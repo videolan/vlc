@@ -102,12 +102,14 @@
         [self.window setLevel: i_level];
 }
 
-- (void)showBookmarks
+- (IBAction)toggleWindow:(id)sender
 {
-    /* show the window, called from intf.m */
-    [self.window displayIfNeeded];
-    [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-    [self.window makeKeyAndOrderFront:nil];
+    if ([self.window isVisible])
+        [self.window orderOut:sender];
+    else {
+        [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [self.window makeKeyAndOrderFront:sender];
+    }
 }
 
 -(void)inputChangedEvent:(NSNotification *)o_notification

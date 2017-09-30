@@ -1216,7 +1216,7 @@
 
 - (IBAction)showBookmarks:(id)sender
 {
-    [[[VLCMain sharedInstance] bookmarks] showBookmarks];
+    [[[VLCMain sharedInstance] bookmarks] toggleWindow:sender];
 }
 
 - (IBAction)showPreferences:(id)sender
