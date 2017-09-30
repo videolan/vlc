@@ -42,11 +42,27 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+typedef struct
+{
+    float       i_value;
+    enum
+    {
+        TTML_UNIT_UNKNOWN = 0,
+        TTML_UNIT_PERCENT,
+        TTML_UNIT_CELL,
+        TTML_UNIT_PIXELS,
+    } unit;
+} ttml_length_t;
+
+#define TTML_DEFAULT_CELL_RESOLUTION_H 32
+#define TTML_DEFAULT_CELL_RESOLUTION_V 15
+#define TTML_LINE_TO_HEIGHT_RATIO      1.06
 
 typedef struct
 {
     text_style_t*   font_style;
-    unsigned        i_cell_height;
+    ttml_length_t   font_size;
+    ttml_length_t   extent_h, extent_v;
     int             i_text_align;
     int             i_direction;
     bool            b_direction_set;
@@ -63,6 +79,8 @@ typedef struct
 {
     vlc_dictionary_t regions;
     tt_node_t *      p_rootnode; /* for now. FIXME: split header */
+    ttml_length_t    root_extent_h, root_extent_v;
+    unsigned         i_cell_resolution_v;
 } ttml_context_t;
 
 typedef struct
@@ -105,7 +123,12 @@ static ttml_style_t * ttml_style_New( )
     if( unlikely( !p_ttml_style ) )
         return NULL;
 
-    p_ttml_style->i_cell_height = 15;
+    p_ttml_style->extent_h.i_value = 100;
+    p_ttml_style->extent_h.unit = TTML_UNIT_PERCENT;
+    p_ttml_style->extent_v.i_value = 100;
+    p_ttml_style->extent_v.unit = TTML_UNIT_PERCENT;
+    p_ttml_style->font_size.i_value = 1.0;
+    p_ttml_style->font_size.unit = TTML_UNIT_CELL;
     p_ttml_style->font_style = text_style_Create( STYLE_NO_DEFAULTS );
     if( unlikely( !p_ttml_style->font_style ) )
     {
@@ -169,6 +192,43 @@ static ttml_region_t *ttml_region_New( )
     return p_ttml_region;
 }
 
+static ttml_length_t ttml_read_length( const char *psz )
+{
+    ttml_length_t len = { 0.0, TTML_UNIT_UNKNOWN };
+
+    char* psz_end = NULL;
+    float size = us_strtof( psz, &psz_end );
+    len.i_value = size;
+    if( psz_end )
+    {
+        if( *psz_end == 'c' || *psz_end == 'r' )
+            len.unit = TTML_UNIT_CELL;
+        else if( *psz_end == '%' )
+            len.unit = TTML_UNIT_PERCENT;
+        else if( *psz_end == 'p' && *(psz_end + 1) == 'x' )
+            len.unit = TTML_UNIT_PIXELS;
+    }
+    return len;
+}
+
+static ttml_length_t ttml_rebase_length( ttml_length_t value,
+                                         ttml_length_t reference,
+                                         unsigned i_cell_resolution )
+{
+    if( value.unit == TTML_UNIT_PERCENT )
+    {
+        value.i_value *= reference.i_value / 100.0;
+        value.unit = reference.unit;
+    }
+    else if( value.unit == TTML_UNIT_CELL )
+    {
+        value.i_value *= reference.i_value / i_cell_resolution;
+        value.unit = reference.unit;
+    }
+    // pixels as-is
+    return value;
+}
+
 static tt_node_t * FindNode( tt_node_t *p_node, const char *psz_nodename,
                              size_t i_maxdepth, const char *psz_id )
 {
@@ -201,7 +261,7 @@ static tt_node_t * FindNode( tt_node_t *p_node, const char *psz_nodename,
 }
 
 static void FillTextStyle( const char *psz_attr, const char *psz_val,
-                           const ttml_style_t *p_ttml_style, text_style_t *p_text_style )
+                           text_style_t *p_text_style )
 {
     if( !strcasecmp ( "tts:fontFamily", psz_attr ) )
     {
@@ -213,20 +273,6 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
         p_text_style->i_background_alpha = atoi( psz_val );
         p_text_style->i_font_alpha = atoi( psz_val );
         p_text_style->i_features |= STYLE_HAS_BACKGROUND_ALPHA | STYLE_HAS_FONT_ALPHA;
-    }
-    else if( !strcasecmp( "tts:fontSize", psz_attr ) )
-    {
-        char* psz_end = NULL;
-        float size = us_strtof( psz_val, &psz_end );
-        if( size > 0.0 )
-        {
-            if( *psz_end == 'c' )
-                p_text_style->f_font_relsize = 100.0 * size / p_ttml_style->i_cell_height;
-            else if( *psz_end == '%' )
-                p_text_style->f_font_relsize = size / p_ttml_style->i_cell_height;
-            else
-                p_text_style->i_font_size = (int)( size + 0.5 );
-        }
     }
     else if( !strcasecmp( "tts:color", psz_attr ) )
     {
@@ -348,23 +394,57 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
     }
 }
 
-static void FillTTMLStylePrio( const vlc_dictionary_t *p_dict,
+static void ReadTTMLExtent( const char *value, ttml_length_t *h, ttml_length_t *v )
+{
+    ttml_length_t vals[2] = { { 0.0, TTML_UNIT_UNKNOWN },
+                              { 0.0, TTML_UNIT_UNKNOWN } };
+    char *dup = strdup( value );
+    char* psz_saveptr = NULL;
+    char* token = (dup) ? strtok_r( dup, " ", &psz_saveptr ) : NULL;
+    for(int i=0; i<2 && token != NULL; i++)
+    {
+        token = strtok_r( NULL, " ", &psz_saveptr );
+        if( token != NULL )
+            vals[i] = ttml_read_length( token );
+    }
+    free( dup );
+
+    if( vals[0].unit != TTML_UNIT_UNKNOWN &&
+        vals[1].unit != TTML_UNIT_UNKNOWN )
+    {
+        *h = vals[0];
+        *v = vals[1];
+    }
+}
+
+static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_dict,
                                ttml_style_t *p_ttml_style )
 {
-    void *value = vlc_dictionary_value_for_key( p_dict, "ttp:cellResolution" );
-    if( value != kVLCDictionaryNotFound )
-    {
-        const char *psz_val = value;
-        unsigned w, h;
-        if( sscanf( psz_val, "%u %u", &w, &h) == 2 && w && h )
-            p_ttml_style->i_cell_height = h;
-    }
+    VLC_UNUSED(p_dict);
+    /* Values depending on multiple others are converted last
+     * Default value conversion must also not depend on attribute presence */
+    text_style_t *p_text_style = p_ttml_style->font_style;
+    ttml_length_t len = p_ttml_style->font_size;
+    len = ttml_rebase_length( len, p_ctx->root_extent_h,
+                              p_ctx->i_cell_resolution_v );
+    if( len.unit == TTML_UNIT_CELL )
+        p_text_style->f_font_relsize = 100.0 * len.i_value /
+                    (p_ctx->i_cell_resolution_v / TTML_LINE_TO_HEIGHT_RATIO);
+    else if( len.unit == TTML_UNIT_PERCENT )
+        p_text_style->f_font_relsize = len.i_value;
+    else if( len.unit == TTML_UNIT_PIXELS )
+        p_text_style->i_font_size = (int)( len.i_value + 0.5 );
 }
 
 static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
                            ttml_style_t *p_ttml_style )
 {
-    if( !strcasecmp( "tts:textAlign", psz_attr ) )
+    if( !strcasecmp( "tts:extent", psz_attr ) )
+    {
+        ReadTTMLExtent( psz_attr, &p_ttml_style->extent_h,
+                                  &p_ttml_style->extent_v );
+    }
+    else if( !strcasecmp( "tts:textAlign", psz_attr ) )
     {
         if( !strcasecmp ( "left", psz_val ) )
             p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
@@ -376,6 +456,12 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
         else if( !strcasecmp ( "end", psz_val ) )  /* FIXME: should be BIDI based */
             p_ttml_style->i_text_align = SUBPICTURE_ALIGN_RIGHT;
+    }
+    else if( !strcasecmp( "tts:fontSize", psz_attr ) )
+    {
+        ttml_length_t len = ttml_read_length( psz_val );
+        if( len.unit != TTML_UNIT_UNKNOWN && len.i_value > 0.0 )
+            p_ttml_style->font_size = len;
     }
     else if( !strcasecmp( "tts:direction", psz_attr ) )
     {
@@ -423,7 +509,7 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
     {
         p_ttml_style->b_preserve_space = !strcmp( "preserve", psz_val );
     }
-    else FillTextStyle( psz_attr, psz_val, p_ttml_style, p_ttml_style->font_style );
+    else FillTextStyle( psz_attr, psz_val, p_ttml_style->font_style );
 }
 
 static void DictionaryMerge( const vlc_dictionary_t *p_src, vlc_dictionary_t *p_dst )
@@ -489,10 +575,9 @@ static void DictMergeWithRegionID( ttml_context_t *p_ctx, const char *psz_id,
     }
 }
 
-static void DictToTTMLStyle( const vlc_dictionary_t *p_dict, ttml_style_t *p_ttml_style )
+static void DictToTTMLStyle( ttml_context_t *p_ctx, const vlc_dictionary_t *p_dict,
+                             ttml_style_t *p_ttml_style )
 {
-    /* Units, defaults, that must be set first to compute styles */
-    FillTTMLStylePrio( p_dict, p_ttml_style );
     for( int i = 0; i < p_dict->i_size; ++i )
     {
         for ( vlc_dictionary_entry_t* p_entry = p_dict->p_entries[i];
@@ -501,6 +586,7 @@ static void DictToTTMLStyle( const vlc_dictionary_t *p_dict, ttml_style_t *p_ttm
             FillTTMLStyle( p_entry->psz_key, p_entry->p_value, p_ttml_style );
         }
     }
+    ComputeTTMLStyles( p_ctx, p_dict, p_ttml_style );
 }
 
 static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_node )
@@ -528,7 +614,7 @@ static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_nod
 
     if( !vlc_dictionary_is_empty( &merged ) && (p_ttml_style = ttml_style_New()) )
     {
-        DictToTTMLStyle( &merged, p_ttml_style );
+        DictToTTMLStyle( p_ctx, &merged, p_ttml_style );
     }
 
     vlc_dictionary_clear( &merged, NULL, NULL );
@@ -756,7 +842,7 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
                 if( p_set_styles != NULL || (p_set_styles = ttml_style_New()) )
                 {
                     /* Merge with or create a local set of styles to apply to following childs */
-                    DictToTTMLStyle( &p_set->attr_dict, p_set_styles );
+                    DictToTTMLStyle( p_ctx, &p_set->attr_dict, p_set_styles );
                 }
             }
         }
@@ -805,6 +891,33 @@ static tt_node_t *ParseTTML( decoder_t *p_dec, const uint8_t *p_buffer, size_t i
     return p_rootnode;
 }
 
+static void InitTTMLContext( tt_node_t *p_rootnode, ttml_context_t *p_ctx )
+{
+    p_ctx->p_rootnode = p_rootnode;
+    /* set defaults required for size/cells computation */
+    p_ctx->root_extent_h.i_value = 100;
+    p_ctx->root_extent_h.unit = TTML_UNIT_PERCENT;
+    p_ctx->root_extent_v.i_value = 100;
+    p_ctx->root_extent_v.unit = TTML_UNIT_PERCENT;
+    p_ctx->i_cell_resolution_v = TTML_DEFAULT_CELL_RESOLUTION_V;
+    /* and override them */
+    const char *value = vlc_dictionary_value_for_key( &p_rootnode->attr_dict,
+                                                      "tts:extent" );
+    if( value != kVLCDictionaryNotFound )
+    {
+        ReadTTMLExtent( value, &p_ctx->root_extent_h,
+                               &p_ctx->root_extent_v );
+    }
+    value = vlc_dictionary_value_for_key( &p_rootnode->attr_dict,
+                                          "ttp:cellResolution" );
+    if( value != kVLCDictionaryNotFound )
+    {
+        unsigned w, h;
+        if( sscanf( value, "%u %u", &w, &h) == 2 && w && h )
+            p_ctx->i_cell_resolution_v = h;
+    }
+}
+
 static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, tt_time_t playbacktime )
 {
     ttml_region_t*  p_regions = NULL;
@@ -816,7 +929,9 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, tt_time_t playback
         if( p_bodynode )
         {
             ttml_context_t context;
+            InitTTMLContext( p_rootnode, &context );
             context.p_rootnode = p_rootnode;
+
             vlc_dictionary_init( &context.regions, 1 );
             ConvertNodesToRegionContent( &context, p_bodynode, NULL, NULL, playbacktime );
 
