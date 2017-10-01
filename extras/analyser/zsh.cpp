@@ -26,7 +26,9 @@
 #endif
 
 #include <stdio.h>
+#include <algorithm>
 #include <map>
+#include <set>
 #include <string>
 #include <sstream>
 
@@ -44,26 +46,25 @@ typedef std::pair<int, std::string> mcpair;
 typedef std::multimap<int, std::string> mcmap;
 mcmap categories;
 
-static void ReplaceChars(char *str)
+std::set<std::string> mnames;
+
+static void ReplaceChars(std::string& str)
 {
-    if (str) {
-        char *parser;
-        while ((parser = strchr(str, ':'))) *parser=';' ;
-        while ((parser = strchr(str, '"'))) *parser='\'' ;
-        while ((parser = strchr(str, '`'))) *parser='\'' ;
-    }
+    std::replace(str.begin(), str.end(), ':', ';');
+    std::replace(str.begin(), str.end(), '"', '\'');
+    std::replace(str.begin(), str.end(), '`', '\'');
 }
 
 static void PrintOption(const module_config_t *item, const std::string &opt,
                         const std::string &excl, const std::string &args)
 {
-    char *longtext = item->psz_longtext;
-    char *text = item->psz_text;
+    std::string longtext = item->psz_longtext ? item->psz_longtext : "";
+    std::string text = item->psz_text ? item->psz_text : "";
     char i_short = item->i_short;
     ReplaceChars(longtext);
     ReplaceChars(text);
 
-    if (!longtext || strchr(longtext, '\n') || strchr(longtext, '('))
+    if (!longtext.length() || longtext.find('\n') != std::string::npos || longtext.find('(') != std::string::npos)
         longtext = text;
 
     printf("  \"");
@@ -75,10 +76,10 @@ static void PrintOption(const module_config_t *item, const std::string &opt,
         if (!excl.empty())
             printf("%s", excl.c_str());
 
-        printf(")--%s%s[%s]", opt.c_str(), args_c, text);
+        printf(")--%s%s[%s]", opt.c_str(), args_c, text.c_str());
 
         if (!args.empty())
-            printf(":%s:%s", longtext, args.c_str());
+            printf(":%s:%s", longtext.c_str(), args.c_str());
 
         printf("\"\\\n  \"(--%s%s)-%c", opt.c_str(), excl.c_str(), i_short);
     } else {
@@ -89,9 +90,9 @@ static void PrintOption(const module_config_t *item, const std::string &opt,
             printf("%s", args_c);
     }
 
-    printf("[%s]", text);
+    printf("[%s]", text.c_str());
     if (!args.empty())
-        printf( ":%s:%s", longtext, args.c_str());
+        printf( ":%s:%s", longtext.c_str(), args.c_str());
     puts( "\"\\");
 }
 
@@ -108,7 +109,7 @@ static void ParseOption(const module_config_t *item)
     switch(item->i_type)
     {
     case CONFIG_ITEM_MODULE:
-        range_mod = capabilities.equal_range(item->psz_type);
+        range_mod = capabilities.equal_range(item->psz_type ? item->psz_type : "");
         args = "(" + (*range_mod.first).second;
         while (range_mod.first++ != range_mod.second)
             args += " " + range_mod.first->second;
@@ -199,24 +200,38 @@ static void PrintModule(const module_t *mod)
     if (mod->psz_capability)
         capabilities.insert(mpair(mod->psz_capability, name));
 
-    module_config_t *max = &mod->p_config[mod->i_config_items];
-    for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
+    unsigned int cfg_size = 0;
+    module_config_t *cfg_list = module_config_get(mod, &cfg_size);
+
+    for (unsigned int j = 0; j < cfg_size; ++j)
+    {
+        const module_config_t *cfg = cfg_list + j;
         if (cfg->i_type == CONFIG_SUBCATEGORY)
             categories.insert(mcpair(cfg->value.i, name));
+    }
 
-    if (!mod->parent)
+    module_config_free(cfg_list);
+
+    if (mnames.find(name) == mnames.end())
+    {
         printf("%s ", name);
+        mnames.insert(name);
+    }
 }
 
 static void ParseModule(const module_t *mod)
 {
-    if (mod->parent)
-        return;
+    unsigned int cfg_size = 0;
+    module_config_t *cfg_list = module_config_get(mod, &cfg_size);
 
-    module_config_t *max = mod->p_config + mod->confsize;
-    for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
+    for (unsigned int j = 0; j < cfg_size; ++j)
+    {
+        const module_config_t *cfg = cfg_list + j;
         if (CONFIG_ITEM(cfg->i_type))
             ParseOption(cfg);
+    }
+
+    module_config_free(cfg_list);
 }
 
 int main(int argc, const char **argv)
