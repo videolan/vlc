@@ -36,7 +36,6 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
-#include "../src/modules/modules.h" /* evil hack */
 
 typedef std::pair<std::string, std::string> mpair;
 typedef std::multimap<std::string, std::string> mumap;
@@ -193,12 +192,14 @@ static void ParseOption(const module_config_t *item)
 
 static void PrintModule(const module_t *mod)
 {
-    const char *name = mod->pp_shortcuts[0];
-    if (!strcmp(name, "main"))
+    if (module_is_main(mod))
         return;
 
-    if (mod->psz_capability)
-        capabilities.insert(mpair(mod->psz_capability, name));
+    const char *name = module_get_object(mod);
+    const char *cap = module_get_capability(mod);
+
+    if (strcmp(cap, "none"))
+        capabilities.insert(mpair(cap, name));
 
     unsigned int cfg_size = 0;
     module_config_t *cfg_list = module_config_get(mod, &cfg_size);
