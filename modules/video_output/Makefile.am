@@ -17,6 +17,7 @@ endif
 
 libglconv_cvpx_plugin_la_SOURCES = video_output/opengl/converter_cvpx.c \
 	video_output/opengl/converter.h
+libglconv_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES)
@@ -28,7 +29,7 @@ libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
 libglconv_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
-libglconv_cvpx_plugin_la_LDFLAGS = -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
+libglconv_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
 	libglconv_cvpx_plugin.la
 endif
