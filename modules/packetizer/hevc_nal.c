@@ -1081,7 +1081,7 @@ static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_s
 }
 
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
-                          hevc_video_parameter_set_t **pp_vps,
+                          const hevc_video_parameter_set_t *p_vps,
                           unsigned *pi_num, unsigned *pi_den )
 {
     if( p_sps->vui_parameters_present_flag && p_sps->vui.vui_timing_info_present_flag )
@@ -1090,11 +1090,10 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
         *pi_num = p_sps->vui.timing.vui_time_scale;
         return (*pi_den && *pi_num);
     }
-    else if( pp_vps && pp_vps[p_sps->sps_video_parameter_set_id] &&
-             pp_vps[p_sps->sps_video_parameter_set_id]->vps_timing_info_present_flag )
+    else if( p_vps && p_vps->vps_timing_info_present_flag )
     {
-        *pi_den = pp_vps[p_sps->sps_video_parameter_set_id]->vps_num_units_in_tick;
-        *pi_num = pp_vps[p_sps->sps_video_parameter_set_id]->vps_time_scale;
+        *pi_den = p_vps->vps_num_units_in_tick;
+        *pi_num = p_vps->vps_time_scale;
         return (*pi_den && *pi_num);
     }
     return false;

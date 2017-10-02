@@ -463,7 +463,7 @@ static void ActivateSets(decoder_t *p_dec,
         if(!p_dec->fmt_in.video.i_frame_rate || !p_dec->fmt_in.video.i_frame_rate_base)
         {
             unsigned num, den;
-            if(hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps, &num, &den ))
+            if(hevc_get_frame_rate( p_sps, p_vps, &num, &den ))
             {
                 p_dec->fmt_out.video.i_frame_rate = num;
                 p_dec->fmt_out.video.i_frame_rate_base = den;
