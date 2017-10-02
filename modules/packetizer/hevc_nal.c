@@ -522,10 +522,22 @@ bool hevc_get_xps_id(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id)
     bs_t bs;
     bs_init(&bs, &p_buf[2], i_buf - 2);
     if(i_nal_type == HEVC_NAL_PPS)
+    {
         *pi_id = bs_read_ue( &bs );
+        if(*pi_id > HEVC_PPS_ID_MAX)
+            return false;
+    }
     else
+    {
         *pi_id = bs_read( &bs, 4 );
-
+        if(i_nal_type == HEVC_NAL_SPS)
+        {
+            if(*pi_id > HEVC_SPS_ID_MAX)
+                return false;
+        }
+        else if(*pi_id > HEVC_VPS_ID_MAX)
+            return false;
+    }
     return true;
 }
 
