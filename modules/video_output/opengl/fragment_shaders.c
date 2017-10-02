@@ -38,6 +38,9 @@
 #ifndef GL_R16
 # define GL_R16 0x822A
 #endif
+#ifndef GL_BGRA
+# define GL_BGRA 0x80E1
+#endif
 #ifndef GL_LUMINANCE16
 # define GL_LUMINANCE16 0x8042
 #endif
@@ -55,8 +58,11 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
         return -1;
 
     GLint tex_param_size;
+    int mul = 1;
     switch (tex_format)
     {
+        case GL_BGRA:
+            mul = 4;
         case GL_RED:
             tex_param_size = GL_TEXTURE_RED_SIZE;
             break;
@@ -75,7 +81,7 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
     tc->vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
     tc->vt->DeleteTextures(1, &texture);
-    return size;
+    return size > 0 ? size * mul : size;
 }
 
 static int
@@ -252,13 +258,28 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 {
     (void) tex_target;
 
-    if (chroma != VLC_CODEC_RGB32)
-        return VLC_EGENERIC;
 
     tc->tex_count = 1;
-    tc->texs[0] = (struct opengl_tex_cfg) {
-        { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
-    };
+    switch (chroma)
+    {
+        case VLC_CODEC_RGB32:
+        case VLC_CODEC_RGBA:
+            tc->texs[0] = (struct opengl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
+            };
+            break;
+        case VLC_CODEC_BGRA: {
+            if (GetTexFormatSize(tc, tex_target, GL_BGRA, GL_RGBA,
+                                 GL_UNSIGNED_BYTE) != 32)
+                return VLC_EGENERIC;
+            tc->texs[0] = (struct opengl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE
+            };
+            break;
+        }
+        default:
+            return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
