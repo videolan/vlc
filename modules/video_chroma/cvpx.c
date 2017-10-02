@@ -89,6 +89,11 @@ static picture_t *CVPX_TO_SW_Filter(filter_t *p_filter, picture_t *src)
     picture_t *src_sw =
         cvpxpic_create_mapped(&p_filter->fmt_out.video, cvpxpic_get_ref(src),
                               true);
+    if (!src_sw)
+    {
+        picture_Release(src);
+        return NULL;
+    }
     picture_CopyProperties(src_sw, src);
     picture_Release(src);
     return src_sw;
