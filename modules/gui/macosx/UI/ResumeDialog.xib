@@ -21,18 +21,17 @@
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="550" height="160"/>
+            <rect key="contentRect" x="196" y="240" width="549" height="160"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="446" height="133"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="550" height="160"/>
+                <rect key="frame" x="0.0" y="0.0" width="549" height="160"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="560" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                        <rect key="frame" x="102" y="83" width="430" height="32"/>
+                    <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3" customClass="VLCWrappableTextField">
+                        <rect key="frame" x="102" y="83" width="429" height="32"/>
                         <constraints>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="YO6-yf-hXE"/>
-                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="128" id="i6c-N2-KuS"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="425" id="kkj-bo-hIa"/>
                         </constraints>
                         <textFieldCell key="cell" truncatesLastVisibleLine="YES" sendsActionOnEndEditing="YES" title="Do you want to resume this file? This-is-a-file" id="4">
                             <font key="font" metaFont="cellTitle"/>
@@ -40,7 +39,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="42">
+                    <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="42">
                         <rect key="frame" x="102" y="123" width="132" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Continue playback?" id="43">
                             <font key="font" metaFont="systemBold"/>
@@ -56,7 +55,7 @@
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="VLC" id="56"/>
                     </imageView>
-                    <button translatesAutoresizingMaskIntoConstraints="NO" id="85X-TN-2Hu">
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="85X-TN-2Hu">
                         <rect key="frame" x="102" y="59" width="219" height="18"/>
                         <buttonCell key="cell" type="check" title="Always continue media playback" bezelStyle="regularSquare" imagePosition="left" inset="2" id="xHm-jn-IdY">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -66,8 +65,8 @@
                             <action selector="resumeSettingChanged:" target="-2" id="alS-ps-u5T"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21">
-                        <rect key="frame" x="441" y="13" width="95" height="32"/>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21">
+                        <rect key="frame" x="440" y="13" width="95" height="32"/>
                         <buttonCell key="cell" type="push" title="Continue" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="22">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -79,8 +78,8 @@ DQ
                             <action selector="buttonClicked:" target="-2" id="54"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                        <rect key="frame" x="357" y="13" width="84" height="32"/>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9">
+                        <rect key="frame" x="356" y="13" width="84" height="32"/>
                         <buttonCell key="cell" type="push" title="Restart" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -102,6 +101,7 @@ DQ
                     <constraint firstAttribute="bottom" secondItem="9" secondAttribute="bottom" constant="20" id="SZk-pu-Lgd"/>
                     <constraint firstAttribute="bottom" secondItem="21" secondAttribute="bottom" constant="20" id="fiW-7M-G63"/>
                     <constraint firstItem="55" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="lQU-ef-GZw"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="85X-TN-2Hu" secondAttribute="trailing" constant="20" id="mew-JH-yRV"/>
                     <constraint firstItem="21" firstAttribute="top" secondItem="85X-TN-2Hu" secondAttribute="bottom" constant="20" id="p8X-Vs-WZx"/>
                     <constraint firstItem="21" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="12" id="xrB-He-ihV"/>
                     <constraint firstItem="42" firstAttribute="leading" secondItem="55" secondAttribute="trailing" constant="19" id="yR0-JV-Hcv"/>

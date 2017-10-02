@@ -70,6 +70,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/Windows.h gui/macosx/Windows.m \
 	gui/macosx/VLCAudioEffectsWindowController.h gui/macosx/VLCAudioEffectsWindowController.m \
 	gui/macosx/VLCBookmarksWindowController.h gui/macosx/VLCBookmarksWindowController.m \
+	gui/macosx/VLCBottomBarView.h gui/macosx/VLCBottomBarView.m \
 	gui/macosx/VLCCoreDialogProvider.h gui/macosx/VLCCoreDialogProvider.m \
 	gui/macosx/VLCLogMessage.h gui/macosx/VLCLogMessage.m \
 	gui/macosx/VLCLogWindowController.h gui/macosx/VLCLogWindowController.m \
@@ -104,7 +105,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m \
 	gui/macosx/VLCVolumeSlider.h gui/macosx/VLCVolumeSlider.m \
 	gui/macosx/VLCVolumeSliderCell.h gui/macosx/VLCVolumeSliderCell.m \
-	gui/macosx/VLCBottomBarView.h gui/macosx/VLCBottomBarView.m
+	gui/macosx/VLCWrappableTextField.h gui/macosx/VLCWrappableTextField.m
+
 
 # User interface compilation
 
