@@ -29,7 +29,8 @@ libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
 libglconv_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
-libglconv_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
+libglconv_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface \
+	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,OpenGL
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
 	libglconv_cvpx_plugin.la
 endif
