@@ -644,9 +644,9 @@ static bool hevc_parse_video_parameter_set_rbsp( bs_t *p_bs,
                       0 : p_vps->vps_max_sub_layers_minus1);
          i<= p_vps->vps_max_sub_layers_minus1; i++ )
     {
-        (void) bs_read_ue( p_bs ); //nal_ue_t dec_pic_buffering_minus1;
-        (void) bs_read_ue( p_bs ); //nal_ue_t num_reorder_pics;
-        (void) bs_read_ue( p_bs ); //nal_ue_t max_latency_increase_plus1;
+        p_vps->vps_max[i].dec_pic_buffering_minus1 = bs_read_ue( p_bs );
+        p_vps->vps_max[i].num_reorder_pics = bs_read_ue( p_bs );
+        p_vps->vps_max[i].max_latency_increase_plus1 = bs_read_ue( p_bs );
     }
     if( bs_remain( p_bs ) < 10 )
         return false;
@@ -1041,6 +1041,11 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
         *p_vh -= p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset;
     }
     return true;
+}
+
+uint8_t hevc_get_max_num_reorder( const hevc_video_parameter_set_t *p_vps )
+{
+    return p_vps->vps_max[0/* base layer */].num_reorder_pics;
 }
 
 static inline uint8_t vlc_ceil_log2( uint32_t val )
