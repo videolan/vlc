@@ -460,7 +460,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2809">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2809" customClass="VLCWrappableTextField">
                                             <rect key="frame" x="17" y="149" width="493" height="28"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2887">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -481,13 +481,15 @@
                                         </button>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="2810" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2809" secondAttribute="bottom" constant="20" id="3QW-iu-DXR"/>
                                         <constraint firstItem="730" firstAttribute="leading" secondItem="725" secondAttribute="trailing" constant="7" id="6Tj-OE-JsJ"/>
-                                        <constraint firstItem="2810" firstAttribute="centerY" secondItem="683" secondAttribute="centerY" constant="30" id="9SY-uJ-aSg"/>
+                                        <constraint firstItem="2810" firstAttribute="centerY" secondItem="683" secondAttribute="centerY" priority="700" constant="30" id="9SY-uJ-aSg"/>
                                         <constraint firstItem="730" firstAttribute="top" secondItem="683" secondAttribute="top" constant="20" id="9s2-QQ-87x"/>
                                         <constraint firstAttribute="trailing" secondItem="730" secondAttribute="trailing" constant="20" id="Q7k-zl-RYB"/>
                                         <constraint firstItem="725" firstAttribute="centerY" secondItem="730" secondAttribute="centerY" id="Sbf-Lc-mLX"/>
                                         <constraint firstItem="2809" firstAttribute="top" secondItem="730" secondAttribute="bottom" constant="13" id="UaZ-hu-QkV"/>
                                         <constraint firstItem="2810" firstAttribute="centerX" secondItem="683" secondAttribute="centerX" id="XkU-DX-2Ar"/>
+                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2810" secondAttribute="bottom" constant="20" id="eJe-XV-eRj"/>
                                         <constraint firstItem="725" firstAttribute="leading" secondItem="683" secondAttribute="leading" constant="19" id="eYD-RW-TKf"/>
                                         <constraint firstItem="2809" firstAttribute="trailing" secondItem="730" secondAttribute="trailing" id="vhk-vw-m5p"/>
                                         <constraint firstItem="2809" firstAttribute="leading" secondItem="725" secondAttribute="leading" id="yhg-Eg-xBD"/>
@@ -534,7 +536,7 @@ Gw
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="03DB12E1-9518-49E5-9F7A-38F9B0BB0B07" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="D7A0CD31-0169-446A-A58D-337466FC8F67" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -1461,8 +1463,8 @@ Gw
                             <action selector="openNetUDPButtonAction:" target="-2" id="jxT-wR-kT9"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2811">
-                        <rect key="frame" x="22" y="57" width="652" height="70"/>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2811" customClass="VLCWrappableTextField">
+                        <rect key="frame" x="17" y="57" width="662" height="70"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2986">
                             <font key="font" metaFont="smallSystem"/>
                             <string key="title">If you want to open a multicast stream, enter the respective IP address given by the stream provider. In unicast mode, VLC uses your machine's IP automatically.
@@ -1529,7 +1531,6 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2860" firstAttribute="top" secondItem="2852" secondAttribute="bottom" constant="10" id="A44-Pb-RLR"/>
                     <constraint firstItem="2852" firstAttribute="leading" secondItem="2793" secondAttribute="leading" constant="36" id="AFT-te-FAa"/>
                     <constraint firstItem="2808" firstAttribute="top" secondItem="2811" secondAttribute="bottom" constant="17" id="CBv-Rs-fOh"/>
-                    <constraint firstItem="2811" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2801" secondAttribute="bottom" constant="17" id="EV8-jG-FKj"/>
                     <constraint firstItem="2853" firstAttribute="leading" secondItem="2794" secondAttribute="leading" id="Flk-xE-dCg"/>
                     <constraint firstItem="2794" firstAttribute="top" secondItem="2853" secondAttribute="bottom" constant="10" id="Igp-RM-1Y5"/>
                     <constraint firstItem="2808" firstAttribute="centerY" secondItem="2807" secondAttribute="centerY" id="Iy4-pX-L4Z"/>
@@ -1543,7 +1544,6 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstAttribute="bottom" secondItem="2807" secondAttribute="bottom" constant="19" id="QhV-Oj-y5a"/>
                     <constraint firstItem="2803" firstAttribute="centerY" secondItem="2804" secondAttribute="centerY" id="TUP-sC-HQd"/>
                     <constraint firstItem="2799" firstAttribute="centerY" secondItem="2800" secondAttribute="centerY" id="TX5-95-yCI"/>
-                    <constraint firstItem="2811" firstAttribute="centerX" secondItem="2793" secondAttribute="centerX" id="TgD-Vr-drz"/>
                     <constraint firstItem="2854" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2853" secondAttribute="trailing" constant="17" placeholder="YES" id="Uu3-Q5-9fi"/>
                     <constraint firstItem="2801" firstAttribute="centerY" secondItem="2798" secondAttribute="centerY" id="Vf8-Vl-OQ3"/>
                     <constraint firstItem="2797" firstAttribute="top" secondItem="2854" secondAttribute="bottom" constant="11" id="VhZ-kk-edE"/>
@@ -1554,12 +1554,13 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2853" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2852" secondAttribute="trailing" constant="17" id="dyz-J7-929"/>
                     <constraint firstItem="2852" firstAttribute="leading" secondItem="2860" secondAttribute="leading" id="eWW-Cl-s2C"/>
                     <constraint firstAttribute="trailing" secondItem="2807" secondAttribute="trailing" constant="20" id="eqK-2H-3qB"/>
+                    <constraint firstItem="2811" firstAttribute="top" secondItem="2860" secondAttribute="bottom" constant="28" id="euO-Dv-ab2"/>
                     <constraint firstItem="2803" firstAttribute="leading" secondItem="2802" secondAttribute="trailing" constant="7" id="feT-zt-W1v"/>
                     <constraint firstItem="2794" firstAttribute="leading" secondItem="2860" secondAttribute="trailing" constant="40" id="hU5-Mn-ivi"/>
                     <constraint firstItem="2800" firstAttribute="leading" secondItem="2799" secondAttribute="trailing" constant="8" id="kzG-8t-8V9"/>
-                    <constraint firstItem="2811" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2793" secondAttribute="leading" constant="19" id="mSq-9N-Q0E"/>
+                    <constraint firstItem="2811" firstAttribute="leading" secondItem="2793" secondAttribute="leading" constant="19" id="mSq-9N-Q0E"/>
                     <constraint firstItem="2797" firstAttribute="centerY" secondItem="2799" secondAttribute="centerY" id="o23-eX-HGr"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2811" secondAttribute="trailing" constant="19" id="o8m-te-c2O"/>
+                    <constraint firstAttribute="trailing" secondItem="2811" secondAttribute="trailing" constant="19" id="o8m-te-c2O"/>
                     <constraint firstItem="2852" firstAttribute="top" secondItem="2793" secondAttribute="top" constant="20" id="rQ9-ZJ-SGa"/>
                     <constraint firstItem="2804" firstAttribute="leading" secondItem="2803" secondAttribute="trailing" constant="8" id="y1j-kM-eXP"/>
                 </constraints>
@@ -1967,7 +1968,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="03DB12E1-9518-49E5-9F7A-38F9B0BB0B07" width="1" height="1">
+        <image name="D7A0CD31-0169-446A-A58D-337466FC8F67" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
