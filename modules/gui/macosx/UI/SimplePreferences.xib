@@ -267,7 +267,6 @@ Gw
                                 <constraint firstItem="3636" firstAttribute="top" secondItem="uTV-TS-NBc" secondAttribute="top" constant="9" id="rXM-tR-QmR"/>
                             </constraints>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
                 </subviews>
                 <constraints>
@@ -387,7 +386,6 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="3600" secondAttribute="trailing" constant="20" id="uep-X9-H4z"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Playback control" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
                     <rect key="frame" x="18" y="313" width="563" height="142"/>
@@ -463,7 +461,6 @@ Gw
                             <constraint firstItem="3542" firstAttribute="top" secondItem="3919" secondAttribute="bottom" constant="14" id="vZI-fE-nJ7"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box verticalHuggingPriority="251" verticalCompressionResistancePriority="751" title="Playback behaviour" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
                     <rect key="frame" x="18" y="223" width="563" height="86"/>
@@ -515,7 +512,6 @@ Gw
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="3911" secondAttribute="bottom" constant="11" id="PWH-HQ-Y6B"/>
                     </constraints>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Privacy / Network Interaction" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
                     <rect key="frame" x="18" y="112" width="563" height="107"/>
@@ -565,7 +561,6 @@ Gw
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3556" secondAttribute="trailing" constant="17" id="XUj-7I-zjk"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="HTTP Server" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
                     <rect key="frame" x="16" y="16" width="563" height="89"/>
@@ -616,7 +611,6 @@ Gw
                             <constraint firstItem="3875" firstAttribute="top" secondItem="lpZ-9y-Vfn" secondAttribute="bottom" constant="12" id="g8b-hJ-m2Y"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
             </subviews>
             <constraints>
@@ -720,7 +714,6 @@ Gw
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2365" secondAttribute="trailing" constant="17" id="oTe-cp-70l"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Effects" translatesAutoresizingMaskIntoConstraints="NO" id="2347">
                     <rect key="frame" x="17" y="139" width="560" height="59"/>
@@ -763,7 +756,6 @@ Gw
                             <constraint firstItem="2358" firstAttribute="centerY" secondItem="2357" secondAttribute="centerY" id="y22-8V-YcZ"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="General Audio" translatesAutoresizingMaskIntoConstraints="NO" id="2332">
                     <rect key="frame" x="17" y="204" width="560" height="178"/>
@@ -918,7 +910,6 @@ Gw
                             <constraint firstItem="3664" firstAttribute="top" secondItem="sX1-um-Nbr" secondAttribute="top" constant="10" id="ydK-et-WGv"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <button verticalHuggingPriority="251" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2331">
                     <rect key="frame" x="18" y="389" width="101" height="18"/>
@@ -1025,7 +1016,6 @@ Gw
                             <constraint firstItem="2451" firstAttribute="top" secondItem="rpy-5O-tek" secondAttribute="bottom" constant="12" id="y3H-yC-OW5"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Fullscreen" translatesAutoresizingMaskIntoConstraints="NO" id="9CN-jv-NQ1">
                     <rect key="frame" x="17" y="229" width="548" height="118"/>
@@ -1106,7 +1096,6 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="74n-z2-A2G" secondAttribute="trailing" constant="17" id="yZy-4L-b2e"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Video" translatesAutoresizingMaskIntoConstraints="NO" id="3722">
                     <rect key="frame" x="17" y="136" width="548" height="89"/>
@@ -1181,7 +1170,6 @@ Gw
                             <constraint firstItem="3705" firstAttribute="leading" secondItem="3707" secondAttribute="leading" id="zyL-Bg-DpF"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Video snapshots" translatesAutoresizingMaskIntoConstraints="NO" id="2466">
                     <rect key="frame" x="17" y="16" width="548" height="116"/>
@@ -1304,7 +1292,6 @@ Gw
                             <constraint firstItem="2470" firstAttribute="centerY" secondItem="2468" secondAttribute="centerY" id="vNq-re-dl4"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hrj-mH-eqd" userLabel="half size helper view">
                     <rect key="frame" x="291" y="459" width="271" height="23"/>
@@ -1388,7 +1375,6 @@ Gw
                     <constraints>
                         <constraint firstItem="3614" firstAttribute="leading" secondItem="3623" secondAttribute="leading" constant="16" id="YUQ-6L-lr3"/>
                     </constraints>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Network" translatesAutoresizingMaskIntoConstraints="NO" id="2563">
                     <rect key="frame" x="17" y="276" width="538" height="62"/>
@@ -1416,7 +1402,6 @@ Gw
                         <constraint firstItem="3742" firstAttribute="leading" secondItem="2563" secondAttribute="leading" constant="16" id="0wq-Sm-I8k"/>
                         <constraint firstAttribute="trailing" secondItem="3742" secondAttribute="trailing" constant="16" id="tGu-zJ-RHQ"/>
                     </constraints>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Caching" translatesAutoresizingMaskIntoConstraints="NO" id="2572">
                     <rect key="frame" x="17" y="183" width="538" height="88"/>
@@ -1474,7 +1459,6 @@ Gw
                             <constraint firstItem="2574" firstAttribute="centerY" secondItem="2580" secondAttribute="centerY" id="yq3-Ir-bxc"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="Codecs / Muxers" translatesAutoresizingMaskIntoConstraints="NO" id="2585">
                     <rect key="frame" x="17" y="16" width="538" height="160"/>
@@ -1602,7 +1586,6 @@ Gw
                             <constraint firstItem="2593" firstAttribute="leading" secondItem="2592" secondAttribute="leading" id="raR-vS-fzh"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
             </subviews>
             <constraints>
@@ -1861,7 +1844,6 @@ Gw
                             <constraint firstItem="2541" firstAttribute="centerY" secondItem="2543" secondAttribute="centerY" id="z02-2p-mxY"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="On Screen Display" translatesAutoresizingMaskIntoConstraints="NO" id="2524">
                     <rect key="frame" x="17" y="328" width="537" height="53"/>
@@ -1887,7 +1869,6 @@ Gw
                             <constraint firstItem="2526" firstAttribute="leading" secondItem="GNq-vl-Idl" secondAttribute="leading" constant="16" id="vBb-ey-eQ6"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
                 <box title="SPU language" translatesAutoresizingMaskIntoConstraints="NO" id="1aw-Yd-yzY">
                     <rect key="frame" x="17" y="235" width="537" height="87"/>
@@ -1959,7 +1940,6 @@ Gw
                             <constraint firstItem="2530" firstAttribute="leading" secondItem="2529" secondAttribute="trailing" constant="17" id="yQq-El-4Ln"/>
                         </constraints>
                     </view>
-                    <font key="titleFont" metaFont="message" size="11"/>
                 </box>
             </subviews>
             <constraints>
@@ -2026,6 +2006,9 @@ Gw
                             </tableView>
                         </subviews>
                     </clipView>
+                    <constraints>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="311" id="fAq-ky-igL"/>
+                    </constraints>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="3540">
                         <rect key="frame" x="1" y="294" width="528" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
