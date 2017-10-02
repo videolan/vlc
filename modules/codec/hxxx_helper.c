@@ -687,26 +687,50 @@ h264_helper_get_current_sps(const struct hxxx_helper *hh)
 }
 
 int
-h264_helper_get_current_picture_size(const struct hxxx_helper *hh,
+hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
                                      unsigned *p_w, unsigned *p_h,
                                      unsigned *p_vw, unsigned *p_vh)
 {
-    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-    if (hsps == NULL)
-        return VLC_EGENERIC;
-    return h264_get_picture_size(hsps->h264_sps, p_w, p_h, p_vw, p_vh) ?
-           VLC_SUCCESS : VLC_EGENERIC;
+    if(hh->i_codec == VLC_CODEC_H264)
+    {
+        const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+        if (hsps && h264_get_picture_size(hsps->h264_sps, p_w, p_h, p_vw, p_vh))
+               return VLC_SUCCESS;
+    }
+    else if(hh->i_codec == VLC_CODEC_HEVC)
+    {
+        const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
+        if(hsps && hevc_get_picture_size(hsps->hevc_sps, p_w, p_h, p_vw, p_vh))
+            return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
 }
 
 int
-h264_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den)
+hxxx_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den)
 {
-    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-    if (hsps == NULL)
-        return VLC_EGENERIC;
-    *p_num = hsps->h264_sps->vui.i_sar_num;
-    *p_den = hsps->h264_sps->vui.i_sar_den;
-    return VLC_SUCCESS;
+    if(hh->i_codec == VLC_CODEC_H264)
+    {
+        const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+        if (hsps)
+        {
+            *p_num = hsps->h264_sps->vui.i_sar_num;
+            *p_den = hsps->h264_sps->vui.i_sar_den;
+            return VLC_SUCCESS;
+        }
+    }
+    else if(hh->i_codec == VLC_CODEC_HEVC)
+    {
+        const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
+        unsigned num, den;
+        if(hsps && hevc_get_aspect_ratio(hsps->hevc_sps, &num, &den))
+        {
+            *p_num = num;
+            *p_den = den;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
 }
 
 int
@@ -721,15 +745,27 @@ h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
 }
 
 int
-h264_helper_get_current_profile_level(const struct hxxx_helper *hh,
+hxxx_helper_get_current_profile_level(const struct hxxx_helper *hh,
                                       uint8_t *p_profile, uint8_t *p_level)
 {
-    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-    if (hsps == NULL)
-        return VLC_EGENERIC;
-    *p_profile = hsps->h264_sps->i_profile;
-    *p_level = hsps->h264_sps->i_level;
-    return VLC_SUCCESS;
+    if(hh->i_codec == VLC_CODEC_H264)
+    {
+        const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+        if (hsps)
+        {
+            *p_profile = hsps->h264_sps->i_profile;
+            *p_level = hsps->h264_sps->i_level;
+            return VLC_SUCCESS;
+        }
+    }
+    else if(hh->i_codec == VLC_CODEC_HEVC)
+    {
+        const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
+        if (hsps &&
+            hevc_get_sps_profile_tier_level(hsps->hevc_sps, p_profile, p_level))
+            return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
 }
 
 int

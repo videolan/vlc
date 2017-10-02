@@ -258,7 +258,7 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
         CSDInit(p_dec, p_spspps_blocks, 2);
 
     unsigned i_w, i_h, i_vw, i_vh;
-    h264_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
+    hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
 
     if (p_size_changed)
         *p_size_changed = (i_w != p_dec->fmt_out.video.i_width
