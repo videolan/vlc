@@ -209,6 +209,13 @@ typedef struct
     bool first_picture; /* Must be set on start or on NAL_EOS */
 } hevc_poc_ctx_t;
 
+static inline void hevc_poc_cxt_init( hevc_poc_ctx_t *p_ctx )
+{
+    p_ctx->prevPicOrderCnt.lsb = 0;
+    p_ctx->prevPicOrderCnt.msb = 0;
+    p_ctx->first_picture = true;
+}
+
 int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
                                        const hevc_slice_segment_header_t *slice,
                                        hevc_poc_ctx_t *ctx );
