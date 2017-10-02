@@ -214,6 +214,10 @@ endif
 FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
+ifdef HAVE_NACL
+FFMPEGCONF+=--disable-inline-asm --disable-asm --target-os=linux
+endif
+
 # Build
 PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale"),)
