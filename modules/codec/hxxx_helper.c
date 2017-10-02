@@ -49,32 +49,36 @@ hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
     hh->b_need_xvcC = b_need_xvcC;
 }
 
+#define RELEASE_NALS(list, max, release) \
+    for (size_t i = 0; i <= max; ++i) \
+    { \
+        hnal = &list[i]; \
+        if (hnal->b) \
+        { \
+            block_Release(hnal->b); \
+            release; \
+        } \
+    }
+
 void
 hxxx_helper_clean(struct hxxx_helper *hh)
 {
+    struct hxxx_helper_nal *hnal;
     switch (hh->i_codec)
     {
         case VLC_CODEC_H264:
-            for (size_t i = 0; i <= H264_SPS_ID_MAX; ++i)
-            {
-                struct hxxx_helper_nal *hnal = &hh->h264.sps_list[i];
-                if (hnal->b)
-                {
-                    block_Release(hnal->b);
-                    h264_release_sps(hnal->h264_sps);
-                }
-            }
-            for (size_t i = 0; i <= H264_PPS_ID_MAX; ++i)
-            {
-                struct hxxx_helper_nal *hnal = &hh->h264.pps_list[i];
-                if (hnal->b)
-                {
-                    block_Release(hnal->b);
-                    h264_release_pps(hnal->h264_pps);
-                }
-            }
+            RELEASE_NALS(hh->h264.sps_list, H264_SPS_ID_MAX,
+                         h264_release_sps(hnal->h264_sps));
+            RELEASE_NALS(hh->h264.pps_list, H264_PPS_ID_MAX,
+                         h264_release_pps(hnal->h264_pps));
             break;
         case VLC_CODEC_HEVC:
+            RELEASE_NALS(hh->hevc.vps_list, HEVC_VPS_ID_MAX,
+                         hevc_rbsp_release_vps(hnal->hevc_vps));
+            RELEASE_NALS(hh->hevc.sps_list, HEVC_SPS_ID_MAX,
+                         hevc_rbsp_release_sps(hnal->hevc_sps));
+            RELEASE_NALS(hh->hevc.pps_list, HEVC_PPS_ID_MAX,
+                         hevc_rbsp_release_pps(hnal->hevc_pps));
             free(hh->hevc.p_annexb_config_nal);
             break;
         default:
@@ -125,12 +129,6 @@ helper_search_nal(const struct hxxx_helper_nal *p_nal_list, size_t i_nal_count,
     }
     return NULL;
 }
-#define helper_search_sps(hh, p_nal, i_nal) \
-    helper_search_nal(hh->h264.sps_list, hh->h264.i_sps_count, \
-                      H264_SPS_ID_MAX+1, p_nal, i_nal)
-#define helper_search_pps(hh, p_nal, i_nal) \
-    helper_search_nal(hh->h264.pps_list, hh->h264.i_pps_count, \
-                      H264_PPS_ID_MAX+1, p_nal, i_nal)
 
 static inline bool
 helper_nal_length_valid(struct hxxx_helper *hh)
@@ -138,6 +136,27 @@ helper_nal_length_valid(struct hxxx_helper *hh)
     return hh->i_nal_length_size == 1 || hh->i_nal_length_size == 2
         || hh->i_nal_length_size == 4;
 }
+
+#define LOAD_xPS(list, count, id, max, xpstype, xpsdecode, xpsrelease) \
+    if (helper_search_nal(list, count, max+1, p_nal, i_nal) != NULL)\
+        continue;\
+    xpstype *p_xps = xpsdecode(p_nal, i_nal, true);\
+    if (!p_xps)\
+        return VLC_EGENERIC;\
+\
+    struct hxxx_helper_nal *hnal = &list[id];\
+    if (helper_dup_buf(hnal, p_nal, i_nal))\
+    {\
+        xpsrelease(p_xps);\
+        return VLC_EGENERIC;\
+    }\
+    if (hnal->xps)\
+        xpsrelease(hnal->xps);\
+    else\
+        count++;\
+\
+    hnal->xps = p_xps;\
+    *p_config_changed = true
 
 static int
 h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf,
@@ -159,53 +178,22 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
 
         if (i_nal_type == H264_NAL_SPS)
         {
-            if (helper_search_sps(hh, p_nal, i_nal) != NULL)
-                continue;
-            h264_sequence_parameter_set_t *p_sps =
-                h264_decode_sps(p_nal, i_nal, true);
-            if (!p_sps)
-                return VLC_EGENERIC;
-
-            struct hxxx_helper_nal *hnal = &hh->h264.sps_list[p_sps->i_id];
-            if (helper_dup_buf(hnal, p_nal, i_nal))
-            {
-                h264_release_sps(p_sps);
-                return VLC_EGENERIC;
-            }
-            if (hnal->h264_sps)
-                h264_release_sps(hnal->h264_sps);
-            else
-                hh->h264.i_sps_count++;
-
-            hnal->h264_sps = p_sps;
-            *p_config_changed = true;
-            hh->h264.i_current_sps = p_sps->i_id;
-            msg_Dbg(hh->p_obj, "new SPS parsed: %u", p_sps->i_id);
+            LOAD_xPS(hh->h264.sps_list, hh->h264.i_sps_count,
+                     p_xps->i_id, H264_SPS_ID_MAX,
+                     h264_sequence_parameter_set_t,
+                     h264_decode_sps,
+                     h264_release_sps);
+            hh->h264.i_current_sps = ((h264_sequence_parameter_set_t*)p_xps)->i_id;
+            msg_Dbg(hh->p_obj, "new SPS parsed: %u", hh->h264.i_current_sps);
         }
         else if (i_nal_type == H264_NAL_PPS)
         {
-            if (helper_search_pps(hh, p_nal, i_nal) != NULL)
-                continue;
-            h264_picture_parameter_set_t *p_pps =
-                h264_decode_pps(p_nal, i_nal, true);
-            if (!p_pps)
-                return VLC_EGENERIC;
-
-            struct hxxx_helper_nal *hnal = &hh->h264.pps_list[p_pps->i_id];
-
-            if (helper_dup_buf(hnal, p_nal, i_nal))
-            {
-                h264_release_pps(p_pps);
-                return VLC_EGENERIC;
-            }
-            if (hnal->h264_pps)
-                h264_release_pps(hnal->h264_pps);
-            else
-                hh->h264.i_pps_count++;
-
-            hnal->h264_pps = p_pps;
-            *p_config_changed = true;
-            msg_Dbg(hh->p_obj, "new PPS parsed: %u", p_pps->i_id);
+            LOAD_xPS(hh->h264.pps_list, hh->h264.i_pps_count,
+                     p_xps->i_id, H264_PPS_ID_MAX,
+                     h264_picture_parameter_set_t,
+                     h264_decode_pps,
+                     h264_release_pps);
+            msg_Dbg(hh->p_obj, "new PPS parsed: %u", ((h264_picture_parameter_set_t*)p_xps)->i_id);
         }
         else if (i_nal_type <= H264_NAL_SLICE_IDR
               && i_nal_type != H264_NAL_UNKNOWN)
@@ -239,6 +227,98 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                 if (hsps->h264_sps->i_id != hh->h264.i_current_sps)
                 {
                     hh->h264.i_current_sps = hsps->h264_sps->i_id;
+                    *p_config_changed = true;
+                }
+            }
+            break; /* No need to parse further NAL */
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static int
+hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf,
+                      uint8_t i_nal_length_size, bool *p_config_changed)
+{
+    const uint8_t *p_nal;
+    size_t i_nal;
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init(&it, p_buf, i_buf, i_nal_length_size);
+    *p_config_changed = false;
+
+    while ((i_nal_length_size) ? hxxx_iterate_next(&it, &p_nal, &i_nal)
+                               : hxxx_annexb_iterate_next(&it, &p_nal, &i_nal))
+    {
+        if (i_nal < 2 || hevc_getNALLayer(p_nal) > 0)
+            continue;
+
+        const uint8_t i_nal_type = hevc_getNALType(p_nal);
+        if (i_nal_type == HEVC_NAL_VPS)
+        {
+            uint8_t i_id;
+            if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
+                return VLC_EGENERIC;
+            LOAD_xPS(hh->hevc.vps_list, hh->hevc.i_vps_count,
+                     i_id, HEVC_VPS_ID_MAX,
+                     hevc_video_parameter_set_t,
+                     hevc_decode_vps,
+                     hevc_rbsp_release_vps);
+            msg_Dbg(hh->p_obj, "new VPS parsed: %u", i_id);
+        }
+        else if (i_nal_type == HEVC_NAL_SPS)
+        {
+            uint8_t i_id;
+            if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
+                return VLC_EGENERIC;
+            LOAD_xPS(hh->hevc.sps_list, hh->hevc.i_sps_count,
+                     i_id, HEVC_SPS_ID_MAX,
+                     hevc_sequence_parameter_set_t,
+                     hevc_decode_sps,
+                     hevc_rbsp_release_sps);
+            msg_Dbg(hh->p_obj, "new SPS parsed: %u", i_id);
+        }
+        else if (i_nal_type == HEVC_NAL_PPS)
+        {
+            uint8_t i_id;
+            if( !hevc_get_xps_id(p_nal, i_nal, &i_id) )
+                return VLC_EGENERIC;
+            LOAD_xPS(hh->hevc.pps_list, hh->hevc.i_pps_count,
+                     i_id, HEVC_PPS_ID_MAX,
+                     hevc_picture_parameter_set_t,
+                     hevc_decode_pps,
+                     hevc_rbsp_release_pps);
+            msg_Dbg(hh->p_obj, "new PPS parsed: %u", i_id);
+        }
+        else if (i_nal_type <= HEVC_NAL_IRAP_VCL23)
+        {
+            if (hh->hevc.i_sps_count > 1 || hh->hevc.i_vps_count > 1)
+            {
+                /* Get the PPS id from the slice: inspirated from
+                 * h264_decode_slice() */
+                bs_t s;
+                bs_init(&s, p_nal, i_nal);
+                bs_skip(&s, 2);
+                unsigned i_id = bs_read_ue(&s);
+                if (i_id > HEVC_PPS_ID_MAX)
+                    return VLC_EGENERIC;
+
+                struct hxxx_helper_nal *xps = &hh->hevc.pps_list[i_id];
+                if (xps->b == NULL)
+                    return VLC_EGENERIC;
+
+                const uint8_t i_spsid = hevc_get_pps_sps_id(xps->hevc_pps);
+                xps = &hh->hevc.sps_list[i_spsid];
+                if (xps->b == NULL)
+                    return VLC_EGENERIC;
+
+                i_id = hevc_get_sps_vps_id(xps->hevc_sps);
+                xps = &hh->hevc.vps_list[i_id];
+
+                if (i_spsid != hh->hevc.i_current_sps ||
+                    i_id != hh->hevc.i_current_vps)
+                {
+                    hh->hevc.i_current_sps = i_spsid;
+                    hh->hevc.i_current_vps = i_id;
                     *p_config_changed = true;
                 }
             }
@@ -353,20 +433,42 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
         return VLC_EGENERIC;
 }
 
-static block_t *
-helper_process_block_h264_annexb(struct hxxx_helper *hh, block_t *p_block,
-                                 bool *p_config_changed)
+static inline block_t *
+helper_process_block_hxxx_annexb(struct hxxx_helper *hh,
+                                 int(*parser)(struct hxxx_helper *,
+                                              const uint8_t*, size_t,uint8_t,bool*),
+                                 block_t *p_block, bool *p_config_changed)
 {
     if (p_config_changed != NULL)
     {
-        int i_ret = h264_helper_parse_nal(hh, p_block->p_buffer,
-                                          p_block->i_buffer, 0, p_config_changed);
+        int i_ret = parser(hh, p_block->p_buffer, p_block->i_buffer,
+                           0, p_config_changed);
         if (i_ret != VLC_SUCCESS)
         {
             block_Release(p_block);
             return NULL;
         }
     }
+    return p_block;
+}
+
+static block_t *
+helper_process_block_h264_annexb(struct hxxx_helper *hh, block_t *p_block,
+                                 bool *p_config_changed)
+{
+    if (p_config_changed != NULL)
+        return helper_process_block_hxxx_annexb(hh, h264_helper_parse_nal,
+                                                p_block,p_config_changed);
+    return p_block;
+}
+
+static block_t *
+helper_process_block_hevc_annexb(struct hxxx_helper *hh, block_t *p_block,
+                                 bool *p_config_changed)
+{
+    if (p_config_changed != NULL)
+        return helper_process_block_hxxx_annexb(hh, hevc_helper_parse_nal,
+                                                p_block,p_config_changed);
     return p_block;
 }
 
@@ -385,6 +487,14 @@ helper_process_block_h264_annexb2avcc(struct hxxx_helper *hh, block_t *p_block,
                                       bool *p_config_changed)
 {
     p_block = helper_process_block_h264_annexb(hh, p_block, p_config_changed);
+    return p_block ? hxxx_AnnexB_to_xVC(p_block, hh->i_nal_length_size) : NULL;
+}
+
+static block_t *
+helper_process_block_hevc_annexb2hvcc(struct hxxx_helper *hh, block_t *p_block,
+                                      bool *p_config_changed)
+{
+    p_block = helper_process_block_hevc_annexb(hh, p_block, p_config_changed);
     return p_block ? hxxx_AnnexB_to_xVC(p_block, hh->i_nal_length_size) : NULL;
 }
 
@@ -408,11 +518,21 @@ helper_process_block_h264_avcc(struct hxxx_helper *hh, block_t *p_block,
 }
 
 static block_t *
-helper_process_block_dummy(struct hxxx_helper *hh, block_t *p_block,
-                           bool *p_config_changed)
+helper_process_block_hevc_hvcc(struct hxxx_helper *hh, block_t *p_block,
+                               bool *p_config_changed)
 {
-    (void) hh;
-    (void) p_config_changed;
+    if (p_config_changed != NULL)
+    {
+        int i_ret = hevc_helper_parse_nal(hh, p_block->p_buffer,
+                                          p_block->i_buffer,
+                                          hh->i_nal_length_size,
+                                          p_config_changed);
+        if (i_ret != VLC_SUCCESS)
+        {
+            block_Release(p_block);
+            return NULL;
+        }
+    }
     return p_block;
 }
 
@@ -457,16 +577,16 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
             if (hh->b_is_xvcC)
             {
                 if (hh->b_need_xvcC)
-                    hh->pf_process_block = helper_process_block_dummy;
+                    hh->pf_process_block = helper_process_block_hevc_hvcc;
                 else
                     hh->pf_process_block = helper_process_block_xvcc2annexb;
             }
             else /* AnnexB */
             {
                 if (hh->b_need_xvcC)
-                    return VLC_EGENERIC; /* TODO */
+                    hh->pf_process_block = helper_process_block_hevc_annexb2hvcc;
                 else
-                    hh->pf_process_block = helper_process_block_dummy;
+                    hh->pf_process_block = helper_process_block_hevc_annexb;
             }
             break;
         default:
