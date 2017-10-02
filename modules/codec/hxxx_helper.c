@@ -878,8 +878,15 @@ hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
                 == true ? VLC_SUCCESS : VLC_EGENERIC;
         }
         case VLC_CODEC_HEVC:
-            /* FIXME */
-            return VLC_EGENERIC;
+        {
+            const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
+            if (hsps == NULL)
+                return VLC_EGENERIC;
+
+            return hevc_get_colorimetry(hsps->hevc_sps, p_primaries, p_transfer,
+                                        p_colorspace, p_full_range)
+                == true ? VLC_SUCCESS : VLC_EGENERIC;
+        }
         default:
             vlc_assert_unreachable();
     }

@@ -179,6 +179,7 @@ struct decoder_sys_t
     int                         i_forced_cvpx_format;
 
     h264_poc_context_t          h264_pocctx;
+    hevc_poc_ctx_t              hevc_pocctx;
     date_t                      pts;
 };
 
@@ -512,6 +513,192 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     return b_ret;
 }
 
+static bool InitHEVC(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    hevc_poc_cxt_init(&p_sys->hevc_pocctx);
+    hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
+                     p_dec->fmt_in.i_codec, true);
+    return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
+                                             p_dec->fmt_in.i_extra) == VLC_SUCCESS;
+}
+
+#define CleanHEVC CleanH264
+
+static void GetxPSHEVC(uint8_t i_id, void *priv,
+                       hevc_picture_parameter_set_t **pp_pps,
+                       hevc_sequence_parameter_set_t **pp_sps,
+                       hevc_video_parameter_set_t **pp_vps)
+{
+    decoder_sys_t *p_sys = priv;
+
+    *pp_pps = p_sys->hh.hevc.pps_list[i_id].hevc_pps;
+    if (*pp_pps == NULL)
+    {
+        *pp_vps = NULL;
+        *pp_sps = NULL;
+    }
+    else
+    {
+        uint8_t i_sps_id = hevc_get_pps_sps_id(*pp_pps);
+        *pp_sps = p_sys->hh.hevc.sps_list[i_sps_id].hevc_sps;
+        if (*pp_sps == NULL)
+            *pp_vps = NULL;
+        else
+        {
+            uint8_t i_vps_id = hevc_get_sps_vps_id(*pp_sps);
+            *pp_vps = p_sys->hh.hevc.vps_list[i_vps_id].hevc_vps;
+        }
+    }
+}
+
+struct hevc_sei_callback_s
+{
+    hevc_sei_pic_timing_t *p_timing;
+    const hevc_sequence_parameter_set_t *p_sps;
+};
+
+static bool ParseHEVCSEI(const hxxx_sei_data_t *p_sei_data, void *priv)
+{
+    if(p_sei_data->i_type == HXXX_SEI_PIC_TIMING)
+    {
+        struct hevc_sei_callback_s *s = priv;
+        if(likely(s->p_sps))
+            s->p_timing = hevc_decode_sei_pic_timing(p_sei_data->p_bs, s->p_sps);
+        return false;
+    }
+    return true;
+}
+
+static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
+                                frame_info_t *p_info)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    hxxx_iterator_ctx_t itctx;
+    hxxx_iterator_init(&itctx, p_block->p_buffer, p_block->i_buffer,
+                       p_sys->hh.i_nal_length_size);
+
+    const uint8_t *p_nal; size_t i_nal;
+    const uint8_t *p_sei_nal = NULL; size_t i_sei_nal = 0;
+    while(hxxx_iterate_next(&itctx, &p_nal, &i_nal))
+    {
+        if(i_nal < 2 || hevc_getNALLayer(p_nal) > 0)
+            continue;
+
+        const enum hevc_nal_unit_type_e i_nal_type = hevc_getNALType(p_nal);
+        if (i_nal_type <= HEVC_NAL_IRAP_VCL23)
+        {
+            hevc_slice_segment_header_t *p_sli =
+                    hevc_decode_slice_header(p_nal, i_nal, true, GetxPSHEVC, p_sys);
+
+            hevc_sequence_parameter_set_t *p_sps;
+            hevc_picture_parameter_set_t *p_pps;
+            hevc_video_parameter_set_t *p_vps;
+            GetxPSHEVC(hevc_get_slice_pps_id(p_sli), p_sys, &p_pps, &p_sps, &p_vps);
+            if(p_sps)
+            {
+                struct hevc_sei_callback_s sei;
+                sei.p_sps = p_sps;
+                sei.p_timing = NULL;
+
+                if(!p_sys->b_invalid_pic_reorder_max && p_vps)
+                {
+                    vlc_mutex_lock(&p_sys->lock);
+                    p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
+                    vlc_mutex_unlock(&p_sys->lock);
+                }
+
+                const int POC = hevc_compute_picture_order_count(p_sps, p_sli,
+                                                                 &p_sys->hevc_pocctx);
+
+                if(p_sei_nal)
+                    HxxxParseSEI(p_sei_nal, i_sei_nal, 1, ParseHEVCSEI, &sei);
+
+                p_info->i_poc = POC;
+                p_info->i_foc = POC; /* clearly looks wrong :/ */
+                p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
+                p_info->b_flush = (POC == 0);
+                p_info->b_field = (p_info->i_num_ts == 1);
+                p_info->b_progressive = hevc_frame_is_progressive(p_sps, sei.p_timing);
+
+                /* Set frame rate for timings in case of missing rate */
+                if( (!p_dec->fmt_in.video.i_frame_rate_base ||
+                     !p_dec->fmt_in.video.i_frame_rate) )
+                {
+                    unsigned num, den;
+                    if(hevc_get_frame_rate(p_sps, p_vps, &num, &den))
+                        date_Change(&p_sys->pts, num, den);
+                }
+
+                if(sei.p_timing)
+                    hevc_release_sei_pic_timing(sei.p_timing);
+            }
+
+            return true; /* No need to parse further NAL */
+        }
+        else if(i_nal_type == HEVC_NAL_PREF_SEI)
+        {
+            p_sei_nal = p_nal;
+            i_sei_nal = i_nal;
+        }
+    }
+
+    return false;
+}
+
+static bool VideoToolboxNeedsToRestartHEVC(decoder_t *p_dec,
+                                           VTDecompressionSessionRef session)
+{
+    VLC_UNUSED(p_dec);
+    VLC_UNUSED(session);
+    return false;
+}
+
+static CFMutableDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    CFMutableDictionaryRef extradata = nil;
+    if(p_dec->fmt_in.i_extra) /* copy DecoderConfiguration */
+    {
+        extradata = ExtradataInfoCreate(CFSTR("hvcC"),
+                                        p_dec->fmt_in.p_extra,
+                                        p_dec->fmt_in.i_extra);
+    }
+    else if (p_sys->hh.hevc.i_pps_count &&
+             p_sys->hh.hevc.i_sps_count &&
+             p_sys->hh.hevc.i_vps_count)
+    {
+        /* build DecoderConfiguration from gathered */
+        block_t *p_hvcC = hevc_helper_get_hvcc_config(&p_sys->hh);
+        if (p_hvcC)
+        {
+            extradata = ExtradataInfoCreate(CFSTR("hvcC"),
+                                            p_hvcC->p_buffer,
+                                            p_hvcC->i_buffer);
+            block_Release(p_hvcC);
+        }
+    }
+    return extradata;
+}
+
+static bool LateStartHEVC(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    return (p_dec->fmt_in.i_extra == 0 &&
+            (!p_sys->hh.hevc.i_pps_count ||
+             !p_sys->hh.hevc.i_sps_count ||
+             !p_sys->hh.hevc.i_vps_count) );
+}
+
+static bool CodecSupportedHEVC(decoder_t *p_dec)
+{
+    return true;
+}
+
+#define ConfigureVoutHEVC ConfigureVoutH264
+#define ProcessBlockHEVC ProcessBlockH264
+
 static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
 {
     if (p_dec->fmt_in.i_extra)
@@ -713,6 +900,14 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
     switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_H264:
             return kCMVideoCodecType_H264;
+
+        case VLC_CODEC_HEVC:
+            if (!deviceSupportsHEVC())
+            {
+                msg_Warn(p_dec, "device doesn't support HEVC");
+                return -1;
+            }
+            return kCMVideoCodecType_HEVC;
 
         case VLC_CODEC_MP4V:
         {
@@ -1093,6 +1288,19 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->b_poc_based_reorder = true;
             break;
 
+        case kCMVideoCodecType_HEVC:
+            p_sys->pf_codec_init = InitHEVC;
+            p_sys->pf_codec_clean = CleanHEVC;
+            p_sys->pf_codec_supported = CodecSupportedHEVC;
+            p_sys->pf_late_start = LateStartHEVC;
+            p_sys->pf_process_block = ProcessBlockHEVC;
+            p_sys->pf_need_restart = VideoToolboxNeedsToRestartHEVC;
+            p_sys->pf_configure_vout = ConfigureVoutHEVC;
+            p_sys->pf_get_extradata = GetDecoderExtradataHEVC;
+            p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
+            p_sys->b_poc_based_reorder = true;
+            break;
+
         case kCMVideoCodecType_MPEG4Video:
             p_sys->pf_get_extradata = GetDecoderExtradataMPEG4;
             break;
@@ -1102,22 +1310,23 @@ static int OpenDecoder(vlc_object_t *p_this)
             break;
     }
 
-    if(p_sys->pf_codec_init && !p_sys->pf_codec_init(p_dec))
+    if (p_sys->pf_codec_init && !p_sys->pf_codec_init(p_dec))
+    {
+        CloseDecoder(p_this);
+        return VLC_EGENERIC;
+    }
+    if (p_sys->pf_codec_supported && !p_sys->pf_codec_supported(p_dec))
     {
         CloseDecoder(p_this);
         return VLC_EGENERIC;
     }
 
     int i_ret = StartVideoToolbox(p_dec);
-    if(i_ret == VLC_SUCCESS)
-    {
+    if (i_ret == VLC_SUCCESS)
         msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'",
                         (char *)&p_dec->fmt_in.i_codec);
-    }
     else
-    {
         CloseDecoder(p_this);
-    }
     return i_ret;
 }
 
