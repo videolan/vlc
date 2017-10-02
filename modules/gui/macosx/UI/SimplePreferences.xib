@@ -175,7 +175,7 @@
                             <rect key="frame" x="1" y="1" width="578" height="573"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <view translatesAutoresizingMaskIntoConstraints="NO" id="HOX-DS-Fgr">
+                                <view translatesAutoresizingMaskIntoConstraints="NO" id="HOX-DS-Fgr" userLabel="content view">
                                     <rect key="frame" x="0.0" y="0.0" width="578" height="573"/>
                                 </view>
                             </subviews>
@@ -563,13 +563,13 @@ Gw
                     </view>
                 </box>
                 <box title="HTTP Server" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
-                    <rect key="frame" x="16" y="16" width="563" height="89"/>
+                    <rect key="frame" x="18" y="16" width="563" height="89"/>
                     <view key="contentView" id="Who-VF-GbQ">
                         <rect key="frame" x="1" y="1" width="561" height="73"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3875">
-                                <rect key="frame" x="14" y="20" width="120" height="17"/>
+                                <rect key="frame" x="14" y="20" width="118" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Password" usesSingleLineMode="YES" id="3876">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -577,7 +577,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3884" customClass="NSSecureTextField">
-                                <rect key="frame" x="149" y="17" width="395" height="22"/>
+                                <rect key="frame" x="147" y="17" width="397" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3885">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -616,22 +616,22 @@ Gw
             <constraints>
                 <constraint firstItem="kup-aY-Wqq" firstAttribute="width" secondItem="CZP-ZN-k6p" secondAttribute="width" id="256-vh-pET"/>
                 <constraint firstItem="drh-ot-Vyn" firstAttribute="width" secondItem="2318" secondAttribute="width" id="3Ad-bw-7Zc"/>
-                <constraint firstItem="drh-ot-Vyn" firstAttribute="top" secondItem="nnH-Tj-ON7" secondAttribute="bottom" constant="8" id="5Ac-ey-iDg"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="top" secondItem="CZP-ZN-k6p" secondAttribute="bottom" constant="8" id="6rd-dG-SxK"/>
                 <constraint firstItem="2318" firstAttribute="top" secondItem="EKZ-iB-CMo" secondAttribute="bottom" constant="8" id="9hm-PK-wnp"/>
                 <constraint firstItem="2318" firstAttribute="leading" secondItem="EKZ-iB-CMo" secondAttribute="leading" id="C2v-Vz-tFm"/>
                 <constraint firstAttribute="bottom" secondItem="drh-ot-Vyn" secondAttribute="bottom" constant="20" id="CO3-Gq-TzK"/>
                 <constraint firstItem="3920" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="G1a-CX-xIQ"/>
                 <constraint firstItem="3884" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="HYO-kS-Hu7"/>
+                <constraint firstItem="drh-ot-Vyn" firstAttribute="top" secondItem="2318" secondAttribute="bottom" constant="11" id="Hqu-NO-bpg"/>
+                <constraint firstItem="CZP-ZN-k6p" firstAttribute="top" secondItem="kup-aY-Wqq" secondAttribute="bottom" constant="8" id="QJY-SR-Xvz"/>
                 <constraint firstItem="3900" firstAttribute="leading" secondItem="3920" secondAttribute="leading" id="RWL-CF-hmi"/>
-                <constraint firstItem="CZP-ZN-k6p" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="bottom" constant="5" id="Yef-Et-tln"/>
                 <constraint firstAttribute="trailing" secondItem="kup-aY-Wqq" secondAttribute="trailing" constant="19" id="Zzz-GQ-G45"/>
                 <constraint firstItem="2318" firstAttribute="width" secondItem="EKZ-iB-CMo" secondAttribute="width" id="a3R-SI-UDB"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="width" secondItem="CZP-ZN-k6p" secondAttribute="width" id="aXx-RF-saK"/>
-                <constraint firstItem="CZP-ZN-k6p" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="2" id="ai4-HU-V0z"/>
-                <constraint firstItem="drh-ot-Vyn" firstAttribute="leading" secondItem="nnH-Tj-ON7" secondAttribute="leading" id="cTv-JQ-7CF"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="leading" secondItem="CZP-ZN-k6p" secondAttribute="leading" id="dO9-ft-ERv"/>
+                <constraint firstItem="CZP-ZN-k6p" firstAttribute="leading" secondItem="kup-aY-Wqq" secondAttribute="leading" id="dXs-ze-aij"/>
                 <constraint firstItem="kup-aY-Wqq" firstAttribute="top" secondItem="2311" secondAttribute="top" constant="21" id="kbD-gc-Cpm"/>
+                <constraint firstItem="drh-ot-Vyn" firstAttribute="leading" secondItem="2318" secondAttribute="leading" id="quv-cD-pvk"/>
                 <constraint firstItem="kup-aY-Wqq" firstAttribute="leading" secondItem="2311" secondAttribute="leading" constant="21" id="xN8-XW-D0e"/>
             </constraints>
             <point key="canvasLocation" x="256" y="428.5"/>
@@ -1963,7 +1963,7 @@ Gw
                     <rect key="frame" x="20" y="60" width="530" height="311"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="310"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="287"/>
