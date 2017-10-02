@@ -1308,6 +1308,7 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
 struct hevc_sei_pic_timing_t
 {
     nal_u4_t pic_struct;
+    nal_u2_t source_scan_type;
 };
 
 void hevc_release_sei_pic_timing( hevc_sei_pic_timing_t *p_timing )
@@ -1322,11 +1323,37 @@ hevc_sei_pic_timing_t * hevc_decode_sei_pic_timing( bs_t *p_bs,
     if( p_timing )
     {
         if( p_sps->vui.frame_field_info_present_flag )
+        {
             p_timing->pic_struct = bs_read( p_bs, 4 );
+            p_timing->source_scan_type = bs_read( p_bs, 2 );
+        }
         else
+        {
             p_timing->pic_struct = 0;
+            p_timing->source_scan_type = 1;
+        }
     }
     return p_timing;
+}
+
+bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *p_sps,
+                                const hevc_sei_pic_timing_t *p_timing )
+{
+    if( p_sps->vui_parameters_present_flag &&
+        p_sps->vui.field_seq_flag )
+        return false;
+
+    if( p_sps->profile_tier_level.general.interlaced_source_flag &&
+       !p_sps->profile_tier_level.general.progressive_source_flag )
+        return false;
+
+    if( p_timing && p_sps->vui.frame_field_info_present_flag )
+    {
+        if( p_timing->source_scan_type < 2 )
+            return p_timing->source_scan_type != 0;
+    }
+
+    return true;
 }
 
 uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *p_sps,

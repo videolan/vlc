@@ -221,5 +221,7 @@ void hevc_release_sei_pic_timing( hevc_sei_pic_timing_t * );
 
 uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *,
                                const hevc_sei_pic_timing_t * /* can be NULL */ );
+bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *,
+                                const hevc_sei_pic_timing_t * /* can be NULL */);
 
 #endif /* HEVC_NAL_H */
