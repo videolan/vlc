@@ -399,8 +399,9 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
 
     if (p_sys->b_poc_based_reorder)
     {
-        if(p_sys->codec != kCMVideoCodecType_H264 ||
-           !ParseH264NAL(p_dec, p_block->p_buffer, p_block->i_buffer, 4, p_info))
+        if (p_sys->codec != kCMVideoCodecType_H264 ||
+            !ParseH264NAL(p_dec, p_block->p_buffer, p_block->i_buffer,
+                          p_sys->hh.i_nal_length_size , p_info))
         {
             assert(p_sys->codec == kCMVideoCodecType_H264);
             free(p_info);
