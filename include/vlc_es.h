@@ -263,6 +263,7 @@ typedef enum video_color_primaries_t
 #define COLOR_PRIMARIES_EBU_3213        COLOR_PRIMARIES_BT601_625
 #define COLOR_PRIMARIES_BT470_BG        COLOR_PRIMARIES_BT601_625
 #define COLOR_PRIMARIES_BT470_M         COLOR_PRIMARIES_FCC1953
+#define COLOR_PRIMARIES_MAX             COLOR_PRIMARIES_FCC1953
 } video_color_primaries_t;
 
 /**
@@ -285,6 +286,7 @@ typedef enum video_transfer_func_t
 #define TRANSFER_FUNC_SMPTE_293         TRANSFER_FUNC_BT709
 #define TRANSFER_FUNC_SMPTE_296         TRANSFER_FUNC_BT709
 #define TRANSFER_FUNC_ARIB_B67          TRANSFER_FUNC_HLG
+#define TRANSFER_FUNC_MAX               TRANSFER_FUNC_HLG
 } video_transfer_func_t;
 
 /**
@@ -299,6 +301,7 @@ typedef enum video_color_space_t
 #define COLOR_SPACE_SRGB      COLOR_SPACE_BT709
 #define COLOR_SPACE_SMPTE_170 COLOR_SPACE_BT601
 #define COLOR_SPACE_SMPTE_240 COLOR_SPACE_SMPTE_170
+#define COLOR_SPACE_MAX       COLOR_SPACE_BT2020
 } video_color_space_t;
 
 /**
@@ -313,6 +316,7 @@ typedef enum video_chroma_location_t
     CHROMA_LOCATION_TOP_CENTER,
     CHROMA_LOCATION_BOTTOM_LEFT,
     CHROMA_LOCATION_BOTTOM_CENTER,
+#define CHROMA_LOCATION_MAX CHROMA_LOCATION_BOTTOM_CENTER
 } video_chroma_location_t;
 
 /**

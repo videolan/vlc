@@ -3146,60 +3146,67 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if( fmt->video.primaries != COLOR_PRIMARIES_UNDEF )
        {
-           static const char *primaries_names[] = { N_("Undefined"),
-               N_("ITU-R BT.601 (525 lines, 60 Hz)"),
-               N_("ITU-R BT.601 (625 lines, 50 Hz)"),
-               "ITU-R BT.709",
-               "ITU-R BT.2020",
-               "DCI/P3 D65",
-               "ITU-R BT.470 M",
+           static const char primaries_names[][32] = {
+               [COLOR_PRIMARIES_UNDEF] = N_("Undefined"),
+               [COLOR_PRIMARIES_BT601_525] =
+                   N_("ITU-R BT.601 (525 lines, 60 Hz)"),
+               [COLOR_PRIMARIES_BT601_625] =
+                   N_("ITU-R BT.601 (625 lines, 50 Hz)"),
+               [COLOR_PRIMARIES_BT709] = "ITU-R BT.709",
+               [COLOR_PRIMARIES_BT2020] = "ITU-R BT.2020",
+               [COLOR_PRIMARIES_DCI_P3] = "DCI/P3 D65",
+               [COLOR_PRIMARIES_BT470_M] = "ITU-R BT.470 M",
            };
-           if( fmt->video.primaries < ARRAY_SIZE(primaries_names) )
-                info_category_AddInfo( p_cat, _("Color primaries"), "%s",
-                                      _(primaries_names[fmt->video.primaries]) );
+           static_assert(ARRAY_SIZE(primaries_names) == COLOR_PRIMARIES_MAX+1,
+                         "Color primiaries table mismatch");
+           info_category_AddInfo( p_cat, _("Color primaries"), "%s",
+                                  _(primaries_names[fmt->video.primaries]) );
        }
        if( fmt->video.transfer != TRANSFER_FUNC_UNDEF )
        {
-           static const char *func_names[] = { N_("Undefined"),
-               N_("Linear"),
-               "sRGB",
-               "ITU-R BT.470 BG",
-               "ITU-R BT.470 M",
-               "ITU-R BT.709, ITU-R BT.2020",
-               "SMPTE ST2084",
-               "SMPTE 240M",
-               "Hybrid Log-Gamma",
+           static const char func_names[][20] = {
+               [TRANSFER_FUNC_UNDEF] = N_("Undefined"),
+               [TRANSFER_FUNC_LINEAR] = N_("Linear"),
+               [TRANSFER_FUNC_SRGB] = "sRGB",
+               [TRANSFER_FUNC_BT470_BG] = "ITU-R BT.470 BG",
+               [TRANSFER_FUNC_BT470_M] = "ITU-R BT.470 M",
+               [TRANSFER_FUNC_BT709] = "ITU-R BT.709",
+               [TRANSFER_FUNC_SMPTE_ST2084] = "SMPTE ST2084",
+               [TRANSFER_FUNC_SMPTE_240] = "SMPTE 240M",
+               [TRANSFER_FUNC_HLG] = N_("Hybrid Log-Gamma"),
            };
-           if( fmt->video.transfer < ARRAY_SIZE(func_names) )
-                info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
-                                      _(func_names[fmt->video.transfer]) );
+           static_assert(ARRAY_SIZE(func_names) == TRANSFER_FUNC_MAX+1,
+                         "Transfer functions table mismatch");
+           info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
+                                  _(func_names[fmt->video.transfer]) );
        }
        if( fmt->video.space != COLOR_SPACE_UNDEF )
        {
-           static const char *space_names[] = { N_("Undefined"),
-               "ITU-R BT.601",
-               "ITU-R BT.709",
-               "ITU-R BT.2020",
+           static const char space_names[][16] = {
+               [COLOR_SPACE_UNDEF] = N_("Undefined"),
+               [COLOR_SPACE_BT601] = "ITU-R BT.601",
+               [COLOR_SPACE_BT709] = "ITU-R BT.709",
+               [COLOR_SPACE_BT2020] = "ITU-R BT.2020",
            };
-           static const char *range_names[] = {
-               N_("Limited Range"),
-               N_("Full Range"),
-           };
-           if( fmt->video.space < ARRAY_SIZE(space_names) )
-                info_category_AddInfo( p_cat, _("Color space"), "%s %s",
-                                      _(space_names[fmt->video.space]),
-                                      _(range_names[fmt->video.b_color_range_full]) );
+           static_assert(ARRAY_SIZE(space_names) == COLOR_SPACE_MAX+1,
+                         "Color space table mismatch");
+           info_category_AddInfo( p_cat, _("Color space"), _("%s Range"),
+                                  _(space_names[fmt->video.space]),
+                       _(fmt->video.b_color_range_full ? "Full" : "Limited") );
        }
        if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
        {
-           static const char *c_loc_names[] = { N_("Undefined"),
-               N_("Left"),
-               N_("Center"),
-               N_("Top Left"),
-               N_("Top Center"),
-               N_("Bottom Left"),
-               N_("Bottom Center"),
+           static const char c_loc_names[][16] = {
+               [CHROMA_LOCATION_UNDEF] = N_("Undefined"),
+               [CHROMA_LOCATION_LEFT] = N_("Left"),
+               [CHROMA_LOCATION_CENTER] = N_("Center"),
+               [CHROMA_LOCATION_TOP_LEFT] = N_("Top Left"),
+               [CHROMA_LOCATION_TOP_CENTER] = N_("Top Center"),
+               [CHROMA_LOCATION_BOTTOM_LEFT] =N_("Bottom Left"),
+               [CHROMA_LOCATION_BOTTOM_CENTER] = N_("Bottom Center"),
            };
+           static_assert(ARRAY_SIZE(c_loc_names) == CHROMA_LOCATION_MAX+1,
+                         "Chroma location table mismatch");
            info_category_AddInfo( p_cat, _("Chroma location"), "%s",
                    _(c_loc_names[fmt->video.chroma_location]) );
        }
