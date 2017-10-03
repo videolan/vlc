@@ -463,7 +463,6 @@ enum input_query_e
     INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
                             * arg3= bool forced, arg4= bool notify,
                             * arg5= bool check_extension */
-    INPUT_ADD_SUBTITLE,    /* arg1= const char *, arg2=bool b_check_extension */
 
     /* On the fly record while playing */
     INPUT_SET_RECORD_STATE, /* arg1=bool    res=can fail */

@@ -1690,9 +1690,6 @@ static void ControlRelease( int i_type, vlc_value_t val )
 {
     switch( i_type )
     {
-    case INPUT_CONTROL_ADD_SUBTITLE:
-        free( val.psz_string );
-        break;
     case INPUT_CONTROL_ADD_SLAVE:
         if( val.p_address )
             input_item_slave_Delete( val.p_address );
@@ -2225,19 +2222,6 @@ static bool Control( input_thread_t *p_input,
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
             break;
         }
-
-        case INPUT_CONTROL_ADD_SUBTITLE:
-            if( val.psz_string )
-            {
-                char *psz_uri = input_SubtitleFile2Uri( p_input, val.psz_string );
-                if( psz_uri != NULL )
-                {
-                    input_SlaveSourceAdd( p_input, SLAVE_TYPE_SPU, psz_uri,
-                                          SLAVE_ADD_FORCED );
-                    free( psz_uri );
-                }
-            }
-            break;
 
         case INPUT_CONTROL_ADD_SLAVE:
             if( val.p_address )
