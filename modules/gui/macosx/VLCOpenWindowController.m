@@ -84,7 +84,6 @@ struct display_info_t
     NSArray *_opticalDevices;
     NSMutableArray *_specialMediaFolders;
     NSString *_filePath;
-    NSView *_currentCaptureView;
     NSString *_fileSlavePath;
     NSString *_subPath;
     NSString *_MRL;
@@ -206,7 +205,6 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
     [_captureModePopup addItemWithTitle: _NS("Screen")];
-    [_screenlongLabel setStringValue: _NS("This input allows you to save, stream or display your current screen contents.")];
     [_screenFPSLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Frames per Second")]];
     [_screenLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Screen")]];
     [_screenLeftLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen left")]];
@@ -754,6 +752,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     NSRect viewRect = [theView frame];
     [theView setFrame: NSMakeRect(233, 0, viewRect.size.width, viewRect.size.height)];
     [theView setAutoresizesSubviews: YES];
+
     NSView *opticalTabView = [[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:kDiscTabViewId]] view];
     if (_currentOpticalMediaView) {
         [[opticalTabView animator] replaceSubview: _currentOpticalMediaView with: theView];
@@ -1133,25 +1132,13 @@ static NSString *kCaptureTabViewId  = @"capture";
 #pragma mark -
 #pragma mark Capture Panel
 
-- (void)showCaptureView: theView
-{
-    NSRect viewRect = [theView frame];
-    [theView setFrame: NSMakeRect(0, -10, viewRect.size.width, viewRect.size.height)];
-    [theView setAutoresizesSubviews: YES];
-    if (_currentCaptureView) {
-        [[[[_tabView tabViewItemAtIndex: 3] view] animator] replaceSubview: _currentCaptureView with: theView];
-    } else {
-        [[[[_tabView tabViewItemAtIndex: 3] view] animator] addSubview: theView];
-    }
-    _currentCaptureView = theView;
-}
-
 - (IBAction)openCaptureModeChanged:(id)sender
 {
     intf_thread_t * p_intf = getIntf();
 
     if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
-        [self showCaptureView: _screenView];
+        [_captureTabView selectTabViewItemAtIndex:1];
+
         [self setMRL: @"screen://"];
         [_screenHeightTextField setIntValue: config_GetInt(p_intf, "screen-height")];
         [_screenWidthTextField setIntValue: config_GetInt(p_intf, "screen-width")];
@@ -1200,7 +1187,8 @@ static NSString *kCaptureTabViewId  = @"capture";
         }
     }
     else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
-        [self showCaptureView: _qtkView];
+        [_captureTabView selectTabViewItemAtIndex:0];
+
         [self qtkChanged:nil];
         [self qtkAudioChanged:nil];
 
