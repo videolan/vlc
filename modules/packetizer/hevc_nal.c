@@ -1099,6 +1099,50 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
     return false;
 }
 
+bool hevc_get_aspect_ratio( const hevc_sequence_parameter_set_t *p_sps,
+                            unsigned *num, unsigned *den )
+{
+    if( p_sps->vui_parameters_present_flag )
+    {
+        if( p_sps->vui.ar.aspect_ratio_idc != 255 )
+        {
+            static const uint8_t ar_table[16][2] =
+            {
+                {    1,      1 },
+                {   12,     11 },
+                {   10,     11 },
+                {   16,     11 },
+                {   40,     33 },
+                {   24,     11 },
+                {   20,     11 },
+                {   32,     11 },
+                {   80,     33 },
+                {   18,     11 },
+                {   15,     11 },
+                {   64,     33 },
+                {  160,     99 },
+                {    4,      3 },
+                {    3,      2 },
+                {    2,      1 },
+            };
+            if( p_sps->vui.ar.aspect_ratio_idc > 0 &&
+                p_sps->vui.ar.aspect_ratio_idc < 17 )
+            {
+                *num = ar_table[p_sps->vui.ar.aspect_ratio_idc - 1][0];
+                *den = ar_table[p_sps->vui.ar.aspect_ratio_idc - 1][1];
+                return true;
+            }
+        }
+        else
+        {
+            *num = p_sps->vui.ar.sar_width;
+            *den = p_sps->vui.ar.sar_height;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,

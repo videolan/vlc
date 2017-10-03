@@ -187,6 +187,8 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *, unsigned *p_w
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *,
                           const hevc_video_parameter_set_t * /* can be NULL */,
                           unsigned *pi_num, unsigned *pi_den );
+bool hevc_get_aspect_ratio( const hevc_sequence_parameter_set_t *,
+                            unsigned *pi_num, unsigned *pi_den );
 bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
