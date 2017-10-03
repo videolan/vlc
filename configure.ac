@@ -1136,6 +1136,12 @@ AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
 ])
 AS_IF([test "${ac_cv_ld_z_defs}" = "no" -o "x$with_sanitizer" != xno], [VLC_RESTORE_FLAGS])
 
+AM_COND_IF([HAVE_DARWIN], [], [
+  AS_IF([test "${with_sanitizer}" = "no"], [
+    AC_SUBST([LDFLAGS_no_undefined], [-no-undefined])
+  ])
+])
+
 dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],

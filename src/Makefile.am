@@ -462,7 +462,7 @@ endif
 
 libvlccore_la_LDFLAGS = \
 	$(LDFLAGS_libvlccore) \
-	-no-undefined \
+	$(LDFLAGS_no_undefined) \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 8:0:0
 libvlccore_la_DEPENDENCIES = libvlccore.sym

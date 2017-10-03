@@ -114,7 +114,7 @@ libvlc_xcb_events_la_SOURCES = \
 libvlc_xcb_events_la_CPPFLAGS = -DMODULE_STRING=\"xcb\"
 libvlc_xcb_events_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS)
 libvlc_xcb_events_la_LDFLAGS = \
-	-no-undefined \
+	$(LDFLAGS_no_undefined) \
 	-export-symbols-regex ^vlc_xcb_ \
 	-version-info 0:0:0
 libvlc_xcb_events_la_LIBADD = $(XCB_LIBS) $(LTLIBVLCCORE)
