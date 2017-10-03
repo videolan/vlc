@@ -407,7 +407,7 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
         if( psz_mrl )
         {
             if( !input_AddSlave( p_input_thread, SLAVE_TYPE_SPU, psz_mrl,
-                                 true, false ) )
+                                 true, false, false ) )
                 b_ret = true;
             free( psz_mrl );
         }

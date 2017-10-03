@@ -412,8 +412,12 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             psz = va_arg( args, char * );
             b_bool = va_arg( args, int );
             bool b_notify = va_arg( args, int );
+            bool b_check_ext = va_arg( args, int );
 
             if( !psz || ( type != SLAVE_TYPE_SPU && type != SLAVE_TYPE_AUDIO ) )
+                return VLC_EGENERIC;
+            if( b_check_ext && type == SLAVE_TYPE_SPU &&
+                !subtitles_Filter( psz ) )
                 return VLC_EGENERIC;
 
             input_item_slave_t *p_slave =

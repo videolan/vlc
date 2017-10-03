@@ -239,13 +239,13 @@ static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
         b_autoselect = lua_toboolean( L, 2 );
     const char *psz_sub = luaL_checkstring( L, 1 );
     if( !b_path )
-        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_sub, b_autoselect, true );
+        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_sub, b_autoselect, true, false );
     else
     {
         char* psz_mrl = vlc_path2uri( psz_sub, NULL );
         if ( psz_mrl )
         {
-            input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true );
+            input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true, false );
             free( psz_mrl );
         }
     }

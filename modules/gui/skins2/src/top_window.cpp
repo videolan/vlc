@@ -265,7 +265,7 @@ void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
         {
             std::list<std::string>::const_iterator it = files.begin();
             is_subtitle = !input_AddSlave( pInput, SLAVE_TYPE_SPU,
-                                           it->c_str(), true, true );
+                                           it->c_str(), true, true, true );
         }
         if( !is_subtitle )
         {

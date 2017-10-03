@@ -608,7 +608,7 @@
     if (isSubtitle && array.count == 1 && p_input) {
         int i_result = input_AddSlave(p_input, SLAVE_TYPE_SPU,
                     [[[array firstObject] objectForKey:@"ITEM_URL"] UTF8String],
-                    true, true);
+                    true, true, true);
         if (i_result == VLC_SUCCESS) {
             vlc_object_release(p_input);
             return;
