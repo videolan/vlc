@@ -358,6 +358,7 @@ FREENULL( psz_##foo );
         [alert setInformativeText:_NS("VLC was unable to save the meta data.")];
         [alert addButtonWithTitle:_NS("OK")];
         [alert runModal];
+        return;
     }
 
     #define utf8( _blub ) \
