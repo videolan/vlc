@@ -626,10 +626,10 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     unsigned w, h, vw, vh;
     int sarn, sard;
 
-    if (h264_helper_get_current_picture_size(hh, &w, &h, &vw, &vh) != VLC_SUCCESS)
+    if (hxxx_helper_get_current_picture_size(hh, &w, &h, &vw, &vh) != VLC_SUCCESS)
         return true;
 
-    if (h264_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)
+    if (hxxx_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)
         return true;
 
     CFMutableDictionaryRef extradataInfo = H264ExtradataInfoCreate(hh);
@@ -1152,19 +1152,19 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
     unsigned i_h264_width, i_h264_height, i_video_width, i_video_height;
     int i_sar_num, i_sar_den, i_ret;
 
-    i_ret = h264_helper_get_current_profile_level(&p_sys->hh, &i_profile, &i_level);
+    i_ret = hxxx_helper_get_current_profile_level(&p_sys->hh, &i_profile, &i_level);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
     if (!IsH264ProfileLevelSupported(p_dec, i_profile, i_level))
         return VLC_ENOMOD; /* This error is critical */
 
-    i_ret = h264_helper_get_current_picture_size(&p_sys->hh,
+    i_ret = hxxx_helper_get_current_picture_size(&p_sys->hh,
                                                  &i_h264_width, &i_h264_height,
                                                  &i_video_width, &i_video_height);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
-    i_ret = h264_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den);
+    i_ret = hxxx_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
