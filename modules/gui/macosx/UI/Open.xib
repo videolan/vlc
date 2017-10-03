@@ -149,7 +149,7 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="162" y="354" width="574" height="426"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
-            <value key="minSize" type="size" width="213" height="107"/>
+            <value key="minSize" type="size" width="530" height="107"/>
             <view key="contentView" id="637">
                 <rect key="frame" x="0.0" y="0.0" width="574" height="426"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -157,8 +157,16 @@
                     <tabView identifier="central tab view" translatesAutoresizingMaskIntoConstraints="NO" id="678">
                         <rect key="frame" x="13" y="142" width="548" height="278"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="262" id="XDQ-Ya-06b"/>
-                            <constraint firstAttribute="width" constant="534" id="rqv-N4-u9s"/>
+                            <constraint firstAttribute="height" constant="262" id="i1N-3L-NiL">
+                                <attributedString key="userComments">
+                                    <fragment content="Explicit height to fix animation with MRL">
+                                        <attributes>
+                                            <font key="NSFont" metaFont="smallSystem"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                            </constraint>
                         </constraints>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -240,17 +248,17 @@
                                                 <constraint firstAttribute="height" constant="41" id="Pjd-9n-xU7"/>
                                             </constraints>
                                         </box>
-                                        <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="400" translatesAutoresizingMaskIntoConstraints="NO" id="3342">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3342">
                                             <rect key="frame" x="54" y="193" width="96" height="17"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="bla bla bla.mov" id="3343">
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="bla bla bla.mov" usesSingleLineMode="YES" id="3343">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="400" translatesAutoresizingMaskIntoConstraints="NO" id="3328">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3328">
                                             <rect key="frame" x="54" y="193" width="83" height="17"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Choose a file" id="3329">
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Choose a file" usesSingleLineMode="YES" id="3329">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -263,12 +271,9 @@
                                             </constraints>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="generic" id="3336"/>
                                         </imageView>
-                                        <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="447" translatesAutoresizingMaskIntoConstraints="NO" id="3334">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3334">
                                             <rect key="frame" x="60" y="121" width="451" height="14"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="14" id="W98-LZ-wwi"/>
-                                            </constraints>
-                                            <textFieldCell key="cell" controlSize="small" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.txt&quot;" id="3337">
+                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.txt&quot;" usesSingleLineMode="YES" id="3337">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -286,12 +291,9 @@
                                             </constraints>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="generic" id="3327"/>
                                         </imageView>
-                                        <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="447" translatesAutoresizingMaskIntoConstraints="NO" id="3008">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3008">
                                             <rect key="frame" x="60" y="69" width="451" height="14"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="14" id="AV9-QP-hUh"/>
-                                            </constraints>
-                                            <textFieldCell key="cell" controlSize="small" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.mp3&quot;" id="3009">
+                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.mp3&quot;" usesSingleLineMode="YES" id="3009">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -309,9 +311,6 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2995">
                                             <rect key="frame" x="15" y="86" width="230" height="18"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="D2B-MV-nET"/>
-                                            </constraints>
                                             <buttonCell key="cell" type="check" title="Play another media synchronously" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2998">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -362,6 +361,7 @@
                                         </button>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="3487" secondAttribute="bottom" constant="3" id="1uy-w8-UYK"/>
                                         <constraint firstItem="3332" firstAttribute="top" secondItem="2995" secondAttribute="bottom" constant="3" id="37Z-Zd-gOd"/>
                                         <constraint firstItem="3477" firstAttribute="trailing" secondItem="3004" secondAttribute="trailing" id="4Fb-jN-bEt"/>
                                         <constraint firstItem="1269" firstAttribute="top" secondItem="686" secondAttribute="bottom" constant="34" id="7OL-j6-ORn"/>
@@ -369,10 +369,10 @@
                                         <constraint firstItem="1112" firstAttribute="centerY" secondItem="1269" secondAttribute="centerY" id="Chw-Ci-DYj"/>
                                         <constraint firstItem="1112" firstAttribute="leading" secondItem="3326" secondAttribute="leading" id="DVb-Ml-fZA"/>
                                         <constraint firstItem="2995" firstAttribute="baseline" secondItem="3004" secondAttribute="baseline" id="Esf-rE-HSn"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="834" secondAttribute="trailing" constant="20" symbolic="YES" id="GOJ-zf-eyU"/>
                                         <constraint firstItem="3326" firstAttribute="top" secondItem="681" secondAttribute="top" constant="15" id="I1N-tf-guF"/>
                                         <constraint firstItem="3487" firstAttribute="leading" secondItem="681" secondAttribute="leading" constant="4" id="IBM-ci-tlC"/>
                                         <constraint firstItem="3334" firstAttribute="trailing" secondItem="3008" secondAttribute="trailing" id="JqA-6g-r8W"/>
-                                        <constraint firstAttribute="bottom" secondItem="3487" secondAttribute="bottom" constant="3" id="Kwd-WZ-roA"/>
                                         <constraint firstItem="686" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3342" secondAttribute="trailing" constant="17" id="LAT-Ym-oK3"/>
                                         <constraint firstItem="1269" firstAttribute="width" secondItem="3004" secondAttribute="width" id="LXv-H0-bbZ"/>
                                         <constraint firstItem="3004" firstAttribute="trailing" secondItem="1269" secondAttribute="trailing" id="O5h-UU-Cic"/>
@@ -412,10 +412,10 @@
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <popUpButton hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3166">
-                                            <rect key="frame" x="162" y="205" width="203" height="26"/>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3166">
+                                            <rect key="frame" x="163" y="205" width="203" height="26"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="198" id="dwD-kf-qo1"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="198" id="dwD-kf-qo1"/>
                                             </constraints>
                                             <popUpButtonCell key="cell" type="push" title="GANGS_OF_NEW_YORK" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3169" id="3167">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -434,7 +434,9 @@
                                         </popUpButton>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="3166" firstAttribute="leading" secondItem="677" secondAttribute="leading" constant="164" id="efQ-AP-8YN"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3166" secondAttribute="trailing" constant="20" symbolic="YES" id="2kq-3I-P07"/>
+                                        <constraint firstItem="3166" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="677" secondAttribute="leading" constant="20" symbolic="YES" id="QpQ-3W-HHk"/>
+                                        <constraint firstItem="3166" firstAttribute="centerX" secondItem="677" secondAttribute="centerX" id="Sfn-Dr-Ef5"/>
                                         <constraint firstItem="3166" firstAttribute="top" secondItem="677" secondAttribute="top" constant="3" id="q4w-VX-914"/>
                                     </constraints>
                                 </view>
@@ -503,12 +505,12 @@
                                     <subviews>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2327">
                                             <rect key="frame" x="202" y="198" width="124" height="26"/>
-                                            <popUpButtonCell key="cell" type="push" title="Screen" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2330" id="2889">
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="2889">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
                                                 <menu key="menu" title="OtherViews" id="2328">
                                                     <items>
-                                                        <menuItem title="Screen" state="on" id="2330">
+                                                        <menuItem title="Screen" id="2330">
                                                             <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -524,6 +526,8 @@ Gw
                                         </popUpButton>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="2327" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2258" secondAttribute="leading" constant="20" symbolic="YES" id="FOy-yW-vRe"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2327" secondAttribute="trailing" constant="20" symbolic="YES" id="K5w-vK-bHV"/>
                                         <constraint firstItem="2327" firstAttribute="top" secondItem="2258" secondAttribute="top" constant="10" id="QFB-bm-Md9"/>
                                         <constraint firstItem="2327" firstAttribute="centerX" secondItem="2258" secondAttribute="centerX" id="pIC-EN-YxZ"/>
                                     </constraints>
@@ -536,7 +540,7 @@ Gw
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="DD39074D-A5CB-4A71-B088-CF7C54161C5F" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="2A3E6549-BF15-4FEF-9B0B-691E157583B8" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -544,7 +548,7 @@ Gw
                             <action selector="expandMRLfieldAction:" target="-2" id="xIA-tD-1dw"/>
                         </connections>
                     </button>
-                    <customView identifier="mrl view" translatesAutoresizingMaskIntoConstraints="NO" id="2837">
+                    <customView identifier="mrl view" translatesAutoresizingMaskIntoConstraints="NO" id="2837" userLabel="MRL View">
                         <rect key="frame" x="35" y="90" width="504" height="39"/>
                         <subviews>
                             <box title="Media Resource Locator (MRL)" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2838">
@@ -553,12 +557,9 @@ Gw
                                     <rect key="frame" x="2" y="2" width="506" height="41"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2840">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="474" translatesAutoresizingMaskIntoConstraints="NO" id="2840">
                                             <rect key="frame" x="16" y="11" width="474" height="19"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="474" id="pdj-kx-cSy"/>
-                                            </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="2990">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="2990">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -761,9 +762,9 @@ Gw
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3373">
-                                    <rect key="frame" x="54" y="55" width="96" height="17"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="bla bla bla.mov" id="3374">
+                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3373">
+                                    <rect key="frame" x="54" y="55" width="278" height="17"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="bla bla bla.movbla bla bla.movbla bla bla.mov" id="3374">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1968,7 +1969,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="DD39074D-A5CB-4A71-B088-CF7C54161C5F" width="1" height="1">
+        <image name="2A3E6549-BF15-4FEF-9B0B-691E157583B8" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
