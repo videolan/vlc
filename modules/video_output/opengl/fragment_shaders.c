@@ -63,6 +63,7 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
     {
         case GL_BGRA:
             mul = 4;
+            /* fall through */
         case GL_RED:
             tex_param_size = GL_TEXTURE_RED_SIZE;
             break;
