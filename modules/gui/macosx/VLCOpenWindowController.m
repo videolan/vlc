@@ -508,50 +508,6 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
 }
 
-- (IBAction)screenChanged:(id)sender
-{
-    int selected_index = [_screenPopup indexOfSelectedItem];
-    if (selected_index >= [_displayInfos count]) return;
-
-    NSValue *v = [_displayInfos objectAtIndex:selected_index];
-    struct display_info_t *item = (struct display_info_t *)[v pointerValue];
-
-    [_screenLeftStepper setMaxValue: item->rect.size.width];
-    [_screenTopStepper setMaxValue: item->rect.size.height];
-    [_screenWidthStepper setMaxValue: item->rect.size.width];
-    [_screenHeightStepper setMaxValue: item->rect.size.height];
-
-    [_screenqtkAudioPopup setEnabled: [_screenqtkAudioCheckbox state]];
-}
-
-- (IBAction)qtkChanged:(id)sender
-{
-    NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
-    if (_avvideoDevices.count >= 1) {
-        _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    }
-}
-
-- (IBAction)qtkAudioChanged:(id)sender
-{
-    NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
-    if (_avaudioDevices.count >= 1) {
-        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    }
-    [_screenqtkAudioPopup selectItemAtIndex: selectedDevice];
-    [_qtkAudioDevicePopup selectItemAtIndex: selectedDevice];
-}
-
-- (IBAction)qtkToggleUIElements:(id)sender
-{
-    [_qtkAudioDevicePopup setEnabled:[_qtkAudioCheckbox state]];
-    BOOL b_state = [_qtkVideoCheckbox state];
-    [_qtkVideoDevicePopup setEnabled:b_state];
-    [self qtkAudioChanged:sender];
-    [self qtkChanged:sender];
-    [self openCaptureModeChanged:sender];
-}
-
 #pragma mark -
 #pragma mark Main Actions
 
@@ -1201,12 +1157,63 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 }
 
+// Screen actions
 - (void)screenFPSfieldChanged:(NSNotification *)o_notification
 {
     [_screenFPSStepper setFloatValue: [_screenFPSTextField floatValue]];
     if ([[_screenFPSTextField stringValue] isEqualToString: @""])
         [_screenFPSTextField setFloatValue: 1.0];
     [self setMRL: @"screen://"];
+}
+
+- (IBAction)screenChanged:(id)sender
+{
+    int selected_index = [_screenPopup indexOfSelectedItem];
+    if (selected_index >= [_displayInfos count]) return;
+
+    NSValue *v = [_displayInfos objectAtIndex:selected_index];
+    struct display_info_t *item = (struct display_info_t *)[v pointerValue];
+
+    [_screenLeftStepper setMaxValue: item->rect.size.width];
+    [_screenTopStepper setMaxValue: item->rect.size.height];
+    [_screenWidthStepper setMaxValue: item->rect.size.width];
+    [_screenHeightStepper setMaxValue: item->rect.size.height];
+
+    [_screenqtkAudioPopup setEnabled: [_screenqtkAudioCheckbox state]];
+}
+
+- (IBAction)screenAudioChanged:(id)sender
+{
+    [_screenqtkAudioPopup setEnabled:_screenqtkAudioCheckbox.state];
+}
+
+// QTKit Recording actions
+- (IBAction)qtkChanged:(id)sender
+{
+    NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
+    if (_avvideoDevices.count >= 1) {
+        _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+}
+
+- (IBAction)qtkAudioChanged:(id)sender
+{
+    NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
+    if (_avaudioDevices.count >= 1) {
+        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+    [_screenqtkAudioPopup selectItemAtIndex: selectedDevice];
+    [_qtkAudioDevicePopup selectItemAtIndex: selectedDevice];
+}
+
+- (IBAction)qtkToggleUIElements:(id)sender
+{
+    [_qtkAudioDevicePopup setEnabled:[_qtkAudioCheckbox state]];
+    BOOL b_state = [_qtkVideoCheckbox state];
+    [_qtkVideoDevicePopup setEnabled:b_state];
+    [self qtkAudioChanged:sender];
+    [self qtkChanged:sender];
+    [self openCaptureModeChanged:sender];
 }
 
 #pragma mark -

@@ -213,10 +213,15 @@
 
 - (void)openCapture;
 - (IBAction)openCaptureModeChanged:(id)sender;
+
+// Screen actions
+- (IBAction)screenChanged:(id)sender;
+- (IBAction)screenAudioChanged:(id)sender;
+
+// QTKit actions
 - (IBAction)qtkChanged:(id)sender;
 - (IBAction)qtkAudioChanged:(id)sender;
 - (IBAction)qtkToggleUIElements:(id)sender;
-- (IBAction)screenChanged:(id)sender;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;

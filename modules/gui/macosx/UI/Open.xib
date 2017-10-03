@@ -442,7 +442,7 @@
                             </tabViewItem>
                             <tabViewItem label="Network" identifier="network" id="682">
                                 <view key="view" id="683">
-                                    <rect key="frame" x="10" y="33" width="528" height="232"/>
+                                    <rect key="frame" x="10" y="33" width="556" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="725">
@@ -454,15 +454,15 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="456" translatesAutoresizingMaskIntoConstraints="NO" id="730" customClass="VLCOpenTextField">
-                                            <rect key="frame" x="52" y="190" width="456" height="22"/>
+                                            <rect key="frame" x="52" y="190" width="484" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="2886">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2809" customClass="VLCWrappableTextField">
-                                            <rect key="frame" x="17" y="149" width="493" height="28"/>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2809" customClass="VLCWrappableTextField">
+                                            <rect key="frame" x="17" y="149" width="521" height="28"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2887">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <string key="title">To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.</string>
@@ -471,7 +471,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2810">
-                                            <rect key="frame" x="175" y="69" width="179" height="32"/>
+                                            <rect key="frame" x="189" y="33" width="179" height="32"/>
                                             <buttonCell key="cell" type="push" title="Open RTP/UDP Stream" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2888">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -484,13 +484,12 @@
                                     <constraints>
                                         <constraint firstItem="2810" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2809" secondAttribute="bottom" constant="20" id="3QW-iu-DXR"/>
                                         <constraint firstItem="730" firstAttribute="leading" secondItem="725" secondAttribute="trailing" constant="7" id="6Tj-OE-JsJ"/>
-                                        <constraint firstItem="2810" firstAttribute="centerY" secondItem="683" secondAttribute="centerY" priority="700" constant="30" id="9SY-uJ-aSg"/>
-                                        <constraint firstItem="730" firstAttribute="top" secondItem="683" secondAttribute="top" constant="20" id="9s2-QQ-87x"/>
+                                        <constraint firstItem="2809" firstAttribute="top" secondItem="725" secondAttribute="bottom" constant="15" id="6XF-NS-D47"/>
+                                        <constraint firstItem="725" firstAttribute="top" secondItem="683" secondAttribute="top" constant="23" id="ANL-34-byc"/>
                                         <constraint firstAttribute="trailing" secondItem="730" secondAttribute="trailing" constant="20" id="Q7k-zl-RYB"/>
                                         <constraint firstItem="725" firstAttribute="centerY" secondItem="730" secondAttribute="centerY" id="Sbf-Lc-mLX"/>
-                                        <constraint firstItem="2809" firstAttribute="top" secondItem="730" secondAttribute="bottom" constant="13" id="UaZ-hu-QkV"/>
                                         <constraint firstItem="2810" firstAttribute="centerX" secondItem="683" secondAttribute="centerX" id="XkU-DX-2Ar"/>
-                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2810" secondAttribute="bottom" constant="20" id="eJe-XV-eRj"/>
+                                        <constraint firstAttribute="bottom" secondItem="2810" secondAttribute="bottom" constant="40" id="eJe-XV-eRj"/>
                                         <constraint firstItem="725" firstAttribute="leading" secondItem="683" secondAttribute="leading" constant="19" id="eYD-RW-TKf"/>
                                         <constraint firstItem="2809" firstAttribute="trailing" secondItem="730" secondAttribute="trailing" id="vhk-vw-m5p"/>
                                         <constraint firstItem="2809" firstAttribute="leading" secondItem="725" secondAttribute="leading" id="yhg-Eg-xBD"/>
@@ -860,6 +859,9 @@ Gw
                                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                         <font key="font" metaFont="smallSystem"/>
                                                                                     </buttonCell>
+                                                                                    <connections>
+                                                                                        <action selector="screenAudioChanged:" target="-2" id="8zr-Js-FCB"/>
+                                                                                    </connections>
                                                                                 </button>
                                                                             </subviews>
                                                                             <constraints>
@@ -963,7 +965,7 @@ Gw
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="82AD5619-1EE1-4935-96D6-862DEB185C7E" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="192D718C-CC37-42F8-A5E8-FE16D23CACA4" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -2003,7 +2005,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="82AD5619-1EE1-4935-96D6-862DEB185C7E" width="1" height="1">
+        <image name="192D718C-CC37-42F8-A5E8-FE16D23CACA4" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
