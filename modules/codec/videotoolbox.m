@@ -551,11 +551,8 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
 static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
                                                              unsigned i_sar_num,
-                                                             unsigned i_sar_den,
-                                                             CFMutableDictionaryRef extradataInfo)
+                                                             unsigned i_sar_den)
 {
-    assert(extradataInfo != nil);
-
     CFMutableDictionaryRef decoderConfiguration = cfdict_create(2);
     if (decoderConfiguration == NULL)
         return nil;
@@ -566,10 +563,6 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     CFDictionarySetValue(decoderConfiguration,
                          kCVImageBufferChromaLocationTopFieldKey,
                          kCVImageBufferChromaLocation_Left);
-
-    CFDictionarySetValue(decoderConfiguration,
-                         kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms,
-                         extradataInfo);
 
     /* pixel aspect ratio */
     CFMutableDictionaryRef pixelaspectratio = cfdict_create(2);
@@ -639,9 +632,12 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     bool b_ret = true;
 
     CFMutableDictionaryRef decoderConfiguration =
-            CreateSessionDescriptionFormat(p_dec, sarn, sard, extradataInfo);
+            CreateSessionDescriptionFormat(p_dec, sarn, sard);
     if (decoderConfiguration != nil)
     {
+        CFDictionarySetValue(decoderConfiguration,
+                             kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms,
+                             extradataInfo);
         CMFormatDescriptionRef newvideoFormatDesc;
         /* create new video format description */
         OSStatus status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
@@ -674,12 +670,18 @@ static int StartVideoToolbox(decoder_t *p_dec)
     CFMutableDictionaryRef decoderConfiguration =
         CreateSessionDescriptionFormat(p_dec,
                                        p_dec->fmt_out.video.i_sar_num,
-                                       p_dec->fmt_out.video.i_sar_den,
-                                       p_sys->extradataInfo);
+                                       p_dec->fmt_out.video.i_sar_den);
     if(decoderConfiguration == nil)
     {
         CFRelease(destinationPixelBufferAttributes);
         return VLC_EGENERIC;
+    }
+
+    if(p_sys->extradataInfo)
+    {
+        CFDictionarySetValue(decoderConfiguration,
+                             kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms,
+                             p_sys->extradataInfo);
     }
 
     /* create video format description */
