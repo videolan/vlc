@@ -58,7 +58,7 @@ vlc_http_res_req(const struct vlc_http_resource *res, void *opaque)
     }
 
     /* Authentication */
-    if (res->username != NULL)
+    if (res->username != NULL && res->password != NULL)
         vlc_http_msg_add_creds_basic(req, false, res->username, res->password);
 
     /* Request context */
