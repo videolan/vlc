@@ -189,8 +189,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->url.i_port <= 0 )
         p_sys->url.i_port = 80;
 
-    vlc_http_auth_Init( &p_sys->auth );
-    vlc_http_auth_Init( &p_sys->proxy_auth );
     vlc_credential_init( &credential, &p_sys->url );
 
     /* Determine the HTTP user agent */
@@ -385,10 +383,8 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
-    vlc_http_auth_Deinit( &p_sys->auth );
     if( p_sys->b_proxy )
         vlc_UrlClean( &p_sys->proxy );
-    vlc_http_auth_Deinit( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
     free( p_sys->psz_location );
@@ -642,7 +638,8 @@ static int Connect( stream_t *p_access )
     free( p_sys->psz_icy_name );
     free( p_sys->psz_icy_title );
 
-
+    vlc_http_auth_Init( &p_sys->auth );
+    vlc_http_auth_Init( &p_sys->proxy_auth );
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
     p_sys->i_icy_meta = 0;
@@ -987,6 +984,9 @@ static void Disconnect( stream_t *p_access )
     if( p_sys->fd != -1)
         net_Close(p_sys->fd);
     p_sys->fd = -1;
+
+    vlc_http_auth_Deinit( &p_sys->auth );
+    vlc_http_auth_Deinit( &p_sys->proxy_auth );
 }
 
 /*****************************************************************************
