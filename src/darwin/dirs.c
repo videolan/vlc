@@ -138,7 +138,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
     }
 
     // Default fallback
-    const char *fallback = strdup("org.videolan.vlc");
+    const char *fallback = "org.videolan.vlc";
     char *name = NULL;
 
     CFBundleRef mainBundle = CFBundleGetMainBundle();
