@@ -866,6 +866,7 @@ static void DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p
                     p_cc->i_pts = p_cc->i_dts;
                 decoder_cc_desc_t desc;
                 desc.i_608_channels = p_sys->cc.i_608channels;
+                desc.i_708_channels = p_sys->cc.i_708channels;
                 desc.i_reorder_depth = 4;
                 decoder_QueueCc( p_dec, p_cc, &desc );
             }

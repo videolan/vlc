@@ -42,6 +42,7 @@ enum cc_payload_type_e
 typedef struct
 {
     /* Which channel are present */
+    uint64_t i_708channels;
     uint8_t  i_608channels;
 
     /* */
@@ -63,6 +64,7 @@ typedef struct
 static inline void cc_Init( cc_data_t *c )
 {
     c->i_608channels = 0;
+    c->i_708channels = 0;
     c->i_data = 0;
     c->b_reorder = false;
     c->i_payload_type = CC_PAYLOAD_NONE;
@@ -83,6 +85,8 @@ static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8
     uint8_t i_field = cc_preamble & 0x03;
     if( i_field == 0 || i_field == 1 )
         c->i_608channels |= (3 << (2 * i_field));
+    else
+        c->i_708channels |= 1;
 
     c->p_data[c->i_data++] = cc_preamble;
     c->p_data[c->i_data++] = cc[0];

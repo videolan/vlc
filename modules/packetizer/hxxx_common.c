@@ -97,6 +97,7 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t *p_desc
         p_block->i_flags = p_ccs->i_flags & BLOCK_FLAG_TYPE_MASK;
 
         p_desc->i_608_channels = p_ccs->current.i_608channels;
+        p_desc->i_708_channels = p_ccs->current.i_708channels;
         p_desc->i_reorder_depth = p_ccs->current.b_reorder ? 4 : -1;
     }
     cc_Flush( &p_ccs->current );

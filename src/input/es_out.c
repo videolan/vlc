@@ -213,6 +213,8 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
     int i_channel;
     if( p_fmt->i_codec == VLC_CODEC_CEA608 && p_fmt->subs.cc.i_channel < 4 )
         i_channel = p_fmt->subs.cc.i_channel;
+    else if( p_fmt->i_codec == VLC_CODEC_CEA708 && p_fmt->subs.cc.i_channel < 64 )
+        i_channel = p_fmt->subs.cc.i_channel;
     else
         i_channel = -1;
     return i_channel;
@@ -2123,6 +2125,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     decoder_cc_desc_t desc;
 
     input_DecoderGetCcDesc( es->p_dec, &desc );
+    if( var_InheritInteger( p_input, "captions" ) == 708 )
+        EsOutCreateCCChannels( out, VLC_CODEC_CEA708, desc.i_708_channels,
+                               _("DTVCC Closed captions %u"), es );
     EsOutCreateCCChannels( out, VLC_CODEC_CEA608, desc.i_608_channels,
                            _("Closed captions %u"), es );
 

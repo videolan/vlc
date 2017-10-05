@@ -131,7 +131,7 @@ struct decoder_owner_sys_t
     bool b_idle;
 
     /* CC */
-#define MAX_CC_DECODERS 4 /* The es_out only creates one type of es */
+#define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
     struct
     {
         bool b_supported;
@@ -915,8 +915,10 @@ static void DecoderPlayCc( decoder_t *p_dec, block_t *p_cc,
 
     p_owner->cc.desc = *p_desc;
 
-    /* Fanout data to all decoders. */
-    uint64_t i_bitmap = p_owner->cc.desc.i_608_channels;
+    /* Fanout data to all decoders. We do not know if es_out
+       selected 608 or 708. */
+    uint64_t i_bitmap = p_owner->cc.desc.i_608_channels |
+                        p_owner->cc.desc.i_708_channels;
 
     for( int i=0; i_bitmap > 0; i_bitmap >>= 1, i++ )
     {
@@ -1777,6 +1779,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->cc.b_supported = ( p_sout == NULL );
 
     p_owner->cc.desc.i_608_channels = 0;
+    p_owner->cc.desc.i_708_channels = 0;
     for( unsigned i = 0; i < MAX_CC_DECODERS; i++ )
         p_owner->cc.pp_decoder[i] = NULL;
     p_owner->i_ts_delay = 0;
@@ -2141,6 +2144,11 @@ static bool input_DecoderHasCCChanFlag( decoder_t *p_dec,
     {
         i_max_channels = 4;
         i_bitmap = p_owner->cc.desc.i_608_channels;
+    }
+    else if( codec == VLC_CODEC_CEA708 )
+    {
+        i_max_channels = 64;
+        i_bitmap = p_owner->cc.desc.i_708_channels;
     }
     else return false;
 

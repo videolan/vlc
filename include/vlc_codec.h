@@ -194,6 +194,7 @@ struct decoder_t
 struct decoder_cc_desc_t
 {
     uint8_t i_608_channels;  /* 608 channels bitmap */
+    uint64_t i_708_channels; /* 708 */
     int i_reorder_depth;     /* reorder depth, -1 for no reorder, 0 for old P/B flag based */
 };
 
