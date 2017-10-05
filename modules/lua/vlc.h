@@ -105,6 +105,12 @@ static inline void lua_Dbg( vlc_object_t * p_this, const char * ppz_fmt, ... )
     va_end( ap );
 }
 
+static inline bool lua_Disabled( vlc_object_t *p_this )
+{
+    return !var_InheritBool( p_this, "lua" );
+}
+#define lua_Disabled( x ) lua_Disabled( VLC_OBJECT( x ) )
+
 /*****************************************************************************
  * Functions that should be in lua ... but aren't for some obscure reason
  *****************************************************************************/

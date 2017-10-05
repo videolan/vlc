@@ -241,6 +241,9 @@ static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
 
 int ReadMeta( demux_meta_t *p_this )
 {
+    if( lua_Disabled( p_this ) )
+        return VLC_EGENERIC;
+
     return vlclua_scripts_batch_execute( VLC_OBJECT(p_this), "meta"DIR_SEP"reader",
                                          (void*) &read_meta, NULL );
 }
@@ -252,6 +255,9 @@ int ReadMeta( demux_meta_t *p_this )
 
 int FetchMeta( meta_fetcher_t *p_finder )
 {
+    if( lua_Disabled( p_finder ) )
+        return VLC_EGENERIC;
+
     luabatch_context_t context = { p_finder->p_item, p_finder->e_scope, validate_scope };
 
     return vlclua_scripts_batch_execute( VLC_OBJECT(p_finder), "meta"DIR_SEP"fetcher",
@@ -264,6 +270,9 @@ int FetchMeta( meta_fetcher_t *p_finder )
  *****************************************************************************/
 int FindArt( meta_fetcher_t *p_finder )
 {
+    if( lua_Disabled( p_finder ) )
+        return VLC_EGENERIC;
+
     luabatch_context_t context = { p_finder->p_item, p_finder->e_scope, validate_scope };
 
     return vlclua_scripts_batch_execute( VLC_OBJECT(p_finder), "meta"DIR_SEP"art",

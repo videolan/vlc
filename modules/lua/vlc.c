@@ -526,6 +526,9 @@ out:
 
 static int vlc_sd_probe_Open( vlc_object_t *obj )
 {
+    if( lua_Disabled( obj ) )
+        return VLC_EGENERIC;
+
     vlc_dictionary_t name_d;
 
     char **ppsz_dir_list;

@@ -201,6 +201,9 @@ static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 {
+    if( lua_Disabled( p_this ) )
+        return VLC_EGENERIC;
+
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     lua_State *L;
 

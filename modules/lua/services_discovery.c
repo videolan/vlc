@@ -154,6 +154,9 @@ static const luaL_Reg p_reg[] = { { NULL, NULL } };
  *****************************************************************************/
 int Open_LuaSD( vlc_object_t *p_this )
 {
+    if( lua_Disabled( p_this ) )
+        return VLC_EGENERIC;
+
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
     services_discovery_sys_t *p_sys;
     lua_State *L = NULL;

@@ -690,6 +690,9 @@ static const char *const ppsz_prefres[] = {
     "$n: Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>"  \
     "$Z: \"Now playing\" (Fall back on Title - Artist)" )
 
+#define INPUT_LUA_TEXT N_( "Disable lua" )
+#define INPUT_LUA_LONGTEXT N_( "Disable all lua plugins" )
+
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
@@ -1899,6 +1902,8 @@ vlc_module_begin ()
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
 
     add_string( "input-title-format", "$Z", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT, false );
+
+    add_bool( "lua", true, INPUT_LUA_TEXT, INPUT_LUA_LONGTEXT, true );
 
 /* Decoder options */
     set_subcategory( SUBCAT_INPUT_VCODEC )

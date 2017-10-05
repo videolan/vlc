@@ -275,8 +275,10 @@ static int ReadDir(stream_t *s, input_item_node_t *node)
  *****************************************************************************/
 int Import_LuaPlaylist(vlc_object_t *obj)
 {
-    stream_t *s = (stream_t *)obj;
+    if( lua_Disabled( obj ) )
+        return VLC_EGENERIC;
 
+    stream_t *s = (stream_t *)obj;
     if( !vlc_stream_Control( s->p_source, STREAM_IS_DIRECTORY ) )
         return VLC_EGENERIC;
 
