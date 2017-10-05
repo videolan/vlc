@@ -1395,7 +1395,7 @@
 	<key>BreakpadRequestComments</key>
 	<string>1</string>
 	<key>BreakpadURL</key>
-	<string>https://crashes.videolan.org/crashreports</string>
+	<string>@BREAKPAD_URL@/crashreports</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
