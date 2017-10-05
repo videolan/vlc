@@ -5,7 +5,7 @@ libvlc_vdpau_la_CFLAGS = $(VDPAU_CFLAGS)
 libvlc_vdpau_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
 	$(LIBDL) $(LIBPTHREAD)
 libvlc_vdpau_la_LDFLAGS = \
-	$(LDFLAGS_no_undefined) \
+	-no-undefined \
 	-export-symbols-regex ^vdp_ \
 	-version-info 0:0:0
 

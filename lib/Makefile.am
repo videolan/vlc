@@ -60,7 +60,7 @@ libvlc_la_LIBADD = \
 	../src/libvlccore.la ../compat/libcompat.la $(LIBPTHREAD) $(LIBM)
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
-	$(LDFLAGS_no_undefined) \
+	-no-undefined \
 	-version-info 10:0:5 \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym
