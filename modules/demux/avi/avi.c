@@ -1213,16 +1213,7 @@ static int Demux_Seekable( demux_t *p_demux )
         }
         else
         {
-            if( !p_sys->b_fastseekable
-             && (i_pos > vlc_stream_Tell( p_demux->s )) )
-            {
-                vlc_stream_Read( p_demux->s, NULL,
-                                 i_pos - vlc_stream_Tell( p_demux->s ) );
-            }
-            else
-            {
-                vlc_stream_Seek( p_demux->s, i_pos );
-            }
+            vlc_stream_Seek( p_demux->s, i_pos );
         }
 
         /* Set the track to use */
