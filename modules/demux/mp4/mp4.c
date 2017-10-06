@@ -1460,19 +1460,40 @@ static int Seek( demux_t *p_demux, mtime_t i_date, bool b_accurate )
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_track;
 
-    /* First update global time */
-    p_sys->i_time = MP4_rescale( i_date, CLOCK_FREQ, p_sys->i_timescale );
-    p_sys->i_pcr  = VLC_TS_INVALID;
-
     /* Now for each stream try to go to this time */
+    mtime_t i_start = i_date;
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
-        MP4_TrackSeek( p_demux, tk, i_date );
+        /* FIXME: we should find the lowest time from tracks with indexes.
+           considering only video for now */
+        if( tk->fmt.i_cat != VIDEO_ES )
+            continue;
+        if( MP4_TrackSeek( p_demux, tk, i_date ) == VLC_SUCCESS )
+        {
+            mtime_t i_seeked = MP4_TrackGetDTS( p_demux, tk );
+            if( i_seeked < i_start )
+                i_start = i_seeked;
+        }
     }
-    MP4_UpdateSeekpoint( p_demux, i_date );
 
+    msg_Dbg( p_demux, "seeking with %"PRId64 "ms %s", (i_date - i_start) / 1000,
+            !b_accurate ? "alignment" : "preroll (use input-fast-seek to avoid)" );
+
+    for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+    {
+        mp4_track_t *tk = &p_sys->track[i_track];
+        if( tk->fmt.i_cat == VIDEO_ES )
+            continue;
+        MP4_TrackSeek( p_demux, tk, i_start );
+    }
+
+    MP4_UpdateSeekpoint( p_demux, i_date );
     MP4ASF_ResetFrames( p_sys );
+    /* update global time */
+    p_sys->i_time = MP4_rescale( i_start, CLOCK_FREQ, p_sys->i_timescale );
+    p_sys->i_pcr  = VLC_TS_INVALID;
+
     if( b_accurate )
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
