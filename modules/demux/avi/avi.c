@@ -91,7 +91,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static int Control         ( demux_t *, int, va_list );
-static int Seek            ( demux_t *, mtime_t, int );
+static int Seek            ( demux_t *, mtime_t, int, bool );
 static int Demux_Seekable  ( demux_t * );
 static int Demux_UnSeekable( demux_t * );
 
@@ -1493,7 +1493,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
 /*****************************************************************************
  * Seek: goto to i_date or i_percent
  *****************************************************************************/
-static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
+static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %d%%",
@@ -1622,7 +1622,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         }
         p_sys->i_time = i_start;
         es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
+        if( b_accurate )
+            es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
         msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
         return VLC_SUCCESS;
 
@@ -1664,6 +1665,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double   f, *pf;
     int64_t i64, *pi64;
+    bool b;
     vlc_meta_t *p_meta;
 
     switch( i_query )
@@ -1678,6 +1680,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
+            b = va_arg( args, int );
             if ( !p_sys->b_seekable )
             {
                 return VLC_EGENERIC;
@@ -1685,7 +1688,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else
             {
                 i64 = (mtime_t)(f * CLOCK_FREQ * p_sys->i_length);
-                return Seek( p_demux, i64, (int)(f * 100) );
+                return Seek( p_demux, i64, (int)(f * 100), b );
             }
 
         case DEMUX_GET_TIME:
@@ -1698,6 +1701,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int i_percent = 0;
 
             i64 = va_arg( args, int64_t );
+            b = va_arg( args, int );
             if( !p_sys->b_seekable )
             {
                 return VLC_EGENERIC;
@@ -1711,7 +1715,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 i_percent = (int)( 100.0 * ControlGetPosition( p_demux ) *
                                    (double)i64 / (double)p_sys->i_time );
             }
-            return Seek( p_demux, i64, i_percent );
+            return Seek( p_demux, i64, i_percent, b );
         }
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
