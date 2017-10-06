@@ -274,9 +274,9 @@ char *directx_va_GetDecoderName(const GUID *guid)
             return strdup(DXVA_MODES[i].name);
     }
 
-    char *psz_name = malloc(36);
-    if (likely(psz_name))
-        asprintf(&psz_name, "Unknown decoder " GUID_FMT, GUID_PRINT(*guid));
+    char *psz_name;
+    if (asprintf(&psz_name, "Unknown decoder " GUID_FMT, GUID_PRINT(*guid)) < 0)
+        return NULL;
     return psz_name;
 }
 
