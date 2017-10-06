@@ -67,6 +67,9 @@ ifeq ($(TIZEN_ABI), x86)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
 endif
+ifdef HAVE_NACL
+GCRYPT_CONF += --disable-asm ac_cv_func_syslog=no
+endif
 
 .gcrypt: gcrypt
 	# Reconfiguring this requires a git repo to be available, to
