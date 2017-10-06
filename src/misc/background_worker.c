@@ -20,6 +20,7 @@
 #  include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_arrays.h>
@@ -48,6 +49,7 @@ struct background_worker {
     } head;
 
     struct {
+        vlc_cond_t wait; /**< wait for update in terms of tail */
         vlc_array_t data; /**< queue of pending entities to process */
     } tail;
 };
@@ -62,6 +64,7 @@ static void* Thread( void* data )
         void* handle;
 
         vlc_mutex_lock( &worker->lock );
+        for( ;; )
         {
             if( vlc_array_count( &worker->tail.data ) )
             {
@@ -71,18 +74,43 @@ static void* Thread( void* data )
                 vlc_array_remove( &worker->tail.data, 0 );
             }
 
-            worker->head.deadline = INT64_MAX;
-            worker->head.active = item != NULL;
+            if( worker->head.deadline == VLC_TS_0 && item == NULL )
+                worker->head.active = false;
             worker->head.id = item ? item->id : NULL;
-
-            if( item && item->timeout > 0 )
-                worker->head.deadline = mdate() + item->timeout * 1000;
             vlc_cond_broadcast( &worker->head.wait );
+
+            if( item )
+            {
+                if( item->timeout > 0 )
+                    worker->head.deadline = mdate() + item->timeout * 1000;
+                else
+                    worker->head.deadline = INT64_MAX;
+            }
+            else if( worker->head.deadline != VLC_TS_0 )
+            {
+                /* Wait 1 seconds for new inputs before terminating */
+                mtime_t deadline = mdate() + INT64_C(1000000);
+                int ret = vlc_cond_timedwait( &worker->tail.wait,
+                                              &worker->lock, deadline );
+                if( ret != 0 )
+                {
+                    /* Timeout: if there is still no items, the thread will be
+                     * terminated at next loop iteration (active = false). */
+                    worker->head.deadline = VLC_TS_0;
+                }
+                continue;
+            }
+            break;
+        }
+
+        if( !worker->head.active )
+        {
+            vlc_mutex_unlock( &worker->lock );
+            break;
         }
         vlc_mutex_unlock( &worker->lock );
 
-        if( item == NULL )
-            break;
+        assert( item != NULL );
 
         if( worker->conf.pf_start( worker->owner, item->entity, &handle ) )
         {
@@ -147,6 +175,7 @@ static void BackgroundWorkerCancel( struct background_worker* worker, void* id)
     {
         worker->head.deadline = VLC_TS_0;
         vlc_cond_signal( &worker->head.worker_wait );
+        vlc_cond_signal( &worker->tail.wait );
         vlc_cond_wait( &worker->head.wait, &worker->lock );
     }
     vlc_mutex_unlock( &worker->lock );
@@ -171,6 +200,7 @@ struct background_worker* background_worker_New( void* owner,
     vlc_cond_init( &worker->head.worker_wait );
 
     vlc_array_init( &worker->tail.data );
+    vlc_cond_init( &worker->tail.wait );
 
     return worker;
 }
@@ -189,6 +219,7 @@ int background_worker_Push( struct background_worker* worker, void* entity,
 
     vlc_mutex_lock( &worker->lock );
     vlc_array_append( &worker->tail.data, item );
+    vlc_cond_signal( &worker->tail.wait );
 
     if( worker->head.active == false )
     {
@@ -226,5 +257,6 @@ void background_worker_Delete( struct background_worker* worker )
     vlc_mutex_destroy( &worker->lock );
     vlc_cond_destroy( &worker->head.wait );
     vlc_cond_destroy( &worker->head.worker_wait );
+    vlc_cond_destroy( &worker->tail.wait );
     free( worker );
 }
