@@ -1592,18 +1592,37 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         }
 
         /* */
-        for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+        mtime_t i_wanted = i_date;
+        mtime_t i_start = i_date;
+        /* Do a 2 pass seek, first with video (can seek ahead due to keyframes),
+           so we can seek audio to the same starting time */
+        for(int i=0; i<2; i++)
         {
-            avi_track_t *p_stream = p_sys->track[i_stream];
+            for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+            {
+                avi_track_t *p_stream = p_sys->track[i_stream];
 
-            if( !p_stream->b_activated )
-                continue;
+                if( !p_stream->b_activated )
+                    continue;
 
-            p_stream->b_eof = AVI_TrackSeek( p_demux, i_stream, i_date ) != 0;
+                if( (i==0 && p_stream->fmt.i_cat != VIDEO_ES) ||
+                    (i!=0 && p_stream->fmt.i_cat == VIDEO_ES) )
+                    continue;
+
+                p_stream->b_eof = AVI_TrackSeek( p_demux, i_stream, i_wanted ) != 0;
+                if( !p_stream->b_eof )
+                {
+                    if( p_stream->fmt.i_cat == AUDIO_ES || p_stream->fmt.i_cat == VIDEO_ES )
+                        i_start = __MIN(i_start, AVI_GetPTS( p_stream ));
+
+                    if( i == 0 && p_stream->fmt.i_cat == VIDEO_ES )
+                        i_wanted = i_start;
+                }
+            }
         }
-        p_sys->i_time = i_date;
+        p_sys->i_time = i_start;
         es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + p_sys->i_time );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
         msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
         return VLC_SUCCESS;
 
