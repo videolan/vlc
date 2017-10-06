@@ -345,7 +345,7 @@ static int vlc_swidth(const char *str)
     }
 }
 
-static void print_item(const module_t *m, const module_config_t *item,
+static void print_item(const vlc_object_t *p_this, const module_t *m, const module_config_t *item,
                        const module_config_t **section, bool color, bool desc)
 {
 #ifndef _WIN32
@@ -379,46 +379,68 @@ static void print_item(const module_t *m, const module_config_t *item,
             return;
 
         case CONFIG_ITEM_STRING:
+        {
             type = _("string");
-            if (item->list_count > 0)
+
+            char **ppsz_values, **ppsz_texts;
+
+            ssize_t i_count = config_GetPszChoices(VLC_OBJECT(p_this), item->psz_name, &ppsz_values, &ppsz_texts);
+
+            if (i_count > 0)
             {
                 size_t len = 0;
 
-                for (unsigned i = 0; i < item->list_count; i++)
-                    len += strlen(item->list.psz[i]) + 1;
+                for (unsigned i = 0; i < i_count; i++)
+                    len += strlen(ppsz_values[i]) + 1;
 
                 typebuf = malloc(len);
                 if (typebuf == NULL)
-                    break;
+                    goto end_string;
 
                 bra = OPTION_VALUE_SEP "{";
                 type = typebuf;
                 ket = "}";
 
                 *typebuf = 0;
-                for (unsigned i = 0; i < item->list_count; i++)
+                for (unsigned i = 0; i < i_count; i++)
                 {
                     if (i > 0)
                         strcat(typebuf, ",");
-                    strcat(typebuf, item->list.psz[i]);
+                    strcat(typebuf, ppsz_values[i]);
                 }
-            }
-            break;
 
+            end_string:
+                for (unsigned i = 0; i < i_count; i++)
+                {
+                    free(ppsz_values[i]);
+                    free(ppsz_texts[i]);
+                }
+                free(ppsz_values);
+                free(ppsz_texts);
+            }
+
+            break;
+        }
         case CONFIG_ITEM_INTEGER:
+        {
             type = _("integer");
 
-            if (item->list_count > 0)
+            int64_t *pi_values;
+            char **ppsz_texts;
+
+            ssize_t i_count = config_GetIntChoices(VLC_OBJECT(p_this), item->psz_name, &pi_values, &ppsz_texts);
+
+            if (i_count > 0)
             {
                 size_t len = 0;
 
-                for (unsigned i = 0; i < item->list_count; i++)
-                    len += strlen(module_gettext(m, item->list_text[i]))
-                           + 4 * sizeof (int) + 5;
+                for (unsigned i = 0; i < i_count; i++)
+                    len += strlen(ppsz_texts[i])
+                           + 4 * sizeof (int64_t) + 5;
 
                 typebuf = malloc(len);
                 if (typebuf == NULL)
-                    break;
+                    goto end_integer;
 
                 bra = OPTION_VALUE_SEP "{";
                 type = typebuf;
@@ -429,10 +451,16 @@ static void print_item(const module_t *m, const module_config_t *item,
                 {
                     if (i != 0)
                         strcat(typebuf, ", ");
-                    sprintf(typebuf + strlen(typebuf), "%i (%s)",
-                            item->list.i[i],
-                            module_gettext(m, item->list_text[i]));
+                    sprintf(typebuf + strlen(typebuf), "%li (%s)",
+                            pi_values[i],
+                            ppsz_texts[i]);
                 }
+
+            end_integer:
+                for (unsigned i = 0; i < i_count; i++)
+                    free(ppsz_texts[i]);
+                free(pi_values);
+                free(ppsz_texts);
             }
             else if (item->min.i != INT64_MIN || item->max.i != INT64_MAX )
             {
@@ -443,7 +471,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                     typebuf = NULL;
             }
             break;
-
+        }
         case CONFIG_ITEM_FLOAT:
             type = _("float");
             if (item->min.f != FLT_MIN || item->max.f != FLT_MAX)
@@ -614,7 +642,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                 b_has_advanced = true;
                 continue;
             }
-            print_item(m, item, &section, color, desc);
+            print_item(p_this, m, item, &section, color, desc);
         }
     }
 
