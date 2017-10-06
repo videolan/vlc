@@ -221,5 +221,7 @@ void background_worker_Delete( struct background_worker* worker )
 {
     BackgroundWorkerCancel( worker, NULL );
     vlc_array_clear( &worker->tail.data );
+    vlc_mutex_destroy( &worker->lock );
+    vlc_cond_destroy( &worker->head.wait );
     free( worker );
 }
