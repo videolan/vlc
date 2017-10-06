@@ -41,6 +41,7 @@ struct background_worker {
     struct {
         bool probe_request; /**< true if a probe is requested */
         vlc_cond_t wait; /**< wait for update in terms of head */
+        vlc_cond_t worker_wait; /**< wait for probe request or cancelation */
         mtime_t deadline; /**< deadline of the current task */
         void* id; /**< id of the current task */
         bool active; /**< true if there is an active thread */
@@ -112,7 +113,7 @@ static void* Thread( void* data )
             if( worker->head.probe_request == false &&
                 worker->head.deadline > mdate() )
             {
-                vlc_cond_timedwait( &worker->head.wait, &worker->lock,
+                vlc_cond_timedwait( &worker->head.worker_wait, &worker->lock,
                                      worker->head.deadline );
             }
             vlc_mutex_unlock( &worker->lock );
@@ -145,7 +146,7 @@ static void BackgroundWorkerCancel( struct background_worker* worker, void* id)
         || ( id != NULL && worker->head.id == id ) )
     {
         worker->head.deadline = VLC_TS_0;
-        vlc_cond_broadcast( &worker->head.wait );
+        vlc_cond_signal( &worker->head.worker_wait );
         vlc_cond_wait( &worker->head.wait, &worker->lock );
     }
     vlc_mutex_unlock( &worker->lock );
@@ -167,6 +168,7 @@ struct background_worker* background_worker_New( void* owner,
 
     vlc_mutex_init( &worker->lock );
     vlc_cond_init( &worker->head.wait );
+    vlc_cond_init( &worker->head.worker_wait );
 
     vlc_array_init( &worker->tail.data );
 
@@ -213,7 +215,7 @@ void background_worker_RequestProbe( struct background_worker* worker )
 {
     vlc_mutex_lock( &worker->lock );
     worker->head.probe_request = true;
-    vlc_cond_broadcast( &worker->head.wait );
+    vlc_cond_signal( &worker->head.worker_wait );
     vlc_mutex_unlock( &worker->lock );
 }
 
@@ -223,5 +225,6 @@ void background_worker_Delete( struct background_worker* worker )
     vlc_array_clear( &worker->tail.data );
     vlc_mutex_destroy( &worker->lock );
     vlc_cond_destroy( &worker->head.wait );
+    vlc_cond_destroy( &worker->head.worker_wait );
     free( worker );
 }
