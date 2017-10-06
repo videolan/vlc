@@ -155,6 +155,7 @@ typedef struct
 
     es_format_t     fmt;
     es_out_id_t     *p_es;
+    int             i_next_block_flags;
 
     int             i_dv_audio_rate;
     es_out_id_t     *p_es_dv_audio;
@@ -1323,6 +1324,12 @@ static int Demux_Seekable( demux_t *p_demux )
         if( tk->i_dv_audio_rate )
             AVI_DvHandleAudio( p_demux, tk, p_frame );
 
+        if( tk->i_next_block_flags )
+        {
+            p_frame->i_flags = tk->i_next_block_flags;
+            tk->i_next_block_flags = 0;
+        }
+
         if( tk->p_es )
             es_out_Send( p_demux->out, tk->p_es, p_frame );
         else
@@ -1612,6 +1619,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent, bool b_accurat
                 p_stream->b_eof = AVI_TrackSeek( p_demux, i_stream, i_wanted ) != 0;
                 if( !p_stream->b_eof )
                 {
+                    p_stream->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+
                     if( p_stream->fmt.i_cat == AUDIO_ES || p_stream->fmt.i_cat == VIDEO_ES )
                         i_start = __MIN(i_start, AVI_GetPTS( p_stream ));
 
