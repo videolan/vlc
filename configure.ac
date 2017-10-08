@@ -2046,12 +2046,16 @@ AC_ARG_ENABLE(gme,
     [use Game Music Emu (default auto)])])
 AS_IF([test "${enable_gme}" != "no"], [
   AC_CHECK_HEADER([gme/gme.h], [
-    if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([gme], [-lgme -lstdc++])
-    else
-        VLC_ADD_LIBS([gme], [-lgme])
-    fi
-    VLC_ADD_PLUGIN([gme])
+    VLC_ADD_LIBS([gme], [-lgme])
+
+    AC_CHECK_LIB([gme], [gme_identify_header], [
+      VLC_ADD_PLUGIN([gme])
+    ], [
+      AC_CHECK_LIB([gme], [gme_identify_extension], [
+         VLC_ADD_LIBS([gme], [-lstdc++ $LIBM])
+         VLC_ADD_PLUGIN([gme])
+      ],, [-lstdc++ $LIBM])
+    ])
   ], [
     AS_IF([test "x${enable_gme}" != "x"], [
       AC_MSG_ERROR([GME cannot be found. Please install the development files.])
