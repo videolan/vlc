@@ -1795,6 +1795,9 @@ static void httpdLoop(httpd_host_t *host)
                             break;
                         }
 
+                        if (httpd_MsgGet(&cl->query, "Connection") != NULL)
+                            httpd_MsgAdd(answer, "Connection", "close");
+
                         cl->i_buffer = -1;  /* Force the creation of the answer in
                                              * httpd_ClientSend */
                         cl->i_state = HTTPD_CLIENT_SENDING;
