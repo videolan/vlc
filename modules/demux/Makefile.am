@@ -99,7 +99,7 @@ demux_LTLIBRARIES += libdemux_cdg_plugin.la
 libsmf_plugin_la_SOURCES = demux/smf.c
 demux_LTLIBRARIES += libsmf_plugin.la
 
-libgme_plugin_la_SOURCES = demux/gme.c dummy.cpp
+libgme_plugin_la_SOURCES = demux/gme.c
 libgme_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libgme_plugin_la_LIBADD = $(LIBS_gme)
 EXTRA_LTLIBRARIES += libgme_plugin.la
