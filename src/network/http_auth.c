@@ -357,7 +357,7 @@ int vlc_http_auth_ParseAuthenticationInfoHeader(
          */
         psz_digest = AuthDigest( p_this, p_auth, psz_method, psz_path,
                                  psz_username, psz_password );
-        if ( strcmp( psz_digest, psz_rspauth ) != 0 )
+        if( psz_digest == NULL || strcmp( psz_digest, psz_rspauth ) != 0 )
         {
             msg_Err( p_this, "HTTP Digest Access Authentication: server "
                              "replied with an invalid response digest "
