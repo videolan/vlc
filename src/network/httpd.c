@@ -310,7 +310,7 @@ httpd_FileCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
                     httpd_message_t *answer, const httpd_message_t *query)
 {
     httpd_file_t *file = (httpd_file_t*)p_sys;
-    uint8_t **pp_body, *p_body; const char *psz_connection;
+    uint8_t **pp_body, *p_body;
     int *pi_body, i_body;
 
     if (!answer || !query )
@@ -347,9 +347,8 @@ httpd_FileCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         free(p_body);
 
     /* We respect client request */
-    psz_connection = httpd_MsgGet(&cl->query, "Connection");
-    if (psz_connection)
-        httpd_MsgAdd(answer, "Connection", "%s", psz_connection);
+    if (httpd_MsgGet(&cl->query, "Connection") != NULL)
+        httpd_MsgAdd(answer, "Connection", "close");
 
     httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
 
