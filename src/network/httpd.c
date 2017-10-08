@@ -742,6 +742,9 @@ static int httpd_StreamCallBack(httpd_callback_sys_t *p_sys,
 
         if (!b_has_cache_control)
             httpd_MsgAdd(answer, "Cache-Control", "no-cache");
+
+        httpd_MsgAdd(answer, "Connection", "close");
+
         return VLC_SUCCESS;
     }
 }
