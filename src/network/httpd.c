@@ -1880,6 +1880,8 @@ static void httpdLoop(httpd_host_t *host)
                             cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
                             httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
                             httpd_MsgAdd(answer, "Content-Type", "%s", "text/html");
+                            if (httpd_MsgGet(&cl->query, "Connection") != NULL)
+                                httpd_MsgAdd(answer, "Connection", "close");
                         }
 
                         cl->i_state = HTTPD_CLIENT_SENDING;
