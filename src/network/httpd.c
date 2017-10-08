@@ -1892,23 +1892,22 @@ static void httpdLoop(httpd_host_t *host)
 
             case HTTPD_CLIENT_SEND_DONE:
                 if (!cl->b_stream_mode || cl->answer.i_body_offset == 0) {
-                    const char *psz_connection = httpd_MsgGet(&cl->answer, "Connection");
-                    const char *psz_query = httpd_MsgGet(&cl->query, "Connection");
-                    bool b_connection = false;
-                    bool b_query = false;
+                    bool do_close = false;
 
                     cl->url = NULL;
-                    if (psz_connection) {
-                        b_connection = (strcasecmp(psz_connection, "Close") == 0);
+
+                    if (cl->query.i_proto != HTTPD_PROTO_HTTP
+                     || cl->query.i_version > 0)
+                    {
+                        const char *psz_connection = httpd_MsgGet(&cl->answer,
+                                                                 "Connection");
+                        if (psz_connection != NULL)
+                            do_close = !strcasecmp(psz_connection, "close");
                     }
+                    else
+                        do_close = true;
 
-                    if (psz_query)
-                        b_query = (strcasecmp(psz_query, "Close") == 0);
-
-                    if (((cl->query.i_proto == HTTPD_PROTO_HTTP) &&
-                                (cl->query.i_version == 1 && !b_connection)) ||
-                            ((cl->query.i_proto == HTTPD_PROTO_RTSP) &&
-                              !b_query && !b_connection)) {
+                    if (!do_close) {
                         httpd_MsgClean(&cl->query);
                         httpd_MsgInit(&cl->query);
 
