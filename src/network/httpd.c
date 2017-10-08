@@ -551,6 +551,9 @@ static int httpd_RedirectCallBack(httpd_callback_sys_t *p_sys,
 
     httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
 
+    if (httpd_MsgGet(&cl->query, "Connection") != NULL)
+        httpd_MsgAdd(answer, "Connection", "close");
+
     return VLC_SUCCESS;
 }
 
