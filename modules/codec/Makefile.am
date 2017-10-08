@@ -475,9 +475,9 @@ endif
 
 ### X26x encoders ###
 
-libx265_plugin_la_SOURCES = codec/x265.c dummy.cpp
+libx265_plugin_la_SOURCES = codec/x265.c
 libx265_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libx265_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CFLAGS_x265)
+libx265_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x265)
 libx265_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x265) -rpath '$(codecdir)'
 libx265_plugin_la_LIBADD = $(LIBS_x265)
 EXTRA_LTLIBRARIES += libx265_plugin.la
