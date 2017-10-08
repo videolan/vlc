@@ -1884,21 +1884,18 @@ static void httpdLoop(httpd_host_t *host)
                     const char *psz_connection = httpd_MsgGet(&cl->answer, "Connection");
                     const char *psz_query = httpd_MsgGet(&cl->query, "Connection");
                     bool b_connection = false;
-                    bool b_keepalive = false;
                     bool b_query = false;
 
                     cl->url = NULL;
                     if (psz_connection) {
                         b_connection = (strcasecmp(psz_connection, "Close") == 0);
-                        b_keepalive = (strcasecmp(psz_connection, "Keep-Alive") == 0);
                     }
 
                     if (psz_query)
                         b_query = (strcasecmp(psz_query, "Close") == 0);
 
                     if (((cl->query.i_proto == HTTPD_PROTO_HTTP) &&
-                                ((cl->query.i_version == 0 && b_keepalive) ||
-                                  (cl->query.i_version == 1 && !b_connection))) ||
+                                (cl->query.i_version == 1 && !b_connection)) ||
                             ((cl->query.i_proto == HTTPD_PROTO_RTSP) &&
                               !b_query && !b_connection)) {
                         httpd_MsgClean(&cl->query);
