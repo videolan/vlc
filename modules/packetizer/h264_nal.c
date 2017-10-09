@@ -739,7 +739,7 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
                     i_max_num_reorder_frames = 0; /* all IDR */
                     break;
                 }
-                // ft
+                /* fallthrough */
             default:
                 i_max_num_reorder_frames = h264_get_max_dpb_frames( p_sps );
                 break;

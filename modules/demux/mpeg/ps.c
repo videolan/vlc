@@ -496,7 +496,7 @@ static int Demux( demux_t *p_demux )
             block_Release( p_pkt );
             break;
         }
-        //ft
+        /* fallthrough */
     case PS_STREAM_ID_PRIVATE_STREAM1:
     case PS_STREAM_ID_EXTENDED:
         {

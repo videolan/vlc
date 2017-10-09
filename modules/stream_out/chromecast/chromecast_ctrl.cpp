@@ -129,12 +129,12 @@ intf_sys_t::~intf_sys_t()
     case Seeking:
         // Generate the close messages.
         m_communication.msgReceiverClose( m_appTransportId );
-        // ft
+        /* fallthrough */
     case Connecting:
     case Connected:
     case Launching:
         m_communication.msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
-        // ft
+        /* fallthrough */
     default:
         break;
     }

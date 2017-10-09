@@ -298,7 +298,7 @@ static void ParsePMTPrivateRegistrations( demux_t *p_demux, const dvbpsi_descrip
                     msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
                     break;
                 }
-                //ft
+                /* fallthrough */
             }
             default:
                 msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
@@ -1492,7 +1492,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         /* All other private or reserved types */
         case 0x13: /* SL in sections */
             p_pes->transport = TS_TRANSPORT_SECTIONS;
-            //ft
+            /* fallthrough */
         case 0x0f:
         case 0x10:
         case 0x11:

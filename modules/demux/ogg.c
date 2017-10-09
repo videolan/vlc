@@ -1239,7 +1239,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 #ifdef HAVE_LIBVORBIS
             Ogg_DecodeVorbisHeader( p_stream, p_oggpacket, p_stream->i_packets_backup );
 #endif
-            //ft
+            /* fallthrough */
         case VLC_CODEC_THEORA:
             if( p_stream->i_packets_backup == 3 )
                 p_stream->b_force_backup = false;
@@ -2733,7 +2733,7 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
         }
         vorbis_info_init( p_stream->special.vorbis.p_info );
         vorbis_comment_init( p_stream->special.vorbis.p_comment );
-        // ft
+        /* fallthrough */
 
     case VORBIS_HEADER_COMMENT:
     case VORBIS_HEADER_SETUP:
@@ -2744,7 +2744,7 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
             break;
 
         p_stream->special.vorbis.i_headers_flags |= VORBIS_HEADER_TO_FLAG(i_number);
-        // ft
+        /* fallthrough */
 
     default:
         break;
