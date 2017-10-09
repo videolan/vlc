@@ -228,6 +228,18 @@ libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
                               demux/webvtt.c \
                               demux/mp4/minibox.h
 codec_LTLIBRARIES += libwebvtt_plugin.la
+AM_YFLAGS = -d
+if ENABLE_CSS
+SUFFIXES += .l .y
+# dependency: we need grammar build first
+BUILT_SOURCES += codec/webvtt/CSSGrammar.h
+libwebvtt_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/codec/webvtt/ -I$(builddir)/codec/webvtt/
+libwebvtt_plugin_la_SOURCES += codec/webvtt/CSSGrammar.y \
+                               codec/webvtt/CSSLexer.l \
+                               codec/webvtt/css_parser.c \
+                               codec/webvtt/css_parser.h \
+                               codec/webvtt/css_bridge.h
+endif
 
 libsvcdsub_plugin_la_SOURCES = codec/svcdsub.c
 codec_LTLIBRARIES += libsvcdsub_plugin.la

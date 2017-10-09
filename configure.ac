@@ -2956,6 +2956,25 @@ AS_IF([test "${enable_tiger}" != "no"], [
   ])
 ])
 
+dnl
+dnl  check if we can build the css selector engine 
+dnl
+AC_ARG_ENABLE(css,
+[  --enable-css            CSS selector engine (default auto)])
+AS_IF([test "${enable_css}" != "no"], [
+  AC_PROG_LEX
+  with_css="no"
+  AS_IF([test "x$LEX" != "x:"], [
+    AC_PROG_YACC
+    dnl can only accept bison or we need byacc feature test for %destructor
+    AS_IF([test "x$YACC" = "xbison -y"], [
+      AC_DEFINE(HAVE_CSS, 1, [Define if CSS engine is built])]
+      with_css="yes"
+    ,[AC_MSG_WARN("Bison not found. CSS support disabled.")])
+  ])
+])
+AM_CONDITIONAL([ENABLE_CSS], [test "${with_css}" = "yes"])
+
 
 dnl
 dnl  Video plugins
