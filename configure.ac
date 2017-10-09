@@ -2046,8 +2046,6 @@ AC_ARG_ENABLE(gme,
     [use Game Music Emu (default auto)])])
 AS_IF([test "${enable_gme}" != "no"], [
   AC_CHECK_HEADER([gme/gme.h], [
-    VLC_ADD_LIBS([gme], [-lgme])
-
     AC_CHECK_LIB([gme], [gme_identify_header], [
       VLC_ADD_PLUGIN([gme])
     ], [
@@ -2056,6 +2054,7 @@ AS_IF([test "${enable_gme}" != "no"], [
          VLC_ADD_PLUGIN([gme])
       ],, [-lstdc++ $LIBM])
     ])
+    VLC_ADD_LIBS([gme], [-lgme])
   ], [
     AS_IF([test "x${enable_gme}" != "x"], [
       AC_MSG_ERROR([GME cannot be found. Please install the development files.])
