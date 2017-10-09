@@ -451,7 +451,7 @@ static void print_item(const vlc_object_t *p_this, const module_t *m, const modu
                 {
                     if (i != 0)
                         strcat(typebuf, ", ");
-                    sprintf(typebuf + strlen(typebuf), "%li (%s)",
+                    sprintf(typebuf + strlen(typebuf), "%"PRIi64" (%s)",
                             pi_values[i],
                             ppsz_texts[i]);
                 }
