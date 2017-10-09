@@ -1571,6 +1571,7 @@ static void *DecoderThread( void *p_data )
         if( p_owner->paused && p_owner->frames_countdown == 0 )
         {   /* Wait for resumption from pause */
             p_owner->b_idle = true;
+            vlc_cond_signal( &p_owner->wait_acknowledge );
             vlc_fifo_Wait( p_owner->p_fifo );
             p_owner->b_idle = false;
             continue;
@@ -1585,6 +1586,7 @@ static void *DecoderThread( void *p_data )
             if( likely(!p_owner->b_draining) )
             {   /* Wait for a block to decode (or a request to drain) */
                 p_owner->b_idle = true;
+                vlc_cond_signal( &p_owner->wait_acknowledge );
                 vlc_fifo_Wait( p_owner->p_fifo );
                 p_owner->b_idle = false;
                 continue;
