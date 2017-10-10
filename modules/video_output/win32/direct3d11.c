@@ -1671,7 +1671,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     DXGI_SWAP_CHAIN_DESC1 scd;
     memset(&scd, 0, sizeof(scd));
-    scd.BufferCount = 2;
+    scd.BufferCount = 3;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.SampleDesc.Count = 1;
     scd.SampleDesc.Quality = 0;
