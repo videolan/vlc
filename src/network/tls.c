@@ -253,8 +253,13 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
         }
         if (iov.iov_len == 0 || val == 0)
             return rcvd;
-        if (val == -1 && errno != EINTR && errno != EAGAIN)
-            return rcvd ? (ssize_t)rcvd : -1;
+        if (val == -1)
+        {
+            if (vlc_killed())
+                return -1;
+            if (errno != EINTR && errno != EAGAIN)
+                return rcvd ? (ssize_t)rcvd : -1;
+        }
 
         vlc_poll_i11e(&ufd, 1, -1);
     }
@@ -287,8 +292,13 @@ ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
         }
         if (iov.iov_len == 0 || val == 0)
             return sent;
-        if (val == -1 && errno != EINTR && errno != EAGAIN)
-            return sent ? (ssize_t)sent : -1;
+        if (val == -1)
+        {
+            if (vlc_killed())
+                return -1;
+            if (errno != EINTR && errno != EAGAIN)
+                return sent ? (ssize_t)sent : -1;
+        }
 
         vlc_poll_i11e(&ufd, 1, -1);
     }
