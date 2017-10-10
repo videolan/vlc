@@ -1405,7 +1405,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
     }
 
-    //ID3D11DeviceContext_Flush(sys->d3dcontext);
+    ID3D11DeviceContext_Flush(sys->d3dcontext);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
