@@ -72,7 +72,7 @@ vlc_module_begin ()
     add_integer ("xvideo-format-id", 0,
                  FORMAT_TEXT, FORMAT_LONGTEXT, true)
     add_obsolete_bool ("xvideo-shm") /* removed in 2.0.0 */
-    add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
+    add_shortcut ("xcb-xv", "xv", "xvideo")
 vlc_module_end ()
 
 #define MAX_PICTURES (128)

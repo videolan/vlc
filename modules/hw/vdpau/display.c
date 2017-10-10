@@ -49,7 +49,7 @@ vlc_module_begin()
     set_capability("vout display", 0)
     set_callbacks(Open, Close)
 
-    add_shortcut("vdpau", "xid")
+    add_shortcut("vdpau")
 vlc_module_end()
 
 struct vout_display_sys_t
