@@ -595,16 +595,6 @@ error:
     return VLC_EGENERIC;
 }
 
-#if MAC_OS_X_VERSION_MIN_ALLOWED <= MAC_OS_X_VERSION_10_11
-const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
-#endif
-
-#if TARGET_OS_IPHONE
-# define CI_HANDLE_COLORSPACES (NSFoundationVersionNumber >= 1240)
-#else
-# define CI_HANDLE_COLORSPACES (NSFoundationVersionNumber >= 1252)
-#endif
-
 static int
 Open(vlc_object_t *obj, char const *psz_filter)
 {
@@ -616,7 +606,10 @@ Open(vlc_object_t *obj, char const *psz_filter)
         case VLC_CODEC_CVPX_UYVY:
         case VLC_CODEC_CVPX_I420:
         case VLC_CODEC_CVPX_BGRA:
-            if (!CI_HANDLE_COLORSPACES)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+            if (&kCGColorSpaceITUR_709 == nil)
+#pragma clang diagnostic pop
             {
                 msg_Warn(obj, "iOS/macOS version is too old, aborting...");
                 return VLC_EGENERIC;
