@@ -1175,7 +1175,7 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
     assert (p_mi != NULL);
 
     var_SetString (p_mi, "avcodec-hw", "");
-    var_SetString (p_mi, "vout", drawable ? "xid" : "");
+    var_SetString (p_mi, "vout", "");
     var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
