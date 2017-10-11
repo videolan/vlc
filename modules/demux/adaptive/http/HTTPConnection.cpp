@@ -235,18 +235,24 @@ int HTTPConnection::parseReply()
     int replycode;
     ss >> replycode;
 
-    std::string line = readLine();
-
-    while(!line.empty() && line.compare("\r\n"))
+    std::string lines;
+    for( ;; )
     {
-        size_t split = line.find_first_of(':');
-        size_t value = split + 1;
+        std::string l = readLine();
+        if(!l.empty() && l.compare("\r\n"))
+            break;
+        lines.append(l);
 
-        while(line.at(value) == ' ')
-            value++;
+        size_t split = lines.find_first_of(':');
+        if(split != std::string::npos)
+        {
+            size_t value = split + 1;
+            while(lines.at(value) == ' ')
+                value++;
 
-        onHeader(line.substr(0, split), line.substr(value));
-        line = readLine();
+            onHeader(lines.substr(0, split), lines.substr(value));
+            lines = std::string();
+        }
     }
 
     if((replycode == 301 || replycode == 302 || replycode == 307 || replycode == 308) &&
