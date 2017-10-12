@@ -542,7 +542,7 @@ libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_
 LIBVLC_API
 libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_instance );
 
-/** @} */
+/** @} */
 
 /** \defgroup libvlc_clock LibVLC time
  * These functions provide access to the LibVLC time/clock.
@@ -571,7 +571,7 @@ static inline int64_t libvlc_delay(int64_t pts)
     return pts - libvlc_clock();
 }
 
-/** @} */
+/** @} */
 
 # ifdef __cplusplus
 }
