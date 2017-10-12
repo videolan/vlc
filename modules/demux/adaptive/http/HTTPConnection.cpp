@@ -239,7 +239,7 @@ int HTTPConnection::parseReply()
     for( ;; )
     {
         std::string l = readLine();
-        if(l.empty() || l.compare("\r\n") == 0)
+        if(l.empty())
             break;
         lines.append(l);
 
