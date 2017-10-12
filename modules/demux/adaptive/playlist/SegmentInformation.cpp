@@ -422,7 +422,7 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     else
     {
         const Timescale timescale = inheritTimescale();
-        const ISegment *segment = getSegment(SegmentInfoType::INFOTYPE_MEDIA, number);
+        const ISegment *segment = getSegment(INFOTYPE_MEDIA, number);
         if( segment )
         {
             *time = timescale.ToTime(segment->startTime.Get());

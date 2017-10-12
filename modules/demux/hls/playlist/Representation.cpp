@@ -160,7 +160,7 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInfor
 {
     if(consistentSegmentNumber())
         return num;
-    ISegment *fromSeg = from->getSegment(SegmentInfoType::INFOTYPE_MEDIA, num);
+    ISegment *fromSeg = from->getSegment(INFOTYPE_MEDIA, num);
     HLSSegment *fromHlsSeg = dynamic_cast<HLSSegment *>(fromSeg);
     if(!fromHlsSeg)
         return 1;
@@ -168,7 +168,7 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInfor
 
     std::vector<ISegment *> list;
     std::vector<ISegment *>::const_iterator it;
-    getSegments(SegmentInfoType::INFOTYPE_MEDIA, list);
+    getSegments(INFOTYPE_MEDIA, list);
     for(it=list.begin(); it != list.end(); ++it)
     {
         const HLSSegment *hlsSeg = dynamic_cast<HLSSegment *>(*it);
