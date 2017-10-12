@@ -1194,7 +1194,7 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
             p_val->i_int = config_GetInt( p_this, psz_name );
             break;
         case VLC_VAR_BOOL:
-            p_val->b_bool = config_GetInt( p_this, psz_name );
+            p_val->b_bool = config_GetInt( p_this, psz_name ) > 0;
             break;
         default:
             vlc_assert_unreachable();
