@@ -1670,8 +1670,15 @@ void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
                              vlc_object_t *p_obj, input_item_node_t *p_node)
 {
     /* Read options from the parent item. This allows vlc_stream_ReadDir()
-     * users to specify options whitout touching any vlc_object_t. */
-    input_item_ApplyOptions(p_obj, p_node->p_item);
+     * users to specify options whitout touhing any vlc_object_t. Apply options
+     * on a temporary object in order to not apply options (that can be
+     * insecure) to the current object. */
+    vlc_object_t *p_var_obj = vlc_object_create(p_obj, sizeof(vlc_object_t));
+    if (p_var_obj != NULL)
+    {
+        input_item_ApplyOptions(p_var_obj, p_node->p_item);
+        p_obj = p_var_obj;
+    }
 
     p_rdh->p_node = p_node;
     p_rdh->b_show_hiddenfiles = var_InheritBool(p_obj, "show-hiddenfiles");
@@ -1681,6 +1688,9 @@ void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
         var_InheritInteger(p_obj, "sub-autodetect-fuzzy");
     TAB_INIT(p_rdh->i_slaves, p_rdh->pp_slaves);
     TAB_INIT(p_rdh->i_dirs, p_rdh->pp_dirs);
+
+    if (p_var_obj != NULL)
+        vlc_object_release(p_var_obj);
 }
 
 void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
