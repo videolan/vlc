@@ -244,6 +244,7 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
             if( !child_stream )
             {
                 msg_Err( getIntf(), "unable to open %s for reading", child->psz_name );
+                return false;
             }
 
             auto out_path = tempPath + "/" + child->psz_name;
