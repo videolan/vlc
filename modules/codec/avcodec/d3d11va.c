@@ -385,6 +385,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             va->sys->totalTextureSlices = dstDesc.ArraySize;
         }
     }
+    if (!va->sys->textureWidth || !va->sys->textureHeight)
+    {
+        va->sys->textureWidth  = fmt->video.i_width;
+        va->sys->textureHeight = fmt->video.i_height;
+    }
 
 #if VLC_WINSTORE_APP
     err = directx_va_Open(va, &sys->dx_sys, false);
@@ -861,8 +866,8 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     {
         D3D11_TEXTURE2D_DESC texDesc;
         ZeroMemory(&texDesc, sizeof(texDesc));
-        texDesc.Width = fmt->i_width;
-        texDesc.Height = fmt->i_height;
+        texDesc.Width = sys->textureWidth;
+        texDesc.Height = sys->textureHeight;
         texDesc.MipLevels = 1;
         texDesc.Format = sys->render;
         texDesc.SampleDesc.Count = 1;
