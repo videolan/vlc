@@ -1606,7 +1606,7 @@ done:
                 }
 
                 msg_Dbg(vd, "Output max luminance: %.1f, colorspace %s, bits per pixel %d", desc1.MaxFullFrameLuminance, csp?csp->name:"unknown", desc1.BitsPerColor);
-                sys->display.luminance_peak = desc1.MaxFullFrameLuminance;
+                //sys->display.luminance_peak = desc1.MaxFullFrameLuminance;
             }
             IDXGIOutput6_Release( dxgiOutput6 );
         }
