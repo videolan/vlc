@@ -130,7 +130,7 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
         std::string fext = filename.substr(namesize - ext.length(), ext.length());
         std::transform(fext.begin(), fext.end(), fext.begin(), ::toupper);
         if(fext == ext)
-            return new T(fileName, false, AudioProperties::ReadStyle::Fast);
+            return new T(fileName, false, AudioProperties::Fast);
     }
 
     return 0;
