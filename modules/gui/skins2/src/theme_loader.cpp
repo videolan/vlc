@@ -229,6 +229,8 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
         if( !item || !node )
             return false;
 
+        input_item_AddOption( item.get(), "ignore-filetypes=\"\"", VLC_INPUT_OPTION_TRUSTED );
+        input_item_AddOption( item.get(), "extractor-flatten", VLC_INPUT_OPTION_TRUSTED );
         node->p_item = item.release();
 
         if( vlc_stream_ReadDir( input.get(), node.get() ) )
