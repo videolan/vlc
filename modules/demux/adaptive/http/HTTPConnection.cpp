@@ -246,10 +246,9 @@ int HTTPConnection::parseReply()
         size_t split = lines.find_first_of(':');
         if(split != std::string::npos)
         {
-            size_t value = split + 1;
-            while(lines.at(value) == ' ')
-                value++;
-
+            size_t value = lines.find_first_not_of(' ', split + 1);
+            if(value == std::string::npos)
+                value = lines.length();
             onHeader(lines.substr(0, split), lines.substr(value));
             lines = std::string();
         }
