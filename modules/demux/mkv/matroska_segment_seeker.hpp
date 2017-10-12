@@ -49,7 +49,7 @@ class SegmentSeeker
 
             bool operator<( Range const& rhs ) const
             {
-                return start < rhs.start;    
+                return start < rhs.start;
             }
         };
 
