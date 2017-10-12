@@ -1686,6 +1686,7 @@ void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
     bool b_autodetect = var_InheritBool(p_obj, "sub-autodetect-file");
     p_rdh->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
         var_InheritInteger(p_obj, "sub-autodetect-fuzzy");
+    p_rdh->b_flatten = var_InheritBool(p_obj, "extractor-flatten");
     TAB_INIT(p_rdh->i_slaves, p_rdh->pp_slaves);
     TAB_INIT(p_rdh->i_dirs, p_rdh->pp_dirs);
 
@@ -1728,13 +1729,22 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
     struct rdh_slave *p_rdh_slave = NULL;
     assert(psz_flatpath || psz_filename);
 
-    if (psz_filename == NULL)
+    if (!p_rdh->b_flatten)
     {
-        psz_filename = strrchr(psz_flatpath, '/');
-        if (psz_filename != NULL)
-            ++psz_filename;
-        else
+        if (psz_filename == NULL)
+        {
+            psz_filename = strrchr(psz_flatpath, '/');
+            if (psz_filename != NULL)
+                ++psz_filename;
+            else
+                psz_filename = psz_flatpath;
+        }
+    }
+    else
+    {
+        if (psz_filename == NULL)
             psz_filename = psz_flatpath;
+        psz_flatpath = NULL;
     }
 
     if (p_rdh->i_sub_autodetect_fuzzy != 0

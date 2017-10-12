@@ -425,6 +425,7 @@ struct vlc_readdir_helper
     size_t i_dirs;
     int i_sub_autodetect_fuzzy;
     bool b_show_hiddenfiles;
+    bool b_flatten;
     char *psz_ignored_exts;
 };
 
