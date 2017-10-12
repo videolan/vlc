@@ -1609,7 +1609,12 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             p_dec->p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
             return -1;
     }
-    return decoder_UpdateVideoFormat(p_dec);
+    if (decoder_UpdateVideoFormat(p_dec) != 0)
+    {
+        p_dec->p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        return -1;
+    }
+    return 0;
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
