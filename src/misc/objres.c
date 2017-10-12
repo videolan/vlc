@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <stdalign.h>
+#include <stddef.h>
 
 #include <vlc_common.h>
 
