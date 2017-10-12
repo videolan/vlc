@@ -31,7 +31,7 @@
 using namespace adaptive::playlist;
 
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
-    ICanonicalUrl( parent ), Initializable(), Indexable(),
+    ICanonicalUrl( parent ),
     startIndex( 0 )
 {
     duration.Set(0);

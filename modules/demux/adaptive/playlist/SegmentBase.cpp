@@ -30,9 +30,7 @@
 using namespace adaptive::playlist;
 
 SegmentBase::SegmentBase(ICanonicalUrl *parent) :
-             Segment(parent),
-             Initializable(),
-             Indexable()
+             Segment(parent)
 {
 }
 SegmentBase::~SegmentBase   ()
