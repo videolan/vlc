@@ -13,6 +13,11 @@ ifeq ($(ARCH),mips64el)
 GMP_CONF += --disable-assembly
 endif
 endif
+ifdef HAVE_NACL
+ifeq ($(ARCH),x86_64)
+GMP_CONF += --disable-assembly
+endif
+endif
 
 $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 	$(call download_pkg,$(GMP_URL),gmp)
