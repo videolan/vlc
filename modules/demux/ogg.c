@@ -1171,7 +1171,10 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
         {
             DemuxDebug( msg_Dbg( p_demux, "block sent directly > pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
                      p_block->i_pts, p_stream->i_pcr, p_ogg->i_pcr ) );
-            es_out_Send( p_demux->out, p_stream->p_es, p_block );
+            if ( p_stream->p_es )
+                es_out_Send( p_demux->out, p_stream->p_es, p_block );
+            else
+                block_Release( p_block );
         }
     }
 }
