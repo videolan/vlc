@@ -8,7 +8,7 @@ PKGS_FOUND += mpg123
 endif
 
 MPG123CONF = $(HOSTCONF)
-MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no
+MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no --disable-network
 
 ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), armeabi-v7a)
