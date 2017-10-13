@@ -448,6 +448,12 @@ static void OpenglESSwap(vlc_gl_t *gl)
     if (unlikely(!_appActive))
         return nil;
 
+    /* the following creates a new OpenGL ES context with the API version we
+     * need if there is already an active context created by another OpenGL
+     * provider we cache it and restore analog to the lock/unlock pattern used
+     * through-out the class */
+    _previousEaglContext = [EAGLContext currentContext];
+
     _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
     if (unlikely(!_eaglContext))
@@ -460,6 +466,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
     layer.opaque = YES;
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    [self unlock];
 
     return self;
 }
@@ -640,8 +648,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
-    EAGLContext *previousContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
+    [self lock];
 
     CGSize viewSize = [self bounds].size;
     CGFloat scaleFactor = self.contentScaleFactor;
@@ -661,7 +668,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
-    [EAGLContext setCurrentContext:previousContext];
+    [self unlock];
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
