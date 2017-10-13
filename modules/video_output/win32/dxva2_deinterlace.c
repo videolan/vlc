@@ -50,6 +50,11 @@ struct filter_sys_t
 
     DXVA2_VideoProcessorCaps       decoder_caps;
 
+    SHORT Brightness;
+    SHORT Contrast;
+    SHORT Hue;
+    SHORT Saturation;
+
     struct deinterlace_ctx         context;
     picture_t *                    (*buffer_new)( filter_t * );
 };
@@ -102,7 +107,8 @@ static void FillSample( DXVA2_VideoSample *p_sample,
     p_sample->PlanarAlpha    = DXVA2_Fixed32OpaqueAlpha();
 }
 
-static void FillBlitParams( DXVA2_VideoProcessBltParams *params, const RECT *area,
+static void FillBlitParams( filter_sys_t *sys,
+                            DXVA2_VideoProcessBltParams *params, const RECT *area,
                             const DXVA2_VideoSample *samples, int order )
 {
     memset(params, 0, sizeof(*params));
@@ -114,6 +120,11 @@ static void FillBlitParams( DXVA2_VideoProcessBltParams *params, const RECT *are
     params->BackgroundColor.Alpha = 0xFFFF;
     params->ConstrictionSize.cx = params->TargetRect.right;
     params->ConstrictionSize.cy = params->TargetRect.bottom;
+
+    params->ProcAmpValues.Brightness.Value = sys->Brightness;
+    params->ProcAmpValues.Contrast.Value   = sys->Contrast;
+    params->ProcAmpValues.Hue.Value        = sys->Hue;
+    params->ProcAmpValues.Saturation.Value = sys->Saturation;
 }
 
 static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
@@ -171,7 +182,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
         }
     }
 
-    FillBlitParams( &params, &area, samples, order );
+    FillBlitParams( sys, &params, &area, samples, order );
 
     hr = IDirectXVideoProcessor_VideoProcessBlt( sys->processor,
                                                  sys->hw_surface,
@@ -400,6 +411,35 @@ static int Open(vlc_object_t *obj)
                                                       NULL);
     if (FAILED(hr))
         goto error;
+
+    DXVA2_ValueRange Range;
+    hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
+                                                        dstDesc.Format, DXVA2_ProcAmp_Brightness,
+                                                        &Range );
+    if (FAILED(hr))
+        goto error;
+    sys->Brightness = Range.DefaultValue.Value;
+
+    hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
+                                                        dstDesc.Format, DXVA2_ProcAmp_Contrast,
+                                                        &Range );
+    if (FAILED(hr))
+        goto error;
+    sys->Contrast = Range.DefaultValue.Value;
+
+    hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
+                                                        dstDesc.Format, DXVA2_ProcAmp_Hue,
+                                                        &Range );
+    if (FAILED(hr))
+        goto error;
+    sys->Hue = Range.DefaultValue.Value;
+
+    hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
+                                                        dstDesc.Format, DXVA2_ProcAmp_Saturation,
+                                                        &Range );
+    if (FAILED(hr))
+        goto error;
+    sys->Saturation = Range.DefaultValue.Value;
 
     sys->hdecoder_dll = hdecoder_dll;
     sys->d3d9_dll     = d3d9_dll;
