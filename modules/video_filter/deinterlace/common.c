@@ -351,6 +351,10 @@ drop:
         if( p_dst[i] )
             picture_Release( p_dst[i] );
     }
+#ifndef NDEBUG
     picture_Release( p_pic );
     return NULL;
+#else
+    return p_pic;
+#endif
 }
