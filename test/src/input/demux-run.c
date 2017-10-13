@@ -47,6 +47,7 @@
 #include <vlc/vlc.h>
 
 #include "demux-run.h"
+#include "decoder.h"
 
 struct test_es_out_t
 {
@@ -57,6 +58,9 @@ struct test_es_out_t
 struct es_out_id_t
 {
     struct es_out_id_t *next;
+#ifdef HAVE_DECODERS
+    decoder_t *decoder;
+#endif
 };
 
 static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
@@ -72,6 +76,9 @@ static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
 
     id->next = ctx->ids;
     ctx->ids = id;
+#ifdef HAVE_DECODERS
+    id->decoder = test_decoder_create((void *)out->p_sys, fmt);
+#endif
 
     debug("[%p] Added   ES\n", (void *)id);
     return id;
@@ -92,8 +99,26 @@ static int EsOutSend(es_out_t *out, es_out_id_t *id, block_t *block)
 {
     //debug("[%p] Sent    ES: %zu\n", (void *)idd, block->i_buffer);
     EsOutCheckId(out, id);
-    block_Release(block);
+#ifdef HAVE_DECODERS
+    if (id->decoder)
+        test_decoder_process(id->decoder, block);
+    else
+#endif
+        block_Release(block);
     return VLC_SUCCESS;
+}
+
+static void IdDelete(es_out_id_t *id)
+{
+#ifdef HAVE_DECODERS
+    if (id->decoder)
+    {
+        /* Drain */
+        test_decoder_process(id->decoder, NULL);
+        test_decoder_destroy(id->decoder);
+    }
+#endif
+    free(id);
 }
 
 static void EsOutDelete(es_out_t *out, es_out_id_t *id)
@@ -110,7 +135,7 @@ static void EsOutDelete(es_out_t *out, es_out_id_t *id)
 
     debug("[%p] Deleted ES\n", (void *)id);
     *pp = id->next;
-    free(id);
+    IdDelete(id);
 }
 
 static int EsOutControl(es_out_t *out, int query, va_list args)
@@ -164,7 +189,7 @@ static void EsOutDestroy(es_out_t *out)
     while ((id = ctx->ids) != NULL)
     {
         ctx->ids = id->next;
-        free(id);
+        IdDelete(id);
     }
     free(ctx);
 }
@@ -340,6 +365,31 @@ int vlc_demux_process_memory(const struct vlc_run_args *args,
 typedef int (*vlc_plugin_cb)(int (*)(void *, void *, int, ...), void *);
 extern vlc_plugin_cb vlc_static_modules[];
 
+#ifdef HAVE_DECODERS
+#define DECODER_PLUGINS(f) \
+    f(adpcm) \
+    f(aes3) \
+    f(araw) \
+    f(g711) \
+    f(lpcm) \
+    f(uleaddvaudio) \
+    f(rawvideo) \
+    f(cc) \
+    f(cvdsub) \
+    f(dvbsub) \
+    f(scte18) \
+    f(scte27) \
+    f(spudec) \
+    f(stl) \
+    f(subsdec) \
+    f(subsusf) \
+    f(svcdsub) \
+    f(textst) \
+    f(substx3g)
+#else
+#define DECODER_PLUGINS(f)
+#endif
+
 #define PLUGINS(f) \
     f(xml) \
     f(console) \
@@ -383,7 +433,9 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(mpeg4video) \
     f(mpegaudio) \
     f(mpegvideo) \
-    f(vc1)
+    f(vc1) \
+    DECODER_PLUGINS(f)
+
 #ifdef HAVE_DVBPSI
 # define PLUGIN_TS(f) f(ts)
 #else

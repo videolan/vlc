@@ -200,6 +200,35 @@ endif
 endif
 EXTRA_LTLIBRARIES = libvlc_demux_run.la
 
+libvlc_demux_dec_run_la_SOURCES = $(libvlc_demux_run_la_SOURCES) \
+	src/input/decoder.c src/input/decoder.h
+libvlc_demux_dec_run_la_CPPFLAGS = $(libvlc_demux_run_la_CPPFLAGS) -DHAVE_DECODERS
+libvlc_demux_dec_run_la_LDFLAGS = $(libvlc_demux_run_la_LDFLAGS)
+libvlc_demux_dec_run_la_LIBADD = $(libvlc_demux_run_la_LIBADD)
+if !HAVE_DYNAMIC_PLUGINS
+libvlc_demux_dec_run_la_LIBADD += \
+	../modules/libadpcm_plugin.la \
+	../modules/libaes3_plugin.la \
+	../modules/libaraw_plugin.la \
+	../modules/libg711_plugin.la \
+	../modules/liblpcm_plugin.la \
+	../modules/libuleaddvaudio_plugin.la \
+	../modules/librawvideo_plugin.la \
+	../modules/libcc_plugin.la \
+	../modules/libcvdsub_plugin.la \
+	../modules/libdvbsub_plugin.la \
+	../modules/libscte18_plugin.la \
+	../modules/libscte27_plugin.la \
+	../modules/libspudec_plugin.la \
+	../modules/libstl_plugin.la \
+	../modules/libsubsdec_plugin.la \
+	../modules/libsubsusf_plugin.la \
+	../modules/libsvcdsub_plugin.la \
+	../modules/libtextst_plugin.la \
+	../modules/libsubstx3g_plugin.la
+endif
+EXTRA_LTLIBRARIES += libvlc_demux_dec_run.la
+
 #
 # Fuzzers
 #
@@ -210,3 +239,13 @@ EXTRA_PROGRAMS += vlc-demux-run
 vlc_demux_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
 vlc_demux_libfuzzer_LDADD = libvlc_demux_run.la
 EXTRA_PROGRAMS += vlc-demux-libfuzzer
+
+vlc_demux_dec_run_SOURCES = vlc-demux-run.c
+vlc_demux_dec_run_LDFLAGS = -no-install -static
+vlc_demux_dec_run_LDADD = libvlc_demux_dec_run.la
+EXTRA_PROGRAMS += vlc-demux-dec-run
+
+vlc_demux_dec_libfuzzer_SOURCES = vlc-demux-libfuzzer.c
+vlc_demux_dec_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
+vlc_demux_dec_libfuzzer_LDADD = libvlc_demux_dec_run.la
+EXTRA_PROGRAMS += vlc-demux-dec-libfuzzer
