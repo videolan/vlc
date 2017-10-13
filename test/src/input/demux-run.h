@@ -26,7 +26,7 @@
 
 #include "common.h"
 
-int vlc_demux_process_url(const char *demux, const char *url);
-int vlc_demux_process_path(const char *demux, const char *path);
-int vlc_demux_process_memory(const char *demux,
+int vlc_demux_process_url(const struct vlc_run_args *, const char *url);
+int vlc_demux_process_path(const struct vlc_run_args *, const char *path);
+int vlc_demux_process_memory(const struct vlc_run_args *,
                              const unsigned char *buf, size_t length);

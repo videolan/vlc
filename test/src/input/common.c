@@ -26,7 +26,23 @@
 
 #include "common.h"
 
-libvlc_instance_t *libvlc_create(void)
+static inline int getenv_atoi(const char *name)
+{
+    char *env = getenv(name);
+    return env ? atoi(env) : 0;
+}
+
+void vlc_run_args_init(struct vlc_run_args *args)
+{
+    memset(args, 0, sizeof(struct vlc_run_args));
+    args->verbose = getenv_atoi("V");
+    if (args->verbose >= 10)
+        args->verbose = 9;
+
+    args->name = getenv("VLC_TARGET");
+}
+
+libvlc_instance_t *libvlc_create(const struct vlc_run_args *args)
 {
 #ifdef TOP_BUILDDIR
 # ifndef HAVE_STATIC_MODULES
@@ -35,8 +51,24 @@ libvlc_instance_t *libvlc_create(void)
     setenv("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
 #endif
 
-    libvlc_instance_t *vlc = libvlc_new(0, NULL);
+    /* Override argc/argv with "--verbose lvl" or "--quiet" depending on the V
+     * environment variable */
+    const char *argv[2];
+    char verbose[2];
+    int argc = args->verbose == 0 ? 1 : 2;
+
+    if (args->verbose > 0)
+    {
+        argv[0] = "--verbose";
+        sprintf(verbose, "%u", args->verbose);
+        argv[1] = verbose;
+    }
+    else
+        argv[0] = "--quiet";
+
+    libvlc_instance_t *vlc = libvlc_new(argc, argv);
     if (vlc == NULL)
         fprintf(stderr, "Error: cannot initialize LibVLC.\n");
+
     return vlc;
 }

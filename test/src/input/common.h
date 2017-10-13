@@ -26,4 +26,16 @@
 #define debug(...) (void)0
 #endif
 
-libvlc_instance_t *libvlc_create(void);
+struct vlc_run_args
+{
+    /* force specific target name (demux or decoder name). NULL to don't force
+     * any */
+    const char *name;
+
+    /* vlc verbose level */
+    unsigned verbose;
+};
+
+void vlc_run_args_init(struct vlc_run_args *args);
+
+libvlc_instance_t *libvlc_create(const struct vlc_run_args *args);

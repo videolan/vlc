@@ -189,8 +189,9 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
     return out;
 }
 
-static int demux_process_stream(const char *name, stream_t *s)
+static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
 {
+    const char *name = args->name;
     if (name == NULL)
         name = "any";
 
@@ -224,9 +225,9 @@ static int demux_process_stream(const char *name, stream_t *s)
     return val == VLC_DEMUXER_EOF ? 0 : -1;
 }
 
-int vlc_demux_process_url(const char *demux, const char *url)
+int vlc_demux_process_url(const struct vlc_run_args *args, const char *url)
 {
-    libvlc_instance_t *vlc = libvlc_create();
+    libvlc_instance_t *vlc = libvlc_create(args);
     if (vlc == NULL)
         return -1;
 
@@ -234,12 +235,12 @@ int vlc_demux_process_url(const char *demux, const char *url)
     if (s == NULL)
         fprintf(stderr, "Error: cannot create input stream: %s\n", url);
 
-    int ret = demux_process_stream(demux, s);
+    int ret = demux_process_stream(args, s);
     libvlc_release(vlc);
     return ret;
 }
 
-int vlc_demux_process_path(const char *demux, const char *path)
+int vlc_demux_process_path(const struct vlc_run_args *args, const char *path)
 {
     char *url = vlc_path2uri(path, NULL);
     if (url == NULL)
@@ -248,15 +249,15 @@ int vlc_demux_process_path(const char *demux, const char *path)
         return -1;
     }
 
-    int ret = vlc_demux_process_url(demux, url);
+    int ret = vlc_demux_process_url(args, url);
     free(url);
     return ret;
 }
 
-int vlc_demux_process_memory(const char *demux,
+int vlc_demux_process_memory(const struct vlc_run_args *args,
                              const unsigned char *buf, size_t length)
 {
-    libvlc_instance_t *vlc = libvlc_create();
+    libvlc_instance_t *vlc = libvlc_create(args);
     if (vlc == NULL)
         return -1;
 
@@ -265,7 +266,7 @@ int vlc_demux_process_memory(const char *demux,
     if (s == NULL)
         fprintf(stderr, "Error: cannot create input stream\n");
 
-    int ret = demux_process_stream(demux, s);
+    int ret = demux_process_stream(args, s);
     libvlc_release(vlc);
     return ret;
 }
