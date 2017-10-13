@@ -138,7 +138,8 @@ FORCE:
 
 .PHONY: FORCE
 
-libvlc_demux_run_la_SOURCES = src/input/demux-run.c src/input/demux-run.h
+libvlc_demux_run_la_SOURCES = src/input/demux-run.c src/input/demux-run.h \
+	src/input/common.c src/input/common.h
 libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
 	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\"

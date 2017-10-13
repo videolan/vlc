@@ -24,6 +24,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "common.h"
 
 int vlc_demux_process_url(const char *demux, const char *url);
 int vlc_demux_process_path(const char *demux, const char *path);

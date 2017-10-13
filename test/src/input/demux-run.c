@@ -46,12 +46,6 @@
 
 #include "demux-run.h"
 
-#if 0
-#define debug(...) printf(__VA_ARGS__)
-#else
-#define debug(...) (void)0
-#endif
-
 struct test_es_out_t
 {
     struct es_out_t out;
@@ -228,26 +222,6 @@ static int demux_process_stream(const char *name, stream_t *s)
     debug("Completed with %ju iteration(s).\n", i);
 
     return val == VLC_DEMUXER_EOF ? 0 : -1;
-}
-
-static libvlc_instance_t *libvlc_create(void)
-{
-    const char *argv[] = {
-        NULL
-    };
-    unsigned argc = (sizeof (argv) / sizeof (*argv)) - 1;
-
-#ifdef TOP_BUILDDIR
-# ifndef HAVE_STATIC_MODULES
-    setenv("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
-# endif
-    setenv("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
-#endif
-
-    libvlc_instance_t *vlc = libvlc_new(argc, argv);
-    if (vlc == NULL)
-        fprintf(stderr, "Error: cannot initialize LibVLC.\n");
-    return vlc;
 }
 
 int vlc_demux_process_url(const char *demux, const char *url)
