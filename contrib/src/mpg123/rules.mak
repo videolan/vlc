@@ -26,6 +26,10 @@ MPG123CONF += --with-cpu=generic_dither
 endif
 endif
 
+ifdef HAVE_NACL
+MPG123CONF += ac_cv_header_sys_select_h=no
+endif
+
 $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 	$(call download_pkg,$(MPG123_URL),mpg123)
 
