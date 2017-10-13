@@ -34,6 +34,9 @@ struct vlc_run_args
 
     /* vlc verbose level */
     unsigned verbose;
+
+    /* true to test demux controls */
+    bool test_demux_controls;
 };
 
 void vlc_run_args_init(struct vlc_run_args *args);

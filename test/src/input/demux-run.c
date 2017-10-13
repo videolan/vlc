@@ -38,6 +38,8 @@
 #include <vlc_access.h>
 #include <vlc_block.h>
 #include <vlc_demux.h>
+#include <vlc_input.h>
+#include <vlc_meta.h>
 #include <vlc_es_out.h>
 #include <vlc_url.h>
 #include "../lib/libvlc_internal.h"
@@ -189,6 +191,46 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
     return out;
 }
 
+static unsigned demux_test_and_clear_flags(demux_t *demux, unsigned flags)
+{
+    unsigned update;
+    if (demux_Control(demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update) == VLC_SUCCESS)
+        return update;
+    unsigned ret = demux->info.i_update & flags;
+    demux->info.i_update &= ~flags;
+    return ret;
+}
+
+static void demux_get_title_list(demux_t *demux)
+{
+    int title;
+    int title_offset;
+    int seekpoint_offset;
+    input_title_t **title_list;
+
+    if (demux_Control(demux, DEMUX_GET_TITLE_INFO, &title_list, &title,
+                      &title_offset, &seekpoint_offset) == VLC_SUCCESS)
+    {
+        for (int i = 0; i < title; i++)
+            vlc_input_title_Delete(title_list[i]);
+    }
+}
+
+static void demux_get_meta(demux_t *demux)
+{
+    vlc_meta_t *p_meta = vlc_meta_New();
+    if (unlikely(p_meta == NULL) )
+        return;
+
+    input_attachment_t **attachment;
+    int i_attachment;
+
+    demux_Control(demux, DEMUX_GET_META, p_meta);
+    demux_Control(demux, DEMUX_GET_ATTACHMENTS, &attachment, &i_attachment);
+
+    vlc_meta_Delete(p_meta);
+}
+
 static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
 {
     const char *name = args->name;
@@ -215,7 +257,28 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
     int val;
 
     while ((val = demux_Demux(demux)) == VLC_DEMUXER_SUCCESS)
-         i++;
+    {
+        if (args->test_demux_controls)
+        {
+            if (demux_test_and_clear_flags(demux, INPUT_UPDATE_TITLE_LIST))
+                demux_get_title_list(demux);
+
+            if (demux_test_and_clear_flags(demux, INPUT_UPDATE_META))
+                demux_get_meta(demux);
+
+            int seekpoint = 0;
+            double position = 0.0;
+            mtime_t time = 0;
+            mtime_t length = 0;
+
+            /* Call controls for increased code coverage */
+            demux_Control(demux, DEMUX_GET_SEEKPOINT, &seekpoint);
+            demux_Control(demux, DEMUX_GET_POSITION, &position);
+            demux_Control(demux, DEMUX_GET_TIME, &time);
+            demux_Control(demux, DEMUX_GET_LENGTH, &length);
+        }
+        i++;
+    }
 
     demux_Delete(demux);
     es_out_Delete(out);
