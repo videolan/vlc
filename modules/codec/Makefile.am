@@ -225,6 +225,7 @@ codec_LTLIBRARIES += libttml_plugin.la
 libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
                               codec/webvtt/webvtt.c \
                               codec/webvtt/webvtt.h \
+                              demux/webvtt.c \
                               demux/mp4/minibox.h
 codec_LTLIBRARIES += libwebvtt_plugin.la
 
