@@ -236,7 +236,7 @@ static int Create( vlc_object_t *p_this )
         vlc_dialog_release( p_dec, p_dialog_id );
 #endif
 #else
-    ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );
+    ass_set_fonts( p_renderer, psz_font, psz_family, 0, NULL, 0 );
 #endif
 
     /* Anything else than NONE will break smooth img updating.
