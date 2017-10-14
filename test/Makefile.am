@@ -204,5 +204,5 @@ vlc_demux_run_LDADD = libvlc_demux_run.la
 EXTRA_PROGRAMS += vlc-demux-run
 
 vlc_demux_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
-vlc_demux_libfuzzer_LDADD = -lFuzzer libvlc_demux_run.la
+vlc_demux_libfuzzer_LDADD = libvlc_demux_run.la
 EXTRA_PROGRAMS += vlc-demux-libfuzzer

@@ -786,6 +786,17 @@ AS_IF([test "${SYS}" = "mingw32"], [
   have_dynamic_objects="yes" #assume we can use shared objects
 ])
 
+AC_ARG_WITH([libfuzzer],
+    [AS_HELP_STRING([--with-libfuzzer=DIR],
+        [use libFuzzer library from DIR and triggers sanitize coverage (default disabled)])],
+     [],
+     [with_libfuzzer=no])
+AS_VAR_IF(with_libfuzzer, no, [], [
+    enable_shared=no
+    enable_static=yes
+    enable_vlc=no
+])
+
 AS_IF([test "${enable_shared}" = "no"], [
   have_dynamic_objects=no
 ])
@@ -4192,6 +4203,26 @@ dnl
 AC_ARG_ENABLE(vlc,
   [  --enable-vlc            build the VLC media player (default enabled)])
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
+
+dnl
+dnl Fuzzer (at the end in order to don't mess dependencies FLAGS)
+dnl
+AS_VAR_IF(with_libfuzzer, no, [], [
+    LIBS="-lstdc++ ${LIBM} ${LIBPTHREAD} -L${with_libfuzzer} -lFuzzer"
+    AX_CHECK_COMPILE_FLAG(-fsanitize-coverage=trace-pc-guard, [
+        AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard])
+        AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard], [CXXFLAGS])
+        AX_APPEND_COMPILE_FLAGS([-fsanitize-coverage=trace-cmp])
+        AX_APPEND_COMPILE_FLAGS([-fsanitize-coverage=trace-cmp], [CXXFLAGS])
+    ], [
+        AX_CHECK_COMPILE_FLAG(-fsanitize-coverage=trace-pc, [
+            AX_APPEND_FLAG([-fsanitize-coverage=trace-pc])
+            AX_APPEND_FLAG([-fsanitize-coverage=trace-pc], [CXXFLAGS])
+        ], [
+            AC_MSG_ERROR([Sanitizer coverage not supported by your compiler])
+        ])
+    ])
+])
 
 dnl
 dnl  Stuff used by the program
