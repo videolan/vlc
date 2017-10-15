@@ -1283,7 +1283,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
 
     switch (status)
     {
-        case 0:
+        case noErr:
             return VLC_SUCCESS;
 
         VTERRCASE(kVTPropertyNotSupportedErr)
