@@ -64,7 +64,7 @@ static const char *const ppsz_sub_type[] =
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
     "aqt", "pjs", "mpsub", "jacosub", "psb", "realtext", "dks",
-    "subviewer1", "vtt", "sbv"
+    "subviewer1", "sbv"
 };
 
 vlc_module_begin ()
@@ -114,7 +114,6 @@ enum subtitle_type_e
     SUB_TYPE_DKS,
     SUB_TYPE_SUBVIEW1, /* SUBVIEWER 1 - mplayer calls it subrip09,
                          and Gnome subtitles SubViewer 1.0 */
-    SUB_TYPE_VTT,
     SUB_TYPE_SBV,
     SUB_TYPE_SCC,      /* Scenarist Closed Caption */
 };
@@ -207,7 +206,7 @@ static int  ParsePSB        ( vlc_object_t *, subs_properties_t *, text_t *, sub
 static int  ParseRealText   ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
 static int  ParseDKS        ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
 static int  ParseSubViewer1 ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
-static int  ParseCommonVTTSBV( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
+static int  ParseCommonSBV  ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
 static int  ParseSCC        ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
 
 static const struct
@@ -236,8 +235,7 @@ static const struct
     { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
     { "dks",        SUB_TYPE_DKS,         "DKS",         ParseDKS },
     { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSubViewer1 },
-    { "text/vtt",   SUB_TYPE_VTT,         "WebVTT",      ParseCommonVTTSBV },
-    { "sbv",        SUB_TYPE_SBV,         "SBV",         ParseCommonVTTSBV },
+    { "sbv",        SUB_TYPE_SBV,         "SBV",         ParseCommonSBV },
     { "scc",        SUB_TYPE_SCC,         "SCC",         ParseSCC },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
@@ -621,7 +619,7 @@ static int Open ( vlc_object_t *p_this )
             }
             else if( !strncasecmp( s, "WEBVTT",6 ) )
             {
-                p_sys->props.i_type = SUB_TYPE_VTT;
+                /* FAIL */
                 break;
             }
             else if( !strncasecmp( s, "Scenarist_SCC V1.0", 18 ) )
@@ -2330,12 +2328,12 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
     return VLC_SUCCESS;
 }
 
-/* Common code for VTT/SBV since they just differ in timestamps */
-static int ParseCommonVTTSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
-                              text_t *txt, subtitle_t *p_subtitle, size_t i_idx )
+static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
+                           text_t *txt, subtitle_t *p_subtitle, size_t i_idx )
 {
     VLC_UNUSED(p_obj);
     VLC_UNUSED( i_idx );
+    VLC_UNUSED( p_props );
     char        *psz_text;
 
     for( ;; )
@@ -2347,33 +2345,9 @@ static int ParseCommonVTTSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( !s )
             return VLC_EGENERIC;
 
-        bool b_matched = false;
-
-        if( p_props->i_type == SUB_TYPE_VTT )
-        {
-            b_matched =
-            ( sscanf( s,"%d:%d.%d --> %d:%d.%d",
-                             &m1, &s1, &d1,
-                             &m2, &s2, &d2 ) == 6 ||
-                sscanf( s,"%d:%d.%d --> %d:%d:%d.%d",
-                             &m1, &s1, &d1,
-                        &h2, &m2, &s2, &d2 ) == 7 ||
-                sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
-                        &h1, &m1, &s1, &d1,
-                             &m2, &s2, &d2 ) == 7 ||
-                sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
-                        &h1, &m1, &s1, &d1,
-                        &h2, &m2, &s2, &d2 ) == 8 );
-        }
-        else if( p_props->i_type == SUB_TYPE_SBV )
-        {
-            b_matched =
-            ( sscanf( s,"%d:%d:%d.%d,%d:%d:%d.%d",
-                        &h1, &m1, &s1, &d1,
-                        &h2, &m2, &s2, &d2 ) == 8 );
-        }
-
-        if( b_matched )
+        if( sscanf( s,"%d:%d:%d.%d,%d:%d:%d.%d",
+                    &h1, &m1, &s1, &d1,
+                    &h2, &m2, &s2, &d2 ) == 8 )
         {
             p_subtitle->i_start = ( (int64_t)h1 * 3600 * 1000 +
                                     (int64_t)m1 * 60 * 1000 +

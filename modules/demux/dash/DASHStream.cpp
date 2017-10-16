@@ -49,7 +49,7 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
             break;
 
         case StreamFormat::WEBVTT:
-            ret = new SlaveDemuxer(p_realdemux, "subtitle", fakeesout->getEsOut(), demuxersource);
+            ret = new SlaveDemuxer(p_realdemux, "webvtt", fakeesout->getEsOut(), demuxersource);
             break;
 
         case StreamFormat::TTML:
