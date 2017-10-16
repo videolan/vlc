@@ -180,6 +180,15 @@ error:
 }
 #endif
 
+static HRESULT can_map(filter_sys_t *sys, ID3D11DeviceContext *context)
+{
+    D3D11_MAPPED_SUBRESOURCE lock;
+    HRESULT hr = ID3D11DeviceContext_Map(context, sys->staging_resource, 0,
+                                         D3D11_MAP_READ, 0, &lock);
+    ID3D11DeviceContext_Unmap(context, sys->staging_resource, 0);
+    return hr;
+}
+
 static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
 {
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
@@ -203,6 +212,9 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
     ID3D11DeviceContext_GetDevice(p_sys->context, &p_device);
     sys->staging = NULL;
     hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->staging);
+    /* test if mapping the texture works ref #18746 */
+    if (SUCCEEDED(hr) && FAILED(hr = can_map(sys, p_sys->context)))
+        msg_Dbg(p_filter, "can't map default staging texture (hr=0x%0lx)", hr);
 #if CAN_PROCESSOR
     if (FAILED(hr)) {
         /* failed with the this format, try a different one */
@@ -220,7 +232,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
                 texDesc.CPUAccessFlags = 0;
                 texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
                 hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->procOutTexture);
-                if (SUCCEEDED(hr))
+                if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, p_sys->context)))
                 {
                     if (SetupProcessor(p_filter, p_device, p_sys->context, srcFormat, new_fmt->formatTexture))
                     {
@@ -234,9 +246,9 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
                 }
                 else
                 {
+                    msg_Dbg(p_filter, "can't create intermediate texture (hr=0x%0lx)", hr);
                     ID3D11Texture2D_Release(sys->staging);
                     sys->staging = NULL;
-                    hr = E_FAIL;
                 }
             }
         }
