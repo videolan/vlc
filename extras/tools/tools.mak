@@ -86,6 +86,7 @@ libtool-$(LIBTOOL_VERSION).tar.gz:
 libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(UNPACK)
 	$(APPLY) libtool-2.4.2-bitcode.patch
+	$(APPLY) libtool-2.4.2-san.patch
 	$(MOVE)
 
 .libtool: libtool .automake

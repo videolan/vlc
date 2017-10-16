@@ -1,0 +1,44 @@
+From a5c6466528c060cc4660ad0319c00740db0e42ba Mon Sep 17 00:00:00 2001
+From: Jeremy Huddleston Sequoia <jeremyhu@macports.org>
+Date: Sun, 18 Oct 2015 21:55:39 -0700
+Subject: libtool: fix GCC/clang linking with -fsanitize=*
+
+References:
+https://lists.gnu.org/archive/html/libtool/2014-04/msg00026.html
+
+* build-aux/ltmain.in (func_mode_link): Pass -fsanitize=* to the
+linker to allow trivial use of the clang address sanitizer.
+
+Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@macports.org>
+Copyright-paperwork-exempt: Yes
+---
+diff -ru libtool/libltdl/config/ltmain.m4sh libtool-fixed/libltdl/config/ltmain.m4sh
+--- libtool/libltdl/config/ltmain.m4sh	2017-10-16 08:20:47.000000000 +0200
++++ libtool-fixed/libltdl/config/ltmain.m4sh	2017-10-16 08:22:23.000000000 +0200
+@@ -5064,9 +5064,10 @@
+       # -tp=*                Portland pgcc target processor selection
+       # --sysroot=*          for sysroot support
+       # -O*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
++      # -fsanitize=*         Clang/GCC memory and address sanitizer
+       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
+       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
+-      -O*|-flto*|-fwhopr*|-fuse-linker-plugin)
++      -O*|-flto*|-fwhopr*|-fuse-linker-plugin|-fsanitize=*)
+         func_quote_for_eval "$arg"
+ 	arg="$func_quote_for_eval_result"
+         func_append compile_command " $arg"
+diff -ru libtool/libltdl/config/ltmain.sh libtool-fixed/libltdl/config/ltmain.sh
+--- libtool/libltdl/config/ltmain.sh	2017-10-16 08:20:47.000000000 +0200
++++ libtool-fixed/libltdl/config/ltmain.sh	2017-10-16 08:22:58.000000000 +0200
+@@ -5851,9 +5851,10 @@
+       # -tp=*                Portland pgcc target processor selection
+       # --sysroot=*          for sysroot support
+       # -O*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
++      # -fsanitize=*         Clang/GCC memory and address sanitizer
+       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
+       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
+-      -O*|-flto*|-fwhopr*|-fuse-linker-plugin)
++      -O*|-flto*|-fwhopr*|-fuse-linker-plugin|-fsanitize=*)
+         func_quote_for_eval "$arg"
+ 	arg="$func_quote_for_eval_result"
+         func_append compile_command " $arg"
