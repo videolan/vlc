@@ -229,6 +229,8 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
                         sys->staging = NULL;
                         hr = E_FAIL;
                     }
+                    else
+                        msg_Dbg(p_filter, "Using shader+processor format %s", new_fmt->name);
                 }
                 else
                 {
