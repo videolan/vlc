@@ -190,16 +190,20 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     QSignalMapper *mapper = new QSignalMapper( layout );
     CONNECT( mapper, mapped(int), this, switchPanel(int) );
 
-    short icon_height = ICON_HEIGHT;
+    QPixmap scaled;
 
 #define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \
-    button->setIcon( QIcon( ":/prefsmenu/" #icon ".png" ) );                \
+    /* Scale icon to non native size outside of toolbutton to avoid widget size */\
+    /* computation using native size */\
+    scaled = QPixmap( ":/prefsmenu/" #icon ".png" )\
+             .scaledToHeight( ICON_HEIGHT , Qt::SmoothTransformation );\
+    button->setIcon( scaled );                \
     button->setText( label );                                               \
     button->setToolTip( ltooltip );                                         \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
-    button->setIconSize( QSize( icon_height, icon_height ) );               \
-    button->setMinimumSize( QSize( icon_height + 40, icon_height + 40 ) );  \
+    button->setIconSize( QSize( scaled.width(), scaled.height() ) );          \
+    button->setMinimumWidth( 40 + scaled.width() );\
     button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum); \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
