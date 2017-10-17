@@ -2943,9 +2943,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (AllocateTextures(vd, sys->d3dregion_format, &r->fmt, 1, textures)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
-                for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-                    if (textures[i])
-                        ID3D11Texture2D_Release(textures[i]);
+                for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
+                    if (textures[j])
+                        ID3D11Texture2D_Release(textures[j]);
                 free(d3dquad);
                 continue;
             }
