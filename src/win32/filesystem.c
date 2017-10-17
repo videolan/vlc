@@ -81,7 +81,13 @@ int vlc_open (const char *filename, int flags, ...)
 
     va_start (ap, flags);
     if (flags & O_CREAT)
-        mode = va_arg (ap, int);
+    {
+        int unixmode = va_arg(ap, int);
+        if (unixmode & 0444)
+            mode |= _S_IREAD;
+        if (unixmode & 0222)
+            mode |= _S_IWRITE;
+    }
     va_end (ap);
 
     /*
