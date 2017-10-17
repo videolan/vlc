@@ -1587,25 +1587,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     IDXGIFactory2 *dxgifactory;
 
 #if !VLC_WINSTORE_APP
-
-    UINT creationFlags = 0;
     HRESULT hr = S_OK;
-
-# if !defined(NDEBUG)
-#  if !VLC_WINSTORE_APP
-    if (IsDebuggerPresent())
-#  endif
-    {
-        HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
-        if (sdklayer_dll) {
-            creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-            FreeLibrary(sdklayer_dll);
-        }
-    }
-# endif
-
-    if (is_d3d11_opaque(fmt->i_chroma))
-        creationFlags |= D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
 
     DXGI_SWAP_CHAIN_DESC1 scd;
     memset(&scd, 0, sizeof(scd));
@@ -1627,40 +1609,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    static const D3D_DRIVER_TYPE driverAttempts[] = {
-        D3D_DRIVER_TYPE_HARDWARE,
-        D3D_DRIVER_TYPE_WARP,
-#if 0 /* ifndef NDEBUG */
-        D3D_DRIVER_TYPE_REFERENCE,
-#endif
-    };
-
-    D3D_FEATURE_LEVEL features[] = {
-       D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
-       D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
-       D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
-    };
-
-    for (UINT driver = 0; driver < ARRAYSIZE(driverAttempts); driver++) {
-        D3D_FEATURE_LEVEL i_feature_level;
-        hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    features, ARRAY_SIZE(features), D3D11_SDK_VERSION,
-                    &sys->d3ddevice, &i_feature_level, &sys->d3dcontext);
-        if (SUCCEEDED(hr)) {
-#ifndef NDEBUG
-            msg_Dbg(vd, "Created the D3D11 device 0x%p ctx 0x%p type %d level %x.",
-                    (void *)sys->d3ddevice, (void *)sys->d3dcontext,
-                    driverAttempts[driver], i_feature_level);
-#endif
-            if ( vd->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_1 )
-                break;
-            ID3D11DeviceContext_Release(sys->d3dcontext);
-            sys->d3dcontext = NULL;
-            ID3D11Device_Release(sys->d3ddevice);
-            sys->d3ddevice = NULL;
-        }
-    }
-
+    hr = D3D11_CreateDevice(VLC_OBJECT(vd), sys->hd3d11_dll,
+                            is_d3d11_opaque(fmt->i_chroma),
+                            &sys->d3ddevice, &sys->d3dcontext);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
        return VLC_EGENERIC;

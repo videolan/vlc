@@ -68,10 +68,6 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-#if VLC_WINSTORE_APP
-#define pf_CreateDevice                 D3D11CreateDevice
-#endif
-
 /*
  * In this mode libavcodec doesn't need the whole array on texture on startup
  * So we get the surfaces from the decoder pool when needed. We don't need to
@@ -430,36 +426,11 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-#if !VLC_WINSTORE_APP
-    /* */
-    PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
-    pf_CreateDevice = (void *)GetProcAddress(dx_sys->hdecoder_dll, "D3D11CreateDevice");
-    if (!pf_CreateDevice) {
-        msg_Err(va, "Cannot locate reference to D3D11CreateDevice ABI in DLL");
-        return VLC_EGENERIC;
-    }
-#endif
-
-    UINT creationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
-#if !defined(NDEBUG)
-#if !VLC_WINSTORE_APP
-    if (IsDebuggerPresent())
-#endif
-    {
-        HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
-        if (sdklayer_dll) {
-            creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-            FreeLibrary(sdklayer_dll);
-        }
-    }
-#endif
-
     /* */
     ID3D11Device *d3ddev;
     ID3D11DeviceContext *d3dctx;
-    hr = pf_CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL,
-                                 creationFlags, NULL, 0,
-                                 D3D11_SDK_VERSION, &d3ddev, NULL, &d3dctx);
+    hr = D3D11_CreateDevice(VLC_OBJECT(va), dx_sys->hdecoder_dll, true,
+                            &d3ddev, &d3dctx);
     if (FAILED(hr)) {
         msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
