@@ -238,6 +238,8 @@ libwebvtt_plugin_la_SOURCES += codec/webvtt/CSSGrammar.y \
                                codec/webvtt/CSSLexer.l \
                                codec/webvtt/css_parser.c \
                                codec/webvtt/css_parser.h \
+                               codec/webvtt/css_style.c \
+                               codec/webvtt/css_style.h \
                                codec/webvtt/css_bridge.h
 endif
 

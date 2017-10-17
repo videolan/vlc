@@ -38,6 +38,12 @@
 #include "../demux/mp4/minibox.h"
 #include "webvtt.h"
 
+
+#ifdef HAVE_CSS
+#  include "css_parser.h"
+#  include "css_style.h"
+#endif
+
 #include <ctype.h>
 
 //#define SUBSVTT_DEBUG
@@ -53,6 +59,7 @@ typedef struct webvtt_dom_cue_t webvtt_dom_cue_t;
 #define WEBVTT_REGION_LINES_COUNT          18
 #define WEBVTT_DEFAULT_LINE_HEIGHT_VH    5.33
 #define WEBVTT_LINE_TO_HEIGHT_RATIO      1.06
+#define WEBVTT_MAX_DEPTH                 20 /* recursion prevention for now */
 
 enum webvtt_align_e
 {
@@ -83,7 +90,6 @@ enum webvtt_node_type_e
     NODE_TEXT,
     NODE_CUE,
     NODE_REGION,
-    NODE_VIDEO,
 };
 
 #define WEBVTT_NODE_BASE_MEMBERS \
@@ -102,6 +108,7 @@ struct webvtt_region_t
     float viewport_anchor_x;
     float viewport_anchor_y;
     bool b_scroll_up;
+    text_style_t *p_cssstyle;
     webvtt_dom_node_t *p_child;
 };
 
@@ -113,6 +120,7 @@ struct webvtt_dom_cue_t
     mtime_t i_stop;
     webvtt_cue_settings_t settings;
     unsigned i_lines;
+    text_style_t *p_cssstyle;
     webvtt_dom_node_t *p_child;
 };
 
@@ -128,14 +136,9 @@ typedef struct
     mtime_t i_start;
     char *psz_tag;
     char *psz_attrs;
+    text_style_t *p_cssstyle;
     webvtt_dom_node_t *p_child;
 } webvtt_dom_tag_t;
-
-typedef struct
-{
-    WEBVTT_NODE_BASE_MEMBERS
-    webvtt_dom_node_t *p_child;
-} webvtt_dom_video_t;
 
 struct webvtt_dom_node_t
 {
@@ -144,7 +147,11 @@ struct webvtt_dom_node_t
 
 struct decoder_sys_t
 {
-    webvtt_dom_video_t *p_root;
+    webvtt_dom_tag_t *p_root;
+#ifdef HAVE_CSS
+    /* CSS */
+    vlc_css_rule_t *p_css_rules;
+#endif
 };
 
 #define ATOM_iden VLC_FOURCC('i', 'd', 'e', 'n')
@@ -334,17 +341,12 @@ static void webvtt_domnode_Debug( webvtt_dom_node_t *p_node, int i_depth )
         }
     }
 }
+#define webvtt_domnode_Debug(a,b) webvtt_domnode_Debug((webvtt_dom_node_t *)a,b)
 #endif
 
 static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
 static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue );
 static void webvtt_region_Delete( webvtt_region_t *p_region );
-
-static void webvtt_dom_video_Delete( webvtt_dom_video_t *p_node )
-{
-    webvtt_domnode_ChainDelete( p_node->p_child );
-    free( p_node );
-}
 
 static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
 {
@@ -354,6 +356,7 @@ static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
 
 static void webvtt_dom_tag_Delete( webvtt_dom_tag_t *p_node )
 {
+    text_style_Delete( p_node->p_cssstyle );
     free( p_node->psz_attrs );
     free( p_node->psz_tag );
     webvtt_domnode_ChainDelete( p_node->p_child );
@@ -385,19 +388,9 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             webvtt_dom_cue_Delete( (webvtt_dom_cue_t *) p_node );
         else if( p_node->type == NODE_REGION )
             webvtt_region_Delete( (webvtt_region_t *) p_node );
-        else if( p_node->type == NODE_VIDEO )
-            webvtt_dom_video_Delete( (webvtt_dom_video_t *) p_node );
 
         p_node = p_next;
     }
-}
-
-static webvtt_dom_video_t * webvtt_dom_video_New( void )
-{
-    webvtt_dom_video_t *p_node = calloc( 1, sizeof(*p_node) );
-    if( p_node )
-        p_node->type = NODE_VIDEO;
-    return p_node;
 }
 
 static webvtt_dom_text_t * webvtt_dom_text_New( webvtt_dom_node_t *p_parent )
@@ -438,7 +431,7 @@ static webvtt_dom_node_t * webvtt_domnode_getParentByTag( webvtt_dom_node_t *p_p
     return p_parent;
 }
 
-static const webvtt_dom_node_t * webvtt_domnode_getFirstChild( const webvtt_dom_node_t *p_node )
+static webvtt_dom_node_t * webvtt_domnode_getFirstChild( webvtt_dom_node_t *p_node )
 {
     webvtt_dom_node_t *p_child = NULL;
     switch( p_node->type )
@@ -457,6 +450,336 @@ static const webvtt_dom_node_t * webvtt_domnode_getFirstChild( const webvtt_dom_
     }
     return p_child;
 }
+#define webvtt_domnode_getFirstChild(a) webvtt_domnode_getFirstChild((webvtt_dom_node_t *)a)
+
+static mtime_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_node, bool b_end )
+{
+    for( ; p_node; p_node = p_node->p_parent )
+    {
+        if( p_node->type == NODE_TAG )
+        {
+            mtime_t i_start = ((const webvtt_dom_tag_t *) p_node)->i_start;
+            if( i_start > -1 && !b_end )
+                return i_start;
+        }
+        else if( p_node->type == NODE_CUE )
+        {
+            break;
+        }
+    }
+    if( p_node )
+        return b_end ? ((const webvtt_dom_cue_t *) p_node)->i_stop:
+                       ((const webvtt_dom_cue_t *) p_node)->i_start;
+    return VLC_TS_INVALID;
+}
+
+#ifdef HAVE_CSS
+static bool webvtt_domnode_Match_Class( const webvtt_dom_node_t *p_node, const char *psz )
+{
+    const size_t i_len = strlen( psz );
+    if( p_node->type == NODE_TAG )
+    {
+        const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
+        while( p_tagnode->psz_attrs && psz )
+        {
+            const char *p = strstr( p_tagnode->psz_attrs, psz );
+            if( !p )
+                return false;
+            if( p > psz && p[-1] == '.' && !isalnum(p[i_len]) )
+                return true;
+            psz = p + 1;
+        }
+    }
+    return false;
+}
+
+static bool webvtt_domnode_Match_Id( const webvtt_dom_node_t *p_node, const char *psz_id )
+{
+    if( !psz_id )
+        return false;
+    if( *psz_id == '#' )
+        psz_id++;
+    if( p_node->type == NODE_REGION )
+        return ((webvtt_region_t *)p_node)->psz_id &&
+                !strcmp( ((webvtt_region_t *)p_node)->psz_id, psz_id );
+    else if( p_node->type == NODE_CUE )
+        return ((webvtt_dom_cue_t *)p_node)->psz_id &&
+                !strcmp( ((webvtt_dom_cue_t *)p_node)->psz_id, psz_id );
+    return false;
+}
+
+static bool webvtt_domnode_Match_Tag( const webvtt_dom_node_t *p_node, const char *psz_tag )
+{
+    if( p_node->type == NODE_TAG && psz_tag )
+    {
+        /* special case, not allowed to match anywhere but root */
+        if( !strcmp(psz_tag, "video") && p_node->p_parent )
+            return false;
+        return ((webvtt_dom_tag_t *)p_node)->psz_tag &&
+                !strcmp( ((webvtt_dom_tag_t *)p_node)->psz_tag, psz_tag );
+    }
+    else return false;
+}
+
+static bool webvtt_domnode_Match_PseudoClass( const webvtt_dom_node_t *p_node, const char *psz,
+                                              mtime_t i_playbacktime )
+{
+    if( !strcmp(psz, "past") || !strcmp(psz, "future") )
+    {
+        mtime_t i_start = webvtt_domnode_GetPlaybackTime( p_node, false );
+        return ( *psz == 'p' ) ? i_start < i_playbacktime : i_start > i_playbacktime;
+    }
+    return false;
+}
+
+static bool webvtt_domnode_Match_PseudoElement( const webvtt_dom_node_t *p_node, const char *psz )
+{
+    if( !strcmp(psz, "cue") )
+        return p_node->type == NODE_CUE;
+    else if( !strcmp(psz, "cue-region") )
+        return p_node->type == NODE_REGION;
+    return false;
+}
+
+static bool MatchAttribute( const char *psz_attr, const char *psz_lookup, enum vlc_css_match_e match )
+{
+    switch( match )
+    {
+        case MATCH_EQUALS:
+            return !strcmp( psz_attr, psz_lookup );
+        case MATCH_INCLUDES:
+        {
+            const char *p = strstr( psz_attr, psz_lookup );
+            if( p && ( p == psz_attr || isspace(p[-1]) ) )
+            {
+                const char *end = p + strlen( psz_lookup );
+                return (*end == 0 || isspace(*end));
+            }
+            break;
+        }
+        case MATCH_DASHMATCH:
+        {
+            size_t i_len = strlen(psz_lookup);
+            if( !strncmp( psz_attr, psz_lookup, i_len ) )
+            {
+                const char *end = psz_attr + i_len;
+                return (*end == 0 || !isalnum(*end) );
+            }
+            break;
+        }
+        case MATCH_BEGINSWITH:
+            return !strncmp( psz_attr, psz_lookup, strlen(psz_lookup) );
+        case MATCH_ENDSWITH:
+        {
+            const char *p = strstr( psz_attr, psz_lookup );
+            return (p && *p && p[1] == 0);
+        }
+        case MATCH_CONTAINS:
+            return !!strstr( psz_attr, psz_lookup );
+        default:
+            break;
+    }
+    return false;
+}
+
+static bool webvtt_domnode_Match_Attribute( const webvtt_dom_node_t *p_node,
+                                            const char *psz, const vlc_css_selector_t *p_matchsel )
+{
+    if( p_node->type == NODE_TAG && p_matchsel )
+    {
+        const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
+
+        if( ( !strcmp( p_tagnode->psz_tag, "v" ) && !strcmp( psz, "voice" ) ) || /* v = only voice */
+            ( !strcmp( p_tagnode->psz_tag, "lang" ) && !strcmp( psz, "lang" ) ) )
+        {
+            const char *psz_start = NULL;
+            /* skip classes decl */
+            for( const char *p = p_tagnode->psz_attrs; *p; p++ )
+            {
+                if( isspace(*p) )
+                {
+                    psz_start = p + 1;
+                }
+                else if( psz_start != NULL )
+                {
+                    break;
+                }
+            }
+
+            if( psz_start == NULL || *psz_start == 0 )
+                psz_start = p_tagnode->psz_attrs;
+
+            if( !p_matchsel ) /* attribute check only */
+                return strlen( psz_start ) > 0;
+
+            return MatchAttribute( psz_start, p_matchsel->psz_name, p_matchsel->match );
+        }
+    }
+    return false;
+}
+
+static bool webvtt_domnode_MatchType( decoder_t *p_dec, const webvtt_dom_node_t *p_node,
+                                      const vlc_css_selector_t *p_sel, mtime_t i_playbacktime )
+{
+    VLC_UNUSED(p_dec);
+    switch( p_sel->type )
+    {
+        case SELECTOR_SIMPLE:
+            return webvtt_domnode_Match_Tag( p_node, p_sel->psz_name );
+        case SELECTOR_PSEUDOCLASS:
+            return webvtt_domnode_Match_PseudoClass( p_node, p_sel->psz_name,
+                                                     i_playbacktime );
+        case SELECTOR_PSEUDOELEMENT:
+            return webvtt_domnode_Match_PseudoElement( p_node, p_sel->psz_name );
+        case SPECIFIER_ID:
+            return webvtt_domnode_Match_Id( p_node, p_sel->psz_name );
+        case SPECIFIER_CLASS:
+            return webvtt_domnode_Match_Class( p_node, p_sel->psz_name );
+        case SPECIFIER_ATTRIB:
+            return webvtt_domnode_Match_Attribute( p_node, p_sel->psz_name, p_sel->p_matchsel );
+    }
+    return false;
+}
+#endif
+
+static text_style_t ** get_ppCSSStyle( webvtt_dom_node_t *p_node )
+{
+    switch( p_node->type )
+    {
+        case NODE_CUE:
+            return &((webvtt_dom_cue_t *)p_node)->p_cssstyle;
+        case NODE_REGION:
+            return &((webvtt_region_t *)p_node)->p_cssstyle;
+        case NODE_TAG:
+            return &((webvtt_dom_tag_t *)p_node)->p_cssstyle;
+        default:
+            return NULL;
+    }
+}
+
+static text_style_t * webvtt_domnode_getCSSStyle( webvtt_dom_node_t *p_node )
+{
+    text_style_t **pp_style = get_ppCSSStyle( p_node );
+    if( pp_style )
+        return *pp_style;
+    return NULL;
+}
+#define webvtt_domnode_getCSSStyle(a) webvtt_domnode_getCSSStyle((webvtt_dom_node_t *)a)
+
+static bool webvtt_domnode_supportsCSSStyle( webvtt_dom_node_t *p_node )
+{
+    return get_ppCSSStyle( p_node ) != NULL;
+}
+
+static void webvtt_domnode_setCSSStyle( webvtt_dom_node_t *p_node, text_style_t *p_style )
+{
+    text_style_t **pp_style = get_ppCSSStyle( p_node );
+    if( !pp_style )
+    {
+        assert( pp_style );
+        if( p_style )
+            text_style_Delete( p_style );
+        return;
+    }
+    if( *pp_style )
+        text_style_Delete( *pp_style );
+    *pp_style = p_style;
+}
+
+#ifdef HAVE_CSS
+static void webvtt_domnode_SelectNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
+                                              const webvtt_dom_node_t *p_tree, int i_max_depth,
+                                              mtime_t i_playbacktime, vlc_array_t *p_results );
+
+static void webvtt_domnode_SelectChildNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
+                                                   const webvtt_dom_node_t *p_root, int i_max_depth,
+                                                   mtime_t i_playbacktime, vlc_array_t *p_results )
+{
+    const webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_root );
+    if( i_max_depth > 0 )
+    {
+        for( ; p_child; p_child = p_child->p_next )
+            webvtt_domnode_SelectNodesInTree( p_dec, p_sel, p_child, i_max_depth - 1,
+                                              i_playbacktime, p_results );
+    }
+}
+
+static void webvtt_domnode_SelectNodesBySpeficier( decoder_t *p_dec, const vlc_css_selector_t *p_spec,
+                                                   const webvtt_dom_node_t *p_node,
+                                                   mtime_t i_playbacktime, vlc_array_t *p_results )
+{
+    if( p_spec == NULL )
+        return;
+
+    switch( p_spec->combinator )
+    {
+        case RELATION_DESCENDENT:
+            webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_node, WEBVTT_MAX_DEPTH,
+                                                   i_playbacktime, p_results );
+            break;
+        case RELATION_DIRECTADJACENT:
+            for( const webvtt_dom_node_t *p_adj = p_node->p_next; p_adj; p_adj = p_adj->p_next )
+                webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_adj, 1,
+                                                       i_playbacktime, p_results );
+            break;
+        case RELATION_INDIRECTADJACENT:
+            for( const webvtt_dom_node_t *p_adj = webvtt_domnode_getFirstChild( p_node->p_parent );
+                                          p_adj && p_adj != p_node; p_adj = p_adj->p_next )
+                webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_adj, 1,
+                                                       i_playbacktime, p_results );
+            break;
+        case RELATION_CHILD:
+            webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_node, 1,
+                                                   i_playbacktime, p_results );
+            break;
+        case RELATION_SELF:
+            webvtt_domnode_SelectNodesInTree( p_dec, p_spec, p_node, WEBVTT_MAX_DEPTH,
+                                              i_playbacktime, p_results );
+    }
+}
+
+static void webvtt_domnode_SelectNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
+                                              const webvtt_dom_node_t *p_root, int i_max_depth,
+                                              mtime_t i_playbacktime, vlc_array_t *p_results )
+{
+    if( p_root == NULL )
+        return;
+
+    if( webvtt_domnode_MatchType( p_dec, p_root, p_sel, i_playbacktime ) )
+    {
+        if( p_sel->specifiers.p_first == NULL )
+        {
+            /* End of matching, this node is part of results */
+            (void) vlc_array_append( p_results, (void *) p_root );
+        }
+        else webvtt_domnode_SelectNodesBySpeficier( p_dec, p_sel->specifiers.p_first, p_root,
+                                                    i_playbacktime, p_results );
+    }
+
+    /* lookup other subnodes */
+    webvtt_domnode_SelectChildNodesInTree( p_dec, p_sel, p_root, i_max_depth - 1,
+                                           i_playbacktime, p_results );
+}
+
+static void webvtt_domnode_SelectRuleNodes( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
+                                            mtime_t i_playbacktime, vlc_array_t *p_results )
+{
+    const webvtt_dom_node_t *p_cues = p_dec->p_sys->p_root->p_child;
+    for( const vlc_css_selector_t *p_sel = p_rule->p_selectors; p_sel; p_sel = p_sel->p_next )
+    {
+        vlc_array_t tempresults;
+        vlc_array_init( &tempresults );
+        for( const webvtt_dom_node_t *p_node = p_cues; p_node; p_node = p_node->p_next )
+        {
+            webvtt_domnode_SelectNodesInTree( p_dec, p_sel, p_node, WEBVTT_MAX_DEPTH,
+                                              i_playbacktime, &tempresults );
+        }
+        for( size_t i=0; i<vlc_array_count(&tempresults); i++ )
+            (void) vlc_array_append( p_results, vlc_array_item_at_index( &tempresults, i ) );
+        vlc_array_clear( &tempresults );
+    }
+}
+#endif
 
 static inline bool IsEndTag( const char *psz )
 {
@@ -517,6 +840,7 @@ static webvtt_dom_cue_t * webvtt_dom_cue_New( mtime_t i_start, mtime_t i_end )
         p_cue->i_stop = i_end;
         p_cue->p_child = NULL;
         p_cue->i_lines = 0;
+        p_cue->p_cssstyle = NULL;
         webvtt_cue_settings_Init( &p_cue->settings );
     }
     return p_cue;
@@ -531,6 +855,7 @@ static void webvtt_dom_cue_ClearText( webvtt_dom_cue_t *p_cue )
 
 static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue )
 {
+    text_style_Delete( p_cue->p_cssstyle );
     webvtt_dom_cue_ClearText( p_cue );
     webvtt_cue_settings_Clean( &p_cue->settings );
     free( p_cue->psz_id );
@@ -725,6 +1050,7 @@ static void webvtt_region_AddCue( webvtt_region_t *p_region,
 
 static void webvtt_region_Delete( webvtt_region_t *p_region )
 {
+    text_style_Delete( p_region->p_cssstyle );
     webvtt_region_ClearCues( p_region );
     free( p_region->psz_id );
     free( p_region );
@@ -745,6 +1071,7 @@ static webvtt_region_t * webvtt_region_New( void )
         p_region->viewport_anchor_x = 0;
         p_region->viewport_anchor_y = 1.0; /* 100% */
         p_region->b_scroll_up = false;
+        p_region->p_cssstyle = NULL;
         p_region->p_child = NULL;
     }
     return p_region;
@@ -878,57 +1205,92 @@ static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_c
 #endif
 }
 
-static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_dom_node_t *p_node )
+static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p_leaf )
 {
     VLC_UNUSED(p_dec);
-
     text_style_t *p_style = NULL;
-    for( ; p_node; p_node = p_node->p_parent )
+    mtime_t i_tagtime = -1;
+
+    for( const webvtt_dom_node_t *p_node = p_leaf ; p_node; p_node = p_node->p_parent )
     {
-        if( p_node->type == NODE_TAG )
+        bool b_nooverride = false;
+        if( p_node->type == NODE_CUE )
+        {
+            const webvtt_dom_cue_t *p_cue = (const webvtt_dom_cue_t *)p_node;
+            if( p_cue )
+            {
+                if( i_tagtime > -1 ) /* don't override timed stylings */
+                    b_nooverride = true;
+            }
+        }
+        else if( p_node->type == NODE_TAG )
         {
             const webvtt_dom_tag_t *p_tagnode = (const webvtt_dom_tag_t *)p_node;
-            if ( p_tagnode->psz_tag == NULL )
+
+            if( p_tagnode->i_start > -1 )
             {
-                continue;
+                /* Ignore other timed stylings */
+                if( i_tagtime == -1 )
+                    i_tagtime = p_tagnode->i_start;
+                else
+                    continue;
             }
-            else if ( !strcmp( p_tagnode->psz_tag, "b" ) )
+
+            if ( p_tagnode->psz_tag )
             {
-                if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                if ( !strcmp( p_tagnode->psz_tag, "b" ) )
                 {
-                    p_style->i_style_flags |= STYLE_BOLD;
-                    p_style->i_features |= STYLE_HAS_FLAGS;
+                    if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                    {
+                        p_style->i_style_flags |= STYLE_BOLD;
+                        p_style->i_features |= STYLE_HAS_FLAGS;
+                    }
                 }
-            }
-            else if ( !strcmp( p_tagnode->psz_tag, "i" ) )
-            {
-                if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                else if ( !strcmp( p_tagnode->psz_tag, "i" ) )
                 {
-                    p_style->i_style_flags |= STYLE_ITALIC;
-                    p_style->i_features |= STYLE_HAS_FLAGS;
+                    if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                    {
+                        p_style->i_style_flags |= STYLE_ITALIC;
+                        p_style->i_features |= STYLE_HAS_FLAGS;
+                    }
                 }
-            }
-            else if ( !strcmp( p_tagnode->psz_tag, "u" ) )
-            {
-                if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                else if ( !strcmp( p_tagnode->psz_tag, "u" ) )
                 {
-                    p_style->i_style_flags |= STYLE_UNDERLINE;
-                    p_style->i_features |= STYLE_HAS_FLAGS;
+                    if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                    {
+                        p_style->i_style_flags |= STYLE_UNDERLINE;
+                        p_style->i_features |= STYLE_HAS_FLAGS;
+                    }
                 }
-            }
-            else if ( !strcmp( p_tagnode->psz_tag, "v" ) && p_tagnode->psz_attrs )
-            {
-                if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                else if ( !strcmp( p_tagnode->psz_tag, "v" ) && p_tagnode->psz_attrs )
                 {
-                    unsigned a = 0;
-                    for( char *p = p_tagnode->psz_attrs; *p; p++ )
-                        a = (a << 3) ^ *p;
-                    p_style->i_font_color = (0x7F7F7F | a) & 0xFFFFFF;
-                    p_style->i_features |= STYLE_HAS_FONT_COLOR;
+#ifdef HAVE_CSS
+                    if( p_dec->p_sys->p_css_rules == NULL ) /* Only auto style when no CSS sheet */
+#endif
+                    {
+                        if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
+                        {
+                            unsigned a = 0;
+                            for( char *p = p_tagnode->psz_attrs; *p; p++ )
+                                a = (a << 3) ^ *p;
+                            p_style->i_font_color = (0x7F7F7F | a) & 0xFFFFFF;
+                            p_style->i_features |= STYLE_HAS_FONT_COLOR;
+                        }
+                    }
                 }
             }
         }
+
+        const text_style_t *p_nodestyle = webvtt_domnode_getCSSStyle( p_node );
+        if( p_nodestyle )
+        {
+            if( p_style )
+                text_style_Merge( p_style, p_nodestyle, false );
+            else if( !b_nooverride )
+                p_style = text_style_Duplicate( p_nodestyle );
+        }
     }
+
     return p_style;
 }
 
@@ -984,7 +1346,7 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
             {
                 if( (*pp_append)->psz_text )
                     vlc_xml_decode( (*pp_append)->psz_text );
-                (*pp_append)->style = InheritStyles( p_dec, p_node );
+                (*pp_append)->style = ComputeStyle( p_dec, p_node );
             }
         }
         else if( p_node->type == NODE_TAG )
@@ -1072,7 +1434,6 @@ static void GetTimedTags( const webvtt_dom_node_t *p_node,
             } break;
             case NODE_REGION:
             case NODE_CUE:
-            case NODE_VIDEO:
                 GetTimedTags( webvtt_domnode_getFirstChild( p_node ),
                               i_start, i_stop, p_times );
                 break;
@@ -1104,10 +1465,61 @@ static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
     }
 }
 
+static void ClearCSSStyles( webvtt_dom_node_t *p_node )
+{
+    if( webvtt_domnode_supportsCSSStyle( p_node ) )
+        webvtt_domnode_setCSSStyle( p_node, NULL );
+    webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_node );
+    for ( ; p_child ; p_child = p_child->p_next )
+        ClearCSSStyles( p_child );
+}
+
+#ifdef HAVE_CSS
+static void ApplyCSSRules( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
+                           mtime_t i_playbacktime )
+{
+    for ( ;  p_rule ; p_rule = p_rule->p_next )
+    {
+        vlc_array_t results;
+        vlc_array_init( &results );
+
+        webvtt_domnode_SelectRuleNodes( p_dec, p_rule, i_playbacktime, &results );
+
+        for( const vlc_css_declaration_t *p_decl = p_rule->p_declarations;
+                                          p_decl; p_decl = p_decl->p_next )
+        {
+            for( size_t i=0; i<vlc_array_count(&results); i++ )
+            {
+                webvtt_dom_node_t *p_node = vlc_array_item_at_index( &results, i );
+                if( !webvtt_domnode_supportsCSSStyle( p_node ) )
+                    continue;
+
+                text_style_t *p_style = webvtt_domnode_getCSSStyle( p_node );
+                if( !p_style )
+                {
+                    p_style = text_style_Create( STYLE_NO_DEFAULTS );
+                    webvtt_domnode_setCSSStyle( p_node, p_style );
+                }
+
+                if( !p_style )
+                    continue;
+
+                webvtt_FillStyleFromCssDeclaration( p_decl, p_style );
+            }
+        }
+        vlc_array_clear( &results );
+    }
+}
+#endif
+
 static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
 {
     subpicture_t *p_spu = NULL;
     subpicture_updater_sys_region_t *p_updtregion = NULL;
+
+#ifdef HAVE_CSS
+    ApplyCSSRules( p_dec, p_dec->p_sys->p_css_rules, i_start );
+#endif
 
     for( const webvtt_dom_node_t *p_node = p_dec->p_sys->p_root->p_child;
                                   p_node; p_node = p_node->p_next )
@@ -1217,12 +1629,18 @@ static void Render( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
                  (const webvtt_dom_tag_t *) vlc_array_item_at_index( &timedtags, i );
          if( p_tag->i_start != i_substart ) /* might be duplicates */
          {
+             if( i > 0 )
+                 ClearCSSStyles( (webvtt_dom_node_t *)p_sys->p_root );
              RenderRegions( p_dec, i_substart, p_tag->i_start );
              i_substart = p_tag->i_start;
          }
     }
     if( i_substart != i_stop )
+    {
+        if( i_substart != i_start )
+            ClearCSSStyles( (webvtt_dom_node_t *)p_sys->p_root );
         RenderRegions( p_dec, i_substart, i_stop );
+    }
 
     vlc_array_clear( &timedtags );
 }
@@ -1288,6 +1706,9 @@ static int ProcessISOBMFF( decoder_t *p_dec,
 struct parser_ctx
 {
     webvtt_region_t *p_region;
+#ifdef HAVE_CSS
+    struct vlc_memstream css;
+#endif
     decoder_t *p_dec;
 };
 
@@ -1312,6 +1733,30 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
             else webvtt_region_Delete( ctx->p_region );
             ctx->p_region = NULL;
         }
+#ifdef HAVE_CSS
+        else if( ctx->css.stream )
+        {
+            if( vlc_memstream_close( &ctx->css ) == VLC_SUCCESS )
+            {
+                vlc_css_parser_t p;
+                vlc_css_parser_Init(&p);
+                vlc_css_parser_ParseBytes( &p,
+                                          (const uint8_t *) ctx->css.ptr,
+                                           ctx->css.length );
+#  ifdef CSS_PARSER_DEBUG
+                vlc_css_parser_Debug( &p );
+#  endif
+                vlc_css_rule_t **pp_append = &p_sys->p_css_rules;
+                while( *pp_append )
+                    pp_append = &((*pp_append)->p_next);
+                *pp_append = p.rules.p_first;
+                p.rules.p_first = NULL;
+
+                vlc_css_parser_Clean(&p);
+                free( ctx->css.ptr );
+            }
+        }
+#endif
 
         if( !psz_line )
             return;
@@ -1320,12 +1765,23 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
         {
             if( s == WEBVTT_HEADER_REGION )
                 ctx->p_region = webvtt_region_New();
+#ifdef HAVE_CSS
+            else if( s == WEBVTT_HEADER_STYLE )
+                (void) vlc_memstream_open( &ctx->css );
+#endif
             return;
         }
     }
 
     if( s == WEBVTT_HEADER_REGION && ctx->p_region )
         webvtt_region_Parse( ctx->p_region, (char*) psz_line );
+#ifdef HAVE_CSS
+    else if( s == WEBVTT_HEADER_STYLE && ctx->css.stream )
+    {
+        vlc_memstream_puts( &ctx->css, psz_line );
+        vlc_memstream_putc( &ctx->css, '\n' );
+    }
+#endif
 }
 
 static void LoadExtradata( decoder_t *p_dec )
@@ -1338,6 +1794,9 @@ static void LoadExtradata( decoder_t *p_dec )
         return;
 
    struct parser_ctx ctx;
+#ifdef HAVE_CSS
+   ctx.css.stream = NULL;
+#endif
    ctx.p_region = NULL;
    ctx.p_dec = p_dec;
    webvtt_text_parser_t *p_parser =
@@ -1363,15 +1822,18 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
+    mtime_t i_start = p_block->i_pts - VLC_TS_0;
+    mtime_t i_stop = i_start + p_block->i_length;
+
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         ClearCuesByTime( &p_dec->p_sys->p_root->p_child, INT64_MAX );
     else
-        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, p_block->i_dts );
+        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, i_start );
 
     ProcessISOBMFF( p_dec, p_block->p_buffer, p_block->i_buffer,
-                    p_block->i_pts, p_block->i_pts + p_block->i_length );
+                    i_start, i_stop );
 
-    Render( p_dec, p_block->i_pts, p_block->i_pts + p_block->i_length );
+    Render( p_dec, i_start, i_stop );
 
     block_Release( p_block );
     return VLCDEC_SUCCESS;
@@ -1386,6 +1848,10 @@ void CloseDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_root );
+
+#ifdef HAVE_CSS
+    vlc_css_rules_Delete( p_sys->p_css_rules );
+#endif
 
     free( p_sys );
 }
@@ -1406,12 +1872,13 @@ int OpenDecoder( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_root = webvtt_dom_video_New();
+    p_sys->p_root = webvtt_dom_tag_New( NULL );
     if( !p_sys->p_root )
     {
         free( p_sys );
         return VLC_ENOMEM;
     }
+    p_sys->p_root->psz_tag = strdup( "video" );
 
     p_dec->pf_decode = DecodeBlock;
 
