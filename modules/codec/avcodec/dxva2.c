@@ -223,6 +223,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     /* Check the device */
     HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
     if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
+        msg_Warn(va, "New video device detected.");
         if (DxResetVideoDecoder(va))
             return VLC_EGENERIC;
     } else if (FAILED(hr)) {
