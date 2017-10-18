@@ -212,11 +212,12 @@ static inline HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_d
             /* we can work with legacy levels but only if forced */
             if ( obj->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_1 )
                 break;
-            msg_Dbg(obj, "Incompatible feature level %i", i_feature_level);
+            msg_Dbg(obj, "Incompatible feature level %x", i_feature_level);
             ID3D11DeviceContext_Release(*pp_d3dcontext);
             *pp_d3dcontext = NULL;
             ID3D11Device_Release(*pp_d3ddevice);
             *pp_d3ddevice = NULL;
+            hr = E_NOTIMPL;
         }
     }
     return hr;
