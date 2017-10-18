@@ -1138,7 +1138,7 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
     int ret = avcodec_send_frame( p_sys->p_context, frame );
     if( frame && ret != 0 && ret != AVERROR(EAGAIN) )
     {
-        msg_Warn( p_enc, "cannot send one frame to encoder");
+        msg_Warn( p_enc, "cannot send one frame to encoder %d", ret );
         return NULL;
     }
     ret = avcodec_receive_packet( p_sys->p_context, &av_pkt );
