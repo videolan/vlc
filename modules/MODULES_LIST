@@ -428,10 +428,9 @@ $Id$
  * uleaddvaudio: codec for DV Audio from Ulead
  * upnp: libupnp UPNP service discovery
  * v4l2: Video 4 Linux 2 input module
- * vaapi_dr: VAAPI hardware-accelerated decoding with vout backend (direct rendering)
+ * vaapi: VAAPI hardware-accelerated decoding with vout backend
  * vaapi_drm: VAAPI hardware-accelerated decoding with drm backend
  * vaapi_filters: VAAPI hardware-accelerated deinterlacing/chroma/adjust/sharpen/chroma filters
- * vaapi_x11: VAAPI hardware-accelerated decoding with x11 backend
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vdpau_adjust: VDPAU color adjust video filter
