@@ -897,22 +897,30 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
                 d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
     }
 
+    DWORD creationFlags = D3DCREATE_MULTITHREADED;
+    if ( (sys->d3dcaps.DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
+         (sys->d3dcaps.DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
+        creationFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+    } else if (sys->d3dcaps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
+        creationFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
+    } else {
+        creationFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    }
+
     // Create the D3DDevice
     HRESULT hr;
     if (sys->use_d3d9ex) {
         LPDIRECT3DDEVICE9EX d3ddevex;
         hr = IDirect3D9Ex_CreateDeviceEx((LPDIRECT3D9EX)d3dobj, AdapterToUse,
                                          DeviceType, sys->sys.hvideownd,
-                                         D3DCREATE_SOFTWARE_VERTEXPROCESSING|
-                                         D3DCREATE_MULTITHREADED,
+                                         creationFlags,
                                          &sys->d3dpp, NULL, &d3ddevex);
         sys->d3ddev = (LPDIRECT3DDEVICE9)d3ddevex;
     } else {
         LPDIRECT3DDEVICE9 d3ddev;
         hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
                                      DeviceType, sys->sys.hvideownd,
-                                     D3DCREATE_SOFTWARE_VERTEXPROCESSING|
-                                     D3DCREATE_MULTITHREADED,
+                                     creationFlags,
                                      &sys->d3dpp, &d3ddev);
         sys->d3ddev = d3ddev;
     }
