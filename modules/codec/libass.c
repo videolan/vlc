@@ -212,8 +212,24 @@ static int Create( vlc_object_t *p_this )
     ass_set_line_spacing( p_renderer, 0.0 );
 
 #if defined( __ANDROID__ )
-    const char *psz_font = "/system/fonts/DroidSans-Bold.ttf";
-    const char *psz_family = "Droid Sans Bold";
+    const char *psz_font, *psz_family;
+    const char *psz_font_droid = "/system/fonts/DroidSans-Bold.ttf";
+    const char *psz_family_droid = "Droid Sans Bold";
+    const char *psz_font_noto = "/system/fonts/NotoSansCJK-Regular.ttc";
+    const char *psz_family_noto = "Noto Sans";
+
+    // Workaround for Android 5.0+, since libass doesn't parse the XML yet
+    if( access( psz_font_noto, R_OK ) != -1 )
+    {
+        psz_font = psz_font_noto;
+        psz_family = psz_family_noto;
+    }
+    else
+    {
+        psz_font = psz_font_droid;
+        psz_family = psz_family_droid;
+    }
+
 #elif defined( __APPLE__ )
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Helvetica Neue"; /* Use HN if we can't find anything more suitable - Arial is not on all Apple platforms */
