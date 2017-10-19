@@ -197,6 +197,17 @@ static int Open(filter_t *filter)
     sys->output->buffer_num = 3;
 
     if (filter->fmt_in.i_codec == VLC_CODEC_MMAL_OPAQUE) {
+        MMAL_PARAMETER_UINT32_T extra_buffers = {
+            { MMAL_PARAMETER_EXTRA_BUFFERS, sizeof(MMAL_PARAMETER_UINT32_T) },
+            5
+        };
+        status = mmal_port_parameter_set(sys->output, &extra_buffers.hdr);
+        if (status != MMAL_SUCCESS) {
+            msg_Err(filter, "Failed to set MMAL_PARAMETER_EXTRA_BUFFERS on output port (status=%"PRIx32" %s)",
+                    status, mmal_status_to_string(status));
+            goto out;
+        }
+
         MMAL_PARAMETER_BOOLEAN_T zero_copy = {
             { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
             1
