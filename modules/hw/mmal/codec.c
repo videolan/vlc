@@ -42,8 +42,8 @@
 /*
  * This seems to be a bit high, but reducing it causes instabilities
  */
-#define NUM_EXTRA_BUFFERS 20
-#define NUM_DECODER_BUFFER_HEADERS 20
+#define NUM_EXTRA_BUFFERS 5
+#define NUM_DECODER_BUFFER_HEADERS 30
 
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
@@ -338,7 +338,7 @@ port_reset:
     }
 
     if (sys->opaque) {
-        sys->output->buffer_num = NUM_ACTUAL_OPAQUE_BUFFERS;
+        sys->output->buffer_num = NUM_DECODER_BUFFER_HEADERS;
         pool_size = NUM_DECODER_BUFFER_HEADERS;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
@@ -508,7 +508,7 @@ static void fill_output_port(decoder_t *dec)
                 MIN_NUM_BUFFERS_IN_TRANSIT);
         buffers_available = mmal_queue_length(sys->output_pool->queue);
     } else {
-        max_buffers_in_transit = __MAX(sys->output->buffer_num, MIN_NUM_BUFFERS_IN_TRANSIT);
+        max_buffers_in_transit = NUM_DECODER_BUFFER_HEADERS;
         buffers_available = NUM_DECODER_BUFFER_HEADERS - atomic_load(&sys->output_in_transit) -
             mmal_queue_length(sys->decoded_pictures);
     }
