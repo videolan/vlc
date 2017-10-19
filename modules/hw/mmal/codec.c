@@ -540,7 +540,8 @@ static void flush_decoder(decoder_t *dec)
     mmal_port_flush(sys->output);
     mmal_port_flush(sys->input);
 
-    while (atomic_load(&sys->output_in_transit))
+    while (atomic_load(&sys->output_in_transit) ||
+           atomic_load(&sys->input_in_transit))
         vlc_sem_wait(&sys->sem);
 
     /* Free pictures which are decoded but have not yet been sent
