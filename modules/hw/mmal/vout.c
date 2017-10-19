@@ -50,6 +50,11 @@
 #define MMAL_LAYER_TEXT N_("VideoCore layer where the video is displayed.")
 #define MMAL_LAYER_LONGTEXT N_("VideoCore layer where the video is displayed. Subpictures are displayed directly above and a black background directly below.")
 
+#define MMAL_BLANK_BACKGROUND_NAME "mmal-blank-background"
+#define MMAL_BLANK_BACKGROUND_TEXT N_("Blank screen below video.")
+#define MMAL_BLANK_BACKGROUND_LONGTEXT N_("Render blank screen below video. " \
+        "Increases VideoCore load.")
+
 #define MMAL_ADJUST_REFRESHRATE_NAME "mmal-adjust-refreshrate"
 #define MMAL_ADJUST_REFRESHRATE_TEXT N_("Adjust HDMI refresh rate to the video.")
 #define MMAL_ADJUST_REFRESHRATE_LONGTEXT N_("Adjust HDMI refresh rate to the video.")
@@ -72,6 +77,8 @@ vlc_module_begin()
     set_capability("vout display", 90)
     add_shortcut("mmal_vout")
     add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT, false)
+    add_bool(MMAL_BLANK_BACKGROUND_NAME, true, MMAL_BLANK_BACKGROUND_TEXT,
+                    MMAL_BLANK_BACKGROUND_LONGTEXT, true);
     add_bool(MMAL_ADJUST_REFRESHRATE_NAME, false, MMAL_ADJUST_REFRESHRATE_TEXT,
                     MMAL_ADJUST_REFRESHRATE_LONGTEXT, false)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
@@ -426,7 +433,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return -EINVAL;
     }
 
-    show_background(vd, cfg->is_fullscreen);
+    show_background(vd, var_InheritBool(vd, MMAL_BLANK_BACKGROUND_NAME));
     sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
     sys->native_interlaced = var_InheritBool(vd, MMAL_NATIVE_INTERLACED);
     if (sys->adjust_refresh_rate) {
