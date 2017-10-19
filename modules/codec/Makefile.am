@@ -222,6 +222,12 @@ libttml_plugin_la_SOURCES = codec/ttml/substtml.c \
                             codec/ttml/ttml.h codec/ttml/ttml.c
 codec_LTLIBRARIES += libttml_plugin.la
 
+libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
+                              codec/webvtt/webvtt.c \
+                              codec/webvtt/webvtt.h \
+                              demux/mp4/minibox.h
+codec_LTLIBRARIES += libwebvtt_plugin.la
+
 libsvcdsub_plugin_la_SOURCES = codec/svcdsub.c
 codec_LTLIBRARIES += libsvcdsub_plugin.la
 
