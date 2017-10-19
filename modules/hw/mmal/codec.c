@@ -647,7 +647,7 @@ static int decode(decoder_t *dec, block_t *block)
         flags |= MMAL_BUFFER_HEADER_FLAG_CORRUPTED;
 
     while (block && block->i_buffer > 0) {
-        buffer = mmal_queue_timedwait(sys->input_pool->queue, 2);
+        buffer = mmal_queue_timedwait(sys->input_pool->queue, 100);
         if (!buffer) {
             msg_Err(dec, "Failed to retrieve buffer header for input data");
             need_flush = true;
