@@ -409,19 +409,15 @@ static void flush(filter_t *filter)
 
     msg_Dbg(filter, "flush deinterlace filter");
 
-    if (atomic_load(&sys->input_in_transit) ||
-            atomic_load(&sys->output_in_transit)) {
+    msg_Dbg(filter, "flush: flush ports (input: %d, output: %d in transit)",
+            sys->input_in_transit, sys->output_in_transit);
+    mmal_port_flush(sys->output);
+    mmal_port_flush(sys->input);
 
-        msg_Dbg(filter, "flush: flush ports (input: %d, output: %d in transit)",
-                sys->input_in_transit, sys->output_in_transit);
-        mmal_port_flush(sys->output);
-        mmal_port_flush(sys->input);
-
-        msg_Dbg(filter, "flush: wait for all buffers to be returned");
-        while (atomic_load(&sys->input_in_transit) ||
-                atomic_load(&sys->output_in_transit))
-            vlc_sem_wait(&sys->sem);
-    }
+    msg_Dbg(filter, "flush: wait for all buffers to be returned");
+    while (atomic_load(&sys->input_in_transit) ||
+            atomic_load(&sys->output_in_transit))
+        vlc_sem_wait(&sys->sem);
 
     while ((buffer = mmal_queue_get(sys->filtered_pictures))) {
         picture_t *pic = (picture_t *)buffer->user_data;
@@ -429,6 +425,7 @@ static void flush(filter_t *filter)
                 (void *)pic);
         picture_Release(pic);
     }
+    atomic_store(&sys->started, false);
     msg_Dbg(filter, "flush: done");
 }
 
