@@ -1242,8 +1242,7 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_codec = VLC_CODEC_TTML;
             break;
         case ATOM_wvtt:
-            p_track->fmt.i_codec = VLC_CODEC_SUBT;
-            p_track->fmt.i_original_fourcc = ATOM_wvtt;
+            p_track->fmt.i_codec = VLC_CODEC_WEBVTT;
             break;
         case ATOM_c608: /* EIA608 closed captions */
             p_track->fmt.i_codec = VLC_CODEC_CEA608;
