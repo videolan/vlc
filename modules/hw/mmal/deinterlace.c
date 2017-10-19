@@ -41,6 +41,10 @@
 
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
+#define MMAL_DEINTERLACE_QPU "mmal-deinterlace-adv-qpu"
+#define MMAL_DEINTERLACE_QPU_TEXT N_("Use QPUs for advanced HD deinterlacing.")
+#define MMAL_DEINTERLACE_QPU_LONGTEXT N_("Make use of the QPUs to allow higher quality deinterlacing of HD content.")
+
 static int Open(filter_t *filter);
 static void Close(filter_t *filter);
 
@@ -52,6 +56,8 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callbacks(Open, Close)
     add_shortcut("deinterlace")
+    add_bool(MMAL_DEINTERLACE_QPU, false, MMAL_DEINTERLACE_QPU_TEXT,
+                    MMAL_DEINTERLACE_QPU_LONGTEXT, true);
 vlc_module_end()
 
 struct filter_sys_t {
@@ -82,19 +88,21 @@ static int Open(filter_t *filter)
     int32_t frame_duration = filter->fmt_in.video.i_frame_rate != 0 ?
             (int64_t)1000000 * filter->fmt_in.video.i_frame_rate_base /
             filter->fmt_in.video.i_frame_rate : 0;
+    bool use_qpu = var_InheritBool(filter, MMAL_DEINTERLACE_QPU);
 
     MMAL_PARAMETER_IMAGEFX_PARAMETERS_T imfx_param = {
             { MMAL_PARAMETER_IMAGE_EFFECT_PARAMETERS, sizeof(imfx_param) },
             MMAL_PARAM_IMAGEFX_DEINTERLACE_ADV,
-            2,
-            { 3, frame_duration }
+            4,
+            { 3, frame_duration, 0, use_qpu }
     };
 
     int ret = VLC_SUCCESS;
     MMAL_STATUS_T status;
     filter_sys_t *sys;
 
-    msg_Dbg(filter, "Try to open mmal_deinterlace filter. frame_duration: %d!", frame_duration);
+    msg_Dbg(filter, "Try to open mmal_deinterlace filter. frame_duration: %d, QPU %s!",
+            frame_duration, use_qpu ? "used" : "unused");
 
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
         return VLC_EGENERIC;
