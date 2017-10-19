@@ -537,35 +537,8 @@ static void flush_decoder(decoder_t *dec)
     MMAL_STATUS_T status;
 
     msg_Dbg(dec, "Flushing decoder ports...");
-    mmal_port_disable(sys->output);
-    mmal_port_disable(sys->input);
     mmal_port_flush(sys->output);
     mmal_port_flush(sys->input);
-
-    /* Reload extradata if available */
-    if (dec->fmt_in.i_codec == VLC_CODEC_H264) {
-        if (dec->fmt_in.i_extra > 0) {
-            status = mmal_format_extradata_alloc(sys->input->format,
-                    dec->fmt_in.i_extra);
-            if (status == MMAL_SUCCESS) {
-                memcpy(sys->input->format->extradata, dec->fmt_in.p_extra,
-                        dec->fmt_in.i_extra);
-                sys->input->format->extradata_size = dec->fmt_in.i_extra;
-            } else {
-                msg_Err(dec, "Failed to allocate extra format data on input port %s (status=%"PRIx32" %s)",
-                        sys->input->name, status, mmal_status_to_string(status));
-            }
-        }
-    }
-
-    status = mmal_port_format_commit(sys->input);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(dec, "Failed to commit format for input port %s (status=%"PRIx32" %s)",
-                sys->input->name, status, mmal_status_to_string(status));
-    }
-
-    mmal_port_enable(sys->output, output_port_cb);
-    mmal_port_enable(sys->input, input_port_cb);
 
     while (atomic_load(&sys->output_in_transit))
         vlc_sem_wait(&sys->sem);
