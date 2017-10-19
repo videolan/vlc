@@ -72,7 +72,6 @@ struct decoder_sys_t {
     MMAL_POOL_T *output_pool; /* only used for non-opaque mode */
     MMAL_ES_FORMAT_T *output_format;
     MMAL_QUEUE_T *decoded_pictures;
-    vlc_mutex_t mutex;
     vlc_sem_t sem;
 
     bool b_top_field_first;
@@ -235,7 +234,6 @@ static int OpenDecoder(decoder_t *dec)
     dec->pf_decode = decode;
     dec->pf_flush  = flush_decoder;
 
-    vlc_mutex_init_recursive(&sys->mutex);
     vlc_sem_init(&sys->sem, 0);
 
 out:
@@ -294,7 +292,6 @@ static void CloseDecoder(decoder_t *dec)
     if (sys->component)
         mmal_component_release(sys->component);
 
-    vlc_mutex_destroy(&sys->mutex);
     vlc_sem_destroy(&sys->sem);
     free(sys);
 
@@ -649,8 +646,7 @@ static int decode(decoder_t *dec, block_t *block)
     if (block->i_flags & BLOCK_FLAG_CORRUPTED)
         flags |= MMAL_BUFFER_HEADER_FLAG_CORRUPTED;
 
-    vlc_mutex_lock(&sys->mutex);
-    while (block->i_buffer > 0) {
+    while (block && block->i_buffer > 0) {
         buffer = mmal_queue_timedwait(sys->input_pool->queue, 2);
         if (!buffer) {
             msg_Err(dec, "Failed to retrieve buffer header for input data");
@@ -671,8 +667,10 @@ static int decode(decoder_t *dec, block_t *block)
         block->p_buffer += len;
         block->i_buffer -= len;
         buffer->length = len;
-        if (block->i_buffer == 0)
+        if (block->i_buffer == 0) {
             buffer->user_data = block;
+            block = NULL;
+        }
         buffer->flags = flags;
 
         status = mmal_port_send_buffer(sys->input, buffer);
@@ -683,7 +681,6 @@ static int decode(decoder_t *dec, block_t *block)
         }
         atomic_fetch_add(&sys->input_in_transit, 1);
     }
-    vlc_mutex_unlock(&sys->mutex);
 
 out:
     if (need_flush)
@@ -714,10 +711,8 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     buffer->user_data = NULL;
 
     mmal_buffer_header_release(buffer);
-    vlc_mutex_lock(&sys->mutex);
     if (block)
         block_Release(block);
-    vlc_mutex_unlock(&sys->mutex);
     atomic_fetch_sub(&sys->input_in_transit, 1);
     vlc_sem_post(&sys->sem);
 }
