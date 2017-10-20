@@ -475,6 +475,13 @@ int OpenDemux( vlc_object_t *p_this )
                     free( psz_buf );
                 }
             }
+            else if( !strcmp( p_sys->ic->iformat->name, "wtv" ) &&
+                     cp->codec_id == AV_CODEC_ID_DVB_SUBTITLE &&
+                     cp->extradata_size > 3 )
+            {
+                es_fmt.subs.dvb.i_id = GetWBE( cp->extradata ) |
+                                      (GetWBE( cp->extradata + 2 ) << 16);
+            }
 
             psz_type = "subtitle";
             break;
@@ -733,6 +740,19 @@ static int Demux( demux_t *p_demux )
             av_packet_unref( &pkt );
             return 1;
         }
+    }
+    else if( !strcmp( p_sys->fmt->name, "wtv" ) &&
+             p_stream->codecpar->codec_id == AV_CODEC_ID_DVB_SUBTITLE )
+    {
+        if( ( p_frame = block_Alloc( pkt.size + 3 ) ) == NULL )
+        {
+            av_packet_unref( &pkt );
+            return 0;
+        }
+        p_frame->p_buffer[0] = 0x20;
+        p_frame->p_buffer[1] = 0x00;
+        memcpy( &p_frame->p_buffer[2], pkt.data, pkt.size );
+        p_frame->p_buffer[p_frame->i_buffer - 1] = 0x3f;
     }
     else
     {
