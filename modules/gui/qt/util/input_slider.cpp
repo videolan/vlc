@@ -601,9 +601,11 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     const QBitmap mask( temp.createHeuristicMask() );
 
     pixGradient = QPixmap( pixOutside.size() );
-    pixGradient.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
     pixGradient2 = QPixmap( pixOutside.size() );
+#if HAS_QT56
+    pixGradient.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
     pixGradient2.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
+#endif
 
     /* Gradient building from the preferences */
     QLinearGradient gradient( PADDINGL, 2, width() - PADDINGR, 2 );

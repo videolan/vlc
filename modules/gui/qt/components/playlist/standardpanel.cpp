@@ -560,14 +560,22 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
             QStylePainter painter( viewport );
 
             QPixmap dropzone = ImageHelper::loadSvgToPixmap(":/dropzone.svg", DROPZONE_SIZE, DROPZONE_SIZE);
-            qreal scale = dropzone.devicePixelRatio();
             QRect rect = viewport->geometry();
+#if HAS_QT56
+            qreal scale = dropzone.devicePixelRatio();
             QSize size = rect.size()  / 2 - dropzone.size() / (2 * scale);
+#else
+            QSize size = rect.size()  / 2 - dropzone.size() / 2;
+#endif
             rect.adjust( 0, size.height(), 0 , 0 );
             painter.drawItemPixmap( rect, Qt::AlignHCenter, dropzone );
             /* now select the zone just below the drop zone and let Qt center
                the text by itself */
+#if HAS_QT56
             rect.adjust( 0, dropzone.height() / scale + 10, 0, 0 );
+#else
+            rect.adjust( 0, dropzone.height() + 10, 0, 0 );
+#endif
             rect.setRight( viewport->geometry().width() );
             rect.setLeft( 0 );
             painter.drawItemText( rect,
