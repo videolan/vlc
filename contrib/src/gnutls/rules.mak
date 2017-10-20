@@ -83,6 +83,10 @@ endif
 endif
 endif
 
+ifdef HAVE_NACL
+	GNUTLS_CONF += --disable-hardware-acceleration
+endif
+
 .gnutls: gnutls
 	$(RECONF)
 	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
