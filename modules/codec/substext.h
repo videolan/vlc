@@ -262,6 +262,7 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
     {
         subpicture_updater_sys_region_t *p_next = p_region->p_next;
         SubpictureUpdaterSysRegionClean( p_region );
+        free( p_region );
         p_region = p_next;
     }
     text_style_Delete( sys->p_default_style );
