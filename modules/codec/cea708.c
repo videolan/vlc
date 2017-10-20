@@ -1011,7 +1011,7 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
         p_region->origin.y = (float)p_w->i_anchor_offset_v /
                              (CEA708_SCREEN_ROWS * CEA708_FONT_TO_LINE_HEIGHT_RATIO);
     }
-    p_region->flags |= UPDT_REGION_ORIGIN_X_IS_PERCENTILE|UPDT_REGION_ORIGIN_Y_IS_PERCENTILE;
+    p_region->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO;
 
     if( p_w->i_firstrow <= p_w->i_lastrow )
     {

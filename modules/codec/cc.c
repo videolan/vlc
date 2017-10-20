@@ -1241,7 +1241,7 @@ static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia60
             {
                 p_region->origin.y = (float) i /* start line number */
                                      / (EIA608_SCREEN_ROWS * FONT_TO_LINE_HEIGHT_RATIO);
-                p_region->flags |= UPDT_REGION_ORIGIN_Y_IS_PERCENTILE;
+                p_region->flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
             }
             else /* Insert line break between region lines */
             {

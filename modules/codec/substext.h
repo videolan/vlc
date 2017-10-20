@@ -29,13 +29,13 @@ typedef struct subpicture_updater_sys_region_t subpicture_updater_sys_region_t;
 
 enum subpicture_updater_sys_region_flags_e
 {
-    UPDT_REGION_ORIGIN_X_IS_PERCENTILE = 1 << 0,
-    UPDT_REGION_ORIGIN_Y_IS_PERCENTILE = 1 << 1,
-    UPDT_REGION_EXTENT_X_IS_PERCENTILE = 1 << 2,
-    UPDT_REGION_EXTENT_Y_IS_PERCENTILE = 1 << 3,
+    UPDT_REGION_ORIGIN_X_IS_RATIO      = 1 << 0,
+    UPDT_REGION_ORIGIN_Y_IS_RATIO      = 1 << 1,
+    UPDT_REGION_EXTENT_X_IS_RATIO      = 1 << 2,
+    UPDT_REGION_EXTENT_Y_IS_RATIO      = 1 << 3,
     UPDT_REGION_IGNORE_BACKGROUND      = 1 << 4,
     UPDT_REGION_USES_GRID_COORDINATES  = 1 << 5,
-    UPDT_REGION_FIX_DONE               = 1 << 31,
+    UPDT_REGION_FIXED_DONE             = 1 << 31,
 };
 
 struct subpicture_updater_sys_region_t
@@ -107,18 +107,18 @@ static int SubpictureTextValidate(subpicture_t *subpic,
 
     subpicture_updater_sys_region_t *p_updtregion = &sys->region;
 
-    if (!(p_updtregion->flags & UPDT_REGION_FIX_DONE) &&
+    if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE) &&
         subpic->b_absolute && subpic->p_region &&
         subpic->i_original_picture_width > 0 &&
         subpic->i_original_picture_height > 0)
     {
-        p_updtregion->flags |= UPDT_REGION_FIX_DONE;
+        p_updtregion->flags |= UPDT_REGION_FIXED_DONE;
         p_updtregion->origin.x = subpic->p_region->i_x;
         p_updtregion->origin.y = subpic->p_region->i_y;
         p_updtregion->extent.x = subpic->i_original_picture_width;
         p_updtregion->extent.y = subpic->i_original_picture_height;
-        p_updtregion->flags &= ~(UPDT_REGION_ORIGIN_X_IS_PERCENTILE|UPDT_REGION_ORIGIN_Y_IS_PERCENTILE|
-                                 UPDT_REGION_EXTENT_X_IS_PERCENTILE|UPDT_REGION_EXTENT_Y_IS_PERCENTILE);
+        p_updtregion->flags &= ~(UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO|
+                                 UPDT_REGION_EXTENT_X_IS_RATIO|UPDT_REGION_EXTENT_Y_IS_RATIO);
     }
 
     return VLC_EGENERIC;
@@ -169,7 +169,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->b_noregionbg = p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND;
         r->b_gridmode = p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES;
 
-        if (!(p_updtregion->flags & UPDT_REGION_FIX_DONE))
+        if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE))
         {
             const float margin_ratio = sys->margin_ratio;
             const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? (unsigned) subpic->i_original_picture_width
@@ -193,12 +193,12 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
             else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
                 r->i_y = margin_v + outerbottom_v;
 
-            if( p_updtregion->flags & UPDT_REGION_ORIGIN_X_IS_PERCENTILE )
+            if( p_updtregion->flags & UPDT_REGION_ORIGIN_X_IS_RATIO )
                 r->i_x += p_updtregion->origin.x * inner_w;
             else
                 r->i_x += p_updtregion->origin.x;
 
-            if( p_updtregion->flags & UPDT_REGION_ORIGIN_Y_IS_PERCENTILE )
+            if( p_updtregion->flags & UPDT_REGION_ORIGIN_Y_IS_RATIO )
                 r->i_y += p_updtregion->origin.y * inner_h;
             else
                 r->i_y += p_updtregion->origin.y;
