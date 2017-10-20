@@ -62,7 +62,7 @@
 # include <QWindow>
 #endif
 
-#if defined(_WIN32) && HAS_QT5
+#if defined(_WIN32)
 #include <QWindow>
 #include <qpa/qplatformnativeinterface.h>
 #endif
@@ -198,7 +198,7 @@ QSize VideoWidget::physicalSize() const
         return QSize( x_attributes.width, x_attributes.height );
     }
 #endif
-#if defined(_WIN32) && HAS_QT5
+#if defined(_WIN32)
     HWND hwnd;
     RECT rect;
 
@@ -215,11 +215,9 @@ QSize VideoWidget::physicalSize() const
 #   if HAS_QT56
     /* Android-like scaling */
     current_size *= devicePixelRatioF();
-#   elif HAS_QT54
+#   else
     /* OSX-like scaling */
     current_size *= devicePixelRatio();
-#   else
-#       warning "No HiDPI support"
 #   endif
 
     return current_size;

@@ -117,11 +117,7 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
     layout->addWidget( treePlugins, 0, 0, 1, -1 );
 
     /* Users cannot move the columns around but we need to sort */
-#if HAS_QT5
     treePlugins->header()->setSectionsMovable( false );
-#else
-    treePlugins->header()->setMovable( false );
-#endif
     treePlugins->header()->setSortIndicatorShown( true );
     //    treePlugins->header()->setResizeMode( QHeaderView::ResizeToContents );
     treePlugins->setAlternatingRowColors( true );
@@ -1046,11 +1042,7 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index ) const
 {
-#if HAS_QT5
     QStyleOptionViewItem opt = option;
-#else
-    QStyleOptionViewItemV4 opt = option;
-#endif
     initStyleOption( &opt, index );
 
     // Draw background
@@ -1132,11 +1124,7 @@ void AddonItemDelegate::paint( QPainter *painter,
                                const QStyleOptionViewItem &option,
                                const QModelIndex &index ) const
 {
-#if HAS_QT5
     QStyleOptionViewItem newopt = option;
-#else
-    QStyleOptionViewItemV4 newopt = option;
-#endif
     int i_state = index.data( AddonsListModel::StateRole ).toInt();
     int i_type = index.data( AddonsListModel::TypeRole ).toInt();
 
@@ -1259,15 +1247,9 @@ void AddonItemDelegate::paint( QPainter *painter,
                 progressbar->setGeometry(
                     newopt.rect.adjusted( adjustment.width(), adjustment.height(),
                                           -adjustment.width(), -adjustment.height() ) );
-#if HAS_QT5
                 painter->drawPixmap( newopt.rect.left() + adjustment.width(),
                                      newopt.rect.top() + adjustment.height(),
                                      progressbar->grab() );
-#else
-                painter->drawPixmap( newopt.rect.left() + adjustment.width(),
-                                     newopt.rect.top() + adjustment.height(),
-                                     QPixmap::grabWidget( progressbar ) );
-#endif
             }
             painter->restore();
         }

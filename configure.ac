@@ -3668,20 +3668,15 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
     ], [
-      PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.8.0],, [
-        AS_IF([test -n "${enable_qt}"],[
-          AC_MSG_ERROR([${QT_PKG_ERRORS}.])
-        ],[
-          AC_MSG_WARN([${QT_PKG_ERRORS}.])
-        ])
-        enable_qt="no"
+      AS_IF([test -n "${enable_qt}"],[
+        AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+      ],[
+        AC_MSG_WARN([${QT_PKG_ERRORS}.])
       ])
-      QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
-      AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, ["${QT_PATH}/bin"])
-      AC_PATH_PROG(RCC, rcc, rcc, ["${QT_PATH}/bin"])
-      AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, ["${QT_PATH}/bin"])
+      enable_qt="no"
     ])
 ])
+
 AS_IF([test "${enable_qt}" != "no"], [
   ALIASES="${ALIASES} qvlc"
 ])

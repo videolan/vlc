@@ -479,11 +479,7 @@ InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
      InfoTree = new QTreeWidget(this);
      InfoTree->setColumnCount( 1 );
      InfoTree->header()->hide();
-#if HAS_QT5
      InfoTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-     InfoTree->header()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
      layout->addWidget(InfoTree, 1, 0 );
 }
 

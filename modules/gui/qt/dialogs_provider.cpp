@@ -121,17 +121,10 @@ QStringList DialogsProvider::getOpenURL( QWidget *parent,
                                          QString *selectedFilter )
 {
     QStringList res;
-
-#if HAS_QT5
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
 
     foreach( const QUrl& url, urls )
         res.append( url.toEncoded() );
-#else
-    QStringList files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
-    foreach ( const QString& file, files )
-        res.append( toURI( toNativeSeparators( file ) ) );
-#endif
 
     return res;
 }

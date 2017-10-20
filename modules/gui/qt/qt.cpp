@@ -53,18 +53,14 @@
 
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
- #if HAS_QT5
-  #ifdef QT_STATICPLUGIN
-   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-   Q_IMPORT_PLUGIN(QSvgIconPlugin)
-   Q_IMPORT_PLUGIN(QSvgPlugin)
-   #if !HAS_QT56
-    Q_IMPORT_PLUGIN(AccessibleFactory)
-   #endif
+
+ #ifdef QT_STATICPLUGIN
+  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+  Q_IMPORT_PLUGIN(QSvgIconPlugin)
+  Q_IMPORT_PLUGIN(QSvgPlugin)
+  #if !HAS_QT56
+   Q_IMPORT_PLUGIN(AccessibleFactory)
   #endif
- #else
-  Q_IMPORT_PLUGIN(qjpeg)
-  Q_IMPORT_PLUGIN(qtaccessiblewidgets)
  #endif
 #endif
 
@@ -604,7 +600,6 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 
         /* Check window type from the Qt platform back-end */
         p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if HAS_QT5
         QString platform = app.platformName();
         if( platform == qfu("xcb") )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
@@ -616,11 +611,6 @@ static void *ThreadPlatform( void *obj, char *platform_name )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
         else
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
-#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
-#elif defined (Q_WS_MAC)
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
-#endif
 
         var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
         var_SetAddress( THEPL, "qt4-iface", p_intf );

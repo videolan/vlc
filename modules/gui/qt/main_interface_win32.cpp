@@ -37,10 +37,8 @@
 
 #include <assert.h>
 
-#if HAS_QT5
-# include <QWindow>
-# include <qpa/qplatformnativeinterface.h>
-#endif
+#include <QWindow>
+#include <qpa/qplatformnativeinterface.h>
 
 #define WM_APPCOMMAND 0x0319
 
@@ -106,32 +104,21 @@ MainInterfaceWin32::~MainInterfaceWin32()
 
 HWND MainInterfaceWin32::WinId( QWidget *w )
 {
-#if HAS_QT5
     if( w && w->windowHandle() )
         return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
             nativeResourceForWindow("handle", w->windowHandle()));
     else
         return 0;
-#else
-    return winId();
-#endif
 }
 
-#if !HAS_QT5
-static const int PremultipliedAlpha = QPixmap::PremultipliedAlpha;
-static HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0)
-{
-    return p.toWinHBITMAP((enum QBitmap::HBitmapFormat)hbitmapFormat);
-}
-#else
 Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
+
 enum HBitmapFormat
 {
     NoAlpha,
     PremultipliedAlpha,
     Alpha
 };
-#endif
 
 void MainInterfaceWin32::createTaskBarButtons()
 {
@@ -228,12 +215,10 @@ void MainInterfaceWin32::createTaskBarButtons()
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
-#if HAS_QT5
 bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
 {
     return winEvent( static_cast<MSG*>( message ), result );
 }
-#endif
 
 bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
 {
@@ -346,12 +331,8 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
      * but ignore the ones always on top
      * and the ones which can't be activated */
     HWND winId;
-#if HAS_QT5
     QWindow *window = windowHandle();
     winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
-#else
-    winId = internalWinId();
-#endif
 
     WINDOWINFO wi;
     HWND hwnd;

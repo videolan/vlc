@@ -279,15 +279,9 @@ void FileOpenPanel::updateMRL()
         }
     else
     {
-#if HAS_QT5
         QList<QUrl> urls = dialogBox->selectedUrls();
         foreach( const QUrl &url, urls )
             fileList.append( url.toEncoded() );
-#else
-        fileList = dialogBox->selectedFiles();
-        for( int i = 0; i < fileList.count(); i++ )
-            fileList[i] = toURI( fileList[i] );
-#endif
     }
 
     /* Options */

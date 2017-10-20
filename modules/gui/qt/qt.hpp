@@ -42,18 +42,11 @@
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
-#if ( QT_VERSION < 0x040800 )
-# error Update your Qt version to at least 4.8.0
+#if ( QT_VERSION < 0x050500 )
+# error Update your Qt version to at least 5.5.0
 #endif
 
-#define HAS_QT5  ( QT_VERSION >= 0x050000 )
-#define HAS_QT54 ( QT_VERSION >= 0x050400 )
 #define HAS_QT56 ( QT_VERSION >= 0x050600 )
-
-/* Q_DECL_OVERRIDE is a Qt5 feature, add empty define to not break with Qt4 */
-#if !HAS_QT5 && !defined(Q_DECL_OVERRIDE)
-# define Q_DECL_OVERRIDE
-#endif
 
 enum {
     DialogEventTypeOffset = 0,
