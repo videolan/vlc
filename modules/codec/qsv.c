@@ -790,7 +790,7 @@ static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
         if (sts != MFX_WRN_DEVICE_BUSY && sts != MFX_WRN_IN_EXECUTION)
             break;
         if (sys->busy_warn_counter++ % 16 == 0)
-            msg_Dbg(enc, "Device is busy, let's wait and retry");
+            msg_Dbg(enc, "Device is busy, let's wait and retry %d", sts);
         if (sts == MFX_WRN_DEVICE_BUSY)
             msleep(QSV_BUSYWAIT_TIME);
     }
