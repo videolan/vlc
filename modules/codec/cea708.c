@@ -1655,7 +1655,8 @@ static void CEA708_Decode_ServiceBuffer( cea708_t *h )
 
         /* Update internal clock */
         const uint8_t i_consumed = i_in - cea708_input_buffer_size( &h->input_buffer );
-        h->i_clock += CLOCK_FREQ / 1200 * i_consumed;
+        if( i_consumed )
+            h->i_clock += CLOCK_FREQ / 1200 * i_consumed;
     }
 }
 
@@ -1686,7 +1687,8 @@ void CEA708_Decoder_Push( cea708_t *h, mtime_t i_time,
             if ( h->suspended_deadline > h->i_clock )
             {
                 /* Increase internal clock */
-                h->i_clock += CLOCK_FREQ / 1200 * i_push;
+                if( i_push )
+                    h->i_clock += CLOCK_FREQ / 1200 * i_push;
                 continue;
             }
             h->suspended_deadline = 0;
