@@ -160,7 +160,7 @@ namespace adaptive
             bool isEmpty() const;
             void setDrop( bool );
             void setDraining();
-            void setEOF();
+            void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
             mtime_t getDemuxedAmount() const;

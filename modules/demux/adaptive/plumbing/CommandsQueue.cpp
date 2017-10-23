@@ -401,11 +401,14 @@ bool CommandsQueue::isDraining() const
     return b;
 }
 
-void CommandsQueue::setEOF()
+void CommandsQueue::setEOF( bool b )
 {
     vlc_mutex_lock(&lock);
-    b_eof = true;
-    LockedSetDraining();
+    b_eof = b;
+    if( b_eof )
+        LockedSetDraining();
+    else
+        b_draining = false;
     vlc_mutex_unlock(&lock);
 }
 

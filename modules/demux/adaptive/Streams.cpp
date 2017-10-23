@@ -338,7 +338,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 return AbstractStream::buffering_ongoing;
             }
             dead = true; /* Prevent further retries */
-            commandsqueue->setEOF();
+            commandsqueue->setEOF(true);
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
         }
@@ -380,7 +380,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
-            commandsqueue->setEOF();
+            commandsqueue->setEOF(true);
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
         }
@@ -499,6 +499,8 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 
             if( !restartDemux() )
                 dead = true;
+            else
+                commandsqueue->setEOF(false);
         }
         else commandsqueue->Abort( true );
 
