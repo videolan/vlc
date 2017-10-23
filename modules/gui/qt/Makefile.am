@@ -365,13 +365,13 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/playlist/sidebar-icons/sd/frenchtv.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/sd/jamendo.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/sd/assembleenationale.svg \
-	gui/qt/pixmaps/prefs/advprefs_audio.png \
-	gui/qt/pixmaps/prefs/advprefs_codec.png \
-	gui/qt/pixmaps/prefs/advprefs_extended.png \
-	gui/qt/pixmaps/prefs/advprefs_intf.png \
-	gui/qt/pixmaps/prefs/advprefs_playlist.png \
-	gui/qt/pixmaps/prefs/advprefs_sout.png \
-	gui/qt/pixmaps/prefs/advprefs_video.png \
+	gui/qt/pixmaps/prefs/advprefs_audio.svg \
+	gui/qt/pixmaps/prefs/advprefs_codec.svg \
+	gui/qt/pixmaps/prefs/advprefs_extended.svg \
+	gui/qt/pixmaps/prefs/advprefs_intf.svg \
+	gui/qt/pixmaps/prefs/advprefs_playlist.svg \
+	gui/qt/pixmaps/prefs/advprefs_sout.svg \
+	gui/qt/pixmaps/prefs/advprefs_video.svg \
 	gui/qt/pixmaps/prefs/spref_cone_Audio_64.png \
 	gui/qt/pixmaps/prefs/spref_cone_Hotkeys_64.png \
 	gui/qt/pixmaps/prefs/spref_cone_Input_64.png \
@@ -433,10 +433,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/util/wait2.svg \
 	gui/qt/pixmaps/util/wait3.svg \
 	gui/qt/pixmaps/util/wait4.svg \
-	gui/qt/pixmaps/win7/win7thumbnail_pause.png \
-	gui/qt/pixmaps/win7/win7thumbnail_prev.png \
-	gui/qt/pixmaps/win7/win7thumbnail_next.png \
-	gui/qt/pixmaps/win7/win7thumbnail_play.png \
+	gui/qt/pixmaps/win7/win7thumbnail_pause.svg \
+	gui/qt/pixmaps/win7/win7thumbnail_prev.svg \
+	gui/qt/pixmaps/win7/win7thumbnail_next.svg \
+	gui/qt/pixmaps/win7/win7thumbnail_play.svg \
 	gui/qt/pixmaps/update.svg \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \
