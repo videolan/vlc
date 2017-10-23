@@ -1036,8 +1036,8 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
             [CEA708_ANCHOR_BOTTOM_RIGHT]    = SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_RIGHT,
         };
         p_region->align = vlc_subpicture_aligns[p_w->anchor_point];
-        p_region->align |= SUBPICTURE_ALIGN_LEAVETEXT;
     }
+    p_region->inner_align = SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_LEFT;
 }
 
 static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )

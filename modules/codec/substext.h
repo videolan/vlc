@@ -75,6 +75,8 @@ static inline void SubpictureUpdaterSysRegionClean(subpicture_updater_sys_region
 static inline void SubpictureUpdaterSysRegionInit(subpicture_updater_sys_region_t *p_updtregion)
 {
     memset(p_updtregion, 0, sizeof(*p_updtregion));
+    p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM /* CENTER */;
+    p_updtregion->inner_align = SUBPICTURE_ALIGN_BOTTOM /* CENTER */;
 }
 
 static inline subpicture_updater_sys_region_t *SubpictureUpdaterSysRegionNew( )
@@ -165,7 +167,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         pp_last_region = &r->p_next;
 
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
-        r->i_align  = p_updtregion->inner_align | p_updtregion->align; /* we do not support text align by itself */
+        r->i_align = p_updtregion->align;
+        r->i_text_align = p_updtregion->inner_align;
         r->b_noregionbg = p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND;
         r->b_gridmode = p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES;
 

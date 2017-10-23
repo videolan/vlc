@@ -275,7 +275,7 @@ static FT_Vector GetAlignedOffset( const line_desc_t *p_line,
     FT_Vector offsets = { 0, 0 };
     const int i_text_width = p_textbbox->xMax - p_textbbox->xMin;
     if ( p_line->i_width < i_text_width &&
-        (i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_LEAVETEXT)) == 0 )
+        (i_align & SUBPICTURE_ALIGN_LEFT) == 0 )
     {
         /* Left offset to take into account alignment */
         if( i_align & SUBPICTURE_ALIGN_RIGHT )
