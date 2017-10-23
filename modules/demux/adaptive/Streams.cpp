@@ -487,6 +487,8 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     bool ret = segmentTracker->setPositionByTime(time, demuxer->needsRestartOnSeek(), tryonly);
     if(!tryonly && ret)
     {
+        // clear eof flag before restartDemux() to prevent readNextBlock() fail
+        eof = false;
         if(demuxer->needsRestartOnSeek())
         {
             if(currentChunk)
@@ -498,9 +500,16 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             setTimeOffset(segmentTracker->getPlaybackTime());
 
             if( !restartDemux() )
+            {
+                msg_Info(p_realdemux, "Restart demux failed");
+                eof = true;
                 dead = true;
+                ret = false;
+            }
             else
+            {
                 commandsqueue->setEOF(false);
+            }
         }
         else commandsqueue->Abort( true );
 
