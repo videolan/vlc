@@ -80,7 +80,7 @@ sd_LTLIBRARIES += $(LTLIBmicrodns)
 EXTRA_LTLIBRARIES += libmicrodns_plugin.la
 
 libbonjour_plugin_la_SOURCES = services_discovery/bonjour.m
-libbonjour_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -fobjc-arc
+libbonjour_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libbonjour_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)' -Wl,-framework,Foundation
 if HAVE_DARWIN
 sd_LTLIBRARIES += libbonjour_plugin.la
