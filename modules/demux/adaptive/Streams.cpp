@@ -184,10 +184,23 @@ int AbstractStream::esCount() const
 
 bool AbstractStream::seekAble() const
 {
-    return (demuxer &&
-            !fakeesout->restarting() &&
-            !discontinuity &&
-            !commandsqueue->isDraining() );
+    bool restarting = fakeesout->restarting();
+    bool draining = commandsqueue->isDraining();
+    bool eof = commandsqueue->isEOF();
+
+    msg_Dbg(p_realdemux, "demuxer %p, fakeesout restarting %d, "
+            "discontinuity %d, commandsqueue draining %d, commandsqueue eof %d",
+            static_cast<void *>(demuxer), restarting, discontinuity, draining, eof);
+
+    if(!demuxer || restarting || discontinuity || (!eof && draining))
+    {
+        msg_Warn(p_realdemux, "not seekable");
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 bool AbstractStream::isSelected() const
