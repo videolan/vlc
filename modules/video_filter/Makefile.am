@@ -116,7 +116,7 @@ video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
 if HAVE_IOS
-libci_filters_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -miphoneos-version-min=9.0
+libci_filters_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -miphoneos-version-min=9.0
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
