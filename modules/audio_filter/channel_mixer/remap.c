@@ -359,6 +359,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    audio_out->i_rate = audio_in->i_rate;
     audio_out->i_format = audio_in->i_format;
     audio_out->i_physical_channels = i_output_physical;
     aout_FormatPrepare( audio_out );
