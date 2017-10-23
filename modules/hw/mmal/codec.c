@@ -71,7 +71,6 @@ struct decoder_sys_t {
     MMAL_PORT_T *output;
     MMAL_POOL_T *output_pool; /* only used for non-opaque mode */
     MMAL_ES_FORMAT_T *output_format;
-    MMAL_QUEUE_T *decoded_pictures;
     vlc_sem_t sem;
 
     bool b_top_field_first;
@@ -221,7 +220,6 @@ static int OpenDecoder(decoder_t *dec)
     }
 
     sys->input_pool = mmal_pool_create(sys->input->buffer_num, 0);
-    sys->decoded_pictures = mmal_queue_create();
 
     if (sys->opaque) {
         dec->fmt_out.i_codec = VLC_CODEC_MMAL_OPAQUE;
@@ -268,23 +266,6 @@ static void CloseDecoder(decoder_t *dec)
 
     if (sys->output_format)
         mmal_format_free(sys->output_format);
-
-    /* Free pictures which are decoded but have not yet been sent
-     * out to the core */
-    while ((buffer = mmal_queue_get(sys->decoded_pictures))) {
-        picture_t *pic = (picture_t *)buffer->user_data;
-        picture_Release(pic);
-
-        if (sys->output_pool) {
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
-            mmal_buffer_header_release(buffer);
-        }
-    }
-
-    if (sys->decoded_pictures)
-        mmal_queue_destroy(sys->decoded_pictures);
 
     if (sys->output_pool)
         mmal_pool_destroy(sys->output_pool);
@@ -509,8 +490,7 @@ static void fill_output_port(decoder_t *dec)
         buffers_available = mmal_queue_length(sys->output_pool->queue);
     } else {
         max_buffers_in_transit = NUM_DECODER_BUFFER_HEADERS;
-        buffers_available = NUM_DECODER_BUFFER_HEADERS - atomic_load(&sys->output_in_transit) -
-            mmal_queue_length(sys->decoded_pictures);
+        buffers_available = NUM_DECODER_BUFFER_HEADERS - atomic_load(&sys->output_in_transit);
     }
     buffers_to_send = max_buffers_in_transit - atomic_load(&sys->output_in_transit);
 
@@ -519,10 +499,9 @@ static void fill_output_port(decoder_t *dec)
 
 #ifndef NDEBUG
     msg_Dbg(dec, "Send %d buffers to output port (available: %d, "
-                    "in_transit: %d, decoded: %d, buffer_num: %d)",
+                    "in_transit: %d, buffer_num: %d)",
                     buffers_to_send, buffers_available,
                     atomic_load(&sys->output_in_transit),
-                    mmal_queue_length(sys->decoded_pictures),
                     sys->output->buffer_num);
 #endif
     for (i = 0; i < buffers_to_send; ++i)
@@ -543,21 +522,6 @@ static void flush_decoder(decoder_t *dec)
     while (atomic_load(&sys->output_in_transit) ||
            atomic_load(&sys->input_in_transit))
         vlc_sem_wait(&sys->sem);
-
-    /* Free pictures which are decoded but have not yet been sent
-     * out to the core */
-    while ((buffer = mmal_queue_get(sys->decoded_pictures))) {
-        picture_t *pic = (picture_t *)buffer->user_data;
-        picture_Release(pic);
-
-        if (sys->output_pool) {
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
-            mmal_buffer_header_release(buffer);
-        }
-    }
-    msg_Dbg(dec, "Ports flushed, returning to normal operation");
 }
 
 static int decode(decoder_t *dec, block_t *block)
@@ -589,29 +553,8 @@ static int decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
     }
 
-    /*
-     * Send output buffers
-     */
-    picture_t *ret = NULL;
-    if (atomic_load(&sys->started)) {
-        buffer = mmal_queue_get(sys->decoded_pictures);
-        if (buffer) {
-            ret = (picture_t *)buffer->user_data;
-            ret->date = buffer->pts;
-            ret->b_progressive = sys->b_progressive;
-            ret->b_top_field_first = sys->b_top_field_first;
-
-            if (sys->output_pool) {
-                buffer->data = NULL;
-                mmal_buffer_header_reset(buffer);
-                mmal_buffer_header_release(buffer);
-            }
-        }
-
+    if (atomic_load(&sys->started))
         fill_output_port(dec);
-    }
-    if (ret)
-        decoder_QueueVideo(dec, ret);
 
     /*
      * Process input
@@ -700,10 +643,13 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     MMAL_ES_FORMAT_T *format;
 
     if (buffer->cmd == 0) {
+        picture = (picture_t *)buffer->user_data;
         if (buffer->length > 0) {
-            mmal_queue_put(sys->decoded_pictures, buffer);
+            picture->date = buffer->pts;
+            picture->b_progressive = sys->b_progressive;
+            picture->b_top_field_first = sys->b_top_field_first;
+            decoder_QueueVideo(dec, picture);
         } else {
-            picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
             if (sys->output_pool) {
                 buffer->user_data = NULL;
