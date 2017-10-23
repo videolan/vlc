@@ -236,7 +236,6 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, next, &next, &b_gap);
     if(!segment)
     {
-        reset();
         return NULL;
     }
 
