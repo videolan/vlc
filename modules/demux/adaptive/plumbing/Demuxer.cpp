@@ -101,6 +101,11 @@ bool Demuxer::create()
         b_eof = true;
         return false;
     }
+    else
+    {
+        b_eof = false;
+    }
+
     return true;
 }
 
