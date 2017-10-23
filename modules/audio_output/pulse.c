@@ -729,6 +729,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_AC3_IEC61937;
+            ss.format = PA_SAMPLE_S16NE;
             break;
         case VLC_CODEC_EAC3:
             fmt->i_format = VLC_CODEC_SPDIFL;
@@ -737,6 +738,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_EAC3_IEC61937;
+            ss.format = PA_SAMPLE_S16NE;
             break;
         /* case VLC_CODEC_MPGA:
             fmt->i_format = VLC_CODEC_SPDIFL FIXME;
@@ -749,6 +751,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_DTS_IEC61937;
+            ss.format = PA_SAMPLE_S16NE;
             break;
         default:
             if (!AOUT_FMT_LINEAR(fmt) || aout_FormatNbChannels(fmt) == 0)
