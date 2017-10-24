@@ -63,6 +63,11 @@
 #include <QFileInfo>
 #endif
 
+#if ! HAS_QT510 && defined(QT5_HAS_X11)
+# include <QX11Info>
+# include <X11/Xlib.h>
+#endif
+
 #include <QTimer>
 
 #include <vlc_actions.h>                    /* Wheel event */
@@ -397,7 +402,7 @@ void MainInterface::showResumePanel( int64_t _time ) {
     else
     {
         if( !isFullScreen() && !isMaximized() )
-            resize( width(), height() + resumePanel->height() );
+            resizeWindow( width(), height() + resumePanel->height() );
         resumePanel->setVisible(true);
         resumeTimer->start();
     }
@@ -408,7 +413,7 @@ void MainInterface::hideResumePanel()
     if( resumePanel->isVisible() )
     {
         if( !isFullScreen() && !isMaximized() )
-            resize( width(), height() - resumePanel->height() );
+            resizeWindow( width(), height() - resumePanel->height() );
         resumePanel->hide();
         resumeTimer->stop();
     }
@@ -877,7 +882,7 @@ void MainInterface::setVideoFullScreen( bool fs )
         if( lastWinPosition.isNull() == false )
         {
             move( lastWinPosition );
-            resize( lastWinSize );
+            resizeWindow( lastWinSize.width(), lastWinSize.height() );
             lastWinPosition = QPoint();
             lastWinSize = QSize();
         }
@@ -1080,7 +1085,7 @@ void MainInterface::setMinimalView( bool b_minimal )
             i_heightChange += inputC->height();
 
         if( i_heightChange != 0 )
-            resize( width(), height() - i_heightChange );
+            resizeWindow( width(), height() - i_heightChange );
     }
 
     menuBar()->setVisible( !b_minimal );
@@ -1102,7 +1107,7 @@ void MainInterface::setMinimalView( bool b_minimal )
             i_heightChange += inputC->height();
 
         if( i_heightChange != 0 )
-            resize( width(), height() + i_heightChange );
+            resizeWindow( width(), height() + i_heightChange );
     }
 }
 
@@ -1255,6 +1260,28 @@ void MainInterface::createSystray()
 void MainInterface::toggleUpdateSystrayMenuWhenVisible()
 {
     hide();
+}
+
+void MainInterface::resizeWindow(int w, int h)
+{
+#if ! HAS_QT510 && defined(QT5_HAS_X11)
+    if( QX11Info::isPlatformX11() )
+    {
+        QSize size(w, h);
+        size = size.boundedTo(maximumSize()).expandedTo(minimumSize());
+        /* X11 window managers are not required to accept geometry changes on
+         * the top-level window.  Unfortunately, Qt < 5.10 assumes that the
+         * change will succeed, and resizes all sub-windows unconditionally.
+         * By calling XMoveResizeWindow directly, Qt will not see our change
+         * request until the ConfigureNotify event on success
+         * and not at all if it is rejected. */
+        XMoveResizeWindow( QX11Info::display(), winId(),
+                          geometry().x(), geometry().y(),
+                          (unsigned int)size.width(), (unsigned int)size.height());
+        return;
+    }
+#endif
+    resize(w, h);
 }
 
 /**

@@ -110,6 +110,8 @@ protected:
     bool eventFilter(QObject *, QEvent *) Q_DECL_OVERRIDE;
     virtual void toggleUpdateSystrayMenuWhenVisible();
 
+    void resizeWindow(int width, int height);
+
 protected:
     /* Main Widgets Creation */
     void createMainWidget( QSettings* );
@@ -235,11 +237,11 @@ protected slots:
         if( !isFullScreen() && !isMaximized() )
         {
             if( b_minimalView )
-                resize( w, h ); /* Oh yes, it shouldn't
+                resizeWindow( w, h ); /* Oh yes, it shouldn't
                                    be possible that size() - stackCentralW->size() < 0
                                    since stackCentralW is contained in the QMW... */
             else
-                resize( size() - stackCentralW->size() + QSize( w, h ) );
+                resizeWindow( width() - stackCentralW->width() + w, height() - stackCentralW->height() + h );
         }
         debug();
     }
