@@ -55,10 +55,15 @@ char *vlc_getProxyUrl(const char *url)
     if (vlc_pipe(fd))
         return NULL;
 
-    posix_spawn_file_actions_init(&actions);
-    posix_spawn_file_actions_addopen(&actions, STDIN_FILENO, "/dev/null",
-                                     O_RDONLY, 0644);
-    posix_spawn_file_actions_adddup2(&actions, fd[1], STDOUT_FILENO);
+    if (posix_spawn_file_actions_init(&actions))
+        return NULL;
+    if (posix_spawn_file_actions_addopen(&actions, STDIN_FILENO, "/dev/null",
+                                         O_RDONLY, 0644) ||
+        posix_spawn_file_actions_adddup2(&actions, fd[1], STDOUT_FILENO))
+    {
+        posix_spawn_file_actions_destroy(&actions);
+        return NULL;
+    }
 
     posix_spawnattr_init(&attr);
     {
