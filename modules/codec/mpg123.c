@@ -141,7 +141,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     mpg123_close( p_sys->p_handle );
     mpg123_delete( p_sys->p_handle );
@@ -203,7 +203,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     int i_err;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_out = NULL;
+    mtime_t i_pts = VLC_TS_INVALID;
 
     if( !p_sys->b_opened )
     {
@@ -215,51 +215,58 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     /* Feed input block */
     if( p_block != NULL )
     {
-        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
-        {
-            /* We've just started the stream, wait for the first PTS. */
-            msg_Dbg( p_dec, "waiting for PTS" );
-            goto end;
-        }
+        i_pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
         {
             Flush( p_dec );
             if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-                goto end;
+            {
+                block_Release( p_block );
+                return VLCDEC_SUCCESS;
+            }
+        }
+
+        if( !date_Get( &p_sys->end_date ) && i_pts <= VLC_TS_INVALID )
+        {
+            /* We've just started the stream, wait for the first PTS. */
+            msg_Dbg( p_dec, "waiting for PTS" );
+            block_Release( p_block );
+            return VLCDEC_SUCCESS;
         }
 
         /* Feed mpg123 with raw data */
-        i_err = mpg123_feed( p_sys->p_handle, p_block->p_buffer,
-                             p_block->i_buffer );
+        i_err = mpg123_feed( p_sys->p_handle, p_block->p_buffer, p_block->i_buffer );
+        block_Release( p_block );
 
         if( i_err != MPG123_OK )
         {
             msg_Err( p_dec, "mpg123_feed failed: %s",
                      mpg123_plain_strerror( i_err ) );
-            goto end;
+            return VLCDEC_SUCCESS;
         }
     }
 
-    /* Fetch a new output block (if possible) */
-    if( !p_sys->p_out
-     || p_sys->p_out->i_buffer != mpg123_outblock( p_sys->p_handle ) )
-    {
-        if( p_sys->p_out )
-            block_Release( p_sys->p_out );
-
-        /* Keep the output buffer for next calls in case it's not used (in case
-         * of MPG123_NEED_MORE status) */
-        p_sys->p_out = block_Alloc( mpg123_outblock( p_sys->p_handle ) );
-
-        if( unlikely( !p_sys->p_out ) )
-            return VLCDEC_SUCCESS;
-    }
-
-    /* Do the actual decoding now */
-    size_t i_bytes = 0;
     while( true )
     {
+        /* Fetch a new output block (if possible) */
+        if( !p_sys->p_out
+            || p_sys->p_out->i_buffer != mpg123_outblock( p_sys->p_handle ) )
+        {
+            if( p_sys->p_out )
+                block_Release( p_sys->p_out );
+
+            /* Keep the output buffer for next calls in case it's not used (in case
+             * of MPG123_NEED_MORE status) */
+            p_sys->p_out = block_Alloc( mpg123_outblock( p_sys->p_handle ) );
+
+            if( unlikely( !p_sys->p_out ) )
+                return VLCDEC_SUCCESS;
+        }
+
+        /* Do the actual decoding now */
+        size_t i_bytes = 0;
+
         /* Make mpg123 write directly into the VLC output buffer */
         i_err = mpg123_replace_buffer( p_sys->p_handle, p_sys->p_out->p_buffer,
                                        p_sys->p_out->i_buffer );
@@ -269,59 +276,69 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                      mpg123_plain_strerror( i_err ) );
             block_Release( p_sys->p_out );
             p_sys->p_out = NULL;
-            return VLCDEC_SUCCESS;
+            break;
         }
 
         i_err = mpg123_decode_frame( p_sys->p_handle, NULL, NULL, &i_bytes );
-        if( i_err != MPG123_OK )
+        if( i_err != MPG123_OK && i_err != MPG123_NEED_MORE )
         {
             if( i_err == MPG123_NEW_FORMAT )
             {
-                if( UpdateAudioFormat( p_dec ) != VLC_SUCCESS )
-                    goto end;
-                else
-                    continue;
+                p_dec->fmt_out.audio.i_rate = 0;
             }
-            else if( i_err != MPG123_NEED_MORE )
+            else
+            {
                 msg_Err( p_dec, "mpg123_decode_frame error: %s",
                          mpg123_plain_strerror( i_err ) );
+                date_Set( &p_sys->end_date, VLC_TS_INVALID );
+                break;
+            }
         }
-        else if( p_dec->fmt_out.audio.i_rate == 0 )
+
+        if( i_bytes == 0 )
+            break;
+
+        if( p_dec->fmt_out.audio.i_rate == 0 )
         {
-            msg_Warn( p_dec, "mpg123_decode_frame returned valid frame without "
-                             "updating the format" );
             if( UpdateAudioFormat( p_dec ) != VLC_SUCCESS )
-                goto end;
+            {
+                date_Set( &p_sys->end_date, VLC_TS_INVALID );
+                break;
+            }
         }
-        break;
+
+        block_t *p_out = p_sys->p_out;
+        p_sys->p_out = NULL;
+
+        if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+        {
+            if( i_pts != VLC_TS_INVALID )
+            {
+                date_Set( &p_sys->end_date, i_pts );
+            }
+            else if( p_out ) /* we need a valid date and that's not guaranteed on flush/error */
+            {
+                block_Release( p_out );
+                break;
+            }
+        }
+
+        if( p_out )
+        {
+            assert( p_dec->fmt_out.audio.i_rate != 0 );
+            assert( p_out->i_buffer >= i_bytes );
+            p_out->i_buffer = i_bytes;
+            p_out->i_nb_samples = p_out->i_buffer * p_dec->fmt_out.audio.i_frame_length
+                                / p_dec->fmt_out.audio.i_bytes_per_frame;
+
+            /* Configure the buffer */
+            p_out->i_dts = p_out->i_pts = date_Get( &p_sys->end_date );
+            p_out->i_length = date_Increment( &p_sys->end_date, p_out->i_nb_samples )
+                            - p_out->i_pts;
+            decoder_QueueAudio( p_dec, p_out );
+        }
     }
 
-    if( p_block && p_block->i_pts > VLC_TS_INVALID &&
-        p_block->i_pts != date_Get( &p_sys->end_date ) )
-        date_Set( &p_sys->end_date, p_block->i_pts );
-
-    if( i_bytes == 0 )
-        goto end;
-
-    assert( p_dec->fmt_out.audio.i_rate != 0 );
-
-    p_out = p_sys->p_out;
-    p_sys->p_out = NULL;
-
-    assert( p_out->i_buffer >= i_bytes );
-    p_out->i_buffer = i_bytes;
-    p_out->i_nb_samples = p_out->i_buffer * p_dec->fmt_out.audio.i_frame_length
-                        / p_dec->fmt_out.audio.i_bytes_per_frame;
-
-    /* Configure the buffer */
-    p_out->i_dts = p_out->i_pts = date_Get( &p_sys->end_date );
-    p_out->i_length = date_Increment( &p_sys->end_date, p_out->i_nb_samples )
-        - p_out->i_pts;
-end:
-    if( p_block )
-        block_Release( p_block );
-    if( p_out != NULL )
-        decoder_QueueAudio( p_dec, p_out );
     return VLCDEC_SUCCESS;
 }
 
