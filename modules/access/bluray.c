@@ -1028,7 +1028,7 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
                 p_pair->i_id = p_fmt->i_id;
                 p_pair->p_es = p_es;
                 msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
-                vlc_array_append(&p_sys->es, p_pair);
+                vlc_array_append_or_abort(&p_sys->es, p_pair);
 
                 if (b_select) {
                     if (fmt.i_cat == AUDIO_ES) {

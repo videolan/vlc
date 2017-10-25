@@ -335,7 +335,7 @@ void libvlc_media_list_internal_add_media( libvlc_media_list_t * p_mlist,
 
     notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items ),
                           EventWillHappen );
-    vlc_array_append( &p_mlist->items, p_md );
+    vlc_array_append_or_abort( &p_mlist->items, p_md );
     notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items )-1,
                           EventDidHappen );
 }

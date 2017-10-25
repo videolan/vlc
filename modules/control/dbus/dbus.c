@@ -342,7 +342,7 @@ static dbus_bool_t add_timeout(DBusTimeout *to, void *data)
     dbus_timeout_set_data(to, expiry, free);
 
     vlc_mutex_lock(&sys->lock);
-    vlc_array_append(&sys->timeouts, to);
+    vlc_array_append_or_abort(&sys->timeouts, to);
     vlc_mutex_unlock(&sys->lock);
 
     return TRUE;
@@ -447,7 +447,7 @@ static dbus_bool_t add_watch( DBusWatch *p_watch, void *p_data )
     intf_sys_t    *p_sys  = (intf_sys_t*) p_intf->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
-    vlc_array_append( &p_sys->watches, p_watch );
+    vlc_array_append_or_abort( &p_sys->watches, p_watch );
     vlc_mutex_unlock( &p_sys->lock );
 
     return TRUE;
@@ -942,7 +942,7 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
         p_info->signal = SIGNAL_STATE;
     }
     if( p_info->signal )
-        vlc_array_append( &p_sys->events, p_info );
+        vlc_array_append_or_abort( &p_sys->events, p_info );
     else
         free( p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
@@ -1003,7 +1003,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     // Append the event
     *p_info = info;
     vlc_mutex_lock( &p_intf->p_sys->lock );
-    vlc_array_append( &p_intf->p_sys->events, p_info );
+    vlc_array_append_or_abort( &p_intf->p_sys->events, p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     wakeup_main_loop( p_intf );

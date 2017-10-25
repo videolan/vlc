@@ -620,9 +620,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             return VLC_EGENERIC;
     }
 
+    if( vlc_array_append( &p_sys->tracks, tk ) )
+    {
+        free( tk->p_extra );
+        free( tk );
+        return VLC_EGENERIC;
+    }
+
     es_format_Copy( &tk->fmt, p_input->p_fmt );
 
-    vlc_array_append( &p_sys->tracks, tk );
     tk->i_id = vlc_array_index_of_item( &p_sys->tracks, tk ) + 1;
 
     if( p_sys->b_asf_http )

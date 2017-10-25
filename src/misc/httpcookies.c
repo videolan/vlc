@@ -340,11 +340,14 @@ bool vlc_http_cookies_store(vlc_http_cookie_jar_t *p_jar, const char *cookies,
             break;
         }
     }
-    vlc_array_append( &p_jar->cookies, cookie );
+
+    bool b_ret = (vlc_array_append( &p_jar->cookies, cookie ) == 0);
+    if( !b_ret )
+        cookie_destroy( cookie );
 
     vlc_mutex_unlock( &p_jar->lock );
 
-    return true;
+    return b_ret;
 }
 
 char *vlc_http_cookies_fetch(vlc_http_cookie_jar_t *p_jar, bool secure,

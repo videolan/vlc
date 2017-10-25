@@ -880,7 +880,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         return -1;
     }
 
-    vlc_array_append( &p_sys->segments_t, segment );
+    vlc_array_append_or_abort( &p_sys->segments_t, segment );
 
     if( p_sys->psz_keyfile )
     {

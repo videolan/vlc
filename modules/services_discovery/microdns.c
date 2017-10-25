@@ -174,7 +174,7 @@ items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
     p_item->p_input_item = p_input_item;
     p_item->p_renderer_item = NULL;
     p_item->i_last_seen = mdate();
-    vlc_array_append( &p_sys->items, p_item );
+    vlc_array_append_or_abort( &p_sys->items, p_item );
     services_discovery_AddItem( p_sd, p_input_item );
 
     return VLC_SUCCESS;
@@ -206,7 +206,7 @@ items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery_t *p_rd,
     p_item->p_input_item = NULL;
     p_item->p_renderer_item = p_renderer_item;
     p_item->i_last_seen = mdate();
-    vlc_array_append( &p_sys->items, p_item );
+    vlc_array_append_or_abort( &p_sys->items, p_item );
     vlc_rd_add_item( p_rd, p_renderer_item );
 
     return VLC_SUCCESS;

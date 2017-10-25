@@ -130,7 +130,11 @@ mrl_FragmentSplit( vlc_array_t* out_items,
         if( unlikely( !decoded ) || !vlc_uri_decode( decoded ) )
             goto error;
 
-        vlc_array_append( out_items, decoded );
+        if( vlc_array_append( out_items, decoded ) )
+        {
+            free( decoded );
+            goto error;
+        }
         payload += len;
     }
 

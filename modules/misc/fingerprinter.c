@@ -80,22 +80,25 @@ vlc_module_end ()
  * Requests lifecycle
  *****************************************************************************/
 
-static void EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r )
+static int EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r )
 {
     fingerprinter_sys_t *p_sys = f->p_sys;
     vlc_mutex_lock( &p_sys->incoming.lock );
-    vlc_array_append( &p_sys->incoming.queue, r );
+    int i_ret = vlc_array_append( &p_sys->incoming.queue, r );
     vlc_mutex_unlock( &p_sys->incoming.lock );
+    return i_ret;
 }
 
 static void QueueIncomingRequests( fingerprinter_sys_t *p_sys )
 {
     vlc_mutex_lock( &p_sys->incoming.lock );
-    size_t i = vlc_array_count( &p_sys->incoming.queue );
 
-    while( i )
-        vlc_array_append( &p_sys->processing.queue,
-                          vlc_array_item_at_index( &p_sys->incoming.queue, --i ) );
+    for( size_t i = vlc_array_count( &p_sys->incoming.queue ); i > 0 ; i-- )
+    {
+        fingerprint_request_t *r = vlc_array_item_at_index( &p_sys->incoming.queue, i - 1 );
+        if( vlc_array_append( &p_sys->processing.queue, r ) )
+            fingerprint_request_Delete( r );
+    }
     vlc_array_clear( &p_sys->incoming.queue );
     vlc_mutex_unlock(&p_sys->incoming.lock);
 }
@@ -313,7 +316,8 @@ static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_finger
                 vlc_meta_Set( p_meta, vlc_meta_Title, p_record->psz_title );
                 vlc_meta_Set( p_meta, vlc_meta_Artist, p_record->psz_artist );
                 vlc_meta_AddExtra( p_meta, "musicbrainz-id", p_record->s_musicbrainz_id );
-                vlc_array_append( & p_r->results.metas_array, p_meta );
+                if( vlc_array_append( & p_r->results.metas_array, p_meta ) )
+                    vlc_meta_Delete( p_meta );
             }
         }
     }
@@ -370,7 +374,8 @@ static void *Run( void *opaque )
 
             /* copy results */
             vlc_mutex_lock( &p_sys->results.lock );
-            vlc_array_append( &p_sys->results.queue, p_data );
+            if( vlc_array_append( &p_sys->results.queue, p_data ) )
+                fingerprint_request_Delete( p_data );
             vlc_mutex_unlock( &p_sys->results.lock );
 
             vlc_testcancel();

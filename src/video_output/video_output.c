@@ -747,7 +747,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         if (likely(e))
         {
             free(config_ChainCreate(&e->name, &e->cfg, "deinterlace"));
-            vlc_array_append(&array_static, e);
+            vlc_array_append_or_abort(&array_static, e);
         }
     }
 
@@ -764,9 +764,9 @@ static void ThreadChangeFilters(vout_thread_t *vout,
                 e->name = name;
                 e->cfg  = cfg;
                 if (!strcmp(e->name, "postproc"))
-                    vlc_array_append(&array_static, e);
+                    vlc_array_append_or_abort(&array_static, e);
                 else
-                    vlc_array_append(&array_interactive, e);
+                    vlc_array_append_or_abort(&array_interactive, e);
             }
             else {
                 if (cfg)

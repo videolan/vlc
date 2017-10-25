@@ -1565,7 +1565,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
                 new_stream->bitrate = medias[i].bitrate;
 
-                vlc_array_append( &sys->hds_streams, new_stream );
+                vlc_array_append_or_abort( &sys->hds_streams, new_stream );
 
                 msg_Info( (vlc_object_t*)s, "New track with quality_segment(%s), bitrate(%u), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
                           new_stream->quality_segment_modifier?new_stream->quality_segment_modifier:"", new_stream->bitrate, new_stream->timescale,

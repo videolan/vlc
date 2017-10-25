@@ -239,10 +239,17 @@ int libvlc_event_attach(libvlc_event_manager_t *em, libvlc_event_type_t type,
     listener->p_user_data = opaque;
     listener->pf_callback = callback;
 
+    int i_ret;
     vlc_mutex_lock(&em->lock);
-    vlc_array_append(&em->listeners, listener);
+    if(vlc_array_append(&em->listeners, listener) != 0)
+    {
+        i_ret = VLC_EGENERIC;
+        free(listener);
+    }
+    else
+        i_ret = VLC_SUCCESS;
     vlc_mutex_unlock(&em->lock);
-    return 0;
+    return i_ret;
 }
 
 /**************************************************************************

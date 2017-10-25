@@ -188,13 +188,19 @@ dialog_add_locked(vlc_dialog_provider *p_provider, enum dialog_type i_type)
 
     if (p_id == NULL)
         return NULL;
+
+    if(vlc_array_append(&p_provider->dialog_array, p_id))
+    {
+        free(p_id);
+        return NULL;
+    }
+
     vlc_mutex_init(&p_id->lock);
     vlc_cond_init(&p_id->wait);
 
     p_id->i_type = i_type;
     p_id->i_refcount = 2; /* provider and callbacks */
 
-    vlc_array_append(&p_provider->dialog_array, p_id);
     return p_id;
 }
 

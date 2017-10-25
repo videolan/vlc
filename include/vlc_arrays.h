@@ -307,15 +307,22 @@ static inline void vlc_array_insert( vlc_array_t *ar, void *elem, int idx )
     ar->pp_elems = pp;
 }
 
-static inline void vlc_array_append( vlc_array_t *ar, void *elem )
+static inline int vlc_array_append( vlc_array_t *ar, void *elem )
 {
     void **pp = (void **)realloc( ar->pp_elems,
                                   sizeof( void * ) * (ar->i_count + 1) );
     if( unlikely(pp == NULL) )
-        abort();
+        return -1;
 
     pp[ar->i_count++] = elem;
     ar->pp_elems = pp;
+    return 0;
+}
+
+static inline void vlc_array_append_or_abort( vlc_array_t *ar, void *elem )
+{
+    if( vlc_array_append( ar, elem ) != 0 )
+        abort();
 }
 
 static inline void vlc_array_remove( vlc_array_t *ar, size_t idx )
