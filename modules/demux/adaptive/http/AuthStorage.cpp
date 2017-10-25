@@ -26,14 +26,17 @@
 
 using namespace adaptive::http;
 
-AuthStorage::AuthStorage()
+AuthStorage::AuthStorage( vlc_object_t *p_obj )
 {
-    p_cookies_jar = vlc_http_cookies_new();
+    if ( var_InheritBool( p_obj, "http-forward-cookies" ) )
+        p_cookies_jar = static_cast<vlc_http_cookie_jar_t *>
+                (var_InheritAddress( p_obj, "http-cookies" ));
+    else
+        p_cookies_jar = NULL;
 }
 
 AuthStorage::~AuthStorage()
 {
-    vlc_http_cookies_destroy( p_cookies_jar );
 }
 
 void AuthStorage::addCookie( const std::string &cookie, const ConnectionParams &params )

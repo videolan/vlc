@@ -34,7 +34,7 @@ namespace adaptive
         class AuthStorage
         {
             public:
-                AuthStorage();
+                AuthStorage(vlc_object_t *p_obj);
                 ~AuthStorage();
                 void addCookie( const std::string &cookie, const ConnectionParams & );
                 std::string getCookie( const ConnectionParams &, bool secure );

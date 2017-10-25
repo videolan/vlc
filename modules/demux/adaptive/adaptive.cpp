@@ -152,7 +152,7 @@ static int Open(vlc_object_t *p_obj)
     }
 
     PlaylistManager *p_manager = NULL;
-    AuthStorage *authStorage = new AuthStorage();
+    AuthStorage *authStorage = new AuthStorage(p_obj);
 
     char *psz_logic = var_InheritString(p_obj, "adaptive-logic");
     AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::Default;
