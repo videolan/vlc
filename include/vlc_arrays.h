@@ -291,12 +291,12 @@ static inline ssize_t vlc_array_index_of_item( const vlc_array_t *ar,
 }
 
 /* Write */
-static inline void vlc_array_insert( vlc_array_t *ar, void *elem, int idx )
+static inline int vlc_array_insert( vlc_array_t *ar, void *elem, int idx )
 {
     void **pp = (void **)realloc( ar->pp_elems,
                                   sizeof( void * ) * (ar->i_count + 1) );
     if( unlikely(pp == NULL) )
-        abort();
+        return -1;
 
     size_t tail = ar->i_count - idx;
     if( tail > 0 )
@@ -305,6 +305,13 @@ static inline void vlc_array_insert( vlc_array_t *ar, void *elem, int idx )
     pp[idx] = elem;
     ar->i_count++;
     ar->pp_elems = pp;
+    return 0;
+}
+
+static inline void vlc_array_insert_or_abort( vlc_array_t *ar, void *elem, int idx )
+{
+    if( vlc_array_insert( ar, elem, idx ) )
+        abort();
 }
 
 static inline int vlc_array_append( vlc_array_t *ar, void *elem )
