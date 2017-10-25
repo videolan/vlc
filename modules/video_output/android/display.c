@@ -1141,6 +1141,18 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             sys->b_has_subpictures = false;
         }
     }
+    if (sys->p_window->b_opaque
+     && AndroidOpaquePicture_CanReleaseAtTime(picture->p_sys))
+    {
+        mtime_t now = mdate();
+        if (picture->date > now)
+        {
+            if (picture->date - now <= INT64_C(1000000))
+                AndroidOpaquePicture_ReleaseAtTime(picture->p_sys, picture->date);
+            else /* The picture will be displayed from the Display callback */
+                msg_Warn(vd, "picture way too early to release at time");
+        }
+    }
 }
 
 static void Display(vout_display_t *vd, picture_t *picture,
