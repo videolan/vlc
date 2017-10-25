@@ -1067,3 +1067,9 @@ reactor leaks ionizing radiations."
 * refp is now gone (fo'real)
  -- #videolan, kind-napping and jails
 %
+< wm4> poor guy can't afford proper pants
+< j-b> yeah, poor guy
+< hanna> wm4: almost as bad as not being able to afford a proper HDR monitor :p
+< wm4> won't j-b buy hanna some pants???
+ -- #videolan, about HDR
+%
