@@ -1869,6 +1869,8 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         case TRANSFER_FUNC_HLG:
             src_luminance_peak = 1000;
             break;
+        case TRANSFER_FUNC_BT470_BG:
+        case TRANSFER_FUNC_BT470_M:
         case TRANSFER_FUNC_BT709:
         case TRANSFER_FUNC_SRGB:
             src_luminance_peak = DEFAULT_BRIGHTNESS;
@@ -1907,8 +1909,13 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                 psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
+            case TRANSFER_FUNC_BT470_M:
             case TRANSFER_FUNC_SRGB:
                 psz_src_transform = "return pow(rgb, 2.2)";
+                src_transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            case TRANSFER_FUNC_BT470_BG:
+                psz_src_transform = "return pow(rgb, 2.8)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             default:
