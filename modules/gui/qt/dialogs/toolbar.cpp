@@ -96,7 +96,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
 
     positionCheckbox = new QCheckBox( qtr( "Above the Video" ) );
     positionCheckbox->setChecked(
-                getSettings()->value( "MainWindow/ToolbarPos", 0 ).toInt() );
+                getSettings()->value( "MainWindow/ToolbarPos", false ).toBool() );
     mainTboxLayout->addRow( new QLabel( qtr( "Toolbar position:" ) ),
                             positionCheckbox );
 
@@ -182,7 +182,8 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     profileCombo->setCurrentIndex( -1 );
 
     /* Build and prepare our preview */
-    PreviewWidget *previewWidget = new PreviewWidget( controller, controller1, controller2 );
+    PreviewWidget *previewWidget = new PreviewWidget( controller, controller1, controller2,
+                                                      positionCheckbox->isChecked() );
     QGroupBox *previewBox = new QGroupBox( qtr("Preview"), this );
     previewBox->setLayout( new QVBoxLayout() );
     previewBox->layout()->addWidget( previewWidget );
@@ -292,7 +293,7 @@ void ToolbarEditDialog::cancel()
 }
 
 
-PreviewWidget::PreviewWidget( QWidget *a, QWidget *b, QWidget *c )
+PreviewWidget::PreviewWidget( QWidget *a, QWidget *b, QWidget *c, bool barsTopPosition )
                : QWidget( a )
 {
     bars[0] = a;
@@ -300,7 +301,7 @@ PreviewWidget::PreviewWidget( QWidget *a, QWidget *b, QWidget *c )
     bars[2] = c;
     for ( int i=0; i<3; i++ ) bars[i]->installEventFilter( this );
     setAutoFillBackground( true );
-    setBarsTopPosition( false );
+    setBarsTopPosition( barsTopPosition );
 }
 
 void PreviewWidget::setBarsTopPosition( int b )

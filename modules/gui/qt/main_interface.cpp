@@ -326,7 +326,7 @@ void MainInterface::recreateToolbars()
     controls = new ControlsWidget( p_intf, b_adv, this );
     inputC = new InputControlsWidget( p_intf, this );
     mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
+    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", false ).toBool() ? 0: 3,
                               controls );
 
     if( fullscreenControls )
@@ -494,7 +494,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
 
     mainLayout->insertWidget( 2, inputC );
     mainLayout->insertWidget(
-        creationSettings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
+        creationSettings->value( "MainWindow/ToolbarPos", false ).toBool() ? 0: 3,
         controls );
 
     /* Visualisation, disabled for now, they SUCK */

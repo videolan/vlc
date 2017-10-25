@@ -53,7 +53,7 @@ class PreviewWidget : public QWidget
     Q_OBJECT
 
 public:
-    PreviewWidget( QWidget *, QWidget *, QWidget * );
+    PreviewWidget( QWidget *, QWidget *, QWidget *, bool );
 
 public slots:
     void setBarsTopPosition( int b );
