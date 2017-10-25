@@ -1006,6 +1006,7 @@ int MediaCodecJni_Init(mc_api *api)
     api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
+    api->release_out_ts = NULL;
     api->set_output_surface = SetOutputSurface;
 
     /* Allow rotation only after API 21 */

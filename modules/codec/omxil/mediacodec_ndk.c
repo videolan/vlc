@@ -143,6 +143,9 @@ typedef uint8_t* (*pf_AMediaCodec_getOutputBuffer)(AMediaCodec*,
 typedef media_status_t (*pf_AMediaCodec_releaseOutputBuffer)(AMediaCodec*,
         size_t idx, bool render);
 
+typedef media_status_t (*pf_AMediaCodec_releaseOutputBufferAtTime)(AMediaCodec*,
+        size_t idx, int64_t timestampNs);
+
 typedef media_status_t (*pf_AMediaCodec_setOutputSurface)(AMediaCodec*,
         ANativeWindow *surface);
 
@@ -174,6 +177,7 @@ struct syms
         pf_AMediaCodec_dequeueOutputBuffer dequeueOutputBuffer;
         pf_AMediaCodec_getOutputBuffer getOutputBuffer;
         pf_AMediaCodec_releaseOutputBuffer releaseOutputBuffer;
+        pf_AMediaCodec_releaseOutputBufferAtTime releaseOutputBufferAtTime;
         pf_AMediaCodec_setOutputSurface setOutputSurface;
     } AMediaCodec;
     struct {
@@ -208,6 +212,7 @@ static struct members members[] =
     { "AMediaCodec_dequeueOutputBuffer", OFF(dequeueOutputBuffer), true },
     { "AMediaCodec_getOutputBuffer", OFF(getOutputBuffer), true },
     { "AMediaCodec_releaseOutputBuffer", OFF(releaseOutputBuffer), true },
+    { "AMediaCodec_releaseOutputBufferAtTime", OFF(releaseOutputBufferAtTime), true },
     { "AMediaCodec_setOutputSurface", OFF(setOutputSurface), false },
 #undef OFF
 #define OFF(x) offsetof(struct syms, AMediaFormat.x)
@@ -558,6 +563,21 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
 }
 
 /*****************************************************************************
+ * ReleaseOutputAtTime
+ *****************************************************************************/
+static int ReleaseOutputAtTime(mc_api *api, int i_index, int64_t i_ts_ns)
+{
+    mc_api_sys *p_sys = api->p_sys;
+
+    assert(i_index >= 0);
+    if (syms.AMediaCodec.releaseOutputBufferAtTime(p_sys->p_codec, i_index, i_ts_ns)
+                                                   == AMEDIA_OK)
+        return 0;
+    else
+        return MC_API_ERROR;
+}
+
+/*****************************************************************************
  * SetOutputSurface
  *****************************************************************************/
 static int SetOutputSurface(mc_api *api, void *p_surface, void *p_jsurface)
@@ -622,6 +642,7 @@ int MediaCodecNdk_Init(mc_api *api)
     api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
+    api->release_out_ts = ReleaseOutputAtTime;
     api->set_output_surface = SetOutputSurface;
 
     api->b_support_rotation = true;

@@ -813,6 +813,14 @@ static void ReleasePicture(decoder_t *p_dec, unsigned i_index, bool b_render)
     p_sys->api.release_out(&p_sys->api, i_index, b_render);
 }
 
+static void ReleasePictureTs(decoder_t *p_dec, unsigned i_index, mtime_t i_ts)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_sys->api.release_out_ts);
+
+    p_sys->api.release_out_ts(&p_sys->api, i_index, i_ts * INT64_C(1000));
+}
+
 static void InvalidateAllPictures(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -830,6 +838,8 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_sys_t *p_picsys)
     {
         p_picsys->hw.p_dec = p_dec;
         p_picsys->hw.pf_release = ReleasePicture;
+        if (p_sys->api.release_out_ts)
+            p_picsys->hw.pf_release_ts = ReleasePictureTs;
         TAB_APPEND_CAST((picture_sys_t **),
                         p_sys->video.i_inflight_pictures,
                         p_sys->video.pp_inflight_pictures,
