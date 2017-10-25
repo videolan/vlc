@@ -35,6 +35,7 @@ namespace adaptive
     namespace http
     {
         class Socket;
+        class AuthStorage;
 
         class AbstractConnection
         {
@@ -63,7 +64,7 @@ namespace adaptive
         class HTTPConnection : public AbstractConnection
         {
             public:
-                HTTPConnection(vlc_object_t *stream, Socket *, bool = false);
+                HTTPConnection(vlc_object_t *, AuthStorage *,  Socket *, bool = false);
                 virtual ~HTTPConnection();
 
                 virtual bool    canReuse     (const ConnectionParams &) const;
@@ -89,6 +90,7 @@ namespace adaptive
                 std::string readLine();
                 char * psz_useragent;
 
+                AuthStorage        *authStorage;
                 ConnectionParams    locationparams;
                 bool                connectionClose;
                 bool                chunked;
@@ -123,14 +125,17 @@ namespace adaptive
        class ConnectionFactory
        {
            public:
-               ConnectionFactory();
+               ConnectionFactory( AuthStorage * );
                virtual ~ConnectionFactory();
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
+           private:
+               AuthStorage *authStorage;
        };
 
        class StreamUrlConnectionFactory : public ConnectionFactory
        {
            public:
+               StreamUrlConnectionFactory();
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
        };
     }

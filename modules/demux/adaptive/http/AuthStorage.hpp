@@ -1,7 +1,7 @@
 /*
- * HLSManager.hpp
+ * AuthStorage.hpp
  *****************************************************************************
- * Copyright © 2015 - VideoLAN and VLC authors
+ * Copyright (C) 2017 - VideoLabs and VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,32 +17,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef HLSMANAGER_HPP
-#define HLSMANAGER_HPP
+#ifndef AUTHSTORAGE_HPP_
+#define AUTHSTORAGE_HPP_
 
-#include "../adaptive/PlaylistManager.h"
-#include "../adaptive/logic/AbstractAdaptationLogic.h"
-#include "playlist/M3U8.hpp"
+#include <vlc_common.h>
+#include <vlc_http.h>
 
-namespace hls
+#include <string>
+
+namespace adaptive
 {
-    using namespace adaptive;
-
-    class HLSManager : public PlaylistManager
+    namespace http
     {
-        public:
-            HLSManager( demux_t *,
-                        AuthStorage *,
-                        playlist::M3U8 *,
-                        AbstractStreamFactory *,
-                        logic::AbstractAdaptationLogic::LogicType type );
-            virtual ~HLSManager();
-            static bool isHTTPLiveStreaming(stream_t *);
+        class ConnectionParams;
 
-        protected:
-            virtual mtime_t getFirstPlaybackTime() const;
-    };
+        class AuthStorage
+        {
+            public:
+                AuthStorage();
+                ~AuthStorage();
+                void addCookie( const std::string &cookie, const ConnectionParams & );
+                std::string getCookie( const ConnectionParams &, bool secure );
 
+            private:
+                vlc_http_cookie_jar_t *p_cookies_jar;
+        };
+    }
 }
 
-#endif // HLSMANAGER_HPP
+#endif

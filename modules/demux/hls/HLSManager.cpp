@@ -35,10 +35,12 @@ using namespace adaptive::logic;
 using namespace hls;
 using namespace hls::playlist;
 
-HLSManager::HLSManager(demux_t *demux_, M3U8 *playlist,
+HLSManager::HLSManager(demux_t *demux_,
+                       AuthStorage *auth,
+                       M3U8 *playlist,
                        AbstractStreamFactory *factory,
                        AbstractAdaptationLogic::LogicType type) :
-             PlaylistManager(demux_, playlist, factory, type)
+             PlaylistManager(demux_, auth, playlist, factory, type)
 {
 }
 

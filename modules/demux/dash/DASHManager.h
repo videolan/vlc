@@ -44,7 +44,9 @@ namespace dash
     class DASHManager : public PlaylistManager
     {
         public:
-            DASHManager( demux_t *, mpd::MPD *mpd,
+            DASHManager( demux_t *,
+                         AuthStorage *,
+                         mpd::MPD *mpd,
                          AbstractStreamFactory *,
                          logic::AbstractAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();

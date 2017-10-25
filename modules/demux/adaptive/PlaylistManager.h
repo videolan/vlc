@@ -37,6 +37,7 @@ namespace adaptive
     namespace http
     {
         class AbstractConnectionManager;
+        class AuthStorage;
     }
 
     using namespace playlist;
@@ -46,7 +47,9 @@ namespace adaptive
     class PlaylistManager
     {
         public:
-            PlaylistManager( demux_t *, AbstractPlaylist *,
+            PlaylistManager( demux_t *,
+                             AuthStorage *,
+                             AbstractPlaylist *,
                              AbstractStreamFactory *,
                              AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
@@ -91,6 +94,7 @@ namespace adaptive
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
                                                          AbstractConnectionManager *);
 
+            AuthStorage                         *authStorage;
             AbstractConnectionManager           *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractAdaptationLogic             *logic;

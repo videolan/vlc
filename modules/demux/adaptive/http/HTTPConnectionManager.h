@@ -28,6 +28,7 @@
 #include "../logic/IDownloadRateObserver.h"
 
 #include <vlc_common.h>
+
 #include <vector>
 #include <string>
 
@@ -38,6 +39,7 @@ namespace adaptive
         class ConnectionParams;
         class ConnectionFactory;
         class AbstractConnection;
+        class AuthStorage;
         class Downloader;
         class AbstractChunkSource;
 
@@ -64,7 +66,8 @@ namespace adaptive
         class HTTPConnectionManager : public AbstractConnectionManager
         {
             public:
-                HTTPConnectionManager           (vlc_object_t *p_object, ConnectionFactory * = NULL);
+                HTTPConnectionManager           (vlc_object_t *p_object, ConnectionFactory *);
+                HTTPConnectionManager           (vlc_object_t *p_object, AuthStorage *);
                 virtual ~HTTPConnectionManager  ();
 
                 virtual void    closeAllConnections () /* impl */;

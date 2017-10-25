@@ -39,10 +39,12 @@ using namespace adaptive::logic;
 using namespace smooth;
 using namespace smooth::playlist;
 
-SmoothManager::SmoothManager(demux_t *demux_, Manifest *playlist,
+SmoothManager::SmoothManager(demux_t *demux_,
+                             AuthStorage *auth,
+                             Manifest *playlist,
                        AbstractStreamFactory *factory,
                        AbstractAdaptationLogic::LogicType type) :
-             PlaylistManager(demux_, playlist, factory, type)
+             PlaylistManager(demux_, auth, playlist, factory, type)
 {
 }
 
@@ -56,7 +58,7 @@ Manifest * SmoothManager::fetchManifest()
     playlisturl.append("://");
     playlisturl.append(p_demux->psz_location);
 
-    block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), playlisturl);
+    block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), authStorage, playlisturl);
     if(!p_block)
         return NULL;
 

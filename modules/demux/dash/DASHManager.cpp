@@ -49,10 +49,12 @@ using namespace dash;
 using namespace dash::mpd;
 using namespace adaptive::logic;
 
-DASHManager::DASHManager(demux_t *demux_, MPD *mpd,
+DASHManager::DASHManager(demux_t *demux_,
+                         AuthStorage *auth,
+                         MPD *mpd,
                          AbstractStreamFactory *factory,
                          AbstractAdaptationLogic::LogicType type) :
-             PlaylistManager(demux_, mpd, factory, type)
+             PlaylistManager(demux_, auth, mpd, factory, type)
 {
 }
 
@@ -103,7 +105,7 @@ bool DASHManager::updatePlaylist()
         url.append("://");
         url.append(p_demux->psz_location);
 
-        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), url);
+        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), authStorage, url);
         if(!p_block)
             return false;
 

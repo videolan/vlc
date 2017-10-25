@@ -25,10 +25,15 @@
 
 namespace adaptive
 {
+    namespace http
+    {
+        class AuthStorage;
+    }
+
     class Retrieve
     {
         public:
-            static block_t * HTTP(vlc_object_t *, const std::string &uri);
+            static block_t * HTTP(vlc_object_t *, http::AuthStorage *, const std::string &uri);
     };
 }
 

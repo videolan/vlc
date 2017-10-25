@@ -31,9 +31,9 @@
 using namespace adaptive;
 using namespace adaptive::http;
 
-block_t * Retrieve::HTTP(vlc_object_t *obj, const std::string &uri)
+block_t * Retrieve::HTTP(vlc_object_t *obj, AuthStorage *auth, const std::string &uri)
 {
-    HTTPConnectionManager connManager(obj);
+    HTTPConnectionManager connManager(obj, auth);
     HTTPChunk *datachunk;
     try
     {

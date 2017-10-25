@@ -326,6 +326,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/logic/Representationselectors.cpp \
     demux/adaptive/mp4/AtomsReader.cpp \
     demux/adaptive/mp4/AtomsReader.hpp \
+    demux/adaptive/http/AuthStorage.cpp \
+    demux/adaptive/http/AuthStorage.hpp \
     demux/adaptive/http/BytesRange.cpp \
     demux/adaptive/http/BytesRange.hpp \
     demux/adaptive/http/Chunk.cpp \

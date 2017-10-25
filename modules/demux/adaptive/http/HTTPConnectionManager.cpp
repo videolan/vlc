@@ -31,6 +31,7 @@
 #include "Sockets.hpp"
 #include "Downloader.hpp"
 #include <vlc_url.h>
+#include <vlc_http.h>
 
 using namespace adaptive::http;
 
@@ -63,16 +64,21 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, Connec
     vlc_mutex_init(&lock);
     downloader = new (std::nothrow) Downloader();
     downloader->start();
-    if(!factory_)
-    {
-        if(var_InheritBool(p_object, "adaptive-use-access"))
-            factory = new (std::nothrow) StreamUrlConnectionFactory();
-        else
-            factory = new (std::nothrow) ConnectionFactory();
-    }
-    else
-        factory = factory_;
+    factory = factory_;
 }
+
+HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, AuthStorage *storage)
+    : AbstractConnectionManager( p_object_ )
+{
+    vlc_mutex_init(&lock);
+    downloader = new (std::nothrow) Downloader();
+    downloader->start();
+    if(var_InheritBool(p_object, "adaptive-use-access"))
+        factory = new (std::nothrow) StreamUrlConnectionFactory();
+    else
+        factory = new (std::nothrow) ConnectionFactory( storage );
+}
+
 HTTPConnectionManager::~HTTPConnectionManager   ()
 {
     delete downloader;

@@ -140,10 +140,13 @@ bool Representation::needsUpdate() const
 bool Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
 {
     const time_t now = time(NULL);
-    const AbstractPlaylist *playlist = getPlaylist();
+    AbstractPlaylist *playlist = getPlaylist();
     if(!b_loaded || (isLive() && nextUpdateTime < now))
     {
-        M3U8Parser parser;
+        /* ugly hack */
+        M3U8 *m3u = dynamic_cast<M3U8 *>(playlist);
+        M3U8Parser parser((m3u) ? m3u->getAuth() : NULL);
+        /* !ugly hack */
         parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this);
         b_loaded = true;
 

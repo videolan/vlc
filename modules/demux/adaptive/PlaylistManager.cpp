@@ -30,6 +30,7 @@
 #include "playlist/BaseAdaptationSet.h"
 #include "playlist/BaseRepresentation.h"
 #include "http/HTTPConnectionManager.h"
+#include "http/AuthStorage.hpp"
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
@@ -48,6 +49,7 @@ using namespace adaptive::logic;
 using namespace adaptive;
 
 PlaylistManager::PlaylistManager( demux_t *p_demux_,
+                                  AuthStorage *auth,
                                   AbstractPlaylist *pl,
                                   AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
@@ -59,6 +61,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
              p_demux        ( p_demux_ )
 {
     currentPeriod = playlist->getFirstPeriod();
+    authStorage = auth;
     failedupdates = 0;
     b_thread = false;
     b_buffering = false;
@@ -83,6 +86,7 @@ PlaylistManager::~PlaylistManager   ()
     delete playlist;
     delete conManager;
     delete logic;
+    delete authStorage;
     vlc_cond_destroy(&waitcond);
     vlc_mutex_destroy(&lock);
     vlc_mutex_destroy(&demux.lock);
@@ -150,7 +154,10 @@ bool PlaylistManager::setupPeriod()
 
 bool PlaylistManager::start()
 {
-    if(!conManager && !(conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s))))
+    if(!conManager &&
+       !(conManager =
+         new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s), authStorage))
+      )
         return false;
 
     if(!setupPeriod())

@@ -33,9 +33,10 @@
 
 using namespace hls::playlist;
 
-M3U8::M3U8 (vlc_object_t *p_object) :
+M3U8::M3U8 (vlc_object_t *p_object, AuthStorage *auth_) :
     AbstractPlaylist(p_object)
 {
+    auth = auth_;
     minUpdatePeriod.Set( 5 * CLOCK_FREQ );
     vlc_mutex_init(&keystore_lock);
 }
@@ -54,7 +55,7 @@ std::vector<uint8_t> M3U8::getEncryptionKey(const std::string &uri)
     if(it == keystore.end())
     {
         /* Pretty bad inside the lock */
-        block_t *p_block = Retrieve::HTTP(p_object, uri);
+        block_t *p_block = Retrieve::HTTP(p_object, auth, uri);
         if(p_block)
         {
             if(p_block->i_buffer == 16)
@@ -102,6 +103,11 @@ bool M3U8::isLive() const
     }
 
     return b_live;
+}
+
+AuthStorage * M3U8::getAuth()
+{
+    return auth;
 }
 
 void M3U8::debug()

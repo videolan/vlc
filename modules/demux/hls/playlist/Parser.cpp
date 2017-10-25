@@ -45,8 +45,9 @@ using namespace adaptive;
 using namespace adaptive::playlist;
 using namespace hls::playlist;
 
-M3U8Parser::M3U8Parser()
+M3U8Parser::M3U8Parser( AuthStorage *auth_ )
 {
+    auth = auth_;
 }
 
 M3U8Parser::~M3U8Parser   ()
@@ -160,7 +161,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
 
 bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
 {
-    block_t *p_block = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString());
+    block_t *p_block = Retrieve::HTTP(p_obj, auth, rep->getPlaylistUrl().toString());
     if(p_block)
     {
         stream_t *substream = vlc_stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
@@ -384,7 +385,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
     }
     free(psz_line);
 
-    M3U8 *playlist = new (std::nothrow) M3U8(p_object);
+    M3U8 *playlist = new (std::nothrow) M3U8(p_object, auth);
     if(!playlist)
         return NULL;
 
