@@ -632,7 +632,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
                    DxgiFormatToStr(processorInput[idx]));
 #else
            if ( !DeviceSupportsFormat(dx_sys->d3ddev, processorInput[idx],
-                                      D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT) )
+                                      D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT) )
            {
                msg_Dbg(va, "Format %s needs a processor but is not available",
                        DxgiFormatToStr(processorInput[idx]));
