@@ -1653,6 +1653,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     const d3d_format_t *decoder_format = NULL;
     if ( !sys->picQuadConfig && is_d3d11_opaque(fmt->i_chroma) )
         decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
+    else
+        decoder_format = sys->picQuadConfig;
 
     // look for any pixel format that we can handle with enough pixels per channel
     if ( !sys->picQuadConfig )
@@ -1687,7 +1689,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    fmt->i_chroma = sys->picQuadConfig->fourcc;
+    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuadConfig->fourcc;
 
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuadConfig->name,
                  (char *)&fmt->i_chroma );
