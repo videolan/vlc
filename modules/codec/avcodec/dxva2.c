@@ -463,7 +463,7 @@ static int D3dCreateDeviceManager(vlc_va_t *va)
         return VLC_EGENERIC;
     }
     sys->devmng = devmng;
-    msg_Info(va, "obtained IDirect3DDeviceManager9");
+    msg_Dbg(va, "obtained IDirect3DDeviceManager9");
 
     HRESULT hr = IDirect3DDeviceManager9_ResetDevice(devmng, dx_sys->d3ddev, token);
     if (FAILED(hr)) {
