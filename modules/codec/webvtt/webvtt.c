@@ -59,6 +59,7 @@ struct webvtt_text_parser_t
         WEBVTT_SECTION_UNDEFINED = WEBVTT_HEADER_STYLE - 1,
         WEBVTT_SECTION_STYLE = WEBVTT_HEADER_STYLE,
         WEBVTT_SECTION_REGION = WEBVTT_HEADER_REGION,
+        WEBVTT_SECTION_NOTE,
         WEBVTT_SECTION_CUES,
     } section;
     char * reads[3];
@@ -188,6 +189,7 @@ void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
         }
         else if( KeywordMatch( psz_line, "NOTE" ) )
         {
+            p->section = WEBVTT_SECTION_NOTE;
             return;
         }
         else if( psz_line[0] != 0 )
@@ -252,6 +254,11 @@ void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
     {
         forward_line( p, psz_line, false );
         if( psz_line[0] == 0 ) /* End of region declaration */
+            p->section = WEBVTT_SECTION_UNDEFINED;
+    }
+    else if( p->section == WEBVTT_SECTION_NOTE )
+    {
+        if( psz_line[0] == 0 )
             p->section = WEBVTT_SECTION_UNDEFINED;
     }
 }
