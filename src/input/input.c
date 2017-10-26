@@ -3295,6 +3295,10 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     input_source_t *p_source = InputSourceNew( p_input, psz_uri,
                                                psz_forced_demux, b_can_fail );
+
+    if( i_type == SLAVE_TYPE_SPU && p_source == NULL )
+        p_source = InputSourceNew( p_input, psz_uri, NULL, b_can_fail );
+
     if( p_source == NULL )
     {
         msg_Warn( p_input, "failed to add %s as slave", psz_uri );
