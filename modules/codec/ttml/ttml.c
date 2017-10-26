@@ -51,11 +51,11 @@ vlc_module_begin ()
     add_submodule()
         set_shortname( N_("TTML") )
         set_description( N_("TTML demuxer") )
-        set_capability( "demux", 2 )
+        set_capability( "demux", 3 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
         set_callbacks( OpenDemux, CloseDemux )
-        add_shortcut( "ttml", "subtitle" )
+        add_shortcut( "ttml" )
 
 vlc_module_end ()
 
