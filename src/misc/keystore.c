@@ -194,12 +194,8 @@ is_credential_valid(vlc_credential *p_credential)
     if (p_credential->psz_username && *p_credential->psz_username != '\0'
      && p_credential->psz_password)
         return true;
-    else
-    {
-        p_credential->psz_password = NULL;
-        return false;
-    }
-
+    p_credential->psz_password = NULL;
+    return false;
 }
 
 static bool
