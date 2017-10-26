@@ -431,7 +431,8 @@ static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_
         p_text_style->f_font_relsize = 100.0 * len.i_value /
                     (p_ctx->i_cell_resolution_v / TTML_LINE_TO_HEIGHT_RATIO);
     else if( len.unit == TTML_UNIT_PERCENT )
-        p_text_style->f_font_relsize = len.i_value;
+        p_text_style->f_font_relsize = len.i_value /
+                    (p_ctx->i_cell_resolution_v / TTML_LINE_TO_HEIGHT_RATIO);
     else if( len.unit == TTML_UNIT_PIXELS )
         p_text_style->i_font_size = (int)( len.i_value + 0.5 );
 }
