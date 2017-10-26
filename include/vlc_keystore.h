@@ -117,7 +117,7 @@ vlc_keystore_store(vlc_keystore *p_keystore,
 
 /**
  * Find all entries that match a set of key/values
- * 
+ *
  * @param ppsz_values set of key/values, see vlc_keystore_key, any values can
  * be NULL
  * @param pp_entries list of found entries. To be released with

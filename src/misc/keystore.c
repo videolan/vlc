@@ -101,7 +101,7 @@ vlc_keystore_store(vlc_keystore *p_keystore,
 }
 
 unsigned int
-vlc_keystore_find(vlc_keystore *p_keystore, 
+vlc_keystore_find(vlc_keystore *p_keystore,
                   const char * const ppsz_values[KEY_MAX],
                   vlc_keystore_entry **pp_entries)
 {
