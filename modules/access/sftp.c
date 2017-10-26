@@ -313,6 +313,10 @@ static int Open( vlc_object_t* p_this )
             continue;
 
         psz_userauthlist = libssh2_userauth_list( p_sys->ssh_session, credential.psz_username, strlen( credential.psz_username ) );
+        if (!psz_userauthlist) {
+            msg_Err( p_access, "Host authentication list failed");
+            goto error;
+        }
 
         /* TODO: Follow PreferredAuthentications in ssh_config */
 
