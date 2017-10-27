@@ -131,7 +131,7 @@ private:
     }
 
     static QMenu *HelpMenu( QWidget * );
-    static QMenu *RendererMenu( intf_thread_t *p_intf );
+    static QMenu *RendererMenu(intf_thread_t *p_intf , QMenu *menu = NULL );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );

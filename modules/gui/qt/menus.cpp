@@ -609,7 +609,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        audioDeviceMenu = new QMenu( qtr( "Audio &Device" ) );
+        audioDeviceMenu = new QMenu(qtr( "Audio &Device" ), current );
         current->addMenu( audioDeviceMenu );
         addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
         current->addSeparator();
@@ -667,7 +667,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
 
         current->addSeparator();
-        rendererMenu = RendererMenu( p_intf );
+        rendererMenu = RendererMenu( p_intf, current );
         current->addMenu( rendererMenu );
 
         current->addSeparator();
@@ -1622,9 +1622,9 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
     }
 }
 
-QMenu *VLCMenuBar::RendererMenu( intf_thread_t *p_intf )
+QMenu *VLCMenuBar::RendererMenu(intf_thread_t *p_intf, QMenu *menu )
 {
-    QMenu *submenu = new QMenu( qtr("&Renderer") );
+    QMenu *submenu = new QMenu( qtr("&Renderer"), menu );
 
     rendererGroup = new QActionGroup(submenu);
 
