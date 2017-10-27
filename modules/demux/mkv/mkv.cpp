@@ -607,6 +607,18 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             continue;
          }
 
+         case VLC_CODEC_WEBVTT:
+            {
+                p_block = block_Realloc( p_block, 16, p_block->i_buffer );
+                if( !p_block )
+                    continue;
+                SetDWBE( p_block->p_buffer, p_block->i_buffer );
+                memcpy( &p_block->p_buffer[4], "vttc", 4 );
+                SetDWBE( &p_block->p_buffer[8], p_block->i_buffer - 8 );
+                memcpy( &p_block->p_buffer[12], "payl", 4 );
+            }
+            break;
+
          case VLC_CODEC_OPUS:
             mtime_t i_length = i_duration * track. f_timecodescale *
                     (double) p_segment->i_timescale / 1000.0;
