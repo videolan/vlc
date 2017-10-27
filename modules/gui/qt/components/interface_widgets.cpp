@@ -125,6 +125,7 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
      * in Qt4-X11 changes the WinId of the widget, so we need to create another
      * dummy widget that stays within the reparentable widget. */
     stable = new QWidget();
+    stable->setContextMenuPolicy( Qt::PreventContextMenu );
     QPalette plt = palette();
     plt.setColor( QPalette::Window, Qt::black );
     stable->setPalette( plt );
