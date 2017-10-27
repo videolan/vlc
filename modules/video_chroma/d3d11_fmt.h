@@ -209,7 +209,7 @@ static inline HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_d
                     driverAttempts[driver], i_feature_level);
 #endif
             /* we can work with legacy levels but only if forced */
-            if ( obj->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_1 )
+            if ( obj->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
             msg_Dbg(obj, "Incompatible feature level %x", i_feature_level);
             ID3D11DeviceContext_Release(*pp_d3dcontext);
