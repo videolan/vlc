@@ -82,6 +82,7 @@ enum webvtt_node_type_e
     NODE_TAG,
     NODE_TEXT,
     NODE_CUE,
+    NODE_REGION,
 };
 
 #define WEBVTT_NODE_BASE_MEMBERS \
@@ -91,6 +92,7 @@ enum webvtt_node_type_e
 
 struct webvtt_region_t
 {
+    WEBVTT_NODE_BASE_MEMBERS
     char *psz_id;
     float f_width;
     unsigned i_lines_max_scroll;
@@ -100,7 +102,6 @@ struct webvtt_region_t
     float viewport_anchor_y;
     bool b_scroll_up;
     webvtt_dom_node_t *p_child;
-    webvtt_region_t *p_next;
 };
 
 struct webvtt_dom_cue_t
@@ -135,8 +136,8 @@ struct webvtt_dom_node_t
 
 struct decoder_sys_t
 {
-    webvtt_region_t regions;
-    webvtt_region_t **pp_region_append;
+    webvtt_region_t *p_regions;
+    webvtt_dom_cue_t *p_regionless_cues;
 };
 
 #define ATOM_iden VLC_FOURCC('i', 'd', 'e', 'n')
@@ -318,12 +319,19 @@ static void webvtt_domnode_Debug( webvtt_dom_node_t *p_node, int i_depth )
             printf("CUE %s\n", p_cue->psz_id );
             webvtt_domnode_Debug( p_cue->p_child, i_depth + 1 );
         }
+        else if( p_node->type == NODE_REGION )
+        {
+            webvtt_region_t *p_region = (webvtt_region_t *)p_node;
+            printf("REGION %s\n", p_region->psz_id );
+            webvtt_domnode_Debug( p_region->p_child, i_depth + 1 );
+        }
     }
 }
 #endif
 
 static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
 static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue );
+static void webvtt_region_Delete( webvtt_region_t *p_region );
 
 static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
 {
@@ -339,6 +347,17 @@ static void webvtt_dom_tag_Delete( webvtt_dom_tag_t *p_node )
     free( p_node );
 }
 
+static void webvtt_domnode_AppendLast( webvtt_dom_node_t **pp_append,
+                                       webvtt_dom_node_t *p_node )
+{
+    while( *pp_append )
+        pp_append = &((*pp_append)->p_next);
+    *pp_append = p_node;
+}
+
+#define webvtt_domnode_AppendLast( a, b ) \
+    webvtt_domnode_AppendLast( (webvtt_dom_node_t **) a, (webvtt_dom_node_t *) b )
+
 static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
 {
     while( p_node )
@@ -351,6 +370,8 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             webvtt_dom_text_Delete( (webvtt_dom_text_t *) p_node );
         else if( p_node->type == NODE_CUE )
             webvtt_dom_cue_Delete( (webvtt_dom_cue_t *) p_node );
+        else if( p_node->type == NODE_REGION )
+            webvtt_region_Delete( (webvtt_region_t *) p_node );
 
         p_node = p_next;
     }
@@ -579,12 +600,11 @@ static void webvtt_region_ClearCues( webvtt_region_t *p_region )
     p_region->p_child = NULL;
 }
 
-static void webvtt_region_ClearCuesByTime( webvtt_region_t *p_region, mtime_t i_time )
+static void ClearCuesByTime( webvtt_dom_node_t **pp_next, mtime_t i_time )
 {
-    webvtt_dom_node_t **pp_node = &p_region->p_child;
-    while( *pp_node )
+    while( *pp_next )
     {
-        webvtt_dom_node_t *p_node = *pp_node;
+        webvtt_dom_node_t *p_node = *pp_next;
         if( p_node )
         {
             assert( p_node->type == NODE_CUE );
@@ -593,22 +613,15 @@ static void webvtt_region_ClearCuesByTime( webvtt_region_t *p_region, mtime_t i_
                 webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_node;
                 if( p_cue->i_stop <= i_time )
                 {
-                    *pp_node = p_node->p_next;
+                    *pp_next = p_node->p_next;
                     p_node->p_next = NULL;
                     webvtt_dom_cue_Delete( p_cue );
                     continue;
                 }
             }
-            pp_node = &p_node->p_next;
+            pp_next = &p_node->p_next;
         }
     }
-}
-
-static void webvtt_region_Clean( webvtt_region_t *p_region )
-{
-    webvtt_region_ClearCues( p_region );
-    free( p_region->psz_id );
-    p_region->psz_id = NULL;
 }
 
 /* Remove top most line/cue for bottom insert */
@@ -652,23 +665,10 @@ static void webvtt_region_AddCue( webvtt_region_t *p_region,
     }
 }
 
-static void webvtt_region_Init( webvtt_region_t *p_region )
-{
-    p_region->psz_id = NULL;
-    p_region->p_next = NULL;
-    p_region->f_width = 1.0; /* 100% */
-    p_region->anchor_x = 0;
-    p_region->anchor_y = 1.0; /* 100% */
-    p_region->i_lines_max_scroll = 3;
-    p_region->viewport_anchor_x = 0;
-    p_region->viewport_anchor_y = 1.0; /* 100% */
-    p_region->b_scroll_up = false;
-    p_region->p_child = NULL;
-}
-
 static void webvtt_region_Delete( webvtt_region_t *p_region )
 {
-    webvtt_region_Clean( p_region );
+    webvtt_region_ClearCues( p_region );
+    free( p_region->psz_id );
     free( p_region );
 }
 
@@ -676,24 +676,32 @@ static webvtt_region_t * webvtt_region_New( void )
 {
     webvtt_region_t *p_region = malloc(sizeof(*p_region));
     if( p_region )
-        webvtt_region_Init( p_region );
+    {
+        p_region->type = NODE_REGION;
+        p_region->psz_id = NULL;
+        p_region->p_next = NULL;
+        p_region->f_width = 1.0; /* 100% */
+        p_region->anchor_x = 0;
+        p_region->anchor_y = 1.0; /* 100% */
+        p_region->i_lines_max_scroll = 3;
+        p_region->viewport_anchor_x = 0;
+        p_region->viewport_anchor_y = 1.0; /* 100% */
+        p_region->b_scroll_up = false;
+        p_region->p_child = NULL;
+    }
     return p_region;
 }
 
 static webvtt_region_t * webvtt_region_GetByID( decoder_sys_t *p_sys,
                                                 const char *psz_id )
 {
-    webvtt_region_t *p_region = &p_sys->regions;
-    if( psz_id != NULL )
+    for( webvtt_region_t *p_region = p_sys->p_regions; p_region && psz_id;
+                          p_region = (webvtt_region_t *) p_region->p_next )
     {
-        for( p_region = p_sys->regions.p_next;
-             p_region; p_region = p_region->p_next )
-        {
-            if( !strcmp( psz_id, p_region->psz_id ) )
-                return p_region;
-        }
+        if( !strcmp( psz_id, p_region->psz_id ) )
+            return p_region;
     }
-    return p_region;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -789,11 +797,15 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
 
 static void ExpireCues( decoder_t *p_dec, mtime_t i_time )
 {
-    for( webvtt_region_t *p_vttregion = &p_dec->p_sys->regions;
-                          p_vttregion; p_vttregion = p_vttregion->p_next )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    for( webvtt_region_t *p_vttregion = p_sys->p_regions; p_vttregion;
+                          p_vttregion = (webvtt_region_t *) p_vttregion->p_next )
     {
-        webvtt_region_ClearCuesByTime( p_vttregion, i_time );
+        assert( p_vttregion->type == NODE_REGION );
+        ClearCuesByTime( &p_vttregion->p_child, i_time );
     }
+
+    ClearCuesByTime( (webvtt_dom_node_t **) &p_sys->p_regionless_cues, i_time );
 }
 
 static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_cue )
@@ -880,6 +892,9 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
     text_segment_t **pp_append = &p_head;
     for( ; p_node ; p_node = p_node->p_next )
     {
+        while( *pp_append )
+            pp_append = &((*pp_append)->p_next);
+
         if( p_node->type == NODE_TEXT )
         {
             const webvtt_dom_text_t *p_textnode = (const webvtt_dom_text_t *) p_node;
@@ -892,7 +907,6 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                 if( (*pp_append)->psz_text )
                     vlc_xml_decode( (*pp_append)->psz_text );
                 (*pp_append)->style = InheritStyles( p_dec, p_node );
-                pp_append = &((*pp_append)->p_next);
             }
         }
         else if( p_node->type == NODE_TAG )
@@ -900,9 +914,6 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
             *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
                                                  ((const webvtt_dom_tag_t *)p_node)->p_child );
         }
-
-        while( *pp_append )
-            pp_append = &((*pp_append)->p_next);
     }
     return p_head;
 }
@@ -914,17 +925,72 @@ static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
     return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
 }
 
+static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop,
+                                               struct render_variables_s *p_vars,
+                                               const webvtt_dom_cue_t *p_cue )
+{
+    text_segment_t *p_segments = NULL;
+    text_segment_t **pp_append = &p_segments;
+    VLC_UNUSED(i_stop);
+
+    for( ; p_cue; p_cue = (const webvtt_dom_cue_t *) p_cue->p_next )
+    {
+        assert( p_cue->type == NODE_CUE );
+        if( p_cue->type != NODE_CUE )
+            continue;
+
+        if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
+            continue;
+
+        text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue );
+        if( p_new )
+        {
+            while( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+
+            if( p_segments ) /* auto newlines */
+            {
+                *pp_append = text_segment_New( "\n" );
+                if( *pp_append )
+                    pp_append = &((*pp_append)->p_next);
+            }
+
+            *pp_append = p_new;
+        }
+    }
+    return p_segments;
+}
+
+static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
+                                         subpicture_t **pp_spu,
+                                         subpicture_updater_sys_region_t **pp_updtregion )
+{
+    if( *pp_spu == NULL )
+    {
+        *pp_spu = decoder_NewSubpictureText( p_dec );
+        if( *pp_spu )
+            *pp_updtregion = &(*pp_spu)->updater.p_sys->region;
+    }
+    else
+    {
+        subpicture_updater_sys_region_t *p_new =
+                                SubpictureUpdaterSysRegionNew( );
+        if( p_new )
+        {
+            SubpictureUpdaterSysRegionAdd( *pp_updtregion, p_new );
+            *pp_updtregion = p_new;
+        }
+    }
+}
+
 static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
 {
     subpicture_t *p_spu = NULL;
     subpicture_updater_sys_region_t *p_updtregion = NULL;
 
-    for( webvtt_region_t *p_vttregion = &p_dec->p_sys->regions;
-                          p_vttregion; p_vttregion = p_vttregion->p_next )
+    for( const webvtt_region_t *p_vttregion = p_dec->p_sys->p_regions; p_vttregion;
+                                p_vttregion = (const webvtt_region_t *) p_vttregion->p_next )
     {
-        text_segment_t *p_segments = NULL;
-        text_segment_t **pp_append = &p_segments;
-
         /* Variables */
         struct render_variables_s v;
         v.p_region = p_vttregion;
@@ -935,81 +1001,60 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         v.i_top = p_vttregion->viewport_anchor_y - v.i_top_offset;
         /* !Variables */
 
-        for( webvtt_dom_node_t *p_node = p_vttregion->p_child;
-                                p_node; p_node = p_node->p_next )
-        {
-            assert( p_node->type == NODE_CUE );
-            if( p_node->type != NODE_CUE )
-                continue;
-            webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *) p_node;
-
-            if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
-                continue;
-
-            text_segment_t *p_new = ConvertCueToSegments( p_dec, &v, p_cue );
-            if( p_new )
-            {
-                if( p_segments ) /* auto newlines */
-                {
-                    *pp_append = text_segment_New( "\n" );
-                    if( *pp_append )
-                        pp_append = &((*pp_append)->p_next);
-                }
-
-                *pp_append = p_new;
-                while( *pp_append )
-                    pp_append = &((*pp_append)->p_next);
-            }
-        }
+        text_segment_t *p_segments =
+                ConvertCuesToSegments( p_dec, i_start, i_stop, &v,
+                                      (const webvtt_dom_cue_t *)p_vttregion->p_child );
         if( !p_segments )
             continue;
 
-        if( p_spu == NULL )
-        {
-            p_spu = decoder_NewSubpictureText( p_dec );
-            if( p_spu )
-            {
-                p_updtregion = &p_spu->updater.p_sys->region;
-                p_spu->i_start = i_start;
-                p_spu->i_stop  = i_stop;
-            }
-        }
-        else
-        {
-            subpicture_updater_sys_region_t *p_new =
-                                    SubpictureUpdaterSysRegionNew( );
-            if( p_new )
-            {
-                SubpictureUpdaterSysRegionAdd( p_updtregion, p_new );
-                p_updtregion = p_new;
-            }
-        }
-
+        CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
         if( !p_spu || !p_updtregion )
         {
             text_segment_ChainDelete( p_segments );
             continue;
         }
 
+        p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+        p_updtregion->origin.x = v.i_left;
+        p_updtregion->origin.y = v.i_top;
+        p_updtregion->extent.x = p_vttregion->f_width;
 
-        if( p_vttregion == &p_dec->p_sys->regions )
-        {
-            p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
-        }
-        else
-        {
-            p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
-            p_updtregion->origin.x = v.i_left;
-            p_updtregion->origin.y = v.i_top;
-            p_updtregion->extent.x = p_vttregion->f_width;
-        }
         p_updtregion->flags = UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO
                             | UPDT_REGION_EXTENT_X_IS_RATIO;
         p_updtregion->p_segments = p_segments;
     }
 
+    for( const webvtt_dom_cue_t *p_cue = p_dec->p_sys->p_regionless_cues; p_cue;
+                                 p_cue = (const webvtt_dom_cue_t *) p_cue->p_next )
+    {
+        /* Variables */
+        struct render_variables_s v;
+        v.p_region = NULL;
+        v.i_left_offset = 0.0;
+        v.i_left = 0.0;
+        v.i_top_offset = 0.0;
+        v.i_top = 0.0;
+        /* !Variables */
+
+        text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_cue );
+        if( !p_segments )
+            continue;
+
+        CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
+        if( !p_spu || !p_updtregion )
+        {
+            text_segment_ChainDelete( p_segments );
+            continue;
+        }
+
+        p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
+        p_updtregion->p_segments = p_segments;
+    }
+
     if( p_spu )
     {
+        p_spu->i_start = i_start;
+        p_spu->i_stop = i_stop;
         p_spu->b_ephemer  = true; /* !important */
         p_spu->b_absolute = false;
 
@@ -1063,11 +1108,15 @@ static int ProcessISOBMFF( decoder_t *p_dec,
 
             webvtt_region_t *p_region = webvtt_region_GetByID( p_dec->p_sys,
                                                                p_cue->settings.psz_region );
-            if( p_region == NULL )
-                p_region = webvtt_region_GetByID( p_dec->p_sys, NULL /*defaut region*/ );
-            assert( p_region );
-            webvtt_region_AddCue( p_region, p_cue );
-            assert( p_region->p_child );
+            if( p_region )
+            {
+                webvtt_region_AddCue( p_region, p_cue );
+                assert( p_region->p_child );
+            }
+            else
+            {
+                webvtt_domnode_AppendLast( &p_dec->p_sys->p_regionless_cues, p_cue );
+            }
         }
     }
     return 0;
@@ -1092,9 +1141,8 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
         {
             if( ctx->p_region->psz_id )
             {
+                webvtt_domnode_AppendLast( &p_sys->p_regions, ctx->p_region );
                 msg_Dbg( p_dec, "added new region %s", ctx->p_region->psz_id );
-                *p_sys->pp_region_append = ctx->p_region;
-                p_sys->pp_region_append = &ctx->p_region->p_next;
             }
             /* incomplete region decl (no id at least) */
             else webvtt_region_Delete( ctx->p_region );
@@ -1170,14 +1218,8 @@ void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    while( p_sys->regions.p_next )
-    {
-        webvtt_region_t *p_next = p_sys->regions.p_next->p_next;
-        webvtt_region_Clean( p_sys->regions.p_next );
-        free( p_sys->regions.p_next );
-        p_sys->regions.p_next = p_next;
-    }
-    webvtt_region_Clean( &p_sys->regions );
+    webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_regions );
+    webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_regionless_cues );
 
     free( p_sys );
 }
@@ -1198,8 +1240,8 @@ int OpenDecoder( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    webvtt_region_Init( &p_sys->regions );
-    p_sys->pp_region_append = &p_sys->regions.p_next;
+    p_sys->p_regions = NULL;
+    p_sys->p_regionless_cues = NULL;
 
     p_dec->pf_decode = DecodeBlock;
 
