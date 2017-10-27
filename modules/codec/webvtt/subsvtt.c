@@ -77,20 +77,11 @@ typedef struct
     enum webvtt_align_e align;
 } webvtt_cue_settings_t;
 
-struct webvtt_dom_cue_t
-{
-    char *psz_id;
-    mtime_t i_start;
-    mtime_t i_stop;
-    webvtt_cue_settings_t settings;
-    webvtt_dom_node_t *p_nodes;
-    unsigned i_lines;
-};
-
 enum webvtt_node_type_e
 {
     NODE_TAG,
-    NODE_TEXT
+    NODE_TEXT,
+    NODE_CUE,
 };
 
 #define WEBVTT_NODE_BASE_MEMBERS \
@@ -108,8 +99,19 @@ struct webvtt_region_t
     float viewport_anchor_x;
     float viewport_anchor_y;
     bool b_scroll_up;
-    webvtt_dom_cue_t *p_cues[WEBVTT_REGION_LINES_COUNT]; /* worst case 1 line == 1 cue */
+    webvtt_dom_node_t *p_child;
     webvtt_region_t *p_next;
+};
+
+struct webvtt_dom_cue_t
+{
+    WEBVTT_NODE_BASE_MEMBERS
+    char *psz_id;
+    mtime_t i_start;
+    mtime_t i_stop;
+    webvtt_cue_settings_t settings;
+    unsigned i_lines;
+    webvtt_dom_node_t *p_child;
 };
 
 typedef struct
@@ -310,12 +312,18 @@ static void webvtt_domnode_Debug( webvtt_dom_node_t *p_node, int i_depth )
             printf("TAG%s (%s)\n", p_tag->psz_tag, p_tag->psz_attrs );
             webvtt_domnode_Debug( p_tag->p_child, i_depth + 1 );
         }
+        else if( p_node->type == NODE_CUE )
+        {
+            webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_node;
+            printf("CUE %s\n", p_cue->psz_id );
+            webvtt_domnode_Debug( p_cue->p_child, i_depth + 1 );
+        }
     }
 }
 #endif
 
 static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
-
+static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue );
 
 static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
 {
@@ -341,6 +349,8 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             webvtt_dom_tag_Delete( (webvtt_dom_tag_t *) p_node );
         else if( p_node->type == NODE_TEXT )
             webvtt_dom_text_Delete( (webvtt_dom_text_t *) p_node );
+        else if( p_node->type == NODE_CUE )
+            webvtt_dom_cue_Delete( (webvtt_dom_cue_t *) p_node );
 
         p_node = p_next;
     }
@@ -427,10 +437,11 @@ static webvtt_dom_cue_t * webvtt_dom_cue_New( mtime_t i_start, mtime_t i_end )
     webvtt_dom_cue_t *p_cue = calloc( 1, sizeof(*p_cue) );
     if( p_cue )
     {
+        p_cue->type = NODE_CUE;
         p_cue->psz_id = NULL;
         p_cue->i_start = i_start;
         p_cue->i_stop = i_end;
-        p_cue->p_nodes = NULL;
+        p_cue->p_child = NULL;
         p_cue->i_lines = 0;
         webvtt_cue_settings_Init( &p_cue->settings );
     }
@@ -439,8 +450,8 @@ static webvtt_dom_cue_t * webvtt_dom_cue_New( mtime_t i_start, mtime_t i_end )
 
 static void webvtt_dom_cue_ClearText( webvtt_dom_cue_t *p_cue )
 {
-    webvtt_domnode_ChainDelete( p_cue->p_nodes );
-    p_cue->p_nodes = NULL;
+    webvtt_domnode_ChainDelete( p_cue->p_child );
+    p_cue->p_child = NULL;
     p_cue->i_lines = 0;
 }
 
@@ -452,16 +463,13 @@ static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue )
     free( p_cue );
 }
 
-/* Returns reduced by one line cue or deletes it */
-static webvtt_dom_cue_t * webvtt_dom_cue_Reduced( webvtt_dom_cue_t *p_cue )
+/* reduces by one line */
+static unsigned webvtt_dom_cue_Reduced( webvtt_dom_cue_t *p_cue )
 {
-    if( p_cue->i_lines <= 1 )
-    {
-        webvtt_dom_cue_Delete( p_cue );
-        return NULL;
-    }
+    if( p_cue->i_lines < 1 )
+        return 0;
 
-    for( webvtt_dom_node_t *p_node = p_cue->p_nodes;
+    for( webvtt_dom_node_t *p_node = p_cue->p_child;
                            p_node; p_node = p_node->p_next )
     {
         if( p_node->type != NODE_TEXT )
@@ -475,8 +483,7 @@ static webvtt_dom_cue_t * webvtt_dom_cue_Reduced( webvtt_dom_cue_t *p_cue )
             char *psz_new = strndup( nl + 1, i_remain );
             free( p_textnode->psz_text );
             p_textnode->psz_text = psz_new;
-            p_cue->i_lines--;
-            return p_cue;
+            return --p_cue->i_lines;
         }
         else
         {
@@ -486,9 +493,7 @@ static webvtt_dom_cue_t * webvtt_dom_cue_Reduced( webvtt_dom_cue_t *p_cue )
         }
     }
 
-    /* should not happen */
-    webvtt_dom_cue_Delete( p_cue );
-    return NULL;
+    return p_cue->i_lines;
 }
 
 /*****************************************************************************
@@ -557,35 +562,44 @@ static void webvtt_region_Parse( webvtt_region_t *p_region, char *psz_line )
 static unsigned webvtt_region_CountLines( const webvtt_region_t *p_region )
 {
     unsigned i_lines = 0;
-    for( size_t i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
-        if( p_region->p_cues[i] )
-            i_lines += p_region->p_cues[i]->i_lines;
+    for( const webvtt_dom_node_t *p_node = p_region->p_child;
+                                  p_node; p_node = p_node->p_next )
+    {
+        assert( p_node->type == NODE_CUE );
+        if( p_node->type != NODE_CUE )
+            continue;
+        i_lines += ((const webvtt_dom_cue_t *)p_node)->i_lines;
+    }
     return i_lines;
 }
 
 static void webvtt_region_ClearCues( webvtt_region_t *p_region )
 {
-    for( size_t i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
-    {
-        if( p_region->p_cues[i] == NULL )
-            continue;
-        webvtt_dom_cue_Delete( p_region->p_cues[i] );
-        p_region->p_cues[i] = NULL;
-    }
+    webvtt_domnode_ChainDelete( p_region->p_child );
+    p_region->p_child = NULL;
 }
 
 static void webvtt_region_ClearCuesByTime( webvtt_region_t *p_region, mtime_t i_time )
 {
-    for( size_t i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
+    webvtt_dom_node_t **pp_node = &p_region->p_child;
+    while( *pp_node )
     {
-        if( p_region->p_cues[i] == NULL )
-            continue;
-        if( p_region->p_cues[i]->i_stop <= i_time )
+        webvtt_dom_node_t *p_node = *pp_node;
+        if( p_node )
         {
-            webvtt_dom_cue_Delete( p_region->p_cues[i] );
-            for( size_t j=i; j<WEBVTT_REGION_LINES_COUNT - 1; j++ )
-                p_region->p_cues[j]  = p_region->p_cues[j] + 1;
-            p_region->p_cues[WEBVTT_REGION_LINES_COUNT - 1] = NULL;
+            assert( p_node->type == NODE_CUE );
+            if( p_node->type == NODE_CUE )
+            {
+                webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_node;
+                if( p_cue->i_stop <= i_time )
+                {
+                    *pp_node = p_node->p_next;
+                    p_node->p_next = NULL;
+                    webvtt_dom_cue_Delete( p_cue );
+                    continue;
+                }
+            }
+            pp_node = &p_node->p_next;
         }
     }
 }
@@ -594,64 +608,48 @@ static void webvtt_region_Clean( webvtt_region_t *p_region )
 {
     webvtt_region_ClearCues( p_region );
     free( p_region->psz_id );
+    p_region->psz_id = NULL;
 }
 
 /* Remove top most line/cue for bottom insert */
 static void webvtt_region_Reduce( webvtt_region_t *p_region )
 {
-    if( p_region->p_cues[0] )
+    if( p_region->p_child )
     {
-        webvtt_dom_cue_Delete( p_region->p_cues[0] );
-    }
-    else
-    {
-        for( int i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
+        assert( p_region->p_child->type == NODE_CUE );
+        if( p_region->p_child->type != NODE_CUE )
+            return;
+        webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_region->p_child;
+        if( p_cue->i_lines == 1 ||
+            webvtt_dom_cue_Reduced( p_cue ) < 1 )
         {
-            if( p_region->p_cues[i] )
-            {
-                p_region->p_cues[i] =
-                        webvtt_dom_cue_Reduced( p_region->p_cues[i] );
-                break;
-            }
+            p_region->p_child = p_cue->p_next;
+            p_cue->p_next = NULL;
+            webvtt_dom_cue_Delete( p_cue );
         }
     }
-}
-
-static void webvtt_region_ScrollUp( webvtt_region_t *p_region )
-{
-    if( p_region->p_cues[0] )
-        webvtt_dom_cue_Delete( p_region->p_cues[0] );
-
-    memmove( &p_region->p_cues[0], &p_region->p_cues[1],
-            (WEBVTT_REGION_LINES_COUNT - 1) * sizeof(p_region->p_cues[0]) );
-    p_region->p_cues[WEBVTT_REGION_LINES_COUNT - 1] = NULL;
 }
 
 static void webvtt_region_AddCue( webvtt_region_t *p_region,
                                   webvtt_dom_cue_t *p_cue )
 {
-    if( p_region->b_scroll_up == false )
+    webvtt_dom_node_t **pp_add = &p_region->p_child;
+    while( *pp_add )
+        pp_add = &((*pp_add)->p_next);
+    *pp_add = (webvtt_dom_node_t *)p_cue;
+
+    for( ;; )
     {
-        webvtt_region_ClearCues( p_region );
-    }
-    else
-    {
-        while( p_cue->i_lines > p_region->i_lines_max_scroll ) /* eh eh */
+        unsigned i_lines = webvtt_region_CountLines( p_region );
+        if( i_lines > 0 &&
+            ( i_lines > WEBVTT_REGION_LINES_COUNT ||
+             (p_region->b_scroll_up && i_lines > p_region->i_lines_max_scroll)) )
         {
-            p_cue = webvtt_dom_cue_Reduced( p_cue );
-            assert( p_cue );
-            if( unlikely(!p_cue) )
-                return;
+            webvtt_region_Reduce( p_region ); /* scrolls up */
+            assert( webvtt_region_CountLines( p_region ) < i_lines );
         }
-
-        while( webvtt_region_CountLines( p_region ) + p_cue->i_lines
-               > p_region->i_lines_max_scroll )
-            webvtt_region_Reduce( p_region );
-
-        /* now move everything up */
-        webvtt_region_ScrollUp( p_region );
+        else break;
     }
-    p_region->p_cues[WEBVTT_REGION_LINES_COUNT - 1] = p_cue;
 }
 
 static void webvtt_region_Init( webvtt_region_t *p_region )
@@ -665,8 +663,7 @@ static void webvtt_region_Init( webvtt_region_t *p_region )
     p_region->viewport_anchor_x = 0;
     p_region->viewport_anchor_y = 1.0; /* 100% */
     p_region->b_scroll_up = false;
-    for( int i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
-        p_region->p_cues[i] = NULL;
+    p_region->p_child = NULL;
 }
 
 static void webvtt_region_Delete( webvtt_region_t *p_region )
@@ -803,11 +800,11 @@ static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_c
 {
     VLC_UNUSED(p_dec);
 
-    if( p_cue->p_nodes )
+    if( p_cue->p_child )
         return;
-    p_cue->p_nodes = CreateDomNodes( psz, &p_cue->i_lines );
+    p_cue->p_child = CreateDomNodes( psz, &p_cue->i_lines );
 #ifdef SUBSVTT_DEBUG
-    webvtt_domnode_Debug( p_cue->p_nodes, 0 );
+    webvtt_domnode_Debug( (webvtt_dom_node_t *) p_cue, 0 );
 #endif
 }
 
@@ -914,7 +911,7 @@ static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
                                              struct render_variables_s *p_vars,
                                              const webvtt_dom_cue_t *p_cue )
 {
-    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_nodes );
+    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
 }
 
 static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
@@ -938,15 +935,18 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         v.i_top = p_vttregion->viewport_anchor_y - v.i_top_offset;
         /* !Variables */
 
-        for( int i=0; i<WEBVTT_REGION_LINES_COUNT; i++ )
+        for( webvtt_dom_node_t *p_node = p_vttregion->p_child;
+                                p_node; p_node = p_node->p_next )
         {
-            if( !p_vttregion->p_cues[i] ||
-                p_vttregion->p_cues[i]->i_start > i_start ||
-                p_vttregion->p_cues[i]->i_stop <= i_start )
+            assert( p_node->type == NODE_CUE );
+            if( p_node->type != NODE_CUE )
+                continue;
+            webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *) p_node;
+
+            if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
                 continue;
 
-            text_segment_t *p_new = ConvertCueToSegments( p_dec, &v,
-                                                          p_vttregion->p_cues[i] );
+            text_segment_t *p_new = ConvertCueToSegments( p_dec, &v, p_cue );
             if( p_new )
             {
                 if( p_segments ) /* auto newlines */
@@ -1067,6 +1067,7 @@ static int ProcessISOBMFF( decoder_t *p_dec,
                 p_region = webvtt_region_GetByID( p_dec->p_sys, NULL /*defaut region*/ );
             assert( p_region );
             webvtt_region_AddCue( p_region, p_cue );
+            assert( p_region->p_child );
         }
     }
     return 0;
