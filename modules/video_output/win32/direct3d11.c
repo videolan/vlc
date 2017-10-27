@@ -65,6 +65,10 @@ DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d,
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
+#define DEFAULT_BRIGHTNESS         100
+#define DEFAULT_SRGB_BRIGHTNESS    100
+#define MAX_PQ_BRIGHTNESS        10000
+
 #define D3D11_HELP N_("Recommended video output for Windows 8 and later versions")
 #define HW_BLENDING_TEXT N_("Use hardware blending support")
 #define HW_BLENDING_LONGTEXT N_(\
@@ -389,9 +393,6 @@ const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\
 const float ST2084_c1 = 3424.0 / 4096.0;\
 const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\
 const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;"
-
-#define DEFAULT_BRIGHTNESS 80
-
 
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
@@ -1541,10 +1542,10 @@ done:
     {
     case TRANSFER_FUNC_LINEAR:
     case TRANSFER_FUNC_SRGB:
-        sys->display.luminance_peak = DEFAULT_BRIGHTNESS;
+        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
         break;
     case TRANSFER_FUNC_SMPTE_ST2084:
-        sys->display.luminance_peak = 10000;
+        sys->display.luminance_peak = MAX_PQ_BRIGHTNESS;
         break;
     /* there is no other output transfer on Windows */
     default:
@@ -1863,7 +1864,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     {
         case TRANSFER_FUNC_SMPTE_ST2084:
             /* TODO ajust this value using HDR metadata ? */
-            src_luminance_peak = 7500;
+            src_luminance_peak = MAX_PQ_BRIGHTNESS;
             break;
         case TRANSFER_FUNC_HLG:
             src_luminance_peak = 1000;
