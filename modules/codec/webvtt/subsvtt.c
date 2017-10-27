@@ -47,7 +47,7 @@
  *****************************************************************************/
 
 typedef struct webvtt_region_t webvtt_region_t;
-typedef struct webvtt_domnode_t webvtt_domnode_t;
+typedef struct webvtt_dom_node_t webvtt_dom_node_t;
 typedef struct webvtt_dom_cue_t webvtt_dom_cue_t;
 
 #define WEBVTT_REGION_LINES_COUNT          18
@@ -83,9 +83,20 @@ struct webvtt_dom_cue_t
     mtime_t i_start;
     mtime_t i_stop;
     webvtt_cue_settings_t settings;
-    webvtt_domnode_t *p_nodes;
+    webvtt_dom_node_t *p_nodes;
     unsigned i_lines;
 };
+
+enum webvtt_node_type_e
+{
+    NODE_TAG,
+    NODE_TEXT
+};
+
+#define WEBVTT_NODE_BASE_MEMBERS \
+    enum webvtt_node_type_e type;\
+    webvtt_dom_node_t *p_parent;\
+    webvtt_dom_node_t *p_next;
 
 struct webvtt_region_t
 {
@@ -101,15 +112,23 @@ struct webvtt_region_t
     webvtt_region_t *p_next;
 };
 
-struct webvtt_domnode_t
+typedef struct
 {
+    WEBVTT_NODE_BASE_MEMBERS
+    char *psz_text;
+} webvtt_dom_text_t;
+
+typedef struct
+{
+    WEBVTT_NODE_BASE_MEMBERS
     char *psz_tag;
     char *psz_attrs;
-    char *psz_text;
+    webvtt_dom_node_t *p_child;
+} webvtt_dom_tag_t;
 
-    webvtt_domnode_t *p_parent;
-    webvtt_domnode_t *p_next;
-    webvtt_domnode_t *p_child;
+struct webvtt_dom_node_t
+{
+    WEBVTT_NODE_BASE_MEMBERS
 };
 
 struct decoder_sys_t
@@ -276,51 +295,90 @@ static void webvtt_cue_settings_Init( webvtt_cue_settings_t *p_settings )
  *
  *****************************************************************************/
 #ifdef SUBSVTT_DEBUG
-static void webvtt_domnode_Debug( webvtt_domnode_t *p_node, int i_depth )
+static void webvtt_domnode_Debug( webvtt_dom_node_t *p_node, int i_depth )
 {
     for( ; p_node ; p_node = p_node->p_next )
     {
         for( int i=0; i<i_depth; i++) printf(" ");
-        if( p_node->psz_text )
-            printf("TEXT %s\n", p_node->psz_text );
-        else
-            printf("TAG%s (%s)\n", p_node->psz_tag, p_node->psz_attrs );
-        webvtt_domnode_Debug( p_node->p_child, i_depth + 1 );
+        if( p_node->type == NODE_TEXT )
+        {
+            printf("TEXT %s\n", ((webvtt_dom_text_t *)p_node)->psz_text );
+        }
+        else if( p_node->type == NODE_TAG )
+        {
+            webvtt_dom_tag_t *p_tag = (webvtt_dom_tag_t *)p_node;
+            printf("TAG%s (%s)\n", p_tag->psz_tag, p_tag->psz_attrs );
+            webvtt_domnode_Debug( p_tag->p_child, i_depth + 1 );
+        }
     }
 }
 #endif
-static void webvtt_domnode_RecursiveDelete( webvtt_domnode_t *p_node )
+
+static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
+
+
+static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
+{
+    free( p_node->psz_text );
+    free( p_node );
+}
+
+static void webvtt_dom_tag_Delete( webvtt_dom_tag_t *p_node )
+{
+    free( p_node->psz_attrs );
+    free( p_node->psz_tag );
+    webvtt_domnode_ChainDelete( p_node->p_child );
+    free( p_node );
+}
+
+static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
 {
     while( p_node )
     {
-        assert( p_node->psz_text == NULL || p_node->p_child == NULL );
-        webvtt_domnode_t *p_next = p_node->p_next;
+        webvtt_dom_node_t *p_next = p_node->p_next;
 
-        webvtt_domnode_RecursiveDelete( p_node->p_child );
-        free( p_node->psz_tag );
-        free( p_node->psz_attrs );
-        free( p_node->psz_text );
-        free( p_node );
+        if( p_node->type == NODE_TAG )
+            webvtt_dom_tag_Delete( (webvtt_dom_tag_t *) p_node );
+        else if( p_node->type == NODE_TEXT )
+            webvtt_dom_text_Delete( (webvtt_dom_text_t *) p_node );
 
         p_node = p_next;
     }
 }
 
-static webvtt_domnode_t * webvtt_domnode_New( webvtt_domnode_t *p_parent )
+static webvtt_dom_text_t * webvtt_dom_text_New( webvtt_dom_node_t *p_parent )
 {
-    webvtt_domnode_t *p_node = calloc( 1, sizeof(*p_node) );
+    webvtt_dom_text_t *p_node = calloc( 1, sizeof(*p_node) );
     if( p_node )
+    {
+        p_node->type = NODE_TEXT;
         p_node->p_parent = p_parent;
+    }
     return p_node;
 }
 
-static webvtt_domnode_t * webvtt_domnode_getParentByTag( webvtt_domnode_t *p_parent,
+static webvtt_dom_tag_t * webvtt_dom_tag_New( webvtt_dom_node_t *p_parent )
+{
+    webvtt_dom_tag_t *p_node = calloc( 1, sizeof(*p_node) );
+    if( p_node )
+    {
+        p_node->type = NODE_TAG;
+        p_node->p_parent = p_parent;
+    }
+    return p_node;
+}
+
+static webvtt_dom_node_t * webvtt_domnode_getParentByTag( webvtt_dom_node_t *p_parent,
                                                          const char *psz_tag )
 {
     for( ; p_parent ; p_parent = p_parent->p_parent )
     {
-        if( p_parent->psz_tag && psz_tag && !strcmp( p_parent->psz_tag, psz_tag ) )
-            break;
+        if( p_parent->type == NODE_TAG )
+        {
+            webvtt_dom_tag_t *p_node = (webvtt_dom_tag_t *) p_parent;
+            if( p_node->psz_tag && psz_tag && !strcmp( p_node->psz_tag, psz_tag ) )
+                break;
+        }
     }
     return p_parent;
 }
@@ -381,7 +439,7 @@ static webvtt_dom_cue_t * webvtt_dom_cue_New( mtime_t i_start, mtime_t i_end )
 
 static void webvtt_dom_cue_ClearText( webvtt_dom_cue_t *p_cue )
 {
-    webvtt_domnode_RecursiveDelete( p_cue->p_nodes );
+    webvtt_domnode_ChainDelete( p_cue->p_nodes );
     p_cue->p_nodes = NULL;
     p_cue->i_lines = 0;
 }
@@ -403,26 +461,27 @@ static webvtt_dom_cue_t * webvtt_dom_cue_Reduced( webvtt_dom_cue_t *p_cue )
         return NULL;
     }
 
-    for( webvtt_domnode_t *p_node = p_cue->p_nodes;
+    for( webvtt_dom_node_t *p_node = p_cue->p_nodes;
                            p_node; p_node = p_node->p_next )
     {
-        if( !p_node->psz_text )
+        if( p_node->type != NODE_TEXT )
             continue;
-        const char *nl = strchr( p_node->psz_text, '\n' );
+        webvtt_dom_text_t *p_textnode = (webvtt_dom_text_t *) p_node;
+        const char *nl = strchr( p_textnode->psz_text, '\n' );
         if( nl )
         {
-            size_t i_len = strlen( p_node->psz_text );
-            size_t i_remain = i_len - (nl - p_node->psz_text);
+            size_t i_len = strlen( p_textnode->psz_text );
+            size_t i_remain = i_len - (nl - p_textnode->psz_text);
             char *psz_new = strndup( nl + 1, i_remain );
-            free( p_node->psz_text );
-            p_node->psz_text = psz_new;
+            free( p_textnode->psz_text );
+            p_textnode->psz_text = psz_new;
             p_cue->i_lines--;
             return p_cue;
         }
         else
         {
-            free( p_node->psz_text );
-            p_node->psz_text = NULL;
+            free( p_textnode->psz_text );
+            p_textnode->psz_text = NULL;
             /* FIXME: probably can do a local nodes cleanup */
         }
     }
@@ -651,11 +710,11 @@ static unsigned CountNewLines( const char *psz )
     return i;
 }
 
-static webvtt_domnode_t * CreateDomNodes( const char *psz_text, unsigned *pi_lines )
+static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_lines )
 {
-    webvtt_domnode_t *p_head = NULL;
-    webvtt_domnode_t **pp_append = &p_head;
-    webvtt_domnode_t *p_parent = p_head;
+    webvtt_dom_node_t *p_head = NULL;
+    webvtt_dom_node_t **pp_append = &p_head;
+    webvtt_dom_node_t *p_parent = p_head;
     *pi_lines = 0;
 
     while( *psz_text )
@@ -666,19 +725,19 @@ static webvtt_domnode_t * CreateDomNodes( const char *psz_text, unsigned *pi_lin
         {
             if( psz_tag - psz_text > 0 )
             {
-                webvtt_domnode_t *p_node = webvtt_domnode_New( p_parent );
+                webvtt_dom_text_t *p_node = webvtt_dom_text_New( p_parent );
                 if( p_node )
                 {
                     p_node->psz_text = strndup( psz_text, psz_tag - psz_text );
                     *pi_lines += ((*pi_lines == 0) ? 1 : 0) + CountNewLines( p_node->psz_text );
-                    *pp_append = p_node;
+                    *pp_append = (webvtt_dom_node_t *) p_node;
                     pp_append = &p_node->p_next;
                 }
             }
 
             if( ! IsEndTag( psz_tag ) )
             {
-                webvtt_domnode_t *p_node = webvtt_domnode_New( p_parent );
+                webvtt_dom_tag_t *p_node = webvtt_dom_tag_New( p_parent );
                 if( p_node )
                 {
                     const char *psz_attrs = NULL;
@@ -686,8 +745,8 @@ static webvtt_domnode_t * CreateDomNodes( const char *psz_text, unsigned *pi_lin
                     p_node->psz_tag = strndup( psz_name, psz_attrs - psz_name );
                     if( psz_attrs != psz_taglast )
                         p_node->psz_attrs = strndup( psz_attrs, psz_taglast - psz_attrs );
-                    *pp_append = p_node;
-                    p_parent = p_node;
+                    *pp_append = (webvtt_dom_node_t *) p_node;
+                    p_parent = (webvtt_dom_node_t *) p_node;
                     pp_append = &p_node->p_child;
                 }
             }
@@ -717,12 +776,12 @@ static webvtt_domnode_t * CreateDomNodes( const char *psz_text, unsigned *pi_lin
         }
         else /* Special case: end */
         {
-            webvtt_domnode_t *p_node = webvtt_domnode_New( p_parent );
+            webvtt_dom_text_t *p_node = webvtt_dom_text_New( p_parent );
             if( p_node )
             {
                 p_node->psz_text = strdup( psz_text );
                 *pi_lines += ((*pi_lines == 0) ? 1 : 0) + CountNewLines( p_node->psz_text );
-                *pp_append = p_node;
+                *pp_append = (webvtt_dom_node_t *) p_node;
             }
             break;
         }
@@ -752,16 +811,21 @@ static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_c
 #endif
 }
 
-static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_domnode_t *p_node )
+static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_dom_node_t *p_node )
 {
     VLC_UNUSED(p_dec);
 
     text_style_t *p_style = NULL;
     for( ; p_node; p_node = p_node->p_parent )
     {
-        if( p_node->psz_tag )
+        if( p_node->type == NODE_TAG )
         {
-            if ( !strcmp( p_node->psz_tag, "b" ) )
+            const webvtt_dom_tag_t *p_tagnode = (const webvtt_dom_tag_t *)p_node;
+            if ( p_tagnode->psz_tag == NULL )
+            {
+                continue;
+            }
+            else if ( !strcmp( p_tagnode->psz_tag, "b" ) )
             {
                 if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
                 {
@@ -769,7 +833,7 @@ static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_domnode_t *p
                     p_style->i_features |= STYLE_HAS_FLAGS;
                 }
             }
-            else if ( !strcmp( p_node->psz_tag, "i" ) )
+            else if ( !strcmp( p_tagnode->psz_tag, "i" ) )
             {
                 if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
                 {
@@ -777,7 +841,7 @@ static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_domnode_t *p
                     p_style->i_features |= STYLE_HAS_FLAGS;
                 }
             }
-            else if ( !strcmp( p_node->psz_tag, "u" ) )
+            else if ( !strcmp( p_tagnode->psz_tag, "u" ) )
             {
                 if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
                 {
@@ -785,12 +849,12 @@ static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_domnode_t *p
                     p_style->i_features |= STYLE_HAS_FLAGS;
                 }
             }
-            else if ( !strcmp( p_node->psz_tag, "v" ) && p_node->psz_attrs )
+            else if ( !strcmp( p_tagnode->psz_tag, "v" ) && p_tagnode->psz_attrs )
             {
                 if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
                 {
                     unsigned a = 0;
-                    for( char *p = p_node->psz_attrs; *p; p++ )
+                    for( char *p = p_tagnode->psz_attrs; *p; p++ )
                         a = (a << 3) ^ *p;
                     p_style->i_font_color = (0x7F7F7F | a) & 0xFFFFFF;
                     p_style->i_features |= STYLE_HAS_FONT_COLOR;
@@ -813,15 +877,19 @@ struct render_variables_s
 static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue,
-                                               const webvtt_domnode_t *p_node )
+                                               const webvtt_dom_node_t *p_node )
 {
     text_segment_t *p_head = NULL;
     text_segment_t **pp_append = &p_head;
     for( ; p_node ; p_node = p_node->p_next )
     {
-        if( p_node->psz_text )
+        if( p_node->type == NODE_TEXT )
         {
-            *pp_append = text_segment_New( p_node->psz_text );
+            const webvtt_dom_text_t *p_textnode = (const webvtt_dom_text_t *) p_node;
+            if( p_textnode->psz_text == NULL )
+                continue;
+
+            *pp_append = text_segment_New( p_textnode->psz_text );
             if( *pp_append )
             {
                 if( (*pp_append)->psz_text )
@@ -830,8 +898,12 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                 pp_append = &((*pp_append)->p_next);
             }
         }
+        else if( p_node->type == NODE_TAG )
+        {
+            *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
+                                                 ((const webvtt_dom_tag_t *)p_node)->p_child );
+        }
 
-        *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue, p_node->p_child );
         while( *pp_append )
             pp_append = &((*pp_append)->p_next);
     }
