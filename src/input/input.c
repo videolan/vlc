@@ -3294,9 +3294,10 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
              b_forced );
 
     input_source_t *p_source = InputSourceNew( p_input, psz_uri,
-                                               psz_forced_demux, b_can_fail );
+                                               psz_forced_demux,
+                                               b_can_fail || psz_forced_demux );
 
-    if( i_type == SLAVE_TYPE_SPU && p_source == NULL )
+    if( psz_forced_demux && p_source == NULL )
         p_source = InputSourceNew( p_input, psz_uri, NULL, b_can_fail );
 
     if( p_source == NULL )
