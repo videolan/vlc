@@ -1865,8 +1865,12 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     switch (transfer)
     {
         case TRANSFER_FUNC_SMPTE_ST2084:
-            /* TODO ajust this value using HDR metadata ? */
-            src_luminance_peak = MAX_PQ_BRIGHTNESS;
+            if (sys->display.colorspace->transfer == TRANSFER_FUNC_SMPTE_ST2084)
+                /* the display will take care of the meta data if there are some */
+                src_luminance_peak = MAX_PQ_BRIGHTNESS;
+            else
+                /* TODO adjust this value during playback using HDR metadata ? */
+                src_luminance_peak = 5000;
             break;
         case TRANSFER_FUNC_HLG:
             src_luminance_peak = 1000;
