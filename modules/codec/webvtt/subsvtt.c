@@ -1199,7 +1199,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    ExpireCues( p_dec, p_block->i_dts );
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        ExpireCues( p_dec, INT64_MAX );
+    else
+        ExpireCues( p_dec, p_block->i_dts );
 
     ProcessISOBMFF( p_dec, p_block->p_buffer, p_block->i_buffer,
                     p_block->i_pts, p_block->i_pts + p_block->i_length );
