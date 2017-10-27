@@ -41,6 +41,7 @@ struct demux_sys_t
     es_out_id_t *es;
     bool         b_slave;
     bool         b_first_time;
+    int          i_next_block_flags;
     mtime_t      i_next_demux_time;
     mtime_t      i_length;
     struct
@@ -298,6 +299,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->b_first_time = true;
                 p_sys->i_next_demux_time =
                         p_sys->cues.p_array[p_sys->cues.i_current].i_start;
+                p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
                 return VLC_SUCCESS;
             }
 
@@ -327,6 +329,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->b_first_time = true;
                 p_sys->i_next_demux_time =
                         p_sys->cues.p_array[p_sys->cues.i_current].i_start;
+                p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
                 return VLC_SUCCESS;
             }
             break;
@@ -379,6 +382,11 @@ static int Demux( demux_t *p_demux )
                 if( p_cue->i_stop >= 0 && p_cue->i_stop >= p_cue->i_start )
                     p_block->i_length = p_cue->i_stop - p_cue->i_start;
 
+                if( p_sys->i_next_block_flags )
+                {
+                    p_block->i_flags = p_sys->i_next_block_flags;
+                    p_sys->i_next_block_flags = 0;
+                }
                 es_out_Send( p_demux->out, p_sys->es, p_block );
             }
         }
@@ -432,6 +440,7 @@ int OpenDemux ( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sys->i_next_block_flags = 0;
     p_sys->i_next_demux_time = 0;
     p_sys->i_length = 0;
     p_sys->b_slave = false;
