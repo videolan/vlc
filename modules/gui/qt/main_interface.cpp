@@ -1033,6 +1033,8 @@ void MainInterface::dockPlaylist( bool p_docked )
         dialog->importPlaylistWidget( playlistWidget );
         if (THEMIM->getIM()->hasVideo())
             showTab(videoWidget);
+        else
+            showTab(bgWidget);
         if ( playlistVisible ) dialog->show();
     }
     else /* Previously undocked */
