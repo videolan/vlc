@@ -48,6 +48,7 @@
 #include "../smooth/SmoothStream.hpp"
 #include "../smooth/playlist/Parser.hpp"
 
+using namespace adaptive::http;
 using namespace adaptive::logic;
 using namespace adaptive::playlist;
 using namespace adaptive::xml;
