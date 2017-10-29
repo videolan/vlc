@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCTextfieldPanelController">
@@ -22,22 +22,22 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="159"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="159"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="4">
-                        <rect key="frame" x="17" y="122" width="129" height="17"/>
-                        <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Save as new profile" id="13">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4">
+                        <rect key="frame" x="18" y="122" width="129" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Save as new profile" usesSingleLineMode="YES" id="13">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                        <rect key="frame" x="17" y="100" width="172" height="14"/>
-                        <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Enter a name for the new profile" usesSingleLineMode="YES" id="12">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5">
+                        <rect key="frame" x="18" y="100" width="172" height="14"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Enter a name for the new profile" usesSingleLineMode="YES" id="12">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -70,7 +70,7 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6">
-                        <rect key="frame" x="19" y="68" width="573" height="22"/>
+                        <rect key="frame" x="20" y="68" width="572" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="11">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -79,14 +79,17 @@ Gw
                     </textField>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" constant="22" id="2eI-2U-i85"/>
                     <constraint firstItem="4" firstAttribute="top" secondItem="3" secondAttribute="top" constant="20" id="4Oc-x8-seM"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="8" secondAttribute="trailing" constant="12" id="564-S6-DGN"/>
-                    <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="19" id="6PC-8r-exg"/>
+                    <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" id="6PC-8r-exg"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4" secondAttribute="trailing" constant="20" id="Egm-qq-QKp"/>
                     <constraint firstItem="7" firstAttribute="centerY" secondItem="8" secondAttribute="centerY" id="LiA-Xw-4Og"/>
                     <constraint firstItem="5" firstAttribute="leading" secondItem="4" secondAttribute="leading" id="UX0-7z-iJf"/>
                     <constraint firstItem="7" firstAttribute="trailing" secondItem="6" secondAttribute="trailing" id="VI5-Rn-1Fo"/>
                     <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="20" id="XeS-rh-GeW"/>
                     <constraint firstItem="6" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="10" id="Y3E-qC-fAJ"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="5" secondAttribute="trailing" constant="20" id="cOA-LJ-PmC"/>
                     <constraint firstItem="5" firstAttribute="top" secondItem="4" secondAttribute="bottom" constant="8" id="srk-nM-3iQ"/>
                     <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="bottom" constant="25" id="u2w-Ou-uGC"/>
                     <constraint firstItem="6" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="zwT-Vi-paI"/>

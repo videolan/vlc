@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
@@ -22,24 +21,24 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="159"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="612" height="159"/>
             <value key="maxSize" type="size" width="612" height="159"/>
             <view key="contentView" id="14">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="159"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="18">
-                        <rect key="frame" x="17" y="122" width="112" height="17"/>
-                        <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Remove a profile" id="25">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="18">
+                        <rect key="frame" x="18" y="122" width="112" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Remove a profile" usesSingleLineMode="YES" id="25">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                        <rect key="frame" x="17" y="100" width="230" height="14"/>
-                        <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Select the profile you would like to remove:" usesSingleLineMode="YES" id="26">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="17">
+                        <rect key="frame" x="18" y="100" width="230" height="14"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Select the profile you would like to remove:" usesSingleLineMode="YES" id="26">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -72,7 +71,7 @@ Gw
                         </connections>
                     </button>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
-                        <rect key="frame" x="17" y="66" width="578" height="26"/>
+                        <rect key="frame" x="18" y="66" width="577" height="26"/>
                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="22" id="20">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
@@ -88,9 +87,10 @@ Gw
                 </subviews>
                 <constraints>
                     <constraint firstItem="16" firstAttribute="leading" secondItem="15" secondAttribute="trailing" constant="12" id="0xF-7k-lNe"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="17" secondAttribute="trailing" constant="20" id="2rI-pv-u6N"/>
                     <constraint firstItem="17" firstAttribute="top" secondItem="18" secondAttribute="bottom" constant="8" id="48p-Px-NO6"/>
                     <constraint firstItem="17" firstAttribute="leading" secondItem="18" secondAttribute="leading" id="EUc-zh-2bg"/>
-                    <constraint firstItem="18" firstAttribute="leading" secondItem="14" secondAttribute="leading" constant="19" id="IeJ-Jq-PC1"/>
+                    <constraint firstItem="18" firstAttribute="leading" secondItem="14" secondAttribute="leading" constant="20" id="IeJ-Jq-PC1"/>
                     <constraint firstItem="16" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="-21" id="RxG-QG-83V"/>
                     <constraint firstAttribute="bottom" secondItem="16" secondAttribute="bottom" constant="20" id="Zsd-2P-O34"/>
                     <constraint firstItem="16" firstAttribute="centerY" secondItem="15" secondAttribute="centerY" id="ajf-qO-uAB"/>
@@ -98,6 +98,7 @@ Gw
                     <constraint firstAttribute="trailing" secondItem="19" secondAttribute="trailing" constant="20" id="s0H-w9-ufO"/>
                     <constraint firstItem="16" firstAttribute="trailing" secondItem="19" secondAttribute="trailing" id="u6M-dv-Ew9"/>
                     <constraint firstItem="19" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="10" id="uOa-iI-ZVT"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="18" secondAttribute="trailing" constant="20" id="uxm-Yf-FZs"/>
                     <constraint firstItem="18" firstAttribute="top" secondItem="14" secondAttribute="top" constant="20" id="xkV-Dp-NIO"/>
                 </constraints>
             </view>
