@@ -31,11 +31,11 @@
 @property (weak) IBOutlet NSButton *cancelButton;
 @property (weak) IBOutlet NSButton *okButton;
 
-@property (readwrite, assign) NSString *titleString;
-@property (readwrite, assign) NSString *subTitleString;
-@property (readwrite, assign) NSString *okButtonString;
-@property (readwrite, assign) NSString *cancelButtonString;
-@property (readwrite, assign) NSArray *popupButtonContent;
+@property (readwrite) NSString *titleString;
+@property (readwrite) NSString *subTitleString;
+@property (readwrite) NSString *okButtonString;
+@property (readwrite) NSString *cancelButtonString;
+@property (readwrite) NSArray *popupButtonContent;
 
 /**
  * Completion handler for popup panel
