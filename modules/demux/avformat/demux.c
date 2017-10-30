@@ -827,17 +827,22 @@ static int Demux( demux_t *p_demux )
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 #endif
-    if( p_frame->i_dts > VLC_TS_INVALID )
+    if( p_frame->i_dts > VLC_TS_INVALID && p_sys->tk[pkt.stream_index] != NULL )
         p_sys->tk_pcr[pkt.stream_index] = p_frame->i_dts;
 
     int64_t i_ts_max = INT64_MIN;
     for( int i = 0; i < p_sys->i_tk; i++ )
-        i_ts_max = __MAX( i_ts_max, p_sys->tk_pcr[i] );
+    {
+        if( p_sys->tk[i] != NULL )
+            i_ts_max = __MAX( i_ts_max, p_sys->tk_pcr[i] );
+    }
 
     int64_t i_ts_min = INT64_MAX;
     for( int i = 0; i < p_sys->i_tk; i++ )
     {
-        if( p_sys->tk_pcr[i] > VLC_TS_INVALID && p_sys->tk_pcr[i] + 10 * CLOCK_FREQ >= i_ts_max )
+        if( p_sys->tk[i] != NULL &&
+                p_sys->tk_pcr[i] > VLC_TS_INVALID &&
+                p_sys->tk_pcr[i] + 10 * CLOCK_FREQ >= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tk_pcr[i] );
     }
     if( i_ts_min >= p_sys->i_pcr && likely(i_ts_min != INT64_MAX) )
