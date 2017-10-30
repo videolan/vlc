@@ -253,6 +253,7 @@ protected slots:
     void setVideoOnTop( bool );
     void setBoss();
     void setRaise();
+    void voutReleaseMouseEvents();
 
     void showResumePanel( int64_t);
     void hideResumePanel();

@@ -229,6 +229,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askBoss(), this, setBoss() );
     CONNECT( this, askRaise(), this, setRaise() );
 
+
+    connect( THEDP, &DialogsProvider::releaseMouseEvents, this, &MainInterface::voutReleaseMouseEvents ) ;
     /** END of CONNECTS**/
 
 
@@ -1663,6 +1665,29 @@ void MainInterface::setRaise()
 {
     activateWindow();
     raise();
+}
+
+void MainInterface::voutReleaseMouseEvents()
+{
+    if (videoWidget)
+    {
+        QPoint pos = QCursor::pos();
+        QPoint localpos = videoWidget->mapFromGlobal(pos);
+        int buttons = QApplication::mouseButtons();
+        int i_button = 1;
+        while (buttons != 0)
+        {
+            if ( (buttons & 1) != 0 )
+            {
+                QMouseEvent new_e( QEvent::MouseButtonRelease, localpos,
+                                   (Qt::MouseButton)i_button, (Qt::MouseButton)i_button, Qt::NoModifier );
+                QApplication::sendEvent(videoWidget, &new_e);
+            }
+            buttons >>= 1;
+            i_button <<= 1;
+        }
+
+    }
 }
 
 /*****************************************************************************

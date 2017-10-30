@@ -184,6 +184,7 @@ private slots:
     void menuUpdateAction( QObject * );
 signals:
     void  toolBarConfUpdated();
+    void releaseMouseEvents();
 };
 
 class DialogEvent : public QEvent
