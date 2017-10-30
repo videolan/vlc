@@ -261,17 +261,17 @@ static void updateProgressCallback(void *p_data,
 
     NSInteger returnValue = [alert runModal];
     switch (returnValue) {
+        case NSAlertDefaultReturn:
+            vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 1);
+            break;
+
         case NSAlertAlternateReturn:
             vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 2);
             break;
 
         case NSAlertOtherReturn:
-            vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 3);
-            break;
-
         default:
-            vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 1);
-            break;
+            vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
     }
 
 }
