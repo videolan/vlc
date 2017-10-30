@@ -1845,6 +1845,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         break;
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_B5G6R5_UNORM:
         psz_sampler =
                 "sample = shaderTexture[0].Sample(SampleType, In.Texture);";
