@@ -114,6 +114,16 @@ vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format)
     return 0;
 }
 
+DXGI_FORMAT DxgiFourccFormat(vlc_fourcc_t fcc)
+{
+    for (const dxgi_format_t *f = dxgi_formats; f->name != NULL; ++f)
+    {
+        if (f->vlc_format == fcc)
+            return f->format;
+    }
+    return DXGI_FORMAT_UNKNOWN;
+}
+
 const d3d_format_t *GetRenderFormatList(void)
 {
     return d3d_formats;
