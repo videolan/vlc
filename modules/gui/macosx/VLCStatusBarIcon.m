@@ -93,13 +93,13 @@
     [self configurationChanged:nil];
 
     // Set Accessibility Attributes for Image Buttons
-    [backwardsButton.cell accessibilitySetOverrideValue:_NS("Go to previous track")
+    [backwardsButton.cell accessibilitySetOverrideValue:_NS("Go to previous item")
                                            forAttribute:NSAccessibilityDescriptionAttribute];
 
-    [playPauseButton.cell accessibilitySetOverrideValue:_NS("Play or pause current media")
+    [playPauseButton.cell accessibilitySetOverrideValue:_NS("Toggle Play/Pause")
                                            forAttribute:NSAccessibilityDescriptionAttribute];
 
-    [forwardButton.cell accessibilitySetOverrideValue:_NS("Go to next track")
+    [forwardButton.cell accessibilitySetOverrideValue:_NS("Go to next item")
                                          forAttribute:NSAccessibilityDescriptionAttribute];
 
     [randButton.cell accessibilitySetOverrideValue:_NS("Toggle random order playback")

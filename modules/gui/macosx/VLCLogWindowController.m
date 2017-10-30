@@ -102,16 +102,16 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
     setupButton(_saveButton,
                 _NS("Save log"),
-                _NS("Click to save the debug log to a file."));
+                _NS("Save the debug log to a file"));
     setupButton(_refreshButton,
                 _NS("Refresh log"),
-                _NS("Click to frefresh the log output."));
+                _NS("Refresh the log output"));
     setupButton(_clearButton,
                 _NS("Clear log"),
-                _NS("Click to clear the log output."));
+                _NS("Clear the log output"));
     setupButton(_toggleDetailsButton,
                 _NS("Toggle details"),
-                _NS("Click to show/hide details about a log message."));
+                _NS("Show/hide details about a log message"));
 
 #undef setupButton
 }

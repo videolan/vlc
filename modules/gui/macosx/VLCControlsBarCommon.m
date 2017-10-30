@@ -61,27 +61,25 @@
 
     [self.dropView setDrawBorder: NO];
 
-    [self.playButton setToolTip: _NS("Play/Pause")];
-    [[self.playButton cell] accessibilitySetOverrideValue:_NS("Click to play or pause the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[self.playButton cell] accessibilitySetOverrideValue:[self.playButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.playButton setToolTip: _NS("Play")];
+    [[self.playButton cell] accessibilitySetOverrideValue:[self.playButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
 
     [self.backwardButton setToolTip: _NS("Backward")];
-    [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Seek backward") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.backwardButton cell] accessibilitySetOverrideValue:[self.backwardButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     [self.forwardButton setToolTip: _NS("Forward")];
-    [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Seek forward") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.forwardButton cell] accessibilitySetOverrideValue:[self.forwardButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     [self.timeSlider setToolTip: _NS("Position")];
-    [[self.timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.timeSlider cell] accessibilitySetOverrideValue:_NS("Playback position") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.timeSlider cell] accessibilitySetOverrideValue:[self.timeSlider toolTip] forAttribute:NSAccessibilityTitleAttribute];
     if (_darkInterface)
         [self.timeSlider setSliderStyleDark];
 
-    [self.fullscreenButton setToolTip: _NS("Toggle Fullscreen mode")];
-    [[self.fullscreenButton cell] accessibilitySetOverrideValue:_NS("Click to enable fullscreen video playback.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.fullscreenButton setToolTip: _NS("Fullscreen")];
+    [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
 
     if (!_darkInterface) {
         [self.bottomBarView setDark:NO];
@@ -126,6 +124,8 @@
     [self.timeField setAlignment: NSCenterTextAlignment];
     [self.timeField setNeedsDisplay:YES];
     [self.timeField setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
+    [[self.timeField cell] accessibilitySetOverrideValue:_NS("Playback time")
+                                            forAttribute:NSAccessibilityDescriptionAttribute];
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
@@ -146,16 +146,22 @@
 {
     if (b_alt == YES) {
         /* change the accessibility help for the backward/forward buttons accordingly */
-        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Backward") forAttribute:NSAccessibilityTitleAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Seek backward") forAttribute:NSAccessibilityDescriptionAttribute];
+
+        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Forward") forAttribute:NSAccessibilityTitleAttribute];
+        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Seek forward") forAttribute:NSAccessibilityDescriptionAttribute];
 
         [self.forwardButton setAction:@selector(alternateForward:)];
         [self.backwardButton setAction:@selector(alternateBackward:)];
 
     } else {
         /* change the accessibility help for the backward/forward buttons accordingly */
-        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Previous") forAttribute:NSAccessibilityTitleAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Go to previous item") forAttribute:NSAccessibilityDescriptionAttribute];
+
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Next") forAttribute:NSAccessibilityTitleAttribute];
+        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Go to next item") forAttribute:NSAccessibilityDescriptionAttribute];
 
         [self.forwardButton setAction:@selector(fwd:)];
         [self.backwardButton setAction:@selector(bwd:)];
@@ -378,6 +384,7 @@
     [self.playButton setImage: _pauseImage];
     [self.playButton setAlternateImage: _pressedPauseImage];
     [self.playButton setToolTip: _NS("Pause")];
+    [[self.playButton cell] accessibilitySetOverrideValue:[self.playButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 }
 
 - (void)setPlay
@@ -385,6 +392,7 @@
     [self.playButton setImage: _playImage];
     [self.playButton setAlternateImage: _pressedPlayImage];
     [self.playButton setToolTip: _NS("Play")];
+    [[self.playButton cell] accessibilitySetOverrideValue:[self.playButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 }
 
 - (void)setFullscreenState:(BOOL)b_fullscreen

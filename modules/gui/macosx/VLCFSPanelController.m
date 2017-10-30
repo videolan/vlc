@@ -107,28 +107,28 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     /* Setup translations for buttons */
     setupButton(_playPauseButton,
                 _NS("Play/Pause"),
-                _NS("Click to play or pause the current media."));
+                _NS("Play/Pause the current media"));
     setupButton(_nextButton,
                 _NS("Next"),
-                _NS("Click to go to the next playlist item."));
+                _NS("Go to next item"));
     setupButton(_previousButton,
                 _NS("Previous"),
-                _NS("Click to go to the previous playlist item."));
+                _NS("Go to the previous item"));
     setupButton(_forwardButton,
                 _NS("Forward"),
-                _NS("Click and hold to skip forward through the current media."));
+                _NS("Seek forward"));
     setupButton(_backwardButton,
                 _NS("Backward"),
-                _NS("Click and hold to skip backward through the current media."));
+                _NS("Seek backward"));
     setupButton(_fullscreenButton,
                 _NS("Toggle Fullscreen mode"),
-                _NS("Click to exit fullscreen playback."));
+                _NS("Leave fullscreen mode"));
     setupButton(_volumeSlider,
                 _NS("Volume"),
-                _NS("Drag to adjust the volume."));
+                _NS("Adjust the volume"));
     setupButton(_timeSlider,
                 _NS("Position"),
-                _NS("Drag to adjust the current playback position."));
+                _NS("Adjust the current playback position"));
 
     /* Setup other controls */
     [_volumeSlider setMaxValue:[[VLCCoreInteraction sharedInstance] maxVolume]];

@@ -184,14 +184,14 @@ static const float f_min_window_height = 307.;
     // Search Field
     [_searchField setToolTip:_NS("Search in Playlist")];
     [_searchField.cell setPlaceholderString:_NS("Search")];
-    [_searchField.cell accessibilitySetOverrideValue:_NS("Enter a term to search the playlist. Results will be selected in the table.")
+    [_searchField.cell accessibilitySetOverrideValue:_NS("Search the playlist. Results will be selected in the table.")
                                         forAttribute:NSAccessibilityDescriptionAttribute];
 
     // Dropzone
     [_dropzoneLabel setStringValue:_NS("Drop media here")];
     [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
     [_dropzoneButton setTitle:_NS("Open media...")];
-    [_dropzoneButton.cell accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.")
+    [_dropzoneButton.cell accessibilitySetOverrideValue:_NS("Open a dialog to select the media to play")
                                            forAttribute:NSAccessibilityDescriptionAttribute];
 
     // Podcast view
