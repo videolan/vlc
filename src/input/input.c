@@ -1141,7 +1141,7 @@ static void LoadSlaves( input_thread_t *p_input )
                SlaveCompare );
 
     /* add all detected slaves */
-    bool p_forced[2] = {};
+    bool p_forced[2] = { false, false };
     static_assert( SLAVE_TYPE_AUDIO <= 1 && SLAVE_TYPE_SPU <= 1,
                    "slave type size mismatch");
     for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
@@ -1150,16 +1150,23 @@ static void LoadSlaves( input_thread_t *p_input )
         /* Slaves added via options should not fail */
         unsigned i_flags = p_slave->i_priority != SLAVE_PRIORITY_USER
                            ? SLAVE_ADD_CANFAIL : SLAVE_ADD_NOFLAG;
+        bool b_forced = false;
 
+        /* Force the first subtitle with the highest priority or with the
+         * forced flag */
         if( !p_forced[p_slave->i_type]
          && ( p_slave->b_forced || p_slave->i_priority == SLAVE_PRIORITY_USER ) )
+        {
             i_flags |= SLAVE_ADD_FORCED;
+            b_forced = true;
+        }
 
         if( input_SlaveSourceAdd( p_input, p_slave->i_type, p_slave->psz_uri,
                                   i_flags ) == VLC_SUCCESS )
         {
             input_item_AddSlave( input_priv(p_input)->p_item, p_slave );
-            p_forced[p_slave->i_type] = true;
+            if( b_forced )
+                p_forced[p_slave->i_type] = true;
         }
         else
             input_item_slave_Delete( p_slave );
@@ -1194,6 +1201,8 @@ static void LoadSlaves( input_thread_t *p_input )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
 
+            /* Force the first subtitle from attachment if there is no
+             * subtitles already forced */
             if( input_SlaveSourceAdd( p_input, SLAVE_TYPE_SPU, psz_mrl,
                                       p_forced[ SLAVE_TYPE_SPU ] ?
                                       SLAVE_ADD_NOFLAG : SLAVE_ADD_FORCED ) == VLC_SUCCESS )
