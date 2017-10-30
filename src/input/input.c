@@ -1194,8 +1194,11 @@ static void LoadSlaves( input_thread_t *p_input )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
 
-            input_SlaveSourceAdd( p_input, SLAVE_TYPE_SPU, psz_mrl,
-                                  SLAVE_ADD_NOFLAG );
+            if( input_SlaveSourceAdd( p_input, SLAVE_TYPE_SPU, psz_mrl,
+                                      p_forced[ SLAVE_TYPE_SPU ] ?
+                                      SLAVE_ADD_NOFLAG : SLAVE_ADD_FORCED ) == VLC_SUCCESS )
+                p_forced[ SLAVE_TYPE_SPU ] = true;
+
             free( psz_mrl );
             /* Don't update item slaves for attachements */
         }
