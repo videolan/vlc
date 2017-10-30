@@ -255,6 +255,35 @@ static int        AVI_TrackStopFinishedStreams( demux_t *);
  */
 
 /*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close ( vlc_object_t * p_this )
+{
+    demux_t *    p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys  ;
+
+    for( unsigned int i = 0; i < p_sys->i_track; i++ )
+    {
+        if( p_sys->track[i] )
+        {
+            es_format_Clean( &p_sys->track[i]->fmt );
+            avi_index_Clean( &p_sys->track[i]->idx );
+            free( p_sys->track[i] );
+        }
+    }
+    free( p_sys->track );
+
+    AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
+    vlc_meta_Delete( p_sys->meta );
+
+    for( unsigned i = 0; i < p_sys->i_attachment; i++)
+        vlc_input_attachment_Delete(p_sys->attachment[i]);
+    free(p_sys->attachment);
+
+    free( p_sys );
+}
+
+/*****************************************************************************
  * Open: check file and initializes AVI structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
@@ -855,45 +884,8 @@ aviindex:
     return VLC_SUCCESS;
 
 error:
-    for( unsigned i = 0; i < p_sys->i_attachment; i++)
-        vlc_input_attachment_Delete(p_sys->attachment[i]);
-    free(p_sys->attachment);
-
-    if( p_sys->meta )
-        vlc_meta_Delete( p_sys->meta );
-
-    AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
-    free( p_sys );
+    Close( p_this );
     return b_aborted ? VLC_ETIMEOUT : VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close ( vlc_object_t * p_this )
-{
-    demux_t *    p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys  ;
-
-    for( unsigned int i = 0; i < p_sys->i_track; i++ )
-    {
-        if( p_sys->track[i] )
-        {
-            es_format_Clean( &p_sys->track[i]->fmt );
-            avi_index_Clean( &p_sys->track[i]->idx );
-            free( p_sys->track[i] );
-        }
-    }
-    free( p_sys->track );
-
-    AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
-    vlc_meta_Delete( p_sys->meta );
-
-    for( unsigned i = 0; i < p_sys->i_attachment; i++)
-        vlc_input_attachment_Delete(p_sys->attachment[i]);
-    free(p_sys->attachment);
-
-    free( p_sys );
 }
 
 /*****************************************************************************
