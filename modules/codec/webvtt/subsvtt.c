@@ -650,6 +650,7 @@ static void webvtt_region_AddCue( webvtt_region_t *p_region,
     while( *pp_add )
         pp_add = &((*pp_add)->p_next);
     *pp_add = (webvtt_dom_node_t *)p_cue;
+    p_cue->p_parent = (webvtt_dom_node_t *)p_region;
 
     for( ;; )
     {
@@ -815,6 +816,8 @@ static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_c
     if( p_cue->p_child )
         return;
     p_cue->p_child = CreateDomNodes( psz, &p_cue->i_lines );
+    for( webvtt_dom_node_t *p_child = p_cue->p_child; p_child; p_child = p_child->p_next )
+        p_child->p_parent = (webvtt_dom_node_t *)p_cue;
 #ifdef SUBSVTT_DEBUG
     webvtt_domnode_Debug( (webvtt_dom_node_t *) p_cue, 0 );
 #endif
