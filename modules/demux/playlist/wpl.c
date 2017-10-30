@@ -317,6 +317,8 @@ int Import_WPL( vlc_object_t* p_this )
 
     p_demux->p_sys = xml_ReaderReset( p_reader, p_demux->p_source );
     vlc_stream_Delete( p_probestream );
+    if( unlikely( p_demux->p_sys == NULL ) )
+        return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "Found valid WPL playlist" );
     p_demux->pf_readdir = Demux;
