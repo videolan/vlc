@@ -352,21 +352,21 @@ static int Open( vlc_object_t* p_this )
     if( !url.psz_path )
     {
         const size_t i_size = 1024;
-        int i_ret;
+        int i_read;
 
         psz_remote_home = malloc( i_size );
         if( !psz_remote_home )
             goto error;
 
-        i_ret = libssh2_sftp_symlink_ex( p_sys->sftp_session, ".", 1,
-                                         psz_remote_home, i_size - 1,
-                                         LIBSSH2_SFTP_REALPATH );
-        if( i_ret <= 0 )
+        i_read = libssh2_sftp_symlink_ex( p_sys->sftp_session, ".", 1,
+                                          psz_remote_home, i_size - 1,
+                                          LIBSSH2_SFTP_REALPATH );
+        if( i_read <= 0 )
         {
             msg_Err( p_access, "Impossible to get the Home directory" );
             goto error;
         }
-        psz_remote_home[i_ret] = '\0';
+        psz_remote_home[i_read] = '\0';
         psz_path = psz_remote_home;
 
         /* store base url for directory read */
