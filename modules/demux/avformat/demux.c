@@ -1113,9 +1113,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !p_sys->p_title )
                 return VLC_EGENERIC;
 
-            *pi_int = 1;
-            *ppp_title = xmalloc( sizeof( input_title_t*) );
+            *ppp_title = malloc( sizeof( input_title_t*) );
+            if( *ppp_title == NULL )
+                return VLC_EGENERIC;
             (*ppp_title)[0] = vlc_input_title_Duplicate( p_sys->p_title );
+            *pi_int = (*ppp_title)[0] ? 1 : 0;
             *pi_title_offset = 0;
             *pi_seekpoint_offset = 0;
             return VLC_SUCCESS;
