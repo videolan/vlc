@@ -339,7 +339,7 @@
     [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:self.profileNames];
 
-    __weak typeof(self) _self = self;
+    __unsafe_unretained typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
         if (returnCode != NSOKButton)
@@ -475,7 +475,7 @@
     [_textfieldPanel setCancelButtonString: _NS("Cancel")];
     [_textfieldPanel setOkButtonString: _NS("Save")];
 
-    __weak typeof(self) _self = self;
+    __unsafe_unretained typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:_customizePanel completionHandler:^(NSInteger returnCode, NSString *resultingText) {
         if (returnCode != NSOKButton || [resultingText length] == 0)
             return;
