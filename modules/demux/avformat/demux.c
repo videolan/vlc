@@ -270,7 +270,12 @@ int OpenDemux( vlc_object_t *p_this )
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = xmalloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+    {
+        free( psz_url );
+        return VLC_ENOMEM;
+    }
     p_sys->ic = 0;
     p_sys->fmt = fmt;
     p_sys->tracks = NULL;
