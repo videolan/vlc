@@ -83,6 +83,7 @@ enum webvtt_node_type_e
     NODE_TEXT,
     NODE_CUE,
     NODE_REGION,
+    NODE_VIDEO,
 };
 
 #define WEBVTT_NODE_BASE_MEMBERS \
@@ -129,6 +130,12 @@ typedef struct
     webvtt_dom_node_t *p_child;
 } webvtt_dom_tag_t;
 
+typedef struct
+{
+    WEBVTT_NODE_BASE_MEMBERS
+    webvtt_dom_node_t *p_child;
+} webvtt_dom_video_t;
+
 struct webvtt_dom_node_t
 {
     WEBVTT_NODE_BASE_MEMBERS
@@ -136,8 +143,7 @@ struct webvtt_dom_node_t
 
 struct decoder_sys_t
 {
-    webvtt_region_t *p_regions;
-    webvtt_dom_cue_t *p_regionless_cues;
+    webvtt_dom_video_t *p_root;
 };
 
 #define ATOM_iden VLC_FOURCC('i', 'd', 'e', 'n')
@@ -333,6 +339,12 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
 static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue );
 static void webvtt_region_Delete( webvtt_region_t *p_region );
 
+static void webvtt_dom_video_Delete( webvtt_dom_video_t *p_node )
+{
+    webvtt_domnode_ChainDelete( p_node->p_child );
+    free( p_node );
+}
+
 static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
 {
     free( p_node->psz_text );
@@ -372,9 +384,19 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             webvtt_dom_cue_Delete( (webvtt_dom_cue_t *) p_node );
         else if( p_node->type == NODE_REGION )
             webvtt_region_Delete( (webvtt_region_t *) p_node );
+        else if( p_node->type == NODE_VIDEO )
+            webvtt_dom_video_Delete( (webvtt_dom_video_t *) p_node );
 
         p_node = p_next;
     }
+}
+
+static webvtt_dom_video_t * webvtt_dom_video_New( void )
+{
+    webvtt_dom_video_t *p_node = calloc( 1, sizeof(*p_node) );
+    if( p_node )
+        p_node->type = NODE_VIDEO;
+    return p_node;
 }
 
 static webvtt_dom_text_t * webvtt_dom_text_New( webvtt_dom_node_t *p_parent )
@@ -607,7 +629,6 @@ static void ClearCuesByTime( webvtt_dom_node_t **pp_next, mtime_t i_time )
         webvtt_dom_node_t *p_node = *pp_next;
         if( p_node )
         {
-            assert( p_node->type == NODE_CUE );
             if( p_node->type == NODE_CUE )
             {
                 webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_node;
@@ -696,11 +717,17 @@ static webvtt_region_t * webvtt_region_New( void )
 static webvtt_region_t * webvtt_region_GetByID( decoder_sys_t *p_sys,
                                                 const char *psz_id )
 {
-    for( webvtt_region_t *p_region = p_sys->p_regions; p_region && psz_id;
-                          p_region = (webvtt_region_t *) p_region->p_next )
+    if( !psz_id )
+        return NULL;
+    for( webvtt_dom_node_t *p_node = p_sys->p_root->p_child;
+                            p_node; p_node = p_node->p_next )
     {
-        if( !strcmp( psz_id, p_region->psz_id ) )
-            return p_region;
+        if( p_node->type == NODE_REGION )
+        {
+            webvtt_region_t *p_region = (webvtt_region_t *) p_node;
+            if( p_region->psz_id && !strcmp( psz_id, p_region->psz_id ) )
+                return p_region;
+        }
     }
     return NULL;
 }
@@ -794,19 +821,6 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
     }
 
     return p_head;
-}
-
-static void ExpireCues( decoder_t *p_dec, mtime_t i_time )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    for( webvtt_region_t *p_vttregion = p_sys->p_regions; p_vttregion;
-                          p_vttregion = (webvtt_region_t *) p_vttregion->p_next )
-    {
-        assert( p_vttregion->type == NODE_REGION );
-        ClearCuesByTime( &p_vttregion->p_child, i_time );
-    }
-
-    ClearCuesByTime( (webvtt_dom_node_t **) &p_sys->p_regionless_cues, i_time );
 }
 
 static void ProcessCue( decoder_t *p_dec, const char *psz, webvtt_dom_cue_t *p_cue )
@@ -991,67 +1005,70 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
     subpicture_t *p_spu = NULL;
     subpicture_updater_sys_region_t *p_updtregion = NULL;
 
-    for( const webvtt_region_t *p_vttregion = p_dec->p_sys->p_regions; p_vttregion;
-                                p_vttregion = (const webvtt_region_t *) p_vttregion->p_next )
+    for( const webvtt_dom_node_t *p_node = p_dec->p_sys->p_root->p_child;
+                                  p_node; p_node = p_node->p_next )
     {
-        /* Variables */
-        struct render_variables_s v;
-        v.p_region = p_vttregion;
-        v.i_left_offset = p_vttregion->anchor_x * p_vttregion->f_width;
-        v.i_left = p_vttregion->viewport_anchor_x - v.i_left_offset;
-        v.i_top_offset = p_vttregion->anchor_y * p_vttregion->i_lines_max_scroll *
-                         WEBVTT_DEFAULT_LINE_HEIGHT_VH / 100.0;
-        v.i_top = p_vttregion->viewport_anchor_y - v.i_top_offset;
-        /* !Variables */
-
-        text_segment_t *p_segments =
-                ConvertCuesToSegments( p_dec, i_start, i_stop, &v,
-                                      (const webvtt_dom_cue_t *)p_vttregion->p_child );
-        if( !p_segments )
-            continue;
-
-        CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
-        if( !p_spu || !p_updtregion )
+        if( p_node->type == NODE_REGION )
         {
-            text_segment_ChainDelete( p_segments );
-            continue;
+            const webvtt_region_t *p_vttregion = (const webvtt_region_t *) p_node;
+            /* Variables */
+            struct render_variables_s v;
+            v.p_region = p_vttregion;
+            v.i_left_offset = p_vttregion->anchor_x * p_vttregion->f_width;
+            v.i_left = p_vttregion->viewport_anchor_x - v.i_left_offset;
+            v.i_top_offset = p_vttregion->anchor_y * p_vttregion->i_lines_max_scroll *
+                             WEBVTT_DEFAULT_LINE_HEIGHT_VH / 100.0;
+            v.i_top = p_vttregion->viewport_anchor_y - v.i_top_offset;
+            /* !Variables */
+
+            text_segment_t *p_segments =
+                    ConvertCuesToSegments( p_dec, i_start, i_stop, &v,
+                                          (const webvtt_dom_cue_t *)p_vttregion->p_child );
+            if( !p_segments )
+                continue;
+
+            CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
+            if( !p_spu || !p_updtregion )
+            {
+                text_segment_ChainDelete( p_segments );
+                continue;
+            }
+
+            p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+            p_updtregion->origin.x = v.i_left;
+            p_updtregion->origin.y = v.i_top;
+            p_updtregion->extent.x = p_vttregion->f_width;
+
+            p_updtregion->flags = UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO
+                                | UPDT_REGION_EXTENT_X_IS_RATIO;
+            p_updtregion->p_segments = p_segments;
         }
-
-        p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
-        p_updtregion->origin.x = v.i_left;
-        p_updtregion->origin.y = v.i_top;
-        p_updtregion->extent.x = p_vttregion->f_width;
-
-        p_updtregion->flags = UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO
-                            | UPDT_REGION_EXTENT_X_IS_RATIO;
-        p_updtregion->p_segments = p_segments;
-    }
-
-    for( const webvtt_dom_cue_t *p_cue = p_dec->p_sys->p_regionless_cues; p_cue;
-                                 p_cue = (const webvtt_dom_cue_t *) p_cue->p_next )
-    {
-        /* Variables */
-        struct render_variables_s v;
-        v.p_region = NULL;
-        v.i_left_offset = 0.0;
-        v.i_left = 0.0;
-        v.i_top_offset = 0.0;
-        v.i_top = 0.0;
-        /* !Variables */
-
-        text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_cue );
-        if( !p_segments )
-            continue;
-
-        CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
-        if( !p_spu || !p_updtregion )
+        else if( p_node->type == NODE_CUE ) /* regionless cues */
         {
-            text_segment_ChainDelete( p_segments );
-            continue;
-        }
+            const webvtt_dom_cue_t *p_cue = (const webvtt_dom_cue_t *) p_node;
+            /* Variables */
+            struct render_variables_s v;
+            v.p_region = NULL;
+            v.i_left_offset = 0.0;
+            v.i_left = 0.0;
+            v.i_top_offset = 0.0;
+            v.i_top = 0.0;
+            /* !Variables */
 
-        p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
-        p_updtregion->p_segments = p_segments;
+            text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_cue );
+            if( !p_segments )
+                continue;
+
+            CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
+            if( !p_spu || !p_updtregion )
+            {
+                text_segment_ChainDelete( p_segments );
+                continue;
+            }
+
+            p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
+            p_updtregion->p_segments = p_segments;
+        }
     }
 
     if( p_spu )
@@ -1118,7 +1135,8 @@ static int ProcessISOBMFF( decoder_t *p_dec,
             }
             else
             {
-                webvtt_domnode_AppendLast( &p_dec->p_sys->p_regionless_cues, p_cue );
+                webvtt_domnode_AppendLast( &p_dec->p_sys->p_root->p_child, p_cue );
+                p_cue->p_parent = (webvtt_dom_node_t *) p_dec->p_sys->p_root;
             }
         }
     }
@@ -1144,7 +1162,8 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
         {
             if( ctx->p_region->psz_id )
             {
-                webvtt_domnode_AppendLast( &p_sys->p_regions, ctx->p_region );
+                webvtt_domnode_AppendLast( &p_sys->p_root->p_child, ctx->p_region );
+                ctx->p_region->p_parent = (webvtt_dom_node_t *) p_sys->p_root;
                 msg_Dbg( p_dec, "added new region %s", ctx->p_region->psz_id );
             }
             /* incomplete region decl (no id at least) */
@@ -1203,9 +1222,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        ExpireCues( p_dec, INT64_MAX );
+        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, INT64_MAX );
     else
-        ExpireCues( p_dec, p_block->i_dts );
+        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, p_block->i_dts );
 
     ProcessISOBMFF( p_dec, p_block->p_buffer, p_block->i_buffer,
                     p_block->i_pts, p_block->i_pts + p_block->i_length );
@@ -1224,8 +1243,7 @@ void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_regions );
-    webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_regionless_cues );
+    webvtt_domnode_ChainDelete( (webvtt_dom_node_t *) p_sys->p_root );
 
     free( p_sys );
 }
@@ -1246,8 +1264,12 @@ int OpenDecoder( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_regions = NULL;
-    p_sys->p_regionless_cues = NULL;
+    p_sys->p_root = webvtt_dom_video_New();
+    if( !p_sys->p_root )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     p_dec->pf_decode = DecodeBlock;
 
