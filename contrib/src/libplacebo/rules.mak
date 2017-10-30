@@ -15,10 +15,13 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
+	$(APPLY) $(SRC)/libplacebo/0001-build-use-a-Makefile.patch
 	$(MOVE)
 
 .libplacebo: libplacebo
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS) meson $(PLACEBOCONF) build
-	cd $< && cd build && ninja install
+# we don't want to depend on meson/ninja for VLC 3.0
+#cd $< && $(HOSTVARS) meson $(PLACEBOCONF) build
+#cd $< && cd build && ninja install
+	cd $< && $(HOSTVARS_PIC) PREFIX=$(PREFIX) make install
 	touch $@
