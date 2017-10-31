@@ -306,6 +306,8 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
+    vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
+                        NULL, NULL );
     char* psz_userauthlist = NULL;
     do
     {
@@ -324,8 +326,10 @@ static int Open( vlc_object_t* p_this )
             ( AuthKeyAgent( p_access, credential.psz_username ) == VLC_SUCCESS ||
               AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS ) )
             break;
-        if( strstr( psz_userauthlist, "password" ) != NULL &&
-            libssh2_userauth_password( p_sys->ssh_session,
+
+        if( strstr( psz_userauthlist, "password" ) != NULL
+         && credential.psz_password != NULL
+         && libssh2_userauth_password( p_sys->ssh_session,
                                        credential.psz_username,
                                        credential.psz_password ) == 0 )
         {
