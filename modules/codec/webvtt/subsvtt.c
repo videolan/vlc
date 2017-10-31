@@ -461,13 +461,22 @@ static const char * FindNextTag( const char *psz, const char **ppsz_taglast )
     return psz;
 }
 
-/* Points to first char of tag name and sets *ppsz_attrs to first of non-name */
-static const char *SplitTag( const char *psz_tag, const char **ppsz_attrs )
+/* Points to first char of tag name and sets *ppsz_attrs to attributes */
+static const char *SplitTag( const char *psz_tag, size_t *pi_tag, const char **ppsz_attrs )
 {
     psz_tag += IsEndTag( psz_tag ) ? 2 : 1;
-    const char *p = psz_tag + 1;
-    while( !isblank( *p ) && !ispunct( *p ) && *p != '>' && *p != '/' )
-        p++;
+    const char *p = psz_tag;
+    *pi_tag = 0;
+    if( isalpha( *p ) )
+    {
+        while( isalnum( *p ) )
+        {
+            p++;
+            (*pi_tag)++;
+        }
+        while( isspace( *p ) )
+            p++;
+    }
     *ppsz_attrs = p;
     return psz_tag;
 }
@@ -774,8 +783,9 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                 if( p_node )
                 {
                     const char *psz_attrs = NULL;
-                    const char *psz_name = SplitTag( psz_tag, &psz_attrs );
-                    p_node->psz_tag = strndup( psz_name, psz_attrs - psz_name );
+                    size_t i_name;
+                    const char *psz_name = SplitTag( psz_tag, &i_name, &psz_attrs );
+                    p_node->psz_tag = strndup( psz_name, i_name );
                     if( psz_attrs != psz_taglast )
                         p_node->psz_attrs = strndup( psz_attrs, psz_taglast - psz_attrs );
                     *pp_append = (webvtt_dom_node_t *) p_node;
@@ -788,8 +798,9 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                 if( p_parent )
                 {
                     const char *psz_attrs = NULL;
-                    const char *psz_name = SplitTag( psz_tag, &psz_attrs );
-                    char *psz_tagname = strndup( psz_name, psz_attrs - psz_name );
+                    size_t i_name;
+                    const char *psz_name = SplitTag( psz_tag, &i_name, &psz_attrs );
+                    char *psz_tagname = strndup( psz_name, i_name );
 
                     /* Close at matched parent node level due to unclosed tags
                      * like <b><v stuff>foo</b> */
