@@ -25,6 +25,11 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#ifdef HAVE_LIBPLACEBO
+#include <libplacebo/shaders.h>
+#include <libplacebo/shaders/colorspace.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_memstream.h>
 #include "internal.h"
@@ -314,6 +319,15 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
     tc->uloc.FillColor = tc->vt->GetUniformLocation(program, "FillColor");
     if (tc->uloc.FillColor == -1)
         return VLC_EGENERIC;
+
+#ifdef HAVE_LIBPLACEBO
+    const struct pl_shader_res *res = tc->pl_sh_res;
+    for (int i = 0; res && i < res->num_variables; i++) {
+        struct pl_shader_var sv = res->variables[i];
+        tc->uloc.pl_vars[i] = tc->vt->GetUniformLocation(program, sv.var.name);
+    }
+#endif
+
     return VLC_SUCCESS;
 }
 
@@ -338,6 +352,40 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
             tc->vt->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
                                tex_height[i]);
     }
+
+#ifdef HAVE_LIBPLACEBO
+    const struct pl_shader_res *res = tc->pl_sh_res;
+    for (int i = 0; res && i < res->num_variables; i++) {
+        GLint loc = tc->uloc.pl_vars[i];
+        if (loc == -1) // uniform optimized out
+            continue;
+
+        struct pl_shader_var sv = res->variables[i];
+        struct ra_var var = sv.var;
+
+        // libplacebo doesn't need anything else anyway
+        if (var.type != RA_VAR_FLOAT)
+            continue;
+        if (var.dim_m > 1 && var.dim_m != var.dim_v)
+            continue;
+
+        const float *f = sv.data;
+        switch (var.dim_m) {
+        case 4: tc->vt->UniformMatrix4fv(loc, 1, GL_FALSE, f); break;
+        case 3: tc->vt->UniformMatrix3fv(loc, 1, GL_FALSE, f); break;
+        case 2: tc->vt->UniformMatrix2fv(loc, 1, GL_FALSE, f); break;
+
+        case 1:
+            switch (var.dim_v) {
+            case 1: tc->vt->Uniform1f(loc, f[0]); break;
+            case 2: tc->vt->Uniform2f(loc, f[0], f[1]); break;
+            case 3: tc->vt->Uniform3f(loc, f[0], f[1], f[2]); break;
+            case 4: tc->vt->Uniform4f(loc, f[0], f[1], f[2], f[3]); break;
+            }
+            break;
+        }
+    }
+#endif
 }
 
 static int
@@ -411,6 +459,57 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
     return fragment_shader;
 }
 
+#ifdef HAVE_LIBPLACEBO
+static struct pl_color_space pl_color_space_from_video_format(video_format_t fmt)
+{
+    static enum pl_color_primaries primaries[COLOR_PRIMARIES_MAX+1] = {
+        [COLOR_PRIMARIES_UNDEF]     = PL_COLOR_PRIM_UNKNOWN,
+        [COLOR_PRIMARIES_BT601_525] = PL_COLOR_PRIM_BT_601_525,
+        [COLOR_PRIMARIES_BT601_625] = PL_COLOR_PRIM_BT_601_625,
+        [COLOR_PRIMARIES_BT709]     = PL_COLOR_PRIM_BT_709,
+        [COLOR_PRIMARIES_BT2020]    = PL_COLOR_PRIM_BT_2020,
+        [COLOR_PRIMARIES_DCI_P3]    = PL_COLOR_PRIM_DCI_P3,
+        [COLOR_PRIMARIES_BT470_M]   = PL_COLOR_PRIM_BT_470M,
+    };
+
+    static enum pl_color_transfer transfers[TRANSFER_FUNC_MAX+1] = {
+        [TRANSFER_FUNC_UNDEF]        = PL_COLOR_TRC_UNKNOWN,
+        [TRANSFER_FUNC_LINEAR]       = PL_COLOR_TRC_LINEAR,
+        [TRANSFER_FUNC_SRGB]         = PL_COLOR_TRC_SRGB,
+        [TRANSFER_FUNC_SMPTE_ST2084] = PL_COLOR_TRC_PQ,
+        [TRANSFER_FUNC_HLG]          = PL_COLOR_TRC_HLG,
+        // these are all designed to be displayed on BT.1886 displays, so this
+        // is the correct way to handle them in libplacebo
+        [TRANSFER_FUNC_BT470_BG]    = PL_COLOR_TRC_BT_1886,
+        [TRANSFER_FUNC_BT470_M]     = PL_COLOR_TRC_BT_1886,
+        [TRANSFER_FUNC_BT709]       = PL_COLOR_TRC_BT_1886,
+        [TRANSFER_FUNC_SMPTE_240]   = PL_COLOR_TRC_BT_1886,
+    };
+
+    // Derive the signal peak/avg from the color light level metadata
+    float sig_peak = fmt.lighting.MaxCLL / PL_COLOR_REF_WHITE;
+    float sig_avg = fmt.lighting.MaxFALL / PL_COLOR_REF_WHITE;
+
+    // As a fallback value for the signal peak, we can also use the mastering
+    // metadata's luminance information
+    if (!sig_peak)
+        sig_peak = fmt.mastering.max_luminance / PL_COLOR_REF_WHITE;
+
+    // Sanitize the sig_peak/sig_avg, because of buggy or low quality tagging
+    // that's sadly common in lots of typical sources
+    sig_peak = (sig_peak > 1.0 && sig_peak <= 100.0) ? sig_peak : 0.0;
+    sig_avg  = (sig_avg >= 0.0 && sig_avg <= 1.0) ? sig_avg : 0.0;
+
+    return (struct pl_color_space) {
+        .primaries = primaries[fmt.primaries],
+        .transfer  = transfers[fmt.transfer],
+        .light     = PL_COLOR_LIGHT_UNKNOWN,
+        .sig_peak  = sig_peak,
+        .sig_avg   = sig_avg,
+    };
+}
+#endif
+
 GLuint
 opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                                  vlc_fourcc_t chroma, video_color_space_t yuv_space)
@@ -461,6 +560,38 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;"
              "varying vec2 TexCoord%u;", sampler, i, i);
+
+#ifdef HAVE_LIBPLACEBO
+    if (tc->pl_sh) {
+        struct pl_shader *sh = tc->pl_sh;
+        pl_shader_color_map(sh, &pl_color_map_default_params,
+                pl_color_space_from_video_format(tc->fmt),
+                pl_color_space_unknown, false);
+
+        const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
+
+        FREENULL(tc->uloc.pl_vars);
+        tc->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
+        for (int i = 0; i < res->num_variables; i++) {
+            struct pl_shader_var sv = res->variables[i];
+            ADDF("uniform %s %s;", ra_var_glsl_type_name(sv.var), sv.var.name);
+        }
+
+        // We can't handle these yet, but nothing we use requires them, either
+        assert(res->num_vertex_attribs == 0);
+        assert(res->num_descriptors == 0);
+
+        ADD(res->glsl);
+    }
+#else
+    if (tc->fmt.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
+        tc->fmt.primaries == COLOR_PRIMARIES_BT2020)
+    {
+        // no warning for HLG because it's more or less backwards-compatible
+        msg_Warn(tc->gl, "VLC needs to be built with support for libplacebo "
+                 "in order to display wide gamut or HDR signals correctly.");
+    }
+#endif
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -531,6 +662,15 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         else
             ADDF("result = color%u + result;", color_idx);
     }
+
+#ifdef HAVE_LIBPLACEBO
+    if (tc->pl_sh_res) {
+        const struct pl_shader_res *res = tc->pl_sh_res;
+        assert(res->input  == PL_SHADER_SIG_COLOR);
+        assert(res->output == PL_SHADER_SIG_COLOR);
+        ADDF("result = %s(result);", res->name);
+    }
+#endif
 
     ADD("gl_FragColor = result * FillColor;"
         "}");

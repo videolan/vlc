@@ -4083,6 +4083,26 @@ dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
 
 dnl
+dnl  libplacebo support
+dnl
+AC_ARG_ENABLE(libplacebo,
+  [AS_HELP_STRING([--disable-libplacebo],
+      [disable libplacebo support (default auto)])])
+
+AS_IF([test "$enable_libplacebo" != "no"], [
+  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.1], [
+    AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
+  ], [
+    AS_IF([test -n "${enable_libplacebo}"], [
+      AC_MSG_ERROR([${LIBPLACEBO_PKG_ERRORS}.])
+    ])
+    enable_libplacebo="no"
+  ])
+])
+AM_CONDITIONAL(HAVE_LIBPLACEBO, [test "$enable_libplacebo" != "no"])
+
+
+dnl
 dnl  Endianness check
 dnl
 AC_C_BIGENDIAN

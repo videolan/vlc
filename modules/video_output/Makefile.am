@@ -8,6 +8,9 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
 	video_output/opengl/internal.h video_output/opengl/fragment_shaders.c \
 	video_output/opengl/converter_sw.c
 
+OPENGL_COMMONCLFAGS = $(LIBPLACEBO_CFLAGS)
+OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
+
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
@@ -21,10 +24,14 @@ libglconv_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES)
+libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
+libvout_macosx_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m $(OPENGL_COMMONSOURCES)
+libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
+libcaopengllayer_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
@@ -39,6 +46,8 @@ libglconv_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/ios.m $(OPENGL_COMMONSOURCES)
+libvout_ios_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
+libvout_ios_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libvout_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
 if HAVE_IOS
@@ -50,16 +59,16 @@ endif
 
 ### OpenGL ###
 libgles2_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) video_output/opengl/display.c
-libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
-libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM)
+libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2 $(OPENGL_COMMONCLFAGS)
+libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM) $(OPENGL_COMMONLIBS)
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 EXTRA_LTLIBRARIES += libgles2_plugin.la
 vout_LTLIBRARIES += $(LTLIBgles2)
 
 libgl_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) video_output/opengl/display.c
-libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libgl_plugin_la_LIBADD = $(GL_LIBS) $(LIBM)
+libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCLFAGS)
+libgl_plugin_la_LIBADD = $(GL_LIBS) $(LIBM) $(OPENGL_COMMONLIBS)
 
 libglconv_vaapi_wl_plugin_la_SOURCES = video_output/opengl/converter_vaapi.c \
 	video_output/opengl/converter.h \
@@ -324,8 +333,11 @@ libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libwgl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
         -DMODULE_NAME_IS_wgl
 
-libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 $(LIBCOM) -luuid
-libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32
+libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 $(LIBCOM) -luuid $(OPENGL_COMMONLIBS)
+libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 $(OPENGL_COMMONLIBS)
+
+libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
+libwgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
 
 libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'

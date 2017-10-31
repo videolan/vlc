@@ -21,6 +21,10 @@
 #ifndef VLC_OPENGL_CONVERTER_H
 #define VLC_OPENGL_CONVERTER_H
 
+#ifdef HAVE_LIBPLACEBO
+#include <libplacebo/shaders.h>
+#endif
+
 #include "vout_helper.h"
 #include <vlc_plugin.h>
 
@@ -198,6 +202,11 @@ struct opengl_tex_converter_t
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 
+#ifdef HAVE_LIBPLACEBO
+    /* libplacebo context, created by the caller (optional) */
+    struct pl_context *pl_ctx;
+#endif
+
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
 
@@ -252,9 +261,15 @@ struct opengl_tex_converter_t
         GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint Coefficients;
         GLint FillColor;
+        GLint *pl_vars; /* for pl_sh_res */
     } uloc;
     bool yuv_color;
     GLfloat yuv_coefficients[16];
+
+#ifdef HAVE_LIBPLACEBO
+    struct pl_shader *pl_sh;
+    const struct pl_shader_res *pl_sh_res;
+#endif
 
     /* Private context */
     void *priv;
