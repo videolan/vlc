@@ -109,7 +109,6 @@ protected:
     void wheelEvent( QWheelEvent * ) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *, QEvent *) Q_DECL_OVERRIDE;
     virtual void toggleUpdateSystrayMenuWhenVisible();
-
     void resizeWindow(int width, int height);
 
 protected:
@@ -180,6 +179,7 @@ protected:
     bool                 b_interfaceFullScreen;
     bool                 b_pauseOnMinimize;
     bool                 b_maximizedView;
+    bool                 b_isWindowTiled;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -234,7 +234,7 @@ protected slots:
 
     void resizeStack( int w, int h )
     {
-        if( !isFullScreen() && !isMaximized() )
+        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
         {
             if( b_minimalView )
                 resizeWindow( w, h ); /* Oh yes, it shouldn't

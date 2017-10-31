@@ -40,6 +40,9 @@ private:
     virtual bool winEvent( MSG *, long * );
     virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
 
+protected:
+    virtual void resizeEvent( QResizeEvent *event ) Q_DECL_OVERRIDE;
+
 private:
     HWND WinId( QWidget *);
     void createTaskBarButtons();

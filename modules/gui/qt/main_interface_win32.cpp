@@ -349,6 +349,46 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
         activateWindow();
 }
 
+
+void MainInterfaceWin32::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    /*
+     * Detects if window placement is not in its normal position (ex: win7 aero snap)
+     * This function compares the normal position (non snapped) to the current position.
+     * The current position is translated from screen referential to workspace referential
+     * to workspace referential
+     */
+    b_isWindowTiled = false;
+    HWND winHwnd = WinId( this );
+
+    WINDOWPLACEMENT windowPlacement;
+    windowPlacement.length = sizeof( windowPlacement );
+    if ( GetWindowPlacement( winHwnd, &windowPlacement ) == 0 )
+        return;
+
+    if ( windowPlacement.showCmd != SW_SHOWNORMAL )
+        return;
+
+    HMONITOR monitor = MonitorFromWindow( winHwnd, MONITOR_DEFAULTTONEAREST );
+
+    MONITORINFO monitorInfo;
+    monitorInfo.cbSize = sizeof( monitorInfo );
+    if ( GetMonitorInfo( monitor, &monitorInfo )  == 0 )
+        return;
+
+    RECT windowRect;
+    if ( GetWindowRect( winHwnd, &windowRect ) == 0 )
+        return;
+
+    OffsetRect( &windowRect,
+                monitorInfo.rcWork.left - monitorInfo.rcMonitor.left,
+                monitorInfo.rcWork.top - monitorInfo.rcMonitor.top );
+
+    b_isWindowTiled = ( EqualRect( &windowPlacement.rcNormalPosition, &windowRect ) == 0 );
+}
+
 void MainInterfaceWin32::reloadPrefs()
 {
     p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );

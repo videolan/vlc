@@ -109,6 +109,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_hasPausedWhenMinimized = false;
     i_kc_offset          = false;
     b_maximizedView      = false;
+    b_isWindowTiled      = false;
 
     /* Ask for Privacy */
     FirstRun::CheckAndRun( this, p_intf );
@@ -403,7 +404,7 @@ void MainInterface::showResumePanel( int64_t _time ) {
         resumePlayback();
     else
     {
-        if( !isFullScreen() && !isMaximized() )
+        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
             resizeWindow( width(), height() + resumePanel->height() );
         resumePanel->setVisible(true);
         resumeTimer->start();
@@ -414,7 +415,7 @@ void MainInterface::hideResumePanel()
 {
     if( resumePanel->isVisible() )
     {
-        if( !isFullScreen() && !isMaximized() )
+        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
             resizeWindow( width(), height() - resumePanel->height() );
         resumePanel->hide();
         resumeTimer->stop();
@@ -1075,7 +1076,7 @@ void MainInterface::setMinimalView( bool b_minimal )
     bool b_statusBarVisible = statusBar()->isVisible();
     bool b_inputCVisible = inputC->isVisible();
 
-    if( !isFullScreen() && !isMaximized() && b_minimal )
+    if( !isFullScreen() && !isMaximized() && b_minimal && !b_isWindowTiled )
     {
         int i_heightChange = 0;
 
@@ -1097,7 +1098,7 @@ void MainInterface::setMinimalView( bool b_minimal )
     statusBar()->setVisible( !b_minimal && b_statusbarVisible );
     inputC->setVisible( !b_minimal );
 
-    if( !isFullScreen() && !isMaximized() && !b_minimal )
+    if( !isFullScreen() && !isMaximized() && !b_minimal && !b_isWindowTiled )
     {
         int i_heightChange = 0;
 
