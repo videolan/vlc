@@ -744,6 +744,7 @@ static const struct
     { { VLC_CODEC_RGB32, 0 },                  PACKED_FMT(4, 24) },
     { { VLC_CODEC_RGBA, VLC_CODEC_ARGB,
         VLC_CODEC_BGRA, },                     PACKED_FMT(4, 32) },
+    { { VLC_CODEC_RGBA64, 0 },                 PACKED_FMT(8, 64) },
     { { VLC_CODEC_VUYA, 0 },                   PACKED_FMT(4, 32) },
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },

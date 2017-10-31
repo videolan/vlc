@@ -800,6 +800,8 @@ static const staticentry_t p_list_video[] = {
         A("AV32"),
     B(VLC_CODEC_BGRA, "32 bits BGRA"),
         A("BGRA"),
+    B(VLC_CODEC_RGBA64, "64 bits RGBA"),
+        A("RGA4"),
 
     B(VLC_CODEC_GREY, "8 bits greyscale"),
         A("GREY"),
