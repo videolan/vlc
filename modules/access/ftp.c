@@ -85,10 +85,8 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_string( "ftp-user", "anonymous", USER_TEXT, USER_LONGTEXT,
-                false )
-    add_string( "ftp-pwd", "anonymous@example.com", PASS_TEXT,
-                PASS_LONGTEXT, false )
+    add_string( "ftp-user", NULL, USER_TEXT, USER_LONGTEXT, false )
+    add_string( "ftp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT, false )
     add_string( "ftp-account", "anonymous", ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, false )
     add_shortcut( "ftp", "ftps", "ftpes" )
@@ -449,12 +447,29 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     vlc_credential_init( &credential, &url );
     bool b_logged = false;
 
+    /* First: try credentials from url / option */
+    vlc_credential_get( &credential, p_access, "ftp-user", "ftp-pwd",
+                        NULL, NULL );
+    do
+    {
+        if( credential.psz_username != NULL )
+        {
+            if( LoginUserPwd( p_access, p_sys, credential.psz_username,
+                              credential.psz_password, &b_logged ) != 0
+             || b_logged )
+                break;
+        }
+        else
+        {
+            /* No crendential specified: show the dialog with a "anonymous"
+             * user pre-filled */
+            credential.psz_username = "anonymous";
+        }
+    }
     while( vlc_credential_get( &credential, p_access, "ftp-user", "ftp-pwd",
                                LOGIN_DIALOG_TITLE, LOGIN_DIALOG_TEXT,
-                               url.psz_host )
-        && LoginUserPwd( p_access, p_sys, credential.psz_username,
-                         credential.psz_password, &b_logged ) == 0
-        && !b_logged );
+                               url.psz_host ) );
+
     if( b_logged )
     {
         vlc_credential_store( &credential, p_access );
