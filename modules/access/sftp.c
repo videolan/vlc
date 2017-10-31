@@ -234,6 +234,7 @@ static int Open( vlc_object_t* p_this )
     vlc_url_t credential_url;
     vlc_credential credential;
     const char* psz_path;
+    char *psz_session_username = NULL;
     char* psz_remote_home = NULL;
     char* psz_home = NULL;
     int i_port;
@@ -341,11 +342,30 @@ static int Open( vlc_object_t* p_this )
         if (!credential.psz_username || !credential.psz_username[0])
             continue;
 
-        psz_userauthlist = libssh2_userauth_list( p_sys->ssh_session, credential.psz_username, strlen( credential.psz_username ) );
-        if (!psz_userauthlist) {
-            msg_Err( p_access, "Host authentication list failed");
-            goto error;
+        if( !psz_session_username )
+        {
+            psz_session_username = strdup( credential.psz_username );
+            psz_userauthlist =
+                libssh2_userauth_list( p_sys->ssh_session, credential.psz_username,
+                                       strlen( credential.psz_username ) );
         }
+        else if( strcmp( psz_session_username, credential.psz_username ) != 0 )
+        {
+            msg_Warn( p_access, "The username changed, starting a new ssh session" );
+
+            SSHSessionDestroy( p_access );
+            if( SSHSessionInit( p_access, url.psz_host, i_port ) != VLC_SUCCESS )
+                goto error;
+
+            b_publickey_tried = false;
+            free( psz_session_username );
+            psz_session_username = strdup( credential.psz_username );
+            psz_userauthlist =
+                libssh2_userauth_list( p_sys->ssh_session, credential.psz_username,
+                                       strlen( credential.psz_username ) );
+        }
+        if( !psz_session_username || !psz_userauthlist )
+            goto error;
 
         /* TODO: Follow PreferredAuthentications in ssh_config */
 
@@ -466,6 +486,7 @@ static int Open( vlc_object_t* p_this )
 error:
     free( psz_home );
     free( psz_remote_home );
+    free( psz_session_username );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
     vlc_UrlClean( &credential_url );
