@@ -173,6 +173,55 @@ static int AuthPublicKey( stream_t *p_access, const char *psz_home, const char *
     return i_result;
 }
 
+static void SSHSessionDestroy( stream_t *p_access )
+{
+    access_sys_t* p_sys = p_access->p_sys;
+
+    if( p_sys->ssh_session )
+    {
+        libssh2_session_free( p_sys->ssh_session );
+        p_sys->ssh_session = NULL;
+    }
+    if( p_sys->i_socket >= 0 )
+    {
+        net_Close( p_sys->i_socket );
+        p_sys->i_socket = -1;
+    }
+}
+
+static int SSHSessionInit( stream_t *p_access, const char *psz_host, int i_port )
+{
+    access_sys_t* p_sys = p_access->p_sys;
+
+    /* Connect to the server using a regular socket */
+    assert( p_sys->i_socket == -1 );
+    p_sys->i_socket = net_ConnectTCP( p_access, psz_host, i_port );
+    if( p_sys->i_socket < 0 )
+        goto error;
+
+    /* Create the ssh connexion and wait until the server answer */
+    p_sys->ssh_session = libssh2_session_init();
+    if( p_sys->ssh_session == NULL )
+        goto error;
+
+    int i_ret;
+    while( ( i_ret = libssh2_session_startup( p_sys->ssh_session, p_sys->i_socket ) )
+           == LIBSSH2_ERROR_EAGAIN );
+
+    if( i_ret != 0 )
+        goto error;
+
+    /* Set the socket in non-blocking mode */
+    libssh2_session_set_blocking( p_sys->ssh_session, 1 );
+    return VLC_SUCCESS;
+
+error:
+    msg_Err( p_access, "Impossible to open the connection to %s:%i",
+             psz_host, i_port );
+    SSHSessionDestroy( p_access );
+    return VLC_EGENERIC;
+}
+
 /**
  * Connect to the sftp server and ask for a file
  * @param p_this: the vlc_object
@@ -188,7 +237,6 @@ static int Open( vlc_object_t* p_this )
     char* psz_remote_home = NULL;
     char* psz_home = NULL;
     int i_port;
-    int i_ret;
     vlc_url_t url;
     size_t i_len;
     int i_type;
@@ -221,31 +269,9 @@ static int Open( vlc_object_t* p_this )
     else
         i_port = url.i_port;
 
-
-    /* Connect to the server using a regular socket */
-    p_sys->i_socket = net_ConnectTCP( p_access, url.psz_host, i_port );
-    if( p_sys->i_socket < 0 )
-    {
-        msg_Err( p_access, "Impossible to open the connection to %s:%i", url.psz_host, i_port );
-        goto error;
-    }
-
     /* Create the ssh connexion and wait until the server answer */
-    if( ( p_sys->ssh_session = libssh2_session_init() ) == NULL )
+    if( SSHSessionInit( p_access, url.psz_host, i_port ) != VLC_SUCCESS )
         goto error;
-
-    while( ( i_ret = libssh2_session_startup( p_sys->ssh_session,
-                                              p_sys->i_socket ) )
-           == LIBSSH2_ERROR_EAGAIN );
-
-    if( i_ret != 0 )
-    {
-        msg_Err( p_access, "Impossible to open the connection to %s:%i", url.psz_host, i_port );
-        goto error;
-    }
-
-    /* Set the socket in non-blocking mode */
-    libssh2_session_set_blocking( p_sys->ssh_session, 1 );
 
     /* List the know hosts */
     LIBSSH2_KNOWNHOSTS *ssh_knownhosts = libssh2_knownhost_init( p_sys->ssh_session );
@@ -460,10 +486,7 @@ static void Close( vlc_object_t* p_this )
         libssh2_sftp_close_handle( p_sys->file );
     if( p_sys->sftp_session )
         libssh2_sftp_shutdown( p_sys->sftp_session );
-    if( p_sys->ssh_session )
-        libssh2_session_free( p_sys->ssh_session );
-    if( p_sys->i_socket >= 0 )
-        net_Close( p_sys->i_socket );
+    SSHSessionDestroy( p_access );
 
     free( p_sys->psz_base_url );
 }
