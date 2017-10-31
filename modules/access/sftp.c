@@ -309,6 +309,7 @@ static int Open( vlc_object_t* p_this )
     vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
                         NULL, NULL );
     char* psz_userauthlist = NULL;
+    bool b_publickey_tried = false;
     do
     {
         if (!credential.psz_username || !credential.psz_username[0])
@@ -322,10 +323,15 @@ static int Open( vlc_object_t* p_this )
 
         /* TODO: Follow PreferredAuthentications in ssh_config */
 
-        if( strstr( psz_userauthlist, "publickey" ) != NULL &&
-            ( AuthKeyAgent( p_access, credential.psz_username ) == VLC_SUCCESS ||
-              AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS ) )
-            break;
+        if( strstr( psz_userauthlist, "publickey" ) != NULL && !b_publickey_tried )
+        {
+            /* Don't try public key multiple times to avoid getting black
+             * listed */
+            b_publickey_tried = true;
+            if( AuthKeyAgent( p_access, credential.psz_username ) == VLC_SUCCESS
+             || AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS )
+                break;
+        }
 
         if( strstr( psz_userauthlist, "password" ) != NULL
          && credential.psz_password != NULL
