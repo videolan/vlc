@@ -64,9 +64,13 @@ typedef void (APIENTRY *PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size,
 #   define PFNGLVERTEXATTRIBPOINTERPROC      typeof(glVertexAttribPointer)*
 #   define PFNGLENABLEVERTEXATTRIBARRAYPROC  typeof(glEnableVertexAttribArray)*
 #   define PFNGLUNIFORMMATRIX4FVPROC         typeof(glUniformMatrix4fv)*
+#   define PFNGLUNIFORMMATRIX3FVPROC         typeof(glUniformMatrix3fv)*
+#   define PFNGLUNIFORMMATRIX2FVPROC         typeof(glUniformMatrix2fv)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
+#   define PFNGLUNIFORM3FPROC                typeof(glUniform3f)*
 #   define PFNGLUNIFORM2FPROC                typeof(glUniform2f)*
+#   define PFNGLUNIFORM1FPROC                typeof(glUniform1f)*
 #   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
 #   define PFNGLCREATESHADERPROC             typeof(glCreateShader)*
 #   define PFNGLSHADERSOURCEPROC             typeof(glShaderSource)*
@@ -144,9 +148,13 @@ typedef struct {
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray;
     PFNGLUNIFORMMATRIX4FVPROC        UniformMatrix4fv;
+    PFNGLUNIFORMMATRIX3FVPROC        UniformMatrix3fv;
+    PFNGLUNIFORMMATRIX2FVPROC        UniformMatrix2fv;
     PFNGLUNIFORM4FVPROC              Uniform4fv;
     PFNGLUNIFORM4FPROC               Uniform4f;
+    PFNGLUNIFORM3FPROC               Uniform3f;
     PFNGLUNIFORM2FPROC               Uniform2f;
+    PFNGLUNIFORM1FPROC               Uniform1f;
     PFNGLUNIFORM1IPROC               Uniform1i;
 
     /* Program commands */
