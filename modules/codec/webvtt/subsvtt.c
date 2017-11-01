@@ -125,6 +125,7 @@ typedef struct
 typedef struct
 {
     WEBVTT_NODE_BASE_MEMBERS
+    mtime_t i_start;
     char *psz_tag;
     char *psz_attrs;
     webvtt_dom_node_t *p_child;
@@ -415,6 +416,7 @@ static webvtt_dom_tag_t * webvtt_dom_tag_New( webvtt_dom_node_t *p_parent )
     webvtt_dom_tag_t *p_node = calloc( 1, sizeof(*p_node) );
     if( p_node )
     {
+        p_node->i_start = -1;
         p_node->type = NODE_TAG;
         p_node->p_parent = p_parent;
     }
@@ -434,6 +436,26 @@ static webvtt_dom_node_t * webvtt_domnode_getParentByTag( webvtt_dom_node_t *p_p
         }
     }
     return p_parent;
+}
+
+static const webvtt_dom_node_t * webvtt_domnode_getFirstChild( const webvtt_dom_node_t *p_node )
+{
+    webvtt_dom_node_t *p_child = NULL;
+    switch( p_node->type )
+    {
+        case NODE_CUE:
+            p_child  = ((webvtt_dom_cue_t *)p_node)->p_child;
+            break;
+        case NODE_REGION:
+            p_child  = ((webvtt_region_t *)p_node)->p_child;
+            break;
+        case NODE_TAG:
+            p_child  = ((webvtt_dom_tag_t *)p_node)->p_child;
+            break;
+        default:
+            break;
+    }
+    return p_child;
 }
 
 static inline bool IsEndTag( const char *psz )
@@ -788,6 +810,9 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                     p_node->psz_tag = strndup( psz_name, i_name );
                     if( psz_attrs != psz_taglast )
                         p_node->psz_attrs = strndup( psz_attrs, psz_taglast - psz_attrs );
+                    /* <hh:mm::ss:fff> time tags */
+                    if( p_node->psz_attrs && isdigit(p_node->psz_attrs[0]) )
+                        (void) webvtt_scan_time( p_node->psz_attrs, &p_node->i_start );
                     *pp_append = (webvtt_dom_node_t *) p_node;
                     p_parent = (webvtt_dom_node_t *) p_node;
                     pp_append = &p_node->p_child;
@@ -914,7 +939,8 @@ struct render_variables_s
 static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue,
-                                               const webvtt_dom_node_t *p_node )
+                                               const webvtt_dom_node_t *p_node,
+                                               mtime_t i_start )
 {
     text_segment_t *p_head = NULL;
     text_segment_t **pp_append = &p_head;
@@ -939,8 +965,10 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
         }
         else if( p_node->type == NODE_TAG )
         {
-            *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
-                                                 ((const webvtt_dom_tag_t *)p_node)->p_child );
+            const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
+            if( p_tag->i_start <= i_start )
+                *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
+                                                     p_tag->p_child, i_start );
         }
     }
     return p_head;
@@ -948,9 +976,10 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
 
 static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
                                              struct render_variables_s *p_vars,
-                                             const webvtt_dom_cue_t *p_cue )
+                                             const webvtt_dom_cue_t *p_cue,
+                                             mtime_t i_start )
 {
-    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
+    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child, i_start );
 }
 
 static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop,
@@ -970,7 +999,7 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
         if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
             continue;
 
-        text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue );
+        text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue, i_start );
         if( p_new )
         {
             while( *pp_append )
@@ -987,6 +1016,32 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
         }
     }
     return p_segments;
+}
+
+static void GetTimedTags( const webvtt_dom_node_t *p_node,
+                           mtime_t i_start, mtime_t i_stop, vlc_array_t *p_times )
+{
+    for( ; p_node; p_node = p_node->p_next )
+    {
+        switch( p_node->type )
+        {
+            case NODE_TAG:
+            {
+                const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *) p_node;
+                if( p_tag->i_start > -1 && p_tag->i_start >= i_start && p_tag->i_start < i_stop )
+                    (void) vlc_array_append( p_times, (void *) p_tag );
+                GetTimedTags( p_tag->p_child, i_start, i_stop, p_times );
+            } break;
+            case NODE_REGION:
+            case NODE_CUE:
+            case NODE_VIDEO:
+                GetTimedTags( webvtt_domnode_getFirstChild( p_node ),
+                              i_start, i_stop, p_times );
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
@@ -1094,6 +1149,41 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
                                                      WEBVTT_LINE_TO_HEIGHT_RATIO;
         decoder_QueueSub( p_dec, p_spu );
     }
+}
+
+static int timedtagsArrayCmp( const void *a, const void *b )
+{
+    const webvtt_dom_tag_t *ta = *((const webvtt_dom_tag_t **) a);
+    const webvtt_dom_tag_t *tb = *((const webvtt_dom_tag_t **) b);
+    const int64_t result = ta->i_start - tb->i_start;
+    return result == 0 ? 0 : result > 0 ? 1 : -1;
+}
+
+static void Render( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    vlc_array_t timedtags;
+    vlc_array_init( &timedtags );
+
+    GetTimedTags( p_sys->p_root->p_child, i_start, i_stop, &timedtags );
+    qsort( timedtags.pp_elems, timedtags.i_count, sizeof(*timedtags.pp_elems), timedtagsArrayCmp );
+
+    mtime_t i_substart = i_start;
+    for( size_t i=0; i<timedtags.i_count; i++ )
+    {
+         const webvtt_dom_tag_t *p_tag =
+                 (const webvtt_dom_tag_t *) vlc_array_item_at_index( &timedtags, i );
+         if( p_tag->i_start != i_substart ) /* might be duplicates */
+         {
+             RenderRegions( p_dec, i_substart, p_tag->i_start );
+             i_substart = p_tag->i_start;
+         }
+    }
+    if( i_substart != i_stop )
+        RenderRegions( p_dec, i_substart, i_stop );
+
+    vlc_array_clear( &timedtags );
 }
 
 static int ProcessISOBMFF( decoder_t *p_dec,
@@ -1240,7 +1330,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     ProcessISOBMFF( p_dec, p_block->p_buffer, p_block->i_buffer,
                     p_block->i_pts, p_block->i_pts + p_block->i_length );
 
-    RenderRegions( p_dec, p_block->i_pts, p_block->i_pts + p_block->i_length );
+    Render( p_dec, p_block->i_pts, p_block->i_pts + p_block->i_length );
 
     block_Release( p_block );
     return VLCDEC_SUCCESS;
