@@ -1461,12 +1461,6 @@ static void D3D11SetColorSpace(vout_display_t *vd)
                           /* the YUV->RGB conversion already output full range */
                           is_d3d11_opaque(vd->source.i_chroma) ||
                           vlc_fourcc_IsYUV(vd->source.i_chroma);
-#if VLC_WINSTORE_APP
-    if (!src_full_range && isXboxHardware(sys->d3ddevice)) {
-        /* even in full range the Xbox outputs with less range so use the max we can*/
-        src_full_range = true;
-    }
-#endif
 
     /* pick the best output based on color support and transfer */
     /* TODO support YUV output later */
@@ -1983,12 +1977,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     }
 
     int range_adjust = sys->display.colorspace->b_full_range;
-#if VLC_WINSTORE_APP
-    if (isXboxHardware(sys->d3ddevice)) {
-        /* the Xbox lies, when it says it outputs full range it's less than full range */
-        range_adjust--;
-    }
-#endif
     if (!IsRGBShader(format))
         range_adjust--; /* the YUV->RGB conversion already output full range */
     if (src_full_range)
