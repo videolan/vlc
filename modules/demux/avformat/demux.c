@@ -328,13 +328,7 @@ int OpenDemux( vlc_object_t *p_this )
     free( psz_url );
 
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
-    const unsigned int nb_streams = p_sys->ic->nb_streams;
-    p_sys->tracks = calloc( nb_streams, sizeof(*p_sys->tracks) );
-    if( !p_sys->tracks )
-    {
-        CloseDemux( p_this );
-        return VLC_ENOMEM;
-    }
+    unsigned nb_streams = p_sys->ic->nb_streams;
 
     AVDictionary *options[nb_streams ? nb_streams : 1];
     options[0] = NULL;
@@ -349,7 +343,6 @@ int OpenDemux( vlc_object_t *p_this )
     }
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     error = avformat_find_stream_info( p_sys->ic, options );
-    /* FIXME: what if nb_streams change after that call? */
     vlc_avcodec_unlock();
     AVDictionaryEntry *t = NULL;
     while ((t = av_dict_get(options[0], "", t, AV_DICT_IGNORE_SUFFIX))) {
@@ -358,6 +351,20 @@ int OpenDemux( vlc_object_t *p_this )
     av_dict_free(&options[0]);
     for (unsigned i = 1; i < nb_streams; i++) {
         av_dict_free(&options[i]);
+    }
+
+    nb_streams = p_sys->ic->nb_streams; /* it may have changed */
+    if( !nb_streams )
+    {
+        msg_Err( p_demux, "No streams found");
+        CloseDemux( p_this );
+        return VLC_EGENERIC;
+    }
+    p_sys->tracks = calloc( nb_streams, sizeof(*p_sys->tracks) );
+    if( !p_sys->tracks )
+    {
+        CloseDemux( p_this );
+        return VLC_ENOMEM;
     }
 
     if( error < 0 )
