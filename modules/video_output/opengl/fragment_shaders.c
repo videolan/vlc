@@ -231,12 +231,20 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
         1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
     };
+    static const float matrix_bt2020_tv2full[12] = {
+        1.164383530616760,  0.0000,             1.678674221038818, -0.915687978267670 ,
+        1.164383530616760, -0.187326118350029, -0.650424420833588,  0.347458571195602 ,
+        1.164383530616760,  2.141772270202637,  0.0000,            -1.148145079612732 ,
+    };
 
     const float *matrix;
     switch (yuv_space)
     {
         case COLOR_SPACE_BT601:
             matrix = matrix_bt601_tv2full;
+            break;
+        case COLOR_SPACE_BT2020:
+            matrix = matrix_bt2020_tv2full;
             break;
         default:
             matrix = matrix_bt709_tv2full;
