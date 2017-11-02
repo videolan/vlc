@@ -492,7 +492,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
 
     if (vlc_dialog_wait_question(creds, VLC_DIALOG_QUESTION_WARNING,
             _("Abort"), _("View certificate"), NULL,
-            _("Insecure site"), 
+            _("Insecure site"),
             _("You attempted to reach %s. %s\n"
             "This problem may be stem from an attempt to breach your security, "
             "compromise your privacy, or a configuration error.\n\n"
