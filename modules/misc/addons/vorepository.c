@@ -345,29 +345,15 @@ static stream_t * vlc_stream_NewURL_ND( addons_finder_t *p_obj, const char *psz_
 
 static int Find( addons_finder_t *p_finder )
 {
-    bool b_done = false;
+    stream_t *p_stream = vlc_stream_NewURL_ND( p_finder,
+                                            ADDONS_REPO_SCHEMEHOST "/xml" );
+    if ( !p_stream )
+        return VLC_EGENERIC;
 
-    while ( !b_done )
-    {
-        char *psz_uri = NULL;
+    int i_res = ParseCategoriesInfo( p_finder, p_stream );
+    vlc_stream_Delete( p_stream );
 
-        if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"/xml" ) ) return VLC_ENOMEM;
-        b_done = true;
-
-        stream_t *p_stream = vlc_stream_NewURL_ND( p_finder, psz_uri );
-        free( psz_uri );
-        if ( !p_stream ) return VLC_EGENERIC;
-
-        if ( ! ParseCategoriesInfo( p_finder, p_stream ) )
-        {
-            /* no more entries have been read: was last page or error */
-            b_done = true;
-        }
-
-        vlc_stream_Delete( p_stream );
-    }
-
-    return VLC_SUCCESS;
+    return i_res > 0 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
