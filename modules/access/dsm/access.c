@@ -295,14 +295,6 @@ static int smb_connect( stream_t *p_access, const char *psz_login,
         return VLC_EGENERIC;
 }
 
-static bool smb_has_invalid_creds( stream_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    uint32_t i_nt_status = smb_session_get_nt_status( p_sys->p_session );
-
-    return i_nt_status & (NT_STATUS_ACCESS_DENIED | NT_STATUS_LOGON_FAILURE);
-}
-
 /* Performs login with existing credentials and ask the user for new ones on
    failure */
 static int login( stream_t *p_access )
@@ -338,8 +330,7 @@ static int login( stream_t *p_access )
     if( smb_connect( p_access, psz_login, psz_password, psz_domain )
                      != VLC_SUCCESS )
     {
-        while( smb_has_invalid_creds( p_access)
-            && vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+        while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
                                    SMB_LOGIN_DIALOG_TITLE,
                                    SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
         {
