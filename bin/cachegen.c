@@ -48,7 +48,7 @@ static void usage (const char *path)
 
 int main (int argc, char *argv[])
 {
-#ifdef _WIN32
+#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN7)
     SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 #ifdef HAVE_GETOPT_H

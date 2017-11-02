@@ -129,7 +129,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     putenv("VLC_DATA_PATH=Z:"TOP_SRCDIR"/share");
 #endif
 
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
     SetErrorMode(SEM_FAILCRITICALERRORS);
+#endif
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
     /* SetProcessDEPPolicy, SetDllDirectory, & Co. */
