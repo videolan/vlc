@@ -421,15 +421,15 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
         if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
         {
             msg_Err( p_this, "Failed to write to Addon file" );
-            fclose( p_destfile );
-            vlc_stream_Delete( p_stream );
-            return VLC_EGENERIC;
+            break;
         }
     }
 
     fclose( p_destfile );
+    if ( i_read < 0 )
+        vlc_unlink( psz_dest );
     vlc_stream_Delete( p_stream );
-    return VLC_SUCCESS;
+    return i_read >= 0 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int InstallAllFiles( addons_storage_t *p_this, const addon_entry_t *p_entry )
