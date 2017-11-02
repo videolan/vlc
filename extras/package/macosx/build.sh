@@ -183,7 +183,7 @@ export OBJCFLAGS="-Werror=partial-availability"
 info "Building contribs"
 spushd "${vlcroot}/contrib"
 mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
-../bootstrap --build=$TRIPLET --host=$TRIPLET > $out
+../bootstrap --build=$TRIPLET --host=$TRIPLET --enable-libplacebo > $out
 if [ "$REBUILD" = "yes" ]; then
     make clean
 fi
