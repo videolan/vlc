@@ -187,9 +187,10 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     vlc_cleanup_push (cleanup_tls, session);
     while ((val = crd->handshake(crd, session, host, service, alp)) != 0)
     {
-        if (val < 0)
+        if (val < 0 || vlc_killed() )
         {
-            msg_Err(crd, "TLS session handshake error");
+            if (val < 0)
+                msg_Err(crd, "TLS session handshake error");
 error:
             vlc_tls_SessionDelete (session);
             session = NULL;
