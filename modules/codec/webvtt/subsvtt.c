@@ -671,6 +671,11 @@ static void ClearCuesByTime( webvtt_dom_node_t **pp_next, mtime_t i_time )
                     continue;
                 }
             }
+            else if( p_node->type == NODE_REGION )
+            {
+                webvtt_region_t *p_region = (webvtt_region_t *) p_node;
+                ClearCuesByTime( &p_region->p_child, i_time );
+            }
             pp_next = &p_node->p_next;
         }
     }
