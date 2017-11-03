@@ -632,6 +632,9 @@ inline void MainInterface::showTab( QWidget *widget )
                  stackCentralW->indexOf( stackCentralOldWidget ) );
     msg_Dbg( p_intf, "ShowTab request for %s", widget->metaObject()->className() );
 #endif
+    if ( stackCentralW->currentWidget() == widget )
+        return;
+
     /* fixing when the playlist has been undocked after being hidden.
        restoreStackOldWidget() is called when video stops but
        stackCentralOldWidget would still be pointing to playlist */
@@ -1034,7 +1037,7 @@ void MainInterface::dockPlaylist( bool p_docked )
         playlistVisible = playlistWidget->isVisible();
         stackCentralW->removeWidget( playlistWidget );
         dialog->importPlaylistWidget( playlistWidget );
-        if (THEMIM->getIM()->hasVideo())
+        if ( videoWidget && THEMIM->getIM()->hasVideo() )
             showTab(videoWidget);
         else
             showTab(bgWidget);
@@ -1042,7 +1045,7 @@ void MainInterface::dockPlaylist( bool p_docked )
     }
     else /* Previously undocked */
     {
-        playlistVisible = dialog->isVisible();
+        playlistVisible = dialog->isVisible() && !( videoWidget && THEMIM->getIM()->hasVideo() );
         dialog->hide();
         playlistWidget = dialog->exportPlaylistWidget();
         stackCentralW->addWidget( playlistWidget );
