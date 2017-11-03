@@ -93,6 +93,10 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         {
             rep->streamFormat = StreamFormat(StreamFormat::MP4);
         }
+        else if(extension == "vtt" || extension == "wvtt" || extension == "webvtt")
+        {
+            rep->streamFormat = StreamFormat(StreamFormat::WEBVTT);
+        }
         else
         {
             rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
@@ -478,7 +482,8 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
 
                 /* Subtitles unsupported for now */
                 if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
-                   pair.second->getAttributeByName("TYPE")->value != "VIDEO")
+                   pair.second->getAttributeByName("TYPE")->value != "VIDEO" &&
+                   pair.second->getAttributeByName("TYPE")->value != "SUBTITLES" )
                 {
                     rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
                 }
