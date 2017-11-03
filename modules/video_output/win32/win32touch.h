@@ -52,16 +52,20 @@ enum {
     GESTURE_ACTION_BRIGHTNESS
 };
 
-typedef struct {
+
+typedef struct win32_gesture_sys_t {
     DWORD       i_type;                 /* Gesture ID */
     int         i_action;               /* GESTURE_ACTION */
 
     int         i_beginx;               /* Start X position */
     int         i_beginy;               /* Start Y position */
     int         i_lasty;                /* Last known Y position for PAN */
+    double      f_lastzoom;             /* Last zoom factor */
 
     ULONGLONG   i_ullArguments;         /* Base values to compare between 2 zoom gestures */
     bool        b_2fingers;             /* Did we detect 2 fingers? */
+
+    BOOL (*DecodeGestureImpl)( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
 
     HINSTANCE   huser_dll;              /* user32.dll */
     BOOL (WINAPI * OurCloseGestureInfoHandle)(HGESTUREINFO hGestureInfo);
@@ -69,7 +73,7 @@ typedef struct {
 } win32_gesture_sys_t;
 
 
-BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **p_gesture );
+BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **p_gesture, bool b_isProjected );
 
 LRESULT DecodeGesture( vlc_object_t *p_intf, win32_gesture_sys_t *p_gesture,
         HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );

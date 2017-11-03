@@ -805,7 +805,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    InitGestures( p_event->hwnd, &p_event->p_gesture );
+    bool b_isProjected  = (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+    InitGestures( p_event->hwnd, &p_event->p_gesture, b_isProjected );
 
     p_event->p_sensors = HookWindowsSensors(vd, p_event->hwnd);
 
