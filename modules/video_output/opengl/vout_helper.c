@@ -614,13 +614,16 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
 
 #ifdef HAVE_LIBPLACEBO
     // create the main libplacebo context
-    tc->pl_ctx = pl_context_create(PL_API_VER, &(struct pl_context_params) {
-        .log_cb    = log_cb,
-        .log_priv  = tc,
-        .log_level = PL_LOG_INFO,
-    });
-    if (tc->pl_ctx)
-        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
+    if (!subpics)
+    {
+        tc->pl_ctx = pl_context_create(PL_API_VER, &(struct pl_context_params) {
+            .log_cb    = log_cb,
+            .log_priv  = tc,
+            .log_level = PL_LOG_INFO,
+        });
+        if (tc->pl_ctx)
+            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
+    }
 #endif
 
     int ret;
