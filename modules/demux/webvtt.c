@@ -57,10 +57,9 @@ struct demux_sys_t
         size_t  i_count;
         size_t  i_current;
     } cues;
-};
 
-static int Demux( demux_t * );
-static int Control( demux_t *, int, va_list );
+    webvtt_text_parser_t *p_streamparser;
+};
 
 /*****************************************************************************
  *
@@ -169,6 +168,9 @@ static void memstream_Grab( struct vlc_memstream *ms, void **pp, size_t *pi )
     }
 }
 
+/*****************************************************************************
+ * Seekable demux Open() parser callbacks
+ *****************************************************************************/
 struct callback_ctx
 {
     demux_t *p_demux;
@@ -230,6 +232,44 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
         memstream_Append( &ctx->styles, psz_line );
     else if( s == WEBVTT_HEADER_REGION )
         memstream_Append( &ctx->regions, psz_line );
+}
+
+/*****************************************************************************
+ * Streamed cues DemuxStream() parser callbacks
+ *****************************************************************************/
+
+static webvtt_cue_t * StreamParserGetCueHandler( void *priv )
+{
+    VLC_UNUSED(priv);
+    return malloc( sizeof(webvtt_cue_t) );
+}
+
+static void StreamParserCueDoneHandler( void *priv, webvtt_cue_t *p_cue )
+{
+    demux_t *p_demux = (demux_t *) priv;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_cue->psz_text )
+    {
+        block_t *p_block = ConvertWEBVTT( p_cue, true );
+        if( p_block )
+        {
+            if ( p_sys->b_first_time )
+            {
+                es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TS_0 );
+                p_sys->b_first_time = false;
+            }
+            p_sys->i_next_demux_time = p_cue->i_start;
+            p_block->i_dts =
+                    p_block->i_pts = VLC_TS_0 + p_cue->i_start;
+            if( p_cue->i_stop >= 0 && p_cue->i_stop >= p_cue->i_start )
+                p_block->i_length = p_cue->i_stop - p_cue->i_start;
+            es_out_Send( p_demux->out, p_sys->es, p_block );
+            es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TS_0 );
+        }
+    }
+    webvtt_cue_Clean( p_cue );
+    free( p_cue );
 }
 
 static int ReadWEBVTT( demux_t *p_demux )
@@ -366,6 +406,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
+static int ControlStream( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_TIME:
+            pi64 = va_arg( args, int64_t * );
+            if( p_sys->i_next_demux_time != VLC_TS_INVALID )
+            {
+                *pi64 = p_sys->i_next_demux_time;
+                return VLC_SUCCESS;
+            }
+        default:
+            break;
+    }
+
+    return VLC_EGENERIC;
+}
+
 /*****************************************************************************
  * Demux: Send subtitle to decoder
  *****************************************************************************/
@@ -419,15 +480,21 @@ static int Demux( demux_t *p_demux )
     return VLC_DEMUXER_SUCCESS;
 }
 
+static int DemuxStream( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    char *psz_line = vlc_stream_ReadLine( p_demux->s );
+    webvtt_text_parser_Feed( p_sys->p_streamparser, psz_line );
+
+    return ( psz_line == NULL ) ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
+}
 
 /*****************************************************************************
- * Module initializer
+ * Module initializers common
  *****************************************************************************/
-int OpenDemux ( vlc_object_t *p_this )
+static int ProbeWEBVTT( demux_t *p_demux )
 {
-    demux_t        *p_demux = (demux_t*)p_this;
-    demux_sys_t    *p_sys;
-
     const uint8_t *p_peek;
     size_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
@@ -447,26 +514,27 @@ int OpenDemux ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Module initializers
+ *****************************************************************************/
+int OpenDemux ( vlc_object_t *p_this )
+{
+    demux_t        *p_demux = (demux_t*)p_this;
+    demux_sys_t    *p_sys;
+
+    int i_ret = ProbeWEBVTT( p_demux );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
+
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-
-    p_sys->i_next_block_flags = 0;
-    p_sys->i_next_demux_time = 0;
-    p_sys->i_length = 0;
-    p_sys->b_slave = false;
-
-    p_sys->regions_headers.p_data = NULL;
-    p_sys->regions_headers.i_data = 0;
-    p_sys->styles_headers.p_data = NULL;
-    p_sys->styles_headers.i_data = 0;
-
-    p_sys->cues.i_count = 0;
-    p_sys->cues.i_alloc = 0;
-    p_sys->cues.p_array = NULL;
-    p_sys->cues.i_current = 0;
 
     if( ReadWEBVTT( p_demux ) != VLC_SUCCESS )
     {
@@ -490,6 +558,45 @@ int OpenDemux ( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+int OpenDemuxStream ( vlc_object_t *p_this )
+{
+    demux_t        *p_demux = (demux_t*)p_this;
+    demux_sys_t    *p_sys;
+
+    int i_ret = ProbeWEBVTT( p_demux );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
+
+    p_demux->pf_demux = DemuxStream;
+    p_demux->pf_control = ControlStream;
+
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
+
+    p_sys->p_streamparser = webvtt_text_parser_New( p_demux,
+                                          StreamParserGetCueHandler,
+                                          StreamParserCueDoneHandler,
+                                          NULL );
+    if( !p_sys->p_streamparser )
+    {
+        CloseDemux( p_this );
+        return VLC_EGENERIC;
+    }
+
+    es_format_t fmt;
+    es_format_Init( &fmt, SPU_ES, VLC_CODEC_WEBVTT );
+    p_sys->es = es_out_Add( p_demux->out, &fmt );
+    es_format_Clean( &fmt );
+    if( p_sys->es == NULL )
+    {
+        CloseDemux( p_this );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Close: Close subtitle demux
  *****************************************************************************/
@@ -501,6 +608,12 @@ void CloseDemux( vlc_object_t *p_this )
     for( size_t i=0; i< p_sys->cues.i_count; i++ )
         webvtt_cue_Clean( &p_sys->cues.p_array[i] );
     free( p_sys->cues.p_array );
+
+    if( p_sys->p_streamparser )
+    {
+        webvtt_text_parser_Feed( p_sys->p_streamparser, NULL );
+        webvtt_text_parser_Delete( p_sys->p_streamparser );
+    }
 
     free( p_sys );
 }

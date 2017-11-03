@@ -24,6 +24,7 @@ int  OpenDecoder   ( vlc_object_t * );
 void CloseDecoder  ( vlc_object_t * );
 
 int  OpenDemux     ( vlc_object_t * );
+int  OpenDemuxStream (vlc_object_t *);
 void CloseDemux    ( vlc_object_t * );
 
 typedef struct webvtt_text_parser_t webvtt_text_parser_t;
