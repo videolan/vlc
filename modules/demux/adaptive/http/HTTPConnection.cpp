@@ -374,6 +374,7 @@ void HTTPConnection::onHeader(const std::string &key,
 std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 {
     std::stringstream req;
+    req.imbue(std::locale("C"));
     req << "GET " << path << " HTTP/1.1\r\n";
     if((params.getScheme() == "http" && params.getPort() != 80) ||
             (params.getScheme() == "https" && params.getPort() != 443))
