@@ -266,10 +266,6 @@ void AbstractStream::setDisabled(bool b)
 {
     if(disabled != b)
         segmentTracker->notifyBufferingState(!b);
-     /* Ensures unselected ES no longer
-      * have decoder/are seen as selected */
-    if(b)
-        fakeesout->recycleAll();
     disabled = b;
 }
 
