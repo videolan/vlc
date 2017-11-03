@@ -204,7 +204,12 @@ void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
         {
             if( psz_line[0] == 0 )
             {
-                p->p_cue = NULL;
+                if( p->p_cue )
+                {
+                    if( p->pf_cue_done )
+                        p->pf_cue_done( p->priv, p->p_cue );
+                    p->p_cue = NULL;
+                }
             }
             else
             {

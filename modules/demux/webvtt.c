@@ -180,6 +180,13 @@ static webvtt_cue_t * ParserGetCueHandler( void *priv )
 {
     struct callback_ctx *ctx = (struct callback_ctx *) priv;
     demux_sys_t *p_sys = ctx->p_demux->p_sys;
+    /* invalid recycled cue */
+    if( p_sys->cues.i_count &&
+        p_sys->cues.p_array[p_sys->cues.i_count - 1].psz_text == NULL )
+    {
+        return &p_sys->cues.p_array[p_sys->cues.i_count - 1];
+    }
+
     if( p_sys->cues.i_alloc <= p_sys->cues.i_count )
     {
         webvtt_cue_t *p_realloc = realloc( p_sys->cues.p_array,
@@ -201,6 +208,12 @@ static void ParserCueDoneHandler( void *priv, webvtt_cue_t *p_cue )
 {
     struct callback_ctx *ctx = (struct callback_ctx *) priv;
     demux_sys_t *p_sys = ctx->p_demux->p_sys;
+    if( p_cue->psz_text == NULL )
+    {
+        webvtt_cue_Clean( p_cue );
+        webvtt_cue_Init( p_cue );
+        return;
+    }
     if( p_cue->i_stop > p_sys->i_length )
         p_sys->i_length = p_cue->i_stop;
     if( p_sys->cues.i_count > 0 &&
