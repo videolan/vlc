@@ -49,7 +49,8 @@ int Import_podcast( vlc_object_t *p_this )
     stream_t *p_demux = (stream_t *)p_this;
 
     CHECK_FILE(p_demux);
-    if( stream_IsMimeType( p_demux->p_source, "text/xml" ) )
+    if( stream_IsMimeType( p_demux->p_source, "text/xml" )
+     || stream_IsMimeType( p_demux->p_source, "application/xml" ) )
     {
         /* XML: check if the root node is "rss". Use a specific peeked
          * probestream in order to not modify the source state while probing.
