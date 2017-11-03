@@ -152,29 +152,33 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     if(first->getSequenceNumber() > number)
         return false;
 
-    *time = first->startTime.Get();
+    bool found = false;
+    stime_t seg_start = first->startTime.Get();
+    stime_t seg_dura = 0;
     std::vector<ISegment *>::const_iterator it = segments.begin();
     for(it = segments.begin(); it != segments.end(); ++it)
     {
         const ISegment *seg = *it;
+
+        if(seg->duration.Get())
+            seg_dura = seg->duration.Get();
+        else
+            seg_dura = duration.Get();
+
         /* Assuming there won't be any discontinuity in sequence */
         if(seg->getSequenceNumber() == number)
         {
+            found = true;
             break;
         }
-        else if(seg->duration.Get())
-        {
-            *time += seg->duration.Get();
-            *dur = seg->duration.Get();
-        }
-        else
-        {
-            *time += duration.Get();
-            *dur = duration.Get();
-        }
+
+        seg_start += seg_dura;
     }
 
-    *time = VLC_TS_0 + timescale.ToTime( *time );
-    *dur = VLC_TS_0 + timescale.ToTime( *dur );
+    if(!found)
+        return false;
+
+    *time = VLC_TS_0 + timescale.ToTime(seg_start);
+    *dur = VLC_TS_0 + timescale.ToTime(seg_dura);
     return true;
 }
