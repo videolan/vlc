@@ -566,8 +566,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
-        ADDF("uniform %s Texture%u;"
-             "varying vec2 TexCoord%u;", sampler, i, i);
+        ADDF("uniform %s Texture%u;\n"
+             "varying vec2 TexCoord%u;\n", sampler, i, i);
 
 #ifdef HAVE_LIBPLACEBO
     if (tc->pl_sh) {
@@ -582,7 +582,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         tc->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
         for (int i = 0; i < res->num_variables; i++) {
             struct pl_shader_var sv = res->variables[i];
-            ADDF("uniform %s %s;", ra_var_glsl_type_name(sv.var), sv.var.name);
+            ADDF("uniform %s %s;\n", ra_var_glsl_type_name(sv.var), sv.var.name);
         }
 
         // We can't handle these yet, but nothing we use requires them, either
@@ -604,21 +604,21 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
-            ADDF("uniform vec2 TexSize%u;", i);
+            ADDF("uniform vec2 TexSize%u;\n", i);
     }
 
     if (is_yuv)
-        ADD("uniform vec4 Coefficients[4];");
+        ADD("uniform vec4 Coefficients[4];\n");
 
-    ADD("uniform vec4 FillColor;"
-        "void main(void) {"
-        "float val;vec4 colors;");
+    ADD("uniform vec4 FillColor;\n"
+        "void main(void) {\n"
+        " float val;vec4 colors;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
-            ADDF("vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
-                 "TexCoord%u.y * TexSize%u.y);", i, i, i, i, i);
+            ADDF(" vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
+                 "TexCoord%u.y * TexSize%u.y);\n", i, i, i, i, i);
     }
 
     unsigned color_idx = 0;
@@ -628,11 +628,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         if (swizzle)
         {
             size_t swizzle_count = strlen(swizzle);
-            ADDF("colors = %s(Texture%u, %s%u);", lookup, i, coord_name, i);
+            ADDF(" colors = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
-                ADDF("val = colors.%c;"
-                     "vec4 color%u = vec4(val, val, val, 1);",
+                ADDF(" val = colors.%c;\n"
+                     " vec4 color%u = vec4(val, val, val, 1);\n",
                      swizzle[j], color_idx);
                 color_idx++;
                 assert(color_idx <= PICTURE_PLANE_MAX);
@@ -640,7 +640,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         }
         else
         {
-            ADDF("vec4 color%u = %s(Texture%u, %s%u);",
+            ADDF(" vec4 color%u = %s(Texture%u, %s%u);\n",
                  color_idx, lookup, i, coord_name, i);
             color_idx++;
             assert(color_idx <= PICTURE_PLANE_MAX);
@@ -650,9 +650,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
     if (is_yuv)
-        ADD("vec4 result = (color0 * Coefficients[0]) + Coefficients[3];");
+        ADD(" vec4 result = (color0 * Coefficients[0]) + Coefficients[3];\n");
     else
-        ADD("vec4 result = color0;");
+        ADD(" vec4 result = color0;\n");
 
     for (unsigned i = 1; i < color_count; ++i)
     {
@@ -666,9 +666,10 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
             color_idx = i;
 
         if (is_yuv)
-            ADDF("result = (color%u * Coefficients[%u]) + result;", color_idx, i);
+            ADDF(" result = (color%u * Coefficients[%u]) + result;\n",
+                 color_idx, i);
         else
-            ADDF("result = color%u + result;", color_idx);
+            ADDF(" result = color%u + result;\n", color_idx);
     }
 
 #ifdef HAVE_LIBPLACEBO
@@ -676,11 +677,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         const struct pl_shader_res *res = tc->pl_sh_res;
         assert(res->input  == PL_SHADER_SIG_COLOR);
         assert(res->output == PL_SHADER_SIG_COLOR);
-        ADDF("result = %s(result);", res->name);
+        ADDF(" result = %s(result);\n", res->name);
     }
 #endif
 
-    ADD("gl_FragColor = result * FillColor;"
+    ADD(" gl_FragColor = result * FillColor;\n"
         "}");
 
 #undef ADD
