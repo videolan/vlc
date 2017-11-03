@@ -630,6 +630,9 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
         /* Normal orientation and no projection for subtitles */
         tc->fmt.orientation = ORIENT_NORMAL;
         tc->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
+        tc->fmt.primaries = COLOR_PRIMARIES_UNDEF;
+        tc->fmt.transfer = TRANSFER_FUNC_UNDEF;
+        tc->fmt.space = COLOR_SPACE_UNDEF;
 
         ret = opengl_tex_converter_generic_init(tc, false);
     }
