@@ -295,6 +295,7 @@ net_vaPrintf
 net_Write
 NTPtime64
 picture_BlendSubpicture
+picture_Clone
 picture_CopyPixels
 picture_Hold
 picture_Release

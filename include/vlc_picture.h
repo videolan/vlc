@@ -189,6 +189,17 @@ VLC_API void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src );
 VLC_API void picture_Copy( picture_t *p_dst, const picture_t *p_src );
 
 /**
+ * Perform a shallow picture copy
+ *
+ * This function makes a shallow copy of an existing picture. The same planes
+ * and resources will be used, and the cloned picture reference count will be
+ * incremented.
+ *
+ * \return A clone picture on success, NULL on error.
+ */
+VLC_API picture_t *picture_Clone(picture_t *pic);
+
+/**
  * This function will export a picture to an encoded bitstream.
  *
  * pp_image will contain the encoded bitstream in psz_format format.

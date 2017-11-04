@@ -374,6 +374,38 @@ void picture_Copy( picture_t *p_dst, const picture_t *p_src )
     picture_CopyProperties( p_dst, p_src );
 }
 
+static void picture_DestroyClone(picture_t *clone)
+{
+    picture_t *picture = ((picture_priv_t *)clone)->gc.opaque;
+
+    free(clone);
+    picture_Release(picture);
+}
+
+picture_t *picture_Clone(picture_t *picture)
+{
+    /* TODO: merge common code with picture_pool_ClonePicture(). */
+    picture_resource_t res = {
+        .p_sys = picture->p_sys,
+        .pf_destroy = picture_DestroyClone,
+    };
+
+    for (int i = 0; i < picture->i_planes; i++) {
+        res.p[i].p_pixels = picture->p[i].p_pixels;
+        res.p[i].i_lines = picture->p[i].i_lines;
+        res.p[i].i_pitch = picture->p[i].i_pitch;
+    }
+
+    picture_t *clone = picture_NewFromResource(&picture->format, &res);
+    if (likely(clone != NULL)) {
+        ((picture_priv_t *)clone)->gc.opaque = picture;
+        picture_Hold(picture);
+
+        if (picture->context != NULL)
+            clone->context = picture->context->copy(picture->context);
+    }
+    return clone;
+}
 
 /*****************************************************************************
  *
