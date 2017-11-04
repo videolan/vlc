@@ -298,7 +298,6 @@ picture_BlendSubpicture
 picture_CopyPixels
 picture_Hold
 picture_Release
-picture_IsReferenced
 picture_CopyProperties
 picture_Copy
 picture_Export

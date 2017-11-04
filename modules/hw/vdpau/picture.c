@@ -120,7 +120,6 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_444);
-    assert(!picture_IsReferenced(pic));
     assert(pic->context == NULL);
     pic->context = &field->context;
     return VDP_STATUS_OK;

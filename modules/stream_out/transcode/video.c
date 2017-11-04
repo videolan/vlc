@@ -710,7 +710,7 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
         /* Overlay subpicture */
         if( p_subpic )
         {
-            if( picture_IsReferenced( p_pic ) && filter_chain_IsEmpty( id->p_f_chain ) )
+            if( filter_chain_IsEmpty( id->p_f_chain ) )
             {
                 /* We can't modify the picture, we need to duplicate it,
                  * in this point the picture is already p_encoder->fmt.in format*/

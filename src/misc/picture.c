@@ -308,13 +308,6 @@ void picture_Release( picture_t *p_picture )
     priv->gc.destroy( p_picture );
 }
 
-bool picture_IsReferenced( picture_t *p_picture )
-{
-    picture_priv_t *priv = (picture_priv_t *)p_picture;
-
-    return atomic_load( &priv->gc.refs ) > 1;
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/

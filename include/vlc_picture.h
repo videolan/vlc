@@ -159,14 +159,6 @@ VLC_API picture_t *picture_Hold( picture_t *p_picture );
 VLC_API void picture_Release( picture_t *p_picture );
 
 /**
- * This function will return true if you are not the only owner of the
- * picture.
- *
- * It is only valid if it is created using picture_New.
- */
-VLC_API bool picture_IsReferenced( picture_t *p_picture );
-
-/**
  * This function will copy all picture dynamic properties.
  */
 VLC_API void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src );
