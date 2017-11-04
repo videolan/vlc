@@ -413,12 +413,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->b_pre_me = var_GetBool( p_enc, ENC_CFG_PREFIX "pre-me" );
     p_sys->b_hurry_up = var_GetBool( p_enc, ENC_CFG_PREFIX "hurry-up" );
 
-    if( p_sys->b_hurry_up )
-    {
-        /* hurry up mode needs noise reduction, even small */
-        p_sys->i_noise_reduction = 1;
-    }
-
     p_sys->i_rc_buffer_size = var_GetInteger( p_enc, ENC_CFG_PREFIX "rc-buffer-size" );
     p_sys->f_rc_buffer_aggressivity = var_GetFloat( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity" );
     p_sys->f_i_quant_factor = var_GetFloat( p_enc, ENC_CFG_PREFIX "i-quant-factor" );
