@@ -250,7 +250,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->channels = fmt->audio.i_channels;
         codec->sample_rate = fmt->audio.i_rate;
         stream->time_base = (AVRational){1, codec->sample_rate};
-        codec->frame_size = fmt->audio.i_frame_length;
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing audio bitrate, assuming 64k" );
             i_bitrate = 64000;
