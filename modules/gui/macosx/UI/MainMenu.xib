@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -969,7 +969,7 @@
                         <action selector="setPlaybackRate:" target="-2" id="hdX-mB-WKd"/>
                     </connections>
                 </slider>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4600">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4600">
                     <rect key="frame" x="26" y="19" width="40" height="14"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="left" title="Slower" id="4602">
                         <font key="font" metaFont="smallSystem"/>
@@ -977,7 +977,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4599">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4599">
                     <rect key="frame" x="254" y="19" width="37" height="14"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Faster" id="4603">
                         <font key="font" metaFont="smallSystem"/>
@@ -985,7 +985,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4598">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4598">
                     <rect key="frame" x="136" y="19" width="46" height="14"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Normal" id="4604">
                         <font key="font" metaFont="smallSystem"/>
@@ -999,7 +999,7 @@
                         <constraint firstAttribute="height" constant="8" id="3TW-kT-FcC"/>
                     </constraints>
                 </box>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4615">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4615">
                     <rect key="frame" x="19" y="35" width="108" height="18"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Playback Speed" id="4616">
                         <font key="font" metaFont="system" size="14"/>
@@ -1007,7 +1007,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4617">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4617">
                     <rect key="frame" x="273" y="35" width="18" height="18"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1x" id="4618">
                         <font key="font" metaFont="system" size="14"/>
@@ -1018,26 +1018,26 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="4597" secondAttribute="trailing" constant="18" id="0mI-WU-Hft"/>
-                <constraint firstItem="4615" firstAttribute="leading" secondItem="4597" secondAttribute="leading" constant="-7" id="3bT-I0-wWf"/>
                 <constraint firstItem="4597" firstAttribute="leading" secondItem="4596" secondAttribute="leading" constant="28" id="3eU-xF-bKw"/>
                 <constraint firstItem="4600" firstAttribute="centerY" secondItem="4598" secondAttribute="centerY" id="5aF-Lp-phm"/>
                 <constraint firstItem="4597" firstAttribute="top" secondItem="4601" secondAttribute="bottom" constant="-8" id="5k1-Co-uGX"/>
                 <constraint firstItem="4615" firstAttribute="top" secondItem="4596" secondAttribute="top" id="7KB-Mh-tpE"/>
                 <constraint firstItem="4597" firstAttribute="top" secondItem="4615" secondAttribute="bottom" constant="16" id="8kk-M5-VKI"/>
-                <constraint firstItem="4598" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4596" secondAttribute="leading" constant="17" id="DE9-Iq-xv0"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4615" secondAttribute="trailing" constant="182" id="Orx-9E-hkb"/>
                 <constraint firstItem="4617" firstAttribute="centerY" secondItem="4615" secondAttribute="centerY" id="Qtz-HV-35I"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4600" secondAttribute="trailing" constant="17" id="VaO-P3-Lcc"/>
+                <constraint firstItem="4615" firstAttribute="leading" secondItem="4596" secondAttribute="leading" constant="21" id="Zdw-tm-Z6L"/>
                 <constraint firstItem="4600" firstAttribute="centerY" secondItem="4599" secondAttribute="centerY" id="acy-Wj-eHh"/>
+                <constraint firstItem="4617" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4615" secondAttribute="trailing" constant="10" id="adv-PY-Nfr"/>
                 <constraint firstItem="4617" firstAttribute="trailing" secondItem="4597" secondAttribute="trailing" id="d6x-PQ-pfq"/>
                 <constraint firstItem="4598" firstAttribute="centerX" secondItem="4597" secondAttribute="centerX" id="dVp-4U-EiF"/>
+                <constraint firstItem="4598" firstAttribute="left" relation="greaterThanOrEqual" secondItem="4600" secondAttribute="right" constant="10" id="fky-PP-mvL"/>
                 <constraint firstItem="4601" firstAttribute="centerX" secondItem="4597" secondAttribute="centerX" id="gAy-Wg-VLj"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4598" secondAttribute="trailing" constant="17" id="nMl-yc-nVG"/>
+                <constraint firstAttribute="bottom" secondItem="4597" secondAttribute="bottom" constant="4" id="h79-fh-FBi"/>
+                <constraint firstItem="4599" firstAttribute="left" relation="greaterThanOrEqual" secondItem="4598" secondAttribute="right" constant="10" id="haf-NR-a54"/>
                 <constraint firstItem="4597" firstAttribute="top" secondItem="4600" secondAttribute="bottom" id="uku-8k-K3D"/>
-                <constraint firstItem="4599" firstAttribute="trailing" secondItem="4597" secondAttribute="trailing" id="wQZ-1a-DAZ"/>
-                <constraint firstItem="4599" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4596" secondAttribute="leading" constant="17" id="xOK-OP-wcl"/>
-                <constraint firstItem="4600" firstAttribute="leading" secondItem="4597" secondAttribute="leading" id="zGp-3d-2RP"/>
+                <constraint firstItem="4599" firstAttribute="right" secondItem="4597" secondAttribute="right" id="wQZ-1a-DAZ"/>
+                <constraint firstItem="4600" firstAttribute="left" secondItem="4597" secondAttribute="left" id="zGp-3d-2RP"/>
             </constraints>
+            <point key="canvasLocation" x="288.5" y="149.5"/>
         </customView>
         <customView id="5547" userLabel="Sub BG Opacity">
             <rect key="frame" x="0.0" y="0.0" width="309" height="39"/>
@@ -1050,7 +1050,7 @@
                         <action selector="switchSubtitleBackgroundOpacity:" target="-2" id="mIi-V5-gqn"/>
                     </connections>
                 </slider>
-                <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5550">
+                <textField hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5550">
                     <rect key="frame" x="19" y="20" width="133" height="18"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Background opacity" id="5560">
                         <font key="font" metaFont="system" size="14"/>
@@ -1058,7 +1058,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5548">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5548">
                     <rect key="frame" x="19" y="20" width="133" height="18"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Background opacity" id="5562">
                         <font key="font" metaFont="system" size="14"/>
@@ -1078,9 +1078,10 @@
                 <constraint firstAttribute="trailing" secondItem="5555" secondAttribute="trailing" constant="20" id="WG2-ZC-N9x"/>
                 <constraint firstItem="5548" firstAttribute="centerX" secondItem="5550" secondAttribute="centerX" id="ZTn-Vv-gdG"/>
                 <constraint firstItem="5555" firstAttribute="leading" secondItem="5547" secondAttribute="leading" constant="28" id="abd-YT-hbw"/>
+                <constraint firstAttribute="bottom" secondItem="5555" secondAttribute="bottom" constant="2" id="fI1-6z-VzI"/>
                 <constraint firstItem="5548" firstAttribute="centerY" secondItem="5550" secondAttribute="centerY" id="jed-zg-Ueg"/>
             </constraints>
-            <point key="canvasLocation" x="479.5" y="564.5"/>
+            <point key="canvasLocation" x="296.5" y="285.5"/>
         </customView>
         <customObject id="GfD-zq-JqC" customClass="VLCRendererMenuController">
             <connections>

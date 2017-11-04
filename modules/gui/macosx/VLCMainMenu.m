@@ -377,6 +377,7 @@
     [_play setTitle: _NS("Play")];
     [_stop setTitle: _NS("Stop")];
     [_record setTitle: _NS("Record")];
+    [_rate_view setAutoresizingMask:NSViewWidthSizable];
     [_rate setView: _rate_view];
     [_rateLabel setStringValue: _NS("Playback Speed")];
     [_rate_slowerLabel setStringValue: _NS("Slower")];
@@ -443,6 +444,10 @@
     [_subtitle_size setTitle: _NS("Text Size")];
     [_subtitle_textcolor setTitle: _NS("Text Color")];
     [_subtitle_outlinethickness setTitle: _NS("Outline Thickness")];
+
+    // Autoresizing with constraints does not work on 10.7,
+    // translate autoresizing mask to constriaints for now
+    [_subtitle_bgopacity_view setAutoresizingMask:NSViewWidthSizable];
     [_subtitle_bgopacity setView: _subtitle_bgopacity_view];
     [_subtitle_bgopacityLabel setStringValue: _NS("Background Opacity")];
     [_subtitle_bgopacityLabel_gray setStringValue: _NS("Background Opacity")];
