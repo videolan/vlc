@@ -238,8 +238,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     codec = stream->codec;
 
-    codec->opaque = p_mux;
-
     unsigned int i_bitrate = fmt->i_bitrate;
     unsigned int i_frame_rate = fmt->video.i_frame_rate;
     unsigned int i_frame_rate_base = fmt->video.i_frame_rate_base;
