@@ -766,7 +766,7 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t
 }
 
 
-static void DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_pic )
+static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_pic )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     bool format_changed = false;
@@ -846,8 +846,8 @@ static void DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p
     }
 #endif
 
-    if (format_changed)
-        decoder_UpdateVideoFormat( p_dec );
+    if (format_changed && decoder_UpdateVideoFormat( p_dec ))
+        return -1;
 
     const AVFrameSideData *p_avcc = av_frame_get_side_data( frame, AV_FRAME_DATA_A53_CC );
     if( p_avcc )
@@ -872,6 +872,7 @@ static void DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p
             cc_Flush( &p_sys->cc );
         }
     }
+    return 0;
 }
 
 /*****************************************************************************
@@ -1201,7 +1202,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 
-        DecodeSidedata( p_dec, frame, p_pic );
+        if (DecodeSidedata(p_dec, frame, p_pic))
+            i_pts = VLC_TS_INVALID;
 
         av_frame_free(&frame);
 
