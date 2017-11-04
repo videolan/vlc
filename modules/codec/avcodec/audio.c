@@ -219,8 +219,6 @@ int InitAudioDec( vlc_object_t *obj )
     if( avctx == NULL )
         return VLC_EGENERIC;
 
-    avctx->refcounted_frames = true;
-
     /* Allocate the memory needed to store the decoder's structure */
     decoder_sys_t *p_sys = malloc(sizeof(*p_sys));
     if( unlikely(p_sys == NULL) )

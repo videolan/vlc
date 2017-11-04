@@ -532,7 +532,6 @@ int InitVideoDec( vlc_object_t *obj )
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
     p_context->get_buffer2 = lavc_GetFrame;
-    p_context->refcounted_frames = true;
     p_context->opaque = p_dec;
 
     int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
