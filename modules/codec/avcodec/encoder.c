@@ -142,7 +142,6 @@ struct encoder_sys_t
     bool       b_hurry_up;
     bool       b_interlace, b_interlace_me;
     float      f_i_quant_factor;
-    int        i_noise_reduction;
     bool       b_mpeg4_matrix;
     bool       b_trellis;
     int        i_quality; /* for VBR */
@@ -416,7 +415,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_rc_buffer_size = var_GetInteger( p_enc, ENC_CFG_PREFIX "rc-buffer-size" );
     p_sys->f_rc_buffer_aggressivity = var_GetFloat( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity" );
     p_sys->f_i_quant_factor = var_GetFloat( p_enc, ENC_CFG_PREFIX "i-quant-factor" );
-    p_sys->i_noise_reduction = var_GetInteger( p_enc, ENC_CFG_PREFIX "noise-reduction" );
     p_sys->b_mpeg4_matrix = var_GetBool( p_enc, ENC_CFG_PREFIX "mpeg4-matrix" );
 
     f_val = var_GetFloat( p_enc, ENC_CFG_PREFIX "qscale" );
@@ -559,7 +557,8 @@ int OpenEncoder( vlc_object_t *p_this )
         if ( p_sys->f_i_quant_factor != 0.f )
             p_context->i_quant_factor = p_sys->f_i_quant_factor;
 
-        add_av_option_int( p_enc, &options, "noise_reduction", p_sys->i_noise_reduction );
+        int nr = var_GetInteger( p_enc, ENC_CFG_PREFIX "noise-reduction" );
+        add_av_option_int( p_enc, &options, "noise_reduction", nr );
 
         if ( p_sys->b_mpeg4_matrix )
         {
