@@ -1241,11 +1241,12 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     return p_block;
 }
 
-static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int buffer_delay, block_t *p_aout_buf, int leftover_samples )
+static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, unsigned int buffer_delay,
+                                     block_t *p_aout_buf, size_t leftover_samples )
 {
     block_t *p_block = NULL;
     //How much we need to copy from new packet
-    const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
+    const size_t leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
 
     av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
