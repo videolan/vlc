@@ -217,13 +217,16 @@ Service Discovery:
 
 Mac OS X Interface
  * Dropped support for Mac OS X 10.6 Snow Leopard
- * Add support for keyboard blacklight dimming during fullscreen video playback
- * new AppleScript API giving access to audio desynchronization
- * Support for building with disabled sparkle update mechanism
- * New configure flag to disable automatic updates
- * Expanded AppleScript API for menu detection and navigation
+ * Support right-to-left user interface layout for right-to-left languages
  * New resizable fullscreen controller with improved design
  * Add status bar icon which displays metadata and play controls
+ * Add support for keyboard blacklight dimming during fullscreen video playback
+ * Improved and simplified preferences window
+ * Huge performance improvements in playlist handling and other areas
+ * New AppleScript API giving access to audio desynchronization
+ * Expanded AppleScript API for menu detection and navigation
+ * Support for building with disabled sparkle update mechanism
+ * Remove deprecated transcoding wizard, use convert and save dialog instead
 
 iOS:
  * Dropped support for iOS 6.x
