@@ -495,12 +495,6 @@ struct vlc_common_members
  * Macros and inline functions
  *****************************************************************************/
 
-/* CEIL: division with round to nearest greater integer */
-#define CEIL(n, d)  ( ((n) / (d)) + ( ((n) % (d)) ? 1 : 0) )
-
-/* PAD: PAD(n, d) = CEIL(n ,d) * d */
-#define PAD(n, d)   ( ((n) % (d)) ? ((((n) / (d)) + 1) * (d)) : (n) )
-
 /* __MAX and __MIN: self explanatory */
 #ifndef __MAX
 #   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
