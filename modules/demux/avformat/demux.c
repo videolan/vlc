@@ -441,8 +441,15 @@ int OpenDemux( vlc_object_t *p_this )
 
 # warning FIXME: implement palette transmission
             psz_type = "video";
+#if (LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(55, 20, 0))
+            es_fmt.video.i_frame_rate = s->time_base.num;
+            es_fmt.video.i_frame_rate_base = s->time_base.den;
+            if( s->codec->ticks_per_frame > 0 )
+                es_fmt.video.i_frame_rate_base *= s->codec->ticks_per_frame;
+#else
             es_fmt.video.i_frame_rate = s->codec->time_base.num;
             es_fmt.video.i_frame_rate_base = s->codec->time_base.den * __MAX( s->codec->ticks_per_frame, 1 );
+#endif
             es_fmt.video.i_sar_num = s->sample_aspect_ratio.num;
             if (s->sample_aspect_ratio.num > 0)
                 es_fmt.video.i_sar_den = s->sample_aspect_ratio.den;
