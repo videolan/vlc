@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
@@ -11,10 +12,12 @@
                 <outlet property="albumField" destination="SKt-XT-Vki" id="33Z-OU-f74"/>
                 <outlet property="artistField" destination="FnZ-Gr-BKf" id="wl6-Tg-uhc"/>
                 <outlet property="backwardsButton" destination="p8X-zU-PwN" id="y6F-9l-mm8"/>
+                <outlet property="controlsView" destination="v97-Ct-Yqs" id="6AP-DL-0Hk"/>
                 <outlet property="coverImageView" destination="0kw-t4-DcN" id="QmE-0F-ud4"/>
                 <outlet property="forwardButton" destination="NHj-Vf-SPF" id="XOV-fo-CZn"/>
                 <outlet property="pathActionItem" destination="1QM-IB-vK4" id="gbD-sJ-WLP"/>
                 <outlet property="playPauseButton" destination="lvI-lN-t4O" id="kA7-4Q-q36"/>
+                <outlet property="playbackInfoView" destination="fDN-Tb-DeD" id="qjG-v2-VzI"/>
                 <outlet property="progressField" destination="z3X-aG-Veg" id="wV9-n7-N7O"/>
                 <outlet property="quitItem" destination="539" id="xuy-Vl-Ami"/>
                 <outlet property="randButton" destination="PaW-Fe-vxo" id="L3x-xm-50A"/>
@@ -69,32 +72,33 @@
             <rect key="frame" x="0.0" y="0.0" width="247" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="0kw-t4-DcN">
-                    <rect key="frame" x="6" y="4" width="48" height="62"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0kw-t4-DcN">
+                    <rect key="frame" x="6" y="4" width="62" height="62"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="90" id="A0x-WX-x1a"/>
+                        <constraint firstAttribute="width" secondItem="0kw-t4-DcN" secondAttribute="height" multiplier="1:1" id="W9c-ff-1ds"/>
+                        <constraint firstAttribute="height" constant="62" id="z6W-PJ-dk5"/>
+                    </constraints>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="VLC" id="7Ns-2s-EgU"/>
                 </imageView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="Byt-pH-60l">
-                    <rect key="frame" x="60" y="42" width="183" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Byt-pH-60l">
+                    <rect key="frame" x="74" y="42" width="167" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="The Fox (What Does the Fox Say?) to this very very" usesSingleLineMode="YES" id="Fo7-qA-sCC">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="FnZ-Gr-BKf">
-                    <rect key="frame" x="60" y="27" width="183" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="FnZ-Gr-BKf">
+                    <rect key="frame" x="74" y="27" width="167" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="by Ylvis" usesSingleLineMode="YES" id="TWt-2V-iGT">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" red="0.021842277486911033" green="0.021842277486911033" blue="0.021842277486911033" alpha="1" colorSpace="calibratedRGB"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="SKt-XT-Vki">
-                    <rect key="frame" x="60" y="12" width="183" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="SKt-XT-Vki">
+                    <rect key="frame" x="74" y="12" width="167" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="on “The Fox”" usesSingleLineMode="YES" id="IKI-Pl-Iji">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -102,15 +106,29 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="SKt-XT-Vki" secondAttribute="trailing" constant="8" id="3dK-k6-jdo"/>
+                <constraint firstAttribute="bottom" secondItem="0kw-t4-DcN" secondAttribute="bottom" constant="4" id="3mr-9q-uiU"/>
+                <constraint firstItem="Byt-pH-60l" firstAttribute="leading" secondItem="0kw-t4-DcN" secondAttribute="trailing" constant="8" id="5xj-kL-0Iz"/>
+                <constraint firstItem="FnZ-Gr-BKf" firstAttribute="top" secondItem="Byt-pH-60l" secondAttribute="bottom" constant="-2" id="Afa-VQ-Ylp"/>
+                <constraint firstItem="SKt-XT-Vki" firstAttribute="top" secondItem="FnZ-Gr-BKf" secondAttribute="bottom" constant="-2" id="Dbl-82-Tbg"/>
+                <constraint firstAttribute="trailing" secondItem="Byt-pH-60l" secondAttribute="trailing" constant="8" id="KPq-cq-e0H"/>
+                <constraint firstAttribute="trailing" secondItem="FnZ-Gr-BKf" secondAttribute="trailing" constant="8" id="NMl-LX-jSq"/>
+                <constraint firstItem="0kw-t4-DcN" firstAttribute="leading" secondItem="fDN-Tb-DeD" secondAttribute="leading" constant="6" id="Rcw-oP-eQe"/>
+                <constraint firstItem="SKt-XT-Vki" firstAttribute="leading" secondItem="FnZ-Gr-BKf" secondAttribute="leading" id="X9d-lo-yGH"/>
+                <constraint firstItem="0kw-t4-DcN" firstAttribute="top" secondItem="fDN-Tb-DeD" secondAttribute="top" constant="4" id="kXt-fY-Yce"/>
+                <constraint firstItem="Byt-pH-60l" firstAttribute="top" secondItem="fDN-Tb-DeD" secondAttribute="top" constant="11" id="qYF-pm-VnY"/>
+                <constraint firstAttribute="bottom" secondItem="SKt-XT-Vki" secondAttribute="bottom" constant="12" id="sye-FJ-k4l"/>
+                <constraint firstItem="FnZ-Gr-BKf" firstAttribute="leading" secondItem="Byt-pH-60l" secondAttribute="leading" id="vrb-x1-kSG"/>
+            </constraints>
             <point key="canvasLocation" x="370.5" y="-52"/>
         </customView>
         <customView id="v97-Ct-Yqs">
-            <rect key="frame" x="0.0" y="0.0" width="247" height="45"/>
+            <rect key="frame" x="0.0" y="0.0" width="251" height="45"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <button verticalHuggingPriority="750" id="rih-mA-gAq">
-                    <rect key="frame" x="32" y="1" width="184" height="14"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rih-mA-gAq">
+                    <rect key="frame" x="103" y="-153" width="4" height="15"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" transparent="YES" imageScaling="proportionallyDown" inset="2" id="RbD-Js-cLU">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -119,9 +137,12 @@
                         <action selector="toggelProgressTime:" target="-2" id="S3e-vr-guH"/>
                     </connections>
                 </button>
-                <button id="p8X-zU-PwN" customClass="VLCImageButton">
-                    <rect key="frame" x="76" y="20" width="28" height="24"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="p8X-zU-PwN" customClass="VLCImageButton">
+                    <rect key="frame" x="84" y="20" width="24" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="5IV-1l-2UV"/>
+                        <constraint firstAttribute="width" secondItem="p8X-zU-PwN" secondAttribute="height" multiplier="1:1" id="lkX-DA-UeD"/>
+                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPreviousTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="PSI-Wi-u0R">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -130,9 +151,12 @@
                         <action selector="statusBarIconPrevious:" target="-2" id="kAL-hK-8qL"/>
                     </connections>
                 </button>
-                <button id="lvI-lN-t4O" customClass="VLCImageButton">
-                    <rect key="frame" x="109" y="20" width="28" height="24"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="lvI-lN-t4O" customClass="VLCImageButton">
+                    <rect key="frame" x="113" y="20" width="24" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="VH7-ja-clp"/>
+                        <constraint firstAttribute="width" secondItem="lvI-lN-t4O" secondAttribute="height" multiplier="1:1" id="kzq-fw-PfK"/>
+                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPlayTemplate" imagePosition="only" alignment="center" alternateImage="VLCPauseTemplate" imageScaling="proportionallyUpOrDown" inset="2" id="nqu-wV-vI1">
                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -144,9 +168,12 @@
                         <action selector="statusBarIconTogglePlayPause:" target="-2" id="K38-Dr-lNS"/>
                     </connections>
                 </button>
-                <button id="NHj-Vf-SPF" customClass="VLCImageButton">
-                    <rect key="frame" x="141" y="20" width="28" height="24"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="NHj-Vf-SPF" customClass="VLCImageButton">
+                    <rect key="frame" x="141" y="20" width="24" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="NHj-Vf-SPF" secondAttribute="height" multiplier="1:1" id="WY1-gG-mtJ"/>
+                        <constraint firstAttribute="height" constant="24" id="YJ5-t2-qjF"/>
+                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCNextTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="BIa-Vy-yD2">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -155,9 +182,12 @@
                         <action selector="statusBarIconNext:" target="-2" id="4I4-wu-R5u"/>
                     </connections>
                 </button>
-                <button id="PaW-Fe-vxo">
-                    <rect key="frame" x="179" y="12" width="18" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="PaW-Fe-vxo">
+                    <rect key="frame" x="180" y="12" width="21" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="7y1-o7-Gbn"/>
+                        <constraint firstAttribute="width" secondItem="PaW-Fe-vxo" secondAttribute="height" multiplier="1:1" id="vLQ-Kw-bgS"/>
+                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCShuffleTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="VEm-qG-2cc">
                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -166,27 +196,24 @@
                         <action selector="statusBarIconToggleRandom:" target="-2" id="IHE-JL-EfK"/>
                     </connections>
                 </button>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="z3X-aG-Veg">
-                    <rect key="frame" x="18" y="0.0" width="100" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z3X-aG-Veg">
+                    <rect key="frame" x="88" y="1" width="33" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="--:--" usesSingleLineMode="YES" id="CLT-p2-bxf">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="za4-8d-tZy">
-                    <rect key="frame" x="115" y="1" width="17" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="za4-8d-tZy">
+                    <rect key="frame" x="119" y="1" width="13" height="17"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="/" usesSingleLineMode="YES" id="y3P-oA-eTa">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="wXO-2p-mxK">
-                    <rect key="frame" x="127" y="0.0" width="102" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wXO-2p-mxK">
+                    <rect key="frame" x="126" y="1" width="33" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="--:--" usesSingleLineMode="YES" id="vF8-Z8-vhW">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -194,6 +221,26 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <constraints>
+                <constraint firstItem="PaW-Fe-vxo" firstAttribute="centerY" secondItem="v97-Ct-Yqs" secondAttribute="centerY" id="42L-1o-8cA"/>
+                <constraint firstItem="za4-8d-tZy" firstAttribute="leading" secondItem="z3X-aG-Veg" secondAttribute="trailing" constant="2" id="4bG-Pe-3cU"/>
+                <constraint firstItem="z3X-aG-Veg" firstAttribute="centerY" secondItem="za4-8d-tZy" secondAttribute="centerY" id="8VB-Dt-jgU"/>
+                <constraint firstItem="lvI-lN-t4O" firstAttribute="left" secondItem="p8X-zU-PwN" secondAttribute="right" constant="5" id="8qk-us-Qmc"/>
+                <constraint firstItem="za4-8d-tZy" firstAttribute="top" secondItem="lvI-lN-t4O" secondAttribute="bottom" constant="2" id="DTr-sG-enY"/>
+                <constraint firstItem="za4-8d-tZy" firstAttribute="centerX" secondItem="v97-Ct-Yqs" secondAttribute="centerX" id="DVz-hc-j3Y"/>
+                <constraint firstAttribute="bottom" secondItem="za4-8d-tZy" secondAttribute="bottom" constant="1" id="GoL-sY-3XZ"/>
+                <constraint firstItem="p8X-zU-PwN" firstAttribute="centerY" secondItem="lvI-lN-t4O" secondAttribute="centerY" id="KWu-wM-R6c"/>
+                <constraint firstItem="NHj-Vf-SPF" firstAttribute="centerY" secondItem="lvI-lN-t4O" secondAttribute="centerY" id="NSu-xN-eSD"/>
+                <constraint firstItem="wXO-2p-mxK" firstAttribute="centerY" secondItem="za4-8d-tZy" secondAttribute="centerY" id="RwL-B7-pNI"/>
+                <constraint firstItem="PaW-Fe-vxo" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NHj-Vf-SPF" secondAttribute="trailing" constant="10" id="YH5-QF-W4F"/>
+                <constraint firstItem="lvI-lN-t4O" firstAttribute="top" secondItem="v97-Ct-Yqs" secondAttribute="top" constant="1" id="iT5-o0-kGi"/>
+                <constraint firstAttribute="trailing" secondItem="PaW-Fe-vxo" secondAttribute="trailing" constant="50" id="oNo-R6-lGu"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wXO-2p-mxK" secondAttribute="trailing" constant="10" id="r0h-9T-Nta"/>
+                <constraint firstItem="lvI-lN-t4O" firstAttribute="centerX" secondItem="v97-Ct-Yqs" secondAttribute="centerX" id="rNe-e3-3aF"/>
+                <constraint firstItem="z3X-aG-Veg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="v97-Ct-Yqs" secondAttribute="leading" constant="10" id="vF3-RT-xhz"/>
+                <constraint firstItem="za4-8d-tZy" firstAttribute="trailing" secondItem="wXO-2p-mxK" secondAttribute="leading" constant="2" id="vk9-j9-Mmu"/>
+                <constraint firstItem="NHj-Vf-SPF" firstAttribute="left" secondItem="lvI-lN-t4O" secondAttribute="right" constant="4" id="xzh-Vk-QlB"/>
+            </constraints>
             <point key="canvasLocation" x="370.5" y="100.5"/>
         </customView>
     </objects>

@@ -90,6 +90,10 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+
+    [_controlsView setAutoresizingMask:NSViewWidthSizable];
+    [_playbackInfoView setAutoresizingMask:NSViewWidthSizable];
+
     [self configurationChanged:nil];
 
     // Set Accessibility Attributes for Image Buttons
