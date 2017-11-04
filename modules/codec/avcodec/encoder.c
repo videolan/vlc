@@ -1094,16 +1094,11 @@ static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_e
         if ( current_date + HURRY_UP_GUARD2 > frame->pts )
         {
             p_sys->p_context->trellis = 0;
-            p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
-                + (HURRY_UP_GUARD2 + current_date - frame->pts) / 500;
             msg_Dbg( p_enc, "hurry up mode 2" );
         }
         else
         {
             p_sys->p_context->trellis = p_sys->b_trellis;
-
-            p_sys->p_context->noise_reduction =
-               p_sys->i_noise_reduction;
         }
     }
 
