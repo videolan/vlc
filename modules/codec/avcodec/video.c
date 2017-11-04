@@ -1166,7 +1166,17 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
         else
         {
-            picture_Hold( p_pic );
+            /* Some codecs can return the same frame multiple times. By the
+             * time that the same frame is returned a second time, it will be
+             * too late to clone the underlying picture. So clone proactively.
+             * A single picture CANNOT be queued multiple times.
+             */
+            p_pic = picture_Clone( p_pic );
+            if( unlikely(p_pic == NULL) )
+            {
+                av_frame_free(&frame);
+                break;
+            }
         }
 
         if( !p_dec->fmt_in.video.i_sar_num || !p_dec->fmt_in.video.i_sar_den )
