@@ -97,16 +97,13 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     playlist_t *p_playlist = p_data;
 
-    if( newval.i_int != INPUT_EVENT_STATE &&
-        newval.i_int != INPUT_EVENT_DEAD )
-        return VLC_SUCCESS;
-
-    PL_LOCK;
-
-    /* XXX: signaling while not changing any parameter... suspicious... */
-    vlc_cond_signal( &pl_priv(p_playlist)->signal );
-
-    PL_UNLOCK;
+    if( newval.i_int == INPUT_EVENT_DEAD )
+    {
+        PL_LOCK;
+        /* XXX: signaling while not changing any parameter... suspicious... */
+        vlc_cond_signal( &pl_priv(p_playlist)->signal );
+        PL_UNLOCK;
+    }
     return VLC_SUCCESS;
 }
 
