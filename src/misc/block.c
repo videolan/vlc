@@ -119,6 +119,12 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
 
 block_t *block_Alloc (size_t size)
 {
+    if (unlikely(size >> 27))
+    {
+        errno = ENOBUFS;
+        return NULL;
+    }
+
     /* 2 * BLOCK_PADDING: pre + post padding */
     const size_t alloc = sizeof (block_t) + BLOCK_ALIGN + (2 * BLOCK_PADDING)
                        + size;
