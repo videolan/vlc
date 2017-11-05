@@ -426,32 +426,33 @@ static void LoopInput( playlist_t *p_playlist )
 
     assert( p_input != NULL );
 
-    if( p_sys->request.b_request || p_sys->killed )
+    /* Wait for input to end or be stopped */
+    while( !p_sys->request.input_dead )
     {
-        PL_DEBUG( "incoming request - stopping current input" );
-        input_Stop( p_input );
-    }
-
-    if( p_sys->request.input_dead )
-    {   /* This input is dead. Remove it ! */
-        p_sys->p_input = NULL;
-        p_sys->request.input_dead = false;
-        PL_DEBUG( "dead input" );
-        PL_UNLOCK;
-
-        var_SetAddress( p_playlist, "input-current", NULL );
-
-        /* WARNING: Input resource manipulation and callback deletion are
-         * incompatible with the playlist lock. */
-        if( !var_InheritBool( p_input, "sout-keep" ) )
-            input_resource_TerminateSout( p_sys->p_input_resource );
-        var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
-
-        input_Close( p_input );
-        PL_LOCK;
-    }
-    else
+        if( p_sys->request.b_request || p_sys->killed )
+        {
+            PL_DEBUG( "incoming request - stopping current input" );
+            input_Stop( p_input );
+        }
         vlc_cond_wait( &p_sys->signal, &p_sys->lock );
+    }
+
+    /* This input is dead. Remove it ! */
+    PL_DEBUG( "dead input" );
+    p_sys->p_input = NULL;
+    p_sys->request.input_dead = false;
+    PL_UNLOCK;
+
+    var_SetAddress( p_playlist, "input-current", NULL );
+
+    /* WARNING: Input resource manipulation and callback deletion are
+     * incompatible with the playlist lock. */
+    if( !var_InheritBool( p_input, "sout-keep" ) )
+        input_resource_TerminateSout( p_sys->p_input_resource );
+    var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
+
+    input_Close( p_input );
+    PL_LOCK;
 }
 
 static bool Next( playlist_t *p_playlist )
@@ -485,15 +486,11 @@ static void *Thread ( void *data )
             continue;
         }
 
+        /* Playlist in running state */
         while( !p_sys->killed && Next( p_playlist ) )
-        {   /* Playlist in running state */
-            assert(p_sys->p_input != NULL);
+            LoopInput( p_playlist );
 
-            do
-                LoopInput( p_playlist );
-            while( p_sys->p_input != NULL );
-        }
-
+        /* Playlist stopping */
         msg_Dbg( p_playlist, "nothing to play" );
         if( var_InheritBool( p_playlist, "play-and-exit" ) )
         {
