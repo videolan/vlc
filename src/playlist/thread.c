@@ -99,9 +99,11 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.i_int == INPUT_EVENT_DEAD )
     {
+        playlist_private_t *sys = pl_priv(p_playlist);
+
         PL_LOCK;
-        /* XXX: signaling while not changing any parameter... suspicious... */
-        vlc_cond_signal( &pl_priv(p_playlist)->signal );
+        sys->request.input_dead = true;
+        vlc_cond_signal( &sys->signal );
         PL_UNLOCK;
     }
     return VLC_SUCCESS;
@@ -430,12 +432,10 @@ static void LoopInput( playlist_t *p_playlist )
         input_Stop( p_input );
     }
 
-    switch( var_GetInteger( p_input, "state" ) )
-    {
-    case END_S:
-    case ERROR_S:
-    /* This input is dead. Remove it ! */
+    if( p_sys->request.input_dead )
+    {   /* This input is dead. Remove it ! */
         p_sys->p_input = NULL;
+        p_sys->request.input_dead = false;
         PL_DEBUG( "dead input" );
         PL_UNLOCK;
 
@@ -449,10 +449,9 @@ static void LoopInput( playlist_t *p_playlist )
 
         input_Close( p_input );
         PL_LOCK;
-        break;
-    default:
-        vlc_cond_wait( &p_sys->signal, &p_sys->lock );
     }
+    else
+        vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 }
 
 static bool Next( playlist_t *p_playlist )
