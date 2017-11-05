@@ -473,6 +473,7 @@ static void *Thread ( void *data )
 {
     playlist_t *p_playlist = data;
     playlist_private_t *p_sys = pl_priv(p_playlist);
+    bool played = false;
 
     PL_LOCK;
     while( !p_sys->killed )
@@ -488,11 +489,14 @@ static void *Thread ( void *data )
 
         /* Playlist in running state */
         while( !p_sys->killed && Next( p_playlist ) )
+        {
             LoopInput( p_playlist );
+            played = true;
+        }
 
         /* Playlist stopping */
         msg_Dbg( p_playlist, "nothing to play" );
-        if( var_InheritBool( p_playlist, "play-and-exit" ) )
+        if( played && var_InheritBool( p_playlist, "play-and-exit" ) )
         {
             msg_Info( p_playlist, "end of playlist, exiting" );
             libvlc_Quit( p_playlist->obj.libvlc );
