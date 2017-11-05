@@ -34,6 +34,7 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <limits.h>
 #include <unistd.h>
 #ifdef HAVE_POLL
 # include <poll.h>
@@ -137,9 +138,8 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     }
     free( psz_socks );
 
-    int timeout = var_InheritInteger (p_this, "ipv4-timeout");
-    if (timeout < 0)
-        timeout = -1;
+    mtime_t timeout = var_InheritInteger(p_this, "ipv4-timeout")
+                      * (CLOCK_FREQ / 1000);
 
     for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
@@ -161,16 +161,28 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             }
 
             struct pollfd ufd;
+            mtime_t deadline = VLC_TS_INVALID;
 
             ufd.fd = fd;
             ufd.events = POLLOUT;
+            if (timeout > 0)
+                deadline = mdate() + timeout;
 
-            do  /* NOTE: timeout screwed up if we catch a signal (EINTR) */
+            do
             {
+                int ms = -1;
+
                 if (vlc_killed())
                     goto next_ai;
 
-                val = vlc_poll_i11e(&ufd, 1, timeout);
+                if (deadline != VLC_TS_INVALID)
+                {
+                    ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
+                    if (ms > INT_MAX)
+                        ms = INT_MAX;
+                }
+
+                val = vlc_poll_i11e(&ufd, 1, ms);
             }
             while (val == -1 && errno == EINTR);
 
