@@ -108,14 +108,16 @@ typedef struct {
     bool                    b_full_range;
 } dxgi_color_space;
 
+typedef struct {
+    const dxgi_color_space   *colorspace;
+    unsigned                 luminance_peak;
+} display_info_t;
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
 
-    struct { /* TODO may go in vout_display_info_t without DXGI */
-        const dxgi_color_space   *colorspace;
-        unsigned                 luminance_peak;
-    } display;
+    display_info_t           display;
 
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
