@@ -606,10 +606,12 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     audio_output_t *p_aout;
     input_thread_t *p_input;
 
+    if (!audioDeviceMenu)
+        audioDeviceMenu = new QMenu( qtr( "Audio &Device" ) );
+
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        audioDeviceMenu = new QMenu(qtr( "Audio &Device" ), current );
         current->addMenu( audioDeviceMenu );
         addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
         current->addSeparator();
@@ -662,12 +664,14 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
 
+    if ( !rendererMenu )
+        rendererMenu = RendererMenu( p_intf );
+
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
 
         current->addSeparator();
-        rendererMenu = RendererMenu( p_intf, current );
         current->addMenu( rendererMenu );
 
         current->addSeparator();
