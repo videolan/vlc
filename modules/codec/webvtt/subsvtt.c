@@ -932,6 +932,25 @@ static text_style_t * InheritStyles( decoder_t *p_dec, const webvtt_dom_node_t *
     return p_style;
 }
 
+static int GetCueTextAlignment( const webvtt_dom_cue_t *p_cue )
+{
+    switch( p_cue->settings.align )
+    {
+        case WEBVTT_ALIGN_LEFT:
+            return SUBPICTURE_ALIGN_LEFT;
+        case WEBVTT_ALIGN_RIGHT:
+            return SUBPICTURE_ALIGN_RIGHT;
+        case WEBVTT_ALIGN_START:
+            return ((p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT) ?
+                     SUBPICTURE_ALIGN_LEFT : SUBPICTURE_ALIGN_RIGHT);
+        case WEBVTT_ALIGN_END:
+            return ((p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT)) ?
+                     SUBPICTURE_ALIGN_RIGHT : SUBPICTURE_ALIGN_LEFT;
+        default:
+            return 0;
+    }
+}
+
 struct render_variables_s
 {
     const webvtt_region_t *p_region;
@@ -1017,7 +1036,21 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
                     pp_append = &((*pp_append)->p_next);
             }
 
+            if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT ) /* LTR */
+            {
+                *pp_append = text_segment_New( "\u2067" );
+                if( *pp_append )
+                    pp_append = &((*pp_append)->p_next);
+            }
+
             *pp_append = p_new;
+
+            if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT )
+            {
+                *pp_append = text_segment_New( "\u2069" );
+                if( *pp_append )
+                    pp_append = &((*pp_append)->p_next);
+            }
         }
     }
     return p_segments;
@@ -1106,6 +1139,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
             }
 
             p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+            p_updtregion->inner_align = GetCueTextAlignment( (const webvtt_dom_cue_t *)p_vttregion->p_child );
             p_updtregion->origin.x = v.i_left;
             p_updtregion->origin.y = v.i_top;
             p_updtregion->extent.x = p_vttregion->f_width;
@@ -1138,6 +1172,8 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
             }
 
             p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
+            p_updtregion->inner_align = GetCueTextAlignment( p_cue );
+
             p_updtregion->p_segments = p_segments;
         }
     }
