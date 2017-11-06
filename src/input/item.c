@@ -1456,6 +1456,13 @@ static uint8_t rdh_get_slave_priority(input_item_t *p_item,
     if (!psz_item_name || !psz_slave_name)
         goto done;
 
+    size_t i_item_len = strlen(psz_item_name);
+    size_t i_slave_len = strlen(psz_slave_name);
+
+    /* The slave name len should not be twice longer than the item name len. */
+    if (i_item_len > i_slave_len || i_slave_len > 2 * i_item_len)
+        goto done;
+
     /* check if the names match exactly */
     if (!strcmp(psz_item_name, psz_slave_name))
     {
@@ -1545,6 +1552,10 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh,
     {
         input_item_node_t *p_node = p_parent_node->pp_children[i];
         input_item_t *p_item = p_node->p_item;
+
+        enum slave_type unused;
+        if (input_item_slave_GetType(p_item->psz_name, &unused))
+            continue; /* don't match 2 possible slaves between each others */
 
         for (size_t j = 0; j < p_rdh->i_slaves; j++)
         {

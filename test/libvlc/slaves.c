@@ -24,7 +24,6 @@
 #include <vlc_threads.h>
 
 #define SLAVES_DIR SRCDIR "/samples/slaves"
-#define MAIN_MEDIA_PATH SLAVES_DIR "/test.mp4"
 
 static void
 finished_event(const libvlc_event_t *p_ev, void *p_data)
@@ -106,6 +105,7 @@ test_expected_slaves(libvlc_media_t *p_m,
 
 static void
 test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
+                                  const char *psz_main_media,
                                   libvlc_media_slave_t *p_expected_slaves,
                                   unsigned i_expected_slaves)
 {
@@ -115,7 +115,7 @@ test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
     printf("Parse media dir to get subitems\n");
     media_parse_sync(p_m);
 
-    char *psz_main_media_mrl = path_to_mrl(p_vlc, MAIN_MEDIA_PATH);
+    char *psz_main_media_mrl = path_to_mrl(p_vlc, psz_main_media);
     assert(psz_main_media_mrl != NULL);
     printf("Main media mrl: '%s'\n", psz_main_media_mrl);
 
@@ -159,17 +159,17 @@ main (void)
     test_init();
 
     const char *pp_slave_paths[] = {
-        SLAVES_DIR "/nomatch.srt",
-        SLAVES_DIR "/left-test.srt",
-        SLAVES_DIR "/test-right.srt",
         SLAVES_DIR "/test.aac",
+        SLAVES_DIR "/test.rt.srt",
+        SLAVES_DIR "/lt-test.srt",
+        SLAVES_DIR "/nomatch.srt",
     };
 
     libvlc_media_slave_t p_expected_slaves[] = {
-        { NULL, libvlc_media_slave_type_subtitle, 0 /* none */ },
-        { NULL, libvlc_media_slave_type_subtitle, 1 /* left */ },
-        { NULL, libvlc_media_slave_type_subtitle, 2 /* right */ },
         { NULL, libvlc_media_slave_type_audio, 3 /* all */ },
+        { NULL, libvlc_media_slave_type_subtitle, 2 /* right */ },
+        { NULL, libvlc_media_slave_type_subtitle, 1 /* left */ },
+        { NULL, libvlc_media_slave_type_subtitle, 0 /* none */ },
     };
 
     #define EXPECTED_SLAVES_COUNT (sizeof(p_expected_slaves) / sizeof(*p_expected_slaves))
@@ -194,16 +194,45 @@ main (void)
         assert(p_expected_slaves[i].psz_uri != NULL);
     }
 
-    printf("== Test if a media has slaves from its parent ==\n");
-    test_media_has_slaves_from_parent(p_vlc, p_expected_slaves,
+    printf("== Testing --sub-autodetect-fuzzy 1 (everything) ==\n");
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
+                                      p_expected_slaves,
                                       EXPECTED_SLAVES_COUNT);
     libvlc_release(p_vlc);
 
-    printf("== Test if a media doesn't have slaves from its parent ==\n");
+    printf("== Testing --sub-autodetect-fuzzy 2 (full, left, and right match) ==\n");
+    pp_args[2] = "2";
+    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    assert(p_vlc != NULL);
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
+                                      p_expected_slaves, 3);
+
+    printf("== Testing if the matching is not too permissive  ==\n");
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/t.mp4",
+                                      NULL, 0);
+    libvlc_release(p_vlc);
+
+    printf("== Testing --sub-autodetect-fuzzy 3 (full and left match) ==\n");
+    pp_args[2] = "3";
+    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    assert(p_vlc != NULL);
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
+                                      p_expected_slaves, 2);
+    libvlc_release(p_vlc);
+
+    printf("== Testing --sub-autodetect-fuzzy 4 (full match) ==\n");
+    pp_args[2] = "4";
+    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    assert(p_vlc != NULL);
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
+                                      p_expected_slaves, 1);
+    libvlc_release(p_vlc);
+
+    printf("== Testing  --no-sub-autodetect-file (no match) ==\n");
     pp_args[ARGC - 1] = "--no-sub-autodetect-file";
     p_vlc = libvlc_new(ARGC, pp_args);
     assert(p_vlc != NULL);
-    test_media_has_slaves_from_parent(p_vlc, NULL, 0);
+    test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4", NULL, 0);
     libvlc_release(p_vlc);
 
     for (unsigned int i = 0; i < EXPECTED_SLAVES_COUNT; ++i)
