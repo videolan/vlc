@@ -178,6 +178,8 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                 if (deadline != VLC_TS_INVALID)
                 {
                     ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
+                    if (ms < 0)
+                        ms = 0;
                     if (ms > INT_MAX)
                         ms = INT_MAX;
                 }
