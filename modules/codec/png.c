@@ -264,7 +264,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         png_set_alpha_mode( p_png, PNG_ALPHA_OPTIMIZED, PNG_DEFAULT_sRGB );
 
     /* Strip to 8 bits per channel */
-    if( i_bit_depth == 16 ) png_set_strip_16( p_png );
+    if( i_bit_depth == 16 )
+    {
+#if PNG_LIBPNG_VER >= 10504
+        png_set_scale_16( p_png );
+#else
+        png_set_strip_16( p_png );
+#endif
+    }
 
     if( png_get_valid( p_png, p_info, PNG_INFO_tRNS ) )
     {
