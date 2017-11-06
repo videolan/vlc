@@ -778,6 +778,11 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
     es_format_Copy( &p_filter->fmt_in, p_fmt_in );
     es_format_Copy( &p_filter->fmt_out, p_fmt_in );
     video_format_Copy( &p_filter->fmt_out.video, p_fmt_out );
+
+    /* whatever the input offset, write at offset 0 in the target image */
+    p_filter->fmt_out.video.i_x_offset = 0;
+    p_filter->fmt_out.video.i_y_offset = 0;
+
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
     p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
 
