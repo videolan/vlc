@@ -233,6 +233,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
                                       bool b_items_expected)
 {
     libvlc_media_add_option(media, ":ignore-filetypes= ");
+    libvlc_media_add_option(media, ":no-sub-autodetect-file");
 
     bool subitems_found[TEST_SUBITEMS_COUNT] = { 0 };
     vlc_sem_t sem;
