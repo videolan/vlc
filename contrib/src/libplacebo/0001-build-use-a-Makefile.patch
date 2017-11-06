@@ -42,7 +42,7 @@ index 0000000..36e7f26
 +	cp libplacebo.a $(PREFIX)/lib/
 +	@echo "Name: libplacebo" > $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Description: Reusable library for GPU-accelerated video/image rendering" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
-+	@echo "Version: 0.1.0" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
++	@echo "Version: 0.1.2" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Libs: -L$(PREFIX)/lib -lplacebo $(lpthread_libs)" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Cflags: -I$(PREFIX)/include" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +
