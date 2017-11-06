@@ -73,33 +73,33 @@ test_expected_slaves(libvlc_media_t *p_m,
     unsigned int i_slave_count = libvlc_media_slaves_get(p_m, &pp_slaves);
     assert(i_expected_slaves == i_slave_count);
 
-    if (i_expected_slaves > 0)
+    unsigned i_found_slaves = 0;
+    bool *p_found_list = calloc(i_expected_slaves, sizeof(bool));
+    assert(p_found_list != NULL);
+    for (unsigned int i = 0; i < i_slave_count; ++i)
     {
-        bool *p_found_list = calloc(i_expected_slaves, sizeof(bool));
-        assert(p_found_list != NULL);
-        for (unsigned int i = 0; i < i_slave_count; ++i)
+        libvlc_media_slave_t *p_slave1 = pp_slaves[i];
+        for (unsigned int j = 0; j < i_expected_slaves; ++j)
         {
-            libvlc_media_slave_t *p_slave1 = pp_slaves[i];
-            for (unsigned int j = 0; i < i_expected_slaves; ++j)
+            libvlc_media_slave_t *p_slave2 = &p_expected_slaves[j];
+            if (strcmp(p_slave1->psz_uri, p_slave2->psz_uri) == 0)
             {
-                libvlc_media_slave_t *p_slave2 = &p_expected_slaves[j];
-                if (strcmp(p_slave1->psz_uri, p_slave2->psz_uri) == 0)
-                {
-                    assert(p_found_list[j] == false);
-                    assert(p_slave1->i_type == p_slave2->i_type);
-                    assert(p_slave1->i_priority == p_slave2->i_priority);
-                    p_found_list[j] = true;
-                    break;
-                }
+                assert(p_found_list[j] == false);
+                assert(p_slave1->i_type == p_slave2->i_type);
+                assert(p_slave1->i_priority == p_slave2->i_priority);
+                p_found_list[j] = true;
+                i_found_slaves++;
+                break;
             }
         }
-        for (unsigned int i = 0; i < i_expected_slaves; ++i)
-        {
-            printf("Check if slaves[%d] is found\n", i);
-            assert(p_found_list[i]);
-        }
-        free(p_found_list);
     }
+    assert(i_expected_slaves == i_found_slaves);
+    for (unsigned int i = 0; i < i_expected_slaves; ++i)
+    {
+        printf("Check if slaves[%d] is found\n", i);
+        assert(p_found_list[i]);
+    }
+    free(p_found_list);
 
     libvlc_media_slaves_release(pp_slaves, i_slave_count);
 }
