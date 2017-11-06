@@ -274,7 +274,8 @@ static void Close ( vlc_object_t * p_this )
     free( p_sys->track );
 
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
-    vlc_meta_Delete( p_sys->meta );
+    if( p_sys->meta )
+        vlc_meta_Delete( p_sys->meta );
 
     for( unsigned i = 0; i < p_sys->i_attachment; i++)
         vlc_input_attachment_Delete(p_sys->attachment[i]);
