@@ -660,7 +660,6 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     for (unsigned i = 1; i < color_count; ++i)
     {
-        unsigned color_idx;
         if (yuv_swap_uv)
         {
             assert(color_count == 3);
