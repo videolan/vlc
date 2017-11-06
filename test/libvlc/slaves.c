@@ -104,52 +104,6 @@ test_expected_slaves(libvlc_media_t *p_m,
     libvlc_media_slaves_release(pp_slaves, i_slave_count);
 }
 
-#if 0
-static void
-mediaplayer_play_sync(libvlc_media_player_t *p_mp)
-{
-    vlc_sem_t sem;
-    vlc_sem_init(&sem, 0);
-
-    libvlc_event_manager_t *p_em = libvlc_media_player_event_manager(p_mp);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerPlaying, finished_event, &sem);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerEndReached, finished_event, &sem);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerEncounteredError, finished_event, &sem);
-
-    int i_ret = libvlc_media_player_play(p_mp);
-    assert(i_ret == 0);
-
-    vlc_sem_wait (&sem);
-
-    libvlc_event_detach(p_em, libvlc_MediaPlayerPlaying, finished_event, &sem);
-    libvlc_event_detach(p_em, libvlc_MediaPlayerEndReached, finished_event, &sem);
-    libvlc_event_detach(p_em, libvlc_MediaPlayerEncounteredError, finished_event, &sem);
-
-    libvlc_media_player_stop(p_mp);
-
-    vlc_sem_destroy (&sem);
-}
-
-static void
-test_media_has_slaves_from_player(libvlc_instance_t *p_vlc,
-                                  libvlc_media_slave_t *p_expected_slaves,
-                                  unsigned i_expected_slaves)
-{
-    /* This function test subtitles_Detect() when playing a local file */
-    libvlc_media_t *p_m = libvlc_media_new_path(p_vlc, MAIN_MEDIA_PATH);
-    assert(p_m != NULL);
-
-    libvlc_media_player_t *p_mp = libvlc_media_player_new_from_media(p_m);
-    assert(p_mp != NULL);
-    mediaplayer_play_sync(p_mp);
-
-    test_expected_slaves(p_m, p_expected_slaves, i_expected_slaves);
-
-    libvlc_media_release(p_m);
-    libvlc_media_player_release(p_mp);
-}
-#endif
-
 static void
 test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
                                   libvlc_media_slave_t *p_expected_slaves,
@@ -239,12 +193,6 @@ main (void)
         p_expected_slaves[i].psz_uri = path_to_mrl(p_vlc, pp_slave_paths[i]);
         assert(p_expected_slaves[i].psz_uri != NULL);
     }
-
-#if 0
-    printf("== Test if a media has slaves from a media player ==\n");
-    test_media_has_slaves_from_player(p_vlc, p_expected_slaves,
-                                      EXPECTED_SLAVES_COUNT - 1);
-#endif
 
     printf("== Test if a media has slaves from its parent ==\n");
     test_media_has_slaves_from_parent(p_vlc, p_expected_slaves,
