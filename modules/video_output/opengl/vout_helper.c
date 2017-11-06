@@ -49,16 +49,13 @@
 
 #define SPHERE_RADIUS 1.f
 
-#ifndef NDEBUG
-# define HAVE_GL_ASSERT_NOERROR
-#endif
-
-#ifdef __APPLE__
 /* FIXME: GL_ASSERT_NOERROR disabled for now because:
+ * Proper GL error handling need to be implemented
  * glClear(GL_COLOR_BUFFER_BIT) throws a GL_INVALID_FRAMEBUFFER_OPERATION on macOS
  * assert fails on vout_display_opengl_Delete on iOS
  */
-# undef HAVE_GL_ASSERT_NOERROR
+#if 0
+# define HAVE_GL_ASSERT_NOERROR
 #endif
 
 #ifdef HAVE_GL_ASSERT_NOERROR
