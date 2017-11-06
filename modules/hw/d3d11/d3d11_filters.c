@@ -508,7 +508,6 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     texDesc.Format = dstDesc.Format;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.CPUAccessFlags = 0;
     texDesc.ArraySize = 1;
     texDesc.Height = dstDesc.Height;
     texDesc.Width = dstDesc.Width;
