@@ -154,7 +154,7 @@ enum slave_priority
 #define SLAVE_AUDIO_EXTENSIONS \
     "ac3", "m4a", "aac", \
     "eac3",  "dtshd", "flac", \
-    "pcm", "dts"
+    "pcm", "dts", "mp3"
 
 struct input_item_slave
 {
