@@ -1059,7 +1059,10 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
 {
     Direct3D9DestroyScene(vd);
     if (vd->sys->sys.pool)
+    {
         picture_pool_Release(vd->sys->sys.pool);
+        vd->sys->sys.pool = NULL;
+    }
     Direct3D9DestroyShaders(vd);
 }
 
