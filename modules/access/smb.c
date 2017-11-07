@@ -34,6 +34,8 @@
 #   include <fcntl.h>
 #   include <sys/stat.h>
 #   include <io.h>
+#   include <windows.h>
+#   include <lm.h>
 #   define smbc_open(a,b,c) vlc_open(a,b,c)
 #   define smbc_stat(a,b) _stati64(a,b)
 #   define smbc_read read
@@ -50,6 +52,7 @@
 #include <vlc_input_item.h>
 #include <vlc_url.h>
 #include <vlc_keystore.h>
+#include <vlc_charset.h>
 
 #include "smb_common.h"
 
@@ -83,9 +86,7 @@ vlc_module_end ()
 static ssize_t Read( stream_t *, void *, size_t );
 static int Seek( stream_t *, uint64_t );
 static int Control( stream_t *, int, va_list );
-#ifndef _WIN32
 static int DirRead( stream_t *, input_item_node_t * );
-#endif
 
 struct access_sys_t
 {
@@ -235,16 +236,12 @@ static int Open( vlc_object_t *p_this )
 
     if( b_is_dir )
     {
-#ifdef _WIN32
-        free( psz_uri );
-        vlc_UrlClean( &url );
-        return VLC_EGENERIC;
-#else
         p_sys->url = url;
         p_access->pf_readdir = DirRead;
         p_access->pf_control = access_vaDirectoryControlHelper;
-        i_smb = smbc_opendir( psz_uri );
         i_size = 0;
+#ifndef _WIN32
+        i_smb = smbc_opendir( psz_uri );
         if( i_smb < 0 )
             vlc_UrlClean( &p_sys->url );
 #endif
@@ -258,12 +255,14 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_uri );
 
+#ifndef _WIN32
     if( i_smb < 0 )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
+#endif
 
     p_sys->size = i_size;
     p_sys->i_smb = i_smb;
@@ -330,18 +329,19 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
     return i_read;
 }
 
-#ifndef _WIN32
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
 static int DirRead (stream_t *p_access, input_item_node_t *p_node )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    struct smbc_dirent *p_entry;
     int i_ret = VLC_SUCCESS;
 
     struct vlc_readdir_helper rdh;
     vlc_readdir_helper_init( &rdh, p_access, p_node );
+
+#ifndef _WIN32
+    struct smbc_dirent *p_entry;
 
     while( i_ret == VLC_SUCCESS && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
     {
@@ -392,12 +392,75 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
                                             i_type, ITEM_NET );
         free( psz_uri );
     }
+#else
+    // Handle share listing from here. Directory browsing is handled by the
+    // usual filesystem module.
+    SHARE_INFO_1 *p_info;
+    DWORD i_share_enum_res;
+    DWORD i_nb_elem;
+    DWORD i_resume_handle = 0;
+    DWORD i_total_elements; // Unused, but needs to be passed
+    wchar_t *wpsz_host = ToWide( p_sys->url.psz_host );
+    if( wpsz_host == NULL )
+        return VLC_ENOMEM;
+    do
+    {
+        i_share_enum_res = NetShareEnum( wpsz_host, 1, (LPBYTE*)&p_info,
+                              MAX_PREFERRED_LENGTH, &i_nb_elem,
+                              &i_total_elements, &i_resume_handle );
+        if( i_share_enum_res == ERROR_SUCCESS ||
+            i_share_enum_res == ERROR_MORE_DATA )
+        {
+            for ( DWORD i = 0; i < i_nb_elem; ++i )
+            {
+                SHARE_INFO_1 *p_current = p_info + i;
+                if( p_current->shi1_type & STYPE_SPECIAL )
+                    continue;
+                char* psz_name = FromWide( p_current->shi1_netname );
+                if( psz_name == NULL )
+                {
+                    i_ret = VLC_ENOMEM;
+                    break;
+                }
+
+                char* psz_path;
+                if( smb_get_uri( p_access, &psz_path, NULL, NULL, NULL,
+                                 p_sys->url.psz_host, p_sys->url.psz_path,
+                                 psz_name ) < 0 )
+                {
+                    free( psz_name );
+                    i_ret = VLC_ENOMEM;
+                    break;
+                }
+                free( psz_name );
+                // We need to concatenate the scheme before, as the window version
+                // of smb_get_uri generates a path (and the other call site needs
+                // a path). The path is already prefixed by "//" so we just need
+                // to add "file:"
+                char* psz_uri;
+                if( asprintf( &psz_uri, "file:%s", psz_path ) < 0 )
+                {
+                    free( psz_path );
+                    i_ret = VLC_ENOMEM;
+                    break;
+                }
+                free( psz_path );
+
+                i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL,
+                                    psz_name, ITEM_TYPE_DIRECTORY, ITEM_NET );
+                free( psz_uri );
+            }
+        }
+        NetApiBufferFree( p_info );
+    } while( i_share_enum_res == ERROR_MORE_DATA && i_ret == VLC_SUCCESS );
+
+    free( wpsz_host );
+#endif
 
     vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
 
     return i_ret;
 }
-#endif
 
 /*****************************************************************************
  * Control:

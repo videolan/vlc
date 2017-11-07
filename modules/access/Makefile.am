@@ -344,7 +344,7 @@ libsmb_plugin_la_SOURCES = access/smb.c access/smb_common.h
 libsmb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
 libsmb_plugin_la_LIBADD = $(SMBCLIENT_LIBS)
 if HAVE_WIN32
-libsmb_plugin_la_LIBADD += -lmpr
+libsmb_plugin_la_LIBADD += -lmpr -lnetapi32
 endif
 libsmb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBsmb)
