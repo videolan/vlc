@@ -330,6 +330,8 @@
 #define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
 /* 32 bits BGRA */
 #define VLC_CODEC_BGRA            VLC_FOURCC('B','G','R','A')
+/* 32 bits BGRA 10:10:10:2 */
+#define VLC_CODEC_RGBA10          VLC_FOURCC('R','G','A','0')
 /* 64 bits RGBA */
 #define VLC_CODEC_RGBA64          VLC_FOURCC('R','G','A','4')
 
