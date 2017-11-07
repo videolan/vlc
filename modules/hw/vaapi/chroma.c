@@ -66,11 +66,12 @@ static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
 
     int i;
     for (i = 0; i < count; i++)
-        if (fmts[i].fourcc == VA_FOURCC_NV12)
+        if (fmts[i].fourcc == VA_FOURCC_NV12
+         || fmts[i].fourcc == VA_FOURCC_P010)
             break;
 
     int ret;
-    if (fmts[i].fourcc == VA_FOURCC_NV12
+    if ((fmts[i].fourcc == VA_FOURCC_NV12 || fmts[i].fourcc == VA_FOURCC_P010)
      && !vlc_vaapi_CreateImage(VLC_OBJECT(filter), va_dpy, &fmts[i],
                                src_pic->format.i_width, src_pic->format.i_height,
                                image_fallback))
@@ -87,23 +88,24 @@ static inline void
 FillPictureFromVAImage(picture_t *dest,
                        VAImage *src_img, uint8_t *src_buf, copy_cache_t *cache)
 {
+    uint8_t *       src_planes[2] = { src_buf + src_img->offsets[0],
+                                      src_buf + src_img->offsets[1] };
+    size_t          src_pitches[2] = { src_img->pitches[0],
+                                       src_img->pitches[1] };
+
     switch (src_img->format.fourcc)
     {
     case VA_FOURCC_NV12:
     {
-        uint8_t *       src_planes[2] = { src_buf + src_img->offsets[0],
-                                          src_buf + src_img->offsets[1] };
-        size_t          src_pitches[2] = { src_img->pitches[0],
-                                           src_img->pitches[1] };
-
         CopyFromNv12ToI420(dest, src_planes, src_pitches,
                            src_img->height, cache);
         break;
     }
-    /* TODO
-     * case VA_FOURCC_P010:
-     *    break;
-     */
+    case VA_FOURCC_P010:
+        /* P010ToP010 is the same than Nv12ToNV12 */
+        CopyFromNv12ToNv12(dest,  src_planes, src_pitches,
+                           src_img->height, cache);
+        break;
     default:
         vlc_assert_unreachable();
         break;
@@ -208,6 +210,16 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
 
         break;
     }
+    case VLC_CODEC_P010:
+    {
+        uint8_t *       src_planes[2] = { src->p[0].p_pixels,
+                                          src->p[1].p_pixels };
+        size_t          src_pitches[2] = { src->p[0].i_pitch,
+                                           src->p[1].i_pitch };
+        CopyFromNv12ToNv12(dest_pic,  src_planes, src_pitches,
+                           src->format.i_height, cache);
+        break;
+    }
     default:
         vlc_assert_unreachable();
     }
@@ -263,14 +275,18 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     if (filter->fmt_in.video.orientation != filter->fmt_out.video.orientation)
         return VLC_EGENERIC;
 
-    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420 &&
-        filter->fmt_out.video.i_chroma == VLC_CODEC_I420)
+    if ((filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420
+      && filter->fmt_out.video.i_chroma == VLC_CODEC_I420)
+     || (filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420_10BPP
+      && filter->fmt_out.video.i_chroma == VLC_CODEC_P010))
     {
         is_upload = false;
         filter->pf_video_filter = DownloadSurface;
     }
-    else if (filter->fmt_in.video.i_chroma == VLC_CODEC_I420 &&
-             filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420)
+    else if ((filter->fmt_in.video.i_chroma == VLC_CODEC_I420
+           && filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420)
+          || (filter->fmt_in.video.i_chroma == VLC_CODEC_P010
+           && filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420_10BPP))
     {
         is_upload = true;
         filter->pf_video_filter = UploadSurface;
