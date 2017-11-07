@@ -217,7 +217,7 @@ gas: gas-preprocessor-$(GAS_VERSION).tar.gz
 
 CLEAN_FILE += .gas
 CLEAN_PKG += gas
-DISTCLEAN_PKG += yuvi-gas-preprocessor-$(GAS_VERSION).tar.gz
+DISTCLEAN_PKG += gas-preprocessor-$(GAS_VERSION).tar.gz
 
 # Ragel State Machine Compiler
 ragel-$(RAGEL_VERSION).tar.gz:
