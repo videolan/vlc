@@ -122,9 +122,12 @@ static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button );
 
 static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-    VLC_UNUSED(hwnd); VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
-    event_thread_t *p_event = (event_thread_t *)idEvent;
-    UpdateCursor( p_event, false );
+    VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
+    if (hwnd)
+    {
+        event_thread_t *p_event = (event_thread_t *)idEvent;
+        UpdateCursor( p_event, false );
+    }
 }
 
 static void UpdateCursorMoved( event_thread_t *p_event )
