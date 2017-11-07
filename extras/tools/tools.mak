@@ -293,6 +293,26 @@ DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.gz
 CLEAN_FILE += .protoc
 
 #
+# GNU bison
+#
+
+bison-$(BISON_VERSION).tar.xz:
+	$(call download_pkg,$(BISON_URL),bison)
+
+bison: bison-$(BISON_VERSION).tar.xz
+	$(UNPACK)
+	$(MOVE)
+
+.bison: bison
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += bison
+DISTCLEAN_PKG += bison-$(BISON_VERSION).tar.xz
+CLEAN_FILE += .bison
+
+
+#
 #
 #
 
