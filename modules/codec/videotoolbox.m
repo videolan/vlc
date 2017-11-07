@@ -1680,7 +1680,12 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
     if(likely(p_info))
     {
+        /* Unlock the mutex because decoder_NewPicture() is blocking. Indeed,
+         * it can wait indefinitely when the input is paused. */
+        vlc_mutex_unlock(&p_sys->lock);
         picture_t *p_pic = decoder_NewPicture(p_dec);
+        vlc_mutex_lock(&p_sys->lock);
+
         if (!p_pic)
             goto end;
 
