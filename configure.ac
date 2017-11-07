@@ -1133,7 +1133,7 @@ AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
     ac_cv_ld_z_defs="no"
   ])
 ])
-AS_IF([test "${ac_cv_ld_z_defs}" = "no" -o "${with_sanitizer}" != "no"], [VLC_RESTORE_FLAGS])
+AS_IF([test "${ac_cv_ld_z_defs}" = "no"], [VLC_RESTORE_FLAGS])
 
 dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
