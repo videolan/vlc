@@ -1,0 +1,48 @@
+From 7df04f9b8a0adb1575ca0555775ec10860143cbf Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Fri, 7 Jul 2017 23:35:32 +0200
+Subject: vasnprintf: port to macOS 10.13
+
+Improve comments in last commit.
+---
+ lib/vasnprintf.c | 17 ++++++++++-------
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/lib/vasnprintf.c b/lib/vasnprintf.c
+index fecaf27..2e4eb19 100644
+--- a/lib/vasnprintf.c
++++ b/lib/vasnprintf.c
+@@ -4869,10 +4869,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
+ #endif
+                   *fbp = dp->conversion;
+ #if USE_SNPRINTF
+-# if ! (((__GLIBC__ > 2                                                 \
+-          || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))                  \
+-         && !defined __UCLIBC__)                                        \
+-        || (defined __APPLE__ && defined __MACH__)                      \
++# if ! (((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))        \
++         && !defined __UCLIBC__)                                            \
++        || (defined __APPLE__ && defined __MACH__)                          \
+         || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
+                 fbp[1] = '%';
+                 fbp[2] = 'n';
+@@ -4887,9 +4886,13 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
+                    in format strings in writable memory may crash the program
+                    (if compiled with _FORTIFY_SOURCE=2), so we should avoid it
+                    in this situation.  */
+-                /* macOS 10.13 High Sierra behaves like glibc with
+-                   _FORTIFY_SOURCE=2, and older macOS releases
+-                   presumably do not need %n.  */
++                /* On Mac OS X 10.3 or newer, we know that snprintf's return
++                   value conforms to ISO C 99: the tests gl_SNPRINTF_RETVAL_C99
++                   and gl_SNPRINTF_TRUNCATION_C99 pass.
++                   Therefore we can avoid using %n in this situation.
++                   On Mac OS X 10.13 or newer, the use of %n in format strings
++                   in writable memory by default crashes the program, so we
++                   should avoid it in this situation.  */
+                 /* On native Windows systems (such as mingw), we can avoid using
+                    %n because:
+                      - Although the gl_SNPRINTF_TRUNCATION_C99 test fails,
+-- 
+cgit v1.0-41-gc330
+

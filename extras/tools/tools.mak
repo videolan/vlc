@@ -301,6 +301,8 @@ bison-$(BISON_VERSION).tar.xz:
 
 bison: bison-$(BISON_VERSION).tar.xz
 	$(UNPACK)
+	$(APPLY) bison-macOS-c41f233c.patch
+	$(APPLY) bison-macOS-7df04f9.patch
 	$(MOVE)
 
 .bison: bison
