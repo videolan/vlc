@@ -28,8 +28,10 @@
  */
 %pure-parser
 
-%parse-param { yyscan_t scanner } { vlc_css_parser_t *css_parser }
-%lex-param   { yyscan_t scanner } { vlc_css_parser_t *css_parser }
+%parse-param { yyscan_t scanner }
+%parse-param { vlc_css_parser_t *css_parser }
+%lex-param   { yyscan_t scanner }
+%lex-param   { vlc_css_parser_t *css_parser }
 
 %{
 #ifdef HAVE_CONFIG_H
