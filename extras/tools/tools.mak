@@ -29,7 +29,7 @@ endif
 
 download_pkg = $(call download,$(VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload package $(lastword $(subst /, ,$(@))) to our FTP" )  \
-	&& sha512sum --check --ignore-missing SHA512SUMS
+	&& grep $(@) SHA512SUMS| shasum -a 512 -c
 
 UNPACK = $(RM) -R $@ \
     $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
