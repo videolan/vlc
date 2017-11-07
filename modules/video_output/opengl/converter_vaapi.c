@@ -157,12 +157,7 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
             goto error;
         release_image = true;
 
-        if (va_image.format.fourcc != priv->fourcc)
-        {
-            msg_Err(tc->gl, "fourcc changed");
-            /* TODO: fetch new fourcc and reconfigure shader */
-            goto error;
-        }
+        assert(va_image.format.fourcc == priv->fourcc);
 
         va_buffer_info = (VABufferInfo) {
             .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
