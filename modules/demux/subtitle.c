@@ -1884,7 +1884,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
             case 'S':
                  shift = isalpha( (unsigned char)psz_text[2] ) ? 6 : 2 ;
                  if ( shift > line_length )
-                     continue;
+                     break;
 
                  if( sscanf( &psz_text[shift], "%d", &h ) )
                  {
@@ -1923,7 +1923,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
             case 'T':
                 shift = isalpha( (unsigned char)psz_text[2] ) ? 8 : 2 ;
                 if ( shift > line_length )
-                    continue;
+                    break;
 
                 sscanf( &psz_text[shift], "%d", &p_props->jss.i_time_resolution );
                 break;
