@@ -108,60 +108,60 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
 
     vlc_css_term_t term0 = p_decl->expr->seq[0].term;
 
-    if( !strcmp( p_decl->psz_property, "color" ) )
+    if( !strcasecmp( p_decl->psz_property, "color" ) )
     {
         Color( term0, &p_style->i_font_color, &p_style->i_font_alpha,
                &p_style->i_features, STYLE_HAS_FONT_COLOR, STYLE_HAS_FONT_ALPHA );
     }
-    else if( !strcmp( p_decl->psz_property, "text-decoration" ) )
+    else if( !strcasecmp( p_decl->psz_property, "text-decoration" ) )
     {
         if( term0.type == TYPE_STRING )
         {
-            if( !strcmp( term0.psz, "none" ) )
+            if( !strcasecmp( term0.psz, "none" ) )
             {
                 p_style->i_style_flags &= ~(STYLE_STRIKEOUT|STYLE_UNDERLINE);
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
-            else if( !strcmp( term0.psz, "line-through" ) )
+            else if( !strcasecmp( term0.psz, "line-through" ) )
             {
                 p_style->i_style_flags |= STYLE_STRIKEOUT;
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
-            else if( !strcmp( term0.psz, "underline" ) )
+            else if( !strcasecmp( term0.psz, "underline" ) )
             {
                 p_style->i_style_flags |= STYLE_UNDERLINE;
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
         }
     }
-    else if( !strcmp( p_decl->psz_property, "text-shadow" ) )
+    else if( !strcasecmp( p_decl->psz_property, "text-shadow" ) )
     {
         ShadowDrop( term0, p_style );
         if( p_decl->expr->i_count == 3 )
             ShadowColor( p_decl->expr->seq[2].term, p_style );
     }
-    else if( !strcmp( p_decl->psz_property, "background-color" ) )
+    else if( !strcasecmp( p_decl->psz_property, "background-color" ) )
     {
         Color( term0, &p_style->i_background_color, &p_style->i_background_alpha,
                &p_style->i_features, STYLE_HAS_BACKGROUND_COLOR, STYLE_HAS_BACKGROUND_ALPHA );
         p_style->i_style_flags |= STYLE_BACKGROUND;
         p_style->i_features |= STYLE_HAS_FLAGS;
     }
-    else if( !strcmp( p_decl->psz_property, "outline-color" ) )
+    else if( !strcasecmp( p_decl->psz_property, "outline-color" ) )
     {
         OutlineColor( term0, p_style );
     }
-    else if( !strcmp( p_decl->psz_property, "outline-width" ) )
+    else if( !strcasecmp( p_decl->psz_property, "outline-width" ) )
     {
         OutlineWidth( term0, p_style );
     }
-    else if( !strcmp( p_decl->psz_property, "outline" ) )
+    else if( !strcasecmp( p_decl->psz_property, "outline" ) )
     {
         OutlineWidth( term0, p_style );
         if( p_decl->expr->i_count == 3 )
             OutlineColor( p_decl->expr->seq[2].term, p_style );
     }
-    else if( !strcmp( p_decl->psz_property, "font-family" ) )
+    else if( !strcasecmp( p_decl->psz_property, "font-family" ) )
     {
         if( term0.type >= TYPE_STRING )
         {
@@ -176,32 +176,32 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
             free( psz_font );
         }
     }
-    else if( !strcmp( p_decl->psz_property, "font-style" ) )
+    else if( !strcasecmp( p_decl->psz_property, "font-style" ) )
     {
         if( term0.type >= TYPE_STRING )
         {
-            if( !strcmp(term0.psz, "normal") )
+            if( !strcasecmp(term0.psz, "normal") )
             {
                 p_style->i_style_flags &= ~STYLE_ITALIC;
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
-            else if( !strcmp(term0.psz, "italic") )
+            else if( !strcasecmp(term0.psz, "italic") )
             {
                 p_style->i_style_flags |= STYLE_ITALIC;
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
         }
     }
-    else if( !strcmp( p_decl->psz_property, "font-weight" ) )
+    else if( !strcasecmp( p_decl->psz_property, "font-weight" ) )
     {
         if( term0.type >= TYPE_STRING )
         {
-            if( !strcmp(term0.psz, "normal") )
+            if( !strcasecmp(term0.psz, "normal") )
             {
                 p_style->i_style_flags &= ~STYLE_BOLD;
                 p_style->i_features |= STYLE_HAS_FLAGS;
             }
-            if( !strcmp(term0.psz, "bold") )
+            if( !strcasecmp(term0.psz, "bold") )
             {
                 p_style->i_style_flags |= STYLE_BOLD;
                 p_style->i_features |= STYLE_HAS_FLAGS;
@@ -216,7 +216,7 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
             p_style->i_features |= STYLE_HAS_FLAGS;
         }
     }
-    else if( !strcmp( p_decl->psz_property, "font-size" ) )
+    else if( !strcasecmp( p_decl->psz_property, "font-size" ) )
     {
         if( term0.type == TYPE_PIXELS )
             p_style->i_font_size = term0.val;
@@ -225,17 +225,17 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
         else if( term0.type == TYPE_PERCENT )
             p_style->f_font_relsize = term0.val * 5.33 / 100;
     }
-    else if( !strcmp( p_decl->psz_property, "font" ) )
+    else if( !strcasecmp( p_decl->psz_property, "font" ) )
     {
         /* what to do ? */
     }
-    else if( !strcmp( p_decl->psz_property, "white-space" ) )
+    else if( !strcasecmp( p_decl->psz_property, "white-space" ) )
     {
         if( term0.type >= TYPE_STRING )
         {
-            if( !strcmp(term0.psz, "normal" ) )
+            if( !strcasecmp(term0.psz, "normal" ) )
                 p_style->e_wrapinfo = STYLE_WRAP_DEFAULT;
-            if( !strcmp(term0.psz, "nowrap" ) )
+            if( !strcasecmp(term0.psz, "nowrap" ) )
                 p_style->e_wrapinfo = STYLE_WRAP_NONE;
         }
     }
