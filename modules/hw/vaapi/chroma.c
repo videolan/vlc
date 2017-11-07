@@ -105,6 +105,7 @@ FillPictureFromVAImage(picture_t *dest,
      *    break;
      */
     default:
+        vlc_assert_unreachable();
         break;
     }
 }
@@ -207,10 +208,8 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
 
         break;
     }
-    case VLC_CODEC_I420_10L || VLC_CODEC_I420_10B:
-        break;
     default:
-        break;
+        vlc_assert_unreachable();
     }
 }
 
@@ -265,16 +264,12 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420 &&
-        (filter->fmt_out.video.i_chroma == VLC_CODEC_I420 ||
-         filter->fmt_out.video.i_chroma == VLC_CODEC_I420_10L ||
-         filter->fmt_out.video.i_chroma == VLC_CODEC_I420_10B))
+        filter->fmt_out.video.i_chroma == VLC_CODEC_I420)
     {
         is_upload = false;
         filter->pf_video_filter = DownloadSurface;
     }
-    else if ((filter->fmt_in.video.i_chroma == VLC_CODEC_I420 ||
-              filter->fmt_in.video.i_chroma == VLC_CODEC_I420_10L ||
-              filter->fmt_in.video.i_chroma == VLC_CODEC_I420_10B) &&
+    else if (filter->fmt_in.video.i_chroma == VLC_CODEC_I420 &&
              filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420)
     {
         is_upload = true;
