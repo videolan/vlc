@@ -155,6 +155,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
                 return NULL; /* Need more data */
 
             p_pack->i_offset = 1; /* To find next startcode */
+            /* fallthrough */
 
         case STATE_NEXT_SYNC:
             /* Find the next startcode */
