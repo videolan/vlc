@@ -343,6 +343,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Need more data */
                 return NULL;
             }
+            /* fallthrough */
 
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
@@ -361,6 +362,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
             }
             p_sys->i_state = STATE_HEADER;
+            /* fallthrough */
 
         case STATE_HEADER:
             /* Get MPGA frame header (MPGA_HEADER_SIZE bytes) */
@@ -407,6 +409,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             p_sys->i_state = STATE_NEXT_SYNC;
+            /* fallthrough */
 
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
@@ -545,6 +548,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
             p_sys->i_state = STATE_SEND_DATA;
+            /* fallthrough */
 
         case STATE_SEND_DATA:
             if( !(p_buf = GetOutBuffer( p_dec, &p_out_buffer )) )
