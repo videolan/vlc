@@ -12,7 +12,7 @@ AUTOCONF=$(PREFIX)/bin/autoconf
 export AUTOCONF
 
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
-download = curl -f -L -- "$(1)" > "$@"
+download = curl -f -L -- "$(1)" > "$@.tmp" && touch $@.tmp && mv $@.tmp $@
 else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
 download = rm -f $@.tmp && \
 	wget --passive -c -p -O $@.tmp "$(1)" && \
@@ -28,7 +28,8 @@ download = $(error Neither curl nor wget found!)
 endif
 
 download_pkg = $(call download,$(VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
-	( $(call download,$(1)) && echo "Please upload package $(lastword $(subst /, ,$(@))) to our FTP" )
+	( $(call download,$(1)) && echo "Please upload package $(lastword $(subst /, ,$(@))) to our FTP" )  \
+	&& sha512sum --check --ignore-missing SHA512SUMS
 
 UNPACK = $(RM) -R $@ \
     $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
