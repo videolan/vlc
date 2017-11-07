@@ -295,6 +295,8 @@ CLEAN_FILE += .protoc
 #
 #
 
+fetch-all: $(DISTCLEAN_PKG)
+
 clean:
 	rm -fr $(CLEAN_FILE) $(CLEAN_PKG) build/
 
