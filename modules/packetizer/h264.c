@@ -497,6 +497,20 @@ static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
 /****************************************************************************
  * Helpers
  ****************************************************************************/
+static void ResetOutputVariables( decoder_sys_t *p_sys )
+{
+    p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
+    p_sys->b_new_sps = false;
+    p_sys->b_new_pps = false;
+    p_sys->b_slice = false;
+    /* From SEI */
+    p_sys->i_dpb_output_delay = 0;
+    p_sys->i_pic_struct = UINT8_MAX;
+    p_sys->i_recovery_frame_cnt = UINT_MAX;
+}
+
 static void PacketizeReset( void *p_private, bool b_broken )
 {
     decoder_t *p_dec = p_private;
@@ -505,21 +519,12 @@ static void PacketizeReset( void *p_private, bool b_broken )
     if( b_broken || !p_sys->b_slice )
     {
         DropStoredNAL( p_sys );
-        p_sys->b_new_sps = false;
-        p_sys->b_new_pps = false;
+        ResetOutputVariables( p_sys );
         p_sys->p_active_pps = NULL;
         p_sys->p_active_sps = NULL;
-        p_sys->i_frame_pts = VLC_TS_INVALID;
-        p_sys->i_frame_dts = VLC_TS_INVALID;
-        p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
-        p_sys->b_slice = false;
         /* POC */
         h264_poc_context_init( &p_sys->pocctx );
         p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
-        /* From SEI */
-        p_sys->i_dpb_output_delay = 0;
-        p_sys->i_pic_struct = UINT8_MAX;
-        p_sys->i_recovery_frame_cnt = UINT_MAX;
     }
     p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
     p_sys->b_recovered = false;
@@ -730,6 +735,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( unlikely(!p_sys->frame.p_head) )
     {
         assert( p_sys->frame.p_head );
+        DropStoredNAL( p_sys );
+        ResetOutputVariables( p_sys );
         return NULL;
     }
 
@@ -739,6 +746,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_pps || !p_sps )
     {
         DropStoredNAL( p_sys );
+        ResetOutputVariables( p_sys );
         return NULL;
     }
 
@@ -821,7 +829,10 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_pic = block_ChainGather( p_pic );
 
     if( !p_pic )
+    {
+        ResetOutputVariables( p_sys );
         return NULL;
+    }
 
     /* clear up flags gathered */
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_MASK;
@@ -973,17 +984,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
 
     /* reset after output */
-    p_sys->i_frame_dts = VLC_TS_INVALID;
-    p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_dpb_output_delay = 0;
-    p_sys->i_pic_struct = UINT8_MAX;
-    p_sys->i_recovery_frame_cnt = UINT_MAX;
-    p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
-    p_sys->p_sei = NULL;
-    p_sys->pp_sei_last = &p_sys->p_sei;
-    p_sys->b_new_sps = false;
-    p_sys->b_new_pps = false;
-    p_sys->b_slice = false;
+    ResetOutputVariables( p_sys );
 
     /* CC */
     cc_storage_commit( p_sys->p_ccs, p_pic );
