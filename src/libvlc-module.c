@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
@@ -1788,6 +1790,7 @@ vlc_module_begin ()
     add_obsolete_bool( "ipv4" ) /* since 2.0.0 */
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
+        change_integer_range( 0, INT_MAX )
 
     add_string( "http-host", NULL, HTTP_HOST_TEXT, HOST_LONGTEXT, true )
     add_integer( "http-port", 8080, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, true )
