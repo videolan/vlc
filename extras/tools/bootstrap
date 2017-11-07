@@ -83,6 +83,7 @@ check_sed
 check protoc 2.6.0
 check ant
 check xz
+check bison 3.0.0
 
 [ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
