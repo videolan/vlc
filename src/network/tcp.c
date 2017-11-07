@@ -165,26 +165,19 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             ufd.fd = fd;
             ufd.events = POLLOUT;
-            if (timeout > 0)
-                deadline = mdate() + timeout;
+            deadline = mdate() + timeout;
 
             do
             {
-                int ms = -1;
+                mtime_t now = mdate();
 
                 if (vlc_killed())
                     goto next_ai;
 
-                if (deadline != VLC_TS_INVALID)
-                {
-                    ms = (deadline - mdate()) / (CLOCK_FREQ / 1000);
-                    if (ms < 0)
-                        ms = 0;
-                    if (ms > INT_MAX)
-                        ms = INT_MAX;
-                }
+                if (now > deadline)
+                    now = deadline;
 
-                val = vlc_poll_i11e(&ufd, 1, ms);
+                val = vlc_poll_i11e(&ufd, 1, (deadline - now) / 1000);
             }
             while (val == -1 && errno == EINTR);
 
