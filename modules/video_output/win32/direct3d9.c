@@ -670,7 +670,8 @@ static void Manage (vout_display_t *vd)
 
     if (ch_desktop) {
         sys->reopen_device = true;
-        vout_display_SendEventPicturesInvalid(vd);
+        if (vd->info.has_pictures_invalid)
+            vout_display_SendEventPicturesInvalid(vd);
     }
 
     /* Position Change */
