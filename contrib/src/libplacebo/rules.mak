@@ -4,6 +4,13 @@ PLACEBO_VERSION := 0.1.2
 PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
 PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
 
+ifndef HAVE_WIN32
+PKGS += libplacebo
+ifeq ($(call need_pkg,"libplacebo"),)
+PKGS_FOUND += libplacebo
+endif
+endif
+
 PLACEBOCONF := --prefix="$(PREFIX)" \
 	--libdir lib \
 	--default-library static
