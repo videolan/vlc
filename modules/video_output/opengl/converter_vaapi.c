@@ -69,14 +69,37 @@ struct priv
     } last;
 };
 
+static EGLImageKHR
+vaegl_image_create(const opengl_tex_converter_t *tc, EGLint w, EGLint h,
+                   EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch)
+{
+    EGLint attribs[] = {
+        EGL_WIDTH, w,
+        EGL_HEIGHT, h,
+        EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+        EGL_DMA_BUF_PLANE0_FD_EXT, fd,
+        EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
+        EGL_DMA_BUF_PLANE0_PITCH_EXT, pitch,
+        EGL_NONE
+    };
+
+    return tc->gl->egl.createImageKHR(tc->gl, EGL_LINUX_DMA_BUF_EXT, NULL,
+                                      attribs);
+}
+
+static void
+vaegl_image_destroy(const opengl_tex_converter_t *tc, EGLImageKHR image)
+{
+    tc->gl->egl.destroyImageKHR(tc->gl, image);
+}
+
 static void
 vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
 {
     vlc_object_t *o = VLC_OBJECT(tc->gl);
-    vlc_gl_t *gl = tc->gl;
 
     for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
-        gl->egl.destroyImageKHR(gl, priv->last.egl_images[i]);
+        vaegl_image_destroy(tc, priv->last.egl_images[i]);
 
     vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
 
@@ -137,7 +160,6 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     (void) plane_offset;
     struct priv *priv = tc->priv;
     vlc_object_t *o = VLC_OBJECT(tc->gl);
-    vlc_gl_t *gl = tc->gl;
     VAImage va_image;
     VABufferInfo va_buffer_info;
     EGLImageKHR egl_images[3] = { };
@@ -170,18 +192,10 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     for (unsigned i = 0; i < va_image.num_planes; ++i)
     {
-        EGLint attribs[] = {
-            EGL_WIDTH, tex_width[i],
-            EGL_HEIGHT, tex_height[i],
-            EGL_LINUX_DRM_FOURCC_EXT, priv->drm_fourccs[i],
-            EGL_DMA_BUF_PLANE0_FD_EXT, va_buffer_info.handle,
-            EGL_DMA_BUF_PLANE0_OFFSET_EXT, va_image.offsets[i],
-            EGL_DMA_BUF_PLANE0_PITCH_EXT, va_image.pitches[i],
-            EGL_NONE
-        };
-
-        egl_images[i] = gl->egl.createImageKHR(gl, EGL_LINUX_DMA_BUF_EXT, NULL,
-                                               attribs);
+        egl_images[i] =
+            vaegl_image_create(tc, tex_width[i], tex_height[i],
+                               priv->drm_fourccs[i], va_buffer_info.handle,
+                               va_image.offsets[i], va_image.pitches[i]);
         if (egl_images[i] == NULL)
             goto error;
 
@@ -210,7 +224,7 @@ error:
             vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
-            gl->egl.destroyImageKHR(gl, egl_images[i]);
+            vaegl_image_destroy(tc, egl_images[i]);
 
         vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
     }
