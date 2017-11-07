@@ -27,6 +27,14 @@
 
 #include <va/va.h>
 
+#ifndef VA_RT_FORMAT_YUV420_10BPP
+# define VA_RT_FORMAT_YUV420_10BPP 0x00000100
+#endif
+
+#ifndef VA_FOURCC_P010
+#define VA_FOURCC_P010 0x30313050
+#endif
+
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 #include <vlc_picture_pool.h>
@@ -208,7 +216,8 @@ vlc_vaapi_PicGetDisplay(picture_t *pic);
 static inline bool
 vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
 {
-    return i_vlc_chroma == VLC_CODEC_VAAPI_420;
+    return i_vlc_chroma == VLC_CODEC_VAAPI_420
+        || i_vlc_chroma == VLC_CODEC_VAAPI_420_10BPP;
 }
 
 #endif /* VLC_VAAPI_H */

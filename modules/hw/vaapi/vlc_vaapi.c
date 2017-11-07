@@ -64,6 +64,10 @@ vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc)
             *va_rt_format = VA_RT_FORMAT_YUV420;
             *va_fourcc = VA_FOURCC_NV12;
             break;
+        case VLC_CODEC_VAAPI_420_10BPP:
+            *va_rt_format = VA_RT_FORMAT_YUV420_10BPP;
+            *va_fourcc = VA_FOURCC_P010;
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -414,9 +418,9 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
     }
 
     /* Not sure what to do if not, I don't have a way to test */
-    if ((attrib.value & VA_RT_FORMAT_YUV420) == 0)
+    if ((attrib.value & (VA_RT_FORMAT_YUV420|VA_RT_FORMAT_YUV420_10BPP)) == 0)
     {
-        msg_Err(o, "config doesn't support VA_RT_FORMAT_YUV420");
+        msg_Err(o, "config doesn't support VA_RT_FORMAT_YUV420*");
         return VA_INVALID_ID;
     }
 
