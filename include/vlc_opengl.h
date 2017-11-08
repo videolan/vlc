@@ -54,6 +54,7 @@ struct vlc_gl_t
     enum {
         VLC_GL_EXT_DEFAULT,
         VLC_GL_EXT_EGL,
+        VLC_GL_EXT_WGL,
     } ext;
 
     union {
@@ -68,6 +69,11 @@ struct vlc_gl_t
             /* call eglDestroyImageKHR() with current display, can be NULL */
             bool (*destroyImageKHR)(vlc_gl_t *, void *image);
         } egl;
+        /* if ext == VLC_GL_EXT_WGL */
+        struct
+        {
+            const char *(*getExtensionsString)(vlc_gl_t *);
+        } wgl;
     };
 };
 

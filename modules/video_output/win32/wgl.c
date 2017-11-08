@@ -66,12 +66,19 @@ struct vout_display_sys_t
     HGLRC                 hGLRC;
     vlc_gl_t              *gl;
     HDC                   affinityHDC; // DC for the selected GPU
+
+    struct
+    {
+        PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
+        PFNWGLGETEXTENSIONSSTRINGARBPROC GetExtensionsStringARB;
+    } exts;
 };
 
 static void          Swap(vlc_gl_t *);
 static void          *OurGetProcAddress(vlc_gl_t *, const char *);
 static int           MakeCurrent(vlc_gl_t *gl);
 static void          ReleaseCurrent(vlc_gl_t *gl);
+static const char *  GetExtensionsString(vlc_gl_t *gl);
 
 #define VLC_PFD_INITIALIZER { \
     .nSize = sizeof(PIXELFORMATDESCRIPTOR), \
@@ -187,8 +194,8 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-#ifdef WGL_EXT_swap_control
     wglMakeCurrent(sys->hGLDC, sys->hGLRC);
+#ifdef WGL_EXT_swap_control
     /* Create an GPU Affinity DC */
     const char *extensions = (const char*)glGetString(GL_EXTENSIONS);
     if (HasExtension(extensions, "WGL_EXT_swap_control")) {
@@ -196,14 +203,26 @@ static int Open(vlc_object_t *object)
         if (SwapIntervalEXT)
             SwapIntervalEXT(1);
     }
-    wglMakeCurrent(sys->hGLDC, NULL);
 #endif
 
+#define LOAD_EXT(name, type) \
+    sys->exts.name = (type) wglGetProcAddress("wgl" #name )
+
+    LOAD_EXT(GetExtensionsStringEXT, PFNWGLGETEXTENSIONSSTRINGEXTPROC);
+    if (!sys->exts.GetExtensionsStringEXT)
+        LOAD_EXT(GetExtensionsStringARB, PFNWGLGETEXTENSIONSSTRINGARBPROC);
+
+    wglMakeCurrent(sys->hGLDC, NULL);
+
+    gl->ext = VLC_GL_EXT_WGL;
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
     gl->resize = NULL;
     gl->swap = Swap;
     gl->getProcAddress = OurGetProcAddress;
+
+    if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)
+        gl->wgl.getExtensionsString = GetExtensionsString;
 
     return VLC_SUCCESS;
 
@@ -250,4 +269,12 @@ static void ReleaseCurrent(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     wglMakeCurrent (sys->hGLDC, NULL);
+}
+
+static const char *GetExtensionsString(vlc_gl_t *gl)
+{
+    vout_display_sys_t *sys = gl->sys;
+    return sys->exts.GetExtensionsStringEXT ?
+            sys->exts.GetExtensionsStringEXT() :
+            sys->exts.GetExtensionsStringARB(sys->hGLDC);
 }
