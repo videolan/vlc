@@ -856,7 +856,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         /* Render all lines */
         for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
-            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_align );
+            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
 
             /* Render all glyphs and underline/strikethrough */
             for( int i = p_line->i_first_visible_char_index; i <= p_line->i_last_visible_char_index; i++ )
