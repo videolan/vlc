@@ -136,6 +136,7 @@ struct d3dctx
     };
     D3DPRESENT_PARAMETERS   pp;
     D3DCAPS9                caps;
+    HWND                    hwnd;
     bool                    use_ex;
 };
 
@@ -854,7 +855,7 @@ static int Direct3D9FillPresentationParameters(vout_display_t *vd)
     ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;
-    d3dpp->hDeviceWindow          = vd->sys->sys.hvideownd;
+    d3dpp->hDeviceWindow          = vd->sys->d3dctx.hwnd;
     d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
                                           vd->source.i_width);
     d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
@@ -886,6 +887,8 @@ static void Direct3D9DestroyResources(vout_display_t *);
 static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
+
+    sys->d3dctx.hwnd = sys->sys.hvideownd;
 
     if (Direct3D9FillPresentationParameters(vd))
         return VLC_EGENERIC;
