@@ -620,12 +620,14 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         if( p_sys->i_state != STATE_SYNC )
             return NULL; /* Need more data */
+        /* fallthrough */
 
     case STATE_SYNC:
         /* Sync state is unverified until we have read frame header and checked CRC
            Once validated, we'll send data from NEXT_SYNC state where we'll
            compute frame size */
         p_sys->i_state = STATE_HEADER;
+        /* fallthrough */
 
     case STATE_HEADER:
         /* Get FLAC frame header (MAX_FLAC_HEADER_SIZE bytes) */
@@ -659,6 +661,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
          * The confusing part below is that sync code needs to be verified in case
          * it would appear in data, so we also need to check next frame header CRC
          */
+        /* fallthrough */
+
     case STATE_NEXT_SYNC:
     {
         if(block_FindStartcodeFromOffset(&p_sys->bytestream, &p_sys->i_offset,
