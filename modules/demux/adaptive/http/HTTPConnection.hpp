@@ -64,7 +64,8 @@ namespace adaptive
         class HTTPConnection : public AbstractConnection
         {
             public:
-                HTTPConnection(vlc_object_t *, AuthStorage *,  Socket *, bool = false);
+                HTTPConnection(vlc_object_t *, AuthStorage *,  Socket *,
+                               const ConnectionParams &, bool = false);
                 virtual ~HTTPConnection();
 
                 virtual bool    canReuse     (const ConnectionParams &) const;
@@ -92,6 +93,7 @@ namespace adaptive
 
                 AuthStorage        *authStorage;
                 ConnectionParams    locationparams;
+                ConnectionParams    proxyparams;
                 bool                connectionClose;
                 bool                chunked;
                 bool                chunked_eof;

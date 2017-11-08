@@ -61,7 +61,7 @@ size_t AbstractConnection::getContentLength() const
 }
 
 HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
-                               Socket *socket_, bool persistent)
+                               Socket *socket_, const ConnectionParams &proxy, bool persistent)
     : AbstractConnection( p_object_ )
 {
     socket = socket_;
@@ -73,6 +73,7 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
     chunked = false;
     chunked_eof = false;
     chunkLength = 0;
+    proxyparams = proxy;
 }
 
 HTTPConnection::~HTTPConnection()
@@ -83,16 +84,31 @@ HTTPConnection::~HTTPConnection()
 
 bool HTTPConnection::canReuse(const ConnectionParams &params_) const
 {
-    return ( available &&
-             params.getHostname() == params_.getHostname() &&
-             params.getScheme() == params_.getScheme() &&
-             params.getPort() == params_.getPort() );
+    if( !available )
+        return false;
+
+    char *psz_proxy_url = vlc_getProxyUrl(params_.getUrl().c_str());
+    if(psz_proxy_url)
+    {
+        ConnectionParams proxy(psz_proxy_url);
+        free(psz_proxy_url);
+        return (proxyparams.getHostname() == proxy.getHostname() &&
+                proxyparams.getScheme() == proxy.getScheme() &&
+                proxyparams.getPort() == proxy.getPort());
+    }
+    else return (params.getHostname() == params_.getHostname() &&
+                 params.getScheme() == params_.getScheme() &&
+                 params.getPort() == params_.getPort());
 }
 
 bool HTTPConnection::connect()
 {
-    return socket->connect(p_object, params.getHostname().c_str(),
-                                     params.getPort());
+    if(proxyparams.getHostname().empty())
+        return socket->connect(p_object, params.getHostname().c_str(),
+                                         params.getPort());
+    else
+        return socket->connect(p_object, proxyparams.getHostname().c_str(),
+                                         proxyparams.getPort());
 }
 
 bool HTTPConnection::connected() const
@@ -123,6 +139,9 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
 
     msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
                        range.isValid() ? range.getStartByte() : 0);
+
+    if(!proxyparams.getHostname().empty())
+        msg_Dbg(p_object, "Using proxy %s", proxyparams.getUrl().c_str());
 
     if(!connected() && ( params.getHostname().empty() || !connect() ))
         return VLC_EGENERIC;
@@ -530,6 +549,18 @@ AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
     if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
         return NULL;
 
+    ConnectionParams proxy;
+
+    std::string scheme;
+    char *psz_proxy_url = vlc_getProxyUrl(params.getUrl().c_str());
+    if(psz_proxy_url)
+    {
+        proxy = ConnectionParams(psz_proxy_url);
+        free(psz_proxy_url);
+        scheme = proxy.getScheme();
+    }
+    else scheme = params.getScheme();
+
     const int sockettype = (params.getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
     Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
                                                     : new (std::nothrow) Socket();
@@ -538,7 +569,7 @@ AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
 
     /* disable pipelined tls until we have ticket/resume session support */
     HTTPConnection *conn = new (std::nothrow)
-            HTTPConnection(p_object, authStorage, socket, sockettype != TLSSocket::TLS);
+            HTTPConnection(p_object, authStorage, socket, proxy, sockettype != TLSSocket::TLS);
     if(!conn)
     {
         delete socket;
