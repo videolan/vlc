@@ -863,26 +863,26 @@ static inline const char *vlc_pgettext_aux( const char *ctx, const char *id )
 /*****************************************************************************
  * Loosy memory allocation functions. Do not use in new code.
  *****************************************************************************/
-static inline void *xmalloc (size_t len)
+static inline void *xmalloc(size_t len)
 {
-    void *ptr = malloc (len);
-    if (unlikely (ptr == NULL))
-        abort ();
+    void *ptr = malloc(len);
+    if (unlikely(ptr == NULL && len > 0))
+        abort();
     return ptr;
 }
 
-static inline void *xrealloc (void *ptr, size_t len)
+static inline void *xrealloc(void *ptr, size_t len)
 {
-    void *nptr = realloc (ptr, len);
-    if (unlikely (nptr == NULL))
-        abort ();
+    void *nptr = realloc(ptr, len);
+    if (unlikely(nptr == NULL && len > 0))
+        abort();
     return nptr;
 }
 
-static inline void *xcalloc (size_t n, size_t size)
+static inline void *xcalloc(size_t n, size_t size)
 {
-    void *ptr = calloc (n, size);
-    if (unlikely (ptr == NULL))
+    void *ptr = calloc(n, size);
+    if (unlikely(ptr == NULL && (n > 0 || size > 0)))
         abort ();
     return ptr;
 }
