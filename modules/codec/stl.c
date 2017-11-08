@@ -103,6 +103,7 @@ typedef struct {
 struct decoder_sys_t {
     stl_sg_t groups[STL_GROUPS_MAX + 1];
     cct_number_value_t cct;
+    uint8_t i_fps;
 };
 
 static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
@@ -265,7 +266,7 @@ static void ClearTeletextStyles(stl_sg_t *p_group)
 }
 
 /* Returns true if group is we need to output group */
-static bool ParseTTI(stl_sg_t *p_group, const uint8_t *p_data, const char *psz_charset)
+static bool ParseTTI(stl_sg_t *p_group, const uint8_t *p_data, const char *psz_charset, double fps)
 {
     uint8_t p_buffer[STL_TEXTFIELD_SIZE];
     uint8_t i_buffer = 0;
@@ -285,8 +286,8 @@ static bool ParseTTI(stl_sg_t *p_group, const uint8_t *p_data, const char *psz_c
      * We must not flush current segments on output and continue on next block */
     p_group->i_accumulating = (p_data[4] == 0x01 || p_data[4] == 0x02);
 
-    p_group->i_start = ParseTimeCode( &p_data[5], 30 );
-    p_group->i_end = ParseTimeCode( &p_data[9], 30 );
+    p_group->i_start = ParseTimeCode( &p_data[5], fps );
+    p_group->i_end = ParseTimeCode( &p_data[9], fps );
 
     /* Text Field */
     for (size_t i = STL_TTI_HEADER_SIZE; i < STL_TTI_SIZE; i++)
@@ -399,7 +400,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     for (size_t i = 0; i < p_block->i_buffer / STL_TTI_SIZE; i++)
     {
         stl_sg_t *p_group = &p_dec->p_sys->groups[p_block->p_buffer[0]];
-        if(ParseTTI(p_group, &p_block->p_buffer[i * STL_TTI_SIZE], psz_charset) &&
+        if(ParseTTI(p_group, &p_block->p_buffer[i * STL_TTI_SIZE], psz_charset, p_dec->p_sys->i_fps) &&
            p_group->p_segment != NULL )
         {
             /* output */
@@ -445,12 +446,21 @@ static int ParseGSI(const decoder_t *dec, decoder_sys_t *p_sys)
         return VLC_EGENERIC;
     }
 
+    char dfc_fps_str[] = { header[6], header[7], '\0' };
+    int fps = strtol(dfc_fps_str, NULL, 10);
+    if (1 > fps || 60 < fps) {
+        msg_Warn(dec, "EBU header contains unsupported DFC fps ('%s'); falling back to 25\n", dfc_fps_str);
+        fps = 25;
+    }
+
     int cct = (header[12] << 8) | header[13];
     if (CCT_BEGIN > cct || CCT_END < cct) {
         msg_Err(dec, "EBU header contains illegal CCT (0x%x)\n", cct);
         return VLC_EGENERIC;
     }
-    msg_Dbg(dec, "CCT=0x%x", cct);
+
+    msg_Dbg(dec, "DFC fps=%d, CCT=0x%x", fps, cct);
+    p_sys->i_fps = fps;
     p_sys->cct = cct;
 
     return VLC_SUCCESS;
