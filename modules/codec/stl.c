@@ -432,7 +432,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     return VLCDEC_SUCCESS;
 }
 
-static int ExtractCCT(const decoder_t *dec, cct_number_value_t *cct_number)
+static int ParseGSI(const decoder_t *dec, decoder_sys_t *p_sys)
 {
     uint8_t *header = dec->fmt_in.p_extra;
     if (!header) {
@@ -450,8 +450,8 @@ static int ExtractCCT(const decoder_t *dec, cct_number_value_t *cct_number)
         msg_Err(dec, "EBU header contains illegal CCT (0x%x)\n", cct);
         return VLC_EGENERIC;
     }
-
-    *cct_number = cct;
+    msg_Dbg(dec, "CCT=0x%x", cct);
+    p_sys->cct = cct;
 
     return VLC_SUCCESS;
 }
@@ -463,18 +463,14 @@ static int Open(vlc_object_t *object)
     if (dec->fmt_in.i_codec != VLC_CODEC_EBU_STL)
         return VLC_EGENERIC;
 
-    cct_number_value_t cct;
-    int rc = ExtractCCT(dec, &cct);
-    if (VLC_SUCCESS != rc)
-        return rc;
-
-    msg_Dbg(dec, "CCT=0x%x", cct);
-
     decoder_sys_t *sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->cct = cct;
+    int rc = ParseGSI(dec, sys);
+    if (VLC_SUCCESS != rc)
+        return rc;
+
     for(size_t i=0; i<=STL_GROUPS_MAX; i++)
         sys->groups[i].pp_segment_last = &sys->groups[i].p_segment;
 
