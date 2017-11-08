@@ -1322,7 +1322,7 @@ StereoWidener::StereoWidener( intf_thread_t *p_intf, QWidget *parent )
  **********************************************************************/
 
 PitchShifter::PitchShifter( intf_thread_t *p_intf, QWidget *parent )
-    : AudioFilterControlWidget( p_intf, parent, "pitch", "scaletempo" )
+    : AudioFilterControlWidget( p_intf, parent, "scaletempo_pitch" )
 {
     i_smallfont = -1;
     controls.append( { "pitch-shift", N_("Adjust pitch"), "semitones",
