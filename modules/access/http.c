@@ -288,14 +288,14 @@ static int Open( vlc_object_t *p_this )
 connect:
     /* Connect */
     if( Connect( p_access ) )
-        goto error;
+        goto disconnect;
 
     if( p_sys->i_code == 401 )
     {
         if( p_sys->auth.psz_realm == NULL )
         {
             msg_Err( p_access, "authentication failed without realm" );
-            goto error;
+            goto disconnect;
         }
         /* FIXME ? */
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
@@ -322,7 +322,7 @@ connect:
             p_sys->psz_username = strdup(credential.psz_username);
             p_sys->psz_password = strdup(credential.psz_password);
             if (!p_sys->psz_username || !p_sys->psz_password)
-                goto error;
+                goto disconnect;
             msg_Err( p_access, "retrying with user=%s", p_sys->psz_username );
             p_sys->url.psz_username = p_sys->psz_username;
             p_sys->url.psz_password = p_sys->psz_password;
@@ -330,7 +330,7 @@ connect:
             goto connect;
         }
         else
-            goto error;
+            goto disconnect;
     }
     else
         vlc_credential_store( &credential, p_access );
@@ -342,7 +342,7 @@ connect:
         p_access->psz_url = p_sys->psz_location;
         p_sys->psz_location = NULL;
         ret = VLC_ACCESS_REDIRECT;
-        goto error;
+        goto disconnect;
     }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
@@ -356,6 +356,9 @@ connect:
 
     return VLC_SUCCESS;
 
+disconnect:
+    Disconnect( p_access );
+
 error:
     vlc_credential_clean( &credential );
     vlc_UrlClean( &p_sys->url );
@@ -368,8 +371,6 @@ error:
     free( p_sys->psz_referrer );
     free( p_sys->psz_username );
     free( p_sys->psz_password );
-
-    Disconnect( p_access );
 
     return ret;
 }
