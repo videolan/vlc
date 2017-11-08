@@ -556,7 +556,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
-    bool b_new_picture = false;
 
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
     const mtime_t i_frag_dts = p_frag->i_dts;
@@ -567,12 +566,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         msg_Warn( p_dec, "waiting for SPS/PPS" );
 
         /* Reset context */
-        p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
-        p_sys->b_slice = false;
         DropStoredNAL( p_sys );
-        /* From SEI */
-        p_sys->i_dpb_output_delay = 0;
-        p_sys->i_pic_struct = UINT8_MAX;
+        ResetOutputVariables( p_sys );
         cc_storage_reset( p_sys->p_ccs );
     }
 
@@ -600,7 +595,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
                 if( newslice.i_idr_pic_id == -1 )
                     newslice.i_idr_pic_id = p_sys->slice.i_idr_pic_id;
 
-                b_new_picture = IsFirstVCLNALUnit( &p_sys->slice, &newslice );
+                bool b_new_picture = IsFirstVCLNALUnit( &p_sys->slice, &newslice );
                 if( b_new_picture )
                 {
                     /* Parse SEI for that frame now we should have matched SPS/PPS */
@@ -708,7 +703,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
     *pb_ts_used = false;
     if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
-        p_sys->i_frame_pts <= VLC_TS_INVALID && b_new_picture )
+        p_sys->i_frame_pts <= VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
