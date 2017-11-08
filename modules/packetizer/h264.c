@@ -732,6 +732,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
         assert( p_sys->frame.p_head );
         DropStoredNAL( p_sys );
         ResetOutputVariables( p_sys );
+        cc_storage_reset( p_sys->p_ccs );
         return NULL;
     }
 
@@ -742,6 +743,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         DropStoredNAL( p_sys );
         ResetOutputVariables( p_sys );
+        cc_storage_reset( p_sys->p_ccs );
         return NULL;
     }
 
@@ -826,6 +828,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_pic )
     {
         ResetOutputVariables( p_sys );
+        cc_storage_reset( p_sys->p_ccs );
         return NULL;
     }
 
