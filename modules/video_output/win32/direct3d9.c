@@ -179,10 +179,12 @@ static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t c
 
 static int  Open(vlc_object_t *);
 
-static picture_pool_t *Direct3D9CreatePicturePool  (vout_display_t *, unsigned);
+static picture_pool_t *Direct3D9CreatePicturePool  (vlc_object_t *, struct d3dctx *,
+     const d3d_format_t *, const video_format_t *, unsigned);
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
@@ -313,7 +315,7 @@ static int Open(vlc_object_t *object)
     video_format_Copy(&vd->fmt, &fmt);
     vd->info = info;
 
-    vd->pool = Direct3D9CreatePicturePool;
+    vd->pool = DisplayPool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -389,20 +391,19 @@ static void Direct3D9UnlockSurface(picture_t *picture)
 }
 
 /* */
-static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned count)
+static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
+    struct d3dctx *d3dctx, const d3d_format_t *default_d3dfmt, const video_format_t *fmt, unsigned count)
 {
+    picture_pool_t*   pool = NULL;
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
-
-    if ( vd->sys->sys.pool != NULL )
-        return vd->sys->sys.pool;
 
     pictures = calloc(count, sizeof(*pictures));
     if (!pictures)
         goto error;
 
     D3DFORMAT format;
-    switch (vd->fmt.i_chroma)
+    switch (fmt->i_chroma)
     {
     case VLC_CODEC_D3D9_OPAQUE_10B:
         format = MAKEFOURCC('P','0','1','0');
@@ -411,7 +412,9 @@ static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned c
         format = MAKEFOURCC('N','V','1','2');
         break;
     default:
-        format = vd->sys->d3dtexture_format->format;
+        if (!default_d3dfmt)
+            goto error;
+        format = default_d3dfmt->format;
         break;
     }
 
@@ -421,15 +424,15 @@ static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned c
         if (unlikely(picsys == NULL))
             goto error;
 
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(vd->sys->d3dctx.dev,
-                                                          vd->fmt.i_width,
-                                                          vd->fmt.i_height,
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3dctx->dev,
+                                                          fmt->i_width,
+                                                          fmt->i_height,
                                                           format,
                                                           D3DPOOL_DEFAULT,
                                                           &picsys->surface,
                                                           NULL);
         if (FAILED(hr)) {
-           msg_Err(vd, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
            free(picsys);
            goto error;
         }
@@ -439,7 +442,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned c
             .pf_destroy = DestroyPicture,
         };
 
-        picture_t *picture = picture_NewFromResource(&vd->fmt, &resource);
+        picture_t *picture = picture_NewFromResource(fmt, &resource);
         if (unlikely(picture == NULL)) {
             free(picsys);
             goto error;
@@ -452,20 +455,29 @@ static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned c
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = count;
     pool_cfg.picture       = pictures;
-    if( !is_d3d9_opaque( vd->fmt.i_chroma ) )
+    if( !is_d3d9_opaque( fmt->i_chroma ) )
     {
         pool_cfg.lock = Direct3D9LockSurface;
         pool_cfg.unlock = Direct3D9UnlockSurface;
     }
 
-    vd->sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+    pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
-    if (vd->sys->sys.pool == NULL && pictures) {
+    if (pool == NULL && pictures) {
         for (unsigned i=0;i<picture_count; ++i)
             DestroyPicture(pictures[i]);
     }
     free(pictures);
+    return pool;
+}
+
+static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
+{
+    if ( vd->sys->sys.pool != NULL )
+        return vd->sys->sys.pool;
+    vd->sys->sys.pool = Direct3D9CreatePicturePool(VLC_OBJECT(vd), &vd->sys->d3dctx,
+        vd->sys->d3dtexture_format, &vd->fmt, count);
     return vd->sys->sys.pool;
 }
 
