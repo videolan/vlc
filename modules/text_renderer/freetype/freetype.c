@@ -514,7 +514,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     /* Outlining (find something better than nearest neighbour filtering ?) */
     if( 1 )
     {
-        uint8_t *p_dst = p_region->p_picture->Y_PIXELS;
+        p_dst = p_region->p_picture->Y_PIXELS;
         uint8_t *p_top = p_dst; /* Use 1st line as a cache */
         uint8_t left, current;
 
