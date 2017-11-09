@@ -1,60 +1,60 @@
-StrCpy $Name_Section01 "Медиа Плејер (обавезан)"
-StrCpy $Name_Section02a "Старт мени пречица"
-StrCpy $Name_Section02b "Пречица на радној површини"
-StrCpy $Name_Section03 "Мозила додатак"
-StrCpy $Name_Section04 "Activex додатак"
-StrCpy $Name_Section05 "Репродукција дискова"
-StrCpy $Name_Section06 "Одабир врсте фајлова за репродукцију"
-StrCpy $Name_SectionGroupAudio "Аудио фајлови"
-StrCpy $Name_SectionGroupVideo "Видео фајлови"
-StrCpy $Name_SectionGroupOther "Остало"
-StrCpy $Name_Section07 "Контекстуални менији"
-StrCpy $Name_Section08 "Обриши подешавања и кеш"
+StrCpy $Name_Section01 "РњРµРґРёР° РџР»РµСРµСЂ (РѕР±Р°РІРµР·Р°РЅ)"
+StrCpy $Name_Section02a "РЎС‚Р°СЂС‚ РјРµРЅРё РїСЂРµС‡РёС†Р°"
+StrCpy $Name_Section02b "РџСЂРµС‡РёС†Р° РЅР° СЂР°РґРЅРѕС РїРѕРІСЂС€РёРЅРё"
+StrCpy $Name_Section03 "РњРѕР·РёР»Р° РґРѕРґР°С‚Р°Рє"
+StrCpy $Name_Section04 "Activex РґРѕРґР°С‚Р°Рє"
+StrCpy $Name_Section05 "Р РµРїСЂРѕРґСѓРєС†РёСР° РґРёСЃРєРѕРІР°"
+StrCpy $Name_Section06 "РћРґР°Р±РёСЂ РІСЂСЃС‚Рµ С„Р°СР»РѕРІР° Р·Р° СЂРµРїСЂРѕРґСѓРєС†РёССѓ"
+StrCpy $Name_SectionGroupAudio "РђСѓРґРёРѕ С„Р°СР»РѕРІРё"
+StrCpy $Name_SectionGroupVideo "Р’РёРґРµРѕ С„Р°СР»РѕРІРё"
+StrCpy $Name_SectionGroupOther "РћСЃС‚Р°Р»Рѕ"
+StrCpy $Name_Section07 "РљРѕРЅС‚РµРєСЃС‚СѓР°Р»РЅРё РјРµРЅРёСРё"
+StrCpy $Name_Section08 "РћР±СЂРёС€Рё РїРѕРґРµС€Р°РІР°СљР° Рё РєРµС€"
 
 StrCpy $Desc_Section01 \
-    "Медија плејер"
+    "РњРµРґРёСР° РїР»РµСРµСЂ"
 StrCpy $Desc_Section02a \
-    "Додавање иконе на твој старт мени за лакши приступ"
+    "Р”РѕРґР°РІР°СљРµ РёРєРѕРЅРµ РЅР° С‚РІРѕС СЃС‚Р°СЂС‚ РјРµРЅРё Р·Р° Р»Р°РєС€Рё РїСЂРёСЃС‚СѓРї"
 StrCpy $Desc_Section02b \
-    "Додавање иконе на твојој радној површини за лакши приступ"
+    "Р”РѕРґР°РІР°СљРµ РёРєРѕРЅРµ РЅР° С‚РІРѕСРѕС СЂР°РґРЅРѕС РїРѕРІСЂС€РёРЅРё Р·Р° Р»Р°РєС€Рё РїСЂРёСЃС‚СѓРї"
 StrCpy $Desc_Section03 \
-    "VLC Мозила и Мозила Фајерфокс додатак"
+    "VLC РњРѕР·РёР»Р° Рё РњРѕР·РёР»Р° Р¤Р°СРµСЂС„РѕРєСЃ РґРѕРґР°С‚Р°Рє"
 StrCpy $Desc_Section04 \
-    "VLC ActiveX додатак"
+    "VLC ActiveX РґРѕРґР°С‚Р°Рє"
 StrCpy $Desc_Section05 \
-    "DVD и CD регистрација репродукције"
+    "DVD Рё CD СЂРµРіРёСЃС‚СЂР°С†РёСР° СЂРµРїСЂРѕРґСѓРєС†РёСРµ"
 StrCpy $Desc_Section06 \
-    "Подешавање VLC медиа плејере као главне апликације за изабране врсте фајлова"
+    "РџРѕРґРµС€Р°РІР°СљРµ VLC РјРµРґРёР° РїР»РµСРµСЂРµ РєР°Рѕ РіР»Р°РІРЅРµ Р°РїР»РёРєР°С†РёСРµ Р·Р° РёР·Р°Р±СЂР°РЅРµ РІСЂСЃС‚Рµ С„Р°СР»РѕРІР°"
 StrCpy $Desc_Section07 \
-    "Додавање ставки у контекстном менију ('Репродукуј са VLC' and 'Додај у VLC-ову листу за пуштање')"
+    "Р”РѕРґР°РІР°СљРµ СЃС‚Р°РІРєРё Сѓ РєРѕРЅС‚РµРєСЃС‚РЅРѕРј РјРµРЅРёССѓ ('Р РµРїСЂРѕРґСѓРєСѓС СЃР° VLC' and 'Р”РѕРґР°С Сѓ VLC-РѕРІСѓ Р»РёСЃС‚Сѓ Р·Р° РїСѓС€С‚Р°СљРµ')"
 StrCpy $Desc_Section08 \
-    "Брисање подешавања и кеш фајлова VLC медиа плејера остали из претходних инсталација"
+    "Р‘СЂРёСЃР°СљРµ РїРѕРґРµС€Р°РІР°СљР° Рё РєРµС€ С„Р°СР»РѕРІР° VLC РјРµРґРёР° РїР»РµСРµСЂР° РѕСЃС‚Р°Р»Рё РёР· РїСЂРµС‚С…РѕРґРЅРёС… РёРЅСЃС‚Р°Р»Р°С†РёСР°"
 
-StrCpy $Name_Section91 "Уклони"
-StrCpy $Name_Section92 "Обриши подешавање и кеш"
+StrCpy $Name_Section91 "РЈРєР»РѕРЅРё"
+StrCpy $Name_Section92 "РћР±СЂРёС€Рё РїРѕРґРµС€Р°РІР°СљРµ Рё РєРµС€"
 
 StrCpy $Desc_Section91 \
-"Уклони VLC медиа плејер и све његове компоненте"
+"РЈРєР»РѕРЅРё VLC РјРµРґРёР° РїР»РµСРµСЂ Рё СЃРІРµ СљРµРіРѕРІРµ РєРѕРјРїРѕРЅРµРЅС‚Рµ"
 StrCpy $Desc_Section92 \
-"Брише подешавања и кеш фајлове VLC медиа плејера"
+"Р‘СЂРёС€Рµ РїРѕРґРµС€Р°РІР°СљР° Рё РєРµС€ С„Р°СР»РѕРІРµ VLC РјРµРґРёР° РїР»РµСРµСЂР°"
 
-StrCpy $ShellAssociation_Play "Репродукуј"
-StrCpy $ContextMenuEntry_PlayWith "Репродукуј са VLC медиа плејером"
-StrCpy $ContextMenuEntry_AddToPlaylist "Додај у VLC медиа плејер-ову листу за пуштање"
+StrCpy $ShellAssociation_Play "Р РµРїСЂРѕРґСѓРєСѓС"
+StrCpy $ContextMenuEntry_PlayWith "Р РµРїСЂРѕРґСѓРєСѓС СЃР° VLC РјРµРґРёР° РїР»РµСРµСЂРѕРј"
+StrCpy $ContextMenuEntry_AddToPlaylist "Р”РѕРґР°С Сѓ VLC РјРµРґРёР° РїР»РµСРµСЂ-РѕРІСѓ Р»РёСЃС‚Сѓ Р·Р° РїСѓС€С‚Р°СљРµ"
 
-StrCpy $Link_VisitWebsite "Посети VideoLAN VLC медиа плејер интернет презентацију"
+StrCpy $Link_VisitWebsite "РџРѕСЃРµС‚Рё VideoLAN VLC РјРµРґРёР° РїР»РµСРµСЂ РёРЅС‚РµСЂРЅРµС‚ РїСЂРµР·РµРЅС‚Р°С†РёССѓ"
 
-StrCpy $Name_InstTypeRecommended "Препоручено"
-StrCpy $Name_InstTypeMinimum "Минимум"
-StrCpy $Name_InstTypeFull "Све"
+StrCpy $Name_InstTypeRecommended "РџСЂРµРїРѕСЂСѓС‡РµРЅРѕ"
+StrCpy $Name_InstTypeMinimum "РњРёРЅРёРјСѓРј"
+StrCpy $Name_InstTypeFull "РЎРІРµ"
 
-StrCpy $Action_OnArrivalDVD "Пушај DVD филмове"
-StrCpy $Action_OnArrivalAudioCD "Пуштај аудио цд-ове"
-StrCpy $Action_OnArrivalVCDMovie "Пуштај VCD филмове"
-StrCpy $Action_OnArrivalSVCDMovie "Пуштај SVCD филмове"
-StrCpy $Action_OnArrivalVideoFiles "Пуштај видео фајлове"
-StrCpy $Action_OnArrivalMusicFiles "Пуштај аудио фајлове"
-StrCpy $Action_OnArrivalDVDAudio "Пуштај аудио DVD"
+StrCpy $Action_OnArrivalDVD "РџСѓС€Р°С DVD С„РёР»РјРѕРІРµ"
+StrCpy $Action_OnArrivalAudioCD "РџСѓС€С‚Р°С Р°СѓРґРёРѕ С†Рґ-РѕРІРµ"
+StrCpy $Action_OnArrivalVCDMovie "РџСѓС€С‚Р°С VCD С„РёР»РјРѕРІРµ"
+StrCpy $Action_OnArrivalSVCDMovie "РџСѓС€С‚Р°С SVCD С„РёР»РјРѕРІРµ"
+StrCpy $Action_OnArrivalVideoFiles "РџСѓС€С‚Р°С РІРёРґРµРѕ С„Р°СР»РѕРІРµ"
+StrCpy $Action_OnArrivalMusicFiles "РџСѓС€С‚Р°С Р°СѓРґРёРѕ С„Р°СР»РѕРІРµ"
+StrCpy $Action_OnArrivalDVDAudio "РџСѓС€С‚Р°С Р°СѓРґРёРѕ DVD"
 
-StrCpy $License_NextText "Сада си упознат(а) са својим правима. Кликни на Next за наставак."
+StrCpy $License_NextText "РЎР°РґР° СЃРё СѓРїРѕР·РЅР°С‚(Р°) СЃР° СЃРІРѕСРёРј РїСЂР°РІРёРјР°. РљР»РёРєРЅРё РЅР° Next Р·Р° РЅР°СЃС‚Р°РІР°Рє."
 
