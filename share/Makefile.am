@@ -56,9 +56,10 @@ EXTRA_DIST += \
 	$(DIST_solid)
 
 nobase_vlcdata_DATA =
+nobase_dist_vlcdata_DATA =
 if BUILD_SKINS
 nobase_vlcdata_DATA += skins2/default.vlt
-nobase_dist_vlcdata_DATA = $(DIST_skins2)
+nobase_dist_vlcdata_DATA += $(DIST_skins2)
 endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
@@ -176,7 +177,7 @@ nobase_doc_DATA = \
 	lua/sd/icast.lua \
 	$(NULL)
 
-nobase_dist_vlcdata_DATA = \
+nobase_dist_vlcdata_DATA += \
 	lua/http/view.html \
 	lua/http/mobile.html \
 	lua/http/dialogs/create_stream.html \
