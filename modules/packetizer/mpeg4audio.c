@@ -1060,6 +1060,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
             /* Need more data */
             return NULL;
         }
+        /* fallthrough */
 
     case STATE_SYNC:
         /* New frame, set the Presentation Time Stamp */
@@ -1102,6 +1103,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         }
 
         p_sys->i_state = STATE_NEXT_SYNC;
+        /* fallthrough */
 
     case STATE_NEXT_SYNC:
         if (p_sys->bytestream.p_block == NULL) {
@@ -1157,6 +1159,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
                     p_sys->i_header_size) != VLC_SUCCESS)
             return NULL; /* Need more data */
         p_sys->i_state = STATE_SEND_DATA;
+        /* fallthrough */
 
     case STATE_SEND_DATA:
         /* When we reach this point we already know we have enough
