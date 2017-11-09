@@ -326,6 +326,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 /* Need more data */
                 return NULL;
             }
+            /* fallthrough */
 
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
@@ -336,6 +337,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
+            /* fallthrough */
 
         case STATE_HEADER:
             /* Get a MLP header */
@@ -358,6 +360,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
             p_sys->i_state = STATE_NEXT_SYNC;
+            /* fallthrough */
 
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
@@ -395,6 +398,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
             p_sys->i_state = STATE_SEND_DATA;
+            /* fallthrough */
 
         case STATE_SEND_DATA:
             /* When we reach this point we already know we have enough
