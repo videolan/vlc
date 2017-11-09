@@ -89,6 +89,8 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
 
         case StreamFormat::WEBVTT:
             ret = new Demuxer(p_realdemux, "webvttstream", fakeesout->getEsOut(), demuxersource);
+            if(ret)
+                ret->setRestartsOnEachSegment(true);
             break;
 
         default:

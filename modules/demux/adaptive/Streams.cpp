@@ -588,6 +588,15 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             {
                 needrestart = true;
             }
+            break;
+
+        case SegmentTrackerEvent::SEGMENT_CHANGE:
+            if(demuxer && demuxer->needsRestartOnEachSegment() && !inrestart)
+            {
+                needrestart = true;
+            }
+            break;
+
         default:
             break;
     }

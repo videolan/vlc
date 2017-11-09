@@ -39,11 +39,14 @@ namespace adaptive
             bool alwaysStartsFromZero() const;
             bool needsRestartOnSeek() const;
             bool needsRestartOnSwitch() const;
+            bool needsRestartOnEachSegment() const;
             void setCanDetectSwitches(bool);
+            void setRestartsOnEachSegment(bool);
 
         protected:
             bool b_startsfromzero;
             bool b_reinitsonseek;
+            bool b_alwaysrestarts;
             bool b_candetectswitches;
     };
 

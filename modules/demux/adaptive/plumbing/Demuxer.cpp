@@ -54,9 +54,19 @@ bool AbstractDemuxer::needsRestartOnSwitch() const
     return !b_candetectswitches;
 }
 
+bool AbstractDemuxer::needsRestartOnEachSegment() const
+{
+    return b_alwaysrestarts;
+}
+
 void AbstractDemuxer::setCanDetectSwitches( bool b )
 {
     b_candetectswitches = b;
+}
+
+void AbstractDemuxer::setRestartsOnEachSegment( bool b )
+{
+    b_alwaysrestarts = b;
 }
 
 bool AbstractDemuxer::needsRestartOnSeek() const
