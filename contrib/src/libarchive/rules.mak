@@ -29,6 +29,7 @@ endif
 	$(MOVE)
 
 .libarchive: libarchive
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
 		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
 		--without-nettle --without-cng \
