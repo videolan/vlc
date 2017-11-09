@@ -63,6 +63,9 @@
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
+static int  GLConvOpen(vlc_object_t *);
+static void GLConvClose(vlc_object_t *);
+
 #define DESKTOP_LONGTEXT N_(\
     "The desktop mode allows you to display the video on the desktop.")
 
@@ -100,6 +103,10 @@ vlc_module_begin ()
     add_shortcut("direct3d9", "direct3d")
     set_callbacks(Open, Close)
 
+    add_submodule()
+    set_description("DX OpenGL surface converter for D3D9")
+    set_capability("glconv", 1)
+    set_callbacks(GLConvOpen, GLConvClose)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -1970,4 +1977,223 @@ static int FindShadersCallback(vlc_object_t *object, const char *name,
     *descs = ctx.descs;
     return ctx.count;
 
+}
+
+#include "../opengl/converter.h"
+#include <GL/wglew.h>
+
+struct wgl_vt {
+    PFNWGLDXSETRESOURCESHAREHANDLENVPROC DXSetResourceShareHandleNV;
+    PFNWGLDXOPENDEVICENVPROC             DXOpenDeviceNV;
+    PFNWGLDXCLOSEDEVICENVPROC            DXCloseDeviceNV;
+    PFNWGLDXREGISTEROBJECTNVPROC         DXRegisterObjectNV;
+    PFNWGLDXUNREGISTEROBJECTNVPROC       DXUnregisterObjectNV;
+    PFNWGLDXLOCKOBJECTSNVPROC            DXLockObjectsNV;
+    PFNWGLDXUNLOCKOBJECTSNVPROC          DXUnlockObjectsNV;
+};
+struct glpriv
+{
+    struct wgl_vt vt;
+    struct d3dctx d3dctx;
+    HANDLE gl_handle_d3d;
+    HANDLE gl_render;
+    IDirect3DSurface9 *dx_render;
+};
+
+static int
+GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
+             const GLsizei *tex_width, const GLsizei *tex_height,
+             picture_t *pic, const size_t *plane_offset)
+{
+    VLC_UNUSED(textures); VLC_UNUSED(tex_width); VLC_UNUSED(tex_height); VLC_UNUSED(plane_offset);
+    struct glpriv *priv = tc->priv;
+    HRESULT hr;
+
+    picture_sys_t *picsys = ActivePictureSys(pic);
+    if (!picsys)
+        return VLC_EGENERIC;
+
+    if (!priv->vt.DXUnlockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
+    {
+        msg_Warn(tc->gl, "DXUnlockObjectsNV failed");
+        return VLC_EGENERIC;
+    }
+
+    hr = IDirect3DDevice9Ex_StretchRect(priv->d3dctx.devex, picsys->surface,
+                                        NULL, priv->dx_render, NULL, D3DTEXF_NONE);
+    if (FAILED(hr))
+    {
+        msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed");
+        return VLC_EGENERIC;
+    }
+
+    if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
+    {
+        msg_Warn(tc->gl, "DXLockObjectsNV failed");
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static picture_pool_t *
+GLConvGetPool(const opengl_tex_converter_t *tc, unsigned requested_count)
+{
+    struct glpriv *priv = tc->priv;
+    return Direct3D9CreatePicturePool(VLC_OBJECT(tc->gl), &priv->d3dctx, NULL,
+                                      &tc->fmt, requested_count);
+}
+
+static int
+GLConvAllocateTextures(const opengl_tex_converter_t *tc, GLuint *textures,
+                       const GLsizei *tex_width, const GLsizei *tex_height)
+{
+    VLC_UNUSED(tex_width); VLC_UNUSED(tex_height);
+    struct glpriv *priv = tc->priv;
+    tc->vt->GenTextures(1, textures);
+
+    tc->vt->ActiveTexture(GL_TEXTURE0);
+    tc->vt->BindTexture(tc->tex_target, textures[0]);
+    tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    priv->gl_render =
+        priv->vt.DXRegisterObjectNV(priv->gl_handle_d3d, priv->dx_render,
+                                    textures[0], GL_TEXTURE_2D, WGL_ACCESS_WRITE_DISCARD_NV);
+    if (!priv->gl_render)
+    {
+        msg_Warn(tc->gl, "DXRegisterObjectNV failed: %lu", GetLastError());
+        return VLC_EGENERIC;
+    }
+
+    if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
+    {
+        msg_Warn(tc->gl, "DXLockObjectsNV failed");
+        priv->vt.DXUnregisterObjectNV(priv->gl_handle_d3d, priv->gl_render);
+        priv->gl_render = NULL;
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void
+GLConvClose(vlc_object_t *obj)
+{
+    opengl_tex_converter_t *tc = (void *)obj;
+    struct glpriv *priv = tc->priv;
+
+    if (priv->gl_handle_d3d)
+    {
+        if (priv->gl_render)
+        {
+            priv->vt.DXUnlockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render);
+            priv->vt.DXUnregisterObjectNV(priv->gl_handle_d3d, priv->gl_render);
+        }
+
+        priv->vt.DXCloseDeviceNV(priv->gl_handle_d3d);
+    }
+
+    if (priv->dx_render)
+        IDirect3DSurface9_Release(priv->dx_render);
+
+    Direct3D9DestroyDevice(obj, &priv->d3dctx);
+    Direct3D9Destroy(obj, &priv->d3dctx);
+    free(tc->priv);
+}
+
+static int
+GLConvOpen(vlc_object_t *obj)
+{
+    opengl_tex_converter_t *tc = (void *) obj;
+
+    if (tc->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
+     && tc->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
+        return VLC_EGENERIC;
+
+    if (tc->gl->ext != VLC_GL_EXT_WGL || !tc->gl->wgl.getExtensionsString)
+        return VLC_EGENERIC;
+
+    const char *wglExt = tc->gl->wgl.getExtensionsString(tc->gl);
+
+    if (wglExt == NULL || !HasExtension(wglExt, "WGL_NV_DX_interop"))
+        return VLC_EGENERIC;
+
+    struct wgl_vt vt;
+#define LOAD_EXT(name, type) do { \
+    vt.name = (type) vlc_gl_GetProcAddress(tc->gl, "wgl" #name); \
+    if (!vt.name) { \
+        msg_Warn(obj, "'wgl " #name "' could not be loaded"); \
+        return VLC_EGENERIC; \
+    } \
+} while(0)
+
+    LOAD_EXT(DXSetResourceShareHandleNV, PFNWGLDXSETRESOURCESHAREHANDLENVPROC);
+    LOAD_EXT(DXOpenDeviceNV, PFNWGLDXOPENDEVICENVPROC);
+    LOAD_EXT(DXCloseDeviceNV, PFNWGLDXCLOSEDEVICENVPROC);
+    LOAD_EXT(DXRegisterObjectNV, PFNWGLDXREGISTEROBJECTNVPROC);
+    LOAD_EXT(DXUnregisterObjectNV, PFNWGLDXUNREGISTEROBJECTNVPROC);
+    LOAD_EXT(DXLockObjectsNV, PFNWGLDXLOCKOBJECTSNVPROC);
+    LOAD_EXT(DXUnlockObjectsNV, PFNWGLDXUNLOCKOBJECTSNVPROC);
+
+    struct glpriv *priv = calloc(1, sizeof(struct glpriv));
+    if (!priv)
+        return VLC_ENOMEM;
+    tc->priv = priv;
+    priv->vt = vt;
+
+    priv->d3dctx = (struct d3dctx) { .hwnd = tc->gl->surface->handle.hwnd };
+    if (Direct3D9Create(obj, &priv->d3dctx, &tc->fmt) != VLC_SUCCESS)
+        goto error;
+
+    if (!priv->d3dctx.use_ex)
+    {
+        msg_Warn(obj, "DX/GL interrop only working on d3d9x");
+        goto error;
+    }
+
+    if (Direct3D9CreateDevice(obj, &priv->d3dctx, &tc->fmt) != VLC_SUCCESS)
+        goto error;
+
+    HRESULT hr;
+    HANDLE shared_handle = NULL;
+    hr = IDirect3DDevice9_CreateOffscreenPlainSurface(priv->d3dctx.dev,
+                                                      tc->fmt.i_width,
+                                                      tc->fmt.i_height,
+                                                      D3DFMT_X8R8G8B8,
+                                                      D3DPOOL_DEFAULT,
+                                                      &priv->dx_render,
+                                                      &shared_handle);
+    if (FAILED(hr))
+    {
+        msg_Warn(obj, "IDirect3DDevice9_CreateOffscreenPlainSurface failed");
+        goto error;
+    }
+
+   if (shared_handle)
+        priv->vt.DXSetResourceShareHandleNV(priv->dx_render, shared_handle);
+
+    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(priv->d3dctx.dev);
+    if (!priv->gl_handle_d3d)
+    {
+        msg_Warn(obj, "DXOpenDeviceNV failed: %lu", GetLastError());
+        goto error;
+    }
+
+    tc->pf_update  = GLConvUpdate;
+    tc->pf_get_pool = GLConvGetPool;
+    tc->pf_allocate_textures = GLConvAllocateTextures;
+
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_RGB32,
+                                              COLOR_SPACE_UNDEF);
+    if (tc->fshader == 0)
+        goto error;
+
+    return VLC_SUCCESS;
+
+error:
+    GLConvClose(obj);
+    return VLC_EGENERIC;
 }
