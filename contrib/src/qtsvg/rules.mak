@@ -36,3 +36,4 @@ qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 		-e 's/-lQt\([^ ]*\)d/-lQt\1/g' \
 		-e '/Libs:/  s/-lQt5Svg/-lqsvg -lqsvgicon -lQt5Svg/ ' \
 		Qt5Svg.pc
+	touch $@
