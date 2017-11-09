@@ -902,7 +902,8 @@ void FilterSliderData::writeToConfig()
 
 AudioFilterControlWidget::AudioFilterControlWidget
 ( intf_thread_t *_p_intf, QWidget *parent, const char *_name ) :
-    QWidget( parent ), p_intf( _p_intf ), name( _name ), i_smallfont(0)
+    QWidget( parent ), slidersBox( NULL ), p_intf( _p_intf ), name( _name ),
+    i_smallfont(0)
 {}
 
 void AudioFilterControlWidget::connectConfigChanged( FilterSliderData *slider )
