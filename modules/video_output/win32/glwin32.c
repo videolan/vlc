@@ -50,11 +50,11 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_shortname("OpenGL")
-    set_description(N_("OpenGL video output"))
+    set_description(N_("OpenGL video output for Windows"))
 
     add_integer("gpu-affinity", -1, HW_GPU_AFFINITY_TEXT, HW_GPU_AFFINITY_TEXT, true)
 
-    set_capability("vout display", 220)
+    set_capability("vout display", 275)
     add_shortcut("glwin32", "opengl")
     set_callbacks(Open, Close)
     add_glconv()
