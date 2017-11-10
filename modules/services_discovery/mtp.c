@@ -198,6 +198,7 @@ static int AddDevice( services_discovery_t *p_sd,
                             CountTracks, p_sd ) ) == NULL )
         {
             msg_Warn( p_sd, "No tracks on the device" );
+            p_sd->p_sys->pp_items = NULL;
         }
         else
         {
