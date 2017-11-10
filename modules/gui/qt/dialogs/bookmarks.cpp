@@ -168,7 +168,8 @@ void BookmarksDialog::add()
     {
         QString name = THEMIM->getIM()->getName() + " #"
                      + QString::number( bookmarksList->topLevelItemCount() );
-        bookmark.psz_name = const_cast<char *>qtu( name );
+        QByteArray raw = name.toUtf8();
+        bookmark.psz_name = raw.data();
 
         input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
     }
