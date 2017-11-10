@@ -73,20 +73,21 @@ static void          *OurGetProcAddress(vlc_gl_t *, const char *);
 static int           MakeCurrent(vlc_gl_t *gl);
 static void          ReleaseCurrent(vlc_gl_t *gl);
 
+#define VLC_PFD_INITIALIZER { \
+    .nSize = sizeof(PIXELFORMATDESCRIPTOR), \
+    .nVersion = 1, \
+    .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, \
+    .iPixelType = PFD_TYPE_RGBA, \
+    .cColorBits = 24, \
+    .cDepthBits = 16, \
+    .iLayerType = PFD_MAIN_PLANE, \
+}
 
 /* Create an GPU Affinity DC */
 static void CreateGPUAffinityDC(vlc_gl_t *gl, UINT nVidiaAffinity) {
     vout_display_sys_t *sys = gl->sys;
 
-    PIXELFORMATDESCRIPTOR pfd;
-    memset(&pfd, 0, sizeof(pfd));
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 16;
-    pfd.iLayerType = PFD_MAIN_PLANE;
+    PIXELFORMATDESCRIPTOR pfd = VLC_PFD_INITIALIZER;
 
     /* create a temporary GL context */
     HDC winDC = GetDC(sys->sys.hvideownd);
@@ -127,15 +128,7 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
 
     if (sys->affinityHDC == NULL) return;
 
-    PIXELFORMATDESCRIPTOR pfd;
-    memset(&pfd, 0, sizeof(pfd));
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 16;
-    pfd.iLayerType = PFD_MAIN_PLANE;
+    PIXELFORMATDESCRIPTOR pfd = VLC_PFD_INITIALIZER;
 
     /* create a temporary GL context */
     HDC winDC = GetDC(sys->sys.hvideownd);
@@ -183,15 +176,7 @@ static int Open(vlc_object_t *object)
     }
 
     /* Set the pixel format for the DC */
-    PIXELFORMATDESCRIPTOR pfd;
-    memset(&pfd, 0, sizeof(pfd));
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 16;
-    pfd.iLayerType = PFD_MAIN_PLANE;
+    PIXELFORMATDESCRIPTOR pfd = VLC_PFD_INITIALIZER;
     SetPixelFormat(sys->hGLDC, ChoosePixelFormat(sys->hGLDC, &pfd), &pfd);
 
     /* Create the context. */
