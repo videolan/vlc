@@ -55,7 +55,7 @@ block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
     if(!p_block->i_buffer || p_block->p_buffer[0])
         goto error;
 
-    if(! (p_list = malloc( sizeof(*p_list) * i_list )) )
+    if(! (p_list = vlc_alloc( i_list, sizeof(*p_list) )) )
         goto error;
 
     /* Search all startcode of size 3 */
