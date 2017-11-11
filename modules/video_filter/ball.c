@@ -576,20 +576,20 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
 
     if( !p_filter->p_sys->p_smooth )
         p_filter->p_sys->p_smooth =
-                (uint32_t *)malloc( i_numLines * i_numCols
-                                    * sizeof(uint32_t));
+                (uint32_t *)vlc_alloc( i_numLines * i_numCols,
+                                       sizeof(uint32_t));
     p_smooth = p_filter->p_sys->p_smooth;
 
     if( !p_filter->p_sys->p_grad_x )
         p_filter->p_sys->p_grad_x =
-                (int32_t *)malloc( i_numLines * i_numCols
-                                   * sizeof(int32_t));
+                (int32_t *)vlc_alloc( i_numLines * i_numCols,
+                                      sizeof(int32_t));
     p_grad_x = p_filter->p_sys->p_grad_x;
 
     if( !p_filter->p_sys->p_grad_y )
         p_filter->p_sys->p_grad_y =
-                (int32_t *)malloc( i_numLines * i_numCols
-                                   * sizeof(int32_t));
+                (int32_t *)vlc_alloc( i_numLines * i_numCols,
+                                      sizeof(int32_t));
     p_grad_y = p_filter->p_sys->p_grad_y;
 
     if( !p_smooth || !p_grad_x || !p_grad_y ) return;
