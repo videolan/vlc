@@ -81,6 +81,7 @@ typedef struct
     tt_node_t *      p_rootnode; /* for now. FIXME: split header */
     ttml_length_t    root_extent_h, root_extent_v;
     unsigned         i_cell_resolution_v;
+    unsigned         i_cell_resolution_h;
 } ttml_context_t;
 
 typedef struct
@@ -901,6 +902,7 @@ static void InitTTMLContext( tt_node_t *p_rootnode, ttml_context_t *p_ctx )
     p_ctx->root_extent_v.i_value = 100;
     p_ctx->root_extent_v.unit = TTML_UNIT_PERCENT;
     p_ctx->i_cell_resolution_v = TTML_DEFAULT_CELL_RESOLUTION_V;
+    p_ctx->i_cell_resolution_h = TTML_DEFAULT_CELL_RESOLUTION_H;
     /* and override them */
     const char *value = vlc_dictionary_value_for_key( &p_rootnode->attr_dict,
                                                       "tts:extent" );
@@ -915,7 +917,10 @@ static void InitTTMLContext( tt_node_t *p_rootnode, ttml_context_t *p_ctx )
     {
         unsigned w, h;
         if( sscanf( value, "%u %u", &w, &h) == 2 && w && h )
+        {
+            p_ctx->i_cell_resolution_h = w;
             p_ctx->i_cell_resolution_v = h;
+        }
     }
 }
 
