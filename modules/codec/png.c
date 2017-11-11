@@ -289,7 +289,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( !p_pic ) goto error;
 
     /* Decode picture */
-    p_row_pointers = malloc( sizeof(png_bytep) * i_height );
+    p_row_pointers = vlc_alloc( i_height, sizeof(png_bytep) );
     if( !p_row_pointers )
         goto error;
     for( i = 0; i < (int)i_height; i++ )
