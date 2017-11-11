@@ -269,7 +269,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 int i;
 
                 *pi_bkmk = priv->i_bookmark;
-                *ppp_bkmk = malloc( sizeof(seekpoint_t *) * priv->i_bookmark );
+                *ppp_bkmk = vlc_alloc( priv->i_bookmark, sizeof(seekpoint_t *) );
                 for( i = 0; i < priv->i_bookmark; i++ )
                 {
                     (*ppp_bkmk)[i] =
@@ -464,7 +464,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             *pi_attachment = priv->i_attachment;
-            *ppp_attachment = malloc( sizeof(input_attachment_t*) * priv->i_attachment );
+            *ppp_attachment = vlc_alloc( priv->i_attachment, sizeof(input_attachment_t*));
             for( int i = 0; i < priv->i_attachment; i++ )
                 (*ppp_attachment)[i] = vlc_input_attachment_Duplicate( priv->attachment[i] );
 

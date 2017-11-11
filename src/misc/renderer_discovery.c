@@ -211,8 +211,8 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
         return VLC_EGENERIC;
     }
 
-    char **ppsz_names = malloc(sizeof(char *) * (i_count + 1));
-    char **ppsz_longnames = malloc(sizeof(char *) * (i_count + 1));
+    char **ppsz_names = vlc_alloc(i_count + 1, sizeof(char *));
+    char **ppsz_longnames = vlc_alloc(i_count + 1, sizeof(char *));
 
     if (unlikely(ppsz_names == NULL || ppsz_longnames == NULL))
     {

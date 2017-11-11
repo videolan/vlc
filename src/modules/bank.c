@@ -741,7 +741,7 @@ ssize_t module_list_cap (module_t ***restrict list, const char *name)
 
     const vlc_modcap_t *cap = *cp;
     size_t n = cap->modc;
-    module_t **tab = malloc (sizeof (*tab) * n);
+    module_t **tab = vlc_alloc (n, sizeof (*tab));
     *list = tab;
     if (unlikely(tab == NULL))
         return -1;

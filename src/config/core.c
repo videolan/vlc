@@ -318,8 +318,8 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
         return cfg->list.i_cb(obj, name, values, texts);
     }
 
-    int64_t *vals = malloc (sizeof (*vals) * count);
-    char **txts = malloc (sizeof (*txts) * count);
+    int64_t *vals = vlc_alloc (count, sizeof (*vals));
+    char **txts = vlc_alloc (count, sizeof (*txts));
     if (vals == NULL || txts == NULL)
     {
         errno = ENOMEM;
@@ -480,7 +480,7 @@ int config_SortConfig (void)
     for (p = vlc_plugins; p != NULL; p = p->next)
          nconf += p->conf.size;
 
-    module_config_t **clist = malloc (sizeof (*clist) * nconf);
+    module_config_t **clist = vlc_alloc (nconf, sizeof (*clist));
     if (unlikely(clist == NULL))
         return VLC_ENOMEM;
 

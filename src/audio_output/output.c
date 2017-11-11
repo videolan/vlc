@@ -847,8 +847,8 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
     unsigned i = 0;
 
     vlc_mutex_lock (&owner->dev.lock);
-    tabid = malloc (sizeof (*tabid) * owner->dev.count);
-    tabname = malloc (sizeof (*tabname) * owner->dev.count);
+    tabid = vlc_alloc (owner->dev.count, sizeof (*tabid));
+    tabname = vlc_alloc (owner->dev.count, sizeof (*tabname));
 
     if (unlikely(tabid == NULL || tabname == NULL))
         goto error;

@@ -69,9 +69,9 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames, int **pp_cat
         return NULL;
     }
 
-    char **names = malloc (sizeof(char *) * (count + 1));
-    char **longnames = malloc (sizeof(char *) * (count + 1));
-    int *categories = malloc(sizeof(int) * (count + 1));
+    char **names = vlc_alloc (count + 1, sizeof(char *));
+    char **longnames = vlc_alloc (count + 1, sizeof(char *));
+    int *categories = vlc_alloc (count + 1, sizeof(int));
 
     if (unlikely (names == NULL || longnames == NULL || categories == NULL))
     {

@@ -854,7 +854,7 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     size_t i_command_len = strlen( psz_command );
     char *buf = malloc( i_command_len + 1 ), *psz_buf = buf;
     size_t i_ppsz_command_len = (3 + (i_command_len + 1) / 2);
-    char **ppsz_command = malloc( i_ppsz_command_len * sizeof(char *) );
+    char **ppsz_command = vlc_alloc( i_ppsz_command_len, sizeof(char *) );
     vlm_message_t *p_message = NULL;
     int i_ret = 0;
 

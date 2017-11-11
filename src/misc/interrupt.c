@@ -385,7 +385,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
     }
     else
     {   /* Slow path but poll() is slow with large nfds anyway. */
-        struct pollfd *ufd = malloc((nfds + 1) * sizeof (*ufd));
+        struct pollfd *ufd = vlc_alloc(nfds + 1, sizeof (*ufd));
         if (unlikely(ufd == NULL))
             return -1; /* ENOMEM */
 

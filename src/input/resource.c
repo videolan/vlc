@@ -315,7 +315,7 @@ static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
     if( p_resource->i_vout <= 0 )
         goto exit;
 
-    pp_vout = malloc( p_resource->i_vout * sizeof(*pp_vout) );
+    pp_vout = vlc_alloc( p_resource->i_vout, sizeof(*pp_vout) );
     if( !pp_vout )
         goto exit;
 

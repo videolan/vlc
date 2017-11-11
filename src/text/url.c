@@ -900,7 +900,7 @@ static char *vlc_idna_to_ascii (const char *idn)
         goto error;
     }
 
-    wchar_t *buf = malloc (sizeof (*buf) * len);
+    wchar_t *buf = vlc_alloc (len, sizeof (*buf));
     if (unlikely(buf == NULL))
         goto error;
     if (!IdnToAscii (IDN_ALLOW_UNASSIGNED, wide, -1, buf, len))

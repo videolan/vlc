@@ -521,7 +521,7 @@ vlc_list_t *vlc_list_children( vlc_object_t *obj )
 
     if (count > 0)
     {
-        l->p_values = malloc (count * sizeof (vlc_value_t));
+        l->p_values = vlc_alloc (count, sizeof (vlc_value_t));
         if (unlikely(l->p_values == NULL))
         {
             vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);

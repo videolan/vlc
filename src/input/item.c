@@ -171,7 +171,7 @@ void input_item_CopyOptions( input_item_t *p_child,
     {
         optv = malloc( p_parent->i_options * sizeof (*optv) );
         if( likely(optv) )
-            flagv = malloc( p_parent->i_options * sizeof (*flagv) );
+            flagv = vlc_alloc( p_parent->i_options, sizeof (*flagv) );
 
         if( likely(flagv) )
         {
