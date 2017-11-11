@@ -1,15 +1,19 @@
 demuxdir = $(pluginsdir)/demux
 demux_LTLIBRARIES =
 
-libflacsys_plugin_la_SOURCES = demux/flac.c demux/xiph_metadata.h demux/xiph_metadata.c
+vlc_xiph_metadata_la_SOURCES = demux/xiph_metadata.h demux/xiph_metadata.c
+noinst_LTLIBRARIES += vlc_xiph_metadata.la
+
+libflacsys_plugin_la_SOURCES = demux/flac.c
 libflacsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libflacsys_plugin_la_LIBADD = vlc_xiph_metadata.la
 demux_LTLIBRARIES += libflacsys_plugin.la
 
 libogg_plugin_la_SOURCES = demux/ogg.c demux/ogg.h demux/oggseek.c demux/oggseek.h \
-	demux/xiph_metadata.h demux/xiph.h demux/xiph_metadata.c demux/opus.h
+	demux/xiph.h demux/opus.h
 libogg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBVORBIS_CFLAGS) $(OGG_CFLAGS)
 libogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
-libogg_plugin_la_LIBADD = $(LIBVORBIS_LIBS) $(OGG_LIBS)
+libogg_plugin_la_LIBADD = $(LIBVORBIS_LIBS) $(OGG_LIBS) vlc_xiph_metadata.la
 EXTRA_LTLIBRARIES += libogg_plugin.la
 demux_LTLIBRARIES += $(LTLIBogg)
 
