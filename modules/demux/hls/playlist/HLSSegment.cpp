@@ -60,7 +60,9 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
 {
     block_t *p_block = *pp_block;
 
-#ifdef HAVE_GCRYPT
+#ifndef HAVE_GCRYPT
+    (void)chunk;
+#else
     if(encryption.method == SegmentEncryption::AES_128)
     {
         block_t *p_block = *pp_block;
