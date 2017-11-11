@@ -1114,7 +1114,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         returnedError = CGGetOnlineDisplayList(0, NULL, &displayCount);
         if (!returnedError) {
             CGDirectDisplayID *ids;
-            ids = (CGDirectDisplayID *)malloc(displayCount * sizeof(CGDirectDisplayID));
+            ids = (CGDirectDisplayID *)vlc_alloc(displayCount, sizeof(CGDirectDisplayID));
             returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
             if (!returnedError) {
                 NSUInteger displayInfoCount = [_displayInfos count];
