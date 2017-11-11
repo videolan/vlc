@@ -240,7 +240,7 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
     char *tmp;
 
     /* */
-    imem_sys_t *sys = vlc_calloc(object, 1, sizeof(*sys));
+    imem_sys_t *sys = vlc_obj_calloc(object, 1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 

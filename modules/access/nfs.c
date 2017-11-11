@@ -621,7 +621,7 @@ static int
 Open(vlc_object_t *p_obj)
 {
     stream_t *p_access = (stream_t *)p_obj;
-    access_sys_t *p_sys = vlc_calloc(p_obj, 1, sizeof (*p_sys));
+    access_sys_t *p_sys = vlc_obj_calloc(p_obj, 1, sizeof (*p_sys));
 
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;

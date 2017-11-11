@@ -653,7 +653,7 @@ static int blurayOpen(vlc_object_t *object)
     }
 
     /* */
-    p_demux->p_sys = p_sys = vlc_calloc(object, 1, sizeof(*p_sys));
+    p_demux->p_sys = p_sys = vlc_obj_calloc(object, 1, sizeof(*p_sys));
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 

@@ -188,7 +188,7 @@ static int Open( vlc_object_t *p_this )
         !S_ISDIR( st.st_mode ) )
         return VLC_EGENERIC;
 
-    access_sys_t *p_sys = vlc_calloc( p_this, 1, sizeof( *p_sys ) );
+    access_sys_t *p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
 
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;

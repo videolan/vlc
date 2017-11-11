@@ -184,7 +184,7 @@ nop:
         if( length == 0 )
             goto nop; /* avoid division by zero */
 
-        demux_sys_t *p_sys = vlc_malloc( p_this, sizeof( *p_sys ) );
+        demux_sys_t *p_sys = vlc_obj_alloc( p_this, 1, sizeof( *p_sys ) );
         if( p_sys == NULL )
             return VLC_ENOMEM;
 

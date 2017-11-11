@@ -225,7 +225,7 @@ static int DemuxOpen(vlc_object_t *obj)
     if (track == 0 /* Whole disc -> use access plugin */)
         goto error;
 
-    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
+    demux_sys_t *sys = vlc_obj_alloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
         goto error;
 
@@ -619,7 +619,7 @@ static int AccessOpen(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    access_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
+    access_sys_t *sys = vlc_obj_alloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
         ioctl_Close(obj, dev);

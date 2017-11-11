@@ -626,7 +626,7 @@ static int satip_open(vlc_object_t *obj)
 
     bool multicast = var_InheritBool(access, "satip-multicast");
 
-    access->p_sys = sys = vlc_calloc(obj, 1, sizeof(*sys));
+    access->p_sys = sys = vlc_obj_calloc(obj, 1, sizeof(*sys));
     if (sys == NULL)
         return VLC_ENOMEM;
 
