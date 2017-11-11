@@ -254,7 +254,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     /* worst case */
     size_t i_buffer = BLOCK_MAX_SIZE * MAX_CHANNELS * p_sys->wmadec.nb_frames;
     free( p_sys->p_output );
-    p_sys->p_output = malloc(i_buffer * sizeof(int32_t) );
+    p_sys->p_output = vlc_alloc(i_buffer, sizeof(int32_t));
     p_sys->p_samples = (int8_t*)p_sys->p_output;
 
     if( !p_sys->p_output )
