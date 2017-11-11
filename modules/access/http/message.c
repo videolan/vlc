@@ -396,7 +396,7 @@ struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
         assert(strcasecmp(m->headers[j][0], "HTTP2-Settings"));
     }
 
-    const char *(*headers)[2] = malloc((m->count + 5) * sizeof (char *[2]));
+    const char *(*headers)[2] = vlc_alloc(m->count + 5, sizeof (char *[2]));
     if (unlikely(headers == NULL))
         return NULL;
 
