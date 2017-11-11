@@ -1139,7 +1139,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( *pi_int <= 0 )
             return VLC_EGENERIC;
 
-        *ppp_attach = malloc( sizeof(input_attachment_t*) * *pi_int );
+        *ppp_attach = vlc_alloc( *pi_int, sizeof(input_attachment_t*) );
         if( !*ppp_attach )
             return VLC_EGENERIC;
 
