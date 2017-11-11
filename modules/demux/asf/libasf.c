@@ -707,14 +707,13 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
         if( ASF_HAVE( p_codec->i_information_length ) )
         {
             p_codec->p_information = malloc( p_codec->i_information_length );
-            if( unlikely(p_codec->p_information == NULL
-                      && p_codec->i_information_length > 0) )
-                goto error;
-
-            memcpy( p_codec->p_information, p_data,
-                    p_codec->i_information_length );
+            if( likely(p_codec->p_information != NULL) )
+                memcpy( p_codec->p_information, p_data,
+                        p_codec->i_information_length );
             p_data += p_codec->i_information_length;
         }
+        else
+            p_codec->p_information = NULL;
 
 #ifdef ASF_DEBUG
         msg_Dbg( s, "  - codec[%"PRIu32"] %s name:\"%s\" "
