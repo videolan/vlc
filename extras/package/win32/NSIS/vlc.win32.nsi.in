@@ -24,6 +24,7 @@
 !define MEMENTO_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 
 ManifestDPIAware true
+Unicode true
 
 !define INSTALL_ACTIVEX
 !define INSTALL_MOZILLA
