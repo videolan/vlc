@@ -844,6 +844,12 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #define container_of(ptr, type, member) \
     ((type *)(((char *)(ptr)) - offsetof(type, member)))
 
+VLC_USED VLC_MALLOC
+static inline void *vlc_alloc(size_t count, size_t size)
+{
+    return likely(count * size >= size) ? malloc(count * size) : NULL;
+}
+
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
