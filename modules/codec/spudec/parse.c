@@ -125,7 +125,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
      *  one byte gaves two nibbles and may be used twice (once per field)
      * generating 4 codes.
      */
-    spu_data.p_data = malloc( sizeof(*spu_data.p_data) * 2 * 2 * p_sys->i_rle_size );
+    spu_data.p_data = vlc_alloc( p_sys->i_rle_size, sizeof(*spu_data.p_data) * 2 * 2 );
 
     /* We try to display it */
     if( ParseRLE( p_dec, &spu_data, &spu_properties ) )
