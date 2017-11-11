@@ -545,7 +545,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
     uint8_t *p_block;
 
     if( i_type == VCD_TYPE )
-        p_block = malloc( VCD_SECTOR_SIZE * i_nb );
+        p_block = vlc_alloc( i_nb, VCD_SECTOR_SIZE );
     else
         p_block = p_buffer;
 
