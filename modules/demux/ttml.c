@@ -391,7 +391,7 @@ static int Demux( demux_t* p_demux )
     return VLC_DEMUXER_SUCCESS;
 }
 
-int OpenDemux( vlc_object_t* p_this )
+int tt_OpenDemux( vlc_object_t* p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -530,12 +530,12 @@ int OpenDemux( vlc_object_t* p_this )
     return VLC_SUCCESS;
 
 error:
-    CloseDemux( p_demux );
+    tt_CloseDemux( p_demux );
 
     return VLC_EGENERIC;
 }
 
-void CloseDemux( demux_t* p_demux )
+void tt_CloseDemux( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
 
