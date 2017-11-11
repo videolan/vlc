@@ -249,7 +249,6 @@ endif
 
 ### Win32 ###
 libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
-	video_chroma/copy.c video_chroma/copy.h \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
@@ -258,7 +257,7 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_chroma/d3d9_fmt.h
 libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d9
-libdirect3d9_plugin_la_LIBADD = -lgdi32 $(LIBCOM) -luuid
+libdirect3d9_plugin_la_LIBADD = video_chroma_copy.la -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlace.c \
         video_filter/deinterlace/common.c video_filter/deinterlace/common.h \
@@ -277,18 +276,18 @@ endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
- video_output/win32/common.c video_output/win32/common.h \
- video_chroma/copy.c video_chroma/copy.h
+ video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11
+libdirect3d11_plugin_la_LIBADD = video_chroma_copy.la $(LIBCOM) -luuid
 if !HAVE_WINSTORE
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \
  video_output/win32/sensors.cpp \
  video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirect3d11_plugin_la_LIBADD = -lgdi32 $(LIBCOM) -luuid
+libdirect3d11_plugin_la_LIBADD += -lgdi32
 else
-libdirect3d11_plugin_la_LIBADD = -ld3dcompiler_47 $(LIBCOM) -luuid
+libdirect3d11_plugin_la_LIBADD += -ld3dcompiler_47
 endif
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
@@ -306,13 +305,12 @@ EXTRA_LTLIBRARIES += libdirect3d11_deinterlace_plugin.la libdirect3d11_adjust_pl
 
 libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
 	video_output/win32/common.c video_output/win32/common.h \
-	video_chroma/copy.c video_chroma/copy.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
-libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 $(LIBCOM) -luuid
+libdirectdraw_plugin_la_LIBADD = video_chroma_copy.la -luser32 -lgdi32 $(LIBCOM) -luuid
 libdirectdraw_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirectdraw)
@@ -322,7 +320,6 @@ endif
 libglwin32_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) \
 	video_output/win32/glwin32.c \
 	video_output/win32/common.c video_output/win32/common.h \
-	video_chroma/copy.c video_chroma/copy.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
@@ -333,7 +330,7 @@ libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libwgl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
         -DMODULE_NAME_IS_wgl
 
-libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 $(LIBCOM) -luuid $(OPENGL_COMMONLIBS)
+libglwin32_plugin_la_LIBADD = video_chroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid $(OPENGL_COMMONLIBS)
 libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 $(OPENGL_COMMONLIBS)
 
 libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCLFAGS)
@@ -349,13 +346,12 @@ endif
 
 libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/common.c video_output/win32/common.h \
-	video_chroma/copy.c video_chroma/copy.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_wingdi
-libwingdi_plugin_la_LIBADD = -lgdi32 $(LIBCOM) -luuid
+libwingdi_plugin_la_LIBADD = video_chroma_copy.la -lgdi32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
 endif
