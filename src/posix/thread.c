@@ -698,7 +698,7 @@ unsigned vlc_GetCPUCount(void)
     u_int numcpus;
     processor_info_t cpuinfo;
 
-    processorid_t *cpulist = malloc (sizeof (*cpulist) * sysconf(_SC_NPROCESSORS_MAX));
+    processorid_t *cpulist = vlc_alloc (sysconf(_SC_NPROCESSORS_MAX), sizeof (*cpulist));
     if (unlikely(cpulist == NULL))
         return 1;
 
