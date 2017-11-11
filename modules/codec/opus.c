@@ -675,7 +675,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     /* Buffer for incoming audio, since opus only accepts frame sizes that are
        multiples of 2.5ms */
     enc->p_sys = sys;
-    sys->buffer = malloc(OPUS_FRAME_SIZE * header.channels * sizeof(float));
+    sys->buffer = vlc_alloc(header.channels, sizeof(float) * OPUS_FRAME_SIZE);
     if (!sys->buffer) {
         status = VLC_ENOMEM;
         goto error;
