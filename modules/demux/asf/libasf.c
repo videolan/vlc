@@ -1379,34 +1379,6 @@ static int ASF_ReadObject_Raw(stream_t *s, asf_object_t *p_obj)
     return VLC_SUCCESS;
 }
 
-#if 0
-static int ASF_ReadObject_XXX(stream_t *s, asf_object_t *p_obj)
-{
-    asf_object_XXX_t *p_XX =
-        (asf_object_XXX_t *)p_obj;
-    const uint8_t *p_peek;
-    uint8_t *p_data;
-    ssize_t i_peek;
-
-    if( ( i_peek = vlc_stream_Peek( s, &p_peek, p_XX->i_object_size ) ) < XXX )
-       return VLC_EGENERIC;
-
-    p_data = &p_peek[ASF_OBJECT_COMMON_SIZE];
-
-#ifdef ASF_DEBUG
-    msg_Dbg( s,
-             "Read \"XXX object\"" );
-#endif
-    return VLC_SUCCESS;
-}
-static void ASF_FreeObject_XXX( asf_object_t *p_obj)
-{
-    asf_object_XXX_t *p_XX =
-        (asf_object_XXX_t *)p_obj;
-}
-#endif
-
-
 /* */
 static const struct ASF_Object_Function_entry
 {
