@@ -1146,7 +1146,7 @@ static bo_t *BuildMoov(sout_mux_t *p_mux)
     mp4mux_trackinfo_t **pp_infos = NULL;
     if(p_sys->i_nb_streams) /* Trackless moov ? */
     {
-        pp_infos = malloc(sizeof(mp4mux_trackinfo_t *) * p_sys->i_nb_streams);
+        pp_infos = vlc_alloc(p_sys->i_nb_streams, sizeof(mp4mux_trackinfo_t *));
         if(!pp_infos)
             return NULL;
         for(unsigned int i=0; i<p_sys->i_nb_streams; i++)

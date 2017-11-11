@@ -427,7 +427,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                unsigned i_programs, tsmux_stream_t *p_pmt, const int *pi_programs_number,
                unsigned i_mapped_streams, const pes_mapped_stream_t *p_mapped_streams )
 {
-    dvbpsi_pmt_t *dvbpmt = malloc( i_programs * sizeof(dvbpsi_pmt_t) );
+    dvbpsi_pmt_t *dvbpmt = vlc_alloc( i_programs, sizeof(dvbpsi_pmt_t) );
     if( !dvbpmt )
             return;
 
