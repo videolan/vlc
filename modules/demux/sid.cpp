@@ -259,7 +259,7 @@ static int Control (demux_t *demux, int query, va_list args)
                 int *pi_int = va_arg( args, int* );
 
                 *pi_int = sys->tuneInfo.songs;
-                *ppp_title = (input_title_t**) malloc( sizeof (input_title_t*) * sys->tuneInfo.songs);
+                *ppp_title = (input_title_t**) vlc_alloc( sys->tuneInfo.songs, sizeof (input_title_t*));
 
                 for( int i = 0; i < sys->tuneInfo.songs; i++ ) {
                     (*ppp_title)[i] = vlc_input_title_New();
