@@ -461,7 +461,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* XXX: rounding shouldn't affect us at normal sampling rate */
     sys->rate = fmt->i_rate;
     sys->samples_per_buf = OPENSLES_BUFLEN * fmt->i_rate / 1000;
-    sys->buf = malloc(OPENSLES_BUFFERS * sys->samples_per_buf * bytesPerSample());
+    sys->buf = vlc_alloc(sys->samples_per_buf * bytesPerSample(), OPENSLES_BUFFERS);
     if (!sys->buf)
         goto error;
 
