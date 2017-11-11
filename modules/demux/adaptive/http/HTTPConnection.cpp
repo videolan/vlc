@@ -25,7 +25,6 @@
 #include "ConnectionParams.hpp"
 #include "AuthStorage.hpp"
 #include "Sockets.hpp"
-#include "../adaptive/tools/Helper.h"
 
 #include <cstdio>
 #include <sstream>
