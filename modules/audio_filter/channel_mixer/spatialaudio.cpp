@@ -284,7 +284,7 @@ static int allocateBuffers(filter_sys_t *p_sys)
 
     for (unsigned i = 0; i < p_sys->i_inputNb; ++i)
     {
-        p_sys->inBuf[i] = (float *)malloc(AMB_BLOCK_TIME_LEN * sizeof(float));
+        p_sys->inBuf[i] = (float *)vlc_alloc(AMB_BLOCK_TIME_LEN, sizeof(float));
         if (p_sys->inBuf[i] == NULL)
             return VLC_ENOMEM;
     }
@@ -295,7 +295,7 @@ static int allocateBuffers(filter_sys_t *p_sys)
 
     for (unsigned i = 0; i < p_sys->i_outputNb; ++i)
     {
-        p_sys->outBuf[i] = (float *)malloc(AMB_BLOCK_TIME_LEN * sizeof(float));
+        p_sys->outBuf[i] = (float *)vlc_alloc(AMB_BLOCK_TIME_LEN, sizeof(float));
         if (p_sys->outBuf[i] == NULL)
             return VLC_ENOMEM;
     }
