@@ -586,7 +586,7 @@ static char* GetTag( const char** ppsz_subtitle, bool b_closing )
     size_t tag_size = 1;
     while ( isalnum( psz_subtitle[tag_size] ) || psz_subtitle[tag_size] == '_' )
         tag_size++;
-    char* psz_tagname = malloc( ( tag_size + 1 ) * sizeof( *psz_tagname ) );
+    char* psz_tagname = vlc_alloc( tag_size + 1, sizeof( *psz_tagname ) );
     if ( unlikely( !psz_tagname ) )
         return NULL;
     strncpy( psz_tagname, psz_subtitle, tag_size );
