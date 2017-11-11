@@ -252,8 +252,8 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     unsigned int       i;
 
     /* We just ignore error on the index */
-    if( vlc_stream_Peek( s, &p_peek, p_index->i_object_size ) <
-        __MAX( (int64_t)p_index->i_object_size, 56 ) )
+    if( p_index->i_object_size < 56
+     || vlc_stream_Peek( s, &p_peek, p_index->i_object_size ) < 56 )
         return VLC_SUCCESS;
 
     ASF_GetGUID( &p_index->i_file_id, p_peek + ASF_OBJECT_COMMON_SIZE );
