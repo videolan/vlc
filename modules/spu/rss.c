@@ -642,7 +642,7 @@ static int ParseUrls( filter_t *p_filter, char *psz_urls )
     }
 
     /* Allocate the structure */
-    p_sys->p_feeds = malloc( p_sys->i_feeds * sizeof( rss_feed_t ) );
+    p_sys->p_feeds = vlc_alloc( p_sys->i_feeds, sizeof( rss_feed_t ) );
     if( !p_sys->p_feeds )
         return VLC_ENOMEM;
 
@@ -896,7 +896,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     bool b_images = p_sys->b_images;
 
     /* Allocate a new structure */
-    rss_feed_t *p_feeds = malloc( i_feeds * sizeof( rss_feed_t ) );
+    rss_feed_t *p_feeds = vlc_alloc( i_feeds, sizeof( rss_feed_t ) );
     if( !p_feeds )
         return NULL;
 
