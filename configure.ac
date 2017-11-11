@@ -1036,7 +1036,6 @@ AS_VAR_IF(with_sanitizer, no, [], [
     AS_IF([test -z "${with_sanitizer##*address*}" ], [
        AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer])
        AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer], [CXXFLAGS])
-       AX_APPEND_COMPILE_FLAGS([-lasan], [LDFLAGS])
     ])
     AS_IF([test -z "${with_sanitizer##*memory*}" ], [
         AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
