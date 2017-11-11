@@ -388,7 +388,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         if( !file.isEmpty() )
         {
             p_arg->i_results = 1;
-            p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
+            p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
             p_arg->psz_results[0] = strdup( qtu( toNativeSepNoSlash( file ) ) );
         }
         else
@@ -399,7 +399,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         QStringList urls = getOpenURL( NULL, qfu( p_arg->psz_title ),
                                        p_intf->p_sys->filepath, extensions );
         p_arg->i_results = urls.count();
-        p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
+        p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
         i = 0;
         foreach( const QString &uri, urls )
             p_arg->psz_results[i++] = strdup( qtu( uri ) );
