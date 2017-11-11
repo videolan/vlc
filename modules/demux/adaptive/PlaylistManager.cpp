@@ -346,6 +346,7 @@ mtime_t PlaylistManager::getDuration() const
 bool PlaylistManager::setPosition(mtime_t time)
 {
     bool ret = true;
+    bool hasValidStream = false;
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
@@ -354,10 +355,18 @@ bool PlaylistManager::setPosition(mtime_t time)
         {
             AbstractStream *st = *it;
             if(!st->isDisabled())
+            {
+                hasValidStream = true;
                 ret &= st->setPosition(time, !real);
+            }
         }
         if(!ret)
             break;
+    }
+    if(!hasValidStream)
+    {
+        msg_Warn(p_demux, "there is no valid streams");
+        ret = false;
     }
     return ret;
 }
