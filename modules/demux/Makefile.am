@@ -136,17 +136,13 @@ libcaf_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libcaf_plugin.la
 
 libavformat_plugin_la_SOURCES = demux/avformat/demux.c \
-	codec/avcodec/fourcc.c \
-	codec/avcodec/chroma.c \
-	codec/avcodec/avcommon.h \
-	codec/avcodec/avcommon_compat.h \
 	demux/vobsub.h \
 	demux/avformat/avformat.c demux/avformat/avformat.h
 if ENABLE_SOUT
 libavformat_plugin_la_SOURCES += demux/avformat/mux.c
 endif
 libavformat_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
-libavformat_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
+libavformat_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM) vlc_avcodec_common.la
 libavformat_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 if HAVE_ZLIB
 libavformat_plugin_la_LIBADD += -lz
@@ -157,6 +153,7 @@ endif
 if HAVE_AVFORMAT
 if !MERGE_FFMPEG
 demux_LTLIBRARIES += libavformat_plugin.la
+noinst_LTLIBRARIES += vlc_avcodec_common.la
 endif
 endif
 

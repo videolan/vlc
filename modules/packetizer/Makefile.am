@@ -27,11 +27,9 @@ libpacketizer_dts_plugin_la_SOURCES = packetizer/dts.c \
 
 libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	packetizer/avparser.h \
-	codec/avcodec/avcommon.h \
-	codec/avcodec/avcodec.h \
-	codec/avcodec/fourcc.c
+	codec/avcodec/avcodec.h
 libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
-libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
+libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM) vlc_avcodec_common.la
 
 noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
 

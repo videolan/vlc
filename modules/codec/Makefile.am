@@ -361,22 +361,21 @@ EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
 
 ### FFmpeg/libav ###
+vlc_avcodec_common_la_SOURCES = codec/avcodec/fourcc.c codec/avcodec/avcommon.h \
+	codec/avcodec/chroma.c codec/avcodec/chroma.h \
+	codec/avcodec/avcommon_compat.h
 
 libavcodec_plugin_la_SOURCES = \
-	codec/avcodec/avcommon_compat.h \
-	codec/avcodec/avcommon.h \
 	codec/avcodec/video.c \
 	codec/avcodec/subtitle.c \
 	codec/avcodec/audio.c \
-	codec/avcodec/fourcc.c \
-	codec/avcodec/chroma.c codec/avcodec/chroma.h \
 	codec/avcodec/va.c codec/avcodec/va.h \
 	codec/avcodec/avcodec.c codec/avcodec/avcodec.h
 if ENABLE_SOUT
 libavcodec_plugin_la_SOURCES += codec/avcodec/encoder.c
 endif
 libavcodec_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AM_CFLAGS)
-libavcodec_plugin_la_LIBADD = $(AVCODEC_LIBS) $(LIBM)
+libavcodec_plugin_la_LIBADD = $(AVCODEC_LIBS) $(LIBM) vlc_avcodec_common.la
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 
 if MERGE_FFMPEG
@@ -392,6 +391,7 @@ if HAVE_DARWIN
 libavcodec_plugin_la_LDFLAGS += -Wl,-framework,Foundation -Wl,-framework,Security,-framework,CoreFoundation
 endif
 if HAVE_AVCODEC
+noinst_LTLIBRARIES += vlc_avcodec_common.la
 codec_LTLIBRARIES += libavcodec_plugin.la
 endif
 
