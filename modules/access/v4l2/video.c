@@ -673,7 +673,7 @@ struct buffer_t *StartMmap (vlc_object_t *obj, int fd, uint32_t *restrict n)
         return NULL;
     }
 
-    struct buffer_t *bufv = malloc (req.count * sizeof (*bufv));
+    struct buffer_t *bufv = vlc_alloc (req.count, sizeof (*bufv));
     if (unlikely(bufv == NULL))
         return NULL;
 
