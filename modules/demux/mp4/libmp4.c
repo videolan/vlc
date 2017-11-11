@@ -1952,8 +1952,8 @@ static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_sbgp->i_entry_count > i_read / (4 + 4) )
         p_sbgp->i_entry_count = i_read / (4 + 4);
 
-    p_sbgp->entries.pi_sample_count = malloc( p_sbgp->i_entry_count * sizeof(uint32_t) );
-    p_sbgp->entries.pi_group_description_index = malloc( p_sbgp->i_entry_count * sizeof(uint32_t) );
+    p_sbgp->entries.pi_sample_count = vlc_alloc( p_sbgp->i_entry_count, sizeof(uint32_t) );
+    p_sbgp->entries.pi_group_description_index = vlc_alloc( p_sbgp->i_entry_count, sizeof(uint32_t) );
 
     if( !p_sbgp->entries.pi_sample_count || !p_sbgp->entries.pi_group_description_index )
     {
@@ -2032,7 +2032,7 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET4BYTES( p_sgpd->i_entry_count );
 
-    p_sgpd->p_entries = malloc( p_sgpd->i_entry_count * sizeof(*p_sgpd->p_entries) );
+    p_sgpd->p_entries = vlc_alloc( p_sgpd->i_entry_count, sizeof(*p_sgpd->p_entries) );
     if( !p_sgpd->p_entries )
         MP4_READBOX_EXIT( 0 );
 
@@ -2108,7 +2108,7 @@ static int MP4_ReadBox_stsdext_chan( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     p_chan->layout.p_descriptions =
-        malloc( p_chan->layout.i_channels_description_count * i_descsize );
+        vlc_alloc( p_chan->layout.i_channels_description_count, i_descsize );
 
     if ( !p_chan->layout.p_descriptions )
         MP4_READBOX_EXIT( 0 );
