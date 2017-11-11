@@ -131,7 +131,7 @@ static int Open (vlc_object_t *obj)
 
     /* Titles */
     unsigned n = gme_track_count (sys->emu);
-    sys->titlev = malloc (n * sizeof (*sys->titlev));
+    sys->titlev = vlc_alloc (n, sizeof (*sys->titlev));
     if (unlikely(sys->titlev == NULL))
         n = 0;
     sys->titlec = n;
@@ -309,7 +309,7 @@ static int Control (demux_t *demux, int query, va_list args)
             *(va_arg (args, int *)) = 0; /* Chapter offset */
 
             unsigned n = sys->titlec;
-            *titlev = malloc (sizeof (**titlev) * n);
+            *titlev = vlc_alloc (n, sizeof (**titlev));
             if (unlikely(*titlev == NULL))
                 n = 0;
             *titlec = n;
