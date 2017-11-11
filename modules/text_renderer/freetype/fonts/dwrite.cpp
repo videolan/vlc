@@ -505,7 +505,7 @@ static char *DWrite_Fallback( filter_t *p_filter, const char *psz_family,
         goto done;
     }
 
-    pwsz_buffer = ( wchar_t * ) malloc( ( i_string_length + 1 ) * sizeof( *pwsz_buffer ) );
+    pwsz_buffer = ( wchar_t * ) vlc_alloc( ( i_string_length + 1 ), sizeof( *pwsz_buffer ) );
     if( unlikely( !pwsz_buffer ) )
         goto done;
 

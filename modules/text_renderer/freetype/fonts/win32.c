@@ -310,7 +310,7 @@ static TCHAR *GetFullEnglishName( const ENUMLOGFONTEX *lpelfe )
         goto done;
 
     int i_length_in_wchars = i_name_length / 2;
-    wchar_t *psz_name = malloc( ( i_length_in_wchars + 1 ) * sizeof( *psz_name ) );
+    wchar_t *psz_name = vlc_alloc( i_length_in_wchars + 1, sizeof( *psz_name ) );
 
     if( !psz_name )
         goto done;

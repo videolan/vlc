@@ -302,7 +302,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         return VLC_EGENERIC;
 
     p_sys->i_font_attachments = 0;
-    p_sys->pp_font_attachments = malloc( i_attachments_cnt * sizeof(*p_sys->pp_font_attachments));
+    p_sys->pp_font_attachments = vlc_alloc( i_attachments_cnt, sizeof(*p_sys->pp_font_attachments));
     if( !p_sys->pp_font_attachments )
     {
         for( int i = 0; i < i_attachments_cnt; ++i )

@@ -253,11 +253,11 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
 
     p_paragraph->i_size = i_size;
     p_paragraph->p_code_points =
-            malloc( i_size * sizeof( *p_paragraph->p_code_points ) );
+            vlc_alloc( i_size, sizeof( *p_paragraph->p_code_points ) );
     p_paragraph->pi_glyph_indices =
-            malloc( i_size * sizeof( *p_paragraph->pi_glyph_indices ) );
+            vlc_alloc( i_size, sizeof( *p_paragraph->pi_glyph_indices ) );
     p_paragraph->pp_styles =
-            malloc( i_size * sizeof( *p_paragraph->pp_styles ) );
+            vlc_alloc( i_size, sizeof( *p_paragraph->pp_styles ) );
     p_paragraph->pp_faces =
             calloc( i_size, sizeof( *p_paragraph->pp_faces ) );
     p_paragraph->pi_run_ids =
@@ -293,16 +293,16 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
     }
 
 #ifdef HAVE_HARFBUZZ
-    p_paragraph->p_scripts = malloc( i_size * sizeof( *p_paragraph->p_scripts ) );
+    p_paragraph->p_scripts = vlc_alloc( i_size, sizeof( *p_paragraph->p_scripts ) );
     if( !p_paragraph->p_scripts )
         goto error;
 #endif
 
 #ifdef HAVE_FRIBIDI
-    p_paragraph->p_levels = malloc( i_size * sizeof( *p_paragraph->p_levels ) );
-    p_paragraph->p_types = malloc( i_size * sizeof( *p_paragraph->p_types ) );
+    p_paragraph->p_levels = vlc_alloc( i_size, sizeof( *p_paragraph->p_levels ) );
+    p_paragraph->p_types = vlc_alloc( i_size, sizeof( *p_paragraph->p_types ) );
     p_paragraph->pi_reordered_indices =
-            malloc( i_size * sizeof( *p_paragraph->pi_reordered_indices ) );
+            vlc_alloc( i_size, sizeof( *p_paragraph->pi_reordered_indices ) );
 
     if( !p_paragraph->p_levels || !p_paragraph->p_types
      || !p_paragraph->pi_reordered_indices )
@@ -843,7 +843,7 @@ static int ShapeParagraphFriBidi( filter_t *p_filter, paragraph_t *p_paragraph )
     }
 
     FriBidiJoiningType *p_joining_types =
-            malloc( p_paragraph->i_size * sizeof( *p_joining_types ) );
+            vlc_alloc( p_paragraph->i_size, sizeof( *p_joining_types ) );
     if( !p_joining_types )
         return VLC_ENOMEM;
 
