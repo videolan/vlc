@@ -323,8 +323,8 @@ static int reinit_buffers( filter_t *p_filter )
         p->samples_overlap  = frames_overlap * p->samples_per_frame;
         p->bytes_standing   = p->bytes_stride - p->bytes_overlap;
         p->samples_standing = p->bytes_standing / p->bytes_per_sample;
-        p->buf_overlap      = malloc( p->bytes_overlap );
-        p->table_blend      = malloc( p->samples_overlap * 4 ); /* sizeof (int32|float) */
+        p->buf_overlap      = vlc_alloc( 1, p->bytes_overlap );
+        p->table_blend      = vlc_alloc( 4, p->samples_overlap ); /* sizeof (int32|float) */
         if( !p->buf_overlap || !p->table_blend )
             return VLC_ENOMEM;
         if( p->bytes_overlap > prev_overlap )
