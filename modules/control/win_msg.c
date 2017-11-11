@@ -74,7 +74,7 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
             size_t i_data = 0;
             int i_argc = p_data->argc, i_opt, i_options;
 
-            ppsz_argv = (char **)malloc( i_argc * sizeof(char *) );
+            ppsz_argv = vlc_alloc( i_argc, sizeof(char *) );
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
             {
                 ppsz_argv[i_opt] = p_data->data + i_data + sizeof(size_t);
