@@ -915,7 +915,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
     int subpicture_buffer_object_count = 8;
-    vgl->subpicture_buffer_object = malloc(subpicture_buffer_object_count * sizeof(GLuint));
+    vgl->subpicture_buffer_object = vlc_alloc(subpicture_buffer_object_count, sizeof(GLuint));
     if (!vgl->subpicture_buffer_object) {
         vout_display_opengl_Delete(vgl);
         return NULL;
@@ -1201,16 +1201,16 @@ static int BuildSphere(unsigned nbPlanes,
     *nbVertices = (nbLatBands + 1) * (nbLonBands + 1);
     *nbIndices = nbLatBands * nbLonBands * 3 * 2;
 
-    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
         return VLC_ENOMEM;
     }
-    *indices = malloc(*nbIndices * sizeof(GLushort));
+    *indices = vlc_alloc(*nbIndices, sizeof(GLushort));
     if (*indices == NULL)
     {
         free(*textureCoord);
@@ -1284,16 +1284,16 @@ static int BuildCube(unsigned nbPlanes,
     *nbVertices = 4 * 6;
     *nbIndices = 6 * 6;
 
-    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
         return VLC_ENOMEM;
     }
-    *indices = malloc(*nbIndices * sizeof(GLushort));
+    *indices = vlc_alloc(*nbIndices, sizeof(GLushort));
     if (*indices == NULL)
     {
         free(*textureCoord);
@@ -1408,16 +1408,16 @@ static int BuildRectangle(unsigned nbPlanes,
     *nbVertices = 4;
     *nbIndices = 6;
 
-    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
         return VLC_ENOMEM;
     }
-    *indices = malloc(*nbIndices * sizeof(GLushort));
+    *indices = vlc_alloc(*nbIndices, sizeof(GLushort));
     if (*indices == NULL)
     {
         free(*textureCoord);
