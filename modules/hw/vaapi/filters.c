@@ -1110,7 +1110,7 @@ OpenDeinterlace_InitHistory(void * p_data, VAProcPipelineCaps const * pipeline_c
     if (history_sz - 1)
     {
         p_deint_data->forward_refs.surfaces =
-            malloc((history_sz - 1) * sizeof(VASurfaceID));
+            vlc_alloc(history_sz - 1, sizeof(VASurfaceID));
         if (!p_deint_data->forward_refs.surfaces)
             return VLC_ENOMEM;
     }

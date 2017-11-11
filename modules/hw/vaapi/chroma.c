@@ -54,7 +54,7 @@ static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
 {
     int count = vaMaxNumImageFormats(va_dpy);
 
-    VAImageFormat *fmts = malloc(count * sizeof (*fmts));
+    VAImageFormat *fmts = vlc_alloc(count, sizeof (*fmts));
     if (unlikely(fmts == NULL))
         return VLC_ENOMEM;
 

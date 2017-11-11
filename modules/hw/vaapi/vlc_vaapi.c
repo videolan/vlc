@@ -362,7 +362,7 @@ IsEntrypointAvailable(VADisplay dpy, VAProfile i_profile,
 
     if (num_entrypoints <= 0)
         return false;
-    entrypoints = malloc(num_entrypoints * sizeof(VAEntrypoint));
+    entrypoints = vlc_alloc(num_entrypoints, sizeof(VAEntrypoint));
 
     if (!entrypoints)
         return false;
@@ -438,7 +438,7 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
         != VA_STATUS_SUCCESS)
         goto error;
 
-    sattribs = malloc(num_sattribs * sizeof(*sattribs));
+    sattribs = vlc_alloc(num_sattribs, sizeof(*sattribs));
     if (sattribs == NULL)
         goto error;
     if (vaQuerySurfaceAttributes(dpy, va_config_id, sattribs, &num_sattribs)
