@@ -83,7 +83,7 @@ int screen_InitCapture(demux_t *p_demux)
     returnedError = CGGetOnlineDisplayList(0, NULL, &displayCount);
     if (!returnedError) {
         CGDirectDisplayID *ids;
-        ids = (CGDirectDisplayID *)malloc(displayCount * sizeof(CGDirectDisplayID));
+        ids = vlc_alloc(displayCount, sizeof(CGDirectDisplayID));
         returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
         if (!returnedError) {
             if (p_sys->i_display_id > 0) {
