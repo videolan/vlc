@@ -351,7 +351,7 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
 }
 
 static void FillRegionStyle( const char *psz_attr, const char *psz_val,
-                             ttml_region_t *p_region )
+                             ttml_context_t *p_ctx, ttml_region_t *p_region )
 {
     if( !strcasecmp( "tts:displayAlign", psz_attr ) )
     {
@@ -362,36 +362,43 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
         else
             p_region->updt.align = SUBPICTURE_ALIGN_BOTTOM;
     }
-    else if( !strcasecmp ( "tts:origin", psz_attr ) )
+    else if( !strcasecmp ( "tts:origin", psz_attr ) ||
+             !strcasecmp ( "tts:extent", psz_attr ) )
     {
         const char *psz_token = psz_val;
         while( isspace( *psz_token ) )
             psz_token++;
 
-        const char *psz_separator = strchr( psz_token, ' ' );
-        if( psz_separator == NULL )
-            return;
-        const char *psz_percent_sign = strchr( psz_token, '%' );
+        ttml_length_t x = ttml_read_length( psz_token );
 
-        p_region->updt.origin.x = atoi( psz_token );
-        if( psz_percent_sign != NULL && psz_percent_sign < psz_separator )
+        while( *psz_token && !isspace( *psz_token ) )
+            psz_token++;
+        while( *psz_token && isspace( *psz_token ) )
+            psz_token++;
+
+        ttml_length_t y = ttml_read_length( psz_token );
+
+        if ( x.unit != TTML_UNIT_UNKNOWN && y.unit != TTML_UNIT_UNKNOWN )
         {
-            p_region->updt.origin.x /= 100.0;
-            p_region->updt.flags |= UPDT_REGION_ORIGIN_X_IS_RATIO;
+            ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
+            x = ttml_rebase_length( x, base, p_ctx->i_cell_resolution_h );
+            y = ttml_rebase_length( y, base, p_ctx->i_cell_resolution_v );
+            if( psz_attr[4] == 'o' )
+            {
+                p_region->updt.origin.x = x.i_value / 100.0;
+                p_region->updt.flags |= UPDT_REGION_ORIGIN_X_IS_RATIO;
+                p_region->updt.origin.y = y.i_value / 100.0;
+                p_region->updt.flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
+                p_region->updt.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+            }
+            else
+            {
+                p_region->updt.extent.x = x.i_value / 100.0;
+                p_region->updt.flags |= UPDT_REGION_EXTENT_X_IS_RATIO;
+                p_region->updt.extent.y = y.i_value / 100.0;
+                p_region->updt.flags |= UPDT_REGION_EXTENT_Y_IS_RATIO;
+            }
         }
-
-        while( isspace( *psz_separator ) )
-            psz_separator++;
-        psz_token = psz_separator;
-        psz_percent_sign = strchr( psz_token, '%' );
-
-        p_region->updt.origin.y = atoi( psz_token );
-        if( psz_percent_sign != NULL )
-        {
-            p_region->updt.origin.y /= 100.0;
-            p_region->updt.flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
-        }
-        p_region->updt.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
     }
 }
 
@@ -729,7 +736,8 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
                     for ( vlc_dictionary_entry_t* p_entry = merged.p_entries[i];
                           p_entry != NULL; p_entry = p_entry->p_next )
                     {
-                        FillRegionStyle( p_entry->psz_key, p_entry->p_value, p_region );
+                        FillRegionStyle( p_entry->psz_key, p_entry->p_value,
+                                         p_ctx, p_region );
                     }
                 }
             }
@@ -787,6 +795,11 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
                 p_segment->style->i_font_alpha = STYLE_ALPHA_TRANSPARENT;
                 p_segment->style->i_features |= STYLE_HAS_FONT_ALPHA;
             }
+
+            /* we don't have paragraph, so no per text line alignment.
+             * Text style brings horizontal textAlign to region.
+             * Region itself is styled with vertical displayAlign */
+            p_region->updt.inner_align |= s->i_text_align;
 
             ttml_style_Delete( s );
         }
