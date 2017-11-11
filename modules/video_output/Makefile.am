@@ -260,9 +260,8 @@ libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libdirect3d9_plugin_la_LIBADD = video_chroma_copy.la -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlace.c \
-        video_filter/deinterlace/common.c video_filter/deinterlace/common.h \
         video_chroma/d3d9_fmt.h
-libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM)
+libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM) vlc_deinterlace_common.la
 libdirect3d9_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_adjust_plugin_la_SOURCES = video_output/win32/d3d9_adjust.c \
   video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
@@ -294,9 +293,9 @@ vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c \
-  video_filter/deinterlace/common.c video_filter/deinterlace/common.h \
   video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
 libdirect3d11_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libdirect3d11_deinterlace_plugin_la_LIBADD = vlc_deinterlace_common.la
 libdirect3d11_adjust_plugin_la_SOURCES = video_output/win32/d3d11_adjust.c \
   video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
 libdirect3d11_adjust_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
