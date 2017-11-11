@@ -149,6 +149,7 @@ libvlc_demux_run_la_LIBADD = \
 if !HAVE_DYNAMIC_PLUGINS
 libvlc_demux_run_la_CPPFLAGS += -DHAVE_STATIC_MODULES
 libvlc_demux_run_la_LIBADD += \
+	../modules/libxml_plugin.la \
 	../modules/libconsole_logger_plugin.la \
 	../modules/libaiff_plugin.la \
 	../modules/libasf_plugin.la \
@@ -175,6 +176,7 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/libty_plugin.la \
 	../modules/libvoc_plugin.la \
 	../modules/libwav_plugin.la \
+	../modules/libwebvtt_plugin.la \
 	../modules/libxa_plugin.la \
 	../modules/libpacketizer_a52_plugin.la \
 	../modules/libpacketizer_dts_plugin.la \
