@@ -372,7 +372,7 @@ static uint8_t *vlclua_todata( lua_State *L, int narg, int *pi_data )
 {
     size_t i_data;
     const char *psz_data = lua_tolstring( L, narg, &i_data );
-    uint8_t *p_data = (uint8_t*)malloc( i_data * sizeof(uint8_t) );
+    uint8_t *p_data = vlc_alloc( i_data, sizeof(uint8_t) );
     *pi_data = (int)i_data;
     if( !p_data )
     {
