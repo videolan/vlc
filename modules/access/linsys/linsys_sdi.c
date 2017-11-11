@@ -780,7 +780,7 @@ static int InitTelx( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_telx_buffer = malloc( p_sys->i_telx_count * p_sys->i_width * 4 );
+    p_sys->p_telx_buffer = vlc_alloc( p_sys->i_telx_count * p_sys->i_width, 4 );
     if( !p_sys->p_telx_buffer )
     {
         vbi_raw_decoder_destroy ( &p_sys->rd_telx );
@@ -861,7 +861,7 @@ static int InitAudio( demux_t *p_demux, sdi_audio_t *p_audio )
     p_audio->i_max_samples        = (float)p_audio->i_nb_samples *
                                     (1.f + SAMPLERATE_TOLERANCE);
 
-    p_audio->p_buffer             = malloc( p_audio->i_max_samples * sizeof(int16_t) * 2 );
+    p_audio->p_buffer             = vlc_alloc( p_audio->i_max_samples, sizeof(int16_t) * 2 );
     p_audio->i_left_samples       = p_audio->i_right_samples = 0;
     p_audio->i_block_number       = 0;
 
@@ -1737,7 +1737,7 @@ static int InitCapture( demux_t *p_demux )
 
     i_bufmemsize = ((p_sys->i_buffer_size + i_page_size - 1) / i_page_size)
                      * i_page_size;
-    p_sys->pp_buffers = malloc( p_sys->i_buffers * sizeof(uint8_t *) );
+    p_sys->pp_buffers = vlc_alloc( p_sys->i_buffers, sizeof(uint8_t *) );
     if( !p_sys->pp_buffers )
         return VLC_ENOMEM;
 

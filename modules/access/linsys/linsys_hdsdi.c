@@ -840,7 +840,7 @@ static int InitCapture( demux_t *p_demux )
 #ifdef HAVE_MMAP_SDIAUDIO
         i_bufmemsize = ((p_sys->i_abuffer_size + i_page_size - 1) / i_page_size)
                          * i_page_size;
-        p_sys->pp_abuffers = malloc( p_sys->i_abuffers * sizeof(uint8_t *) );
+        p_sys->pp_abuffers = vlc_alloc( p_sys->i_abuffers, sizeof(uint8_t *) );
         if( unlikely( !p_sys->pp_abuffers ) )
             return VLC_ENOMEM;
         for ( unsigned int i = 0; i < p_sys->i_abuffers; i++ )
@@ -895,7 +895,7 @@ static int InitCapture( demux_t *p_demux )
     p_sys->i_current_vbuffer = 0;
     i_bufmemsize = ((p_sys->i_vbuffer_size + i_page_size - 1) / i_page_size)
                      * i_page_size;
-    p_sys->pp_vbuffers = malloc( p_sys->i_vbuffers * sizeof(uint8_t *) );
+    p_sys->pp_vbuffers = vlc_alloc( p_sys->i_vbuffers, sizeof(uint8_t *) );
     if( unlikely( !p_sys->pp_vbuffers ) )
         return VLC_ENOMEM;
     for ( unsigned int i = 0; i < p_sys->i_vbuffers; i++ )
