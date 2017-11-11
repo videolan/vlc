@@ -277,6 +277,7 @@ typedef int (*vlc_plugin_cb)(int (*)(void *, void *, int, ...), void *);
 extern vlc_plugin_cb vlc_static_modules[];
 
 #define PLUGINS(f) \
+    f(console) \
     f(filesystem) \
     f(xml) \
     f(aiff) \

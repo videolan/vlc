@@ -149,6 +149,7 @@ libvlc_demux_run_la_LIBADD = \
 if !HAVE_DYNAMIC_PLUGINS
 libvlc_demux_run_la_CPPFLAGS += -DHAVE_STATIC_MODULES
 libvlc_demux_run_la_LIBADD += \
+	../modules/libconsole_logger_plugin.la \
 	../modules/libaiff_plugin.la \
 	../modules/libasf_plugin.la \
 	../modules/libau_plugin.la \
