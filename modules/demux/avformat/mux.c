@@ -84,7 +84,7 @@ static int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
 /*****************************************************************************
  * Open
  *****************************************************************************/
-int OpenMux( vlc_object_t *p_this )
+int avformat_OpenMux( vlc_object_t *p_this )
 {
     AVOutputFormat *file_oformat;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
@@ -163,7 +163,7 @@ int OpenMux( vlc_object_t *p_this )
 /*****************************************************************************
  * Close
  *****************************************************************************/
-void CloseMux( vlc_object_t *p_this )
+void avformat_CloseMux( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;

@@ -148,7 +148,7 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
     }
 }
 
-int OpenDemux( vlc_object_t *p_this )
+int avformat_OpenDemux( vlc_object_t *p_this )
 {
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
@@ -288,7 +288,7 @@ int OpenDemux( vlc_object_t *p_this )
     if( !p_io_buffer )
     {
         free( psz_url );
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
 
@@ -297,7 +297,7 @@ int OpenDemux( vlc_object_t *p_this )
     {
         av_free( p_io_buffer );
         free( psz_url );
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
 
@@ -307,7 +307,7 @@ int OpenDemux( vlc_object_t *p_this )
     {
         av_free( p_io_buffer );
         free( psz_url );
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
 
@@ -322,7 +322,7 @@ int OpenDemux( vlc_object_t *p_this )
         av_free( pb );
         p_sys->ic = NULL;
         free( psz_url );
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_EGENERIC;
     }
     free( psz_url );
@@ -357,13 +357,13 @@ int OpenDemux( vlc_object_t *p_this )
     if( !nb_streams )
     {
         msg_Err( p_demux, "No streams found");
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_EGENERIC;
     }
     p_sys->tracks = calloc( nb_streams, sizeof(*p_sys->tracks) );
     if( !p_sys->tracks )
     {
-        CloseDemux( p_this );
+        avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
 
@@ -697,7 +697,7 @@ int OpenDemux( vlc_object_t *p_this )
 /*****************************************************************************
  * Close
  *****************************************************************************/
-void CloseDemux( vlc_object_t *p_this )
+void avformat_CloseDemux( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
