@@ -327,8 +327,6 @@ libwgl_plugin_la_SOURCES = video_output/win32/wgl.c $(OPENGL_COMMONSOURCES)
 
 libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
-libwgl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-        -DMODULE_NAME_IS_wgl
 
 libglwin32_plugin_la_LIBADD = video_chroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid $(OPENGL_COMMONLIBS)
 libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 $(OPENGL_COMMONLIBS)
@@ -349,8 +347,6 @@ libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DMODULE_NAME_IS_wingdi
 libwingdi_plugin_la_LIBADD = video_chroma_copy.la -lgdi32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
