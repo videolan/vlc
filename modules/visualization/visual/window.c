@@ -126,7 +126,7 @@ bool window_init( int i_buffer_size, window_param * p_param,
         goto exit;
     }
 
-    pf_table = malloc( i_buffer_size * sizeof( *pf_table ) );
+    pf_table = vlc_alloc( i_buffer_size, sizeof( *pf_table ) );
     if( !pf_table )
     {
         /* Memory allocation failed */
