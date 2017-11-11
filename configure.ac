@@ -1046,9 +1046,6 @@ AS_VAR_IF(with_sanitizer, no, [], [
         AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
         AX_APPEND_COMPILE_FLAGS([-fPIE -pie], [CXXFLAGS])
     ])
-    AS_IF([test -z "${with_sanitizer##*undefined*}" ], [
-        AX_APPEND_COMPILE_FLAGS([-lubsan], [LDFLAGS])
-    ])
 ])
 
 dnl
