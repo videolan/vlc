@@ -548,7 +548,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->i_attachments <= 0 )
             return VLC_EGENERIC;
 
-        *ppp_attach = malloc( sizeof(input_attachment_t*) * p_sys->i_attachments );
+        *ppp_attach = vlc_alloc( p_sys->i_attachments, sizeof(input_attachment_t*) );
         if( !*ppp_attach )
             return VLC_EGENERIC;
         *pi_int = p_sys->i_attachments;
@@ -578,7 +578,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
-        p_title->seekpoint = malloc( p_sys->i_title_seekpoints * sizeof(seekpoint_t*) );
+        p_title->seekpoint = vlc_alloc( p_sys->i_title_seekpoints, sizeof(seekpoint_t*) );
         if(!p_title->seekpoint)
         {
             vlc_input_title_Delete(p_title);
