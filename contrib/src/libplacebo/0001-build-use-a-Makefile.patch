@@ -36,7 +36,7 @@ index 0000000..36e7f26
 +
 +install: $(targets)
 +	rm -rf $(PREFIX)/include/libplacebo
-+	mkdir -p $(PREFIX)/lib/pkgconfig/
++	mkdir -p $(PREFIX)/lib/pkgconfig/ $(PREFIX)/include/libplacebo
 +	cp -r src/include/libplacebo $(PREFIX)/include
 +	cp src/config.h $(PREFIX)/include/libplacebo
 +	cp libplacebo.a $(PREFIX)/lib/
