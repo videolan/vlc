@@ -146,7 +146,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     if( !pf_sum )
         goto out;
 
-    pf_gain = malloc( sizeof(float) * i_channels );
+    pf_gain = vlc_alloc( i_channels, sizeof(float) );
     if( !pf_gain )
     {
         free( pf_sum );
