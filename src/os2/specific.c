@@ -70,7 +70,7 @@ static void IPCHelperThread( void *arg )
         /* Read a count of arguments */
         DosRead( hpipeIPC, &i_argc, sizeof( i_argc ), &cbActual );
 
-        ppsz_argv = malloc( i_argc * sizeof( *ppsz_argv ));
+        ppsz_argv = vlc_alloc( i_argc, sizeof( *ppsz_argv ));
 
         for( int i_opt = 0; i_opt < i_argc; i_opt++ )
         {
