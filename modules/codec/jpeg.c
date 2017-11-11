@@ -549,7 +549,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
     /* Decode picture */
-    p_row_pointers = malloc(sizeof(JSAMPROW) * p_sys->p_jpeg.output_height);
+    p_row_pointers = vlc_alloc(p_sys->p_jpeg.output_height, sizeof(JSAMPROW));
     if (!p_row_pointers)
     {
         goto error;
@@ -680,7 +680,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     jpeg_start_compress(&p_sys->p_jpeg, TRUE);
 
     /* Encode picture */
-    p_row_pointers = malloc(sizeof(JSAMPARRAY) * p_pic->i_planes);
+    p_row_pointers = vlc_alloc(p_pic->i_planes, sizeof(JSAMPARRAY));
     if (p_row_pointers == NULL)
     {
         goto error;
@@ -688,7 +688,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     for (int i = 0; i < p_pic->i_planes; i++)
     {
-        p_row_pointers[i] = malloc(sizeof(JSAMPROW) * p_sys->p_jpeg.comp_info[i].v_samp_factor * DCTSIZE);
+        p_row_pointers[i] = vlc_alloc(p_sys->p_jpeg.comp_info[i].v_samp_factor, sizeof(JSAMPROW) * DCTSIZE);
     }
 
     while (p_sys->p_jpeg.next_scanline < p_sys->p_jpeg.image_height)
