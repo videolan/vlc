@@ -358,7 +358,7 @@ static void *EventThread( void *p_this )
             if( p_event->psz_title )
             {
                 const size_t i_length = strlen(p_event->psz_title);
-                pwz_title = malloc( 2 * (i_length + 1) );
+                pwz_title = vlc_alloc( i_length + 1, 2 );
                 if( pwz_title )
                 {
                     mbstowcs( pwz_title, p_event->psz_title, 2 * i_length );

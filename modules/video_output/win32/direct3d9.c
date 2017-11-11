@@ -1417,7 +1417,7 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
         if (length == -1 || length >= MAX_SHADER_FILE_SIZE)
             goto error;
         rewind(fs);
-        shader_source_file = malloc(sizeof(*shader_source_file) * length);
+        shader_source_file = vlc_alloc(length, sizeof(*shader_source_file));
         if (!shader_source_file)
             goto error;
         ret = fread(shader_source_file, length, 1, fs);
