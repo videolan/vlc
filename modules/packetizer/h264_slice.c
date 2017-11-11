@@ -160,7 +160,7 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
         const unsigned i_num_layers = ( i_slice_type % 5 == 1 ) ? 2 : 1;
         for( unsigned j=0; j < i_num_layers; j++ )
         {
-            for( unsigned i=0; i<=num_ref_idx_l01_active_minus1[j]; i++ )
+            for( unsigned k=0; k<=num_ref_idx_l01_active_minus1[j]; k++ )
             {
                 if( bs_read1( &s ) ) /* luma_weight_l{0,1}_flag */
                 {
