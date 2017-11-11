@@ -313,8 +313,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
 
             *pi_int = p_sys->stored_attachments.size();
-            *ppp_attach = static_cast<input_attachment_t**>( malloc( sizeof(input_attachment_t*) *
-                                                        p_sys->stored_attachments.size() ) );
+            *ppp_attach = static_cast<input_attachment_t**>( vlc_alloc( p_sys->stored_attachments.size(),
+                                                        sizeof(input_attachment_t*) ) );
             if( !(*ppp_attach) )
                 return VLC_ENOMEM;
             for( size_t i = 0; i < p_sys->stored_attachments.size(); i++ )
