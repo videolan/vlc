@@ -91,6 +91,7 @@ int CommonInit(vout_display_t *vd)
         return VLC_EGENERIC;
 #endif
 
+#if !VLC_WINSTORE_APP
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
 #ifdef MODULE_NAME_IS_direct3d9
@@ -104,7 +105,6 @@ int CommonInit(vout_display_t *vd)
     cfg.width  = vd->cfg->display.width;
     cfg.height = vd->cfg->display.height;
 
-#if !VLC_WINSTORE_APP
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
         return VLC_EGENERIC;
