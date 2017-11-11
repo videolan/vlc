@@ -521,15 +521,16 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
 
     for( ; ; )
     {
-        asf_object_t *p_obj = malloc( sizeof( asf_object_t ) );
+        asf_object_t *p_child = malloc( sizeof( asf_object_t ) );
 
-        if( !p_obj || ASF_ReadObject( s, p_obj, (asf_object_t*)p_he ) )
+        if( p_child == NULL
+         || ASF_ReadObject( s, p_child, (asf_object_t*)p_he ) )
         {
-            free( p_obj );
+            free( p_child );
             break;
         }
 
-        if( ASF_NextObject( s, p_obj, 0 ) ) /* Go to the next object */
+        if( ASF_NextObject( s, p_child, 0 ) ) /* Go to the next object */
         {
             break;
         }
