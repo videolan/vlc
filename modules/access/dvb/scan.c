@@ -1712,7 +1712,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
 
     const size_t i_total_services = scan_CountServices( p_scan );
     size_t i_filtered_count = 0;
-    const scan_service_t **pp_filtered_list = malloc( sizeof(scan_service_t *) * i_total_services );
+    const scan_service_t **pp_filtered_list = vlc_alloc( i_total_services, sizeof(scan_service_t *) );
     if( !pp_filtered_list )
     {
         block_Release( p_playlist );
