@@ -291,9 +291,9 @@ static int EqzInit( filter_t *p_filter, int i_rate )
 
     /* Create the static filter config */
     p_sys->i_band = cfg.i_band;
-    p_sys->f_alpha = malloc( p_sys->i_band * sizeof(float) );
-    p_sys->f_beta  = malloc( p_sys->i_band * sizeof(float) );
-    p_sys->f_gamma = malloc( p_sys->i_band * sizeof(float) );
+    p_sys->f_alpha = vlc_alloc( p_sys->i_band, sizeof(float) );
+    p_sys->f_beta  = vlc_alloc( p_sys->i_band, sizeof(float) );
+    p_sys->f_gamma = vlc_alloc( p_sys->i_band, sizeof(float) );
     if( !p_sys->f_alpha || !p_sys->f_beta || !p_sys->f_gamma )
         goto error;
 
@@ -307,7 +307,7 @@ static int EqzInit( filter_t *p_filter, int i_rate )
     /* Filter dyn config */
     p_sys->b_2eqz = false;
     p_sys->f_gamp = 1.0f;
-    p_sys->f_amp  = malloc( p_sys->i_band * sizeof(float) );
+    p_sys->f_amp  = vlc_alloc( p_sys->i_band, sizeof(float) );
     if( !p_sys->f_amp )
         goto error;
 
