@@ -29,6 +29,7 @@
 #include <vlc_codec.h>
 #include <vlc_stream.h>
 #include <vlc_access.h>
+#include <vlc_meta.h>
 #include <vlc_block.h>
 #include <vlc_url.h>
 
@@ -81,21 +82,25 @@ static int queue_sub(decoder_t *dec, subpicture_t *p_subpic)
     return 0;
 }
 
+static void decoder_unload(decoder_t *decoder)
+{
+    if (decoder->p_module != NULL)
+    {
+        module_unneed(decoder, decoder->p_module);
+        es_format_Clean(&decoder->fmt_out);
+    }
+    es_format_Clean(&decoder->fmt_in);
+    if (decoder->p_description)
+        vlc_meta_Delete(decoder->p_description);
+    vlc_object_release(decoder);
+}
+
 void test_decoder_destroy(decoder_t *decoder)
 {
     decoder_t *packetizer = (void *) decoder->p_owner;
 
-    if (packetizer->p_module != NULL)
-        module_unneed(packetizer, packetizer->p_module);
-    es_format_Clean(&packetizer->fmt_in);
-    es_format_Clean(&packetizer->fmt_out);
-    vlc_object_release(packetizer);
-
-    if (decoder->p_module != NULL)
-        module_unneed(decoder, decoder->p_module);
-    es_format_Clean(&decoder->fmt_in);
-    es_format_Clean(&decoder->fmt_out);
-    vlc_object_release(decoder);
+    decoder_unload(packetizer);
+    decoder_unload(decoder);
 }
 
 decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
