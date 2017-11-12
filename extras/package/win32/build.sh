@@ -98,6 +98,7 @@ make package
 fi
 else
 make prebuilt
+make .luac
 fi
 cd ../..
 
