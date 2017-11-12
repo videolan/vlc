@@ -155,15 +155,16 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll $(win32_destd
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis"; \
-	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
-	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
 	elif [ -x "$(PROGRAMFILES)/NSIS/makensis" ]; then \
 	    MAKENSIS="$(PROGRAMFILES)/NSIS/makensis"; \
-	elif wine --version >/dev/null 2>&1; then \
-	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe"; \
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
 	fi; \
+	MAKENSIS_VERSION=`makensis -VERSION`; echo $${MAKENSIS_VERSION:1:1}; \
+	if [ $${MAKENSIS_VERSION:1:1} -lt 3 ]; then \
+	    echo 'Please update your nsis packager';\
+	    exit 1; \
+	fi
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 	if test -n "$(SIGNATURE)"; then \
