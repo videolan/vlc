@@ -137,7 +137,6 @@ static void Close( vlc_object_t *p_this )
         block_ChainRelease( p_dec->p_sys->p_block );
     }
 
-    es_format_Clean( &p_dec->fmt_out );
     free( p_dec->p_sys );
 }
 
