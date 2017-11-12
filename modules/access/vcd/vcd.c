@@ -265,10 +265,11 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 
         case STREAM_GET_TITLE_INFO:
             ppp_title = va_arg( args, input_title_t*** );
-            *va_arg( args, int* ) = p_sys->i_titles;
-
             /* Duplicate title infos */
-            *ppp_title = xmalloc( sizeof(input_title_t *) * p_sys->i_titles );
+            *ppp_title = vlc_alloc( p_sys->i_titles, sizeof(input_title_t *) );
+            if (!*ppp_title)
+                return VLC_ENOMEM;
+            *va_arg( args, int* ) = p_sys->i_titles;
             for( int i = 0; i < p_sys->i_titles; i++ )
                 (*ppp_title)[i] = vlc_input_title_New();
             break;
