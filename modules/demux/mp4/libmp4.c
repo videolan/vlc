@@ -3618,7 +3618,7 @@ static int MP4_ReadBox_HMMT( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_hmmt->i_chapter_count > MAX_CHAPTER_COUNT )
         p_hmmt->i_chapter_count = MAX_CHAPTER_COUNT;
 
-    p_hmmt->pi_chapter_start = malloc( p_hmmt->i_chapter_count * sizeof(uint32_t) );
+    p_hmmt->pi_chapter_start = vlc_alloc( p_hmmt->i_chapter_count, sizeof(uint32_t) );
     if( p_hmmt->pi_chapter_start == NULL )
         MP4_READBOX_EXIT( 0 );
 
