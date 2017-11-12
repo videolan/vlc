@@ -32,6 +32,7 @@ parts:
     source: ../../../
     source-type: git
     plugin: autotools
+    configflags: ['--disable-chromecast']
     build-packages:
       - autopoint
       - debhelper
@@ -135,7 +136,6 @@ parts:
       - libzvbi-dev
       - lua5.2
       - pkg-config
-      - protobuf-compiler
       - qtbase5-dev
       - wayland-protocols
       - zlib1g-dev
