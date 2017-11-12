@@ -1007,19 +1007,23 @@ static BOOL deviceSupportsAdvancedLevels()
     return YES;
 #endif
 #if TARGET_OS_IPHONE
-    size_t size;
-    int32_t cpufamily;
+    #ifdef __LP64__
+        size_t size;
+        int32_t cpufamily;
+        size = sizeof(cpufamily);
+        sysctlbyname("hw.cpufamily", &cpufamily, &size, NULL, 0);
 
-    size = sizeof(cpufamily);
-    sysctlbyname("hw.cpufamily", &cpufamily, &size, NULL, 0);
+        /* Proper 4K decoding requires a Twister SoC
+         * Everything below will kill the decoder daemon */
+        if (cpufamily == CPUFAMILY_ARM_CYCLONE || cpufamily == CPUFAMILY_ARM_TYPHOON) {
+            return NO;
+        }
 
-    /* Proper 4K decoding requires a Twister SoC
-     * Everything below will kill the decoder daemon */
-    if (cpufamily == CPUFAMILY_ARM_TWISTER) {
         return YES;
-    }
-
-    return NO;
+    #else
+        /* we need a 64bit SoC for advanced levels */
+        return NO;
+    #endif
 #else
     return YES;
 #endif
