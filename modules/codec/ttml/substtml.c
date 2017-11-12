@@ -454,16 +454,15 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
     }
     else if( !strcasecmp( "tts:textAlign", psz_attr ) )
     {
+        p_ttml_style->i_text_align &= ~(SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
         if( !strcasecmp ( "left", psz_val ) )
-            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
+            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
         else if( !strcasecmp ( "right", psz_val ) )
-            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_RIGHT;
-        else if( !strcasecmp ( "center", psz_val ) )
-            p_ttml_style->i_text_align = 0;
+            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_RIGHT;
         else if( !strcasecmp ( "start", psz_val ) ) /* FIXME: should be BIDI based */
-            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
+            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
         else if( !strcasecmp ( "end", psz_val ) )  /* FIXME: should be BIDI based */
-            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_RIGHT;
+            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_RIGHT;
     }
     else if( !strcasecmp( "tts:fontSize", psz_attr ) )
     {
