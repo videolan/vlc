@@ -266,34 +266,53 @@ error:
     goto ret;
 }
 
+static int CheckFmt(const video_format_t *in, const video_format_t *out,
+                    bool *upload)
+{
+    *upload = false;
+    switch (in->i_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+            if (out->i_chroma == VLC_CODEC_I420)
+                return VLC_SUCCESS;
+            break;
+        case VLC_CODEC_VAAPI_420_10BPP:
+            if (out->i_chroma == VLC_CODEC_P010)
+                return VLC_SUCCESS;
+            break;
+    }
+
+    *upload = true;
+    switch (out->i_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+            if (in->i_chroma == VLC_CODEC_I420)
+                return VLC_SUCCESS;
+            break;
+        case VLC_CODEC_VAAPI_420_10BPP:
+            if (in->i_chroma == VLC_CODEC_P010)
+                return VLC_SUCCESS;
+            break;
+    }
+    return VLC_EGENERIC;
+}
+
 int
 vlc_vaapi_OpenChroma(vlc_object_t *obj)
 {
     filter_t *const     filter = (filter_t *)obj;
     filter_sys_t *      filter_sys;
-    bool                is_upload;
 
-    if (filter->fmt_in.video.orientation != filter->fmt_out.video.orientation)
+    if (filter->fmt_in.video.i_height != filter->fmt_out.video.i_height
+     || filter->fmt_in.video.i_width != filter->fmt_out.video.i_width
+     || filter->fmt_in.video.orientation != filter->fmt_out.video.orientation)
         return VLC_EGENERIC;
 
-    if ((filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420
-      && filter->fmt_out.video.i_chroma == VLC_CODEC_I420)
-     || (filter->fmt_in.video.i_chroma == VLC_CODEC_VAAPI_420_10BPP
-      && filter->fmt_out.video.i_chroma == VLC_CODEC_P010))
-    {
-        is_upload = false;
-        filter->pf_video_filter = DownloadSurface;
-    }
-    else if ((filter->fmt_in.video.i_chroma == VLC_CODEC_I420
-           && filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420)
-          || (filter->fmt_in.video.i_chroma == VLC_CODEC_P010
-           && filter->fmt_out.video.i_chroma == VLC_CODEC_VAAPI_420_10BPP))
-    {
-        is_upload = true;
-        filter->pf_video_filter = UploadSurface;
-    }
-    else
+    bool is_upload;
+    if (CheckFmt(&filter->fmt_in.video, &filter->fmt_out.video, &is_upload))
         return VLC_EGENERIC;
+
+    filter->pf_video_filter = is_upload ? UploadSurface : DownloadSurface;
 
     if (!(filter_sys = calloc(1, sizeof(filter_sys_t))))
     {
