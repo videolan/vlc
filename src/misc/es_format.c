@@ -492,6 +492,8 @@ int es_format_Copy(es_format_t *restrict dst, const es_format_t *src)
             ret = VLC_ENOMEM;
         }
     }
+    else
+        dst->p_extra = NULL;
 
     if (src->i_cat == VIDEO_ES)
         ret = video_format_Copy( &dst->video, &src->video );
