@@ -136,9 +136,8 @@ static bool ptrcmp(void *a, void *b)
 static void *vlc_obj_alloc_common(vlc_object_t *obj, size_t nmemb, size_t size,
                                   bool do_memset)
 {
-    size_t tabsize = nmemb * size;
-
-    if (unlikely(tabsize < nmemb))
+    size_t tabsize;
+    if (mul_overflow(nmemb, size, &tabsize))
     {
         errno = ENOMEM;
         return NULL;
