@@ -904,7 +904,7 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
     vlc_mutex_lock( &p_input_item->lock );
 
     const int i_es = p_input_item->i_es;
-    *pp_es = (i_es > 0) ? malloc( i_es * sizeof(libvlc_media_track_info_t) ) : NULL;
+    *pp_es = (i_es > 0) ? vlc_alloc( i_es, sizeof(libvlc_media_track_info_t) ) : NULL;
 
     if( !*pp_es ) /* no ES, or OOM */
     {

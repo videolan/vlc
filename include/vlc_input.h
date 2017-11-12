@@ -139,7 +139,7 @@ static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
     dup->i_length    = t->i_length;
     if( t->i_seekpoint > 0 )
     {
-        dup->seekpoint = (seekpoint_t**)malloc( t->i_seekpoint * sizeof(seekpoint_t*) );
+        dup->seekpoint = (seekpoint_t**)vlc_alloc( t->i_seekpoint, sizeof(seekpoint_t*) );
         if( likely(dup->seekpoint) )
         {
             for( int i = 0; i < t->i_seekpoint; i++ )

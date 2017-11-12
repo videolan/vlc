@@ -615,7 +615,7 @@ vlc_actions_get_keycodes(vlc_object_t *p_obj, const char *psz_key_name,
             ++i_nb_keycodes;
     }
     ++i_nb_keycodes;
-    *pp_keycodes = malloc( i_nb_keycodes * sizeof( **pp_keycodes ) );
+    *pp_keycodes = vlc_alloc( i_nb_keycodes, sizeof( **pp_keycodes ) );
     if( unlikely( !*pp_keycodes ) )
     {
         free( psz_keys );

@@ -2081,7 +2081,7 @@ int httpd_StreamSetHTTPHeaders(httpd_stream_t * p_stream,
         return VLC_SUCCESS;
     }
 
-    p_stream->p_http_headers = malloc(sizeof(httpd_header) * i_headers);
+    p_stream->p_http_headers = vlc_alloc(i_headers, sizeof(httpd_header));
     if (!p_stream->p_http_headers) {
         vlc_mutex_unlock(&p_stream->lock);
         return VLC_ENOMEM;

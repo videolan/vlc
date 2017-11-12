@@ -438,7 +438,7 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
 
     unsigned i,j;
     size_t size = plugin->conf.size;
-    module_config_t *config = malloc( size * sizeof( *config ) );
+    module_config_t *config = vlc_alloc( size, sizeof( *config ) );
 
     assert( psize != NULL );
     *psize = 0;

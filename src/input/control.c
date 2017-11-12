@@ -344,7 +344,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         {
             vlc_mutex_lock( &priv->p_item->lock );
             unsigned count = priv->i_title;
-            input_title_t **array = malloc( count * sizeof (*array) );
+            input_title_t **array = vlc_alloc( count, sizeof (*array) );
 
             if( count > 0 && unlikely(array == NULL) )
             {

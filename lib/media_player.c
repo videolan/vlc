@@ -1513,7 +1513,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
     if( ret != VLC_SUCCESS )
         return -1;
 
-    libvlc_title_description_t **titles = malloc( count * sizeof (*titles) );
+    libvlc_title_description_t **titles = vlc_alloc( count, sizeof (*titles) );
     if( count > 0 && unlikely(titles == NULL) )
         return -1;
 
