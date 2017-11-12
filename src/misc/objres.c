@@ -46,13 +46,13 @@ static struct vlc_res **vlc_obj_res(vlc_object_t *obj)
 
 void *vlc_objres_new(size_t size, void (*release)(void *))
 {
-    if (unlikely(size > SIZE_MAX - sizeof (struct vlc_res)))
+    if (unlikely(add_overflow(sizeof (struct vlc_res), size, &size)))
     {
         errno = ENOMEM;
         return NULL;
     }
 
-    struct vlc_res *res = malloc(sizeof (*res) + size);
+    struct vlc_res *res = malloc(size);
     if (unlikely(res == NULL))
         return NULL;
 
