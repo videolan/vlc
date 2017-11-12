@@ -355,7 +355,8 @@ endif
 if HAVE_TVOS
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -mtvos-version-min=10.2
 endif
-libvideotoolbox_plugin_la_LDFLAGS = video_chroma_copy.la $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+libvideotoolbox_plugin_la_LIBADD = video_chroma_copy.la
+libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
 
