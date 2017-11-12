@@ -355,12 +355,11 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
 {
     if( !strcasecmp( "tts:displayAlign", psz_attr ) )
     {
-        if( !strcasecmp ( "top", psz_val ) )
-            p_region->updt.align = SUBPICTURE_ALIGN_TOP;
-        else if( !strcasecmp ( "center", psz_val ) )
-            p_region->updt.align = 0;
-        else
-            p_region->updt.align = SUBPICTURE_ALIGN_BOTTOM;
+        p_region->updt.inner_align &= ~(SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_BOTTOM);
+        if( !strcasecmp ( "before", psz_val ) )
+            p_region->updt.inner_align |= SUBPICTURE_ALIGN_TOP;
+        else if( !strcasecmp ( "after", psz_val ) )
+            p_region->updt.inner_align |= SUBPICTURE_ALIGN_BOTTOM;
     }
     else if( !strcasecmp ( "tts:origin", psz_attr ) ||
              !strcasecmp ( "tts:extent", psz_attr ) )
