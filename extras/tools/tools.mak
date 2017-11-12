@@ -313,6 +313,25 @@ CLEAN_PKG += bison
 DISTCLEAN_PKG += bison-$(BISON_VERSION).tar.xz
 CLEAN_FILE += .bison
 
+#
+# GNU flex
+#
+
+flex-$(FLEX_VERSION).tar.gz:
+	$(call download_pkg,$(FLEX_URL),flex)
+
+flex: flex-$(FLEX_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.flex: flex
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += flex
+DISTCLEAN_PKG += flex-$(FLEX_VERSION).tar.gz
+CLEAN_FILE += .flex
+
 
 #
 #

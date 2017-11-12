@@ -48,3 +48,5 @@ PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF
 BISON_VERSION=3.0.4
 BISON_URL=$(GNU)/bison/bison-$(BISON_VERSION).tar.xz
 
+FLEX_VERSION=2.6.4
+FLEX_URL=https://github.com/westes/flex/releases/download/v$(FLEX_VERSION)/flex-$(FLEX_VERSION).tar.gz
