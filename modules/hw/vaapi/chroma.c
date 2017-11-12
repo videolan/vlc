@@ -97,11 +97,13 @@ FillPictureFromVAImage(picture_t *dest,
     {
     case VA_FOURCC_NV12:
     {
+        assert(dest->format.i_chroma == VLC_CODEC_I420);
         CopyFromNv12ToI420(dest, src_planes, src_pitches,
                            src_img->height, cache);
         break;
     }
     case VA_FOURCC_P010:
+        assert(dest->format.i_chroma == VLC_CODEC_P010);
         /* P010ToP010 is the same than Nv12ToNV12 */
         CopyFromNv12ToNv12(dest,  src_planes, src_pitches,
                            src_img->height, cache);
@@ -188,6 +190,7 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
     {
     case VLC_CODEC_I420:
     {
+        assert(dest_pic->format.i_chroma == VLC_CODEC_VAAPI_420);
         uint8_t *       src_planes[3] = { src->p[Y_PLANE].p_pixels,
                                           src->p[U_PLANE].p_pixels,
                                           src->p[V_PLANE].p_pixels };
@@ -212,6 +215,7 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
     }
     case VLC_CODEC_P010:
     {
+        assert(dest_pic->format.i_chroma == VLC_CODEC_VAAPI_420_10BPP);
         uint8_t *       src_planes[2] = { src->p[0].p_pixels,
                                           src->p[1].p_pixels };
         size_t          src_pitches[2] = { src->p[0].i_pitch,
