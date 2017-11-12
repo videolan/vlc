@@ -423,6 +423,7 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(webvtt) \
     f(xa) \
     f(a52) \
+    f(copy) \
     f(dirac) \
     f(dts) \
     f(flac) \
@@ -434,6 +435,8 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(mpegaudio) \
     f(mpegvideo) \
     f(vc1) \
+    f(rawvid) \
+    f(rawaud) \
     DECODER_PLUGINS(f)
 
 #ifdef HAVE_DVBPSI

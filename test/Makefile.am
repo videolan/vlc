@@ -179,6 +179,7 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/libwebvtt_plugin.la \
 	../modules/libxa_plugin.la \
 	../modules/libpacketizer_a52_plugin.la \
+	../modules/libpacketizer_copy_plugin.la \
 	../modules/libpacketizer_dts_plugin.la \
 	../modules/libpacketizer_dirac_plugin.la \
 	../modules/libpacketizer_flac_plugin.la \
@@ -190,6 +191,8 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/libpacketizer_mpegaudio_plugin.la \
 	../modules/libpacketizer_mpegvideo_plugin.la \
 	../modules/libpacketizer_vc1_plugin.la \
+	../modules/librawaud_plugin.la \
+	../modules/librawvid_plugin.la \
 	../modules/libfilesystem_plugin.la \
 	../modules/libxml_plugin.la \
 	-lstdc++
