@@ -427,9 +427,11 @@ error:
  *****************************************************************************/
 static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
                        line_desc_t *p_line,
-                       FT_BBox *p_regionbbox, FT_BBox *p_bbox )
+                       FT_BBox *p_regionbbox, FT_BBox *p_paddedbbox,
+                       FT_BBox *p_bbox )
 {
     VLC_UNUSED(p_filter);
+    VLC_UNUSED(p_paddedbbox);
     static const uint8_t pi_gamma[16] =
         {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -725,11 +727,14 @@ static inline void BlendAXYZLine( picture_t *p_picture,
 static inline void RenderBackground( subpicture_region_t *p_region,
                                      line_desc_t *p_line_head,
                                      FT_BBox *p_regionbbox,
+                                     FT_BBox *p_paddedbbox,
                                      FT_BBox *p_textbbox,
                                      picture_t *p_picture,
                                      void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
                                      void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
+    FT_BBox prevbox;
+
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
         FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
@@ -743,6 +748,11 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         if( p_line->i_first_visible_char_index < 0 )
             continue; /* only spaces */
 
+        /* add padding */
+        linebgbox.yMax += (p_paddedbbox->xMax - p_textbbox->xMax);
+        linebgbox.yMin -= (p_textbbox->xMin - p_paddedbbox->xMin);
+        linebgbox.xMin -= (p_textbbox->xMin - p_paddedbbox->xMin);
+        linebgbox.xMax += (p_paddedbbox->xMax - p_textbbox->xMax);
 
         /* Compute lower boundary for the background
            continue down to next line top */
@@ -758,7 +768,8 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         if( i_char_index > 0 )
         {
             segmentbgbox.xMin = offset.x +
-                                p_line->p_character[p_line->i_first_visible_char_index].bbox.xMin;
+                                p_line->p_character[p_line->i_first_visible_char_index].bbox.xMin -
+                                /* padding offset */ (p_textbbox->xMin - p_paddedbbox->xMin);
         }
 
         while( i_char_index <= p_line->i_last_visible_char_index )
@@ -773,6 +784,8 @@ static inline void RenderBackground( subpicture_region_t *p_region,
 
             /* Find right boundary for bounding box for background */
             segmentbgbox.xMax = offset.x + p_line->p_character[i_seg_end].bbox.xMax;
+            if( i_seg_end == p_line->i_last_visible_char_index ) /* add padding on last */
+                segmentbgbox.xMax += (p_paddedbbox->xMax - p_textbbox->xMax);
 
             const line_character_t *p_char = &p_line->p_character[i_char_index];
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
@@ -818,6 +831,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               subpicture_region_t *p_region,
                               line_desc_t *p_line_head,
                               FT_BBox *p_regionbbox,
+                              FT_BBox *p_paddedtextbbox,
                               FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
                               void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
@@ -857,8 +871,9 @@ static inline int RenderAXYZ( filter_t *p_filter,
     }
 
     /* Render text's background (from decoder) if any */
-    RenderBackground(p_region, p_line_head, p_regionbbox, p_textbbox, p_picture,
-                     ExtractComponents, BlendPixel);
+    RenderBackground(p_region, p_line_head,
+                     p_regionbbox, p_paddedtextbbox, p_textbbox,
+                     p_picture, ExtractComponents, BlendPixel);
 
     /* Render shadow then outline and then normal glyphs */
     for( int g = 0; g < 3; g++ )
@@ -1136,13 +1151,17 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     else if( p_region_in->i_y > 0 && (unsigned)p_region_in->i_y < i_max_height )
         i_max_height -= p_region_in->i_y;
 
+    uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
+    i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
+    int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
+
+    if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
+        i_margin = 0;
+
     rv = LayoutText( p_filter,
                      psz_text, pp_styles, pi_k_durations, i_text_length,
                      p_region_in->b_gridmode, p_region_in->b_balanced_text,
                      i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
-
-    p_region_out->i_x = p_region_in->i_x;
-    p_region_out->i_y = p_region_in->i_y;
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
@@ -1156,35 +1175,100 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         else if( !p_chroma_list || *p_chroma_list == 0 )
             p_chroma_list = p_chroma_list_rgba;
 
-        uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
-        i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
-        int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
+        FT_BBox paddedbbox = bbox;
+        paddedbbox.xMin -= i_margin;
+        paddedbbox.xMax += i_margin;
+        paddedbbox.yMin -= i_margin;
+        paddedbbox.yMax += i_margin;
 
-        FT_BBox regionbbox = bbox;
-        regionbbox.xMin -= i_margin;
-        regionbbox.xMax += i_margin;
-        regionbbox.yMin -= i_margin;
-        regionbbox.yMax += i_margin;
+        FT_BBox regionbbox = paddedbbox;
+
+        /* _______regionbbox_______________
+         * |                               |
+         * |                               |
+         * |                               |
+         * |     _bbox(<paddedbbox)___     |
+         * |    |         rightaligned|    |
+         * |    |            textlines|    |
+         * |    |_____________________|    |
+         * |_______________________________|
+         *
+         * we need at least 3 bounding boxes.
+         * regionbbox containing the whole, including region background pixels
+         * paddedbox an enlarged text box when for drawing text background
+         * bbox the lines bounding box for all glyphs
+         * For simple unstyled subs, bbox == paddedbox == regionbbox
+         */
+
+        unsigned outertext_w = (regionbbox.xMax - regionbbox.xMin);
+        if( outertext_w < (unsigned) p_region_in->i_max_width )
+        {
+            if( p_region_in->i_text_align & SUBPICTURE_ALIGN_RIGHT )
+                regionbbox.xMin -= (p_region_in->i_max_width - outertext_w);
+            else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_LEFT )
+                regionbbox.xMax += (p_region_in->i_max_width - outertext_w);
+            else
+            {
+                regionbbox.xMin -= (p_region_in->i_max_width - outertext_w) / 2;
+                regionbbox.xMax += (p_region_in->i_max_width - outertext_w + 1) / 2;
+            }
+        }
+
+        unsigned outertext_h = (regionbbox.yMax - regionbbox.yMin);
+        if( outertext_h < (unsigned) p_region_in->i_max_height )
+        {
+            if( p_region_in->i_text_align & SUBPICTURE_ALIGN_TOP )
+                regionbbox.yMin -= (p_region_in->i_max_height - outertext_h);
+            else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_BOTTOM )
+                regionbbox.yMax += (p_region_in->i_max_height - outertext_h);
+            else
+            {
+                regionbbox.yMin -= (p_region_in->i_max_height - outertext_h + 1) / 2;
+                regionbbox.yMax += (p_region_in->i_max_height - outertext_h) / 2;
+            }
+        }
+
+//        unsigned bboxcolor = 0xFF000000;
+        /* TODO 4.0. No region self BG color for VLC 3.0 API*/
+
+        /* Avoid useless pixels:
+         *        reshrink/trim Region Box to padded text one,
+         *        but update offsets to keep position and have same rendering */
+//        if( (bboxcolor & 0xFF) == 0 )
+        {
+            p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
+            p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
+            regionbbox = paddedbbox;
+        }
+//        else /* case where the bounding box is larger and visible */
+//        {
+//            p_region_out->i_x = p_region_in->i_x;
+//            p_region_out->i_y = p_region_in->i_y;
+//        }
 
         for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
         {
             rv = VLC_EGENERIC;
             if( *p_chroma == VLC_CODEC_YUVP )
-                rv = RenderYUVP( p_filter, p_region_out, p_lines, &regionbbox, &bbox );
+                rv = RenderYUVP( p_filter, p_region_out, p_lines,
+                                 &regionbbox, &paddedbbox, &bbox );
             else if( *p_chroma == VLC_CODEC_YUVA )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &regionbbox, &bbox,
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                                 &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_YUVA,
                                  YUVFromRGB,
                                  FillYUVAPicture,
                                  BlendYUVAPixel );
             else if( *p_chroma == VLC_CODEC_RGBA )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &regionbbox, &bbox,
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                                 &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_RGBA,
                                  RGBFromRGB,
                                  FillRGBAPicture,
                                  BlendRGBAPixel );
             else if( *p_chroma == VLC_CODEC_ARGB )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &regionbbox, &bbox,
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                                 &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_ARGB,
                                  RGBFromRGB,
                                  FillARGBPicture,

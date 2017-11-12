@@ -206,6 +206,16 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
             else
                 r->i_y += p_updtregion->origin.y;
 
+            if( p_updtregion->flags & UPDT_REGION_EXTENT_X_IS_RATIO )
+                r->i_max_width += p_updtregion->extent.x * inner_w;
+            else
+                r->i_max_width += p_updtregion->extent.x;
+
+            if( p_updtregion->flags & UPDT_REGION_EXTENT_Y_IS_RATIO )
+                r->i_max_height += p_updtregion->extent.y * inner_h;
+            else
+                r->i_max_height += p_updtregion->extent.y;
+
         } else {
             /* FIXME it doesn't adapt on crop settings changes */
             r->i_x = p_updtregion->origin.x * fmt_dst->i_width  / p_updtregion->extent.x;
