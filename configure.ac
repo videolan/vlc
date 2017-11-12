@@ -1121,6 +1121,11 @@ AH_BOTTOM([
     ])
     AS_IF([test "${ac_cv_c_omit_frame_pointer}" = "no"], [VLC_RESTORE_FLAGS])
   ])
+
+  AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong])
+  AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong], [CXXFLAGS])
+  dnl Win32 requires linking to ssp for stack-protection
+  AS_IF([test "${SYS}" = "mingw32"], [ LDFLAGS="${LDFLAGS} -lssp -ladvapi32" ])
 ])
 
 VLC_SAVE_FLAGS
