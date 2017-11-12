@@ -64,7 +64,6 @@ struct decoder_sys_t
      * Common properties
      */
     date_t  end_date;
-    bool    b_date_set;
 
     mtime_t i_pts;
     bool    b_discontuinity;
@@ -77,7 +76,7 @@ static void PacketizeFlush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_sys->b_discontuinity = true;
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
 }
@@ -86,7 +85,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !p_sys->b_date_set
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID
      || p_dec->fmt_out.audio.i_rate != p_sys->frame.i_rate )
     {
         msg_Dbg( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
@@ -94,7 +93,6 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
 
         date_Init( &p_sys->end_date, p_sys->frame.i_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
-        p_sys->b_date_set = true;
     }
 
     p_dec->fmt_out.audio.i_rate     = p_sys->frame.i_rate;
@@ -328,9 +326,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     p_sys->i_pts = VLC_TS_INVALID;
-    p_sys->b_date_set = false;
     p_sys->b_discontuinity = false;
     memset(&p_sys->frame, 0, sizeof(vlc_a52_header_t));
 
