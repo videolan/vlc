@@ -318,7 +318,7 @@ char *vlc_stream_ReadLine( stream_t *s )
 
             /* iconv */
             /* UTF-8 needs at most 150% of the buffer as many as UTF-16 */
-            i_new_line = i_line * 3 / 2;
+            i_new_line = i_line * 3 / 2 + 1;
             psz_new_line = malloc( i_new_line );
             if( psz_new_line == NULL )
                 goto error;
