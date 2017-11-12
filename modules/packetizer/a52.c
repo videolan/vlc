@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -88,13 +90,18 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID
      || p_dec->fmt_out.audio.i_rate != p_sys->frame.i_rate )
     {
+        if( p_sys->i_pts == VLC_TS_INVALID )
+            return NULL;
+
         msg_Dbg( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
                  p_sys->frame.i_channels, p_sys->frame.i_rate, p_sys->frame.i_bitrate );
 
+        assert( p_sys->frame.i_rate > 0 );
         date_Init( &p_sys->end_date, p_sys->frame.i_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
     }
 
+    assert( p_sys->i_pts > VLC_TS_INVALID );
     p_dec->fmt_out.audio.i_rate     = p_sys->frame.i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->frame.i_channels;
     if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->frame.i_size )
