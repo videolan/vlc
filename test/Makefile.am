@@ -12,6 +12,7 @@ extra_check_verbose__0 = $(extra_check_verbose_0)
 ###############################################################################
 # Unit/regression test
 ###############################################################################
+noinst_PROGRAMS =
 check_PROGRAMS = \
 	test_libvlc_core \
 	test_libvlc_equalizer \
@@ -237,23 +238,14 @@ EXTRA_LTLIBRARIES += libvlc_demux_dec_run.la
 #
 vlc_demux_run_LDFLAGS = -no-install -static
 vlc_demux_run_LDADD = libvlc_demux_run.la
-EXTRA_PROGRAMS += vlc-demux-run
-
-vlc_demux_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
-vlc_demux_libfuzzer_LDADD = libvlc_demux_run.la
-EXTRA_PROGRAMS += vlc-demux-libfuzzer
-
 vlc_demux_dec_run_SOURCES = vlc-demux-run.c
 vlc_demux_dec_run_LDFLAGS = -no-install -static
 vlc_demux_dec_run_LDADD = libvlc_demux_dec_run.la
-EXTRA_PROGRAMS += vlc-demux-dec-run
+EXTRA_PROGRAMS += vlc-demux-run vlc-demux-dec-run
 
+vlc_demux_libfuzzer_LDADD = libvlc_demux_run.la
 vlc_demux_dec_libfuzzer_SOURCES = vlc-demux-libfuzzer.c
-vlc_demux_dec_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
 vlc_demux_dec_libfuzzer_LDADD = libvlc_demux_dec_run.la
-EXTRA_PROGRAMS += vlc-demux-dec-libfuzzer
-
 if HAVE_LIBFUZZER
-bin_PROGRAMS = vlc-demux-run vlc-demux-dec-run \
-    vlc-demux-libfuzzer vlc-demux-dec-libfuzzer
+noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer
 endif
