@@ -796,6 +796,7 @@ AS_VAR_IF(with_libfuzzer, no, [], [
     enable_static=yes
     enable_vlc=no
 ])
+AM_CONDITIONAL(HAVE_LIBFUZZER, [test "${with_libfuzzer}" != "no"])
 
 AS_IF([test "${enable_shared}" = "no"], [
   have_dynamic_objects=no

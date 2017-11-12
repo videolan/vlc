@@ -252,3 +252,8 @@ vlc_demux_dec_libfuzzer_SOURCES = vlc-demux-libfuzzer.c
 vlc_demux_dec_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
 vlc_demux_dec_libfuzzer_LDADD = libvlc_demux_dec_run.la
 EXTRA_PROGRAMS += vlc-demux-dec-libfuzzer
+
+if HAVE_LIBFUZZER
+bin_PROGRAMS = vlc-demux-run vlc-demux-dec-run \
+    vlc-demux-libfuzzer vlc-demux-dec-libfuzzer
+endif
