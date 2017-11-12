@@ -127,6 +127,8 @@ static int Open( vlc_object_t * p_this )
     if( p_stream == NULL )
     {
         msg_Err( p_demux, "cannot find KaxSegment or missing mandatory KaxInfo" );
+        delete p_io_stream;
+        delete p_io_callback;
         goto error;
     }
     p_sys->streams.push_back( p_stream );
