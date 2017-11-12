@@ -148,7 +148,6 @@ void ClosePacketizer( vlc_object_t *p_this )
         av_parser_close( p_dec->p_sys->p_parser_ctx );
         free( p_dec->p_sys );
     }
-    es_format_Clean( &p_dec->fmt_out );
 }
 
 /*****************************************************************************
