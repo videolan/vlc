@@ -661,6 +661,120 @@ static inline uint64_t (bswap64)(uint64_t x)
 #endif
 }
 
+/* Integer overflow */
+static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
+{
+#ifdef __GNUC__
+     return __builtin_uadd_overflow(a, b, res);
+#else
+     *res = a + b;
+     return (a + b) < a;
+#endif
+}
+
+static inline bool uaddl_overflow(unsigned long a, unsigned long b,
+                                  unsigned long *res)
+{
+#ifdef __GNUC__
+     return __builtin_uaddl_overflow(a, b, res);
+#else
+     *res = a + b;
+     return (a + b) < a;
+#endif
+}
+
+static inline bool uaddll_overflow(unsigned long long a, unsigned long long b,
+                                   unsigned long long *res)
+{
+#ifdef __GNUC__
+     return __builtin_uaddll_overflow(a, b, res);
+#else
+     *res = a + b;
+     return (a + b) < a;
+#endif
+}
+
+#ifndef __cplusplus
+# define add_overflow(a,b,r) \
+    _Generic(*(r), \
+        unsigned: uadd_overflow(a, b, (unsigned *)(r)), \
+        unsigned long: uaddl_overflow(a, b, (unsigned long *)(r)), \
+        unsigned long long: uaddll_overflow(a, b, (unsigned long long *)(r)))
+#else
+static inline bool add_overflow(unsigned a, unsigned b, unsigned *res)
+{
+    return uadd_overflow(a, b, res);
+}
+
+static inline bool add_overflow(unsigned long a, unsigned long b,
+                                unsigned long *res)
+{
+    return uaddl_overflow(a, b, res);
+}
+
+static inline bool add_overflow(unsigned long long a, unsigned long long b,
+                                unsigned long long *res)
+{
+    return uaddll_overflow(a, b, res);
+}
+#endif
+
+static inline bool umul_overflow(unsigned a, unsigned b, unsigned *res)
+{
+#ifdef __GNUC__
+     return __builtin_umul_overflow(a, b, res);
+#else
+     *res = a * b;
+     return b > 0 && a > (UINT_MAX / b);
+#endif
+}
+
+static inline bool umull_overflow(unsigned long a, unsigned long b,
+                                  unsigned long *res)
+{
+#ifdef __GNUC__
+     return __builtin_umull_overflow(a, b, res);
+#else
+     *res = a * b;
+     return b > 0 && a > (ULONG_MAX / b);
+#endif
+}
+
+static inline bool umulll_overflow(unsigned long long a, unsigned long long b,
+                                   unsigned long long *res)
+{
+#ifdef __GNUC__
+     return __builtin_umulll_overflow(a, b, res);
+#else
+     *res = a * b;
+     return b > 0 && a > (ULLONG_MAX / b);
+#endif
+}
+
+#ifndef __cplusplus
+#define mul_overflow(a,b,r) \
+    _Generic(*(r), \
+        unsigned: umul_overflow(a, b, (unsigned *)(r)), \
+        unsigned long: umull_overflow(a, b, (unsigned long *)(r)), \
+        unsigned long long: umulll_overflow(a, b, (unsigned long long *)(r)))
+#else
+static inline bool mul_overflow(unsigned a, unsigned b, unsigned *res)
+{
+    return umul_overflow(a, b, res);
+}
+
+static inline bool mul_overflow(unsigned long a, unsigned long b,
+                                unsigned long *res)
+{
+    return umull_overflow(a, b, res);
+}
+
+static inline bool mul_overflow(unsigned long long a, unsigned long long b,
+                                unsigned long long *res)
+{
+    return umulll_overflow(a, b, res);
+}
+#endif
 
 /* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
