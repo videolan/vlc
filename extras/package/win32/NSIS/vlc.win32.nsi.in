@@ -3,8 +3,6 @@
 ; (http://nsis.sourceforge.net) ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-!include "languages\declaration.nsh"
-
 !define PRODUCT_NAME "VLC media player"
 !define VERSION @VERSION@
 !define PRODUCT_VERSION @VERSION@
@@ -55,9 +53,9 @@ SetOverwrite ifdiff
 CRCCheck on
 BrandingText "${PRODUCT_GROUP} ${PRODUCT_NAME}"
 
-InstType $Name_InstTypeRecommended
-InstType $Name_InstTypeMinimum
-InstType $Name_InstTypeFull
+InstType "$(Name_InstTypeRecommended)"
+InstType "$(Name_InstTypeMinimum)"
+InstType "$(Name_InstTypeFull)"
 
 RequestExecutionLevel admin
 !addincludedir NSIS
@@ -90,7 +88,7 @@ RequestExecutionLevel admin
     Page custom PageReinstall PageLeaveReinstall
   ; License page
     !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
-    !define MUI_LICENSEPAGE_TEXT_BOTTOM $License_NextText
+    !define MUI_LICENSEPAGE_TEXT_BOTTOM "$(License_NextText)"
     !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipPre
     !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
   ; Components page
@@ -105,7 +103,7 @@ RequestExecutionLevel admin
     !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_FUNCTION AppExecAs
-    !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
+    !define MUI_FINISHPAGE_LINK "$(Link_VisitWebsite)"
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
     !insertmacro MUI_PAGE_FINISH
@@ -116,51 +114,104 @@ RequestExecutionLevel admin
     !insertmacro MUI_UNPAGE_INSTFILES
     !insertmacro MUI_UNPAGE_FINISH
 
-; Language files
-  !insertmacro MUI_LANGUAGE "English" # first language is the default language
+  !addincludedir "languages"
+  !define VLC_LANGFILE_FALLBACK "EnglishExtra.nsh"
+
+; Language files (first language is default)
+  !insertmacro MUI_LANGUAGE "English"
+  !insertmacro LANGFILE_INCLUDE "EnglishExtra.nsh"
+
   !insertmacro MUI_LANGUAGE "French"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "FrenchExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "German"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "GermanExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Spanish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SpanishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "SimpChinese"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SimpChineseExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "TradChinese"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "TradChineseExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Japanese"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "JapaneseExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Italian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ItalianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Dutch"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "DutchExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Danish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "DanishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Swedish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SwedishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Finnish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "FinnishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Russian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "RussianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Portuguese"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "PortugueseExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "PortugueseBR"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "PortugueseBRExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Welsh"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "WelshExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Uzbek"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "UzbekExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Ukrainian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "UkrainianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Turkish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "TurkishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Thai"
-;  !insertmacro MUI_LANGUAGE "Sinhala"
-;  !insertmacro MUI_LANGUAGE "Scottish_Gaelic"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ThaiExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Norwegian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "NorwegianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Malay"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "MalayExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Korean"
-;  !insertmacro MUI_LANGUAGE "Khmer"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "KoreanExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Greek"
-;  !insertmacro MUI_LANGUAGE "English_United_Kingdom"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "GreekExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Czech"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "CzechExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Bosnian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "BosnianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Arabic"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ArabicExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Polish"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "PolishExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Romanian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "RomanianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Slovak"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SlovakExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Serbian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SerbianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Hungarian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "HungarianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Catalan"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "CatalanExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Bulgarian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "BulgarianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Estonian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "EstonianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Lithuanian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "LithuanianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Basque"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "BasqueExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Galician"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "GalicianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Hebrew"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "HebrewExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Slovenian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SlovenianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+
+; Missing upstream translations:
+;
+;  !insertmacro MUI_LANGUAGE "Sinhala"
+;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SinhalaExtra.nsh"
+;  !insertmacro MUI_LANGUAGE "EnglishUK"
+;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "EnglishUKExtra.nsh"
+
+; Upstream files broken:
+;  !insertmacro MUI_LANGUAGE "Khmer"
+;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "KhmerExtra.nsh"
+;  !insertmacro MUI_LANGUAGE "ScotsGaelic"
+;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ScotsGaelicExtra.nsh"
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
@@ -179,12 +230,12 @@ RequestExecutionLevel admin
 ; installer          ;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-${MementoSection} $Name_Section01 SEC01
+${MementoSection} "$(Name_Section01)" SEC01
   SectionIn 1 2 3 RO
   SetShellVarContext all
   SetOutPath "$INSTDIR"
 
-  DetailPrint $Detail_CheckProcesses
+  DetailPrint "$(Detail_CheckProcesses)"
   Call CheckRunningProcesses
 
   !insertmacro OpenUninstallLog
@@ -225,7 +276,7 @@ ${MementoSection} $Name_Section01 SEC01
   ; Add VLC to "recommended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
-  WriteRegStr HKCR Applications\vlc.exe\shell\Open "" $ContextMenuEntry_PlayWith
+  WriteRegStr HKCR Applications\vlc.exe\shell\Open "" "$(ContextMenuEntry_PlayWith)"
   WriteRegStr HKCR Applications\vlc.exe\shell\Open\command "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   !insertmacro MacroAllExtensions RegisterExtensionMacro
   !insertmacro MacroSkinExtensions RegisterSkinExtensionMacro
@@ -248,7 +299,7 @@ ${MementoSection} $Name_Section01 SEC01
   ${EndIf}
 ${MementoSectionEnd}
 
-${MementoSection} $Name_Section02a SEC02a
+${MementoSection} "$(Name_Section02a)" SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
@@ -265,15 +316,15 @@ ${MementoSection} $Name_Section02a SEC02a
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
 ${MementoSectionEnd}
 
-${MementoSection} $Name_Section02b SEC02b
+${MementoSection} "$(Name_Section02b)" SEC02b
   SectionIn 1 2 3
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" ""
 ${MementoSectionEnd}
 
-SectionGroup /e !$Name_Section34
+SectionGroup /e "!$(Name_Section34)"
 !ifdef INSTALL_MOZILLA
-${MementoSection} $Name_Section03 SEC03
+${MementoSection} "$(Name_Section03)" SEC03
   SectionIn 1 3
 
   SetOutPath "$INSTDIR"
@@ -291,7 +342,7 @@ ${MementoSectionEnd}
 !endif
 
 !ifdef INSTALL_ACTIVEX
-${MementoSection} $Name_Section04 SEC04
+${MementoSection} "$(Name_Section04)" SEC04
   SectionIn 1 3
 
   SetOutPath "$INSTDIR"
@@ -305,66 +356,66 @@ ${MementoSectionEnd}
 SectionGroupEnd
 
 
-${MementoSection} $Name_Section05 SEC05
+${MementoSection} "$(Name_Section05)" SEC05
   SectionIn 1 2 3
-  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
+  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "$(ContextMenuEntry_PlayWith)"
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
     '"$INSTDIR\vlc.exe" --started-from-file cdda:///%1'
-  WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
+  WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "$(ContextMenuEntry_PlayWith)"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
     '"$INSTDIR\vlc.exe" --started-from-file dvd:///%1'
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" $Action_OnArrivalDVD
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "$(Action_OnArrivalDVD)"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeProgID" "VLC.DVDMovie"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayCDAudioOnArrival" "VLCPlayCDAudioOnArrival" ""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" $Action_OnArrivalAudioCD
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" "$(Action_OnArrivalAudioCD)"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeProgID" "VLC.CDAudio"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayVideoCDMovieOnArrival" "VLCPlayVCDMovieOnArrival" ""
-  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "Action" $Action_OnArrivalVCDMovie
+  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "Action" "$(Action_OnArrivalVCDMovie)"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "InvokeProgID" "VLC.VCDMovie"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVCDMovieOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlaySuperVideoCDMovieOnArrival" "VLCPlaySVCDMovieOnArrival" ""
-  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "Action" $Action_OnArrivalSVCDMovie
+  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "Action" "$(Action_OnArrivalSVCDMovie)"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "InvokeProgID" "VLC.SVCDMovie"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlaySVCDMovieOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDAudioOnArrival" "VLCPlayDVDAudioOnArrival" ""
-  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "Action" $Action_OnArrivalDVDAudio
+  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "Action" "$(Action_OnArrivalDVDAudio)"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "InvokeProgID" "VLC.OPENFolder"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDAudioOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayVideoFilesOnArrival" "VLCPlayVideoFilesOnArrival" ""
-  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "Action" $Action_OnArrivalVideoFiles
+  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "Action" "$(Action_OnArrivalVideoFiles)"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "InvokeProgID" "VLC.OPENFolder"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayVideoFilesOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayMusicFilesOnArrival" "VLCPlayMusicFilesOnArrival" ""
-  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "Action" $Action_OnArrivalMusicFiles
+  WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "Action" "$(Action_OnArrivalMusicFiles)"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "InvokeProgID" "VLC.OPENFolder"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBlurayOnArrival" "VLCPlayBlurayOnArrival" ""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "Action" $Action_OnArrivalBluray
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "Action" "$(Action_OnArrivalBluray)"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "InvokeProgID" "VLC.Bluray"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "InvokeVerb" "Open"
@@ -409,27 +460,27 @@ ${MementoSection} $Name_Section05 SEC05
 ${MementoSectionEnd}
 
 
-SectionGroup /e !$Name_Section06 SEC06
-  SectionGroup $Name_SectionGroupAudio
+SectionGroup /e "!$(Name_Section06)" SEC06
+  SectionGroup "$(Name_SectionGroupAudio)"
     !insertmacro MacroAudioExtensions AssociateExtensionSection
   SectionGroupEnd
-  SectionGroup $Name_SectionGroupVideo
+  SectionGroup "$(Name_SectionGroupVideo)"
     !insertmacro MacroVideoExtensions AssociateExtensionSection
   SectionGroupEnd
-  SectionGroup $Name_SectionGroupOther
+  SectionGroup "$(Name_SectionGroupOther)"
     !insertmacro MacroOtherExtensions AssociateExtensionSection
     !insertmacro MacroSkinExtensions AssociateSkinExtensionSection
     !insertmacro MacroUnassociatedExtensions AssociateExtensionUnselectedSection
   SectionGroupEnd
 SectionGroupEnd
 
-${MementoSection} $Name_Section07 SEC07
+${MementoSection} "$(Name_Section07)" SEC07
   SectionIn 1 3
   !insertmacro MacroAllExtensions AddContextMenu
   !insertmacro AddContextMenuExt "Directory"
 ${MementoSectionEnd}
 
-${MementoUnselectedSection} $Name_Section08 SEC08
+${MementoUnselectedSection} "$(Name_Section08)" SEC08
   !insertmacro delprefs
 ${MementoSectionEnd}
 
@@ -437,19 +488,19 @@ ${MementoSectionDone}
 
 ; Installer section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $Desc_Section01
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} $Desc_Section02a
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} $Desc_Section02b
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "$(Desc_Section01)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} "$(Desc_Section02a)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} "$(Desc_Section02b)"
 !ifdef INSTALL_MOZILLA
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $Desc_Section03
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "$(Desc_Section03)"
 !endif
 !ifdef INSTALL_ACTIVEX
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $Desc_Section04
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "$(Desc_Section04)"
 !endif
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $Desc_Section05
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $Desc_Section06
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $Desc_Section07
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $Desc_Section08
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "$(Desc_Section05)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} "$(Desc_Section06)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC07} "$(Desc_Section07)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC08} "$(Desc_Section08)"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;;; Start function
@@ -503,184 +554,6 @@ WinOk:
 
   !insertmacro MUI_LANGDLL_DISPLAY
 
-  !include "languages\english.nsh"
-  StrCmp $LANGUAGE ${LANG_FRENCH} French 0
-  StrCmp $LANGUAGE ${LANG_GERMAN} German 0
-  StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
-  StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
-  StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
-  StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
-  StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
-  StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
-  StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
-  StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
-  StrCmp $LANGUAGE ${LANG_DANISH} Danish 0
-  StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
-  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
-  StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
-;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
-;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
-  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
-  StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
-  StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
-  StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
-  StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
-  StrCmp $LANGUAGE ${LANG_SERBIAN} Serbian 0
-  StrCmp $LANGUAGE ${LANG_RUSSIAN} Russian 0
-  StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
-  StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
-  StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
-  StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
-  StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
-  StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
-;  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
-  StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
-;  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
-  StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
-  StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
-  StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
-;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
-;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
-  StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADCHINESE} TradChinese 0
-  StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
-  StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
-  StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
-  StrCmp $LANGUAGE ${LANG_WELSH} Welsh 0
-  StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
-  French:
-  !include "languages\french.nsh"
-  Goto EndLanguageCmp
-  German:
-  !include "languages\german.nsh"
-  Goto EndLanguageCmp
-  Italian:
-  !include "languages\italian.nsh"
-  Goto EndLanguageCmp
-  Hungarian:
-  !include "languages\hungarian.nsh"
-  Goto EndLanguageCmp
-  Romanian:
-  !include "languages\romanian.nsh"
-  Goto EndLanguageCmp
-  Catalan:
-  !include "languages\catalan.nsh"
-  Goto EndLanguageCmp
-  Bulgarian:
-  !include "languages\bulgarian.nsh"
-  Goto EndLanguageCmp
-  Slovak:
-  !include "languages\slovak.nsh"
-  Goto EndLanguageCmp
-  Polish:
-  !include "languages\polish.nsh"
-  Goto EndLanguageCmp
-  Dutch:
-  !include "languages\dutch.nsh"
-  Goto EndLanguageCmp
-  Danish:
-  !include "languages\danish.nsh"
-  Goto EndLanguageCmp
-  Schinese:
-  !include "languages\schinese.nsh"
-  Goto EndLanguageCmp
-  Finnish:
-  !include "languages\finnish.nsh"
-  Goto EndLanguageCmp
-  Japanese:
-  !include "languages\japanese.nsh"
-  Goto EndLanguageCmp
-;  Bengali:
-;  !include "languages\bengali.nsh"
-;  Goto EndLanguageCmp
-;  Punjabi:
-;  !include "languages\punjabi.nsh"
-;  Goto EndLanguageCmp
-  Slovenian:
-  !include "languages\slovenian.nsh"
-  Goto EndLanguageCmp
-  Spanish:
-  !include "languages\spanish.nsh"
-  Goto EndLanguageCmp
-  Estonian:
-  !include "languages\estonian.nsh"
-  Goto EndLanguageCmp
-  Lithuanian:
-  !include "languages\lithuanian.nsh"
-  Goto EndLanguageCmp
-  Basque:
-  !include "languages\basque.nsh"
-  Goto EndLanguageCmp
-  Serbian:
-  !include "languages\serbian.nsh"
-  Goto EndLanguageCmp
-  Russian:
-  !include "languages\Russian.nsh"
-  Goto EndLanguageCmp
-  Hebrew:
-  !include "languages\hebrew.nsh"
-  Goto EndLanguageCmp
-  Galician:
-  !include "languages\galician.nsh"
-  Goto EndLanguageCmp
-  Swedish:
-  !include "languages\swedish.nsh"
-  Goto EndLanguageCmp
-  Arabic:
-  !include "languages\arabic.nsh"
-  Goto EndLanguageCmp
-  Bosnian:
-  !include "languages\bosnian.nsh"
-  Goto EndLanguageCmp
-  Czech:
-  !include "languages\czech.nsh"
-  Goto EndLanguageCmp
-;  English_United_Kingdom:
-;  !include "languages\english_united_kingdom.nsh"
-;  Goto EndLanguageCmp
-  Greek:
-  !include "languages\greek.nsh"
-  Goto EndLanguageCmp
-;  Khmer:
-;  !include "languages\khmer.nsh"
-;  Goto EndLanguageCmp
-  Korean:
-  !include "languages\korean.nsh"
-  Goto EndLanguageCmp
-  Malay:
-  !include "languages\malay.nsh"
-  Goto EndLanguageCmp
-  Norwegian:
-  !include "languages\norwegian.nsh"
-  Goto EndLanguageCmp
-;  Scottish_Gaelic:
-;  !include "languages\scottish_gaelic.nsh"
-;  Goto EndLanguageCmp
-;  Sinhala:
-;  !include "languages\sinhala.nsh"
-;  Goto EndLanguageCmp
-  Thai:
-  !include "languages\thai.nsh"
-  Goto EndLanguageCmp
-  TradChinese:
-  !include "languages\tradchinese.nsh"
-  Goto EndLanguageCmp
-  Turkish:
-  !include "languages\turkish.nsh"
-  Goto EndLanguageCmp
-  Ukrainian:
-  !include "languages\ukrainian.nsh"
-  Goto EndLanguageCmp
-  Uzbek:
-  !include "languages\uzbek.nsh"
-  Goto EndLanguageCmp
-  Welsh:
-  !include "languages\welsh.nsh"
-  Goto EndLanguageCmp
-  Brazilian:
-  !include "languages\brazilian_portuguese.nsh"
-  EndLanguageCmp:
-
 FunctionEnd
 
 ;;; Page to upgrade / downgrade or customize the installation
@@ -699,12 +572,12 @@ Function PageReinstall
 
   ${If} $PreviousVersionState == "newer"
 
-    !insertmacro MUI_HEADER_TEXT $Reinstall_Headline $Reinstall_HeadlineInstall
-    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 $Reinstall_MessageOlder
+    !insertmacro MUI_HEADER_TEXT "$(Reinstall_Headline)" "$(Reinstall_HeadlineInstall)"
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "$(Reinstall_MessageOlder)"
     Pop $R0
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 $Reinstall_OptionUpgrade
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "$(Reinstall_OptionUpgrade)"
     Pop $ReinstallUninstallBtn
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 $Reinstall_OptionAdvanced
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "$(Reinstall_OptionAdvanced)"
     Pop $R0
 
     ${If} $ReinstallType == ""
@@ -713,12 +586,12 @@ Function PageReinstall
 
   ${ElseIf} $PreviousVersionState == "older"
 
-    !insertmacro MUI_HEADER_TEXT $Reinstall_Headline $Reinstall_HeadlineInstall
-    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 $Reinstall_MessageNewer
+    !insertmacro MUI_HEADER_TEXT "$(Reinstall_Headline)" "$(Reinstall_HeadlineInstall)"
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "$(Reinstall_MessageNewer)"
     Pop $R0
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 $Reinstall_OptionDowngrade
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "$(Reinstall_OptionDowngrade)"
     Pop $ReinstallUninstallBtn
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 $Reinstall_OptionAdvanced
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "$(Reinstall_OptionAdvanced)"
     Pop $R0
 
     ${If} $ReinstallType == ""
@@ -727,12 +600,12 @@ Function PageReinstall
 
   ${ElseIf} $PreviousVersionState == "same"
 
-    !insertmacro MUI_HEADER_TEXT $Reinstall_Headline $Reinstall_HeadlineMaintenance
-    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 $Reinstall_MessageSame
+    !insertmacro MUI_HEADER_TEXT "$(Reinstall_Headline)" "$(Reinstall_HeadlineMaintenance)"
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "$(Reinstall_MessageSame)"
     Pop $R0
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 $Reinstall_OptionComponents
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "$(Reinstall_OptionComponents)"
     Pop $R0
-    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 $Reinstall_OptionUninstall
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "$(Reinstall_OptionUninstall)"
     Pop $ReinstallUninstallBtn
 
     ${If} $ReinstallType == ""
@@ -871,7 +744,7 @@ SectionEnd
 ; Uninstaller sections ;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-Section "un.$Name_Section91" SEC91
+Section "un.$(Name_Section91)" SEC91
   SectionIn 1 2 3 RO
   SetShellVarContext all
 
@@ -978,14 +851,14 @@ Section "un.$Name_Section91" SEC91
   SetAutoClose true
 SectionEnd
 
-Section /o "un.$Name_Section92" SEC92
+Section /o "un.$(Name_Section92)" SEC92
   !insertmacro delprefs
 SectionEnd
 
 ; Uninstaller section descriptions
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC91} $Desc_Section91
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC92} $Desc_Section92
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC91} "$(Desc_Section91)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC92} "$(Desc_Section92)"
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 Function un.onInit
@@ -993,183 +866,5 @@ Function un.onInit
 @HAVE_WIN64_TRUE@ SetRegView 64
 
   !insertmacro MUI_UNGETLANGUAGE
-
-  !include "languages\english.nsh"
-  StrCmp $LANGUAGE ${LANG_FRENCH} French 0
-  StrCmp $LANGUAGE ${LANG_GERMAN} German 0
-  StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
-  StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
-  StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
-  StrCmp $LANGUAGE ${LANG_CATALAN} Catalan 0
-  StrCmp $LANGUAGE ${LANG_BULGARIAN} Bulgarian 0
-  StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
-  StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
-  StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
-  StrCmp $LANGUAGE ${LANG_DANISH} Danish 0
-  StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
-  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
-  StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
-;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
-;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
-  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
-  StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
-  StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
-  StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
-  StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
-  StrCmp $LANGUAGE ${LANG_SERBIAN} Serbian 0
-  StrCmp $LANGUAGE ${LANG_RUSSIAN} Russian 0
-  StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
-  StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
-  StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
-  StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
-  StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
-  StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
-;  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
-  StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
-;  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
-  StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
-  StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
-  StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
-;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
-;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
-  StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADCHINESE} TradChinese 0
-  StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
-  StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
-  StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
-  StrCmp $LANGUAGE ${LANG_WELSH} Welsh 0
-  StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
-  French:
-  !include "languages\french.nsh"
-  Goto EndLanguageCmp
-  German:
-  !include "languages\german.nsh"
-  Goto EndLanguageCmp
-  Italian:
-  !include "languages\italian.nsh"
-  Goto EndLanguageCmp
-  Hungarian:
-  !include "languages\hungarian.nsh"
-  Goto EndLanguageCmp
-  Romanian:
-  !include "languages\romanian.nsh"
-  Goto EndLanguageCmp
-  Catalan:
-  !include "languages\catalan.nsh"
-  Goto EndLanguageCmp
-  Bulgarian:
-  !include "languages\bulgarian.nsh"
-  Goto EndLanguageCmp
-  Slovak:
-  !include "languages\slovak.nsh"
-  Goto EndLanguageCmp
-  Polish:
-  !include "languages\polish.nsh"
-  Goto EndLanguageCmp
-  Dutch:
-  !include "languages\dutch.nsh"
-  Goto EndLanguageCmp
-  Danish:
-  !include "languages\danish.nsh"
-  Goto EndLanguageCmp
-  Schinese:
-  !include "languages\schinese.nsh"
-  Goto EndLanguageCmp
-  Finnish:
-  !include "languages\finnish.nsh"
-  Goto EndLanguageCmp
-  Japanese:
-  !include "languages\japanese.nsh"
-  Goto EndLanguageCmp
-;  Bengali:
-;  !include "languages\bengali.nsh"
-;  Goto EndLanguageCmp
-;  Punjabi:
-;  !include "languages\punjabi.nsh"
-;  Goto EndLanguageCmp
-  Slovenian:
-  !include "languages\slovenian.nsh"
-  Goto EndLanguageCmp
-  Spanish:
-  !include "languages\spanish.nsh"
-  Goto EndLanguageCmp
-  Estonian:
-  !include "languages\estonian.nsh"
-  Goto EndLanguageCmp
-  Lithuanian:
-  !include "languages\lithuanian.nsh"
-  Goto EndLanguageCmp
-  Basque:
-  !include "languages\basque.nsh"
-  Goto EndLanguageCmp
-  Serbian:
-  !include "languages\serbian.nsh"
-  Goto EndLanguageCmp
-  Russian:
-  !include "languages\russian.nsh"
-  Goto EndLanguageCmp
-  Hebrew:
-  !include "languages\hebrew.nsh"
-  Goto EndLanguageCmp
-  Galician:
-  !include "languages\galician.nsh"
-  Goto EndLanguageCmp
-  Swedish:
-  !include "languages\swedish.nsh"
-  Goto EndLanguageCmp
-  Arabic:
-  !include "languages\arabic.nsh"
-  Goto EndLanguageCmp
-  Bosnian:
-  !include "languages\bosnian.nsh"
-  Goto EndLanguageCmp
-  Czech:
-  !include "languages\czech.nsh"
-  Goto EndLanguageCmp
-;  English_United_Kingdom:
-;  !include "languages\english_united_kingdom.nsh"
-;  Goto EndLanguageCmp
-  Greek:
-  !include "languages\greek.nsh"
-  Goto EndLanguageCmp
-;  Khmer:
-;  !include "languages\khmer.nsh"
-;  Goto EndLanguageCmp
-  Korean:
-  !include "languages\korean.nsh"
-  Goto EndLanguageCmp
-  Malay:
-  !include "languages\malay.nsh"
-  Goto EndLanguageCmp
-  Norwegian:
-  !include "languages\norwegian.nsh"
-  Goto EndLanguageCmp
-;  Scottish_Gaelic:
-;  !include "languages\scottish_gaelic.nsh"
-;  Goto EndLanguageCmp
-;  Sinhala:
-;  !include "languages\sinhala.nsh"
-;  Goto EndLanguageCmp
-  Thai:
-  !include "languages\thai.nsh"
-  Goto EndLanguageCmp
-  TradChinese:
-  !include "languages\tradchinese.nsh"
-  Goto EndLanguageCmp
-  Turkish:
-  !include "languages\turkish.nsh"
-  Goto EndLanguageCmp
-  Ukrainian:
-  !include "languages\ukrainian.nsh"
-  Goto EndLanguageCmp
-  Uzbek:
-  !include "languages\uzbek.nsh"
-  Goto EndLanguageCmp
-  Welsh:
-  !include "languages\welsh.nsh"
-  Goto EndLanguageCmp
-  Brazilian:
-  !include "languages\brazilian_portuguese.nsh"
-  EndLanguageCmp:
 
 FunctionEnd
