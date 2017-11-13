@@ -566,7 +566,8 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(tc->uloc.pl_vars);
-    pl_context_destroy(&tc->pl_ctx);
+    if (tc->pl_ctx)
+        pl_context_destroy(&tc->pl_ctx);
 #endif
 }
 
