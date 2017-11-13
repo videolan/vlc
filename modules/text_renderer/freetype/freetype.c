@@ -753,7 +753,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         }
 
         /* Compute the background for the line (identify leading/trailing space) */
-        int line_start = offset.x + p_line->p_character[p_line->i_first_visible_char_index].p_glyph->left - p_regionbbox->xMin;
+        int line_start = offset.x + p_line->p_character[p_line->i_first_visible_char_index].bbox.xMin - p_regionbbox->xMin;
 
         /* Fudge factor to make sure caption background edges are left aligned
            despite variable font width */
@@ -775,9 +775,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             }
 
             /* Find right boundary for bounding box for background */
-            int line_end = offset.x +
-                           p_line->p_character[i_seg_end].p_glyph->left - p_regionbbox->xMin +
-                           p_line->p_character[i_seg_end].p_glyph->bitmap.width;
+            int line_end = offset.x + p_line->p_character[i_seg_end].bbox.xMax - p_regionbbox->xMin;
 
             const line_character_t *p_char = &p_line->p_character[i_char_index];
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
