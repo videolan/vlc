@@ -98,7 +98,7 @@ if [ "$PREBUILT" != "yes" ]; then
 make list
 make -j$JOBS fetch
 make -j$JOBS
-if [ "$PACKAGE" == "yes" ]; then
+if [ "$PACKAGE" = "yes" ]; then
 make package
 fi
 else
@@ -130,8 +130,8 @@ fi
 info "Compiling"
 make -j$JOBS
 
-if [ "$INSTALLER" == "n" ]; then
+if [ "$INSTALLER" = "n" ]; then
 make package-win32-debug package-win32
-elif [ "$INSTALLER" == "r" ]; then
+elif [ "$INSTALLER" = "r" ]; then
 make package-win32
 fi
