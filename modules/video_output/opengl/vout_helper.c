@@ -560,7 +560,6 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
         module_unneed(tc, tc->p_module);
     else if (tc->priv != NULL)
         opengl_tex_converter_generic_deinit(tc);
-    vlc_object_release(tc);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);
 
@@ -569,6 +568,8 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
     if (tc->pl_ctx)
         pl_context_destroy(&tc->pl_ctx);
 #endif
+
+    vlc_object_release(tc);
 }
 
 #ifdef HAVE_LIBPLACEBO
