@@ -1,7 +1,7 @@
-From 185f0ee9dc6ca6b46a43c669d98b5b63020a04e5 Mon Sep 17 00:00:00 2001
+From 2f3ec424ca2dcfdd1abe5f1774c35aea1c9b0088 Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Mon, 30 Oct 2017 14:32:03 +0100
-Subject: [PATCH] build: use a Makefile
+Subject: [PATCH 1/2] build: use a Makefile
 
 Only needed for VLC 3.0
 ---
@@ -13,7 +13,7 @@ Only needed for VLC 3.0
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..36e7f26
+index 0000000..13f661b
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,38 @@

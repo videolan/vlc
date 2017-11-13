@@ -4,11 +4,13 @@ PLACEBO_VERSION := 0.1.2
 PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
 PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
 
-ifndef HAVE_WIN32
+ifdef HAVE_WIN32
+LIBPLACEBO_WIN32 = HAVE_WIN32=1
+endif
+
 PKGS += libplacebo
 ifeq ($(call need_pkg,"libplacebo"),)
 PKGS_FOUND += libplacebo
-endif
 endif
 
 PLACEBOCONF := --prefix="$(PREFIX)" \
@@ -23,6 +25,9 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
 	$(APPLY) $(SRC)/libplacebo/0001-build-use-a-Makefile.patch
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/libplacebo/0002-build-fix-win32-build.patch
+endif
 	$(MOVE)
 
 .libplacebo: libplacebo
@@ -30,5 +35,5 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 # we don't want to depend on meson/ninja for VLC 3.0
 #cd $< && $(HOSTVARS) meson $(PLACEBOCONF) build
 #cd $< && cd build && ninja install
-	cd $< && $(HOSTVARS_PIC) PREFIX=$(PREFIX) make install
+	cd $< && $(HOSTVARS_PIC) PREFIX=$(PREFIX) $(LIBPLACEBO_WIN32) make install
 	touch $@
