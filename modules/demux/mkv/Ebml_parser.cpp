@@ -202,6 +202,9 @@ EbmlElement *EbmlParser::Get( int n_call )
     else if( m_el[mi_level] == NULL )
     {
         msg_Dbg( p_demux,"MKV/Ebml Parser: m_el[mi_level] == NULL" );
+        /* go back to the end of the parent */
+        if( p_prev )
+            p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
     }
     else if( m_el[mi_level]->IsDummy() && !mb_dummy )
     {
