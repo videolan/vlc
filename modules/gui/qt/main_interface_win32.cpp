@@ -383,8 +383,8 @@ void MainInterfaceWin32::resizeEvent(QResizeEvent *event)
         return;
 
     OffsetRect( &windowRect,
-                monitorInfo.rcWork.left - monitorInfo.rcMonitor.left,
-                monitorInfo.rcWork.top - monitorInfo.rcMonitor.top );
+                monitorInfo.rcMonitor.left - monitorInfo.rcWork.left ,
+                monitorInfo.rcMonitor.top - monitorInfo.rcWork.top );
 
     b_isWindowTiled = ( EqualRect( &windowPlacement.rcNormalPosition, &windowRect ) == 0 );
 }
