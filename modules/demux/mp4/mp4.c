@@ -625,7 +625,6 @@ static int Open( vlc_object_t * p_this )
     const uint8_t   *p_peek;
 
     MP4_Box_t       *p_ftyp;
-    MP4_Box_t       *p_rmra;
     const MP4_Box_t *p_mvhd = NULL;
     const MP4_Box_t *p_mvex = NULL;
 
@@ -760,7 +759,8 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if( ( p_rmra = MP4_BoxGet( p_sys->p_root,  "/moov/rmra" ) ) )
+    MP4_Box_t *p_rmra = MP4_BoxGet( p_sys->p_root, "/moov/rmra" );
+    if( p_rmra != NULL && p_demux->p_input != NULL )
     {
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
         int        i;
