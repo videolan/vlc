@@ -78,6 +78,8 @@ static int Import_Dir( vlc_object_t *p_this )
 
     if( vlc_stream_Control( p_demux->s, STREAM_IS_DIRECTORY ) )
         return VLC_EGENERIC;
+    if( p_demux->p_input == NULL )
+        return VLC_ETIMEOUT;
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
