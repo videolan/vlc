@@ -274,10 +274,10 @@ EbmlElement *EbmlParser::Get( int n_call )
                 return NULL;
             }
 
-            delete m_el[mi_level];
-            m_el[mi_level] = NULL;
-            m_el[mi_level - 1]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level - 1]) );
-            return Get();
+            EbmlElement *unwanted_dummy = m_el[mi_level];
+            EbmlElement *upper_dummy = Get();
+            delete unwanted_dummy;
+            return upper_dummy;
         }
     }
 
