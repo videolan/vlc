@@ -213,9 +213,9 @@ EbmlElement *EbmlParser::Get( int n_call )
             return NULL;
         }
 
-        if( p_prev && p_prev->IsFiniteSize() &&
-            p_prev->GetEndPosition() != m_el[mi_level]->GetElementPosition() &&
-            mi_level > 1 )
+        if( mi_level > 1 &&
+            p_prev && p_prev->IsFiniteSize() &&
+            p_prev->GetEndPosition() != m_el[mi_level]->GetElementPosition() )
         {
             msg_Err( p_demux, "Dummy Element at unexpected position... corrupted file?" );
             b_bad_position = true;
