@@ -38,6 +38,7 @@ typedef struct
     FT_BitmapGlyph p_glyph;
     FT_BitmapGlyph p_outline;
     FT_BitmapGlyph p_shadow;
+    FT_BBox        bbox;
     const text_style_t *p_style;
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */

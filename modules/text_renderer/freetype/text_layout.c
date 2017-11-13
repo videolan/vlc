@@ -199,10 +199,7 @@ line_desc_t *NewLine( int i_count )
     p_line->i_first_visible_char_index = -1;
     p_line->i_last_visible_char_index = -2;
 
-    p_line->bbox.xMin = INT_MAX;
-    p_line->bbox.yMin = INT_MAX;
-    p_line->bbox.xMax = INT_MIN;
-    p_line->bbox.yMax = INT_MIN;
+    BBoxInit( &p_line->bbox );
 
     p_line->p_character = calloc( i_count, sizeof(*p_line->p_character) );
     if( !p_line->p_character )
@@ -230,14 +227,6 @@ static void FixGlyph( FT_Glyph glyph, FT_BBox *p_bbox,
         p_bbox->yMin = FT_CEIL(p_pen->y + i_y_advance);
         glyph_bmp->top  = p_bbox->yMax;
     }
-}
-
-static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
-{
-    p_max->xMin = __MIN(p_max->xMin, p->xMin);
-    p_max->yMin = __MIN(p_max->yMin, p->yMin);
-    p_max->xMax = __MAX(p_max->xMax, p->xMax);
-    p_max->yMax = __MAX(p_max->yMax, p->yMax);
 }
 
 static paragraph_t *NewParagraph( filter_t *p_filter,
@@ -1123,6 +1112,7 @@ static int LayoutLine( filter_t *p_filter,
 
         if( !p_bitmaps->p_glyph )
         {
+            BBoxInit( &p_ch->bbox );
             --i_line_index;
             continue;
         }
@@ -1251,11 +1241,14 @@ static int LayoutLine( filter_t *p_filter,
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;
 
-        BBoxEnlarge( &p_line->bbox, &p_bitmaps->glyph_bbox );
+        /* Compute bounding box for all glyphs */
+        p_ch->bbox = p_bitmaps->glyph_bbox;
         if( p_bitmaps->p_outline )
-            BBoxEnlarge( &p_line->bbox, &p_bitmaps->outline_bbox );
+            BBoxEnlarge( &p_ch->bbox, &p_bitmaps->outline_bbox );
         if( p_bitmaps->p_shadow )
-            BBoxEnlarge( &p_line->bbox, &p_bitmaps->shadow_bbox );
+            BBoxEnlarge( &p_ch->bbox, &p_bitmaps->shadow_bbox );
+
+        BBoxEnlarge( &p_line->bbox, &p_ch->bbox );
 
         pen.x += p_bitmaps->i_x_advance;
         pen.y += p_bitmaps->i_y_advance;
@@ -1585,12 +1578,8 @@ int LayoutText( filter_t *p_filter,
     }
 
     int i_base_line = 0;
-    FT_BBox bbox = {
-        .xMin = INT_MAX,
-        .yMin = INT_MAX,
-        .xMax = INT_MIN,
-        .yMax = INT_MIN
-    };
+    FT_BBox bbox;
+    BBoxInit( &bbox );
 
     for( line_desc_t *p_line = p_first_line; p_line; p_line = p_line->p_next )
     {
