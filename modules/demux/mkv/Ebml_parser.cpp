@@ -155,11 +155,8 @@ EbmlElement *EbmlParser::Get( int n_call )
     }
 
     p_prev = m_el[mi_level];
-    if( m_el[mi_level] )
-    {
-        m_el[mi_level]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level]) );
-
-    }
+    if( p_prev )
+        p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
 
     // If the parent is a segment, use the segment context when creating children
     // (to prolong their lifetime), otherwise just continue as normal
