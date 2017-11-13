@@ -29,7 +29,7 @@ EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcl" OPTION
+while getopts "hra:pcli:" OPTION
 do
      case $OPTION in
          h)
