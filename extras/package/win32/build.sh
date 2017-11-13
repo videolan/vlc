@@ -24,6 +24,7 @@ OPTIONS:
    -p            Use a Prebuilt contrib package (speeds up compilation)
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
+   -i <n|r>      Create an Installer (n: nightly, r: release)
 EOF
 }
 
@@ -37,6 +38,7 @@ do
          ;;
          r)
              RELEASE="yes"
+             INSTALLER="r"
          ;;
          a)
              ARCH=$OPTARG
@@ -49,6 +51,9 @@ do
          ;;
          l)
              I18N="yes"
+         ;;
+         i)
+             INSTALLER=$OPTARG
          ;;
      esac
 done
@@ -125,8 +130,8 @@ fi
 info "Compiling"
 make -j$JOBS
 
-if [ "$RELEASE" != "yes" ]; then
-make package-win32-debug
-else
+if [ "$INSTALLER" == "n" ]; then
+make package-win32-debug package-win32
+elif [ "$INSTALLER" == "r" ]; then
 make package-win32
 fi
