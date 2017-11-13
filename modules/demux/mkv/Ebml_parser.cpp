@@ -158,6 +158,27 @@ EbmlElement *EbmlParser::Get( int n_call )
     if( p_prev )
         p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
 
+    uint64_t i_max_read;
+    if (mi_level == 0)
+        i_max_read = UINT64_MAX;
+    else if (!m_el[mi_level-1]->IsFiniteSize())
+        i_max_read = UINT64_MAX;
+    else if (!p_prev)
+        i_max_read = m_el[mi_level-1]->GetSize();
+    else {
+        size_t size_lvl = mi_level;
+        while ( size_lvl && m_el[size_lvl-1]->IsFiniteSize() &&
+                m_el[size_lvl-1]->GetEndPosition() == m_el[size_lvl]->GetEndPosition() )
+            size_lvl--;
+        if (size_lvl == 0 || !m_el[size_lvl-1]->IsFiniteSize() )
+            i_max_read = UINT64_MAX;
+        else {
+            uint64 top = m_el[size_lvl-1]->GetEndPosition();
+            uint64 bom = m_el[mi_level]->GetEndPosition();
+            i_max_read = top - bom;
+        }
+    }
+
     // If the parent is a segment, use the segment context when creating children
     // (to prolong their lifetime), otherwise just continue as normal
     EbmlSemanticContext e_context =
@@ -167,7 +188,7 @@ EbmlElement *EbmlParser::Get( int n_call )
 
     /* Ignore unknown level 0 or 1 elements */
     m_el[mi_level] = m_es->FindNextElement( e_context,
-                                            i_ulev, UINT64_MAX,
+                                            i_ulev, i_max_read,
                                             (  mb_dummy | (mi_level > 1) ), 1 );
     if( i_ulev > 0 )
     {
