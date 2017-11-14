@@ -173,7 +173,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
     }
     free(path);
 
-    setvbuf(sys->stream, NULL, _IONBF, 0);
+    setvbuf(sys->stream, NULL, _IOLBF, 0);
     fputs(header, sys->stream);
 
     *sysp = sys;
