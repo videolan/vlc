@@ -219,6 +219,7 @@ static void BuildPATCallback( void *p_opaque, block_t *p_block )
 {
     ts_pid_t *pat_pid = (ts_pid_t *) p_opaque;
     dvbpsi_packet_push( pat_pid->u.p_pat->handle, p_block->p_buffer );
+    block_Release( p_block );
 }
 
 static void BuildPMTCallback( void *p_opaque, block_t *p_block )
@@ -229,7 +230,9 @@ static void BuildPMTCallback( void *p_opaque, block_t *p_block )
     {
         dvbpsi_packet_push( program_pid->u.p_pmt->handle,
                             p_block->p_buffer );
-        p_block = p_block->p_next;
+        block_t *p_next = p_block->p_next;
+        block_Release( p_block );
+        p_block = p_next;
     }
 }
 
