@@ -283,6 +283,10 @@ static FT_Vector GetAlignedOffset( const line_desc_t *p_line,
         else /* center */
             offsets.x = ( i_text_width - p_line->i_width ) / 2;
     }
+    else
+    {
+        offsets.x = p_textbbox->xMin - p_line->bbox.xMin;
+    }
     return offsets;
 }
 
