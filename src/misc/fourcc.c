@@ -391,7 +391,7 @@ static const vlc_fourcc_t p_VAAPI_420_fallback[] = {
 };
 
 static const vlc_fourcc_t p_VAAPI_420_10BPP_fallback[] = {
-    VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_P010, VLC_CODEC_I420, 0,
+    VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_I420_10B, VLC_CODEC_P010, 0,
 };
 
 static const vlc_fourcc_t p_D3D9_OPAQUE_fallback[] = {
