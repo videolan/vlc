@@ -2159,13 +2159,12 @@ GLConvOpen(vlc_object_t *obj)
 
     HRESULT hr;
     HANDLE shared_handle = NULL;
-    hr = IDirect3DDevice9_CreateOffscreenPlainSurface(priv->d3dctx.dev,
-                                                      tc->fmt.i_width,
-                                                      tc->fmt.i_height,
-                                                      D3DFMT_X8R8G8B8,
-                                                      D3DPOOL_DEFAULT,
-                                                      &priv->dx_render,
-                                                      &shared_handle);
+    hr = IDirect3DDevice9Ex_CreateRenderTarget(priv->d3dctx.devex,
+                                               tc->fmt.i_width,
+                                               tc->fmt.i_height,
+                                               D3DFMT_X8R8G8B8,
+                                               D3DMULTISAMPLE_NONE, 0, FALSE,
+                                               &priv->dx_render, &shared_handle);
     if (FAILED(hr))
     {
         msg_Warn(obj, "IDirect3DDevice9_CreateOffscreenPlainSurface failed");
