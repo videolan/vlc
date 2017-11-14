@@ -153,7 +153,7 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/
 	if [ $${MAKENSIS_VERSION:1:1} -lt 3 ]; then \
 	    echo 'Please update your nsis packager';\
 	    exit 1; \
-	fi
+	fi; \
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 	if test -n "$(SIGNATURE)"; then \
