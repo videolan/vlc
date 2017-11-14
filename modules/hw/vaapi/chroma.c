@@ -386,6 +386,11 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     }
 
     filter->p_sys = filter_sys;
+    msg_Warn(obj, "Using SW chroma filter for %dx%d %4.4s -> %4.4s",
+             filter->fmt_in.video.i_width,
+             filter->fmt_in.video.i_height,
+             (const char *) &filter->fmt_in.video.i_chroma,
+             (const char *) &filter->fmt_out.video.i_chroma);
 
     return VLC_SUCCESS;
 }
