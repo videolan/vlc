@@ -2019,8 +2019,14 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
         return VLC_EGENERIC;
     }
 
+    const RECT rect = {
+        .left = 0,
+        .top = 0,
+        .right = pic->format.i_visible_width,
+        .bottom = pic->format.i_visible_height
+    };
     hr = IDirect3DDevice9Ex_StretchRect(priv->d3dctx.devex, picsys->surface,
-                                        NULL, priv->dx_render, NULL, D3DTEXF_NONE);
+                                        &rect, priv->dx_render, NULL, D3DTEXF_NONE);
     if (FAILED(hr))
     {
         msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed");
@@ -2160,8 +2166,8 @@ GLConvOpen(vlc_object_t *obj)
     HRESULT hr;
     HANDLE shared_handle = NULL;
     hr = IDirect3DDevice9Ex_CreateRenderTarget(priv->d3dctx.devex,
-                                               tc->fmt.i_width,
-                                               tc->fmt.i_height,
+                                               tc->fmt.i_visible_width,
+                                               tc->fmt.i_visible_height,
                                                D3DFMT_X8R8G8B8,
                                                D3DMULTISAMPLE_NONE, 0, FALSE,
                                                &priv->dx_render, &shared_handle);
