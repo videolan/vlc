@@ -124,11 +124,9 @@ void vlc_h2_parse_destroy(struct vlc_h2_parser *);
 
 const uint8_t *vlc_h2_frame_data_get(const struct vlc_h2_frame *f,
                                      size_t *restrict len);
-#if (__STDC_VERSION__ >= 201112L)
 #define vlc_h2_frame_data_get(f, l) \
     _Generic((f), \
         const struct vlc_h2_frame *: (vlc_h2_frame_data_get)(f, l), \
         struct vlc_h2_frame *: (uint8_t *)(vlc_h2_frame_data_get)(f, l))
-#endif
 
 /** @} */

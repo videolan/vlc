@@ -34,7 +34,7 @@
 #endif
 
 # ifndef __cplusplus
-#  if (__STDC_VERSION__ >= 201112L) && !defined (__STDC_NO_ATOMICS__)
+#  if !defined (__STDC_NO_ATOMICS__)
 /*** Native C11 atomics ***/
 #   include <stdatomic.h>
 

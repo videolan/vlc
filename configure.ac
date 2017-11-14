@@ -43,7 +43,7 @@ AC_SUBST(vlclibdir)
 dnl
 dnl Check for tools
 dnl
-AC_PROG_CC_C99
+AC_PROG_CC
 AC_USE_SYSTEM_EXTENSIONS
 VLC_PROG_CC_C11
 AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to 2 to get glibc warnings.])

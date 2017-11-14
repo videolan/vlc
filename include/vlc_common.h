@@ -470,23 +470,12 @@ struct vlc_common_members
  * It checks if the compound type actually starts with an embedded
  * \ref vlc_object_t structure.
  */
-#if !defined(__cplusplus) && (__STDC_VERSION__ >= 201112L)
+#if !defined(__cplusplus)
 # define VLC_OBJECT(x) \
     _Generic((x)->obj, \
         struct vlc_common_members: (vlc_object_t *)(&(x)->obj), \
         const struct vlc_common_members: (const vlc_object_t *)(&(x)->obj) \
     )
-#elif defined (__GNUC__)
-# ifndef __cplusplus
-#  define VLC_OBJECT( x ) \
-    __builtin_choose_expr( \
-        __builtin_types_compatible_p(__typeof__((x)->obj), struct vlc_common_members), \
-        (vlc_object_t *)(x), (void)0)
-# else
-#  define VLC_OBJECT( x ) \
-    ((vlc_object_t *)(&((x)->obj)) \
-      + 0 * __builtin_offsetof(__typeof__(*(x)), obj.object_type))
-# endif
 #else
 # define VLC_OBJECT( x ) ((vlc_object_t *)&(x)->obj)
 #endif
