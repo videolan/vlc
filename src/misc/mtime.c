@@ -152,6 +152,7 @@ void date_Move( date_t *p_date, mtime_t i_difference )
  */
 mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 {
+    assert( p_date->i_divider_num != 0 );
     mtime_t i_dividend = i_nb_samples * CLOCK_FREQ * p_date->i_divider_den;
     lldiv_t d = lldiv( i_dividend, p_date->i_divider_num );
 
