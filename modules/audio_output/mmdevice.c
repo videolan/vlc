@@ -1037,7 +1037,7 @@ static void *MMThread(void *data)
     EnterCriticalSection(&sys->lock);
 
     do
-        if (FAILED(MMSession(aout, it)))
+        if (sys->requested_device == NULL || FAILED(MMSession(aout, it)))
             SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
     while (sys->it != NULL);
 
