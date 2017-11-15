@@ -795,7 +795,7 @@ static void CEA708_Window_Forward( cea708_window_t *p_w )
 
 static void CEA708_Window_Backward( cea708_window_t *p_w )
 {
-    static const int const reverse[] =
+    static const int reverse[] =
     {
         [CEA708_WA_DIRECTION_LTR] = CEA708_WA_DIRECTION_RTL,
         [CEA708_WA_DIRECTION_RTL] = CEA708_WA_DIRECTION_LTR,
@@ -1121,7 +1121,7 @@ cea708_t * CEA708_Decoder_New( decoder_t *p_dec )
 }
 
 #define POP_COMMAND() (void) cea708_input_buffer_get( ib )
-#define POP_ARGS(n) for(size_t i=0; i<n;i++) POP_COMMAND()
+#define POP_ARGS(n) for(size_t pops=0; pops<(size_t)n;pops++) POP_COMMAND()
 #define REQUIRE_ARGS(n) if(cea708_input_buffer_size( ib ) < n + 1)\
                             return CEA708_STATUS_STARVING
 #define REQUIRE_ARGS_AND_POP_COMMAND(n) REQUIRE_ARGS(n); else POP_COMMAND()
