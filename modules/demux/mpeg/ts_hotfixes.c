@@ -316,7 +316,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
         int j=0;
         for( int i=0; i<p_sys->pids.i_all; i++ )
         {
-            const ts_pid_t *p_pid = p_sys->pids.pp_all[i];
+            p_pid = p_sys->pids.pp_all[i];
 
             if( !SEEN(p_pid) ||
                 p_pid->probed.i_fourcc == 0 )
