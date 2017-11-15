@@ -1,7 +1,7 @@
 # Mysofa
 
-MYSOFA_VERSION := 65d92e6463537c9f7907b69c2c768a7c8c3a02b5
-MYSOFA_GITURL = https://github.com/hoene/libmysofa.git
+MYSOFA_VERSION := 0.5
+MYSOFA_URL = https://github.com/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
 
 PKGS += mysofa
 
@@ -11,14 +11,12 @@ endif
 
 DEPS_mysofa += pthreads zlib $(DEPS_pthreads) $(DEPS_zlib)
 
-$(TARBALLS)/mysofa-git.tar.xz:
-	$(call download_git,$(MYSOFA_GITURL),,$(MYSOFA_VERSION))
+$(TARBALLS)/libmysofa-$(MYSOFA_VERSION).tar.gz:
+	$(call download_pkg,$(MYSOFA_URL),mysofa)
 
-.sum-mysofa: mysofa-git.tar.xz
-	$(call check_githash,$(MYSOFA_VERSION))
-	touch $@
+.sum-mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz
 
-mysofa: mysofa-git.tar.xz .sum-mysofa
+mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz .sum-mysofa
 	$(UNPACK)
 	$(MOVE)
 
