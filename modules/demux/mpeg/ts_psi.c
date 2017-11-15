@@ -287,6 +287,7 @@ static void ParsePMTPrivateRegistrations( demux_t *p_demux, const dvbpsi_descrip
                 else
                     msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
             }
+            break;
 
             case TS_STANDARD_DVB:
             case TS_STANDARD_AUTO:
@@ -298,8 +299,8 @@ static void ParsePMTPrivateRegistrations( demux_t *p_demux, const dvbpsi_descrip
                     msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
                     break;
                 }
-                /* fallthrough */
             }
+            /* fallthrough */
             default:
                 msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
                 break;
@@ -581,11 +582,12 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
 
     ts_teletext_page_t p_page[2 * 64 + 20];
     unsigned i_page = 0;
+    dvbpsi_descriptor_t *p_dr;
 
     /* Gather pages information */
     for( unsigned i_tag_idx = 0; i_tag_idx < 2; i_tag_idx++ )
     {
-        dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, i_tag_idx == 0 ? 0x46 : 0x56 );
+        p_dr = PMTEsFindDescriptor( p_dvbpsies, i_tag_idx == 0 ? 0x46 : 0x56 );
         if( !p_dr )
             continue;
 
@@ -612,7 +614,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
         }
     }
 
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x59 );
+    p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x59 );
     if( p_dr )
     {
         dvbpsi_subtitling_dr_t *p_sub = dvbpsi_DecodeSubtitlingDr( p_dr );
@@ -653,7 +655,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
         p_fmt->subs.teletext.i_page = 0;
         p_fmt->psz_description = strdup( vlc_gettext(ppsz_teletext_type[1]) );
 
-        dvbpsi_descriptor_t *p_dr;
         p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x46 );
         if( !p_dr )
             p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x56 );
