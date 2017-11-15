@@ -364,6 +364,7 @@ codec_LTLIBRARIES += $(LTLIBvideotoolbox)
 vlc_avcodec_common_la_SOURCES = codec/avcodec/fourcc.c codec/avcodec/avcommon.h \
 	codec/avcodec/chroma.c codec/avcodec/chroma.h \
 	codec/avcodec/avcommon_compat.h
+vlc_avcodec_common_la_CFLAGS = $(AVCODEC_CFLAGS) $(AM_CFLAGS)
 
 libavcodec_plugin_la_SOURCES = \
 	codec/avcodec/video.c \
