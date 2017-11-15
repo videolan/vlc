@@ -264,6 +264,7 @@ static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
 
     region->p_text   = p_segment;
     region->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
+    region->i_text_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
     region->i_x      = x;
     region->i_y      = y;
     region->b_balanced_text = false;
