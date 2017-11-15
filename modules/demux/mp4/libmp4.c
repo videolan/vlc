@@ -3070,6 +3070,10 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET4BYTES( p_box->data.p_elst->i_entry_count );
 
+    uint32_t i_entries_max = i_read / ((p_box->data.p_elst->i_version == 1) ? 20 : 12);
+    if( p_box->data.p_elst->i_entry_count > i_entries_max )
+        p_box->data.p_elst->i_entry_count = i_entries_max;
+
     p_box->data.p_elst->i_segment_duration =
         calloc( p_box->data.p_elst->i_entry_count, sizeof(uint64_t) );
     p_box->data.p_elst->i_media_time =
@@ -3086,23 +3090,16 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
     }
 
-    unsigned i;
-    for( i = 0; i < p_box->data.p_elst->i_entry_count; i++ )
+    for( uint32_t i = 0; i < p_box->data.p_elst->i_entry_count; i++ )
     {
         if( p_box->data.p_elst->i_version == 1 )
         {
-            if ( i_read < 20 )
-                break;
             MP4_GET8BYTES( p_box->data.p_elst->i_segment_duration[i] );
-
             MP4_GET8BYTES( p_box->data.p_elst->i_media_time[i] );
         }
         else
         {
-            if ( i_read < 12 )
-                break;
             MP4_GET4BYTES( p_box->data.p_elst->i_segment_duration[i] );
-
             MP4_GET4BYTES( p_box->data.p_elst->i_media_time[i] );
             p_box->data.p_elst->i_media_time[i] = (int32_t)p_box->data.p_elst->i_media_time[i];
         }
@@ -3110,8 +3107,7 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET2BYTES( p_box->data.p_elst->i_media_rate_integer[i] );
         MP4_GET2BYTES( p_box->data.p_elst->i_media_rate_fraction[i] );
     }
-    if ( i < p_box->data.p_elst->i_entry_count )
-        p_box->data.p_elst->i_entry_count = i;
+
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"elst\" entry-count %lu",
              (unsigned long)p_box->data.p_elst->i_entry_count );
