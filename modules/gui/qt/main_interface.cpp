@@ -152,6 +152,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* */
     b_plDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
 
+    /* Should the UI stays on top of other windows */
+    b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
 
     /**************************
      *  UI and Widgets design
@@ -524,6 +526,9 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
             CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
                      this, handleKeyPress( QKeyEvent * ) );
         }
+
+    if ( b_interfaceOnTop )
+        setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
 }
 
 inline void MainInterface::initSystray()
@@ -913,6 +918,10 @@ void MainInterface::setHideMouse( bool hide )
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
 {
+    //don't apply changes if user has already sets its interface on top
+    if ( b_interfaceOnTop )
+        return;
+
     Qt::WindowFlags oldflags = windowFlags(), newflags;
 
     if( on_top )
@@ -920,7 +929,22 @@ void MainInterface::setVideoOnTop( bool on_top )
     else
         newflags = oldflags & ~Qt::WindowStaysOnTopHint;
     if( newflags != oldflags && !b_videoFullScreen )
+    {
+        setWindowFlags( newflags );
+        show(); /* necessary to apply window flags */
+    }
+}
 
+void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
+{
+    b_interfaceOnTop = on_top;
+    Qt::WindowFlags oldflags = windowFlags(), newflags;
+
+    if( on_top )
+        newflags = oldflags | Qt::WindowStaysOnTopHint;
+    else
+        newflags = oldflags & ~Qt::WindowStaysOnTopHint;
+    if( newflags != oldflags && !b_videoFullScreen )
     {
         setWindowFlags( newflags );
         show(); /* necessary to apply window flags */

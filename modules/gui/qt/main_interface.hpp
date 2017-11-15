@@ -95,6 +95,7 @@ public:
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
+    bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     StandardPLPanel* getPlaylistView();
 
 protected:
@@ -179,6 +180,7 @@ protected:
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_interfaceFullScreen;
+    bool                 b_interfaceOnTop;      ///keep UI on top
     bool                 b_pauseOnMinimize;
     bool                 b_maximizedView;
     bool                 b_isWindowTiled;
@@ -205,6 +207,7 @@ public slots:
     void toggleAdvancedButtons();
     void toggleInterfaceFullScreen();
     void toggleFSC();
+    void setInterfaceAlwaysOnTop( bool );
 
     void setStatusBarVisibility(bool b_visible);
     void setPlaylistVisibility(bool b_visible);
