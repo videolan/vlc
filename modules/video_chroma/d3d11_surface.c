@@ -360,32 +360,34 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (desc.Format == DXGI_FORMAT_YUY2) {
         size_t chroma_pitch = (lock.RowPitch / 2);
 
-        size_t pitch[3] = {
+        const size_t pitch[3] = {
             lock.RowPitch,
             chroma_pitch,
             chroma_pitch,
         };
 
-        uint8_t *plane[3] = {
+        const uint8_t *plane[3] = {
             (uint8_t*)lock.pData,
             (uint8_t*)lock.pData + pitch[0] * desc.Height,
             (uint8_t*)lock.pData + pitch[0] * desc.Height
                                  + pitch[1] * desc.Height / 2,
         };
 
-        CopyFromYv12ToYv12(dst, plane, pitch,
-                           src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
+        Copy420_P_to_P(dst, plane, pitch,
+                       src->format.i_visible_height + src->format.i_y_offset,
+                       &sys->cache);
     } else if (desc.Format == DXGI_FORMAT_NV12) {
-        uint8_t *plane[2] = {
+        const uint8_t *plane[2] = {
             lock.pData,
             (uint8_t*)lock.pData + lock.RowPitch * desc.Height
         };
-        size_t  pitch[2] = {
+        const size_t  pitch[2] = {
             lock.RowPitch,
             lock.RowPitch,
         };
-        CopyFromNv12ToYv12(dst, plane, pitch,
-                           src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
+        Copy420_SP_to_P(dst, plane, pitch,
+                        src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
+        picture_SwapUV(dst);
     } else {
         msg_Err(p_filter, "Unsupported D3D11VA conversion from 0x%08X to YV12", desc.Format);
     }
@@ -485,7 +487,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     ID3D11Texture2D_GetDesc(sys->staging, &desc);
 
     if (desc.Format == DXGI_FORMAT_NV12) {
-        uint8_t *plane[2] = {
+        const uint8_t *plane[2] = {
             lock.pData,
             (uint8_t*)lock.pData + lock.RowPitch * desc.Height
         };
@@ -493,8 +495,8 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             lock.RowPitch,
             lock.RowPitch,
         };
-        CopyFromNv12ToNv12(dst, plane, pitch,
-                           src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
+        Copy420_SP_to_SP(dst, plane, pitch,
+                          src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
     } else {
         msg_Err(p_filter, "Unsupported D3D11VA conversion from 0x%08X to NV12", desc.Format);
     }

@@ -399,8 +399,8 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
 
 static void
 SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
-                     uint8_t *srcu, size_t srcu_pitch,
-                     uint8_t *srcv, size_t srcv_pitch,
+                     const uint8_t *srcu, size_t srcu_pitch,
+                     const uint8_t *srcv, size_t srcv_pitch,
                      uint8_t *cache, size_t cache_size,
                      unsigned int height,
                      unsigned int cpu)
@@ -459,27 +459,9 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
     }
 }
 
-static void SSE_CopyFromNv12ToYv12(picture_t *dst,
-                                   uint8_t *src[2], size_t src_pitch[2],
-                                   unsigned height,
-                                   copy_cache_t *cache, unsigned cpu)
-{
-    SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
-                  src[0], src_pitch[0],
-                  cache->buffer, cache->size,
-                  height, cpu);
-    SSE_SplitPlanes(dst->p[2].p_pixels, dst->p[2].i_pitch,
-                    dst->p[1].p_pixels, dst->p[1].i_pitch,
-                    src[1], src_pitch[1],
-                    cache->buffer, cache->size,
-                    (height+1)/2, cpu);
-    asm volatile ("emms");
-}
-
-static void SSE_CopyFromYv12ToYv12(picture_t *dst,
-                                   uint8_t *src[3], size_t src_pitch[3],
-                                   unsigned height,
-                                   copy_cache_t *cache, unsigned cpu)
+static void SSE_Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
+                               const size_t src_pitch[static 3], unsigned height,
+                               const copy_cache_t *cache, unsigned cpu)
 {
     for (unsigned n = 0; n < 3; n++) {
         const unsigned d = n > 0 ? 2 : 1;
@@ -492,10 +474,9 @@ static void SSE_CopyFromYv12ToYv12(picture_t *dst,
 }
 
 
-static void SSE_CopyFromNv12ToNv12(picture_t *dst,
-                             uint8_t *src[2], size_t src_pitch[2],
-                             unsigned height,
-                             copy_cache_t *cache, unsigned cpu)
+static void SSE_Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
+                                 const size_t src_pitch[static 2], unsigned height,
+                                 const copy_cache_t *cache, unsigned cpu)
 {
     SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
                   src[0], src_pitch[0],
@@ -509,9 +490,9 @@ static void SSE_CopyFromNv12ToNv12(picture_t *dst,
 }
 
 static void
-SSE_CopyFromNv12ToI420(picture_t *dest, uint8_t *src[2],
-                       size_t src_pitch[2], unsigned int height,
-                       copy_cache_t *cache, unsigned int cpu)
+SSE_Copy420_SP_to_P(picture_t *dest, const uint8_t *src[static 2],
+                    const size_t src_pitch[static 2], unsigned int height,
+                    const copy_cache_t *cache, unsigned int cpu)
 {
     SSE_CopyPlane(dest->p[0].p_pixels, dest->p[0].i_pitch,
                   src[0], src_pitch[0], cache->buffer, cache->size,
@@ -523,10 +504,10 @@ SSE_CopyFromNv12ToI420(picture_t *dest, uint8_t *src[2],
     asm volatile ("emms");
 }
 
-static void SSE_CopyFromI420ToNv12(picture_t *dst,
-                             uint8_t *src[3], size_t src_pitch[3],
-                             unsigned height,
-                             copy_cache_t *cache, unsigned cpu)
+static void SSE_Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
+                                const size_t src_pitch[static 3],
+                                unsigned height, const copy_cache_t *cache,
+                                unsigned cpu)
 {
     SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
                   src[0], src_pitch[0],
@@ -571,32 +552,15 @@ static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
     }
 }
 
-void CopyFromNv12ToYv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                        unsigned height, copy_cache_t *cache)
+void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
+                      const size_t src_pitch[static 2], unsigned height,
+                      const copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromNv12ToYv12(dst, src, src_pitch, height, cache, cpu);
-#else
-    (void) cache;
-#endif
-
-    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
-              src[0], src_pitch[0], height);
-    SplitPlanes(dst->p[2].p_pixels, dst->p[2].i_pitch,
-                dst->p[1].p_pixels, dst->p[1].i_pitch,
-                src[1], src_pitch[1], height/2);
-}
-
-void CopyFromNv12ToNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                  unsigned height, copy_cache_t *cache)
-{
-#ifdef CAN_COMPILE_SSE2
-    unsigned cpu = vlc_CPU();
-    if (vlc_CPU_SSE2())
-        return SSE_CopyFromNv12ToNv12(dst, src, src_pitch, height,
-                                cache, cpu);
+        return SSE_Copy420_SP_to_SP(dst, src, src_pitch, height,
+                                    cache, cpu);
 #else
     (void) cache;
 #endif
@@ -607,14 +571,15 @@ void CopyFromNv12ToNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
               src[1], src_pitch[1], height/2);
 }
 
-void CopyFromNv12ToI420(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                        unsigned height, copy_cache_t *cache)
+void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
+                     const size_t src_pitch[static 2], unsigned height,
+                     const copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned    cpu = vlc_CPU();
 
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromNv12ToI420(dst, src, src_pitch, height, cache, cpu);
+        return SSE_Copy420_SP_to_P(dst, src, src_pitch, height, cache, cpu);
 #else
     VLC_UNUSED(cache);
 #endif
@@ -626,14 +591,14 @@ void CopyFromNv12ToI420(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
                 src[1], src_pitch[1], height/2);
 }
 
-void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                        unsigned height, copy_cache_t *cache)
+void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
+                     const size_t src_pitch[static 3], unsigned height,
+                     const copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromI420ToNv12(dst, src, src_pitch, height,
-                                cache, cpu);
+        return SSE_Copy420_P_to_SP(dst, src, src_pitch, height, cache, cpu);
 #else
     (void) cache;
 #endif
@@ -649,8 +614,8 @@ void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
     const int i_extra_pitch_v  = src_pitch[V_PLANE] - copy_pitch;
 
     uint8_t *dstUV = dst->p[1].p_pixels;
-    uint8_t *srcU  = src[U_PLANE];
-    uint8_t *srcV  = src[V_PLANE];
+    const uint8_t *srcU  = src[U_PLANE];
+    const uint8_t *srcV  = src[V_PLANE];
     for ( unsigned int line = 0; line < copy_lines; line++ )
     {
         for ( unsigned int col = 0; col < copy_pitch; col++ )
@@ -664,15 +629,16 @@ void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
     }
 }
 
-void CopyFromI420_10ToP010(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                        unsigned height, copy_cache_t *cache)
+void CopyFromI420_10ToP010(picture_t *dst, const uint8_t *src[static 3],
+                           const size_t src_pitch[static 3],
+                           unsigned height, const copy_cache_t *cache)
 {
     (void) cache;
 
     const int i_extra_pitch_dst_y = (dst->p[0].i_pitch  - src_pitch[0]) / 2;
     const int i_extra_pitch_src_y = (src_pitch[Y_PLANE] - src_pitch[0]) / 2;
-    uint16_t *dstY = dst->p[0].p_pixels;
-    uint16_t *srcY = src[Y_PLANE];
+    uint16_t *dstY = (uint16_t *) dst->p[0].p_pixels;
+    const uint16_t *srcY = (const uint16_t *) src[Y_PLANE];
     for (unsigned y = 0; y < height; y++) {
         for (unsigned x = 0; x < (src_pitch[0] / 2); x++) {
             *dstY++ = *srcY++ << 6;
@@ -688,9 +654,9 @@ void CopyFromI420_10ToP010(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
     const int i_extra_pitch_u  = src_pitch[U_PLANE] / 2 - copy_pitch;
     const int i_extra_pitch_v  = src_pitch[V_PLANE] / 2 - copy_pitch;
 
-    uint16_t *dstUV = dst->p[1].p_pixels;
-    uint16_t *srcU  = src[U_PLANE];
-    uint16_t *srcV  = src[V_PLANE];
+    uint16_t *dstUV = (uint16_t *) dst->p[1].p_pixels;
+    const uint16_t *srcU  = (const uint16_t *) src[U_PLANE];
+    const uint16_t *srcV  = (const uint16_t *) src[V_PLANE];
     for ( unsigned int line = 0; line < copy_lines; line++ )
     {
         for ( unsigned int col = 0; col < copy_pitch; col++ )
@@ -704,14 +670,14 @@ void CopyFromI420_10ToP010(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
     }
 }
 
-
-void CopyFromYv12ToYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                        unsigned height, copy_cache_t *cache)
+void Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
+                    const size_t src_pitch[static 3], unsigned height,
+                    const copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromYv12ToYv12(dst, src, src_pitch, height, cache, cpu);
+        return SSE_Copy420_P_to_P(dst, src, src_pitch, height, cache, cpu);
 #else
     (void) cache;
 #endif
@@ -722,6 +688,15 @@ void CopyFromYv12ToYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
                src[1], src_pitch[1], height / 2);
      CopyPlane(dst->p[2].p_pixels, dst->p[2].i_pitch,
                src[2], src_pitch[2], height / 2);
+}
+
+void picture_SwapUV(picture_t *picture)
+{
+    assert(picture->i_planes == 3);
+
+    plane_t tmp_plane = picture->p[1];
+    picture->p[1] = picture->p[2];
+    picture->p[2] = tmp_plane;
 }
 
 int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)

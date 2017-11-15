@@ -120,21 +120,21 @@ static void I420_YUV( filter_sys_t *p_sys, picture_t *p_src, picture_t *p_dst, b
     const size_t u_plane = invertUV ? V_PLANE : U_PLANE;
     const size_t v_plane = invertUV ? U_PLANE : V_PLANE;
 
-    size_t pitch[3] = {
+    const size_t pitch[3] = {
         p_src->p[Y_PLANE].i_pitch,
         p_src->p[u_plane].i_pitch,
         p_src->p[v_plane].i_pitch,
     };
 
-    uint8_t *plane[3] = {
+    const uint8_t *plane[3] = {
         (uint8_t*)p_src->p[Y_PLANE].p_pixels,
         (uint8_t*)p_src->p[u_plane].p_pixels,
         (uint8_t*)p_src->p[v_plane].p_pixels,
     };
 
-    CopyFromI420ToNv12( p_dst, plane, pitch,
-                        p_src->format.i_y_offset + p_src->format.i_visible_height,
-                        &p_sys->cache );
+    Copy420_P_to_SP( p_dst, plane, pitch,
+                     p_src->format.i_y_offset + p_src->format.i_visible_height,
+                     &p_sys->cache );
 }
 
 /*****************************************************************************
