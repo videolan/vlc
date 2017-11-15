@@ -129,6 +129,24 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     old_pmt_rm.p_elems = p_pat->programs.p_elems;
     ARRAY_INIT(p_pat->programs);
 
+    bool b_force_reselect = false;
+    if( p_sys->programs.i_size && p_sys->seltype == PROGRAM_AUTO_DEFAULT )
+    {
+        /* If the program was set by default selection, we'll need to repick */
+        b_force_reselect = true;
+        for( p_program = p_dvbpsipat->p_first_program; p_program != NULL;
+             p_program = p_program->p_next )
+        {
+            if( p_sys->programs.p_elems[0] == p_program->i_number )
+            {
+                b_force_reselect = false;
+                break;
+            }
+        }
+        if( b_force_reselect )
+            ARRAY_RESET( p_sys->programs );
+    }
+
     /* now create programs */
     for( p_program = p_dvbpsipat->p_first_program; p_program != NULL;
          p_program = p_program->p_next )
@@ -190,6 +208,11 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         PIDRelease( p_demux, old_pmt_rm.p_elems[i] );
     }
     ARRAY_RESET(old_pmt_rm);
+
+    if( b_force_reselect && p_sys->programs.i_size )
+    {
+        es_out_Control( p_demux->out, ES_OUT_SET_GROUP, p_sys->programs.p_elems[0] );
+    }
 
     dvbpsi_pat_delete( p_dvbpsipat );
 }
