@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_chunk_size = var_InheritInteger( p_access, "chunk-size" );
     p_sys->i_poll_timeout = var_InheritInteger( p_access, "poll-timeout" );
-    p_sys->i_latency = var_InheritInteger( p_stream, "latency" );
+    p_sys->i_latency = var_InheritInteger( p_access, "latency" );
     p_sys->i_poll_id = -1;
     p_sys->i_event_fd = -1;
 
@@ -241,7 +241,7 @@ static int Open( vlc_object_t *p_this )
     srt_setsockopt( p_sys->sock, 0, SRTO_SENDER, &(int) { 1 }, sizeof( int ) );
 
     /* Set latency */
-    srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY, &p_sys->latency, sizeof( int ) );
+    srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY, &p_sys->i_latency, sizeof( int ) );
 
     p_sys->i_poll_id = srt_epoll_create();
     if ( p_sys->i_poll_id == -1 )

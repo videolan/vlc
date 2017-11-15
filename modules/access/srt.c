@@ -217,7 +217,7 @@ static int Open(vlc_object_t *p_this)
     srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDMODE, &(int) { 1 }, sizeof( int ) );
 
     /* Set latency */
-    srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY, &p_sys->latency, sizeof( int ) );
+    srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY, &p_sys->i_latency, sizeof( int ) );
 
     p_sys->i_poll_id = srt_epoll_create();
     if ( p_sys->i_poll_id == -1 )
