@@ -82,17 +82,55 @@ static int queue_sub(decoder_t *dec, subpicture_t *p_subpic)
     return 0;
 }
 
+static int decoder_load(decoder_t *decoder, bool is_packetizer,
+                         const es_format_t *restrict fmt)
+{
+    decoder->b_frame_drop_allowed = true;
+    decoder->i_extra_picture_buffers = 0;
+
+    decoder->pf_decode = NULL;
+    decoder->pf_get_cc = NULL;
+    decoder->pf_packetize = NULL;
+    decoder->pf_flush = NULL;
+
+    es_format_Copy(&decoder->fmt_in, fmt);
+    es_format_Init(&decoder->fmt_out, fmt->i_cat, 0);
+
+    if (!is_packetizer)
+    {
+        static const char caps[ES_CATEGORY_COUNT][16] = {
+            [VIDEO_ES] = "video decoder",
+            [AUDIO_ES] = "audio decoder",
+            [SPU_ES] = "spu decoder",
+        };
+        decoder->p_module =
+            module_need(decoder, caps[decoder->fmt_in.i_cat], NULL, false);
+    }
+    else
+        decoder->p_module = module_need(decoder, "packetizer", NULL, false);
+
+    if (!decoder->p_module)
+    {
+        es_format_Clean(&decoder->fmt_in);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 static void decoder_unload(decoder_t *decoder)
 {
     if (decoder->p_module != NULL)
     {
         module_unneed(decoder, decoder->p_module);
+        decoder->p_module = NULL;
         es_format_Clean(&decoder->fmt_out);
     }
     es_format_Clean(&decoder->fmt_in);
     if (decoder->p_description)
+    {
         vlc_meta_Delete(decoder->p_description);
-    vlc_object_release(decoder);
+        decoder->p_description = NULL;
+    }
 }
 
 void test_decoder_destroy(decoder_t *decoder)
@@ -101,6 +139,8 @@ void test_decoder_destroy(decoder_t *decoder)
 
     decoder_unload(packetizer);
     decoder_unload(decoder);
+    vlc_object_release(packetizer);
+    vlc_object_release(decoder);
 }
 
 decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
@@ -126,30 +166,12 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
     decoder->pf_queue_audio = queue_audio;
     decoder->pf_queue_cc = queue_cc;
     decoder->pf_queue_sub = queue_sub;
-    decoder->b_frame_drop_allowed = true;
-    decoder->i_extra_picture_buffers = 0;
     decoder->p_owner = (void *)packetizer;
-    packetizer->b_frame_drop_allowed = true;
-    packetizer->i_extra_picture_buffers = 0;
 
-    es_format_Copy(&packetizer->fmt_in, fmt);
-    es_format_Init(&packetizer->fmt_out, fmt->i_cat, 0);
-
-    packetizer->p_module = module_need(packetizer, "packetizer", NULL, false);
-    if (packetizer->p_module == NULL)
+    if (decoder_load(packetizer, true, fmt) != VLC_SUCCESS)
         goto end;
 
-    es_format_Copy(&decoder->fmt_in, &packetizer->fmt_out);
-    es_format_Init(&decoder->fmt_out, UNKNOWN_ES, 0);
-
-    static const char caps[ES_CATEGORY_COUNT][16] = {
-        [VIDEO_ES] = "video decoder",
-        [AUDIO_ES] = "audio decoder",
-        [SPU_ES] = "spu decoder",
-    };
-    decoder->p_module = module_need(decoder, caps[decoder->fmt_in.i_cat], NULL,
-                                    false);
-    if (decoder->p_module == NULL)
+    if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
         goto end;
 
     return decoder;
@@ -162,6 +184,14 @@ end:
 int test_decoder_process(decoder_t *decoder, block_t *p_block)
 {
     decoder_t *packetizer = (void *) decoder->p_owner;
+
+    /* This case can happen if a decoder reload failed */
+    if (decoder->p_module == NULL)
+    {
+        if (p_block != NULL)
+            block_Release(p_block);
+        return VLC_EGENERIC;
+    }
 
     block_t **pp_block = p_block ? &p_block : NULL;
     block_t *p_packetized_block;
@@ -177,11 +207,12 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
             decoder->pf_decode(decoder, NULL);
 
             /* Reload decoder */
-            module_unneed(decoder, decoder->p_module);
-            es_format_Clean(&decoder->fmt_in);
-            es_format_Copy(&decoder->fmt_in, &packetizer->fmt_out);
-            decoder->p_module = module_need(decoder, "video decoder",
-                                            NULL, false);
+            decoder_unload(decoder);
+            if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
+            {
+                block_ChainRelease(p_packetized_block);
+                return VLC_EGENERIC;
+            }
         }
 
         if (packetizer->pf_get_cc)
