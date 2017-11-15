@@ -434,8 +434,13 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
     int i_maxwidth, i_maxheight;
     QPixmap pixmap = QPixmap( pixmapUrl );
     QPainter painter(this);
-    QBitmap pMask;
-    float f_alpha = 1.0;
+
+#if HAS_QT56
+    qreal dpr = devicePixelRatioF();
+#else
+    qreal dpr = devicePixelRatio();
+#endif
+    pixmap.setDevicePixelRatio( dpr );
 
     i_maxwidth  = __MIN( maximumWidth(), width() ) - MARGIN * 2;
     i_maxheight = __MIN( maximumHeight(), height() ) - MARGIN * 2;
@@ -447,32 +452,27 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
         /* Scale down the pixmap if the widget is too small */
         if( pixmap.width() > i_maxwidth || pixmap.height() > i_maxheight )
         {
-            pixmap = pixmap.scaled( i_maxwidth, i_maxheight,
+            pixmap = pixmap.scaled( i_maxwidth * dpr, i_maxheight * dpr ,
                             Qt::KeepAspectRatio, Qt::SmoothTransformation );
         }
         else
         if ( b_expandPixmap &&
              pixmap.width() < width() && pixmap.height() < height() )
         {
-            /* Scale up the pixmap to fill widget's size */
-            f_alpha = ( (float) pixmap.height() / (float) height() );
             pixmap = pixmap.scaled(
-                    width() - MARGIN * 2,
-                    height() - MARGIN * 2,
-                    Qt::KeepAspectRatio,
-                    ( f_alpha < .2 )? /* Don't waste cpu when not visible */
-                        Qt::SmoothTransformation:
-                        Qt::FastTransformation
-                    );
-            /* Non agressive alpha compositing when sizing up */
-            pMask = QBitmap( pixmap.width(), pixmap.height() );
-            pMask.fill( QColor::fromRgbF( 1.0, 1.0, 1.0, f_alpha ) );
-            pixmap.setMask( pMask );
+                    (width() - MARGIN * 2) * dpr,
+                    (height() - MARGIN * 2) * dpr ,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+        else if (dpr != 1.0)
+        {
+            pixmap = pixmap.scaled( pixmap.width() * dpr, pixmap.height() * dpr,
+                                    Qt::KeepAspectRatio, Qt::SmoothTransformation );
         }
 
         painter.drawPixmap(
-                MARGIN + ( i_maxwidth - pixmap.width() ) /2,
-                MARGIN + ( i_maxheight - pixmap.height() ) /2,
+                MARGIN + ( i_maxwidth - ( pixmap.width() / dpr ) ) / 2,
+                MARGIN + ( i_maxheight - ( pixmap.height() / dpr ) ) / 2,
                 pixmap);
     }
     QWidget::paintEvent( e );
