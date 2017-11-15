@@ -3109,8 +3109,8 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"elst\" entry-count %lu",
-             (unsigned long)p_box->data.p_elst->i_entry_count );
+    msg_Dbg( p_stream, "read box: \"elst\" entry-count %" PRIu32,
+             p_box->data.p_elst->i_entry_count );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
