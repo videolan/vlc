@@ -187,7 +187,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
         }
 
         if( b_changed )
-            UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
+            UpdatePESFilters( p_demux, p_demux->p_sys->seltype == PROGRAM_ALL );
     }
 }
 

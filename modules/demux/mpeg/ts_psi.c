@@ -98,11 +98,22 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         return;
     }
 
-    if( ( p_pat->i_version != -1 &&
-            ( !p_dvbpsipat->b_current_next ||
-              p_dvbpsipat->i_version == p_pat->i_version ) ) ||
-        ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) ||
-        p_sys->b_user_pmt || PATCheck( p_demux, p_dvbpsipat ) )
+    /* check versioning changes */
+    if( !p_pat->b_generated )
+    {
+        /* override hotfixes */
+        if( ( p_pat->i_version != -1 && p_dvbpsipat->i_version == p_pat->i_version ) ||
+            ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) )
+        {
+            dvbpsi_pat_delete( p_dvbpsipat );
+            return;
+        }
+    }
+    else msg_Warn( p_demux, "Replacing generated PAT with one received from stream" );
+
+    /* check content */
+    if( !p_dvbpsipat->b_current_next || p_sys->b_user_pmt ||
+        PATCheck( p_demux, p_dvbpsipat ) )
     {
         dvbpsi_pat_delete( p_dvbpsipat );
         return;
@@ -171,6 +182,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     }
     p_pat->i_version = p_dvbpsipat->i_version;
     p_pat->i_ts_id = p_dvbpsipat->i_ts_id;
+    p_pat->b_generated = false;
 
     for(int i=0; i<old_pmt_rm.i_size; i++)
     {
@@ -1945,7 +1957,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                   p_pmt->i_number, i_cand );
     }
 
-    UpdatePESFilters( p_demux, p_sys->b_es_all );
+    UpdatePESFilters( p_demux, p_demux->p_sys->seltype == PROGRAM_ALL );
 
     /* Probe Boundaries */
     if( p_sys->b_canfastseek && p_pmt->i_last_dts == -1 )

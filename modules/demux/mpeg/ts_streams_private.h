@@ -31,6 +31,7 @@ struct ts_pat_t
 {
     int             i_version;
     int             i_ts_id;
+    bool            b_generated;
     dvbpsi_t       *handle;
     DECL_ARRAY(ts_pid_t *) programs;
 

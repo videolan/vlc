@@ -71,6 +71,7 @@ ts_pat_t *ts_pat_New( demux_t *p_demux )
 
     pat->i_version  = -1;
     pat->i_ts_id    = -1;
+    pat->b_generated = false;
     ARRAY_INIT( pat->programs );
 
     return pat;

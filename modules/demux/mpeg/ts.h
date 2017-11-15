@@ -77,7 +77,6 @@ struct demux_sys_t
 
     bool        b_user_pmt;
     int         i_pmt_es;
-    bool        b_es_all; /* If we need to return all es/programs */
 
     enum
     {
@@ -108,6 +107,12 @@ struct demux_sys_t
     bool        b_broken_charset; /* True if broken encoding is used in EPG/SDT */
 
     /* Selected programs */
+    enum
+    {
+        PROGRAM_AUTO_DEFAULT, /* Always select first program sending data */
+        PROGRAM_LIST, /* explicit list of programs, see list below */
+        PROGRAM_ALL, /* everything */
+    } seltype; /* reflects the DEMUX_SET_GROUP */
     DECL_ARRAY( int ) programs; /* List of selected/access-filtered programs */
     bool        b_default_selection; /* True if set by default to first pmt seen (to get data from filtered access) */
 
