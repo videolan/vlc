@@ -238,7 +238,6 @@ static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
 
     PUSH_INPUTVAR( "video-es" );
     PUSH_PLVAR( "fullscreen" );
-    PUSH_PLVAR( "video-on-top" );
     PUSH_PLVAR( "video-wallpaper" );
     PUSH_VAR( "video-snapshot" );
     PUSH_VAR( "zoom" );
@@ -497,6 +496,13 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
 
     menu->addSeparator();
 
+    action = menu->addAction( qtr( "Always on &top" ) );
+    action->setCheckable( true );
+    action->setChecked( mi->isInterfaceAlwaysOnTop() );
+    CONNECT( action, triggered( bool ), mi, setInterfaceAlwaysOnTop( bool ) );
+
+    menu->addSeparator();
+
     /* Minimal View */
     action = menu->addAction( qtr( "Mi&nimal Interface" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
@@ -532,6 +538,11 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     adv->setCheckable( true );
     if( visual_selector_enabled ) adv->setChecked( true );
 #endif
+
+    action = menu->addAction( qtr( "Always on &top" ) );
+    action->setCheckable( true );
+    action->setChecked( mi->isInterfaceAlwaysOnTop() );
+    CONNECT( action, triggered( bool ), mi, setInterfaceAlwaysOnTop( bool ) );
 
     menu->addSeparator();
 
@@ -678,7 +689,6 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         /* Surface modifiers */
         addActionWithCheckbox( current, "fullscreen", qtr( "&Fullscreen" ) );
         addActionWithCheckbox( current, "autoscale", qtr( "Always Fit &Window" ) );
-        addActionWithCheckbox( current, "video-on-top", qtr( "Always &on Top" ) );
         addActionWithCheckbox( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
 
         current->addSeparator();
