@@ -1,4 +1,4 @@
-From 5fa4c39b3d5d93e7a5eaf16a813d8af80f59f254 Mon Sep 17 00:00:00 2001
+From 91ec35bff6d1b45d79a81566b03b399c87784d85 Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Mon, 13 Nov 2017 15:00:04 +0100
 Subject: [PATCH 2/2] build: fix win32 build
@@ -35,14 +35,14 @@ index 13f661b..0d29744 100644
  OBJS = $(patsubst %.c, $(OBJDIR)src/%.o, $(SRCS))
  
 diff --git a/src/context.c b/src/context.c
-index a325fb8..caaed3f 100644
+index a325fb8..312e9d7 100644
 --- a/src/context.c
 +++ b/src/context.c
 @@ -17,13 +17,17 @@
  
  #include <stdio.h>
  #include <locale.h>
-+#ifdef _WIN32
++#ifndef _WIN32
  #include <pthread.h>
 +#endif
  
