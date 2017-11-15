@@ -1275,6 +1275,11 @@ void MainInterface::resizeWindow(int w, int h)
 #if ! HAS_QT510 && defined(QT5_HAS_X11)
     if( QX11Info::isPlatformX11() )
     {
+#if HAS_QT56
+        qreal dpr = devicePixelRatioF();
+#else
+        qreal dpr = devicePixelRatio();
+#endif
         QSize size(w, h);
         size = size.boundedTo(maximumSize()).expandedTo(minimumSize());
         /* X11 window managers are not required to accept geometry changes on
@@ -1284,8 +1289,8 @@ void MainInterface::resizeWindow(int w, int h)
          * request until the ConfigureNotify event on success
          * and not at all if it is rejected. */
         XMoveResizeWindow( QX11Info::display(), winId(),
-                          geometry().x(), geometry().y(),
-                          (unsigned int)size.width(), (unsigned int)size.height());
+                          geometry().x() * dpr, geometry().y() * dpr,
+                          (unsigned int)size.width() * dpr, (unsigned int)size.height() * dpr);
         return;
     }
 #endif
