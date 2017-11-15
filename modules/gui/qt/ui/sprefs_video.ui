@@ -53,6 +53,23 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="outputModule">
+           <property name="maxVisibleItems">
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="voutLabel">
+           <property name="text">
+            <string>O&amp;utput</string>
+           </property>
+           <property name="buddy">
+            <cstring>outputModule</cstring>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="overlay">
            <property name="text">
@@ -60,41 +77,17 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="hwYUVBox">
-           <property name="text">
-            <string>Use hardware YUV-&gt;RGB conversions</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="0">
-          <widget class="QCheckBox" name="alwaysOnTop">
-           <property name="text">
-            <string>Always on top</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
           <widget class="QCheckBox" name="windowDecorations">
            <property name="text">
             <string>Window decorations</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="voutLabel">
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="hwYUVBox">
            <property name="text">
-            <string>Output</string>
-           </property>
-           <property name="buddy">
-            <cstring>outputModule</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="outputModule">
-           <property name="maxVisibleItems">
-            <number>15</number>
+            <string>Use hardware YUV-&gt;RGB conversions</string>
            </property>
           </widget>
          </item>
@@ -324,9 +317,6 @@
   <tabstop>enableVideo</tabstop>
   <tabstop>fullscreen</tabstop>
   <tabstop>overlay</tabstop>
-  <tabstop>hwYUVBox</tabstop>
-  <tabstop>alwaysOnTop</tabstop>
-  <tabstop>windowDecorations</tabstop>
   <tabstop>outputModule</tabstop>
   <tabstop>dXdisplayDevice</tabstop>
   <tabstop>kvaFixT23</tabstop>
