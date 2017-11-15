@@ -530,7 +530,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     }
 
     p_region = subpicture_region_New( &fmt );
-    video_format_Clean( &fmt );
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
