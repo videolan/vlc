@@ -734,36 +734,33 @@ static inline void RenderBackground( subpicture_region_t *p_region,
     {
         FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
 
+        FT_BBox linebgbox = p_line->bbox;
+        linebgbox.xMin += offset.x;
+        linebgbox.xMax += offset.x;
+        linebgbox.yMax += offset.y;
+        linebgbox.yMin += offset.y;
+
         if( p_line->i_first_visible_char_index < 0 )
             continue; /* only spaces */
 
-        /* Compute the upper boundary for the background */
-        int line_top = __MAX(0, offset.y + p_regionbbox->yMax - p_line->bbox.yMax);
 
-        /* Compute lower boundary for the background */
-        int line_bottom;
-        if( p_line->p_next == NULL || p_line->p_next->i_first_visible_char_index < 0 )
-        {
-            line_bottom = __MIN(p_region->fmt.i_visible_height, offset.y + p_regionbbox->yMax - p_line->bbox.yMin);
-        }
-        else
-        {
-            const int next_top = __MAX(0, offset.y + p_regionbbox->yMax - p_line->p_next->bbox.yMax);
-            line_bottom = __MIN(p_region->fmt.i_visible_height, next_top);
-        }
-
-        /* Compute the background for the line (identify leading/trailing space) */
-        int line_start = offset.x + p_line->p_character[p_line->i_first_visible_char_index].bbox.xMin - p_regionbbox->xMin;
-
-        /* Fudge factor to make sure caption background edges are left aligned
-           despite variable font width */
-        if (line_start < 12)
-            line_start = 0;
+        /* Compute lower boundary for the background
+           continue down to next line top */
+        if( p_line->p_next && p_line->p_next->i_first_visible_char_index >= 0 )
+            linebgbox.yMin = __MIN(linebgbox.yMin, p_line->bbox.yMin - (p_line->bbox.yMin - p_line->p_next->bbox.yMax));
 
         /* Setup color for the background */
         const text_style_t *p_prev_style = p_line->p_character[p_line->i_first_visible_char_index].p_style;
 
+        FT_BBox segmentbgbox = linebgbox;
         int i_char_index = p_line->i_first_visible_char_index;
+        /* Compute the background for the line (identify leading/trailing space) */
+        if( i_char_index > 0 )
+        {
+            segmentbgbox.xMin = offset.x +
+                                p_line->p_character[p_line->i_first_visible_char_index].bbox.xMin;
+        }
+
         while( i_char_index <= p_line->i_last_visible_char_index )
         {
             /* find last char having the same style */
@@ -775,7 +772,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             }
 
             /* Find right boundary for bounding box for background */
-            int line_end = offset.x + p_line->p_character[i_seg_end].bbox.xMax - p_regionbbox->xMin;
+            segmentbgbox.xMax = offset.x + p_line->p_character[i_seg_end].bbox.xMax;
 
             const line_character_t *p_char = &p_line->p_character[i_char_index];
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
@@ -790,15 +787,26 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                 /* Render the actual background */
                 if( i_alpha != STYLE_ALPHA_TRANSPARENT )
                 {
-                    for( int dy = line_top; dy < line_bottom; dy++ )
+                    /* rebase and clip to SCREEN coordinates */
+                    FT_BBox absbox =
                     {
-                        for( int dx = line_start; dx < line_end; dx++ )
+                        .xMin = __MAX(0, segmentbgbox.xMin - p_regionbbox->xMin),
+                        .xMax = VLC_CLIP(segmentbgbox.xMax - p_regionbbox->xMin,
+                                         0, p_region->fmt.i_visible_width),
+                        .yMin = VLC_CLIP(p_regionbbox->yMax - segmentbgbox.yMin,
+                                         0, p_region->fmt.i_visible_height),
+                        .yMax = __MAX(0, p_regionbbox->yMax - segmentbgbox.yMax),
+                    };
+
+                    for( int dy = absbox.yMax; dy < absbox.yMin; dy++ )
+                    {
+                        for( int dx = absbox.xMin; dx < absbox.xMax; dx++ )
                             BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
                     }
                 }
             }
 
-            line_start = line_end;
+            segmentbgbox.xMin = segmentbgbox.xMax;
             i_char_index = i_seg_end + 1;
             p_prev_style = p_line->p_character->p_style;
         }
