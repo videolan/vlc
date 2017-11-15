@@ -1561,6 +1561,55 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
     glDrawElements(GL_TRIANGLES, vgl->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
 
+
+static void GetTextureCropParamsForStereo(unsigned i_nbTextures,
+                                          const float *stereoCoefs,
+                                          const float *stereoOffsets,
+                                          float *left, float *top,
+                                          float *right, float *bottom)
+{
+    for (unsigned i = 0; i < i_nbTextures; ++i)
+    {
+        float f_2eyesWidth = right[i] - left[i];
+        left[i] = left[i] + f_2eyesWidth * stereoOffsets[0];
+        right[i] = left[i] + f_2eyesWidth * stereoCoefs[0];
+
+        float f_2eyesHeight = bottom[i] - top[i];
+        top[i] = top[i] + f_2eyesHeight * stereoOffsets[1];
+        bottom[i] = top[i] + f_2eyesHeight * stereoCoefs[1];
+    }
+}
+
+static void TextureCropForStereo(vout_display_opengl_t *vgl,
+                                 float *left, float *top,
+                                 float *right, float *bottom)
+{
+    float stereoCoefs[2];
+    float stereoOffsets[2];
+
+    switch (vgl->fmt.multiview_mode)
+    {
+    case MULTIVIEW_STEREO_TB:
+        // Display only the left eye.
+        stereoCoefs[0] = 1; stereoCoefs[1] = 0.5;
+        stereoOffsets[0] = 0; stereoOffsets[1] = 0;
+        GetTextureCropParamsForStereo(vgl->prgm->tc->tex_count,
+                                      stereoCoefs, stereoOffsets,
+                                      left, top, right, bottom);
+        break;
+    case MULTIVIEW_STEREO_SBS:
+        // Display only the left eye.
+        stereoCoefs[0] = 0.5; stereoCoefs[1] = 1;
+        stereoOffsets[0] = 0; stereoOffsets[1] = 0;
+        GetTextureCropParamsForStereo(vgl->prgm->tc->tex_count,
+                                      stereoCoefs, stereoOffsets,
+                                      left, top, right, bottom);
+        break;
+    default:
+        break;
+    }
+}
+
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
@@ -1607,6 +1656,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
         }
 
+        TextureCropForStereo(vgl, left, top, right, bottom);
         int ret = SetupCoords(vgl, left, top, right, bottom);
         if (ret != VLC_SUCCESS)
             return ret;
