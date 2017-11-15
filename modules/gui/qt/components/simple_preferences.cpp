@@ -48,6 +48,7 @@
 #include <math.h>
 
 #define ICON_HEIGHT 48
+#define ICON_WIDTH 48
 
 #ifdef _WIN32
 # include <vlc_charset.h>
@@ -191,19 +192,25 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( mapper, mapped(int), this, switchPanel(int) );
 
     QPixmap scaled;
+#if HAS_QT56
+    qreal dpr = devicePixelRatioF();
+#else
+    qreal dpr = devicePixelRatio();
+#endif
 
 #define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \
     /* Scale icon to non native size outside of toolbutton to avoid widget size */\
     /* computation using native size */\
     scaled = QPixmap( ":/prefsmenu/" #icon ".png" )\
-             .scaledToHeight( ICON_HEIGHT , Qt::SmoothTransformation );\
+             .scaledToHeight( ICON_HEIGHT * dpr, Qt::SmoothTransformation );\
+    scaled.setDevicePixelRatio( dpr ); \
     button->setIcon( scaled );                \
     button->setText( label );                                               \
     button->setToolTip( ltooltip );                                         \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
-    button->setIconSize( QSize( scaled.width(), scaled.height() ) );          \
-    button->setMinimumWidth( 40 + scaled.width() );\
+    button->setIconSize( QSize( ICON_WIDTH, ICON_HEIGHT ) );          \
+    button->setMinimumWidth( 40 + ICON_WIDTH );\
     button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum); \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
