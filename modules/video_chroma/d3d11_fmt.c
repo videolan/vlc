@@ -132,8 +132,7 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_dll,
                                          bool hw_decoding,
-                                         ID3D11Device **pp_d3ddevice,
-                                         ID3D11DeviceContext **pp_d3dcontext)
+                                         d3d11_handle_t *p_hd3d11)
 {
 #if !VLC_WINSTORE_APP
 # define D3D11CreateDevice(args...)             pf_CreateDevice(args)
@@ -182,21 +181,21 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_dll,
         D3D_FEATURE_LEVEL i_feature_level;
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
                     D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
-                    pp_d3ddevice, &i_feature_level, pp_d3dcontext);
+                    &p_hd3d11->d3ddevice, &i_feature_level, &p_hd3d11->d3dcontext);
         if (SUCCEEDED(hr)) {
 #ifndef NDEBUG
             msg_Dbg(obj, "Created the D3D11 device 0x%p ctx 0x%p type %d level %x.",
-                    (void *)*pp_d3ddevice, (void *)*pp_d3dcontext,
+                    (void *)p_hd3d11->d3ddevice, (void *)p_hd3d11->d3dcontext,
                     driverAttempts[driver], i_feature_level);
 #endif
             /* we can work with legacy levels but only if forced */
             if ( obj->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
             msg_Dbg(obj, "Incompatible feature level %x", i_feature_level);
-            ID3D11DeviceContext_Release(*pp_d3dcontext);
-            *pp_d3dcontext = NULL;
-            ID3D11Device_Release(*pp_d3ddevice);
-            *pp_d3ddevice = NULL;
+            ID3D11DeviceContext_Release(p_hd3d11->d3dcontext);
+            ID3D11Device_Release(p_hd3d11->d3ddevice);
+            p_hd3d11->d3dcontext = NULL;
+            p_hd3d11->d3ddevice = NULL;
             hr = E_NOTIMPL;
         }
     }

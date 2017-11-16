@@ -29,6 +29,12 @@
 
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
+typedef struct
+{
+    ID3D11Device             *d3ddevice;       /* D3D device */
+    ID3D11DeviceContext      *d3dcontext;      /* D3D context */
+} d3d11_handle_t;
+
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
 {
@@ -65,8 +71,7 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_dll,
                                          bool hw_decoding,
-                                         ID3D11Device **pp_d3ddevice,
-                                         ID3D11DeviceContext **pp_d3dcontext);
+                                         d3d11_handle_t *p_hd3d11);
 
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
