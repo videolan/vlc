@@ -37,6 +37,7 @@ AbstractDemuxer::AbstractDemuxer()
     b_startsfromzero = false;
     b_reinitsonseek = true;
     b_candetectswitches = true;
+    b_alwaysrestarts = false;
 }
 
 AbstractDemuxer::~AbstractDemuxer()
