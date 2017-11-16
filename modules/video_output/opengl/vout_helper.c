@@ -398,6 +398,9 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
 
     GLuint shader = tc->vt->CreateShader(GL_VERTEX_SHADER);
     tc->vt->ShaderSource(shader, 1, (const char **) &code, NULL);
+    if (tc->b_dump_shaders)
+        fprintf(stderr, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
+                (const char *)&tc->fmt.i_chroma, code);
     tc->vt->CompileShader(shader);
     free(code);
     return shader;
@@ -590,7 +593,8 @@ log_cb(void *priv, enum pl_log_level level, const char *msg)
 
 static int
 opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
-                    const char *glexts, const video_format_t *fmt, bool subpics)
+                    const char *glexts, const video_format_t *fmt, bool subpics,
+                    bool b_dump_shaders)
 {
     opengl_tex_converter_t *tc =
         vlc_object_create(vgl->gl, sizeof(opengl_tex_converter_t));
@@ -599,6 +603,7 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
 
     tc->gl = vgl->gl;
     tc->vt = &vgl->vt;
+    tc->b_dump_shaders = b_dump_shaders;
     tc->pf_fragment_shader_init = opengl_fragment_shader_init_impl;
     tc->glexts = glexts;
 #if defined(USE_OPENGL_ES2)
@@ -844,12 +849,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                          HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 #endif
 
+    bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
+
     vgl->prgm = &vgl->prgms[0];
     vgl->sub_prgm = &vgl->prgms[1];
 
     GL_ASSERT_NOERROR();
     int ret;
-    ret = opengl_init_program(vgl, vgl->prgm, extensions, fmt, false);
+    ret = opengl_init_program(vgl, vgl->prgm, extensions, fmt, false,
+                              b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
         msg_Warn(gl, "could not init tex converter for %4.4s",
@@ -859,7 +867,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-    ret = opengl_init_program(vgl, vgl->sub_prgm, extensions, fmt, true);
+    ret = opengl_init_program(vgl, vgl->sub_prgm, extensions, fmt, true,
+                              b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
         msg_Warn(gl, "could not init subpictures tex converter for %4.4s",

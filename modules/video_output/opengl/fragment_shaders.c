@@ -59,10 +59,6 @@
 # define GL_TEXTURE_LUMINANCE_SIZE 0x8060
 #endif
 
-#if 0
-#define DUMP_SHADERS
-#endif
-
 static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
@@ -736,10 +732,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     GLint length = ms.length;
     tc->vt->ShaderSource(fragment_shader, 1, (const char **)&ms.ptr, &length);
     tc->vt->CompileShader(fragment_shader);
-#ifdef DUMP_SHADERS
-    fprintf(stderr, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n\n",
-            (const char *)&chroma, yuv_space, ms.ptr);
-#endif
+    if (tc->b_dump_shaders)
+        fprintf(stderr, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
+                (const char *)&chroma, yuv_space, ms.ptr);
     free(ms.ptr);
 
     tc->tex_target = tex_target;

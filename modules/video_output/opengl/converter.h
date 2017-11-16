@@ -210,6 +210,9 @@ struct opengl_tex_converter_t
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
 
+    /* True to dump shaders, set by the caller */
+    bool b_dump_shaders;
+
     /* Function pointer to the shader init command, set by the caller, see
      * opengl_fragment_shader_init() documentation. */
     GLuint (*pf_fragment_shader_init)(opengl_tex_converter_t *, GLenum,
