@@ -87,10 +87,10 @@ static tt_time_t tt_ParseTime( const char *s )
     char c = 0;
 
     /* Clock time */
-    if( sscanf( s, "%u:%u:%u%c%u",     &h1, &m1, &s1, &c, &d1 ) == 5 ||
-                         tt_ScanReset( &h1, &m1, &s1, &c, &d1 )      ||
-        sscanf( s, "%u:%u:%u",         &h1, &m1, &s1          ) == 3 ||
-                         tt_ScanReset( &h1, &m1, &s1, &c, &d1 ) )
+    if( sscanf( s, "%u:%2u:%2u%c%u",     &h1, &m1, &s1, &c, &d1 ) == 5 ||
+                           tt_ScanReset( &h1, &m1, &s1, &c, &d1 )      ||
+        sscanf( s, "%u:%2u:%2u",         &h1, &m1, &s1          ) == 3 ||
+                           tt_ScanReset( &h1, &m1, &s1, &c, &d1 ) )
     {
         t.base = CLOCK_FREQ * (h1 * 3600 + m1 * 60 + s1);
         if( c == '.' && d1 > 0 )
