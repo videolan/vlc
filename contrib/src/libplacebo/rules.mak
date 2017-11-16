@@ -28,6 +28,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/libplacebo/0002-build-fix-win32-build.patch
 endif
+	$(APPLY) $(SRC)/libplacebo/0003-osdep-explicitly-set-a-category-mask-for-newlocale.patch
 	$(MOVE)
 
 .libplacebo: libplacebo

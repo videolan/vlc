@@ -1,0 +1,32 @@
+From e0a1db693f38eb40437b1aaa81a72848ce02210b Mon Sep 17 00:00:00 2001
+From: ePirat <epirat07@gmail.com>
+Date: Thu, 16 Nov 2017 03:53:40 +0100
+Subject: [PATCH 3/3] osdep: explicitly set a category mask for newlocale
+
+While on Linux it works fine to not specify one, as Linux will fill all
+not given ones from the POSIX locale, on BSD using `xlocale.h` this does
+not work.
+
+When no base locale is given, BSD uses the current locale and fills not
+matching bitmasks with values from that one, not with values from the
+POSIX locale.
+---
+ src/osdep/printf_useloc_posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osdep/printf_useloc_posix.c b/src/osdep/printf_useloc_posix.c
+index 9bb1812..7ddc01f 100644
+--- a/src/osdep/printf_useloc_posix.c
++++ b/src/osdep/printf_useloc_posix.c
+@@ -31,7 +31,7 @@ static locale_t cloc;
+ 
+ void printf_c_init()
+ {
+-    cloc = newlocale(0, "C", (locale_t) 0);
++    cloc = newlocale(LC_NUMERIC_MASK, "C", (locale_t) 0);
+     if (!cloc)
+         abort();
+ }
+-- 
+2.11.0
+
