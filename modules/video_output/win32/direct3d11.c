@@ -55,7 +55,6 @@
 #include "common.h"
 
 #if !VLC_WINSTORE_APP
-# define D3D11CreateDevice(args...)             sys->OurD3D11CreateDevice(args)
 # define D3DCompile(args...)                    sys->OurD3DCompile(args)
 #endif
 
