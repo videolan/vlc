@@ -450,7 +450,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
 
         /* Copy from our cache to the destination */
         SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
-                    cache, w16, src_pitch, hblock, cpu);
+                    cache, w16, src_pitch / 2, hblock, cpu);
 
         /* */
         src  += src_pitch  * hblock;
