@@ -75,9 +75,9 @@ struct filter_sys_t
 
     HANDLE                         context_mutex;
     union {
-        ID3D11Texture2D            *outTexture;
-        ID3D11Resource             *outResource;
-    };
+        ID3D11Texture2D            *texture;
+        ID3D11Resource             *resource;
+    } out[PROCESSOR_SLICES];
     ID3D11VideoProcessorInputView  *procInput[PROCESSOR_SLICES];
     ID3D11VideoProcessorOutputView *procOutput[PROCESSOR_SLICES];
 };
@@ -269,8 +269,8 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                               p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
                                               p_outpic->p_sys->slice_index,
                                               0, 0, 0,
-                                              p_sys->outResource,
-                                              outputs[idx] == p_sys->procOutput[0] ? 1 : 0,
+                                              p_sys->out[outputs[idx] == p_sys->procOutput[0] ? 1 : 0].resource,
+                                              0,
                                               NULL);
 
     if( p_sys->context_mutex  != INVALID_HANDLE_VALUE )
@@ -478,12 +478,18 @@ static int Open(vlc_object_t *obj)
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
-    texDesc.ArraySize = PROCESSOR_SLICES;
+    texDesc.ArraySize = 1;
     texDesc.Height = dstDesc.Height;
     texDesc.Width = dstDesc.Width;
 
-    hr = ID3D11Device_CreateTexture2D( d3ddevice, &texDesc, NULL, &sys->outTexture );
+    hr = ID3D11Device_CreateTexture2D( d3ddevice, &texDesc, NULL, &sys->out[0].texture );
     if (FAILED(hr)) {
+        msg_Err(filter, "CreateTexture2D failed. (hr=0x%0lx)", hr);
+        goto error;
+    }
+    hr = ID3D11Device_CreateTexture2D( d3ddevice, &texDesc, NULL, &sys->out[1].texture );
+    if (FAILED(hr)) {
+        ID3D11Texture2D_Release(sys->out[0].texture);
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%0lx)", hr);
         goto error;
     }
@@ -502,9 +508,8 @@ static int Open(vlc_object_t *obj)
 
     for (int i=0; i<PROCESSOR_SLICES; i++)
     {
-        outDesc.Texture2DArray.FirstArraySlice = i;
         hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3dviddev,
-                                                             sys->outResource,
+                                                             sys->out[i].resource,
                                                              processorEnumerator,
                                                              &outDesc,
                                                              &sys->procOutput[i]);
@@ -514,9 +519,8 @@ static int Open(vlc_object_t *obj)
             goto error;
         }
 
-        inDesc.Texture2D.ArraySlice = i;
         hr = ID3D11VideoDevice_CreateVideoProcessorInputView(sys->d3dviddev,
-                                                             sys->outResource,
+                                                             sys->out[0].resource,
                                                              processorEnumerator,
                                                              &inDesc,
                                                              &sys->procInput[i]);
@@ -549,8 +553,10 @@ error:
             ID3D11VideoProcessorOutputView_Release(sys->procOutput[i]);
     }
 
-    if (sys->outTexture)
-        ID3D11Texture2D_Release(sys->outTexture);
+    if (sys->out[0].texture)
+        ID3D11Texture2D_Release(sys->out[0].texture);
+    if (sys->out[1].texture)
+        ID3D11Texture2D_Release(sys->out[1].texture);
     if (sys->videoProcessor)
         ID3D11VideoProcessor_Release(sys->videoProcessor);
     if (processorEnumerator)
@@ -581,7 +587,8 @@ static void Close(vlc_object_t *obj)
         ID3D11VideoProcessorInputView_Release(sys->procInput[i]);
         ID3D11VideoProcessorOutputView_Release(sys->procOutput[i]);
     }
-    ID3D11Texture2D_Release(sys->outTexture);
+    ID3D11Texture2D_Release(sys->out[0].texture);
+    ID3D11Texture2D_Release(sys->out[1].texture);
     ID3D11VideoProcessor_Release(sys->videoProcessor);
     ID3D11VideoProcessorEnumerator_Release(sys->procEnumerator);
     ID3D11VideoContext_Release(sys->d3dvidctx);
