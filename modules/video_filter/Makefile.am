@@ -120,8 +120,9 @@ libci_filters_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -miphoneos-version-min=9.0
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
-vlc_deinterlace_common_la_SOURCES = video_filter/deinterlace/common.c video_filter/deinterlace/common.h
-noinst_LTLIBRARIES += vlc_deinterlace_common.la
+libdeinterlace_common_la_SOURCES = video_filter/deinterlace/common.c video_filter/deinterlace/common.h
+libdeinterlace_common_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libdeinterlace_common.la
 
 libdeinterlace_plugin_la_SOURCES = \
 	video_filter/deinterlace/deinterlace.c video_filter/deinterlace/deinterlace.h \
@@ -144,7 +145,7 @@ if HAVE_ARM64
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm64.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM64
 endif
-libdeinterlace_plugin_la_LIBADD = vlc_deinterlace_common.la
+libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c

@@ -2,8 +2,9 @@ chromadir = $(pluginsdir)/video_chroma
 
 libchain_plugin_la_SOURCES = video_chroma/chain.c
 
-video_chroma_copy_la_SOURCES = video_chroma/copy.c video_chroma/copy.h
-noinst_LTLIBRARIES += video_chroma_copy.la
+libchroma_copy_la_SOURCES = video_chroma/copy.c video_chroma/copy.h
+libchroma_copy_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libchroma_copy.la
 
 libchroma_omx_plugin_la_SOURCES = video_chroma/omxdl.c
 libchroma_omx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OMXIP_CFLAGS)
@@ -27,12 +28,12 @@ libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c
 libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i420_nv12
-libi420_nv12_plugin_la_LIBADD = video_chroma_copy.la
+libi420_nv12_plugin_la_LIBADD = libchroma_copy.la
 
 libi420_10_p010_plugin_la_SOURCES = video_chroma/i420_10_p010.c
 libi420_10_p010_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i420_10_p010
-libi420_10_p010_plugin_la_LIBADD = video_chroma_copy.la
+libi420_10_p010_plugin_la_LIBADD = libchroma_copy.la
 
 libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
 
@@ -119,7 +120,7 @@ endif
 # DXVA2
 libdxa9_plugin_la_SOURCES = video_chroma/dxa9.c \
         video_chroma/d3d9_fmt.h
-libdxa9_plugin_la_LIBADD = video_chroma_copy.la
+libdxa9_plugin_la_LIBADD = libchroma_copy.la
 
 if HAVE_AVCODEC_DXVA2
 chroma_LTLIBRARIES += \
@@ -129,7 +130,7 @@ endif
 # D3D11VA
 libd3d11_surface_plugin_la_SOURCES = video_chroma/d3d11_surface.c \
 	video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
-libd3d11_surface_plugin_la_LIBADD = video_chroma_copy.la
+libd3d11_surface_plugin_la_LIBADD = libchroma_copy.la
 
 if HAVE_AVCODEC_D3D11VA
 chroma_LTLIBRARIES += \
