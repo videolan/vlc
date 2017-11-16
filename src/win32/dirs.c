@@ -52,6 +52,10 @@
 #include <windows.storage.h>
 #include <roapi.h>
 
+#ifndef CSIDL_LOCAL_APPDATA
+# define CSIDL_LOCAL_APPDATA 0x001C
+#endif
+
 static HRESULT WinRTSHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath)
 {
     VLC_UNUSED(hwnd);
