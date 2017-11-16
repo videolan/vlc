@@ -580,11 +580,10 @@ static void Close(vlc_object_t *object)
     free(vd->sys);
 }
 
-static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
-                            const video_format_t *fmt, unsigned pool_size,
-                            ID3D11Texture2D *textures[])
+static int AllocateTextures(vlc_object_t *obj, d3d11_handle_t *hd3d11,
+                            const d3d_format_t *cfg, const video_format_t *fmt,
+                            unsigned pool_size, ID3D11Texture2D *textures[])
 {
-    vout_display_sys_t *sys = vd->sys;
     plane_t planes[PICTURE_PLANE_MAX];
     int plane, plane_count;
     HRESULT hr;
@@ -612,7 +611,7 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
     if (cfg->formatTexture == DXGI_FORMAT_UNKNOWN) {
         if (p_chroma_desc->plane_count == 0)
         {
-            msg_Dbg(vd, "failed to get the pixel format planes for %4.4s", (char *)&fmt->i_chroma);
+            msg_Dbg(obj, "failed to get the pixel format planes for %4.4s", (char *)&fmt->i_chroma);
             return VLC_EGENERIC;
         }
         assert(p_chroma_desc->plane_count <= D3D11_MAX_SHADER_VIEW);
@@ -638,9 +637,9 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
         texDesc.Height = fmt->i_height;
         texDesc.Width = fmt->i_width;
 
-        hr = ID3D11Device_CreateTexture2D( sys->hd3d11.d3ddevice, &texDesc, NULL, &slicedTexture );
+        hr = ID3D11Device_CreateTexture2D( hd3d11->d3ddevice, &texDesc, NULL, &slicedTexture );
         if (FAILED(hr)) {
-            msg_Err(vd, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+            msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
             goto error;
         }
     }
@@ -654,9 +653,9 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
             } else {
                 texDesc.Height = planes[plane].i_lines;
                 texDesc.Width = planes[plane].i_pitch;
-                hr = ID3D11Device_CreateTexture2D( sys->hd3d11.d3ddevice, &texDesc, NULL, &textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] );
+                hr = ID3D11Device_CreateTexture2D( hd3d11->d3ddevice, &texDesc, NULL, &textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] );
                 if (FAILED(hr)) {
-                    msg_Err(vd, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+                    msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
                     goto error;
                 }
             }
@@ -674,14 +673,14 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
 
     if (!is_d3d11_opaque(fmt->i_chroma) && cfg->formatTexture != DXGI_FORMAT_UNKNOWN) {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
-        hr = ID3D11DeviceContext_Map(sys->hd3d11.d3dcontext, (ID3D11Resource*)textures[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        hr = ID3D11DeviceContext_Map(hd3d11->d3dcontext, (ID3D11Resource*)textures[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( FAILED(hr) ) {
-            msg_Err(vd, "The texture cannot be mapped. (hr=0x%lX)", hr);
+            msg_Err(obj, "The texture cannot be mapped. (hr=0x%lX)", hr);
             goto error;
         }
-        ID3D11DeviceContext_Unmap(sys->hd3d11.d3dcontext, (ID3D11Resource*)textures[0], 0);
+        ID3D11DeviceContext_Unmap(hd3d11->d3dcontext, (ID3D11Resource*)textures[0], 0);
         if (mappedResource.RowPitch < p_chroma_desc->pixel_size * texDesc.Width) {
-            msg_Err( vd, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
+            msg_Err( obj, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
                      p_chroma_desc->pixel_size * texDesc.Width );
             goto error;
         }
@@ -729,7 +728,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
     if (sys->picQuadConfig->formatTexture != DXGI_FORMAT_UNKNOWN)
     {
-        if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures))
+        if (AllocateTextures(VLC_OBJECT(vd), &sys->hd3d11, sys->picQuadConfig, &surface_fmt, pool_size, textures))
             goto error;
 
         pictures = calloc(pool_size, sizeof(*pictures));
@@ -770,7 +769,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (!is_d3d11_opaque(surface_fmt.i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, 1, textures))
+        if (AllocateTextures(VLC_OBJECT(vd), &sys->hd3d11, sys->picQuadConfig, &surface_fmt, 1, textures))
             goto error;
 
         sys->picQuad.p_chroma_sampling = vlc_fourcc_GetChromaDescription( surface_fmt.i_chroma );
@@ -2943,7 +2942,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, sys->d3dregion_format, &r->fmt, 1, textures)) {
+            if (AllocateTextures(VLC_OBJECT(vd), &sys->hd3d11, sys->d3dregion_format, &r->fmt, 1, textures)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
