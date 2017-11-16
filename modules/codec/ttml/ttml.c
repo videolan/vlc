@@ -29,6 +29,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "ttml.h"
 
@@ -95,7 +96,7 @@ static tt_time_t tt_ParseTime( const char *s )
         if( c == '.' && d1 > 0 )
         {
             unsigned i_den = 1;
-            for( const char *p = strchr( s, '.' ) + 1; *p; p++ )
+            for( const char *p = strchr( s, '.' ) + 1; *p && (i_den < UINT_MAX / 10); p++ )
                 i_den *= 10;
             t.base += CLOCK_FREQ * d1 / i_den;
         }
