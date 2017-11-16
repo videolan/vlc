@@ -263,8 +263,7 @@ libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlac
         video_chroma/d3d9_fmt.h
 libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM) libdeinterlace_common.la
 libdirect3d9_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libdirect3d9_adjust_plugin_la_SOURCES = video_output/win32/d3d9_adjust.c \
-  video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
+libdirect3d9_adjust_plugin_la_SOURCES = video_output/win32/d3d9_adjust.c
 libdirect3d9_adjust_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_adjust_plugin_la_LIBADD = $(LIBCOM)
 if HAVE_WIN32_DESKTOP
@@ -274,11 +273,10 @@ EXTRA_LTLIBRARIES += libdirect3d9_plugin.la libdirect3d9_deinterlace_plugin.la l
 endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
- video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
  video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11
-libdirect3d11_plugin_la_LIBADD = libchroma_copy.la $(LIBCOM) -luuid
+libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
 if !HAVE_WINSTORE
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \
@@ -292,13 +290,12 @@ libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
-libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c \
-  video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
+libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c
 libdirect3d11_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libdirect3d11_deinterlace_plugin_la_LIBADD = libdeinterlace_common.la
-libdirect3d11_adjust_plugin_la_SOURCES = video_output/win32/d3d11_adjust.c \
-  video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
+libdirect3d11_deinterlace_plugin_la_LIBADD = libdeinterlace_common.la libd3d11_common.la
+libdirect3d11_adjust_plugin_la_SOURCES = video_output/win32/d3d11_adjust.c
 libdirect3d11_adjust_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libdirect3d11_adjust_plugin_la_LIBADD = libd3d11_common.la
 video_filter_LTLIBRARIES += $(LTLIBdirect3d11_deinterlace) $(LTLIBdirect3d11_adjust)
 EXTRA_LTLIBRARIES += libdirect3d11_deinterlace_plugin.la libdirect3d11_adjust_plugin.la
 

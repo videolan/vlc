@@ -128,9 +128,8 @@ chroma_LTLIBRARIES += \
 endif
 
 # D3D11VA
-libd3d11_surface_plugin_la_SOURCES = video_chroma/d3d11_surface.c \
-	video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
-libd3d11_surface_plugin_la_LIBADD = libchroma_copy.la
+libd3d11_surface_plugin_la_SOURCES = video_chroma/d3d11_surface.c
+libd3d11_surface_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la
 
 if HAVE_AVCODEC_D3D11VA
 chroma_LTLIBRARIES += \

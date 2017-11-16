@@ -34,8 +34,9 @@
 #include <vlc_picture.h>
 #include <vlc_modules.h>
 
-#include "copy.h"
+#include <assert.h>
 
+#include "copy.h"
 
 #include <windows.h>
 #define COBJMACROS
