@@ -59,6 +59,12 @@ picture_sys_t *ActivePictureSys(picture_t *p_pic);
  * (ie not DXGI_FORMAT_UNKNWON) */
 #define KNOWN_DXGI_INDEX   0
 
+static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
+{
+    return chroma == VLC_CODEC_D3D11_OPAQUE ||
+           chroma == VLC_CODEC_D3D11_OPAQUE_10B;
+}
+
 void AcquirePictureSys(picture_sys_t *p_sys);
 
 void ReleasePictureSys(picture_sys_t *p_sys);
@@ -91,5 +97,9 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
                                                   uint8_t bits_per_channel,
                                                   bool allow_opaque,
                                                   UINT supportFlags);
+
+int AllocateTextures(vlc_object_t *obj, d3d11_handle_t *hd3d11,
+                     const d3d_format_t *cfg, const video_format_t *fmt,
+                     unsigned pool_size, ID3D11Texture2D *textures[]);
 
 #endif /* include-guard */
