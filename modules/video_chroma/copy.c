@@ -33,6 +33,18 @@
 
 #include "copy.h"
 
+#define ASSERT_PLANE(i) assert(src[i]); \
+    assert(src_pitch[i])
+
+#define ASSERT_2PLANES \
+    assert(dst); \
+    ASSERT_PLANE(0); \
+    ASSERT_PLANE(1); \
+    assert(height)
+
+#define ASSERT_3PLANES ASSERT_2PLANES; \
+    ASSERT_PLANE(2)
+
 int CopyInitCache(copy_cache_t *cache, unsigned width)
 {
 #ifdef CAN_COMPILE_SSE2
@@ -556,6 +568,7 @@ void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
                       const size_t src_pitch[static 2], unsigned height,
                       const copy_cache_t *cache)
 {
+    ASSERT_2PLANES;
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
@@ -575,6 +588,7 @@ void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
                      const size_t src_pitch[static 2], unsigned height,
                      const copy_cache_t *cache)
 {
+    ASSERT_2PLANES;
 #ifdef CAN_COMPILE_SSE2
     unsigned    cpu = vlc_CPU();
 
@@ -595,6 +609,7 @@ void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
                      const size_t src_pitch[static 3], unsigned height,
                      const copy_cache_t *cache)
 {
+    ASSERT_3PLANES;
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
@@ -674,6 +689,7 @@ void Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
                     const size_t src_pitch[static 3], unsigned height,
                     const copy_cache_t *cache)
 {
+    ASSERT_3PLANES;
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
