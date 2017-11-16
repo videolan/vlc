@@ -366,29 +366,30 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     /* Basic vertex shader */
     static const char *template =
         "#version %u\n"
-        "varying vec2 TexCoord0;attribute vec4 MultiTexCoord0;"
+        "varying vec2 TexCoord0;\n"
+        "attribute vec4 MultiTexCoord0;\n"
         "%s%s"
-        "attribute vec3 VertexPosition;"
-        "uniform mat4 OrientationMatrix;"
-        "uniform mat4 ProjectionMatrix;"
-        "uniform mat4 XRotMatrix;"
-        "uniform mat4 YRotMatrix;"
-        "uniform mat4 ZRotMatrix;"
-        "uniform mat4 ZoomMatrix;"
-        "void main() {"
-        " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;"
+        "attribute vec3 VertexPosition;\n"
+        "uniform mat4 OrientationMatrix;\n"
+        "uniform mat4 ProjectionMatrix;\n"
+        "uniform mat4 XRotMatrix;\n"
+        "uniform mat4 YRotMatrix;\n"
+        "uniform mat4 ZRotMatrix;\n"
+        "uniform mat4 ZoomMatrix;\n"
+        "void main() {\n"
+        " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
+        " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
-        "varying vec2 TexCoord1;attribute vec4 MultiTexCoord1;" : "";
+        "varying vec2 TexCoord1;\nattribute vec4 MultiTexCoord1;\n" : "";
     const char *coord1_code = plane_count > 1 ?
-        " TexCoord1 = vec4(OrientationMatrix * MultiTexCoord1).st;" : "";
+        " TexCoord1 = vec4(OrientationMatrix * MultiTexCoord1).st;\n" : "";
     const char *coord2_header = plane_count > 2 ?
-        "varying vec2 TexCoord2;attribute vec4 MultiTexCoord2;" : "";
+        "varying vec2 TexCoord2;\nattribute vec4 MultiTexCoord2;\n" : "";
     const char *coord2_code = plane_count > 2 ?
-        " TexCoord2 = vec4(OrientationMatrix * MultiTexCoord2).st;" : "";
+        " TexCoord2 = vec4(OrientationMatrix * MultiTexCoord2).st;\n" : "";
 
     char *code;
     if (asprintf(&code, template, tc->glsl_version, coord1_header, coord2_header,
