@@ -56,6 +56,13 @@ void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
                      const size_t src_pitch[static 2], unsigned height,
                      const copy_cache_t *cache);
 
+void Copy420_16_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
+                     const size_t src_pitch[static 3], unsigned height,
+                     const copy_cache_t *cache);
+
+void Copy420_16_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
+                        const size_t src_pitch[static 2], unsigned height,
+                        const copy_cache_t *cache);
 
 /* XXX: Not optimized copy (no SEE) */
 void CopyFromI420_10ToP010(picture_t *dst, const uint8_t *src[static 3],

@@ -191,7 +191,7 @@ static void
 SSE_InterleaveUV(uint8_t *dst, size_t dst_pitch,
                  uint8_t *srcu, size_t srcu_pitch,
                  uint8_t *srcv, size_t srcv_pitch,
-                 unsigned int width, unsigned int height,
+                 unsigned int width, unsigned int height, uint8_t pixel_size,
                  unsigned int cpu)
 {
     assert(!((intptr_t)srcu & 0xf) && !(srcu_pitch & 0x0f) &&
@@ -201,14 +201,19 @@ SSE_InterleaveUV(uint8_t *dst, size_t dst_pitch,
     VLC_UNUSED(cpu);
 #endif
 
-    uint8_t const       shuffle[] = { 0, 8,
-                                      1, 9,
-                                      2, 10,
-                                      3, 11,
-                                      4, 12,
-                                      5, 13,
-                                      6, 14,
-                                      7, 15 };
+    static const uint8_t shuffle_8[] = { 0, 8,
+                                         1, 9,
+                                         2, 10,
+                                         3, 11,
+                                         4, 12,
+                                         5, 13,
+                                         6, 14,
+                                         7, 15 };
+    static const uint8_t shuffle_16[] = { 0, 1, 8, 9,
+                                          2, 3, 10, 11,
+                                          4, 5, 12, 13,
+                                          6, 7, 14, 15 };
+    const uint8_t *shuffle = pixel_size == 1 ? shuffle_8 : shuffle_16;
 
     for (unsigned int y = 0; y < height; ++y)
     {
@@ -254,6 +259,7 @@ SSE_InterleaveUV(uint8_t *dst, size_t dst_pitch,
 #endif
 
         {
+            assert(pixel_size == 1);
             for (x = 0; x < (width & ~31); x += 32)
                 asm volatile
                     (
@@ -279,10 +285,21 @@ SSE_InterleaveUV(uint8_t *dst, size_t dst_pitch,
 #undef LOAD2X32
 #undef STORE64
 
-        for (; x < width; ++x)
+        if (pixel_size == 1)
         {
-            dst[2*x+0] = srcu[x];
-            dst[2*x+1] = srcv[x];
+            for (; x < width; x++) {
+                dst[2*x+0] = srcu[x];
+                dst[2*x+1] = srcv[x];
+            }
+        }
+        else
+        {
+            for (; x < width; x+= 2) {
+                dst[2*x+0] = srcu[x];
+                dst[2*x+1] = srcu[x + 1];
+                dst[2*x+2] = srcv[x];
+                dst[2*x+3] = srcv[x + 1];
+            }
         }
         srcu += srcu_pitch;
         srcv += srcv_pitch;
@@ -294,20 +311,14 @@ VLC_SSE
 static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
                         uint8_t *dstv, size_t dstv_pitch,
                         const uint8_t *src, size_t src_pitch,
-                        unsigned width, unsigned height, unsigned cpu)
+                        unsigned width, unsigned height, uint8_t pixel_size,
+                        unsigned cpu)
 {
 #if defined(__SSSE3__) || !defined (CAN_COMPILE_SSSE3)
     VLC_UNUSED(cpu);
 #endif
-    const uint8_t shuffle[] = { 0, 2, 4, 6, 8, 10, 12, 14,
-                                1, 3, 5, 7, 9, 11, 13, 15 };
-    const uint8_t mask[] = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
-                             0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
-
+    assert(pixel_size == 1 || pixel_size == 2);
     assert(((intptr_t)src & 0xf) == 0 && (src_pitch & 0x0f) == 0);
-
-    for (unsigned y = 0; y < height; y++) {
-        unsigned x = 0;
 
 #define LOAD64 \
     "movdqa  0(%[src]), %%xmm0\n" \
@@ -326,9 +337,16 @@ static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
     "movhpd %%xmm3,  24(%[dst2])\n"
 
 #ifdef CAN_COMPILE_SSSE3
-        if (vlc_CPU_SSSE3())
-        {
-            for (x = 0; x < (width & ~31); x += 32) {
+    if (vlc_CPU_SSSE3())
+    {
+        static const uint8_t shuffle_8[] = { 0, 2, 4, 6, 8, 10, 12, 14,
+                                             1, 3, 5, 7, 9, 11, 13, 15 };
+        static const uint8_t shuffle_16[] = {  0,  1,  4,  5,  8,  9, 12, 13,
+                                               2,  3,  6,  7, 10, 11, 14, 15 };
+        const uint8_t *shuffle = pixel_size == 1 ? shuffle_8 : shuffle_16;
+        for (unsigned y = 0; y < height; y++) {
+            unsigned x = 0;
+            for (; x < (width & ~31); x += 32) {
                 asm volatile (
                     "movdqu (%[shuffle]), %%xmm7\n"
                     LOAD64
@@ -339,10 +357,37 @@ static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
                     STORE2X32
                     : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]), [src]"r"(&src[2*x]), [shuffle]"r"(shuffle) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm7");
             }
-        } else
+            if (pixel_size == 1)
+            {
+                for (; x < width; x++) {
+                    dstu[x] = src[2*x+0];
+                    dstv[x] = src[2*x+1];
+                }
+            }
+            else
+            {
+                for (; x < width; x+= 2) {
+                    dstu[x] = src[2*x+0];
+                    dstu[x+1] = src[2*x+1];
+                    dstv[x] = src[2*x+2];
+                    dstv[x+1] = src[2*x+3];
+                }
+            }
+            src  += src_pitch;
+            dstu += dstu_pitch;
+            dstv += dstv_pitch;
+        }
+    } else
 #endif
+    {
+        assert(pixel_size == 1);
+        static const uint8_t mask[] = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
+                                        0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
+
+        for (unsigned y = 0; y < height; y++)
         {
-            for (x = 0; x < (width & ~31); x += 32) {
+            unsigned x = 0;
+            for (; x < (width & ~31); x += 32) {
                 asm volatile (
                     "movdqu (%[mask]), %%xmm7\n"
                     LOAD64
@@ -364,18 +409,17 @@ static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
                     STORE2X32
                     : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
             }
+            for (; x < width; x++) {
+                dstu[x] = src[2*x+0];
+                dstv[x] = src[2*x+1];
+            }
+            src  += src_pitch;
+            dstu += dstu_pitch;
+            dstv += dstv_pitch;
         }
+    }
 #undef STORE2X32
 #undef LOAD64
-
-        for (; x < width; x++) {
-            dstu[x] = src[2*x+0];
-            dstv[x] = src[2*x+1];
-        }
-        src  += src_pitch;
-        dstu += dstu_pitch;
-        dstv += dstv_pitch;
-    }
 }
 
 static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
@@ -414,8 +458,7 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
                      const uint8_t *srcu, size_t srcu_pitch,
                      const uint8_t *srcv, size_t srcv_pitch,
                      uint8_t *cache, size_t cache_size,
-                     unsigned int height,
-                     unsigned int cpu)
+                     unsigned int height, uint8_t pixel_size, unsigned int cpu)
 {
     assert(srcu_pitch == srcv_pitch);
     unsigned int const  w16 = (srcu_pitch+15) & ~15;
@@ -434,7 +477,8 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
 
         /* Copy from our cache to the destination */
         SSE_InterleaveUV(dst, dst_pitch, cache, w16,
-                         cache+w16*hblock, w16, srcu_pitch, hblock, cpu);
+                         cache+w16*hblock, w16, srcu_pitch, hblock, pixel_size,
+                         cpu);
 
         /* */
         srcu += hblock * srcu_pitch;
@@ -447,7 +491,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
                             uint8_t *dstv, size_t dstv_pitch,
                             const uint8_t *src, size_t src_pitch,
                             uint8_t *cache, size_t cache_size,
-                            unsigned height, unsigned cpu)
+                            unsigned height, uint8_t pixel_size, unsigned cpu)
 {
     const unsigned w16 = (src_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
@@ -462,7 +506,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
 
         /* Copy from our cache to the destination */
         SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
-                    cache, w16, src_pitch / 2, hblock, cpu);
+                    cache, w16, src_pitch / 2, hblock, pixel_size, cpu);
 
         /* */
         src  += src_pitch  * hblock;
@@ -504,7 +548,8 @@ static void SSE_Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
 static void
 SSE_Copy420_SP_to_P(picture_t *dest, const uint8_t *src[static 2],
                     const size_t src_pitch[static 2], unsigned int height,
-                    const copy_cache_t *cache, unsigned int cpu)
+                    const copy_cache_t *cache, uint8_t pixel_size,
+                    unsigned int cpu)
 {
     SSE_CopyPlane(dest->p[0].p_pixels, dest->p[0].i_pitch,
                   src[0], src_pitch[0], cache->buffer, cache->size,
@@ -512,14 +557,14 @@ SSE_Copy420_SP_to_P(picture_t *dest, const uint8_t *src[static 2],
     SSE_SplitPlanes(dest->p[1].p_pixels, dest->p[1].i_pitch,
                     dest->p[2].p_pixels, dest->p[2].i_pitch,
                     src[1], src_pitch[1], cache->buffer, cache->size,
-                    height / 2, cpu);
+                    height / 2, pixel_size, cpu);
     asm volatile ("emms");
 }
 
 static void SSE_Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
                                 const size_t src_pitch[static 3],
                                 unsigned height, const copy_cache_t *cache,
-                                unsigned cpu)
+                                uint8_t pixel_size, unsigned cpu)
 {
     SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
                   src[0], src_pitch[0],
@@ -528,7 +573,7 @@ static void SSE_Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
     SSE_InterleavePlanes(dst->p[1].p_pixels, dst->p[1].i_pitch,
                          src[U_PLANE], src_pitch[U_PLANE],
                          src[V_PLANE], src_pitch[V_PLANE],
-                         cache->buffer, cache->size, height / 2, cpu);
+                         cache->buffer, cache->size, height / 2, pixel_size, cpu);
     asm volatile ("emms");
 }
 #undef COPY64
@@ -545,22 +590,6 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch,
         memcpy(dst, src, src_pitch);
         src += src_pitch;
         dst += dst_pitch;
-    }
-}
-
-static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
-                        uint8_t *dstv, size_t dstv_pitch,
-                        const uint8_t *src, size_t src_pitch,
-                        unsigned height)
-{
-    for (unsigned y = 0; y < height; y++) {
-        for (unsigned x = 0; x < src_pitch / 2; x++) {
-            dstu[x] = src[2*x+0];
-            dstv[x] = src[2*x+1];
-        }
-        src  += src_pitch;
-        dstu += dstu_pitch;
-        dstv += dstv_pitch;
     }
 }
 
@@ -584,6 +613,32 @@ void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
               src[1], src_pitch[1], height/2);
 }
 
+#define SPLIT_PLANES(type, pitch_den) do { \
+    for (unsigned y = 0; y < height; y++) { \
+        for (unsigned x = 0; x < src_pitch / pitch_den; x++) { \
+            ((type *) dstu)[x] = ((const type *) src)[2*x+0]; \
+            ((type *) dstv)[x] = ((const type *) src)[2*x+1]; \
+        } \
+        src  += src_pitch; \
+        dstu += dstu_pitch; \
+        dstv += dstv_pitch; \
+    } \
+} while(0)
+
+static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
+                        uint8_t *dstv, size_t dstv_pitch,
+                        const uint8_t *src, size_t src_pitch, unsigned height)
+{
+    SPLIT_PLANES(uint8_t, 2);
+}
+
+static void SplitPlanes16(uint8_t *dstu, size_t dstu_pitch,
+                          uint8_t *dstv, size_t dstv_pitch,
+                          const uint8_t *src, size_t src_pitch, unsigned height)
+{
+    SPLIT_PLANES(uint16_t, 4);
+}
+
 void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
                      const size_t src_pitch[static 2], unsigned height,
                      const copy_cache_t *cache)
@@ -593,7 +648,7 @@ void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
     unsigned    cpu = vlc_CPU();
 
     if (vlc_CPU_SSE2())
-        return SSE_Copy420_SP_to_P(dst, src, src_pitch, height, cache, cpu);
+        return SSE_Copy420_SP_to_P(dst, src, src_pitch, height, cache, 1, cpu);
 #else
     VLC_UNUSED(cache);
 #endif
@@ -605,6 +660,39 @@ void Copy420_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
                 src[1], src_pitch[1], height/2);
 }
 
+void Copy420_16_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
+                        const size_t src_pitch[static 2], unsigned height,
+                        const copy_cache_t *cache)
+{
+    ASSERT_2PLANES;
+#ifdef CAN_COMPILE_SSE3
+    unsigned    cpu = vlc_CPU();
+
+    if (vlc_CPU_SSE3())
+        return SSE_Copy420_SP_to_P(dst, src, src_pitch, height, cache, 2, cpu);
+#else
+    VLC_UNUSED(cache);
+#endif
+
+    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+              src[0], src_pitch[0], height);
+    SplitPlanes16(dst->p[1].p_pixels, dst->p[1].i_pitch,
+                  dst->p[2].p_pixels, dst->p[2].i_pitch,
+                  src[1], src_pitch[1], height/2);
+}
+
+#define INTERLEAVE_UV() do { \
+    for ( unsigned int line = 0; line < copy_lines; line++ ) { \
+        for ( unsigned int col = 0; col < copy_pitch; col++ ) { \
+            *dstUV++ = *srcU++; \
+            *dstUV++ = *srcV++; \
+        } \
+        dstUV += i_extra_pitch_uv; \
+        srcU  += i_extra_pitch_u; \
+        srcV  += i_extra_pitch_v; \
+    } \
+}while(0)
+
 void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
                      const size_t src_pitch[static 3], unsigned height,
                      const copy_cache_t *cache)
@@ -613,7 +701,7 @@ void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_Copy420_P_to_SP(dst, src, src_pitch, height, cache, cpu);
+        return SSE_Copy420_P_to_SP(dst, src, src_pitch, height, cache, 1, cpu);
 #else
     (void) cache;
 #endif
@@ -631,17 +719,36 @@ void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
     uint8_t *dstUV = dst->p[1].p_pixels;
     const uint8_t *srcU  = src[U_PLANE];
     const uint8_t *srcV  = src[V_PLANE];
-    for ( unsigned int line = 0; line < copy_lines; line++ )
-    {
-        for ( unsigned int col = 0; col < copy_pitch; col++ )
-        {
-            *dstUV++ = *srcU++;
-            *dstUV++ = *srcV++;
-        }
-        dstUV += i_extra_pitch_uv;
-        srcU  += i_extra_pitch_u;
-        srcV  += i_extra_pitch_v;
-    }
+    INTERLEAVE_UV();
+}
+
+void Copy420_16_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
+                        const size_t src_pitch[static 3], unsigned height,
+                        const copy_cache_t *cache)
+{
+    ASSERT_3PLANES;
+#ifdef CAN_COMPILE_SSE2
+    unsigned cpu = vlc_CPU();
+    if (vlc_CPU_SSE3())
+        return SSE_Copy420_P_to_SP(dst, src, src_pitch, height, cache, 2, cpu);
+#else
+    (void) cache;
+#endif
+
+    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+              src[0], src_pitch[0], height);
+
+    const unsigned copy_lines = height / 2;
+    const unsigned copy_pitch = src_pitch[1] / 2;
+
+    const int i_extra_pitch_uv = dst->p[1].i_pitch / 2 - 2 * copy_pitch;
+    const int i_extra_pitch_u  = src_pitch[U_PLANE] / 2 - copy_pitch;
+    const int i_extra_pitch_v  = src_pitch[V_PLANE] / 2 - copy_pitch;
+
+    uint16_t *dstUV = (void*) dst->p[1].p_pixels;
+    const uint16_t *srcU  = (const uint16_t *) src[U_PLANE];
+    const uint16_t *srcV  = (const uint16_t *) src[V_PLANE];
+    INTERLEAVE_UV();
 }
 
 void CopyFromI420_10ToP010(picture_t *dst, const uint8_t *src[static 3],
