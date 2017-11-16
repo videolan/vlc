@@ -149,3 +149,19 @@ endif
 libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libcvpx_plugin.la
 chroma_LTLIBRARIES += $(LTLIBcvpx)
+
+# Tests
+chroma_copy_sse_test_SOURCES = $(libchroma_copy_la_SOURCES)
+chroma_copy_sse_test_CFLAGS = -DCOPY_TEST
+chroma_copy_sse_test_LDADD = ../src/libvlccore.la
+
+chroma_copy_test_SOURCES = $(libchroma_copy_la_SOURCES)
+chroma_copy_test_CFLAGS = -DCOPY_TEST -DCOPY_TEST_NOOTPIM
+chroma_copy_test_LDADD = ../src/libvlccore.la
+
+if HAVE_SSE2
+check_PROGRAMS += chroma_copy_sse_test
+TESTS += chroma_copy_sse_test
+endif
+check_PROGRAMS += chroma_copy_test
+TESTS += chroma_copy_test

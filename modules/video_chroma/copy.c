@@ -106,6 +106,15 @@ void CopyCleanCache(copy_cache_t *cache)
 # define vlc_CPU_SSE2() ((cpu & VLC_CPU_SSE2) != 0)
 #endif
 
+#ifdef COPY_TEST_NOOTPIM
+# undef vlc_CPU_SSE4_1
+# define vlc_CPU_SSE4_1() (0)
+# undef vlc_CPU_SSE3
+# define vlc_CPU_SSE3() (0)
+# undef vlc_CPU_SSE2
+# define vlc_CPU_SSE2() (0)
+#endif
+
 /* Optimized copy from "Uncacheable Speculative Write Combining" memory
  * as used by some video surface.
  * XXX It is really efficient only when SSE4.1 is available.
@@ -876,3 +885,223 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
     }
     return VLC_SUCCESS;
 }
+
+#ifdef COPY_TEST
+# undef NDEBUG
+
+#include <vlc_picture.h>
+
+struct test_dst
+{
+    vlc_fourcc_t chroma;
+    void (*conv)(picture_t *, const uint8_t *[], const size_t [], unsigned,
+                 const copy_cache_t *);
+};
+
+struct test_conv
+{
+    vlc_fourcc_t src_chroma;
+    struct test_dst dsts[3];
+};
+
+static const struct test_conv convs[] = {
+    { .src_chroma = VLC_CODEC_NV12,
+      .dsts = { { VLC_CODEC_I420, Copy420_SP_to_P },
+                { VLC_CODEC_NV12, Copy420_SP_to_SP } },
+    },
+    { .src_chroma = VLC_CODEC_I420,
+      .dsts = { { VLC_CODEC_I420, Copy420_P_to_P },
+                { VLC_CODEC_NV12, Copy420_P_to_SP } },
+    },
+    { .src_chroma = VLC_CODEC_P010,
+      .dsts = { { VLC_CODEC_I420_10B, Copy420_16_SP_to_P } },
+    },
+    { .src_chroma = VLC_CODEC_I420_10B,
+      .dsts = { { VLC_CODEC_P010, Copy420_16_P_to_SP } },
+    },
+};
+#define NB_CONVS ARRAY_SIZE(convs)
+
+struct test_size
+{
+    int i_width;
+    int i_height;
+    int i_visible_width;
+    int i_visible_height;
+};
+static const struct test_size sizes[] = {
+    { 1, 1, 1, 1 },
+    { 3, 3, 3, 3 },
+    { 65, 39, 65, 39 },
+    { 560, 369, 540, 350 },
+    { 1274, 721, 1200, 720 },
+    { 1920, 1088, 1920, 1080 },
+    { 3840, 2160, 3840, 2160 },
+#if 0 /* too long */
+    { 8192, 8192, 8192, 8192 },
+#endif
+};
+#define NB_SIZES ARRAY_SIZE(sizes)
+
+static void piccheck(picture_t *pic, const vlc_chroma_description_t *dsc,
+                     bool init)
+{
+#define ASSERT_COLOR() do { \
+    fprintf(stderr, "error: pixel doesn't match @ plane: %d: %d x %d: %X\n", i, x, y, *(--p)); \
+    assert(!"error: pixel doesn't match"); \
+} while(0)
+
+#define PICCHECK(type_u, type_uv, colors_P, color_UV, pitch_den) do { \
+    for (int i = 0; i < pic->i_planes; ++i) \
+    { \
+        const struct plane_t *plane = &pic->p[i]; \
+        for (int y = 0; y < plane->i_visible_lines; ++y) \
+        { \
+            if (pic->i_planes == 2 && i == 1) \
+            { \
+                type_uv *p = (type_uv *)&plane->p_pixels[y * plane->i_pitch]; \
+                for (int x = 0; x < plane->i_visible_pitch / 2 / pitch_den; ++x) \
+                    if (init) \
+                        *(p++) = color_UV; \
+                    else if (*(p++) != color_UV) \
+                        ASSERT_COLOR(); \
+            } \
+            else \
+            { \
+                type_u *p = (type_u *) &plane->p_pixels[y * plane->i_pitch]; \
+                for (int x = 0; x < plane->i_visible_pitch / pitch_den; ++x) \
+                    if (init) \
+                        *(p++) = colors_P[i]; \
+                    else if (*(p++) != colors_P[i]) \
+                        ASSERT_COLOR(); \
+            } \
+        } \
+    } \
+} while (0)
+
+    assert(pic->i_planes == 2 || pic->i_planes == 3);
+    const uint8_t colors_8_P[3] = { 0x42, 0xF1, 0x36 };
+    const uint16_t color_8_UV = 0x36F1;
+
+    const uint16_t colors_16_P[3] = { 0x4210, 0x14F1, 0x4536 };
+    const uint32_t color_16_UV = 0x453614F1;
+
+    assert(dsc->pixel_size == 1 || dsc->pixel_size == 2);
+    if (dsc->pixel_size == 1)
+        PICCHECK(uint8_t, uint16_t, colors_8_P, color_8_UV, 1);
+    else
+        PICCHECK(uint16_t, uint32_t, colors_16_P, color_16_UV, 2);
+}
+
+static void pic_rsc_destroy(picture_t *pic)
+{
+    for (unsigned i = 0; i < 3; i++)
+        free(pic->p[i].p_pixels);
+    free(pic);
+}
+
+static picture_t *pic_new_unaligned(const video_format_t *fmt)
+{
+    /* Allocate a no-aligned picture in order to ease buffer overflow detection
+     * from the source picture */
+    const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+    assert(dsc);
+    picture_resource_t rsc = { .pf_destroy = pic_rsc_destroy };
+    for (unsigned i = 0; i < dsc->plane_count; i++)
+    {
+        rsc.p[i].i_lines = ((fmt->i_visible_height + 1) & ~ 1) * dsc->p[i].h.num / dsc->p[i].h.den;
+        rsc.p[i].i_pitch = ((fmt->i_visible_width + 1) & ~ 1) * dsc->pixel_size * dsc->p[i].w.num / dsc->p[i].w.den;
+        rsc.p[i].p_pixels = malloc(rsc.p[i].i_lines * rsc.p[i].i_pitch);
+        assert(rsc.p[i].p_pixels);
+    }
+    return picture_NewFromResource(fmt, &rsc);
+}
+
+int main(void)
+{
+    unsigned cpu = vlc_CPU();
+#if defined (COPY_TEST_SSE4)
+    if (!vlc_CPU_SSE4_1())
+    {
+        fprintf(stderr, "WARNING: could not test SSE4\n");
+        return 0;
+    }
+#elif defined (COPY_TEST_SSE3)
+    if (!vlc_CPU_SSSE3())
+    {
+        fprintf(stderr, "WARNING: could not test SSSE3\n");
+        return 0;
+    }
+#elif defined (COPY_TEST_SSE2)
+    if (!vlc_CPU_SSE2())
+    {
+        fprintf(stderr, "WARNING: could not test SSE2\n");
+        return 0;
+    }
+#endif
+
+    alarm(10);
+
+    for (size_t i = 0; i < NB_CONVS; ++i)
+    {
+        const struct test_conv *conv = &convs[i];
+
+        for (size_t j = 0; j < NB_SIZES; ++j)
+        {
+            const struct test_size *size = &sizes[j];
+
+            const vlc_chroma_description_t *src_dsc =
+                vlc_fourcc_GetChromaDescription(conv->src_chroma);
+            assert(src_dsc);
+
+            video_format_t fmt;
+            video_format_Init(&fmt, 0);
+            video_format_Setup(&fmt, conv->src_chroma,
+                               size->i_width, size->i_height,
+                               size->i_visible_width, size->i_visible_height,
+                               1, 1);
+            picture_t *src = pic_new_unaligned(&fmt);
+            assert(src);
+            piccheck(src, src_dsc, true);
+
+            copy_cache_t cache;
+            int ret = CopyInitCache(&cache, src->format.i_width
+                                    * src_dsc->pixel_size);
+            assert(ret == VLC_SUCCESS);
+
+            for (size_t f = 0; conv->dsts[f].chroma != 0; ++f)
+            {
+                const struct test_dst *test_dst= &conv->dsts[f];
+
+                const vlc_chroma_description_t *dst_dsc =
+                    vlc_fourcc_GetChromaDescription(test_dst->chroma);
+                assert(dst_dsc);
+                fmt.i_chroma = test_dst->chroma;
+                picture_t *dst = picture_NewFromFormat(&fmt);
+                assert(dst);
+
+                const uint8_t * src_planes[3] = { src->p[Y_PLANE].p_pixels,
+                                                  src->p[U_PLANE].p_pixels,
+                                                  src->p[V_PLANE].p_pixels };
+                const size_t    src_pitches[3] = { src->p[Y_PLANE].i_pitch,
+                                                   src->p[U_PLANE].i_pitch,
+                                                   src->p[V_PLANE].i_pitch };
+
+                fprintf(stderr, "testing: %u x %u (vis: %u x %u) %4.4s -> %4.4s\n",
+                        size->i_width, size->i_height,
+                        size->i_visible_width, size->i_visible_height,
+                        (const char *) &src->format.i_chroma,
+                        (const char *) &dst->format.i_chroma);
+                test_dst->conv(dst, src_planes, src_pitches,
+                                src->format.i_visible_height, &cache);
+                piccheck(dst, dst_dsc, false);
+                picture_Release(dst);
+            }
+            picture_Release(src);
+            CopyCleanCache(&cache);
+        }
+    }
+    return 0;
+}
+
+#endif
