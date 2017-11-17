@@ -192,6 +192,11 @@ static int ActivateFilter( vlc_object_t *p_this )
     if( !p_filter->b_allow_fmt_out_change || p_filter->psz_name == NULL )
         return VLC_EGENERIC;
 
+    /* Force only one level of iteration when using the chain converter from a
+     * filter. */
+    var_Create( p_filter, MODULE_STRING "-level", VLC_VAR_INTEGER );
+    var_SetInteger( p_filter, MODULE_STRING "-level", CHAIN_LEVEL_MAX - 1 );
+
     /* Try to add a converter before the requested filter */
     return Activate( p_filter, BuildFilterChain );
 }
