@@ -1924,7 +1924,8 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                 {
                     if( p_pkt->i_buffer >= 4 + 2 + 5 )
                     {
-                        i_pcr = GetPCR( p_pkt );
+                        if( p_pmt->i_pid_pcr == i_pid )
+                            i_pcr = GetPCR( p_pkt );
                         i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
                     }
                 }
