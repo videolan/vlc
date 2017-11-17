@@ -1929,7 +1929,8 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                         i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
                     }
                 }
-                else
+
+                if( i_pcr == -1 )
                 {
                     mtime_t i_dts = -1;
                     mtime_t i_pts = -1;
