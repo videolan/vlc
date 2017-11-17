@@ -1127,7 +1127,10 @@ AH_BOTTOM([
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong])
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong], [CXXFLAGS])
   dnl Win32 requires linking to ssp for stack-protection
-  AS_IF([test "${SYS}" = "mingw32"], [ LDFLAGS="${LDFLAGS} -lssp -ladvapi32" ])
+  AS_IF([test "${SYS}" = "mingw32"], [
+      LDFLAGS="${LDFLAGS} -lssp"
+      AS_IF([test "${vlc_winstore_app}" != 1], [LDFLAGS="${LDFLAGS} -ladvapi32"])
+  ])
 ])
 
 VLC_SAVE_FLAGS
