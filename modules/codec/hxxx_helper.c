@@ -692,6 +692,22 @@ h264_helper_get_annexb_config(const struct hxxx_helper *hh)
 }
 
 block_t *
+hevc_helper_get_annexb_config(const struct hxxx_helper *hh)
+{
+    if (hh->hevc.i_vps_count == 0 || hh->hevc.i_sps_count == 0 ||
+        hh->hevc.i_pps_count == 0 )
+        return NULL;
+
+    const struct hxxx_helper_nal *pp_nal_lists[] = {
+        hh->hevc.vps_list, hh->hevc.sps_list, hh->hevc.pps_list };
+    const size_t p_nal_counts[] = { hh->hevc.i_vps_count, hh->hevc.i_sps_count,
+                                    hh->hevc.i_pps_count };
+    const size_t p_nal_maxs[] = { HEVC_VPS_ID_MAX+1, HEVC_SPS_ID_MAX+1, HEVC_PPS_ID_MAX+1 };
+
+    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 3 );
+}
+
+block_t *
 h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 {
     const struct hxxx_helper_nal *p_nal;

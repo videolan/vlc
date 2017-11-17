@@ -86,6 +86,7 @@ int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                           size_t i_extra);
 
 block_t *h264_helper_get_annexb_config(const struct hxxx_helper *hh);
+block_t *hevc_helper_get_annexb_config(const struct hxxx_helper *hh);
 
 block_t *h264_helper_get_avcc_config(const struct hxxx_helper *hh);
 
