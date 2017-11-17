@@ -397,6 +397,45 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 }
 
 static int
+helper_process_hvcC_hevc(struct hxxx_helper *hh, const uint8_t *p_buf,
+                         size_t i_buf)
+{
+    if (i_buf < HEVC_MIN_HVCC_SIZE)
+        return VLC_EGENERIC;
+
+    const uint8_t i_num_array = p_buf[22];
+    p_buf += 23; i_buf -= 23;
+
+    for( uint8_t i = 0; i < i_num_array; i++ )
+    {
+        if(i_buf < 3)
+            return VLC_EGENERIC;
+
+        const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
+        p_buf += 3; i_buf -= 3;
+
+        for( uint16_t j = 0; j < i_num_nalu; j++ )
+        {
+            if(i_buf < 2)
+                return VLC_EGENERIC;
+
+            const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
+            if(i_buf < (size_t)i_nalu_length + 2)
+                return VLC_EGENERIC;
+
+            bool foo;
+            hevc_helper_parse_nal( hh, &p_buf[0],
+                                   i_nalu_length + 2, 2, &foo );
+
+            p_buf += i_nalu_length + 2;
+            i_buf -= i_nalu_length + 2;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
 hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                       size_t i_extra)
 {
@@ -413,9 +452,6 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
             return VLC_EGENERIC;
         hh->b_is_xvcC = true;
 
-        if (hh->b_need_xvcC)
-            return VLC_SUCCESS;
-
         size_t i_buf;
         uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &i_buf,
                                                  NULL);
@@ -427,9 +463,10 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 
         hh->hevc.p_annexb_config_nal = p_buf;
         hh->hevc.i_annexb_config_nal = i_buf;
-        return VLC_SUCCESS;
+
+        return helper_process_hvcC_hevc( hh, p_extra, i_extra );
     }
-    else /* Can't handle extra that is not avcC */
+    else /* Can't handle extra that is not hvcC */
         return VLC_EGENERIC;
 }
 
