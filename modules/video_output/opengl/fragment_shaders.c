@@ -502,7 +502,7 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
 }
 
 #ifdef HAVE_LIBPLACEBO
-static struct pl_color_space pl_color_space_from_video_format(video_format_t fmt)
+static struct pl_color_space pl_color_space_from_video_format(const video_format_t *fmt)
 {
     static enum pl_color_primaries primaries[COLOR_PRIMARIES_MAX+1] = {
         [COLOR_PRIMARIES_UNDEF]     = PL_COLOR_PRIM_UNKNOWN,
@@ -529,13 +529,13 @@ static struct pl_color_space pl_color_space_from_video_format(video_format_t fmt
     };
 
     // Derive the signal peak/avg from the color light level metadata
-    float sig_peak = fmt.lighting.MaxCLL / PL_COLOR_REF_WHITE;
-    float sig_avg = fmt.lighting.MaxFALL / PL_COLOR_REF_WHITE;
+    float sig_peak = fmt->lighting.MaxCLL / PL_COLOR_REF_WHITE;
+    float sig_avg = fmt->lighting.MaxFALL / PL_COLOR_REF_WHITE;
 
     // As a fallback value for the signal peak, we can also use the mastering
     // metadata's luminance information
     if (!sig_peak)
-        sig_peak = fmt.mastering.max_luminance / PL_COLOR_REF_WHITE;
+        sig_peak = fmt->mastering.max_luminance / PL_COLOR_REF_WHITE;
 
     // Sanitize the sig_peak/sig_avg, because of buggy or low quality tagging
     // that's sadly common in lots of typical sources
@@ -543,8 +543,8 @@ static struct pl_color_space pl_color_space_from_video_format(video_format_t fmt
     sig_avg  = (sig_avg >= 0.0 && sig_avg <= 1.0) ? sig_avg : 0.0;
 
     return (struct pl_color_space) {
-        .primaries = primaries[fmt.primaries],
-        .transfer  = transfers[fmt.transfer],
+        .primaries = primaries[fmt->primaries],
+        .transfer  = transfers[fmt->transfer],
         .light     = PL_COLOR_LIGHT_UNKNOWN,
         .sig_peak  = sig_peak,
         .sig_avg   = sig_avg,
@@ -607,7 +607,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (tc->pl_sh) {
         struct pl_shader *sh = tc->pl_sh;
         pl_shader_color_map(sh, &pl_color_map_default_params,
-                pl_color_space_from_video_format(tc->fmt),
+                pl_color_space_from_video_format(&tc->fmt),
                 pl_color_space_unknown, false);
 
         const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
