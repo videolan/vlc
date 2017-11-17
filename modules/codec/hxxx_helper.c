@@ -632,21 +632,16 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
     return VLC_SUCCESS;;
 }
 
-block_t *
-h264_helper_get_annexb_config(const struct hxxx_helper *hh)
+static block_t *
+hxxx_helper_get_annexb_config( const struct hxxx_helper_nal *pp_nal_lists[],
+                               const size_t p_nal_counts[],
+                               const size_t p_nal_maxs[],
+                               size_t i_lists_size )
 {
     static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
 
-    if (hh->h264.i_sps_count == 0 || hh->h264.i_pps_count == 0)
-        return NULL;
-
-    const struct hxxx_helper_nal *pp_nal_lists[] = {
-        hh->h264.sps_list, hh->h264.pps_list };
-    const size_t p_nal_counts[] = { hh->h264.i_sps_count, hh->h264.i_pps_count };
-    const size_t p_nal_maxs[] = { H264_SPS_ID_MAX+1, H264_PPS_ID_MAX+1 };
-
     block_t *p_block_list = NULL;
-    for (size_t i = 0; i < 2; ++i)
+    for (size_t i = 0; i < i_lists_size; ++i)
     {
         size_t i_nals_size = 0;
         const struct hxxx_helper_nal *p_nal;
@@ -680,6 +675,20 @@ h264_helper_get_annexb_config(const struct hxxx_helper *hh)
     }
 
     return p_block_list;
+}
+
+block_t *
+h264_helper_get_annexb_config(const struct hxxx_helper *hh)
+{
+    if (hh->h264.i_sps_count == 0 || hh->h264.i_pps_count == 0)
+        return NULL;
+
+    const struct hxxx_helper_nal *pp_nal_lists[] = {
+        hh->h264.sps_list, hh->h264.pps_list };
+    const size_t p_nal_counts[] = { hh->h264.i_sps_count, hh->h264.i_pps_count };
+    const size_t p_nal_maxs[] = { H264_SPS_ID_MAX+1, H264_PPS_ID_MAX+1 };
+
+    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 2 );
 }
 
 block_t *
