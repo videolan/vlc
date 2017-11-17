@@ -733,7 +733,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     tc->vt->ShaderSource(fragment_shader, 1, (const char **)&ms.ptr, &length);
     tc->vt->CompileShader(fragment_shader);
     if (tc->b_dump_shaders)
-        fprintf(stderr, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
+        msg_Dbg(tc->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
                 (const char *)&chroma, yuv_space, ms.ptr);
     free(ms.ptr);
 

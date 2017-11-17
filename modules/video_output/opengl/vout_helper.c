@@ -399,7 +399,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     GLuint shader = tc->vt->CreateShader(GL_VERTEX_SHADER);
     tc->vt->ShaderSource(shader, 1, (const char **) &code, NULL);
     if (tc->b_dump_shaders)
-        fprintf(stderr, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
+        msg_Dbg(tc->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
                 (const char *)&tc->fmt.i_chroma, code);
     tc->vt->CompileShader(shader);
     free(code);
