@@ -245,6 +245,23 @@ static int CSDDup(decoder_t *p_dec, const void *p_buf, size_t i_buf)
     return VLC_SUCCESS;
 }
 
+static void HXXXInitSize(decoder_t *p_dec, bool *p_size_changed)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct hxxx_helper *hh = &p_sys->video.hh;
+    unsigned i_w, i_h, i_vw, i_vh;
+    hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
+
+    if (p_size_changed)
+        *p_size_changed = (i_w != p_dec->fmt_out.video.i_width
+                        || i_h != p_dec->fmt_out.video.i_height);
+
+    p_dec->fmt_out.video.i_visible_width =
+    p_dec->fmt_out.video.i_width = i_w;
+    p_dec->fmt_out.video.i_visible_height =
+    p_dec->fmt_out.video.i_height = i_h;
+}
+
 /* Fill the p_sys->p_csd struct with H264 Parameter Sets */
 static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
 {
@@ -257,31 +274,34 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
     if (p_spspps_blocks != NULL)
         CSDInit(p_dec, p_spspps_blocks, 2);
 
-    unsigned i_w, i_h, i_vw, i_vh;
-    hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
+    HXXXInitSize(p_dec, p_size_changed);
 
-    if (p_size_changed)
-        *p_size_changed = (i_w != p_dec->fmt_out.video.i_width
-                        || i_h != p_dec->fmt_out.video.i_height);
-
-    p_dec->fmt_out.video.i_visible_width =
-    p_dec->fmt_out.video.i_width = i_w;
-    p_dec->fmt_out.video.i_visible_height =
-    p_dec->fmt_out.video.i_height = i_h;
     return VLC_SUCCESS;
 }
 
 /* Fill the p_sys->p_csd struct with HEVC Parameter Sets */
 static int HEVCSetCSD(decoder_t *p_dec, bool *p_size_changed)
 {
-    (void) p_size_changed;
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
 
-    assert(hh->hevc.i_annexb_config_nal > 0);
+    assert(hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
+           hh->hevc.i_pps_count > 0 );
 
-    return CSDDup(p_dec, hh->hevc.p_annexb_config_nal,
-                  hh->hevc.i_annexb_config_nal);
+    block_t *p_xps_blocks = hevc_helper_get_annexb_config(hh);
+    if (p_xps_blocks != NULL)
+    {
+        block_t *p_monolith = block_ChainGather(p_xps_blocks);
+        if (p_monolith == NULL)
+        {
+            block_ChainRelease(p_xps_blocks);
+            return VLC_ENOMEM;
+        }
+        CSDInit(p_dec, p_monolith, 1);
+    }
+
+    HXXXInitSize(p_dec, p_size_changed);
+    return VLC_SUCCESS;
 }
 
 static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
@@ -319,7 +339,8 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
-    if (hh->hevc.i_annexb_config_nal > 0)
+    if (hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
+        hh->hevc.i_pps_count > 0 )
         return HEVCSetCSD(p_dec, NULL);
     return VLC_SUCCESS;
 }
@@ -1524,7 +1545,11 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
                 i_ret = VLC_EGENERIC;
             break;
         case VLC_CODEC_HEVC:
-            i_ret = HEVCSetCSD(p_dec, &b_size_changed);
+            if (hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
+                hh->hevc.i_pps_count > 0 )
+                i_ret = HEVCSetCSD(p_dec, &b_size_changed);
+            else
+                i_ret = VLC_EGENERIC;
             break;
         }
         if (i_ret != VLC_SUCCESS)
