@@ -60,6 +60,10 @@
 
 #endif
 
+#ifndef MAC_OS_X_VERSION_10_13
+enum { kCMVideoCodecType_HEVC = 'hvc1' };
+#endif
+
 #pragma mark - module descriptor
 
 static int OpenDecoder(vlc_object_t *);
@@ -109,6 +113,7 @@ static void RequestFlush(decoder_t *);
 static void Drain(decoder_t *p_dec, bool flush);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
+static BOOL deviceSupportsHEVC();
 static BOOL deviceSupportsAdvancedProfiles();
 static BOOL deviceSupportsAdvancedLevels();
 
@@ -1132,11 +1137,19 @@ static void CloseDecoder(vlc_object_t *p_this)
 
 #pragma mark - helpers
 
+static BOOL deviceSupportsHEVC()
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+    if (VTIsHardwareDecodeSupported != nil)
+        return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
+#pragma clang diagnostic pop
+    else
+        return NO;
+}
+
 static BOOL deviceSupportsAdvancedProfiles()
 {
-#if TARGET_IPHONE_SIMULATOR
-    return NO;
-#endif
 #if TARGET_OS_IPHONE
     size_t size;
     cpu_type_t type;
@@ -1150,15 +1163,13 @@ static BOOL deviceSupportsAdvancedProfiles()
 
     return NO;
 #else
-    return NO;
+    /* Assume that the CPU support advanced profiles if it can handle HEVC */
+    return deviceSupportsHEVC();
 #endif
 }
 
 static BOOL deviceSupportsAdvancedLevels()
 {
-#if TARGET_IPHONE_SIMULATOR
-    return YES;
-#endif
 #if TARGET_OS_IPHONE
     #ifdef __LP64__
         size_t size;
