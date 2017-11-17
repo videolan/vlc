@@ -48,7 +48,7 @@
 int CopyInitCache(copy_cache_t *cache, unsigned width)
 {
 #ifdef CAN_COMPILE_SSE2
-    cache->size = __MAX((width + 0x3f) & ~ 0x3f, 8192);
+    cache->size = __MAX((width + 0x3f) & ~ 0x3f, 16384);
     cache->buffer = aligned_alloc(64, cache->size);
     if (!cache->buffer)
         return VLC_EGENERIC;
