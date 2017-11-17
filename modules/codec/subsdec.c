@@ -905,6 +905,15 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         psz_subtitle++;
                     free( psz_tagname );
                 }
+                else
+                {
+                    /**
+                      * This doesn't appear to be a valid tag closing syntax.
+                      * Simply append the text
+                      */
+                    AppendString( p_segment, "</" );
+                    psz_subtitle += 2;
+                }
             }
             else
             {
