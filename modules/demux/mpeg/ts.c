@@ -262,6 +262,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
         vlc_stream_Peek( p_demux->s, &p_peek, TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
             == TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
     {
+        const int i_service = GetWBE(&p_peek[18]);
         i_packet_size = DetectPacketSize( p_demux, pi_header_size, TOPFIELD_HEADER_SIZE );
         if( i_packet_size != -1 )
         {
@@ -329,7 +330,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
             msg_Dbg( p_demux, "extended event text=%s", psz_ext_text );
             // 52 bytes reserved Bslbf
 #endif
-            p_vdr->i_service = GetWBE(&p_peek[18]);
+            p_vdr->i_service = i_service;
 
             return i_packet_size;
             //return TS_PACKET_SIZE_188;
