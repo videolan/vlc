@@ -1925,7 +1925,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                     if( p_pkt->i_buffer >= 4 + 2 + 5 )
                     {
                         i_pcr = GetPCR( p_pkt );
-                        i_skip += 1 + p_pkt->p_buffer[4];
+                        i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
                     }
                 }
                 else
@@ -2020,7 +2020,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 uint8_t i_stream_id;
                 unsigned i_skip = 4;
                 if ( b_adaptfield ) // adaptation field
-                    i_skip += 1 + p_pkt->p_buffer[4];
+                    i_skip += 1 + __MIN(p_pkt->p_buffer[4], 182);
 
                 if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                     p_pkt->i_buffer - i_skip, &i_skip,
