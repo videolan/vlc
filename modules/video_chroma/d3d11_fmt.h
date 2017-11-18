@@ -97,7 +97,7 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
                                                   bool allow_opaque,
                                                   UINT supportFlags);
 
-int AllocateTextures(vlc_object_t *obj, d3d11_device_t *hd3d11,
+int AllocateTextures(vlc_object_t *obj, d3d11_device_t *d3d_dev,
                      const d3d_format_t *cfg, const video_format_t *fmt,
                      unsigned pool_size, ID3D11Texture2D *textures[]);
 
