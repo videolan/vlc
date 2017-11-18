@@ -1476,7 +1476,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    hr = D3D11_CreateDevice(VLC_OBJECT(vd), &sys->hd3d,
+    hr = D3D11_CreateDevice(vd, &sys->hd3d,
                             is_d3d11_opaque(fmt->i_chroma),
                             &sys->d3d_dev);
     if (FAILED(hr)) {
