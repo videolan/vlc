@@ -145,7 +145,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
  * \param obj VLC object emitting the message or NULL
  * \param type VLC_MSG_* message type (info, error, warning or debug)
  * \param module name of module from which the message come
- *               (normally MODULE_STRING)
+ *               (normally vlc_module_name)
  * \param file source module file name (normally __FILE__) or NULL
  * \param line function call source line number (normally __LINE__) or 0
  * \param func calling function name (normally __func__) or NULL

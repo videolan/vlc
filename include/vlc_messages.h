@@ -71,11 +71,11 @@ VLC_API void vlc_vaLog(vlc_object_t *obj, int prio, const char *module,
                        const char *file, unsigned line, const char *func,
                        const char *format, va_list ap);
 #define msg_GenericVa(o, p, fmt, ap) \
-    vlc_vaLog(VLC_OBJECT(o), p, MODULE_STRING, __FILE__, __LINE__, __func__, \
-              fmt, ap)
+    vlc_vaLog(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
+              __func__, fmt, ap)
 
 #define msg_Generic(o, p, ...) \
-    vlc_Log(VLC_OBJECT(o), p, MODULE_STRING, __FILE__, __LINE__, \
+    vlc_Log(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
             __func__, __VA_ARGS__)
 #define msg_Info(p_this, ...) \
     msg_Generic(p_this, VLC_MSG_INFO, __VA_ARGS__)
@@ -86,9 +86,7 @@ VLC_API void vlc_vaLog(vlc_object_t *obj, int prio, const char *module,
 #define msg_Dbg(p_this, ...) \
     msg_Generic(p_this, VLC_MSG_DBG, __VA_ARGS__)
 
-#ifndef MODULE_STRING
-# define MODULE_STRING __FILE__
-#endif
+extern const char vlc_module_name[];
 
 VLC_API const char *vlc_strerror(int);
 VLC_API const char *vlc_strerror_c(int);

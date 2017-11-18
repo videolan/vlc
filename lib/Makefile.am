@@ -1,6 +1,5 @@
 AUTOMAKE_OPTIONS = subdir-objects
 pkgconfigdir = $(libdir)/pkgconfig
-AM_CPPFLAGS = -DMODULE_STRING=\"libvlc\"
 AM_CFLAGS = $(CFLAGS_libvlc)
 
 SUFFIXES = .pc.in .pc

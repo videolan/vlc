@@ -120,7 +120,6 @@ endif # HAVE_GL
 ### XCB ###
 libvlc_xcb_events_la_SOURCES = \
 	video_output/xcb/events.c video_output/xcb/events.h
-libvlc_xcb_events_la_CPPFLAGS = -DMODULE_STRING=\"xcb\"
 libvlc_xcb_events_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS)
 libvlc_xcb_events_la_LDFLAGS = \
 	-no-undefined \

@@ -256,3 +256,5 @@ int64_t libvlc_clock(void)
 {
     return mdate();
 }
+
+const char vlc_module_name[] = "libvlc";
