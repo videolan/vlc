@@ -133,7 +133,6 @@ struct d3dctx
     HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     d3d9_handle_t           hd3d;
     d3d9_device_t           d3d_dev;
-    D3DCAPS9                caps;
     HWND                    hwnd;
 };
 
@@ -186,7 +185,7 @@ static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
-static int  Direct3D9Create (vlc_object_t *, struct d3dctx *, const video_format_t *);
+static int  Direct3D9Create (vlc_object_t *, struct d3dctx *);
 static int  Direct3D9Reset  (vout_display_t *);
 static void Direct3D9Destroy(vlc_object_t *, struct d3dctx *);
 
@@ -254,7 +253,7 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (Direct3D9Create(VLC_OBJECT(vd), &sys->d3dctx, &vd->fmt)) {
+    if (Direct3D9Create(VLC_OBJECT(vd), &sys->d3dctx)) {
         msg_Err(vd, "Direct3D9 could not be initialized");
         free(sys);
         return VLC_EGENERIC;
@@ -289,11 +288,11 @@ static int Open(vlc_object_t *object)
     info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&
-        (sys->d3dctx.caps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&
-        (sys->d3dctx.caps.DestBlendCaps & D3DPBLENDCAPS_INVSRCALPHA) &&
-        (sys->d3dctx.caps.TextureCaps   & D3DPTEXTURECAPS_ALPHA) &&
-        (sys->d3dctx.caps.TextureOpCaps & D3DTEXOPCAPS_SELECTARG1) &&
-        (sys->d3dctx.caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
+        (sys->d3dctx.d3d_dev.caps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&
+        (sys->d3dctx.d3d_dev.caps.DestBlendCaps & D3DPBLENDCAPS_INVSRCALPHA) &&
+        (sys->d3dctx.d3d_dev.caps.TextureCaps   & D3DPTEXTURECAPS_ALPHA) &&
+        (sys->d3dctx.d3d_dev.caps.TextureOpCaps & D3DTEXOPCAPS_SELECTARG1) &&
+        (sys->d3dctx.d3d_dev.caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
         info.subpicture_chromas = d3d_subpicture_chromas;
     else
         info.subpicture_chromas = NULL;
@@ -735,7 +734,7 @@ static HINSTANCE Direct3D9LoadShaderLibrary(void)
 /**
  * It initializes an instance of Direct3D9
  */
-static int Direct3D9Create(vlc_object_t *o, struct d3dctx *d3dctx, const video_format_t *fmt)
+static int Direct3D9Create(vlc_object_t *o, struct d3dctx *d3dctx)
 {
     d3dctx->hdll = LoadLibrary(TEXT("D3D9.DLL"));
     if (!d3dctx->hdll) {
@@ -776,32 +775,6 @@ static int Direct3D9Create(vlc_object_t *o, struct d3dctx *d3dctx, const video_f
     d3dctx->hxdll = Direct3D9LoadShaderLibrary();
     if (!d3dctx->hxdll)
         msg_Warn(o, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
-
-    /*
-    ** Get device capabilities
-    */
-    ZeroMemory(&d3dctx->caps, sizeof(d3dctx->caps));
-    HRESULT hr = IDirect3D9_GetDeviceCaps(d3dctx->hd3d.obj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &d3dctx->caps);
-    if (FAILED(hr)) {
-       msg_Err(o, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
-       goto error;
-    }
-
-    /* TODO: need to test device capabilities and select the right render function */
-    if (!(d3dctx->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
-        msg_Err(o, "Device does not support stretching from textures.");
-        goto error;
-    }
-
-    if ( fmt->i_width > d3dctx->caps.MaxTextureWidth ||
-         fmt->i_height > d3dctx->caps.MaxTextureHeight )
-    {
-        msg_Err(o, "Textures too large %ux%u max possible: %ux%u",
-                fmt->i_width, fmt->i_height,
-                (unsigned) d3dctx->caps.MaxTextureWidth,
-                (unsigned) d3dctx->caps.MaxTextureHeight);
-        goto error;
-    }
 
     return VLC_SUCCESS;
 error:
@@ -851,7 +824,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     sys->d3dctx.hwnd = sys->sys.hvideownd;
 
     if (FAILED(D3D9_CreateDevice(vd, &sys->d3dctx.hd3d, sys->d3dctx.hwnd,
-                                 &vd->source, &sys->d3dctx.caps, &sys->d3dctx.d3d_dev)))
+                                 &vd->source, &sys->d3dctx.d3d_dev)))
         return VLC_EGENERIC;
 
     const d3d9_device_t *p_d3d9_dev = &sys->d3dctx.d3d_dev;
@@ -1157,14 +1130,14 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
     // Set linear filtering quality
-    if (sys->d3dctx.caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
+    if (sys->d3dctx.d3d_dev.caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
         //msg_Dbg(vd, "Using D3DTEXF_LINEAR for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
     } else {
         //msg_Dbg(vd, "Using D3DTEXF_POINT for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
     }
-    if (sys->d3dctx.caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
+    if (sys->d3dctx.d3d_dev.caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
         //msg_Dbg(vd, "Using D3DTEXF_LINEAR for magnification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     } else {
@@ -1195,7 +1168,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_SRCBLEND,D3DBLEND_SRCALPHA);
     IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA);
 
-    if (sys->d3dctx.caps.AlphaCmpCaps & D3DPCMPCAPS_GREATER) {
+    if (sys->d3dctx.d3d_dev.caps.AlphaCmpCaps & D3DPCMPCAPS_GREATER) {
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHATESTENABLE,TRUE);
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHAREF, 0x00);
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHAFUNC,D3DCMP_GREATER);
@@ -2049,7 +2022,7 @@ GLConvOpen(vlc_object_t *obj)
     priv->vt = vt;
 
     priv->d3dctx = (struct d3dctx) { .hwnd = tc->gl->surface->handle.hwnd };
-    if (Direct3D9Create(obj, &priv->d3dctx, &tc->fmt) != VLC_SUCCESS)
+    if (Direct3D9Create(obj, &priv->d3dctx) != VLC_SUCCESS)
         goto error;
 
     if (!priv->d3dctx.hd3d.use_ex)
@@ -2059,7 +2032,7 @@ GLConvOpen(vlc_object_t *obj)
     }
 
     if (FAILED(D3D9_CreateDevice(obj, &priv->d3dctx.hd3d, priv->d3dctx.hwnd,
-                                 &tc->fmt, &priv->d3dctx.caps, &priv->d3dctx.d3d_dev)))
+                                 &tc->fmt, &priv->d3dctx.d3d_dev)))
         goto error;
 
     HRESULT hr;

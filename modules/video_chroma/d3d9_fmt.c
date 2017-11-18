@@ -37,8 +37,7 @@ picture_sys_t *ActivePictureSys(picture_t *p_pic)
 
 #undef D3D9_CreateDevice
 HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
-                          const video_format_t *source, const D3DCAPS9 *caps,
-                          d3d9_device_t *out)
+                          const video_format_t *source, d3d9_device_t *out)
 {
     HRESULT hr;
 
@@ -59,6 +58,32 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     }
 #endif
 
+    /*
+    ** Get device capabilities
+    */
+    ZeroMemory(&out->caps, sizeof(out->caps));
+    hr = IDirect3D9_GetDeviceCaps(hd3d->obj, AdapterToUse, DeviceType, &out->caps);
+    if (FAILED(hr)) {
+       msg_Err(o, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
+       return hr;
+    }
+
+    /* TODO: need to test device capabilities and select the right render function */
+    if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
+        msg_Err(o, "Device does not support stretching from textures.");
+        return E_INVALIDARG;
+    }
+
+    if ( source->i_width > out->caps.MaxTextureWidth ||
+         source->i_height > out->caps.MaxTextureHeight )
+    {
+        msg_Err(o, "Textures too large %ux%u max possible: %ux%u",
+                source->i_width, source->i_height,
+                (unsigned) out->caps.MaxTextureWidth,
+                (unsigned) out->caps.MaxTextureHeight);
+        return E_INVALIDARG;
+    }
+
     if (D3D9_FillPresentationParameters(o, hd3d, AdapterToUse, hwnd, source, out))
         return E_INVALIDARG;
 
@@ -72,10 +97,10 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     }
 
     DWORD creationFlags = D3DCREATE_MULTITHREADED;
-    if ( (caps->DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
-         (caps->DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
+    if ( (out->caps.DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
+         (out->caps.DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
         creationFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
-    } else if (caps->DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
+    } else if (out->caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
         creationFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
     } else {
         creationFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;

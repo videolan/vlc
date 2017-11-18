@@ -55,6 +55,7 @@ typedef struct
     /* creation parameters */
     D3DPRESENT_PARAMETERS   pp;
     UINT                    adapterId;
+    D3DCAPS9                caps;
 } d3d9_device_t;
 
 #include "../codec/avcodec/va_surface.h"
@@ -72,9 +73,8 @@ static inline void ReleasePictureSys(picture_sys_t *p_sys)
 }
 
 HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
-                          const video_format_t *, const D3DCAPS9 *,
-                          d3d9_device_t *out);
-#define D3D9_CreateDevice(a,b,c,d,e,f)  D3D9_CreateDevice(VLC_OBJECT(a),b,c,d,e,f)
+                          const video_format_t *, d3d9_device_t *out);
+#define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
 
 int D3D9_FillPresentationParameters(vlc_object_t *, d3d9_handle_t *, UINT AdapterToUse, HWND,
                                     const video_format_t *, d3d9_device_t *out);
