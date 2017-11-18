@@ -84,7 +84,8 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
         return E_INVALIDARG;
     }
 
-    if (D3D9_FillPresentationParameters(o, hd3d, AdapterToUse, hwnd, source, out))
+    out->hwnd      = hwnd;
+    if (D3D9_FillPresentationParameters(o, hd3d, AdapterToUse, source, out))
         return E_INVALIDARG;
 
     /* */
@@ -138,7 +139,7 @@ void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
  * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
  * from the default adapter.
  */
-int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT AdapterToUse, HWND hwnd,
+int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT AdapterToUse,
                                     const video_format_t *source, d3d9_device_t *out)
 {
     /*
@@ -165,7 +166,7 @@ int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT A
     d3dpp->EnableAutoDepthStencil = FALSE;
     if (source->i_width)
     {
-        d3dpp->hDeviceWindow     = hwnd;
+        d3dpp->hDeviceWindow     = out->hwnd;
         d3dpp->SwapEffect        = D3DSWAPEFFECT_COPY;
         d3dpp->BackBufferFormat  = d3ddm.Format;
         d3dpp->BackBufferCount   = 1;

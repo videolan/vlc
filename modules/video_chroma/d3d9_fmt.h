@@ -56,6 +56,7 @@ typedef struct
     /* creation parameters */
     D3DPRESENT_PARAMETERS   pp;
     UINT                    adapterId;
+    HWND                    hwnd;
     D3DCAPS9                caps;
 } d3d9_device_t;
 
@@ -83,7 +84,7 @@ int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
 
 void D3D9_Destroy(d3d9_handle_t *);
 
-int D3D9_FillPresentationParameters(vlc_object_t *, d3d9_handle_t *, UINT AdapterToUse, HWND,
+int D3D9_FillPresentationParameters(vlc_object_t *, d3d9_handle_t *, UINT AdapterToUse,
                                     const video_format_t *, d3d9_device_t *out);
 
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */

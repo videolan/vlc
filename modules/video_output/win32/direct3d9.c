@@ -131,7 +131,6 @@ struct d3dctx
 {
     d3d9_handle_t           hd3d;
     d3d9_device_t           d3d_dev;
-    HWND                    hwnd;
 };
 
 struct vout_display_sys_t
@@ -758,9 +757,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    sys->d3dctx.hwnd = sys->sys.hvideownd;
-
-    if (FAILED(D3D9_CreateDevice(vd, &sys->d3dctx.hd3d, sys->d3dctx.hwnd,
+    if (FAILED(D3D9_CreateDevice(vd, &sys->d3dctx.hd3d, sys->sys.hvideownd,
                                  &vd->source, &sys->d3dctx.d3d_dev)))
         return VLC_EGENERIC;
 
@@ -826,7 +823,7 @@ static int Direct3D9Reset(vout_display_t *vd)
     struct d3dctx *d3dctx = &sys->d3dctx;
     d3d9_device_t *p_d3d9_dev = &d3dctx->d3d_dev;
 
-    if (D3D9_FillPresentationParameters(VLC_OBJECT(vd), &d3dctx->hd3d, p_d3d9_dev->adapterId, d3dctx->hwnd, &vd->source, &d3dctx->d3d_dev))
+    if (D3D9_FillPresentationParameters(VLC_OBJECT(vd), &d3dctx->hd3d, p_d3d9_dev->adapterId, &vd->source, &d3dctx->d3d_dev))
         return VLC_EGENERIC;
 
     /* release all D3D objects */
@@ -1958,7 +1955,7 @@ GLConvOpen(vlc_object_t *obj)
     tc->priv = priv;
     priv->vt = vt;
 
-    priv->d3dctx = (struct d3dctx) { .hwnd = tc->gl->surface->handle.hwnd };
+    priv->d3dctx = (struct d3dctx) { 0 };
     if (D3D9_Create(obj, &priv->d3dctx.hd3d) != VLC_SUCCESS)
         goto error;
 
@@ -1968,7 +1965,7 @@ GLConvOpen(vlc_object_t *obj)
         goto error;
     }
 
-    if (FAILED(D3D9_CreateDevice(obj, &priv->d3dctx.hd3d, priv->d3dctx.hwnd,
+    if (FAILED(D3D9_CreateDevice(obj, &priv->d3dctx.hd3d, tc->gl->surface->handle.hwnd,
                                  &tc->fmt, &priv->d3dctx.d3d_dev)))
         goto error;
 
