@@ -115,6 +115,9 @@ struct vlc_va_sys_t
     d3d9_handle_t          hd3d;
     d3d9_device_t          d3d_dev;
 
+    /* DLL */
+    HINSTANCE              dxva2_dll;
+
     /* Device manager */
     IDirect3DDeviceManager9  *devmng;
     HANDLE                   device;
@@ -241,6 +244,9 @@ static void Close(vlc_va_t *va, void **ctx)
 
     directx_va_Close(va, &sys->dx_sys);
 
+    if (sys->dxva2_dll)
+        FreeLibrary(sys->dxva2_dll);
+
     free((char *)va->description);
     free(sys);
 }
@@ -266,6 +272,13 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
+    /* Load dll*/
+    sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
+    if (!sys->dxva2_dll) {
+        msg_Warn(va, "cannot load DXVA2 decoder DLL");
+        goto error;
+    }
+
     dx_sys = &sys->dx_sys;
 
     dx_sys->va_pool.pf_create_device           = D3dCreateDevice;
@@ -280,7 +293,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->va_pool.pf_new_surface_context     = NewSurfacePicContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
-    dx_sys->psz_decoder_dll            = TEXT("DXVA2.DLL");
 
     va->sys = sys;
 
@@ -391,12 +403,11 @@ static char *DxDescribe(vlc_va_sys_t *sys)
 static int D3dCreateDeviceManager(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
 
     HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
                                            IDirect3DDeviceManager9 **);
     CreateDeviceManager9 =
-      (void *)GetProcAddress(dx_sys->hdecoder_dll,
+      (void *)GetProcAddress(sys->dxva2_dll,
                              "DXVA2CreateDirect3DDeviceManager9");
 
     if (!CreateDeviceManager9) {

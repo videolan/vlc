@@ -330,22 +330,10 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     va_pool_Close(va, &dx_sys->va_pool);
-    if (dx_sys->hdecoder_dll)
-        FreeLibrary(dx_sys->hdecoder_dll);
 }
 
 int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys)
 {
-    if (dx_sys->psz_decoder_dll) {
-        /* Load dll*/
-        dx_sys->hdecoder_dll = LoadLibrary(dx_sys->psz_decoder_dll);
-        if (!dx_sys->hdecoder_dll) {
-            msg_Warn(va, "cannot load DirectX decoder DLL");
-            goto error;
-        }
-        msg_Dbg(va, "DLLs loaded");
-    }
-
     if (va_pool_Open(va, &dx_sys->va_pool) != VLC_SUCCESS)
         goto error;
 

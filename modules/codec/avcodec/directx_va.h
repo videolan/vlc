@@ -59,10 +59,6 @@ typedef struct
     /* for pre allocation */
     D3D_DecoderSurface     *hw_surface[MAX_SURFACE_COUNT];
 
-    /* DLL */
-    HINSTANCE             hdecoder_dll;
-    const TCHAR           *psz_decoder_dll;
-
     /* Video service */
     GUID                   input;
     D3D_DecoderDevice      *d3ddec;
