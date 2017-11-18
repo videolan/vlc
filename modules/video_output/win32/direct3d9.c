@@ -805,15 +805,6 @@ static void Direct3D9Destroy(vlc_object_t *o, struct d3dctx *d3dctx)
 static int  Direct3D9CreateResources (vout_display_t *, video_format_t *);
 static void Direct3D9DestroyResources(vout_display_t *);
 
-static void Direct3D9DestroyDevice(vlc_object_t *o, struct d3dctx *d3dctx)
-{
-    VLC_UNUSED(o);
-
-    if (d3dctx->d3d_dev.dev)
-       IDirect3DDevice9_Release(d3dctx->d3d_dev.dev);
-    d3dctx->d3d_dev.dev = NULL;
-}
-
 /**
  * It creates a Direct3D9 device and the associated resources.
  */
@@ -865,7 +856,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     return VLC_SUCCESS;
 
 error:
-    Direct3D9DestroyDevice(VLC_OBJECT(vd), &sys->d3dctx);
+    D3D9_ReleaseDevice(&sys->d3dctx.d3d_dev);
     return VLC_EGENERIC;
 }
 
@@ -877,7 +868,7 @@ static void Direct3D9Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D9DestroyResources(vd);
-    Direct3D9DestroyDevice(VLC_OBJECT(vd), &sys->d3dctx);
+    D3D9_ReleaseDevice(&sys->d3dctx.d3d_dev);
 }
 
 /**
@@ -1976,7 +1967,7 @@ GLConvClose(vlc_object_t *obj)
     if (priv->dx_render)
         IDirect3DSurface9_Release(priv->dx_render);
 
-    Direct3D9DestroyDevice(obj, &priv->d3dctx);
+    D3D9_ReleaseDevice(&priv->d3dctx.d3d_dev);
     Direct3D9Destroy(obj, &priv->d3dctx);
     free(tc->priv);
 }

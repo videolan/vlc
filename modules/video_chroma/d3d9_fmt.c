@@ -125,6 +125,15 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     return hr;
 }
 
+void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
+{
+    if (d3d_dev->dev)
+    {
+       IDirect3DDevice9_Release(d3d_dev->dev);
+       d3d_dev->dev = NULL;
+    }
+}
+
 /**
  * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
  * from the default adapter.
