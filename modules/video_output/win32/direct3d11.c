@@ -1602,17 +1602,6 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
-    if (sys->d3d_dev.d3dcontext)
-    {
-        ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
-        ID3D11DeviceContext_Release(sys->d3d_dev.d3dcontext);
-        sys->d3d_dev.d3dcontext = NULL;
-    }
-    if (sys->d3d_dev.d3ddevice)
-    {
-        ID3D11Device_Release(sys->d3d_dev.d3ddevice);
-        sys->d3d_dev.d3ddevice = NULL;
-    }
     if (sys->dxgiswapChain4)
     {
         IDXGISwapChain_Release(sys->dxgiswapChain4);
@@ -1623,6 +1612,8 @@ static void Direct3D11Close(vout_display_t *vd)
         IDXGISwapChain_Release(sys->dxgiswapChain);
         sys->dxgiswapChain = NULL;
     }
+
+    D3D11_ReleaseDevice( &sys->d3d_dev );
 
     msg_Dbg(vd, "Direct3D11 device adapter closed");
 }
