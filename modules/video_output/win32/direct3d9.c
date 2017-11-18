@@ -817,7 +817,7 @@ static int Direct3D9Reset(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
-    if (D3D9_FillPresentationParameters(VLC_OBJECT(vd), &sys->hd3d, p_d3d9_dev->adapterId, &vd->source, p_d3d9_dev))
+    if (D3D9_FillPresentationParameters(VLC_OBJECT(vd), &sys->hd3d, &vd->source, p_d3d9_dev))
         return VLC_EGENERIC;
 
     /* release all D3D objects */
