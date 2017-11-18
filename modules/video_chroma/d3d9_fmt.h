@@ -35,11 +35,12 @@ struct picture_sys_t
 
 typedef struct
 {
-    bool                    use_ex;
+    HINSTANCE               hdll;       /* handle of the opened d3d9 dll */
     union {
         LPDIRECT3D9         obj;
         LPDIRECT3D9EX       objex;
     };
+    bool                    use_ex;
 } d3d9_handle_t;
 
 typedef struct

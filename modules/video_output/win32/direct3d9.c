@@ -129,7 +129,6 @@ typedef struct
 
 struct d3dctx
 {
-    HINSTANCE               hdll;       /* handle of the opened d3d9 dll */
     HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     d3d9_handle_t           hd3d;
     d3d9_device_t           d3d_dev;
@@ -185,9 +184,9 @@ static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
-static int  Direct3D9Create (vlc_object_t *, struct d3dctx *);
+static int  D3D9_Create(vlc_object_t *, d3d9_handle_t *);
 static int  Direct3D9Reset  (vout_display_t *);
-static void Direct3D9Destroy(vlc_object_t *, struct d3dctx *);
+static void Direct3D9Destroy(struct d3dctx *);
 
 static int  Direct3D9Open (vout_display_t *, video_format_t *);
 static void Direct3D9Close(vout_display_t *);
@@ -232,6 +231,19 @@ static bool is_d3d9_opaque(vlc_fourcc_t chroma)
     }
 }
 
+static HINSTANCE Direct3D9LoadShaderLibrary(void)
+{
+    HINSTANCE instance = NULL;
+    for (int i = 43; i > 23; --i) {
+        TCHAR filename[16];
+        _sntprintf(filename, 16, TEXT("D3dx9_%d.dll"), i);
+        instance = LoadLibrary(filename);
+        if (instance)
+            break;
+    }
+    return instance;
+}
+
 /**
  * It creates a Direct3D vout display.
  */
@@ -253,11 +265,15 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (Direct3D9Create(VLC_OBJECT(vd), &sys->d3dctx)) {
+    if (D3D9_Create(VLC_OBJECT(vd), &sys->d3dctx.hd3d)) {
         msg_Err(vd, "Direct3D9 could not be initialized");
         free(sys);
         return VLC_EGENERIC;
     }
+
+    sys->d3dctx.hxdll = Direct3D9LoadShaderLibrary();
+    if (!sys->d3dctx.hxdll)
+        msg_Warn(object, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
 
     sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
@@ -326,7 +342,7 @@ static int Open(vlc_object_t *object)
 error:
     Direct3D9Close(vd);
     CommonClean(vd);
-    Direct3D9Destroy(VLC_OBJECT(vd), &sys->d3dctx);
+    Direct3D9Destroy(&sys->d3dctx);
     free(vd->sys);
     return VLC_EGENERIC;
 }
@@ -345,7 +361,7 @@ static void Close(vlc_object_t *object)
 
     CommonClean(vd);
 
-    Direct3D9Destroy(VLC_OBJECT(vd), &vd->sys->d3dctx);
+    Direct3D9Destroy(&vd->sys->d3dctx);
 
     free(vd->sys);
 }
@@ -718,33 +734,34 @@ static void Manage (vout_display_t *vd)
     }
 }
 
-static HINSTANCE Direct3D9LoadShaderLibrary(void)
+static void D3D9_Release(d3d9_handle_t *hd3d)
 {
-    HINSTANCE instance = NULL;
-    for (int i = 43; i > 23; --i) {
-        TCHAR filename[16];
-        _sntprintf(filename, 16, TEXT("D3dx9_%d.dll"), i);
-        instance = LoadLibrary(filename);
-        if (instance)
-            break;
+    if (hd3d->obj)
+    {
+       IDirect3D9_Release(hd3d->obj);
+       hd3d->obj = NULL;
     }
-    return instance;
+    if (hd3d->hdll)
+    {
+        FreeLibrary(hd3d->hdll);
+        hd3d->hdll = NULL;
+    }
 }
 
 /**
  * It initializes an instance of Direct3D9
  */
-static int Direct3D9Create(vlc_object_t *o, struct d3dctx *d3dctx)
+static int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
 {
-    d3dctx->hdll = LoadLibrary(TEXT("D3D9.DLL"));
-    if (!d3dctx->hdll) {
+    hd3d->hdll = LoadLibrary(TEXT("D3D9.DLL"));
+    if (!hd3d->hdll) {
         msg_Warn(o, "cannot load d3d9.dll, aborting");
         return VLC_EGENERIC;
     }
 
     LPDIRECT3D9 (WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
     OurDirect3DCreate9 =
-        (void *)GetProcAddress(d3dctx->hdll, "Direct3DCreate9");
+        (void *)GetProcAddress(hd3d->hdll, "Direct3DCreate9");
     if (!OurDirect3DCreate9) {
         msg_Err(o, "Cannot locate reference to Direct3DCreate9 ABI in DLL");
         goto error;
@@ -752,53 +769,44 @@ static int Direct3D9Create(vlc_object_t *o, struct d3dctx *d3dctx)
 
     HRESULT (WINAPI *OurDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex **ppD3D);
     OurDirect3DCreate9Ex =
-        (void *)GetProcAddress(d3dctx->hdll, "Direct3DCreate9Ex");
+        (void *)GetProcAddress(hd3d->hdll, "Direct3DCreate9Ex");
 
     /* Create the D3D object. */
+    hd3d->use_ex = false;
     if (OurDirect3DCreate9Ex) {
-        HRESULT hr = OurDirect3DCreate9Ex(D3D_SDK_VERSION, &d3dctx->hd3d.objex);
+        HRESULT hr = OurDirect3DCreate9Ex(D3D_SDK_VERSION, &hd3d->objex);
         if(!FAILED(hr)) {
             msg_Dbg(o, "Using Direct3D9 Extended API!");
-            d3dctx->hd3d.use_ex = true;
+            hd3d->use_ex = true;
         }
     }
 
-    if (!d3dctx->hd3d.obj)
+    if (!hd3d->obj)
     {
-        d3dctx->hd3d.obj = OurDirect3DCreate9(D3D_SDK_VERSION);
-        if (!d3dctx->hd3d.obj) {
+        hd3d->obj = OurDirect3DCreate9(D3D_SDK_VERSION);
+        if (!hd3d->obj) {
             msg_Err(o, "Could not create Direct3D9 instance.");
             goto error;
         }
     }
-
-    d3dctx->hxdll = Direct3D9LoadShaderLibrary();
-    if (!d3dctx->hxdll)
-        msg_Warn(o, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
-
     return VLC_SUCCESS;
 error:
-    Direct3D9Destroy(o, d3dctx);
+    D3D9_Release( hd3d );
     return VLC_EGENERIC;
 }
 
 /**
  * It releases an instance of Direct3D9
  */
-static void Direct3D9Destroy(vlc_object_t *o, struct d3dctx *d3dctx)
+static void Direct3D9Destroy(struct d3dctx *d3dctx)
 {
-    VLC_UNUSED(o);
+    D3D9_Release( &d3dctx->hd3d );
 
-    if (d3dctx->hd3d.obj)
-       IDirect3D9_Release(d3dctx->hd3d.obj);
-    if (d3dctx->hdll)
-        FreeLibrary(d3dctx->hdll);
     if (d3dctx->hxdll)
+    {
         FreeLibrary(d3dctx->hxdll);
-
-    d3dctx->hd3d.obj = NULL;
-    d3dctx->hdll = NULL;
-    d3dctx->hxdll = NULL;
+        d3dctx->hxdll = NULL;
+    }
 }
 
 /* */
@@ -1968,7 +1976,7 @@ GLConvClose(vlc_object_t *obj)
         IDirect3DSurface9_Release(priv->dx_render);
 
     D3D9_ReleaseDevice(&priv->d3dctx.d3d_dev);
-    Direct3D9Destroy(obj, &priv->d3dctx);
+    Direct3D9Destroy(&priv->d3dctx);
     free(tc->priv);
 }
 
@@ -2013,7 +2021,7 @@ GLConvOpen(vlc_object_t *obj)
     priv->vt = vt;
 
     priv->d3dctx = (struct d3dctx) { .hwnd = tc->gl->surface->handle.hwnd };
-    if (Direct3D9Create(obj, &priv->d3dctx) != VLC_SUCCESS)
+    if (D3D9_Create(obj, &priv->d3dctx.hd3d) != VLC_SUCCESS)
         goto error;
 
     if (!priv->d3dctx.hd3d.use_ex)
