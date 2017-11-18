@@ -50,7 +50,6 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
-#define D3D_Device          ID3D11Device
 #define D3D_DecoderType     ID3D11VideoDecoder
 #define D3D_DecoderDevice   ID3D11VideoDevice
 #define D3D_DecoderSurface  ID3D11VideoDecoderOutputView
@@ -373,7 +372,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 msg_Warn(va, "No mutex found to lock the decoder");
             sys->context_mutex = context_lock;
 
-            dx_sys->d3ddev = sys->d3d_dev.d3ddevice;
             sys->d3d_dev.d3dcontext = p_sys->context;
             sys->d3d_dev.owner = false;
             sys->d3dvidctx = d3dvidctx;
@@ -424,7 +422,6 @@ error:
 static int D3dCreateDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
     HRESULT hr;
 
     if (sys->d3d_dev.d3ddevice && sys->d3d_dev.d3dcontext) {
@@ -439,7 +436,6 @@ static int D3dCreateDevice(vlc_va_t *va)
         msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
-    dx_sys->d3ddev = sys->d3d_dev.d3ddevice;
 
     void *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);

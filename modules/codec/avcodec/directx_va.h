@@ -63,9 +63,6 @@ typedef struct
     HINSTANCE             hdecoder_dll;
     const TCHAR           *psz_decoder_dll;
 
-    /* Direct3D */
-    D3D_Device            *d3ddev;
-
     /* Video service */
     GUID                   input;
     D3D_DecoderDevice      *d3ddec;

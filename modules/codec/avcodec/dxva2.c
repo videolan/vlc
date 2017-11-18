@@ -38,7 +38,6 @@
 #include <libavcodec/dxva2.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-#define D3D_Device          IDirect3DDevice9
 #define D3D_DecoderType     IDirectXVideoDecoder
 #define D3D_DecoderDevice   IDirectXVideoDecoderService
 #define D3D_DecoderSurface  IDirect3DSurface9
@@ -285,14 +284,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     va->sys = sys;
 
-    dx_sys->d3ddev = NULL;
     if (p_sys!=NULL)
     {
         D3DSURFACE_DESC src;
         if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
             sys->render = src.Format;
         IDirect3DSurface9_GetDevice(p_sys->surface, &sys->d3d_dev.dev );
-        dx_sys->d3ddev = sys->d3d_dev.dev;
         sys->d3d_dev.owner = false;
     }
 
@@ -336,7 +333,6 @@ static int D3dCreateDevice(vlc_va_t *va)
         msg_Err(va, "IDirect3D9_CreateDevice failed");
         return VLC_EGENERIC;
     }
-    sys->dx_sys.d3ddev = sys->d3d_dev.dev;
 
     return VLC_SUCCESS;
 }
