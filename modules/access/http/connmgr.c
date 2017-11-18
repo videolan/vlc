@@ -39,7 +39,7 @@ void vlc_http_err(void *ctx, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    msg_GenericVa((vlc_object_t *)ctx, VLC_MSG_ERR, fmt, ap);
+    vlc_vaLog(ctx, VLC_MSG_ERR, "http", __FILE__, __LINE__, __func__, fmt, ap);
     va_end(ap);
 }
 
@@ -48,7 +48,7 @@ void vlc_http_dbg(void *ctx, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    msg_GenericVa((vlc_object_t *)ctx, VLC_MSG_DBG, fmt, ap);
+    vlc_vaLog(ctx, VLC_MSG_DBG, "http", __FILE__, __LINE__, __func__, fmt, ap);
     va_end(ap);
 }
 
