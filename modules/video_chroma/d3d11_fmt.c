@@ -130,6 +130,21 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
+void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
+{
+    if (d3d_dev->d3dcontext)
+    {
+        ID3D11DeviceContext_Flush(d3d_dev->d3dcontext);
+        ID3D11DeviceContext_Release(d3d_dev->d3dcontext);
+        d3d_dev->d3dcontext = NULL;
+    }
+    if (d3d_dev->d3ddevice)
+    {
+        ID3D11Device_Release(d3d_dev->d3ddevice);
+        d3d_dev->d3ddevice = NULL;
+    }
+}
+
 #undef D3D11_CreateDevice
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                            bool hw_decoding, d3d11_device_t *out)
