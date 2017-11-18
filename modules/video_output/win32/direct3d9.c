@@ -129,7 +129,6 @@ typedef struct
 
 struct d3dctx
 {
-    HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     d3d9_handle_t           hd3d;
     d3d9_device_t           d3d_dev;
     HWND                    hwnd;
@@ -149,6 +148,7 @@ struct vout_display_sys_t
 
     // core objects
     struct d3dctx           d3dctx;
+    HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     IDirect3DPixelShader9*  d3dx_shader;
 
     // scene objects
@@ -185,7 +185,7 @@ static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
 static int  Direct3D9Reset  (vout_display_t *);
-static void Direct3D9Destroy(struct d3dctx *);
+static void Direct3D9Destroy(vout_display_sys_t *);
 
 static int  Direct3D9Open (vout_display_t *, video_format_t *);
 static void Direct3D9Close(vout_display_t *);
@@ -270,8 +270,8 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    sys->d3dctx.hxdll = Direct3D9LoadShaderLibrary();
-    if (!sys->d3dctx.hxdll)
+    sys->hxdll = Direct3D9LoadShaderLibrary();
+    if (!sys->hxdll)
         msg_Warn(object, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
 
     sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
@@ -341,7 +341,7 @@ static int Open(vlc_object_t *object)
 error:
     Direct3D9Close(vd);
     CommonClean(vd);
-    Direct3D9Destroy(&sys->d3dctx);
+    Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
 }
@@ -360,7 +360,7 @@ static void Close(vlc_object_t *object)
 
     CommonClean(vd);
 
-    Direct3D9Destroy(&vd->sys->d3dctx);
+    Direct3D9Destroy(vd->sys);
 
     free(vd->sys);
 }
@@ -736,14 +736,14 @@ static void Manage (vout_display_t *vd)
 /**
  * It releases an instance of Direct3D9
  */
-static void Direct3D9Destroy(struct d3dctx *d3dctx)
+static void Direct3D9Destroy(vout_display_sys_t *sys)
 {
-    D3D9_Destroy( &d3dctx->hd3d );
+    D3D9_Destroy( &sys->d3dctx.hd3d );
 
-    if (d3dctx->hxdll)
+    if (sys->hxdll)
     {
-        FreeLibrary(d3dctx->hxdll);
-        d3dctx->hxdll = NULL;
+        FreeLibrary(sys->hxdll);
+        sys->hxdll = NULL;
     }
 }
 
@@ -1167,7 +1167,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
             LPD3DXBUFFER *ppErrorMsgs,
             LPD3DXCONSTANTTABLE *ppConstantTable);
 
-    OurD3DXCompileShader = (void*)GetProcAddress(sys->d3dctx.hxdll, "D3DXCompileShader");
+    OurD3DXCompileShader = (void*)GetProcAddress(sys->hxdll, "D3DXCompileShader");
     if (!OurD3DXCompileShader) {
         msg_Warn(vd, "Cannot locate reference to D3DXCompileShader; pixel shading will be disabled");
         return VLC_EGENERIC;
@@ -1214,7 +1214,7 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->d3dctx.hxdll)
+    if (!sys->hxdll)
         return VLC_EGENERIC;
 
     /* Find which shader was selected in the list. */
@@ -1914,7 +1914,7 @@ GLConvClose(vlc_object_t *obj)
         IDirect3DSurface9_Release(priv->dx_render);
 
     D3D9_ReleaseDevice(&priv->d3dctx.d3d_dev);
-    Direct3D9Destroy(&priv->d3dctx);
+    D3D9_Destroy(&priv->d3dctx.hd3d);
     free(tc->priv);
 }
 
