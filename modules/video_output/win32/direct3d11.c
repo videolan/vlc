@@ -139,9 +139,6 @@ struct vout_display_sys_t
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     d3d11_handle_t           hd3d;
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
-    /* We should find a better way to store this or atleast a shorter name */
-    PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
-    PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
     pD3DCompile                            OurD3DCompile;
 #endif
 #if defined(HAVE_ID3D11VIDEODECODER)
@@ -418,11 +415,8 @@ static int OpenHwnd(vout_display_t *vd)
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->hd3d.hdll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!sys->hd3d.hdll) {
-        msg_Warn(vd, "cannot load d3d11.dll, aborting");
+    if (D3D11_Create(vd, &sys->hd3d) != VLC_SUCCESS)
         return VLC_EGENERIC;
-    }
 
     sys->hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
     if (!sys->hd3dcompiler_dll) {
@@ -434,14 +428,6 @@ static int OpenHwnd(vout_display_t *vd)
     sys->OurD3DCompile = (void *)GetProcAddress(sys->hd3dcompiler_dll, "D3DCompile");
     if (!sys->OurD3DCompile) {
         msg_Err(vd, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-        Direct3D11Destroy(vd);
-        return VLC_EGENERIC;
-    }
-
-    sys->OurD3D11CreateDevice =
-        (void *)GetProcAddress(sys->hd3d.hdll, "D3D11CreateDevice");
-    if (!sys->OurD3D11CreateDevice) {
-        msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
         Direct3D11Destroy(vd);
         return VLC_EGENERIC;
     }
@@ -1242,20 +1228,14 @@ static void Direct3D11Destroy(vout_display_t *vd)
 #if !VLC_WINSTORE_APP
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->hd3d.hdll)
-        FreeLibrary(sys->hd3d.hdll);
     if (sys->hd3dcompiler_dll)
         FreeLibrary(sys->hd3dcompiler_dll);
 
-    sys->OurD3D11CreateDevice = NULL;
-    sys->OurD3D11CreateDeviceAndSwapChain = NULL;
     sys->OurD3DCompile = NULL;
     sys->hdxgi_dll = NULL;
-    sys->hd3d.hdll = NULL;
     sys->hd3dcompiler_dll = NULL;
-#else
-    VLC_UNUSED(vd);
 #endif
+    D3D11_Destroy( &vd->sys->hd3d );
 }
 
 #if !VLC_WINSTORE_APP

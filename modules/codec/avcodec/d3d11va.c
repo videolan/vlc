@@ -109,6 +109,7 @@ struct vlc_va_sys_t
     unsigned                     textureWidth;
     unsigned                     textureHeight;
 
+    d3d11_handle_t               hd3d;
     d3d11_device_t               d3d_dev;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
@@ -311,6 +312,8 @@ static void Close(vlc_va_t *va, void **ctx)
 
     directx_va_Close(va, &sys->dx_sys);
 
+    D3D11_Destroy( &sys->hd3d );
+
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (sys->dxgidebug_dll)
         FreeLibrary(sys->dxgidebug_dll);
@@ -390,6 +393,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         va->sys->textureHeight = fmt->video.i_height;
     }
 
+    err = D3D11_Create( va, &sys->hd3d );
+    if (err != VLC_SUCCESS)
+        goto error;
+
 #if VLC_WINSTORE_APP
     err = directx_va_Open(va, &sys->dx_sys, false);
 #else
@@ -431,7 +438,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
 
     /* */
-    hr = D3D11_CreateDevice(va, dx_sys->hdecoder_dll, true, &sys->d3d_dev);
+    hr = D3D11_CreateDevice(va, &sys->hd3d, true, &sys->d3d_dev);
     if (FAILED(hr)) {
         msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
