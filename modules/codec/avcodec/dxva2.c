@@ -296,7 +296,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         sys->d3d_dev.owner = false;
     }
 
-    err = directx_va_Open(va, &sys->dx_sys, true);
+    err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
 

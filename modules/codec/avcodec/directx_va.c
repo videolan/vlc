@@ -335,9 +335,9 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
         FreeLibrary(dx_sys->hdecoder_dll);
 }
 
-int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys, bool b_dll)
+int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys)
 {
-    if (b_dll) {
+    if (dx_sys->psz_decoder_dll) {
         /* Load dll*/
         dx_sys->hdecoder_dll = LoadLibrary(dx_sys->psz_decoder_dll);
         if (!dx_sys->hdecoder_dll) {

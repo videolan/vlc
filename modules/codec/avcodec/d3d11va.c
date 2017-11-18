@@ -354,7 +354,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->va_pool.pf_new_surface_context     = NewSurfacePicContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
-    dx_sys->psz_decoder_dll            = TEXT("D3D11.DLL");
 
     va->sys = sys;
 
@@ -398,11 +397,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
-#if VLC_WINSTORE_APP
-    err = directx_va_Open(va, &sys->dx_sys, false);
-#else
-    err = directx_va_Open(va, &sys->dx_sys, true);
-#endif
+    err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
 
