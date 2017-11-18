@@ -137,7 +137,7 @@ struct vout_display_sys_t
 
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
-    HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
+    d3d11_handle_t           hd3d;
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
     /* We should find a better way to store this or atleast a shorter name */
     PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
@@ -418,8 +418,8 @@ static int OpenHwnd(vout_display_t *vd)
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!sys->hd3d11_dll) {
+    sys->hd3d.hdll = LoadLibrary(TEXT("D3D11.DLL"));
+    if (!sys->hd3d.hdll) {
         msg_Warn(vd, "cannot load d3d11.dll, aborting");
         return VLC_EGENERIC;
     }
@@ -439,7 +439,7 @@ static int OpenHwnd(vout_display_t *vd)
     }
 
     sys->OurD3D11CreateDevice =
-        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDevice");
+        (void *)GetProcAddress(sys->hd3d.hdll, "D3D11CreateDevice");
     if (!sys->OurD3D11CreateDevice) {
         msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
         Direct3D11Destroy(vd);
@@ -1242,8 +1242,8 @@ static void Direct3D11Destroy(vout_display_t *vd)
 #if !VLC_WINSTORE_APP
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->hd3d11_dll)
-        FreeLibrary(sys->hd3d11_dll);
+    if (sys->hd3d.hdll)
+        FreeLibrary(sys->hd3d.hdll);
     if (sys->hd3dcompiler_dll)
         FreeLibrary(sys->hd3dcompiler_dll);
 
@@ -1251,7 +1251,7 @@ static void Direct3D11Destroy(vout_display_t *vd)
     sys->OurD3D11CreateDeviceAndSwapChain = NULL;
     sys->OurD3DCompile = NULL;
     sys->hdxgi_dll = NULL;
-    sys->hd3d11_dll = NULL;
+    sys->hd3d.hdll = NULL;
     sys->hd3dcompiler_dll = NULL;
 #else
     VLC_UNUSED(vd);
@@ -1476,7 +1476,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    hr = D3D11_CreateDevice(VLC_OBJECT(vd), sys->hd3d11_dll,
+    hr = D3D11_CreateDevice(VLC_OBJECT(vd), &sys->hd3d,
                             is_d3d11_opaque(fmt->i_chroma),
                             &sys->d3d_dev);
     if (FAILED(hr)) {

@@ -130,14 +130,14 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
-HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_dll,
+HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                            bool hw_decoding, d3d11_device_t *out)
 {
 #if !VLC_WINSTORE_APP
 # define D3D11CreateDevice(args...)             pf_CreateDevice(args)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
-    pf_CreateDevice = (void *)GetProcAddress(hdecoder_dll, "D3D11CreateDevice");
+    pf_CreateDevice = (void *)GetProcAddress(hd3d->hdll, "D3D11CreateDevice");
     if (!pf_CreateDevice) {
         msg_Err(obj, "Cannot locate reference to D3D11CreateDevice ABI in DLL");
         return E_NOINTERFACE;
