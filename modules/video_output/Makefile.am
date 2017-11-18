@@ -252,19 +252,17 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/builtin_shaders.h \
-	video_output/win32/win32touch.c video_output/win32/win32touch.h \
-	video_chroma/d3d9_fmt.h
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d9
-libdirect3d9_plugin_la_LIBADD = libchroma_copy.la -lgdi32 $(LIBCOM) -luuid
+libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlace.c \
-        video_chroma/d3d9_fmt.h
-libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM) libdeinterlace_common.la
+libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlace.c
+libdirect3d9_deinterlace_plugin_la_LIBADD = libd3d9_common.la $(LIBCOM) libdeinterlace_common.la
 libdirect3d9_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_adjust_plugin_la_SOURCES = video_output/win32/d3d9_adjust.c
 libdirect3d9_adjust_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libdirect3d9_adjust_plugin_la_LIBADD = $(LIBCOM)
+libdirect3d9_adjust_plugin_la_LIBADD = libd3d9_common.la $(LIBCOM)
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 video_filter_LTLIBRARIES += $(LTLIBdirect3d9_deinterlace) $(LTLIBdirect3d9_adjust)

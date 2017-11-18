@@ -25,6 +25,8 @@
 
 #include <vlc_picture.h>
 
+#include <d3d9.h>
+
 /* owned by the vout for VLC_CODEC_D3D9_OPAQUE */
 struct picture_sys_t
 {
@@ -48,17 +50,16 @@ typedef struct
         LPDIRECT3DDEVICE9   dev;
         LPDIRECT3DDEVICE9EX devex;
     };
+    bool                    owner;
+
+    /* creation parameters */
     D3DPRESENT_PARAMETERS   pp;
     UINT                    adapterId;
 } d3d9_device_t;
 
 #include "../codec/avcodec/va_surface.h"
 
-static inline picture_sys_t *ActivePictureSys(picture_t *p_pic)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
-    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
-}
+picture_sys_t *ActivePictureSys(picture_t *p_pic);
 
 static inline void AcquirePictureSys(picture_sys_t *p_sys)
 {
@@ -69,5 +70,13 @@ static inline void ReleasePictureSys(picture_sys_t *p_sys)
 {
     IDirect3DSurface9_Release(p_sys->surface);
 }
+
+HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
+                          const video_format_t *, const D3DCAPS9 *,
+                          d3d9_device_t *out);
+#define D3D9_CreateDevice(a,b,c,d,e,f)  D3D9_CreateDevice(VLC_OBJECT(a),b,c,d,e,f)
+
+int D3D9_FillPresentationParameters(vlc_object_t *, d3d9_handle_t *, UINT AdapterToUse, HWND,
+                                    const video_format_t *, d3d9_device_t *out);
 
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */

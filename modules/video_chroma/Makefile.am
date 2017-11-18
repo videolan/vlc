@@ -118,9 +118,8 @@ chroma_LTLIBRARIES += \
 endif
 
 # DXVA2
-libdxa9_plugin_la_SOURCES = video_chroma/dxa9.c \
-        video_chroma/d3d9_fmt.h
-libdxa9_plugin_la_LIBADD = libchroma_copy.la
+libdxa9_plugin_la_SOURCES = video_chroma/dxa9.c
+libdxa9_plugin_la_LIBADD = libd3d9_common.la libchroma_copy.la
 
 if HAVE_AVCODEC_DXVA2
 chroma_LTLIBRARIES += \

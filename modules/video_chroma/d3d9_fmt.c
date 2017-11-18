@@ -1,0 +1,139 @@
+/*****************************************************************************
+ * d3d9_fmt.c : D3D9 helper calls
+ *****************************************************************************
+ * Copyright © 2017 VLC authors, VideoLAN and VideoLabs
+ *
+ * Authors: Steve Lhomme <robux4@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <assert.h>
+
+#include "d3d9_fmt.h"
+
+#include "../codec/avcodec/va_surface.h"
+
+picture_sys_t *ActivePictureSys(picture_t *p_pic)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
+    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
+}
+
+#undef D3D9_CreateDevice
+HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
+                          const video_format_t *source, const D3DCAPS9 *caps,
+                          d3d9_device_t *out)
+{
+    HRESULT hr;
+
+    UINT AdapterToUse = D3DADAPTER_DEFAULT;
+    D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
+
+#ifndef NDEBUG
+    // Look for 'NVIDIA PerfHUD' adapter
+    // If it is present, override default settings
+    for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(hd3d->obj); ++Adapter) {
+        D3DADAPTER_IDENTIFIER9 Identifier;
+        hr = IDirect3D9_GetAdapterIdentifier(hd3d->obj,Adapter,0,&Identifier);
+        if (SUCCEEDED(hr) && strstr(Identifier.Description,"PerfHUD") != 0) {
+            AdapterToUse = Adapter;
+            DeviceType = D3DDEVTYPE_REF;
+            break;
+        }
+    }
+#endif
+
+    if (D3D9_FillPresentationParameters(o, hd3d, AdapterToUse, hwnd, source, out))
+        return E_INVALIDARG;
+
+    /* */
+    D3DADAPTER_IDENTIFIER9 d3dai;
+    if (FAILED(IDirect3D9_GetAdapterIdentifier(hd3d->obj, AdapterToUse,0, &d3dai))) {
+        msg_Warn(o, "IDirect3D9_GetAdapterIdentifier failed");
+    } else {
+        msg_Dbg(o, "Direct3d9 Device: %s %lu %lu %lu", d3dai.Description,
+                d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
+    }
+
+    DWORD creationFlags = D3DCREATE_MULTITHREADED;
+    if ( (caps->DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
+         (caps->DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
+        creationFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+    } else if (caps->DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
+        creationFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
+    } else {
+        creationFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    }
+
+    if (hd3d->use_ex)
+        hr = IDirect3D9Ex_CreateDeviceEx(hd3d->objex, AdapterToUse,
+                                         DeviceType, hwnd,
+                                         creationFlags,
+                                         &out->pp, NULL, &out->devex);
+    else
+        hr = IDirect3D9_CreateDevice(hd3d->obj, AdapterToUse,
+                                     DeviceType, hwnd,
+                                     creationFlags,
+                                     &out->pp, &out->dev);
+
+    if (SUCCEEDED(hr))
+    {
+        out->owner = true;
+        out->adapterId = AdapterToUse;
+    }
+    return hr;
+}
+
+/**
+ * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
+ * from the default adapter.
+ */
+int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT AdapterToUse, HWND hwnd,
+                                    const video_format_t *source, d3d9_device_t *out)
+{
+    /*
+    ** Get the current desktop display mode, so we can set up a back
+    ** buffer of the same format
+    */
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, AdapterToUse, &d3ddm);
+    if (FAILED(hr)) {
+       msg_Err(o, "Could not read adapter display mode. (hr=0x%0lx)", hr);
+       return VLC_EGENERIC;
+    }
+
+    /* Set up the structure used to create the D3DDevice. */
+    D3DPRESENT_PARAMETERS *d3dpp = &out->pp;
+    ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
+    d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
+    d3dpp->Windowed               = TRUE;
+    d3dpp->hDeviceWindow          = hwnd;
+    d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
+                                          source->i_width);
+    d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
+                                          source->i_height);
+    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
+    d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
+    d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
+    d3dpp->BackBufferFormat       = d3ddm.Format;
+    d3dpp->BackBufferCount        = 1;
+    d3dpp->EnableAutoDepthStencil = FALSE;
+
+    return VLC_SUCCESS;
+}

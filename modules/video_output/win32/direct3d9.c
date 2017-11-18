@@ -190,9 +190,6 @@ static int  Direct3D9Create (vlc_object_t *, struct d3dctx *, const video_format
 static int  Direct3D9Reset  (vout_display_t *);
 static void Direct3D9Destroy(vlc_object_t *, struct d3dctx *);
 
-static int Direct3D9CreateDevice(vlc_object_t *, struct d3dctx *, const video_format_t *);
-static void Direct3D9DestroyDevice(vlc_object_t *, struct d3dctx *);
-
 static int  Direct3D9Open (vout_display_t *, video_format_t *);
 static void Direct3D9Close(vout_display_t *);
 
@@ -831,113 +828,9 @@ static void Direct3D9Destroy(vlc_object_t *o, struct d3dctx *d3dctx)
     d3dctx->hxdll = NULL;
 }
 
-
-/**
- * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
- * from the default adapter.
- */
-static int Direct3D9FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT AdapterToUse, HWND hwnd,
-                                               const video_format_t *source, d3d9_device_t *out)
-{
-    /*
-    ** Get the current desktop display mode, so we can set up a back
-    ** buffer of the same format
-    */
-    D3DDISPLAYMODE d3ddm;
-    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, AdapterToUse, &d3ddm);
-    if (FAILED(hr)) {
-       msg_Err(o, "Could not read adapter display mode. (hr=0x%0lx)", hr);
-       return VLC_EGENERIC;
-    }
-
-    /* Set up the structure used to create the D3DDevice. */
-    D3DPRESENT_PARAMETERS *d3dpp = &out->pp;
-    ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-    d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
-    d3dpp->Windowed               = TRUE;
-    d3dpp->hDeviceWindow          = hwnd;
-    d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
-                                          source->i_width);
-    d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
-                                          source->i_height);
-    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
-    d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
-    d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
-    d3dpp->BackBufferFormat       = d3ddm.Format;
-    d3dpp->BackBufferCount        = 1;
-    d3dpp->EnableAutoDepthStencil = FALSE;
-
-    return VLC_SUCCESS;
-}
-
 /* */
 static int  Direct3D9CreateResources (vout_display_t *, video_format_t *);
 static void Direct3D9DestroyResources(vout_display_t *);
-
-static HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
-                                 const video_format_t *source, const D3DCAPS9 *caps,
-                                 d3d9_device_t *out)
-{
-    HRESULT hr;
-
-    UINT AdapterToUse = D3DADAPTER_DEFAULT;
-    D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
-
-#ifndef NDEBUG
-    // Look for 'NVIDIA PerfHUD' adapter
-    // If it is present, override default settings
-    for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(hd3d->obj); ++Adapter) {
-        D3DADAPTER_IDENTIFIER9 Identifier;
-        HRESULT Res = IDirect3D9_GetAdapterIdentifier(hd3d->obj,Adapter,0,&Identifier);
-        if (SUCCEEDED(Res) && strstr(Identifier.Description,"PerfHUD") != 0) {
-            AdapterToUse = Adapter;
-            DeviceType = D3DDEVTYPE_REF;
-            break;
-        }
-    }
-#endif
-
-    if (Direct3D9FillPresentationParameters(o, hd3d, AdapterToUse, hwnd, source, out))
-        return E_INVALIDARG;
-
-    /* */
-    D3DADAPTER_IDENTIFIER9 d3dai;
-    if (FAILED(IDirect3D9_GetAdapterIdentifier(hd3d->obj, AdapterToUse,0, &d3dai))) {
-        msg_Warn(o, "IDirect3D9_GetAdapterIdentifier failed");
-    } else {
-        msg_Dbg(o, "Direct3d9 Device: %s %lu %lu %lu", d3dai.Description,
-                d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
-    }
-
-    DWORD creationFlags = D3DCREATE_MULTITHREADED;
-    if ( (caps->DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
-         (caps->DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
-        creationFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
-    } else if (caps->DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
-        creationFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
-    } else {
-        creationFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-    }
-
-    if (hd3d->use_ex)
-        hr = IDirect3D9Ex_CreateDeviceEx(hd3d->objex, AdapterToUse,
-                                         DeviceType, hwnd,
-                                         creationFlags,
-                                         &out->pp, NULL, &out->devex);
-    else
-        hr = IDirect3D9_CreateDevice(hd3d->obj, AdapterToUse,
-                                     DeviceType, hwnd,
-                                     creationFlags,
-                                     &out->pp, &out->dev);
-    return hr;
-}
-
-static int Direct3D9CreateDevice(vlc_object_t *o, struct d3dctx *d3dctx, const video_format_t *source)
-{
-    // Create the D3DDevice
-    HRESULT hr = D3D9_CreateDevice(o, &d3dctx->hd3d, d3dctx->hwnd, source, &d3dctx->caps, &d3dctx->d3d_dev);
-    return FAILED(hr) ? VLC_EGENERIC : VLC_SUCCESS;
-}
 
 static void Direct3D9DestroyDevice(vlc_object_t *o, struct d3dctx *d3dctx)
 {
@@ -957,7 +850,8 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 
     sys->d3dctx.hwnd = sys->sys.hvideownd;
 
-    if (Direct3D9CreateDevice(VLC_OBJECT(vd), &sys->d3dctx, &vd->source) != VLC_SUCCESS)
+    if (FAILED(D3D9_CreateDevice(vd, &sys->d3dctx.hd3d, sys->d3dctx.hwnd,
+                                 &vd->source, &sys->d3dctx.caps, &sys->d3dctx.d3d_dev)))
         return VLC_EGENERIC;
 
     const d3d9_device_t *p_d3d9_dev = &sys->d3dctx.d3d_dev;
@@ -1022,7 +916,7 @@ static int Direct3D9Reset(vout_display_t *vd)
     struct d3dctx *d3dctx = &sys->d3dctx;
     d3d9_device_t *p_d3d9_dev = &d3dctx->d3d_dev;
 
-    if (Direct3D9FillPresentationParameters(VLC_OBJECT(vd), &d3dctx->hd3d, p_d3d9_dev->adapterId, d3dctx->hwnd, &vd->source, &d3dctx->d3d_dev))
+    if (D3D9_FillPresentationParameters(VLC_OBJECT(vd), &d3dctx->hd3d, p_d3d9_dev->adapterId, d3dctx->hwnd, &vd->source, &d3dctx->d3d_dev))
         return VLC_EGENERIC;
 
     /* release all D3D objects */
@@ -2164,7 +2058,8 @@ GLConvOpen(vlc_object_t *obj)
         goto error;
     }
 
-    if (Direct3D9CreateDevice(obj, &priv->d3dctx, &tc->fmt) != VLC_SUCCESS)
+    if (FAILED(D3D9_CreateDevice(obj, &priv->d3dctx.hd3d, priv->d3dctx.hwnd,
+                                 &tc->fmt, &priv->d3dctx.caps, &priv->d3dctx.d3d_dev)))
         goto error;
 
     HRESULT hr;
