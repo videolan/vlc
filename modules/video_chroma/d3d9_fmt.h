@@ -78,6 +78,10 @@ HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
 #define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
 
 void D3D9_ReleaseDevice(d3d9_device_t *);
+int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
+#define D3D9_Create(a,b) D3D9_Create( VLC_OBJECT(a), b )
+
+void D3D9_Destroy(d3d9_handle_t *);
 
 int D3D9_FillPresentationParameters(vlc_object_t *, d3d9_handle_t *, UINT AdapterToUse, HWND,
                                     const video_format_t *, d3d9_device_t *out);

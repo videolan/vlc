@@ -171,3 +171,65 @@ int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d, UINT A
 
     return VLC_SUCCESS;
 }
+
+void D3D9_Destroy(d3d9_handle_t *hd3d)
+{
+    if (hd3d->obj)
+    {
+       IDirect3D9_Release(hd3d->obj);
+       hd3d->obj = NULL;
+    }
+    if (hd3d->hdll)
+    {
+        FreeLibrary(hd3d->hdll);
+        hd3d->hdll = NULL;
+    }
+}
+
+/**
+ * It initializes an instance of Direct3D9
+ */
+#undef D3D9_Create
+int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
+{
+    hd3d->hdll = LoadLibrary(TEXT("D3D9.DLL"));
+    if (!hd3d->hdll) {
+        msg_Warn(o, "cannot load d3d9.dll, aborting");
+        return VLC_EGENERIC;
+    }
+
+    LPDIRECT3D9 (WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
+    OurDirect3DCreate9 =
+        (void *)GetProcAddress(hd3d->hdll, "Direct3DCreate9");
+    if (!OurDirect3DCreate9) {
+        msg_Err(o, "Cannot locate reference to Direct3DCreate9 ABI in DLL");
+        goto error;
+    }
+
+    HRESULT (WINAPI *OurDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex **ppD3D);
+    OurDirect3DCreate9Ex =
+        (void *)GetProcAddress(hd3d->hdll, "Direct3DCreate9Ex");
+
+    /* Create the D3D object. */
+    hd3d->use_ex = false;
+    if (OurDirect3DCreate9Ex) {
+        HRESULT hr = OurDirect3DCreate9Ex(D3D_SDK_VERSION, &hd3d->objex);
+        if(!FAILED(hr)) {
+            msg_Dbg(o, "Using Direct3D9 Extended API!");
+            hd3d->use_ex = true;
+        }
+    }
+
+    if (!hd3d->obj)
+    {
+        hd3d->obj = OurDirect3DCreate9(D3D_SDK_VERSION);
+        if (!hd3d->obj) {
+            msg_Err(o, "Could not create Direct3D9 instance.");
+            goto error;
+        }
+    }
+    return VLC_SUCCESS;
+error:
+    D3D9_Destroy( hd3d );
+    return VLC_EGENERIC;
+}
