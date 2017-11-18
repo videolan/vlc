@@ -194,7 +194,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     /* Find out the filename of ourselves so we can install it to the
      * service control manager */
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
-    sprintf( psz_path, "\"%s\" -I "MODULE_STRING, FromT(psz_pathtmp) );
+    sprintf( psz_path, "\"%s\" -I ntservice", FromT(psz_pathtmp) );
 
     psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
     if( psz_extra && *psz_extra )
