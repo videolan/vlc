@@ -136,20 +136,20 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     }
 
     int type = VLC_VAR_INTEGER;
-    if( var_Type( p_filter->obj.parent, MODULE_STRING "-level" ) != 0 )
+    if( var_Type( p_filter->obj.parent, "chain-level" ) != 0 )
         type |= VLC_VAR_DOINHERIT;
 
-    var_Create( p_filter, MODULE_STRING "-level", type );
+    var_Create( p_filter, "chain-level", type );
     /* Note: atomicity is not actually needed here. */
-    var_IncInteger( p_filter, MODULE_STRING "-level" );
+    var_IncInteger( p_filter, "chain-level" );
 
-    int level = var_GetInteger( p_filter, MODULE_STRING "-level" );
+    int level = var_GetInteger( p_filter, "chain-level" );
     if( level < 0 || level > CHAIN_LEVEL_MAX )
         msg_Err( p_filter, "Too high level of recursion (%d)", level );
     else
         i_ret = pf_build( p_filter );
 
-    var_Destroy( p_filter, MODULE_STRING "-level" );
+    var_Destroy( p_filter, "chain-level" );
 
     if( i_ret )
     {
@@ -195,8 +195,8 @@ static int ActivateFilter( vlc_object_t *p_this )
 
     /* Force only one level of iteration when using the chain converter from a
      * filter. */
-    var_Create( p_filter, MODULE_STRING "-level", VLC_VAR_INTEGER );
-    var_SetInteger( p_filter, MODULE_STRING "-level", CHAIN_LEVEL_MAX - 1 );
+    var_Create( p_filter, "chain-level", VLC_VAR_INTEGER );
+    var_SetInteger( p_filter, "chain-level", CHAIN_LEVEL_MAX - 1 );
 
     /* Try to add a converter before the requested filter */
     return Activate( p_filter, BuildFilterChain );
