@@ -31,6 +31,27 @@ struct picture_sys_t
     LPDIRECT3DSURFACE9 surface;
 };
 
+typedef struct
+{
+    bool                    use_ex;
+    union {
+        LPDIRECT3D9         obj;
+        LPDIRECT3D9EX       objex;
+    };
+} d3d9_handle_t;
+
+typedef struct
+{
+    /* d3d9_handle_t           hd3d; TODO */
+    union
+    {
+        LPDIRECT3DDEVICE9   dev;
+        LPDIRECT3DDEVICE9EX devex;
+    };
+    D3DPRESENT_PARAMETERS   pp;
+    UINT                    adapterId;
+} d3d9_device_t;
+
 #include "../codec/avcodec/va_surface.h"
 
 static inline picture_sys_t *ActivePictureSys(picture_t *p_pic)
