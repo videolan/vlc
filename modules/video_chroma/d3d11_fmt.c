@@ -413,3 +413,25 @@ error:
         ID3D11Texture2D_Release(slicedTexture);
     return VLC_EGENERIC;
 }
+
+#undef D3D11_Create
+int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
+    hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
+    if (!hd3d->hdll)
+    {
+        msg_Warn(obj, "cannot load d3d11.dll, aborting");
+        return VLC_EGENERIC;
+    }
+#endif
+    return VLC_SUCCESS;
+}
+
+void D3D11_Destroy(d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
+    if (hd3d->hdll)
+        FreeLibrary(hd3d->hdll);
+#endif
+}
