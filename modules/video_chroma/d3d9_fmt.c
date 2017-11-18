@@ -85,8 +85,12 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     }
 
     out->adapterId = AdapterToUse;
-    if (D3D9_FillPresentationParameters(o, hd3d, source, out))
+    out->hwnd      = hwnd;
+    if (D3D9_FillPresentationParameters(hd3d, source, out))
+    {
+        msg_Err(o, "Could not presentation parameters");
         return E_INVALIDARG;
+    }
 
     /* */
     D3DADAPTER_IDENTIFIER9 d3dai;
@@ -138,7 +142,7 @@ void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
  * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
  * from the default adapter.
  */
-int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d,
+int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
                                     const video_format_t *source, d3d9_device_t *out)
 {
     /*
@@ -149,10 +153,8 @@ int D3D9_FillPresentationParameters(vlc_object_t *o, d3d9_handle_t *hd3d,
     if (source->i_width)
     {
         HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, out->adapterId, &d3ddm);
-        if (FAILED(hr)) {
-           msg_Err(o, "Could not read adapter display mode. (hr=0x%0lx)", hr);
+        if (FAILED(hr))
            return VLC_EGENERIC;
-        }
     }
 
     /* Set up the structure used to create the D3DDevice. */
