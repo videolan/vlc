@@ -196,8 +196,8 @@ static void Destroy( vlc_object_t *p_this )
                 p_out[i * i_out_line_len + j] =                         \
                     VLC_CLIP( p_src[line_idx_2 + j] + pix, 0, maxval);  \
             }                                                           \
-            p_out[i * i_out_line_len + i_visible_pitch / 2 - 1] =       \
-                p_src[i * i_src_line_len + i_visible_pitch / 2 - 1];    \
+            p_out[i * i_out_line_len + i_visible_pitch / data_sz - 1] = \
+                p_src[i * i_src_line_len + i_visible_pitch / data_sz - 1];  \
         }                                                               \
         memcpy(&p_out[(i_visible_lines - 1) * i_out_line_len],          \
                &p_src[(i_visible_lines - 1) * i_src_line_len],          \
