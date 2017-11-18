@@ -150,7 +150,7 @@ struct vout_display_sys_t
 #endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
-    d3d11_handle_t           hd3d11;
+    d3d11_device_t           hd3d11;
     d3d_quad_t               picQuad;
     const d3d_format_t       *picQuadConfig;
     ID3D11PixelShader        *picQuadPixelShader;

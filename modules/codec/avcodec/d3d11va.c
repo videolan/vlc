@@ -427,7 +427,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
 
     /* */
-    d3d11_handle_t hd3d11;
+    d3d11_device_t hd3d11;
     hr = D3D11_CreateDevice(VLC_OBJECT(va), dx_sys->hdecoder_dll, true, &hd3d11);
     if (FAILED(hr)) {
         msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);

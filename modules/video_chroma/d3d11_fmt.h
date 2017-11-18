@@ -33,7 +33,7 @@ typedef struct
 {
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
-} d3d11_handle_t;
+} d3d11_device_t;
 
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
@@ -76,8 +76,7 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                               ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW]);
 
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, HINSTANCE hdecoder_dll,
-                                         bool hw_decoding,
-                                         d3d11_handle_t *p_hd3d11);
+                           bool hw_decoding, d3d11_device_t *out);
 
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
@@ -98,7 +97,7 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
                                                   bool allow_opaque,
                                                   UINT supportFlags);
 
-int AllocateTextures(vlc_object_t *obj, d3d11_handle_t *hd3d11,
+int AllocateTextures(vlc_object_t *obj, d3d11_device_t *hd3d11,
                      const d3d_format_t *cfg, const video_format_t *fmt,
                      unsigned pool_size, ID3D11Texture2D *textures[]);
 
