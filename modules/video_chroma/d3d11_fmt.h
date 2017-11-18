@@ -33,6 +33,7 @@ typedef struct
 {
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
+    bool                     owner;
 } d3d11_device_t;
 
 typedef struct
