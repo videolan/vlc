@@ -2177,17 +2177,17 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
 
 /**
  * Compute the vertex ordering needed to rotate the video. Without
- * rotation, the vertices of the rectangle are defined in a clockwise
+ * rotation, the vertices of the rectangle are defined in a counterclockwise
  * order. This function computes a remapping of the coordinates to
  * implement the rotation, given fixed texture coordinates.
  * The unrotated order is the following:
- * 0--1
- * |  |
  * 3--2
- * For a 180 degrees rotation it should like this:
- * 2--3
  * |  |
+ * 0--1
+ * For a 180 degrees rotation it should like this:
  * 1--0
+ * |  |
+ * 2--3
  * Vertex 0 should be assigned coordinates at index 2 from the
  * unrotated order and so on, thus yielding order: 2 3 0 1.
  */
@@ -2219,22 +2219,22 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
             vertex_order[3] = 3;
             break;
         case ORIENT_HFLIPPED:
-            vertex_order[0] = 3;
-            vertex_order[1] = 2;
-            vertex_order[2] = 1;
-            vertex_order[3] = 0;
-            break;
-        case ORIENT_VFLIPPED:
             vertex_order[0] = 1;
             vertex_order[1] = 0;
             vertex_order[2] = 3;
             vertex_order[3] = 2;
             break;
-        case ORIENT_ANTI_TRANSPOSED: /* transpose + vflip */
-            vertex_order[0] = 1;
+        case ORIENT_VFLIPPED:
+            vertex_order[0] = 3;
             vertex_order[1] = 2;
-            vertex_order[2] = 3;
+            vertex_order[2] = 1;
             vertex_order[3] = 0;
+            break;
+        case ORIENT_ANTI_TRANSPOSED: /* transpose + vflip */
+            vertex_order[0] = 0;
+            vertex_order[1] = 3;
+            vertex_order[2] = 2;
+            vertex_order[3] = 1;
             break;
        default:
             vertex_order[0] = 0;
@@ -2308,13 +2308,28 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
     dst_data[3].texture.x = 0.0f;
     dst_data[3].texture.y = 0.0f;
 
-    triangle_pos[0] = 3;
-    triangle_pos[1] = 1;
-    triangle_pos[2] = 0;
+    /* Make sure surfaces are facing the right way */
+    if( orientation == ORIENT_TOP_RIGHT || orientation == ORIENT_BOTTOM_LEFT
+     || orientation == ORIENT_LEFT_TOP  || orientation == ORIENT_RIGHT_BOTTOM )
+    {
+        triangle_pos[0] = 0;
+        triangle_pos[1] = 1;
+        triangle_pos[2] = 3;
 
-    triangle_pos[3] = 2;
-    triangle_pos[4] = 1;
-    triangle_pos[5] = 3;
+        triangle_pos[3] = 3;
+        triangle_pos[4] = 1;
+        triangle_pos[5] = 2;
+    }
+    else
+    {
+        triangle_pos[0] = 3;
+        triangle_pos[1] = 1;
+        triangle_pos[2] = 0;
+
+        triangle_pos[3] = 2;
+        triangle_pos[4] = 1;
+        triangle_pos[5] = 3;
+    }
 }
 
 #define SPHERE_SLICES 128
