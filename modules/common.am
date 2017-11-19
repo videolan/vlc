@@ -35,5 +35,6 @@ AM_LDFLAGS = \
 if HAVE_WIN32
 AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo -Wc,-static
 endif
+AM_YFLAGS = -d
 
-SUFFIXES =
+SUFFIXES = .l .y

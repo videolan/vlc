@@ -65,6 +65,8 @@ AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AM_PROG_AS
+AC_PROG_LEX
+AC_PROG_YACC
 
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
@@ -2979,10 +2981,8 @@ dnl
 AC_ARG_ENABLE(css,
 [  --enable-css            CSS selector engine (default auto)])
 AS_IF([test "${enable_css}" != "no"], [
-  AC_PROG_LEX
   with_css="no"
   AS_IF([test "x$LEX" != "x:"], [
-    AC_PROG_YACC
     dnl can only accept bison or we need byacc feature test for %destructor
     AS_IF([test "x$YACC" = "xbison -y"], [
         AC_DEFINE(HAVE_CSS, 1, [Define if CSS engine is built])
