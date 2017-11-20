@@ -753,12 +753,14 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     return block;
 }
 
-static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
-                                     picture_t *pic)
+static void qsv_queue_encode_picture(encoder_t *enc, picture_t *pic)
 {
     encoder_sys_t *sys = enc->p_sys;
     mfxStatus sts;
     mfxFrameSurface1 *frame = NULL;
+    async_task_t *task = calloc(1, sizeof(*task));
+    if (unlikely(task == NULL))
+        return;
 
     if (!(task->syncp = calloc(1, sizeof(*task->syncp)))) {
         msg_Err(enc, "Unable to allocate syncpoint for encoder output");
@@ -791,6 +793,15 @@ static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
     memset(&task->bs, 0, sizeof(task->bs));
     task->bs.MaxLength = task->block->i_buffer;
     task->bs.Data = task->block->p_buffer;
+
+    if (!(task->syncp = calloc(1, sizeof(*task->syncp)))) {
+        msg_Err(enc, "Unable to allocate syncpoint for encoder output");
+        goto done;
+    }
+
+    if (qsv_frame) {
+        surf = &qsv_frame->surface;
+    }
 
     for (;;) {
         sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, frame, &task->bs, task->syncp);
@@ -828,22 +839,18 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
 {
     encoder_t     *enc = (encoder_t *)this;
     encoder_sys_t *sys = enc->p_sys;
-    async_task_t  *task = NULL;
     block_t       *block = NULL;
 
-    task = calloc(1, sizeof(*task));
-    if (likely(task != NULL))
-    {
-        qsv_queue_encode_picture( enc, task, pic );
+    qsv_queue_encode_picture( enc, pic );
 
-        if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
-             (!pic && async_task_t_fifo_GetCount(&sys->packets)))
-        {
-            assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
-            task = async_task_t_fifo_Get(&sys->packets);
-            block = qsv_synchronize_block( enc, task );
-            free(task);
-        }
+    if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
+         (!pic && async_task_t_fifo_GetCount(&sys->packets)))
+    {
+        assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
+        async_task_t *task = async_task_t_fifo_Get(&sys->packets);
+        block = qsv_synchronize_block( enc, task );
+        free(task->syncp);
+        free(task);
     }
 
     return block;
