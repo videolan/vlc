@@ -53,6 +53,8 @@ void ts_pid_list_Release( demux_t *p_demux, ts_pid_list_t *p_list )
 #ifndef NDEBUG
         if( pid->type != TYPE_FREE )
             msg_Err( p_demux, "PID %d type %d not freed refcount %d", pid->i_pid, pid->type, pid->i_refcount );
+#else
+        VLC_UNUSED(p_demux);
 #endif
         free( pid );
     }
