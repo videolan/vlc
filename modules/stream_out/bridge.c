@@ -67,7 +67,7 @@
     "If set to true, the bridge will discard all input elementary streams " \
     "except if it doesn't receive data from another bridge-in. This can " \
     "be used to configure a place holder stream when the real source " \
-    "breaks. Source and placeholder streams should have the same format. " )
+    "breaks. Source and placeholder streams should have the same format." )
 
 #define PLACEHOLDER_DELAY_TEXT N_( "Placeholder delay" )
 #define PLACEHOLDER_DELAY_LONGTEXT N_( \

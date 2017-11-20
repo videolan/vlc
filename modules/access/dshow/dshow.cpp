@@ -136,7 +136,7 @@ static const char *const ppsz_standards_list_text[] =
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
-    "will be used. ")
+    "will be used.")
 #define SIZE_TEXT N_("Video size")
 #define SIZE_LONGTEXT N_( \
     "Size of the video that will be displayed by the " \

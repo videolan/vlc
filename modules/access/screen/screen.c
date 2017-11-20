@@ -79,7 +79,7 @@
 #ifdef SCREEN_DISPLAY_ID
 #define DISPLAY_ID_TEXT N_( "Display ID" )
 #define DISPLAY_ID_LONGTEXT N_( \
-    "Display ID. If not specified, main display ID is used. " )
+    "Display ID. If not specified, main display ID is used." )
 #define INDEX_TEXT N_( "Screen index" )
 #define INDEX_LONGTEXT N_( \
     "Index of screen (1, 2, 3, ...). Alternative to Display ID." )

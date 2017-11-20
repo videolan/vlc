@@ -616,7 +616,7 @@ QFrame *AbstractController::telexFrame()
     QToolButton *telexTransparent = new QToolButton;
     setupButton( telexTransparent );
     BUTTON_SET_BAR2( telexTransparent, toolbar/tvtelx,
-                     qtr( "Toggle Transparency " ) );
+                     qtr( "Toggle Transparency" ) );
     telexTransparent->setEnabled( false );
     telexTransparent->setCheckable( true );
     telexLayout->addWidget( telexTransparent );

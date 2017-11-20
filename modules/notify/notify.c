@@ -53,7 +53,7 @@ static void Close   ( vlc_object_t * );
 #define APPLICATION_NAME "VLC media player"
 
 #define TIMEOUT_TEXT N_("Timeout (ms)")
-#define TIMEOUT_LONGTEXT N_("How long the notification will be displayed ")
+#define TIMEOUT_LONGTEXT N_("How long the notification will be displayed.")
 
 vlc_module_begin ()
     set_category( CAT_INTERFACE )

@@ -65,7 +65,7 @@
 #define KAISER_PARAMETER_TEXT N_( "Kaiser window parameter" )
 #define KAISER_PARAMETER_LONGTEXT N_( \
       "The parameter alpha for the Kaiser window. Increasing alpha " \
-      "increases the main-lobe width and decreases the side-lobe amplitude. " )
+      "increases the main-lobe width and decreases the side-lobe amplitude." )
 
 #define NBBANDS_TEXT N_( "Show 80 bands instead of 20" )
 #define SPNBBANDS_LONGTEXT N_( \

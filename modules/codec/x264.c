@@ -292,7 +292,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #define WEIGHTP_TEXT N_("Weighted prediction for P-frames")
-#define WEIGHTP_LONGTEXT N_(" Weighted prediction for P-frames: "\
+#define WEIGHTP_LONGTEXT N_("Weighted prediction for P-frames: "\
     " - 0: Disabled\n"\
     " - 1: Blind offset\n"\
     " - 2: Smart analysis\n" )

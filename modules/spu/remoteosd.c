@@ -82,7 +82,7 @@
 
 #define RMTOSD_UPDATE_TEXT N_("VNC poll interval" )
 #define RMTOSD_UPDATE_LONGTEXT N_( \
-    "In this interval an update from VNC is requested, default every 300 ms. ")
+    "In this interval an update from VNC is requested, default every 300 ms.")
 
 #define RMTOSD_POLL_TEXT N_("VNC polling")
 #define RMTOSD_POLL_LONGTEXT N_( \

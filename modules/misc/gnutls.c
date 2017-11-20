@@ -482,7 +482,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
             msg_Dbg(creds, "certificate keys mismatch for %s", host);
             msg = N_("However, the security certificate presented by the "
                 "server changed since the previous visit and was not "
-                "authenticated by any trusted Certificate Authority. ");
+                "authenticated by any trusted Certificate Authority.");
             break;
         default:
             msg_Err(creds, "certificate key match error for %s: %s", host,

@@ -99,7 +99,7 @@ static void Close ( vlc_object_t * );
 #define CPKT_TEXT N_("Packet size in bytes to decrypt")
 #define CPKT_LONGTEXT N_("Specify the size of the TS packet to decrypt. " \
     "The decryption routines subtract the TS-header from the value before " \
-    "decrypting. " )
+    "decrypting." )
 
 #define SPLIT_ES_TEXT N_("Separate sub-streams")
 #define SPLIT_ES_LONGTEXT N_( \

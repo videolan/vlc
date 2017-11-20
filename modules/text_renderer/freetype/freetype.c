@@ -91,7 +91,7 @@ static void Destroy( vlc_object_t * );
 #define OPACITY_TEXT N_("Text opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of the " \
     "text that will be rendered on the video. 0 = transparent, " \
-    "255 = totally opaque. " )
+    "255 = totally opaque." )
 #define COLOR_TEXT N_("Text default color")
 #define COLOR_LONGTEXT N_("The color of the text that will be rendered on "\
     "the video. This must be an hexadecimal (like HTML colors). The first two "\

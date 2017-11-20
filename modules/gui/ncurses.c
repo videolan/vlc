@@ -1052,8 +1052,8 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
 
     y++; /* leave a blank line */
 
-    repeat = var_GetBool(p_playlist, "repeat") ? _("[Repeat] ") : "";
-    random = var_GetBool(p_playlist, "random") ? _("[Random] ") : "";
+    repeat = var_GetBool(p_playlist, "repeat") ? _("[Repeat]") : "";
+    random = var_GetBool(p_playlist, "random") ? _("[Random]") : "";
     loop   = var_GetBool(p_playlist, "loop")   ? _("[Loop]")    : "";
 
     if (p_input) {

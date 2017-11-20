@@ -46,7 +46,7 @@
 #define VBI_DEVICE_TEXT N_("VBI capture device")
 #define VBI_DEVICE_LONGTEXT N_( \
     "The device node where VBI data can be read "   \
-    " (for closed captions) " )
+    " (for closed captions)." )
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
