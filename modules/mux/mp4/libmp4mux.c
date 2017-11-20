@@ -269,6 +269,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
             i_object_type_indication = 0x6b;
             break;
         }
+        /* fallthrough */
     case VLC_CODEC_MP2V:
         /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
         i_object_type_indication = 0x65;
