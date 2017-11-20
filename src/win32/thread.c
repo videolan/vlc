@@ -280,11 +280,12 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 int vlc_threadvar_set (vlc_threadvar_t key, void *value)
 {
     int saved = GetLastError ();
-    int val = TlsSetValue (key->id, value) ? ENOMEM : 0;
 
-    if (val == 0)
-        SetLastError(saved);
-    return val;
+    if (!TlsSetValue(key->id, value))
+        return ENOMEM;
+
+    SetLastError(saved);
+    return 0;
 }
 
 void *vlc_threadvar_get (vlc_threadvar_t key)
