@@ -1300,7 +1300,156 @@ bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
     return true;
 }
 
-/* 8.3.1 Decoding process for POC */
+/*
+ * HEVCDecoderConfigurationRecord operations
+ */
+
+static void hevc_dcr_params_from_vps( const uint8_t * p_buffer, size_t i_buffer,
+                                      struct hevc_dcr_values *p_values )
+{
+    if( i_buffer < 19 )
+        return;
+
+    bs_t bs;
+    bs_init( &bs, p_buffer, i_buffer );
+    unsigned i_bitflow = 0;
+    bs.p_fwpriv = &i_bitflow;
+    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+
+    /* first two bytes are the NAL header, 3rd and 4th are:
+        vps_video_parameter_set_id(4)
+        vps_reserved_3_2bis(2)
+        vps_max_layers_minus1(6)
+        vps_max_sub_layers_minus1(3)
+        vps_temporal_id_nesting_flags
+    */
+    bs_skip( &bs, 16 + 4 + 2 + 6 );
+    p_values->i_numTemporalLayer = bs_read( &bs, 3 ) + 1;
+    p_values->b_temporalIdNested = bs_read1( &bs );
+
+    /* 5th & 6th are reserved 0xffff */
+    bs_skip( &bs, 16 );
+    /* copy the first 12 bytes of profile tier */
+    for( unsigned i=0; i<12; i++ )
+        p_values->general_configuration[i] = bs_read( &bs, 8 );
+}
+
+#define HEVC_DCR_ADD_NALS(type, count, buffers, sizes) \
+for (uint8_t i = 0; i < count; i++) \
+{ \
+    if( i ==0 ) \
+    { \
+        *p++ = (type | (b_completeness ? 0x80 : 0)); \
+        SetWBE( p, count ); p += 2; \
+    } \
+    SetWBE( p, sizes[i]); p += 2; \
+    memcpy( p, buffers[i], sizes[i] ); p += sizes[i];\
+}
+
+#define HEVC_DCR_ADD_SIZES(count, sizes) \
+if(count > 0) \
+{\
+    i_total_size += 3;\
+    for(uint8_t i=0; i<count; i++)\
+        i_total_size += 2 + sizes[i];\
+}
+
+/* Generate HEVCDecoderConfiguration iso/iec 14496-15 3rd edition */
+uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
+                           uint8_t i_nal_length_size,
+                           bool b_completeness, size_t *pi_size )
+{
+    *pi_size = 0;
+
+    if( i_nal_length_size != 1 && i_nal_length_size != 2 && i_nal_length_size != 4 )
+        return NULL;
+
+    struct hevc_dcr_values values =
+    {
+        .general_configuration = {0},
+        .i_numTemporalLayer = 0,
+        .i_chroma_idc = 1,
+        .i_bit_depth_luma_minus8 = 0,
+        .i_bit_depth_chroma_minus8 = 0,
+        .b_temporalIdNested = false,
+    };
+
+    if( p_params->p_values != NULL )
+    {
+        values = *p_params->p_values;
+    }
+    else
+    {
+        if( p_params->i_vps_count == 0 || p_params->i_sps_count == 0 )
+           return NULL; /* required to extract info */
+
+        hevc_dcr_params_from_vps( p_params->p_vps[0], p_params->rgi_vps[0], &values );
+
+        hevc_sequence_parameter_set_t *p_sps =
+                hevc_decode_sps( p_params->p_sps[0], p_params->rgi_sps[0], true );
+        if( p_sps )
+        {
+            values.i_chroma_idc = p_sps->chroma_format_idc;
+            values.i_bit_depth_chroma_minus8 = p_sps->bit_depth_chroma_minus8;
+            values.i_bit_depth_luma_minus8 = p_sps->bit_depth_luma_minus8;
+            hevc_rbsp_release_sps( p_sps );
+        }
+    }
+
+    size_t i_total_size = 1+12+2+4+2+2;
+    HEVC_DCR_ADD_SIZES(p_params->i_vps_count, p_params->rgi_vps);
+    HEVC_DCR_ADD_SIZES(p_params->i_sps_count, p_params->rgi_sps);
+    HEVC_DCR_ADD_SIZES(p_params->i_pps_count, p_params->rgi_pps);
+    HEVC_DCR_ADD_SIZES(p_params->i_sei_count, p_params->rgi_sei);
+
+    uint8_t *p_data = malloc( i_total_size );
+    if( p_data == NULL )
+        return NULL;
+
+    *pi_size = i_total_size;
+    uint8_t *p = p_data;
+
+    /* version */
+    *p++ = 0x01;
+    memcpy( p, values.general_configuration, 12 ); p += 12;
+    /* Don't set min spatial segmentation */
+    SetWBE( p, 0xF000 ); p += 2;
+    /* Don't set parallelism type since segmentation isn't set */
+    *p++ = 0xFC;
+    *p++ = (0xFC | (values.i_chroma_idc & 0x03));
+    *p++ = (0xF8 | (values.i_bit_depth_luma_minus8 & 0x07));
+    *p++ = (0xF8 | (values.i_bit_depth_chroma_minus8 & 0x07));
+
+    /* Don't set framerate */
+    SetWBE( p, 0x0000); p += 2;
+    /* Force NAL size of 4 bytes that replace the startcode */
+    *p++ = ( ((values.i_numTemporalLayer & 0x07) << 3) |
+              (values.b_temporalIdNested << 2) |
+              (i_nal_length_size - 1) );
+    /* total number of arrays */
+    *p++ = !!p_params->i_vps_count + !!p_params->i_sps_count +
+           !!p_params->i_pps_count + !!p_params->i_sei_count;
+
+    /* Write NAL arrays */
+    HEVC_DCR_ADD_NALS(HEVC_NAL_VPS, p_params->i_vps_count,
+                      p_params->p_vps, p_params->rgi_vps);
+    HEVC_DCR_ADD_NALS(HEVC_NAL_SPS, p_params->i_sps_count,
+                      p_params->p_sps, p_params->rgi_sps);
+    HEVC_DCR_ADD_NALS(HEVC_NAL_PPS, p_params->i_pps_count,
+                      p_params->p_pps, p_params->rgi_pps);
+    HEVC_DCR_ADD_NALS(HEVC_NAL_PREF_SEI, p_params->i_sei_count,
+                      p_params->p_sei, p_params->rgi_sei);
+
+    return p_data;
+}
+
+#undef HEVC_DCR_ADD_NALS
+#undef HEVC_DCR_ADD_SIZES
+
+
+/*
+ * 8.3.1 Decoding process for POC
+ */
 int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
                                        const hevc_slice_segment_header_t *p_slice,
                                        hevc_poc_ctx_t *p_ctx )

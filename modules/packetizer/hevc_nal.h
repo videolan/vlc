@@ -175,10 +175,6 @@ uint8_t hevc_get_sps_vps_id( const hevc_sequence_parameter_set_t * );
 uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t * );
 uint8_t hevc_get_slice_pps_id( const hevc_slice_segment_header_t * );
 
-/* Converts HEVCDecoderConfigurationRecord to Annex B format */
-uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
-                                   size_t *pi_res, uint8_t *pi_nal_length_size );
-
 bool hevc_get_xps_id(const uint8_t *p_nalbuf, size_t i_nalbuf, uint8_t *pi_id);
 bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *,
                                       uint8_t *pi_profile, uint8_t *pi_level );
@@ -201,6 +197,49 @@ bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_t
 bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
                             uint8_t *pi_level, uint8_t *pi_nal_length_size);
 
+/*
+ * HEVCDecoderConfigurationRecord related
+ */
+struct hevc_dcr_values
+{
+    uint8_t general_configuration[12];
+    uint8_t i_numTemporalLayer;
+    uint8_t i_chroma_idc;
+    uint8_t i_bit_depth_luma_minus8;
+    uint8_t i_bit_depth_chroma_minus8;
+    bool b_temporalIdNested;
+};
+
+#define HEVC_DCR_VPS_COUNT (HEVC_VPS_ID_MAX + 1)
+#define HEVC_DCR_SPS_COUNT (HEVC_SPS_ID_MAX + 1)
+#define HEVC_DCR_PPS_COUNT (HEVC_PPS_ID_MAX + 1)
+#define HEVC_DCR_SEI_COUNT (16)
+
+struct hevc_dcr_params
+{
+    const uint8_t *p_vps[HEVC_DCR_VPS_COUNT],
+                  *p_sps[HEVC_DCR_SPS_COUNT],
+                  *p_pps[HEVC_DCR_VPS_COUNT],
+                  *p_sei[HEVC_DCR_SEI_COUNT];
+    uint8_t rgi_vps[HEVC_DCR_VPS_COUNT],
+            rgi_sps[HEVC_DCR_SPS_COUNT],
+            rgi_pps[HEVC_DCR_PPS_COUNT],
+            rgi_sei[HEVC_DCR_SEI_COUNT];
+    uint8_t i_vps_count, i_sps_count, i_pps_count, i_sei_count;
+    struct hevc_dcr_values *p_values;
+};
+
+uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
+                           uint8_t i_nal_length_size,
+                           bool b_completeness, size_t *pi_size );
+
+/* Converts HEVCDecoderConfigurationRecord to Annex B format */
+uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                                   size_t *pi_res, uint8_t *pi_nal_length_size );
+
+/*
+ * POC computing
+ */
 typedef struct
 {
     struct
