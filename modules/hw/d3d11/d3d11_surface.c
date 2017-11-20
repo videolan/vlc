@@ -683,7 +683,7 @@ int D3D11OpenConverter( vlc_object_t *obj )
     if (CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width * pixel_bytes))
         return VLC_ENOMEM;
 
-    if (D3D11_Create(p_filter, &p_sys->hd3d) != VLC_SUCCESS)
+    if (D3D11_Create(p_filter, &p_sys->hd3d, false) != VLC_SUCCESS)
     {
         msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
         CopyCleanCache(&p_sys->cache);
@@ -794,7 +794,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
          goto done;
     }
 
-    if (D3D11_Create(p_filter, &p_sys->hd3d) != VLC_SUCCESS)
+    if (D3D11_Create(p_filter, &p_sys->hd3d, false) != VLC_SUCCESS)
     {
         msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
         goto done;
