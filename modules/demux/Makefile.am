@@ -450,7 +450,7 @@ libadaptive_smooth_SOURCES = \
     demux/smooth/SmoothStream.hpp \
     demux/smooth/SmoothStream.cpp
 libadaptive_smooth_SOURCES += mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \
-				packetizer/h264_nal.c packetizer/h264_nal.h
+			      packetizer/h264_nal.c packetizer/hevc_nal.c
 
 libadaptive_plugin_la_SOURCES += $(libadaptive_hls_SOURCES)
 libadaptive_plugin_la_SOURCES += $(libadaptive_dash_SOURCES)

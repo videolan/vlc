@@ -571,106 +571,6 @@ static bo_t *GetD263Tag(void)
     return d263;
 }
 
-static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
-                         uint8_t * numTemporalLayer, bool * temporalIdNested)
-{
-    if(i_buffer < 19)
-        return;
-
-    bs_t bs;
-    bs_init(&bs, p_buffer, i_buffer);
-    unsigned i_bitflow = 0;
-    bs.p_fwpriv = &i_bitflow;
-    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
-
-    /* first two bytes are the NAL header, 3rd and 4th are:
-        vps_video_parameter_set_id(4)
-        vps_reserved_3_2bis(2)
-        vps_max_layers_minus1(6)
-        vps_max_sub_layers_minus1(3)
-        vps_temporal_id_nesting_flags
-    */
-    bs_skip( &bs, 16 + 4 + 2 + 6 );
-    *numTemporalLayer = bs_read( &bs, 3 ) + 1;
-    *temporalIdNested = bs_read1( &bs );
-
-    /* 5th & 6th are reserved 0xffff */
-    bs_skip( &bs, 16 );
-    /* copy the first 12 bytes of profile tier */
-    for(unsigned i=0; i<12; i++)
-        general[i] = bs_read( &bs, 8 );
-}
-
-static inline void hevc_skip_profile_tiers_level( bs_t * bs, int32_t max_sub_layer_minus1 )
-{
-    uint8_t sub_layer_profile_present_flag[8];
-    uint8_t sub_layer_level_present_flag[8];
-
-    /* skipping useless fields of the VPS see https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=item */
-    bs_skip( bs, 2 + 1 + 5 + 32 + 1 + 1 + 1 + 1 + 44 + 8 );
-
-    for( int32_t i = 0; i < max_sub_layer_minus1; i++ )
-    {
-        sub_layer_profile_present_flag[i] = bs_read1( bs );
-        sub_layer_level_present_flag[i] = bs_read1( bs );
-    }
-
-    if(max_sub_layer_minus1 > 0)
-        bs_skip( bs, (8 - max_sub_layer_minus1) * 2 );
-
-    for( int32_t i = 0; i < max_sub_layer_minus1; i++ )
-    {
-        if( sub_layer_profile_present_flag[i] )
-            bs_skip( bs, 2 + 1 + 5 + 32 + 1 + 1 + 1 + 1 + 44 );
-        if( sub_layer_level_present_flag[i] )
-            bs_skip( bs, 8 );
-    }
-}
-
-static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_idc,
-                         uint8_t *bit_depth_luma_minus8, uint8_t *bit_depth_chroma_minus8)
-{
-    if(i_buffer < 2)
-        return;
-
-    bs_t bs;
-    bs_init(&bs, p_buffer + 2, i_buffer - 2);
-    unsigned i_bitflow = 0;
-    bs.p_fwpriv = &i_bitflow;
-    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
-
-    /* skip vps id */
-    bs_skip(&bs, 4);
-    uint32_t sps_max_sublayer_minus1 = bs_read(&bs, 3);
-
-    /* skip nesting flag */
-    bs_skip(&bs, 1);
-
-    hevc_skip_profile_tiers_level(&bs, sps_max_sublayer_minus1);
-
-    /* skip sps id */
-    (void) bs_read_ue( &bs );
-
-    *chroma_idc = bs_read_ue(&bs);
-    if (*chroma_idc == 3)
-        bs_skip(&bs, 1);
-
-    /* skip width and heigh */
-    (void) bs_read_ue( &bs );
-    (void) bs_read_ue( &bs );
-
-    uint32_t conformance_window_flag = bs_read1(&bs);
-    if (conformance_window_flag) {
-        /* skip offsets*/
-        (void) bs_read_ue(&bs);
-        (void) bs_read_ue(&bs);
-        (void) bs_read_ue(&bs);
-        (void) bs_read_ue(&bs);
-    }
-    *bit_depth_luma_minus8 = bs_read_ue(&bs);
-    *bit_depth_chroma_minus8 = bs_read_ue(&bs);
-}
-
 static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
 {
     /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
@@ -678,154 +578,71 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
     if(!hvcC || !p_fmt->i_extra)
         return hvcC;
 
-    struct nal {
-        size_t i_buffer;
-        uint8_t * p_buffer;
-    };
-
-    struct nal rg_vps[HEVC_VPS_ID_MAX + 1], rg_sps[HEVC_SPS_ID_MAX + 1],
-               rg_pps[HEVC_PPS_ID_MAX + 1], *p_sei = NULL, *p_nal = NULL;
-    uint8_t i_vps = 0, i_sps = 0, i_pps = 0, i_num_arrays = 0;
-    size_t i_sei = 0;
-
-    uint8_t * p_buffer = p_fmt->p_extra;
-    size_t i_buffer = p_fmt->i_extra;
-
     /* Extradata is already an HEVCDecoderConfigurationRecord */
-    if(hevc_ishvcC(p_buffer, i_buffer))
+    if(hevc_ishvcC(p_fmt->p_extra, p_fmt->i_extra))
     {
-        (void) bo_add_mem(hvcC, i_buffer, p_buffer);
+        (void) bo_add_mem(hvcC, p_fmt->i_extra, p_fmt->p_extra);
         return hvcC;
     }
 
-    uint8_t general_configuration[12] = {0};
-    uint8_t i_numTemporalLayer = 0;
-    uint8_t i_chroma_idc = 1;
-    uint8_t i_bit_depth_luma_minus8 = 0;
-    uint8_t i_bit_depth_chroma_minus8 = 0;
-    bool b_temporalIdNested = false;
+    struct hevc_dcr_params params = { };
+    const uint8_t *p_nal;
+    size_t i_nal;
 
-
-    struct nal nalu;
     hxxx_iterator_ctx_t it;
-    hxxx_iterator_init( &it, p_buffer, i_buffer, 0 );
-
-    while (hxxx_annexb_iterate_next( &it, &nalu.p_buffer, &nalu.i_buffer )) {
-
-        switch (hevc_getNALType(p_buffer)) {
-
-        case HEVC_NAL_VPS:
-            if(i_vps > HEVC_VPS_ID_MAX)
-                break;
-            rg_vps[i_vps++] = nalu;
-            /* Only keep the general profile from the first VPS
-             * if there are several (this shouldn't happen so soon) */
-            if (i_vps == 1) {
-                hevcParseVPS(p_buffer, i_buffer, general_configuration,
-                             &i_numTemporalLayer, &b_temporalIdNested);
-                i_num_arrays++;
-            }
-            break;
-
-        case HEVC_NAL_SPS: {
-            if(i_sps > HEVC_SPS_ID_MAX)
-                break;
-            rg_sps[i_sps++] = nalu;
-            if (i_sps == 1 && i_buffer > 15) {
-                /* Get Chroma_idc and bitdepths */
-                hevcParseSPS(p_buffer, i_buffer, &i_chroma_idc,
-                             &i_bit_depth_luma_minus8, &i_bit_depth_chroma_minus8);
-                i_num_arrays++;
-            }
-            break;
-            }
-
-        case HEVC_NAL_PPS: {
-            if(i_pps > HEVC_PPS_ID_MAX)
-                break;
-            rg_pps[i_pps++] = nalu;
-            if (i_pps == 1)
-                i_num_arrays++;
-            break;
-            }
-
-        case HEVC_NAL_PREF_SEI:
-        case HEVC_NAL_SUFF_SEI: {
-            struct nal * p_tmp =  realloc(p_sei, sizeof(struct nal) * (i_sei + 1));
-            if (!p_tmp)
-                break;
-            p_sei = p_tmp;
-            p_sei[i_sei++] = nalu;
-            if(i_sei == 1)
-                i_num_arrays++;
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    bo_add_8(hvcC, 0x01);
-    bo_add_mem(hvcC, 12, general_configuration);
-    /* Don't set min spatial segmentation */
-    bo_add_16be(hvcC, 0xF000);
-    /* Don't set parallelism type since segmentation isn't set */
-    bo_add_8(hvcC, 0xFC);
-    bo_add_8(hvcC, (0xFC | (i_chroma_idc & 0x03)));
-    bo_add_8(hvcC, (0xF8 | (i_bit_depth_luma_minus8 & 0x07)));
-    bo_add_8(hvcC, (0xF8 | (i_bit_depth_chroma_minus8 & 0x07)));
-
-    /* Don't set framerate */
-    bo_add_16be(hvcC, 0x0000);
-    /* Force NAL size of 4 bytes that replace the startcode */
-    bo_add_8(hvcC, (((i_numTemporalLayer & 0x07) << 3) |
-                    (b_temporalIdNested << 2) | 0x03));
-    bo_add_8(hvcC, i_num_arrays);
-
-    if (i_vps)
+    hxxx_iterator_init(&it, p_fmt->p_extra, p_fmt->i_extra, 0);
+    while(hxxx_annexb_iterate_next(&it, &p_nal, &i_nal))
     {
-        /* Write VPS */
-        bo_add_8(hvcC, HEVC_NAL_VPS | (b_completeness ? 0x80 : 0));
-        bo_add_16be(hvcC, i_vps);
-        for (uint8_t i = 0; i < i_vps; i++) {
-            p_nal = &rg_vps[i];
-            bo_add_16be(hvcC, p_nal->i_buffer);
-            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        switch (hevc_getNALType(p_nal))
+        {
+            case HEVC_NAL_VPS:
+                if(params.i_vps_count != HEVC_DCR_VPS_COUNT)
+                {
+                    params.p_vps[params.i_vps_count] = p_nal;
+                    params.rgi_vps[params.i_vps_count] = i_nal;
+                    params.i_vps_count++;
+                }
+                break;
+            case HEVC_NAL_SPS:
+                if(params.i_sps_count != HEVC_DCR_SPS_COUNT)
+                {
+                    params.p_sps[params.i_sps_count] = p_nal;
+                    params.rgi_sps[params.i_sps_count] = i_nal;
+                    params.i_sps_count++;
+                }
+                break;
+            case HEVC_NAL_PPS:
+                if(params.i_pps_count != HEVC_DCR_PPS_COUNT)
+                {
+                    params.p_pps[params.i_pps_count] = p_nal;
+                    params.rgi_pps[params.i_pps_count] = i_nal;
+                    params.i_pps_count++;
+                }
+                break;
+            case HEVC_NAL_PREF_SEI:
+                if(params.i_sei_count != HEVC_DCR_SEI_COUNT)
+                {
+                    params.p_sei[params.i_sei_count] = p_nal;
+                    params.rgi_sei[params.i_sei_count] = i_nal;
+                    params.i_sei_count++;
+                }
+                break;
+            default:
+                break;
         }
     }
 
-    if (i_sps) {
-        /* Write SPS */
-        bo_add_8(hvcC, HEVC_NAL_SPS | (b_completeness ? 0x80 : 0));
-        bo_add_16be(hvcC, i_sps);
-        for (uint8_t i = 0; i < i_sps; i++) {
-            p_nal = &rg_sps[i];
-            bo_add_16be(hvcC, p_nal->i_buffer);
-            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
-        }
+    size_t i_dcr;
+    uint8_t *p_dcr = hevc_create_dcr(&params, 4, b_completeness, &i_dcr);
+    if(!p_dcr)
+    {
+        bo_free(hvcC);
+        return NULL;
     }
 
-    if (i_pps) {
-        /* Write PPS */
-        bo_add_8(hvcC, HEVC_NAL_PPS | (b_completeness ? 0x80 : 0));
-        bo_add_16be(hvcC, i_pps);
-        for (uint8_t i = 0; i < i_pps; i++) {
-            p_nal = &rg_pps[i];
-            bo_add_16be(hvcC, p_nal->i_buffer);
-            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
-        }
-    }
+    bo_add_mem(hvcC, i_dcr, p_dcr);
+    free(p_dcr);
 
-    if (i_sei) {
-        /* Write SEI */
-        bo_add_8(hvcC, HEVC_NAL_PREF_SEI | (b_completeness ? 0x80 : 0));
-        bo_add_16be(hvcC, i_sei);
-        for (size_t i = 0; i < i_sei; i++) {
-            p_nal = &p_sei[i];
-            bo_add_16be(hvcC, p_nal->i_buffer);
-            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
-        }
-    }
-    free(p_sei);
     return hvcC;
 }
 
