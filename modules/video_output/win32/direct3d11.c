@@ -45,7 +45,6 @@
 #else
 # include <dxgi1_5.h>
 #endif
-#include <d3dcompiler.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
@@ -56,7 +55,7 @@
 #include "common.h"
 
 #if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    sys->OurD3DCompile(args)
+# define D3DCompile(args...)                    sys->hd3d.OurD3DCompile(args)
 #endif
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
@@ -122,8 +121,6 @@ struct vout_display_sys_t
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     d3d11_handle_t           hd3d;
-    HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile                            OurD3DCompile;
 #endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
@@ -188,7 +185,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count);
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 
-static HINSTANCE Direct3D11LoadShaderLibrary(void);
 static void Direct3D11Destroy(vout_display_t *);
 
 static int  Direct3D11Open (vout_display_t *);
@@ -402,23 +398,7 @@ static int OpenHwnd(vout_display_t *vd)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (D3D11_Create(vd, &sys->hd3d) != VLC_SUCCESS)
-        return VLC_EGENERIC;
-
-    sys->hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
-    if (!sys->hd3dcompiler_dll) {
-        msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
-        Direct3D11Destroy(vd);
-        return VLC_EGENERIC;
-    }
-
-    sys->OurD3DCompile = (void *)GetProcAddress(sys->hd3dcompiler_dll, "D3DCompile");
-    if (!sys->OurD3DCompile) {
-        msg_Err(vd, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-        Direct3D11Destroy(vd);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    return D3D11_Create(vd, &sys->hd3d, true);
 }
 #else
 static int OpenCoreW(vout_display_t *vd)
@@ -1296,31 +1276,10 @@ static void Direct3D11Destroy(vout_display_t *vd)
 {
 #if !VLC_WINSTORE_APP
     vout_display_sys_t *sys = vd->sys;
-
-    if (sys->hd3dcompiler_dll)
-        FreeLibrary(sys->hd3dcompiler_dll);
-
-    sys->OurD3DCompile = NULL;
     sys->hdxgi_dll = NULL;
-    sys->hd3dcompiler_dll = NULL;
     D3D11_Destroy( &vd->sys->hd3d );
 #endif
 }
-
-#if !VLC_WINSTORE_APP
-static HINSTANCE Direct3D11LoadShaderLibrary(void)
-{
-    HINSTANCE instance = NULL;
-    /* d3dcompiler_47 is the latest on windows 8.1 */
-    for (int i = 47; i > 41; --i) {
-        TCHAR filename[19];
-        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
-        instance = LoadLibrary(filename);
-        if (instance) break;
-    }
-    return instance;
-}
-#endif
 
 #define COLOR_RANGE_FULL   1 /* 0-255 */
 #define COLOR_RANGE_STUDIO 0 /* 16-235 */

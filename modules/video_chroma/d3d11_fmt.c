@@ -631,8 +631,23 @@ error:
     return VLC_EGENERIC;
 }
 
+#if !VLC_WINSTORE_APP
+static HINSTANCE Direct3D11LoadShaderLibrary(void)
+{
+    HINSTANCE instance = NULL;
+    /* d3dcompiler_47 is the latest on windows 8.1 */
+    for (int i = 47; i > 41; --i) {
+        TCHAR filename[19];
+        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
+        instance = LoadLibrary(filename);
+        if (instance) break;
+    }
+    return instance;
+}
+#endif
+
 #undef D3D11_Create
-int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
+int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
 {
 #if !VLC_WINSTORE_APP
     hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
@@ -640,6 +655,24 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
     {
         msg_Warn(obj, "cannot load d3d11.dll, aborting");
         return VLC_EGENERIC;
+    }
+
+    if (with_shaders)
+    {
+        hd3d->compiler_dll = Direct3D11LoadShaderLibrary();
+        if (!hd3d->compiler_dll) {
+            msg_Err(obj, "cannot load d3dcompiler.dll, aborting");
+            FreeLibrary(hd3d->hdll);
+            return VLC_EGENERIC;
+        }
+
+        hd3d->OurD3DCompile = (void *)GetProcAddress(hd3d->compiler_dll, "D3DCompile");
+        if (!hd3d->OurD3DCompile) {
+            msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
+            FreeLibrary(hd3d->compiler_dll);
+            FreeLibrary(hd3d->hdll);
+            return VLC_EGENERIC;
+        }
     }
 
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
@@ -666,6 +699,13 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
 #if !VLC_WINSTORE_APP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
+
+    if (hd3d->compiler_dll)
+    {
+        FreeLibrary(hd3d->compiler_dll);
+        hd3d->compiler_dll = NULL;
+    }
+    hd3d->OurD3DCompile = NULL;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (hd3d->dxgidebug_dll)

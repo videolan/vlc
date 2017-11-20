@@ -354,7 +354,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
-    if ( unlikely(D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS ))
+    if ( unlikely(D3D11_Create(filter, &sys->hd3d, false) != VLC_SUCCESS ))
     {
        msg_Err(filter, "Could not access the d3d11.");
        goto error;
@@ -369,7 +369,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOOBJ;
     }
 
-    if (D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS)
+    if (D3D11_Create(filter, &sys->hd3d, false) != VLC_SUCCESS)
         goto error;
 
     hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);

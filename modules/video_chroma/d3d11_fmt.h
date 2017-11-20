@@ -24,6 +24,7 @@
 #define VLC_VIDEOCHROMA_D3D11_FMT_H_
 
 #include <d3d11.h>
+#include <d3dcompiler.h>
 
 #include "dxgi_fmt.h"
 
@@ -48,7 +49,9 @@ typedef struct
 typedef struct
 {
 #if !VLC_WINSTORE_APP
-    HINSTANCE                 hdll;       /* handle of the opened d3d11 dll */
+    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
+    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
+    pD3DCompile               OurD3DCompile;
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
 #endif
@@ -102,8 +105,8 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *,
 
 void D3D11_ReleaseDevice(d3d11_device_t *);
 
-int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
-#define D3D11_Create(a,b) D3D11_Create( VLC_OBJECT(a), b )
+int D3D11_Create(vlc_object_t *, d3d11_handle_t *, bool with_shaders);
+#define D3D11_Create(a,b,c) D3D11_Create( VLC_OBJECT(a), b, c )
 
 void D3D11_Destroy(d3d11_handle_t *);
 
