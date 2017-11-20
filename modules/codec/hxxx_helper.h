@@ -87,6 +87,7 @@ block_t *h264_helper_get_annexb_config(const struct hxxx_helper *hh);
 block_t *hevc_helper_get_annexb_config(const struct hxxx_helper *hh);
 
 block_t *h264_helper_get_avcc_config(const struct hxxx_helper *hh);
+block_t *hevc_helper_get_hvcc_config(const struct hxxx_helper *hh);
 
 int hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
                                          unsigned *p_w, unsigned *p_h,

@@ -627,7 +627,7 @@ hxxx_helper_get_annexb_config( const struct hxxx_helper_nal *pp_nal_lists[],
 {
     static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
 
-    block_t *p_block_list = NULL;
+    block_t *p_block_list = NULL, *p_current;
     for (size_t i = 0; i < i_lists_size; ++i)
     {
         size_t i_nals_size = 0;
@@ -656,9 +656,12 @@ hxxx_helper_get_annexb_config( const struct hxxx_helper_nal *pp_nal_lists[],
             p_block->i_buffer += p_nal->b->i_buffer;
         }
         if (p_block_list == NULL)
-            p_block_list = p_block;
+            p_current = p_block_list = p_block;
         else
-            p_block_list->p_next = p_block;
+        {
+            p_current->p_next = p_block;
+            p_current = p_block;
+        }
     }
 
     return p_block_list;
@@ -721,6 +724,45 @@ h264_helper_get_avcc_config(const struct hxxx_helper *hh)
     }
     return h264_NAL_to_avcC(4, pp_sps_bufs, p_sps_sizes, hh->h264.i_sps_count,
                             pp_pps_bufs, p_pps_sizes, hh->h264.i_pps_count);
+}
+
+block_t *
+hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
+{
+    struct hevc_dcr_params params = {};
+    const struct hxxx_helper_nal *p_nal;
+    size_t i = 0;
+
+    HELPER_FOREACH_NAL(p_nal, hh->hevc.vps_list, hh->hevc.i_vps_count,
+                       HEVC_VPS_ID_MAX+1)
+    {
+        params.p_vps[params.i_vps_count] = p_nal->b->p_buffer;
+        params.rgi_vps[params.i_vps_count++] = p_nal->b->i_buffer;
+        ++i;
+    }
+
+    HELPER_FOREACH_NAL(p_nal, hh->hevc.sps_list, hh->hevc.i_sps_count,
+                       HEVC_SPS_ID_MAX+1)
+    {
+        params.p_sps[params.i_sps_count] = p_nal->b->p_buffer;
+        params.rgi_sps[params.i_sps_count++] = p_nal->b->i_buffer;
+        ++i;
+    }
+
+    HELPER_FOREACH_NAL(p_nal, hh->hevc.pps_list, hh->hevc.i_pps_count,
+                       HEVC_PPS_ID_MAX+1)
+    {
+        params.p_pps[params.i_pps_count] = p_nal->b->p_buffer;
+        params.rgi_pps[params.i_pps_count++] = p_nal->b->i_buffer;
+        ++i;
+    }
+
+    size_t i_dcr;
+    uint8_t *p_dcr = hevc_create_dcr(&params, 4, true, &i_dcr);
+    if(p_dcr == NULL)
+        return NULL;
+
+    return block_heap_Alloc(p_dcr, i_dcr);
 }
 
 static const struct hxxx_helper_nal *
