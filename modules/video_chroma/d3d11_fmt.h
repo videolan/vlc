@@ -40,6 +40,9 @@ typedef struct
 {
 #if !VLC_WINSTORE_APP
     HINSTANCE                 hdll;       /* handle of the opened d3d11 dll */
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    HINSTANCE                 dxgidebug_dll;
+#endif
 #endif
 } d3d11_handle_t;
 

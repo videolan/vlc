@@ -93,10 +93,6 @@ vlc_module_end()
 
 #endif /* __MINGW32__ */
 
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-# include <dxgidebug.h>
-#endif
-
 DEFINE_GUID(DXVA_Intel_H264_NoFGT_ClearVideo,       0x604F8E68, 0x4951, 0x4c54, 0x88, 0xFE, 0xAB, 0xD2, 0x5C, 0x15, 0xB3, 0xD6);
 
 DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
@@ -110,10 +106,6 @@ struct vlc_va_sys_t
 
     d3d11_handle_t               hd3d;
     d3d11_device_t               d3d_dev;
-
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    HINSTANCE                    dxgidebug_dll;
-#endif
 
     /* Video service */
     ID3D11VideoContext           *d3dvidctx;
@@ -313,11 +305,6 @@ static void Close(vlc_va_t *va, void **ctx)
 
     D3D11_Destroy( &sys->hd3d );
 
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    if (sys->dxgidebug_dll)
-        FreeLibrary(sys->dxgidebug_dll);
-#endif
-
     free((char *)va->description);
     free(sys);
 }
@@ -336,10 +323,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-#endif
 
     dx_sys = &sys->dx_sys;
 
@@ -444,20 +427,6 @@ static int D3dCreateDevice(vlc_va_t *va)
        return VLC_EGENERIC;
     }
     sys->d3dvidctx = d3dvidctx;
-
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    HRESULT (WINAPI  * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
-    if (sys->dxgidebug_dll) {
-        pf_DXGIGetDebugInterface = (void *)GetProcAddress(sys->dxgidebug_dll, "DXGIGetDebugInterface");
-        if (pf_DXGIGetDebugInterface) {
-            IDXGIDebug *pDXGIDebug = NULL;
-            hr = pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug);
-            if (SUCCEEDED(hr) && pDXGIDebug) {
-                hr = IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-            }
-        }
-    }
-#endif
 
     return VLC_SUCCESS;
 }
