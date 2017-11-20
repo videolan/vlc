@@ -218,6 +218,13 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             if( a52.b_eac3 && a52.eac3.strmtyp != EAC3_STRMTYP_INDEPENDENT )
             {
                 /* Use the channel configuration of the independent stream */
+                if( !p_sys->frame.i_blocks_per_sync_frame )
+                {
+                    /* Not synced on main stream yet */
+                    block_SkipByte( &p_sys->bytestream );
+                    p_sys->i_state = STATE_NOSYNC;
+                    break;
+                }
                 p_sys->frame.i_samples = a52.i_samples;
                 p_sys->frame.i_size = a52.i_size;
             }
