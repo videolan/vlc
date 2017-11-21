@@ -1019,28 +1019,16 @@ static picture_t *pic_new_unaligned(const video_format_t *fmt)
 
 int main(void)
 {
+    alarm(10);
+
     unsigned cpu = vlc_CPU();
-#if defined (COPY_TEST_SSE4)
-    if (!vlc_CPU_SSE4_1())
-    {
-        fprintf(stderr, "WARNING: could not test SSE4\n");
-        return 0;
-    }
-#elif defined (COPY_TEST_SSE3)
-    if (!vlc_CPU_SSSE3())
-    {
-        fprintf(stderr, "WARNING: could not test SSSE3\n");
-        return 0;
-    }
-#elif defined (COPY_TEST_SSE2)
+#ifndef COPY_TEST_NOOTPIM
     if (!vlc_CPU_SSE2())
     {
-        fprintf(stderr, "WARNING: could not test SSE2\n");
+        fprintf(stderr, "WARNING: could not test SSE\n");
         return 0;
     }
 #endif
-
-    alarm(10);
 
     for (size_t i = 0; i < NB_CONVS; ++i)
     {
