@@ -116,6 +116,7 @@ video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
 if HAVE_IOS
+libci_filters_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -Wpartial-availability
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 

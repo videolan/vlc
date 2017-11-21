@@ -606,10 +606,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
         case VLC_CODEC_CVPX_UYVY:
         case VLC_CODEC_CVPX_I420:
         case VLC_CODEC_CVPX_BGRA:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
             if (&kCGColorSpaceITUR_709 == nil)
-#pragma clang diagnostic pop
             {
                 msg_Warn(obj, "iOS/macOS version is too old, aborting...");
                 return VLC_EGENERIC;
@@ -638,10 +635,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
          && Open_AddConverter(filter, ctx))
             goto error;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
         ctx->color_space = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-#pragma clang diagnostic pop
 
 #if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
