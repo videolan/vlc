@@ -50,6 +50,7 @@
 #include <QSignalMapper>
 #include <QTimer>
 #include <QApplication>
+#include <QWindow>
 #include <QScreen>
 
 //#define DEBUG_LAYOUT 1
@@ -869,6 +870,7 @@ void FullscreenControllerWidget::restoreFSC()
         adjustSize();
 
         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+        windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
 
         if( currentRes == screenRes &&
             QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
@@ -984,7 +986,7 @@ void FullscreenControllerWidget::toggleFullwidth()
 
 int FullscreenControllerWidget::targetScreen()
 {
-    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->numScreens() )
+    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->screenCount() )
         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
     return i_screennumber;
 }

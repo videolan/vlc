@@ -51,6 +51,7 @@ class FullscreenControllerWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
+class QScreen;
 class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
@@ -166,6 +167,7 @@ protected:
     QWidget             *stackCentralOldWidget;
     QPoint              lastWinPosition;
     QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
+    QScreen             *lastWinScreen;
 
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
