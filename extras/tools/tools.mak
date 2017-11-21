@@ -175,6 +175,8 @@ m4-$(M4_VERSION).tar.gz:
 
 m4: m4-$(M4_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) bison-macOS-c41f233c.patch
+	$(APPLY) bison-macOS-7df04f9.patch
 	$(MOVE)
 
 .m4: m4
