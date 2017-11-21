@@ -1,0 +1,11 @@
+--- game-music-emu/gme/CMakeLists.txt	2017-11-21 10:43:46.577551600 +0100
++++ game-music-emu/gme/CMakeLists.txt.static	2017-11-21 10:43:22.791330000 +0100
+@@ -137,7 +137,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DI
+ # On some platforms we may need to change headers or whatnot based on whether
+ # we're building the library or merely using the library. The following is
+ # only defined when building the library to allow us to tell which is which.
+-add_definitions(-DBLARGG_BUILD_DLL)
++#add_definitions(-DBLARGG_BUILD_DLL)
+ 
+ # For the gme_types.h
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
