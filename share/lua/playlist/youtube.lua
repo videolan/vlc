@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2016 the VideoLAN team
+ Copyright © 2007-2017 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ function get_fmt( fmt_list )
     end
 
     local fmt = nil
-    for itag,height in string.gmatch( fmt_list, "(%d+)/%d+x(%d+)/[^,]+" ) do
+    for itag,height in string.gmatch( fmt_list, "(%d+)/%d+x(%d+)[^,]*" ) do
         -- Apparently formats are listed in quality
         -- order, so we take the first one that works,
         -- or fallback to the lowest quality
