@@ -59,24 +59,38 @@ static uint64_t AVI_ChunkEnd( const avi_chunk_t *p_ck )
  * Basics functions to manipulates chunks
  *
  ****************************************************************************/
-static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
+static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
+                                const avi_chunk_t *p_father )
 {
     const uint8_t *p_peek;
 
     memset( p_chk, 0, sizeof( avi_chunk_t ) );
 
+    const uint64_t i_pos = vlc_stream_Tell( s );
     if( vlc_stream_Peek( s, &p_peek, 8 ) < 8 )
+    {
+        if( stream_Size( s ) > 0 && (uint64_t) stream_Size( s ) > i_pos )
+            msg_Warn( s, "can't peek at %"PRIu64, i_pos );
+        else
+            msg_Dbg( s, "no more data at %"PRIu64, i_pos );
         return VLC_EGENERIC;
+    }
 
     p_chk->common.i_chunk_fourcc = GetFOURCC( p_peek );
     p_chk->common.i_chunk_size   = GetDWLE( p_peek + 4 );
-    p_chk->common.i_chunk_pos    = vlc_stream_Tell( s );
+    p_chk->common.i_chunk_pos    = i_pos;
 
     if( p_chk->common.i_chunk_size >= UINT64_MAX - 8 ||
         p_chk->common.i_chunk_pos > UINT64_MAX - 8 ||
         UINT64_MAX - p_chk->common.i_chunk_pos - 8 < __EVEN(p_chk->common.i_chunk_size) )
         return VLC_EGENERIC;
 
+    if( p_father && AVI_ChunkEnd( p_chk ) > AVI_ChunkEnd( p_father ) )
+    {
+        msg_Warn( s, "chunk %4.4s does not fit into parent %ld",
+                     (char*)&p_chk->common.i_chunk_fourcc, AVI_ChunkEnd( p_father ) );
+        return VLC_EGENERIC;
+    }
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
@@ -94,19 +108,11 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 
     if( !p_chk )
     {
-        if( AVI_ChunkReadCommon( s, &chk ) )
+        if( AVI_ChunkReadCommon( s, &chk, p_chk->common.p_father ) )
         {
             return VLC_EGENERIC;
         }
         p_chk = &chk;
-    }
-
-    if( p_chk->common.p_father )
-    {
-        if( AVI_ChunkEnd( p_chk->common.p_father ) < AVI_ChunkEnd( p_chk ) )
-        {
-            return VLC_EGENERIC;
-        }
     }
 
     bool b_seekable = false;
@@ -200,8 +206,8 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         {
             break;
         }
-        if( p_chk->common.p_father->common.i_chunk_size > 0 &&
-            vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_chk->common.p_father ) )
+        if( p_container->common.i_chunk_size > 0 &&
+            vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_container ) )
         {
             break;
         }
@@ -972,11 +978,8 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
         return VLC_EGENERIC;
     }
 
-    if( AVI_ChunkReadCommon( s, p_chk ) )
-    {
-        msg_Warn( (vlc_object_t*)s, "cannot read one chunk" );
+    if( AVI_ChunkReadCommon( s, p_chk, p_father ) )
         return VLC_EGENERIC;
-    }
 
     if( p_chk->common.i_chunk_fourcc == VLC_FOURCC( 0, 0, 0, 0 ) )
     {
