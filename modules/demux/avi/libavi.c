@@ -1102,7 +1102,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
     vlc_stream_Control( s, STREAM_CAN_SEEK, &b_seekable );
 
     p_list->i_chunk_pos  = 0;
-    p_list->i_chunk_size = stream_Size( s );
+    p_list->i_chunk_size = ((UINT64_MAX - 12) >> 1) << 1;
     p_list->i_chunk_fourcc = AVIFOURCC_LIST;
     p_list->p_father = NULL;
     p_list->p_next  = NULL;
@@ -1141,6 +1141,8 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
             break;
         }
     }
+
+    p_list->i_chunk_size = stream_Size( s );
 
     AVI_ChunkDumpDebug_level( (vlc_object_t*)s, p_root, 0 );
     return VLC_SUCCESS;
