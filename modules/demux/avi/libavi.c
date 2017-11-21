@@ -44,6 +44,16 @@ static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
     return VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] );
 }
 
+static uint64_t AVI_ChunkSize( const avi_chunk_t *p_ck )
+{
+    return __EVEN(p_ck->common.i_chunk_size) + 8;
+}
+
+static uint64_t AVI_ChunkEnd( const avi_chunk_t *p_ck )
+{
+    return p_ck->common.i_chunk_pos + AVI_ChunkSize( p_ck );
+}
+
 /****************************************************************************
  *
  * Basics functions to manipulates chunks
@@ -93,18 +103,14 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 
     if( p_chk->common.p_father )
     {
-        if( p_chk->common.p_father->common.i_chunk_pos +
-                __EVEN( p_chk->common.p_father->common.i_chunk_size ) + 8 <
-            p_chk->common.i_chunk_pos +
-                __EVEN( p_chk->common.i_chunk_size ) + 8 )
+        if( AVI_ChunkEnd( p_chk->common.p_father ) < AVI_ChunkEnd( p_chk ) )
         {
             return VLC_EGENERIC;
         }
     }
 
     bool b_seekable = false;
-    uint64_t i_offset = p_chk->common.i_chunk_pos +
-                        __EVEN( p_chk->common.i_chunk_size ) + 8;
+    const uint64_t i_offset = AVI_ChunkEnd( p_chk );
     if ( !vlc_stream_Control(s, STREAM_CAN_SEEK, &b_seekable) && b_seekable )
     {
         return vlc_stream_Seek( s, i_offset );
@@ -195,9 +201,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
             break;
         }
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
-           ( vlc_stream_Tell( s ) >
-             p_chk->common.p_father->common.i_chunk_pos +
-             __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+            vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_chk->common.p_father ) )
         {
             break;
         }
@@ -225,7 +229,7 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
         return VLC_EGENERIC;
 
     avi_chunk_t *p_chk;
-    uint64_t i_indexpos = 8 + p_movi->common.i_chunk_pos + p_movi->common.i_chunk_size;
+    const uint64_t i_indexpos = AVI_ChunkEnd( p_movi );
     bool b_seekable = false;
     int i_ret = VLC_SUCCESS;
 
