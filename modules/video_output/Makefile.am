@@ -281,6 +281,7 @@ libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d11_plugin_la_LIBADD += -lgdi32
 else
+libdirect3d11_plugin_la_LIBADD += -ld3d11
 libdirect3d11_plugin_la_LIBADD += -ld3dcompiler_47
 endif
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
@@ -290,9 +291,15 @@ EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c
 libdirect3d11_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d11_deinterlace_plugin_la_LIBADD = libdeinterlace_common.la libd3d11_common.la
+if HAVE_WINSTORE
+libdirect3d11_deinterlace_plugin_la_LIBADD += -ld3d11
+endif
 libdirect3d11_adjust_plugin_la_SOURCES = video_output/win32/d3d11_adjust.c
 libdirect3d11_adjust_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d11_adjust_plugin_la_LIBADD = libd3d11_common.la
+if HAVE_WINSTORE
+libdirect3d11_adjust_plugin_la_LIBADD += -ld3d11
+endif
 video_filter_LTLIBRARIES += $(LTLIBdirect3d11_deinterlace) $(LTLIBdirect3d11_adjust)
 EXTRA_LTLIBRARIES += libdirect3d11_deinterlace_plugin.la libdirect3d11_adjust_plugin.la
 
