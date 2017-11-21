@@ -67,10 +67,6 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
         UINT64_MAX - p_chk->common.i_chunk_pos - 8 < __EVEN(p_chk->common.i_chunk_size) )
         return VLC_EGENERIC;
 
-    p_chk->common.p_father = NULL;
-    p_chk->common.p_next = NULL;
-    p_chk->common.p_first = NULL;
-    p_chk->common.p_next = NULL;
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
