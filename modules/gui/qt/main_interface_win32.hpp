@@ -58,6 +58,7 @@ private slots:
     void playlistItemRemoved( int itemId );
     virtual void reloadPrefs() Q_DECL_OVERRIDE;
     virtual void setVideoFullScreen( bool fs ) Q_DECL_OVERRIDE;
+    virtual void setVideoHMDMode( bool HMDMode, int i_screenNumber ) Q_DECL_OVERRIDE;
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP

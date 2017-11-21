@@ -325,6 +325,13 @@ void MainInterfaceWin32::setVideoFullScreen( bool fs )
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
+void MainInterfaceWin32::setVideoHMDMode( bool HMDMode, int i_screenNumber )
+{
+    MainInterface::setVideoHMDMode( HMDMode, i_screenNumber );
+    if( !HMDMode )
+        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+}
+
 void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
 {
     /* check if any visible window is above vlc in the z-order,

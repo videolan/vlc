@@ -54,6 +54,7 @@ class QSize;
 class QScreen;
 class QTimer;
 class StandardPLPanel;
+class HMDModeHelper;
 struct vout_window_t;
 struct vout_window_cfg_t;
 
@@ -140,6 +141,7 @@ protected:
 
     /* */
     void displayNormalView();
+    void setWindowFullScreen( bool, int );
     void setMinimalView( bool );
     void setInterfaceFullScreen( bool );
     void computeMinimumSize();
@@ -162,6 +164,7 @@ protected:
     BackgroundWidget    *bgWidget;
     PlaylistWidget      *playlistWidget;
     //VisualSelector      *visualSelector;
+    HMDModeHelper         *hmdModeHelper;
 
     /* resume panel */
     QWidget             *resumePanel;
@@ -186,6 +189,8 @@ protected:
     unsigned             i_notificationSetting; /// Systray Notifications
     bool                 b_autoresize;          ///< persistent resizable window
     bool                 b_videoFullScreen;     ///< --fullscreen
+    bool                 b_videoHMDMode;        ///< --hmd
+    unsigned             i_hmdModeScreenNumber;
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_interfaceFullScreen;
@@ -270,6 +275,7 @@ protected slots:
     void setVideoSize( unsigned int, unsigned int );
     void videoSizeChanged( int, int );
     virtual void setVideoFullScreen( bool );
+    virtual void setVideoHMDMode( bool, int );
     void setVideoOnTop( bool );
     void setBoss();
     void setRaise();
@@ -280,11 +286,14 @@ protected slots:
     void resumePlayback();
     void onInputChanged( bool );
 
+    void updateHMDMode(int newCount);
+
 signals:
     void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
+    void askVideoSetHMDMode( bool, int );
     void askVideoOnTop( bool );
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );

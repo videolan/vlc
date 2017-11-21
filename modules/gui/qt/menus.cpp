@@ -235,6 +235,8 @@ static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
 
     PUSH_INPUTVAR( "video-es" );
     PUSH_PLVAR( "fullscreen" );
+    PUSH_PLVAR( "hmd" );
+    PUSH_PLVAR( "video-on-top" );
     PUSH_PLVAR( "video-wallpaper" );
     PUSH_VAR( "video-snapshot" );
     PUSH_VAR( "zoom" );
@@ -243,7 +245,6 @@ static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
     PUSH_VAR( "crop" );
     PUSH_VAR( "deinterlace" );
     PUSH_VAR( "deinterlace-mode" );
-    PUSH_VAR( "hmd" );
 
     if( p_object )
         vlc_object_release( p_object );
@@ -1530,6 +1531,7 @@ void VLCMenuBar::DoAction( QObject *data )
         var_Set( p_object, var, val );
 
     if( !strcmp( var, "fullscreen" )
+     || !strcmp( var, "hmd" )
      || !strcmp( var, "video-on-top" )
      || !strcmp( var, "video-wallpaper" ) ) /* FIXME: reverse abstraction */
     {   /* Apply playlist variables to current existing vout too */
