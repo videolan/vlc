@@ -26,6 +26,10 @@
 # include "config.h"
 #endif
 
+#ifdef COPY_TEST
+# undef NDEBUG
+#endif
+
 #include <vlc_common.h>
 #include <vlc_picture.h>
 #include <vlc_cpu.h>
@@ -887,7 +891,6 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
 }
 
 #ifdef COPY_TEST
-# undef NDEBUG
 
 #include <vlc_picture.h>
 
