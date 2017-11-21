@@ -643,7 +643,10 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
         case HEVC_NAL_PPS:
         {
             uint8_t i_id;
-            if(hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id))
+            const uint8_t *p_xps = p_nalb->p_buffer;
+            size_t i_xps = p_nalb->i_buffer;
+            if(hxxx_strip_AnnexB_startcode(&p_xps, &i_xps) &&
+               hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id))
                 InsertXPS(p_dec, i_nal_type, i_id, p_nalb);
             break;
         }

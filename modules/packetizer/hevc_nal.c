@@ -515,7 +515,7 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
 /* Shortcut for retrieving vps/sps/pps id */
 bool hevc_get_xps_id(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id)
 {
-    if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buf, &i_buf) || i_buf < 3))
+    if(i_buf < 3)
         return false;
     /* No need to lookup convert from emulation for that data */
     uint8_t i_nal_type = hevc_getNALType(p_buf);
