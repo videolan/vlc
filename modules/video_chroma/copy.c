@@ -115,6 +115,8 @@ void CopyCleanCache(copy_cache_t *cache)
 # define vlc_CPU_SSE4_1() (0)
 # undef vlc_CPU_SSE3
 # define vlc_CPU_SSE3() (0)
+# undef vlc_CPU_SSSE3
+# define vlc_CPU_SSSE3() (0)
 # undef vlc_CPU_SSE2
 # define vlc_CPU_SSE2() (0)
 #endif
