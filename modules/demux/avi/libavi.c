@@ -185,27 +185,27 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
              (char*)&p_container->list.i_type );
 #endif
     msg_Dbg( (vlc_object_t*)s, "<list \'%4.4s\'>", (char*)&p_container->list.i_type );
+
+    union  avi_chunk_u **pp_append = &p_container->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
         if( !p_chk )
             return VLC_EGENERIC;
 
-        if( !p_container->common.p_first )
-        {
-            p_container->common.p_first = p_chk;
-        }
-        else
-        {
-            p_container->common.p_last->common.p_next = p_chk;
-        }
-        p_container->common.p_last = p_chk;
-
         i_ret = AVI_ChunkRead( s, p_chk, p_container );
         if( i_ret )
         {
+            AVI_ChunkClean( s, p_chk );
+            free( p_chk );
             break;
         }
+
+        *pp_append = p_chk;
+        while( *pp_append )
+            pp_append = &((*pp_append)->common.p_next);
+        p_container->common.p_last = p_chk;
+
         if( p_container->common.i_chunk_size > 0 &&
             vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_container ) )
         {
@@ -243,6 +243,7 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
     if ( !b_seekable || vlc_stream_Seek( s, i_indexpos ) )
         return VLC_EGENERIC;
 
+    union  avi_chunk_u **pp_append = &p_riff->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
@@ -252,15 +253,18 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
             break;
         }
 
-        if (unlikely( !p_riff->common.p_first ))
-            p_riff->common.p_first = p_chk;
-        else
-            p_riff->common.p_last->common.p_next = p_chk;
-        p_riff->common.p_last = p_chk;
-
         i_ret = AVI_ChunkRead( s, p_chk, p_riff );
         if( i_ret )
+        {
+            AVI_ChunkClean( s, p_chk );
+            free( p_chk );
             break;
+        }
+
+        *pp_append = p_chk;
+        while( *pp_append )
+            pp_append = &((*pp_append)->common.p_next);
+        p_riff->common.p_last = p_chk;
 
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
            ( vlc_stream_Tell( s ) >
@@ -1045,7 +1049,7 @@ void AVI_ChunkClean( stream_t *s,
 #endif
         AVI_Chunk_Function[i_index].AVI_ChunkFree_function( p_chk);
     }
-    else
+    else if( p_chk->common.i_chunk_fourcc != 0 )
     {
         msg_Warn( (vlc_object_t*)s, "unknown chunk: %4.4s (not unloaded)",
                 (char*)&p_chk->common.i_chunk_fourcc );
@@ -1118,29 +1122,31 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 
     p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
 
+    union  avi_chunk_u **pp_append = &p_root->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
         if( !p_chk )
             return VLC_EGENERIC;
 
-        if( !p_root->common.p_first )
+        if( AVI_ChunkRead( s, p_chk, p_root ) != VLC_SUCCESS )
         {
-            p_root->common.p_first = p_chk;
+            AVI_ChunkClean( s, p_chk );
+            free( p_chk );
+            break;
         }
-        else
-        {
-            p_root->common.p_last->common.p_next = p_chk;
-        }
-        p_root->common.p_last = p_chk;
-
-        if( AVI_ChunkRead( s, p_chk, p_root ) ||
-           ( vlc_stream_Tell( s ) >=
-             p_chk->common.p_father->common.i_chunk_pos +
-             __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+        else if( vlc_stream_Tell( s ) >=
+                 p_chk->common.p_father->common.i_chunk_pos +
+                 __EVEN( p_chk->common.p_father->common.i_chunk_size ) )
         {
             break;
         }
+
+        *pp_append = p_chk;
+        while( *pp_append )
+            pp_append = &((*pp_append)->common.p_next);
+        p_root->common.p_last = p_chk;
+
         /* If we can't seek then stop when we 've found first RIFF-AVI */
         if( p_chk->common.i_chunk_fourcc == AVIFOURCC_RIFF &&
             p_chk->list.i_type == AVIFOURCC_AVI && !b_seekable )
