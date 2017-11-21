@@ -110,7 +110,7 @@ void CopyCleanCache(copy_cache_t *cache)
 # define vlc_CPU_SSE2() ((cpu & VLC_CPU_SSE2) != 0)
 #endif
 
-#ifdef COPY_TEST_NOOTPIM
+#ifdef COPY_TEST_NOOPTIM
 # undef vlc_CPU_SSE4_1
 # define vlc_CPU_SSE4_1() (0)
 # undef vlc_CPU_SSE3
@@ -1027,7 +1027,7 @@ int main(void)
     alarm(10);
 
     unsigned cpu = vlc_CPU();
-#ifndef COPY_TEST_NOOTPIM
+#ifndef COPY_TEST_NOOPTIM
     if (!vlc_CPU_SSE2())
     {
         fprintf(stderr, "WARNING: could not test SSE\n");

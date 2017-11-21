@@ -155,7 +155,7 @@ chroma_copy_sse_test_CFLAGS = -DCOPY_TEST
 chroma_copy_sse_test_LDADD = ../src/libvlccore.la
 
 chroma_copy_test_SOURCES = $(libchroma_copy_la_SOURCES)
-chroma_copy_test_CFLAGS = -DCOPY_TEST -DCOPY_TEST_NOOTPIM
+chroma_copy_test_CFLAGS = -DCOPY_TEST -DCOPY_TEST_NOOPTIM
 chroma_copy_test_LDADD = ../src/libvlccore.la
 
 if HAVE_SSE2
