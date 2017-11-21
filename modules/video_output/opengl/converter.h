@@ -107,6 +107,8 @@ typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLs
 #   define PFNGLUNIFORMMATRIX3FVPROC         typeof(glUniformMatrix3fv)*
 #   define PFNGLUNIFORMMATRIX2FVPROC         typeof(glUniformMatrix2fv)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
+#   define PFNGLUNIFORM3FVPROC               typeof(glUniform3fv)*
+#   define PFNGLUNIFORM2FVPROC               typeof(glUniform2fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
 #   define PFNGLUNIFORM3FPROC                typeof(glUniform3f)*
 #   define PFNGLUNIFORM2FPROC                typeof(glUniform2f)*
@@ -127,6 +129,16 @@ typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLs
 #   define PFNGLBUFFERSUBDATAPROC            typeof(glBufferSubData)*
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
 #   define PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC typeof(glGetFramebufferAttachmentParameteriv)*
+#   define PFNGLBINDFRAMEBUFFERPROC          typeof(glBindFramebuffer)*
+#   define PFNGLGENFRAMEBUFFERSPROC          typeof(glGenFramebuffers)*
+#   define PFNGLDELETEFRAMEBUFFERSPROC       typeof(glDeleteFramebuffers)*
+#   define PFNGLCHECKFRAMEBUFFERSTATUSPROC   typeof(glCheckFramebufferStatus)*
+#   define PFNGLFRAMEBUFFERTEXTURE2DPROC     typeof(glFramebufferTexture2D)*
+#   define PFNGLGENRENDERBUFFERSPROC         typeof(glGenRenderbuffers)*
+#   define PFNGLDELETERENDERBUFFERSPROC      typeof(glDeleteRenderbuffers)*
+#   define PFNGLBINDRENDERBUFFERPROC         typeof(glBindRenderbuffer)*
+#   define PFNGLRENDERBUFFERSTORAGEPROC      typeof(glRenderbufferStorage)*
+#   define PFNGLFRAMEBUFFERRENDERBUFFERPROC  typeof(glFramebufferRenderbuffer)*
 #if defined(__APPLE__)
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
@@ -204,6 +216,8 @@ typedef struct {
     PFNGLUNIFORMMATRIX3FVPROC        UniformMatrix3fv;
     PFNGLUNIFORMMATRIX2FVPROC        UniformMatrix2fv;
     PFNGLUNIFORM4FVPROC              Uniform4fv;
+    PFNGLUNIFORM3FVPROC              Uniform3fv;
+    PFNGLUNIFORM2FVPROC              Uniform2fv;
     PFNGLUNIFORM4FPROC               Uniform4f;
     PFNGLUNIFORM3FPROC               Uniform3f;
     PFNGLUNIFORM2FPROC               Uniform2f;
@@ -227,6 +241,17 @@ typedef struct {
 
     /* Framebuffers commands */
     PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC GetFramebufferAttachmentParameteriv;
+
+    PFNGLBINDFRAMEBUFFERPROC           BindFramebuffer;
+    PFNGLGENFRAMEBUFFERSPROC           GenFramebuffers;
+    PFNGLDELETEFRAMEBUFFERSPROC        DeleteFramebuffers;
+    PFNGLCHECKFRAMEBUFFERSTATUSPROC    CheckFramebufferStatus;
+    PFNGLFRAMEBUFFERTEXTURE2DPROC      FramebufferTexture2D;
+    PFNGLGENRENDERBUFFERSPROC          GenRenderbuffers;
+    PFNGLDELETERENDERBUFFERSPROC       DeleteRenderbuffers;
+    PFNGLBINDRENDERBUFFERPROC          BindRenderbuffer;
+    PFNGLRENDERBUFFERSTORAGEPROC       RenderbufferStorage;
+    PFNGLFRAMEBUFFERRENDERBUFFERPROC   FramebufferRenderbuffer;
 
     /* Commands used for PBO and/or Persistent mapping */
     PFNGLBUFFERSUBDATAPROC          BufferSubData; /* can be NULL */

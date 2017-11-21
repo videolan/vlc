@@ -101,6 +101,7 @@ struct prgm
     struct {
         GLfloat OrientationMatrix[16];
         GLfloat ProjectionMatrix[16];
+        GLfloat ModelViewMatrix[16];
         GLfloat ZRotMatrix[16];
         GLfloat YRotMatrix[16];
         GLfloat XRotMatrix[16];
@@ -110,6 +111,7 @@ struct prgm
     struct { /* UniformLocation */
         GLint OrientationMatrix;
         GLint ProjectionMatrix;
+        GLint ModelViewMatrix;
         GLint ZRotMatrix;
         GLint YRotMatrix;
         GLint XRotMatrix;
@@ -140,9 +142,10 @@ struct vout_display_opengl_t {
     picture_pool_t *pool;
 
     /* One YUV program and one RGBA program (for subpics) */
-    struct prgm prgms[2];
+    struct prgm prgms[3];
     struct prgm *prgm; /* Main program */
     struct prgm *sub_prgm; /* Subpicture program */
+    struct prgm *stereo_prgm; /* Stereo program */
 
     unsigned nb_indices;
     GLuint vertex_buffer_object;
@@ -164,6 +167,7 @@ struct vout_display_opengl_t {
 
     /* HMD device */
     vlc_hmd_interface_t *hmd;
+    vlc_hmd_cfg_t hmd_cfg;
     vlc_mutex_t hmd_lock;
     bool close_hmd;
 
@@ -175,12 +179,35 @@ struct vout_display_opengl_t {
     float f_fovy; /* to avoid recalculating them when needed.      */
     float f_z;    /* Position of the camera on the shpere radius vector */
     float f_sar;
+
+    /* Side by side */
+    bool b_sideBySide;
+    bool b_lastSideBySide;
+
+    unsigned i_displayWidth;
+    unsigned i_displayHeight;
+    vout_display_place_t displayPlace;
+
+    /* FBO */
+    GLuint leftColorTex, leftDepthTex, leftFBO;
+    GLuint rightColorTex, rightDepthTex, rightFBO;
+
+    GLuint vertex_buffer_object_stereo;
+    GLuint index_buffer_object_stereo;
+    GLuint texture_buffer_object_stereo;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
     VLC_CODEC_RGBA,
     0
 };
+
+typedef enum
+{
+    UNDEFINED_EYE,
+    LEFT_EYE,
+    RIGHT_EYE
+} side_by_side_eye;
 
 static const GLfloat identity[] = {
     1.0f, 0.0f, 0.0f, 0.0f,
@@ -273,14 +300,18 @@ static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]
      memcpy(matrix, m, sizeof(m));
 }
 
+
 static void getViewpointMatrixes(vout_display_opengl_t *vgl,
                                  video_projection_mode_t projection_mode,
                                  struct prgm *prgm)
 {
     if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
-        || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+        || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD
+        || vgl->b_sideBySide)
     {
-        getProjectionMatrix(vgl->f_sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
+        float sar = (float) vgl->f_sar;
+        getProjectionMatrix(sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
+        memcpy(prgm->var.ModelViewMatrix, identity, sizeof(identity));
         getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
         getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
@@ -289,6 +320,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
     else
     {
         memcpy(prgm->var.ProjectionMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.ModelViewMatrix, identity, sizeof(identity));
         memcpy(prgm->var.ZRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.YRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.XRotMatrix, identity, sizeof(identity));
@@ -381,6 +413,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec3 VertexPosition;\n"
         "uniform mat4 OrientationMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
+        "uniform mat4 ModelViewMatrix;\n"
         "uniform mat4 XRotMatrix;\n"
         "uniform mat4 YRotMatrix;\n"
         "uniform mat4 ZRotMatrix;\n"
@@ -388,7 +421,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -458,6 +491,60 @@ DelTextures(const opengl_tex_converter_t *tc, GLuint *textures)
     memset(textures, 0, tc->tex_count * sizeof(GLuint));
 }
 
+static int CheckShaderMessages(const vlc_gl_t *gl, const opengl_vtable_t *vt,
+                               GLuint* shaders)
+{
+    for (unsigned i = 0; i < 2; i++) {
+        int infoLength;
+        vt->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
+        if (infoLength <= 1)
+            continue;
+
+        char *infolog = malloc(infoLength);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
+                                      infolog);
+            msg_Err(gl, "shader %u: %s", i, infolog);
+            free(infolog);
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int CheckProgramMessages(const vlc_gl_t *gl, const opengl_vtable_t *vt,
+                                struct prgm *prgm)
+{
+    int infoLength = 0;
+    vt->GetProgramiv(prgm->id, GL_INFO_LOG_LENGTH, &infoLength);
+    if (infoLength > 1)
+    {
+        char *infolog = malloc(infoLength);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            vt->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
+                                       infolog);
+            msg_Err(gl, "shader program: %s", infolog);
+            free(infolog);
+        }
+
+        /* If there is some message, better to check linking is ok */
+        GLint link_status = GL_TRUE;
+        vt->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
+        if (link_status == GL_FALSE)
+        {
+            msg_Err(gl, "Unable to use program");
+            return VLC_EGENERIC;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+
 static int
 opengl_link_program(struct prgm *prgm)
 {
@@ -466,23 +553,8 @@ opengl_link_program(struct prgm *prgm)
     GLuint vertex_shader = BuildVertexShader(tc, tc->tex_count);
     GLuint shaders[] = { tc->fshader, vertex_shader };
 
-    /* Check shaders messages */
-    for (unsigned i = 0; i < 2; i++) {
-        int infoLength;
-        tc->vt->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
-        if (infoLength <= 1)
-            continue;
-
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            tc->vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
-                                      infolog);
-            msg_Err(tc->gl, "shader %u: %s", i, infolog);
-            free(infolog);
-        }
-    }
+    if (CheckShaderMessages(tc->gl, tc->vt, shaders) != VLC_SUCCESS)
+        goto error;
 
     prgm->id = tc->vt->CreateProgram();
     tc->vt->AttachShader(prgm->id, tc->fshader);
@@ -492,30 +564,8 @@ opengl_link_program(struct prgm *prgm)
     tc->vt->DeleteShader(vertex_shader);
     tc->vt->DeleteShader(tc->fshader);
 
-    /* Check program messages */
-    int infoLength = 0;
-    tc->vt->GetProgramiv(prgm->id, GL_INFO_LOG_LENGTH, &infoLength);
-    if (infoLength > 1)
-    {
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            tc->vt->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
-                                       infolog);
-            msg_Err(tc->gl, "shader program: %s", infolog);
-            free(infolog);
-        }
-
-        /* If there is some message, better to check linking is ok */
-        GLint link_status = GL_TRUE;
-        tc->vt->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
-        if (link_status == GL_FALSE)
-        {
-            msg_Err(tc->gl, "Unable to use program");
-            goto error;
-        }
-    }
+    if (CheckProgramMessages(tc->gl, tc->vt, prgm) != VLC_SUCCESS)
+        goto error;
 
     /* Fetch UniformLocations and AttribLocations */
 #define GET_LOC(type, x, str) do { \
@@ -530,6 +580,7 @@ opengl_link_program(struct prgm *prgm)
 #define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
     GET_ULOC(OrientationMatrix, "OrientationMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
+    GET_ULOC(ModelViewMatrix, "ModelViewMatrix");
     GET_ULOC(ZRotMatrix, "ZRotMatrix");
     GET_ULOC(YRotMatrix, "YRotMatrix");
     GET_ULOC(XRotMatrix, "XRotMatrix");
@@ -720,10 +771,194 @@ ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
     }
 }
 
+#define GLSL_VERSION "120" // Temporary hack.
+
+static void BuildStereoVertexShader(vout_display_opengl_t *vgl,
+                                    GLuint *shader)
+{
+    const char *fragmentShader =
+        "#version " GLSL_VERSION "\n"
+        //PRECISION // Temporary hack
+        "attribute vec4 MultiTexCoord0;"
+        "attribute vec3 VertexPosition;"
+        "varying vec2 TexCoord0;"
+        ""
+
+        "void main(void)"
+        "{"
+        "   TexCoord0 = MultiTexCoord0.st;"
+        "   gl_Position = vec4(VertexPosition, 1.0);"
+        "}";
+
+    *shader = vgl->vt.CreateShader(GL_VERTEX_SHADER);
+    vgl->vt.ShaderSource(*shader, 1, &fragmentShader, NULL);
+    vgl->vt.CompileShader(*shader);
+}
+
+
+static void BuildStereoFragmentShader(vout_display_opengl_t *vgl,
+                                      GLuint *shader)
+{
+    // Fragment shader from OpenHMD.
+    const char *fragmentShader =
+        "#version " GLSL_VERSION "\n"
+        "\n"
+        "//per eye texture to warp for lens distortion\n"
+        "uniform sampler2D warpTexture;\n"
+        "\n"
+        "//Position of lens center in m (usually eye_w/2, eye_h/2)\n"
+        "uniform vec2 LensCenter;\n"
+        "//Scale from texture co-ords to m (usually eye_w, eye_h)\n"
+        "uniform vec2 ViewportScale;\n"
+        "//Distortion overall scale in m (usually ~eye_w/2)\n"
+        "uniform float WarpScale;\n"
+        "//Distoriton coefficients (PanoTools model) [a,b,c,d]\n"
+        "uniform vec4 HmdWarpParam;\n"
+        "\n"
+        "//chromatic distortion post scaling\n"
+        "uniform vec3 aberr;\n"
+        "\n"
+        "varying vec2 TexCoord0;\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+            "//output_loc is the fragment location on screen from [0,1]x[0,1]\n"
+            "vec2 output_loc = vec2(TexCoord0.s, TexCoord0.t);\n"
+            "//Compute fragment location in lens-centered co-ordinates at world scale\n"
+            "vec2 r = output_loc * ViewportScale - LensCenter;\n"
+            "//scale for distortion model\n"
+            "//distortion model has r=1 being the largest circle inscribed (e.g. eye_w/2)\n"
+            "r /= WarpScale;\n"
+        "\n"
+            "//|r|**2\n"
+            "float r_mag = length(r);\n"
+            "//offset for which fragment is sourced\n"
+            "vec2 r_displaced = r * (HmdWarpParam.w + HmdWarpParam.z * r_mag +\n"
+                "HmdWarpParam.y * r_mag * r_mag +\n"
+                "HmdWarpParam.x * r_mag * r_mag * r_mag);\n"
+            "//back to world scale\n"
+            "r_displaced *= WarpScale;\n"
+            "//back to viewport co-ord\n"
+            "vec2 tc_r = (LensCenter + aberr.r * r_displaced) / ViewportScale;\n"
+            "vec2 tc_g = (LensCenter + aberr.g * r_displaced) / ViewportScale;\n"
+            "vec2 tc_b = (LensCenter + aberr.b * r_displaced) / ViewportScale;\n"
+        "\n"
+            "float red = texture2D(warpTexture, tc_r).r;\n"
+            "float green = texture2D(warpTexture, tc_g).g;\n"
+            "float blue = texture2D(warpTexture, tc_b).b;\n"
+            "//Black edges off the texture\n"
+            "gl_FragColor = ((tc_g.x < 0.0) || (tc_g.x > 1.0) || (tc_g.y < 0.0) || (tc_g.y > 1.0)) ? vec4(0.0, 0.0, 0.0, 1.0) : vec4(red, green, blue, 1.0);\n"
+        "}";
+
+    *shader = vgl->vt.CreateShader(GL_FRAGMENT_SHADER);
+    vgl->vt.ShaderSource(*shader, 1, &fragmentShader, NULL);
+    vgl->vt.CompileShader(*shader);
+}
+
+
+static int opengl_init_stereo_program(vout_display_opengl_t *vgl)
+{
+    GLuint stereo_vertex_shader;
+    GLuint stereo_fragment_shader;
+    BuildStereoVertexShader(vgl, &stereo_vertex_shader);
+    BuildStereoFragmentShader(vgl, &stereo_fragment_shader);
+
+    GLuint shaders[] = {stereo_vertex_shader, stereo_fragment_shader};
+
+    if (CheckShaderMessages(vgl->gl, &vgl->vt, shaders) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
+    /* Stereo fragment shaders */
+    vgl->stereo_prgm->id = vgl->vt.CreateProgram();
+    vgl->vt.AttachShader(vgl->stereo_prgm->id, stereo_fragment_shader);
+    vgl->vt.AttachShader(vgl->stereo_prgm->id, stereo_vertex_shader);
+    vgl->vt.LinkProgram(vgl->stereo_prgm->id);
+
+    if (CheckProgramMessages(vgl->gl, &vgl->vt, vgl->stereo_prgm) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
+    vgl->vt.UseProgram(vgl->stereo_prgm->id);
+    vgl->vt.Uniform1i(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "warpTexture"), 0);
+
+    return VLC_SUCCESS;
+}
+
+
+static void CreateFBO(vout_display_opengl_t *vgl,
+                      GLuint* fbo, GLuint* color_tex, GLuint* depth_tex)
+{
+    vgl->vt.GenTextures(1, color_tex);
+#ifdef USE_OPENGL_ES2
+    vgl->vt.GenRenderbuffers(1, depth_tex);
+#else
+    vgl->vt.GenTextures(1, depth_tex);
+#endif
+    vgl->vt.GenFramebuffers(1, fbo);
+}
+
+
+static void DeleteFBO(vout_display_opengl_t *vgl,
+                      GLuint fbo, GLuint color_tex, GLuint depth_tex)
+{
+    vgl->vt.DeleteTextures(1, &color_tex);
+#ifdef USE_OPENGL_ES2
+    vgl->vt.DeleteRenderbuffers(1, &depth_tex);
+#else
+    vgl->vt.DeleteTextures(1, &depth_tex);
+#endif
+    vgl->vt.DeleteFramebuffers(1, &fbo);
+}
+
+
+static void UpdateFBOSize(vout_display_opengl_t *vgl,
+                          GLuint fbo, GLuint color_tex, GLuint depth_tex)
+{
+#ifdef USE_OPENGL_ES2
+    vgl->vt.BindTexture(GL_TEXTURE_2D, color_tex);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+    vgl->vt.BindRenderbuffer(GL_RENDERBUFFER, depth_tex);
+    vgl->vt.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, vgl->i_displayWidth, vgl->i_displayHeight);
+#else
+    vgl->vt.BindTexture(GL_TEXTURE_2D, color_tex);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    vgl->vt.BindTexture(GL_TEXTURE_2D, depth_tex);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#endif
+
+    vgl->vt.BindTexture(GL_TEXTURE_2D, 0);
+
+    vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, fbo);
+    vgl->vt.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex, 0);
+#ifdef USE_OPENGL_ES2
+    vgl->vt.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_tex);
+#else
+    vgl->vt.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
+#endif
+
+    GLenum status = vgl->vt.CheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if(status != GL_FRAMEBUFFER_COMPLETE){
+        msg_Err(vgl->gl, "Failed to create fbo %x %d %d\n", status, vgl->i_displayWidth, vgl->i_displayHeight);
+    }
+    vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
-                                               const vlc_viewpoint_t *viewpoint)
+                                               const vlc_viewpoint_t *viewpoint, bool b_hmd)
 {
     vout_display_opengl_t *vgl = calloc(1, sizeof(*vgl));
     if (!vgl)
@@ -798,11 +1033,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(UniformMatrix3fv);
     GET_PROC_ADDR(UniformMatrix2fv);
     GET_PROC_ADDR(Uniform4fv);
+    GET_PROC_ADDR(Uniform3fv);
+    GET_PROC_ADDR(Uniform2fv);
     GET_PROC_ADDR(Uniform4f);
     GET_PROC_ADDR(Uniform3f);
     GET_PROC_ADDR(Uniform2f);
     GET_PROC_ADDR(Uniform1f);
     GET_PROC_ADDR(Uniform1i);
+
 
     GET_PROC_ADDR(CreateProgram);
     GET_PROC_ADDR(LinkProgram);
@@ -815,6 +1053,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(BindBuffer);
     GET_PROC_ADDR(BufferData);
     GET_PROC_ADDR(DeleteBuffers);
+
+    GET_PROC_ADDR(BindFramebuffer);
+    GET_PROC_ADDR(GenFramebuffers);
+    GET_PROC_ADDR(DeleteFramebuffers);
+    GET_PROC_ADDR(CheckFramebufferStatus);
+    GET_PROC_ADDR(FramebufferTexture2D);
+    GET_PROC_ADDR(GenRenderbuffers);
+    GET_PROC_ADDR(DeleteRenderbuffers);
+    GET_PROC_ADDR(BindRenderbuffer);
+    GET_PROC_ADDR(RenderbufferStorage);
+    GET_PROC_ADDR(FramebufferRenderbuffer);
 
     GET_PROC_ADDR_OPTIONAL(GetFramebufferAttachmentParameteriv);
 
@@ -871,6 +1120,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->prgm = &vgl->prgms[0];
     vgl->sub_prgm = &vgl->prgms[1];
+    vgl->stereo_prgm = &vgl->prgms[2];
 
     GL_ASSERT_NOERROR();
     int ret;
@@ -931,6 +1181,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
+    ret = opengl_init_stereo_program(vgl);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Warn(gl, "could not init the stereo shader");
+        vout_display_opengl_Delete(vgl);
+        return NULL;
+    }
+
     /* */
     vgl->vt.Disable(GL_BLEND);
     vgl->vt.Disable(GL_DEPTH_TEST);
@@ -942,6 +1200,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->vt.GenBuffers(1, &vgl->vertex_buffer_object);
     vgl->vt.GenBuffers(1, &vgl->index_buffer_object);
     vgl->vt.GenBuffers(vgl->prgm->tc->tex_count, vgl->texture_buffer_object);
+
+    vgl->vt.GenBuffers(1, &vgl->vertex_buffer_object_stereo);
+    vgl->vt.GenBuffers(1, &vgl->index_buffer_object_stereo);
+    vgl->vt.GenBuffers(1, &vgl->texture_buffer_object_stereo);
+
 
     /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
     int subpicture_buffer_object_count = 8;
@@ -958,7 +1221,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->region = NULL;
     vgl->pool = NULL;
 
-    if (vgl->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
+    if ((vgl->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR || b_hmd)
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
     {
         vout_display_opengl_Delete(vgl);
@@ -971,6 +1234,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     vlc_mutex_init(&vgl->hmd_lock);
+
+    CreateFBO(vgl, &vgl->leftFBO, &vgl->leftColorTex, &vgl->leftDepthTex);
+    CreateFBO(vgl, &vgl->rightFBO, &vgl->rightColorTex, &vgl->rightDepthTex);
 
     GL_ASSERT_NOERROR();
     return vgl;
@@ -986,6 +1252,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 
     const size_t main_tex_count = vgl->prgm->tc->tex_count;
     const bool main_del_texs = !vgl->prgm->tc->handle_texs_gen;
+
+    DeleteFBO(vgl, vgl->leftFBO, vgl->leftColorTex, vgl->leftDepthTex);
+    DeleteFBO(vgl, vgl->rightFBO, vgl->rightColorTex, vgl->rightDepthTex);
+    vgl->vt.DeleteProgram(vgl->stereo_prgm->id);
 
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
@@ -1062,7 +1332,6 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     vgl->f_phi  = RAD(p_vp->pitch);
     vgl->f_roll = RAD(p_vp->roll);
 
-
     if (fabsf(f_fovx - vgl->f_fovx) >= 0.001f)
     {
         /* FOVx has changed. */
@@ -1092,7 +1361,22 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
                                   unsigned width, unsigned height)
 {
-    vgl->vt.Viewport(x, y, width, height);
+    vgl->i_displayWidth = width;
+    vgl->i_displayHeight = height;
+    vgl->displayPlace = (const vout_display_place_t){
+        .x = x, .y = y,
+        .width = width,
+        .height = height };
+
+    if (vgl->b_sideBySide)
+    {
+        vgl->vt.Viewport(0, 0, width, height);
+
+        UpdateFBOSize(vgl, vgl->leftFBO, vgl->leftColorTex, vgl->leftDepthTex);
+        UpdateFBOSize(vgl, vgl->rightFBO, vgl->rightColorTex, vgl->rightDepthTex);
+    }
+    else
+        vgl->vt.Viewport(x, y, width, height);
 }
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
@@ -1445,6 +1729,67 @@ static int BuildCube(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
+
+static int BuildVirtualScreen(unsigned nbPlanes,
+                              GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                              GLushort **indices, unsigned *nbIndices,
+                              const float *left, const float *top,
+                              const float *right, const float *bottom,
+                              float f_ar)
+{
+    *nbVertices = 4;
+    *nbIndices = 6;
+
+    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    if (*vertexCoord == NULL)
+        return VLC_ENOMEM;
+    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    if (*textureCoord == NULL)
+    {
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+    *indices = malloc(*nbIndices * sizeof(GLushort));
+    if (*indices == NULL)
+    {
+        free(*textureCoord);
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+
+    const GLfloat coord[] = {
+        -1.0,    1.0 / f_ar,    1.0f,
+        -1.0,    -1.0 / f_ar,   1.0f,
+        -1.0,    1.0 / f_ar,    -1.0f,
+        -1.0,    -1.0 / f_ar,   -1.0f,
+    };
+
+    memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
+
+    for (unsigned p = 0; p < nbPlanes; ++p)
+    {
+        const GLfloat tex[] = {
+            left[p],  top[p],
+            left[p],  bottom[p],
+            right[p], top[p],
+            right[p], bottom[p]
+        };
+
+        memcpy(*textureCoord + p * *nbVertices * 2, tex,
+               *nbVertices * 2 * sizeof(GLfloat));
+    }
+
+    const GLushort ind[] = {
+        0, 1, 2,
+        2, 1, 3,
+    };
+
+    memcpy(*indices, ind, *nbIndices * sizeof(GLushort));
+
+    return VLC_SUCCESS;
+}
+
+
 static int BuildRectangle(unsigned nbPlanes,
                           GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                           GLushort **indices, unsigned *nbIndices,
@@ -1505,7 +1850,8 @@ static int BuildRectangle(unsigned nbPlanes,
 
 static int SetupCoords(vout_display_opengl_t *vgl,
                        const float *left, const float *top,
-                       const float *right, const float *bottom)
+                       const float *right, const float *bottom,
+                       float f_ar)
 {
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1515,10 +1861,16 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     switch (vgl->fmt.projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
-        i_ret = BuildRectangle(vgl->prgm->tc->tex_count,
-                               &vertexCoord, &textureCoord, &nbVertices,
-                               &indices, &nbIndices,
-                               left, top, right, bottom);
+        if (vgl->b_sideBySide)
+            i_ret = BuildVirtualScreen(vgl->prgm->tc->tex_count,
+                                       &vertexCoord, &textureCoord, &nbVertices,
+                                       &indices, &nbIndices,
+                                       left, top, right, bottom, f_ar);
+        else
+            i_ret = BuildRectangle(vgl->prgm->tc->tex_count,
+                                   &vertexCoord, &textureCoord, &nbVertices,
+                                   &indices, &nbIndices,
+                                   left, top, right, bottom);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
         i_ret = BuildSphere(vgl->prgm->tc->tex_count,
@@ -1566,7 +1918,8 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
-static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
+static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
+                            side_by_side_eye eye)
 {
     opengl_tex_converter_t *tc = prgm->tc;
     tc->pf_prepare_shader(tc, vgl->tex_width, vgl->tex_height, 1.0f);
@@ -1589,22 +1942,41 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
     vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
     vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
+    if (vgl->b_sideBySide)
+    {
+        if (eye == LEFT_EYE)
+        {
+            memcpy(vgl->prgm->var.ModelViewMatrix,
+                   vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
+            memcpy(vgl->prgm->var.ProjectionMatrix,
+                   vgl->hmd_cfg.left.projection, 16 * sizeof(float));
+        }
+        else if (eye == RIGHT_EYE)
+        {
+            memcpy(vgl->prgm->var.ModelViewMatrix,
+                   vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
+            memcpy(vgl->prgm->var.ProjectionMatrix,
+                   vgl->hmd_cfg.right.projection, 16 * sizeof(float));
+        }
+    }
+
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
-                             prgm->var.OrientationMatrix);
+                              prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
-                             prgm->var.ProjectionMatrix);
+                              prgm->var.ProjectionMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
+                              prgm->var.ModelViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                             prgm->var.ZRotMatrix);
+                              prgm->var.ZRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                             prgm->var.YRotMatrix);
+                              prgm->var.YRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                             prgm->var.XRotMatrix);
+                              prgm->var.XRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                             prgm->var.ZoomMatrix);
+                              prgm->var.ZoomMatrix);
 
     vgl->vt.DrawElements(GL_TRIANGLES, vgl->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
-
 
 static void GetTextureCropParamsForStereo(unsigned i_nbTextures,
                                           const float *stereoCoefs,
@@ -1654,8 +2026,7 @@ static void TextureCropForStereo(vout_display_opengl_t *vgl,
     }
 }
 
-int vout_display_opengl_Display(vout_display_opengl_t *vgl,
-                                const video_format_t *source)
+static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, side_by_side_eye eye)
 {
     GL_ASSERT_NOERROR();
 
@@ -1686,7 +2057,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     if (source->i_x_offset != vgl->last_source.i_x_offset
      || source->i_y_offset != vgl->last_source.i_y_offset
      || source->i_visible_width != vgl->last_source.i_visible_width
-     || source->i_visible_height != vgl->last_source.i_visible_height)
+     || source->i_visible_height != vgl->last_source.i_visible_height
+     || vgl->b_lastSideBySide != vgl->b_sideBySide)
     {
         float left[PICTURE_PLANE_MAX];
         float top[PICTURE_PLANE_MAX];
@@ -1717,8 +2089,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
         }
 
-        TextureCropForStereo(vgl, left, top, right, bottom);
-        int ret = SetupCoords(vgl, left, top, right, bottom);
+        if (!vgl->b_sideBySide)
+            TextureCropForStereo(vgl, left, top, right, bottom);
+        int ret = SetupCoords(vgl, left, top, right, bottom,
+                              (float)source->i_visible_width / source->i_visible_height);
         if (ret != VLC_SUCCESS)
             return ret;
 
@@ -1726,8 +2100,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->last_source.i_y_offset = source->i_y_offset;
         vgl->last_source.i_visible_width = source->i_visible_width;
         vgl->last_source.i_visible_height = source->i_visible_height;
+        vgl->b_lastSideBySide = vgl->b_sideBySide;
     }
-    DrawWithShaders(vgl, vgl->prgm);
+    DrawWithShaders(vgl, vgl->prgm, eye);
 
     /* Draw the subpictures */
     // Change the program for overlays
@@ -1781,30 +2156,136 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
         vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
         vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT,
-                                    0, 0, 0);
+                                     0, 0, 0);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
         vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
         vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 2, GL_FLOAT,
-                                    0, 0, 0);
+                                     0, 0, 0);
 
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
-                                 prgm->var.OrientationMatrix);
+                                  prgm->var.OrientationMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
-                                 prgm->var.ProjectionMatrix);
+                                  prgm->var.ProjectionMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
+                                  prgm->var.ModelViewMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                                 prgm->var.ZRotMatrix);
+                                  prgm->var.ZRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                                 prgm->var.YRotMatrix);
+                                  prgm->var.YRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                                 prgm->var.XRotMatrix);
+                                  prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                                 prgm->var.ZoomMatrix);
+                                  prgm->var.ZoomMatrix);
 
         vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+
     vgl->vt.Disable(GL_BLEND);
+
+    return VLC_SUCCESS;
+}
+
+
+int vout_display_opengl_Display(vout_display_opengl_t *vgl,
+                                const video_format_t *source)
+{
+    GL_ASSERT_NOERROR();
+
+    /* Why drawing here and not in Render()? Because this way, the
+       OpenGL providers can call vout_display_opengl_Display to force redraw.
+       Currently, the OS X provider uses it to get a smooth window resizing */
+    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
+
+    if (vgl->b_sideBySide) {
+        // Draw scene into framebuffers.
+        vgl->vt.UseProgram(vgl->prgm->id);
+
+        // Left eye
+        vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, vgl->leftFBO);
+        vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        drawScene(vgl, source, LEFT_EYE);
+
+        // Right eye
+        vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, vgl->rightFBO);
+        vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        drawScene(vgl, source, RIGHT_EYE);
+
+        // Exit framebuffer.
+        vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        vgl->vt.ActiveTexture(GL_TEXTURE0);
+
+        GLuint program = vgl->stereo_prgm->id;
+        vgl->vt.UseProgram(program);
+
+        // Draw eyes.
+        GLfloat vertexCoordLeft[] = {
+            -1, -1, 0,
+            0, -1, 0,
+            0, 1, 0,
+            -1, 1, 0,
+        };
+
+        GLfloat vertexCoordRight[] = {
+            0, -1, 0,
+            1, -1, 0,
+            1,  1, 0,
+            0,  1, 0,
+        };
+
+        GLushort indices[] = {
+            0, 1, 2,
+            0, 2, 3,
+        };
+
+        GLfloat textureCoord[] = {
+            0, 0,
+            1, 0,
+            1, 1,
+            0, 1,
+        };
+
+        vgl->vt.Uniform1f(vgl->vt.GetUniformLocation(program, "WarpScale"),
+                          vgl->hmd_cfg.warp_scale * vgl->hmd_cfg.warp_adj);
+        vgl->vt.Uniform4fv(vgl->vt.GetUniformLocation(program, "HmdWarpParam"),
+                           1, vgl->hmd_cfg.distorsion_coefs);
+
+        vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object_stereo);
+        vgl->vt.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object_stereo);
+        vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+        vgl->vt.EnableVertexAttribArray(vgl->vt.GetAttribLocation(program, "MultiTexCoord0"));
+        vgl->vt.VertexAttribPointer(vgl->vt.GetAttribLocation(program, "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+
+        // Left eye
+        vgl->vt.Uniform2fv(vgl->vt.GetUniformLocation(program, "LensCenter"),
+                           1, vgl->hmd_cfg.left.lens_center);
+
+        vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->leftColorTex);
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object_stereo);
+        vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoordLeft), vertexCoordLeft, GL_STATIC_DRAW);
+        vgl->vt.EnableVertexAttribArray(vgl->vt.GetAttribLocation(program, "VertexPosition"));
+        vgl->vt.VertexAttribPointer(vgl->vt.GetAttribLocation(program, "VertexPosition"), 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.DrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+        // Right eye
+        vgl->vt.Uniform2fv(vgl->vt.GetUniformLocation(program, "LensCenter"),
+                           1, vgl->hmd_cfg.right.lens_center);
+
+        vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->rightColorTex);
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object_stereo);
+        vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoordRight), vertexCoordRight, GL_STATIC_DRAW);
+        vgl->vt.EnableVertexAttribArray(vgl->vt.GetAttribLocation(program, "VertexPosition"));
+        vgl->vt.VertexAttribPointer(vgl->vt.GetAttribLocation(program, "VertexPosition"), 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.DrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    }
+    else
+        drawScene(vgl, source, UNDEFINED_EYE);
 
     /* Display */
     vlc_gl_Swap(vgl->gl);
@@ -1818,6 +2299,31 @@ static void HmdStateChanged(vlc_hmd_interface_t *hmd,
                             vlc_hmd_state_e state,
                             void *userdata)
 {
+    vout_display_opengl_t *vgl = userdata;
+
+    if (state == VLC_HMD_STATE_ENABLED)
+    {
+        // TODO: update shader parameters/config
+
+        vgl->b_sideBySide = true;
+
+        vgl->vt.UseProgram(vgl->stereo_prgm->id);
+
+        vgl->vt.Uniform2fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "ViewportScale"),
+                           1, vgl->hmd_cfg.viewport_scale);
+        vgl->vt.Uniform3fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "aberr"),
+                           1, vgl->hmd_cfg.aberr_scale);
+    }
+    else
+        vgl->b_sideBySide = false;
+
+    vout_display_opengl_Viewport(vgl, vgl->displayPlace.x,
+                                      vgl->displayPlace.y,
+                                      vgl->i_displayWidth,
+                                      vgl->i_displayHeight);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
+
+    return VLC_SUCCESS;
 
 }
 

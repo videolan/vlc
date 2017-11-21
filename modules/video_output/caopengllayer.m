@@ -187,7 +187,8 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         const vlc_fourcc_t *subpicture_chromas;
         if (!OpenglLock(sys->gl)) {
             sys->vgl = vout_display_opengl_New(fmt, &subpicture_chromas,
-                                               sys->gl, &cfg->viewpoint);
+                                               sys->gl, &cfg->viewpoint,
+                                               cfg->hmd);
             OpenglUnlock(sys->gl);
         } else
             sys->vgl = NULL;

@@ -30,6 +30,7 @@
 #define VLC_OPENGL_VOUT_HELPER_H
 
 #include "converter.h"
+#include <vlc_vout_display.h>
 
 #ifdef HAVE_LIBPLACEBO
 #include "../placebo_utils.h"
@@ -74,7 +75,8 @@ typedef struct vout_display_opengl_t vout_display_opengl_t;
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
-                                               const vlc_viewpoint_t *viewpoint);
+                                               const vlc_viewpoint_t *viewpoint,
+                                               bool b_hmd);
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl);
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned);
@@ -94,5 +96,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
 void vout_display_opengl_UpdateHMD(vout_display_opengl_t *vgl,
                                    vlc_hmd_device_t *device);
+
+int vout_display_opengl_UpdateViewport(vout_display_opengl_t *vgl,
+                                       vout_display_place_t place,
+                                       unsigned displayWidth, unsigned displayHeight);
 
 #endif
