@@ -1234,8 +1234,8 @@ static void Direct3D11Destroy(vout_display_t *vd)
     sys->OurD3DCompile = NULL;
     sys->hdxgi_dll = NULL;
     sys->hd3dcompiler_dll = NULL;
-#endif
     D3D11_Destroy( &vd->sys->hd3d );
+#endif
 }
 
 #if !VLC_WINSTORE_APP
