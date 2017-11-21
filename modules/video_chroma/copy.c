@@ -681,7 +681,7 @@ void Copy420_16_SP_to_P(picture_t *dst, const uint8_t *src[static 2],
 #ifdef CAN_COMPILE_SSE3
     unsigned    cpu = vlc_CPU();
 
-    if (vlc_CPU_SSE3())
+    if (vlc_CPU_SSSE3())
         return SSE_Copy420_SP_to_P(dst, src, src_pitch, height, cache, 2, cpu);
 #else
     VLC_UNUSED(cache);
@@ -742,7 +742,7 @@ void Copy420_16_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
     ASSERT_3PLANES;
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
-    if (vlc_CPU_SSE3())
+    if (vlc_CPU_SSSE3())
         return SSE_Copy420_P_to_SP(dst, src, src_pitch, height, cache, 2, cpu);
 #else
     (void) cache;
