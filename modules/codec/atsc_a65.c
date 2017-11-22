@@ -132,20 +132,7 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
             return false;
     }
 
-    if( i_mode == ATSC_A65_MODE_UNICODE_RANGE_START ) /* Latin 1 */
-    {
-        char *psz_realloc = realloc( psz_dest, i_mergmin1 + i_src + 1 );
-        if( psz_realloc )
-        {
-            psz_realloc[i_mergmin1 + i_src] = 0;
-            memcpy( &psz_realloc[i_mergmin1], p_src, i_src );
-            psz_dest = psz_realloc;
-            i_mergmin1 += i_src;
-        }
-        else return false;
-    }
-    else if( i_mode > ATSC_A65_MODE_UNICODE_RANGE_START &&  /* 8 range prefix + 8 */
-             i_mode <= ATSC_A65_MODE_UNICODE_RANGE_END )
+    if( i_mode <= ATSC_A65_MODE_UNICODE_RANGE_END ) /* 8 range prefix + 8 */
     {
         if( !p_handle->iconv_u16be )
         {
