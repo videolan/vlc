@@ -732,6 +732,7 @@ static int Open( vlc_object_t * p_this )
 
             case( AVIFOURCC_mids):
                 msg_Dbg( p_demux, "stream[%u] midi is UNSUPPORTED", i );
+                /* fall through */
 
             default:
                 msg_Warn( p_demux, "stream[%u] unknown type %4.4s", i, (char *)&p_strh->i_type );
