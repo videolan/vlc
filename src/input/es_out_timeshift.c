@@ -894,7 +894,7 @@ static int TsPopCmdLocked( ts_thread_t *p_ts, ts_cmd_t *p_cmd, bool b_flush )
 
     TsStoragePopCmd( p_ts->p_storage_r, p_cmd, b_flush );
 
-    while( p_ts->p_storage_r && TsStorageIsEmpty( p_ts->p_storage_r ) )
+    while( TsStorageIsEmpty( p_ts->p_storage_r ) )
     {
         ts_storage_t *p_next = p_ts->p_storage_r->p_next;
         if( !p_next )
