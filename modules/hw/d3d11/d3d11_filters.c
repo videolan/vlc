@@ -342,20 +342,14 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
-    picture_t *dst = filter_NewPicture(filter);
-    if (dst == NULL)
-        return VLC_EGENERIC;
-    if (!dst->p_sys)
-    {
-        msg_Dbg(filter, "D3D11 opaque without a texture");
-        picture_Release(dst);
-        return VLC_EGENERIC;
-    }
-
     D3D11_TEXTURE2D_DESC dstDesc;
-    ID3D11Texture2D_GetDesc(dst->p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
-    sys->d3d_dev.d3dcontext = dst->p_sys->context;
-    ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
+    D3D11_FilterHoldInstance(filter, &sys->d3d_dev, &dstDesc);
+    if (unlikely(sys->d3d_dev.d3dcontext==NULL))
+    {
+        msg_Dbg(filter, "Filter without a context");
+        free(sys);
+        return VLC_ENOOBJ;
+    }
 
     hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
     if (FAILED(hr)) {
@@ -556,11 +550,8 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     filter->pf_video_filter = Filter;
     filter->p_sys = sys;
 
-    picture_Release(dst);
     return VLC_SUCCESS;
 error:
-    picture_Release(dst);
-
     for (int i=0; i<PROCESSOR_SLICES; i++)
     {
         if (sys->procInput[i])
@@ -582,7 +573,7 @@ error:
     if (sys->d3dviddev)
         ID3D11VideoDevice_Release(sys->d3dviddev);
     if (sys->d3d_dev.d3dcontext)
-        D3D11_ReleaseDevice(&sys->d3d_dev);
+        D3D11_FilterReleaseInstance(&sys->d3d_dev);
 
     return VLC_EGENERIC;
 }
@@ -612,7 +603,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11VideoContext_Release(sys->d3dvidctx);
     ID3D11VideoDevice_Release(sys->d3dviddev);
 
-    D3D11_ReleaseDevice(&sys->d3d_dev);
+    D3D11_FilterReleaseInstance(&sys->d3d_dev);
 
     free(sys);
 }
