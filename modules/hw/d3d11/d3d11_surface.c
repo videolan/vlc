@@ -624,7 +624,7 @@ VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
 VIDEO_FILTER_WRAPPER (NV12_D3D11)
 
-static int OpenConverter( vlc_object_t *obj )
+static int D3D11OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
@@ -671,7 +671,7 @@ done:
     return err;
 }
 
-static int OpenFromCPU( vlc_object_t *obj )
+static int D3D11OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
@@ -796,7 +796,7 @@ done:
     return err;
 }
 
-static void CloseConverter( vlc_object_t *obj )
+static void D3D11CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
@@ -819,7 +819,7 @@ static void CloseConverter( vlc_object_t *obj )
     p_filter->p_sys = NULL;
 }
 
-static void CloseFromCPU( vlc_object_t *obj )
+static void D3D11CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
@@ -836,8 +836,8 @@ static void CloseFromCPU( vlc_object_t *obj )
 vlc_module_begin ()
     set_description( N_("Conversions from D3D11 to YUV") )
     set_capability( "video converter", 10 )
-    set_callbacks( OpenConverter, CloseConverter )
+    set_callbacks( D3D11OpenConverter, D3D11CloseConverter )
     add_submodule()
-        set_callbacks( OpenFromCPU, CloseFromCPU )
+        set_callbacks( D3D11OpenCPUConverter, D3D11CloseCPUConverter )
         set_capability( "video converter", 10 )
 vlc_module_end ()

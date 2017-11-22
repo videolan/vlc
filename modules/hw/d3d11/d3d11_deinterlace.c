@@ -281,7 +281,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
     return pic;
 }
 
-static int Open(vlc_object_t *obj)
+static int D3D11OpenDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
@@ -515,7 +515,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void D3D11CloseDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
@@ -535,6 +535,6 @@ vlc_module_begin()
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
+    set_callbacks(D3D11OpenDeinterlace, D3D11CloseDeinterlace)
     add_shortcut ("deinterlace")
 vlc_module_end()
