@@ -369,17 +369,13 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
          goto done;
     }
 
-    picture_t *peek = filter_NewPicture(p_filter);
-    if (peek == NULL)
-        return VLC_EGENERIC;
-    if (!peek->p_sys)
-    {
-        msg_Dbg(p_filter, "D3D9 opaque without a texture");
-        return VLC_EGENERIC;
-    }
-
     D3DSURFACE_DESC texDesc;
-    IDirect3DSurface9_GetDesc( peek->p_sys->surface, &texDesc);
+    D3D9_FilterHoldInstance(p_filter, &p_sys->d3d_dev, &texDesc);
+    if (!p_sys->d3d_dev.dev)
+    {
+        msg_Dbg(p_filter, "Filter without a context");
+        goto done;
+    }
     if (texDesc.Format == 0)
         goto done;
 
@@ -406,7 +402,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         }
         picture_Setup(p_dst, &p_dst->format);
 
-        IDirect3DSurface9_GetDevice(peek->p_sys->surface, &p_sys->d3d_dev.dev);
         HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
                                                           p_dst->format.i_width,
                                                           p_dst->format.i_height,
@@ -440,14 +435,13 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
 
 done:
     video_format_Clean(&fmt_staging);
-    picture_Release(peek);
     if (err != VLC_SUCCESS)
     {
         if (p_cpu_filter)
             DeleteFilter( p_cpu_filter );
         if (texture)
             IDirect3DSurface9_Release(texture);
-        D3D9_ReleaseDevice(&p_sys->d3d_dev);
+        D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
         if (hd3d_dll)
             FreeLibrary(hd3d_dll);
         free(p_sys);
@@ -470,7 +464,7 @@ void D3D9CloseCPUConverter( vlc_object_t *obj )
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging);
-    D3D9_ReleaseDevice(&p_sys->d3d_dev);
+    D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
     FreeLibrary(p_sys->hd3d_dll);
     free( p_sys );
     p_filter->p_sys = NULL;

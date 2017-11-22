@@ -274,7 +274,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     HINSTANCE hdecoder_dll = NULL;
     HINSTANCE d3d9_dll = NULL;
     HRESULT hr;
-    picture_t *dst = NULL;
     GUID *processorGUIDs = NULL;
     GUID *processorGUID = NULL;
     IDirectXVideoProcessorService *processor = NULL;
@@ -297,13 +296,11 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         goto error;
 
-    dst = filter_NewPicture(filter);
-    if (dst == NULL)
-        goto error;
-
-    if (!dst->p_sys)
+    D3DSURFACE_DESC dstDesc;
+    D3D9_FilterHoldInstance( filter, &sys->d3d_dev, &dstDesc );
+    if (!sys->d3d_dev.dev)
     {
-        msg_Dbg(filter, "D3D9 opaque without a texture");
+        msg_Dbg(filter, "Filter without a context");
         goto error;
     }
 
@@ -314,16 +311,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
       (void *)GetProcAddress(hdecoder_dll, "DXVA2CreateVideoService");
     if (CreateVideoService == NULL)
         goto error;
-
-    hr = IDirect3DSurface9_GetDevice( dst->p_sys->surface, &sys->d3d_dev.dev );
-    if (FAILED(hr))
-        goto error;
-
-    D3DSURFACE_DESC dstDesc;
-    hr = IDirect3DSurface9_GetDesc( dst->p_sys->surface, &dstDesc );
-    if (unlikely(FAILED(hr)))
-        goto error;
-
     hr = CreateVideoService( sys->d3d_dev.dev, &IID_IDirectXVideoProcessorService,
                             (void**)&processor);
     if (FAILED(hr))
@@ -464,7 +451,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
 
     CoTaskMemFree(processorGUIDs);
     IDirectXVideoProcessorService_Release(processor);
-    picture_Release(dst);
 
     sys->buffer_new = filter->owner.video.buffer_new;
     filter->owner.video.buffer_new = NewOutputPicture;
@@ -480,13 +466,11 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    D3D9_ReleaseDevice( &sys->d3d_dev );
+    D3D9_FilterReleaseInstance( &sys->d3d_dev );
     if (hdecoder_dll)
         FreeLibrary(hdecoder_dll);
     if (d3d9_dll)
         FreeLibrary(d3d9_dll);
-    if (dst)
-        picture_Release(dst);
     free(sys);
 
     return VLC_EGENERIC;
@@ -499,7 +483,7 @@ void D3D9CloseDeinterlace(vlc_object_t *obj)
 
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    D3D9_ReleaseDevice( &sys->d3d_dev );
+    D3D9_FilterReleaseInstance( &sys->d3d_dev );
     FreeLibrary( sys->hdecoder_dll );
     FreeLibrary( sys->d3d9_dll );
 
