@@ -643,7 +643,10 @@ static int satip_open(vlc_object_t *obj)
      * */
     char *psz_lower_url = strdup(access->psz_url);
     if (psz_lower_url == NULL)
-        goto error;
+    {
+        free( psz_host );
+        return VLC_ENOMEM;
+    }
 
     for (unsigned i = 0; i < strlen(psz_lower_url); i++)
         psz_lower_url[i] = tolower(psz_lower_url[i]);
