@@ -231,9 +231,8 @@ static char *net_readln_timeout(vlc_object_t *obj, int fd, int timeout, bool *in
             };
             int ret;
 
-            while((ret = poll(&pfd, 1, timeout)) < 0);
-            if (ret < 0)
-                goto error;
+            while((ret = poll(&pfd, 1, timeout)) < 0)
+                ;
 
             val = recv(fd, buf + len, size - len, MSG_PEEK);
             if (val <= 0)
