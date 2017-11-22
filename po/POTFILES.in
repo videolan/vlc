@@ -917,6 +917,7 @@ modules/hw/vdpau/deinterlace.c
 modules/hw/vdpau/display.c
 modules/hw/vdpau/sharpen.c
 modules/hw/vaapi/filters.c
+modules/hw/d3d11/d3d11_surface.c
 modules/keystore/keychain.m
 modules/lua/demux.c
 modules/lua/intf.c
@@ -1052,7 +1053,6 @@ modules/text_renderer/svg.c
 modules/text_renderer/tdummy.c
 modules/video_chroma/chain.c
 modules/video_chroma/cvpx.c
-modules/video_chroma/d3d11_surface.c
 modules/video_chroma/dxa9.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb16.c

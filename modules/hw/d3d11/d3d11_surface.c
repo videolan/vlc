@@ -36,12 +36,12 @@
 
 #include <assert.h>
 
-#include "copy.h"
+#include "../../video_chroma/copy.h"
 
 #include <windows.h>
 #define COBJMACROS
 #include <d3d11.h>
-#include "d3d11_fmt.h"
+#include "../../video_chroma/d3d11_fmt.h"
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
 #define CAN_PROCESSOR 1
