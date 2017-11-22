@@ -763,7 +763,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 } while(0)
 #if defined(USE_OPENGL_ES2)
 #define GET_PROC_ADDR(name) GET_PROC_ADDR_CORE(name)
-#define GET_PROC_ADDR_CORE_GL(name) vgl->vt.name = NULL /* GL only functions (not GLES) */
+#define GET_PROC_ADDR_CORE_GL(name) GET_PROC_ADDR_EXT(name, false) /* optional for GLES */
 #else
 #define GET_PROC_ADDR(name) GET_PROC_ADDR_EXT(name, true)
 #define GET_PROC_ADDR_CORE_GL(name) GET_PROC_ADDR_CORE(name)
