@@ -795,7 +795,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
     return p_ret;
 }
 
-static void DrainDPB(decoder_t *p_dec, bool flush)
+static void DrainDPBLocked(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     for( ;; )
@@ -1657,7 +1657,7 @@ static void Drain(decoder_t *p_dec, bool flush)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
-    DrainDPB(p_dec, flush);
+    DrainDPBLocked(p_dec, flush);
     p_sys->b_vt_flush = false;
     vlc_mutex_unlock(&p_sys->lock);
 }
