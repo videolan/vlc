@@ -25,11 +25,16 @@
 
 #include <vlc_common.h>
 
+#include "../../video_chroma/d3d11_fmt.h"
+
 int  D3D11OpenDeinterlace(vlc_object_t *);
 void D3D11CloseDeinterlace(vlc_object_t *);
 int  D3D11OpenConverter(vlc_object_t *);
 void D3D11CloseConverter(vlc_object_t *);
 int  D3D11OpenCPUConverter(vlc_object_t *);
 void D3D11CloseCPUConverter(vlc_object_t *);
+
+void D3D11_FilterHoldInstance(filter_t *, d3d11_device_t *, D3D11_TEXTURE2D_DESC *);
+void D3D11_FilterReleaseInstance(d3d11_device_t *);
 
 #endif /* VLC_D3D11_FILTERS_H */
