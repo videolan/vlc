@@ -602,10 +602,13 @@ static int Mux(sout_mux_t *p_mux)
         /* Reset reference dts in case of discontinuity (ex: gather sout) */
         if (p_data->i_flags & BLOCK_FLAG_DISCONTINUITY && p_stream->mux.i_entry_count)
         {
-            if(!CreateCurrentEdit(p_stream, p_sys->i_start_dts, p_sys->b_fragmented))
+            if(p_stream->i_first_dts != VLC_TS_INVALID)
             {
-                block_Release( p_data );
-                return VLC_ENOMEM;
+                if(!CreateCurrentEdit(p_stream, p_sys->i_start_dts, p_sys->b_fragmented))
+                {
+                    block_Release( p_data );
+                    return VLC_ENOMEM;
+                }
             }
 
             p_stream->i_length_neg = 0;
