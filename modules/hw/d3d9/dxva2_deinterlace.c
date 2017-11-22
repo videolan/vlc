@@ -45,7 +45,7 @@ struct filter_sys_t
     HINSTANCE                      hdecoder_dll;
     /* keep a reference in case the vout is released first */
     HINSTANCE                      d3d9_dll;
-    IDirect3DDevice9               *d3ddev;
+    d3d9_device_t                  d3d_dev;
     IDirectXVideoProcessor         *processor;
     IDirect3DSurface9              *hw_surface;
 
@@ -193,7 +193,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    hr = IDirect3DDevice9_StretchRect( sys->d3ddev,
+    hr = IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
                                        sys->hw_surface, NULL,
                                        p_outpic->p_sys->surface, NULL,
                                        D3DTEXF_NONE);
@@ -293,6 +293,10 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (!hdecoder_dll)
         goto error;
 
+    sys = calloc(1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        goto error;
+
     dst = filter_NewPicture(filter);
     if (dst == NULL)
         goto error;
@@ -303,10 +307,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
         goto error;
     }
 
-    sys = calloc(1, sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
-
     HRESULT (WINAPI *CreateVideoService)(IDirect3DDevice9 *,
                                          REFIID riid,
                                          void **ppService);
@@ -315,7 +315,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (CreateVideoService == NULL)
         goto error;
 
-    hr = IDirect3DSurface9_GetDevice( dst->p_sys->surface, &sys->d3ddev );
+    hr = IDirect3DSurface9_GetDevice( dst->p_sys->surface, &sys->d3d_dev.dev );
     if (FAILED(hr))
         goto error;
 
@@ -324,7 +324,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (unlikely(FAILED(hr)))
         goto error;
 
-    hr = CreateVideoService( sys->d3ddev, &IID_IDirectXVideoProcessorService,
+    hr = CreateVideoService( sys->d3d_dev.dev, &IID_IDirectXVideoProcessorService,
                             (void**)&processor);
     if (FAILED(hr))
         goto error;
@@ -480,8 +480,7 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    if (sys && sys->d3ddev)
-        IDirect3DDevice9_Release( sys->d3ddev );
+    D3D9_ReleaseDevice( &sys->d3d_dev );
     if (hdecoder_dll)
         FreeLibrary(hdecoder_dll);
     if (d3d9_dll)
@@ -500,7 +499,7 @@ void D3D9CloseDeinterlace(vlc_object_t *obj)
 
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    IDirect3DDevice9_Release( sys->d3ddev );
+    D3D9_ReleaseDevice( &sys->d3d_dev );
     FreeLibrary( sys->hdecoder_dll );
     FreeLibrary( sys->d3d9_dll );
 

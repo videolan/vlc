@@ -55,7 +55,7 @@ struct filter_sys_t
     HINSTANCE                      hdecoder_dll;
     /* keep a reference in case the vout is released first */
     HINSTANCE                      d3d9_dll;
-    IDirect3DDevice9               *d3ddev;
+    d3d9_device_t                  d3d_dev;
     IDirectXVideoProcessor         *processor;
     IDirect3DSurface9              *hw_surface;
 
@@ -147,7 +147,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                                  &params,
                                                  &sample,
                                                  1, NULL );
-    hr = IDirect3DDevice9_StretchRect( p_sys->d3ddev,
+    hr = IDirect3DDevice9_StretchRect( p_sys->d3d_dev.dev,
                                        p_sys->hw_surface, NULL,
                                        p_outpic->p_sys->surface, NULL,
                                        D3DTEXF_NONE);
@@ -236,6 +236,10 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
+    sys = calloc(1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
     d3d9_dll = LoadLibrary(TEXT("D3D9.DLL"));
     if (!d3d9_dll)
         goto error;
@@ -254,10 +258,6 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
         goto error;
     }
 
-    sys = calloc(1, sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
-
     HRESULT (WINAPI *CreateVideoService)(IDirect3DDevice9 *,
                                          REFIID riid,
                                          void **ppService);
@@ -266,7 +266,7 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
     if (CreateVideoService == NULL)
         goto error;
 
-    hr = IDirect3DSurface9_GetDevice( dst->p_sys->surface, &sys->d3ddev );
+    hr = IDirect3DSurface9_GetDevice( dst->p_sys->surface, &sys->d3d_dev.dev );
     if (FAILED(hr))
         goto error;
 
@@ -275,7 +275,7 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
     if (unlikely(FAILED(hr)))
         goto error;
 
-    hr = CreateVideoService( sys->d3ddev, &IID_IDirectXVideoProcessorService,
+    hr = CreateVideoService( sys->d3d_dev.dev, &IID_IDirectXVideoProcessorService,
                             (void**)&processor);
     if (FAILED(hr))
         goto error;
@@ -413,8 +413,8 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    if (sys && sys->d3ddev)
-        IDirect3DDevice9_Release( sys->d3ddev );
+    if (sys)
+        D3D9_ReleaseDevice( &sys->d3d_dev );
     if (hdecoder_dll)
         FreeLibrary(hdecoder_dll);
     if (d3d9_dll)
@@ -433,7 +433,7 @@ static void D3D9CloseAdjust(vlc_object_t *obj)
 
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    IDirect3DDevice9_Release( sys->d3ddev );
+    D3D9_ReleaseDevice( &sys->d3d_dev );
     FreeLibrary( sys->hdecoder_dll );
     FreeLibrary( sys->d3d9_dll );
 

@@ -47,7 +47,7 @@ struct filter_sys_t {
     copy_cache_t      cache;
 
     /* CPU to GPU */
-    IDirect3DDevice9  *d3ddev;
+    d3d9_device_t     d3d_dev;
     filter_t          *filter;
     picture_t         *staging;
 
@@ -265,7 +265,7 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
     RECT visibleSource = {
         .right = dst->format.i_width, .bottom = dst->format.i_height,
     };
-    IDirect3DDevice9_StretchRect( sys->d3ddev,
+    IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
                                   sys->staging->p_sys->surface, &visibleSource,
                                   dst->p_sys->surface, &visibleSource,
                                   D3DTEXF_NONE );
@@ -342,7 +342,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
     LPDIRECT3DSURFACE9 texture = NULL;
-    IDirect3DDevice9  *d3ddev = NULL;
     filter_t *p_cpu_filter = NULL;
     picture_t *p_dst = NULL;
     HINSTANCE hd3d_dll = NULL;
@@ -362,6 +361,12 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         break;
     default:
         return VLC_EGENERIC;
+    }
+
+    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    if (!p_sys) {
+         err = VLC_ENOMEM;
+         goto done;
     }
 
     picture_t *peek = filter_NewPicture(p_filter);
@@ -401,8 +406,8 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         }
         picture_Setup(p_dst, &p_dst->format);
 
-        IDirect3DSurface9_GetDevice(peek->p_sys->surface, &d3ddev);
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3ddev,
+        IDirect3DSurface9_GetDevice(peek->p_sys->surface, &p_sys->d3d_dev.dev);
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
                                                           p_dst->format.i_width,
                                                           p_dst->format.i_height,
                                                           texDesc.Format,
@@ -427,12 +432,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         goto done;
     }
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!p_sys) {
-         err = VLC_ENOMEM;
-         goto done;
-    }
-    p_sys->d3ddev    = d3ddev;
     p_sys->filter    = p_cpu_filter;
     p_sys->staging   = p_dst;
     p_sys->hd3d_dll = hd3d_dll;
@@ -444,14 +443,14 @@ done:
     picture_Release(peek);
     if (err != VLC_SUCCESS)
     {
-        if (d3ddev)
-            IDirect3DDevice9_Release(d3ddev);
         if (p_cpu_filter)
             DeleteFilter( p_cpu_filter );
         if (texture)
             IDirect3DSurface9_Release(texture);
+        D3D9_ReleaseDevice(&p_sys->d3d_dev);
         if (hd3d_dll)
             FreeLibrary(hd3d_dll);
+        free(p_sys);
     }
     return err;
 }
@@ -471,7 +470,7 @@ void D3D9CloseCPUConverter( vlc_object_t *obj )
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging);
-    IDirect3DDevice9_Release(p_sys->d3ddev);
+    D3D9_ReleaseDevice(&p_sys->d3d_dev);
     FreeLibrary(p_sys->hd3d_dll);
     free( p_sys );
     p_filter->p_sys = NULL;
