@@ -332,10 +332,10 @@ static int ProcessHeaders( decoder_t *p_dec )
         p_dec->fmt_out.video.i_frame_rate_base = p_sys->ti.fps_denominator;
     }
 
-    msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
+    msg_Dbg( p_dec, "%dx%d %u/%u fps video, frame content "
              "is %dx%d with offset (%d,%d)",
              p_sys->ti.frame_width, p_sys->ti.frame_height,
-             (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
+             p_sys->ti.fps_numerator, p_sys->ti.fps_denominator,
              p_sys->ti.pic_width, p_sys->ti.pic_height,
              p_sys->ti.pic_x, p_sys->ti.pic_y );
 
