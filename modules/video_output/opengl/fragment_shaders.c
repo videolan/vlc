@@ -306,8 +306,6 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 {
     (void) tex_target;
 
-
-    tc->tex_count = 1;
     switch (chroma)
     {
         case VLC_CODEC_RGB32:
@@ -328,6 +326,7 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         default:
             return VLC_EGENERIC;
     }
+    tc->tex_count = 1;
     return VLC_SUCCESS;
 }
 
