@@ -1931,8 +1931,11 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
         break;
     case VLC_CODEC_HEVC:
         if(!p_fmt->i_extra && p_obj)
+        {
             msg_Err(p_obj, "HEVC muxing from AnnexB source is unsupported");
-        return false;
+            return false;
+        }
+        break;
     case VLC_CODEC_SUBT:
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
