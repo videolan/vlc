@@ -647,8 +647,7 @@ static void *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
     {
         subpicture_t *p_buf = DecodePacket( p_dec, p_kp, p_block );
 
-        if( p_block )
-            block_Release( p_block );
+        block_Release( p_block );
         return p_buf;
     }
 }
