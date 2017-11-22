@@ -108,7 +108,7 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 
     if( !p_chk )
     {
-        if( AVI_ChunkReadCommon( s, &chk, p_chk->common.p_father ) )
+        if( AVI_ChunkReadCommon( s, &chk, NULL ) )
         {
             return VLC_EGENERIC;
         }
