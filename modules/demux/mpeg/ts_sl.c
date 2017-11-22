@@ -251,7 +251,7 @@ static block_t * SL_stream_processor_Push( ts_stream_processor_t *h, uint8_t i_s
         }
         block_ChainLastAppend( &ctx->pp_au_last, p_block );
         p_block = NULL;
-        if( header.b_au_end )
+        if( header.b_au_end && ctx->p_au )
         {
             p_block = block_ChainGather( ctx->p_au );
             ctx->p_au = NULL;
