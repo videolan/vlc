@@ -204,7 +204,6 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         *pp_append = p_chk;
         while( *pp_append )
             pp_append = &((*pp_append)->common.p_next);
-        p_container->common.p_last = p_chk;
 
         if( p_container->common.i_chunk_size > 0 &&
             vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_container ) )
@@ -264,7 +263,6 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
         *pp_append = p_chk;
         while( *pp_append )
             pp_append = &((*pp_append)->common.p_next);
-        p_riff->common.p_last = p_chk;
 
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
            ( vlc_stream_Tell( s ) >
@@ -1055,7 +1053,6 @@ void AVI_ChunkClean( stream_t *s,
                 (char*)&p_chk->common.i_chunk_fourcc );
     }
     p_chk->common.p_first = NULL;
-    p_chk->common.p_last  = NULL;
 
     return;
 }
@@ -1118,7 +1115,6 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
     p_list->p_father = NULL;
     p_list->p_next  = NULL;
     p_list->p_first = NULL;
-    p_list->p_last  = NULL;
 
     p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
 
@@ -1145,7 +1141,6 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
         *pp_append = p_chk;
         while( *pp_append )
             pp_append = &((*pp_append)->common.p_next);
-        p_root->common.p_last = p_chk;
 
         /* If we can't seek then stop when we 've found first RIFF-AVI */
         if( p_chk->common.i_chunk_fourcc == AVIFOURCC_RIFF &&

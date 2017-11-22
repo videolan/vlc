@@ -44,8 +44,7 @@
     uint64_t i_chunk_pos;          \
     union  avi_chunk_u *p_next;    \
     union  avi_chunk_u *p_father;  \
-    union  avi_chunk_u *p_first;   \
-    union  avi_chunk_u *p_last;
+    union  avi_chunk_u *p_first;
 
 #define AVI_CHUNK( p_chk ) (avi_chunk_t*)(p_chk)
 
