@@ -249,11 +249,40 @@ static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t 
 
 static picture_t *NewOutputPicture( filter_t *p_filter )
 {
-    picture_t *pic = p_filter->p_sys->buffer_new( p_filter );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    picture_t *pic = p_sys->buffer_new( p_filter );
     if ( !pic->context )
     {
+        bool b_local_texture = false;
+
+        if (!pic->p_sys )
+        {
+            D3DSURFACE_DESC dstDesc;
+            if ( !p_sys->hw_surface ||
+                 FAILED(IDirect3DSurface9_GetDesc( p_sys->hw_surface, &dstDesc )) )
+                return NULL;
+
+            pic->p_sys = calloc(1, sizeof(*pic->p_sys));
+            if (unlikely(pic->p_sys == NULL))
+                return NULL;
+
+            HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
+                                                              p_filter->fmt_out.video.i_width,
+                                                              p_filter->fmt_out.video.i_height,
+                                                              dstDesc.Format,
+                                                              D3DPOOL_DEFAULT,
+                                                              &pic->p_sys->surface,
+                                                              NULL);
+
+            if (FAILED(hr))
+            {
+                free(pic->p_sys);
+                pic->p_sys = NULL;
+                return NULL;
+            }
+            b_local_texture = true;
+        }
         /* the picture might be duplicated for snapshots so it needs a context */
-        assert( pic->p_sys != NULL ); /* this opaque picture is wrong */
         struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx!=NULL))
         {
@@ -263,6 +292,8 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             AcquirePictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;
         }
+        if (b_local_texture)
+            IDirect3DSurface9_Release(pic->p_sys->surface);
     }
     return pic;
 }
