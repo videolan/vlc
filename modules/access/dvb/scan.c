@@ -1411,7 +1411,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 }
 
                 if ( s->psz_original_network_name == NULL && p_nn )
-                    s->psz_original_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
+                    s->psz_original_network_name = strndup( (const char*) p_nn->p_data, p_nn->i_length );
 
                 scan_NotifyService( p_scan, s, !b_newservice );
             }
