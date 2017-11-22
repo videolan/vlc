@@ -216,7 +216,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
-static int Open(vlc_object_t *obj)
+static int D3D9OpenAdjust(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = NULL;
@@ -424,7 +424,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void D3D9CloseAdjust(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
@@ -443,7 +443,7 @@ vlc_module_begin()
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
+    set_callbacks(D3D9OpenAdjust, D3D9CloseAdjust)
     add_shortcut( "adjust" )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,
