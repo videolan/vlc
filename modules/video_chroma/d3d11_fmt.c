@@ -466,3 +466,21 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
 #endif
 #endif
 }
+
+#ifndef NDEBUG
+#undef D3D11_LogProcessorSupport
+void D3D11_LogProcessorSupport(vlc_object_t *o,
+                               ID3D11VideoProcessorEnumerator *processorEnumerator)
+{
+    UINT flags;
+    HRESULT hr;
+    for (int format = 0; format < 188; format++) {
+        hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, format, &flags);
+        if (SUCCEEDED(hr) && (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT))
+            msg_Dbg(o, "processor format %s (%d) is supported for input", DxgiFormatToStr(format),format);
+        if (SUCCEEDED(hr) && (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
+            msg_Dbg(o, "processor format %s (%d) is supported for output", DxgiFormatToStr(format),format);
+    }
+}
+
+#endif
