@@ -236,9 +236,6 @@ static mtime_t  AVI_MovieGetLength( demux_t * );
 
 static void AVI_MetaLoad( demux_t *, avi_chunk_list_t *p_riff, avi_chunk_avih_t *p_avih );
 
-block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
-                     const int i_header, const int i_size );
-
 /*****************************************************************************
  * Stream management
  *****************************************************************************/
@@ -894,7 +891,7 @@ error:
  * ReadFrame: Reads frame, using stride if necessary
  *****************************************************************************/
 
-block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
+static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
                      const int i_header, const int i_size )
 {
     block_t *p_frame = vlc_stream_Block( p_demux->s, __EVEN( i_size ) );
