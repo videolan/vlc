@@ -912,12 +912,12 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     p_frame->p_buffer += i_header;
     p_frame->i_buffer -= i_header;
 
-    if ( !tk->i_width_bytes )
-        return p_frame;
-
     const unsigned int i_stride_bytes = ((( (tk->i_width_bytes << 3) + 31) & ~31) >> 3);
 
-    if ( p_frame->i_buffer < i_stride_bytes )
+    if ( !tk->i_width_bytes || !i_stride_bytes )
+        return p_frame;
+
+    if( p_frame->i_buffer < i_stride_bytes )
     {
         p_frame->i_buffer = 0;
         return p_frame;
