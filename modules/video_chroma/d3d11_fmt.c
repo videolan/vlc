@@ -293,8 +293,7 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
             continue;
         if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
             continue;
-        if (!allow_opaque && (output_format->fourcc == VLC_CODEC_D3D11_OPAQUE ||
-                              output_format->fourcc == VLC_CODEC_D3D11_OPAQUE_10B))
+        if (!allow_opaque && is_d3d11_opaque(output_format->fourcc))
             continue;
 
         DXGI_FORMAT textureFormat;

@@ -306,8 +306,7 @@ static int Open(vlc_object_t *obj)
     ID3D11Device *d3ddevice = NULL;
     ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B)
+    if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;

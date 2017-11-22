@@ -712,7 +712,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
          output_format->name != NULL; ++output_format)
     {
         if (output_format->formatTexture == sys->render &&
-            (output_format->fourcc == VLC_CODEC_D3D11_OPAQUE || output_format->fourcc == VLC_CODEC_D3D11_OPAQUE_10B))
+                is_d3d11_opaque(output_format->fourcc))
         {
             textureFmt = output_format;
             break;
