@@ -69,6 +69,7 @@ struct filter_sys_t
     struct filter_level Hue;
     struct filter_level Saturation;
 
+    d3d11_device_t                 d3d_dev;
     ID3D11VideoDevice              *d3dviddev;
     ID3D11VideoContext             *d3dvidctx;
     ID3D11VideoProcessor           *videoProcessor;
@@ -329,13 +330,17 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
-    ID3D11Device *d3ddevice = NULL;
     ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
     if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
+
+    filter_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    memset(sys, 0, sizeof (*sys));
 
     picture_t *dst = filter_NewPicture(filter);
     if (dst == NULL)
@@ -349,21 +354,16 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 
     D3D11_TEXTURE2D_DESC dstDesc;
     ID3D11Texture2D_GetDesc(dst->p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
+    sys->d3d_dev.d3dcontext = dst->p_sys->context;
+    ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
 
-    filter_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
-    memset(sys, 0, sizeof (*sys));
-
-    ID3D11DeviceContext_GetDevice(dst->p_sys->context, &d3ddevice);
-
-    hr = ID3D11Device_QueryInterface(d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
+    hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
     if (FAILED(hr)) {
        msg_Err(filter, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
        goto error;
     }
 
-    hr = ID3D11DeviceContext_QueryInterface(dst->p_sys->context, &IID_ID3D11VideoContext, (void **)&sys->d3dvidctx);
+    hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, (void **)&sys->d3dvidctx);
     if (FAILED(hr)) {
        msg_Err(filter, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
        goto error;
@@ -371,7 +371,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 
     HANDLE context_lock = INVALID_HANDLE_VALUE;
     UINT dataSize = sizeof(context_lock);
-    hr = ID3D11Device_GetPrivateData(d3ddevice, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+    hr = ID3D11Device_GetPrivateData(sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
     if (FAILED(hr))
         msg_Warn(filter, "No mutex found to lock the decoder");
     sys->context_mutex = context_lock;
@@ -501,12 +501,12 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     texDesc.Height = dstDesc.Height;
     texDesc.Width = dstDesc.Width;
 
-    hr = ID3D11Device_CreateTexture2D( d3ddevice, &texDesc, NULL, &sys->out[0].texture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[0].texture );
     if (FAILED(hr)) {
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%0lx)", hr);
         goto error;
     }
-    hr = ID3D11Device_CreateTexture2D( d3ddevice, &texDesc, NULL, &sys->out[1].texture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[1].texture );
     if (FAILED(hr)) {
         ID3D11Texture2D_Release(sys->out[0].texture);
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%0lx)", hr);
@@ -556,12 +556,9 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     filter->pf_video_filter = Filter;
     filter->p_sys = sys;
 
-    ID3D11Device_Release(d3ddevice);
     picture_Release(dst);
     return VLC_SUCCESS;
 error:
-    if (d3ddevice)
-        ID3D11Device_Release(d3ddevice);
     picture_Release(dst);
 
     for (int i=0; i<PROCESSOR_SLICES; i++)
@@ -584,6 +581,8 @@ error:
         ID3D11VideoContext_Release(sys->d3dvidctx);
     if (sys->d3dviddev)
         ID3D11VideoDevice_Release(sys->d3dviddev);
+    if (sys->d3d_dev.d3dcontext)
+        D3D11_ReleaseDevice(&sys->d3d_dev);
 
     return VLC_EGENERIC;
 }
@@ -612,6 +611,8 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11VideoProcessorEnumerator_Release(sys->procEnumerator);
     ID3D11VideoContext_Release(sys->d3dvidctx);
     ID3D11VideoDevice_Release(sys->d3dviddev);
+
+    D3D11_ReleaseDevice(&sys->d3d_dev);
 
     free(sys);
 }

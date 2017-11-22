@@ -70,6 +70,7 @@ struct filter_sys_t {
     ID3D11VideoProcessorEnumerator *procEnumerator;
     ID3D11VideoProcessor           *videoProcessor;
 #endif
+    d3d11_device_t                 d3d_dev;
 
     /* CPU to GPU */
     filter_t   *filter;
@@ -698,6 +699,8 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
+    d3d11_device_t d3d_dev;
+    D3D11_TEXTURE2D_DESC texDesc;
     picture_t *peek = filter_NewPicture(p_filter);
     if (peek == NULL)
         return VLC_EGENERIC;
@@ -710,7 +713,6 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     video_format_Init(&fmt_staging, 0);
 
-    D3D11_TEXTURE2D_DESC texDesc;
     ID3D11Texture2D_GetDesc( peek->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
     vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(texDesc.Format);
     if (d3d_fourcc == 0)
@@ -723,7 +725,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         err = VLC_ENOMEM;
         goto done;
     }
-    res.p_sys->context = peek->p_sys->context;
+    res.p_sys->context = d3d_dev.d3dcontext = peek->p_sys->context;
     res.p_sys->formatTexture = texDesc.Format;
 
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
@@ -747,10 +749,8 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     texDesc.BindFlags = 0;
     texDesc.Height = p_dst->format.i_height; /* make sure we match picture_Setup() */
 
-    ID3D11Device *p_device;
-    ID3D11DeviceContext_GetDevice(peek->p_sys->context, &p_device);
-    HRESULT hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &texture);
-    ID3D11Device_Release(p_device);
+    ID3D11DeviceContext_GetDevice(peek->p_sys->context, &d3d_dev.d3ddevice);
+    HRESULT hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &texture);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%0lx)", DxgiFormatToStr(texDesc.Format), hr );
         goto done;
@@ -792,7 +792,12 @@ done:
             DeleteFilter( p_cpu_filter );
         if (texture)
             ID3D11Texture2D_Release(texture);
+        D3D11_ReleaseDevice(&d3d_dev);
         free(p_sys);
+    }
+    else
+    {
+        p_sys->d3d_dev = d3d_dev;
     }
     return err;
 }
@@ -815,6 +820,7 @@ void D3D11CloseConverter( vlc_object_t *obj )
     vlc_mutex_destroy(&p_sys->staging_lock);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
+    D3D11_ReleaseDevice(&p_sys->d3d_dev);
     D3D11_Destroy(&p_sys->hd3d);
     free( p_sys );
     p_filter->p_sys = NULL;
