@@ -1176,7 +1176,7 @@ int  AVI_ChunkCount_( avi_chunk_t *p_chk, vlc_fourcc_t i_fourcc, bool b_list )
             continue;
 
         if( p_child->common.i_chunk_fourcc != i_fourcc &&
-            p_child->list.i_type != i_fourcc )
+            (!b_list || p_child->list.i_type != i_fourcc) )
             continue;
 
         i_count++;
@@ -1198,7 +1198,7 @@ void *AVI_ChunkFind_( avi_chunk_t *p_chk,
             continue;
 
         if( p_child->common.i_chunk_fourcc != i_fourcc &&
-            p_child->list.i_type != i_fourcc )
+            (!b_list || p_child->list.i_type != i_fourcc) )
             continue;
 
         if( i_number-- == 0 )
