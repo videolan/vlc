@@ -20,6 +20,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+enum biCompression
+{
+    BI_RGB = 0x00,
+    BI_RLE8,
+    BI_RLE4,
+    BI_BITFIELDS,
+    BI_JPEG,
+    BI_PNG,
+    BI_CMYK = 0x0B,
+    BI_CMYKRLE8,
+    BI_CMYKRLE4
+};
+
 /* flags for use in <dwFlags> in AVIFileHdr */
 #define AVIF_HASINDEX       0x00000010  /* Index at end of file? */
 #define AVIF_MUSTUSEINDEX   0x00000020

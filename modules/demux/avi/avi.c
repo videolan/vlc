@@ -58,9 +58,6 @@
     "Recreate a index for the AVI file. Use this if your AVI file is damaged "\
     "or incomplete (not seekable)." )
 
-#define BI_RAWRGB 0x00
-#define BI_RGBBITFIELDS 0x03
-
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -558,7 +555,7 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &tk->fmt, VIDEO_ES,
                         AVI_FourccGetCodec( VIDEO_ES, p_vids->p_bih->biCompression ) );
 
-                if( p_vids->p_bih->biCompression == BI_RAWRGB )
+                if( p_vids->p_bih->biCompression == BI_RGB )
                 {
                     switch( p_vids->p_bih->biBitCount )
                     {
