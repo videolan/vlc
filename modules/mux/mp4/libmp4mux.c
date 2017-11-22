@@ -705,26 +705,19 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
     uint8_t i_bit_depth_chroma_minus8 = 0;
     bool b_temporalIdNested = false;
 
-    uint32_t cmp = 0xFFFFFFFF;
-    while (i_buffer) {
-        /* look for start code 0X0000001 */
-        while (i_buffer) {
-            cmp = (cmp << 8) | *p_buffer;
-            if((cmp ^ UINT32_C(0x100)) <= UINT32_C(0xFF))
-                break;
-            p_buffer++;
-            i_buffer--;
-        }
-        if (p_nal)
-            p_nal->i_buffer = p_buffer - p_nal->p_buffer - ((i_buffer)?3:0);
+
+    struct nal nalu;
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init( &it, p_buffer, i_buffer, 0 );
+
+    while (hxxx_annexb_iterate_next( &it, &nalu.p_buffer, &nalu.i_buffer )) {
 
         switch (hevc_getNALType(p_buffer)) {
 
         case HEVC_NAL_VPS:
             if(i_vps > HEVC_VPS_ID_MAX)
                 break;
-            p_nal = &rg_vps[i_vps++];
-            p_nal->p_buffer = p_buffer;
+            rg_vps[i_vps++] = nalu;
             /* Only keep the general profile from the first VPS
              * if there are several (this shouldn't happen so soon) */
             if (i_vps == 1) {
@@ -737,8 +730,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
         case HEVC_NAL_SPS: {
             if(i_sps > HEVC_SPS_ID_MAX)
                 break;
-            p_nal = &rg_sps[i_sps++];
-            p_nal->p_buffer = p_buffer;
+            rg_sps[i_sps++] = nalu;
             if (i_sps == 1 && i_buffer > 15) {
                 /* Get Chroma_idc and bitdepths */
                 hevcParseSPS(p_buffer, i_buffer, &i_chroma_idc,
@@ -751,8 +743,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
         case HEVC_NAL_PPS: {
             if(i_pps > HEVC_PPS_ID_MAX)
                 break;
-            p_nal = &rg_pps[i_pps++];
-            p_nal->p_buffer = p_buffer;
+            rg_pps[i_pps++] = nalu;
             if (i_pps == 1)
                 i_num_arrays++;
             break;
@@ -764,14 +755,12 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
             if (!p_tmp)
                 break;
             p_sei = p_tmp;
-            p_nal = &p_sei[i_sei++];
-            p_nal->p_buffer = p_buffer;
+            p_sei[i_sei++] = nalu;
             if(i_sei == 1)
                 i_num_arrays++;
             break;
         }
         default:
-            p_nal = NULL;
             break;
         }
     }
