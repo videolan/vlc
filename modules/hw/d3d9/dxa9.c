@@ -372,14 +372,13 @@ static int OpenFromCPU( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    video_format_Init(&fmt_staging, 0);
     D3DSURFACE_DESC texDesc;
     IDirect3DSurface9_GetDesc( peek->p_sys->surface, &texDesc);
-    vlc_fourcc_t d3d_fourcc = texDesc.Format;
-    if (d3d_fourcc == 0)
+    if (texDesc.Format == 0)
         goto done;
 
-    if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
+    video_format_Init(&fmt_staging, 0);
+    if ( p_filter->fmt_in.video.i_chroma != texDesc.Format )
     {
         picture_resource_t res;
         res.pf_destroy = DestroyPicture;
@@ -390,7 +389,7 @@ static int OpenFromCPU( vlc_object_t *obj )
         }
 
         video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
-        fmt_staging.i_chroma = d3d_fourcc;
+        fmt_staging.i_chroma = texDesc.Format;
         fmt_staging.i_height = texDesc.Height;
         fmt_staging.i_width  = texDesc.Width;
 
