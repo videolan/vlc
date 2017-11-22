@@ -476,10 +476,24 @@ void D3D11_LogProcessorSupport(vlc_object_t *o,
     HRESULT hr;
     for (int format = 0; format < 188; format++) {
         hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, format, &flags);
-        if (SUCCEEDED(hr) && (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT))
-            msg_Dbg(o, "processor format %s (%d) is supported for input", DxgiFormatToStr(format),format);
-        if (SUCCEEDED(hr) && (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
-            msg_Dbg(o, "processor format %s (%d) is supported for output", DxgiFormatToStr(format),format);
+        if (FAILED(hr))
+            continue;
+        const char *name = DxgiFormatToStr(format);
+        const char *support = NULL;
+        if ((flags & (D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT|D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
+                 == (D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT|D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
+            support = "input/output";
+        else if (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT)
+            support = "input";
+        else if (flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT)
+            support = "output";
+        if (support)
+        {
+            if (name)
+                msg_Dbg(o, "processor format %s is supported for %s", name, support);
+            else
+                msg_Dbg(o, "processor format (%d) is supported for %s", format, support);
+        }
     }
 }
 
