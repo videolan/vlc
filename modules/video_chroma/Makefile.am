@@ -117,15 +117,6 @@ chroma_LTLIBRARIES += \
 	libi422_yuy2_sse2_plugin.la
 endif
 
-# DXVA2
-libdxa9_plugin_la_SOURCES = video_chroma/dxa9.c
-libdxa9_plugin_la_LIBADD = libd3d9_common.la libchroma_copy.la
-
-if HAVE_AVCODEC_DXVA2
-chroma_LTLIBRARIES += \
-	libdxa9_plugin.la
-endif
-
 libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.c
 if HAVE_OSX
 libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.8
