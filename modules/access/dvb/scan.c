@@ -1385,7 +1385,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 msg_Dbg( p_obj, "           * service_id=%" PRIu16 " type=%" PRIu8,
                                 i_service_id, i_service_type );
 
-                if( p_cfg->i_frequency == 0 )
+                if( !p_cfg || p_cfg->i_frequency == 0 )
                 {
                     msg_Warn( p_obj, "cannot create service_id=%" PRIu16 " ts_id=%" PRIu16 " (no config)",
                                      i_service_id, p_ts->i_ts_id );
