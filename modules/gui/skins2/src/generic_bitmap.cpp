@@ -74,10 +74,6 @@ bool BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
 {
     int srcWidth = rSource.getWidth();
     uint32_t *pSrc = (uint32_t*)rSource.getData() + ySrc * srcWidth + xSrc;
-    if( !pSrc )
-    {
-        return false;
-    }
     if( xSrc < 0 || xSrc + width > srcWidth ||
         ySrc < 0 || ySrc + height > rSource.getHeight() )
     {
