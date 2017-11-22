@@ -190,7 +190,7 @@ ts_es_t * ts_es_New( ts_pmt_t *p_program )
 
 static void ts_pes_es_Clean( demux_t *p_demux, ts_es_t *p_es )
 {
-    if( p_es && p_es->id )
+    if( p_es->id )
     {
         /* Ensure we don't wait for overlap hacks #14257 */
         es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, p_es->id, false );
