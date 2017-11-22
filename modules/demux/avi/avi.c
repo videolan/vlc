@@ -330,8 +330,8 @@ static int Open( vlc_object_t * p_this )
     if( unlikely(!p_sys) )
         return VLC_EGENERIC;
     p_sys->b_odml   = false;
-    p_sys->track    = NULL;
     p_sys->meta     = NULL;
+    TAB_INIT(p_sys->i_track, p_sys->track);
     TAB_INIT(p_sys->i_attachment, p_sys->attachment);
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK,
