@@ -350,7 +350,7 @@ static int Open(vlc_object_t *obj)
         msg_Warn(filter, "No mutex found to lock the decoder");
     sys->context_mutex = context_lock;
 
-    const video_format_t *fmt = &dst->format;
+    const video_format_t *fmt = &filter->fmt_out.video;
 
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
         .InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
@@ -360,11 +360,11 @@ static int Open(vlc_object_t *obj)
         },
         .InputWidth   = fmt->i_width,
         .InputHeight  = fmt->i_height,
-        .OutputWidth  = dst->format.i_width,
-        .OutputHeight = dst->format.i_height,
+        .OutputWidth  = dstDesc.Width,
+        .OutputHeight = dstDesc.Height,
         .OutputFrameRate = {
-            .Numerator   = dst->format.i_frame_rate,
-            .Denominator = dst->format.i_frame_rate_base,
+            .Numerator   = fmt->i_frame_rate,
+            .Denominator = fmt->i_frame_rate_base,
         },
         .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
     };
@@ -379,16 +379,16 @@ static int Open(vlc_object_t *obj)
 #ifndef NDEBUG
     D3D11_LogProcessorSupport(filter, processorEnumerator);
 #endif
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, dst->p_sys->formatTexture, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, dstDesc.Format, &flags);
     if (!SUCCEEDED(hr))
     {
-        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dst->p_sys->formatTexture));
+        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dstDesc.Format));
         goto error;
     }
     if ( !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT) ||
          !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT) )
     {
-        msg_Dbg(filter, "input/output %s is not supported", DxgiFormatToStr(dst->p_sys->formatTexture));
+        msg_Dbg(filter, "input/output %s is not supported", DxgiFormatToStr(dstDesc.Format));
         goto error;
     }
 
