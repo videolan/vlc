@@ -341,11 +341,7 @@ static int Open(vlc_object_t *obj)
         dsc.InputSampleFreq.Denominator = 0;
     }
     dsc.OutputFrameFreq = dsc.InputSampleFreq;
-
-    DXVA2_ExtendedFormat *pFormat = &dsc.SampleFormat;
-    pFormat->SampleFormat = dst->b_top_field_first ?
-                DXVA2_SampleFieldInterleavedEvenFirst :
-                DXVA2_SampleFieldInterleavedOddFirst;
+    dsc.SampleFormat.SampleFormat = DXVA2_SampleFieldInterleavedEvenFirst;
 
     UINT count = 0;
     hr = IDirectXVideoProcessorService_GetVideoProcessorDeviceGuids( processor,
