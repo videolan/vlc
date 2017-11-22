@@ -108,8 +108,8 @@ fi
 cd ../..
 
 info "Bootstrapping"
-export PKG_CONFIG_LIBDIR=$PWD/vlc/contrib/$TRIPLET/lib/pkgconfig
-export PATH=$PWD/vlc/contrib/$TRIPLET/bin:$PATH
+export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
+export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
 echo $PATH
 
 ./bootstrap
