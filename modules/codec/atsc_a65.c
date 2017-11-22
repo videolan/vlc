@@ -102,7 +102,7 @@ static char *enlarge_to16( const uint8_t *p_src, size_t i_src, uint8_t i_prefix 
     {
         memset( psz_new, i_prefix, i_src * 2 );
         psz_new[ i_src * 2 ] = 0;
-        while( *p_src )
+        while( i_src-- )
         {
             psz_new[1] = p_src[0];
             p_src++;
