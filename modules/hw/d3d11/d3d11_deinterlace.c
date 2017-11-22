@@ -200,12 +200,20 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     if (FAILED(hr))
         return VLC_EGENERIC;
 
+    D3D11_BOX box = {
+        .top = 0,
+        .bottom = p_outpic->format.i_visible_height,
+        .left = 0,
+        .right = p_outpic->format.i_visible_width,
+        .back = 1,
+    };
+
     ID3D11DeviceContext_CopySubresourceRegion(p_outpic->p_sys->context,
                                               p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
                                               p_outpic->p_sys->slice_index,
                                               0, 0, 0,
                                               p_sys->outResource,
-                                              0, NULL);
+                                              0, &box);
     return VLC_SUCCESS;
 }
 
@@ -267,8 +275,46 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
     picture_t *pic = p_filter->p_sys->buffer_new( p_filter );
     if ( !pic->context )
     {
+        bool b_local_texture = false;
+
+        if ( !pic->p_sys )
+        {
+            pic->p_sys = calloc(1, sizeof(*pic->p_sys));
+            if (unlikely(pic->p_sys == NULL))
+                return NULL;
+
+            D3D11_TEXTURE2D_DESC dstDesc;
+            ID3D11Texture2D_GetDesc(p_filter->p_sys->outTexture, &dstDesc);
+
+            const d3d_format_t *cfg = NULL;
+            for (const d3d_format_t *output_format = GetRenderFormatList();
+                 output_format->name != NULL; ++output_format)
+            {
+                if (output_format->formatTexture == dstDesc.Format &&
+                    is_d3d11_opaque(output_format->fourcc))
+                {
+                    cfg = output_format;
+                    break;
+                }
+            }
+
+            /* create the texture that's missing */
+            video_format_t fmt = p_filter->fmt_out.video;
+            fmt.i_width  = dstDesc.Width;
+            fmt.i_height = dstDesc.Height;
+            if (AllocateTextures(VLC_OBJECT(p_filter), &p_filter->p_sys->d3d_dev, cfg,
+                                 &fmt, 1, pic->p_sys->texture) != VLC_SUCCESS)
+            {
+                free(pic->p_sys);
+                return NULL;
+            }
+            b_local_texture = true;
+
+            pic->p_sys->context = p_filter->p_sys->d3d_dev.d3dcontext;
+            pic->p_sys->formatTexture = dstDesc.Format;
+
+        }
         /* the picture might be duplicated for snapshots so it needs a context */
-        assert( pic->p_sys != NULL ); /* this opaque picture is wrong */
         struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx!=NULL))
         {
@@ -277,6 +323,12 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             pic_ctx->picsys = *pic->p_sys;
             AcquirePictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;
+        }
+        if (b_local_texture) {
+            for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+                if (pic->p_sys->texture[i])
+                    ID3D11Texture2D_Release(pic->p_sys->texture[i]);
+            }
         }
     }
     return pic;
