@@ -602,7 +602,7 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
 
     /* on OS X, we can force VT to fail if no suitable HW decoder is available,
      * preventing the aforementioned SW fallback */
-    if (var_InheritInteger(p_dec, "videotoolbox-hw-decoder-only"))
+    if (var_InheritBool(p_dec, "videotoolbox-hw-decoder-only"))
         CFDictionarySetValue(decoderConfiguration,
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
