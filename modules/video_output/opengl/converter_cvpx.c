@@ -187,7 +187,6 @@ Open(vlc_object_t *obj)
             return VLC_EGENERIC;
         }
     }
-    tc->handle_texs_gen = true;
 #else
     const GLenum tex_target = GL_TEXTURE_RECTANGLE;
     {
@@ -253,6 +252,9 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+#if TARGET_OS_IPHONE
+    tc->handle_texs_gen = true;
+#endif
     tc->priv              = priv;
     tc->pf_update         = tc_cvpx_update;
     tc->fshader           = fragment_shader;
