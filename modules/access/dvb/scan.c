@@ -1607,11 +1607,11 @@ static void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     /* Do the same for all other networks */
     for( size_t i=0; i<p_session->others.i_nit; i++ )
-        ParseNIT( p_scan->p_obj, p_scan, p_nit, NULL );
+        ParseNIT( p_scan->p_obj, p_scan, p_session->others.pp_nit[i], NULL );
 
     /* Map service name for all other ts/networks */
     for( size_t i=0; i<p_session->others.i_sdt; i++ )
-        ParseSDT( p_scan->p_obj, p_scan, p_sdt );
+        ParseSDT( p_scan->p_obj, p_scan, p_session->others.pp_sdt[i] );
 
     /* */
     scan_session_Delete( p_session );
