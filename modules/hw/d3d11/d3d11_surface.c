@@ -29,7 +29,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_modules.h>
@@ -41,6 +40,8 @@
 #include <windows.h>
 #define COBJMACROS
 #include <d3d11.h>
+
+#include "d3d11_filters.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
@@ -624,7 +625,7 @@ VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
 VIDEO_FILTER_WRAPPER (NV12_D3D11)
 
-static int D3D11OpenConverter( vlc_object_t *obj )
+int D3D11OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
@@ -671,7 +672,7 @@ done:
     return err;
 }
 
-static int D3D11OpenCPUConverter( vlc_object_t *obj )
+int D3D11OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
@@ -796,7 +797,7 @@ done:
     return err;
 }
 
-static void D3D11CloseConverter( vlc_object_t *obj )
+void D3D11CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
@@ -819,7 +820,7 @@ static void D3D11CloseConverter( vlc_object_t *obj )
     p_filter->p_sys = NULL;
 }
 
-static void D3D11CloseCPUConverter( vlc_object_t *obj )
+void D3D11CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
@@ -829,15 +830,3 @@ static void D3D11CloseCPUConverter( vlc_object_t *obj )
     free( p_sys );
     p_filter->p_sys = NULL;
 }
-
-/*****************************************************************************
- * Module descriptor.
- *****************************************************************************/
-vlc_module_begin ()
-    set_description( N_("Conversions from D3D11 to YUV") )
-    set_capability( "video converter", 10 )
-    set_callbacks( D3D11OpenConverter, D3D11CloseConverter )
-    add_submodule()
-        set_callbacks( D3D11OpenCPUConverter, D3D11CloseCPUConverter )
-        set_capability( "video converter", 10 )
-vlc_module_end ()

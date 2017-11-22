@@ -28,7 +28,6 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 
@@ -36,6 +35,7 @@
 #include <initguid.h>
 #include <d3d11.h>
 
+#include "d3d11_filters.h"
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
@@ -281,7 +281,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
     return pic;
 }
 
-static int D3D11OpenDeinterlace(vlc_object_t *obj)
+int D3D11OpenDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
@@ -515,7 +515,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void D3D11CloseDeinterlace(vlc_object_t *obj)
+void D3D11CloseDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
@@ -530,11 +530,3 @@ static void D3D11CloseDeinterlace(vlc_object_t *obj)
     free(sys);
 }
 
-vlc_module_begin()
-    set_description(N_("Direct3D11 deinterlacing filter"))
-    set_capability("video filter", 0)
-    set_category(CAT_VIDEO)
-    set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(D3D11OpenDeinterlace, D3D11CloseDeinterlace)
-    add_shortcut ("deinterlace")
-vlc_module_end()

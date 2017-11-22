@@ -1,7 +1,7 @@
 /*****************************************************************************
- * d3d11_adjust.c: D3D11 adjust filter (no gamma)
+ * d3d11_adjust.c: D3D11 filters module callbacks
  *****************************************************************************
- * Copyright (C) 2017 Videolabs SAS
+ * Copyright © 2017 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Steve Lhomme <robux4@gmail.com>
  *
@@ -38,6 +38,7 @@
 #include <initguid.h>
 #include <d3d11.h>
 
+#include "d3d11_filters.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
 #ifdef __MINGW32__
@@ -616,7 +617,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_description(N_("Direct3D11 adjust filter"))
+    set_description(N_("Direct3D11 filter"))
     set_capability("video filter", 0)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
@@ -641,5 +642,17 @@ vlc_module_begin()
     add_bool( "brightness-threshold", false,
               THRES_TEXT, THRES_LONGTEXT, false )
         change_safe()
+
+    add_submodule()
+    set_callbacks( D3D11OpenDeinterlace, D3D11CloseDeinterlace )
+    add_shortcut ("deinterlace")
+
+    add_submodule()
+    set_capability( "video converter", 10 )
+    set_callbacks( D3D11OpenConverter, D3D11CloseConverter )
+
+    add_submodule()
+    set_callbacks( D3D11OpenCPUConverter, D3D11CloseCPUConverter )
+    set_capability( "video converter", 10 )
 
 vlc_module_end()
