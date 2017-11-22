@@ -358,7 +358,7 @@ static int Open( vlc_object_t * p_this )
             avi_chunk_list_t *p_sysx;
 
             p_sysx = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, i, true );
-            if( p_sysx->i_type == AVIFOURCC_AVIX )
+            if( p_sysx && p_sysx->i_type == AVIFOURCC_AVIX )
             {
                 msg_Warn( p_demux, "detected OpenDML file" );
                 p_sys->b_odml = true;
@@ -849,7 +849,8 @@ aviindex:
         p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i, true );
         p_auds = AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0, false );
 
-        if( p_auds->p_wf->wFormatTag != WAVE_FORMAT_PCM &&
+        if( p_auds &&
+            p_auds->p_wf->wFormatTag != WAVE_FORMAT_PCM &&
             tk->i_rate == p_auds->p_wf->nSamplesPerSec )
         {
             int64_t i_track_length =
@@ -2384,6 +2385,8 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
      * has unused chunk at the beginning of the movi content.
      */
     avi_chunk_list_t *p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0, true );
+    if( !p_movi )
+        return VLC_EGENERIC;
     uint64_t i_first_pos = UINT64_MAX;
     for( unsigned i = 0; i < __MIN( p_idx1->i_entry_count, 100 ); i++ )
     {
@@ -2727,7 +2730,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
                                             AVIFOURCC_RIFF, 1, true );
 
                     msg_Dbg( p_demux, "looking for new RIFF chunk" );
-                    if( vlc_stream_Seek( p_demux->s,
+                    if( !p_sysx || vlc_stream_Seek( p_demux->s,
                                          p_sysx->i_chunk_pos + 24 ) )
                         goto print_stat;
                     break;
