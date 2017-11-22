@@ -181,21 +181,13 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* HDSDI AR */
-    char *psz_ar = var_InheritString( p_demux, "linsys-hdsdi-aspect-ratio" );
-    if ( psz_ar != NULL )
-    {
-        psz_parser = strchr( psz_ar, ':' );
-        if ( psz_parser )
-        {
-            *psz_parser++ = '\0';
-            p_sys->i_forced_aspect = p_sys->i_aspect =
-                 strtol( psz_ar, NULL, 0 ) * VOUT_ASPECT_FACTOR
-                 / strtol( psz_parser, NULL, 0 );
-        }
-        else
-            p_sys->i_forced_aspect = 0;
-        free( psz_ar );
-    }
+    unsigned int i_num, i_den;
+    if ( !var_InheritURational( p_demux, &i_num, &i_den,
+                               "linsys-hdsdi-aspect-ratio" ) && i_den != 0 )
+        p_sys->i_forced_aspect = p_sys->i_aspect =
+                i_num * VOUT_ASPECT_FACTOR / i_den;
+    else
+        p_sys->i_forced_aspect = 0;
 
     /* */
     p_sys->i_id_video = var_InheritInteger( p_demux, "linsys-hdsdi-id-video" );
