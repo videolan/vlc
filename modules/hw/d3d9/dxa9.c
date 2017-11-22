@@ -30,10 +30,11 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_modules.h>
+
+#include "d3d9_filters.h"
 
 #include "../../video_chroma/copy.h"
 
@@ -287,7 +288,7 @@ VIDEO_FILTER_WRAPPER (DXA9_YV12)
 VIDEO_FILTER_WRAPPER (DXA9_NV12)
 VIDEO_FILTER_WRAPPER (YV12_D3D9)
 
-static int D3D9OpenConverter( vlc_object_t *obj )
+int D3D9OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     HINSTANCE hd3d_dll = NULL;
@@ -336,7 +337,7 @@ done:
     return err;
 }
 
-static int D3D9OpenCPUConverter( vlc_object_t *obj )
+int D3D9OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
@@ -455,7 +456,7 @@ done:
     return err;
 }
 
-static void D3D9CloseConverter( vlc_object_t *obj )
+void D3D9CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
@@ -464,7 +465,7 @@ static void D3D9CloseConverter( vlc_object_t *obj )
     p_filter->p_sys = NULL;
 }
 
-static void D3D9CloseCPUConverter( vlc_object_t *obj )
+void D3D9CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
@@ -475,15 +476,3 @@ static void D3D9CloseCPUConverter( vlc_object_t *obj )
     free( p_sys );
     p_filter->p_sys = NULL;
 }
-
-/*****************************************************************************
- * Module descriptor.
- *****************************************************************************/
-vlc_module_begin ()
-    set_description( N_("Conversions from DxVA2 to YUV") )
-    set_capability( "video converter", 10 )
-    set_callbacks( D3D9OpenConverter, D3D9CloseConverter )
-    add_submodule()
-        set_callbacks( D3D9OpenCPUConverter, D3D9CloseCPUConverter )
-        set_capability( "video converter", 10 )
-vlc_module_end ()

@@ -3338,7 +3338,7 @@ AS_IF([test "${enable_directx}" != "no"], [
           #endif
         ]],[[;]])
       ],[
-        VLC_ADD_PLUGIN([direct3d9_deinterlace direct3d9_adjust])
+        VLC_ADD_PLUGIN([direct3d9_filters])
       ],
       [AC_MSG_WARN([Could not find required IDirectXVideoDecoder in dxva2api.h])])
 

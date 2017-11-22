@@ -1,7 +1,7 @@
 /*****************************************************************************
- * d3d9_adjust.c: D3D9 adjust filter (no gamma)
+ * d3d9_filters.c: D3D9 filters module callbacks
  *****************************************************************************
- * Copyright (C) 2017 Videolabs SAS
+ * Copyright © 2017 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Steve Lhomme <robux4@gmail.com>
  *
@@ -38,6 +38,8 @@
 #include <d3d9.h>
 #include <dxva2api.h>
 #include "../../video_chroma/d3d9_fmt.h"
+
+#include "d3d9_filters.h"
 
 struct filter_level
 {
@@ -464,4 +466,16 @@ vlc_module_begin()
     add_bool( "brightness-threshold", false,
               THRES_TEXT, THRES_LONGTEXT, false )
         change_safe()
+
+    add_submodule()
+    set_callbacks(D3D9OpenDeinterlace, D3D9CloseDeinterlace)
+    add_shortcut ("deinterlace")
+
+    add_submodule()
+    set_capability( "video converter", 10 )
+    set_callbacks( D3D9OpenConverter, D3D9CloseConverter )
+
+    add_submodule()
+    set_callbacks( D3D9OpenCPUConverter, D3D9CloseCPUConverter )
+    set_capability( "video converter", 10 )
 vlc_module_end()
