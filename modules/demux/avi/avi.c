@@ -892,7 +892,7 @@ error:
  *****************************************************************************/
 
 static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
-                     const int i_header, const int i_size )
+                     const unsigned int i_header, const int i_size )
 {
     block_t *p_frame = vlc_stream_Block( p_demux->s, __EVEN( i_size ) );
     if ( !p_frame ) return p_frame;
