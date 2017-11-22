@@ -74,7 +74,7 @@ struct filter_sys_t {
     filter_t   *filter;
     picture_t  *staging_pic;
 
-    HINSTANCE  hd3d_dll;
+    d3d11_handle_t  hd3d;
 };
 
 #if CAN_PROCESSOR
@@ -627,7 +627,6 @@ VIDEO_FILTER_WRAPPER (NV12_D3D11)
 static int OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    HINSTANCE hd3d_dll = NULL;
     int err = VLC_EGENERIC;
 
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
@@ -649,29 +648,28 @@ static int OpenConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    hd3d_dll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (unlikely(!hd3d_dll)) {
-        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
-        goto done;
-    }
-
     filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
     if (!p_sys)
          goto done;
 
+    if (D3D11_Create(p_filter, &p_sys->hd3d) != VLC_SUCCESS)
+    {
+        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
+        goto done;
+    }
+
     CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width );
     vlc_mutex_init(&p_sys->staging_lock);
-    p_sys->hd3d_dll = hd3d_dll;
     p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
 
 done:
     if (err != VLC_SUCCESS)
     {
-        if (hd3d_dll)
-            FreeLibrary(hd3d_dll);
+        free(p_sys);
     }
-    return err;}
+    return err;
+}
 
 static int OpenFromCPU( vlc_object_t *obj )
 {
@@ -679,7 +677,6 @@ static int OpenFromCPU( vlc_object_t *obj )
     int err = VLC_EGENERIC;
     ID3D11Texture2D *texture = NULL;
     filter_t *p_cpu_filter = NULL;
-    HINSTANCE hd3d_dll = NULL;
     video_format_t fmt_staging;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
@@ -768,20 +765,20 @@ static int OpenFromCPU( vlc_object_t *obj )
             goto done;
     }
 
-    hd3d_dll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (unlikely(!hd3d_dll)) {
-        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
-        goto done;
-    }
-
     filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
     if (!p_sys) {
          err = VLC_ENOMEM;
          goto done;
     }
+
+    if (D3D11_Create(p_filter, &p_sys->hd3d) != VLC_SUCCESS)
+    {
+        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
+        goto done;
+    }
+
     p_sys->filter = p_cpu_filter;
     p_sys->staging_pic = p_dst;
-    p_sys->hd3d_dll = hd3d_dll;
     p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
 
@@ -794,8 +791,7 @@ done:
             DeleteFilter( p_cpu_filter );
         if (texture)
             ID3D11Texture2D_Release(texture);
-        if (hd3d_dll)
-            FreeLibrary(hd3d_dll);
+        free(p_sys);
     }
     return err;
 }
@@ -818,7 +814,7 @@ static void CloseConverter( vlc_object_t *obj )
     vlc_mutex_destroy(&p_sys->staging_lock);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
-    FreeLibrary(p_sys->hd3d_dll);
+    D3D11_Destroy(&p_sys->hd3d);
     free( p_sys );
     p_filter->p_sys = NULL;
 }
@@ -829,7 +825,7 @@ static void CloseFromCPU( vlc_object_t *obj )
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging_pic);
-    FreeLibrary(p_sys->hd3d_dll);
+    D3D11_Destroy(&p_sys->hd3d);
     free( p_sys );
     p_filter->p_sys = NULL;
 }
