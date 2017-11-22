@@ -35,11 +35,11 @@
 #include <vlc_picture.h>
 #include <vlc_modules.h>
 
-#include "copy.h"
+#include "../../video_chroma/copy.h"
 
 #include <windows.h>
 #include <d3d9.h>
-#include "d3d9_fmt.h"
+#include "../../video_chroma/d3d9_fmt.h"
 
 struct filter_sys_t {
     /* GPU to CPU */
