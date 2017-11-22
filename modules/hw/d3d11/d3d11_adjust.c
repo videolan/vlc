@@ -243,35 +243,60 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         p_sys->procOutput[1]
     };
 
-    size_t idx = 0;
+    size_t idx = 0, count = 0;
     /* contrast */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_CONTRAST, &p_sys->Contrast,
                       inputs[idx], outputs[idx] ) )
+    {
         idx++;
+        count++;
+    }
     /* brightness */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_BRIGHTNESS, &p_sys->Brightness,
                       inputs[idx], outputs[idx] ) )
+    {
         idx++;
+        count++;
+    }
     /* hue */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_HUE, &p_sys->Hue,
                       inputs[idx], outputs[idx] ) )
+    {
         idx++;
+        count++;
+    }
     /* saturation */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_SATURATION, &p_sys->Saturation,
                       inputs[idx], outputs[idx] ) )
+    {
         idx++;
+        count++;
+    }
 
-    ID3D11DeviceContext_CopySubresourceRegion(p_outpic->p_sys->context,
-                                              p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
-                                              p_outpic->p_sys->slice_index,
-                                              0, 0, 0,
-                                              p_sys->out[outputs[idx] == p_sys->procOutput[0] ? 1 : 0].resource,
-                                              0,
-                                              NULL);
+    if (count == 0)
+    {
+        ID3D11DeviceContext_CopySubresourceRegion(p_outpic->p_sys->context,
+                                                  p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                  p_outpic->p_sys->slice_index,
+                                                  0, 0, 0,
+                                                  p_src_sys->resource[KNOWN_DXGI_INDEX],
+                                                  p_src_sys->slice_index,
+                                                  NULL);
+    }
+    else
+    {
+        ID3D11DeviceContext_CopySubresourceRegion(p_outpic->p_sys->context,
+                                                  p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                  p_outpic->p_sys->slice_index,
+                                                  0, 0, 0,
+                                                  p_sys->out[outputs[idx] == p_sys->procOutput[0] ? 1 : 0].resource,
+                                                  0,
+                                                  NULL);
+    }
 
     if( p_sys->context_mutex  != INVALID_HANDLE_VALUE )
         ReleaseMutex( p_sys->context_mutex );
