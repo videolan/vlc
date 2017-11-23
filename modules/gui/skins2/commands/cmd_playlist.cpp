@@ -24,6 +24,7 @@
 
 #include "cmd_playlist.hpp"
 #include <vlc_playlist.h>
+#include <vlc_url.h>
 #include "../src/vlcproc.hpp"
 #include "../utils/var_bool.hpp"
 
@@ -64,7 +65,14 @@ void CmdPlaylistRepeat::execute()
 
 void CmdPlaylistLoad::execute()
 {
-    playlist_Import( getPL(), m_file.c_str() );
+    char* psz_path = vlc_uri2path( m_file.c_str() );
+    if ( !psz_path )
+    {
+        msg_Err(getIntf(),"unable to load playlist %s", m_file.c_str() );
+        return;
+    }
+    playlist_Import( getPL(), psz_path );
+    free( psz_path );
 }
 
 
