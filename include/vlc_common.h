@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <limits.h>
 
 #ifndef __cplusplus
 # include <stdbool.h>
