@@ -632,8 +632,6 @@ static int satip_open(vlc_object_t *obj)
     msg_Dbg(access, "try to open '%s'", access->psz_url);
 
     char *psz_host = var_InheritString(access, "satip-host");
-    if (psz_host == NULL)
-        return VLC_ENOMEM;
 
     sys->udp_sock = -1;
     sys->rtcp_sock = -1;
