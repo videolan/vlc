@@ -113,21 +113,21 @@ static char *mp4_getstringz( uint8_t **restrict in, int64_t *restrict size )
     int64_t i_read = p_box->i_size; \
     if( maxread < (uint64_t)i_read ) i_read = maxread;\
     uint8_t *p_peek, *p_buff; \
-    ssize_t i_actually_read; \
+    const size_t header_size = mp4_box_headersize( p_box ); \
     if( !( p_peek = p_buff = malloc( i_read ) ) ) \
     { \
         return( 0 ); \
     } \
-    i_actually_read = vlc_stream_Read( p_stream, p_peek, i_read ); \
-    if( i_actually_read < 0 || i_actually_read < i_read )\
+    ssize_t val = vlc_stream_Read( p_stream, p_peek, i_read ); \
+    if( val < 0 || val < i_read )\
     { \
         msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %zd bytes, "\
-        "but I requested %" PRId64, i_actually_read, i_read );\
+        "but I requested %" PRId64, val, i_read );\
         free( p_buff ); \
         return( 0 ); \
     } \
-    p_peek += mp4_box_headersize( p_box ); \
-    i_read -= mp4_box_headersize( p_box ); \
+    p_peek += header_size; \
+    i_read -= header_size; \
     if( !( p_box->data.p_payload = calloc( 1, sizeof( MP4_Box_data_TYPE_t ) ) ) ) \
     { \
         free( p_buff ); \
@@ -2377,6 +2377,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_sample_soun_t, MP4_FreeBox_sample_soun );
     p_box->data.p_sample_soun->p_qt_description = NULL;
 
+    ssize_t i_actually_read = i_read + header_size;
+
     /* Sanity check needed because the "wave" box does also contain an
      * "mp4a" box that we don't understand. */
     if( i_read < 28 )
@@ -2553,6 +2555,8 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
 {
     p_box->i_handler = ATOM_vide;
     MP4_READBOX_ENTER( MP4_Box_data_sample_vide_t, MP4_FreeBox_sample_vide );
+
+    ssize_t i_actually_read = i_read + header_size;
 
     for( unsigned i = 0; i < 6 ; i++ )
     {
