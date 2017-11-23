@@ -159,7 +159,7 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
                                                                             &p_outbuf, &i_outbuf_remain ) );
                 psz_dest = psz_realloc;
                 i_mergmin1 += (i_outbuf_size - i_outbuf_remain);
-                psz_dest[i_mergmin1 - 1] = 0;
+                *p_outbuf = '\0';
             }
             free( psz16 );
         }
