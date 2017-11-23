@@ -1184,8 +1184,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
     while (*psz_sdp)
     {
         /* Extract one line */
-        char *eol = strchr (psz_sdp, '\n');
-        size_t linelen = eol ? (size_t)(eol - psz_sdp) : strlen (psz_sdp);
+        size_t linelen = strcspn(psz_sdp, "\n");
         char line[linelen + 1];
         memcpy (line, psz_sdp, linelen);
         line[linelen] = '\0';
@@ -1193,7 +1192,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
         psz_sdp += linelen + 1;
 
         /* Remove carriage return if present */
-        eol = strchr (line, '\r');
+        char *eol = strchr (line, '\r');
         if (eol != NULL)
         {
             linelen = eol - line;
