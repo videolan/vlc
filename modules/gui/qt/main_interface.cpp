@@ -860,7 +860,7 @@ void MainInterface::setVideoFullScreen( bool fs )
          * than current number of screens, take screennumber where current interface
          * is
          */
-        if( numscreen == -1 || numscreen > QApplication::desktop()->screenCount() )
+        if( numscreen < 0 || numscreen >= QApplication::desktop()->screenCount() )
             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
 
         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
