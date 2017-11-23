@@ -1795,78 +1795,7 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     i_read -= (size);   \
   } while(0)
 
-#define MP4_GET1BYTE( dst )  MP4_GETX_PRIVATE( dst, *p_peek, 1 )
 #define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
-#define MP4_GET3BYTES( dst ) MP4_GETX_PRIVATE( dst, Get24bBE(p_peek), 3 )
-#define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
-#define MP4_GET8BYTES( dst ) MP4_GETX_PRIVATE( dst, GetQWBE(p_peek), 8 )
-#define MP4_GETFOURCC( dst ) MP4_GETX_PRIVATE( dst, \
-                VLC_FOURCC(p_peek[0],p_peek[1],p_peek[2],p_peek[3]), 4)
-
-#define MP4_GET2BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetWLE(p_peek), 2 )
-#define MP4_GET4BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetDWLE(p_peek), 4 )
-#define MP4_GET8BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetQWLE(p_peek), 8 )
-
-#define MP4_GETVERSIONFLAGS( p_void ) \
-    MP4_GET1BYTE( p_void->i_version ); \
-    MP4_GET3BYTES( p_void->i_flags )
-
-#define MP4_GETSTRINGZ( p_str )         \
-    if( (i_read > 0) && (p_peek[0]) )   \
-    {       \
-        const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
-        p_str = malloc( __i_copy__+1 );               \
-        if( p_str ) \
-        { \
-             memcpy( p_str, p_peek, __i_copy__ ); \
-             p_str[__i_copy__] = 0; \
-        } \
-        p_peek += __i_copy__ + 1;   \
-        i_read -= __i_copy__ + 1;   \
-    }       \
-    else    \
-    {       \
-        p_str = NULL; \
-    }
-
-#define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread, release ) \
-    int64_t i_read = p_box->i_size; \
-    if( maxread < (uint64_t)i_read ) i_read = maxread;\
-    uint8_t *p_peek, *p_buff; \
-    ssize_t i_actually_read; \
-    if( !( p_peek = p_buff = malloc( i_read ) ) ) \
-    { \
-        return( 0 ); \
-    } \
-    i_actually_read = vlc_stream_Read( p_stream, p_peek, i_read ); \
-    if( i_actually_read < 0 || i_actually_read < i_read )\
-    { \
-        msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %zd bytes, "\
-        "but I requested %" PRId64, i_actually_read, i_read );\
-        free( p_buff ); \
-        return( 0 ); \
-    } \
-    p_peek += mp4_box_headersize( p_box ); \
-    i_read -= mp4_box_headersize( p_box ); \
-    if( !( p_box->data.p_payload = calloc( 1, sizeof( MP4_Box_data_TYPE_t ) ) ) ) \
-    { \
-        free( p_buff ); \
-        return( 0 ); \
-    }\
-    p_box->pf_free = release;
-
-#define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t, release ) \
-    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, p_box->i_size, release )
-
-#define MP4_READBOX_EXIT( i_code ) \
-    do \
-    { \
-        free( p_buff ); \
-        if( i_read < 0 ) \
-            msg_Warn( p_stream, "Not enough data" ); \
-        return( i_code ); \
-    } while (0)
-
 
 /* This macro is used when we want to printf the box type
  * APPLE annotation box is :
