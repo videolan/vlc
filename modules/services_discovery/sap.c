@@ -1185,6 +1185,9 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
     {
         /* Extract one line */
         size_t linelen = strcspn(psz_sdp, "\n");
+        if (psz_sdp[linelen] == '\0')
+            goto error;
+
         char line[linelen + 1];
         memcpy (line, psz_sdp, linelen);
         line[linelen] = '\0';
