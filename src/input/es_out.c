@@ -2070,7 +2070,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         if( p_block->i_pts <= VLC_TS_INVALID )
             i_date = p_block->i_dts;
 
-        if( i_date < p_sys->i_preroll_end )
+        if( i_date + p_block->i_length < p_sys->i_preroll_end )
             p_block->i_flags |= BLOCK_FLAG_PREROLL;
     }
 
