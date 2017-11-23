@@ -426,9 +426,6 @@ static const char *const enc_me_list[] =
 static const char *const enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa"), N_("tesa") };
 
-static const char *const profile_list[] =
-  { "baseline", "main", "high" };
-
 static const char *const bpyramid_list[] =
   { "none", "strict", "normal" };
 
