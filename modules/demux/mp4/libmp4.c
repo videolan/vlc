@@ -109,34 +109,78 @@ static char *mp4_getstringz( uint8_t **restrict in, int64_t *restrict size )
         (p_str) = (i_read >= 0) ? mp4_getstringz( &p_peek, &i_read ) : NULL; \
     while(0)
 
+static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
+                                          size_t typesize,
+                                          void (*release)( MP4_Box_t * ),
+                                          uint64_t readsize )
+{
+    if( unlikely(readsize > SSIZE_MAX) )
+        return NULL;
+
+    uint8_t *buf = malloc( readsize );
+    if( unlikely(buf == NULL) )
+        return NULL;
+
+    ssize_t val = vlc_stream_Read( s, buf, readsize );
+    if( (size_t)val != readsize )
+    {
+        msg_Warn( s, "mp4: wanted %"PRIu64" bytes, got %zd", readsize, val );
+        goto error;
+    }
+
+    box->data.p_payload = malloc( typesize );
+    if( unlikely(box->data.p_payload == NULL) )
+        goto error;
+
+    memset( box->data.p_payload, 0, typesize );
+    box->pf_free = release;
+    return buf;
+error:
+    free( buf );
+    return NULL;
+}
+
+static uint8_t *mp4_readbox_enter_partial( stream_t *s, MP4_Box_t *box,
+                                           size_t typesize,
+                                           void (*release)( MP4_Box_t * ),
+                                           int64_t *restrict readsize )
+{
+    if( *readsize < 0 )
+        return NULL;
+    if( (uint64_t)*readsize > box->i_size )
+        *readsize = box->i_size;
+
+    return mp4_readbox_enter_common( s, box, typesize, release, *readsize );
+}
+
+static uint8_t *mp4_readbox_enter( stream_t *s, MP4_Box_t *box,
+                                   size_t typesize,
+                                   void (*release)( MP4_Box_t * ) )
+{
+    uint64_t readsize = box->i_size;
+    return mp4_readbox_enter_common( s, box, typesize, release, readsize );
+}
+
+
 #define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread, release ) \
-    int64_t i_read = p_box->i_size; \
-    if( maxread < (uint64_t)i_read ) i_read = maxread;\
-    uint8_t *p_peek, *p_buff; \
+    int64_t i_read = (maxread); \
+    uint8_t *p_buff = mp4_readbox_enter_partial( p_stream, p_box, \
+        sizeof( MP4_Box_data_TYPE_t ), release, &i_read ); \
+    if( unlikely(p_buff == NULL) ) \
+        return 0; \
     const size_t header_size = mp4_box_headersize( p_box ); \
-    if( !( p_peek = p_buff = malloc( i_read ) ) ) \
-    { \
-        return( 0 ); \
-    } \
-    ssize_t val = vlc_stream_Read( p_stream, p_peek, i_read ); \
-    if( val < 0 || val < i_read )\
-    { \
-        msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %zd bytes, "\
-        "but I requested %" PRId64, val, i_read );\
-        free( p_buff ); \
-        return( 0 ); \
-    } \
-    p_peek += header_size; \
-    i_read -= header_size; \
-    if( !( p_box->data.p_payload = calloc( 1, sizeof( MP4_Box_data_TYPE_t ) ) ) ) \
-    { \
-        free( p_buff ); \
-        return( 0 ); \
-    }\
-    p_box->pf_free = release;
+    uint8_t *p_peek = p_buff + header_size; \
+    i_read -= header_size
 
 #define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t, release ) \
-    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, p_box->i_size, release )
+    uint8_t *p_buff = mp4_readbox_enter( p_stream, p_box, \
+        sizeof(MP4_Box_data_TYPE_t), release ); \
+    if( unlikely(p_buff == NULL) ) \
+        return 0; \
+    int64_t i_read = p_box->i_size; \
+    const size_t header_size = mp4_box_headersize( p_box ); \
+    uint8_t *p_peek = p_buff + header_size; \
+    i_read -= header_size
 
 #define MP4_READBOX_EXIT( i_code ) \
     do \
@@ -2638,6 +2682,7 @@ static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
 {
     p_box->i_handler = ATOM_text;
     MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_sample_text_t, 16, NULL );
+    (void) p_peek;
     if( i_read < 8 )
         MP4_READBOX_EXIT( 0 );
 
