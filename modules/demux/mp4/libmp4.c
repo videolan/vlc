@@ -84,23 +84,30 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
     MP4_GET1BYTE( p_void->i_version ); \
     MP4_GET3BYTES( p_void->i_flags )
 
-#define MP4_GETSTRINGZ( p_str )         \
-    if( (i_read > 0) && (p_peek[0]) )   \
-    {       \
-        const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
-        p_str = malloc( __i_copy__+1 );               \
-        if( p_str ) \
-        { \
-             memcpy( p_str, p_peek, __i_copy__ ); \
-             p_str[__i_copy__] = 0; \
-        } \
-        p_peek += __i_copy__ + 1;   \
-        i_read -= __i_copy__ + 1;   \
-    }       \
-    else    \
-    {       \
-        p_str = NULL; \
+static char *mp4_getstringz( uint8_t **restrict in, int64_t *restrict size )
+{
+    assert( *size <= SSIZE_MAX );
+
+    size_t len = strnlen( (const char *)*in, *size );
+    if( len == 0 )
+        return NULL;
+
+    char *ret = malloc( len + 1 );
+    if( likely(ret != NULL) )
+    {
+        memcpy( ret, *in, len );
+        ret[len] = '\0';
     }
+    len++;
+    *in += len;
+    *size -= len;
+    return ret;
+}
+
+#define MP4_GETSTRINGZ( p_str ) \
+    do \
+        (p_str) = (i_read >= 0) ? mp4_getstringz( &p_peek, &i_read ) : NULL; \
+    while(0)
 
 #define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread, release ) \
     int64_t i_read = p_box->i_size; \

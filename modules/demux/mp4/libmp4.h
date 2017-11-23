@@ -805,7 +805,7 @@ typedef struct MP4_Box_data_timestampsynchrony_s
 typedef struct MP4_Box_data_moviehintinformation_rtp_s
 {
     uint32_t i_description_format;
-    unsigned char *psz_text;
+    char *psz_text;
 
 } MP4_Box_data_moviehintinformation_rtp_t;
 
