@@ -314,8 +314,56 @@ Removed modules
  * RAOP stream output module
 
 
-Changes between 2.2.5 and 2.2.5.1:
+Changes between 2.2.7 and 2.2.8:
 --------------------------------
+
+Demuxers:
+ * Fix AVI invalid pointer dereferences
+
+Translations updates
+
+
+Changes between 2.2.6 and 2.2.7:
+--------------------------------
+
+Decoders:
+ * Fix flac heap write overflow on format change
+ * Fix crash in libavcodec module (heap write out-of band) (CVE-2017-10699)
+ * Fix infinite loop in sami subtitle
+ * Fix AAC 7.1 channels detection
+
+Demuxers:
+ * Fix potential crash in ASX parser
+ * Fix AVI read/write overflow
+
+Mac OS X:
+ * Fix compatibility with macOS High Sierra
+ * Fix regression in ASS subtitle decoding
+ * Fix crash during automatic update. Some users might need to manually
+   update to the newest version.
+
+Video Output:
+ * Fix Direct3D9 output with odd offsets
+
+Misc:
+ * Fix crash in MTP
+ * Support libupnp 1.8
+
+Translations updates
+
+
+Changes between 2.2.5.1 and 2.2.6:
+----------------------------------
+
+Video output:
+ * Fix systematic green line on nvidia
+ * Fix direct3d SPU texture offsets handling
+
+Demuxer:
+ * Fix heap buffer overflows (CVE-2017-8310, 8311, 8312, 8313)
+
+Changes between 2.2.5 and 2.2.5.1:
+----------------------------------
 
 Security hardening for DLL hijacking environments
 
@@ -323,8 +371,8 @@ Translations updates
 
 Misc:
  * Update for Soundcloud, liveleak and Youtube scripts
- * Fix potential out-of-band dereference in flac decoder
- * Fix potential out-of-band reads in mpeg packetizers
+ * Fix potential out-of-band dereference in flac decoder (CVE-2017-9300)
+ * Fix potential out-of-band reads in mpeg packetizers (CVE-2017-9301)
  * Fix infinite loop in subtitles demuxer
  * Fix incorrect memory free in ogg demuxer
  * Fix potential out-of-band reads in subtitle decoders and demuxers
