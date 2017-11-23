@@ -525,9 +525,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     }
 
     D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
-        .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2DARRAY,
-        .Texture2DArray.MipSlice = 0,
-        .Texture2DArray.ArraySize = 1,
+        .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
     };
 
     D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc = {

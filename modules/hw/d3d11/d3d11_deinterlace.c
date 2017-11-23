@@ -504,7 +504,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
         .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
-        .Texture2D.MipSlice = 0,
     };
 
     hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3dviddev,
