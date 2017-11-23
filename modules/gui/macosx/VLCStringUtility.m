@@ -64,23 +64,6 @@ NSString *const kVLCMediaUnknown = @"Unknown";
 #pragma mark -
 #pragma mark String utility
 
-- (NSString *)localizedString:(const char *)psz
-{
-    NSString * stringObject = nil;
-
-    if (psz != NULL) {
-        stringObject = toNSStr(_(psz));
-
-        if (stringObject == NULL) {
-            msg_Err(getIntf(), "could not translate: %s", psz);
-            return @"";
-        }
-    } else
-        return @"";
-
-    return stringObject;
-}
-
 /* i_width is in pixels */
 - (NSString *)wrapString:(NSString *)o_in_string toWidth:(int)i_width
 {
