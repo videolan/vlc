@@ -69,10 +69,9 @@ static void ParseHeader( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
 static void SVCDSubRenderImage( decoder_t *, block_t *, subpicture_region_t * );
 
-#define GETINT16(p) ( (p[0] <<  8) +   p[1] )  ; p +=2;
+#define GETINT16(p) GetWBE(p)  ; p +=2;
 
-#define GETINT32(p) ( (p[0] << 24) +  (p[1] << 16) +    \
-                      (p[2] <<  8) +  (p[3]) ) ; p += 4;
+#define GETINT32(p) GetDWBE(p) ; p += 4;
 
 typedef enum  {
   SUBTITLE_BLOCK_EMPTY    = 0,
