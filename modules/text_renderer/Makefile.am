@@ -17,7 +17,7 @@ libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/dwrite.cpp
 libfreetype_plugin_la_LINK = $(CXXLINK)
 if HAVE_WIN32_DESKTOP
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/win32.c
-libfreetype_plugin_la_LIBADD += -liconv -lz -lgdi32 -lusp10 -luuid
+libfreetype_plugin_la_LIBADD += -liconv -lz -lusp10 -lgdi32 -luuid
 else
 libfreetype_plugin_la_LIBADD += -ldwrite
 endif
