@@ -36,6 +36,10 @@ void cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value);
  */
 int cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx);
 
+int cvpxpic_attach_with_cb(picture_t *p_pic, CVPixelBufferRef cvpx,
+                           void (*on_released_cb)(void *),
+                           void *on_released_data);
+
 /*
  * Get the cvpx buffer attached to a picture
  */
