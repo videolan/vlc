@@ -3228,18 +3228,28 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
 
     for( uint32_t i = 0; i < p_box->data.p_elst->i_entry_count; i++ )
     {
+        uint64_t segment_duration;
+        int64_t media_time;
+
         if( p_box->data.p_elst->i_version == 1 )
         {
-            MP4_GET8BYTES( p_box->data.p_elst->i_segment_duration[i] );
-            MP4_GET8BYTES( p_box->data.p_elst->i_media_time[i] );
+            union { int64_t s; uint64_t u; } u;
+
+            MP4_GET8BYTES( segment_duration );
+            MP4_GET8BYTES( u.u );
+            media_time = u.s;
         }
         else
         {
-            MP4_GET4BYTES( p_box->data.p_elst->i_segment_duration[i] );
-            MP4_GET4BYTES( p_box->data.p_elst->i_media_time[i] );
-            p_box->data.p_elst->i_media_time[i] = (int32_t)p_box->data.p_elst->i_media_time[i];
+            union { int32_t s; uint32_t u; } u;
+
+            MP4_GET4BYTES( segment_duration );
+            MP4_GET4BYTES( u.u );
+            media_time = u.s;
         }
 
+        p_box->data.p_elst->i_segment_duration[i] = segment_duration;
+        p_box->data.p_elst->i_media_time[i] = media_time;
         MP4_GET2BYTES( p_box->data.p_elst->i_media_rate_integer[i] );
         MP4_GET2BYTES( p_box->data.p_elst->i_media_rate_fraction[i] );
     }
