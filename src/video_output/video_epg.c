@@ -60,14 +60,6 @@
 #define EPGOSD_TEXTSIZE_PROG    (OSDEPG_ROWS(2))
 #define EPGOSD_TEXTSIZE_NTWK    (OSDEPG_ROWS(2))
 
-#define RGB2YUV( R, G, B ) \
-    ((0.257 * R) + (0.504 * G) + (0.098 * B) + 16), \
-    (-(0.148 * R) - (0.291 * G) + (0.439 * B) + 128),\
-    ((0.439 * R) - (0.368 * G) - (0.071 * B) + 128)
-
-#define HEX2YUV( rgb ) \
-    RGB2YUV( (rgb >> 16), ((rgb & 0xFF00) >> 8), (rgb & 0xFF) )
-
 //#define RGB_COLOR1   0xf48b00
 //#define ARGB_BGCOLOR 0xC0333333
 
