@@ -1739,6 +1739,7 @@ static void Drain(decoder_t *p_dec, bool flush)
 
     /* draining: return last pictures of the reordered queue */
     vlc_mutex_lock(&p_sys->lock);
+    p_sys->b_vt_flush = true;
     DrainDPBLocked(p_dec, flush);
     vlc_mutex_unlock(&p_sys->lock);
 
@@ -1746,6 +1747,7 @@ static void Drain(decoder_t *p_dec, bool flush)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
+    assert(RemoveOneFrameFromDPB(p_sys) == NULL);
     p_sys->b_vt_flush = false;
     p_sys->b_vt_feed = false;
     vlc_mutex_unlock(&p_sys->lock);
