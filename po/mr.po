@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2016-05-27 05:32+0000\n"
 "Last-Translator: Rajnikant Kumbhar <rajnikant.kumbhar@gmail.com>\n"
 "Language-Team: Marathi (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -155,7 +155,8 @@ msgstr "किरकोळ ध्वनी रचना व भाग."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -363,7 +364,8 @@ msgstr "व्हीएलसीची मागणीनुसार ध्व�
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -969,6 +971,7 @@ msgid "Scrambled"
 msgstr "गुंतागुंत झालेले"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "होय"
 
@@ -1015,6 +1018,7 @@ msgstr "भाषा"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "वर्णन"
 
@@ -1038,8 +1042,7 @@ msgstr "%u एचझेड"
 msgid "Bits per sample"
 msgstr "प्रति नमुना बिट्स"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1296,7 +1299,8 @@ msgstr "व्हीएलसी एमआरएल उघडू शकत न�
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "शीर्षक"
@@ -1306,8 +1310,8 @@ msgstr "शीर्षक"
 msgid "Artist"
 msgstr "कलाकार"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "प्रकार"
 
@@ -1324,7 +1328,7 @@ msgstr "ध्वनीफित"
 msgid "Track number"
 msgstr "क्रमांकाचा मागोवा"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "गुणांकन"
 
@@ -1346,7 +1350,7 @@ msgstr "यूआरएल"
 msgid "Now Playing"
 msgstr "आत्ता सुरु आहे"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "प्रकाशक"
 
@@ -1386,7 +1390,7 @@ msgstr "नाव दाखवा"
 msgid "Actors"
 msgstr "कलाकार"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "कलाकार"
@@ -1875,6 +1879,7 @@ msgstr "यामुळे ध्वनी कमी किंवा जास�
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1924,7 +1929,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "ध्वनीचित्र रुंदी"
@@ -1938,7 +1943,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "ध्वनीचित्र उंची"
@@ -2558,13 +2563,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "पूर्वनिर्धारित"
 
@@ -4197,6 +4203,7 @@ msgid "Long jump length, in seconds."
 msgstr "बरेच पुढे जाण्याची लांबी, सेकंदांमध्ये."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5271,14 +5278,14 @@ msgstr "लेखनासाठी \"%s\" उघडण्यात अपयश
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6122,6 +6129,38 @@ msgstr "जोडलेले घटक"
 msgid "Attachment input"
 msgstr "जोडलेल्या घटकांविषयी संगणकाला दिलेली माहिती"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "ध्वनीचित्रफित ग्रहण"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "ध्वनी उत्पादन भाग"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "संगणकाला द्यायच्या माहितीचे कोणतेही साधन सापडले नाही"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"तुमचा मॅक संगणकाला माहिती द्यायच्या योग्य साधनांनी सज्ज असल्याचे दिसत नाही. तुमचे अनुबंधक "
+"व चालक."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"तुमचा मॅक संगणकाला माहिती द्यायच्या योग्य साधनांनी सज्ज असल्याचे दिसत नाही. तुमचे अनुबंधक "
+"व चालक."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "एव्हीआयओ"
@@ -6712,7 +6751,7 @@ msgstr "तुम्ही निवडलेले साधन वापरत
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "ग्रहण साधन \"%s\" आवश्यक निर्देशांकांना पाठिंबा देत नाही."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "विंडो सजावटी"
@@ -7203,6 +7242,48 @@ msgstr "डिजिटल ध्वनीचित्रफित (फायर
 msgid "DV"
 msgstr "डीव्ही"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr ""
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "उपग्रह पल्ला संकेत"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "मापन दर्जा"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "सांख्यिकीसाठी वापरला जातो."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "डीव्ही"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr ""
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "डीव्हीडी पद्धत"
@@ -7279,8 +7360,7 @@ msgstr "डीव्हीडीवाचन वाचू शकत नाही
 msgid "File input"
 msgstr "धारिका संगणकाला दिलेली माहिती"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7305,9 +7385,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7323,9 +7403,9 @@ msgid ""
 msgstr "जोडणीसाठी वापरले जाणारे वापरकर्ता नाव."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7386,11 +7466,50 @@ msgstr "दिलेल्या सर्वरशी व्हीएलसी 
 msgid "Your account was rejected."
 msgstr "तुमचे खाते फेटाळण्यात आले."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "एचटीटीपी प्रतिनिधी"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"एचटीटीपी प्रतिनिधी वापरला जाईल तो पुढील अर्जाचा असला पाहिजे http://"
+"[user@]myproxy.mydomain:myport/ ; रिक्त असल्यास, एचटीटीपी_प्रतिनिधी पर्यावरण "
+"परिवर्तनशील घटक वापरला जाईल."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "एचटीटीपी प्रतिनिधी पासवर्ड"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "तुमच्या एचटीटीपी प्रतिनिधीसाठी पासवर्ड आवश्यक असेल, तर तो येथे निश्चित करा."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "स्वयं फेर-जोडणी"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"स्वयंचलितपणे प्रवाहाशी पुन्हा जोडण्याचा प्रयत्न करा जर अचानकपणे संपर्क तुटला असेल तर."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "एचटीटीपी संगणकाला द्यायची माहिती"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "एचटीटीपी (एस)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "एचटीटीपी प्रमाणीकरण"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "कृपया क्षेत्रासाठी वैध लॉगइन नाव व पासवर्ड घाला %s."
@@ -7447,49 +7566,10 @@ msgstr ""
 "स्वतंत्र केले पाहिजेत, उदा. फूबार/१.२.३. हा पर्याय जागतिकदृष्ट्या नाही तर केवळ संगणकाला "
 "द्यायच्या घटकानुसार विहित करता येईल."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "एचटीटीपी प्रतिनिधी"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"एचटीटीपी प्रतिनिधी वापरला जाईल तो पुढील अर्जाचा असला पाहिजे http://"
-"[user@]myproxy.mydomain:myport/ ; रिक्त असल्यास, एचटीटीपी_प्रतिनिधी पर्यावरण "
-"परिवर्तनशील घटक वापरला जाईल."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "एचटीटीपी प्रतिनिधी पासवर्ड"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "तुमच्या एचटीटीपी प्रतिनिधीसाठी पासवर्ड आवश्यक असेल, तर तो येथे निश्चित करा."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "स्वयं फेर-जोडणी"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"स्वयंचलितपणे प्रवाहाशी पुन्हा जोडण्याचा प्रयत्न करा जर अचानकपणे संपर्क तुटला असेल तर."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "एचटीटीपी संगणकाला द्यायची माहिती"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "एचटीटीपी (एस)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "नक्कल"
 
@@ -7523,6 +7603,7 @@ msgid "Set the category of the elementary stream"
 msgstr "प्राथमिक प्रवाहाची वर्गवारी निश्चित करा"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "अज्ञात"
 
@@ -7933,7 +8014,7 @@ msgstr "आरटीएसपी जोडणी अपयशी"
 msgid "Capture the audio stream in stereo."
 msgstr "ध्वनी प्रवाह त्रिमितीमध्ये ग्रहण करा."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "नमुनादर"
@@ -7953,333 +8034,6 @@ msgstr "ओएसएस"
 msgid "OSS input"
 msgstr "ओएसएस संगणकाला द्यायची माहिती"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "नक्कल प्रवाह उत्पादन"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "सध्याची धारिका ठेवा"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "त्यावर लिहा"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"उत्पादन धारिका आधीपासून आधीपासूनच अस्तित्वात आहे. मुद्रण सुरु राहिल्यास, धारिकेचे उल्लंघन "
-"केले जाईल व त्यातील मजकूर हरवेल."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "सध्याच्या धारिकेवर पुन्हा लिहा"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "धारिका आधीपासून अस्तित्वात असल्यास, तिच्यावर पुन्हा लिहीले जाईल."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "धारिकेला जोडा"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "धारिका अस्तित्वात असल्यास ती बदलण्याऐवजी तिला जोडा."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "प्रारुप वेळ व तारीख"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "धआरिका मार्गावर आयएसओ सी वेळ व तारीख प्रारुपण करा"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "समकालीन लेखन"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "समकालीन लेखनासह धारिका उघडा."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "धारिका प्रवाह उत्पादन"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "वापरकर्ता नाव ज्याची प्रवाह उपलब्ध होण्यासाठी विनंती केली जाईल."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "प्रवाह उपलब्ध होण्यासाठी पासवर्डची विनंती केली जाईल."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "मूकाभिनय"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "सर्वरद्वारे परत पाठविण्यात आलेला मूकअभिनय (नमूद केला नसल्यास स्वशोध घेतलेला)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "मेटाक्यूब"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr "मेटाक्यूब प्रोटोकॉल वापरा. क्यूबमॅप परावर्तकाकडे परिगमनासाठी आवश्यक."
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "एचटीटीपी प्रवाह उत्पादन"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "भागाची लांबी"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "टीएस प्रवाह भागांची लांबी"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "भाग कुठेही विभाजित करा"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr "भागाचे विभाजन करण्यापूर्वी कीफ्रेमची गरज नाही. केवळ ध्वनीसाठी आवश्यक"
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "भागांची संख्या"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "अनुसूचीमध्ये समाविष्ट करायच्या भागांची संख्या"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "संग्रहणास परवानगी द्या"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"ईएक्सटी समाविष्ट करा-एक्स-परवानगी द्या-संग्रह: हे असमर्थ करण्यात आल्यास चालविण्याची "
-"यादी-धारिकेमध्ये कोणतेही निर्देश नाहीत"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "अनुसूची धारिका"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "तयार करण्यासाठी अनुसूची धारिकेचा मार्ग"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "अनुसूची धारिकेत ठेवण्यासाठी संपूर्ण यूआरएल"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "अनुसूची धारिकेत ठेवण्यासाठी संपूर्ण यूआरएल. भागाचा क्रमांक दर्शविण्यासाठी # वापरा"
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "भाग नष्ट करा"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "भागांची गरज उरली नाही की भाग नष्ट करा"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "मिश्रक दर नियंत्रण यंत्रणा वापरा"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "एईएस की यूआरआय चालविण्याच्या यादीत ठेवण्यासाठी"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "एईएस की धारिका"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "धारिकेमध्ये १६ बाईट्स संकेतन कीचा समावेश आहे"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "धारिका जेथे व्हीएलसी की-यूआरआय व कीधारिका-स्थान वाचते "
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"जेव्हा भाग सुरु होतो तेव्हा धारिका वाचली जाते व ती प्रारुपामध्ये असेल असे गृहित धरले जाते: "
-"की-यूआरआय\\nकी-धारिका. भाग उघडल्यानंतर धारिका वाचली जाते व मूल्ये त्या भागावर वापरली "
-"जातात."
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "संकेतनासाठी स्वैर आयव्ही वापरा"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "आयव्ही म्हणून भाग-क्रमांक वापरण्याऐवजी आयव्ही तयार करा"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "पहिल्या भागाचा क्रमांक"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "तयार करण्यात आलेल्या पहिल्या भागाचा क्रमांक"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "एचटीटीपी थेट परिगमन उत्पादन"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "थेटएचटीटीपी"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "प्रवाह नाव"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "या प्रवाहाला/चॅलनला शाउटकास्ट/आयईसकास्ट सर्वरवर द्यायचे नाव."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "प्रवाह वर्णन"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "प्रवाह मजकुराचे वर्णन किंवा तुमच्या चॅलनविषयी माहिती."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "प्रवाह एमपी३"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"तुम्हाला सामान्यपणे शाउटकास्ट भागामध्ये ओजीजी प्रवाह द्यावे लागतील. त्याशिवाय एमपी३चे "
-"परिगमन करणे शक्य आहे, म्हणजे तुम्हाला शाउटकास्ट/आईसकास्ट सर्वरकडे एमपी३ प्रवाह पाठविता "
-"येतील."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "प्रकाराचे वर्णन"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "घटकाचा प्रकार."
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "यूआरएल वर्णन"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "प्रवाहाविषयी किंवा तुमच्या चॅनलविषयी माहितीसह यूआरएल."
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "रुपांतरित प्रवाहाच्या माहितीचा बिटदर."
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "रुपांतरित प्रवाहाच्या माहितीचा नमुनादर."
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "चॅलनची संख्या"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "रुपांतरित प्रवाहाच्या चॅनल संख्येविषयी माहिती. "
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "ऑग व्होर्बिस दर्जा"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "रुपांतरित प्रवाहाची ऑग व्हॉर्बिस दर्जा माहिती."
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "प्रवाह सार्वजनिक"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"सर्वर सार्वजनिकपणे 'येलो पेजेस' (प्रवाहांची मार्गदर्शिकेत नोंद) आईसकास्ट/शाउटकास्ट "
-"संकेतस्थळावर उपलब्ध करेल. शाउटकास्टसाठी विहित केलेली बिटरेट माहिती आवश्यक असते. "
-"आईसकास्टसाठी ओजीजी परिगमन आवश्यक आहे."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "आईसकास्ट उत्पादन"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "संग्रहण मूल्य (एमएस)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"बाहेर जाणा-या यूडीपी प्रवाहांसाठी पूर्वनिर्झारित संग्रहण मूल्य. हे मूल्य मिलीसेकंदांमध्ये "
-"निश्चित केले पाहिजे."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "समूह पॅकेट"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"योग्य वेळी किंवा समूहांद्वारे पॅकेट्स एकेक पाठविली जाऊ शकतात. एकावेळी पाठविता येणा-या "
-"पॅकेट्सची संख्या निवडा. त्यामुळे अतिशय-ताण असलेल्या यंत्रणेवरील नियोजनाचा ताण कमी व्हायला "
-"मदत होते."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "यूडीपी प्रवाह उत्पादन"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8295,6 +8049,35 @@ msgstr "धडधडणेध्वनी"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "धडधडणे ध्वनी संगणकाला द्यायची माहिती"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "वेढणे"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "झटपटवेळ ग्रहण"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "संगणकाला द्यायच्या माहितीचे कोणतेही साधन सापडले नाही"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"तुमचा मॅक संगणकाला माहिती द्यायच्या योग्य साधनांनी सज्ज असल्याचे दिसत नाही. तुमचे अनुबंधक "
+"व चालक."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "संगणकाला द्यायच्या माहितीचे कोणतेही साधन सापडले नाही"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8724,6 +8507,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "आरटीपी"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "एसएफटीपी संगणकाला दिलेली माहिती"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "यूडीपी ग्रहण करणे बफर आकार (बाईट्स)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "डीटीएस विलंब (एमएस)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10039,17 +9846,24 @@ msgstr "कंपनसंख्या ३ क्यू"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "पट्ट-मर्यादित अंतर्वेशन पुन्हा नमुना घेण्यासाठी ध्वनी चाळणी"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "पुन्हा नमुना घेण्याचा दर्जा"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"पुन्हा नमुना घेण्याचा दर्जा (० = निकृष्य व सर्वात जलद, १० = सर्वोत्तम व सर्वात संथ)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "पुन्हा नमुना घेण्याचा दर्जा"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "एसआरसी फेरनमुनाकर्ता"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "स्पिक्स पुनर्नमुनाकर्ता"
 
@@ -11814,6 +11628,16 @@ msgstr "माध्यम मंच रुपांतर विसंकेत
 msgid "MPEG audio decoder using mpg123"
 msgstr "एमपीईजी ध्वनी विसंकेतक"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "वेबएम ध्वनीचित्रफित विसंकेतक"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "थिओरा ध्वनीचित्रफित पॅकटकर्ता"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12499,6 +12323,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "जी.७११ विसंकेतक"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "एसडीएल प्रतिमा विसंकेतक"
@@ -12930,6 +12763,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "टेलीमजकूर अनुवादपट्ट्या विसंकेतक"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "मजकूर अनुवादपट्ट्या विसंकेतक"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13093,6 +12931,21 @@ msgstr "वेबएम ध्वनीचित्रफित विसंक�
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "वेबएम ध्वनीचित्रफित विसंकेतक"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "एमएमएएल विसंकेतक"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "ईबीयू एसटीएल अनुवादपट्ट्या विसंकेतक"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "ईबीयू एसटीएल अनुवादपट्ट्या पदनिरुपक"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14090,7 +13943,8 @@ msgstr "डी-बस नियंत्रण आंतरपृष्ठ"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14462,7 +14316,7 @@ msgstr "प्रारंभ करणे"
 msgid "Opening"
 msgstr "उघडणे"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "चूक"
 
@@ -14962,7 +14816,8 @@ msgstr "विभाजक"
 msgid "Avformat muxer"
 msgstr "एव्हीप्रारुप विभाजक"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "मिश्रक"
 
@@ -15321,6 +15176,161 @@ msgstr "वेढण्याची पातळी"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "वेढणे विलंब (एमएस)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "लेखक"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "संगीतकार"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "निर्माता"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "माहिती "
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "अस्वीकार"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "आवश्यकता"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "मूळ प्रारुप"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "स्रोत च्या स्वरुपात प्रदर्शित करा"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "यजमान संगणक"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "सादरकर्ते"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "मूळ सादरकर्ते"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "पुरवठादार स्रोत घटक"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "इशारा"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "सॉफ्टवेअर "
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "गीताचे बोल"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "मुद्रण कंपनी"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "नमुना"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "उत्पादन"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "वर्गीकरण"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "उप-शीर्षक"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "संगीत आयोजक"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "कला दिग्दर्शक"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "प्रकाशनहक्क ऋणनिर्देश"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "वाहक"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "गाण्याचे वर्णन"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "ध्वनीमुद्रिकेवरील टीपा"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "ध्वनीचिन्ह हक्क"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "ध्वनी अभियंता"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "एकल कलाकार"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "धन्यवाद"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "कार्यकारी निर्माता"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "निर्देशांक संकेतन"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "चॅनल क्रमांक"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "परवलीचे शब्द"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "स्पष्ट"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15709,6 +15719,10 @@ msgstr "पॉडकास्ट आकार"
 msgid "%s bytes"
 msgstr "%s बाईट्स"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "मूकाभिनय"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "शाउटकास्ट"
@@ -15720,6 +15734,11 @@ msgstr "श्रोते"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "उघडा"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "संपृक्तता"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15905,6 +15924,10 @@ msgstr "वेव्ह विभाजक"
 msgid "XA demuxer"
 msgstr "एक्सए विभाजक"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "अज्ञात वर्गवारी"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "बंद मथळे"
@@ -15929,10 +15952,6 @@ msgstr "शब्दार्थ विज्ञान व्याख्या"
 msgid "Transcript"
 msgstr "प्रतिलेख"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "गीताचे बोल"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "भाषिक मूल्य वाढविणे"
@@ -15952,10 +15971,6 @@ msgstr "स्लाईड (मजकूर)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "स्लाईड (चित्रे)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "अज्ञात वर्गवारी"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16006,22 +16021,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "चालविण्याचीयादी पदनिरुपक"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "सेवा शोध"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "आंतरपृष्ठे"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr "आर्ट आणि मेटा फेचर"
 
@@ -16029,6 +16048,7 @@ msgstr "आर्ट आणि मेटा फेचर"
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "विस्तार"
 
@@ -16070,6 +16090,7 @@ msgstr "स्थापना रद्द करा"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "त्वचा"
@@ -16165,10 +16186,10 @@ msgstr "नव्या प्रारुपासाठी नाव घाल
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16332,12 +16353,14 @@ msgid "Playback time"
 msgstr "पार्श्वगायन दर"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "आधीचे शीर्षक"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "वेळेकडे जा"
@@ -16380,9 +16403,10 @@ msgstr "उत्पादन ठिकाण निवडा"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17433,26 +17457,6 @@ msgstr "संपूर्ण तीव्रता"
 msgid "Open Audio Effects window"
 msgstr "ध्वनी परिणाम"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "बी"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "केबी"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "एमबी"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "जीबी"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "टीबी"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "खुले स्रोत"
@@ -17551,6 +17555,7 @@ msgid "Enable DVD menus"
 msgstr "डीव्हीडी विषयसूची समर्थ करा"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "आयपी पत्ता"
 
@@ -17843,58 +17848,6 @@ msgstr "मेटा साठविताना झालेली चूक"
 msgid "VLC was unable to save the meta data."
 msgstr "व्हीएलसीला मेटा डाटा साठवता आला नाही. "
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "प्राधान्ये"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "सर्व पुनर्रचना करा"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "मूलभूत दाखवा"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "एक मार्गदर्शिका निवडा"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "एक धारिका निवडा"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "निवडा"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "पार्श्वगायन सुरु ठेवायचे का?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "सुरु ठेवा"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "पार्श्वगायन सुरु करा"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "पार्श्वगायन पुन्हा सुरु करा"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr "\"%@\" चे पार्श्वगायन %@ ने सुरु राहील"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -17921,6 +17874,31 @@ msgstr "सेवा शोध"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "पटलसंग्रहक असमर्थ करा"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "पार्श्वगायन सुरु ठेवायचे का?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "सुरु ठेवा"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "पार्श्वगायन सुरु करा"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "पार्श्वगायन पुन्हा सुरु करा"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr "\"%@\" चे पार्श्वगायन %@ ने सुरु राहील"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18195,6 +18173,16 @@ msgstr "पूर्वप्रत्यय"
 msgid "Sequential numbering"
 msgstr "क्रमवार संख्या"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "सर्व पुनर्रचना करा"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "प्राधान्ये"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18290,9 +18278,49 @@ msgstr "या कळा हॉटकी संक्षिप्त मार�
 msgid "This combination is already taken by \"%@\"."
 msgstr "हे मिश्रण आधीपासूनच \"%@\" घेतलेले आहे."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "चालवा/थांबवा"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "स्वैर चालविण्याची यादी पार्श्वगायन बदला"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "मुख्य विंडो..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "यूआरएल वर्णन"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "आता चालविले जात आहे"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "धारक निवडा"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "क्लिपबोर्डमधून उघडी व ठिकाण"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "रचना केलेली नाही"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "सेकंद."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18608,7 +18636,8 @@ msgid "Add text"
 msgstr "मजकूर समाविष्ट करा"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "मजकूर"
 
@@ -18631,9 +18660,41 @@ msgstr "पारदर्शकता"
 msgid "Organize profiles..."
 msgstr "प्रारुपांचे संघटन करा..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "सेकंद."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "बी"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "केबी"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "एमबी"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "जीबी"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "टीबी"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "मूलभूत दाखवा"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "एक मार्गदर्शिका निवडा"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "एक धारिका निवडा"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "निवडा"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -18994,11 +19055,6 @@ msgstr "पुढे जा"
 msgid "Loop / Repeat"
 msgstr "लूप/पुनरावृत्ती"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "माहिती "
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "अनुवादपट्ट्या उघडा"
@@ -19109,6 +19165,10 @@ msgstr "ए ते बी लूप थांबवा"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "प्रसर अनुपात"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19265,10 +19325,6 @@ msgstr "(उशीरा)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "या संवाद मूल्यांच्या सुधारणेची सक्ती करा"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19931,6 +19987,11 @@ msgstr ""
 msgid "Base port"
 msgstr "आधार पोर्ट"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "प्रवाह नाव"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr ""
@@ -19964,9 +20025,10 @@ msgstr "सर्व वाचनखुणा नष्ट करा"
 msgid "Extract"
 msgstr "काढा"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20019,6 +20081,19 @@ msgstr "वसुरुवात करा"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "धारक"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "कार्यक्रम मार्गदर्शिका"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "सुधारणा करा"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20441,50 +20516,6 @@ msgstr ""
 "तुम्हाला खात्री आहे का की तुम्हाला व्हीएलसी मीडिया प्लेअरच्या प्राधान्यांची फेररचना करायची "
 "आहे?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "खुली मार्गदर्शिका"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "खुले धारक"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "खुली चालविण्याची यादी..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "एक्सएसपीएफ चालविण्याची यादी"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "एम३यू चालविण्याची यादी"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "एम३यू८ चालविण्याची यादी"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "चालविण्याची यादी म्हणून साठवा..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "अनुवादपट्ट्या म्हणून उघडा..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "माध्यम धारिका"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "अनुवादपट्ट्या धारिका"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "सर्व धआरिका"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "प्रवाह उत्पादन"
@@ -20707,6 +20738,61 @@ msgstr "वेळापत्रक:"
 msgid "VOD: "
 msgstr "व्हीओडी:"
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "खुली मार्गदर्शिका"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "खुले धारक"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "खुली चालविण्याची यादी..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "एक्सएसपीएफ चालविण्याची यादी"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "एम३यू चालविण्याची यादी"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "एम३यू८ चालविण्याची यादी"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "चालविण्याची यादी म्हणून साठवा..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "अनुवादपट्ट्या म्हणून उघडा..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "माध्यम धारिका"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "अनुवादपट्ट्या धारिका"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "सर्व धआरिका"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr ""
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "सक्रिय करा"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "पार्श्वगायन जेथे सोडले होते तेथून तुम्हाला पुन्हा सुरु करायचे आहे का?"
@@ -20811,10 +20897,6 @@ msgstr "व परिणाम व चाळण्या "
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "व समकालनाचा आढावा घ्या"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "कार्यक्रम मार्गदर्शिका"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21300,6 +21382,12 @@ msgstr "इशारे"
 msgid "debug"
 msgstr "दोषनिवारण करा"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "स्पष्ट"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "आवरण धारिका उघडा"
@@ -21402,6 +21490,80 @@ msgstr "त्वचा निवडा"
 msgid "Open skin..."
 msgstr "त्वचा उघडा..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "तेजस्वीता सीमारेषा"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"ही पद्ध समर्थ केली जाते, तेव्हा पिक्सल काळ्या किंवा पांढ-या स्वरुपात दाखविले जातात. "
+"सीमारेषा मूल्य खाली निश्चित केलेली तेजस्वीता असते."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "प्रतिमा परस्परविरोधी रंगसंगती (०-२)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "प्रतिमा विरुद्ध रंगसंगती, ० व २ दरम्यान निश्चित करा. पूर्वनिर्धारित १ वर."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "प्रतिमा रंग (०-३६०)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "प्रतिमा रंग, ० व ३६० दरम्यान निश्चित करा. पूर्वनिर्धारित ० वर."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "प्रतिमा परिपूर्ती (०-३)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "प्रतिमा परिपूर्ती निश्चित करा, ० व ३ दरम्यान. पूर्वनिर्धारित १ वर."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "प्रतिमा तेजस्वीता (०-२)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "प्रतिमा तेजस्वीता निश्चित करा, ० व २ दरम्यान. पूर्वनिर्धारित १ वर."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "प्रतिमा गॅमा (०-१०)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "प्रतिमा गॅमा निश्चित करा, ०.०१ व १० दरम्यान. पूर्वनिर्धारित १ वर."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "थेटएक्स ध्वनीचित्रफित गतिवर्धन (डीएक्सव्हीए) २.०"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "व्हीडीपीएयू ध्वनीचित्रफित चाळणी व्यवस्थित"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr "होस्ट मेमरीऐवजी आरपीआय ध्वनीचित्रफितकेंद्रात थेट फ्रेमचे विसंकेतन करते."
@@ -21465,6 +21627,16 @@ msgstr "एमएमएएल व्हीबाहेर"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "एमएमएएल-आधारित व्हीबाहेर प्लगइन रास्पबेरी पीआयसाठी"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "ध्वनी चाळण्या"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "ध्वनीचित्रफित वाढविणे पट्टी"
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "व्हीडीपीएयू ध्वनीचित्रफित चाळणी व्यवस्थित"
@@ -21525,15 +21697,22 @@ msgstr "व्हीडीपीएयू उत्पादन"
 msgid "VDPAU sharpen video filter"
 msgstr "व्हीडीपीएयू तीक्ष्ण करणे ध्वनीचित्रफित चाळणी"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "ध्वनी चाळण्या"
+msgid "file keystore (plaintext)"
+msgstr "प्राधान्य असलेली पॅकेटायझर यादी"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "ध्वनीचित्रफित वाढविणे पट्टी"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21604,6 +21783,183 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "टीएलएस सहाय्य ओएस X व आयओएस"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+msgid "Secrets are stored via KWallet"
+msgstr ""
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "एस बाह्य प्रवाह"
+
+#: modules/keystore/memory.c:42
+msgid "secrets are stored in memory"
+msgstr ""
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+msgid "Secrets are stored via libsecret"
+msgstr ""
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "प्रतीकचिन्ह समाविष्ट करा"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "शांत राहा"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "सर्व व्हीएलसी संदेशांची मजकूर धारिकेवर नोंद करा."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "नियंत्रण संच"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "नियंत्रण संच"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "अधिक माहिती"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "दोषनिवारण करा"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "धारिकेवर नोंद करा"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "सर्व व्हीएलसी संदेशांची मजकूर धारिकेवर नोंद करा."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "धारिकेच्या नावाची नोंद करा"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "नोंद धारिकानाव नमूद करा."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "नोंद प्रारुप"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "नोंद करण्याचे प्रारुप नमूद करा."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "शब्दमर्यादा"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"नोंद करण्यासाठी वापरायची शब्दमर्यादा किंवा -१ निवडा -- व्हर्बोसद्वारे देण्यात आलेली तीच "
+"शब्दमर्यादा वापरण्यासाठी."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "नोंद करणे"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "धारिका नोंद करणे"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "दोषनिवारण मुखवटा"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "क्षमता"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "यंत्रणानोंद सुविधा"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "यंत्रणा नोंदीवर नोंद करा"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22297,6 +22653,36 @@ msgstr "जेपॉप"
 msgid "Synthpop"
 msgstr "सिंथपॉप"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "कमाल स्थानिक बिटदर"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "ध्वनचित्रफित परिवर्तन चाळणी"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "तुमच्या शेवटच्या.एफएम खात्याचे वापरकर्ता नाव"
@@ -22346,6 +22732,15 @@ msgstr ""
 "कृपया एक वापरकर्ता नाव निश्चित करा किंवा ध्वनीस्क्रॉबलर प्लगइन असमर्थ करा, व व्हीएलसी "
 "पुन्हा सुरु करा.\n"
 "खाते मिळविण्यासाठी भेट द्या http://www.last.fm/join/."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "ध्वनिक"
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22680,10 +23075,6 @@ msgstr "विषय"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "संकेतक"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "परवलीचे शब्द"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23147,6 +23538,18 @@ msgstr "चित्र"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "माझी चित्रे"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "बाँजूर सेवा"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "बाँजूर सेवा"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24308,6 +24711,64 @@ msgstr "संपर्क बाहेर"
 msgid "Bridge in"
 msgstr "संपर्क आत"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "एसएफटीपी पोर्ट"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr ""
+"हा भाग आईसकास्ट सर्वरवर एका प्रारुपातून दुस-या प्रारुपात परिवर्तित प्रवाहाचे उत्पादन देतो."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "ज्या संगणकाकडे पाठवायचे आहे त्याचा पत्ता"
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "क्रोमा प्रारुप"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "क्रोमा"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "संपर्क प्रवाह उत्पादन"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "एव्हीप्रारुप विभाजक"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24363,6 +24824,10 @@ msgstr "प्रवाहाच्या प्रदर्शनात उश�
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "प्रवाह उत्पादन प्रदर्शित करा"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "नक्कल प्रवाह उत्पादन"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24654,6 +25119,10 @@ msgstr ""
 "यामुळे आरटीपी पॅकेट्सच्याच पोर्टवर बहुवितरित आरटीसीपी पॅकेट पाठविली जातात व स्वीकारली "
 "जातात. "
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "संग्रहण मूल्य (एमएस)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24701,6 +25170,15 @@ msgstr ""
 "इतका वेळ कोणतीही आरटीएसपी विनंती मिळाली नाही तर आरटीएसपी सत्रे बंद केली जातील. "
 "याची रचना ऋण मूल्यावर किंवा शून्यावर केल्यास वेळ संपली असमर्थ केले जाते. पूर्वनिर्धारित ६० "
 "आहे (एक मिनिट)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "वापरकर्ता नाव ज्याची प्रवाह उपलब्ध होण्यासाठी विनंती केली जाईल."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "प्रवाह उपलब्ध होण्यासाठी पासवर्डची विनंती केली जाईल."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25371,58 +25849,6 @@ msgstr "एसडब्ल्यू पट्टी"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "वाययूव्हीपी परिवर्तक"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "तेजस्वीता सीमारेषा"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"ही पद्ध समर्थ केली जाते, तेव्हा पिक्सल काळ्या किंवा पांढ-या स्वरुपात दाखविले जातात. "
-"सीमारेषा मूल्य खाली निश्चित केलेली तेजस्वीता असते."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "प्रतिमा परस्परविरोधी रंगसंगती (०-२)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "प्रतिमा विरुद्ध रंगसंगती, ० व २ दरम्यान निश्चित करा. पूर्वनिर्धारित १ वर."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "प्रतिमा रंग (०-३६०)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "प्रतिमा रंग, ० व ३६० दरम्यान निश्चित करा. पूर्वनिर्धारित ० वर."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "प्रतिमा परिपूर्ती (०-३)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "प्रतिमा परिपूर्ती निश्चित करा, ० व ३ दरम्यान. पूर्वनिर्धारित १ वर."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "प्रतिमा तेजस्वीता (०-२)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "प्रतिमा तेजस्वीता निश्चित करा, ० व २ दरम्यान. पूर्वनिर्धारित १ वर."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "प्रतिमा गॅमा (०-१०)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "प्रतिमा गॅमा निश्चित करा, ०.०१ व १० दरम्यान. पूर्वनिर्धारित १ वर."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27099,6 +27525,15 @@ msgstr "खुलेजीएल ध्वनीचित्रफित उत�
 msgid "Windows GDI video output"
 msgstr "विंडोज जीडीआय ध्वनीचित्रफित उत्पादन"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "जीपीयू आकर्षण"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "ईजीएल विस्तार खुल्याजीएलसाठी"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "अक्रिय प्रतिमा क्रोमा प्रारुप"
@@ -27583,6 +28018,26 @@ msgstr "भिंत ध्वनीचित्रफित चाळणी"
 msgid "Image wall"
 msgstr "प्रतिमा भिंत"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "ध्वनीचित्रफित विंडोची रुंदी, पिक्सलमध्ये."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "ध्वनीचित्रफित विंडोची उंची, पिक्सलमध्ये."
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "वर्णपट"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "सध्याचे कल्पनाचित्रण"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "गूम प्रदर्शन रुंदी"
@@ -28036,10 +28491,6 @@ msgstr "तुम्हाला प्रवाह तयार करायच
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "संवाद"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "सुधारणा करा"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -28903,6 +29354,266 @@ msgid "Media Manager List"
 msgstr "माध्यम व्यवस्थापक यादी"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "पुन्हा नमुना घेण्याचा दर्जा"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "मापन दर्जा"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "अनुलेखन दर्जा"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "पुन्हा नमुना घेण्याचा दर्जा (० = निकृष्य व सर्वात जलद, १० = सर्वोत्तम व सर्वात संथ)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "सुरुवात वेळ"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "मेलक देश संकेत"
+
+#~ msgid "Keep existing file"
+#~ msgstr "सध्याची धारिका ठेवा"
+
+#~ msgid "Overwrite"
+#~ msgstr "त्यावर लिहा"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "उत्पादन धारिका आधीपासून आधीपासूनच अस्तित्वात आहे. मुद्रण सुरु राहिल्यास, धारिकेचे "
+#~ "उल्लंघन केले जाईल व त्यातील मजकूर हरवेल."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "सध्याच्या धारिकेवर पुन्हा लिहा"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "धारिका आधीपासून अस्तित्वात असल्यास, तिच्यावर पुन्हा लिहीले जाईल."
+
+#~ msgid "Append to file"
+#~ msgstr "धारिकेला जोडा"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "धारिका अस्तित्वात असल्यास ती बदलण्याऐवजी तिला जोडा."
+
+#~ msgid "Format time and date"
+#~ msgstr "प्रारुप वेळ व तारीख"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "धआरिका मार्गावर आयएसओ सी वेळ व तारीख प्रारुपण करा"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "समकालीन लेखन"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "समकालीन लेखनासह धारिका उघडा."
+
+#~ msgid "File stream output"
+#~ msgstr "धारिका प्रवाह उत्पादन"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "सर्वरद्वारे परत पाठविण्यात आलेला मूकअभिनय (नमूद केला नसल्यास स्वशोध घेतलेला)."
+
+#~ msgid "Metacube"
+#~ msgstr "मेटाक्यूब"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr "मेटाक्यूब प्रोटोकॉल वापरा. क्यूबमॅप परावर्तकाकडे परिगमनासाठी आवश्यक."
+
+#~ msgid "HTTP stream output"
+#~ msgstr "एचटीटीपी प्रवाह उत्पादन"
+
+#~ msgid "Segment length"
+#~ msgstr "भागाची लांबी"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "टीएस प्रवाह भागांची लांबी"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "भाग कुठेही विभाजित करा"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr "भागाचे विभाजन करण्यापूर्वी कीफ्रेमची गरज नाही. केवळ ध्वनीसाठी आवश्यक"
+
+#~ msgid "Number of segments"
+#~ msgstr "भागांची संख्या"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "अनुसूचीमध्ये समाविष्ट करायच्या भागांची संख्या"
+
+#~ msgid "Allow cache"
+#~ msgstr "संग्रहणास परवानगी द्या"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "ईएक्सटी समाविष्ट करा-एक्स-परवानगी द्या-संग्रह: हे असमर्थ करण्यात आल्यास चालविण्याची "
+#~ "यादी-धारिकेमध्ये कोणतेही निर्देश नाहीत"
+
+#~ msgid "Index file"
+#~ msgstr "अनुसूची धारिका"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "तयार करण्यासाठी अनुसूची धारिकेचा मार्ग"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "अनुसूची धारिकेत ठेवण्यासाठी संपूर्ण यूआरएल"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "अनुसूची धारिकेत ठेवण्यासाठी संपूर्ण यूआरएल. भागाचा क्रमांक दर्शविण्यासाठी # वापरा"
+
+#~ msgid "Delete segments"
+#~ msgstr "भाग नष्ट करा"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "भागांची गरज उरली नाही की भाग नष्ट करा"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "मिश्रक दर नियंत्रण यंत्रणा वापरा"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "एईएस की यूआरआय चालविण्याच्या यादीत ठेवण्यासाठी"
+
+#~ msgid "AES key file"
+#~ msgstr "एईएस की धारिका"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "धारिकेमध्ये १६ बाईट्स संकेतन कीचा समावेश आहे"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "धारिका जेथे व्हीएलसी की-यूआरआय व कीधारिका-स्थान वाचते "
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "जेव्हा भाग सुरु होतो तेव्हा धारिका वाचली जाते व ती प्रारुपामध्ये असेल असे गृहित धरले "
+#~ "जाते: की-यूआरआय\\nकी-धारिका. भाग उघडल्यानंतर धारिका वाचली जाते व मूल्ये त्या "
+#~ "भागावर वापरली जातात."
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "संकेतनासाठी स्वैर आयव्ही वापरा"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "आयव्ही म्हणून भाग-क्रमांक वापरण्याऐवजी आयव्ही तयार करा"
+
+#~ msgid "Number of first segment"
+#~ msgstr "पहिल्या भागाचा क्रमांक"
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "तयार करण्यात आलेल्या पहिल्या भागाचा क्रमांक"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "एचटीटीपी थेट परिगमन उत्पादन"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "थेटएचटीटीपी"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr "या प्रवाहाला/चॅलनला शाउटकास्ट/आयईसकास्ट सर्वरवर द्यायचे नाव."
+
+#~ msgid "Stream description"
+#~ msgstr "प्रवाह वर्णन"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "प्रवाह मजकुराचे वर्णन किंवा तुमच्या चॅलनविषयी माहिती."
+
+#~ msgid "Stream MP3"
+#~ msgstr "प्रवाह एमपी३"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "तुम्हाला सामान्यपणे शाउटकास्ट भागामध्ये ओजीजी प्रवाह द्यावे लागतील. त्याशिवाय एमपी३चे "
+#~ "परिगमन करणे शक्य आहे, म्हणजे तुम्हाला शाउटकास्ट/आईसकास्ट सर्वरकडे एमपी३ प्रवाह "
+#~ "पाठविता येतील."
+
+#~ msgid "Genre description"
+#~ msgstr "प्रकाराचे वर्णन"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "घटकाचा प्रकार."
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "प्रवाहाविषयी किंवा तुमच्या चॅनलविषयी माहितीसह यूआरएल."
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "रुपांतरित प्रवाहाच्या माहितीचा बिटदर."
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "रुपांतरित प्रवाहाच्या माहितीचा नमुनादर."
+
+#~ msgid "Number of channels"
+#~ msgstr "चॅलनची संख्या"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "रुपांतरित प्रवाहाच्या चॅनल संख्येविषयी माहिती. "
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "ऑग व्होर्बिस दर्जा"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "रुपांतरित प्रवाहाची ऑग व्हॉर्बिस दर्जा माहिती."
+
+#~ msgid "Stream public"
+#~ msgstr "प्रवाह सार्वजनिक"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "सर्वर सार्वजनिकपणे 'येलो पेजेस' (प्रवाहांची मार्गदर्शिकेत नोंद) आईसकास्ट/शाउटकास्ट "
+#~ "संकेतस्थळावर उपलब्ध करेल. शाउटकास्टसाठी विहित केलेली बिटरेट माहिती आवश्यक असते. "
+#~ "आईसकास्टसाठी ओजीजी परिगमन आवश्यक आहे."
+
+#~ msgid "IceCAST output"
+#~ msgstr "आईसकास्ट उत्पादन"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "बाहेर जाणा-या यूडीपी प्रवाहांसाठी पूर्वनिर्झारित संग्रहण मूल्य. हे मूल्य मिलीसेकंदांमध्ये "
+#~ "निश्चित केले पाहिजे."
+
+#~ msgid "Group packets"
+#~ msgstr "समूह पॅकेट"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "योग्य वेळी किंवा समूहांद्वारे पॅकेट्स एकेक पाठविली जाऊ शकतात. एकावेळी पाठविता येणा-या "
+#~ "पॅकेट्सची संख्या निवडा. त्यामुळे अतिशय-ताण असलेल्या यंत्रणेवरील नियोजनाचा ताण कमी "
+#~ "व्हायला मदत होते."
+
+#~ msgid "UDP stream output"
+#~ msgstr "यूडीपी प्रवाह उत्पादन"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "असमर्थ करा"
 
@@ -28918,9 +29629,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "Navigation"
 #~ msgstr "स्थानांतर"
-
-#~ msgid "Be quiet"
-#~ msgstr "शांत राहा"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "सर्व इशारे व माहिती संदेश बंद करा."
@@ -28951,15 +29659,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 #~ msgstr ""
 #~ "या धारिकेमध्ये ऐच्छिक सीआरएलचा समावेश होतो जे टीएलएस सत्रातील प्रमाणपत्रे रद्द "
 #~ "करण्यापासून दूरस्थ ग्राहकाला प्रतिबंध करतील."
-
-#~ msgid "Log to file"
-#~ msgstr "धारिकेवर नोंद करा"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "सर्व व्हीएलसी संदेशांची मजकूर धारिकेवर नोंद करा."
-
-#~ msgid "Log to syslog"
-#~ msgstr "यंत्रणा नोंदीवर नोंद करा"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "सर्व व्हीएलसी संदेशांची यंत्रणानोंदीवर नोंदणी करा (युनिक्स यंत्रणा)."
@@ -29005,9 +29704,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "Configure"
 #~ msgstr "मांडणी करा"
-
-#~ msgid "Channel number"
-#~ msgstr "चॅनल क्रमांक"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29098,19 +29794,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "Video Capture height"
 #~ msgstr "ध्वनीचित्रफित ग्रहण उंची"
-
-#~ msgid "Quicktime Capture"
-#~ msgstr "झटपटवेळ ग्रहण"
-
-#~ msgid "No Input device found"
-#~ msgstr "संगणकाला द्यायच्या माहितीचे कोणतेही साधन सापडले नाही"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "तुमचा मॅक संगणकाला माहिती द्यायच्या योग्य साधनांनी सज्ज असल्याचे दिसत नाही. तुमचे "
-#~ "अनुबंधक व चालक."
 
 #~ msgid "RDP auth username"
 #~ msgstr "आरडीपी प्रमाणीकरण वापरकर्ता नाव"
@@ -29353,90 +30036,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "डीआरएम संरक्षित प्रवाहांना सहाय्य नाही."
-
-#~ msgid "Writer"
-#~ msgstr "लेखक"
-
-#~ msgid "Composer"
-#~ msgstr "संगीतकार"
-
-#~ msgid "Producer"
-#~ msgstr "निर्माता"
-
-#~ msgid "Disclaimer"
-#~ msgstr "अस्वीकार"
-
-#~ msgid "Requirements"
-#~ msgstr "आवश्यकता"
-
-#~ msgid "Original Format"
-#~ msgstr "मूळ प्रारुप"
-
-#~ msgid "Display Source As"
-#~ msgstr "स्रोत च्या स्वरुपात प्रदर्शित करा"
-
-#~ msgid "Host Computer"
-#~ msgstr "यजमान संगणक"
-
-#~ msgid "Performers"
-#~ msgstr "सादरकर्ते"
-
-#~ msgid "Original Performer"
-#~ msgstr "मूळ सादरकर्ते"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "पुरवठादार स्रोत घटक"
-
-#~ msgid "Warning"
-#~ msgstr "इशारा"
-
-#~ msgid "Software"
-#~ msgstr "सॉफ्टवेअर "
-
-#~ msgid "Record Company"
-#~ msgstr "मुद्रण कंपनी"
-
-#~ msgid "Model"
-#~ msgstr "नमुना"
-
-#~ msgid "Grouping"
-#~ msgstr "वर्गीकरण"
-
-#~ msgid "Sub-Title"
-#~ msgstr "उप-शीर्षक"
-
-#~ msgid "Arranger"
-#~ msgstr "संगीत आयोजक"
-
-#~ msgid "Art Director"
-#~ msgstr "कला दिग्दर्शक"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "प्रकाशनहक्क ऋणनिर्देश"
-
-#~ msgid "Conductor"
-#~ msgstr "वाहक"
-
-#~ msgid "Song Description"
-#~ msgstr "गाण्याचे वर्णन"
-
-#~ msgid "Liner Notes"
-#~ msgstr "ध्वनीमुद्रिकेवरील टीपा"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "ध्वनीचिन्ह हक्क"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "ध्वनी अभियंता"
-
-#~ msgid "Soloist"
-#~ msgstr "एकल कलाकार"
-
-#~ msgid "Thanks"
-#~ msgstr "धन्यवाद"
-
-#~ msgid "Executive Producer"
-#~ msgstr "कार्यकारी निर्माता"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "इच्छित फ्रेम दर एच२६४ प्रवाहासाठी."
@@ -29895,9 +30494,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 #~ "या विझार्डमुळे साध्या परिगमन किंवा एका प्रारुपातून दुस-या प्रारुपात रुपांतर करणा-या "
 #~ "रचनांची मांडणी करता येते."
 
-#~ msgid "More Info"
-#~ msgstr "अधिक माहिती"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -29943,9 +30539,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "Streaming method"
 #~ msgstr "परिगमन पद्धत"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "ज्या संगणकाकडे पाठवायचे आहे त्याचा पत्ता"
 
 #~ msgid "UDP Unicast"
 #~ msgstr "यूडीपी एकलप्रसारण"
@@ -30193,9 +30786,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 #~ msgid "A->B Loop"
 #~ msgstr "ए->बी लूप"
 
-#~ msgid "Current visualization"
-#~ msgstr "सध्याचे कल्पनाचित्रण"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "व मांडणीमध्ये बदल लिहा"
 
@@ -30220,39 +30810,14 @@ msgstr "माध्यम व्यवस्थापक यादी"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "वीज खंडित करणे व सत्र क्रियाशून्यपणे संपण्यास प्रतिबंध करते."
 
-#~ msgid "Log format"
-#~ msgstr "नोंद प्रारुप"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "नोंद करण्याचे प्रारुप नमूद करा."
-
 #~ msgid "Syslog ident"
 #~ msgstr "यंत्रणा नोंद ओळख चित्र"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "ओळख चित्राची रचना करा जे व्हीएलसी यंत्रणानोंदी नोंद करताना वापरेल."
 
-#~ msgid "Syslog facility"
-#~ msgstr "यंत्रणानोंद सुविधा"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "यंत्रणानोंद सुविधा निवडा जेथे नोंदी पुढे पाठविल्या जातील."
-
-#~ msgid "Verbosity"
-#~ msgstr "शब्दमर्यादा"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "नोंद करण्यासाठी वापरायची शब्दमर्यादा किंवा -१ निवडा -- व्हर्बोसद्वारे देण्यात आलेली "
-#~ "तीच शब्दमर्यादा वापरण्यासाठी."
-
-#~ msgid "Log filename"
-#~ msgstr "धारिकेच्या नावाची नोंद करा"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "नोंद धारिकानाव नमूद करा."
 
 #~ msgid "Local drives"
 #~ msgstr "स्थानिक ड्राईव्ह"
@@ -30627,9 +31192,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 #~ msgid "Hue windowing"
 #~ msgstr "रंगाच्या विविध छटा दाखवणे"
 
-#~ msgid "Used for statistics."
-#~ msgstr "सांख्यिकीसाठी वापरला जातो."
-
 #~ msgid "Sat windowing"
 #~ msgstr "सॅटचे विविध भाग प्रदर्शित करणे"
 
@@ -30850,9 +31412,6 @@ msgstr "माध्यम व्यवस्थापक यादी"
 
 #~ msgid "Direct2D video output"
 #~ msgstr "थेट२डी ध्वनीचित्रफित उत्पादन"
-
-#~ msgid "GPU affinity"
-#~ msgstr "जीपीयू आकर्षण"
 
 #~ msgid "SDL chroma format"
 #~ msgstr "एसडीएल क्रोमा प्रारुप"

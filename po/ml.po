@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2016-01-14 07:00+0000\n"
 "Last-Translator: Sajeer P <sajeerforyou@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -151,7 +151,8 @@ msgstr "നിരവധി ഓഡിയോ ക്രമീകരണങ്ങള�
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -361,7 +362,8 @@ msgstr "വീഡിയോ ഓണ്‍ ഡിമാന്‍ഡിന്റെ 
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -938,6 +940,7 @@ msgid "Scrambled"
 msgstr "സ്ക്രാംബള്‍ഡ്"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "അതെ"
 
@@ -984,6 +987,7 @@ msgstr "ഭാഷ"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "വിവരണം"
 
@@ -1007,8 +1011,7 @@ msgstr "%u എച്ച്സെഡ്"
 msgid "Bits per sample"
 msgstr "പ്രതി സാമ്പിള്‍ ബിറ്റുകള്‍"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1265,7 +1268,8 @@ msgstr "വിഎല്‍സിക്കു  '%s' എംആര്‍എല്�
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "തലക്കെട്ട്"
@@ -1275,8 +1279,8 @@ msgstr "തലക്കെട്ട്"
 msgid "Artist"
 msgstr "ആര്‍ടിസ്റ്റ്"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "ജെനര്‍"
 
@@ -1293,7 +1297,7 @@ msgstr "ആല്‍ബം"
 msgid "Track number"
 msgstr "ട്രാക്ക് നമ്പര്‍"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "റേറ്റിംഗ്"
 
@@ -1315,7 +1319,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "ഇപ്പോള്‍ പ്രവര്‍ത്തിക്കുന്നത്"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "പ്രസാധകര്‍"
 
@@ -1355,7 +1359,7 @@ msgstr "നാമം കാണിക്കുക"
 msgid "Actors"
 msgstr "അഭിനേതാക്കള്‍"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "ആര്‍ടിസ്റ്റ്"
@@ -1850,6 +1854,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1900,7 +1905,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "വീഡിയോ വീതി"
@@ -1914,7 +1919,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "വീഡിയോ ഉയരം"
@@ -2540,13 +2545,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "സഹജമായ"
 
@@ -4196,6 +4202,7 @@ msgid "Long jump length, in seconds."
 msgstr "ലോംഗ് ജംപ് ലെങ്ത്, സെക്കന്‍ഡുകളില്‍"
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5270,14 +5277,14 @@ msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക�
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6121,6 +6128,38 @@ msgstr "ഘടിപ്പിക്കുക"
 msgid "Attachment input"
 msgstr "അറ്റാച്ച്മെന്റ് ഇന്‍പുട്ട്"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "വീഡിയോ ക്യാപ്ച്ചര്‍"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "വീഡിയോ ക്യാപ്ച്ചര്‍"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "ഇന്‍പുട്ട് ഡിവൈസ് കണ്ടെത്താനായില്ല"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"ഒരു ഉചിതമായ ഇന്‍പുട്ട് ഡിവൈസിനാല്‍ നിങ്ങളുടെ മാക് സജ്ജീകരിക്കപ്പെട്ടതായി കാണുന്നില്ല.  നിങ്ങളുടെ "
+"കണക്ടറുകളും കൂടാതെ ഡ്രൈവറുകളും ദയവായി പരിശോധിയ്ക്കുക."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"ഒരു ഉചിതമായ ഇന്‍പുട്ട് ഡിവൈസിനാല്‍ നിങ്ങളുടെ മാക് സജ്ജീകരിക്കപ്പെട്ടതായി കാണുന്നില്ല.  നിങ്ങളുടെ "
+"കണക്ടറുകളും കൂടാതെ ഡ്രൈവറുകളും ദയവായി പരിശോധിയ്ക്കുക."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "എവിഐഒ"
@@ -6715,7 +6754,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "ആവശ്യമുള്ള ഘടകങ്ങളെ പിടിച്ചടക്കുന്ന ഡിവൈസ് \"%s\" പിന്താങ്ങുന്നില്ല"
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "വിന്‍ഡോ ഡെക്കറേഷന്‍സ്"
@@ -7209,6 +7248,48 @@ msgstr "ഡിജിറ്റല്‍ വീഡിയോ (Firewire/ieee1394) �
 msgid "DV"
 msgstr "ഡിവി"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr ""
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "സാറ്റലൈറ്റ് റേഞ്ച് കോഡ്"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "മാപന നിലവാരം"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "സ്റ്റാറ്റിസ്റ്റിക്സിനു ഉപയോഗിക്കുന്നത്."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "ഡിവി"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr ""
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "ഡിവിഡി ആംഗിള്‍"
@@ -7285,8 +7366,7 @@ msgstr "ഡി‌വി‌ഡിറീഡിന് %d/%d ബ്ലോക്ക�
 msgid "File input"
 msgstr "ഫയല്‍ ഇന്‍പുട്ട്"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7311,9 +7391,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7329,9 +7409,9 @@ msgid ""
 msgstr "ബന്ധത്തിനായി ഉപയോഗിക്കുന്ന ഉപയോക്ത നാമം."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7392,11 +7472,50 @@ msgstr "തന്നിരിക്കുന്ന സെര്‍വറില�
 msgid "Your account was rejected."
 msgstr "താങ്കളുടെ അക്കൗണ്ട് നിരസിച്ചിരിക്കുന്നു."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "എച്ച്ടിടിപി പ്രോക്സി"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"ഉപയോഗിക്കേണ്ട എച്ച്‌ടി‌ടി‌പി പ്രോക്സി അത് ഈ ആകാരത്തില്‍ ആയിരിക്കണം http://[user@]myproxy."
+"mydomain:myport/; ശൂന്യമാണെങ്കില്‍ എച്ച്‌ടി‌ടി‌പി_പ്രോക്സി പരിസ്ഥിതി പരിവര്‍ത്തിതവസ്‌തു "
+"ശ്രമിക്കപ്പെടും."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "എച്ച്ടിടിപി പ്രോക്സ് രഹസ്യവാക്ക്"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "നിങ്ങളുടെ എച്ച്‌ടി‌ടി‌പി പ്രോക്സിക്കു രഹസ്യവാചകം വേണമെങ്കില്‍, അത് ഇവിടെ സജ്ജീകരിക്കുക."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "ഓട്ടോ റീ-കണക്ട്"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"പെട്ടെന്നുള്ള ബന്ധം വിച്ഛേദിക്കപ്പെടുംബോള് സ്ട്രീമിലേക്ക് സ്വയം വീണ്ടും ബന്ധപ്പെടാന്‍ ശ്രമിക്കും."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "എച്ച്ടിടിപി ഇന്‍പുട്ട്"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "എച്ച്‌ടിടിപി(എസ്)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "എച്ച്ടിടിപി ഓതന്റിക്കേഷന്‍"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "വ്യവഹാരമണ്ഡലത്തിന് സാധുവായ പേരും കൂടാതെ ഒരു രഹസ്യവാക്കും ദയവായി രേഖപ്പെടുത്തുക %s."
@@ -7453,49 +7572,10 @@ msgstr ""
 "ദീര്‍ഘച്ഛേദത്താല്‍ വേര്‍തിരിക്കപ്പെടണം, ഉദാ. ഫൂബാര്‍/1.2.3. ഈ ഐഛികം പ്രതി ഇന്‍പുട്ട് ഇനത്താല്‍ "
 "മാത്രം നിര്‍ദ്ദേശിക്കപ്പെട്ടതായിരിക്കണം, സാര്‍വ്വലൗകികമായി അല്ല."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "എച്ച്ടിടിപി പ്രോക്സി"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"ഉപയോഗിക്കേണ്ട എച്ച്‌ടി‌ടി‌പി പ്രോക്സി അത് ഈ ആകാരത്തില്‍ ആയിരിക്കണം http://[user@]myproxy."
-"mydomain:myport/; ശൂന്യമാണെങ്കില്‍ എച്ച്‌ടി‌ടി‌പി_പ്രോക്സി പരിസ്ഥിതി പരിവര്‍ത്തിതവസ്‌തു "
-"ശ്രമിക്കപ്പെടും."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "എച്ച്ടിടിപി പ്രോക്സ് രഹസ്യവാക്ക്"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "നിങ്ങളുടെ എച്ച്‌ടി‌ടി‌പി പ്രോക്സിക്കു രഹസ്യവാചകം വേണമെങ്കില്‍, അത് ഇവിടെ സജ്ജീകരിക്കുക."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "ഓട്ടോ റീ-കണക്ട്"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"പെട്ടെന്നുള്ള ബന്ധം വിച്ഛേദിക്കപ്പെടുംബോള് സ്ട്രീമിലേക്ക് സ്വയം വീണ്ടും ബന്ധപ്പെടാന്‍ ശ്രമിക്കും."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "എച്ച്ടിടിപി ഇന്‍പുട്ട്"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "എച്ച്‌ടിടിപി(എസ്)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "ഡമ്മി"
 
@@ -7529,6 +7609,7 @@ msgid "Set the category of the elementary stream"
 msgstr "എലിമെന്ററി സ്ട്രീമിന്റെ വിഭാഗം സെറ്റ് ചെയ്യുക"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "അറിയാത്ത"
 
@@ -7939,7 +8020,7 @@ msgstr "ആര്‍ടിഎസ്പി ബന്ധം പരാജയപ്�
 msgid "Capture the audio stream in stereo."
 msgstr "സ്റ്റീരിയോയിലെ ഓഡിയോ സ്ട്രീം ക്യാപ്ച്ചര്‍ ചെയ്യുക."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "സാംപിള്‍റേറ്റ്"
@@ -7960,333 +8041,6 @@ msgstr "ഒഎസ്എസ്"
 msgid "OSS input"
 msgstr "ഒഎസ്എസ് ഇന്‍പുട്ട്"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "ഡമ്മി സ്ട്രീം ഔട്ട്പുട്ട്"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "നിലവിലുള്ള ഫയല്‍ നിലനിര്‍ത്തുക"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "ഓവര്‍റൈറ്റ്"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"ഔട്ട്പുട്ട് ഫയല്‍ നേരത്തെ നിലകൊള്ളുന്നു. റിക്കോര്‍ഡിങ് തുടരുകയാണെങ്കില്‍ ഫയല്‍ അസാധുവായി കൂടാതെ "
-"അതിന്റെ ഉള്ളടക്കം നഷ്ട്ടപ്പെടും."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "നിലവിലുള്ള ഫയല്‍ ഓവര്‍റൈറ്റ് ചെയ്യുക"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "ഫയല്‍ നിലവിലുണ്ടെങ്കില്‍, അത് ഓവര്‍റൈറ്റ് ചെയ്യപ്പെടും."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "ഫയലിലേക്ക് ചേര്‍ക്കുക"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "പുനസ്ഥാപിക്കുന്നതിന് പകരം ഫയല്‍ നിലകൊള്ളുന്നുണ്ടെങ്കില്‍ അതിനോടു കൂട്ടിച്ചേര്‍ക്കുക."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "ഫോര്‍മാറ്റ് സമയവും തീയ്യതിയും"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "ഫയല്‍ പാതയില്‍ ഐ‌എസ്‌ഓ സി സമയം അല്ലെങ്കില്‍ തീയതി തിരുത്തല്‍ നടത്തുക"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "സിന്‍ക്രണസ് റൈറ്റിംഗ്"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "ഫയലിനെ സിങ്ക്രണസ് റൈറ്റിംഗോടു കൂടി തുറക്കുക."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "ഫയല്‍ സ്ട്രീം ഔട്ട്പുട്ട്"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "സ്ട്രീം അക്സസ്സ് ചെയ്യാനായി ആവശ്യപ്പെടുന്ന ഉപയോക്ത നാമം."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "സ്ട്രീം അക്സസ്സ് ചെയ്യാനായി ആവശ്യപ്പെടുന്ന രഹസ്യവാക്ക്."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "മൈം"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "സെര്‍വര്‍ തിരികെ നല്കിയ എം‌ഐ‌എം‌ഇ (വ്യക്തമാക്കിയിട്ടിലെങ്കില്‍ സ്വയം കണ്ടുപിടിക്കും)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "മെറ്റാക്യൂബ്"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-"മെറ്റാക്യൂബ് പ്രോട്ടോക്കോള്‍ ഉപയോഗിക്കുക. ക്യൂബ്മാപ് പ്രതിധ്വനിയിലേക്ക് സ്ട്രീം ചെയ്യാന്‍ ആവശ്യമുണ്ട്. "
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "എച്ച്ടിടിപി സ്ട്രീം ഔട്ട്പുട്ട്"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "സെഗ്മെന്റ് നീളം"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "ടിഎസ് സ്ട്രീം സെഗ്മെന്റുകളുടെ നീളം"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "എവിടെയാണെങ്കിലും സെഗ്മെന്റുകള്‍ സ്പ്ലിറ്റ് ചെയ്യുക"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr "ഒരു അംശം ഭിന്നിക്കുന്നതിന് മുമ്പു കീഫ്രെയിം ആവ്ശ്യമില്ല. ഓഡിയോയ്ക്കു മാത്രം ആവശ്യമുള്ളത്."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "സെഗ്മെന്റുകളുടെ എണ്ണം"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "സൂചികയില്‍ ഉള്‍പ്പെടുത്താനുള്ള സെഗ്മെന്റുകളുടെ എണ്ണം"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "കാഷ് അനുവദിക്കുക"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"ഇ‌എക്സ്‌ടി-എക്സ്-അനുവാദ-കാഷ്: ഇത് പ്രവര്‍ത്തനരഹിതമാക്കുകയാണെങ്കില്‍ പ്ലേലിസ്റ്റ്-ഫയലില്‍ വഴികാട്ടുന്ന "
-"ഒന്നുമില്ല"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "ഇന്‍ഡെക്സ് ഫയല്‍"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "നിര്‍മിക്കാനുള്ള സൂചിക ഫയലിലേക്കുള്ള വഴി"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "സൂചിക ഫയലില്‍ ഇടാനുള്ള മുഴുവന്‍ യു‌ആര്‍‌എല്‍ "
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "സൂചിക ഫയലില്‍ ഇടാനുള്ള മുഴുവന്‍ യു‌ആര്‍‌എല്‍.  അംശ സംഖ്യ പ്രതിപാതിക്കാന്‍ #കള്‍ ഉപയോഗിക്കുക"
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "സെഗ്മെന്റുകള്‍ കളയുക"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "ഇനി അവരെ കൂടുതല്‍ ആവശ്യമില്ലെങ്കില്‍ അംശങ്ങള്‍ നീക്കം ചെയ്യുക"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "മക്സറുകളുടെ റേറ്റ് നിയന്ത്രണ മെക്കാനിസം ഉപയോഗിക്കുക"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "യു‌ആര്‍‌ഐയേ പ്ലേലിസ്റ്റില്‍ നിക്ഷേപിക്കാന്‍ എ‌ഇ‌എസ് സൂചിപ്പിക്കുന്നു"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "എഇഎസ് കീ ഫയല്‍"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "16 ബൈറ്റുകളുടെ എന്‍ക്രിപ്ഷന്‍ സൂചിക ഉല്‍കൊള്ളുന്ന ഫയല്‍"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "സൂചിക-യു‌ആര്‍‌ഐ കൂടാതെ സൂചിക ഫയല്‍- സ്ഥാനം എവിടനിന്നാണോ വി‌എല്‍‌സി വായികുന്ന ഫയല്‍"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"ഘടകം തുടങ്ങുമ്പോള്‍ ഫയല്‍ വായിക്കപ്പെടും കൂടാതെ ഈ ആകാരത്തില്‍ ആയിരിക്കുമെന്ന് അനുമാനിക്കുന്നു:  key-"
-"uri\\nകീ-ഫയല്‍. ഘടകം തുറക്കുമ്പോള്‍ ഫയല്‍ വായിക്കപ്പെടും കൂടാതെ മൂല്യങ്ങള്‍ ആ ഘടകത്തില്‍ ഉപയോഗിക്കും."
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "എന്‍ക്രിപ്ഷനുവേണ്ടി ഉപയോഗിയ്ക്കുന്ന ക്രമമല്ലാത്ത ഐ‌വി"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "അംശ സംഖ്യകള്‍ ഐ‌വി ആയി ഉപയോഗിക്കുന്നതിന് പകരം ഐ‌വി ഉണ്ടാക്കുക"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "ആദ്യ സെഗ്മെന്റിന്റെ നമ്പര്‍"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "ആദ്യം ഉണ്ടാക്കപ്പെട്ട അംശത്തിന്‍റെ സംഖ്യ"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "എച്ച്ടിടിപി ലൈവ് സ്ട്രീമിംഗ് ഔട്ട്പുട്ട്"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "ലൈവ്എച്ച്ടിടിപി"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "സ്ട്രീം നാമം"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "ഷൌട്കാസ്റ്റ്/ഐസ്കാസ്റ്റ് സെര്‍വറിലുള്ള ഈ സ്ട്രീം/ചാനലിനുള്ള പേര്. "
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "സ്ട്രീം വിവരണം"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "നിങ്ങളുടെ ചാനലിനേ പറ്റിയുള്ള സ്ട്രീം ഉള്ളടക്കം/ വിവരങ്ങളുടെ വിവരണം."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "സ്ട്രീം എംപി3"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"നിങ്ങള്‍ സാധാരണമായി ഷൌട്കാസ്റ്റ് ഘടകങ്ങളെ ഓ‌ജി‌ജി സ്ട്രീമുകളാല്‍ പോഷിപ്പിക്കണം. പകരം എം‌പി3  "
-"സ്ട്രീം ചെയ്യാനും സാധ്യമാണ്, അതുകാരണം നിങ്ങള്ക്ക് എം‌പി3 സ്ട്രീമുകള്‍ ഷൌട്കാസ്റ്റ്/ ഐസ്കാസ്റ്റ് "
-"സെര്‍വറിലേക്ക് അയക്കാം."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "ജെനര്‍ വിവരണം"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "ഉള്ളടക്കത്തിന്റെ ജെനര്‍"
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "യുആര്‍എല്‍ വിവരണം"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "നിങ്ങളുടെ ചാനലിന്റെയോ അല്ലെങ്കില്‍ സ്ട്രീമിന്റെയോ  വിവരങ്ങള്‍ ഉള്ള യു‌ആര്‍‌എല്‍."
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ബിറ്റ്റേറ്റ് വിവരം."
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ സാംബിള്‍റേറ്റ് വിവരം."
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "ചാനലുകളുടെ എണ്ണം"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ചാനലുകളുടെ എന്നതിന്റെ വിവരം."
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "ഓഗ് വോര്‍ബിസ് ഗുണം"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ഒഗ്ഗ് വോര്‍ബിസ് ഗുണ വിവരം."
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "സ്ട്രീം പബ്ലിക്ക്"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"ഐസ്കാസ്റ്റ്/ ഷൌട്കാസ്റ്റ് വെബ്സൈറ്റിലുള്ള 'മഞ്ഞ പേജുകളില്‍' (സ്ട്രീമുകളുടെ ഡിറക്ടറി പട്ടിക) "
-"സെര്‍വറിനെ പൊതുവായി ലഭ്യമാക്കുക. ഷൌട്ട്കാസ്റ്റിന് നിര്‍ദ്ദേശിക്കപ്പെട്ട ബിറ്റ്നിരക്കിന്‍റെ വിവരം "
-"ആവ്ശ്യമാണ്.  ഐസ്കാസ്റ്റിന് വേണ്ട ഓ‌ജി‌ജി സ്ട്രീമിങ് ആവ്ശ്യമാണ്."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "ഐസ്കാസ്റ്റ് ഔട്ട്പുട്ട്"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "കാഷിംഗ് മൂല്യം(എംഎസ്)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"പുറത്തേക്കുള്ള യു‌ഡി‌പി സ്ട്രീമുകളുടെ സ്വയമേവയുള്ള കഷിങ് മൂല്യം. ഇതിന്റെ മൂല്യം മില്ലിസെക്കന്‍ഡില്‍ "
-"വേണം സജ്ജീകരിക്കാന്‍."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "ഗ്രൂപ്പ് പാക്കറ്റുകള്‍"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"ശരിയായ സമയത്ത് ഓരോന്നോരോന്നായി പാക്കറ്റുകള്‍ അയക്കാം അല്ലെങ്കില്‍ കൂട്ടങ്ങളാല്‍. ഒരു സമയത്ത് "
-"അയക്കപ്പെടാവുന്ന പാക്കറ്റുകളുടെ എണ്ണം നിങ്ങള്‍ക്ക് തിരഞ്ഞെടുക്കാം. അധികമായി ലോഡ് ചെയ്യപ്പെട്ട "
-"സിസ്റ്റങ്ങളുടെ പട്ടികപ്രകാരമുള്ള ലോഡ് കുറക്കാന്‍ ഇത് സഹായിക്കും."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "യുഡിപി സ്ട്രീം ഔട്ട്പുട്ട്"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8302,6 +8056,35 @@ msgstr "പള്‍സ്ഓഡിയോ"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "പള്‍സ്ഓഡിയോ ഇന്‍പുട്ട്"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "സറൗണ്ട്"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "ക്വിക്ക്ടൈം ക്യാപ്ച്ചര്‍"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "ഇന്‍പുട്ട് ഡിവൈസ് കണ്ടെത്താനായില്ല"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"ഒരു ഉചിതമായ ഇന്‍പുട്ട് ഡിവൈസിനാല്‍ നിങ്ങളുടെ മാക് സജ്ജീകരിക്കപ്പെട്ടതായി കാണുന്നില്ല.  നിങ്ങളുടെ "
+"കണക്ടറുകളും കൂടാതെ ഡ്രൈവറുകളും ദയവായി പരിശോധിയ്ക്കുക."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "ഇന്‍പുട്ട് ഡിവൈസ് കണ്ടെത്താനായില്ല"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8734,6 +8517,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "ആര്‍ടിപി"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "എസ്എഫ്ടിപി ഇന്‍പുട്ട്"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "യുഡിപി റിസീവ് ബഫര്‍ സൈസ്(ബൈറ്റുകളില്‍)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "DTS താമസ്സം (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10056,16 +9863,24 @@ msgstr "ഫ്രീക്ക് 3 ക്യു"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "ബാന്‍ഡ്-പരിമിത പ്രക്ഷിപ്ത റിസമ്പ്ളിങിന് വേണ്ടിയുള്ള ഓഡിയോ ഫില്‍റ്റര്‍"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "റീസാംപ്ലിംഗ് ക്വാളിറ്റി"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr "റിസംപ്ളിങ് ഗുണം (0= രൂക്ഷതരം കൂടാതെ വേഗതയേറിയ, 10= നല്ലത് കൂടാതെ വേഗതയില്ലാത്തത്)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "റീസാംപ്ലിംഗ് ക്വാളിറ്റി"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "എസ്ആര്‍സി റീസാംപ്ലര്‍"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "സ്പീക്സ് റീസാംപ്ലര്‍"
 
@@ -11857,6 +11672,16 @@ msgstr "മെഡിയ അടിത്തറ രൂപാന്തര ഡിക
 msgid "MPEG audio decoder using mpg123"
 msgstr "എംപെഗ് ഓഡിയോ ഡീകോഡര്‍"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "വെബ്ബ്എം വീഡിയോ ഡീക്കോഡര്‍"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "തിയോര വീഡിയോ പാക്കറ്റൈസര്‍"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12551,6 +12376,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "G.711 ഡീകോഡര്‍"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "എസ്ഡിഎല്‍ ചിത്ര ഡീക്കോഡര്‍"
@@ -12982,6 +12816,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "ടെലിടെക്സ്റ്റ് ഉപശീര്‍ഷകങ്ങളുടെ ഡീക്കോഡര്‍"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "ടെക്സ്റ്റ് ഉപശീര്‍ഷക ഡീക്കോഡര്‍"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13150,6 +12989,21 @@ msgstr "വെബ്ബ്എം വീഡിയോ ഡീക്കോഡര്�
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "വെബ്ബ്എം വീഡിയോ ഡീക്കോഡര്‍"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "എംഎംഎഎല്‍ ഡീക്കോഡര്‍"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "ഇ‌ബി‌യു എസ്‌ടി‌എല്‍ ഉപശീര്‍ഷകങ്ങളുടെ ഡികോഡറുകള്‍"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "ഇ‌ബി‌യു എസ്‌ടി‌എല്‍ ഉപശീര്‍ഷകങ്ങളുടെ പാര്‍സര്"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14158,7 +14012,8 @@ msgstr "ഡി-ബസ് നിയന്ത്രണ പൊതുപ്രതല
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14530,7 +14385,7 @@ msgstr "ഇനീഷ്യലൈസിംഗ്"
 msgid "Opening"
 msgstr "ഓപ്പണിംഗ്"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "പിശക്"
 
@@ -15025,7 +14880,8 @@ msgstr "ഡീമക്സര്‍"
 msgid "Avformat muxer"
 msgstr "എവിഫോര്‍മാറ്റ് മക്സര്‍"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "മക്സര്‍"
 
@@ -15386,6 +15242,161 @@ msgstr "സറൗണ്ട് നില"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "ചുറ്റുമുള്ള താമസം (എം‌എസ്)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "എഴുത്തുകാരന്‍"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "രചയിതാവ്"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "നിര്‍മ്മാതാവ്"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "വിവരം"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "ഡിസ്ക്ലെയിമര്‍"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "ആവശ്യങ്ങള്‍"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "യഥാര്‍ത്ഥ ഘടന"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "ഉറവിടമായി കാണിക്കുക"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "ആതിധേയ കമ്പ്യൂട്ടര്‍"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "അവതാരകര്‍"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "യഥാര്‍ത്ഥ അവതാരകര്‍"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "സംഭാരക ഉറവിട ഉള്ളടക്കം"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "മുന്നറിയിപ്പ്"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "സോഫ്റ്റ്വെയര്‍"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "വരികള്‍"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "റിക്കോര്‍ഡ് കമ്പനി"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "തരം"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "ഉല്‍പന്നം"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "ഗ്രൂപ്പിംഗ്"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "ഉപ-ശീര്‍ഷകം"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "ക്രമപ്പെടുത്തുന്നവന്‍"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "കലാസംവിധായകന്‍"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "പകര്‍പ്പവകാശ മറുപടി"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "നയിക്കുന്നവന്‍"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "പാട്ടിന്‍റെ വിവരണം"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "ലൈനര്‍ നോട്ടുകള്‍"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "സ്വരചിഹ്ന അധികാരങ്ങള്‍"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "ശബ്‌ദശാസ്‌ത്രജ്ഞന്‍"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "ഏകാന്തഗീതകന്‍"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "നന്ദി"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "നിര്‍വാഹണ നിര്‍മ്മാതാവ്"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "എന്‍കോഡിംഗ് പരാമീറ്ററുകള്‍"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "ചാനല്‍ നമ്പര്‍"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "രഹസ്യവാക്കുകള്‍"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "കാലിയാക്കുക"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15777,6 +15788,10 @@ msgstr "പോഡ്കാസ്റ്റ് വലുപ്പം"
 msgid "%s bytes"
 msgstr "%s  ബൈറ്റുകള്‍"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "മൈം"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "ഷൗട്ട്കാസ്റ്റ്"
@@ -15788,6 +15803,11 @@ msgstr "ലിസണറുകള്‍"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "ലോഡ്"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "സാച്യുറേഷന്‍"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15971,6 +15991,10 @@ msgstr "ഡബ്ല്യുഎവി ഡീമക്സര്‍"
 msgid "XA demuxer"
 msgstr "എക്സ്എ ഡീമക്സര്‍"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "അറിയപ്പെടാത്ത വിഭാഗം"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍"
@@ -15995,10 +16019,6 @@ msgstr "സെമാന്റിക്ക് അനോട്ടേഷനുക�
 msgid "Transcript"
 msgstr "ട്രാന്‍സ്സ്ക്രിപ്റ്റ്"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "വരികള്‍"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "ലിങ്ക്വിസ്റ്റിക്ക് മാര്‍ക്കപ്പ്"
@@ -16018,10 +16038,6 @@ msgstr "സ്ലൈഡുകള്‍ (ടെക്സ്റ്റ്)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "സ്ലൈഡുകള്‍ (ചിത്രങ്ങള്‍)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "അറിയപ്പെടാത്ത വിഭാഗം"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16072,22 +16088,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "പ്ലേലിസ്റ്റ് പാര്‍സറുകള്‍"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "സര്‍വ്വീസ് ഡിസ്കവറി"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "ഇൻറ്റർഫേസ്"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr "ആർറ്റ് & മെറ്റാ ഫെച്ചര്‍"
 
@@ -16095,6 +16115,7 @@ msgstr "ആർറ്റ് & മെറ്റാ ഫെച്ചര്‍"
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "അനുബന്ധങ്ങള്‍"
 
@@ -16136,6 +16157,7 @@ msgstr "അണ്‍ഇന്‍സ്റ്റാള്‍"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "സ്കിന്നുകള്‍"
@@ -16231,10 +16253,10 @@ msgstr "പുതിയ പ്രൊഫൈലിനായി ഒരു പേര
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16397,12 +16419,14 @@ msgid "Playback time"
 msgstr "പ്ലേബാക്ക് റേറ്റ്"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "മുമ്പത്തെ ശീര്‍ഷകം"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "സമയത്തിലേയ്ക്ക് പോകുക"
@@ -16445,9 +16469,10 @@ msgstr "ഔട്ട്പുട്ട് സ്ഥാനം തിരഞ്ഞ�
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17504,26 +17529,6 @@ msgstr "മുഴുവന്‍ ശബ്ദം"
 msgid "Open Audio Effects window"
 msgstr "ഓഡിയോ പ്രഭാവങ്ങള്‍"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "ബി"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "കെബി"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "എംബി"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "ജിബി"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "ടിബി"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "ഓപ്പണ്‍ സോഴ്സ്"
@@ -17624,6 +17629,7 @@ msgid "Enable DVD menus"
 msgstr "ഡിവിഡി മെനുകള്‍ സാധ്യമാക്കുക"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "IP വിലാസം"
 
@@ -17918,58 +17924,6 @@ msgstr "മെറ്റാ സംരക്ഷിക്കപ്പെടുമ�
 msgid "VLC was unable to save the meta data."
 msgstr "മെറ്റാ‍ഡാറ്റ സംരക്ഷിക്കുവാന്‍ VLCയ്ക്ക് കഴിയില്ല."
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "മുന്‍ഗണനകള്‍"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "എല്ലാം റീസെറ്റ് ചെയ്യുക"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "അടിസ്ഥാനം കാണിക്കുക"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "ഡയറക്ടറി തിരഞ്ഞെടുക്കുക"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "ഫയല്‍ തിരഞ്ഞെടുക്കുക"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "തിരഞ്ഞെടുക്കുക"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "പ്ലേബാക്ക് തുടരുക?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "തുടരുക"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "പ്ലേബാക്ക് തുടരുക"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "പ്ലേബാക്ക് പുനരാരംഭിക്കുക"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr " \"%@\" ന്റെ പ്ലേബാക്ക് %@ ല്‍ തുടരും"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -17996,6 +17950,31 @@ msgstr "സേവനങ്ങളുടെ കണ്ടെത്തല്‍"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "സ്ക്രീന്‍സേവര്‍ അസാധ്യമാക്കുക"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "പ്ലേബാക്ക് തുടരുക?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "തുടരുക"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "പ്ലേബാക്ക് തുടരുക"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "പ്ലേബാക്ക് പുനരാരംഭിക്കുക"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr " \"%@\" ന്റെ പ്ലേബാക്ക് %@ ല്‍ തുടരും"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18270,6 +18249,16 @@ msgstr "ഉപസര്‍ഗ്ഗം:"
 msgid "Sequential numbering"
 msgstr "ക്രമാനുഗത അക്കമിടീല്‍"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "എല്ലാം റീസെറ്റ് ചെയ്യുക"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "മുന്‍ഗണനകള്‍"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18366,9 +18355,49 @@ msgstr "ഖേദജനകമായത്, ഈ കീകള്‍ ഹോട്�
 msgid "This combination is already taken by \"%@\"."
 msgstr "ഈ സംയോജനം നേരത്തെ തന്നെ എടുത്തിരിക്കുന്നത്  \"%@\"."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "പ്ലേ/പോസ്"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "റാന്‍ഡം പ്ലേലിസ്റ്റ് പ്ലേബാക്ക് ടോഗിള്‍ ചെയ്യുക"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "പ്രധാന ജാലകം..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "യുആര്‍എല്‍ വിവരണം"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "ഇപ്പോള്‍ പ്രവര്‍ത്തിക്കുന്നത്"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "ഫോള്‍ഡര്‍ തിരഞ്ഞെടുക്കുക"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "ക്ലിപ്ബോര്‍ഡില്‍ നിന്നുള്ള &സ്ഥലം തുറക്കുക"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "സെറ്റ് ചെയ്തില്ല"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "സെക്."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18684,7 +18713,8 @@ msgid "Add text"
 msgstr "ടെക്സ്റ്റ് ചേര്‍ക്കുക"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "ടെക്സ്റ്റ്"
 
@@ -18707,9 +18737,41 @@ msgstr "ട്രാന്‍സ്പരന്‍സി"
 msgid "Organize profiles..."
 msgstr "പ്രൊഫൈലുകള്‍ ഓര്‍ഗനൈസ് ചെയ്യുക..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "സെക്."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "ബി"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "കെബി"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "എംബി"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "ജിബി"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "ടിബി"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "അടിസ്ഥാനം കാണിക്കുക"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "ഡയറക്ടറി തിരഞ്ഞെടുക്കുക"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "ഫയല്‍ തിരഞ്ഞെടുക്കുക"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "തിരഞ്ഞെടുക്കുക"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19072,11 +19134,6 @@ msgstr "പടി മുമ്പോട്ട്"
 msgid "Loop / Repeat"
 msgstr "ലൂപ്പ്/ ആവര്‍ത്തിക്കുക"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "വിവരം"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "ഉപശീര്‍ഷകങ്ങള്‍ തുറക്കുക"
@@ -19187,6 +19244,11 @@ msgstr "Aയെ B ലൂപ്പിലേയ്ക്ക് തടയുക"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "ആസ്പെക്ട് റേഷ്യോ"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+#, fuzzy
+msgid "No EPG Data Available"
+msgstr "സഹായം ലഭ്യമല്ല"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19343,11 +19405,6 @@ msgstr "(വൈകിപ്പിച്ചിരിക്കുന്നു)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "ഈ ഡയലോഗുകളുടെ മൂല്യങ്ങളുടെ നിര്‍ബന്ധിത കാലികമാക്കല്‍"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
-msgid "No EPG Data Available"
-msgstr "സഹായം ലഭ്യമല്ല"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20006,6 +20063,11 @@ msgstr ""
 msgid "Base port"
 msgstr "അടിസ്ഥാന പോര്‍ട്ട്"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "സ്ട്രീം നാമം"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "ട്രാന്‍സ്കോഡ് ചെയ്ത സ്ട്രീമിനെ ഒരു ഐസ്കാസ്റ്റ് സെര്‍വറിലേയ്ക്ക് ഈ മോഡ്യൂള്‍ ഔട്ട്പുട്ട് ചെയ്യുന്നു."
@@ -20038,9 +20100,10 @@ msgstr "എല്ലാ ബുക്ക്മാര്‍ക്കുകളു�
 msgid "Extract"
 msgstr "എക്സ്ട്രാക്ട്"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20094,6 +20157,19 @@ msgstr "തുടക്കം(_S)"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "കണ്ടയ്നറുകള്‍"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "പ്രോഗ്രാം ഗൈഡ്"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "പുതുക്കുക"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20518,50 +20594,6 @@ msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
 "നിങ്ങളുടെ VLC മീഡിയാ പ്ലേയറിന്റെ മുന്‍ഗണനകള്‍ പുനഃസജ്ജമാക്കുക എന്നുള്ളത് നിങ്ങള്‍ക്ക് തീര്‍ച്ചയാണോ?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "ഡയറക്ടറി തുറക്കുക"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "ഫോള്‍ഡര്‍ തുറക്കുക"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "പ്ലേലിസ്റ്റ് തുറക്കുക..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "എക്സ്എസ്പിഎഫ് പ്ലേലിസ്റ്റ്"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "M3U പ്ലേലിസ്റ്റ്"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "M3U8 പ്ലേലിസ്റ്റ്"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "പ്ലേലിസ്റ്റ് സംരക്ഷിക്കപ്പെടേണ്ടത്..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "ഉപശീര്‍ഷകങ്ങള്‍ തുറക്കുക..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "മീഡിയ ഫയലുകള്‍"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "ഉപശീര്‍ഷക ഫയലുകള്‍"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "എല്ലാ ഫയലുകളും"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "സ്ട്രീം ഔട്ട്പുട്ട്"
@@ -20784,6 +20816,61 @@ msgstr "ഷെഡ്യുള്‍:"
 msgid "VOD: "
 msgstr "വിഒഡി: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "ഡയറക്ടറി തുറക്കുക"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "ഫോള്‍ഡര്‍ തുറക്കുക"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "പ്ലേലിസ്റ്റ് തുറക്കുക..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "എക്സ്എസ്പിഎഫ് പ്ലേലിസ്റ്റ്"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "M3U പ്ലേലിസ്റ്റ്"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "M3U8 പ്ലേലിസ്റ്റ്"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "പ്ലേലിസ്റ്റ് സംരക്ഷിക്കപ്പെടേണ്ടത്..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "ഉപശീര്‍ഷകങ്ങള്‍ തുറക്കുക..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "മീഡിയ ഫയലുകള്‍"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "ഉപശീര്‍ഷക ഫയലുകള്‍"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "എല്ലാ ഫയലുകളും"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr ""
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "സജീവമാക്കുക"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "പ്ലേബാക്ക് നിര്‍ത്തിയ ഇടത്ത് നിന്ന് പുനരാരംഭിക്കാന്‍ നിങ്ങള്‍ ആഗ്രഹിക്കുന്നുവോ?"
@@ -20888,10 +20975,6 @@ msgstr "&പ്രഭാവങ്ങളും അരിപ്പകളും"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "&ട്രാക്ക് സമന്വയം"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "പ്രോഗ്രാം ഗൈഡ്"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21381,6 +21464,12 @@ msgstr "വാര്‍ണിംഗുകള്‍"
 msgid "debug"
 msgstr "ഡീബഗ്ഗ്"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "കാലിയാക്കുക"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "ഒരു സ്കിന്‍ ഫയല്‍ തുറക്കുക"
@@ -21483,6 +21572,80 @@ msgstr "സ്കിന്‍ തിരഞ്ഞെടുക്കുക"
 msgid "Open skin..."
 msgstr "സ്കിന്‍ തുറക്കുക ..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "ബ്രൈറ്റ്നെസ്സ് ത്രെഷ്ഹോള്‍ഡ്"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"ഈ മോഡ് സജ്ജമായിരിക്കുമ്പോള്‍, പിക്സല്‍ കറുപ്പ് അല്ലെങ്കില്‍ വെളുത്തതായി കാണിക്കപ്പെടുന്നു. താഴെ "
+"തെളിച്ചത്തില്‍ പറഞ്ഞിരിക്കുന്നതാണ് ത്രഷോള്‍ഡ് മൂല്യം."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "ഇമേജ് കോണ്ട്രാസ്റ്റ് (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "ചിത്ര പ്രകാശവ്യതിയാനം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "ഇമേജ് ഹ്യൂ (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "ചിത്ര വര്‍ണ്ണവ്യത്യാസം 0 നും 360നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 0."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "ചിത്ര പൂരിതാവസ്ഥ (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "ചിത്ര പൂരിതാവസ്ഥ 0 നും 3 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "ഇമേജ് ബ്രെറ്റ്നെസ്സ് (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "ചിത്ര തെളിച്ചം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "ഇമേജ് ഗാമ (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "ചിത്ര ഗാമ 0.01 നും 10 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "ഡിറക്റ്റ്എക്സ്വീഡിയോ ത്വരിതപ്പെടുത്തല്‍ (ഡി‌എക്സ്‌വി‌എ) 2.0 "
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "VDPAU വീഡിയോ അരിപ്പയെ ക്രമീകരിക്കുന്നു"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr "ഹോസ്റ്റ് മെമ്മറിക്കു പകരം ഫ്രയിംസിനെ RPI വീഡിയോകോറിലേയ്ക്ക് നേരിട്ട് ഡീകോഡ് ചെയ്യുക"
@@ -21546,6 +21709,16 @@ msgstr "എംഎംഎഎല്‍ വൗട്ട്"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "Raspberry Piയ്ക്കുള്ള MMAL-അധിഷ്ഠിതമായ vout പ്ലഗ്ഗിന്‍"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "വീഡിയോ ഫില്‍റ്റര്‍"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "വീഡിയോ സ്കെയിലിംഗ് ഫില്‍റ്റര്‍"
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "VDPAU വീഡിയോ അരിപ്പയെ ക്രമീകരിക്കുന്നു"
@@ -21606,15 +21779,22 @@ msgstr "വിഡിപിഎയു ഔട്ട്പുട്ട്"
 msgid "VDPAU sharpen video filter"
 msgstr "VDPAU കൃത്യതയുള്ള വീഡിയോ അരിപ്പ"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "വീഡിയോ ഫില്‍റ്റര്‍"
+msgid "file keystore (plaintext)"
+msgstr "പ്രിഫെര്‍ഡ് പാക്കറ്റെസര്‍ ലിസ്റ്റ്"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "വീഡിയോ സ്കെയിലിംഗ് ഫില്‍റ്റര്‍"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21685,6 +21865,183 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "OS X കൂടാതെ iOS എന്നിവയ്ക്കുള്ള TLS പിന്തുണ"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+msgid "Secrets are stored via KWallet"
+msgstr ""
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "തിരഞ്ഞെടുത്തത് നീക്കം ചെയ്യുക"
+
+#: modules/keystore/memory.c:42
+msgid "secrets are stored in memory"
+msgstr ""
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+msgid "Secrets are stored via libsecret"
+msgstr ""
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "ലോഗോ ചേര്‍ക്കുക"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "നിശബ്ദമായിരിക്കുക"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "എല്ലാ വിഎല്‍സി സന്ദേശങ്ങളും ടെക്സ്റ്റ് ഫയലിലേക്ക് ലോഗ് ചെയ്യുക."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "കണ്‍സോള്‍"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "കണ്‍സോള്‍"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "കൂടുതല്‍വിവരം"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "ഡീബഗ്ഗ്"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "ഫയലിലേക്ക് ലോഗ് ചെയ്യുക"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "എല്ലാ വിഎല്‍സി സന്ദേശങ്ങളും ടെക്സ്റ്റ് ഫയലിലേക്ക് ലോഗ് ചെയ്യുക."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "ലോഗ് ഫയല്‍ നാമം"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "ലോഗ് ഫയല്‍ നാമം വ്യക്തമാക്കുക."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "ലോഗ് ഫോര്‍മാറ്റ്"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "ലോഗ്ഗിങ്ങ് രൂപഘടന വ്യക്തമാക്കുക."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "വെര്‍ബോസിറ്റി:(_V)"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"ലോഗ് ചെയ്യുന്നതിന് വെര്‍ബോസിറ്റി തിരഞ്ഞെടുക്കുക അല്ലെങ്കില്‍ --വെര്‍ബോസ് നല്കിയ  അതേ വെര്‍ബോസിറ്റി "
+"ഉപയോഗിക്കുന്നതിന് -1 നല്‍കുക."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "ലോഗ്ഗിങ്ങ്"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "ഫയല്‍ ലോഗ്ഗിങ്ങ്"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "ഡീബഗ്ഗ് മാസ്ക്"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "ശേഷി"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "സിസ്ലോഗ് സൗകര്യം"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "സിസ്ലോഗിലേക്ക് ലോഗ് ചെയ്യുക"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22380,6 +22737,36 @@ msgstr "ജ്പോപ്"
 msgid "Synthpop"
 msgstr "സിന്ത്പോപ്"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "കൂടിയ ലോക്കല്‍ ബിറ്റ്റേറ്റ്"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "വീഡിയോ ട്രാന്‍സ്ഫര്‍മേഷന്‍ ഫില്‍റ്റര്‍"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "നിങ്ങളുടെ last.fm അക്കൌണ്ടിന്റെ ഉപയോക്തനാമം "
@@ -22429,6 +22816,15 @@ msgstr ""
 "ദയവായി ഒരു ഉപയോക്തനാമം അല്ലെങ്കില്‍ ഓഡിയോസ്ക്രോബ്ലര്‍ പ്ലഗ്ഗിന്‍ അപ്രാപ്തമാക്കുക, കൂടാതെ VLC "
 "പുനരാരംഭിക്കുക.\n"
 "ഒരു അക്കൌണ്ട് ലഭിക്കുന്നതിന് http://www.last.fm/join/ സന്ദര്‍ശിക്കുക."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "അക്കൗസ്റ്റിക്ക്"
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22763,10 +23159,6 @@ msgstr "വിഷയം"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "എന്‍കോഡര്‍"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "രഹസ്യവാക്കുകള്‍"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23231,6 +23623,18 @@ msgstr "ചിത്രം"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "എന്റെ ചിത്രങ്ങള്‍"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "ബോന്‍ജോര്‍ സേവനങ്ങള്‍"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "ബോന്‍ജോര്‍ സേവനങ്ങള്‍"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24396,6 +24800,63 @@ msgstr "ബ്രിഡ്ജ് പുറത്ത്"
 msgid "Bridge in"
 msgstr "ബ്രിഡ്ജ് അകത്ത്"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "എസ്എഫ്ടിപി പോര്‍ട്ട്"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "ട്രാന്‍സ്കോഡ് ചെയ്ത സ്ട്രീമിനെ ഒരു ഐസ്കാസ്റ്റ് സെര്‍വറിലേയ്ക്ക് ഈ മോഡ്യൂള്‍ ഔട്ട്പുട്ട് ചെയ്യുന്നു."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "സ്ട്രീം ചെയ്യുന്നതിന് കമ്പ്യൂട്ടറിന്റെ വിലാസം."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "ക്രോമ ഫോര്‍മാറ്റ്"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "ക്രോമ"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "ശേഖരണ സ്ട്രീം ഔട്ട്പുട്ട്"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "എവിഫോര്‍മാറ്റ് ഡീമക്സര്‍"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24452,6 +24913,10 @@ msgstr "സ്ട്രീമിന്റെ പ്രദര്‍ശനത്�
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "പ്രദര്‍ശന സ്ട്രീം ഔട്ട്പുട്ട്"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "ഡമ്മി സ്ട്രീം ഔട്ട്പുട്ട്"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24747,6 +25212,10 @@ msgstr ""
 "ഇത് അയയ്ക്കുകയും സ്വീകരിക്കുകയും ചെയ്യുന്ന RTCP പാക്കറ്റ് മള്‍ട്ടിപ്ലക്സ് ചെയ്യപ്പെട്ടിരിക്കുന്നത് RTP "
 "പാക്കറ്റുകള്‍ ഉള്ള അതേ പോര്‍ട്ടില്‍ തന്നെയാണ്."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "കാഷിംഗ് മൂല്യം(എംഎസ്)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24795,6 +25264,15 @@ msgstr ""
 "RTSP സെഷനുകള്‍ ഇത്രയും നേരം യാതൊരു RTSP അഭ്യര്‍ത്ഥനകളും സ്വീകരിച്ചില്ലെങ്കില്‍ അടയ്ക്കപ്പെടും. ഒരു "
 "നെഗറ്റീവ് മൂല്യമോ പൂജ്യമോ ക്രമീകരിക്കുന്നത് ടൈംഔട്ടുകളെ അപ്രാപ്തമാക്കുന്നു. സ്ഥിരസ്ഥിതി എന്നത് "
 "60(ഒരു മിനിട്ട്)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "സ്ട്രീം അക്സസ്സ് ചെയ്യാനായി ആവശ്യപ്പെടുന്ന ഉപയോക്ത നാമം."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "സ്ട്രീം അക്സസ്സ് ചെയ്യാനായി ആവശ്യപ്പെടുന്ന രഹസ്യവാക്ക്."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25461,58 +25939,6 @@ msgstr "എസ്ഡബ്ല്യുസ്കെയില്‍"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "വൈയുവിപി കണ്‍വേര്‍ട്ടര്‍"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "ബ്രൈറ്റ്നെസ്സ് ത്രെഷ്ഹോള്‍ഡ്"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"ഈ മോഡ് സജ്ജമായിരിക്കുമ്പോള്‍, പിക്സല്‍ കറുപ്പ് അല്ലെങ്കില്‍ വെളുത്തതായി കാണിക്കപ്പെടുന്നു. താഴെ "
-"തെളിച്ചത്തില്‍ പറഞ്ഞിരിക്കുന്നതാണ് ത്രഷോള്‍ഡ് മൂല്യം."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "ഇമേജ് കോണ്ട്രാസ്റ്റ് (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "ചിത്ര പ്രകാശവ്യതിയാനം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "ഇമേജ് ഹ്യൂ (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "ചിത്ര വര്‍ണ്ണവ്യത്യാസം 0 നും 360നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 0."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "ചിത്ര പൂരിതാവസ്ഥ (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "ചിത്ര പൂരിതാവസ്ഥ 0 നും 3 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "ഇമേജ് ബ്രെറ്റ്നെസ്സ് (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "ചിത്ര തെളിച്ചം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "ഇമേജ് ഗാമ (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "ചിത്ര ഗാമ 0.01 നും 10 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27195,6 +27621,15 @@ msgstr "ഓപ്പണ്‍ജിഎല്‍ വീഡിയോ ഔട്ട�
 msgid "Windows GDI video output"
 msgstr "വിന്‍ഡോസ് ജിഡിഐ വീഡിയോ ഔട്ട്പുട്ട്"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "ജിപിയു അഫിനിറ്റി"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "ഓപ്പണ്‍ജിഎല്‍നായുള്ള ഇജിഎല്‍ എക്സ്റ്റന്‍ഷന്‍ "
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "ഡമ്മി ചിത്ര ക്രോമ ഘടന"
@@ -27681,6 +28116,26 @@ msgstr "വാള്‍ വീഡിയോ ഫില്‍റ്റര്‍"
 msgid "Image wall"
 msgstr "ചിത്ര ചുമര്‍"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "വീഡിയോ വിന്‍ഡോയുടെ വീതി പിക്സലില്‌‍."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "വീഡിയോ വിന്‍ഡോയുടെ ഉയരം പിക്സലില്‍"
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "സ്പെക്ട്രം"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "നിലവിലെ ദൃശ്യാവിഷ്കരണം"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "ഗൂം ഡിസ്പ്ലേ വീതി"
@@ -28141,10 +28596,6 @@ msgstr "നിങ്ങള്‍ സ്ട്രീം സൃഷ്ടിക്�
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "ഡയലോഗ്"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "പുതുക്കുക"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29006,6 +29457,268 @@ msgid "Media Manager List"
 msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "റീസാംപ്ലിംഗ് ക്വാളിറ്റി"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "മാപന നിലവാരം"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "റെണ്ടറിംഗ് ക്വാളിറ്റി"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "റിസംപ്ളിങ് ഗുണം (0= രൂക്ഷതരം കൂടാതെ വേഗതയേറിയ, 10= നല്ലത് കൂടാതെ വേഗതയില്ലാത്തത്)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "തുടക്ക തീയതി"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "ട്യൂണര്‍ രാജ്യ കോഡ്"
+
+#~ msgid "Keep existing file"
+#~ msgstr "നിലവിലുള്ള ഫയല്‍ നിലനിര്‍ത്തുക"
+
+#~ msgid "Overwrite"
+#~ msgstr "ഓവര്‍റൈറ്റ്"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "ഔട്ട്പുട്ട് ഫയല്‍ നേരത്തെ നിലകൊള്ളുന്നു. റിക്കോര്‍ഡിങ് തുടരുകയാണെങ്കില്‍ ഫയല്‍ അസാധുവായി കൂടാതെ "
+#~ "അതിന്റെ ഉള്ളടക്കം നഷ്ട്ടപ്പെടും."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "നിലവിലുള്ള ഫയല്‍ ഓവര്‍റൈറ്റ് ചെയ്യുക"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "ഫയല്‍ നിലവിലുണ്ടെങ്കില്‍, അത് ഓവര്‍റൈറ്റ് ചെയ്യപ്പെടും."
+
+#~ msgid "Append to file"
+#~ msgstr "ഫയലിലേക്ക് ചേര്‍ക്കുക"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "പുനസ്ഥാപിക്കുന്നതിന് പകരം ഫയല്‍ നിലകൊള്ളുന്നുണ്ടെങ്കില്‍ അതിനോടു കൂട്ടിച്ചേര്‍ക്കുക."
+
+#~ msgid "Format time and date"
+#~ msgstr "ഫോര്‍മാറ്റ് സമയവും തീയ്യതിയും"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "ഫയല്‍ പാതയില്‍ ഐ‌എസ്‌ഓ സി സമയം അല്ലെങ്കില്‍ തീയതി തിരുത്തല്‍ നടത്തുക"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "സിന്‍ക്രണസ് റൈറ്റിംഗ്"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "ഫയലിനെ സിങ്ക്രണസ് റൈറ്റിംഗോടു കൂടി തുറക്കുക."
+
+#~ msgid "File stream output"
+#~ msgstr "ഫയല്‍ സ്ട്രീം ഔട്ട്പുട്ട്"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "സെര്‍വര്‍ തിരികെ നല്കിയ എം‌ഐ‌എം‌ഇ (വ്യക്തമാക്കിയിട്ടിലെങ്കില്‍ സ്വയം കണ്ടുപിടിക്കും)."
+
+#~ msgid "Metacube"
+#~ msgstr "മെറ്റാക്യൂബ്"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr ""
+#~ "മെറ്റാക്യൂബ് പ്രോട്ടോക്കോള്‍ ഉപയോഗിക്കുക. ക്യൂബ്മാപ് പ്രതിധ്വനിയിലേക്ക് സ്ട്രീം ചെയ്യാന്‍ "
+#~ "ആവശ്യമുണ്ട്. "
+
+#~ msgid "HTTP stream output"
+#~ msgstr "എച്ച്ടിടിപി സ്ട്രീം ഔട്ട്പുട്ട്"
+
+#~ msgid "Segment length"
+#~ msgstr "സെഗ്മെന്റ് നീളം"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "ടിഎസ് സ്ട്രീം സെഗ്മെന്റുകളുടെ നീളം"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "എവിടെയാണെങ്കിലും സെഗ്മെന്റുകള്‍ സ്പ്ലിറ്റ് ചെയ്യുക"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "ഒരു അംശം ഭിന്നിക്കുന്നതിന് മുമ്പു കീഫ്രെയിം ആവ്ശ്യമില്ല. ഓഡിയോയ്ക്കു മാത്രം ആവശ്യമുള്ളത്."
+
+#~ msgid "Number of segments"
+#~ msgstr "സെഗ്മെന്റുകളുടെ എണ്ണം"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "സൂചികയില്‍ ഉള്‍പ്പെടുത്താനുള്ള സെഗ്മെന്റുകളുടെ എണ്ണം"
+
+#~ msgid "Allow cache"
+#~ msgstr "കാഷ് അനുവദിക്കുക"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "ഇ‌എക്സ്‌ടി-എക്സ്-അനുവാദ-കാഷ്: ഇത് പ്രവര്‍ത്തനരഹിതമാക്കുകയാണെങ്കില്‍ പ്ലേലിസ്റ്റ്-ഫയലില്‍ "
+#~ "വഴികാട്ടുന്ന ഒന്നുമില്ല"
+
+#~ msgid "Index file"
+#~ msgstr "ഇന്‍ഡെക്സ് ഫയല്‍"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "നിര്‍മിക്കാനുള്ള സൂചിക ഫയലിലേക്കുള്ള വഴി"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "സൂചിക ഫയലില്‍ ഇടാനുള്ള മുഴുവന്‍ യു‌ആര്‍‌എല്‍ "
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr "സൂചിക ഫയലില്‍ ഇടാനുള്ള മുഴുവന്‍ യു‌ആര്‍‌എല്‍.  അംശ സംഖ്യ പ്രതിപാതിക്കാന്‍ #കള്‍ ഉപയോഗിക്കുക"
+
+#~ msgid "Delete segments"
+#~ msgstr "സെഗ്മെന്റുകള്‍ കളയുക"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "ഇനി അവരെ കൂടുതല്‍ ആവശ്യമില്ലെങ്കില്‍ അംശങ്ങള്‍ നീക്കം ചെയ്യുക"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "മക്സറുകളുടെ റേറ്റ് നിയന്ത്രണ മെക്കാനിസം ഉപയോഗിക്കുക"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "യു‌ആര്‍‌ഐയേ പ്ലേലിസ്റ്റില്‍ നിക്ഷേപിക്കാന്‍ എ‌ഇ‌എസ് സൂചിപ്പിക്കുന്നു"
+
+#~ msgid "AES key file"
+#~ msgstr "എഇഎസ് കീ ഫയല്‍"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "16 ബൈറ്റുകളുടെ എന്‍ക്രിപ്ഷന്‍ സൂചിക ഉല്‍കൊള്ളുന്ന ഫയല്‍"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "സൂചിക-യു‌ആര്‍‌ഐ കൂടാതെ സൂചിക ഫയല്‍- സ്ഥാനം എവിടനിന്നാണോ വി‌എല്‍‌സി വായികുന്ന ഫയല്‍"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "ഘടകം തുടങ്ങുമ്പോള്‍ ഫയല്‍ വായിക്കപ്പെടും കൂടാതെ ഈ ആകാരത്തില്‍ ആയിരിക്കുമെന്ന് അനുമാനിക്കുന്നു:  "
+#~ "key-uri\\nകീ-ഫയല്‍. ഘടകം തുറക്കുമ്പോള്‍ ഫയല്‍ വായിക്കപ്പെടും കൂടാതെ മൂല്യങ്ങള്‍ ആ ഘടകത്തില്‍ "
+#~ "ഉപയോഗിക്കും."
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "എന്‍ക്രിപ്ഷനുവേണ്ടി ഉപയോഗിയ്ക്കുന്ന ക്രമമല്ലാത്ത ഐ‌വി"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "അംശ സംഖ്യകള്‍ ഐ‌വി ആയി ഉപയോഗിക്കുന്നതിന് പകരം ഐ‌വി ഉണ്ടാക്കുക"
+
+#~ msgid "Number of first segment"
+#~ msgstr "ആദ്യ സെഗ്മെന്റിന്റെ നമ്പര്‍"
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "ആദ്യം ഉണ്ടാക്കപ്പെട്ട അംശത്തിന്‍റെ സംഖ്യ"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "എച്ച്ടിടിപി ലൈവ് സ്ട്രീമിംഗ് ഔട്ട്പുട്ട്"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "ലൈവ്എച്ച്ടിടിപി"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr "ഷൌട്കാസ്റ്റ്/ഐസ്കാസ്റ്റ് സെര്‍വറിലുള്ള ഈ സ്ട്രീം/ചാനലിനുള്ള പേര്. "
+
+#~ msgid "Stream description"
+#~ msgstr "സ്ട്രീം വിവരണം"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "നിങ്ങളുടെ ചാനലിനേ പറ്റിയുള്ള സ്ട്രീം ഉള്ളടക്കം/ വിവരങ്ങളുടെ വിവരണം."
+
+#~ msgid "Stream MP3"
+#~ msgstr "സ്ട്രീം എംപി3"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "നിങ്ങള്‍ സാധാരണമായി ഷൌട്കാസ്റ്റ് ഘടകങ്ങളെ ഓ‌ജി‌ജി സ്ട്രീമുകളാല്‍ പോഷിപ്പിക്കണം. പകരം "
+#~ "എം‌പി3  സ്ട്രീം ചെയ്യാനും സാധ്യമാണ്, അതുകാരണം നിങ്ങള്ക്ക് എം‌പി3 സ്ട്രീമുകള്‍ ഷൌട്കാസ്റ്റ്/ "
+#~ "ഐസ്കാസ്റ്റ് സെര്‍വറിലേക്ക് അയക്കാം."
+
+#~ msgid "Genre description"
+#~ msgstr "ജെനര്‍ വിവരണം"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "ഉള്ളടക്കത്തിന്റെ ജെനര്‍"
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "നിങ്ങളുടെ ചാനലിന്റെയോ അല്ലെങ്കില്‍ സ്ട്രീമിന്റെയോ  വിവരങ്ങള്‍ ഉള്ള യു‌ആര്‍‌എല്‍."
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ബിറ്റ്റേറ്റ് വിവരം."
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ സാംബിള്‍റേറ്റ് വിവരം."
+
+#~ msgid "Number of channels"
+#~ msgstr "ചാനലുകളുടെ എണ്ണം"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ചാനലുകളുടെ എന്നതിന്റെ വിവരം."
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "ഓഗ് വോര്‍ബിസ് ഗുണം"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "ട്രാന്‍സ്കോഡ് ചെയ്യപ്പെട്ട സ്ട്രീമുകളുടെ ഒഗ്ഗ് വോര്‍ബിസ് ഗുണ വിവരം."
+
+#~ msgid "Stream public"
+#~ msgstr "സ്ട്രീം പബ്ലിക്ക്"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "ഐസ്കാസ്റ്റ്/ ഷൌട്കാസ്റ്റ് വെബ്സൈറ്റിലുള്ള 'മഞ്ഞ പേജുകളില്‍' (സ്ട്രീമുകളുടെ ഡിറക്ടറി പട്ടിക) "
+#~ "സെര്‍വറിനെ പൊതുവായി ലഭ്യമാക്കുക. ഷൌട്ട്കാസ്റ്റിന് നിര്‍ദ്ദേശിക്കപ്പെട്ട ബിറ്റ്നിരക്കിന്‍റെ "
+#~ "വിവരം ആവ്ശ്യമാണ്.  ഐസ്കാസ്റ്റിന് വേണ്ട ഓ‌ജി‌ജി സ്ട്രീമിങ് ആവ്ശ്യമാണ്."
+
+#~ msgid "IceCAST output"
+#~ msgstr "ഐസ്കാസ്റ്റ് ഔട്ട്പുട്ട്"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "പുറത്തേക്കുള്ള യു‌ഡി‌പി സ്ട്രീമുകളുടെ സ്വയമേവയുള്ള കഷിങ് മൂല്യം. ഇതിന്റെ മൂല്യം മില്ലിസെക്കന്‍ഡില്‍ "
+#~ "വേണം സജ്ജീകരിക്കാന്‍."
+
+#~ msgid "Group packets"
+#~ msgstr "ഗ്രൂപ്പ് പാക്കറ്റുകള്‍"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "ശരിയായ സമയത്ത് ഓരോന്നോരോന്നായി പാക്കറ്റുകള്‍ അയക്കാം അല്ലെങ്കില്‍ കൂട്ടങ്ങളാല്‍. ഒരു സമയത്ത് "
+#~ "അയക്കപ്പെടാവുന്ന പാക്കറ്റുകളുടെ എണ്ണം നിങ്ങള്‍ക്ക് തിരഞ്ഞെടുക്കാം. അധികമായി ലോഡ് ചെയ്യപ്പെട്ട "
+#~ "സിസ്റ്റങ്ങളുടെ പട്ടികപ്രകാരമുള്ള ലോഡ് കുറക്കാന്‍ ഇത് സഹായിക്കും."
+
+#~ msgid "UDP stream output"
+#~ msgstr "യുഡിപി സ്ട്രീം ഔട്ട്പുട്ട്"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "നിര്‍ജ്ജീവമാക്കുക"
 
@@ -29021,9 +29734,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #~ msgid "Navigation"
 #~ msgstr "നാവിഗേഷന്‍"
-
-#~ msgid "Be quiet"
-#~ msgstr "നിശബ്ദമായിരിക്കുക"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "എല്ലാ മുന്നറിയിപ്പ് വിവര സന്ദേശങ്ങള്‍ ടേണ്‍ ഓഫ് ചെയ്യുക"
@@ -29054,15 +29764,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgstr ""
 #~ "ടി‌എല്‍‌എസ് സെഷനില്‍ അസാധുവായ സര്‍ട്ടിഫിക്കറ്റുകള്‍ ഉപയോഗിക്കുന്നതില്‍ നിന്നും വിദൂര ക്ളൈന്‍റിനെ "
 #~ "തടുക്കാനുള്ള ഒരു ഐച്ഛിക സി‌ആര്‍‌എല്‍ ഈ ഫയലില്‍ ഉള്‍പ്പെടുന്നു."
-
-#~ msgid "Log to file"
-#~ msgstr "ഫയലിലേക്ക് ലോഗ് ചെയ്യുക"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "എല്ലാ വിഎല്‍സി സന്ദേശങ്ങളും ടെക്സ്റ്റ് ഫയലിലേക്ക് ലോഗ് ചെയ്യുക."
-
-#~ msgid "Log to syslog"
-#~ msgstr "സിസ്ലോഗിലേക്ക് ലോഗ് ചെയ്യുക"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "എല്ലാ വിഎല്‍സി സന്ദേശങ്ങളും സിസ്ലോഗിലേക്ക് ലോഗ് ചെയ്യുക(യൂണിക്സ് സിസ്റ്റങ്ങള്‍)."
@@ -29108,9 +29809,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #~ msgid "Configure"
 #~ msgstr "കോണ്‍ഫിഗര്‍"
-
-#~ msgid "Channel number"
-#~ msgstr "ചാനല്‍ നമ്പര്‍"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29203,19 +29901,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #~ msgid "Video Capture height"
 #~ msgstr "വീഡിയോ ക്യാപ്ച്ചര്‍ ഉയരം"
-
-#~ msgid "Quicktime Capture"
-#~ msgstr "ക്വിക്ക്ടൈം ക്യാപ്ച്ചര്‍"
-
-#~ msgid "No Input device found"
-#~ msgstr "ഇന്‍പുട്ട് ഡിവൈസ് കണ്ടെത്താനായില്ല"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "ഒരു ഉചിതമായ ഇന്‍പുട്ട് ഡിവൈസിനാല്‍ നിങ്ങളുടെ മാക് സജ്ജീകരിക്കപ്പെട്ടതായി കാണുന്നില്ല.  "
-#~ "നിങ്ങളുടെ കണക്ടറുകളും കൂടാതെ ഡ്രൈവറുകളും ദയവായി പരിശോധിയ്ക്കുക."
 
 #~ msgid "RDP auth username"
 #~ msgstr "ആര്‍ഡിപി ഓത് ഉപയോക്തനാമം"
@@ -29457,90 +30142,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "ഡി‌ആര്‍‌എം പരിരക്ഷിക്കപ്പെട്ട സ്ട്രീമുകള്‍ പിന്താങ്ങുന്നില്ല."
-
-#~ msgid "Writer"
-#~ msgstr "എഴുത്തുകാരന്‍"
-
-#~ msgid "Composer"
-#~ msgstr "രചയിതാവ്"
-
-#~ msgid "Producer"
-#~ msgstr "നിര്‍മ്മാതാവ്"
-
-#~ msgid "Disclaimer"
-#~ msgstr "ഡിസ്ക്ലെയിമര്‍"
-
-#~ msgid "Requirements"
-#~ msgstr "ആവശ്യങ്ങള്‍"
-
-#~ msgid "Original Format"
-#~ msgstr "യഥാര്‍ത്ഥ ഘടന"
-
-#~ msgid "Display Source As"
-#~ msgstr "ഉറവിടമായി കാണിക്കുക"
-
-#~ msgid "Host Computer"
-#~ msgstr "ആതിധേയ കമ്പ്യൂട്ടര്‍"
-
-#~ msgid "Performers"
-#~ msgstr "അവതാരകര്‍"
-
-#~ msgid "Original Performer"
-#~ msgstr "യഥാര്‍ത്ഥ അവതാരകര്‍"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "സംഭാരക ഉറവിട ഉള്ളടക്കം"
-
-#~ msgid "Warning"
-#~ msgstr "മുന്നറിയിപ്പ്"
-
-#~ msgid "Software"
-#~ msgstr "സോഫ്റ്റ്വെയര്‍"
-
-#~ msgid "Record Company"
-#~ msgstr "റിക്കോര്‍ഡ് കമ്പനി"
-
-#~ msgid "Model"
-#~ msgstr "തരം"
-
-#~ msgid "Grouping"
-#~ msgstr "ഗ്രൂപ്പിംഗ്"
-
-#~ msgid "Sub-Title"
-#~ msgstr "ഉപ-ശീര്‍ഷകം"
-
-#~ msgid "Arranger"
-#~ msgstr "ക്രമപ്പെടുത്തുന്നവന്‍"
-
-#~ msgid "Art Director"
-#~ msgstr "കലാസംവിധായകന്‍"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "പകര്‍പ്പവകാശ മറുപടി"
-
-#~ msgid "Conductor"
-#~ msgstr "നയിക്കുന്നവന്‍"
-
-#~ msgid "Song Description"
-#~ msgstr "പാട്ടിന്‍റെ വിവരണം"
-
-#~ msgid "Liner Notes"
-#~ msgstr "ലൈനര്‍ നോട്ടുകള്‍"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "സ്വരചിഹ്ന അധികാരങ്ങള്‍"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "ശബ്‌ദശാസ്‌ത്രജ്ഞന്‍"
-
-#~ msgid "Soloist"
-#~ msgstr "ഏകാന്തഗീതകന്‍"
-
-#~ msgid "Thanks"
-#~ msgstr "നന്ദി"
-
-#~ msgid "Executive Producer"
-#~ msgstr "നിര്‍വാഹണ നിര്‍മ്മാതാവ്"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "എച്ച്264 സ്ട്രീമിനു വേണ്ടിയുള്ള അഭിലഷണീയ ഫ്രെയിം നിരക്ക്"
@@ -30017,9 +30618,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ "സാധാരണ സ്ട്രീമിങ്ങ് അല്ലെങ്കില്‍ ട്രാന്‍സ്കോഡിങ്ങ് ക്രമീകരണങ്ങള്‍ രൂപരേഖയിലാക്കുന്നതിന് ഈ വിസാര്‍ഡ് "
 #~ "അനുവദിക്കുന്നു."
 
-#~ msgid "More Info"
-#~ msgstr "കൂടുതല്‍വിവരം"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -30065,9 +30663,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
 #~ msgid "Streaming method"
 #~ msgstr "സ്ട്രീമിംഗ് രീതി"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "സ്ട്രീം ചെയ്യുന്നതിന് കമ്പ്യൂട്ടറിന്റെ വിലാസം."
 
 #~ msgid "UDP Unicast"
 #~ msgstr "യുഡിപി യൂണികാസ്റ്റ്"
@@ -30317,9 +30912,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgid "A->B Loop"
 #~ msgstr "എ->ബി ലൂപ്പ്"
 
-#~ msgid "Current visualization"
-#~ msgstr "നിലവിലെ ദൃശ്യാവിഷ്കരണം"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "&കോണ്‍ഫിഗ്ഗിലേയ്ക്ക് മാറ്റങ്ങള്‍ ഉല്ലേഖിക്കുക"
 
@@ -30344,39 +30936,14 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "പവര്‍ നിര്‍ത്തിവയ്ക്കലും കൂടാതെ സെഷന്‍റെ അലസമായ ഇടവേളയും തടയുന്നു."
 
-#~ msgid "Log format"
-#~ msgstr "ലോഗ് ഫോര്‍മാറ്റ്"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "ലോഗ്ഗിങ്ങ് രൂപഘടന വ്യക്തമാക്കുക."
-
 #~ msgid "Syslog ident"
 #~ msgstr "സിസ്ലോഗ് ഐഡന്റ്"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "സിസ്ലോഗിലേയ്ക്ക് ലോഗിന്‍ ചെയ്യുമ്പോള്‍ VLCയ്ക്ക് ഉപയോഗിക്കാന്‍ ഐഡന്റിനെ ക്രമീകരിക്കുക."
 
-#~ msgid "Syslog facility"
-#~ msgstr "സിസ്ലോഗ് സൗകര്യം"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "ലോഗുകള്‍ മുന്നോട്ടയ്ക്കപ്പെടുന്നിടത്ത് സിസ് ലേഗ് സംവിധാനം തെരഞ്ഞെടുക്കുക."
-
-#~ msgid "Verbosity"
-#~ msgstr "വെര്‍ബോസിറ്റി:(_V)"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "ലോഗ് ചെയ്യുന്നതിന് വെര്‍ബോസിറ്റി തിരഞ്ഞെടുക്കുക അല്ലെങ്കില്‍ --വെര്‍ബോസ് നല്കിയ  അതേ "
-#~ "വെര്‍ബോസിറ്റി ഉപയോഗിക്കുന്നതിന് -1 നല്‍കുക."
-
-#~ msgid "Log filename"
-#~ msgstr "ലോഗ് ഫയല്‍ നാമം"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "ലോഗ് ഫയല്‍ നാമം വ്യക്തമാക്കുക."
 
 #~ msgid "Local drives"
 #~ msgstr "പ്രാദേശിക ഡ്രൈവുകള്‍"
@@ -30754,9 +31321,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgid "Hue windowing"
 #~ msgstr "ഹ്യൂ വിന്‍ഡോവിംഗ്"
 
-#~ msgid "Used for statistics."
-#~ msgstr "സ്റ്റാറ്റിസ്റ്റിക്സിനു ഉപയോഗിക്കുന്നത്."
-
 #~ msgid "Sat windowing"
 #~ msgstr "സാറ്റ് വിന്‍ഡോവിംഗ്"
 
@@ -30979,9 +31543,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgid "Direct2D video output"
 #~ msgstr "ഡയറക്ട്2ഡി വീഡിയോ ഔട്ട്പുട്ട്"
 
-#~ msgid "GPU affinity"
-#~ msgstr "ജിപിയു അഫിനിറ്റി"
-
 #~ msgid "SDL chroma format"
 #~ msgstr "എസ്ഡിഎല്‍ ക്രോമ ഫോര്‍മാറ്റ്"
 
@@ -31077,18 +31638,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #~ msgstr "ഉപശീര്‍ഷക ട്രാക്ക്"
 
 #, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "വീഡിയോ ക്യാപ്ച്ചര്‍"
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "സാറ്റലൈറ്റ് റേഞ്ച് കോഡ്"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "ഇന്‍പുട്ട് ഡിവൈസ് കണ്ടെത്താനായില്ല"
-
-#, fuzzy
 #~ msgid "Windows Store audio output"
 #~ msgstr "വിന്‍ഡോസ് ജിഡിഐ വീഡിയോ ഔട്ട്പുട്ട്"
 
@@ -31099,14 +31648,6 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #, fuzzy
 #~ msgid "Audio Fingerprinting"
 #~ msgstr "&വിരലടയാളം"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "ശേഖരണ സ്ട്രീം ഔട്ട്പുട്ട്"
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "സ്പെക്ട്രം"
 
 #, fuzzy
 #~ msgid "VLC media player - Flash Viewer"

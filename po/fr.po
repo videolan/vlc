@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2017-09-20 03:42+0000\n"
 "Last-Translator: Fan\n"
 "Language-Team: French (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -173,7 +173,8 @@ msgstr "Paramètres et modules audio divers."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -390,7 +391,8 @@ msgstr "Vidéo à la demande"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -1009,6 +1011,7 @@ msgid "Scrambled"
 msgstr "Brouillé"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "Oui"
 
@@ -1055,6 +1058,7 @@ msgstr "Langue "
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Description"
 
@@ -1078,8 +1082,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "Bits par échantillon "
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1340,7 +1343,8 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "Titre"
@@ -1350,8 +1354,8 @@ msgstr "Titre"
 msgid "Artist"
 msgstr "Artiste"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "Genre"
 
@@ -1368,7 +1372,7 @@ msgstr "Album"
 msgid "Track number"
 msgstr "Numéro de piste"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "Note"
 
@@ -1390,7 +1394,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "Actuellement"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "Éditeur"
 
@@ -1430,7 +1434,7 @@ msgstr "Afficher le nom"
 msgid "Actors"
 msgstr "Acteurs"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "Artiste"
@@ -1929,6 +1933,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1979,7 +1984,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "Largeur de la vidéo"
@@ -1994,7 +1999,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "Hauteur de la vidéo"
@@ -2630,13 +2635,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "Prédéfini(e)"
 
@@ -4320,6 +4326,7 @@ msgid "Long jump length, in seconds."
 msgstr "Longueur du « saut long », en secondes."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5443,14 +5450,14 @@ msgstr "Échec d'ouverture de « %s » en écriture"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6296,6 +6303,34 @@ msgstr "Attachement"
 msgid "Attachment input"
 msgstr "Entrée d'attachement"
 
+#: modules/access/avcapture.m:57
+msgid "AVFoundation Video Capture"
+msgstr "Capture vidéo AVFoundation"
+
+#: modules/access/avcapture.m:58
+msgid "AVFoundation video capture module."
+msgstr "Module de capture vidéo AVFoundation."
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+msgid "No video devices found"
+msgstr "Aucun périphérique vidéo trouvé"
+
+#: modules/access/avcapture.m:287
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"Votre Mac ne semble pas équipé d'un périphérique d'entrée vidéo approprié. "
+"Veuillez vérifier vos branchements et pilotes."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"Votre Mac ne semble pas avoir le périphérique adéquat. Vérifiez vos "
+"connecteurs et pilotes."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "AVIO"
@@ -6909,7 +6944,7 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 "Le périphérique de capture « %s » ne supporte pas les paramètres requis."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "Décorations de fenêtres"
@@ -7408,6 +7443,48 @@ msgstr "Entrée Digitale Vidéo (Firewire/ieee1394)"
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "Sonder les capacités de la carte DVB"
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+"Certaines cartes ne tolèrent pas bien le sondage de leur capacités, vous "
+"pouvez désactiver cette option si vous rencontrez des soucis."
+
+#: modules/access/dvb/access.c:70
+msgid "Satellite scanning config"
+msgstr "Configuration du scan satellite"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr "nom du fichier de config dans share/dvb/dvb-s"
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "Qualité de la mise à l'échelle"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "Collecter des statistiques"
+
+#: modules/access/dvb/access.c:79
+msgid "DVB"
+msgstr "DVB"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "Entrée DVB compatible v4l2"
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "Angle DVD"
@@ -7485,8 +7562,7 @@ msgstr "DVDRead : impossible de lire les blocks %d/%d à 0x%02x."
 msgid "File input"
 msgstr "Lecture de fichiers"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7511,9 +7587,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7529,9 +7605,9 @@ msgid ""
 msgstr "Nom d'utilisateur qui sera utilisé pour la connexion."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7594,11 +7670,49 @@ msgstr "La connection de VLC au serveur spécifié à été rejetée."
 msgid "Your account was rejected."
 msgstr "Votre compte a été rejeté."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "Serveur mandataire HTTP"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"Serveur mandataire HTTP. Il doit être de la forme http://[utilisateur:"
+"motdepasse@]monproxy.mondomaine:port/. Si aucun proxy n'est spécifié, la "
+"variable d'environnement http_proxy sera utilisée."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "Mot de passe du proxy HTTP"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "Si votre proxy HTTP nécessite un mot de passe, le donner ici."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "Reconnexion automatique"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr "En cas de déconnexion prématurée, essayer de se reconnecter."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "Entrée HTTP"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "Authentification HTTP"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
@@ -7657,48 +7771,10 @@ msgstr ""
 "doivent être séparés par une barre oblique, p. ex. FooBar/1.2.3. Cette "
 "option doit être précisée pour chaque entrée."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "Serveur mandataire HTTP"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"Serveur mandataire HTTP. Il doit être de la forme http://[utilisateur:"
-"motdepasse@]monproxy.mondomaine:port/. Si aucun proxy n'est spécifié, la "
-"variable d'environnement http_proxy sera utilisée."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "Mot de passe du proxy HTTP"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "Si votre proxy HTTP nécessite un mot de passe, le donner ici."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "Reconnexion automatique"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr "En cas de déconnexion prématurée, essayer de se reconnecter."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "Entrée HTTP"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "Factice"
 
@@ -7732,6 +7808,7 @@ msgid "Set the category of the elementary stream"
 msgstr "Choisir la catégorie du flux élémentaire"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -8144,7 +8221,7 @@ msgstr "La connexion RTSP a échoué"
 msgid "Capture the audio stream in stereo."
 msgstr "Capture audio en stéréo."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "Fréquence d'échantillonage"
@@ -8165,339 +8242,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "Entrée OSS"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "Flux de sortie factice"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "Garder un fichier existant"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "Écraser"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"Le fichier de sortie existe déjà. Si l'enregistrement continue, ce fichier "
-"sera écrasé et son contenu perdu."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "Écraser un fichier existant"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "Si le fichier spécifié existe déjà, il sera écrasé."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "Ajouter au fichier"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "Écrire à la fin du fichier au lieu de le remplacer."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "Formatter la date et l'heure"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr ""
-"Utiliser le formatage ISO de la date et l'heure dans le chemin du fichier"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "Écriture synchrone"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "Ouvrir le fichier avec écriture synchrone."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "Sortie vers un fichier"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "Nom d'utilisateur qui sera demandé pour accéder au flux."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "Mot de passe qui sera demandé pour accéder au flux."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "MIME"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "Type MIME renvoyé par le serveur (auto-détecté si non spécifié)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "Metacube"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-"Utiliser le protocole Metacube. Nécessaire pour diffuser vers le réflecteur "
-"CUbemap."
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "Flux de sortie HTTP"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "Taille segment"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "Durée des segments de flux TS"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "Découper les segments n'importe où"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-"Découper les segments même hors image de référence. Utilisé uniquement pour "
-"l'audio."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "Nombre de segments"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "Nombre de segements à include dans l'index"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "Permettre la mise en cache"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"Ajouter la directive « EXT-X-ALLOW-CACHE:NO » dans le fichier de lecture si "
-"ceci est inhibé"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "Fichier d'index"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "Chemin du fichier d'index à créer"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "URL complète à mettre dans le fichier d'index"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-"URL complète à mettre dans le fichier d'index. Utiliser « # » pour "
-"représenter le numéro d'un segment."
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "Supprimer des segments"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "Supprimer les segments qui ne sont plus utilisés"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "Utiliser un contrôle de vitesse"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "URI des clés AES à mettre dans la liste de lecture"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "Fichier de clés AES"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "Fichier contenant les clés de chiffrement 16 octets"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "Fichier utilisé par VLC pour lire « key-uri » and « keyfile-location »"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"Le fichier est lu quand le segment démarre et est considéré au format : uri-"
-"clé\\nfichier-clé. Le fichier est lu à l'ouverture du segment et les valeurs "
-"sont utilisées pour ce segment."
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr ""
-"Utiliser un vecteur d'initialisation (IV) aléatoire pour le chiffrement."
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "Générer un IV au lieu d'utiliser le numéro de segment comme IV"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "Numéro du premier segment"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "Le numéro du premier segment généré"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "Flux de sortie HTTP"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "Nom"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "Nom à donner à ce flux/canal sur le serveur shoutcast/icecast."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "Description du flux"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "Description du contenu de votre flux et informations sur votre canal."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "Diffuser en MP3"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"Généralement, la sortie Shoutcast/Icecast utilise des flux Ogg. Cette option "
-"vous permet d'utiliser des flux MP3 à la place."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "Description du genre"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "Genre du contenu."
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "Description de l'URL"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "URL avec des informations sur votre flux ou canal. "
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "Information sur le débit du le flux transcodé."
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "Information sur l'échantillonnage du flux transcodé."
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "Nombre de canaux"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "Nombre de canaux du flux transcodé."
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Qualité Ogg Vorbis"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Qualité Ogg Vorbis du flux transcodé."
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "Diffuser publiquement"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"Rend le serveur publiquement accessible sur les « Yellow Pages » (affichage "
-"des contenus des dosssiers de flux) du site web « icecast/shoutcast ». Les "
-"infos de débit doivent être spécifiées pour shoutcast. Les flux doivent être "
-"en format Ogg pour icecast."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "Sortie IceCAST"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "Taille du cache en ms"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr "Taille du cache pour les flux UDP, en millisecondes."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "Groupe les paquets"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Les paquets peuvent être envoyés un par un au moment adéquat ou par groupes. "
-"Ceci permet de préciser le nombre de paquets qui seront envoyés en même "
-"temps. Cela réduit la charge de planification sur les systèmes surchargés."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "Flux de sortie UDP"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8513,6 +8257,30 @@ msgstr "PulseAudio"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "Entrée PulseAudio"
+
+#: modules/access/qtsound.m:59
+msgid "QTSound"
+msgstr "QTSound"
+
+#: modules/access/qtsound.m:60
+msgid "QuickTime Sound Capture"
+msgstr "Capture sonore QuickTime"
+
+#: modules/access/qtsound.m:262
+msgid "No Audio Input device found"
+msgstr "Aucune entrée sonore trouvée"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Votre Mac ne semble pas équipé d'un périphérique d'entrée audio approprié. "
+"Veuillez vérifier vos branchements et pilotes."
+
+#: modules/access/qtsound.m:293
+msgid "No audio input device found"
+msgstr "Aucune entrée sonore trouvée"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8951,6 +8719,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "Entrée SFTP"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "Taille du tampon de réception UDP (octets)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "Retard DTS (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10282,16 +10074,24 @@ msgstr "Q de la fréquence 3"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Rééchantillonneur par interpolation à bande réduite"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "Qualité du ré-échantillonnage"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr "Qualité ré-échantillonnage (0=pire et rapide, 10=meilleure et lente)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "Qualité du ré-échantillonnage"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "Ré-échantillonnage SRC"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "Ré-échantillonnage Speex"
 
@@ -12105,6 +11905,16 @@ msgstr "Décodeur Media Foundation Transform"
 msgid "MPEG audio decoder using mpg123"
 msgstr "Décodeur MPEG audio"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "Décodeur vidéo WebM"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "Empaqueteur vidéo Theora"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12804,6 +12614,16 @@ msgstr "SCTE-27"
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "Décodeur SCTE-27"
+
+#: modules/codec/scte27.c:43
+#, fuzzy
+msgid "SCTE-27"
+msgstr "SCTE-27"
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "Décodeur d'images (SDL)"
@@ -13238,6 +13058,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "Décodeur de sous-titres Télétexte"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "Décodeur de sous-titres texte"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13405,6 +13230,21 @@ msgstr "Décodeur vidéo WebM"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "Décodeur vidéo WebM"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "Décodeur MMAL"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "Décodeur de sous-titres EBU STL"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "Lecteur de sous-titres EBU STL"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14451,7 +14291,8 @@ msgstr "Interface de contrôle D-Bus"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14828,7 +14669,7 @@ msgstr "Initialisation"
 msgid "Opening"
 msgstr "Ouverture"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "Erreur"
 
@@ -15322,7 +15163,8 @@ msgstr "Démultiplexeur"
 msgid "Avformat muxer"
 msgstr "Multiplexeur Avformat"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Multiplexeur"
 
@@ -15687,6 +15529,161 @@ msgstr "Niveau d'effet Surround"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "Délai de Surround (ms)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "Auteur"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "Compositeur"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "Producteur"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "Informations"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "Avis de non-responsabilité"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "Exigences"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "Format original"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "Afficher les sources comme"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "Poste de travail"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "Interprètes"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "Interprète original"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "Contenu de la source du producteur"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "Warning"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "Logiciel"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "Paroles"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "Maison de disque"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "Modèle"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "Produit"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "Regroupement"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "Sous-titres"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "Arrangeur"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "Directeur artistique"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "Copyright"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "Chef d'orchestre"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "Description"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "Notes"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "Droits phonographiques"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "Ingénieur du son"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "Soliste"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "Remerciements"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "Producteur exécutif"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "Paramètres d'encodage"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "Numéro du canal"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "mots-clés"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "Effacer"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -16080,6 +16077,10 @@ msgstr "Taille du Podcast"
 msgid "%s bytes"
 msgstr "%s octets"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "MIME"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -16091,6 +16092,11 @@ msgstr "Auditeurs"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "Charger"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "Saturation"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16281,6 +16287,10 @@ msgstr "Démultiplexeur WAV"
 msgid "XA demuxer"
 msgstr "Démultiplexeur XA"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "catégorie inconnue"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "Sous-titres"
@@ -16305,10 +16315,6 @@ msgstr "Annotations sémantiques"
 msgid "Transcript"
 msgstr "Transcript"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "Paroles"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "Marqueur de langue"
@@ -16328,10 +16334,6 @@ msgstr "Diaporama (textes)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "Diaporama (images)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "catégorie inconnue"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16385,23 +16387,27 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "Analyseurs de listes de lecture"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "Découverte de services"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 #, fuzzy
 msgid "Interfaces"
 msgstr "Interface"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 #, fuzzy
 msgid "Art and meta fetchers"
 msgstr "Méta-récupérateur Lua"
@@ -16410,6 +16416,7 @@ msgstr "Méta-récupérateur Lua"
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "Extensions"
 
@@ -16451,6 +16458,7 @@ msgstr "Désinstaller"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "Habillages"
@@ -16546,10 +16554,10 @@ msgstr "Entrer le nom du nouveau profil :"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16712,12 +16720,14 @@ msgid "Playback time"
 msgstr "Vitesse de lecture"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "Titre précédent"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "Aller au temps"
@@ -16760,9 +16770,10 @@ msgstr "Choisir une destination"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17832,26 +17843,6 @@ msgstr "Plein volume"
 msgid "Open Audio Effects window"
 msgstr "Effets audio"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "o"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "ko"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "Mo"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "Go"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "To"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "Ouvrir un flux"
@@ -17952,6 +17943,7 @@ msgid "Enable DVD menus"
 msgstr "Activer les menus DVD"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "Adresse IP"
 
@@ -18246,58 +18238,6 @@ msgstr "Erreur lors de l'enregistrement des méta-données"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC est incapable d'enregistrer les méta-données."
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "Préférences"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "Tout rétablir"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "Afficher les bases"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "Sélectionnez un dossier"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "Sélectionner un fichier"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "Sélectionner"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "Continuer la lecture ?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "Continuer"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "Continuer la lecture"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "Redémarrer la lecture"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr "La lecture de « %@ » reprendra à %@"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -18324,6 +18264,31 @@ msgstr "Découverte de services"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "Désactiver l'économiseur d'écran"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "Continuer la lecture ?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "Continuer"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "Continuer la lecture"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "Redémarrer la lecture"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr "La lecture de « %@ » reprendra à %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18601,6 +18566,16 @@ msgstr "Préfixe"
 msgid "Sequential numbering"
 msgstr "Numérotation séquentielle"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "Tout rétablir"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "Préférences"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18701,9 +18676,49 @@ msgstr "Hélas, ces touches ne peuvent pas être utilisées comme raccourci."
 msgid "This combination is already taken by \"%@\"."
 msgstr "Cette combinaison est déjà utilisée par « %@ »."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "Lecture/Pause"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "Commuter la lecture aléatoire de liste"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "Fenêtre principale…"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "Description de l'URL"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "En lecture"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "Sélectionner un dossier"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "Ouvrir un &emplacement depuis le presse-papier"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "non défini"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "sec."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -19020,7 +19035,8 @@ msgid "Add text"
 msgstr "Ajout de texte"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "Texte"
 
@@ -19043,9 +19059,41 @@ msgstr "Transparence"
 msgid "Organize profiles..."
 msgstr "Organiser les profils…"
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "sec."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "o"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "ko"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "Mo"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "Go"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "To"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "Afficher les bases"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "Sélectionnez un dossier"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "Sélectionner un fichier"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "Sélectionner"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19410,11 +19458,6 @@ msgstr "Avancer d'un pas"
 msgid "Loop / Repeat"
 msgstr "Boucle / Répétition"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "Informations"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "Ouvrir sous-titres"
@@ -19525,6 +19568,10 @@ msgstr "Arrêter la boucle A->B"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "Proportions"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr "Aucune donnée de guide TV disponible"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19681,10 +19728,6 @@ msgstr "(Ralenti)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "Forcer la mise à jour des valeurs de la fenêtre"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr "Aucune donnée de guide TV disponible"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20340,6 +20383,11 @@ msgstr "Diffuser par le réseau via RTP."
 msgid "Base port"
 msgstr "Port de base"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "Nom"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "Ce module écrit le flux transcodé vers un serveur Icecast."
@@ -20372,9 +20420,10 @@ msgstr "Effacer tous les signets"
 msgid "Extract"
 msgstr "Extraire"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20429,6 +20478,19 @@ msgstr "&Démarrer"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "Conteneurs"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "Guide des programmes"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "Mettre à jour"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr " (classé %1+)"
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20861,50 +20923,6 @@ msgstr ""
 "Attention, ceci va réinitialiser le fichier de configuration de VLC.\n"
 "Désirez-vous vraiment continuer ?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "Ouvrir un dossier"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "Ouvrir un dossier"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "Ouvre la liste de lecture…"
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "Liste de lecture XSPF"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "Liste de lecture M3U"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "Liste de lecture M3U8"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "Enregistrer la liste de lecture sous…"
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "Ouvrir des sous-titres…"
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "Fichiers multimédias"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "Fichiers de sous-titres"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "Tous les fichiers"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "Flux de sortie"
@@ -21128,6 +21146,60 @@ msgstr "Planification :"
 msgid "VOD: "
 msgstr "VOD :"
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "Ouvrir un dossier"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "Ouvrir un dossier"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "Ouvre la liste de lecture…"
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "Liste de lecture XSPF"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "Liste de lecture M3U"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "Liste de lecture M3U8"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "Enregistrer la liste de lecture sous…"
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "Ouvrir des sous-titres…"
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "Fichiers multimédias"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "Fichiers de sous-titres"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "Tous les fichiers"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr "Vide"
+
+#: modules/gui/qt/extensions_manager.cpp:197
+msgid "Deactivate"
+msgstr "Désactiver"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "Voulez-vous redémarrer la lecture là où elle s'était arrêtée ?"
@@ -21233,10 +21305,6 @@ msgstr "&Effets et filtres"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "Synchronisation de &piste"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "Guide des programmes"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21733,6 +21801,11 @@ msgstr "attention"
 msgid "debug"
 msgstr "mise au point"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "Effacer"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "Ouvre un fichier d'habillage"
@@ -21834,6 +21907,80 @@ msgstr "Sélectionner un habillage"
 msgid "Open skin..."
 msgstr "Ouvrir un habillage…"
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "Seuil de luminosité"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"Dans ce mode, les pixels seront soit blancs soit noirs, selon leur "
+"luminosité. La valeur seuil est celle définie plus bas."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "Contraste (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "Fixe le contraste de l'image, entre 0 et 2. 1 par défaut."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "Teinte (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "Fixe la nuance de l'image, entre 0 et 360. 0 par défaut."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "Saturation (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "Fixe la saturation de l'image, entre 0 et 3. 1 par défaut."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "Brillance (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "Fixe la brillance de l'image, entre 0 et 2. 1 par défaut."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "Gamma (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "Fixe le gamma de l'image, entre 0,01 et 10. 1 par défaut."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "Sortie vidéo DirectX Accélérée « DXVA 2.0 »"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "Ajuster filtre vidéo VDPAU"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -21900,6 +22047,16 @@ msgstr "Sortie vidéo MMAL"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "Module basé sur la sortie vidéo MMAL pour Raspberry Pi"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "Filtre vidéo"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "Sortie vidéo DirectX Accélérée « DXVA 2.0 »"
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "Ajuster filtre vidéo VDPAU"
@@ -21960,15 +22117,22 @@ msgstr "sortie VDPAU"
 msgid "VDPAU sharpen video filter"
 msgstr "Filtre de netteté VDPAU"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "Filtre vidéo"
+msgid "file keystore (plaintext)"
+msgstr "Liste des empaqueteurs préférés"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "Sortie vidéo DirectX Accélérée « DXVA 2.0 »"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -22039,6 +22203,188 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "Support de TLS pour OS X et iOS"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "Utiliser la mémoire partagée"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "Supprimer la sélection"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "Utiliser la mémoire partagée"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "Utiliser la mémoire partagée"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "Ajouter un logo"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "Ne rien afficher"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "Journaliser tous les messages de VLC dans un fichier texte."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "Console"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "Console"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "Détails"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "mise au point"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "Journaliser dans un fichier"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "Journaliser tous les messages de VLC dans un fichier texte."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "Nom du fichier de journal"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "Indiquez le nom du fichier pour le journal"
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "Format de journal"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "Indiquez le nom du format pour le journal"
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "Niveau de verbosité"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"Choisir la verbosité pour les messages, ou utiliser -1 pour la même que "
+"celle donnée par l'option « --verbose »."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "Journalisation"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "Module de journalisation dans un fichier"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "Masque de débogage"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "Type"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "Serveur syslog"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "Journaliser vers Syslog"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr "Extension sans réponse !"
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
+"L'extension '%s' ne répond pas.\n"
+"Voulez-vous la stopper maintenant ? "
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22733,6 +23079,34 @@ msgstr "JPop"
 msgid "Synthpop"
 msgstr "Synthpop"
 
+#: modules/misc/addons/fsstorage.c:83
+msgid "addons local storage"
+msgstr "stockage local d'extensions"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr "Installation du stockage local d'extensions"
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr "Liste du stockage local d'extensions"
+
+#: modules/misc/addons/vorepository.c:62
+msgid "Videolan.org's addons finder"
+msgstr "Recherche d'extensions Videolan.org"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr "Recherche d'extensions addons.videolan.org"
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr "Recherche d'extensions en une seule archive Videolan.org"
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr "Recherche d'extensions en une seule archive .vlp"
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "Votre nom d'utilisateur last.fm"
@@ -22782,6 +23156,14 @@ msgstr ""
 "Définissez un nom d'utilisateur ou désactiver le module audioscrobbler, et "
 "redémarrer VLC.\n"
 "Allez sur http://www.last.fm/join/ pour créer un compte."
+
+#: modules/misc/fingerprinter.c:73
+msgid "acoustid"
+msgstr "acoustid"
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr "Empreinte de piste (basé sur Acoustid)"
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -23120,10 +23502,6 @@ msgstr "Sujet"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "Encodeur"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "mots-clés"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23591,6 +23969,18 @@ msgstr "Image"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "Mes images"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "Services « Bonjour »"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "Services « Bonjour »"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24765,6 +25155,63 @@ msgstr "Pont sortant"
 msgid "Bridge in"
 msgstr "Pont entrant"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "Port SFTP"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "Ce module écrit le flux transcodé vers un serveur Icecast."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "Veuillez entrer l'adresse vers laquelle diffuser."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "Format de chrominance"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "Chrominance"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "Sortie de flux Chromaprint"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "Démultiplexeur Avformat"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24821,6 +25268,10 @@ msgstr "Introduit un retard dans l'affichage du flux."
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "Affiche le flux"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "Flux de sortie factice"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -25109,6 +25560,10 @@ msgstr ""
 "Cela envoie et reçoit des paquets RTCP multiplexés à travers le même port "
 "que les paquets RTP."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "Taille du cache en ms"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -25155,6 +25610,15 @@ msgstr ""
 "Les sessions RTSP seront fermées après qu'aucune requête RTSP n'ai été reçu "
 "depuis cette durée. Mettre une valeur négative ou égale à zéro désactive le "
 "délai d'expiration. La valeur par défaut est de 60 secondes."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "Nom d'utilisateur qui sera demandé pour accéder au flux."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "Mot de passe qui sera demandé pour accéder au flux."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25826,58 +26290,6 @@ msgstr "Échelle"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "Convertisseur YUVP"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "Seuil de luminosité"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"Dans ce mode, les pixels seront soit blancs soit noirs, selon leur "
-"luminosité. La valeur seuil est celle définie plus bas."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "Contraste (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Fixe le contraste de l'image, entre 0 et 2. 1 par défaut."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "Teinte (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "Fixe la nuance de l'image, entre 0 et 360. 0 par défaut."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "Saturation (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "Fixe la saturation de l'image, entre 0 et 3. 1 par défaut."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "Brillance (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "Fixe la brillance de l'image, entre 0 et 2. 1 par défaut."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "Gamma (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Fixe le gamma de l'image, entre 0,01 et 10. 1 par défaut."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27578,6 +27990,15 @@ msgstr "Sortie vidéo « OpenGL »"
 msgid "Windows GDI video output"
 msgstr "Sortie vidéo « Windows GDI »"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "Affinité GPU"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "Extensions EGL pour OpenGL"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "Format de chrominance d'image factice"
@@ -28099,6 +28520,22 @@ msgstr "Filtre vidéo effet mur"
 msgid "Image wall"
 msgstr "Mur d'image"
 
+#: modules/visualization/glspectrum.c:56
+msgid "The width of the visualization window, in pixels."
+msgstr "La largeur de la fenêtre de visualisation, en pixels."
+
+#: modules/visualization/glspectrum.c:59
+msgid "The height of the visualization window, in pixels."
+msgstr "La hauteur de la fenêtre de visualisation, en pixels."
+
+#: modules/visualization/glspectrum.c:62
+msgid "glSpectrum"
+msgstr "glSpectrum"
+
+#: modules/visualization/glspectrum.c:63
+msgid "3D OpenGL spectrum visualization"
+msgstr "Visualisation du spectre OpenGL 3D"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "Largeur de la fenêtre Goom"
@@ -28561,10 +28998,6 @@ msgstr "Voulez-vous créer ce flux ?"
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "Fenêtre de dialogue"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "Mettre à jour"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29431,6 +29864,274 @@ msgid "Media Manager List"
 msgstr "Liste du gestionnaire de médias"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "Qualité du ré-échantillonnage"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Qualité de la mise à l'échelle"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Qualité de l'image"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "Qualité ré-échantillonnage (0=pire et rapide, 10=meilleure et lente)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Heure de début"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Code pays du tuner"
+
+#~ msgid "Keep existing file"
+#~ msgstr "Garder un fichier existant"
+
+#~ msgid "Overwrite"
+#~ msgstr "Écraser"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "Le fichier de sortie existe déjà. Si l'enregistrement continue, ce "
+#~ "fichier sera écrasé et son contenu perdu."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "Écraser un fichier existant"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "Si le fichier spécifié existe déjà, il sera écrasé."
+
+#~ msgid "Append to file"
+#~ msgstr "Ajouter au fichier"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "Écrire à la fin du fichier au lieu de le remplacer."
+
+#~ msgid "Format time and date"
+#~ msgstr "Formatter la date et l'heure"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr ""
+#~ "Utiliser le formatage ISO de la date et l'heure dans le chemin du fichier"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "Écriture synchrone"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "Ouvrir le fichier avec écriture synchrone."
+
+#~ msgid "File stream output"
+#~ msgstr "Sortie vers un fichier"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "Type MIME renvoyé par le serveur (auto-détecté si non spécifié)."
+
+#~ msgid "Metacube"
+#~ msgstr "Metacube"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr ""
+#~ "Utiliser le protocole Metacube. Nécessaire pour diffuser vers le "
+#~ "réflecteur CUbemap."
+
+#~ msgid "HTTP stream output"
+#~ msgstr "Flux de sortie HTTP"
+
+#~ msgid "Segment length"
+#~ msgstr "Taille segment"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "Durée des segments de flux TS"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "Découper les segments n'importe où"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "Découper les segments même hors image de référence. Utilisé uniquement "
+#~ "pour l'audio."
+
+#~ msgid "Number of segments"
+#~ msgstr "Nombre de segments"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "Nombre de segements à include dans l'index"
+
+#~ msgid "Allow cache"
+#~ msgstr "Permettre la mise en cache"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "Ajouter la directive « EXT-X-ALLOW-CACHE:NO » dans le fichier de lecture "
+#~ "si ceci est inhibé"
+
+#~ msgid "Index file"
+#~ msgstr "Fichier d'index"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "Chemin du fichier d'index à créer"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "URL complète à mettre dans le fichier d'index"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "URL complète à mettre dans le fichier d'index. Utiliser « # » pour "
+#~ "représenter le numéro d'un segment."
+
+#~ msgid "Delete segments"
+#~ msgstr "Supprimer des segments"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "Supprimer les segments qui ne sont plus utilisés"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "Utiliser un contrôle de vitesse"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "URI des clés AES à mettre dans la liste de lecture"
+
+#~ msgid "AES key file"
+#~ msgstr "Fichier de clés AES"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "Fichier contenant les clés de chiffrement 16 octets"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr ""
+#~ "Fichier utilisé par VLC pour lire « key-uri » and « keyfile-location »"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "Le fichier est lu quand le segment démarre et est considéré au format : "
+#~ "uri-clé\\nfichier-clé. Le fichier est lu à l'ouverture du segment et les "
+#~ "valeurs sont utilisées pour ce segment."
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr ""
+#~ "Utiliser un vecteur d'initialisation (IV) aléatoire pour le chiffrement."
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "Générer un IV au lieu d'utiliser le numéro de segment comme IV"
+
+#~ msgid "Number of first segment"
+#~ msgstr "Numéro du premier segment"
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "Le numéro du premier segment généré"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "Flux de sortie HTTP"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr "Nom à donner à ce flux/canal sur le serveur shoutcast/icecast."
+
+#~ msgid "Stream description"
+#~ msgstr "Description du flux"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr ""
+#~ "Description du contenu de votre flux et informations sur votre canal."
+
+#~ msgid "Stream MP3"
+#~ msgstr "Diffuser en MP3"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Généralement, la sortie Shoutcast/Icecast utilise des flux Ogg. Cette "
+#~ "option vous permet d'utiliser des flux MP3 à la place."
+
+#~ msgid "Genre description"
+#~ msgstr "Description du genre"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "Genre du contenu."
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "URL avec des informations sur votre flux ou canal. "
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "Information sur le débit du le flux transcodé."
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "Information sur l'échantillonnage du flux transcodé."
+
+#~ msgid "Number of channels"
+#~ msgstr "Nombre de canaux"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "Nombre de canaux du flux transcodé."
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Qualité Ogg Vorbis"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "Qualité Ogg Vorbis du flux transcodé."
+
+#~ msgid "Stream public"
+#~ msgstr "Diffuser publiquement"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "Rend le serveur publiquement accessible sur les « Yellow "
+#~ "Pages » (affichage des contenus des dosssiers de flux) du site web "
+#~ "« icecast/shoutcast ». Les infos de débit doivent être spécifiées pour "
+#~ "shoutcast. Les flux doivent être en format Ogg pour icecast."
+
+#~ msgid "IceCAST output"
+#~ msgstr "Sortie IceCAST"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr "Taille du cache pour les flux UDP, en millisecondes."
+
+#~ msgid "Group packets"
+#~ msgstr "Groupe les paquets"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "Les paquets peuvent être envoyés un par un au moment adéquat ou par "
+#~ "groupes. Ceci permet de préciser le nombre de paquets qui seront envoyés "
+#~ "en même temps. Cela réduit la charge de planification sur les systèmes "
+#~ "surchargés."
+
+#~ msgid "UDP stream output"
+#~ msgstr "Flux de sortie UDP"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "Désactiver"
 
@@ -29448,9 +30149,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Navigation"
 #~ msgstr "Navigation"
-
-#~ msgid "Be quiet"
-#~ msgstr "Ne rien afficher"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr ""
@@ -29482,15 +30180,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgstr ""
 #~ "Ce fichier contient un CRL optionnel pour éviter que de clients  "
 #~ "supprimés utilisent des certificats révoqués pour des sessions TLS."
-
-#~ msgid "Log to file"
-#~ msgstr "Journaliser dans un fichier"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "Journaliser tous les messages de VLC dans un fichier texte."
-
-#~ msgid "Log to syslog"
-#~ msgstr "Journaliser vers Syslog"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr ""
@@ -29537,9 +30226,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Configure"
 #~ msgstr "Configurer"
-
-#~ msgid "Channel number"
-#~ msgstr "Numéro du canal"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29639,13 +30325,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "No Input device found"
 #~ msgstr "Aucune entrée trouvée"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Votre Mac ne semble pas avoir le périphérique adéquat. Vérifiez vos "
-#~ "connecteurs et pilotes."
 
 #~ msgid "RDP auth username"
 #~ msgstr "Nom d'utilisateur RDP"
@@ -29895,90 +30574,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "Les flux protégés par DRM ne sont pas supportés."
-
-#~ msgid "Writer"
-#~ msgstr "Auteur"
-
-#~ msgid "Composer"
-#~ msgstr "Compositeur"
-
-#~ msgid "Producer"
-#~ msgstr "Producteur"
-
-#~ msgid "Disclaimer"
-#~ msgstr "Avis de non-responsabilité"
-
-#~ msgid "Requirements"
-#~ msgstr "Exigences"
-
-#~ msgid "Original Format"
-#~ msgstr "Format original"
-
-#~ msgid "Display Source As"
-#~ msgstr "Afficher les sources comme"
-
-#~ msgid "Host Computer"
-#~ msgstr "Poste de travail"
-
-#~ msgid "Performers"
-#~ msgstr "Interprètes"
-
-#~ msgid "Original Performer"
-#~ msgstr "Interprète original"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "Contenu de la source du producteur"
-
-#~ msgid "Warning"
-#~ msgstr "Warning"
-
-#~ msgid "Software"
-#~ msgstr "Logiciel"
-
-#~ msgid "Record Company"
-#~ msgstr "Maison de disque"
-
-#~ msgid "Model"
-#~ msgstr "Modèle"
-
-#~ msgid "Grouping"
-#~ msgstr "Regroupement"
-
-#~ msgid "Sub-Title"
-#~ msgstr "Sous-titres"
-
-#~ msgid "Arranger"
-#~ msgstr "Arrangeur"
-
-#~ msgid "Art Director"
-#~ msgstr "Directeur artistique"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "Copyright"
-
-#~ msgid "Conductor"
-#~ msgstr "Chef d'orchestre"
-
-#~ msgid "Song Description"
-#~ msgstr "Description"
-
-#~ msgid "Liner Notes"
-#~ msgstr "Notes"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "Droits phonographiques"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "Ingénieur du son"
-
-#~ msgid "Soloist"
-#~ msgstr "Soliste"
-
-#~ msgid "Thanks"
-#~ msgstr "Remerciements"
-
-#~ msgid "Executive Producer"
-#~ msgstr "Producteur exécutif"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "Débit d'images pour le flux H264."
@@ -30439,9 +31034,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ "Cet assistant permet de configurer des diffusions simples ou des "
 #~ "transcodages."
 
-#~ msgid "More Info"
-#~ msgstr "Détails"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -30490,9 +31082,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Streaming method"
 #~ msgstr "Méthode de diffusion"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "Veuillez entrer l'adresse vers laquelle diffuser."
 
 #~ msgid "UDP Unicast"
 #~ msgstr "Unicast UDP"
@@ -30775,39 +31364,14 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "Inhibe la veille"
 
-#~ msgid "Log format"
-#~ msgstr "Format de journal"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "Indiquez le nom du format pour le journal"
-
 #~ msgid "Syslog ident"
 #~ msgstr "Identifiant syslog"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "Choisir l'identifiant utilisé par VLC pour syslog."
 
-#~ msgid "Syslog facility"
-#~ msgstr "Serveur syslog"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "Sélectionner l'utilitaire syslog où seront envoyés les logs."
-
-#~ msgid "Verbosity"
-#~ msgstr "Niveau de verbosité"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "Choisir la verbosité pour les messages, ou utiliser -1 pour la même que "
-#~ "celle donnée par l'option « --verbose »."
-
-#~ msgid "Log filename"
-#~ msgstr "Nom du fichier de journal"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "Indiquez le nom du fichier pour le journal"
 
 #~ msgid "Local drives"
 #~ msgstr "Périphériques locaux"
@@ -31198,9 +31762,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Hue windowing"
 #~ msgstr "Ajustement de teinte"
 
-#~ msgid "Used for statistics."
-#~ msgstr "Collecter des statistiques"
-
 #~ msgid "Sat windowing"
 #~ msgstr "Ajustement de saturation"
 
@@ -31431,9 +31992,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Direct2D video output"
 #~ msgstr "Sortie vidéo « Direct2D »"
-
-#~ msgid "GPU affinity"
-#~ msgstr "Affinité GPU"
 
 #~ msgid "SDL chroma format"
 #~ msgstr "Format de chrominance SDL"
@@ -33206,9 +33764,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ "VLC peut utiliser une fenêtre X11 existante pour afficher la sortie "
 #~ "vidéo. Ceci est l'identificant X de cette fenêtre (0 pour aucune)."
 
-#~ msgid "Use shared memory"
-#~ msgstr "Utiliser la mémoire partagée"
-
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr ""
 #~ "Utiliser la mémoire partagée pour communiquer entre VLC et le serveur X."
@@ -33620,22 +34175,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "MTU for out mode."
 #~ msgstr "MTU du mode de sortie."
 
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "Sonder les capacités de la carte DVB"
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ""
-#~ "Certaines cartes ne tolèrent pas bien le sondage de leur capacités, vous "
-#~ "pouvez désactiver cette option si vous rencontrez des soucis."
-
-#~ msgid "filename of config file in share/dvb/dvb-s"
-#~ msgstr "nom du fichier de config dans share/dvb/dvb-s"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "Entrée DVB compatible v4l2"
-
 #~ msgid "Uncompressed RAR"
 #~ msgstr "RAR non compressé"
 
@@ -33676,16 +34215,6 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Fast udp streaming"
 #~ msgstr "Diffusion udp rapide"
-
-#~ msgid "QTSound"
-#~ msgstr "QTSound"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Votre Mac ne semble pas équipé d'un périphérique d'entrée audio "
-#~ "approprié. Veuillez vérifier vos branchements et pilotes."
 
 #~ msgid "Save this Log..."
 #~ msgstr "Enregistrer ce journal..."
@@ -36302,37 +36831,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Addon Manager"
 #~ msgstr "Gestionnaire d'extensions"
 
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "Capture vidéo AVFoundation"
-
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "Module de capture vidéo AVFoundation."
-
-#~ msgid "No video devices found"
-#~ msgstr "Aucun périphérique vidéo trouvé"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Votre Mac ne semble pas équipé d'un périphérique d'entrée vidéo "
-#~ "approprié. Veuillez vérifier vos branchements et pilotes."
-
-#~ msgid "Satellite scanning config"
-#~ msgstr "Configuration du scan satellite"
-
-#~ msgid "DVB"
-#~ msgstr "DVB"
-
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Capture sonore QuickTime"
-
-#~ msgid "No Audio Input device found"
-#~ msgstr "Aucune entrée sonore trouvée"
-
-#~ msgid "No audio input device found"
-#~ msgstr "Aucune entrée sonore trouvée"
-
 #~ msgid "Specify the width to decode the image too"
 #~ msgstr "Spécifier la largeur pour décoder l'image"
 
@@ -36351,15 +36849,6 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Windows messages interface"
 #~ msgstr "Interface de messages Windows"
 
-#~ msgid " (%1+ rated)"
-#~ msgstr " (classé %1+)"
-
-#~ msgid "Empty"
-#~ msgstr "Vide"
-
-#~ msgid "Deactivate"
-#~ msgstr "Désactiver"
-
 #~ msgid "Audio Fingerprinting"
 #~ msgstr "Empreinte audio"
 
@@ -36372,67 +36861,11 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Fingerprinting track..."
 #~ msgstr "Ajout de l'empreinte sur la piste..."
 
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Effacer"
-
-#~ msgid ""
-#~ "Extension '%s' does not respond.\n"
-#~ "Do you want to kill it now? "
-#~ msgstr ""
-#~ "L'extension '%s' ne répond pas.\n"
-#~ "Voulez-vous la stopper maintenant ? "
-
-#~ msgid "Extension not responding!"
-#~ msgstr "Extension sans réponse !"
-
-#~ msgid "addons local storage"
-#~ msgstr "stockage local d'extensions"
-
-#~ msgid "Addons local storage installer"
-#~ msgstr "Installation du stockage local d'extensions"
-
-#~ msgid "Addons local storage lister"
-#~ msgstr "Liste du stockage local d'extensions"
-
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "Recherche d'extensions Videolan.org"
-
-#~ msgid "addons.videolan.org addons finder"
-#~ msgstr "Recherche d'extensions addons.videolan.org"
-
-#~ msgid "Videolan.org's single archive addons finder"
-#~ msgstr "Recherche d'extensions en une seule archive Videolan.org"
-
-#~ msgid "single .vlp archive addons finder"
-#~ msgstr "Recherche d'extensions en une seule archive .vlp"
-
-#~ msgid "acoustid"
-#~ msgstr "acoustid"
-
-#~ msgid "Track fingerprinter (based on Acoustid)"
-#~ msgstr "Empreinte de piste (basé sur Acoustid)"
-
 #~ msgid "Duration of the fingerprinting"
 #~ msgstr "Durée de l'empreinte"
 
 #~ msgid "Default: 90sec"
 #~ msgstr "Par défaut : 90 s"
-
-#~ msgid "Chromaprint stream output"
-#~ msgstr "Sortie de flux Chromaprint"
-
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "La largeur de la fenêtre de visualisation, en pixels."
-
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "La hauteur de la fenêtre de visualisation, en pixels."
-
-#~ msgid "glSpectrum"
-#~ msgstr "glSpectrum"
-
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "Visualisation du spectre OpenGL 3D"
 
 #~ msgid "Hann"
 #~ msgstr "Hann"

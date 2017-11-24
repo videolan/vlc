@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2014-09-03 10:44+0000\n"
 "Last-Translator: Sok Sophea <sksophea@gmail.com>\n"
 "Language-Team: Khmer (http://www.transifex.com/projects/p/vlc-trans/language/"
@@ -151,7 +151,8 @@ msgstr "ការ​កំណត់​អូឌីយ៉ូ​ផ្សេងៗ
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -353,7 +354,8 @@ msgstr "ការ​ប្រតិបត្តិ​​វីដេអូ​ន
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -951,6 +953,7 @@ msgid "Scrambled"
 msgstr "បាន​ច្របល់"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "បាទ/ចាស"
 
@@ -997,6 +1000,7 @@ msgstr "ភាសា"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "សេចក្ដី​ពណ៌នា"
 
@@ -1020,8 +1024,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "ប៊ីត​ក្នុង​មួយ​គំរូ"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1281,7 +1284,8 @@ msgstr "VLC មិន​អាច​បើក MRL '%s' បាន​ទេ ។ �
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "ចំណងជើង"
@@ -1291,8 +1295,8 @@ msgstr "ចំណងជើង"
 msgid "Artist"
 msgstr "សិល្បករ"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "ចង្វាក់"
 
@@ -1309,7 +1313,7 @@ msgstr "អាល់ប៊ុម"
 msgid "Track number"
 msgstr "លេខ​បទ"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "ការ​វាយតម្លៃ"
 
@@ -1331,7 +1335,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "កំពុង​ចាក់"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "អ្នក​​បោះពុម្ព​​ផ្សាយ"
 
@@ -1371,7 +1375,7 @@ msgstr ""
 msgid "Actors"
 msgstr ""
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "សិល្បករ"
@@ -1853,6 +1857,7 @@ msgstr "វា​អនុញ្ញាត​ឲ្យ​ចាក់​អូឌ
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1901,7 +1906,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "ទទឹង​វីដេអូ"
@@ -1914,7 +1919,7 @@ msgstr "អ្នក​អាច​បង្ខំ​ទទឹង​របស់
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "កម្ពស់​វីដេអូ"
@@ -2514,13 +2519,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "លំនាំដើម"
 
@@ -4106,6 +4112,7 @@ msgid "Long jump length, in seconds."
 msgstr "ប្រវែង​លោត​វែង គិតជា​វិនាទី។"
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5177,14 +5184,14 @@ msgstr "បាន​បរាជ័យ​ក្នុង​កា​របើក
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6024,6 +6031,38 @@ msgstr "ឯកសារ​ភ្ជាប់"
 msgid "Attachment input"
 msgstr "ព័ត៌មាន​បញ្ចូល​ឯកសារ​ភ្ជាប់"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "ការ​ចាប់​យក​វីដេអូ"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "ម៉ូឌុល​លទ្ធផល​អូឌីយ៉ូ"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
+"កម្មវិធី​បញ្ជា​របស់​អ្នក។"
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
+"កម្មវិធី​បញ្ជា​របស់​អ្នក។"
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr ""
@@ -6595,7 +6634,7 @@ msgstr "ឧបករណ៍​ដែល​អ្នក​ជ្រើស​មិ
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "ឧបករណ៍​ចាប់​យក \"%s\" មិន​គាំទ្រ​ប៉ារ៉ាម៉ែត្រ​ដែល​បាន​ទាមទារ។"
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "ការ​តុបតែង​បង្អួច"
@@ -7085,6 +7124,49 @@ msgstr "ព័ត៌មាន​បញ្ចូល​វីដេអូ​ឌី
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "ស្ទង់​រក​ចំណុះ​កាត DVB"
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+"កាត DVB មិន​ហាក់ដូចជា​ត្រូវបាន​ស្ទង់​មើល​ចំណុះ​ទេ អ្នក​អាច​បិទ​លក្ខណៈ​ពិសេស​នេះ ប្រសិន​បើ​អ្នក​មាន​បញ្ហា ។"
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "លេខ​កូដ​ជួរ​ផ្កាយ​រណប"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "DVB"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "បាន​ប្រើ​សម្រាប់​ស្ថិតិ ។"
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "ព័ត៌មាន​បញ្ចូល DVB ជាមួយ​នឹង​ការ​គាំទ្រ v4l2"
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "មុំ​ឌីវីឌី"
@@ -7158,8 +7240,7 @@ msgstr "DVDRead មិន​អាច​អាន​ប្លុក %d/%d នៅ
 msgid "File input"
 msgstr "ឯកសារ​ព័ត៌មាន​បញ្ចូល"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7184,9 +7265,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7202,9 +7283,9 @@ msgid ""
 msgstr "ឈ្មោះ​អ្នកប្រើ​ដែល​នឹង​ត្រូវ​បាន​ប្រើ​សម្រាប់​ការ​តភ្ជាប់។"
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7265,11 +7346,48 @@ msgstr "ការ​តភ្ជាប់ VLC ទៅកាន់​ម៉ាស�
 msgid "Your account was rejected."
 msgstr "គណនី​របស់​អ្នក​ត្រូវ​បាន​បដិសេធ។"
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "ប្រូកស៊ី HTTP"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"ប្រូកស៊ី HTTP ដែល​បាន​ប្រើ គឺ​ត្រូវតែ​ជា​ទម្រង់ http://[user@]myproxy.mydomain:myport/ ; "
+"ប្រសិនបើ​ទ​ទេ អថេរ http_proxy នឹង​ត្រូវ​បាន​សាកល្បង។"
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "ពាក្យសម្ងាត់​ប្រូកស៊ី HTTP"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "ប្រសិនបើ​ប្រូកស៊ី HTTP របស់​អ្នក​ទាមទារ​ពាក្យសម្ងាត់ សូម​កំណត់​វា​នៅ​ទីនេះ។"
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "តភ្ជាប់​ឡើងវិញ​ដោយ​ស្វ័យប្រវត្តិ"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr "ព្យាយាម​តភ្ជាប់​ទៅកាន់​ស្ទ្រីម​ឡើងវិញ​ដោយ​ស្វ័យប្រវត្តិ ក្នុង​ករណី​ដាច់​ការ​តភ្ជាប់​ភ្លាមៗ។"
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "ព័ត៌មាន​បញ្ចូល HTTP"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "ការ​ផ្ទៀងផ្ទាត់ HTTP"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "សូម​បញ្ចូល​ឈ្មោះ​ចូល​ និង​ពាក្យសម្ងាត់​ត្រឹមត្រូវ​សម្រាប់​តំបន់ %s ។"
@@ -7325,47 +7443,10 @@ msgstr ""
 "ឈ្មោះ និង​កំណែ​របស់​កម្មវិធី​នឹង​ត្រូវ​បាន​ផ្ដល់​ទៅកាន់​ម៉ាស៊ីន​មេ HTTP ។ ពួកវា​ត្រូវតែ​បំបែក​ដោយ​សញ្ញា (/) ឧ. "
 "FooBar/1.2.3 ។ ជម្រើស​នេះ​អាច​ត្រូវ​បាន​បញ្ជាក់​ក្នុង​មួយ​ធាតុ​បញ្ចូល​ប៉ុណ្ណោះ គឺ​មិនមែន​ទាំងអស់​ទេ។"
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "ប្រូកស៊ី HTTP"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"ប្រូកស៊ី HTTP ដែល​បាន​ប្រើ គឺ​ត្រូវតែ​ជា​ទម្រង់ http://[user@]myproxy.mydomain:myport/ ; "
-"ប្រសិនបើ​ទ​ទេ អថេរ http_proxy នឹង​ត្រូវ​បាន​សាកល្បង។"
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "ពាក្យសម្ងាត់​ប្រូកស៊ី HTTP"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "ប្រសិនបើ​ប្រូកស៊ី HTTP របស់​អ្នក​ទាមទារ​ពាក្យសម្ងាត់ សូម​កំណត់​វា​នៅ​ទីនេះ។"
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "តភ្ជាប់​ឡើងវិញ​ដោយ​ស្វ័យប្រវត្តិ"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr "ព្យាយាម​តភ្ជាប់​ទៅកាន់​ស្ទ្រីម​ឡើងវិញ​ដោយ​ស្វ័យប្រវត្តិ ក្នុង​ករណី​ដាច់​ការ​តភ្ជាប់​ភ្លាមៗ។"
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "ព័ត៌មាន​បញ្ចូល HTTP"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "Dummy"
 
@@ -7399,6 +7480,7 @@ msgid "Set the category of the elementary stream"
 msgstr "កំណត់​ប្រភេទ​របស់​ស្ទ្រីម​ដំបូង"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "មិន​ស្គាល់"
 
@@ -7801,7 +7883,7 @@ msgstr "ការ​តភ្ជាប់ RTSP បាន​បរាជ័យ"
 msgid "Capture the audio stream in stereo."
 msgstr "ចាប់​យក​ស្ទ្រីម​អូឌីយ៉ូ​ជា​ស្តេរ៉េអូ។"
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "អត្រា​គំរូ"
@@ -7820,328 +7902,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "ការ​បញ្ចូល OSS"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "លទ្ធផល​ស្ទ្រីម Dummy"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "ទុក​ឯកសារ​ដែល​មាន​ស្រាប់"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "សរសេរ​ជាន់​លើ"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"ឯកសារ​លទ្ធផល​មាន​រួចហើយ។ ប្រសិនបើ​អ្នក​បន្ត​កត់ត្រា​ទៀត ឯកសារ​នឹង​ត្រូវ​បាន​សរសេរ​ជាន់​ពីលើ ហើយ​មាតិកា​របស់​"
-"វា​នឹង​បាត់បង់។"
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "សរសេរ​ជាន់​លើ​ឯកសារ​ដែល​មាន"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "ប្រសិនបើ​ឯកសារ​មាន​រួចហើយ វា​នឹង​ត្រូវ​បាន​សរសេរ​ជាន់​ពីលើ។"
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "បន្ថែម​ទៅ​ឯកសារ"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "បន្ថែម​​ទៅ​ឯកសារ ប្រសិន​បើ​វា​មាន​ស្រាប់ ជំនួស​ឲ្យ​ការ​ជំនួស​វា។"
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "ទ្រង់ទ្រាយ​ពេលវេលា និង​កាលបរិច្ឆេទ"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "ដំណើរការ​ទ្រង់ទ្រាយ​កាលបរិច្ឆេទ និង​ពេលវេលា​ ISO C នៅ​លើ​ផ្លូវ​ឯកសារ"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "សម​កាល​សំណេរ"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "បើក​ឯកសារ​ដែល​មាន​សមកាលកម្ម​សំណេរ។"
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "លទ្ធផល​ស្ទ្រីម​ឯកសារ"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "ឈ្មោះ​អ្នកប្រើ​ដែល​នឹង​ត្រូវ​បាន​ស្នើ​ដើម្បី​ចូល​ដំណើរការ​ស្ទ្រីម។"
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "ពាក្យសម្ងាត់​ដែល​នឹង​ត្រូវ​បាន​ស្នើ​ដើម្បី​ចូល​ដំណើរការ​ស្ទ្រីម។"
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "បាន​ត្រឡប់ MIME ដោយ​ម៉ាស៊ីន​មេ (រក​ឃើញ​ដោយ​ស្វ័យប្រវត្តិ ប្រសិន​បើ​មិន​បាន​បញ្ជាក់) ។"
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr ""
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "លទ្ធផល​ស្ទ្រីម HTTP"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "ប្រវែង​ចម្រៀក"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "ប្រវែង​ចម្រៀក​ស្ទ្រីម TS"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "ពុះ​ចម្រៀក​នៅ​កន្លែង​ណា​ក៏​បាន"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr "កុំ​ទាមទារ keyframe មុន​ពេល​ពុះ​ចម្រៀក។ ចាំបាច់​សម្រាប់​តែ​អូឌីយ៉ូ​​ប៉ុណ្ណោះ។"
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "ចំនួន​ចម្រៀក"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "ចំនួន​ចម្រៀក​ដែល​ត្រូវ​បញ្ចូល​នៅ​ក្នុង​លិបិក្រម"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "អនុញ្ញាត​ឃ្លាំង​សម្ងាត់"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr "បន្ថែម EXT-X-ALLOW-CACHE:NO ដោយ​ផ្ទាល់​ទៅ​ក្នុង​ឯកសារ​បញ្ជី​ចាក់ ប្រសិនបើ​វា​ត្រូវ​បាន​បិទ"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "ឯកសារ​លិបិក្រម"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "ផ្លូវ​ទៅកាន់​ឯកសារ​លិបិក្រម​ដែល​ត្រូវ​បង្កើត"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "URL ពេញលេញ​ដែល​ត្រូវ​ដាក់​នៅ​ក្នុង​ឯកសារ​លិបិក្រម"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "URL ពេញ​លេញ​ដែល​ត្រូវ​ដាក់​នៅ​ក្នុង​ឯកសារ​លិបិក្រម។ ប្រើ #'s ដើម្បី​បង្ហាញ​ចំនួន​ចម្រៀក"
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "លុប​ចម្រៀក"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "លុប​ចម្រៀក នៅ​ពេល​លែង​ត្រូវការ​វា​"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "ប្រើ​យន្តការ​ត្រួតពិនិត្យ​​របស់​ឧបករណ៍​ទ្វេ​ទិស"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "AES key URI ដែល​ត្រូវ​ជំនួស​នៅ​ក្នុង​បញ្ជី​ចាក់"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "ឯកសារ AES key"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "ឯកសារ​មាន​សោ​អ៊ីនគ្រីប ១៦បៃ"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "ឯកសារ​ដែល vlc អាន key-uri និង keyfile-location"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"បាន​អាន​ឯកសារ​ពេល​ចម្រៀក​ចាប់ផ្ដើម និង​បាន​សន្មត​ថា​នៅ​ក្នុង​ទ្រង់ទ្រាយ៖ key-uri\\nkey-file ។ "
-"ឯកសារ​ត្រូវ​បាន​អាន​នៅ​ពេល​បើក​ចម្រៀក ហើយ​តម្លៃ​ត្រូវ​បាន​ប្រើ​នៅ​លើ​ចម្រៀក​នោះ។"
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "ប្រើ IV គ្មាន​លំដាប់​សម្រាប់​ការ​ដាក់​លេខ​កូដ"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "បង្កើត IV ជំនួស​ឲ្យ​ការ​ប្រើ​លេខ​ចម្រៀក​ជា IV"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr ""
-
-#: modules/access_output/livehttp.c:106
-#, fuzzy
-msgid "The number of the first segment generated"
-msgstr "ចំនួន​ដង​ដែល​ត្រូវ​ធ្វើ​ការ​លាយ"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "លទ្ធផល​​ស្ទ្រីម HTTP Live"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "ឈ្មោះ​ស្ទ្រីម"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "ឈ្មោះ​ដែល​ត្រូវ​ផ្ដល់​ឲ្យ​ស្ទ្រីម/ឆានែល​នេះ នៅ​លើ​ម៉ាស៊ីន​មេ shoutcast/icecast ។"
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "សេចក្ដី​ពណ៌នា​ស្ទ្រីម"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "សេចក្ដី​ពណ៌នា​របស់​មាតិកា​ស្ទ្រីម ឬ​ព័ត៌មាន​អំពី​ឆានែល​របស់​អ្នក។"
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "ស្ទ្រីម MP3"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"តាម​ធម្មតា អ្នក​ត្រូវតែ​ផ្ដល់​ម៉ូឌុល shoutcast ដែល​មាន​ស្ទ្រីម Ogg ។ វា​​ក៏​អាច​ស្ទ្រីម MP3 ជំនួស​ផង​ដែរ "
-"ដូច្នេះ​អ្នក​អាច​បញ្ជូន​ស្ទ្រីម MP3 បន្ត​ទៅកាន់​ម៉ាស៊ីន​មេ shoutcast/icecast បាន។"
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "សេចក្ដី​ពណ៌នា​ចង្វាក់"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "ចង្វាក់​របស់​មាតិកា។ "
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "សេចក្ដី​ពណ៌នា URL"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "URL ដែល​មាន​ព័ត៌មាន​អំពី​ស្ទ្រីម ឬ​ឆានែល​របស់​អ្នក។"
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "ព័ត៌មាន​អត្រា​ប៊ីត​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "ព័ត៌មាន​អត្រា​គំរូ​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "ចំនួន​ឆានែល"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "ចំនួន​ព័ត៌មាន​ឆានែល​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "គុណភាព Ogg Vorbis"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "ព័ត៌មាន​គុណភាព Ogg Vorbis របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "ស្ទ្រីម​សាធារណៈ"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"ដាក់​ម៉ាស៊ីន​មេ​ឲ្យ​មាន​នៅ​លើ 'Yellow Pages' ជា​សាធារណៈ (​បញ្ជី​ថត​នៃ​ស្ទ្រីម) នៅ​លើ​តំបន់បណ្ដាញ "
-"icecast/shoutcast ។ ត្រូវការ​ព័ត៌មាន​អត្រា​ប៊ីត​ដែល​បាន​បញ្ជាក់​សម្រាប់ shoutcast ។ ត្រូវការ​ស្ទ្រីម "
-"Ogg សម្រាប់ icecast ។"
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "លទ្ធផល IceCAST"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "តម្លៃ​ឃ្លាំង​សម្ងាត់ (មិ.វិ.)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"តម្លៃ​ឃ្លាំង​សម្ងាត់​លំនាំដើម សម្រាប់​ស្ទ្រីម UDP ដែល​ហួស​ព្រំដែន។ តម្លៃ​នេះ​គួរតែ​ត្រូវ​បាន​កំណត់​ជា​មិល្លីវិនាទី។"
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "ដាក់​កញ្ចប់​ជា​ក្រុម"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"កញ្ចប់​អាច​ត្រូវ​បាន​ផ្ញើ​ម្ដង​មួយ ឬ​ជា​ក្រុម​នៅ​ពេល​ជាក់លាក់។ អ្នក​អាច​ជ្រើស​ចំនួន​កញ្ចប់​ដែល​នឹង​ត្រូវ​បាន​ផ្ញើ​ក្នុង​"
-"ពេល​តែមួយ។ វា​ជួយ​​កាត់​បន្ថយ​ក្នុង​ការ​ផ្ទុក​តារាង​ពេលវេលា​នៅ​លើ​ប្រព័ន្ធ​ផ្ទុក​ធ្ងន់។"
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "លទ្ធផល​ស្ទ្រីម UDP"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8157,6 +7917,35 @@ msgstr "PulseAudio"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "លទ្ធផល PulseAudio"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "ជុំវិញ"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "ការ​ចាប់​យក Quicktime"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
+"កម្មវិធី​បញ្ជា​របស់​អ្នក។"
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8586,6 +8375,29 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "ព័ត៌មាន​បញ្ចូល SFTP"
+
+#: modules/access/srt.c:303
+msgid "SRT chunk size (bytes)"
+msgstr ""
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "ពន្យារពេល DTS (មិ.វិ.)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9894,16 +9706,24 @@ msgstr "ប្រេកង់ ៣ Q"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "តម្រង​អូឌីយ៉ូ​សម្រាប់​ការ​ធ្វើ​គំរូ​ការ​កែខៃ​ក្រុម​ដែល​បាន​កំណត់"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "គុណភាព"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr "គុណភាព (0 = មិន​ល្អ និង​លឿន​បំផុត ១០ = ល្អ ហើយ​លឿន​បំផុត) ។"
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "គុណភាព"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "SRC resampler"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "Speex resampler"
 
@@ -11639,6 +11459,16 @@ msgstr ""
 msgid "MPEG audio decoder using mpg123"
 msgstr "ឌិកូឌ័រ​អូឌីយ៉ូ MPEG"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "ឧបករណ៍​ចងក្រង​វីដេអូ Theora"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12316,6 +12146,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "កម្មវិធី​ដោះ​លេខ​កូដ G.711"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "ឌិកូឌ័រ​រូបភាព SDL"
@@ -12743,6 +12582,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "ឌិកូឌ័រ​ចំណងជើង​រង Teletext"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "កម្មវិធី​ដោះ​លេខ​កូដ​ចំណងជើង​រង​អត្ថបទ"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -12906,6 +12750,21 @@ msgstr ""
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "អ៊ិនកូឌ័រ​វីដេអូ Theora"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "ឌិកូឌ័រ"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "ឌិកូឌ័រ​ចំណងជើង​រង EBU STL"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "កម្មវិធី​ញែក​ចំណងជើង​រង EBU STL"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13896,7 +13755,8 @@ msgstr "ចំណុច​ប្រទាក់​ឧបករណ៍​បញ្
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14263,7 +14123,7 @@ msgstr "កំពុង​ចាប់ផ្ដើម"
 msgid "Opening"
 msgstr "កំពុង​បើក"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "កំហុស"
 
@@ -14753,7 +14613,8 @@ msgstr ""
 msgid "Avformat muxer"
 msgstr "ឧបករណ៍​ទ្វេ​ទិស Avformat"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "ឧបករណ៍​ទ្វេ​ទិស"
 
@@ -15107,6 +14968,161 @@ msgstr "កម្រិត​ជុំវិញ"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "ការ​ពន្យាពេល​ជុំវិញ (មិ.វិ.)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "អ្នកនិពន្ធ"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "អ្នក​តែង"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "ផលិតករ"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "ព័ត៌មាន"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "អ្នក​ប្រកែក"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "តម្រូវការ"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "ទ្រង់ទ្រាយ​ដើម"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "បង្ហាញ​ប្រភព​ជា"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "ម៉ាស៊ីន​កុំព្យូទ័រ"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "អ្នក​សម្ដែង"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "អ្នកសម្ដែង​ដើម"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "អ្នក​ផ្ដល់​ខ្លឹមសារ​ប្រភព"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "ការ​ព្រមាន"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "កម្មវិធី"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "អត្ថបទ​ចម្រៀង"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "ក្រុមហ៊ុន​ថត"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "ផលិតផល"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "ដាក់​ជា​ក្រុម"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "ចំណងជើង​រង"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "អ្នក​រៀបចំ"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "ចាងហ្វាង​សិល្បៈ"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "រក្សាសិទ្ធិ​ការ​ទទួលស្គាល់"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "គ្រូ​ភ្លេង"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "សេចក្ដី​ពណ៌នា​ចម្រៀង"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "ទ្រនាប់​ចំណាំ"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "សិទ្ធ​ផលិត"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "វិស្វករ​សំឡេង"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "អ្នក​លេង​សូឡូ"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "អរគុណ"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "ផលិតករ​ប្រតិបត្តិ"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "ប៉ារ៉ាម៉ែត្រ​ការ​ដាក់​លេខ​កូដ"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "លេខ​ប៉ុស្តិ៍"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "សម្អាត"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15486,6 +15502,10 @@ msgstr "ទំហំ​ផតខាស់"
 msgid "%s bytes"
 msgstr "%s បៃ"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "Mime"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -15497,6 +15517,11 @@ msgstr "អ្នក​ស្ដាប់"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "ផ្ទុក"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "តិត្ថិភាព"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15677,6 +15702,10 @@ msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស WAV"
 msgid "XA demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស XA"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "មិនស្គាល់​ប្រភេទ"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "ចំណងជើងដែល​បាន​បិទ"
@@ -15701,10 +15730,6 @@ msgstr "ចំណារ​ពន្យល់​ស៊ីម៉ង់ទិច"
 msgid "Transcript"
 msgstr "សញ្ញា​នៃ​សូរ"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "អត្ថបទ​ចម្រៀង"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "ការ​ចំណាំ​ភាសា"
@@ -15724,10 +15749,6 @@ msgstr "ស្លាយ (អត្ថបទ)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "ស្លាយ (រូបភាព)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "មិនស្គាល់​ប្រភេទ"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -15777,23 +15798,27 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 #, fuzzy
 msgid "Interfaces"
 msgstr "ចំណុចប្រទាក់"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 #, fuzzy
 msgid "Art and meta fetchers"
 msgstr "កម្មវិធី​ទៅ​ប្រមូល​យក​មេតា Lua"
@@ -15802,6 +15827,7 @@ msgstr "កម្មវិធី​ទៅ​ប្រមូល​យក​មេ
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "ផ្នែក​បន្ថែម"
 
@@ -15843,6 +15869,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "ស្បែក"
@@ -15938,10 +15965,10 @@ msgstr "បញ្ចូល​ឈ្មោះ​សម្រាប់​ប្រ
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16102,12 +16129,14 @@ msgid "Playback time"
 msgstr "អត្រា​ចាក់​ឡើងវិញ"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "ចំណង​ជើង​មុន"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "ទៅកាន់​ពេលវេលា"
@@ -16150,9 +16179,10 @@ msgstr "ជ្រើស​ទីតាំង​បង្ហាញ"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17187,26 +17217,6 @@ msgstr "កម្រិត​សំឡេង​ពេញ"
 msgid "Open Audio Effects window"
 msgstr "បែបផែន​អូឌីយ៉ូ"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr ""
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "ប្រភព​បើក​ចំហ"
@@ -17305,6 +17315,7 @@ msgid "Enable DVD menus"
 msgstr "បើក​ម៉ឺនុយ​ឌីវីឌី"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "អាសយដ្ឋាន IP"
 
@@ -17595,58 +17606,6 @@ msgstr "កំហុស​ពេល​រក្សាទុក​មេតា"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC មិន​អាច​រក្សាទុក​ទិន្នន័យ​មេតា​បានទេ ។"
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "ចំណូល​ចិត្ត"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "កំណត់​ឡើងវិញ​ទាំងអស់"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "បង្ហាញ​មូលដ្ឋាន"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "ជ្រើស​ថត"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "ជ្រើស​​ឯកសារ"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "ជ្រើស"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr ""
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "បន្ត"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr ""
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr ""
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -17673,6 +17632,31 @@ msgstr "ការ​រក​ឃើញ​សេវា"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "បិទ​ធាតុ​រក្សា​អេក្រង់"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr ""
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "បន្ត"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr ""
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -17947,6 +17931,16 @@ msgstr "បុព្វបទ"
 msgid "Sequential numbering"
 msgstr "ការ​ដាក់​លេខរៀងតាម​លំដាប់"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "កំណត់​ឡើងវិញ​ទាំងអស់"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "ចំណូល​ចិត្ត"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18045,9 +18039,49 @@ msgstr "គួរ​ឲ្យ​ស្ដាយ គ្រាប់ចុច​�
 msgid "This combination is already taken by \"%@\"."
 msgstr "ការ​បន្សំ​នេះ​គឺ​ត្រូវ​បាន​ជ្រើស​រួចហើយ​ដោយ \"%@\" ។"
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "ចាក់​/ផ្អាក"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "បិទ/បើក​ការ​ចាក់​បញ្ជី​ចាក់​ឡើងវិញ​ដោយ​ចៃដន្យ"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "បង្អួច​មេ..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "សេចក្ដី​ពណ៌នា URL"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "កំពុង​ចាក់"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "ជ្រើស​ថត"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "បើក​ទីតាំង​ពី​ក្ដារ​តម្បៀតខ្ទាស់"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "មិន​បាន​កំណត់"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "វិនាទី"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18363,7 +18397,8 @@ msgid "Add text"
 msgstr "បន្ថែម​អត្ថបទ"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "អត្ថបទ"
 
@@ -18386,9 +18421,41 @@ msgstr "ភាពថ្លា"
 msgid "Organize profiles..."
 msgstr "រៀបចំ​ប្រវត្តិរូប..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "វិនាទី"
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr ""
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "បង្ហាញ​មូលដ្ឋាន"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "ជ្រើស​ថត"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "ជ្រើស​​ឯកសារ"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "ជ្រើស"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -18748,11 +18815,6 @@ msgstr "ទៅ​មុខ​មួយ​ជំហាន"
 msgid "Loop / Repeat"
 msgstr "រង្វិល​ជុំ/ចាក់​ឡើងវិញ"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "ព័ត៌មាន"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "បើក​ចំណងជើង​រង"
@@ -18863,6 +18925,10 @@ msgstr "បញ្ឈប់​រង្វិល​ជុំ​ពី A ទៅ B"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "សមាមាត្រ"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19019,10 +19085,6 @@ msgstr "(យឺត)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "បង្ខំ​បច្ចុប្បន្នភាព​នៃ​តម្លៃ​របស់​ប្រអប់​នេះ"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19669,6 +19731,11 @@ msgstr "ម៉ូឌុល​នេះ​បង្ហាញ​ស្ទ្រី
 msgid "Base port"
 msgstr "ច្រក​គោល"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "ឈ្មោះ​ស្ទ្រីម"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "ម៉ូឌុល​នេះ​បង្ហាញ​ស្ទ្រីម​ដែល​បាន​បម្លែង​ត្រឡប់​ទៅកាន់​ម៉ាស៊ីន​មេ Icecast ។"
@@ -19701,9 +19768,10 @@ msgstr "លុប​ចំណាំ​ទាំងអស់"
 msgid "Extract"
 msgstr "ស្រង់​ចេញ"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -19755,6 +19823,19 @@ msgstr "ចាប់ផ្ដើម"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
+msgstr ""
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "មគ្គុទ្ទេសក៍​កម្មវិធី"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "ធ្វើ​បច្ចុប្បន្នភាព"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
 msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
@@ -20162,50 +20243,6 @@ msgstr "មិន​អាច​រក្សាទុក​ឯកសារ​ច
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "តើ​អ្នក​ពិតជា​ចង់​កំណត់​ចំណូល​ចិត្ត​កម្មវិធី​ចាក់​មេឌៀ​ VLC របស់​អ្នក​ឡើង​វិញ​មែនឬ ?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "បើក​ថត"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "បើក​ថត"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "បើក​បញ្ជី​ចាក់..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "បញ្ជី​ចាក់ XSPF"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "បញ្ជី​ចាក់ M3U"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "បញ្ជី​ចាក់ M3U8"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "រក្សាទុក​បញ្ជីចាក់​ជា​..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "បើក​ចំណង​ជើង​រង..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "ឯកសារ​មេឌៀ"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "ឯកសារ​ចំណងជើង​រង"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "ឯកសារ​ទាំង​អស់"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "លទ្ធផល​ស្ទ្រីម"
@@ -20428,6 +20465,61 @@ msgstr "កាលវិភាគ ៖"
 msgid "VOD: "
 msgstr "VOD ៖"
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "បើក​ថត"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "បើក​ថត"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "បើក​បញ្ជី​ចាក់..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "បញ្ជី​ចាក់ XSPF"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "បញ្ជី​ចាក់ M3U"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "បញ្ជី​ចាក់ M3U8"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "រក្សាទុក​បញ្ជីចាក់​ជា​..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "បើក​ចំណង​ជើង​រង..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "ឯកសារ​មេឌៀ"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "ឯកសារ​ចំណងជើង​រង"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "ឯកសារ​ទាំង​អស់"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr ""
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "ធ្វើឲ្យ​សកម្ម"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
@@ -20533,10 +20625,6 @@ msgstr "បែបផែន និង​តម្រង"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "ការ​ធ្វើសមកាលកម្មវ​បទ"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "មគ្គុទ្ទេសក៍​កម្មវិធី"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21018,6 +21106,12 @@ msgstr "ការ​ព្រមាន"
 msgid "debug"
 msgstr "បំបាត់កំហុស"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "សម្អាត"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "បើក​ឯកសារ​ស្បែក"
@@ -21118,6 +21212,80 @@ msgstr "ជ្រើស​ស្បែក"
 msgid "Open skin..."
 msgstr "បើក​ស្បែក..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "កម្រិត​ពន្លឺ"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"នៅ​ពេល​បាន​បើក​របៀប​នេះ ភីកសែល​នឹង​ត្រូវ​បាន​បង្ហាញ​​ជា​ពណ៌ស ឬ​ខ្មៅ ។ តម្លៃ​កម្រិត​ពណ៌​នឹង​ត្រូវ​បាន​កំណត់​ពន្លឺ​ដូច​"
+"ខាងក្រោម ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "កម្រិត​ពន្លឺ​រូបភាព (០-២)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "កំណត់​​កម្រិត​ពន្លឺ​រូបភាព ចន្លោះ​ពី ០ ទៅ ២ ។ លំនាំដើម​គឺ ១ ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "ពណ៌​លាំៗ​របស់​រូបភាព (០-៣៦០)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "កំណត់​ពណ៌​លាំៗ​របស់​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣៦០ ។ លំនាំដើម​គឺ ០ ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "តិត្ថិភាព​រូបភាព (០-៣)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "កំណត់​តិត្ថិភាព​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣ ។ លំនាំដើម​គឺ ១ ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "ពន្លឺ​រូបភាព (០-២)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "កំណត់​ពន្លឺ​រូបភាព ចន្លោះ​ពី ០ ទៅ ២ ។ លំនាំដើម​គឺ ១ ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "ហ្កាម៉ា​រូបភាព (០-១០)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "កំណត់​ហ្កាម៉ា​រូបភាព ចន្លោះ​ពី ០.០១ ទៅ ១០ ។ លំនាំដើម​គឺ ១ ។"
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "DirectX Video Acceleration (DXVA) 2.0"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "លទ្ធផល​វីដេអូ Direct3D"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -21176,6 +21344,16 @@ msgstr ""
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
+
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "តម្រង​វីដេអូ"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "DirectX Video Acceleration (DXVA) 2.0"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21237,15 +21415,22 @@ msgstr ""
 msgid "VDPAU sharpen video filter"
 msgstr ""
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "តម្រង​វីដេអូ"
+msgid "file keystore (plaintext)"
+msgstr "បញ្ជី​កម្មវិធី​វេច​ខ្ចប់​ដែល​ចូលចិត្ត"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "DirectX Video Acceleration (DXVA) 2.0"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21314,6 +21499,186 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keystore for iOS, Mac OS X and tvOS"
+msgstr ""
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "ប្រើ​អង្គ​ចងចាំ​ចែករំលែក"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "យក​អ្វី​ដែល​បាន​ជ្រើស​ចេញ"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "ប្រើ​អង្គ​ចងចាំ​ចែករំលែក"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "ប្រើ​អង្គ​ចងចាំ​ចែករំលែក"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "បន្ថែម​រូប​សញ្ញា"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "ស្ងាត់"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "ចុះ​កំណត់ហេតុ​សារ VLC ទាំងអស់​ទៅកាន់​ឯកសារ​អត្ថបទ។"
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "កុងសូល"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "កុងសូល"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "ព័ត៌មាន​បន្ថែម"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "បំបាត់កំហុស"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "ចុះ​​កំណត់ហេតុ​ទៅកាន់​ឯកសារ"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "ចុះ​កំណត់ហេតុ​សារ VLC ទាំងអស់​ទៅកាន់​ឯកសារ​អត្ថបទ។"
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "ឈ្មោះ​ឯកសារ​កំណត់ហេតុ"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "បញ្ជាក់​ឈ្មោះ​ឯកសារ​កំណត់​ហេតុ ។"
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "ទ្រង់ទ្រាយ​កំណត់ហេតុ"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "បញ្ជាក់​ទ្រង់ទ្រាយ​ការ​ចូល។"
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "ភាព​សម្បូរ​បែប"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"ជ្រើស​​ភាព​សម្បូរ​បែប​ដែល​ត្រូវ​ប្រើ​សម្រាប់​កំណត់ហេតុ ឬ -១ ដើម្បី​ប្រើ​ភាព​សម្បូរ​បែប​ដូច​គ្នា​ដែល​បាន​​ផ្ដល់​ដោយ --"
+"verbose ។"
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "ការ​ចុះ​កំណត់ហេតុ"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "ការ​ចុះ​កំណត់ហេតុ​ឯកសារ"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "របាំង​បំបាត់​កំហុស"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "សមត្ថភាព"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "សេវា​កំណត់ហេតុ​ប្រព័ន្ធ"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "ចុះ​កំណត់ហេតុ​ទៅ​កំណត់ហេតុ​ប្រព័ន្ធ"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
 msgstr ""
 
 #: modules/lua/libs/httpd.c:75
@@ -22007,6 +22372,36 @@ msgstr "JPop"
 msgid "Synthpop"
 msgstr "Synthpop"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "អត្រា​ប៊ីត​មូលដ្ឋាន​អតិ."
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "តម្រង​ការ​ប្លែង​ភាព​វីដេអូ"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "ឈ្មោះ​អ្នកប្រើ​គណនី last.fm របស់​អ្នក"
@@ -22055,6 +22450,15 @@ msgid ""
 msgstr ""
 "សូម​កំណត់​ឈ្មោះ​អ្នកប្រើ ឬ​បិទ​កម្មវិធី​ជំនួយ audioscrobbler ហើយ​ចាប់ផ្ដើម VLC ឡើងវិញ ។\n"
 "ចូល​មើល http://www.last.fm/join/ ដើម្បី​បង្កើត​គណនី ។"
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "Acoustic"
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22383,10 +22787,6 @@ msgstr ""
 
 #: modules/mux/avi.c:56
 msgid "Encoder"
-msgstr ""
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
 msgstr ""
 
 #: modules/mux/avi.c:60
@@ -22835,6 +23235,18 @@ msgstr "រូបភាព​"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "រូបភាពរបស់​ខ្ញុំ"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "សេវា Bonjour"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "សេវា Bonjour"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -23969,6 +24381,63 @@ msgstr "Bridge ក្រៅ"
 msgid "Bridge in"
 msgstr "Bridge ក្នុង"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "ច្រក SFTP"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "ម៉ូឌុល​នេះ​បង្ហាញ​ស្ទ្រីម​ដែល​បាន​បម្លែង​ត្រឡប់​ទៅកាន់​ម៉ាស៊ីន​មេ Icecast ។"
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "អាសយដ្ឋាន​កុំព្យូទ័រ​ដែល​ត្រូវ​ស្ទ្រីម​ទៅ​កាន់ ។"
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "ទ្រង់ទ្រាយ​ក្រូម៉ា"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "ក្រូម៉ា"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "លទ្ធផល​ស្ទ្រីម Bridge"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស Avformat"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24025,6 +24494,10 @@ msgstr "ណែនាំ​ការ​ពន្យារពេល​នៅ​ក
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "បង្ហាញ​លទ្ធផល​ស្ទ្រីម"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "លទ្ធផល​ស្ទ្រីម Dummy"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24312,6 +24785,10 @@ msgid ""
 "packets."
 msgstr "វា​ផ្ញើ និង​ទទួល​កញ្ចប់ RTCP ដែល​បាន​ទ្វេ​ទិស​តាម​ច្រក​ដូចគ្នា​នឹង​កញ្ចប់ RTP ។"
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "តម្លៃ​ឃ្លាំង​សម្ងាត់ (មិ.វិ.)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24356,6 +24833,15 @@ msgid ""
 msgstr ""
 "សម័យ RTSP នឹង​មិន​ត្រូវ​បាន​បិទ​ឡើយ​បន្ទាប់ពី​មិន​បាន​ទទួល​សំណើ RTSP ណាមួយ​ក្នុង​រយៈពេល​យូរ​នោះ ។ លំនាំដើម​គឺ "
 "៦០ (មួយ​នាទី) ។"
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "ឈ្មោះ​អ្នកប្រើ​ដែល​នឹង​ត្រូវ​បាន​ស្នើ​ដើម្បី​ចូល​ដំណើរការ​ស្ទ្រីម។"
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "ពាក្យសម្ងាត់​ដែល​នឹង​ត្រូវ​បាន​ស្នើ​ដើម្បី​ចូល​ដំណើរការ​ស្ទ្រីម។"
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25014,58 +25500,6 @@ msgstr "Swscale"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "កម្មវិធី​បម្លែង YUVP"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "កម្រិត​ពន្លឺ"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"នៅ​ពេល​បាន​បើក​របៀប​នេះ ភីកសែល​នឹង​ត្រូវ​បាន​បង្ហាញ​​ជា​ពណ៌ស ឬ​ខ្មៅ ។ តម្លៃ​កម្រិត​ពណ៌​នឹង​ត្រូវ​បាន​កំណត់​ពន្លឺ​ដូច​"
-"ខាងក្រោម ។"
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "កម្រិត​ពន្លឺ​រូបភាព (០-២)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "កំណត់​​កម្រិត​ពន្លឺ​រូបភាព ចន្លោះ​ពី ០ ទៅ ២ ។ លំនាំដើម​គឺ ១ ។"
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "ពណ៌​លាំៗ​របស់​រូបភាព (០-៣៦០)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "កំណត់​ពណ៌​លាំៗ​របស់​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣៦០ ។ លំនាំដើម​គឺ ០ ។"
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "តិត្ថិភាព​រូបភាព (០-៣)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "កំណត់​តិត្ថិភាព​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣ ។ លំនាំដើម​គឺ ១ ។"
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "ពន្លឺ​រូបភាព (០-២)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "កំណត់​ពន្លឺ​រូបភាព ចន្លោះ​ពី ០ ទៅ ២ ។ លំនាំដើម​គឺ ១ ។"
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "ហ្កាម៉ា​រូបភាព (០-១០)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "កំណត់​ហ្កាម៉ា​រូបភាព ចន្លោះ​ពី ០.០១ ទៅ ១០ ។ លំនាំដើម​គឺ ១ ។"
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26723,6 +27157,15 @@ msgstr "លទ្ធផល​វីដេអូ OpenGL"
 msgid "Windows GDI video output"
 msgstr "ការ​បង្ហាញ​វីដេអូ វីនដូ GDI"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr ""
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "ផ្នែក​បន្ថែម EGL សម្រាប់ OpenGL"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "ទ្រង់ទ្រាយ​ក្រូម៉ា​​រូបភាព Dummy"
@@ -27196,6 +27639,26 @@ msgstr "តម្រង​វីដេអូ​ជញ្ជាំង"
 msgid "Image wall"
 msgstr "ជញ្ជាំង​រូបភាព"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "ទទឹង​បង្អួច​វីដេអូ​ គិត​ជា​ភីកសែល ។"
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "កម្ពស់​បង្អួច​វីដេអូ គិត​ជា​ភីកសែល ។"
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "វិសាលគម"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "រូបភាព​មើល​ឃើញ​បច្ចុប្បន្ន"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "ទទឹង​ការ​បង្ហាញ Goom"
@@ -27641,10 +28104,6 @@ msgstr "តើ​អ្នក​ពិតជា​ចង់​បង្កើត
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "ប្រអប់"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "ធ្វើ​បច្ចុប្បន្នភាព"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -28512,6 +28971,250 @@ msgid "Media Manager List"
 msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "គុណភាព"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "គុណភាព​រូបភាព"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "គុណភាព​​បង្ហាញ"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr "គុណភាព (0 = មិន​ល្អ និង​លឿន​បំផុត ១០ = ល្អ ហើយ​លឿន​បំផុត) ។"
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "ពេលវេលា​ចាប់ផ្ដើម"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "ប្រដាប់​រាវ​កូដ​ប្រទេស"
+
+#~ msgid "Keep existing file"
+#~ msgstr "ទុក​ឯកសារ​ដែល​មាន​ស្រាប់"
+
+#~ msgid "Overwrite"
+#~ msgstr "សរសេរ​ជាន់​លើ"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "ឯកសារ​លទ្ធផល​មាន​រួចហើយ។ ប្រសិនបើ​អ្នក​បន្ត​កត់ត្រា​ទៀត ឯកសារ​នឹង​ត្រូវ​បាន​សរសេរ​ជាន់​ពីលើ ហើយ​មាតិកា​"
+#~ "របស់​វា​នឹង​បាត់បង់។"
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "សរសេរ​ជាន់​លើ​ឯកសារ​ដែល​មាន"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "ប្រសិនបើ​ឯកសារ​មាន​រួចហើយ វា​នឹង​ត្រូវ​បាន​សរសេរ​ជាន់​ពីលើ។"
+
+#~ msgid "Append to file"
+#~ msgstr "បន្ថែម​ទៅ​ឯកសារ"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "បន្ថែម​​ទៅ​ឯកសារ ប្រសិន​បើ​វា​មាន​ស្រាប់ ជំនួស​ឲ្យ​ការ​ជំនួស​វា។"
+
+#~ msgid "Format time and date"
+#~ msgstr "ទ្រង់ទ្រាយ​ពេលវេលា និង​កាលបរិច្ឆេទ"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "ដំណើរការ​ទ្រង់ទ្រាយ​កាលបរិច្ឆេទ និង​ពេលវេលា​ ISO C នៅ​លើ​ផ្លូវ​ឯកសារ"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "សម​កាល​សំណេរ"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "បើក​ឯកសារ​ដែល​មាន​សមកាលកម្ម​សំណេរ។"
+
+#~ msgid "File stream output"
+#~ msgstr "លទ្ធផល​ស្ទ្រីម​ឯកសារ"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "បាន​ត្រឡប់ MIME ដោយ​ម៉ាស៊ីន​មេ (រក​ឃើញ​ដោយ​ស្វ័យប្រវត្តិ ប្រសិន​បើ​មិន​បាន​បញ្ជាក់) ។"
+
+#~ msgid "HTTP stream output"
+#~ msgstr "លទ្ធផល​ស្ទ្រីម HTTP"
+
+#~ msgid "Segment length"
+#~ msgstr "ប្រវែង​ចម្រៀក"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "ប្រវែង​ចម្រៀក​ស្ទ្រីម TS"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "ពុះ​ចម្រៀក​នៅ​កន្លែង​ណា​ក៏​បាន"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr "កុំ​ទាមទារ keyframe មុន​ពេល​ពុះ​ចម្រៀក។ ចាំបាច់​សម្រាប់​តែ​អូឌីយ៉ូ​​ប៉ុណ្ណោះ។"
+
+#~ msgid "Number of segments"
+#~ msgstr "ចំនួន​ចម្រៀក"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "ចំនួន​ចម្រៀក​ដែល​ត្រូវ​បញ្ចូល​នៅ​ក្នុង​លិបិក្រម"
+
+#~ msgid "Allow cache"
+#~ msgstr "អនុញ្ញាត​ឃ្លាំង​សម្ងាត់"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr "បន្ថែម EXT-X-ALLOW-CACHE:NO ដោយ​ផ្ទាល់​ទៅ​ក្នុង​ឯកសារ​បញ្ជី​ចាក់ ប្រសិនបើ​វា​ត្រូវ​បាន​បិទ"
+
+#~ msgid "Index file"
+#~ msgstr "ឯកសារ​លិបិក្រម"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "ផ្លូវ​ទៅកាន់​ឯកសារ​លិបិក្រម​ដែល​ត្រូវ​បង្កើត"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "URL ពេញលេញ​ដែល​ត្រូវ​ដាក់​នៅ​ក្នុង​ឯកសារ​លិបិក្រម"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr "URL ពេញ​លេញ​ដែល​ត្រូវ​ដាក់​នៅ​ក្នុង​ឯកសារ​លិបិក្រម។ ប្រើ #'s ដើម្បី​បង្ហាញ​ចំនួន​ចម្រៀក"
+
+#~ msgid "Delete segments"
+#~ msgstr "លុប​ចម្រៀក"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "លុប​ចម្រៀក នៅ​ពេល​លែង​ត្រូវការ​វា​"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "ប្រើ​យន្តការ​ត្រួតពិនិត្យ​​របស់​ឧបករណ៍​ទ្វេ​ទិស"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "AES key URI ដែល​ត្រូវ​ជំនួស​នៅ​ក្នុង​បញ្ជី​ចាក់"
+
+#~ msgid "AES key file"
+#~ msgstr "ឯកសារ AES key"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "ឯកសារ​មាន​សោ​អ៊ីនគ្រីប ១៦បៃ"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "ឯកសារ​ដែល vlc អាន key-uri និង keyfile-location"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "បាន​អាន​ឯកសារ​ពេល​ចម្រៀក​ចាប់ផ្ដើម និង​បាន​សន្មត​ថា​នៅ​ក្នុង​ទ្រង់ទ្រាយ៖ key-uri\\nkey-file ។ "
+#~ "ឯកសារ​ត្រូវ​បាន​អាន​នៅ​ពេល​បើក​ចម្រៀក ហើយ​តម្លៃ​ត្រូវ​បាន​ប្រើ​នៅ​លើ​ចម្រៀក​នោះ។"
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "ប្រើ IV គ្មាន​លំដាប់​សម្រាប់​ការ​ដាក់​លេខ​កូដ"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "បង្កើត IV ជំនួស​ឲ្យ​ការ​ប្រើ​លេខ​ចម្រៀក​ជា IV"
+
+#, fuzzy
+#~ msgid "The number of the first segment generated"
+#~ msgstr "ចំនួន​ដង​ដែល​ត្រូវ​ធ្វើ​ការ​លាយ"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "លទ្ធផល​​ស្ទ្រីម HTTP Live"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr "ឈ្មោះ​ដែល​ត្រូវ​ផ្ដល់​ឲ្យ​ស្ទ្រីម/ឆានែល​នេះ នៅ​លើ​ម៉ាស៊ីន​មេ shoutcast/icecast ។"
+
+#~ msgid "Stream description"
+#~ msgstr "សេចក្ដី​ពណ៌នា​ស្ទ្រីម"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "សេចក្ដី​ពណ៌នា​របស់​មាតិកា​ស្ទ្រីម ឬ​ព័ត៌មាន​អំពី​ឆានែល​របស់​អ្នក។"
+
+#~ msgid "Stream MP3"
+#~ msgstr "ស្ទ្រីម MP3"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "តាម​ធម្មតា អ្នក​ត្រូវតែ​ផ្ដល់​ម៉ូឌុល shoutcast ដែល​មាន​ស្ទ្រីម Ogg ។ វា​​ក៏​អាច​ស្ទ្រីម MP3 ជំនួស​ផង​"
+#~ "ដែរ ដូច្នេះ​អ្នក​អាច​បញ្ជូន​ស្ទ្រីម MP3 បន្ត​ទៅកាន់​ម៉ាស៊ីន​មេ shoutcast/icecast បាន។"
+
+#~ msgid "Genre description"
+#~ msgstr "សេចក្ដី​ពណ៌នា​ចង្វាក់"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "ចង្វាក់​របស់​មាតិកា។ "
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "URL ដែល​មាន​ព័ត៌មាន​អំពី​ស្ទ្រីម ឬ​ឆានែល​របស់​អ្នក។"
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "ព័ត៌មាន​អត្រា​ប៊ីត​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "ព័ត៌មាន​អត្រា​គំរូ​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
+
+#~ msgid "Number of channels"
+#~ msgstr "ចំនួន​ឆានែល"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "ចំនួន​ព័ត៌មាន​ឆានែល​របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "គុណភាព Ogg Vorbis"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "ព័ត៌មាន​គុណភាព Ogg Vorbis របស់​ស្ទ្រីម​បម្លែង​ត្រឡប់។ "
+
+#~ msgid "Stream public"
+#~ msgstr "ស្ទ្រីម​សាធារណៈ"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "ដាក់​ម៉ាស៊ីន​មេ​ឲ្យ​មាន​នៅ​លើ 'Yellow Pages' ជា​សាធារណៈ (​បញ្ជី​ថត​នៃ​ស្ទ្រីម) នៅ​លើ​តំបន់បណ្ដាញ "
+#~ "icecast/shoutcast ។ ត្រូវការ​ព័ត៌មាន​អត្រា​ប៊ីត​ដែល​បាន​បញ្ជាក់​សម្រាប់ shoutcast ។ ត្រូវការ​"
+#~ "ស្ទ្រីម Ogg សម្រាប់ icecast ។"
+
+#~ msgid "IceCAST output"
+#~ msgstr "លទ្ធផល IceCAST"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "តម្លៃ​ឃ្លាំង​សម្ងាត់​លំនាំដើម សម្រាប់​ស្ទ្រីម UDP ដែល​ហួស​ព្រំដែន។ តម្លៃ​នេះ​គួរតែ​ត្រូវ​បាន​កំណត់​ជា​"
+#~ "មិល្លីវិនាទី។"
+
+#~ msgid "Group packets"
+#~ msgstr "ដាក់​កញ្ចប់​ជា​ក្រុម"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "កញ្ចប់​អាច​ត្រូវ​បាន​ផ្ញើ​ម្ដង​មួយ ឬ​ជា​ក្រុម​នៅ​ពេល​ជាក់លាក់។ អ្នក​អាច​ជ្រើស​ចំនួន​កញ្ចប់​ដែល​នឹង​ត្រូវ​បាន​ផ្ញើ​"
+#~ "ក្នុង​ពេល​តែមួយ។ វា​ជួយ​​កាត់​បន្ថយ​ក្នុង​ការ​ផ្ទុក​តារាង​ពេលវេលា​នៅ​លើ​ប្រព័ន្ធ​ផ្ទុក​ធ្ងន់។"
+
+#~ msgid "UDP stream output"
+#~ msgstr "លទ្ធផល​ស្ទ្រីម UDP"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "បិទ"
 
@@ -28527,9 +29230,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Navigation"
 #~ msgstr "ការ​រុករក"
-
-#~ msgid "Be quiet"
-#~ msgstr "ស្ងាត់"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "បិទ​សារ​ព័ត៌មាន និង​សារ​ព្រមាន​ទាំង​អស់ ។"
@@ -28553,15 +29253,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "HTTP/TLS Certificate Revocation List"
 #~ msgstr "បញ្ជី​ដក​ហូត​វិញ្ញាបនបត្រ HTTP/TLS"
-
-#~ msgid "Log to file"
-#~ msgstr "ចុះ​​កំណត់ហេតុ​ទៅកាន់​ឯកសារ"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "ចុះ​កំណត់ហេតុ​សារ VLC ទាំងអស់​ទៅកាន់​ឯកសារ​អត្ថបទ។"
-
-#~ msgid "Log to syslog"
-#~ msgstr "ចុះ​កំណត់ហេតុ​ទៅ​កំណត់ហេតុ​ប្រព័ន្ធ"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "ចុះ​កំណត់​ហេតុ​សារ VLC ទាំងអស់​ទៅកាន់​កំណត់ហេតុ​ប្រព័ន្ធ (ប្រព័ន្ធ យូនីក)។"
@@ -28605,9 +29296,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Configure"
 #~ msgstr "កំណត់​រចនាសម្ព័ន្ធ"
-
-#~ msgid "Channel number"
-#~ msgstr "លេខ​ប៉ុស្តិ៍"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -28693,19 +29381,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Video Capture height"
 #~ msgstr "ការ​ចាប់​យក​កម្ពស់​វីដេអូ"
-
-#~ msgid "Quicktime Capture"
-#~ msgstr "ការ​ចាប់​យក Quicktime"
-
-#~ msgid "No Input device found"
-#~ msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
-#~ "កម្មវិធី​បញ្ជា​របស់​អ្នក។"
 
 #~ msgid "RDP auth username"
 #~ msgstr "ឈ្មោះ​អ្នកប្រើ​ការ​ផ្ទៀងផ្ទាត់ RDP"
@@ -28936,90 +29611,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "ឌិកូឌ័រ​បណ្ណាល័យ QuickTime"
-
-#~ msgid "Writer"
-#~ msgstr "អ្នកនិពន្ធ"
-
-#~ msgid "Composer"
-#~ msgstr "អ្នក​តែង"
-
-#~ msgid "Producer"
-#~ msgstr "ផលិតករ"
-
-#~ msgid "Disclaimer"
-#~ msgstr "អ្នក​ប្រកែក"
-
-#~ msgid "Requirements"
-#~ msgstr "តម្រូវការ"
-
-#~ msgid "Original Format"
-#~ msgstr "ទ្រង់ទ្រាយ​ដើម"
-
-#~ msgid "Display Source As"
-#~ msgstr "បង្ហាញ​ប្រភព​ជា"
-
-#~ msgid "Host Computer"
-#~ msgstr "ម៉ាស៊ីន​កុំព្យូទ័រ"
-
-#~ msgid "Performers"
-#~ msgstr "អ្នក​សម្ដែង"
-
-#~ msgid "Original Performer"
-#~ msgstr "អ្នកសម្ដែង​ដើម"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "អ្នក​ផ្ដល់​ខ្លឹមសារ​ប្រភព"
-
-#~ msgid "Warning"
-#~ msgstr "ការ​ព្រមាន"
-
-#~ msgid "Software"
-#~ msgstr "កម្មវិធី"
-
-#~ msgid "Record Company"
-#~ msgstr "ក្រុមហ៊ុន​ថត"
-
-#~ msgid "Model"
-#~ msgstr "ម៉ូដែល"
-
-#~ msgid "Grouping"
-#~ msgstr "ដាក់​ជា​ក្រុម"
-
-#~ msgid "Sub-Title"
-#~ msgstr "ចំណងជើង​រង"
-
-#~ msgid "Arranger"
-#~ msgstr "អ្នក​រៀបចំ"
-
-#~ msgid "Art Director"
-#~ msgstr "ចាងហ្វាង​សិល្បៈ"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "រក្សាសិទ្ធិ​ការ​ទទួលស្គាល់"
-
-#~ msgid "Conductor"
-#~ msgstr "គ្រូ​ភ្លេង"
-
-#~ msgid "Song Description"
-#~ msgstr "សេចក្ដី​ពណ៌នា​ចម្រៀង"
-
-#~ msgid "Liner Notes"
-#~ msgstr "ទ្រនាប់​ចំណាំ"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "សិទ្ធ​ផលិត"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "វិស្វករ​សំឡេង"
-
-#~ msgid "Soloist"
-#~ msgstr "អ្នក​លេង​សូឡូ"
-
-#~ msgid "Thanks"
-#~ msgstr "អរគុណ"
-
-#~ msgid "Executive Producer"
-#~ msgstr "ផលិតករ​ប្រតិបត្តិ"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "អត្រា​ស៊ុម​ដែល​ចង់បាន​សម្រាប់​ស្ទ្រីម H264 ។"
@@ -29402,9 +29993,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "This wizard allows configuring simple streaming or transcoding setups."
 #~ msgstr "អ្នកជំនួយការ​នេះ​អនុញ្ញាត​ឲ្យ​រៀបចំ​កំណត់​រចនាសម្ព័ន្ធ​ការ​ស្ទ្រីម​ធម្មតា ឬ​ការ​បម្លែង​ត្រឡប់ ។"
 
-#~ msgid "More Info"
-#~ msgstr "ព័ត៌មាន​បន្ថែម"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -29449,9 +30037,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Streaming method"
 #~ msgstr "វិធីសាស្ត្រ​ស្ទ្រីម"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "អាសយដ្ឋាន​កុំព្យូទ័រ​ដែល​ត្រូវ​ស្ទ្រីម​ទៅ​កាន់ ។"
 
 #~ msgid "UDP Unicast"
 #~ msgstr "យូនីខាស់ UDP"
@@ -29683,9 +30268,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "A->B Loop"
 #~ msgstr "រង្វិលជុំ A->B"
 
-#~ msgid "Current visualization"
-#~ msgstr "រូបភាព​មើល​ឃើញ​បច្ចុប្បន្ន"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "&សរសេរ​ប្ដូរ​ទៅការ​កំណត់​រចនាសម្ព័ន្ធ"
 
@@ -29704,39 +30286,14 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "បាន​ផ្អាក​ថាមពល ហើយ​សម័យ​ទំនេរ​បាន​អស់​ម៉ោង។"
 
-#~ msgid "Log format"
-#~ msgstr "ទ្រង់ទ្រាយ​កំណត់ហេតុ"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "បញ្ជាក់​ទ្រង់ទ្រាយ​ការ​ចូល។"
-
 #~ msgid "Syslog ident"
 #~ msgstr "លេខ​សម្គាល់​កំណត់ហេតុ​ប្រព័ន្ធ"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "កំណត់​លេខ​សម្គាល់​ដែល VLC នឹង​ប្រើ​ពេល​ចូល​កំណត់ហេតុ​ប្រព័ន្ធ។"
 
-#~ msgid "Syslog facility"
-#~ msgstr "សេវា​កំណត់ហេតុ​ប្រព័ន្ធ"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "ជ្រើស​ភាព​ងាយស្រួល​កំណត់ហេតុ​ប្រព័ន្ធ​ដែល​កំណត់ហេតុ​នឹង​ត្រូវ​បាន​បញ្ជូន​បន្ត។"
-
-#~ msgid "Verbosity"
-#~ msgstr "ភាព​សម្បូរ​បែប"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "ជ្រើស​​ភាព​សម្បូរ​បែប​ដែល​ត្រូវ​ប្រើ​សម្រាប់​កំណត់ហេតុ ឬ -១ ដើម្បី​ប្រើ​ភាព​សម្បូរ​បែប​ដូច​គ្នា​ដែល​បាន​​ផ្ដល់​"
-#~ "ដោយ --verbose ។"
-
-#~ msgid "Log filename"
-#~ msgstr "ឈ្មោះ​ឯកសារ​កំណត់ហេតុ"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "បញ្ជាក់​ឈ្មោះ​ឯកសារ​កំណត់​ហេតុ ។"
 
 #~ msgid "Local drives"
 #~ msgstr "ដ្រាយ​មូលដ្ឋាន"
@@ -30099,9 +30656,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Hue windowing"
 #~ msgstr "ដាក់​ពណ៌លាំៗ​ឲ្យ​វីនដូ"
 
-#~ msgid "Used for statistics."
-#~ msgstr "បាន​ប្រើ​សម្រាប់​ស្ថិតិ ។"
-
 #~ msgid "Sat windowing"
 #~ msgstr "ការ​ដាក់​តិត្ថិភាព​ឲ្យ​បង្អួច"
 
@@ -30389,9 +30943,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "%.1f MHz (%d services)\n"
 #~ "~%s remaining"
 #~ msgstr "%.1f MHz (%d សេវាកម្ម)"
-
-#~ msgid "Scanning DVB"
-#~ msgstr "DVB"
 
 #~ msgid ""
 #~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
@@ -32183,9 +32734,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "identifier of that window (0 means none)."
 #~ msgstr "VLC X11 គ្មាន."
 
-#~ msgid "Use shared memory"
-#~ msgstr "ប្រើ​អង្គ​ចងចាំ​ចែករំលែក"
-
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr "VLC."
 
@@ -32387,18 +32935,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "MTU for out mode."
 #~ msgstr "MTU សម្រាប់​របៀប​ខាងក្រៅ ។"
-
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "ស្ទង់​រក​ចំណុះ​កាត DVB"
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ""
-#~ "កាត DVB មិន​ហាក់ដូចជា​ត្រូវបាន​ស្ទង់​មើល​ចំណុះ​ទេ អ្នក​អាច​បិទ​លក្ខណៈ​ពិសេស​នេះ ប្រសិន​បើ​អ្នក​មាន​បញ្ហា ។"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "ព័ត៌មាន​បញ្ចូល DVB ជាមួយ​នឹង​ការ​គាំទ្រ v4l2"
 
 #~ msgid "Uncompressed RAR"
 #~ msgstr "RAR ដែល​មិន​បាន​បង្ហាប់"

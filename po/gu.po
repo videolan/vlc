@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2015-12-04 10:01+0000\n"
 "Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
 "Language-Team: Gujarati (India) (http://www.transifex.com/yaron/vlc-trans/"
@@ -151,7 +151,8 @@ msgstr "વિવિધ જાતનાં ઓડિયો સુયોજનો
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -359,7 +360,8 @@ msgstr "ઇચ્છે ત્યારે વિડિઓનાં VLC નુ�
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -961,6 +963,7 @@ msgid "Scrambled"
 msgstr "મિશ્રિત કરેલું "
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "હાં"
 
@@ -1007,6 +1010,7 @@ msgstr "ભાષા"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "વર્ણન"
 
@@ -1030,8 +1034,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "નમૂના પ્રતિ બીટ"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1288,7 +1291,8 @@ msgstr "MRL '%s' ને ખોલવા માટે VLC અસમર્થ છ�
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "શીર્ષક"
@@ -1298,8 +1302,8 @@ msgstr "શીર્ષક"
 msgid "Artist"
 msgstr "કલાકાર"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "પ્રકાર"
 
@@ -1316,7 +1320,7 @@ msgstr "આલ્બમ"
 msgid "Track number"
 msgstr "ટ્રેક નંબર"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "ક્રમાંકન"
 
@@ -1338,7 +1342,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "હવે વગાડી રહ્યા છે"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "પ્રકાશક"
 
@@ -1378,7 +1382,7 @@ msgstr "નામ બતાવો"
 msgid "Actors"
 msgstr "કલાકાર"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "કલાકાર"
@@ -1865,6 +1869,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1914,7 +1919,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "વિડિઓ પહોળાઇ"
@@ -1929,7 +1934,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "વિડિઓ ઊંચાઇ"
@@ -2542,13 +2547,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "મૂળભૂત"
 
@@ -4160,6 +4166,7 @@ msgid "Long jump length, in seconds."
 msgstr "લાંબી કૂદકા લંબાઇ. સેકંડમાં."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5233,14 +5240,14 @@ msgstr "લખવા માટે \"%s\" ને ખોલવાનું નિ�
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6084,6 +6091,36 @@ msgstr "જોડાણ"
 msgid "Attachment input"
 msgstr "જોડાણ ઇનપુટ"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "ઓડિયો આઉટપુટ મોડ્યુલ"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "ઓડિયો આઉટપુટ મોડ્યુલ"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "AVIO"
@@ -6664,7 +6701,7 @@ msgstr "ઉપકરણ જે તમે પસંદ કરેલ છે તે
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "બંધિત ઉપકરણ \"%s\" એ જરૂરી પરિમાણોને આધાર આપતુ નથી."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "વિન્ડો સજાવટ"
@@ -7152,6 +7189,48 @@ msgstr "ડિજિટલ વિડિઓ (ફાયરવાયર/ieee1394) �
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr ""
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "સેટેલાઇટ પહોંચ કોડ"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "માપ ગુણવત્તા"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "આંકડાશાસ્ત્ર માટે વાપરેલ."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr ""
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "DVD ખૂણો"
@@ -7227,8 +7306,7 @@ msgstr "%d/%d  બ્લોક  0x%02x પર DVDRead વાંચી શકય�
 msgid "File input"
 msgstr "ફાઇલ ઇનપુટ"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7253,9 +7331,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7271,9 +7349,9 @@ msgid ""
 msgstr "વપરાશકર્તા નામ કે જે જોડાણ માટે વાપરેલ હશે."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7334,11 +7412,50 @@ msgstr "આપેલ સર્વર માટે VLC નું જોડાણ 
 msgid "Your account was rejected."
 msgstr "તમારુ ખાતુ નામંજૂર થયેલ હતુ."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "HTTP પ્રોક્સી"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"વાપરવા માટે HTTP પ્રોક્સી તે http://[user@]myproxy.mydomain:myport/ નાં રૂપમાં હોવી "
+"જ જોઇએ ; જો ખાલી હોય તો, http_proxy પર્યાવરણ ચલનો પ્રયત્ન થયેલ હશે."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "HTTP પ્રોક્સી પાસવર્ડ"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "જો તમારી HTTP પ્રોક્સીને પાસવર્ડની જરૂરિયાત હોય તો, અહિંયા તેને સુયોજિત કરો."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "આપોઆપ ફરી જોડાવો"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"જો અચાનક રીતે જોડાણ તૂટી ગયું હોય તેવી સ્થિતિમાં સ્ટ્રીમ સાથે ફરી જોડાવા આપમેળે પ્રયત્ન કરે "
+"છે."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "HTTP ઇનપુટ"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "HTTP સત્તાધિકરણ"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "મહેરબાની કરીને વિસ્તાર %s માટે  યોગ્ય પ્રવેશ નામ અને પાસવર્ડને દાખલ કરો."
@@ -7395,49 +7512,10 @@ msgstr ""
 "હોવા જોઈએ, દા.ત. ફૂબાર/1.2.3. આ વિકલ્પ ફક્ત દર ઇનપુટ દીઠ આપી શકાય, ના કે વૈશ્વિક "
 "રીતે."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP પ્રોક્સી"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"વાપરવા માટે HTTP પ્રોક્સી તે http://[user@]myproxy.mydomain:myport/ નાં રૂપમાં હોવી "
-"જ જોઇએ ; જો ખાલી હોય તો, http_proxy પર્યાવરણ ચલનો પ્રયત્ન થયેલ હશે."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "HTTP પ્રોક્સી પાસવર્ડ"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "જો તમારી HTTP પ્રોક્સીને પાસવર્ડની જરૂરિયાત હોય તો, અહિંયા તેને સુયોજિત કરો."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "આપોઆપ ફરી જોડાવો"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"જો અચાનક રીતે જોડાણ તૂટી ગયું હોય તેવી સ્થિતિમાં સ્ટ્રીમ સાથે ફરી જોડાવા આપમેળે પ્રયત્ન કરે "
-"છે."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "HTTP ઇનપુટ"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "નકલી"
 
@@ -7471,6 +7549,7 @@ msgid "Set the category of the elementary stream"
 msgstr "પ્રાથમિક સ્ટ્રીમનો વર્ગ સુયોજિત કરો"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "અજ્ઞાત"
 
@@ -7878,7 +7957,7 @@ msgstr "RTSP જોડાણ નિષ્ફળ"
 msgid "Capture the audio stream in stereo."
 msgstr "સ્ટીરિઓમાં ઓડિયો સ્ટ્રીમને કેદ કરો."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "નમુના દર"
@@ -7897,327 +7976,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "OSS ઇનપુટ"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "નકલી સ્ટ્રીન આઉટપુટ"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "હાલની ફાઇલને રાખો"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "ઉપર લખો"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"આઉટપુટ ફાઈલ પેહલેથી હાજર છે. જો ધ્વન્યાલેખન ચાલુ રેહશે તો ફાઈલની ઉપર લખાશે અને એની અંદરની "
-"માહિતી જતી રેહશે."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "હાલની ફાઇલ ઉપર લખો"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "જો ફાઇલ પહેલેથી અસ્તિત્વમાં છે, તેને ઉપર ફરી લખાઇ જશે."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "ફાઇલ સાથે જોડાવો"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "ફાઇલ સાથે જોડાવો જો તે તેને બદલે અસ્તિત્વમાં હોય."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "બંધારણ સમય અને તારીખ"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "ફાઇલ પાથ પર ISO C સમય અને તારીખ બંધારણને ચલાવો"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "સુમેળ રીતે લખી રહ્યા છે"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "સુમેળ રીતે લખવા સાથે ફાઇલને ખોલો."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "ફાઇલ સ્ટ્રીમ આઉટપુટ"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "વપરાશકર્તાનામ કે જે સ્ટ્રીમમાં પ્રવેશવા સૂચિત થયેલ હશે."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "પાસવર્ડ કે જે સ્ટ્રીમમાં પ્રવેશવા માટે સૂચિત થયેલ હશે."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "માઈમ"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "સર્વર વડે MIME પાછુ આવેલ છે (આપમેળે શોધેલ હતુ જો સ્પષ્ટ થયેલ ન હોય)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "મેટાક્યુબ"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr "મેટાકયુબ પ્રોટોકોલનો ઉપયોગ કરો. ક્યુબમેપ રીફ્લેકટરને સ્ટ્રીમ કરવા માટે જરૂરી."
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "HTTP સ્ટ્રીમ આઉટપુટ"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "ભાગ લંબાઇ"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "TS સ્ટ્રીમ ભાગોની લંબાઇ"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "કોઇપણ જગ્યાએ ભાગોને અલગ કરો"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr "ભાગને અલગ કરતા પહેલાં કીફ્રેમની જરૂર નથી. ફક્ત ઓડિયો માટે જરૂરી છે."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "ભાગોની સંખ્યા "
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "અનુક્રમણિકામાં સમાવવા માટે ભાગોની સંખ્યા"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "કેશને પરવાનગી આપો"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr "વગાડવાની યાદીમાં EXT-X-ALLOW-CACHE:NO ડિરેક્ટીવને ઉમેરો જો નિષ્ક્રિય થયેલ હોય"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "અનુક્રમણિકા ફાઇલ"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "બનાવવા માટે અનુક્રમણિકા ફાઇલનો પાથ"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "અનુક્રમણિકા ફાઇલમાં મૂકવા માટે સંપૂર્ણ URL"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "અનુક્રમણિકા ફાઇલમાં મૂકવા માટે સંપૂર્ણ URL. ભાગ નંબરને રજૂ કરવા માટે # ને વાપરો"
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "ભાગોને કાઢી નાંખો"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "ભાગોને કાઢી નાંખો જ્યારે તેઓની લાંબા સમય જરૂર નથી"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "મક્સર દર નિયંત્રણ પદ્દતિને વાપરો"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "વગાડવા માટેની યાદીમાં સ્થિત કરવા માટે AES કી URI"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "AES કી ફાઇલ"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "ફાઇલ એ 16 બાઇટ એનક્રિપ્શન કીને સમાવી રહયા છે"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "ફાઇલ જ્યાં vlc એ key-uri અને keyfile-location વાંચે છે"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"ફાઇલ વાંચેલ છે જ્યારે ભાગ શરૂ થાય અને બંધારણમાં છે તેવું ધારેલ છે: key-uri\\nkey-file. ફાઇલ "
-"ખોલેલ ભાગ પર વાંચ્યુ છે અને કિંમતો તે ભાગ પર વાપરેલ છે."
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "એનક્રિપ્શન માટે ગમેતે IV ને વાપરો"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "IV તરીકે ભાગ-નંબરને વાપરવાને બદલે IV ને પેદા કરો"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "પ્રથમ ભાગનો નંબર"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "ઉત્પન્ન થયેલ પ્રથમ ભાગનો નંબર"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "HTTP જીવંત સ્ટ્રીમીંગ આઉટપુટ"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "સ્ટ્રીમ નામ"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "શાઉટકાસ્ટ/આઈસકાસ્ટ સર્વર પર આ સ્ટ્રીમ/ચેનલને નામ આપો."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "સ્ટ્રીમ વર્ણન"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "સ્ટ્રીમ સમાવિષ્ટનું વર્ણન અથવા તમારાં ચેનલ વિશે જાણકારી."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "સ્ટ્રીમ MP3"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"સામાન્ય રીતે તમારે Ogg સ્ટ્રીમ સાથે શાઉટકાસ્ટ મોડ્યુલ પૂરું પડવાનું હોય છે. એના બદલે MP3 "
-"સ્ટ્રીમ કરવું શક્ય છે જેથી તમે MP3 સ્ટ્રીમને શાઉટકાસ્ટ/આઈસકાસ્ટ સર્વરને મોકલી શકો."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "પ્રકારનું વર્ણન"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "સમાવિષ્ટોનાં પ્રકાર. "
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "URL વર્ણન"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "સ્ટ્રીમ અથવા તમારાં ચેનલ વિશે જાણકારી સાથે URL."
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની બીટરેટ જાણકારી. "
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની નમૂનાદર જાણતાકી. "
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "ચેનલોની સંખ્યા"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમી ચેનલોની સંખ્યાની જાણકારી. "
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Ogg વર્બિસ ગુણવત્તા"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની Ogg વર્બિસ ગુણવત્તા જાણકારી. "
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "સ્ટ્રીમ સાર્વજનિક"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"શાઉટકાસ્ટ/આઈસકાસ્ટ ની વેબસાઈટ પર 'યેલ્લો પેજીસ' (સ્ટ્રીમની નિર્દેશિકા) માં સર્વરને "
-"સાર્વજનિક રીતે ઉપલબ્ધ કરવો. શાઉટકાસ્ટ માટે આપેલી બીટરેટની માહિતીની જરૂર છે.આઈસકાસ્ટ "
-"સ્ટ્રીમ કરવા માટે Ogg ની જરૂર છે."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "IceCAST આઉટપુટ"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "કેશીંગ કિંમત (ms)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"આઉટબાઉન્ડ UDP સ્ટ્રીમ માટે મૂળભૂત કેશીંગ કિંમત. આ કિંમત મિલિસેકંડમાં સુયોજિત હોવી જોઇએ."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "જૂથ પેકેટ"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"પેકેટ એક પછી એક બરાબર સમયે અથવા જૂથ દ્વારા મોકલી શકાય. તમે એક સમયે કેટલા પેકેટ મોકલવા "
-"એ પસંદ કરી શકો છો. એ ખુબ કામના ભાર હેઠળના સીસ્ટમ પર ભાર ઓછો કરવામાં મદદ કરશે."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "UDP સ્ટ્રીમ આઉટપુટ"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8233,6 +7991,34 @@ msgstr "પલ્સઓડિયો"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "પલ્સઓડિયો ઇનપુટ"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "આસપાસ"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "ક્વિકટાઇમ કેપ્ચર"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8662,6 +8448,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "SFTP ઇનપુટ"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "UDP એ બફર માપને પ્રાપ્ત કરે છે (bytes)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "DTS વિલંબ (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9974,17 +9784,24 @@ msgstr "આવૃત્તિ 3 Q"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "બેન્ડ-સીમિત પ્રક્ષેપના ફરીથી નમુના લેવા માટે ઓડિયો ફિલ્ટર"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "ફરીથી લેવાતા નમુનાની ગુણવત્તા"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"ફરીથી લેવાતા નમુનાની ગુણવત્તા (0 = સૌથી ખરાબ અને ઝડપી, 10 = સૌથી સારું અને ધીમુ)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "ફરીથી લેવાતા નમુનાની ગુણવત્તા"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "SRC રીસેમ્પલર"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "સ્પીકસ રીસેમ્પલર"
 
@@ -11732,6 +11549,16 @@ msgstr "મીડિયા ફાઉન્ડેશન ટ્રાન્સફ�
 msgid "MPEG audio decoder using mpg123"
 msgstr "MPEG ઓડિયો ડિકોડર"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "WebM વિડિઓ ડિકોડર"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "Theora વિડિઓ પેકેટસાઇઝર"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12411,6 +12238,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "G.711 ડિકોડર"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "SDL છબી ડિકોડર"
@@ -12839,6 +12675,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "ટેલિટેક્સ ઉપશીર્ષક ડિકોડર"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "લખાણ ઉપશીર્ષક ડિકોડર"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13001,6 +12842,21 @@ msgstr "WebM વિડિઓ ડિકોડર"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "WebM વિડિઓ ડિકોડર"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "MMAL ડિકોડર"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "EBU STL ઉપશીર્ષક ડિકોડર"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "EBU STL ઉપશીર્ષક પાર્સર"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13987,7 +13843,8 @@ msgstr "D-Bus નિયંત્રણ ઇન્ટરફેસ"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14357,7 +14214,7 @@ msgstr "પ્રારંભ કરી રહ્યા છે"
 msgid "Opening"
 msgstr "ખોલી રહ્યા છે"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "ભૂલ"
 
@@ -14850,7 +14707,8 @@ msgstr "ડિમક્સર"
 msgid "Avformat muxer"
 msgstr "Avformat મક્સર"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "મક્સર"
 
@@ -15207,6 +15065,161 @@ msgstr "આસપાસનું સ્તર"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "સરાઉન્ડ વિલંબ (ms)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "લેખક"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "કમ્પોઝર"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "નિર્દેશક"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "જાણકારી"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "જાહેરાત"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "જરૂરિયાતો"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "મૂળભૂત બંધારણ"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "આ તરીકે સ્ત્રોતને દર્શાવો"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "યજમાન કમ્પ્યૂટર"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "કલાકાર"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "મૂળ કલાકાર"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "પ્રદાતા સ્ત્રોત સમાવિષ્ટ"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "ચેતવણી"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "સોફ્ટવેર"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "ગીતનાં શબ્દો"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "રેકોર્ડ કંપની"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "મોડલ"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "પ્રોડક્ટ"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "જૂથીકરણ"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "ઉપશીર્ષક"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "સંચાલક"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "કલા નિર્માતા"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "કોપીરાઇટ સ્વીકૃતિ"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "કન્ડક્ટર"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "ગીત વર્ણન"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "લાઇનર નોંધો"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "ફોનતાર હકો"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "સાઉન્ડ ઇજનેર"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "સોલોઈસ્ટ"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "તમારો આભાર"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "એક્ઝિક્યુટિવ નિર્માતા"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "એનકોડીંગ પરિમાણો"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "ચેનલ નંબર"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "કિવર્ડ"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "સાફ કરો"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15595,6 +15608,10 @@ msgstr "પોડકાસ્ટ માપ"
 msgid "%s bytes"
 msgstr "%s બાઇટ"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "માઈમ"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "શાઉટકાસ્ટ"
@@ -15606,6 +15623,11 @@ msgstr "સાંભળનાર"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "લાવો"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "સંતૃપ્તિ"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15789,6 +15811,10 @@ msgstr "WAV ડિમક્સર"
 msgid "XA demuxer"
 msgstr "XA ડિમક્સર"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "અજ્ઞાત વર્ગ"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "બંધ કૅપ્શન"
@@ -15813,10 +15839,6 @@ msgstr "સિમેન્ટીક એનોટેશંસ"
 msgid "Transcript"
 msgstr "ટ્રાન્સસ્ક્રિપ્ટ"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "ગીતનાં શબ્દો"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "ભાષાકીય માર્કઅપ"
@@ -15836,10 +15858,6 @@ msgstr "તકતીઓ (લખાણ)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "તકતીઓ (છબી)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "અજ્ઞાત વર્ગ"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -15890,22 +15908,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "વગાડવા માટેની યાદી પાર્સર"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "સેવા શોધ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr ""
 
@@ -15913,6 +15935,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "એક્સટેન્શન"
 
@@ -15954,6 +15977,7 @@ msgstr "બિનસ્થાપિત"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "આવરણ"
@@ -16049,10 +16073,10 @@ msgstr "નવી રૂપરેખા માટે નામને દાખ�
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16213,12 +16237,14 @@ msgid "Playback time"
 msgstr "પ્લેબેક દર"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "પહેલાંનુ શીર્ષક"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "સમય સાથે જાઓ"
@@ -16261,9 +16287,10 @@ msgstr "આઉટપુટ સ્થાનને પસંદ કરો"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17309,26 +17336,6 @@ msgstr "પૂર્ણ અવાજ"
 msgid "Open Audio Effects window"
 msgstr "ઓડિયો અસરો"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "B"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "KB"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "MB"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "GB"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "TB"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "સ્ત્રોત ખોલો"
@@ -17428,6 +17435,7 @@ msgid "Enable DVD menus"
 msgstr "DVD મેનુને સક્રિય કરો"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "IP સરનામું"
 
@@ -17719,58 +17727,6 @@ msgstr "જ્યારે મેટાને સંગ્રહી રહ્ય
 msgid "VLC was unable to save the meta data."
 msgstr "VLC એ મેટાડેટાને સંગ્રહવા અસમર્થ હતુ."
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "પસંદગીઓ"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "બધુ પુન:સુયોજિત કરો"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "મૂળભૂત બતાવો"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "ડિરેક્ટરીને પસંદ કરો"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "ફાઇલને પસંદ કરો"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "પસંદ કરો"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "શું પ્લેબેકને ચાલુ રાખવુ છે?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "ચાલુ રાખો"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "સતત ચાલતુ પ્લેબેક"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "શું પ્લેબેકને ફરી શરૂ કરવુ છે?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr "\"%@\" નું પ્લેબેક એ %@ પર ચાલુ રહેશે"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -17797,6 +17753,31 @@ msgstr "સેવા શોધ"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "સ્ક્રીનસેવરને નિષ્ક્રિય કરો"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "શું પ્લેબેકને ચાલુ રાખવુ છે?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "ચાલુ રાખો"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "સતત ચાલતુ પ્લેબેક"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "શું પ્લેબેકને ફરી શરૂ કરવુ છે?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr "\"%@\" નું પ્લેબેક એ %@ પર ચાલુ રહેશે"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18070,6 +18051,16 @@ msgstr "ઉપસર્ગ"
 msgid "Sequential numbering"
 msgstr "ક્રમાંકિત નંબર"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "બધુ પુન:સુયોજિત કરો"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "પસંદગીઓ"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18164,9 +18155,49 @@ msgstr "દુ:ખની વાત એ છે કે, આ કી એ હોટ�
 msgid "This combination is already taken by \"%@\"."
 msgstr "આ સંયોજન પહેલેથી \"%@\" દ્દારા લીધેલ છે."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "વગાડો/થોભો"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "ટોગલ ગમેતે વગાડવા માટેની યાદીને ફરી વગાડો "
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "મુખ્ય વિન્ડો..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "URL વર્ણન"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "હવે વગાડી રહ્યા છે"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "ફોલ્ડર પસંદ કરો"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "ક્લિપબોર્ડમાંથી સ્થાનને ખોલો (&L)"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "સુયોજિત નથી"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "સેકંડ."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18482,7 +18513,8 @@ msgid "Add text"
 msgstr "લખાણ ઉમેરો"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "લખાણ"
 
@@ -18505,9 +18537,41 @@ msgstr "પારદર્શકતા"
 msgid "Organize profiles..."
 msgstr "રૂપરેખાને ગોઠવો..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "સેકંડ."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "B"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "KB"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "MB"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "GB"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "TB"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "મૂળભૂત બતાવો"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "ડિરેક્ટરીને પસંદ કરો"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "ફાઇલને પસંદ કરો"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "પસંદ કરો"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -18868,11 +18932,6 @@ msgstr "આગળ વધો"
 msgid "Loop / Repeat"
 msgstr "લુપ / પૂનરાવર્તન"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "જાણકારી"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "ઉપશીર્ષકને ખોલો"
@@ -18983,6 +19042,10 @@ msgstr "A થી B લુપને બંધ કરો"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "આશરે દર"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19139,10 +19202,6 @@ msgstr "(વિલંબ થયેલ)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "આ સંવાદની કિંમતોનાં સુધારા પર દબાણ કરો"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19792,6 +19851,11 @@ msgstr "આ મોડ્યુલ RTP મારફતે નેટવર્ક�
 msgid "Base port"
 msgstr "મૂળ પોર્ટ"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "સ્ટ્રીમ નામ"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "આ મોડ્યુલ Icecast સર્વરમાં ટ્રાન્સકોડ થયેલ સ્ટ્રીમનું આઉટપુટ લે છે."
@@ -19824,9 +19888,10 @@ msgstr "બધા બુકમાર્કોને કાઢી નાંખો
 msgid "Extract"
 msgstr "અર્ક કાઢો"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -19879,6 +19944,19 @@ msgstr "શરૂ કરો (&S)"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "પાત્રો"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "કાર્યક્રમ માર્ગદર્શિકા"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "સુધારો"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20299,50 +20377,6 @@ msgstr "પસંદગી ફાઇલને સંગ્રહી શક્ય
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "શું તમે ખરેખર તમારાં VLC મીડિયા પ્લેયર પસંદીઓને પુન:સુયોજિત કરવા માંગો છો?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "ડિરેક્ટરી ખોલો"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "ફોલ્ડર ખોલો"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "વગાડવા માટેની યાદી ખોલો..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "XSPF વગાડવા માટેની યાદી"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "M3U વગાડવા માટેની યાદી"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "M3U8 વગાડવા માટેની યાદી"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "આ તરીકે વગાડવા માટેની યાદીને સંગ્રહો..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "ઉપશીર્ષકને ખોલો..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "મીડિયા ફાઇલો"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "ઉપશીર્ષક ફાઇલો"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "બધી ફાઇલો"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "સ્ટ્રીમ આઉટપુટ"
@@ -20565,6 +20599,61 @@ msgstr "સમયક્રમ: "
 msgid "VOD: "
 msgstr "VOD: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "ડિરેક્ટરી ખોલો"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "ફોલ્ડર ખોલો"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "વગાડવા માટેની યાદી ખોલો..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "XSPF વગાડવા માટેની યાદી"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "M3U વગાડવા માટેની યાદી"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "M3U8 વગાડવા માટેની યાદી"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "આ તરીકે વગાડવા માટેની યાદીને સંગ્રહો..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "ઉપશીર્ષકને ખોલો..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "મીડિયા ફાઇલો"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "ઉપશીર્ષક ફાઇલો"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "બધી ફાઇલો"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr ""
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "સક્રિય કરો"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "જ્યાંથી છોડી દીધું હતું ત્યાંથી શું પ્લેબેકને ફરી શરૂ કરવા માંગો છો?"
@@ -20669,10 +20758,6 @@ msgstr "અસરો અને ફિલ્ટરો (&E)"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "ટ્રેક સુમેળતા (&T)"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "કાર્યક્રમ માર્ગદર્શિકા"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21155,6 +21240,12 @@ msgstr "ચેતવણીઓ"
 msgid "debug"
 msgstr "ડિબગ"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "સાફ કરો"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "આવરણ ફાઇલને ખોલો"
@@ -21253,6 +21344,80 @@ msgstr "આવરણ પસંદ કરો"
 msgid "Open skin..."
 msgstr "આવરણ ખોલો ..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "પ્રકાશતા થ્રેશોલ્ડ"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"જ્યારે આ સ્થિતિ સક્રિય થયેલ હોય, પિક્સેલ એ કાળા અથવા સફેદ તરીકે બતાવેલ હશે. થ્રેશોલ્ડ કિંમત "
+"નીચે વ્યાખ્યાયિત થયેલ પ્રકાશતાને દેખાડશે."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "વિપરીત છબી (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "છબી વિરોધાભાસને સુયોજિત કરે છે, 0 અને 2 વચ્ચે. મૂળભૂત 1 છે."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "છબી રંગ (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "છબી રંગને સુયોજિત કરો, 0 અને 360 વચ્ચે. મૂળભૂત 0 છે."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "છબી સંતૃપ્તિ (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "છબી સંતૃપ્તિને સુયોજિત કરો, 0 અને 3 ની વચ્ચે છે. મૂળભૂત 1 છે."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "છબી તેજસ્વિતા (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "છબી પ્રકાશતાને સુયોજિત કરો, 0 અને 2 વચ્ચે છે. મૂળભૂત 1 છે."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "છબી ગામા (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "છબી ગામાને સુયોજિત કરો, 0.01 અને 10 ની વચ્ચે, મૂળભૂત 1 છે."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "ડાયરેકટ વિડિઓ એક્સેલરેશન (DXVA) 2.0"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "VDPAU વિડિઓ ફિલ્ટર સંતુલિત"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr "યજમાન મેમરીને બદલે RPI VideoCore માં સીધું ફ્રેમને ડીકોડ કરો."
@@ -21316,6 +21481,16 @@ msgstr "MMAL vout"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "રાસબરી Pi માટે MMAL-આધારિત vout પ્લગઇન"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "ઓડિયો ફિલ્ટર"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "વિડિઓ માપ ફિલ્ટર"
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "VDPAU વિડિઓ ફિલ્ટર સંતુલિત"
@@ -21376,15 +21551,22 @@ msgstr "VDPAU આઉટપુટ"
 msgid "VDPAU sharpen video filter"
 msgstr "VDPAU તીવ્રતા વિડિઓ ફિલ્ટર"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "ઓડિયો ફિલ્ટર"
+msgid "file keystore (plaintext)"
+msgstr "પસંદ થયેલ પેકેટસાઇઝર યાદી"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "વિડિઓ માપ ફિલ્ટર"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21455,6 +21637,183 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "OS X અને iOS માટે TLS આધાર"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+msgid "Secrets are stored via KWallet"
+msgstr ""
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "સાઉટ સ્ટ્રીમ"
+
+#: modules/keystore/memory.c:42
+msgid "secrets are stored in memory"
+msgstr ""
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+msgid "Secrets are stored via libsecret"
+msgstr ""
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "લૉગો ઉમેરો"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "શાંત રહો"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "લખાણ ફાઇલમાં બધા VLC સંદેશાનો લ઼ૉગ કરો."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "કન્સોલ"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "કન્સોલ"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "વધારે જાણકારી"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "ડિબગ"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "ફાઇલમાં લૉગ લો"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "લખાણ ફાઇલમાં બધા VLC સંદેશાનો લ઼ૉગ કરો."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "લૉગ ફાઇલનામ"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "લૉગ ફાઇલનામને સ્પષ્ટ કરો."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "લૉગ બંધારણ"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "લૉગીંગ બંધારણને સ્પષ્ટ કરો."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "વર્બોસીટી"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"લૉગ માટે વાપરવા વર્બોસીટીને પસંદ કરો અથવા --verbose દ્દારા આપેલ એજ વર્બોસીટીને "
+"વાપરવા -1."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "પ્રવેશી રહ્યા છે"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "ફાઇલ પ્રવેશ"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "ડિબગ માસ્ક"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "ક્ષમતા"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "Syslog સુવિધા"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "syslog માં લૉગ લો"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22148,6 +22507,36 @@ msgstr "JPop"
 msgid "Synthpop"
 msgstr "સીન્થપોપ"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "મહત્તમ સ્થાનિક બીટરેટ"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "વિડિઓ રૂપાંતરણ ફિલ્ટર"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "તમારાં last.fm ખાતાનું વપરાશકર્તાનામ"
@@ -22197,6 +22586,16 @@ msgstr ""
 "મહેરબાની કરીને વપરાશકર્તાનામને સુયોજિત કરો અથવા ઓડિયોસ્ક્રોબલર પ્લગઇનને નિષ્ક્રિય કરો, "
 "અને VLC ને ફરી શરૂ કરો.\n"
 "ખાતાને મેળવવા માટે http://www.last.fm/join/ ની મુલાકાત લો."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "એકોસ્ટિક"
+
+#: modules/misc/fingerprinter.c:74
+#, fuzzy
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr "ઇનપુટ મળ્યુ નથી"
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22531,10 +22930,6 @@ msgstr "વિષય"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "એનકોડર"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "કિવર્ડ"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -22992,6 +23387,18 @@ msgstr "ચિત્ર"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "મારું ચિત્ર"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "બોન્જોર સેવાઓ"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "બોન્જોર સેવાઓ"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24138,6 +24545,63 @@ msgstr "બ્રીજ આઉટ"
 msgid "Bridge in"
 msgstr "બ્રિજ ઇન"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "SFTP પોર્ટ"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "આ મોડ્યુલ Icecast સર્વરમાં ટ્રાન્સકોડ થયેલ સ્ટ્રીમનું આઉટપુટ લે છે."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "તેમાં સ્ટ્રીમ કરવા માટે કમ્પ્યૂટરનું સરનામું."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "ક્રોમા બંધારણ"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "ક્રોમા"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "Avformat ડિમક્સર"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24194,6 +24658,10 @@ msgstr "સ્ટ્રીમનાં દર્શાવમાં વિલં�
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "સ્ટ્રીમ આઉટપુટને દર્શાવો"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "નકલી સ્ટ્રીન આઉટપુટ"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24482,6 +24950,10 @@ msgid ""
 msgstr ""
 "આ RTP પેકેટ તરીકે એજ પોર્ટ પર મલ્ટીપ્લેક્ષ થયેલ RTCP પેકેટને મોકલાય છે અને પ્રાપ્ત થાય છે."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "કેશીંગ કિંમત (ms)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24528,6 +25000,15 @@ msgstr ""
 "આ લાંબા સમય માટે કોઈપણ RTSP માંગણી પ્રાપ્ત કરતા નથી તે પછી RTSP સત્રોને બંધ કરેલ હશે. "
 "નકારાત્મક કિમંત અથવા શૂન્ય તરીકે તેને સુયોજિત કરવાથી સમયસમાપ્તિ નિષ્ક્રિય થાય છે. મૂળભૂત "
 "60 છે (એક મિનીટ)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "વપરાશકર્તાનામ કે જે સ્ટ્રીમમાં પ્રવેશવા સૂચિત થયેલ હશે."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "પાસવર્ડ કે જે સ્ટ્રીમમાં પ્રવેશવા માટે સૂચિત થયેલ હશે."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25183,58 +25664,6 @@ msgstr "Swscale"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "YUVP રૂપાંતરક"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "પ્રકાશતા થ્રેશોલ્ડ"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"જ્યારે આ સ્થિતિ સક્રિય થયેલ હોય, પિક્સેલ એ કાળા અથવા સફેદ તરીકે બતાવેલ હશે. થ્રેશોલ્ડ કિંમત "
-"નીચે વ્યાખ્યાયિત થયેલ પ્રકાશતાને દેખાડશે."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "વિપરીત છબી (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "છબી વિરોધાભાસને સુયોજિત કરે છે, 0 અને 2 વચ્ચે. મૂળભૂત 1 છે."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "છબી રંગ (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "છબી રંગને સુયોજિત કરો, 0 અને 360 વચ્ચે. મૂળભૂત 0 છે."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "છબી સંતૃપ્તિ (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "છબી સંતૃપ્તિને સુયોજિત કરો, 0 અને 3 ની વચ્ચે છે. મૂળભૂત 1 છે."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "છબી તેજસ્વિતા (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "છબી પ્રકાશતાને સુયોજિત કરો, 0 અને 2 વચ્ચે છે. મૂળભૂત 1 છે."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "છબી ગામા (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "છબી ગામાને સુયોજિત કરો, 0.01 અને 10 ની વચ્ચે, મૂળભૂત 1 છે."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26897,6 +27326,15 @@ msgstr "OpenGL વિડિઓ આઉટપુટ"
 msgid "Windows GDI video output"
 msgstr "વિન્ડો GDI વિડિઓ આઉટપુટ"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "GPU એફીનીટી"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "OpenGL માટે EGL એક્સટેન્શન"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "નકલી ઇમેજ ક્રોમા બંધારણ"
@@ -27372,6 +27810,26 @@ msgstr "વોલ વિડિઓ ફિલ્ટર"
 msgid "Image wall"
 msgstr "છબી દિવાલ"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "વિડિઓ વિન્ડોની પહોળાઇ, પિક્સેલમાં."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "વિડિઓ વિન્ડોની ઊંચાઇ, પિક્સેલમાં."
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "વર્ણપટ"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "હાલની કલ્પના"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "ગુમ દર્શાવ પહોળાઇ"
@@ -27822,10 +28280,6 @@ msgstr "શું તમે ખરેખર સ્ટ્રીમને બન�
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "સંવાદ"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "સુધારો"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -28688,6 +29142,261 @@ msgid "Media Manager List"
 msgstr "મીડિયા સંચાલક યાદી"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "ફરીથી લેવાતા નમુનાની ગુણવત્તા"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "માપ ગુણવત્તા"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "રેન્ડરીંગ ગુણવત્તા"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "ફરીથી લેવાતા નમુનાની ગુણવત્તા (0 = સૌથી ખરાબ અને ઝડપી, 10 = સૌથી સારું અને ધીમુ)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "શરૂઆતનો સમય"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "ટુનર દેશ કોડ"
+
+#~ msgid "Keep existing file"
+#~ msgstr "હાલની ફાઇલને રાખો"
+
+#~ msgid "Overwrite"
+#~ msgstr "ઉપર લખો"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "આઉટપુટ ફાઈલ પેહલેથી હાજર છે. જો ધ્વન્યાલેખન ચાલુ રેહશે તો ફાઈલની ઉપર લખાશે અને એની "
+#~ "અંદરની માહિતી જતી રેહશે."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "હાલની ફાઇલ ઉપર લખો"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "જો ફાઇલ પહેલેથી અસ્તિત્વમાં છે, તેને ઉપર ફરી લખાઇ જશે."
+
+#~ msgid "Append to file"
+#~ msgstr "ફાઇલ સાથે જોડાવો"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "ફાઇલ સાથે જોડાવો જો તે તેને બદલે અસ્તિત્વમાં હોય."
+
+#~ msgid "Format time and date"
+#~ msgstr "બંધારણ સમય અને તારીખ"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "ફાઇલ પાથ પર ISO C સમય અને તારીખ બંધારણને ચલાવો"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "સુમેળ રીતે લખી રહ્યા છે"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "સુમેળ રીતે લખવા સાથે ફાઇલને ખોલો."
+
+#~ msgid "File stream output"
+#~ msgstr "ફાઇલ સ્ટ્રીમ આઉટપુટ"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "સર્વર વડે MIME પાછુ આવેલ છે (આપમેળે શોધેલ હતુ જો સ્પષ્ટ થયેલ ન હોય)."
+
+#~ msgid "Metacube"
+#~ msgstr "મેટાક્યુબ"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr "મેટાકયુબ પ્રોટોકોલનો ઉપયોગ કરો. ક્યુબમેપ રીફ્લેકટરને સ્ટ્રીમ કરવા માટે જરૂરી."
+
+#~ msgid "HTTP stream output"
+#~ msgstr "HTTP સ્ટ્રીમ આઉટપુટ"
+
+#~ msgid "Segment length"
+#~ msgstr "ભાગ લંબાઇ"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "TS સ્ટ્રીમ ભાગોની લંબાઇ"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "કોઇપણ જગ્યાએ ભાગોને અલગ કરો"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr "ભાગને અલગ કરતા પહેલાં કીફ્રેમની જરૂર નથી. ફક્ત ઓડિયો માટે જરૂરી છે."
+
+#~ msgid "Number of segments"
+#~ msgstr "ભાગોની સંખ્યા "
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "અનુક્રમણિકામાં સમાવવા માટે ભાગોની સંખ્યા"
+
+#~ msgid "Allow cache"
+#~ msgstr "કેશને પરવાનગી આપો"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "વગાડવાની યાદીમાં EXT-X-ALLOW-CACHE:NO ડિરેક્ટીવને ઉમેરો જો નિષ્ક્રિય થયેલ હોય"
+
+#~ msgid "Index file"
+#~ msgstr "અનુક્રમણિકા ફાઇલ"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "બનાવવા માટે અનુક્રમણિકા ફાઇલનો પાથ"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "અનુક્રમણિકા ફાઇલમાં મૂકવા માટે સંપૂર્ણ URL"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr "અનુક્રમણિકા ફાઇલમાં મૂકવા માટે સંપૂર્ણ URL. ભાગ નંબરને રજૂ કરવા માટે # ને વાપરો"
+
+#~ msgid "Delete segments"
+#~ msgstr "ભાગોને કાઢી નાંખો"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "ભાગોને કાઢી નાંખો જ્યારે તેઓની લાંબા સમય જરૂર નથી"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "મક્સર દર નિયંત્રણ પદ્દતિને વાપરો"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "વગાડવા માટેની યાદીમાં સ્થિત કરવા માટે AES કી URI"
+
+#~ msgid "AES key file"
+#~ msgstr "AES કી ફાઇલ"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "ફાઇલ એ 16 બાઇટ એનક્રિપ્શન કીને સમાવી રહયા છે"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "ફાઇલ જ્યાં vlc એ key-uri અને keyfile-location વાંચે છે"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "ફાઇલ વાંચેલ છે જ્યારે ભાગ શરૂ થાય અને બંધારણમાં છે તેવું ધારેલ છે: key-uri\\nkey-file. "
+#~ "ફાઇલ ખોલેલ ભાગ પર વાંચ્યુ છે અને કિંમતો તે ભાગ પર વાપરેલ છે."
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "એનક્રિપ્શન માટે ગમેતે IV ને વાપરો"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "IV તરીકે ભાગ-નંબરને વાપરવાને બદલે IV ને પેદા કરો"
+
+#~ msgid "Number of first segment"
+#~ msgstr "પ્રથમ ભાગનો નંબર"
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "ઉત્પન્ન થયેલ પ્રથમ ભાગનો નંબર"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "HTTP જીવંત સ્ટ્રીમીંગ આઉટપુટ"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr "શાઉટકાસ્ટ/આઈસકાસ્ટ સર્વર પર આ સ્ટ્રીમ/ચેનલને નામ આપો."
+
+#~ msgid "Stream description"
+#~ msgstr "સ્ટ્રીમ વર્ણન"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "સ્ટ્રીમ સમાવિષ્ટનું વર્ણન અથવા તમારાં ચેનલ વિશે જાણકારી."
+
+#~ msgid "Stream MP3"
+#~ msgstr "સ્ટ્રીમ MP3"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "સામાન્ય રીતે તમારે Ogg સ્ટ્રીમ સાથે શાઉટકાસ્ટ મોડ્યુલ પૂરું પડવાનું હોય છે. એના બદલે MP3 "
+#~ "સ્ટ્રીમ કરવું શક્ય છે જેથી તમે MP3 સ્ટ્રીમને શાઉટકાસ્ટ/આઈસકાસ્ટ સર્વરને મોકલી શકો."
+
+#~ msgid "Genre description"
+#~ msgstr "પ્રકારનું વર્ણન"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "સમાવિષ્ટોનાં પ્રકાર. "
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "સ્ટ્રીમ અથવા તમારાં ચેનલ વિશે જાણકારી સાથે URL."
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની બીટરેટ જાણકારી. "
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની નમૂનાદર જાણતાકી. "
+
+#~ msgid "Number of channels"
+#~ msgstr "ચેનલોની સંખ્યા"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમી ચેનલોની સંખ્યાની જાણકારી. "
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Ogg વર્બિસ ગુણવત્તા"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની Ogg વર્બિસ ગુણવત્તા જાણકારી. "
+
+#~ msgid "Stream public"
+#~ msgstr "સ્ટ્રીમ સાર્વજનિક"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "શાઉટકાસ્ટ/આઈસકાસ્ટ ની વેબસાઈટ પર 'યેલ્લો પેજીસ' (સ્ટ્રીમની નિર્દેશિકા) માં સર્વરને "
+#~ "સાર્વજનિક રીતે ઉપલબ્ધ કરવો. શાઉટકાસ્ટ માટે આપેલી બીટરેટની માહિતીની જરૂર છે.આઈસકાસ્ટ "
+#~ "સ્ટ્રીમ કરવા માટે Ogg ની જરૂર છે."
+
+#~ msgid "IceCAST output"
+#~ msgstr "IceCAST આઉટપુટ"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "આઉટબાઉન્ડ UDP સ્ટ્રીમ માટે મૂળભૂત કેશીંગ કિંમત. આ કિંમત મિલિસેકંડમાં સુયોજિત હોવી જોઇએ."
+
+#~ msgid "Group packets"
+#~ msgstr "જૂથ પેકેટ"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "પેકેટ એક પછી એક બરાબર સમયે અથવા જૂથ દ્વારા મોકલી શકાય. તમે એક સમયે કેટલા પેકેટ "
+#~ "મોકલવા એ પસંદ કરી શકો છો. એ ખુબ કામના ભાર હેઠળના સીસ્ટમ પર ભાર ઓછો કરવામાં મદદ "
+#~ "કરશે."
+
+#~ msgid "UDP stream output"
+#~ msgstr "UDP સ્ટ્રીમ આઉટપુટ"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "નિષ્ક્રિય"
 
@@ -28703,9 +29412,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 
 #~ msgid "Navigation"
 #~ msgstr "શોધખોળ"
-
-#~ msgid "Be quiet"
-#~ msgstr "શાંત રહો"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "બધી ચેતવણી અને જાણકારી સંદેશાને બંધ કરો."
@@ -28736,15 +29442,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgstr ""
 #~ "આ ફાઇલ એ TLS સત્રોમાં રદ કરાયેલ પ્રમાણપત્રોની મદદથી દૂરસ્થ ક્લાઇન્ટને અટકાવવા માટે "
 #~ "વૈકલ્પિક CRL ને સમાવે છે."
-
-#~ msgid "Log to file"
-#~ msgstr "ફાઇલમાં લૉગ લો"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "લખાણ ફાઇલમાં બધા VLC સંદેશાનો લ઼ૉગ કરો."
-
-#~ msgid "Log to syslog"
-#~ msgstr "syslog માં લૉગ લો"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "syslog માં બધા VLC સંદેશાનો લૉગ લો (UNIX સિસ્ટમો)."
@@ -28788,9 +29485,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 
 #~ msgid "Configure"
 #~ msgstr "રૂપરેખાંકિત કરો"
-
-#~ msgid "Channel number"
-#~ msgstr "ચેનલ નંબર"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -28881,17 +29575,8 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgid "Video Capture height"
 #~ msgstr "બંધિત વિડિઓની ઊંચાઇ"
 
-#~ msgid "Quicktime Capture"
-#~ msgstr "ક્વિકટાઇમ કેપ્ચર"
-
 #~ msgid "No Input device found"
 #~ msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
 
 #~ msgid "RDP auth username"
 #~ msgstr "RDP સત્તાધિકરણ વપરાશકર્તાનામ"
@@ -29130,90 +29815,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "DRM સુરક્ષિત થયેલ સ્ટ્રીમ આધારભૂત નથી."
-
-#~ msgid "Writer"
-#~ msgstr "લેખક"
-
-#~ msgid "Composer"
-#~ msgstr "કમ્પોઝર"
-
-#~ msgid "Producer"
-#~ msgstr "નિર્દેશક"
-
-#~ msgid "Disclaimer"
-#~ msgstr "જાહેરાત"
-
-#~ msgid "Requirements"
-#~ msgstr "જરૂરિયાતો"
-
-#~ msgid "Original Format"
-#~ msgstr "મૂળભૂત બંધારણ"
-
-#~ msgid "Display Source As"
-#~ msgstr "આ તરીકે સ્ત્રોતને દર્શાવો"
-
-#~ msgid "Host Computer"
-#~ msgstr "યજમાન કમ્પ્યૂટર"
-
-#~ msgid "Performers"
-#~ msgstr "કલાકાર"
-
-#~ msgid "Original Performer"
-#~ msgstr "મૂળ કલાકાર"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "પ્રદાતા સ્ત્રોત સમાવિષ્ટ"
-
-#~ msgid "Warning"
-#~ msgstr "ચેતવણી"
-
-#~ msgid "Software"
-#~ msgstr "સોફ્ટવેર"
-
-#~ msgid "Record Company"
-#~ msgstr "રેકોર્ડ કંપની"
-
-#~ msgid "Model"
-#~ msgstr "મોડલ"
-
-#~ msgid "Grouping"
-#~ msgstr "જૂથીકરણ"
-
-#~ msgid "Sub-Title"
-#~ msgstr "ઉપશીર્ષક"
-
-#~ msgid "Arranger"
-#~ msgstr "સંચાલક"
-
-#~ msgid "Art Director"
-#~ msgstr "કલા નિર્માતા"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "કોપીરાઇટ સ્વીકૃતિ"
-
-#~ msgid "Conductor"
-#~ msgstr "કન્ડક્ટર"
-
-#~ msgid "Song Description"
-#~ msgstr "ગીત વર્ણન"
-
-#~ msgid "Liner Notes"
-#~ msgstr "લાઇનર નોંધો"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "ફોનતાર હકો"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "સાઉન્ડ ઇજનેર"
-
-#~ msgid "Soloist"
-#~ msgstr "સોલોઈસ્ટ"
-
-#~ msgid "Thanks"
-#~ msgstr "તમારો આભાર"
-
-#~ msgid "Executive Producer"
-#~ msgstr "એક્ઝિક્યુટિવ નિર્માતા"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "H264 સ્ટ્રીમ માટે ઇચ્છિત ફ્રેમ દર."
@@ -29651,9 +30252,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgstr ""
 #~ "આ વિઝાર્ડ એ સાદી સ્ટ્રીમીંગ અથવા ટ્રાન્સકોડીંગ સુયોજનને રૂપરેખાંકિત કરવા પરવાનગી આપે છે."
 
-#~ msgid "More Info"
-#~ msgstr "વધારે જાણકારી"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -29698,9 +30296,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 
 #~ msgid "Streaming method"
 #~ msgstr "સ્ટ્રીમીંગ પદ્દતિ"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "તેમાં સ્ટ્રીમ કરવા માટે કમ્પ્યૂટરનું સરનામું."
 
 #~ msgid "UDP Unicast"
 #~ msgstr "UDP યુનિકાસ્ટ"
@@ -29940,9 +30535,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgid "A->B Loop"
 #~ msgstr "A->B લુપ"
 
-#~ msgid "Current visualization"
-#~ msgstr "હાલની કલ્પના"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "રૂપરેખાંકનમાં ફેરફારોને લખો (&W)"
 
@@ -29964,39 +30556,14 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "પાવર અટકાવતું અને નિષ્ક્રિય સત્રને ટાઇમઆઉટ થતું અટકાવે છે."
 
-#~ msgid "Log format"
-#~ msgstr "લૉગ બંધારણ"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "લૉગીંગ બંધારણને સ્પષ્ટ કરો."
-
 #~ msgid "Syslog ident"
 #~ msgstr "Syslog ઓળખ"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "ઓળખ સુયોજિત કરો કે જે  VLC તેને વાપરશે જયારે syslog માં પ્રવેશી રહ્યા હોય."
 
-#~ msgid "Syslog facility"
-#~ msgstr "Syslog સુવિધા"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "syslog સુવિધાને પસંદ કરો જ્યાં લૉગને આગળ ધપાવેલ હશે."
-
-#~ msgid "Verbosity"
-#~ msgstr "વર્બોસીટી"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "લૉગ માટે વાપરવા વર્બોસીટીને પસંદ કરો અથવા --verbose દ્દારા આપેલ એજ વર્બોસીટીને "
-#~ "વાપરવા -1."
-
-#~ msgid "Log filename"
-#~ msgstr "લૉગ ફાઇલનામ"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "લૉગ ફાઇલનામને સ્પષ્ટ કરો."
 
 #~ msgid "Local drives"
 #~ msgstr "સ્થાનિત ડ્રાઇવ"
@@ -30363,9 +30930,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgid "Hue windowing"
 #~ msgstr "રંગોની વિન્ડો"
 
-#~ msgid "Used for statistics."
-#~ msgstr "આંકડાશાસ્ત્ર માટે વાપરેલ."
-
 #~ msgid "Sat windowing"
 #~ msgstr "સેટ વિન્ડો"
 
@@ -30584,9 +31148,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgid "Direct2D video output"
 #~ msgstr "Direct2D વિડિઓ આઉટપુટ"
 
-#~ msgid "GPU affinity"
-#~ msgstr "GPU એફીનીટી"
-
 #~ msgid "SDL chroma format"
 #~ msgstr "SDL ક્રોમા બંધારણ"
 
@@ -30699,22 +31260,6 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgstr "ઉપશીર્ષક ટ્રેક"
 
 #, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "ઓડિયો આઉટપુટ મોડ્યુલ"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
-
-#, fuzzy
 #~ msgid "Windows Store audio output"
 #~ msgstr "વિન્ડો GDI વિડિઓ આઉટપુટ"
 
@@ -30731,25 +31276,8 @@ msgstr "મીડિયા સંચાલક યાદી"
 #~ msgstr "આંગળીની છાપ (&F)"
 
 #, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "ઇનપુટ મળ્યુ નથી"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "સાફ કરો"
-
-#, fuzzy
 #~ msgid "Default: 90sec"
 #~ msgstr "મૂળભૂત સ્ટ્રીમ"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "વર્ણપટ"
 
 #, fuzzy
 #~ msgid "Flat Top"

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2016-04-04 16:53+0000\n"
 "Last-Translator: Alexander Gabilondo <alexgabi@openmailbox.org>\n"
 "Language-Team: Basque (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -155,7 +155,8 @@ msgstr "Askotariko audio-ezarpenak eta moduluak."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -377,7 +378,8 @@ msgstr "VLCren eskatu ahalako bideoaren inplementazioa"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -996,6 +998,7 @@ msgid "Scrambled"
 msgstr "Zifratuta"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "Bai"
 
@@ -1042,6 +1045,7 @@ msgstr "Hizkuntza"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskribapena"
 
@@ -1065,8 +1069,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "Bit lagineko"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1326,7 +1329,8 @@ msgstr "VLCk ezin du ireki '%s' MRLa. Begiratu egunkaria xehetasunak jakiteko."
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "Titulua"
@@ -1336,8 +1340,8 @@ msgstr "Titulua"
 msgid "Artist"
 msgstr "Artista"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "Generoa"
 
@@ -1354,7 +1358,7 @@ msgstr "Albuma"
 msgid "Track number"
 msgstr "Pista-zenbakia"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "Balorazioa"
 
@@ -1376,7 +1380,7 @@ msgstr "URLa"
 msgid "Now Playing"
 msgstr "Erreproduzitzen"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "Argitaratzailea"
 
@@ -1416,7 +1420,7 @@ msgstr "Erakutsi izena"
 msgid "Actors"
 msgstr "Aktoreak"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "Artista"
@@ -1921,6 +1925,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1971,7 +1976,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "Bideoaren zabalera"
@@ -1986,7 +1991,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "Bideoaren altuera"
@@ -2629,13 +2634,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "Lehenetsia"
 
@@ -4351,6 +4357,7 @@ msgid "Long jump length, in seconds."
 msgstr "Jauzi luzearen luzera, segundotan."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5447,14 +5454,14 @@ msgstr "Huts egin du \"%s\" idazteko irekitzean"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6299,6 +6306,38 @@ msgstr "Eranskina"
 msgid "Attachment input"
 msgstr "Eranskinaren sarrera"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "Bideo-kaptura"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "Audio-irteeraren modulua"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "Ez da sarrera-gailurik aurkitu"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
+"konektoreak eta kontrolatzaileak."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
+"konektoreak eta kontrolatzaileak."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "AVIO"
@@ -6906,7 +6945,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "\"%s\" kaptura-gailuak ez ditu behar diren parametroak onartzen."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "Leiho-dekorazioak"
@@ -7412,6 +7451,50 @@ msgstr "Bideo digitalaren (Firewire/ieee1394) sarrera"
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "Probatu DVB txartelaren ahalmenak"
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+"DVB txartel batzuek ez dute onartzen haien ahalmenak probatzea; arazoak "
+"badituzu, eginbide hau desaktiba dezakezu."
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "Satelitearen irismen kodea"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr "'share/dvb/dvb-s'-ko konfigurazio-fitxategiaren fitxategi-izena"
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "Eskala doitzeko kalitatea"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "Estatistiketarako erabiltzen da."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "v4l2 onartzen duen DVB sarrera"
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "DVD angelua"
@@ -7488,8 +7571,7 @@ msgstr "DVDRead-ek ezin izan ditu %d/%d bloke irakurri hemen: 0x%02x."
 msgid "File input"
 msgstr "Fitxategi-sarrera"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7514,9 +7596,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7532,9 +7614,9 @@ msgid ""
 msgstr "Konexiorako erabiliko den erabiltzaile-izena."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7597,11 +7679,51 @@ msgstr "VLCren adierazitako zerbitzariarekiko konexioa baztertu egin da."
 msgid "Your account was rejected."
 msgstr "Zure kontua baztertu egin da."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "HTTP proxya"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"Erabili beharreko HTTP proxyak forma hau eduki behar du: http://"
+"[erabiltzailea[:pasahitza]@]nireproxya.niredomeinua:nireataka/; hutsik "
+"badago, http_proxy ingurune-aldagaiarekin saiatuko da."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "HTTP proxyaren pasahitza"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "Zure HTTP proxyak pasahitza eskatzen badu, ezar ezazu hemen."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "Konektatu berriro automatikoki"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"Automatikoki saiatu transmisio jarraituarekin berriro konektatzen, bat-"
+"batean deskonektatzen bada."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "HTTP sarrera"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "HTTP autentifikazioa"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Sartu baliozko saio-hasierako izena eta pasahitza %s domeinurako."
@@ -7658,50 +7780,10 @@ msgstr ""
 "batez bereizi behar dira; adibidez, FooBar/1.2.3. Aukera hau sarrera-"
 "elementu bakoitzeko zehaztu daiteke soilik, eta ez orokorrean."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP proxya"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"Erabili beharreko HTTP proxyak forma hau eduki behar du: http://"
-"[erabiltzailea[:pasahitza]@]nireproxya.niredomeinua:nireataka/; hutsik "
-"badago, http_proxy ingurune-aldagaiarekin saiatuko da."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "HTTP proxyaren pasahitza"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "Zure HTTP proxyak pasahitza eskatzen badu, ezar ezazu hemen."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "Konektatu berriro automatikoki"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"Automatikoki saiatu transmisio jarraituarekin berriro konektatzen, bat-"
-"batean deskonektatzen bada."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "HTTP sarrera"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "Adibidea"
 
@@ -7735,6 +7817,7 @@ msgid "Set the category of the elementary stream"
 msgstr "Ezarri oinarrizko transmisio jarraituaren kategoria"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "Ezezaguna"
 
@@ -8155,7 +8238,7 @@ msgstr "RTSP konexioak huts egin du"
 msgid "Capture the audio stream in stereo."
 msgstr "Kapturatu audio-transmisio jarraitua estereoan."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "Lagin-emaria"
@@ -8176,350 +8259,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "OSS sarrera"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "Transmisio jarraituaren irteeraren adibidea"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "Mantendu lehendik dagoen fitxategia"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "Gainidatzi"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"Irteera-fitxategia lehendik ere badago. Grabazioak jarraitzen badu, "
-"fitxategia indargabetu eta bere edukia galdu egingo da."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "Gainidatzi dagoen fitxategia"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "Fitxategia lehendik ere badago, gainidatzi egingo da."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "Erantsi fitxategiari"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "Erantsi fitxategiari baldin badago, ordeztu beharrean."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "Orduaren eta dataren formatua"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "Egin ISO C ordua eta eguna formateatzea fitxategiranzko bidean"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "Idazketa sinkronoa"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "Ireki fitxategia idazketa sinkronoarekin."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "Fitxategiaren transmisio jarraituaren irteera"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "Transmisio jarraitua atzitzeko eskatuko den erabiltzaile-izena."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "Transmisio jarraitua atzitzeko eskatuko den pasahitza."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "MIME (detektatu automatikoki zehazten ez bada)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "Metacube"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-"Erabili Metacube protokoloa. Beharrezkoa da Cubemap islagailua modu "
-"jarraituan transmititzeko."
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "HTTP transmisio jarraituaren irteera"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "Segmentuaren luzera"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "TS transmisio-jarraituko segmentuen luzera"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "Bereizi segmentuak edonon"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-"Marko-gako bat ez da beharrezkoa segmentu bat zatitu aurretik. Audiorako da "
-"soilik beharrezkoa."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "Segmentu kopurua"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "Indizean sartzeko segmentu kopurua"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "Baimendu cachea"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"Gehitu EXT-X-ALLOW-CACHE:NO direktiba erreprodukzio-zerrendan desgaituta "
-"badago."
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "Indize-fitxategia"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "Sortu beharreko indize-fitxategirako bidea"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "Indize-fitxategian jartzeko URL osoa"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-"Indize-fitxategian jartzeko URL osoa. Erabili # karaktereak segmentu-"
-"zenbakia errepresentatzeko"
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "Ezabatu segmentuak"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "Ezabatu segmentuak gehiago behar ez direnean"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "Erabili multiplexadoreen tasa-kontrolerako mekanismoa"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "AES gakoaren URIa, erreprodukzio-zerrendan ordezkatzeko"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "AES gako-fitxategia"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "16 byteko zifratze-gakoa duen fitxategia"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr ""
-"Fitxategi honetan irakurtzen ditu VLC-k gakoaren URIa eta gako-fitxategiaren "
-"kokalekua "
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"Fitxategia segmentua hasterakoan irakurriko da eta formatu honetan dagoela "
-"onartuko da: key-uri\\nkey-file. Fitxategia irekitako segmentuan irakurriko "
-"da eta balioak segmentu horretan erabiliko dira. "
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "Erabili ausazko IV zifratzeko"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "Sortu IVa, segmentu-zenbakia IV gisa erabili beharrean"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "Lehenengo segmentuaren izena"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "Sortutako lehenengo segmentuaren izena"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "HTTP zuzeneko transmisio-jarraituaren irteera"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "Transmisio jarraituaren izena"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-"Transmisio jarraitu/Kanal honi shoutcast/icecast zerbitzarian jarri behar "
-"zaion izena."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "Transmisio jarraituaren deskribapena"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-"Transmisio jarraituaren edukiaren deskribapena edo kanalari buruzko "
-"informazioa."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "MP3 modu jarraituan transmititu"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"Normalean shoutcast modulua Ogg transmisio jarraituekin erabili behar duzu. "
-"Halaber, horren ordez MP3 modu jarraituan transmiti dezakezu eta, ondorioz, "
-"MP3 transmisio jarraituak bidali ahal izango dituzu shoutcast/icecast "
-"zerbitzarira."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "Generoaren deskribapena"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "Edukiaren generoa. "
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "URLaren deskribapena"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "Transmisio jarraituari edo kanalari buruzko informazioa duen URLa. "
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr ""
-"Transkodetutako transmisio jarraituari buruzko bit-emariaren informazioa. "
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr ""
-"Transkodetutako transmisio jarraituari buruzko lagin-emariaren informazioa. "
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "Kanal kopurua"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "Transkodetutako transmisio jarraituaren kanal kopuruaren informazioa. "
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Ogg Vorbis kalitatea"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr ""
-"Transkodetutako transmisio jarraituaren Ogg Vorbis kalitatearen informazioa. "
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "Transmisio jarraitu publikoa"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"Zerbitzaria edonorentzako erabilgarri jarri 'Orri horietan' (transmisio "
-"jarraituen direktorio-zerrendan), icecast/shoutcast webgunean. Bit-emariaren "
-"informazioa zehaztea eskatzen du shoutcast-erako. Ogg transmisio jarraitua "
-"eskatzen du icecast-erako."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "IceCAST irteera"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "Cache-balioa (ms)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"Bidalitako UDP transmisio jarraituetarako cache-balio lehenetsia. Balio hori "
-"milisegundotan zehaztu behar da."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "Taldekatu paketeak"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Paketeak banan-banan bidal daitezke une egokian, edo taldeka bidal daitezke. "
-"Aldiko bidaliko den pakete kopurua hauta dezakezu. Zama handia duten "
-"sistemetan programazio-zama arintzen laguntzen du."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "UDP transmisio jarraituaren irteera"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8535,6 +8274,35 @@ msgstr "PulseAudio"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "PulseAudio sarrera"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "Surround"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "Quicktime kaptura"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "Ez da sarrera-gailurik aurkitu"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
+"konektoreak eta kontrolatzaileak."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "Ez da sarrera-gailurik aurkitu"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8972,6 +8740,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "SFTP sarrera"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "UDPa jasotzeko bufferraren tamaina (byteak)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "DTS atzerapena (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10307,17 +10099,24 @@ msgstr "3 maizt Q"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Bandaz mugatutako interpolazioaren birlaginketarako audio-iragazkia"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "Birlaginketaren kalitatea"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"Birlaginketa kalitatea (0 = okerrena eta azkarrena, 10 = onena eta motelena)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "Birlaginketaren kalitatea"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "SRC birlagingailua"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "Speex birlagingailua"
 
@@ -12132,6 +11931,16 @@ msgstr "Media Foundation Transform deskodetzailea"
 msgid "MPEG audio decoder using mpg123"
 msgstr "MPEG audio-deskodetzailea"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "WebM bideo-deskodetzailea"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "Theora bideo-paketatzailea"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12833,6 +12642,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "G.711 deskodetzailea"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "SDL irudi-deskodetzailea"
@@ -13269,6 +13087,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "Teletestuaren azpitituluen deskodetzailea"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "Testu-azpitituluen deskodetzailea"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13438,6 +13261,21 @@ msgstr "WebM bideo-deskodetzailea"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "WebM bideo-deskodetzailea"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "MMAL deskodetzailea"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "EBU STL azpitituluen deskodetzailea"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "EBU STL azpitituluen analizatzailea"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14484,7 +14322,8 @@ msgstr "D-Bus kontroleko interfazea"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14862,7 +14701,7 @@ msgstr "Hasieratzen"
 msgid "Opening"
 msgstr "Irekitzen"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "Errorea"
 
@@ -15376,7 +15215,8 @@ msgstr "demultiplexadoreak"
 msgid "Avformat muxer"
 msgstr "Avformat multiplexadorea"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Multiplexadorea"
 
@@ -15740,6 +15580,161 @@ msgstr "Surround maila"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "Surround atzerapena (ms)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "Idazlea"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "Konpositorea"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "Ekoizlea"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "Informazioa"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "Ezespena"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "Betebeharrak"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "Jatorrizko formatua"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "Bistaratu iturburua honela"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "Ordenagailu ostalaria"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "Artistak"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "Jatorrizko artista"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "Iturburu edukiaren hornitzaileak"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "Abisua"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "Softwarea"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "Letrak"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "Grabaketa konpainia"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "Modeloa"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "Produktua"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "Taldekatzea"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "Azpititulu"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "Antolatzailea"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "Arte zuzendaria"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "Copyright aipamena"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "Zuzendaria"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "Abestiaren azalpena"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "Oharrak"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "Fonograma eskubideak"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "Soinu ingeniaria"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "Bakarlaria"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "Eskerrik asko"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "Produktore eragilea"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "Kodetze-parametroak"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "Kanal-zenbakia"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "Gako-hitzak"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "Garbitu"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -16136,6 +16131,10 @@ msgstr "Podcast tamaina"
 msgid "%s bytes"
 msgstr "%s byte"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "Mime"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -16147,6 +16146,11 @@ msgstr "Entzuleak"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "Kargatu"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "Saturazioa"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16341,6 +16345,10 @@ msgstr "WAV demultiplexadorea"
 msgid "XA demuxer"
 msgstr "XA demultiplexadorea"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "Kategoria ezezaguna"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "Itxitako epigrafeak"
@@ -16365,10 +16373,6 @@ msgstr "Oharpen semantikoak"
 msgid "Transcript"
 msgstr "Transkripzioa"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "Letrak"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "Marka linguistikoak"
@@ -16388,10 +16392,6 @@ msgstr "Diapositibak (testua)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "Diapositibak (irudiak)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "Kategoria ezezaguna"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16445,22 +16445,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "Erreprodukzio-zerrenda analizatzaileak"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "Zerbitzu-aurkikuntza"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "Interfazeak"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr "Arte eta metadatuen eskuratzaileak"
 
@@ -16468,6 +16472,7 @@ msgstr "Arte eta metadatuen eskuratzaileak"
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "Gehigarriak"
 
@@ -16509,6 +16514,7 @@ msgstr "Desinstalatu"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "Azalak"
@@ -16604,10 +16610,10 @@ msgstr "Sartu izen bat profil berriarentzat:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16771,12 +16777,14 @@ msgid "Playback time"
 msgstr "Erreprodukzio-tasa"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "Aurreko titulua"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "Joan ordu honetara:"
@@ -16819,9 +16827,10 @@ msgstr "Aukeratu irteera-kokaleku bat"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17895,26 +17904,6 @@ msgstr "Bolumen osoa"
 msgid "Open Audio Effects window"
 msgstr "Audio-efektuak"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "B"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "KB"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "MB"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "GB"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "TB"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "Ireki iturburua"
@@ -18015,6 +18004,7 @@ msgid "Enable DVD menus"
 msgstr "Gaitu DVD menuak"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "IP helbidea"
 
@@ -18309,58 +18299,6 @@ msgstr "Errorea datuak bidaltzean"
 msgid "VLC was unable to save the meta data."
 msgstr "VLCk ezin izan ditu metadatuak gorde."
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "Hobespenak"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "Berrezarri guztia"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "Erakutsi oinarrizkoa"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "Hautatu direktorio bat"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "Hautatu fitxategi bat"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "Hautatu"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "Erreproduzitzen jarraitu?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "Jarraitu"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "Jarraitu erreprodukzioa"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "Berrabiarazi erreprodukzioa"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr "\"%@\"(r)en erreprodukzioak  %@-n jarraituko du"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -18387,6 +18325,31 @@ msgstr "Zerbitzuen aurkikuntza"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "Desgaitu pantaila-babeslea"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "Erreproduzitzen jarraitu?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "Jarraitu"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "Jarraitu erreprodukzioa"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "Berrabiarazi erreprodukzioa"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr "\"%@\"(r)en erreprodukzioak  %@-n jarraituko du"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18662,6 +18625,16 @@ msgstr "Aurrizkia"
 msgid "Sequential numbering"
 msgstr "Zenbakitze sekuentziala"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "Berrezarri guztia"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "Hobespenak"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18759,9 +18732,49 @@ msgstr "Zoritxarrez, tekla horiek ezin dira laster-tekla gisa esleitu."
 msgid "This combination is already taken by \"%@\"."
 msgstr "Tekla-konbinazio hori jada honentzat hartuta dago: \"%@\"."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "Erreproduzitu/Pausarazi"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "Txandakatu erreprodukzio-zerrenda ausaz erreproduzitzea"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "Leiho nagusia..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "URLaren deskribapena"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "Orain erreproduzitzen"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "Hautatu karpeta"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "Ireki &kokalekua arbeletik"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "Ezarri gabe"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -19077,7 +19090,8 @@ msgid "Add text"
 msgstr "Gehitu testua"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "Testua"
 
@@ -19100,9 +19114,41 @@ msgstr "Gardentasuna"
 msgid "Organize profiles..."
 msgstr "Antolatu profilak..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "seg."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "B"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "KB"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "MB"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "GB"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "TB"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "Erakutsi oinarrizkoa"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "Hautatu direktorio bat"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "Hautatu fitxategi bat"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "Hautatu"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19470,11 +19516,6 @@ msgstr "Urrats bat aurrera"
 msgid "Loop / Repeat"
 msgstr "Begizta / Errepikatu"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "Informazioa"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "Ireki azpitituluak"
@@ -19591,6 +19632,11 @@ msgstr "Gelditu A-tik B-rako begizta"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "Aspektu-erlazioa"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+#, fuzzy
+msgid "No EPG Data Available"
+msgstr "Dagoen onena"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19747,11 +19793,6 @@ msgstr "(Atzeratuta)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "Behartu elkarrizketa-koadro honen balioen eguneratzea"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
-msgid "No EPG Data Available"
-msgstr "Dagoen onena"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20420,6 +20461,11 @@ msgstr ""
 msgid "Base port"
 msgstr "Oinarrizko ataka"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "Transmisio jarraituaren izena"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr ""
@@ -20454,9 +20500,10 @@ msgstr "Ezabatu laster-marka guztiak"
 msgid "Extract"
 msgstr "Erauzi"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20511,6 +20558,19 @@ msgstr "&Hasiera"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "Edukiontziak"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "Programa-gida"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "Eguneratu"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20943,50 +21003,6 @@ msgstr ""
 "Ziur zaude VLC multimedia-erreproduzigailuaren hobespenak berrezarri nahi "
 "dituzula?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "Ireki direktorioa"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "Ireki karpeta"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "Ireki erreprodukzio-zerrenda..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "XSPF erreprodukzio-zerrenda"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "M3U erreprodukzio-zerrenda"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "M3U8 erreprodukzio-zerrenda"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "Gorde erreprodukzio-zerrenda honela..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "Ireki azpitituluak..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "Multimedia-fitxategiak"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "Azpitituluen fitxategiak"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "Fitxategi guztiak"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "Transmisio jarraituaren irteera"
@@ -21210,6 +21226,62 @@ msgstr "Programazioa: "
 msgid "VOD: "
 msgstr "VOD: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "Ireki direktorioa"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "Ireki karpeta"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "Ireki erreprodukzio-zerrenda..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "XSPF erreprodukzio-zerrenda"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "M3U erreprodukzio-zerrenda"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "M3U8 erreprodukzio-zerrenda"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "Gorde erreprodukzio-zerrenda honela..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "Ireki azpitituluak..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "Multimedia-fitxategiak"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "Azpitituluen fitxategiak"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "Fitxategi guztiak"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+#, fuzzy
+msgid "Empty"
+msgstr " - Hutsa -"
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "Aktibatu"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "Erreprodukzioak utzitako lekuan jarraitzea nahi duzu?"
@@ -21314,10 +21386,6 @@ msgstr "&Efektuak eta iragazkiak"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "&Pista-sinkronizazioa"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "Programa-gida"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21816,6 +21884,12 @@ msgstr "abisuak"
 msgid "debug"
 msgstr "arazketa"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "Garbitu"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "Ireki azal-fitxategi bat"
@@ -21918,6 +21992,80 @@ msgstr "Hautatu azala"
 msgid "Open skin..."
 msgstr "Ireki azala..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "Distiraren atalasea"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"Modu hau gaituta dagoenean, pixelak beltz edo zuri erakutsiko dira. Atalase-"
+"balioa behean zehaztutako distira izango da. "
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "Irudiaren kontrastea (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "Ezarri irudiaren kontrastea 0 eta 2 artean. Lehenespena 1 da."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "Irudiaren ñabardura (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "Ezarri irudiaren ñabardura 0 eta 360 artean. Lehenespena 0 da."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "Irudiaren saturazioa (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "Ezarri irudiaren saturazioa 0 eta 3 artean. Lehenespena 1 da."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "Irudiaren distira (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "Ezarri irudiaren distira 0 eta 2 artean. Lehenespena 1 da."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "Irudiaren gamma (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "Ezarri irudiaren gamma 0,01 eta 10 artean. Lehenespena 1 da."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "DirectX bideo-azelerazioa (DXVA) 2.0"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "VDPAU bideo doitze-iragazia"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -21982,6 +22130,16 @@ msgstr "MMAL bideo-irteera"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "MMAL-n oinarrituriko bideo-irteera plugina Raspberry Pi-rako"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "Bideo-iragazkia"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "DirectX bideo-azelerazioa (DXVA) 2.0"
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "VDPAU bideo doitze-iragazia"
@@ -22043,15 +22201,22 @@ msgstr "VDPAU irteera"
 msgid "VDPAU sharpen video filter"
 msgstr "VDPAU araztu bideo iragazkia"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "Bideo-iragazkia"
+msgid "file keystore (plaintext)"
+msgstr "Paketatzaile hobetsien zerrenda"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "DirectX bideo-azelerazioa (DXVA) 2.0"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -22122,6 +22287,186 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "TLS euskarria OS X eta iOSrako"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "Erabili memoria partekatua"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "Kendu hautatutakoa"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "Erabili memoria partekatua"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "Erabili memoria partekatua"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "Gehitu logotipoa"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "Egon isilik"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "Erregistratu VLC mezu guztiak testu-fitxategi batean."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "Kontsola"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "Kontsola"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "Informazio gehiago"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "arazketa"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "Erregistratu fitxategian"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "Erregistratu VLC mezu guztiak testu-fitxategi batean."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "Egunkariaren fitxategi-izena"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "Zehaztu egunkariaren fitxategi-izena."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "Egunkari-formatua"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "Zehaztu saio-hasierako formatua."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "Xehetasun-maila"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"Hautatu egunkarirako erabili beharreko xehetasun-maila, edo hautatu -1 "
+"balioa --verbose-k emandako xehetasun-maila bera erabiltzeko."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "Egunkaria"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "Fitxategi-egunkaria"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "Arazketa-maskara"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "Gaitasuna"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "Syslog zerbitzua"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "Erregistratu syslog-en"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22817,6 +23162,41 @@ msgstr "JPop"
 msgid "Synthpop"
 msgstr "Synthpop"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "Geh bit-emaria lokala"
+
+#: modules/misc/addons/fsstorage.c:85
+#, fuzzy
+msgid "Addons local storage installer"
+msgstr "Geh bit-emaria lokala"
+
+#: modules/misc/addons/fsstorage.c:93
+#, fuzzy
+msgid "Addons local storage lister"
+msgstr "Geh bit-emaria lokala"
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "Bideo-transformazioko iragazkia"
+
+#: modules/misc/addons/vorepository.c:64
+#, fuzzy
+msgid "addons.videolan.org addons finder"
+msgstr "Bideo-transformazioko iragazkia"
+
+#: modules/misc/addons/vorepository.c:70
+#, fuzzy
+msgid "Videolan.org's single archive addons finder"
+msgstr "Bideo-transformazioko iragazkia"
+
+#: modules/misc/addons/vorepository.c:72
+#, fuzzy
+msgid "single .vlp archive addons finder"
+msgstr "Bideo-transformazioko iragazkia"
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "Zure last.fm kontuaren erabiltzaile-izena"
@@ -22866,6 +23246,16 @@ msgstr ""
 "Ezarri erabiltzaile-izen bat edo desgaitu audio-scrobbler plugina, eta "
 "berrabiarazi VLC.\n"
 "Ikusi http://www.last.fm/join/ kontu bat eskuratzeko."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "Akustikoa"
+
+#: modules/misc/fingerprinter.c:74
+#, fuzzy
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr "Ez da sarrerarik aurkitu"
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -23203,10 +23593,6 @@ msgstr "Gaia"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "Kodetzailea"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "Gako-hitzak"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23677,6 +24063,18 @@ msgstr "Irudia"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "Irudiak"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "Bonjour zerbitzuak"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "Bonjour zerbitzuak"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24877,6 +25275,65 @@ msgstr "Irteerako zubia"
 msgid "Bridge in"
 msgstr "Sarrerako zubia"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "SFTP ataka"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr ""
+"Modulu honek transkodetutako transmisio jarraitua Icecast zerbitzari batera "
+"bidaltzen du."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "Transmisio jarraituaren hartzaile izango den ordenagailuaren helbidea."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "Krominantzia-formatua"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "Krominantzia"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "Eskuratu transmisio jarraituaren irteera"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "Avformat demultiplexadorea"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24934,6 +25391,10 @@ msgstr "Transmisio jarraituaren bistaratzean atzerapena sartzen du."
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "Bistaratu transmisio jarraituaren irteera"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "Transmisio jarraituaren irteeraren adibidea"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -25235,6 +25696,10 @@ msgstr ""
 "Honek RTCP paketeak RTP paketeen ataka berean multiplexatuta bidaltzen eta "
 "jasotzen ditu."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "Cache-balioa (ms)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -25284,6 +25749,15 @@ msgstr ""
 "RTSP saioak itxi egingo dira denbora honen ondoren RTSP eskabiderik jasotzen "
 "ez bada. Balio negatibo batean edo 0-n ezarriz epeak desgaitzen ditu. "
 "Lehenetsia 60 da (minutu bat)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "Transmisio jarraitua atzitzeko eskatuko den erabiltzaile-izena."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "Transmisio jarraitua atzitzeko eskatuko den pasahitza."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25968,58 +26442,6 @@ msgstr "Swscale"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "YUVP bihurgailua"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "Distiraren atalasea"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"Modu hau gaituta dagoenean, pixelak beltz edo zuri erakutsiko dira. Atalase-"
-"balioa behean zehaztutako distira izango da. "
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "Irudiaren kontrastea (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Ezarri irudiaren kontrastea 0 eta 2 artean. Lehenespena 1 da."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "Irudiaren ñabardura (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "Ezarri irudiaren ñabardura 0 eta 360 artean. Lehenespena 0 da."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "Irudiaren saturazioa (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "Ezarri irudiaren saturazioa 0 eta 3 artean. Lehenespena 1 da."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "Irudiaren distira (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "Ezarri irudiaren distira 0 eta 2 artean. Lehenespena 1 da."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "Irudiaren gamma (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Ezarri irudiaren gamma 0,01 eta 10 artean. Lehenespena 1 da."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27740,6 +28162,15 @@ msgstr "OpenGL bideo-irteera"
 msgid "Windows GDI video output"
 msgstr "Windows GDI bideo-irteera"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "GPU afinitatea"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "OpenGLrako EGL hedapena"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "Irudiaren adibidearen krominantzia-formatua"
@@ -28226,6 +28657,26 @@ msgstr "Hormako bideo-iragazkia"
 msgid "Image wall"
 msgstr "Irudi-horma"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "Bideo-leihoaren zabalera, pixeletan."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "Bideo-leihoaren altuera, pixeletan."
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "Espektroa"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "Uneko bisualizazioa"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "Goom bistaratzearen zabalera"
@@ -28689,10 +29140,6 @@ msgstr "Ziur zaude transmisio jarraitua sortu nahi duzula?"
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "Elkarrizketa-koadroa"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "Eguneratu"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29558,6 +30005,286 @@ msgid "Media Manager List"
 msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "Birlaginketaren kalitatea"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Eskala doitzeko kalitatea"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Errendatzearen kalitatea"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "Birlaginketa kalitatea (0 = okerrena eta azkarrena, 10 = onena eta "
+#~ "motelena)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Hasiera-ordua"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Sintonizadorearen herrialde-kodea"
+
+#~ msgid "Keep existing file"
+#~ msgstr "Mantendu lehendik dagoen fitxategia"
+
+#~ msgid "Overwrite"
+#~ msgstr "Gainidatzi"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "Irteera-fitxategia lehendik ere badago. Grabazioak jarraitzen badu, "
+#~ "fitxategia indargabetu eta bere edukia galdu egingo da."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "Gainidatzi dagoen fitxategia"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "Fitxategia lehendik ere badago, gainidatzi egingo da."
+
+#~ msgid "Append to file"
+#~ msgstr "Erantsi fitxategiari"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "Erantsi fitxategiari baldin badago, ordeztu beharrean."
+
+#~ msgid "Format time and date"
+#~ msgstr "Orduaren eta dataren formatua"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "Egin ISO C ordua eta eguna formateatzea fitxategiranzko bidean"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "Idazketa sinkronoa"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "Ireki fitxategia idazketa sinkronoarekin."
+
+#~ msgid "File stream output"
+#~ msgstr "Fitxategiaren transmisio jarraituaren irteera"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "MIME (detektatu automatikoki zehazten ez bada)."
+
+#~ msgid "Metacube"
+#~ msgstr "Metacube"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr ""
+#~ "Erabili Metacube protokoloa. Beharrezkoa da Cubemap islagailua modu "
+#~ "jarraituan transmititzeko."
+
+#~ msgid "HTTP stream output"
+#~ msgstr "HTTP transmisio jarraituaren irteera"
+
+#~ msgid "Segment length"
+#~ msgstr "Segmentuaren luzera"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "TS transmisio-jarraituko segmentuen luzera"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "Bereizi segmentuak edonon"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "Marko-gako bat ez da beharrezkoa segmentu bat zatitu aurretik. Audiorako "
+#~ "da soilik beharrezkoa."
+
+#~ msgid "Number of segments"
+#~ msgstr "Segmentu kopurua"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "Indizean sartzeko segmentu kopurua"
+
+#~ msgid "Allow cache"
+#~ msgstr "Baimendu cachea"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "Gehitu EXT-X-ALLOW-CACHE:NO direktiba erreprodukzio-zerrendan desgaituta "
+#~ "badago."
+
+#~ msgid "Index file"
+#~ msgstr "Indize-fitxategia"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "Sortu beharreko indize-fitxategirako bidea"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "Indize-fitxategian jartzeko URL osoa"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "Indize-fitxategian jartzeko URL osoa. Erabili # karaktereak segmentu-"
+#~ "zenbakia errepresentatzeko"
+
+#~ msgid "Delete segments"
+#~ msgstr "Ezabatu segmentuak"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "Ezabatu segmentuak gehiago behar ez direnean"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "Erabili multiplexadoreen tasa-kontrolerako mekanismoa"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "AES gakoaren URIa, erreprodukzio-zerrendan ordezkatzeko"
+
+#~ msgid "AES key file"
+#~ msgstr "AES gako-fitxategia"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "16 byteko zifratze-gakoa duen fitxategia"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr ""
+#~ "Fitxategi honetan irakurtzen ditu VLC-k gakoaren URIa eta gako-"
+#~ "fitxategiaren kokalekua "
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "Fitxategia segmentua hasterakoan irakurriko da eta formatu honetan "
+#~ "dagoela onartuko da: key-uri\\nkey-file. Fitxategia irekitako segmentuan "
+#~ "irakurriko da eta balioak segmentu horretan erabiliko dira. "
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "Erabili ausazko IV zifratzeko"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "Sortu IVa, segmentu-zenbakia IV gisa erabili beharrean"
+
+#~ msgid "Number of first segment"
+#~ msgstr "Lehenengo segmentuaren izena"
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "Sortutako lehenengo segmentuaren izena"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "HTTP zuzeneko transmisio-jarraituaren irteera"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Transmisio jarraitu/Kanal honi shoutcast/icecast zerbitzarian jarri behar "
+#~ "zaion izena."
+
+#~ msgid "Stream description"
+#~ msgstr "Transmisio jarraituaren deskribapena"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr ""
+#~ "Transmisio jarraituaren edukiaren deskribapena edo kanalari buruzko "
+#~ "informazioa."
+
+#~ msgid "Stream MP3"
+#~ msgstr "MP3 modu jarraituan transmititu"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Normalean shoutcast modulua Ogg transmisio jarraituekin erabili behar "
+#~ "duzu. Halaber, horren ordez MP3 modu jarraituan transmiti dezakezu eta, "
+#~ "ondorioz, MP3 transmisio jarraituak bidali ahal izango dituzu shoutcast/"
+#~ "icecast zerbitzarira."
+
+#~ msgid "Genre description"
+#~ msgstr "Generoaren deskribapena"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "Edukiaren generoa. "
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "Transmisio jarraituari edo kanalari buruzko informazioa duen URLa. "
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr ""
+#~ "Transkodetutako transmisio jarraituari buruzko bit-emariaren informazioa. "
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr ""
+#~ "Transkodetutako transmisio jarraituari buruzko lagin-emariaren "
+#~ "informazioa. "
+
+#~ msgid "Number of channels"
+#~ msgstr "Kanal kopurua"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr ""
+#~ "Transkodetutako transmisio jarraituaren kanal kopuruaren informazioa. "
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Ogg Vorbis kalitatea"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr ""
+#~ "Transkodetutako transmisio jarraituaren Ogg Vorbis kalitatearen "
+#~ "informazioa. "
+
+#~ msgid "Stream public"
+#~ msgstr "Transmisio jarraitu publikoa"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "Zerbitzaria edonorentzako erabilgarri jarri 'Orri horietan' (transmisio "
+#~ "jarraituen direktorio-zerrendan), icecast/shoutcast webgunean. Bit-"
+#~ "emariaren informazioa zehaztea eskatzen du shoutcast-erako. Ogg "
+#~ "transmisio jarraitua eskatzen du icecast-erako."
+
+#~ msgid "IceCAST output"
+#~ msgstr "IceCAST irteera"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "Bidalitako UDP transmisio jarraituetarako cache-balio lehenetsia. Balio "
+#~ "hori milisegundotan zehaztu behar da."
+
+#~ msgid "Group packets"
+#~ msgstr "Taldekatu paketeak"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "Paketeak banan-banan bidal daitezke une egokian, edo taldeka bidal "
+#~ "daitezke. Aldiko bidaliko den pakete kopurua hauta dezakezu. Zama handia "
+#~ "duten sistemetan programazio-zama arintzen laguntzen du."
+
+#~ msgid "UDP stream output"
+#~ msgstr "UDP transmisio jarraituaren irteera"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "Desgaitu"
 
@@ -29578,9 +30305,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "Navigation"
 #~ msgstr "Nabigazioa"
-
-#~ msgid "Be quiet"
-#~ msgstr "Egon isilik"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Desaktibatu abisu eta informazio-mezu guztiak."
@@ -29611,15 +30335,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr ""
 #~ "Fitxategi honek aukerako CRL-a du urruneko bezeroei TSL saioetan "
 #~ "errebokatutako ziurtagiriak erabiltzea eragozteko."
-
-#~ msgid "Log to file"
-#~ msgstr "Erregistratu fitxategian"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "Erregistratu VLC mezu guztiak testu-fitxategi batean."
-
-#~ msgid "Log to syslog"
-#~ msgstr "Erregistratu syslog-en"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "Erregistratu VLC mezu guztiak syslog-en (UNIX sistemetan)."
@@ -29666,9 +30381,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "Configure"
 #~ msgstr "Konfiguratu"
-
-#~ msgid "Channel number"
-#~ msgstr "Kanal-zenbakia"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29768,13 +30480,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "No Input device found"
 #~ msgstr "Ez da sarrera-gailurik aurkitu"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
-#~ "konektoreak eta kontrolatzaileak."
 
 #~ msgid "RDP auth username"
 #~ msgstr "RDP autentifikaziorako erabiltzaile-izena"
@@ -30021,90 +30726,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "Babestutako DRM transmisio jarraituak ez dira onartzen."
-
-#~ msgid "Writer"
-#~ msgstr "Idazlea"
-
-#~ msgid "Composer"
-#~ msgstr "Konpositorea"
-
-#~ msgid "Producer"
-#~ msgstr "Ekoizlea"
-
-#~ msgid "Disclaimer"
-#~ msgstr "Ezespena"
-
-#~ msgid "Requirements"
-#~ msgstr "Betebeharrak"
-
-#~ msgid "Original Format"
-#~ msgstr "Jatorrizko formatua"
-
-#~ msgid "Display Source As"
-#~ msgstr "Bistaratu iturburua honela"
-
-#~ msgid "Host Computer"
-#~ msgstr "Ordenagailu ostalaria"
-
-#~ msgid "Performers"
-#~ msgstr "Artistak"
-
-#~ msgid "Original Performer"
-#~ msgstr "Jatorrizko artista"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "Iturburu edukiaren hornitzaileak"
-
-#~ msgid "Warning"
-#~ msgstr "Abisua"
-
-#~ msgid "Software"
-#~ msgstr "Softwarea"
-
-#~ msgid "Record Company"
-#~ msgstr "Grabaketa konpainia"
-
-#~ msgid "Model"
-#~ msgstr "Modeloa"
-
-#~ msgid "Grouping"
-#~ msgstr "Taldekatzea"
-
-#~ msgid "Sub-Title"
-#~ msgstr "Azpititulu"
-
-#~ msgid "Arranger"
-#~ msgstr "Antolatzailea"
-
-#~ msgid "Art Director"
-#~ msgstr "Arte zuzendaria"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "Copyright aipamena"
-
-#~ msgid "Conductor"
-#~ msgstr "Zuzendaria"
-
-#~ msgid "Song Description"
-#~ msgstr "Abestiaren azalpena"
-
-#~ msgid "Liner Notes"
-#~ msgstr "Oharrak"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "Fonograma eskubideak"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "Soinu ingeniaria"
-
-#~ msgid "Soloist"
-#~ msgstr "Bakarlaria"
-
-#~ msgid "Thanks"
-#~ msgstr "Eskerrik asko"
-
-#~ msgid "Executive Producer"
-#~ msgstr "Produktore eragilea"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "H264 transmisio jarraiturako nahi den marko-emaria."
@@ -30588,9 +31209,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ "Laguntzaile honek transmisio jarraitu edo transkodetze arrunten ezarpenak "
 #~ "konfiguratzeko konfiguratzeko aukera ematen du."
 
-#~ msgid "More Info"
-#~ msgstr "Informazio gehiago"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -30640,10 +31258,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "Streaming method"
 #~ msgstr "Transmisio jarraituaren metodoa"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr ""
-#~ "Transmisio jarraituaren hartzaile izango den ordenagailuaren helbidea."
 
 #~ msgid "UDP Unicast"
 #~ msgstr "UDP banakako difusioa"
@@ -30931,12 +31545,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr ""
 #~ "Energia etena desaktibatu egiten du eta saio inaktiboaren denbora-muga."
 
-#~ msgid "Log format"
-#~ msgstr "Egunkari-formatua"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "Zehaztu saio-hasierako formatua."
-
 #~ msgid "Syslog ident"
 #~ msgstr "Syslog identifikatzailea"
 
@@ -30945,27 +31553,8 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ "Ezarri VLC-k syslog-en saioa hasterakoan erabili beharreko "
 #~ "identifikatzailea."
 
-#~ msgid "Syslog facility"
-#~ msgstr "Syslog zerbitzua"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "Hautatu saio-hasierak erregistratuko diren syslog zerbitzua."
-
-#~ msgid "Verbosity"
-#~ msgstr "Xehetasun-maila"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "Hautatu egunkarirako erabili beharreko xehetasun-maila, edo hautatu -1 "
-#~ "balioa --verbose-k emandako xehetasun-maila bera erabiltzeko."
-
-#~ msgid "Log filename"
-#~ msgstr "Egunkariaren fitxategi-izena"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "Zehaztu egunkariaren fitxategi-izena."
 
 #~ msgid "Local drives"
 #~ msgstr "Unitate lokalak"
@@ -31349,9 +31938,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgid "Hue windowing"
 #~ msgstr "Ñabarduraren leihoa"
 
-#~ msgid "Used for statistics."
-#~ msgstr "Estatistiketarako erabiltzen da."
-
 #~ msgid "Sat windowing"
 #~ msgstr "Saturazioaren leihoa"
 
@@ -31586,9 +32172,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgid "Direct2D video output"
 #~ msgstr "Direct2D bideo-irteera"
 
-#~ msgid "GPU affinity"
-#~ msgstr "GPU afinitatea"
-
 #~ msgid "SDL chroma format"
 #~ msgstr "SDL krominantzia-formatua"
 
@@ -31650,22 +32233,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgid "MTU for out mode."
 #~ msgstr "MTU irteera modurako."
 
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "Probatu DVB txartelaren ahalmenak"
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ""
-#~ "DVB txartel batzuek ez dute onartzen haien ahalmenak probatzea; arazoak "
-#~ "badituzu, eginbide hau desaktiba dezakezu."
-
-#~ msgid "filename of config file in share/dvb/dvb-s"
-#~ msgstr "'share/dvb/dvb-s'-ko konfigurazio-fitxategiaren fitxategi-izena"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "v4l2 onartzen duen DVB sarrera"
-
 #, fuzzy
 #~ msgid ""
 #~ "%.1f MHz (%d services)\n"
@@ -31680,10 +32247,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 
 #~ msgid "VLC Debug Log (%s).rtf"
 #~ msgstr "VLC arazketa-egunkaria (%s).rtf"
-
-#, fuzzy
-#~ msgid "Empty"
-#~ msgstr " - Hutsa -"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33600,9 +34163,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ "Hau leiho horren X identifikatzailea da (0 balioak bat ere ez esan nahi "
 #~ "du)."
 
-#~ msgid "Use shared memory"
-#~ msgstr "Erabili memoria partekatua"
-
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr ""
 #~ "Erabili memoria partekatua VLC eta X zerbitzariaren artean komunikatzeko."
@@ -34312,58 +34872,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr "Konfigurazioa transmititzen..."
 
 #, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "Bideo-kaptura"
-
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "Audio-irteeraren modulua"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "Ez da sarrera-gailurik aurkitu"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
-#~ "konektoreak eta kontrolatzaileak."
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "Satelitearen irismen kodea"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "Surround"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Quicktime kaptura"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "Ez da sarrera-gailurik aurkitu"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Ez dirudi Mac ordenagailuak sarrera-gailu egokirik duenik. Egiaztatu "
-#~ "konektoreak eta kontrolatzaileak."
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "Ez da sarrera-gailurik aurkitu"
-
-#, fuzzy
 #~ msgid "Windows Store audio output"
 #~ msgstr "Windows GDI bideo-irteera"
 
@@ -34389,33 +34897,12 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr "&Gorde honela..."
 
 #, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "Aktibatu"
-
-#, fuzzy
 #~ msgid "Audio Fingerprinting"
 #~ msgstr "&Hatz-marka"
 
 #, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "Ez da sarrerarik aurkitu"
-
-#, fuzzy
 #~ msgid "Fingerprinting track..."
 #~ msgstr "&Hatz-marka"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Garbitu"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "Geh bit-emaria lokala"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "Bideo-transformazioko iragazkia"
 
 #, fuzzy
 #~ msgid "Duration of the fingerprinting"
@@ -34426,32 +34913,12 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr "Transmisio jarraitu lehenetsia"
 
 #, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "Eskuratu transmisio jarraituaren irteera"
-
-#, fuzzy
 #~ msgid ""
 #~ "Please wait while your font cache is rebuilt.\n"
 #~ "This should take less than a few minutes."
 #~ msgstr ""
 #~ "Itxaron letra-tipoaren cachea berriro eraikitzen den arte.\n"
 #~ "Minutu bat baino gutxiago beharko da."
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "Bideo-leihoaren zabalera, pixeletan."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "Bideo-leihoaren altuera, pixeletan."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "Espektroa"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "Uneko bisualizazioa"
 
 #, fuzzy
 #~ msgid "Flat Top"

@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
 "Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
 "Language-Team: Finnish (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -163,7 +163,8 @@ msgstr "Muut ääniasetukset ja -moduulit."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -383,7 +384,8 @@ msgstr "VLC:n toteutus Video On Demand -palveluille"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -1006,6 +1008,7 @@ msgid "Scrambled"
 msgstr "Salattu"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "Kyllä"
 
@@ -1052,6 +1055,7 @@ msgstr "Kieli"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Kuvaus"
 
@@ -1075,8 +1079,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "Bittejä näytettä kohti"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1338,7 +1341,8 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "Nimi"
@@ -1348,8 +1352,8 @@ msgstr "Nimi"
 msgid "Artist"
 msgstr "Esittäjä"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "Tyylilaji"
 
@@ -1366,7 +1370,7 @@ msgstr "Albumi"
 msgid "Track number"
 msgstr "Raidan numero"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "Arvostelu"
 
@@ -1388,7 +1392,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "Nyt soimassa"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "Julkaisija"
 
@@ -1428,7 +1432,7 @@ msgstr "Näytöksen nimi"
 msgid "Actors"
 msgstr "Näyttelijät"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "Esittäjä"
@@ -1932,6 +1936,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1982,7 +1987,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "Videon leveys"
@@ -1997,7 +2002,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "Videon korkeus"
@@ -2644,13 +2649,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "Oletusarvo"
 
@@ -4327,6 +4333,7 @@ msgid "Long jump length, in seconds."
 msgstr "Kelaukseen käytetyn \"pitkän\" ajan pituus, sekunteina."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5415,14 +5422,14 @@ msgstr "Tiedoston \"%s\" avaus tallennusta varten epäonnistui"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6264,6 +6271,38 @@ msgstr "Liite"
 msgid "Attachment input"
 msgstr "Liitelähde"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "Videokaappaus"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "Äänilähtömoduuli"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "Lähdelaitetta ei löydy"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"Macissasi ei näytä olevan sopivaa videolähdelaitetta. Tarkista liittimet ja "
+"ajurit."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"Macissasi ei näytä olevan sopivaa videolähdelaitetta. Tarkista liittimet ja "
+"ajurit."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "AVIO"
@@ -6867,7 +6906,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "Laite \"%s\" ei tue tarvittavia parametrejä."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "Ikkunan reunukset"
@@ -7369,6 +7408,50 @@ msgstr "Digitaalisen videon (Firewire/IEEE1394) sisääntulo"
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "Testaa DVB-kortin ominaisuudet"
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+"Jotkin DVB kortit eivät toivu ominaisuuksien testaamisesta. Voit kytkeä "
+"tämän ominaisuuden pois, jos kohtaat ongelmia."
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "Satelliitin range code"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr "asetustiedoston nimi hakemistossa share/dvb/dvb-s"
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "Skaalauksen laatu"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "Käytetään tilastotietoihin."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "DVB-lähde, joka tukee v4l2:ta"
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "DVD:n katselukulma (angle)"
@@ -7445,8 +7528,7 @@ msgstr "DVDRead ei voinut lukea %d/%d lohkosta osoitteessa 0x%02x."
 msgid "File input"
 msgstr "Tiedostolähde"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7471,9 +7553,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7489,9 +7571,9 @@ msgid ""
 msgstr "Yhteyden avaamiseen käytettävä käyttäjätunnus."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7552,11 +7634,52 @@ msgstr "VLC:n yhteysyritys annettuun palvelimeen evättiin (rejected)."
 msgid "Your account was rejected."
 msgstr "Käyttäjätunnus ei kelpaa."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "HTTP-välityspalvelin"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"Käytettävä HTTP-välityspalvelin, muodossa 'http://[käyttäjä@]palvelin."
+"jokindomain:portti/'. Mikäli tyhjä, VLC yrittää käyttää ympäristömuuttujaa "
+"'http_proxy'."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "HTTP-välityspalvelimen salasana"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr ""
+"Jos HTTP-välityspalvelimesi tarvitsee salasanan, voit määrätä sen tässä."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "Yhdistä uudelleen automaattisesti"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"Yritä yhdistää HTTP-virtaan uudelleen, mikäli yhteys katkeaa "
+"odottamattomasti."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "HTTP-lähde"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "HTTP-todentaminen"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Syötä käyttäjätunnus ja salasana alueeseen %s."
@@ -7609,51 +7732,10 @@ msgid ""
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP-välityspalvelin"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"Käytettävä HTTP-välityspalvelin, muodossa 'http://[käyttäjä@]palvelin."
-"jokindomain:portti/'. Mikäli tyhjä, VLC yrittää käyttää ympäristömuuttujaa "
-"'http_proxy'."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "HTTP-välityspalvelimen salasana"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr ""
-"Jos HTTP-välityspalvelimesi tarvitsee salasanan, voit määrätä sen tässä."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "Yhdistä uudelleen automaattisesti"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"Yritä yhdistää HTTP-virtaan uudelleen, mikäli yhteys katkeaa "
-"odottamattomasti."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "HTTP-lähde"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "Lume"
 
@@ -7687,6 +7769,7 @@ msgid "Set the category of the elementary stream"
 msgstr "Aseta alkeisvirran kategoria"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "Tuntematon"
 
@@ -8097,7 +8180,7 @@ msgstr "RTSP-yhteys epäonnistui"
 msgid "Capture the audio stream in stereo."
 msgstr "Tallenna äänivirtaa stereona."
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "Näytteistystaajuus"
@@ -8118,342 +8201,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "OSS-lähde"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "Lumekäyttölähtö"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "Säilytä jo olemassaoleva tiedosto"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "Korvaa"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "Korvaa tiedosto"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "Jos tiedosto on jo olemassa, se korvataan"
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "Lisää tiedoston loppuun"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-"Lisää tiedoston loppuun, jos se on jo olemasssa, tiedoston korvaamisen "
-"sijaan."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "Ajan ja päivämäärän muoto"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "Suorita ISO C-muotoinen ajan ja päivämäärän formaatti tiedostopolkuun."
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "Välitön kirjoitus"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "Avaa tiedoston välittömän kirjoituksen moodissa (synchronous write)."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "Tiedostokäyttölähtö"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "Tietovirran käyttämiseen tarvittava käyttäjätunnus."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "Tietovirran käyttämiseen tarvittava salasana."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
-"Palvelimen palauttama MIME-koodi (tunnistetaan automaattisesti jos ei "
-"määrätty)."
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "Metacube"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-"Käytä Metacube-protokollaa. Tämä tarvitaan kun halutaan virtauttaa Cubemap-"
-"reflektorille."
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "HTTP-käyttölähtö"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "Segmentin pituus"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "TS-tietovirran segmenttien pituus"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "Katkaise segmentti mistä vain"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-"Älä vaadi avainkuvaa ennen segmentin katkaisua. Tarvitaan tietovirroille, "
-"joissa on vain ääni."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "Segmenttien lukumäärä"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "Montako segmenttiä sisällytetään indeksiin"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "Salli välimuisti"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "Indeksitiedosto"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "Luotavan indeksitiedoston polku"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "Indeksitiedostoon laitettava täysi URL"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-"Täysi URL, joka kirjoitetaan indeksitiedostoon. Käytä #-merkkejä ilmaisemaan "
-"segmentin numeroa."
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "Poista segmentit"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "Poista vanhat segmentit, joita ei enää tarvita"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "Käytä kanavoijan nopeudensäätömekanismia (rate control)"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "Soittolistaan sijoitettavan AES-avaimen URI"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "AES-avaintiedosto"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "Tiedosto joka sisältää 16-bittisen salausavaimen"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr ""
-
-#: modules/access_output/livehttp.c:98
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr ""
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr ""
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "Ensimmäisen segmentin numero"
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr ""
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "HTTP Live -käyttölähtö"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "Suoratoiston nimi"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-"Nimi, joka tälle suoratoistolle/kanavalle annetaan shoutcast/icecast -"
-"palvelimella."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "Suoratoiston kuvaus"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-"Voit laittaa tähän kuvauksen lähetettävästä suoratoistosta, tai tietoa "
-"kanavastasi."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "Lähetä MP3:na"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"Yleensä shoutcast-moduulille syötetään Ogg-suoratoistoa. On myös mahdollista "
-"lähettää MP3-suoratoistovirtaa, joten voit ohjata eteenpäin MP3-virran "
-"shoutcast/icecast -palvelimelle käyttämällä tätä asetusta."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "Tyylilaji"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "Sisällön tyylilaji (musikkilaji, genre). "
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "Kuvaus-URL"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr ""
-"Verkko-osoite (URL), josta löytyy tietoa tästä suoratoistostasi tai "
-"kanavastasi. "
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "Transkoodatun tietovirran bittinopeustieto. "
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "Transkoodatun tietovirran näytteistystaajuustieto. "
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "Kanavien määrä"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "Transkoodatun tietovirran kanavien määrätieto. "
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Ogg Vorbiksen laatu"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Tieto transkoodatun tietovirran Ogg Vorbis -laadusta. "
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "Julkinen suoratoisto"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"Julkaise palvelin icecast/shoutcast -sivuston 'Keltaisilla "
-"Sivuilla' (listaus saatavilla olevista suoratoistoista). Vaatii "
-"bittinopeustiedon shoutcastille. Vaatii Ogg-suoratoiston käytön icecastille."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "IceCAST-lähtö"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "Välimuistin koko (ms)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"Oletusarvoisen puskuroinnin määrä lähteville UDP-tietovirroille. Asetetaan "
-"millisekunteina."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "Ryhmitä paketit"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Paketit voidaan lähettää yksi kerrallaan oikeaan aikaan, tai ryhminä. Voit "
-"valita, montako pakettia lähetetään kerrallaan. Tämä vähentää ajastukseen "
-"liittyvää järjestelmäkuormaa, mistä voi olla apua jos järjestelmä on "
-"raskaasti kuormitettu."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "UDP-käyttölähtö"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8469,6 +8216,35 @@ msgstr "PulseAudio"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "PulseAudio-tulo"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "Surround"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "Quicktime-kaappaus"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "Lähdelaitetta ei löydy"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Macissasi ei näytä olevan sopivaa videolähdelaitetta. Tarkista liittimet ja "
+"ajurit."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "Lähdelaitetta ei löydy"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8904,6 +8680,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "SFTP-lähde"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "UDP-vastaanottopuskurin koko (tavuina)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "DTS-aikaleimaviive (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10231,17 +10031,24 @@ msgstr "Taaj. 3 Q-arvo (leveys)"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Kaistarajoitetun interpoloivan uudelleennäytteistyksen äänisuodin"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "Uudelleennäytteistyksen laatu"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"Uudelleennäytteistyksen laatu (0 = huonoin ja nopein, 10 = paras ja hitain)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "Uudelleennäytteistyksen laatu"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "SRC-uudelleennäytteistäjä"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "Speex-uudelleennäytteistäjä"
 
@@ -11998,6 +11805,16 @@ msgstr ""
 msgid "MPEG audio decoder using mpg123"
 msgstr "MPEG-äänenpurkaja"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "WebM-videopurku"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "Theora-videopaketoija"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12642,6 +12459,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "G.711-dekooderi"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "SDL-kuvapurkaja"
@@ -13078,6 +12904,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "Teksti-TV-tekstityksen purkaja"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "Tekstityksen purkaja"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13246,6 +13077,21 @@ msgstr "WebM-videopurku"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "WebM-videopurku"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "MMAL-dekooderi"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "EBU STL -tekstityspurkaja"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "EBU STL -tekstityksen jäsennin"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14293,7 +14139,8 @@ msgstr "D-Bus -etäohjauskäyttöliittymä"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14666,7 +14513,7 @@ msgstr "Alustetaan"
 msgid "Opening"
 msgstr "Avataan"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "Virhe"
 
@@ -15166,7 +15013,8 @@ msgstr "Kanavoinninpurkaja"
 msgid "Avformat muxer"
 msgstr "Avformat-kanavoija"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Kanavoija"
 
@@ -15527,6 +15375,165 @@ msgstr "Surround-taso"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "Surround-viive (ms)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "Kirjoittaja"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "Esittäjä"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "Tuottaja"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "Tietoja"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "Vastuuvapauslauseke"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "Vaatimukset"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "Alkup. formaatti"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "Näytä lähde"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "Isäntätietokone"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "Esittäjät"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "Alkuperäinen esittäjä"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "Tuottajan lähdesisältö"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "Varoitus"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "Ohjelmisto"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "Sanoitus"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "Levy-yhtiö"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "Malli"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "Tuote"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "Ryhmitys"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "Alaotsikko"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "Järjestäjä"
+
+#: modules/demux/mp4/meta.c:90
+#, fuzzy
+msgid "Art Director"
+msgstr "Ohjaaja"
+
+#: modules/demux/mp4/meta.c:91
+#, fuzzy
+msgid "Copyright Acknowledgement"
+msgstr "Tekijänoikeuksien metatiedot"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "Kapelimestari"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "Kappaleen kuvaus"
+
+#: modules/demux/mp4/meta.c:94
+#, fuzzy
+msgid "Liner Notes"
+msgstr "Lineaarinen (nopein)"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "Ääniteknikko"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "Kiitokset"
+
+#: modules/demux/mp4/meta.c:100
+#, fuzzy
+msgid "Executive Producer"
+msgstr "Tuottaja"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "Enkoodauksen parametrit"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "Kanavan numero"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "Avainsanat"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "Tyhjennä"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15915,6 +15922,10 @@ msgstr "Podcastin koko"
 msgid "%s bytes"
 msgstr "%s tavua"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "Mime"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -15926,6 +15937,11 @@ msgstr "Kuuntelijoita"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "Lataa"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "Värikylläisyys"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16111,6 +16127,10 @@ msgstr "WAV-kanavoinninpurkaja"
 msgid "XA demuxer"
 msgstr "XA-kanavoinninpurkaja"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "Tuntematon kategoria"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "Closed captions -tekstitys"
@@ -16135,10 +16155,6 @@ msgstr "Merkityksen selostukset"
 msgid "Transcript"
 msgstr "Transkripti"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "Sanoitus"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "Kielitieteelliset merkinnät"
@@ -16158,10 +16174,6 @@ msgstr "Kalvot (teksti)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "Kalvot (kuvamuodossa)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "Tuntematon kategoria"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16204,22 +16216,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "Soittolistan jäsentimet"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "Palvelujen u"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "Käyttöliittymät"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr ""
 
@@ -16227,6 +16243,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "Laajennukset"
 
@@ -16268,6 +16285,7 @@ msgstr "Poista"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "Ulkoasuteemat"
@@ -16363,10 +16381,10 @@ msgstr "Anna nimi uudelle profiilille:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16530,12 +16548,14 @@ msgid "Playback time"
 msgstr "Toistonopeus"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "Edellinen nimi"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "Siirry ajankohtaan"
@@ -16578,9 +16598,10 @@ msgstr "Valitse ulostulon kohde"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17611,26 +17632,6 @@ msgstr "Täysi äänenvoimakkuus"
 msgid "Open Audio Effects window"
 msgstr "Äänitehosteet"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "B"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "KB"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "MB"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "GB"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "TB"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "Avaa lähde"
@@ -17728,6 +17729,7 @@ msgid "Enable DVD menus"
 msgstr "Käytä DVD-valikkoja"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "IP-osoite"
 
@@ -18018,58 +18020,6 @@ msgstr "Metatiedon tallennus epäonnistui"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC ei voinut tallentaa metatietoja."
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "Asetukset"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "Nollaa kaikki"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "Näytä perusasetukset"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "Valitse kansio"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "Valitse tiedosto"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "Valitse"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "Jatketaanko toistoa?"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "Jatka"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "Jatka toistoa"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "Aloita toisto uudelleen"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr ""
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -18096,6 +18046,31 @@ msgstr "Palvelujen haku"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "Estä näytönsäästäjä"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "Jatketaanko toistoa?"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "Jatka"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "Jatka toistoa"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "Aloita toisto uudelleen"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18370,6 +18345,16 @@ msgstr "Etuliite"
 msgid "Sequential numbering"
 msgstr "Järjestysnumerot"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "Nollaa kaikki"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "Asetukset"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18456,9 +18441,49 @@ msgstr "Valitettavasti tätä näppäinyhdistelmää ei voi käyttää pikanäpp
 msgid "This combination is already taken by \"%@\"."
 msgstr "Tämä näppäinyhdistelmä on jo käytössä toiminnolle \"%@\"."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "Toista/tauko"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "Satunnaistoisto päälle/pois"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "Pääikkuna..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "Kuvaus-URL"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "Toistetaan"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "Valitse kansio"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "Avaa sijainti leikep&öydältä"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "Ei asetettu"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18767,7 +18792,8 @@ msgid "Add text"
 msgstr "Lisää teksti"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "Teksti"
 
@@ -18790,9 +18816,41 @@ msgstr "Läpinäkyvyys"
 msgid "Organize profiles..."
 msgstr "Järjestä profiilit..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "sek."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "B"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "KB"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "MB"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "GB"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "TB"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "Näytä perusasetukset"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "Valitse kansio"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "Valitse tiedosto"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "Valitse"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19152,11 +19210,6 @@ msgstr "Siirry eteenpäin"
 msgid "Loop / Repeat"
 msgstr "Kierto / Uudelleentoisto"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "Tietoja"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "Avaa tekstitykset"
@@ -19269,6 +19322,10 @@ msgstr "Pysäytä A:sta B:hen -silmukka"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "Kuvasuhde"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr "EPG-tietoa ei saatavilla"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19425,10 +19482,6 @@ msgstr "(Viivästetty)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "Pakota päivitys tämän dialogin arvoihin"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr "EPG-tietoa ei saatavilla"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20085,6 +20138,11 @@ msgstr ""
 msgid "Base port"
 msgstr "Perusportti"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "Suoratoiston nimi"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "Tämä moduuli lähettää transkoodatun tietovirran Icecast-palvelimelle."
@@ -20117,9 +20175,10 @@ msgstr "Poista kaikki kirjanmerkit"
 msgid "Extract"
 msgstr "Pura"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20172,6 +20231,19 @@ msgstr "Aloita"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "Säilöt"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "O&hjelmaopas"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "Päivitä"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20580,50 +20652,6 @@ msgstr ""
 "Haluatko varmasti poistaa kaikki VLC-mediasoittimen asetukset ja palauttaa "
 "ne oletusarvoihin?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "Avaa hakemisto"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "Avaa kansio"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "Avaa soittolista..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "XSPF-soittolista"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "M3U-soittolista"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "M3U8-soittolista"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "Tallenna soittolista nimellä..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "Avaa tekstitykset..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "Mediatiedostot"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "Tekstitystiedostot"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "Kaikki tiedostot"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "Suoratoistolähtö"
@@ -20842,6 +20870,61 @@ msgstr "Ajastettu: "
 msgid "VOD: "
 msgstr "VOD: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "Avaa hakemisto"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "Avaa kansio"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "Avaa soittolista..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "XSPF-soittolista"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "M3U-soittolista"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "M3U8-soittolista"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "Tallenna soittolista nimellä..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "Avaa tekstitykset..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "Mediatiedostot"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "Tekstitystiedostot"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "Kaikki tiedostot"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr "Tyhjä"
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "Aktivoi/Enter (DVD)"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "Jatka toistoa siitä, mihin jäätiin"
@@ -20946,10 +21029,6 @@ msgstr "T&ehosteet ja suotimet"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "Raidan synkronoin&ti"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "O&hjelmaopas"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21441,6 +21520,12 @@ msgstr "Huomautukset"
 msgid "debug"
 msgstr "Virheenjäljitys (debug)"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "Tyhjennä"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "Avaa ulkoasutiedosto"
@@ -21542,6 +21627,80 @@ msgstr "Valitse ulkoasutiedosto"
 msgid "Open skin..."
 msgstr "Avaa ulkoasutiedosto..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "Kirkkauskynnys"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"Kun tämä tila on käytössä, pikselit näkyvät joko mustana tai valkoisena. "
+"Kynnysarvo on täällä määrätty kirkkaus."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "Kuvan kontrasti (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "Aseta kuvan kontrasti, väliltä 0 ja 2. Oletusarvo on 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "Kuvan värisävy (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "Aseta kuvan värisävy (hue), väliltä 0 ja 360. Oletus on 0."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "Kuvan värikylläisyys (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "Aseta kuvan värikylläisyys, väliltä 0 ja 3. Oletusarvo on 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "Kuvan kirkkaus (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "Aseta kuvan kirkkaus, väliltä 0 ja 2. Oletusarvo on 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "Kuvan gamma (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "Aseta kuvan gamma, väliltä 0.01 ja 10. Oletusarvo on 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "DirectX-videonkiihdytys (DXVA) 2.0"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "VDPAU-videosuotimen säätö"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -21600,6 +21759,16 @@ msgstr ""
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "MMAL-pohjainen videoulostuloiliitännäinen Raspberry Pi:lle"
+
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "Videosuodin"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "K Video Acceleration -videolähtö"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21661,15 +21830,22 @@ msgstr "VDPAU-ulostulo"
 msgid "VDPAU sharpen video filter"
 msgstr "VDPAU-videonterävöityssuoddin"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "Videosuodin"
+msgid "file keystore (plaintext)"
+msgstr "Paketoijien luettelo suositusjärjestyksessä"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "K Video Acceleration -videolähtö"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21740,6 +21916,186 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "TLS-tuki OS X :lle ja iOS:lle"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "Käytä jaettua muistia"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "Poista valitut"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "Käytä jaettua muistia"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "Käytä jaettua muistia"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "Lisää logo"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "Pysy vaiti"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "Kirjoita kaikki VLC:n lokiviestit tekstitiedostoon."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "Konsoli"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "Konsoli"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "Lisätietoja"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "Virheenjäljitys (debug)"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "Kirjoita lokia tiedostoon"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "Kirjoita kaikki VLC:n lokiviestit tekstitiedostoon."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "Lokin tiedostonimi"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "Määritä lokin tiedostonimi."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "Lokin muoto"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "Määritä lokiinkirjauksen formaatti."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "Sanaisuustaso"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"Valitse lokin sanaisuus. Jos tämä on -1, käytetään samaa sanaisuutta, jonka "
+"komentorivivalinta --verbose tuottaa."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "Loki"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "Tiedostoloki"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "Virheenjäljityksen peite"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "Toiminta"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "Syslog-tunniste"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "Kirjoita lokia syslogiin"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22434,6 +22790,36 @@ msgstr "JPop"
 msgid "Synthpop"
 msgstr "Synthpop"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "Maksimi paikallinen bittinopeus"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "Videon kuvamuunnossuodin"
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "last.fm-tilin käyttäjätunnus"
@@ -22483,6 +22869,15 @@ msgstr ""
 "Aseta käyttäjänimi tai kytke 'audioscrobbler'-liitännäinen pois päältä, ja "
 "käynnistä VLC uudelleen.\n"
 "last.fm-tilin voi luoda Internetissä osoitteessa http://www.last.fm/join/ ."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "Akustinen"
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 msgid ""
@@ -22795,10 +23190,6 @@ msgstr "Aihe"
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "Enkooderi"
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "Avainsanat"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23262,6 +23653,18 @@ msgstr "Kuva"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "Omat kuvat"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "Bonjour-palvelut"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "Bonjour-palvelut"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24444,6 +24847,63 @@ msgstr "Silta ulos"
 msgid "Bridge in"
 msgstr "Silta sisään"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "SFTP-portti"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "Tämä moduuli lähettää transkoodatun tietovirran Icecast-palvelimelle."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "Lähetyksen vastaanottavan tietokoneen osoite."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "Väriformaatti"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "Väriformaatti"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "Siltaava suoratoistolähtö"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "Avformat-kanavoinninpurkaja"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24500,6 +24960,10 @@ msgstr "Viivästää näytettävää tietovirtaa."
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "Kuvaruututallennuksen suoratoistolähtö"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "Lumekäyttölähtö"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24797,6 +25261,10 @@ msgstr ""
 "Tämä lähettää ja vastaanottaa RTCP-paketteja multipleksattuna samassa "
 "portissa kuin RTP-paketit."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "Välimuistin koko (ms)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24840,6 +25308,15 @@ msgstr ""
 "RTSP-istunnot suljetaan, mikäli se ei ole saanut yhtään RTSP-pyyntöä tämän "
 "ajan sisällä. Negatiivinen arvo kytkee aikakatkaisun pois päältä. Oletusarvo "
 "on 60 (yksi minuutti)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "Tietovirran käyttämiseen tarvittava käyttäjätunnus."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "Tietovirran käyttämiseen tarvittava salasana."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25509,58 +25986,6 @@ msgstr "Ohjelmallinen skaalaus"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "YUVP-muunnin"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "Kirkkauskynnys"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"Kun tämä tila on käytössä, pikselit näkyvät joko mustana tai valkoisena. "
-"Kynnysarvo on täällä määrätty kirkkaus."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "Kuvan kontrasti (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Aseta kuvan kontrasti, väliltä 0 ja 2. Oletusarvo on 1."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "Kuvan värisävy (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "Aseta kuvan värisävy (hue), väliltä 0 ja 360. Oletus on 0."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "Kuvan värikylläisyys (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "Aseta kuvan värikylläisyys, väliltä 0 ja 3. Oletusarvo on 1."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "Kuvan kirkkaus (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "Aseta kuvan kirkkaus, väliltä 0 ja 2. Oletusarvo on 1."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "Kuvan gamma (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Aseta kuvan gamma, väliltä 0.01 ja 10. Oletusarvo on 1."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27250,6 +27675,15 @@ msgstr "OpenGL-videolähtö"
 msgid "Windows GDI video output"
 msgstr "Windows GDI -videolähtö"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "Grafiikkasuorittimen affiniteetti"
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "EGL-laajennus OpenGL:ään"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "Lumevideolähdön väriformaatti"
@@ -27757,6 +28191,26 @@ msgstr "Seinä-videosuodin"
 msgid "Image wall"
 msgstr "Kuvaseinä"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "Videoikkunan leveys pikseleinä."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "Videoikkunan korkeus pikseleinä."
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "Spektri"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "Nykyinen visualisointi"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "Goom-näyttöleveys"
@@ -28208,10 +28662,6 @@ msgstr "Oletko varma että haluat luoda virtautuksen?"
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "Dialogi"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "Päivitä"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29066,6 +29516,251 @@ msgid "Media Manager List"
 msgstr "Mediahallinnan lista"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "Uudelleennäytteistyksen laatu"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Skaalauksen laatu"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Renderöinnin laatu"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "Uudelleennäytteistyksen laatu (0 = huonoin ja nopein, 10 = paras ja "
+#~ "hitain)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Aloituskohta"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Virittimen maakoodi"
+
+#~ msgid "Keep existing file"
+#~ msgstr "Säilytä jo olemassaoleva tiedosto"
+
+#~ msgid "Overwrite"
+#~ msgstr "Korvaa"
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "Korvaa tiedosto"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "Jos tiedosto on jo olemassa, se korvataan"
+
+#~ msgid "Append to file"
+#~ msgstr "Lisää tiedoston loppuun"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr ""
+#~ "Lisää tiedoston loppuun, jos se on jo olemasssa, tiedoston korvaamisen "
+#~ "sijaan."
+
+#~ msgid "Format time and date"
+#~ msgstr "Ajan ja päivämäärän muoto"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr ""
+#~ "Suorita ISO C-muotoinen ajan ja päivämäärän formaatti tiedostopolkuun."
+
+#~ msgid "Synchronous writing"
+#~ msgstr "Välitön kirjoitus"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr ""
+#~ "Avaa tiedoston välittömän kirjoituksen moodissa (synchronous write)."
+
+#~ msgid "File stream output"
+#~ msgstr "Tiedostokäyttölähtö"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr ""
+#~ "Palvelimen palauttama MIME-koodi (tunnistetaan automaattisesti jos ei "
+#~ "määrätty)."
+
+#~ msgid "Metacube"
+#~ msgstr "Metacube"
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr ""
+#~ "Käytä Metacube-protokollaa. Tämä tarvitaan kun halutaan virtauttaa "
+#~ "Cubemap-reflektorille."
+
+#~ msgid "HTTP stream output"
+#~ msgstr "HTTP-käyttölähtö"
+
+#~ msgid "Segment length"
+#~ msgstr "Segmentin pituus"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "TS-tietovirran segmenttien pituus"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "Katkaise segmentti mistä vain"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "Älä vaadi avainkuvaa ennen segmentin katkaisua. Tarvitaan tietovirroille, "
+#~ "joissa on vain ääni."
+
+#~ msgid "Number of segments"
+#~ msgstr "Segmenttien lukumäärä"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "Montako segmenttiä sisällytetään indeksiin"
+
+#~ msgid "Allow cache"
+#~ msgstr "Salli välimuisti"
+
+#~ msgid "Index file"
+#~ msgstr "Indeksitiedosto"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "Luotavan indeksitiedoston polku"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "Indeksitiedostoon laitettava täysi URL"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "Täysi URL, joka kirjoitetaan indeksitiedostoon. Käytä #-merkkejä "
+#~ "ilmaisemaan segmentin numeroa."
+
+#~ msgid "Delete segments"
+#~ msgstr "Poista segmentit"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "Poista vanhat segmentit, joita ei enää tarvita"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "Käytä kanavoijan nopeudensäätömekanismia (rate control)"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "Soittolistaan sijoitettavan AES-avaimen URI"
+
+#~ msgid "AES key file"
+#~ msgstr "AES-avaintiedosto"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "Tiedosto joka sisältää 16-bittisen salausavaimen"
+
+#~ msgid "Number of first segment"
+#~ msgstr "Ensimmäisen segmentin numero"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "HTTP Live -käyttölähtö"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Nimi, joka tälle suoratoistolle/kanavalle annetaan shoutcast/icecast -"
+#~ "palvelimella."
+
+#~ msgid "Stream description"
+#~ msgstr "Suoratoiston kuvaus"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr ""
+#~ "Voit laittaa tähän kuvauksen lähetettävästä suoratoistosta, tai tietoa "
+#~ "kanavastasi."
+
+#~ msgid "Stream MP3"
+#~ msgstr "Lähetä MP3:na"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Yleensä shoutcast-moduulille syötetään Ogg-suoratoistoa. On myös "
+#~ "mahdollista lähettää MP3-suoratoistovirtaa, joten voit ohjata eteenpäin "
+#~ "MP3-virran shoutcast/icecast -palvelimelle käyttämällä tätä asetusta."
+
+#~ msgid "Genre description"
+#~ msgstr "Tyylilaji"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "Sisällön tyylilaji (musikkilaji, genre). "
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr ""
+#~ "Verkko-osoite (URL), josta löytyy tietoa tästä suoratoistostasi tai "
+#~ "kanavastasi. "
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "Transkoodatun tietovirran bittinopeustieto. "
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "Transkoodatun tietovirran näytteistystaajuustieto. "
+
+#~ msgid "Number of channels"
+#~ msgstr "Kanavien määrä"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "Transkoodatun tietovirran kanavien määrätieto. "
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Ogg Vorbiksen laatu"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "Tieto transkoodatun tietovirran Ogg Vorbis -laadusta. "
+
+#~ msgid "Stream public"
+#~ msgstr "Julkinen suoratoisto"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "Julkaise palvelin icecast/shoutcast -sivuston 'Keltaisilla "
+#~ "Sivuilla' (listaus saatavilla olevista suoratoistoista). Vaatii "
+#~ "bittinopeustiedon shoutcastille. Vaatii Ogg-suoratoiston käytön "
+#~ "icecastille."
+
+#~ msgid "IceCAST output"
+#~ msgstr "IceCAST-lähtö"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "Oletusarvoisen puskuroinnin määrä lähteville UDP-tietovirroille. "
+#~ "Asetetaan millisekunteina."
+
+#~ msgid "Group packets"
+#~ msgstr "Ryhmitä paketit"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "Paketit voidaan lähettää yksi kerrallaan oikeaan aikaan, tai ryhminä. "
+#~ "Voit valita, montako pakettia lähetetään kerrallaan. Tämä vähentää "
+#~ "ajastukseen liittyvää järjestelmäkuormaa, mistä voi olla apua jos "
+#~ "järjestelmä on raskaasti kuormitettu."
+
+#~ msgid "UDP stream output"
+#~ msgstr "UDP-käyttölähtö"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "Poista käytöstä"
 
@@ -29084,9 +29779,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "Navigation"
 #~ msgstr "Navigaatio"
-
-#~ msgid "Be quiet"
-#~ msgstr "Pysy vaiti"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Kytke pois päältä kaikki huomautukset ja informaatioviestit."
@@ -29117,15 +29809,6 @@ msgstr "Mediahallinnan lista"
 #~ msgstr ""
 #~ "Tämä tiedosto sisältää vaihtoehtoisen CRL:n estääkseen etäasiakkaita "
 #~ "käyttämästä kumottuja sertifikaatteja TLS-sessioissa."
-
-#~ msgid "Log to file"
-#~ msgstr "Kirjoita lokia tiedostoon"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "Kirjoita kaikki VLC:n lokiviestit tekstitiedostoon."
-
-#~ msgid "Log to syslog"
-#~ msgstr "Kirjoita lokia syslogiin"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr ""
@@ -29174,9 +29857,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "Configure"
 #~ msgstr "Määritä asetukset"
-
-#~ msgid "Channel number"
-#~ msgstr "Kanavan numero"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29267,13 +29947,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "No Input device found"
 #~ msgstr "Lähdelaitetta ei löydy"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Macissasi ei näytä olevan sopivaa videolähdelaitetta. Tarkista liittimet "
-#~ "ja ajurit."
 
 #~ msgid "RDP auth username"
 #~ msgstr "RDP-todennuksen käyttäjänimi"
@@ -29496,72 +30169,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "DRM-suojatut virtautukset eivät ole tuettuja."
-
-#~ msgid "Writer"
-#~ msgstr "Kirjoittaja"
-
-#~ msgid "Composer"
-#~ msgstr "Esittäjä"
-
-#~ msgid "Producer"
-#~ msgstr "Tuottaja"
-
-#~ msgid "Disclaimer"
-#~ msgstr "Vastuuvapauslauseke"
-
-#~ msgid "Requirements"
-#~ msgstr "Vaatimukset"
-
-#~ msgid "Original Format"
-#~ msgstr "Alkup. formaatti"
-
-#~ msgid "Display Source As"
-#~ msgstr "Näytä lähde"
-
-#~ msgid "Host Computer"
-#~ msgstr "Isäntätietokone"
-
-#~ msgid "Performers"
-#~ msgstr "Esittäjät"
-
-#~ msgid "Original Performer"
-#~ msgstr "Alkuperäinen esittäjä"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "Tuottajan lähdesisältö"
-
-#~ msgid "Warning"
-#~ msgstr "Varoitus"
-
-#~ msgid "Software"
-#~ msgstr "Ohjelmisto"
-
-#~ msgid "Record Company"
-#~ msgstr "Levy-yhtiö"
-
-#~ msgid "Model"
-#~ msgstr "Malli"
-
-#~ msgid "Grouping"
-#~ msgstr "Ryhmitys"
-
-#~ msgid "Sub-Title"
-#~ msgstr "Alaotsikko"
-
-#~ msgid "Arranger"
-#~ msgstr "Järjestäjä"
-
-#~ msgid "Conductor"
-#~ msgstr "Kapelimestari"
-
-#~ msgid "Song Description"
-#~ msgstr "Kappaleen kuvaus"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "Ääniteknikko"
-
-#~ msgid "Thanks"
-#~ msgstr "Kiitokset"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "Haluttu kuvanopeus H264-virralle."
@@ -30005,9 +30612,6 @@ msgstr "Mediahallinnan lista"
 #~ msgid "Streaming method"
 #~ msgstr "Suoratoiston lähetystapa"
 
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "Lähetyksen vastaanottavan tietokoneen osoite."
-
 #~ msgid "UDP Unicast"
 #~ msgstr "UDP Unicast (yksi kohde)"
 
@@ -30243,9 +30847,6 @@ msgstr "Mediahallinnan lista"
 #~ msgid "A->B Loop"
 #~ msgstr "A->B -silmukka"
 
-#~ msgid "Current visualization"
-#~ msgstr "Nykyinen visualisointi"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "&Kirjoita muutokset konfiguraatiotiedostoon"
 
@@ -30264,36 +30865,11 @@ msgstr "Mediahallinnan lista"
 #~ msgid "Power"
 #~ msgstr "Virta"
 
-#~ msgid "Log format"
-#~ msgstr "Lokin muoto"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "Määritä lokiinkirjauksen formaatti."
-
 #~ msgid "Syslog ident"
 #~ msgstr "Syslog-ident"
 
 #~ msgid "Set the ident that VLC would use when logging to syslog."
 #~ msgstr "Aseta tunniste jota VLC käyttää kirjoittaessaan syslokiin."
-
-#~ msgid "Syslog facility"
-#~ msgstr "Syslog-tunniste"
-
-#~ msgid "Verbosity"
-#~ msgstr "Sanaisuustaso"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "Valitse lokin sanaisuus. Jos tämä on -1, käytetään samaa sanaisuutta, "
-#~ "jonka komentorivivalinta --verbose tuottaa."
-
-#~ msgid "Log filename"
-#~ msgstr "Lokin tiedostonimi"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "Määritä lokin tiedostonimi."
 
 #~ msgid "Local drives"
 #~ msgstr "Paikalliset asemat"
@@ -30676,9 +31252,6 @@ msgstr "Mediahallinnan lista"
 #~ msgid "Hue windowing"
 #~ msgstr "Hue-ikkunointi"
 
-#~ msgid "Used for statistics."
-#~ msgstr "Käytetään tilastotietoihin."
-
 #~ msgid "Sat windowing"
 #~ msgstr "Sat-ikkunointi"
 
@@ -30898,9 +31471,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "Direct2D video output"
 #~ msgstr "Direct2D-videolähtö"
-
-#~ msgid "GPU affinity"
-#~ msgstr "Grafiikkasuorittimen affiniteetti"
 
 #~ msgid "SDL chroma format"
 #~ msgstr "SDL:n väriformaatti"
@@ -32806,9 +33376,6 @@ msgstr "Mediahallinnan lista"
 #~ "VLC voi sisällyttää videolähtönsä olemassaolevaan X11-ikkunaan. Tämä on "
 #~ "käytettävän olemassaolevan ikkunan X ID (0 = älä käytä)."
 
-#~ msgid "Use shared memory"
-#~ msgstr "Käytä jaettua muistia"
-
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr ""
 #~ "Käytä jaettua muistia VLC:n ja X-palvelimen väliseen kommunikaatioon."
@@ -33589,22 +34156,6 @@ msgstr "Mediahallinnan lista"
 #~ msgid "MTU for out mode."
 #~ msgstr "MTU-arvo, jota käytetään ulostulotilassa."
 
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "Testaa DVB-kortin ominaisuudet"
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ""
-#~ "Jotkin DVB kortit eivät toivu ominaisuuksien testaamisesta. Voit kytkeä "
-#~ "tämän ominaisuuden pois, jos kohtaat ongelmia."
-
-#~ msgid "filename of config file in share/dvb/dvb-s"
-#~ msgstr "asetustiedoston nimi hakemistossa share/dvb/dvb-s"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "DVB-lähde, joka tukee v4l2:ta"
-
 #~ msgid "Uncompressed RAR"
 #~ msgstr "Pakkaamaton RAR"
 
@@ -33649,9 +34200,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "Kaiser"
 #~ msgstr "Kaiser"
-
-#~ msgid "Empty"
-#~ msgstr "Tyhjä"
 
 #, fuzzy
 #~ msgid "MJPEG:"
@@ -37409,10 +37957,6 @@ msgstr "Mediahallinnan lista"
 #~ msgstr "%i kohdetta"
 
 #, fuzzy
-#~ msgid "Info"
-#~ msgstr "Lisätietoja"
-
-#, fuzzy
 #~ msgid "%i items in playlist"
 #~ msgstr "Avaa soittolista"
 
@@ -37684,57 +38228,12 @@ msgstr "Mediahallinnan lista"
 #~ msgstr "Lisäosien hallinta"
 
 #, fuzzy
-#~ msgid "acoustid"
-#~ msgstr "Akustinen"
-
-#, fuzzy
 #~ msgid "Default: 90sec"
 #~ msgstr "Oletustietovirta"
 
 #, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "Videoikkunan leveys pikseleinä."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "Videoikkunan korkeus pikseleinä."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "Spektri"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#, fuzzy
 #~ msgid "SVG video decoder"
 #~ msgstr "CDG-videopurkaja"
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "Aktivoi/Enter (DVD)"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Tyhjennä"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "Lähdelaitetta ei löydy"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "Surround"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Quicktime-kaappaus"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "Lähdelaitetta ei löydy"
 
 #, fuzzy
 #~ msgid "VLC media player - Flash Viewer"

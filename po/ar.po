@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
 "Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
 "Language-Team: Arabic (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -168,7 +168,8 @@ msgstr "إعدادات و وحدات الصوت المتفرّقة"
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -368,7 +369,8 @@ msgstr "دعم الفديو حسب الطلب في VLC"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -972,6 +974,7 @@ msgid "Scrambled"
 msgstr "مزاحم"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "نعم"
 
@@ -1018,6 +1021,7 @@ msgstr "اللغة"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "الوصف"
 
@@ -1041,8 +1045,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "بِت لكلّ عيّنة "
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1301,7 +1304,8 @@ msgstr ".فحص سجل للاطلاع على التفاصيل. '%s'  MRL غير 
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "العنوان"
@@ -1311,8 +1315,8 @@ msgstr "العنوان"
 msgid "Artist"
 msgstr "الفنان"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "الصنف"
 
@@ -1329,7 +1333,7 @@ msgstr "الألبوم "
 msgid "Track number"
 msgstr "رقم المقطوعة"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "التقدير "
 
@@ -1351,7 +1355,7 @@ msgstr "ملقم انترنت"
 msgid "Now Playing"
 msgstr "يشتغل الآن"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "الناشر"
 
@@ -1391,7 +1395,7 @@ msgstr "الاسم الظاهر"
 msgid "Actors"
 msgstr "الممثلين"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "الفنان"
@@ -1876,6 +1880,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1926,7 +1931,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "عرض الفيديو"
@@ -1939,7 +1944,7 @@ msgstr ". يتلاءم مع خصائص الفديو  VLC  (أجبر عرض ال�
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "ارتفاع الفيديو"
@@ -2538,13 +2543,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "المبدئي"
 
@@ -4140,6 +4146,7 @@ msgid "Long jump length, in seconds."
 msgstr "طول القفزة الطويلة بالثانية."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5206,14 +5213,14 @@ msgstr "فشٍل فتح \"%s\" لأجل الكتابة"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6047,6 +6054,33 @@ msgstr "المرفق"
 msgid "Attachment input"
 msgstr ""
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "التقاط الفيديو"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "وحدة اخراج الصوت"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "لم توجد أجهزة دخل"
+
+#: modules/access/avcapture.m:287
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr ""
@@ -6606,7 +6640,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ".لا يدعم المعايير المطلوبة  \"%s\" اعتقال جهاز "
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "زخارف النافذة"
@@ -7060,6 +7094,48 @@ msgstr ""
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "DVB  تحقق من قدرة البطاقة "
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ".لا تحتمل كشف قابلياتها DVB بعض البطاقات "
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "موضع البدء"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "قائمة إختيار"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "تستخدمه الإحصاءات."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "مدخل (V4L2) DVB "
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "زاوية DVD"
@@ -7133,8 +7209,7 @@ msgstr ". لا يستطيع قراءة DVDRead %d/%d blocks at 0x%02x"
 msgid "File input"
 msgstr "قراءة الملفات"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7159,9 +7234,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7177,9 +7252,9 @@ msgid ""
 msgstr "اسم المستخدم التي سيستخدم للاتصال."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7238,11 +7313,46 @@ msgstr "رُفض اتصال VLC بالخادوم المُعطى."
 msgid "Your account was rejected."
 msgstr "رُفض حسابك."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "وسيط HTTP"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "كلمة سر وسيط HTTP"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "إذا كان وسيط HTTP يطلب كلمة سر، فاضبطها هنا."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "إعادة الاتصال تلقائيًا"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr "في حالة إنقطاع الإتصال المفاجئ، حاول إعادة الإتصال."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "مدخل HTTP"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "استيثاق HTTP"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
@@ -7293,45 +7403,10 @@ msgid ""
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "وسيط HTTP"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "كلمة سر وسيط HTTP"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "إذا كان وسيط HTTP يطلب كلمة سر، فاضبطها هنا."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "إعادة الاتصال تلقائيًا"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr "في حالة إنقطاع الإتصال المفاجئ، حاول إعادة الإتصال."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "مدخل HTTP"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "عديم الفائدة"
 
@@ -7365,6 +7440,7 @@ msgid "Set the category of the elementary stream"
 msgstr ""
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "غير معروف"
 
@@ -7756,7 +7832,7 @@ msgstr "جلسة فاشلة"
 msgid "Capture the audio stream in stereo."
 msgstr "إلتقاط السمعي في الستريو"
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "معدّل الإعتيان"
@@ -7775,321 +7851,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "دخل OSS"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "تدفق الخروج عديم الفائدة"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "ابقِ الملف الموجود"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr ""
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "الكتابة على الملف الموجود"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "إن كان الملف موجودا، ستتم الكتابة عليه."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "ألحق إلى الملف"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "أكتب في نهاية الملف عوض تغييره."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "تنسيق الزمن والتاريخ"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr ""
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr ""
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr ""
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "ملف ناتج التيار"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr ".إسم المستعمل الذي سيطلب للوصول إلى التدفق"
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr ".كلمة السر التي ستطلب للوصول إلى التدفق"
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr ""
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "تدفق الخروج HTTP"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr ""
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr ""
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr ""
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr ""
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr ""
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "السماح لذاكرة التخزين المؤقت"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "فهرسة الملف"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr ""
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr ""
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr ""
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr ""
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr ""
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr ""
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "ملف مفتاح AES"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "يحوي الملف ال 16 بايتات لمفتاح التعمية"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr ""
-
-#: modules/access_output/livehttp.c:98
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "استخدم متجها أوليا عشوائيا للتعمية"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr "ولّد متجها أوليا بدل استخدام رقم المقطع كمتجه أولي"
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr ""
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr ""
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr ""
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr ""
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "إسم"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ".shoutcast/icecast الإسم المعطى لقناة التدفق في الخادم"
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "وصف التدفق"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "وصف محتوى تدفقكم ومعلومات عن قناتكم."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "MP3 النشر ب "
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "نوع  الوصف"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "نوع من المحتوي"
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "URL  وصف"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr ".معلومات عن تيار أو قناة بلدكم URL "
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "transcoded    للتيار   Bitrate معلومات "
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr ".transcoded  معدل العينه من المعلومات التدفق"
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "عدد القنوات"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr ".transcoded  عدد قنوات الاعلام التابعة للتدفق"
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Ogg Vorbis Quality"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr ".transcoded    معلومات للتدفق  Ogg Vorbis Quality"
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "تدفق جماعي"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-".موقع icecast/shoutcast  (جعل الخدمة متاحة للجمهور على 'الصفحات "
-"الصفراء' (دليل قائمة الجداول\n"
-". icecast لــOgg يتطلب الجري .shoutcast يتطلب معدل البت المعلومات المحددة ل"
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "خروج IceCAST "
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "(حجم الذاكرة الوسيطة(م ثا"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-".هذه القيمه يجب ان يحدد في ميلي ثانية..UDP القيمه الافتراضيه لاستخدام "
-"الذاكرة الوسيطه للالتزام تدفق"
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "مجموعة الرزم"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"يمكن ارسال الحزم واحدة تلو الاخرى في الوقت المناسب ام كليًا. يمكنك اختيار عدد "
-"من العبوات التي سترسل في وقت واحد. وهو يساعد في تقليل العبء على الجدولة بشدة "
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "تدفق الخروج UDP"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8103,6 +7864,31 @@ msgstr ""
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr ""
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "محيطا"
+
+#: modules/access/qtsound.m:60
+msgid "QuickTime Sound Capture"
+msgstr ""
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "لم توجد أجهزة دخل"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "لم توجد أجهزة دخل"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8517,6 +8303,29 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "دخل FTP"
+
+#: modules/access/srt.c:303
+msgid "SRT chunk size (bytes)"
+msgstr ""
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "(ملي ثا) DTS  مهلة"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9787,16 +9596,24 @@ msgstr "Q التردد 3  "
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "مُرشح  الصوت لآخذ العينات بالزيادة  في النطاق المختصر"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr ""
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "جودة بعد المعالجة"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "أداة إعادة إعداد الصوت"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr ""
 
@@ -11479,6 +11296,16 @@ msgstr ""
 msgid "MPEG audio decoder using mpg123"
 msgstr "لسمعي MPEG  كاشف الرموز "
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr " كاشف الرموز للفديو"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "محزِّم الفديو Theora "
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12109,6 +11936,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "فك الشفرة"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr ""
@@ -12535,6 +12371,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr ""
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "كاشف الرموز للعناوين الثانوية DVB"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -12697,6 +12538,21 @@ msgstr ""
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "مرمز الفديو Theora "
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "فك الشفرة"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "كاشف الرموز للعناوين الثانوية DVB"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "تعريب  العناوين الفرعية"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13641,7 +13497,8 @@ msgstr "D-Bus واجهات السيطرة "
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14011,7 +13868,7 @@ msgstr ""
 msgid "Opening"
 msgstr "يفتح"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "الخطأ"
 
@@ -14505,7 +14362,8 @@ msgstr ""
 msgid "Avformat muxer"
 msgstr ""
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Muxer"
 
@@ -14847,6 +14705,178 @@ msgstr "محاصرته مستوى "
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "(محاصرته التأخير (م/ثا"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:69
+#, fuzzy
+msgid "Composer"
+msgstr "مركب"
+
+#: modules/demux/mp4/meta.c:70
+#, fuzzy
+msgid "Producer"
+msgstr "منتج"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "استعلامات"
+
+#: modules/demux/mp4/meta.c:72
+#, fuzzy
+msgid "Disclaimer"
+msgstr "تجاهل"
+
+#: modules/demux/mp4/meta.c:73
+#, fuzzy
+msgid "Requirements"
+msgstr "القطع "
+
+#: modules/demux/mp4/meta.c:74
+#, fuzzy
+msgid "Original Format"
+msgstr "الرقم الأصلي"
+
+#: modules/demux/mp4/meta.c:75
+#, fuzzy
+msgid "Display Source As"
+msgstr "إعدادات العرض"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:77
+#, fuzzy
+msgid "Performers"
+msgstr "خيارات الأداء"
+
+#: modules/demux/mp4/meta.c:78
+#, fuzzy
+msgid "Original Performer"
+msgstr "الصوت الأصلي"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+#, fuzzy
+msgid "Warning"
+msgstr "التحذيرات"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "برمجة"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:83
+#, fuzzy
+msgid "Record Company"
+msgstr "نسبة التسجيل "
+
+#: modules/demux/mp4/meta.c:84
+#, fuzzy
+msgid "Model"
+msgstr "النمط"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "منتج"
+
+#: modules/demux/mp4/meta.c:86
+#, fuzzy
+msgid "Grouping"
+msgstr "المجموعة"
+
+#: modules/demux/mp4/meta.c:88
+#, fuzzy
+msgid "Sub-Title"
+msgstr "الترجمة النصية"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:90
+#, fuzzy
+msgid "Art Director"
+msgstr "مخرج"
+
+#: modules/demux/mp4/meta.c:91
+#, fuzzy
+msgid "Copyright Acknowledgement"
+msgstr "حقوق الطبع"
+
+#: modules/demux/mp4/meta.c:92
+#, fuzzy
+msgid "Conductor"
+msgstr "منتج"
+
+#: modules/demux/mp4/meta.c:93
+#, fuzzy
+msgid "Song Description"
+msgstr "الوصف"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "شكر"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "معطيات الترميز"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "Media Catalog Number (MCN)"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "الكلمات المفتاحية"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "امسح"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15221,6 +15251,10 @@ msgstr "حجم النشرة"
 msgid "%s bytes"
 msgstr ""
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "Mime"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -15232,6 +15266,11 @@ msgstr ""
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "تحميل"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "الإشباع"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15410,6 +15449,10 @@ msgstr "WAV demuxer‎ "
 msgid "XA demuxer"
 msgstr "XA demuxer‎ "
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "تصنيف غير معروف!"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr ""
@@ -15434,10 +15477,6 @@ msgstr ""
 msgid "Transcript"
 msgstr ""
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr ""
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr ""
@@ -15457,10 +15496,6 @@ msgstr ""
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr ""
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "تصنيف غير معروف!"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -15503,22 +15538,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr ""
 
@@ -15526,6 +15565,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "إضافات"
 
@@ -15567,6 +15607,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "الملمس"
@@ -15662,10 +15703,10 @@ msgstr "أدخل اسم الطور الجديد."
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -15828,12 +15869,14 @@ msgid "Playback time"
 msgstr "شغّل"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "العنوان السابق"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "اذهب إلى الوقت"
@@ -15876,9 +15919,10 @@ msgstr "اختيار موقع الناتج"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -16888,26 +16932,6 @@ msgstr ""
 msgid "Open Audio Effects window"
 msgstr "مؤثرات الصوت"
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr ""
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "المصدر المفتوح"
@@ -17005,6 +17029,7 @@ msgid "Enable DVD menus"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr ""
 
@@ -17288,58 +17313,6 @@ msgstr ""
 msgid "VLC was unable to save the meta data."
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "التفضيلات"
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "أعد ضبط الكل"
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr ""
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "اختر دليلًا"
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "اختر ملفًا"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "اختر"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "مواصلة التشغيل؟"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "استئناف"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "مواصلة التشغيل؟"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr ""
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr ""
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -17366,6 +17339,31 @@ msgstr "اكتشاف الخدمات"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "تعطيل حافظة الشاشة"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "مواصلة التشغيل؟"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "استئناف"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "مواصلة التشغيل؟"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr ""
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -17637,6 +17635,16 @@ msgstr "البادئة"
 msgid "Sequential numbering"
 msgstr ""
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "أعد ضبط الكل"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "التفضيلات"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -17721,9 +17729,49 @@ msgstr ""
 msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "شغّل/ألبث"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "بدّل التشغيل العشوائي لقائمة التشغيل"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "اغلاق النافذة"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "URL  وصف"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "يشتغل الآن"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "اختر مجلدًا"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "افتح مو&قعًا من الحافظة"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr ""
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr ".ثا"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18032,7 +18080,8 @@ msgid "Add text"
 msgstr "أضف نصًا"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "النص"
 
@@ -18055,9 +18104,41 @@ msgstr "الشفافيه "
 msgid "Organize profiles..."
 msgstr "تنظيم الأطوار ..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr ".ثا"
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr ""
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr ""
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "اختر دليلًا"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "اختر ملفًا"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "اختر"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -18418,11 +18499,6 @@ msgstr ""
 msgid "Loop / Repeat"
 msgstr ""
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "استعلامات"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr ""
@@ -18531,6 +18607,11 @@ msgstr ""
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "معدل الترميز"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+#, fuzzy
+msgid "No EPG Data Available"
+msgstr "أفضل ما هو متاح"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -18679,11 +18760,6 @@ msgstr ""
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr ""
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
-msgid "No EPG Data Available"
-msgstr "أفضل ما هو متاح"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19318,6 +19394,11 @@ msgstr "هذه الوحدة تخرج التيار المُحوَّل ترميز�
 msgid "Base port"
 msgstr ""
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "إسم"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "هذه الوحدة تخرج التيار المُحوَّل ترميزه نحو الشبكة عبر خادم Icecast."
@@ -19350,9 +19431,10 @@ msgstr ""
 msgid "Extract"
 msgstr "استخراج"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -19405,6 +19487,19 @@ msgstr "اب&بدأ"
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "الحاويات"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr ""
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "حَدِّث"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19810,50 +19905,6 @@ msgstr ""
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "أمتأكد من أنك تريد إعادة ضبط تفضيلات مشغل الوسائط VLC؟"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "فتح دليل"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "افتح مجلدًا..."
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "افتح قائمة تشغيل..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "XSPF قائمة التشغيل"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr ""
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr ""
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "احفظ قائمة التشغيل كـ..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "افتح ترجمات..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "ملفات وسائط"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr ""
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "كل الملفات"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr ""
@@ -20069,6 +20120,61 @@ msgstr "جدول: "
 msgid "VOD: "
 msgstr "VOD: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "فتح دليل"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "افتح مجلدًا..."
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "افتح قائمة تشغيل..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "XSPF قائمة التشغيل"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr ""
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr ""
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "احفظ قائمة التشغيل كـ..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "افتح ترجمات..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "ملفات وسائط"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr ""
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "كل الملفات"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr "فارغ"
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "نشّط"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
@@ -20173,10 +20279,6 @@ msgstr "المؤ&ثرات والمُرشّحات"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "مزامنة الم&قطوعة"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr ""
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -20635,6 +20737,12 @@ msgstr "التحذيرات"
 msgid "debug"
 msgstr "التنقيح"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "امسح"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "فتح ملف  skin"
@@ -20732,6 +20840,78 @@ msgstr "اختر واجهة"
 msgid "Open skin..."
 msgstr "افتح ملفًا..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr ".عتبة الوهج"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "(  تباين الصورة(0-2"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr ".مجموعة صورة مقارنة بين 0 و 2. التقصير الى 1"
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "  (تدرج لون الصورة(0-360"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "مجموعة صورة الشكل ، بين 0 و 360. 0 الى التقصير. "
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "  (اشباع الصورة(0-3"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr ".مجموعة صورة الاشباع ، بين 0 و 3. التقصير الى 1"
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "اضاءة الصورة(0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "مجموعة صورة السطوح بين 0 و 2. التقصير الى 1. "
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "  (جاما الصورة(0-10"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr ".مجموعة صورة غاما ، وبين 0.01 و 10. التقصير الى 1"
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "خرج سمعي DirectX"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "خرج سمعي DirectX"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -20790,6 +20970,16 @@ msgstr ""
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
+
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "مُرشّح الفيديو"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "مُرشّح الفيديو"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -20851,15 +21041,22 @@ msgstr ""
 msgid "VDPAU sharpen video filter"
 msgstr ""
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "مُرشّح الفيديو"
+msgid "file keystore (plaintext)"
+msgstr ".قائمة المحزمون المفضلة"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "مُرشّح الفيديو"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -20928,6 +21125,183 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keystore for iOS, Mac OS X and tvOS"
+msgstr ""
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "استعمال الذاكرة المشتركة"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "احذف المحدد"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "استعمال الذاكرة المشتركة"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "استعمال الذاكرة المشتركة"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "أضف شعارًا"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "كن هادئا"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr ".في نص ملف VLC سجل كل رسائل "
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "لوحة تحكم"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "لوحة تحكم"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "المزيد من المعلومات"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "التنقيح"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "سجل في ملف"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr ".في نص ملف VLC سجل كل رسائل "
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "سجل إسم الملف"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "تحدد  سجل إسم الملف"
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "سجل الصيغة "
+
+#: modules/logger/file.c:212
+#, fuzzy
+msgid "Specify the logging format."
+msgstr "تحدد  سجل إسم الملف"
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "الإسهاب"
+
+#: modules/logger/file.c:215
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "جاري الدخول"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "جاري الدخول لملف"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "قناع التنقيح"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "جودة VBR"
+
+#: modules/logger/syslog.c:148
+msgid "System logging facility."
+msgstr ""
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "سجل إلى syslog"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
 msgstr ""
 
 #: modules/lua/libs/httpd.c:75
@@ -21611,6 +21985,36 @@ msgstr ""
 msgid "Synthpop"
 msgstr ""
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "أعلى معدّل بت محليّ"
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "تحويل الفيديو المرشح "
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "اسم مستخدم حسابك في last.fm"
@@ -21654,6 +22058,14 @@ msgid ""
 "Please set a username or disable the audioscrobbler plugin, and restart "
 "VLC.\n"
 "Visit http://www.last.fm/join/ to get an account."
+msgstr ""
+
+#: modules/misc/fingerprinter.c:73
+msgid "acoustid"
+msgstr ""
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
 msgstr ""
 
 #: modules/misc/gnutls.c:477
@@ -21958,10 +22370,6 @@ msgstr ""
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr ""
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "الكلمات المفتاحية"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -22407,6 +22815,18 @@ msgstr "صورة"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "صُوَري"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "الخدمات صباح الخير "
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "الخدمات صباح الخير "
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -23509,6 +23929,62 @@ msgstr "خارج  جسرا "
 msgid "Bridge in"
 msgstr "جسرا الى"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "منفذ SFTP"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "هذه الوحدة تخرج التيار المُحوَّل ترميزه نحو الشبكة عبر خادم Icecast."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "عنوان الحاسوب الى  تيار الى "
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "زبون المنفذ"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "كروما"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "جسر جدول الانتاج"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+msgid "chromecast demux wrapper"
+msgstr ""
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -23563,6 +24039,10 @@ msgstr "يقدم اي تأخير في عرض للتيار. "
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "عرض مخرج التيار "
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "تدفق الخروج عديم الفائدة"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -23841,6 +24321,10 @@ msgid ""
 "packets."
 msgstr ""
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "(حجم الذاكرة الوسيطة(م ثا"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -23880,6 +24364,15 @@ msgid ""
 "long. Setting it to a negative value or zero disables timeouts. The default "
 "is 60 (one minute)."
 msgstr ""
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr ".إسم المستعمل الذي سيطلب للوصول إلى التدفق"
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr ".كلمة السر التي ستطلب للوصول إلى التدفق"
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -24518,56 +25011,6 @@ msgstr ""
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr ""
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr ".عتبة الوهج"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "(  تباين الصورة(0-2"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr ".مجموعة صورة مقارنة بين 0 و 2. التقصير الى 1"
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "  (تدرج لون الصورة(0-360"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "مجموعة صورة الشكل ، بين 0 و 360. 0 الى التقصير. "
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "  (اشباع الصورة(0-3"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr ".مجموعة صورة الاشباع ، بين 0 و 3. التقصير الى 1"
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "اضاءة الصورة(0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "مجموعة صورة السطوح بين 0 و 2. التقصير الى 1. "
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "  (جاما الصورة(0-10"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr ".مجموعة صورة غاما ، وبين 0.01 و 10. التقصير الى 1"
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26178,6 +26621,14 @@ msgstr "OpenGL ناتج الفيديو"
 msgid "Windows GDI video output"
 msgstr "  اخراج الفديو GDI نافذة"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr ""
+
+#: modules/video_output/win32/wgl.c:46
+msgid "WGL extension for OpenGL"
+msgstr ""
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "شكل الصورة كروماالافتراضي"
@@ -26644,6 +27095,25 @@ msgstr "المرشح الجدار الفيديو "
 msgid "Image wall"
 msgstr "Image wall"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr ".عرض تأثيرات نافذة  الفيديو, بالبكسل"
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr ".ذروة اثار نافذة الفيديو , في البكسل "
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "طيف"
+
+#: modules/visualization/glspectrum.c:63
+msgid "3D OpenGL spectrum visualization"
+msgstr ""
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "عرض عرض جوم"
@@ -27086,10 +27556,6 @@ msgstr "هل أنت متأكد من رغبتك في إنشاء البث؟"
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "حوار"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "حَدِّث"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -27940,6 +28406,148 @@ msgid "Media Manager List"
 msgstr "لائحة مدير الوسائط"
 
 #, fuzzy
+#~ msgid "High quality"
+#~ msgstr "جودة الصورة"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "نوعية الترميز"
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "وقت البدء"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "شفرة بلد المستقبِل"
+
+#~ msgid "Keep existing file"
+#~ msgstr "ابقِ الملف الموجود"
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "الكتابة على الملف الموجود"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "إن كان الملف موجودا، ستتم الكتابة عليه."
+
+#~ msgid "Append to file"
+#~ msgstr "ألحق إلى الملف"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "أكتب في نهاية الملف عوض تغييره."
+
+#~ msgid "Format time and date"
+#~ msgstr "تنسيق الزمن والتاريخ"
+
+#~ msgid "File stream output"
+#~ msgstr "ملف ناتج التيار"
+
+#~ msgid "HTTP stream output"
+#~ msgstr "تدفق الخروج HTTP"
+
+#~ msgid "Allow cache"
+#~ msgstr "السماح لذاكرة التخزين المؤقت"
+
+#~ msgid "Index file"
+#~ msgstr "فهرسة الملف"
+
+#~ msgid "AES key file"
+#~ msgstr "ملف مفتاح AES"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "يحوي الملف ال 16 بايتات لمفتاح التعمية"
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "استخدم متجها أوليا عشوائيا للتعمية"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr "ولّد متجها أوليا بدل استخدام رقم المقطع كمتجه أولي"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr ".shoutcast/icecast الإسم المعطى لقناة التدفق في الخادم"
+
+#~ msgid "Stream description"
+#~ msgstr "وصف التدفق"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "وصف محتوى تدفقكم ومعلومات عن قناتكم."
+
+#~ msgid "Stream MP3"
+#~ msgstr "MP3 النشر ب "
+
+#~ msgid "Genre description"
+#~ msgstr "نوع  الوصف"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "نوع من المحتوي"
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr ".معلومات عن تيار أو قناة بلدكم URL "
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "transcoded    للتيار   Bitrate معلومات "
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr ".transcoded  معدل العينه من المعلومات التدفق"
+
+#~ msgid "Number of channels"
+#~ msgstr "عدد القنوات"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr ".transcoded  عدد قنوات الاعلام التابعة للتدفق"
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Ogg Vorbis Quality"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr ".transcoded    معلومات للتدفق  Ogg Vorbis Quality"
+
+#~ msgid "Stream public"
+#~ msgstr "تدفق جماعي"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ ".موقع icecast/shoutcast  (جعل الخدمة متاحة للجمهور على 'الصفحات "
+#~ "الصفراء' (دليل قائمة الجداول\n"
+#~ ". icecast لــOgg يتطلب الجري .shoutcast يتطلب معدل البت المعلومات المحددة "
+#~ "ل"
+
+#~ msgid "IceCAST output"
+#~ msgstr "خروج IceCAST "
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ ".هذه القيمه يجب ان يحدد في ميلي ثانية..UDP القيمه الافتراضيه لاستخدام "
+#~ "الذاكرة الوسيطه للالتزام تدفق"
+
+#~ msgid "Group packets"
+#~ msgstr "مجموعة الرزم"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "يمكن ارسال الحزم واحدة تلو الاخرى في الوقت المناسب ام كليًا. يمكنك اختيار "
+#~ "عدد من العبوات التي سترسل في وقت واحد. وهو يساعد في تقليل العبء على "
+#~ "الجدولة بشدة "
+
+#~ msgid "UDP stream output"
+#~ msgstr "تدفق الخروج UDP"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "عطًل"
 
@@ -27958,9 +28566,6 @@ msgstr "لائحة مدير الوسائط"
 
 #~ msgid "Navigation"
 #~ msgstr "تصفح"
-
-#~ msgid "Be quiet"
-#~ msgstr "كن هادئا"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr ".إغلاق جميع الرسائل التحذيرية و الإعلامية"
@@ -27991,15 +28596,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgstr ""
 #~ "يحتوي هذا الملف على CRL اختياري لمنع العملاء البعيدين من استخدام الشهادات "
 #~ "التي تم إبطالها في جلسات TLS."
-
-#~ msgid "Log to file"
-#~ msgstr "سجل في ملف"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr ".في نص ملف VLC سجل كل رسائل "
-
-#~ msgid "Log to syslog"
-#~ msgstr "سجل إلى syslog"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr ".UNIX في أنظمة ،syslog إلى VLC سجل كل رسائل "
@@ -28069,9 +28665,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgid "RTSP password"
 #~ msgstr "RTSP كلمة السڒ"
 
-#~ msgid "No Input device found"
-#~ msgstr "لم توجد أجهزة دخل"
-
 #~ msgid "RDP Password"
 #~ msgstr "كلمة مرور RDP"
 
@@ -28089,9 +28682,6 @@ msgstr "لائحة مدير الوسائط"
 
 #~ msgid "SMB password"
 #~ msgstr "كلمة السرّ"
-
-#~ msgid "Segments"
-#~ msgstr "القطع "
 
 #~ msgid "Segment"
 #~ msgstr "قطعة"
@@ -28140,9 +28730,6 @@ msgstr "لائحة مدير الوسائط"
 
 #~ msgid "extended selection list"
 #~ msgstr "قائمة الإختيارالموسعة"
-
-#~ msgid "selection list"
-#~ msgstr "قائمة إختيار"
 
 #~ msgid "unknown type"
 #~ msgstr "نوع غير معروف"
@@ -28239,12 +28826,6 @@ msgstr "لائحة مدير الوسائط"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "كاشف الرموز  QuickTime"
-
-#~ msgid "Software"
-#~ msgstr "برمجة"
-
-#~ msgid "Thanks"
-#~ msgstr "شكر"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr " تدفق h264 معدل رغبة اطار "
@@ -28540,9 +29121,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgid "Streaming method"
 #~ msgstr "طريقة  الدَفق "
 
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "عنوان الحاسوب الى  تيار الى "
-
 #~ msgid "UDP Unicast"
 #~ msgstr "UDP Unicast"
 
@@ -28707,18 +29285,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgid "&Decrease Volume"
 #~ msgstr "اخفض& الصوت"
 
-#~ msgid "Log format"
-#~ msgstr "سجل الصيغة "
-
-#~ msgid "Verbosity"
-#~ msgstr "الإسهاب"
-
-#~ msgid "Log filename"
-#~ msgstr "سجل إسم الملف"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "تحدد  سجل إسم الملف"
-
 #~ msgid "Local drives"
 #~ msgstr "السواقات المحلية"
 
@@ -28747,9 +29313,6 @@ msgstr "لائحة مدير الوسائط"
 
 #~ msgid "Win32 font renderer"
 #~ msgstr ".WIN32 تصيّر الخط"
-
-#~ msgid "Used for statistics."
-#~ msgstr "تستخدمه الإحصاءات."
 
 #~ msgid "No Filtering"
 #~ msgstr "لا مُرشّحات"
@@ -28791,22 +29354,8 @@ msgstr "لائحة مدير الوسائط"
 #~ msgid "MTU for out mode."
 #~ msgstr ".MTU لاصل طريقه."
 
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "DVB  تحقق من قدرة البطاقة "
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ".لا تحتمل كشف قابلياتها DVB بعض البطاقات "
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "مدخل (V4L2) DVB "
-
 #~ msgid "Uncompressed RAR"
 #~ msgstr "RAR غير مضغوط"
-
-#~ msgid "Empty"
-#~ msgstr "فارغ"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -30366,9 +30915,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgid "ID of the video output X window"
 #~ msgstr "ينشئ عدة نسخ لنافذة إخراج الفيديو"
 
-#~ msgid "Use shared memory"
-#~ msgstr "استعمال الذاكرة المشتركة"
-
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr ".Xو الخادم   VLC  استعمال الذاكرة المشتركة  للوصل بين"
 
@@ -30640,9 +31186,6 @@ msgstr "لائحة مدير الوسائط"
 #~ "If set, CD-Text information will be preferred to CDDB information when "
 #~ "both are available"
 #~ msgstr "CD-Text ستستعمل بالأولوية بالنسبة ل CDDB ، إذاكان هذا الخيار منشّط"
-
-#~ msgid "Media Catalog Number (MCN)"
-#~ msgstr "Media Catalog Number (MCN)"
 
 #~ msgid ""
 #~ "DirectX device number: 0 default device, 1..N device by number(Note that "
@@ -32255,15 +32798,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgstr "احف&ظ كـ.."
 
 #, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "نشّط"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "امسح"
-
-#, fuzzy
 #~ msgid "VLC media player - Flash Viewer"
 #~ msgstr "واجهة الوِب لمُشغل الوسائط في​إل​سي \"VLC\""
 
@@ -32659,10 +33193,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgstr "القنوات"
 
 #, fuzzy
-#~ msgid "RTMP input"
-#~ msgstr "دخل FTP"
-
-#, fuzzy
 #~ msgid "SFTP user name"
 #~ msgstr "اسم مستخدم FTP"
 
@@ -32803,10 +33333,6 @@ msgstr "لائحة مدير الوسائط"
 #, fuzzy
 #~ msgid "Dummy ifo demux"
 #~ msgstr "فك الرموز الافتراضي"
-
-#, fuzzy
-#~ msgid "Text subtitles parser"
-#~ msgstr "تعريب  العناوين الفرعية"
 
 #, fuzzy
 #~ msgid "Frames per second"
@@ -33712,10 +34238,6 @@ msgstr "لائحة مدير الوسائط"
 #, fuzzy
 #~ msgid "Transponder FEC"
 #~ msgstr "رمز عابر "
-
-#, fuzzy
-#~ msgid "Satellite Polarisation"
-#~ msgstr "موضع البدء"
 
 #, fuzzy
 #~ msgid "DirectShow DVB input"
@@ -34728,10 +35250,6 @@ msgstr "لائحة مدير الوسائط"
 #~ msgstr "معدّل الإعتيان"
 
 #, fuzzy
-#~ msgid "Quality:"
-#~ msgstr "جودة VBR"
-
-#, fuzzy
 #~ msgid "Tuner:"
 #~ msgstr "المستقبِل"
 
@@ -35567,10 +36085,6 @@ msgstr "لائحة مدير الوسائط"
 #, fuzzy
 #~ msgid "Preparse"
 #~ msgstr "المُعِّد"
-
-#, fuzzy
-#~ msgid "Info"
-#~ msgstr "المزيد من المعلومات"
 
 #, fuzzy
 #~ msgid "%i items in playlist"

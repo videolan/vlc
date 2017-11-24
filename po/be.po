@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2014-03-09 18:41+0000\n"
 "Last-Translator: nesterow <nestserau@me.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/vlc-trans/"
@@ -158,7 +158,8 @@ msgstr "Іншыя гукавыя настаўленні і модулі."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -367,7 +368,8 @@ msgstr "Рэалізацыя сістэмы \"відэа на запыт\" пл�
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -987,6 +989,7 @@ msgid "Scrambled"
 msgstr "Зашыфравана"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "Так"
 
@@ -1033,6 +1036,7 @@ msgstr "Мова"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Апісанне"
 
@@ -1056,8 +1060,7 @@ msgstr "%u Гц"
 msgid "Bits per sample"
 msgstr "Біт"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1317,7 +1320,8 @@ msgstr "VLC не можа адкрыць MRL \"%s\". Падрабязнасці 
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "Загаловак"
@@ -1327,8 +1331,8 @@ msgstr "Загаловак"
 msgid "Artist"
 msgstr "Выканаўца"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "Жанр"
 
@@ -1345,7 +1349,7 @@ msgstr "Альбом"
 msgid "Track number"
 msgstr "Нумар дарожкі"
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "Рэйтынг"
 
@@ -1367,7 +1371,7 @@ msgstr "URL"
 msgid "Now Playing"
 msgstr "Зараз грае"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "Выдавец"
 
@@ -1410,7 +1414,7 @@ msgstr "Асноўныя"
 msgid "Actors"
 msgstr "Каэфіцыент"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "Выканаўца"
@@ -1901,6 +1905,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1950,7 +1955,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "Шырыня відэа"
@@ -1965,7 +1970,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "Вышыня відэа"
@@ -2585,13 +2590,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "Стандартна"
 
@@ -4238,6 +4244,7 @@ msgid "Long jump length, in seconds."
 msgstr "Даўжыня доўгага пераскоку, у секундах."
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5325,14 +5332,14 @@ msgstr "Не выйшла адкрыць \"%s\" на запіс"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6173,6 +6180,38 @@ msgstr "Далучэнне"
 msgid "Attachment input"
 msgstr "Увод далучэнняў"
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "Запіс відэа"
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "VLC не можа адкрыць модуль дэкадавання."
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "Прылада ўводу не знойдзена"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце падлучэнне і "
+"драйверы."
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце падлучэнне і "
+"драйверы."
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr ""
@@ -6775,7 +6814,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "Прылада захопу \"%s\" не падтрымлівае патрэбныя параметры."
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "Аздабленне акна"
@@ -7275,6 +7314,50 @@ msgstr "Увод Digital Video (Firewire/ieee1394)"
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr "Апытаць DVB карту"
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+"Некаторыя DVB карты не могуць быць апытаныя, вы можаце забараніць гэтую "
+"магчымасць пры ўзнікненні праблем."
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "Код спадарожнікавай прылады"
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr "Імя файла канфігурацыі ў share/dvb/dvb-s"
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "Якасць перадыскрэтызацыі"
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "Выкарыстоўваецца для статыстыкі."
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr "Увод з DVB з падтрымкай v4l2"
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "Вугал DVD"
@@ -7352,8 +7435,7 @@ msgstr "DVDRead не можа прачытаць %d/%d блокаў на 0x%02x.
 msgid "File input"
 msgstr "Увод з файла"
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7378,9 +7460,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7396,9 +7478,9 @@ msgid ""
 msgstr "Імя карыстальніка для злучэння з FTP-серверам."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7460,11 +7542,49 @@ msgstr "Дадзены сервер адмовіў VLC ў падлучэнні."
 msgid "Your account was rejected."
 msgstr "Гэты ўліковы запіс адхілены."
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "HTTP-проксі"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"Бягучы HTTP-проксі. Фармат: http://[карыстальнік[: пароль]@]проксі.дамен:"
+"порт/; калі гэты параметр не запоўнены, то будзе выкарыстоўвацца зменная "
+"асяроддзя http_proxy."
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "Пароль HTTP-проксі"
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "Калі для HTTP-проксі патрабуецца пароль, пазначце яго тут."
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "Аўтаматычна аднаўляць злучэнне"
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr "Аўтаматычна спрабаваць аднавіць злучэнне ў выпадку абрыву."
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "Увод з HTTP"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "Праверка карыстальніка HTTP"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Увядзіце дзейсныя імя карыстальніка і пароль для сайта %s."
@@ -7520,48 +7640,10 @@ msgstr ""
 "Назва і версія праграмы, якія атрымае HTTP-сервер. Задаваць праз скос, "
 "прыкладам FooBar/1.2.3. Гэты параметр для кожнай крыніцы свой, не глабальны."
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP-проксі"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"Бягучы HTTP-проксі. Фармат: http://[карыстальнік[: пароль]@]проксі.дамен:"
-"порт/; калі гэты параметр не запоўнены, то будзе выкарыстоўвацца зменная "
-"асяроддзя http_proxy."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "Пароль HTTP-проксі"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "Калі для HTTP-проксі патрабуецца пароль, пазначце яго тут."
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "Аўтаматычна аднаўляць злучэнне"
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr "Аўтаматычна спрабаваць аднавіць злучэнне ў выпадку абрыву."
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "Увод з HTTP"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "Фіктыўны"
 
@@ -7595,6 +7677,7 @@ msgid "Set the category of the elementary stream"
 msgstr "Вызначае катэгорыю элементарнага патоку"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "Невядома"
 
@@ -8001,7 +8084,7 @@ msgstr "RTSP-злучэння не адбылося"
 msgid "Capture the audio stream in stereo."
 msgstr "Захопліваць аўдыёпаток у стэрэарэжыме"
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "Частата дыскрэтызацыі"
@@ -8022,342 +8105,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "Увод з OSS"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "Фіктыўны вывад патоку"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "Пакінуць існы файл"
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "Перазапісаць"
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"Выходны файл ўжо існуе. Калі запіс працягнецца, файл перазапішацца і яго "
-"змест будзе страчаны."
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "Перазапісваць існы файл"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "Калі файл ужо існуе, ён будзе перазапісаны."
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "Дадаваць да файла"
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "Дадаваць да файла замест таго, каб замяняць яго."
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "Фарматаваць час і дату"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr ""
-"Выканаць фарматаванне даты і часу паводле стандарту ISO C па шляху да файла"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "Сінхронны запіс"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "Выходны файл будзе адкрыты ў рэжыме сінхроннага запісу."
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "Вывад патоку ў файл"
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "Імя карыстальніка, якое будзе запытана для доступу да патоку."
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "Пароль, які будзе запытаны для доступу да патоку."
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "MIME"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
-"Тыпы MIME, што вяртаюцца серверам (аўтаматычнае вызначэнне, калі нічога не "
-"паказана)."
-
-#: modules/access_output/http.c:61
-#, fuzzy
-msgid "Metacube"
-msgstr "Meta+"
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "Вывад патоку HTTP"
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "Даўжыня сегмента"
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "Даўжыня сегментаў патоку TS"
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "Падзяляць сегменты ў любым месцы"
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-"Не чакаць ключавога кадра, каб падзяліць сегмент. Толькі для аўдыёпатоку."
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "Колькасць сегментаў"
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "Колькасць сегментаў для ўключэння ў індэкс"
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "Кэшаваць"
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"Калі параметр адключаны, у файл плэйлісту дадаецца дырэктыва EXT-X-ALLOW-"
-"CACHE:NO"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "Файл індэкса"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "Шлях да індэкснага файла, які будзе створаны"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "Поўны URL для змяшчэння ў файле індэкса"
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-"Поўны URL, які будзе змешчаны ў індэксным файле. Нумар сегменту задаецца пры "
-"дапамозе #."
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "Выдаляць сегменты"
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "Выдаляць сегменты, калі яны больш не патрэбны"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "Выкарыстоўваць механізм кіравання хуткасцю"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "Спасылка на ключ AES"
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "Файл з ключом AES"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "Файл з 16-байтавым ключом шыфравання"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "Файл, з якога чытаюцца key-uri і keyfile-location"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"Значэнні, змешчаныя ў файле ў фармаце key-uri\\nkey-file, чытаюцца напачатку "
-"новага сегмента і дастасоўваюцца да яго."
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "Шыфраваць з выпадковым першапачатковым значэннем"
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr ""
-"Выбіраць у якасці першапачатковага значэння выпадковы лік, а не нумар "
-"сегмента"
-
-#: modules/access_output/livehttp.c:105
-#, fuzzy
-msgid "Number of first segment"
-msgstr "Колькасць сегментаў"
-
-#: modules/access_output/livehttp.c:106
-#, fuzzy
-msgid "The number of the first segment generated"
-msgstr "Колькі разоў выконваецца накладанне"
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "Вывад патоку HTTP Live"
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "LiveHTTP"
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "Назва патоку"
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-"Назва, якая надаецца гэтаму патоку/каналу на серверы Shoutcast/Icecast."
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "Апісанне патоку"
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "Апісанне патоку або звесткі пра ваш канал."
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "Вяшчаць у MP3"
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"Звычайна трэба перадаваць модулю Shoutcast патокі Ogg. Таксама магчыма "
-"замест гэтага трансляваць у MP3, так што вы можаце перадаваць патокі MP3 на "
-"сервер Shoutcast/Icecast."
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "Назва жанру"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "Жанр змесціва"
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "Апісанне URL"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "URL са звесткамі пра паток або канал."
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "Звесткі пра бітрэйт перакадаванага патоку."
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "Звесткі пра частату дыскрэтызацыі перакадаванага патоку."
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "Колькасць каналаў"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "Звесткі пра колькасць каналаў перакадаванага патоку."
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "Якасць Ogg Vorbis"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Звесткі пра якасць Ogg Vorbis перакадаванага патоку."
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "Публічны паток"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"Адкрыць публічны доступ да сервера на \"жоўтых старонках\" (каталог патокаў) "
-"на вэб-сайце Icecast / Shoutcast. Для Shoutcast трэба задаць бітрэйт. "
-"Icecast вымагае Ogg-вяшчання."
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "Вывад у IceCAST"
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "Памер кэшу (мс)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr "Памер кэшу для выходных UDP-патокаў. Значэнне задаецца ў мілісекундах."
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "Пакеты ў групах"
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Пакеты могуць пасылацца адзін за адным або ў групах. Вы можаце выбіраць "
-"колькасць пакетаў, пасланых за адзін раз. Гэта дапамагае разгружаць "
-"загружаныя сістемы."
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "Вывад UDP-патоку"
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8373,6 +8120,35 @@ msgstr "PulseAudio"
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "Увод праз PulseAudio"
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "Surround"
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "Захоп Quicktime"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "Прылада ўводу не знойдзена"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце падлучэнне і "
+"драйверы."
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "Прылада ўводу не знойдзена"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8808,6 +8584,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "RTP"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "Увод з SFTP"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "Памер буфера кадраў RTSP"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "Затрымка DTS (мс)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10129,18 +9929,24 @@ msgstr "Q частаты 3"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Перадыскрэтызацыя з вускапалоснай інтэрпаляцыяй"
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "Якасць перадыскрэтызацыі"
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"Якасць перадыскрэтызацыі (0=найгоршая і найхутчэйшая, 10=найлепшая і "
-"найпавольнейшая)."
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "Якасць перадыскрэтызацыі"
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "SRC"
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "Перадыскрэтызацыя Speex"
 
@@ -11938,6 +11744,16 @@ msgstr ""
 msgid "MPEG audio decoder using mpg123"
 msgstr "Дэкодар аўдыё MPEG"
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "Кодар відэа CDG"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "Пакавальнік відэа Theora"
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12635,6 +12451,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "Дэкодар G.711"
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "Дэкодар відарысаў SDL"
@@ -13068,6 +12893,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "Дэкодар субтытраў тэлетэксту"
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "Дэкодар тэкста субтытраў"
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13234,6 +13064,21 @@ msgstr "Кодар відэа CDG"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "Кодар відэа CDG"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "дэкодар"
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "Дэкодар субтытраў EBU STL"
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "Парсер субтытраў EBU STL"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14268,7 +14113,8 @@ msgstr "Інтэрфейс кіравання D-Bus"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14645,7 +14491,7 @@ msgstr "Ініцыялізацыя"
 msgid "Opening"
 msgstr "Адкрыццё"
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "Памылка"
 
@@ -15152,7 +14998,8 @@ msgstr "Дэмультыплексары"
 msgid "Avformat muxer"
 msgstr "Мультыплексар Avformat"
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Мультыплексар"
 
@@ -15515,6 +15362,162 @@ msgstr "Узровень surround"
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "Затрымка surround (мс)"
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "Аўтар"
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "Кампазітар"
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "Прадзюсар"
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "Звесткі"
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "Дысклэймер"
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "Патрабаванні"
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "Зыходны фармат"
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "Паказваць крыніцу як"
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "Сервер"
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "Выканаўцы"
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "Першы выканаўца"
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "Зыходнае змесціва правайдэра"
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "Папярэджанне"
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "Праграма"
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "Словы песні"
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "Гуказапісная кампанія"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "Мадэль"
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "Прадукт"
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "Група"
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "Падзагаловак"
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "Аранжыроўшчык"
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "Арт-дырэктар"
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "Паведамленне пра аўтарскія правы"
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "Дырыжор"
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "Апісанне песні"
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "Анатацыі да альбому"
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "Правы на фанаграму"
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "Гукааператар"
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "Саліст"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "Падзякі"
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "Выканаўчы прадзюсар"
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "Параметры кадавання"
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "Нумар канала"
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+#, fuzzy
+msgid "Keywords"
+msgstr "Ключавыя словы падкаста"
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "Ачысціць"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15910,6 +15913,10 @@ msgstr "Памер падкаста"
 msgid "%s bytes"
 msgstr "байтаў: %s"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "MIME"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "Shoutcast"
@@ -15921,6 +15928,11 @@ msgstr "Слухачы"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "Загрузіць"
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "Насычанасць"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16107,6 +16119,10 @@ msgstr "Дэмультыплексар WAV"
 msgid "XA demuxer"
 msgstr "Дэмультыплексар XA"
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "Нявызначаная катэгорыя"
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "Схаваныя тытры"
@@ -16131,10 +16147,6 @@ msgstr "Сэнсавыя анатацыі"
 msgid "Transcript"
 msgstr "Транскрыпцыя"
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "Словы песні"
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "Лінгвістычныя пазнакі"
@@ -16154,10 +16166,6 @@ msgstr "Слайды (з тэкстам)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "Слайды (відарысы)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "Нявызначаная катэгорыя"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16210,6 +16218,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 #, fuzzy
 msgid "Playlist parsers"
 msgstr "Podcast-парсер"
@@ -16217,18 +16226,21 @@ msgstr "Podcast-парсер"
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 #, fuzzy
 msgid "Service Discovery"
 msgstr "Пошук службаў"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 #, fuzzy
 msgid "Interfaces"
 msgstr "Інтэрфейс"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 #, fuzzy
 msgid "Art and meta fetchers"
 msgstr "Атрымальнік метаданых"
@@ -16237,6 +16249,7 @@ msgstr "Атрымальнік метаданых"
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "Пашырэнні"
 
@@ -16282,6 +16295,7 @@ msgstr "Усталяваць"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "Абалонкі"
@@ -16377,10 +16391,10 @@ msgstr "Увядзіце назву новага профілю:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16543,12 +16557,14 @@ msgid "Playback time"
 msgstr "Хуткасць прайгравання"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "Папярэдні загаловак"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "Пераход да адзнакі часу"
@@ -16591,9 +16607,10 @@ msgstr "Задайце адрас прызначэння"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17653,27 +17670,6 @@ msgstr "Максімальная гучнасць"
 msgid "Open Audio Effects window"
 msgstr "Аўдыёэфекты"
 
-#: modules/gui/macosx/misc.m:301
-#, fuzzy
-msgid "B"
-msgstr "Дыск Blu-ray"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr ""
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr ""
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "Адкрыць крыніцу"
@@ -17775,6 +17771,7 @@ msgid "Enable DVD menus"
 msgstr "Укл. DVD-меню"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "IP-адрас"
 
@@ -18070,32 +18067,32 @@ msgstr "Памылка пры захаванні метаданых"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC не можа захаваць гэтыя метаданыя"
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "Настаўленні"
+#: modules/gui/macosx/VLCRendererMenuController.m:72
+#: modules/gui/macosx/VLCRendererMenuController.m:144
+#, fuzzy
+msgid "Renderer discovery off"
+msgstr "Пошук службаў"
 
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "Скінуць ўсё"
+#: modules/gui/macosx/VLCRendererMenuController.m:75
+#: modules/gui/macosx/VLCRendererMenuController.m:145
+#, fuzzy
+msgid "Enable renderer discovery"
+msgstr "Уключыць рэверберацыю"
 
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "Асноўныя"
+#: modules/gui/macosx/VLCRendererMenuController.m:77
+#, fuzzy
+msgid "No renderer"
+msgstr "Візуалізатар тэксту"
 
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "Выбраць каталог"
+#: modules/gui/macosx/VLCRendererMenuController.m:134
+#, fuzzy
+msgid "Renderer discovery on"
+msgstr "Пошук службаў"
 
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "Выбраць файл"
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "Выбраць"
+#: modules/gui/macosx/VLCRendererMenuController.m:135
+#, fuzzy
+msgid "Disable renderer discovery"
+msgstr "Адключаць ахоўнік экрану"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
@@ -18123,33 +18120,6 @@ msgstr "Дадаткова"
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
 msgstr ""
-
-#: modules/gui/macosx/VLCRendererMenuController.m:72
-#: modules/gui/macosx/VLCRendererMenuController.m:144
-#, fuzzy
-msgid "Renderer discovery off"
-msgstr "Пошук службаў"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:75
-#: modules/gui/macosx/VLCRendererMenuController.m:145
-#, fuzzy
-msgid "Enable renderer discovery"
-msgstr "Уключыць рэверберацыю"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:77
-#, fuzzy
-msgid "No renderer"
-msgstr "Візуалізатар тэксту"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:134
-#, fuzzy
-msgid "Renderer discovery on"
-msgstr "Пошук службаў"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:135
-#, fuzzy
-msgid "Disable renderer discovery"
-msgstr "Адключаць ахоўнік экрану"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18425,6 +18395,16 @@ msgstr "Прэфікс"
 msgid "Sequential numbering"
 msgstr "Паслядоўная нумарацыя"
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "Скінуць ўсё"
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "Настаўленні"
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18524,9 +18504,49 @@ msgstr "Гэтыя клавішы не могуць быць ужыты ў як�
 msgid "This combination is already taken by \"%@\"."
 msgstr "Гэтая камбінацыя ўжо прызначана для \"%@\"."
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "Граць/Паўза"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "Укл./адкл. прайграванне плэйлісту ў выпадковым парадку"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "Асноўнае акно..."
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "Апісанне URL"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "Цяпер грае"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "Абярыце папку"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "Адкрыць адрас з буфера абмену"
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "Не вызначана"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "с"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18842,7 +18862,8 @@ msgid "Add text"
 msgstr "Дадаць тэкст"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "Тэкст"
 
@@ -18865,9 +18886,42 @@ msgstr "Празрыстасць"
 msgid "Organize profiles..."
 msgstr "Кіраваць профілямі..."
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "с"
+#: modules/gui/macosx/misc.m:301
+#, fuzzy
+msgid "B"
+msgstr "Дыск Blu-ray"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr ""
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr ""
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "Асноўныя"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "Выбраць каталог"
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "Выбраць файл"
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "Выбраць"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19231,11 +19285,6 @@ msgstr "Крок наперад"
 msgid "Loop / Repeat"
 msgstr "Цыкл / Паўтор"
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "Звесткі"
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "Адкрыць субтытры"
@@ -19346,6 +19395,11 @@ msgstr "Спыніць цыкл"
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "Стасунак бакоў"
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+#, fuzzy
+msgid "No EPG Data Available"
+msgstr "Максімальна магчымае"
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19502,11 +19556,6 @@ msgstr "(запаволенне)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "Абнаўленне значэнняў гэтага акенца"
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
-msgid "No EPG Data Available"
-msgstr "Максімальна магчымае"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20164,6 +20213,11 @@ msgstr "Гэты модуль выводзіць перакадаваны пат
 msgid "Base port"
 msgstr "Базавы порт"
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "Назва патоку"
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "Гэты модуль выводзіць перакадаваны паток на сервер IceCast."
@@ -20196,9 +20250,10 @@ msgstr "Выдаліць усе закладкі"
 msgid "Extract"
 msgstr "Выняць"
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20252,6 +20307,19 @@ msgstr "Пачаць"
 #, fuzzy
 msgid "Containers"
 msgstr "Кантэйнеры (*"
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "Даведнік па праграмах (EPG)"
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "Абнаўленне"
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20673,50 +20741,6 @@ msgstr "Не выйшла захаваць файл настаўленняў"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "Напраўду скінуць настаўленні медыяплэера VLC?"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "Адкрыць каталог"
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "Выбар папкі"
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "Адкрыць плэйліст..."
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "Плэйліст XSPF"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "Плэйліст M3U"
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "Плэйліст M3U8"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "Захаваць плэйліст як..."
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "Адкрыць субтытры..."
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "Медыяфайлы"
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "Файлы субтытраў"
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "Усе файлы"
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "Вывад патоку"
@@ -20942,6 +20966,62 @@ msgstr "Расклад: "
 msgid "VOD: "
 msgstr "VOD: "
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "Адкрыць каталог"
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "Выбар папкі"
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "Адкрыць плэйліст..."
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "Плэйліст XSPF"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "Плэйліст M3U"
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "Плэйліст M3U8"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "Захаваць плэйліст як..."
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "Адкрыць субтытры..."
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "Медыяфайлы"
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "Файлы субтытраў"
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "Усе файлы"
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+#, fuzzy
+msgid "Empty"
+msgstr " - Пусто - "
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "Актываваць"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
@@ -21047,10 +21127,6 @@ msgstr "&Эфекты і фільтры"
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "Сінхранізацыя дарожкі"
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "Даведнік па праграмах (EPG)"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21535,6 +21611,12 @@ msgstr "папярэджанні"
 msgid "debug"
 msgstr "адладка"
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "Ачысціць"
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "Адкрыць файл абалонкі"
@@ -21635,6 +21717,80 @@ msgstr "Вызначыць абалонку"
 msgid "Open skin..."
 msgstr "Адкрыць абалонку..."
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "Парог яркасці"
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"Пры ўключаным рэжыме пікселі будуць паказаны як чорныя ці белыя. Парог для "
+"вызначэння колеру будзе яркасцю, пазначанай ніжэй."
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "Кантрастнасць (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "Выстаўце кантрастнасць відарысу ад 0 да 2. Стандартна 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "Адценне (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "Выстаўце адценне відарысу ад 0 да 360. Стандартна 0."
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "Насычанасць (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "Выстаўце насычанасць выявы ад 0 да 3. Стандартна 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "Яркасць (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "Выстаўце яркасць выявы ад 0 да 2. Стандартна 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "Гама (0-10)"
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "Выстаўце гаму відарысу ад 0,01 да 10. Стандартна 1."
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "Відэаакселерацыя DXVA (DirectX Video Acceleration) 2.0"
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "Відэафільтр Прыбіранне палос Gradfun"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
@@ -21695,6 +21851,16 @@ msgstr ""
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
+
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "Відэафільтр"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "Праграмны інтэрфейс VA (Video Acceleration)"
 
 #: modules/hw/vdpau/adjust.c:187
 #, fuzzy
@@ -21768,15 +21934,22 @@ msgstr "Вывад цераз YUV"
 msgid "VDPAU sharpen video filter"
 msgstr "Відэафільтр Рэзкасць"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "Відэафільтр"
+msgid "file keystore (plaintext)"
+msgstr "Спіс выбраных пакавальнікаў"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "Праграмны інтэрфейс VA (Video Acceleration)"
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21845,6 +22018,186 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keystore for iOS, Mac OS X and tvOS"
+msgstr ""
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+#, fuzzy
+msgid "Secrets are stored via KWallet"
+msgstr "Использовать общую память"
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "Прыбраць абранае"
+
+#: modules/keystore/memory.c:42
+#, fuzzy
+msgid "secrets are stored in memory"
+msgstr "Использовать общую память"
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+#, fuzzy
+msgid "Secrets are stored via libsecret"
+msgstr "Использовать общую память"
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "Дадаць лагатып"
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "Рэжым цішыні"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "Захоўваць увесь часапіс VLC у тэкставы файл."
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "Кансоль"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "Кансоль"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "Падрабязней"
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "адладка"
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "Захоўваць часапіс у файл"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "Захоўваць увесь часапіс VLC у тэкставы файл."
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "Назва файла часапісу"
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "Задайце назву файла часапісу."
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "Фармат часапісу"
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "Задайце фармат часапісу."
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "Дэтальнасць"
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"Задайце ўзровень падрабязнасці часапісу альбо выстаўце -1, каб ужываць "
+"узровень падрабязнасці, зададзены параметрам --verbose."
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "Часапісанне"
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "Запіс часапісаў у файл"
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "Маска для адладкі"
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "Функцыі"
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "Катэгорыя Syslog"
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "Выводзіць часапіс у syslog"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
 msgstr ""
 
 #: modules/lua/libs/httpd.c:75
@@ -22539,6 +22892,41 @@ msgstr "Джэй-поп"
 msgid "Synthpop"
 msgstr "Сінтпоп"
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "Максімальны лакальны бітрэйт"
+
+#: modules/misc/addons/fsstorage.c:85
+#, fuzzy
+msgid "Addons local storage installer"
+msgstr "Максімальны лакальны бітрэйт"
+
+#: modules/misc/addons/fsstorage.c:93
+#, fuzzy
+msgid "Addons local storage lister"
+msgstr "Максімальны лакальны бітрэйт"
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "Трансфармацыя"
+
+#: modules/misc/addons/vorepository.c:64
+#, fuzzy
+msgid "addons.videolan.org addons finder"
+msgstr "Трансфармацыя"
+
+#: modules/misc/addons/vorepository.c:70
+#, fuzzy
+msgid "Videolan.org's single archive addons finder"
+msgstr "Трансфармацыя"
+
+#: modules/misc/addons/vorepository.c:72
+#, fuzzy
+msgid "single .vlp archive addons finder"
+msgstr "Трансфармацыя"
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "Імя карыстальніка вашага ўліковага запісу на last.fm"
@@ -22587,6 +22975,16 @@ msgid ""
 msgstr ""
 "Вызначце імя карыстальніка або адключыце аўдыёскроблер і перазапусціце VLC.\n"
 "Зайдзіце на http://www.lastfm.ru/join, каб зарэгістравацца."
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "Акустыка"
+
+#: modules/misc/fingerprinter.c:74
+#, fuzzy
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr "Няма ўводу"
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22925,11 +23323,6 @@ msgstr " Объекты "
 #, fuzzy
 msgid "Encoder"
 msgstr "дэкодар"
-
-#: modules/mux/avi.c:57
-#, fuzzy
-msgid "Keywords"
-msgstr "Ключавыя словы падкаста"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23390,6 +23783,18 @@ msgstr "Выява"
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "Мае выявы"
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "Сервіс Bonjour"
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "Сервіс Bonjour"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24562,6 +24967,63 @@ msgstr "Выходны мост"
 msgid "Bridge in"
 msgstr "Уваходны мост"
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "Порт SFTP"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "Гэты модуль выводзіць перакадаваны паток на сервер IceCast."
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "Увядзіце адрас камп'ютара, на які трансляваць."
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "Фармат колернасці"
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "Колернасць"
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "Збіранне выходнага патоку"
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "Дэмультыплексар Avformat"
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24618,6 +25080,10 @@ msgstr "Затрымка пры адлюстраванні патоку."
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "Вывад патоку на экран"
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "Фіктыўны вывад патоку"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24906,6 +25372,10 @@ msgstr ""
 "Перадача і прыём RTCP-пакетаў, мультыплексаваных праз той жа порт, што і RTP-"
 "пакеты."
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "Памер кэшу (мс)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24952,6 +25422,15 @@ msgstr ""
 "RTSP-сесіі будуць закрыты, калі за гэты час не прыйдзе ніводнага RTSP-"
 "запыту. Пры нулявым або адмоўным значэнні часавы ліміт адключаецца. "
 "Стандартнае значэнне часавага ліміту — 60 (1 хвіліна)."
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "Імя карыстальніка, якое будзе запытана для доступу да патоку."
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "Пароль, які будзе запытаны для доступу да патоку."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25618,58 +26097,6 @@ msgstr "Маштабаванне"
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "Пераўтваральнік YUVP"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "Парог яркасці"
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"Пры ўключаным рэжыме пікселі будуць паказаны як чорныя ці белыя. Парог для "
-"вызначэння колеру будзе яркасцю, пазначанай ніжэй."
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "Кантрастнасць (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Выстаўце кантрастнасць відарысу ад 0 да 2. Стандартна 1."
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "Адценне (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "Выстаўце адценне відарысу ад 0 да 360. Стандартна 0."
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "Насычанасць (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "Выстаўце насычанасць выявы ад 0 да 3. Стандартна 1."
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "Яркасць (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "Выстаўце яркасць выявы ад 0 да 2. Стандартна 1."
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "Гама (0-10)"
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Выстаўце гаму відарысу ад 0,01 да 10. Стандартна 1."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27377,6 +27804,15 @@ msgstr "Вывад відэа цераз OpenGL"
 msgid "Windows GDI video output"
 msgstr "Вывад відэа цераз Windows GDI"
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr ""
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "Пашырэнне EGL для OpenGL"
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "Фіктыўны фармат колернасці"
@@ -27858,6 +28294,26 @@ msgstr "Відэафільтр Сцяна"
 msgid "Image wall"
 msgstr "Сцяна відарысаў"
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "Шырыня акна відэа, у пікселях."
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "Вышыня акна відэа, у пікселях."
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "Спектр"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "Бягучая візуалізацыя"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "Шырыня дысплэя Goom"
@@ -28311,10 +28767,6 @@ msgstr "Сапраўды жадаеце стварыць паток?"
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "Акенца"
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "Абнаўленне"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29184,6 +29636,273 @@ msgid "Media Manager List"
 msgstr "Спіс медыякіраўніка"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "Якасць перадыскрэтызацыі"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Якасць перадыскрэтызацыі"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Якасць візуалізацыі"
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "Якасць перадыскрэтызацыі (0=найгоршая і найхутчэйшая, 10=найлепшая і "
+#~ "найпавольнейшая)."
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Старт праз"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Код краіны ТБ-цюнера"
+
+#~ msgid "Keep existing file"
+#~ msgstr "Пакінуць існы файл"
+
+#~ msgid "Overwrite"
+#~ msgstr "Перазапісаць"
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "Выходны файл ўжо існуе. Калі запіс працягнецца, файл перазапішацца і яго "
+#~ "змест будзе страчаны."
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "Перазапісваць існы файл"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "Калі файл ужо існуе, ён будзе перазапісаны."
+
+#~ msgid "Append to file"
+#~ msgstr "Дадаваць да файла"
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "Дадаваць да файла замест таго, каб замяняць яго."
+
+#~ msgid "Format time and date"
+#~ msgstr "Фарматаваць час і дату"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr ""
+#~ "Выканаць фарматаванне даты і часу паводле стандарту ISO C па шляху да "
+#~ "файла"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "Сінхронны запіс"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "Выходны файл будзе адкрыты ў рэжыме сінхроннага запісу."
+
+#~ msgid "File stream output"
+#~ msgstr "Вывад патоку ў файл"
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr ""
+#~ "Тыпы MIME, што вяртаюцца серверам (аўтаматычнае вызначэнне, калі нічога "
+#~ "не паказана)."
+
+#, fuzzy
+#~ msgid "Metacube"
+#~ msgstr "Meta+"
+
+#~ msgid "HTTP stream output"
+#~ msgstr "Вывад патоку HTTP"
+
+#~ msgid "Segment length"
+#~ msgstr "Даўжыня сегмента"
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "Даўжыня сегментаў патоку TS"
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "Падзяляць сегменты ў любым месцы"
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "Не чакаць ключавога кадра, каб падзяліць сегмент. Толькі для аўдыёпатоку."
+
+#~ msgid "Number of segments"
+#~ msgstr "Колькасць сегментаў"
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "Колькасць сегментаў для ўключэння ў індэкс"
+
+#~ msgid "Allow cache"
+#~ msgstr "Кэшаваць"
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "Калі параметр адключаны, у файл плэйлісту дадаецца дырэктыва EXT-X-ALLOW-"
+#~ "CACHE:NO"
+
+#~ msgid "Index file"
+#~ msgstr "Файл індэкса"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "Шлях да індэкснага файла, які будзе створаны"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "Поўны URL для змяшчэння ў файле індэкса"
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "Поўны URL, які будзе змешчаны ў індэксным файле. Нумар сегменту задаецца "
+#~ "пры дапамозе #."
+
+#~ msgid "Delete segments"
+#~ msgstr "Выдаляць сегменты"
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "Выдаляць сегменты, калі яны больш не патрэбны"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "Выкарыстоўваць механізм кіравання хуткасцю"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "Спасылка на ключ AES"
+
+#~ msgid "AES key file"
+#~ msgstr "Файл з ключом AES"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "Файл з 16-байтавым ключом шыфравання"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "Файл, з якога чытаюцца key-uri і keyfile-location"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "Значэнні, змешчаныя ў файле ў фармаце key-uri\\nkey-file, чытаюцца "
+#~ "напачатку новага сегмента і дастасоўваюцца да яго."
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "Шыфраваць з выпадковым першапачатковым значэннем"
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr ""
+#~ "Выбіраць у якасці першапачатковага значэння выпадковы лік, а не нумар "
+#~ "сегмента"
+
+#, fuzzy
+#~ msgid "Number of first segment"
+#~ msgstr "Колькасць сегментаў"
+
+#, fuzzy
+#~ msgid "The number of the first segment generated"
+#~ msgstr "Колькі разоў выконваецца накладанне"
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "Вывад патоку HTTP Live"
+
+#~ msgid "LiveHTTP"
+#~ msgstr "LiveHTTP"
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Назва, якая надаецца гэтаму патоку/каналу на серверы Shoutcast/Icecast."
+
+#~ msgid "Stream description"
+#~ msgstr "Апісанне патоку"
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "Апісанне патоку або звесткі пра ваш канал."
+
+#~ msgid "Stream MP3"
+#~ msgstr "Вяшчаць у MP3"
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "Звычайна трэба перадаваць модулю Shoutcast патокі Ogg. Таксама магчыма "
+#~ "замест гэтага трансляваць у MP3, так што вы можаце перадаваць патокі MP3 "
+#~ "на сервер Shoutcast/Icecast."
+
+#~ msgid "Genre description"
+#~ msgstr "Назва жанру"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "Жанр змесціва"
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "URL са звесткамі пра паток або канал."
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "Звесткі пра бітрэйт перакадаванага патоку."
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "Звесткі пра частату дыскрэтызацыі перакадаванага патоку."
+
+#~ msgid "Number of channels"
+#~ msgstr "Колькасць каналаў"
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "Звесткі пра колькасць каналаў перакадаванага патоку."
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "Якасць Ogg Vorbis"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "Звесткі пра якасць Ogg Vorbis перакадаванага патоку."
+
+#~ msgid "Stream public"
+#~ msgstr "Публічны паток"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "Адкрыць публічны доступ да сервера на \"жоўтых старонках\" (каталог "
+#~ "патокаў) на вэб-сайце Icecast / Shoutcast. Для Shoutcast трэба задаць "
+#~ "бітрэйт. Icecast вымагае Ogg-вяшчання."
+
+#~ msgid "IceCAST output"
+#~ msgstr "Вывад у IceCAST"
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "Памер кэшу для выходных UDP-патокаў. Значэнне задаецца ў мілісекундах."
+
+#~ msgid "Group packets"
+#~ msgstr "Пакеты ў групах"
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "Пакеты могуць пасылацца адзін за адным або ў групах. Вы можаце выбіраць "
+#~ "колькасць пакетаў, пасланых за адзін раз. Гэта дапамагае разгружаць "
+#~ "загружаныя сістемы."
+
+#~ msgid "UDP stream output"
+#~ msgstr "Вывад UDP-патоку"
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "Адключыць"
 
@@ -29199,9 +29918,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "Navigation"
 #~ msgstr "Навігацыя"
-
-#~ msgid "Be quiet"
-#~ msgstr "Рэжым цішыні"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Адключае ўсе папярэджанні і інфармацыйныя паведамленні."
@@ -29233,15 +29949,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgstr ""
 #~ "CRL у гэтым файле дазваляе прадухіліць выкарыстанне ануляваных "
 #~ "сертыфікатаў у TLS-сесіях."
-
-#~ msgid "Log to file"
-#~ msgstr "Захоўваць часапіс у файл"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "Захоўваць увесь часапіс VLC у тэкставы файл."
-
-#~ msgid "Log to syslog"
-#~ msgstr "Выводзіць часапіс у syslog"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "Выводзіць ўвесь часапіс VLC у syslog (UNIX-сістэмы)."
@@ -29286,9 +29993,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "Configure"
 #~ msgstr "Настаўленне"
-
-#~ msgid "Channel number"
-#~ msgstr "Нумар канала"
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29388,13 +30092,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "No Input device found"
 #~ msgstr "Прылада ўводу не знойдзена"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце "
-#~ "падлучэнне і драйверы."
 
 #~ msgid "RDP auth username"
 #~ msgstr "Імя карыстальніка для RDP"
@@ -29632,90 +30329,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Знешні дэкодар QuickTime"
-
-#~ msgid "Writer"
-#~ msgstr "Аўтар"
-
-#~ msgid "Composer"
-#~ msgstr "Кампазітар"
-
-#~ msgid "Producer"
-#~ msgstr "Прадзюсар"
-
-#~ msgid "Disclaimer"
-#~ msgstr "Дысклэймер"
-
-#~ msgid "Requirements"
-#~ msgstr "Патрабаванні"
-
-#~ msgid "Original Format"
-#~ msgstr "Зыходны фармат"
-
-#~ msgid "Display Source As"
-#~ msgstr "Паказваць крыніцу як"
-
-#~ msgid "Host Computer"
-#~ msgstr "Сервер"
-
-#~ msgid "Performers"
-#~ msgstr "Выканаўцы"
-
-#~ msgid "Original Performer"
-#~ msgstr "Першы выканаўца"
-
-#~ msgid "Providers Source Content"
-#~ msgstr "Зыходнае змесціва правайдэра"
-
-#~ msgid "Warning"
-#~ msgstr "Папярэджанне"
-
-#~ msgid "Software"
-#~ msgstr "Праграма"
-
-#~ msgid "Record Company"
-#~ msgstr "Гуказапісная кампанія"
-
-#~ msgid "Model"
-#~ msgstr "Мадэль"
-
-#~ msgid "Grouping"
-#~ msgstr "Група"
-
-#~ msgid "Sub-Title"
-#~ msgstr "Падзагаловак"
-
-#~ msgid "Arranger"
-#~ msgstr "Аранжыроўшчык"
-
-#~ msgid "Art Director"
-#~ msgstr "Арт-дырэктар"
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "Паведамленне пра аўтарскія правы"
-
-#~ msgid "Conductor"
-#~ msgstr "Дырыжор"
-
-#~ msgid "Song Description"
-#~ msgstr "Апісанне песні"
-
-#~ msgid "Liner Notes"
-#~ msgstr "Анатацыі да альбому"
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "Правы на фанаграму"
-
-#~ msgid "Sound Engineer"
-#~ msgstr "Гукааператар"
-
-#~ msgid "Soloist"
-#~ msgstr "Саліст"
-
-#~ msgid "Thanks"
-#~ msgstr "Падзякі"
-
-#~ msgid "Executive Producer"
-#~ msgstr "Выканаўчы прадзюсар"
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "Патрэбная частата кадраў для H264"
@@ -30148,9 +30761,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgstr ""
 #~ "Гэты майстар дапамагае наставіць простыя задачы вяшчання ці перакадавання."
 
-#~ msgid "More Info"
-#~ msgstr "Падрабязней"
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -30196,9 +30806,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "Streaming method"
 #~ msgstr "Метад вяшчання"
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "Увядзіце адрас камп'ютара, на які трансляваць."
 
 #~ msgid "UDP Unicast"
 #~ msgstr "UDP Unicast"
@@ -30476,12 +31083,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "Запабягае выключэнню і завершанню сесіі з прычыны бяздзейнасці."
 
-#~ msgid "Log format"
-#~ msgstr "Фармат часапісу"
-
-#~ msgid "Specify the logging format."
-#~ msgstr "Задайце фармат часапісу."
-
 #~ msgid "Syslog ident"
 #~ msgstr "Ідэнтыфікацыя syslog"
 
@@ -30490,27 +31091,8 @@ msgstr "Спіс медыякіраўніка"
 #~ "Выстаўце ідэнтыфікатар, які VLC будзе ўжываць пры вывадзе часапісу ў "
 #~ "syslog."
 
-#~ msgid "Syslog facility"
-#~ msgstr "Катэгорыя Syslog"
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "Абярыце катэгорыю для паведамленняў часапісу ў syslog."
-
-#~ msgid "Verbosity"
-#~ msgstr "Дэтальнасць"
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "Задайце ўзровень падрабязнасці часапісу альбо выстаўце -1, каб ужываць "
-#~ "узровень падрабязнасці, зададзены параметрам --verbose."
-
-#~ msgid "Log filename"
-#~ msgstr "Назва файла часапісу"
-
-#~ msgid "Specify the log filename."
-#~ msgstr "Задайце назву файла часапісу."
 
 #~ msgid "Local drives"
 #~ msgstr "Лакальныя дыскі"
@@ -30886,9 +31468,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "Hue windowing"
 #~ msgstr "Адсячэнне адцення"
 
-#~ msgid "Used for statistics."
-#~ msgstr "Выкарыстоўваецца для статыстыкі."
-
 #~ msgid "Sat windowing"
 #~ msgstr "Адсячэнне насычанасці"
 
@@ -31212,50 +31791,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgstr "MTU выхаду."
 
 #, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "Запіс відэа"
-
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "VLC не можа адкрыць модуль дэкадавання."
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "Прылада ўводу не знойдзена"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце "
-#~ "падлучэнне і драйверы."
-
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "Апытаць DVB карту"
-
-#~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
-#~ msgstr ""
-#~ "Некаторыя DVB карты не могуць быць апытаныя, вы можаце забараніць гэтую "
-#~ "магчымасць пры ўзнікненні праблем."
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "Код спадарожнікавай прылады"
-
-#~ msgid "filename of config file in share/dvb/dvb-s"
-#~ msgstr "Імя файла канфігурацыі ў share/dvb/dvb-s"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "Увод з DVB з падтрымкай v4l2"
-
-#, fuzzy
 #~ msgid ""
 #~ "%.1f MHz (%d services)\n"
 #~ "~%s remaining"
@@ -31263,30 +31798,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "Scanning DVB"
 #~ msgstr "Сканирование DVB"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "Surround"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Захоп Quicktime"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "Прылада ўводу не знойдзена"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Выглядае, ваш Макінтош не мае прыдатнай прылады ўводу. Праверце "
-#~ "падлучэнне і драйверы."
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "Прылада ўводу не знойдзена"
 
 #~ msgid "Uncompressed RAR"
 #~ msgstr "Нясціснуты RAR"
@@ -31322,41 +31833,12 @@ msgstr "Спіс медыякіраўніка"
 #~ msgstr "Часапіс адладкі VLC (%s).rtf"
 
 #, fuzzy
-#~ msgid "Empty"
-#~ msgstr " - Пусто - "
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "Актываваць"
-
-#, fuzzy
 #~ msgid "Audio Fingerprinting"
 #~ msgstr "&Ідэнтыфікацыя"
 
 #, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "Няма ўводу"
-
-#, fuzzy
 #~ msgid "Fingerprinting track..."
 #~ msgstr "&Ідэнтыфікацыя"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Ачысціць"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "Максімальны лакальны бітрэйт"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "Трансфармацыя"
-
-#, fuzzy
-#~ msgid "acoustid"
-#~ msgstr "Акустыка"
 
 #, fuzzy
 #~ msgid "Duration of the fingerprinting"
@@ -31366,32 +31848,12 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "Default: 90sec"
 #~ msgstr "Стандартна"
 
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "Збіранне выходнага патоку"
-
 #~ msgid ""
 #~ "Please wait while your font cache is rebuilt.\n"
 #~ "This should take less than a few minutes."
 #~ msgstr ""
 #~ "Калі ласка, пачакайце. Ствараецца кэш шрыфтоў…\n"
 #~ "Гэта зойме не больш за некалькі хвілін."
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "Шырыня акна відэа, у пікселях."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "Вышыня акна відэа, у пікселях."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "Спектр"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "Бягучая візуалізацыя"
 
 #, fuzzy
 #~ msgid "Flat Top"
@@ -33565,9 +34027,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgstr ""
 #~ "VLC может встроить выводимое видео в существующее окно X11. Здесь "
 #~ "указывается X-идентификатор этого окна (0 - не встраивать)."
-
-#~ msgid "Use shared memory"
-#~ msgstr "Использовать общую память"
 
 #~ msgid "Use shared memory to communicate between VLC and the X server."
 #~ msgstr "Использовать общую память для связи VLC и X-сервера."

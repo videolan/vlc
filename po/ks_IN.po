@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-24 15:12+0100\n"
+"POT-Creation-Date: 2017-11-24 16:12+0100\n"
 "PO-Revision-Date: 2015-05-21 04:07+0000\n"
 "Last-Translator: Chandrakant Dhutadmal <chandrakantd@cdac.in>\n"
 "Language-Team: Kashmiri (India) (http://www.transifex.com/projects/p/vlc-"
@@ -149,7 +149,8 @@ msgstr "رلْہ مِلْہ آڈیو سیٹینگ تْہ ماڈیول۔"
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:226
 #: modules/gui/qt/qt.cpp:214 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -359,7 +360,8 @@ msgstr "وی ایل سی یُک لاگو کرُن ویڈیو آن ڈیمانڈ
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
-#: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
+#: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
+#: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:166
@@ -963,6 +965,7 @@ msgid "Scrambled"
 msgstr "سیکریمبْل کورمُت"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: modules/lua/extension.c:1184
 msgid "Yes"
 msgstr "آ"
 
@@ -1009,6 +1012,7 @@ msgstr "زبان"
 #: src/input/es_out.c:3097 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "وضاحت"
 
@@ -1032,8 +1036,7 @@ msgstr "%u Hz"
 msgid "Bits per sample"
 msgstr "بِٹْہ پریتھ سیمپلس منز"
 
-#: src/input/es_out.c:3126 modules/access_output/shout.c:92
-#: modules/demux/playlist/shoutcast.c:327
+#: src/input/es_out.c:3126 modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
@@ -1290,7 +1293,8 @@ msgstr "وی ایل سی ہیکِہ نْہ اوپْن کْرتھ MRL '%s' ۔ چ�
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
-#: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
+#: modules/gui/qt/components/open_panels.cpp:517
+#: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
 msgstr "عنوان"
@@ -1300,8 +1304,8 @@ msgstr "عنوان"
 msgid "Artist"
 msgstr "فنکار"
 
-#: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
-#: modules/mux/avi.c:51
+#: src/input/meta.c:57 modules/demux/mp4/meta.c:87
+#: modules/gui/macosx/VLCPlaylist.m:110 modules/mux/avi.c:51
 msgid "Genre"
 msgstr "جانر "
 
@@ -1318,7 +1322,7 @@ msgstr "ایلبم"
 msgid "Track number"
 msgstr "ٹریک نمبر "
 
-#: src/input/meta.c:62 modules/mux/asf.c:64
+#: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
 msgstr "ریٹینگ"
 
@@ -1340,7 +1344,7 @@ msgstr "یو آر ایل"
 msgid "Now Playing"
 msgstr "وْنئ چُھ پْلے کران"
 
-#: src/input/meta.c:69
+#: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
 msgstr "پبلیشر"
 
@@ -1380,7 +1384,7 @@ msgstr "شو ناو"
 msgid "Actors"
 msgstr "ایکٹر"
 
-#: src/input/meta.c:79
+#: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 #, fuzzy
 msgid "Album Artist"
 msgstr "فنکار"
@@ -1872,6 +1876,7 @@ msgstr ""
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -1921,7 +1926,7 @@ msgstr ""
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
-#: modules/visualization/projectm.cpp:65
+#: modules/visualization/glspectrum.c:55 modules/visualization/projectm.cpp:65
 #: modules/visualization/visual/visual.c:53 modules/visualization/vsxu.cpp:52
 msgid "Video width"
 msgstr "ویڈیو کھجر"
@@ -1936,7 +1941,7 @@ msgstr ""
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
-#: modules/visualization/projectm.cpp:68
+#: modules/visualization/glspectrum.c:58 modules/visualization/projectm.cpp:68
 #: modules/visualization/visual/visual.c:57 modules/visualization/vsxu.cpp:55
 msgid "Video height"
 msgstr "ویڈیو تھزر"
@@ -2560,13 +2565,14 @@ msgstr ""
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
-#: modules/gui/macosx/VLCMainMenu.m:592 modules/gui/macosx/prefs_widgets.m:1217
-#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
-#: modules/gui/qt/components/preferences_widgets.cpp:546 modules/spu/marq.c:61
-#: modules/spu/rss.c:69 modules/spu/rss.c:182
-#: modules/video_output/win32/directdraw.c:1495
+#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1274
+#: modules/gui/qt/components/preferences_widgets.cpp:546
+#: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
+#: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1495
 msgid "Default"
 msgstr "ڈیفالٹْہ"
 
@@ -4230,6 +4236,7 @@ msgid "Long jump length, in seconds."
 msgstr " لانگ جمپ لینگْتھ، سیکنڈن منز"
 
 #: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
@@ -5305,14 +5312,14 @@ msgstr "گو ناکام \"%s\"  اوپْن کرنس رایٹینگ باپت"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/prefs.m:189
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
+#: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
@@ -6156,6 +6163,38 @@ msgstr "اٹیچمینٹ "
 msgid "Attachment input"
 msgstr "اٹیچمینٹ اِنپُٹ "
 
+#: modules/access/avcapture.m:57
+#, fuzzy
+msgid "AVFoundation Video Capture"
+msgstr "ویڈیو کیپچر "
+
+#: modules/access/avcapture.m:58
+#, fuzzy
+msgid "AVFoundation video capture module."
+msgstr "آڈیو آوٹ پُٹ ماڈیول"
+
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#, fuzzy
+msgid "No video devices found"
+msgstr "کانہہ اِنپُٹ ڈیوایِس آو نْہ لبنْہ"
+
+#: modules/access/avcapture.m:287
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable video input device. "
+"Please check your connectors and drivers."
+msgstr ""
+"تُہند میک چُھ نْہ باسان صلأحیت تھاوان اکِہ موأفق اِنپُٹ ڈیواسْچ۔ مہربأنی کْرتھ کْریو "
+"چک پنْینی کنیکٹر تْہ ڈرایور۔"
+
+#: modules/access/avcapture.m:316
+msgid ""
+"Your Mac does not seem to be equipped with a suitable input device. Please "
+"check your connectors and drivers."
+msgstr ""
+"تُہند میک چُھ نْہ باسان صلأحیت تھاوان اکِہ موأفق اِنپُٹ ڈیواسْچ۔ مہربأنی کْرتھ کْریو "
+"چک پنْینی کنیکٹر تْہ ڈرایور۔"
+
 #: modules/access/avio.h:33
 msgid "AVIO"
 msgstr "AVIO"
@@ -6749,7 +6788,7 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr " \"%s\" کیپچر ڈیوایس چُھ نْہ تعاون کران ضرورت پیرامیٹرن۔"
 
-#: modules/access/dsm/access.c:61
+#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 #, fuzzy
 msgid "Windows networks"
 msgstr "وینڈو ڈیکریشن"
@@ -7241,6 +7280,48 @@ msgstr "ڈیجیٹل ویڈیو   (فایر وایر/ieee1394) اِنپُٹ  "
 msgid "DV"
 msgstr "DV"
 
+#: modules/access/dvb/access.c:66
+msgid "Probe DVB card for capabilities"
+msgstr ""
+
+#: modules/access/dvb/access.c:67
+msgid ""
+"Some DVB cards do not like to be probed for their capabilities, you can "
+"disable this feature if you experience some trouble."
+msgstr ""
+
+#: modules/access/dvb/access.c:70
+#, fuzzy
+msgid "Satellite scanning config"
+msgstr "سیٹالایٹ رینج کوڈ "
+
+#: modules/access/dvb/access.c:71
+msgid "filename of config file in share/dvb/dvb-s"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
+#, fuzzy
+msgid "Scan tuning list"
+msgstr "سیکیلینگ کالتی "
+
+#: modules/access/dvb/access.c:74
+msgid "filename containing initial scan tuning data"
+msgstr ""
+
+#: modules/access/dvb/access.c:76
+#, fuzzy
+msgid "Use NIT for scanning services"
+msgstr "استعمال گژھان سیٹیٹیسٹیکْس "
+
+#: modules/access/dvb/access.c:79
+#, fuzzy
+msgid "DVB"
+msgstr "DV"
+
+#: modules/access/dvb/access.c:80
+msgid "DVB input with v4l2 support"
+msgstr ""
+
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
 msgstr "DVD اینگْل "
@@ -7317,8 +7398,7 @@ msgstr "ڈی وی ڈی ہیوک نْہ ریڈ کْرتھ %d/%d  بُلاک  0x%0
 msgid "File input"
 msgstr "فایل اِنپُٹ "
 
-#: modules/access/fs.c:35 modules/access_output/file.c:389
-#: modules/audio_output/file.c:113
+#: modules/access/fs.c:35 modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
 #: modules/gui/macosx/VLCOutput.m:298 modules/gui/qt/dialogs/plugins.cpp:1421
@@ -7343,9 +7423,9 @@ msgid "Include devices and pipes when listing directories"
 msgstr ""
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
-#: modules/access_output/http.c:52 modules/access/rdp.c:65
-#: modules/access/sftp.c:55 modules/access/smb_common.h:21
-#: modules/access/vnc.c:46 modules/gui/macosx/VLCCoreDialogProvider.m:191
+#: modules/access/rdp.c:65 modules/access/sftp.c:55
+#: modules/access/smb_common.h:21 modules/access/vnc.c:46
+#: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
@@ -7361,9 +7441,9 @@ msgid ""
 msgstr "یوزر ناو یوس کنیکشنس باپت استعمال گژھ۔"
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
-#: modules/access_output/http.c:55 modules/access/rdp.c:68
-#: modules/access/sftp.c:58 modules/access/smb_common.h:24
-#: modules/access/vnc.c:47 modules/gui/macosx/VLCCoreDialogProvider.m:192
+#: modules/access/rdp.c:68 modules/access/sftp.c:58
+#: modules/access/smb_common.h:24 modules/access/vnc.c:47
+#: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:265
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
@@ -7426,11 +7506,50 @@ msgstr "وی ایل سی یُک کنیکشن دِنْہ آمتِس سْرورس 
 msgid "Your account was rejected."
 msgstr "تُہند ایکاوُنٹ آو رد کرنْہ۔"
 
-#: modules/access/http/access.c:214 modules/access/http.c:318
+#: modules/access/http.c:59
+msgid "HTTP proxy"
+msgstr "پراکزی   HTTP"
+
+#: modules/access/http.c:61
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"ایچ ٹی ٹی پی پراکزی یوس استعمال کرْنئ چھ اتھ گژھ ضرور فارم آسْنئ http://"
+"[user@]myproxy.mydomain:myport/   ؛ اگر ایمپٹی آسِہ، یہ ایچ ٹی ٹی پی۔پراکزی "
+"ماحول ویریبْلْچ یِیہ کوشش کرنْہ۔"
+
+#: modules/access/http.c:65
+msgid "HTTP proxy password"
+msgstr "پراکزی پاس وأرڈ   HTTP "
+
+#: modules/access/http.c:67
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "تُہنزِ ایچ ٹی ٹی پی پراکزی اگر پاس وأرڈ ضرورت چُھ، ییتنس کْریو یہ سیٹ۔"
+
+#: modules/access/http.c:69
+msgid "Auto re-connect"
+msgstr "آٹو ریکنیکٹْہ کْریو "
+
+#: modules/access/http.c:71
+msgid ""
+"Automatically try to reconnect to the stream in case of a sudden disconnect."
+msgstr ""
+"آٹومیٹیکلی کْریو کوشش ریکنیکٹْہ کرنْچ سِٹریمس کُن اگر ذن اچانک ڈیسکنیکٹْہ گژھ۔"
+
+#: modules/access/http.c:75
+msgid "HTTP input"
+msgstr "اِنپُٹ HTTP"
+
+#: modules/access/http.c:77
+msgid "HTTP(S)"
+msgstr "HTTP(S)"
+
+#: modules/access/http.c:318 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "تصدیق HTTP"
 
-#: modules/access/http/access.c:215 modules/access/http.c:319
+#: modules/access/http.c:319 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
@@ -7488,49 +7607,10 @@ msgstr ""
 "الگ کْرتھ آسْن اکِہ فاروأرڈ سیلیش سْیت، مثلن، فو بار یا ۱۔۲۔۲۔ یہ اوپشن ہیکو صرف "
 "مخصوص کْرتھ پریتھ اِنپُٹ آیٹمس باپت، نْہ کِہ گلوبلی۔"
 
-#: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "پراکزی   HTTP"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"ایچ ٹی ٹی پی پراکزی یوس استعمال کرْنئ چھ اتھ گژھ ضرور فارم آسْنئ http://"
-"[user@]myproxy.mydomain:myport/   ؛ اگر ایمپٹی آسِہ، یہ ایچ ٹی ٹی پی۔پراکزی "
-"ماحول ویریبْلْچ یِیہ کوشش کرنْہ۔"
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "پراکزی پاس وأرڈ   HTTP "
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "تُہنزِ ایچ ٹی ٹی پی پراکزی اگر پاس وأرڈ ضرورت چُھ، ییتنس کْریو یہ سیٹ۔"
-
-#: modules/access/http.c:69
-msgid "Auto re-connect"
-msgstr "آٹو ریکنیکٹْہ کْریو "
-
-#: modules/access/http.c:71
-msgid ""
-"Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr ""
-"آٹومیٹیکلی کْریو کوشش ریکنیکٹْہ کرنْچ سِٹریمس کُن اگر ذن اچانک ڈیسکنیکٹْہ گژھ۔"
-
-#: modules/access/http.c:75
-msgid "HTTP input"
-msgstr "اِنپُٹ HTTP"
-
-#: modules/access/http.c:77
-msgid "HTTP(S)"
-msgstr "HTTP(S)"
-
-#: modules/access/idummy.c:41 modules/access_output/dummy.c:44
-#: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
-#: modules/codec/edummy.c:39 modules/control/dummy.c:52
-#: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
+#: modules/access/idummy.c:41 modules/audio_output/adummy.c:36
+#: modules/codec/ddummy.c:46 modules/codec/edummy.c:39
+#: modules/control/dummy.c:52 modules/text_renderer/tdummy.c:35
+#: modules/video_output/vdummy.c:47
 msgid "Dummy"
 msgstr "ڈمی"
 
@@ -7564,6 +7644,7 @@ msgid "Set the category of the elementary stream"
 msgstr "سیٹ کْریو  کیٹاگری  ایلمینٹری سِٹریم ہُند "
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "نا معلوم "
 
@@ -7979,7 +8060,7 @@ msgstr "آر ٹی ایس پی کنیکشن گو ناکام"
 msgid "Capture the audio stream in stereo."
 msgstr "کیپچر کْریو آڈیو سِٹریم سیٹیریوہس منز۔"
 
-#: modules/access/oss.c:67 modules/access_output/shout.c:95
+#: modules/access/oss.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
 msgstr "سیمپیلیریٹ "
@@ -8000,339 +8081,6 @@ msgstr "OSS"
 msgid "OSS input"
 msgstr "اِنپُٹ OSS"
 
-#: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
-msgid "Dummy stream output"
-msgstr "ڈمی سٹریم آوٹ پُٹ"
-
-#: modules/access_output/file.c:315
-msgid "Keep existing file"
-msgstr "موجود فایل تھأیو "
-
-#: modules/access_output/file.c:316
-msgid "Overwrite"
-msgstr "اوور رایِٹ کْریو "
-
-#: modules/access_output/file.c:317
-msgid ""
-"The output file already exists. If recording continues, the file will be "
-"overridden and its content will be lost."
-msgstr ""
-"آوٹ پُٹ فایل چُھ گوڈے موجود۔ اگر ریکارڈینگ جأری تھاوو، یہ فایل یِیہ اوور رایِڈ "
-"کرنْہ تْہ امیوک کنٹینٹ راوِ۔"
-
-#: modules/access_output/file.c:375
-msgid "Overwrite existing file"
-msgstr "اوور رایِٹ کْریو موجود فایل"
-
-#: modules/access_output/file.c:377
-msgid "If the file already exists, it will be overwritten."
-msgstr "اگرفایل گوڈے موجود آسِہ، یہ یِیہ اوور رایِٹ کرِنْہ۔"
-
-#: modules/access_output/file.c:378
-msgid "Append to file"
-msgstr "فایلہ کْریو جمع "
-
-#: modules/access_output/file.c:379
-msgid "Append to file if it exists instead of replacing it."
-msgstr "فایلہ کْریو جمع اگر یہ موجود آسہ یہ بدلاونْچ جاے۔ "
-
-#: modules/access_output/file.c:381
-msgid "Format time and date"
-msgstr "فارمیٹ کْریو ٹایم تْہ تأریخ"
-
-#: modules/access_output/file.c:382
-msgid "Perform ISO C time and date formatting on the file path"
-msgstr "کْریو آی ایس او سی ٹایِم تْہ ڈیٹ فارمیٹینگ فایل پاتھس پیٹھ"
-
-#: modules/access_output/file.c:384
-msgid "Synchronous writing"
-msgstr "سینکرونس لکھأئ"
-
-#: modules/access_output/file.c:385
-msgid "Open the file with synchronous writing."
-msgstr "فایل کْریو اوپْن سینکرونس رایٹینگ سْیت۔"
-
-#: modules/access_output/file.c:388
-msgid "File stream output"
-msgstr "فایل سِٹریم آوٹ پُٹ "
-
-#: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
-msgid "Username that will be requested to access the stream."
-msgstr "یوزر ناو یوس درخواست کرنْہ یِیہ سِٹریم ایسیس کرنْہ باپت۔"
-
-#: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
-msgid "Password that will be requested to access the stream."
-msgstr "پاس وأرڈ  یوس درخواست کرنْہ یِیہ سِٹریم ایسیس کرنْہ باپت۔"
-
-#: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
-#: modules/demux/playlist/shoutcast.c:326
-msgid "Mime"
-msgstr "مایِم"
-
-#: modules/access_output/http.c:59
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr "مایم یوس سْرورن واپس کور ( آٹو ڈیٹیکٹِڈ اگر نْہ مخصوص کرنْہ یِیہ)۔"
-
-#: modules/access_output/http.c:61
-msgid "Metacube"
-msgstr "میٹا کیوب "
-
-#: modules/access_output/http.c:62
-msgid ""
-"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
-msgstr ""
-"استعمال کْریو میٹاکیوب پروٹوکال۔ ضرورت چُھ سٹریم کرنْہ باپت کیوب میپ ریفلیکٹرس "
-"کُن۔"
-
-#: modules/access_output/http.c:67
-msgid "HTTP stream output"
-msgstr "ایچ ٹی ٹی پی سِٹریم آوٹ پُٹ "
-
-#: modules/access_output/livehttp.c:67
-msgid "Segment length"
-msgstr "سیگمینٹ زیچھر "
-
-#: modules/access_output/livehttp.c:68
-msgid "Length of TS stream segments"
-msgstr "زیچھر ٹی ایس سِٹریم سیگمینٹن ہُند "
-
-#: modules/access_output/livehttp.c:70
-msgid "Split segments anywhere"
-msgstr "سُپلِٹ کریو سیگمینٹ کونِہ تِہ جاے "
-
-#: modules/access_output/livehttp.c:71
-msgid ""
-"Don't require a keyframe before splitting a segment. Needed for audio only."
-msgstr ""
-"کی فریم چُھ نْہ ضرورت اکھ سیگمینٹ سُپلِٹ کرنْہ برونہہ۔ ضرورت چُھ صرف آڈیو باپت۔"
-
-#: modules/access_output/livehttp.c:74
-msgid "Number of segments"
-msgstr "سیگمینٹن ہُند تعداد "
-
-#: modules/access_output/livehttp.c:75
-msgid "Number of segments to include in index"
-msgstr "سیگمینٹن ہُند تعداد یم شأمل کرْنئ چھ اِنڈیکسس منز "
-
-#: modules/access_output/livehttp.c:77
-msgid "Allow cache"
-msgstr "کیشے دِیو اجازت "
-
-#: modules/access_output/livehttp.c:78
-msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
-msgstr ""
-"کْریو جمع: کانہہ ڈاریکٹیو چُھ نْہ پْلے لِسٹْہ فایلہ منز اگر یہ ڈیسیبْل کرنْہ یِیہ  "
-"EXT-X-ALLOW-CACHE"
-
-#: modules/access_output/livehttp.c:80
-msgid "Index file"
-msgstr "اِنڈیکْس فایل"
-
-#: modules/access_output/livehttp.c:81
-msgid "Path to the index file to create"
-msgstr "پاتھ اِنڈیکْس فایلِہ کُن بناونْہ باپت"
-
-#: modules/access_output/livehttp.c:83
-msgid "Full URL to put in index file"
-msgstr "فُل یو آر ایل یوس اِنڈیکْس فایلہ منز تھاوُن چُھ "
-
-#: modules/access_output/livehttp.c:84
-msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
-"فُل یو آر ایل یوس اِنڈیکْس فایلہ منز تھاوُن چُھ۔  #'s کْریو استعمال سیگمینٹ نمبر "
-"ہاونْہ باپت "
-
-#: modules/access_output/livehttp.c:87
-msgid "Delete segments"
-msgstr "سیگمینٹ کْریو ڈیلیٹ "
-
-#: modules/access_output/livehttp.c:88
-msgid "Delete segments when they are no longer needed"
-msgstr "سیگمینٹ کْریو ڈیلیٹ ییلِہ نْہ تِم وْنئ ضرورت آسن"
-
-#: modules/access_output/livehttp.c:90
-msgid "Use muxers rate control mechanism"
-msgstr "استعمال کْریو مکسر ریٹ کنٹرول میکانیزْم"
-
-#: modules/access_output/livehttp.c:92
-msgid "AES key URI to place in playlist"
-msgstr "اے ای ایس کی یو آر آی یوس تھاون چُھ پْلے لِسٹس منز "
-
-#: modules/access_output/livehttp.c:94
-msgid "AES key file"
-msgstr "اے ای ایس کی فایل"
-
-#: modules/access_output/livehttp.c:95
-msgid "File containing the 16 bytes encryption key"
-msgstr "فایل یتھ منز موجود چھ ۱۶ بایِٹ اینکریپشن کی"
-
-#: modules/access_output/livehttp.c:97
-msgid "File where vlc reads key-uri and keyfile-location"
-msgstr "فایل ییتنس وی ایل سی ریڈ کران چُھ کی۔یو آر ای تْہ کی فایل۔جاے"
-
-#: modules/access_output/livehttp.c:98
-#, fuzzy
-msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that "
-"segment."
-msgstr ""
-"فایل چھ ریڈ کرنْہ یوان ییلہ سیگمینٹ شروع گژھان چُھ تْہ چُھ ماننْہ یوان فارمیٹس "
-"منز: کی۔یو آر آیi\\nکی۔فایل۔ فایل چھ ریڈ کرنْہ یوان سیگمینٹ اوپینینگ پیٹھ تْہ "
-"ویلیو چِھ استعمال کرنْہ یوان تتھ سیگمینٹس  پیٹھ۔ "
-
-#: modules/access_output/livehttp.c:102
-msgid "Use randomized IV for encryption"
-msgstr "استعمال کْریو رینڈامایزْڈ آی وی اینکریپشن باپت "
-
-#: modules/access_output/livehttp.c:103
-msgid "Generate IV instead using segment-number as IV"
-msgstr ""
-"جنریٹ کْریو آی وی امہ بجاے ذِ توہیہ کْریو استعمال سیگمینٹ نمبر بطور آی وی "
-
-#: modules/access_output/livehttp.c:105
-msgid "Number of first segment"
-msgstr "نمبر گوڈنیک سیگمینٹُک "
-
-#: modules/access_output/livehttp.c:106
-msgid "The number of the first segment generated"
-msgstr "نمبر گوڈنیک سیگمینٹُک یوس جنریٹ کرنْہ آمُت چُھ   "
-
-#: modules/access_output/livehttp.c:109
-msgid "HTTP Live streaming output"
-msgstr "ایچ ٹی ٹی پی لایِو سِٹریمینگ آوٹ پُٹ "
-
-#: modules/access_output/livehttp.c:110
-msgid "LiveHTTP"
-msgstr "لایِو ایچ ٹی ٹی پی "
-
-#: modules/access_output/shout.c:64
-#: modules/gui/qt/components/sout/sout_widgets.cpp:380
-#: share/lua/http/dialogs/create_stream.html:139
-msgid "Stream name"
-msgstr "سِٹریم ناو "
-
-#: modules/access_output/shout.c:65
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "ناو یوس یتھ سِٹریم دیون چُھ/چنل یوس شاوُٹ کاسٹس پیٹھ چِھ/آیِس کاسٹْہ سْرور۔"
-
-#: modules/access_output/shout.c:68
-msgid "Stream description"
-msgstr "سِٹریم وضاحت "
-
-#: modules/access_output/shout.c:69
-msgid "Description of the stream content or information about your channel."
-msgstr "وضاحت سِٹریم کنٹینٹْچ  یا انفارمیشن تُہنزِ چنلِہ ہْنز۔"
-
-#: modules/access_output/shout.c:72
-msgid "Stream MP3"
-msgstr "سِٹریم ایم پی ۳ "
-
-#: modules/access_output/shout.c:73
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"توہیہ چھیو نارملی فیڈ کرُن شاوُٹ کاسٹْہ ماڈیول اوگ سِٹریمن سْیت۔ یہ تِہ چُھ مُمکن ذِ "
-"توہیہ کْریو سٹریم ایم پی ۳ امِہ بجاے، یُتھ ذن توہیہ فاروأرڈ کْرتھ ہیکیو ایم پی ۳ "
-"سِٹریم شاوُٹ کاسٹس کُن یا آیِس کاسٹْہ سْرورس کُن۔"
-
-#: modules/access_output/shout.c:82
-msgid "Genre description"
-msgstr "جنر وضاحت"
-
-#: modules/access_output/shout.c:83
-#, fuzzy
-msgid "Genre of the content."
-msgstr "کنٹینٹُک جنر۔"
-
-#: modules/access_output/shout.c:85
-msgid "URL description"
-msgstr "یو آر ایل وضاحت"
-
-#: modules/access_output/shout.c:86
-#, fuzzy
-msgid "URL with information about the stream or your channel."
-msgstr "یو آر ایل یتھ منز انفارمیشن چھ سِٹریم ہْنز یا تُہنزِ چنلِہ ہْنز۔"
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Bitrate information of the transcoded stream."
-msgstr "بایٹریٹ انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Samplerate information of the transcoded stream."
-msgstr "سیمپْل ریٹ انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
-
-#: modules/access_output/shout.c:98
-msgid "Number of channels"
-msgstr "چنلن ہُند نمبر "
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Number of channels information of the transcoded stream."
-msgstr "تعداد چنلن ہُند  انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
-
-#: modules/access_output/shout.c:101
-msgid "Ogg Vorbis Quality"
-msgstr "اوگ ووربِس کالٹی"
-
-#: modules/access_output/shout.c:102
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "اوگ ووربِس کالٹی انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
-
-#: modules/access_output/shout.c:104
-msgid "Stream public"
-msgstr "سِٹریم پبلِک"
-
-#: modules/access_output/shout.c:105
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-"سْرور بنأیو پبلکلی دستیاب یلو پیجن پیٹھ ( ڈاریکٹری لِسٹینگ سِٹریمن ہْنز)     "
-"شاوٹ کاسٹْہ/آیس کاسٹْہویب سایِٹ پیٹھ اتھ چھ ضرورت بایٹریٹ انفارمیشن یوس مخصوص "
-"کرنْہ آمژ چھ شاوٹ کاسٹس باپت۔ اتھ چھ ضرورت اوگ سِٹریمینگ آیِس کاسٹس باپت۔"
-
-#: modules/access_output/shout.c:111
-msgid "IceCAST output"
-msgstr "آیِس کاسٹہ آوٹ پُٹ "
-
-#: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
-msgid "Caching value (ms)"
-msgstr "کیشینگ ویلیو (ملی سیکنڈ)"
-
-#: modules/access_output/udp.c:64
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"ڈیفالٹْہ کیشینگ ویلیو آوٹ باوُنڈ یو ڈی پی سِٹریمن باپت۔ یہ ویلیو چُھ سیٹ کرُن ملی "
-"سیکنڈن منز۔"
-
-#: modules/access_output/udp.c:67
-msgid "Group packets"
-msgstr "گروپ پیکیٹ "
-
-#: modules/access_output/udp.c:68
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"پیکیٹ ہیکو سوزِتھ اکِہ اکِہ صحیح وقتس پیٹھ یا گروپو ذریعہ۔ توہیہ ہیکیو ژأرتھ "
-"تعداد پیکٹن ہُند یم ذن سوزنْہ یِن اکِہ سات۔ امہ سْیت چُھ ژدولینگ لوڈ کم گژھان "
-"گوبیر والین سِسٹمن پیٹھ۔"
-
-#: modules/access_output/udp.c:75
-msgid "UDP stream output"
-msgstr "یو ڈی پی سِٹریم آوٹ پُٹ "
-
 #: modules/access/pulse.c:35
 msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
@@ -8348,6 +8096,35 @@ msgstr "پلْس آڈیو "
 #: modules/access/pulse.c:43
 msgid "PulseAudio input"
 msgstr "پلْس آڈیو اِنپُٹ  "
+
+#: modules/access/qtsound.m:59
+#, fuzzy
+msgid "QTSound"
+msgstr "سراوُنڈ "
+
+#: modules/access/qtsound.m:60
+#, fuzzy
+msgid "QuickTime Sound Capture"
+msgstr "کویِک ٹایم کیپچر"
+
+#: modules/access/qtsound.m:262
+#, fuzzy
+msgid "No Audio Input device found"
+msgstr "کانہہ اِنپُٹ ڈیوایِس آو نْہ لبنْہ"
+
+#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#, fuzzy
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"تُہند میک چُھ نْہ باسان صلأحیت تھاوان اکِہ موأفق اِنپُٹ ڈیواسْچ۔ مہربأنی کْرتھ کْریو "
+"چک پنْینی کنیکٹر تْہ ڈرایور۔"
+
+#: modules/access/qtsound.m:293
+#, fuzzy
+msgid "No audio input device found"
+msgstr "کانہہ اِنپُٹ ڈیوایِس آو نْہ لبنْہ"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8784,6 +8561,30 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+
+#: modules/access/srt.c:297
+#, fuzzy
+msgid "SRT"
+msgstr "آر ٹی پی"
+
+#: modules/access/srt.c:298
+#, fuzzy
+msgid "SRT input"
+msgstr "اِنپُٹSFTP"
+
+#: modules/access/srt.c:303
+#, fuzzy
+msgid "SRT chunk size (bytes)"
+msgstr "یو ڈی پی ریسیو بفر سایز (بایٹْہ)"
+
+#: modules/access/srt.c:305
+msgid "Return poll wait after timeout miliseconds (-1 = infinite)"
+msgstr ""
+
+#: modules/access/srt.c:306
+#, fuzzy
+msgid "SRT latency (ms)"
+msgstr "ڈی تی ایس ڈیلے (ملی سیکنڈ)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -10110,17 +9911,24 @@ msgstr "فریکوینسی 3 Q"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "آڈیو فلٹر بینڈ۔لیمیٹِڈ اِنٹرپولیشن ریسیمپلینگ باپت "
 
+#: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
 msgstr "ریسیمپیلینگ کالٹی "
 
-#: modules/audio_filter/resampler/speex.c:36
-msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
-msgstr ""
-"ریسیمپیلینگ کالٹی   (0 =خراب ترین تْہ تیز ترین, 10 = بہترین تْہ آہستْہ).۔ "
+#: modules/audio_filter/resampler/soxr.c:41
+#: modules/audio_filter/resampler/speex.c:35
+#, fuzzy
+msgid "Resampling quality, from worst to best"
+msgstr "ریسیمپیلینگ کالٹی "
 
+#: modules/audio_filter/resampler/soxr.c:67
+#, fuzzy
+msgid "SoX Resampler"
+msgstr "ایس آر سی ریسیمپلر "
+
+#: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
-#: modules/audio_filter/resampler/speex.c:44
 msgid "Speex resampler"
 msgstr "سُپیکْس ریسیمپلر "
 
@@ -11909,6 +11717,16 @@ msgstr "میڈیا فاونڈیشن ٹرانسفارم ڈیکوڈر "
 msgid "MPEG audio decoder using mpg123"
 msgstr "ایم پی ای جی آڈیو ڈیکوڈر "
 
+#: modules/codec/oggspots.c:86
+#, fuzzy
+msgid "OggSpots video decoder"
+msgstr "ویب ایم ویڈیو ڈیکوڈر"
+
+#: modules/codec/oggspots.c:92
+#, fuzzy
+msgid "OggSpots video packetizer"
+msgstr "تھییورا ویڈیو پیکیٹایزر   "
+
 #: modules/codec/omxil/omxil.c:139
 #, fuzzy
 msgid "OMX direct rendering"
@@ -12609,6 +12427,15 @@ msgstr ""
 msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
+#: modules/codec/scte27.c:42
+#, fuzzy
+msgid "SCTE-27 decoder"
+msgstr "جی۔۷۱۱ ڈیکوڈر "
+
+#: modules/codec/scte27.c:43
+msgid "SCTE-27"
+msgstr ""
+
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
 msgstr "ایس ڈی ایل امیج ڈیکوڈر "
@@ -13044,6 +12871,11 @@ msgstr ""
 msgid "Teletext subtitles decoder"
 msgstr "ٹیلی ٹیکْسٹْہ سب ٹایٹل ڈیکوڈر "
 
+#: modules/codec/textst.c:49
+#, fuzzy
+msgid "HDMV TextST subtitles decoder"
+msgstr "متن سب ٹایٹل ڈیکوڈر "
+
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
@@ -13209,6 +13041,21 @@ msgstr "ویب ایم ویڈیو ڈیکوڈر"
 #, fuzzy
 msgid "WebM video encoder"
 msgstr "ویب ایم ویڈیو ڈیکوڈر"
+
+#: modules/codec/webvtt/webvtt.c:40
+#, fuzzy
+msgid "WEBVTT decoder"
+msgstr "ڈیکوڈر MMAL "
+
+#: modules/codec/webvtt/webvtt.c:41
+#, fuzzy
+msgid "WEBVTT subtitles decoder"
+msgstr "EBU STL  سب ٹایٹل ڈیکوڈر "
+
+#: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
+#, fuzzy
+msgid "WEBVTT subtitles parser"
+msgstr "EBU STL سب ٹایٹل پارسر "
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14233,7 +14080,8 @@ msgstr "ڈی۔بس کنٹرول اِنٹرفیس "
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1273 modules/gui/ncurses.c:1035
+#: modules/gui/macosx/VLCMainWindow.m:1273
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1213
 #: modules/gui/qt/main_interface.cpp:1217
 #: modules/gui/qt/main_interface.cpp:1256
@@ -14608,7 +14456,7 @@ msgstr "شروع کران "
 msgid "Opening"
 msgstr "کھولان "
 
-#: modules/control/oldrc.c:74
+#: modules/control/oldrc.c:74 modules/logger/file.c:203
 msgid "Error"
 msgstr "ایرر"
 
@@ -15100,7 +14948,8 @@ msgstr "ڈیمکسر "
 msgid "Avformat muxer"
 msgstr "اے وی فارمیٹ مکسر "
 
-#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "مکسر "
 
@@ -15462,6 +15311,161 @@ msgstr "سراوُنڈ لیول   "
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
 msgstr "سراوُنڈ ڈیلے (ملی سیکنڈ) "
+
+#: modules/demux/mp4/meta.c:68
+msgid "Writer"
+msgstr "لْکھأر "
+
+#: modules/demux/mp4/meta.c:69
+msgid "Composer"
+msgstr "کمپوزر "
+
+#: modules/demux/mp4/meta.c:70
+msgid "Producer"
+msgstr "پروڈوسر "
+
+#: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
+#: modules/gui/qt/components/controller.hpp:112
+#: modules/gui/qt/components/controller.hpp:124
+msgid "Information"
+msgstr "انفارمیشن "
+
+#: modules/demux/mp4/meta.c:72
+msgid "Disclaimer"
+msgstr "ڈیسکْلیمر "
+
+#: modules/demux/mp4/meta.c:73
+msgid "Requirements"
+msgstr "ضرورت "
+
+#: modules/demux/mp4/meta.c:74
+msgid "Original Format"
+msgstr "اصلی فارمیٹ "
+
+#: modules/demux/mp4/meta.c:75
+msgid "Display Source As"
+msgstr "ڈیسپْلے کْریو سورس بطور "
+
+#: modules/demux/mp4/meta.c:76
+msgid "Host Computer"
+msgstr "ہوسٹْہ کمپیوٹر "
+
+#: modules/demux/mp4/meta.c:77
+msgid "Performers"
+msgstr "پْرفارمر "
+
+#: modules/demux/mp4/meta.c:78
+msgid "Original Performer"
+msgstr "اصلی پْرفارمر "
+
+#: modules/demux/mp4/meta.c:79
+msgid "Providers Source Content"
+msgstr "فراہم کرن وألی سُند سورس کنٹینٹ "
+
+#: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
+msgid "Warning"
+msgstr "آگأہی "
+
+#: modules/demux/mp4/meta.c:81
+msgid "Software"
+msgstr "سافٹْہ وِیر "
+
+#: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
+#: modules/demux/xiph_metadata.h:64
+msgid "Lyrics"
+msgstr "لیریکْس "
+
+#: modules/demux/mp4/meta.c:83
+msgid "Record Company"
+msgstr "ریکارڈ کمپنی"
+
+#: modules/demux/mp4/meta.c:84
+msgid "Model"
+msgstr "ماڈل "
+
+#: modules/demux/mp4/meta.c:85
+#, fuzzy
+msgid "Product"
+msgstr "پروڈکٹْہ "
+
+#: modules/demux/mp4/meta.c:86
+msgid "Grouping"
+msgstr "گروپینگ "
+
+#: modules/demux/mp4/meta.c:88
+msgid "Sub-Title"
+msgstr "سب۔ٹایٹل "
+
+#: modules/demux/mp4/meta.c:89
+msgid "Arranger"
+msgstr "ارینجر "
+
+#: modules/demux/mp4/meta.c:90
+msgid "Art Director"
+msgstr "آرٹ ڈاریکٹر "
+
+#: modules/demux/mp4/meta.c:91
+msgid "Copyright Acknowledgement"
+msgstr "کاپی رایِٹ ایکنالیجمینٹ "
+
+#: modules/demux/mp4/meta.c:92
+msgid "Conductor"
+msgstr "کنڈکٹر "
+
+#: modules/demux/mp4/meta.c:93
+msgid "Song Description"
+msgstr "بأتھْچ وضاحت "
+
+#: modules/demux/mp4/meta.c:94
+msgid "Liner Notes"
+msgstr "لاینر نوٹ "
+
+#: modules/demux/mp4/meta.c:95
+msgid "Phonogram Rights"
+msgstr "فونوگرام حقوق "
+
+#: modules/demux/mp4/meta.c:97
+msgid "Sound Engineer"
+msgstr "آواز انجینر "
+
+#: modules/demux/mp4/meta.c:98
+msgid "Soloist"
+msgstr "سولواِسٹْہ"
+
+#: modules/demux/mp4/meta.c:99
+msgid "Thanks"
+msgstr "شُکریہ "
+
+#: modules/demux/mp4/meta.c:100
+msgid "Executive Producer"
+msgstr "ایکزیکیوٹیو پروڈوسر "
+
+#: modules/demux/mp4/meta.c:102
+#, fuzzy
+msgid "Encoding Params"
+msgstr "اینکوڈینگ پیرامیٹر "
+
+#: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
+msgid "Vendor"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:104
+#, fuzzy
+msgid "Catalog Number"
+msgstr "چنل نمبر "
+
+#: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
+msgid "Keywords"
+msgstr "کی وأرڈ "
+
+#: modules/demux/mp4/meta.c:423
+msgid "Explicit"
+msgstr ""
+
+#: modules/demux/mp4/meta.c:426
+#, fuzzy
+msgid "Clean"
+msgstr "کْلیر کْریو "
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -15855,6 +15859,10 @@ msgstr "پوڈ کاسٹْہ سایِز  "
 msgid "%s bytes"
 msgstr "بایٹْہ %s"
 
+#: modules/demux/playlist/qtl.c:242 modules/demux/playlist/shoutcast.c:326
+msgid "Mime"
+msgstr "مایِم"
+
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
 msgstr "شاوٹ کاسٹْہ "
@@ -15866,6 +15874,11 @@ msgstr "بوزن وألی"
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
 msgstr "لوڈ "
+
+#: modules/demux/playlist/wpl.c:99
+#, fuzzy
+msgid "Total duration"
+msgstr "سیچوریشن"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16050,6 +16063,10 @@ msgstr "ویو ڈیمکزر "
 msgid "XA demuxer"
 msgstr "ایکْس اے ڈیمکزر "
 
+#: modules/demux/xiph_metadata.c:588
+msgid "Unknown category"
+msgstr "نامعلوم کیٹاگری "
+
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
 msgstr "بند کرنْہ آمْتئ کیپشن"
@@ -16074,10 +16091,6 @@ msgstr "معنے واجنِہ اینوٹیشن "
 msgid "Transcript"
 msgstr "ٹرانسکریپٹْہ "
 
-#: modules/demux/xiph_metadata.h:57 modules/demux/xiph_metadata.h:64
-msgid "Lyrics"
-msgstr "لیریکْس "
-
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
 msgstr "لسأنی مارْک اپ "
@@ -16097,10 +16110,6 @@ msgstr "سلایڈْ (متن)"
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
 msgstr "سلایڈْ (امیج)"
-
-#: modules/demux/xiph_metadata.c:588
-msgid "Unknown category"
-msgstr "نامعلوم کیٹاگری "
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
@@ -16153,22 +16162,26 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
+#: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "پْلے لِسٹْہ پارسر "
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
+#: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "سْروس ڈیسکوری "
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
+#: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
+#: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr ""
 
@@ -16176,6 +16189,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
 #: modules/gui/qt/dialogs/plugins.cpp:395
+#: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "ایکْسٹینشن "
 
@@ -16217,6 +16231,7 @@ msgstr "ان انسٹال کْریو "
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
+#: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:525
 msgid "Skins"
 msgstr "سیکین"
@@ -16312,10 +16327,10 @@ msgstr "اکھ ناو کْریو اینٹر نْوس پروفایلس باپت:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/prefs.m:188
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
@@ -16478,12 +16493,14 @@ msgid "Playback time"
 msgstr "پْلے بیک ریٹ "
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCStatusBarIcon.m:100
 #, fuzzy
 msgid "Go to previous item"
 msgstr "پْتیم ٹایٹل"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCStatusBarIcon.m:106
 #, fuzzy
 msgid "Go to next item"
 msgstr "ٹایمس کُن گْژھیو "
@@ -16526,9 +16543,10 @@ msgstr "اکھ آوٹ پُٹ جاے ژأریو "
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
-#: modules/gui/macosx/VLCOutput.m:67 modules/gui/macosx/prefs_widgets.m:1121
+#: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:426
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
@@ -17587,26 +17605,6 @@ msgstr "فُل والیوم "
 msgid "Open Audio Effects window"
 msgstr "آڈیو ایفیکٹْہ "
 
-#: modules/gui/macosx/misc.m:301
-msgid "B"
-msgstr "B"
-
-#: modules/gui/macosx/misc.m:308
-msgid "KB"
-msgstr "KB"
-
-#: modules/gui/macosx/misc.m:315
-msgid "MB"
-msgstr "MB"
-
-#: modules/gui/macosx/misc.m:323
-msgid "GB"
-msgstr "GB"
-
-#: modules/gui/macosx/misc.m:328
-msgid "TB"
-msgstr "TB"
-
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
 msgstr "اوپْن سورس "
@@ -17707,6 +17705,7 @@ msgid "Enable DVD menus"
 msgstr "اینبْل کْریو ڈی وی ڈی مینیو "
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "IP Address"
 msgstr "آی پی ایڈرس"
 
@@ -18001,58 +18000,6 @@ msgstr "ایرر ییلہ محفوظ کران أسئ میٹا "
 msgid "VLC was unable to save the meta data."
 msgstr "وی ایل سی ہیوک نْہ محفوظ کْرتھ میٹا ڈاٹا "
 
-#: modules/gui/macosx/prefs.m:187
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
-#: modules/gui/qt/dialogs/preferences.cpp:56
-msgid "Preferences"
-msgstr "ترجیحات "
-
-#: modules/gui/macosx/prefs.m:190
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
-msgid "Reset All"
-msgstr "تمام کْریو ریسیٹ "
-
-#: modules/gui/macosx/prefs.m:191
-msgid "Show Basic"
-msgstr "بُنیأدی ہأیو "
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a directory"
-msgstr "اکھ ڈاریکٹری ژأریو "
-
-#: modules/gui/macosx/prefs_widgets.m:1149
-msgid "Select a file"
-msgstr "اکھ فایل ژأریو "
-
-#: modules/gui/macosx/prefs_widgets.m:1150
-msgid "Select"
-msgstr "ژأریو "
-
-#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
-#: modules/gui/qt/ui/sprefs_interface.h:545
-msgid "Continue playback?"
-msgstr "جاری تھاووا پْلے بیک؟"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
-#: modules/gui/qt/dialogs/firstrun.cpp:106
-msgid "Continue"
-msgstr "جأری تھأیو "
-
-#: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
-msgid "Always continue media playback"
-msgstr "پْلے بیک تھأیو جأری "
-
-#: modules/gui/macosx/VLCResumeDialogController.m:62
-#: modules/gui/macosx/VLCResumeDialogController.m:94
-msgid "Restart playback"
-msgstr "دوبار کْریو شروع پْلے بیک"
-
-#: modules/gui/macosx/VLCResumeDialogController.m:69
-msgid "Playback of \"%@\" will continue at %@"
-msgstr "پْلے بیک  \"%@\"روزِ جأری  %@ پیٹھ"
-
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
 #, fuzzy
@@ -18079,6 +18026,31 @@ msgstr "سروِس دریافت"
 #, fuzzy
 msgid "Disable renderer discovery"
 msgstr "ڈیسیبْل کْریو سکرین سیور"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
+#: modules/gui/qt/ui/sprefs_interface.h:545
+msgid "Continue playback?"
+msgstr "جاری تھاووا پْلے بیک؟"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:49
+#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/qt/dialogs/firstrun.cpp:106
+msgid "Continue"
+msgstr "جأری تھأیو "
+
+#: modules/gui/macosx/VLCResumeDialogController.m:51
+#, fuzzy
+msgid "Always continue media playback"
+msgstr "پْلے بیک تھأیو جأری "
+
+#: modules/gui/macosx/VLCResumeDialogController.m:62
+#: modules/gui/macosx/VLCResumeDialogController.m:94
+msgid "Restart playback"
+msgstr "دوبار کْریو شروع پْلے بیک"
+
+#: modules/gui/macosx/VLCResumeDialogController.m:69
+msgid "Playback of \"%@\" will continue at %@"
+msgstr "پْلے بیک  \"%@\"روزِ جأری  %@ پیٹھ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -18353,6 +18325,16 @@ msgstr "پریفیکْس "
 msgid "Sequential numbering"
 msgstr "ترتیب وار نمبرینگ "
 
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/prefs.m:190
+msgid "Reset All"
+msgstr "تمام کْریو ریسیٹ "
+
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
+msgid "Preferences"
+msgstr "ترجیحات "
+
 #: modules/gui/macosx/VLCSimplePrefsController.m:547
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
@@ -18452,9 +18434,49 @@ msgstr "افسوس سان ہیکو نْہ یم کی ایسایِن کْرتھ ب
 msgid "This combination is already taken by \"%@\"."
 msgstr "یہ کمبینیشن چھ گوڈے نیمْژ بذریعہ  \"%@\"  ۔ "
 
+#: modules/gui/macosx/VLCStatusBarIcon.m:103
+#, fuzzy
+msgid "Toggle Play/Pause"
+msgstr "پْلے یا پاز کْریو"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:109
+#, fuzzy
+msgid "Toggle random order playback"
+msgstr "ٹوگل کْریو رینڈم پْلے لِسٹْہ پْلے بیک"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:114
+#, fuzzy
+msgid "Show Main Window"
+msgstr "مین وینڈو ۔ ۔ ۔ "
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:115
+#: modules/gui/macosx/VLCStatusBarIcon.m:406
+#, fuzzy
+msgid "Path/URL Action"
+msgstr "یو آر ایل وضاحت"
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:379
+#, fuzzy
+msgid "Nothing playing"
+msgstr "وْنئ پْلے کران "
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:413
+#, fuzzy
+msgid "Select File In Finder"
+msgstr "فولڈر ژأریو "
+
+#: modules/gui/macosx/VLCStatusBarIcon.m:415
+#, fuzzy
+msgid "Copy URL to clipboard"
+msgstr "کْلپ بورڈ پیٹھ لوکیشن کْریو اوپْن & "
+
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "سیٹ چُھ نْہ"
+
+#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
+msgid "sec."
+msgstr "sec."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
 #: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
@@ -18770,7 +18792,8 @@ msgid "Add text"
 msgstr "متن کْریو جمع "
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
-#: modules/spu/marq.c:88 modules/gui/qt/ui/video_effects.h:1280
+#: modules/logger/file.c:193 modules/spu/marq.c:88
+#: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "متن"
 
@@ -18793,9 +18816,41 @@ msgstr "ٹرانسپیرنسی "
 msgid "Organize profiles..."
 msgstr "پروفایل کْریو آرگانایِز ۔ ۔ ۔ "
 
-#: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
-msgid "sec."
-msgstr "sec."
+#: modules/gui/macosx/misc.m:301
+msgid "B"
+msgstr "B"
+
+#: modules/gui/macosx/misc.m:308
+msgid "KB"
+msgstr "KB"
+
+#: modules/gui/macosx/misc.m:315
+msgid "MB"
+msgstr "MB"
+
+#: modules/gui/macosx/misc.m:323
+msgid "GB"
+msgstr "GB"
+
+#: modules/gui/macosx/misc.m:328
+msgid "TB"
+msgstr "TB"
+
+#: modules/gui/macosx/prefs.m:191
+msgid "Show Basic"
+msgstr "بُنیأدی ہأیو "
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a directory"
+msgstr "اکھ ڈاریکٹری ژأریو "
+
+#: modules/gui/macosx/prefs_widgets.m:1149
+msgid "Select a file"
+msgstr "اکھ فایل ژأریو "
+
+#: modules/gui/macosx/prefs_widgets.m:1150
+msgid "Select"
+msgstr "ژأریو "
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
@@ -19156,11 +19211,6 @@ msgstr "برونہہ پْکیو "
 msgid "Loop / Repeat"
 msgstr "لوپ یا دوہرأیو "
 
-#: modules/gui/qt/components/controller.hpp:112
-#: modules/gui/qt/components/controller.hpp:124
-msgid "Information"
-msgstr "انفارمیشن "
-
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
 msgstr "سب ٹایٹل کْریو اوپْن "
@@ -19271,6 +19321,10 @@ msgstr "رُکأیو ات بی لوپس کُن "
 #: modules/gui/qt/components/controller_widget.cpp:275
 msgid "Aspect Ratio"
 msgstr "آسپیکٹْہ ریشیو "
+
+#: modules/gui/qt/components/epg/EPGWidget.cpp:65
+msgid "No EPG Data Available"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:360 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19427,10 +19481,6 @@ msgstr "(ڈیلے کرنْہ آمُت)"
 #: modules/gui/qt/components/extended_panels.cpp:1449
 msgid "Force update of this dialog's values"
 msgstr "لاگو کْریو اپڈیٹ کرْنئ ییمہ ڈایلاگْک ویلیو "
-
-#: modules/gui/qt/components/epg/EPGWidget.cpp:65
-msgid "No EPG Data Available"
-msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20085,6 +20135,11 @@ msgstr "یہ ماڈیول چُھ آوٹ پُٹ کران ٹرانسکوڈیڈ س�
 msgid "Base port"
 msgstr "بیس پورٹ "
 
+#: modules/gui/qt/components/sout/sout_widgets.cpp:380
+#: share/lua/http/dialogs/create_stream.html:139
+msgid "Stream name"
+msgstr "سِٹریم ناو "
+
 #: modules/gui/qt/components/sout/sout_widgets.cpp:418
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "یہ ماڈیول چُھ آوٹ پُٹ کران ٹرانسکوڈیڈ سٹریم أکس آیِس کاسٹْہ سْرورس کُن۔"
@@ -20117,9 +20172,10 @@ msgstr "تمام بوک مارْک کْریو ڈیلیٹ "
 msgid "Extract"
 msgstr "نیبر کْریو "
 
-#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
@@ -20173,6 +20229,19 @@ msgstr "&شروع "
 #: modules/gui/qt/dialogs/convert.cpp:159
 msgid "Containers"
 msgstr "کنٹینر "
+
+#: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:430
+msgid "Program Guide"
+msgstr "پروگرام گایِڈ "
+
+#: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
+#: modules/gui/qt/ui/about.h:290
+msgid "Update"
+msgstr "اپڈیٹ "
+
+#: modules/gui/qt/dialogs/epg.cpp:161
+msgid " (%1+ rated)"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20597,50 +20666,6 @@ msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
 "کیاہ توہیہ چھیو پْز پأتھ یژھان ریسیٹ کرنِہ پننِہ وی ایل سی میڈیا پْلییرْچ ترجیحات؟"
 
-#: modules/gui/qt/dialogs_provider.cpp:67
-msgid "Open Directory"
-msgstr "ڈاریکٹری کْریو اوپْن "
-
-#: modules/gui/qt/dialogs_provider.cpp:68
-msgid "Open Folder"
-msgstr "فولڈر کْریو اوپْن "
-
-#: modules/gui/qt/dialogs_provider.cpp:615
-msgid "Open playlist..."
-msgstr "پْلے لِسٹْہ  کْریو اوپْن ۔ ۔ ۔"
-
-#: modules/gui/qt/dialogs_provider.cpp:638
-msgid "XSPF playlist"
-msgstr "پْلے لِسٹْہ XSPF"
-
-#: modules/gui/qt/dialogs_provider.cpp:639
-msgid "M3U playlist"
-msgstr "پْلے لِسٹْہ M3U "
-
-#: modules/gui/qt/dialogs_provider.cpp:640
-msgid "M3U8 playlist"
-msgstr "پْلے لِسٹْہ M3U8"
-
-#: modules/gui/qt/dialogs_provider.cpp:658
-msgid "Save playlist as..."
-msgstr "پْلے لِستْہ کْریو محفوظ بطور ۔ ۔ ۔"
-
-#: modules/gui/qt/dialogs_provider.cpp:808
-msgid "Open subtitles..."
-msgstr "سب ٹایٹل کْریو اوپْن ۔ ۔ ۔"
-
-#: modules/gui/qt/dialogs_provider.hpp:40
-msgid "Media Files"
-msgstr "میڈیا فایلْہ "
-
-#: modules/gui/qt/dialogs_provider.hpp:44
-msgid "Subtitle Files"
-msgstr "سب ٹایٹل فایلْہ "
-
-#: modules/gui/qt/dialogs_provider.hpp:45
-msgid "All Files"
-msgstr "تمام فایلْہ "
-
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
 msgstr "سٹریم آوٹ پُٹ "
@@ -20863,6 +20888,61 @@ msgstr "شڈول:"
 msgid "VOD: "
 msgstr "وی او ڈی:"
 
+#: modules/gui/qt/dialogs_provider.cpp:67
+msgid "Open Directory"
+msgstr "ڈاریکٹری کْریو اوپْن "
+
+#: modules/gui/qt/dialogs_provider.cpp:68
+msgid "Open Folder"
+msgstr "فولڈر کْریو اوپْن "
+
+#: modules/gui/qt/dialogs_provider.cpp:615
+msgid "Open playlist..."
+msgstr "پْلے لِسٹْہ  کْریو اوپْن ۔ ۔ ۔"
+
+#: modules/gui/qt/dialogs_provider.cpp:638
+msgid "XSPF playlist"
+msgstr "پْلے لِسٹْہ XSPF"
+
+#: modules/gui/qt/dialogs_provider.cpp:639
+msgid "M3U playlist"
+msgstr "پْلے لِسٹْہ M3U "
+
+#: modules/gui/qt/dialogs_provider.cpp:640
+msgid "M3U8 playlist"
+msgstr "پْلے لِسٹْہ M3U8"
+
+#: modules/gui/qt/dialogs_provider.cpp:658
+msgid "Save playlist as..."
+msgstr "پْلے لِستْہ کْریو محفوظ بطور ۔ ۔ ۔"
+
+#: modules/gui/qt/dialogs_provider.cpp:808
+msgid "Open subtitles..."
+msgstr "سب ٹایٹل کْریو اوپْن ۔ ۔ ۔"
+
+#: modules/gui/qt/dialogs_provider.hpp:40
+msgid "Media Files"
+msgstr "میڈیا فایلْہ "
+
+#: modules/gui/qt/dialogs_provider.hpp:44
+msgid "Subtitle Files"
+msgstr "سب ٹایٹل فایلْہ "
+
+#: modules/gui/qt/dialogs_provider.hpp:45
+msgid "All Files"
+msgstr "تمام فایلْہ "
+
+#: modules/gui/qt/extensions_manager.cpp:181
+#: modules/gui/qt/extensions_manager.cpp:191
+#: modules/gui/qt/util/qmenuview.cpp:70
+msgid "Empty"
+msgstr ""
+
+#: modules/gui/qt/extensions_manager.cpp:197
+#, fuzzy
+msgid "Deactivate"
+msgstr "ایکٹیویٹ کْریو"
+
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
 msgstr "کیاہ توہیہ چھیو یژھان دوبار شروع کرُن پْلے بیک ییتنس یہ آف تراونْہ آو؟"
@@ -20967,10 +21047,6 @@ msgstr "ایفیکٹْہ تْہ فلٹر & "
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
 msgstr "ٹریک کْریو سینکرونایزیشن & "
-
-#: modules/gui/qt/menus.cpp:430
-msgid "Program Guide"
-msgstr "پروگرام گایِڈ "
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
@@ -21461,6 +21537,12 @@ msgstr "آگأہی "
 msgid "debug"
 msgstr "ڈیبگ کْریو "
 
+#: modules/gui/qt/util/searchlineedit.cpp:50
+#, fuzzy
+msgctxt "Tooltip|Clear"
+msgid "Clear"
+msgstr "کْلیر کْریو "
+
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
 msgstr "اکھ سیکین فایل کْریو اوپْن "
@@ -21561,6 +21643,80 @@ msgstr "سیکین ژأریو "
 msgid "Open skin..."
 msgstr "سیکین کْریو اوپْن ۔ ۔ ۔"
 
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/video_filter/adjust.c:61
+msgid "Brightness threshold"
+msgstr "چمک تھرش ہولڈْ "
+
+#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/video_filter/adjust.c:62
+msgid ""
+"When this mode is enabled, pixels will be shown as black or white. The "
+"threshold value will be the brightness defined below."
+msgstr ""
+"ییلہ یہ موڈ اینیبلْڈ آسان چُھ، پیکزل چھ ہاونْہ یوان بطور بُلیک یا وایِٹ۔ تھرش "
+"ہولڈْ ویلیو آسِہ چمک یوس بونْہ کْنئ واضح کْرتھ چِھ۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/video_filter/adjust.c:65
+msgid "Image contrast (0-2)"
+msgstr "امیج کنٹراسٹْہ  (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/video_filter/adjust.c:66
+msgid "Set the image contrast, between 0 and 2. Defaults to 1."
+msgstr "سیٹ کْریو امیج کنٹراستْہ، ۰ تْہ ۲ درمیان۔ ڈیفالٹْہ چُھ ۱ کُن۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/video_filter/adjust.c:67
+msgid "Image hue (0-360)"
+msgstr "امیج ہیو  (0-360)"
+
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/video_filter/adjust.c:68
+msgid "Set the image hue, between 0 and 360. Defaults to 0."
+msgstr "سیٹ کْریو امیج ہیو، ۰ تْہ ۳۶۰ درمیان۔ ڈیفالٹْہ ۰ کُن۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/video_filter/adjust.c:69
+msgid "Image saturation (0-3)"
+msgstr "امیج سیچوریشن (0-3)"
+
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/video_filter/adjust.c:70
+msgid "Set the image saturation, between 0 and 3. Defaults to 1."
+msgstr "سیٹ کْریو امیج سیچوریشن، ۰ تْہ  ۳رمیان۔ ڈیفالٹْہ ۱ کُن۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/video_filter/adjust.c:71
+msgid "Image brightness (0-2)"
+msgstr "امیج چمک (0-2)"
+
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/video_filter/adjust.c:72
+msgid "Set the image brightness, between 0 and 2. Defaults to 1."
+msgstr "سیٹ کْریو امیج چمک، ۰ تْہ ۲ درمیان۔ ڈیفالٹْہ چھ ۱ کُن۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/video_filter/adjust.c:73
+msgid "Image gamma (0-10)"
+msgstr "امیج گاما (0-10) "
+
+#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/video_filter/adjust.c:74
+msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
+msgstr "سیٹ کْریو امیج گاما، درمیان ۰۔۰۱ تْہ ۱۰۔ ڈیفالٹْہ چُھ ۱ کُن۔"
+
+#: modules/hw/d3d11/d3d11_filters.c:612
+#, fuzzy
+msgid "Direct3D11 filter"
+msgstr "ڈاریکٹْہ ایکْس ویڈیو ایکسیلریشن (DXVA) 2.0 "
+
+#: modules/hw/d3d9/d3d9_filters.c:429
+#, fuzzy
+msgid "Direct3D9 adjust filter"
+msgstr "ایڈجسٹْہ ویڈیو فلٹر VDPAU"
+
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr "ڈیکوڈ کْریو فریم ڈاریکٹلی آر پی آی ویڈیو کورس منز ہوسٹْہ میموری بجاے۔"
@@ -21624,6 +21780,16 @@ msgstr "MMAL vout"
 msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "۔بیسْڈ ووٹ پْلگ اِن ریسْپ بیری پاے باپتMMAL"
 
+#: modules/hw/vaapi/filters.c:1187
+#, fuzzy
+msgid "VAAPI filters"
+msgstr "آڈیو فلٹر"
+
+#: modules/hw/vaapi/filters.c:1188
+#, fuzzy
+msgid "Video Accelerated API filters"
+msgstr "ویڈیو سیکیلینگ فلٹر "
+
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
 msgstr "ایڈجسٹْہ ویڈیو فلٹر VDPAU"
@@ -21684,15 +21850,22 @@ msgstr "آوٹ پُٹ VDPAU"
 msgid "VDPAU sharpen video filter"
 msgstr "شارپْن ویڈیو فلٹر VDPAU"
 
-#: modules/hw/vaapi/filters.c:1187
+#: modules/keystore/file.c:54
 #, fuzzy
-msgid "VAAPI filters"
-msgstr "آڈیو فلٹر"
+msgid "file keystore (plaintext)"
+msgstr "ترجیح کرنْہ آمُت پیکیٹایزر لِسٹْہ"
 
-#: modules/hw/vaapi/filters.c:1188
-#, fuzzy
-msgid "Video Accelerated API filters"
-msgstr "ویڈیو سیکیلینگ فلٹر "
+#: modules/keystore/file.c:55
+msgid "secrets are stored on a file without any encryption"
+msgstr ""
+
+#: modules/keystore/file.c:65
+msgid "crypt keystore"
+msgstr ""
+
+#: modules/keystore/file.c:66
+msgid "secrets are stored encrypted on a file"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -21763,6 +21936,183 @@ msgstr ""
 #, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
 msgstr "تعاون TLS باپت  OS X تْہ iOS"
+
+#: modules/keystore/kwallet.c:48
+msgid "KWallet keystore"
+msgstr ""
+
+#: modules/keystore/kwallet.c:49
+msgid "Secrets are stored via KWallet"
+msgstr ""
+
+#: modules/keystore/memory.c:41
+#, fuzzy
+msgid "memory keystore"
+msgstr "ساوُٹ سِٹریم"
+
+#: modules/keystore/memory.c:42
+msgid "secrets are stored in memory"
+msgstr ""
+
+#: modules/keystore/secret.c:39
+msgid "libsecret keystore"
+msgstr ""
+
+#: modules/keystore/secret.c:40
+msgid "Secrets are stored via libsecret"
+msgstr ""
+
+#: modules/logger/android.c:85
+#, fuzzy
+msgid "Android log"
+msgstr "لوگو کْریو جمع "
+
+#: modules/logger/android.c:86
+msgid "Android log using logcat"
+msgstr ""
+
+#: modules/logger/console.c:114
+msgid "Be quiet"
+msgstr "ژھوپْہ کْریو"
+
+#: modules/logger/console.c:115
+#, fuzzy
+msgid "Turn off all messages on the console."
+msgstr "لاگ کْریو تمام وی ایل سی مسیج  أکس متن فایلہ کُن۔"
+
+#: modules/logger/console.c:118
+#, fuzzy
+msgid "Console log"
+msgstr "کنسول"
+
+#: modules/logger/console.c:119
+#, fuzzy
+msgid "Console logger"
+msgstr "کنسول"
+
+#: modules/logger/file.c:193
+msgid "HTML"
+msgstr ""
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Info"
+msgstr "مزید اِنفو "
+
+#: modules/logger/file.c:203
+#, fuzzy
+msgid "Debug"
+msgstr "ڈیبگ کْریو "
+
+#: modules/logger/file.c:205
+msgid "Log to file"
+msgstr "فایلِہ کُن کْریو لاگ"
+
+#: modules/logger/file.c:206
+msgid "Log all VLC messages to a text file."
+msgstr "لاگ کْریو تمام وی ایل سی مسیج  أکس متن فایلہ کُن۔"
+
+#: modules/logger/file.c:208
+msgid "Log filename"
+msgstr "لاگ فایل ناو "
+
+#: modules/logger/file.c:209
+msgid "Specify the log filename."
+msgstr "مخصوص کْریو لاگ فایل ناو "
+
+#: modules/logger/file.c:211
+msgid "Log format"
+msgstr "لاگ فارمیٹ "
+
+#: modules/logger/file.c:212
+msgid "Specify the logging format."
+msgstr "مخصوص کْریو لاگینگ فارمیٹ۔"
+
+#: modules/logger/file.c:214
+msgid "Verbosity"
+msgstr "وْربوسٹی "
+
+#: modules/logger/file.c:215
+#, fuzzy
+msgid ""
+"Select the logging verbosity or default to use the same verbosity given by --"
+"verbose."
+msgstr ""
+"ژأریو وْربوسٹی یوس استعمال کرْنئ چھ لاگ باپت یا منفی ۱ استعمال کرنْہ باپت کونیی "
+"وْربوسٹی یوس دِنْہ آمْژ چھ ۔ ۔ وْربوز ذریعہ۔"
+
+#: modules/logger/file.c:219
+#, fuzzy
+msgid "Logger"
+msgstr "لاگینگ "
+
+#: modules/logger/file.c:220
+#, fuzzy
+msgid "File logger"
+msgstr "فایل لاگینگ "
+
+#: modules/logger/journal.c:77
+msgid "Journal"
+msgstr ""
+
+#: modules/logger/journal.c:78
+msgid "SystemD journal logger"
+msgstr ""
+
+#: modules/logger/syslog.c:138
+msgid "System log (syslog)"
+msgstr ""
+
+#: modules/logger/syslog.c:139
+msgid "Emit log messages through the POSIX system log."
+msgstr ""
+
+#: modules/logger/syslog.c:141
+#, fuzzy
+msgid "Debug messages"
+msgstr "ڈی بگ کْریو ماسْک "
+
+#: modules/logger/syslog.c:142
+msgid "Include debug messages in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:144
+msgid "Identity"
+msgstr ""
+
+#: modules/logger/syslog.c:145
+msgid "Process identity in system log."
+msgstr ""
+
+#: modules/logger/syslog.c:147
+#, fuzzy
+msgid "Facility"
+msgstr "صلأحیت "
+
+#: modules/logger/syslog.c:148
+#, fuzzy
+msgid "System logging facility."
+msgstr "سیسلاگ فیسلٹی "
+
+#: modules/logger/syslog.c:151
+#, fuzzy
+msgid "syslog"
+msgstr "سِسلاگس کُن کْریو لاگ"
+
+#: modules/logger/syslog.c:152
+msgid "System logger (syslog)"
+msgstr ""
+
+#: modules/lua/extension.c:1185
+msgid "Extension not responding!"
+msgstr ""
+
+#: modules/lua/extension.c:1186
+#, c-format
+msgid ""
+"Extension '%s' does not respond.\n"
+"Do you want to kill it now? "
+msgstr ""
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22458,6 +22808,36 @@ msgstr "جےپاپ "
 msgid "Synthpop"
 msgstr "سینتھ پاپ "
 
+#: modules/misc/addons/fsstorage.c:83
+#, fuzzy
+msgid "addons local storage"
+msgstr "میکْس لوکل بِٹ ریٹ "
+
+#: modules/misc/addons/fsstorage.c:85
+msgid "Addons local storage installer"
+msgstr ""
+
+#: modules/misc/addons/fsstorage.c:93
+msgid "Addons local storage lister"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:62
+#, fuzzy
+msgid "Videolan.org's addons finder"
+msgstr "ویڈیو ٹرانسفارمیشن فلٹر "
+
+#: modules/misc/addons/vorepository.c:64
+msgid "addons.videolan.org addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:70
+msgid "Videolan.org's single archive addons finder"
+msgstr ""
+
+#: modules/misc/addons/vorepository.c:72
+msgid "single .vlp archive addons finder"
+msgstr ""
+
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
 msgstr "یوزر ناو تُہندِ پْتمہ ڈاٹ ایف ایم ایکاونٹُک "
@@ -22507,6 +22887,15 @@ msgstr ""
 "مہربأنی کْرتھ کْریو سیٹ اکھ یوزر ناو یا کْریو ڈیسیبْل آڈیوسکروبلر پْلگ اِن، تْہ "
 "کْریو دوبار  شروع وی ایل سی۔\n"
 " کْریو ویزیٹ حأصل کرنْہ باپت اکھ ایکاوُنٹ۔http://www.last.fm/join/ "
+
+#: modules/misc/fingerprinter.c:73
+#, fuzzy
+msgid "acoustid"
+msgstr "ایکاوسٹِک "
+
+#: modules/misc/fingerprinter.c:74
+msgid "Track fingerprinter (based on Acoustid)"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 #, fuzzy
@@ -22841,10 +23230,6 @@ msgstr "سبجکٹْہ "
 #: modules/mux/avi.c:56
 msgid "Encoder"
 msgstr "اینکوڈر "
-
-#: modules/mux/avi.c:57
-msgid "Keywords"
-msgstr "کی وأرڈ "
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23313,6 +23698,18 @@ msgstr "پیکچر "
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
 msgstr "ماے پیکچر "
+
+#: modules/services_discovery/microdns.c:44
+#: modules/services_discovery/microdns.c:57
+#: modules/services_discovery/microdns.c:620
+#, fuzzy
+msgid "mDNS Network Discovery"
+msgstr "بونجور سْروِس "
+
+#: modules/services_discovery/microdns.c:65
+#, fuzzy
+msgid "mDNS Renderer Discovery"
+msgstr "بونجور سْروِس "
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24489,6 +24886,63 @@ msgstr "بریج آوٹ "
 msgid "Bridge in"
 msgstr "بریج اِن "
 
+#: modules/stream_out/chromecast/cast.cpp:103
+#, fuzzy
+msgid "HTTP port"
+msgstr "پورٹSFTP"
+
+#: modules/stream_out/chromecast/cast.cpp:104
+msgid ""
+"This sets the HTTP port of the local server used to stream the media to the "
+"Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:107
+msgid "The Chromecast receiver can receive video."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:109
+#, fuzzy
+msgid "This sets the muxer used to stream to the Chromecast."
+msgstr "یہ ماڈیول چُھ آوٹ پُٹ کران ٹرانسکوڈیڈ سٹریم أکس آیِس کاسٹْہ سْرورس کُن۔"
+
+#: modules/stream_out/chromecast/cast.cpp:110
+msgid "MIME content type"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:111
+msgid "This sets the media MIME content type sent to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:114
+#, fuzzy
+msgid "IP Address of the Chromecast."
+msgstr "ایڈرس کمپیوٹرک  یتھ کُن سٹریم کرُن چُھ "
+
+#: modules/stream_out/chromecast/cast.cpp:115
+#, fuzzy
+msgid "Chromecast port"
+msgstr "کروما فارمیٹ "
+
+#: modules/stream_out/chromecast/cast.cpp:116
+msgid "The port used to talk to the Chromecast."
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:120
+#, fuzzy
+msgid "Chromecast"
+msgstr "کروما "
+
+#: modules/stream_out/chromecast/cast.cpp:121
+#, fuzzy
+msgid "Chromecast stream output"
+msgstr "بریج سٹریم آوٹ پُٹ "
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#, fuzzy
+msgid "chromecast demux wrapper"
+msgstr "اے وی فارمیٹ ڈیمکسر "
+
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
@@ -24545,6 +24999,10 @@ msgstr "انٹروڈوس کْریو اکھ ڈیلے سٹریم کِس ڈیسپْ
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
 msgstr "ڈیسپْلے کْریو سٹریم آوٹ پُٹ "
+
+#: modules/stream_out/dummy.c:50
+msgid "Dummy stream output"
+msgstr "ڈمی سٹریم آوٹ پُٹ"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -24843,6 +25301,10 @@ msgstr ""
 "یہ چُھ سوزان تْہ رٹان آر ٹی سی پی پیکیٹ یم ملٹی پْلیکسْڈ آسن چھ تْتھ پورٹس پیٹھ "
 "یتھ ذن آر ٹی پی پیکیٹ آسن چِھ۔"
 
+#: modules/stream_out/rtp.c:135
+msgid "Caching value (ms)"
+msgstr "کیشینگ ویلیو (ملی سیکنڈ)"
+
 #: modules/stream_out/rtp.c:137
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
@@ -24892,6 +25354,15 @@ msgstr ""
 " سیشن یِیہ بند کرنْہ  اگر ذن نْہ رٹنْہ یِیہ کانہہ آر ٹی ایس پی درخواست ییتس کالس "
 "باپت۔ یہ أکس منفی ویلیو یا صفرس کُن سیٹ کرنْہ سْیتئ گژھن ڈیسیبْل ٹایم آوٹ۔ "
 "ڈیفالٹْہ چُھ ۶۰ ( اکھ منٹ)۔ RTSP "
+
+#: modules/stream_out/rtp.c:174
+#, fuzzy
+msgid "Username that will be requested to access the stream."
+msgstr "یوزر ناو یوس درخواست کرنْہ یِیہ سِٹریم ایسیس کرنْہ باپت۔"
+
+#: modules/stream_out/rtp.c:177
+msgid "Password that will be requested to access the stream."
+msgstr "پاس وأرڈ  یوس درخواست کرنْہ یِیہ سِٹریم ایسیس کرنْہ باپت۔"
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -25562,58 +26033,6 @@ msgstr "ایس ڈبلیو سیکیل "
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
 msgstr "کنوأرٹر YUVP"
-
-#: modules/video_filter/adjust.c:61
-msgid "Brightness threshold"
-msgstr "چمک تھرش ہولڈْ "
-
-#: modules/video_filter/adjust.c:62
-msgid ""
-"When this mode is enabled, pixels will be shown as black or white. The "
-"threshold value will be the brightness defined below."
-msgstr ""
-"ییلہ یہ موڈ اینیبلْڈ آسان چُھ، پیکزل چھ ہاونْہ یوان بطور بُلیک یا وایِٹ۔ تھرش "
-"ہولڈْ ویلیو آسِہ چمک یوس بونْہ کْنئ واضح کْرتھ چِھ۔"
-
-#: modules/video_filter/adjust.c:65
-msgid "Image contrast (0-2)"
-msgstr "امیج کنٹراسٹْہ  (0-2)"
-
-#: modules/video_filter/adjust.c:66
-msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "سیٹ کْریو امیج کنٹراستْہ، ۰ تْہ ۲ درمیان۔ ڈیفالٹْہ چُھ ۱ کُن۔"
-
-#: modules/video_filter/adjust.c:67
-msgid "Image hue (0-360)"
-msgstr "امیج ہیو  (0-360)"
-
-#: modules/video_filter/adjust.c:68
-msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "سیٹ کْریو امیج ہیو، ۰ تْہ ۳۶۰ درمیان۔ ڈیفالٹْہ ۰ کُن۔"
-
-#: modules/video_filter/adjust.c:69
-msgid "Image saturation (0-3)"
-msgstr "امیج سیچوریشن (0-3)"
-
-#: modules/video_filter/adjust.c:70
-msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "سیٹ کْریو امیج سیچوریشن، ۰ تْہ  ۳رمیان۔ ڈیفالٹْہ ۱ کُن۔"
-
-#: modules/video_filter/adjust.c:71
-msgid "Image brightness (0-2)"
-msgstr "امیج چمک (0-2)"
-
-#: modules/video_filter/adjust.c:72
-msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "سیٹ کْریو امیج چمک، ۰ تْہ ۲ درمیان۔ ڈیفالٹْہ چھ ۱ کُن۔"
-
-#: modules/video_filter/adjust.c:73
-msgid "Image gamma (0-10)"
-msgstr "امیج گاما (0-10) "
-
-#: modules/video_filter/adjust.c:74
-msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "سیٹ کْریو امیج گاما، درمیان ۰۔۰۱ تْہ ۱۰۔ ڈیفالٹْہ چُھ ۱ کُن۔"
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -27306,6 +27725,15 @@ msgstr "اوپْن جی ایل ویڈیو آوٹ پُٹ "
 msgid "Windows GDI video output"
 msgstr "وینڈوز جی ڈی آی ویڈیو آوٹ پُٹ "
 
+#: modules/video_output/win32/wgl.c:42
+msgid "GPU affinity"
+msgstr "جی پی یو ایفینیٹی "
+
+#: modules/video_output/win32/wgl.c:46
+#, fuzzy
+msgid "WGL extension for OpenGL"
+msgstr "ای جی ایل ایکْسٹینشن اوپْن جی ایلس باپت "
+
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
 msgstr "ڈمی امیج کروما فارمیٹ"
@@ -27788,6 +28216,26 @@ msgstr "وال ویڈیو فلٹر "
 msgid "Image wall"
 msgstr "امیج وال "
 
+#: modules/visualization/glspectrum.c:56
+#, fuzzy
+msgid "The width of the visualization window, in pixels."
+msgstr "کھجر ویڈیو وینڈو ہُند، پیکزلن منز "
+
+#: modules/visualization/glspectrum.c:59
+#, fuzzy
+msgid "The height of the visualization window, in pixels."
+msgstr "تھزر ویڈیو وینڈو ہُند، پیکزلن منز "
+
+#: modules/visualization/glspectrum.c:62
+#, fuzzy
+msgid "glSpectrum"
+msgstr "سُپیکٹرم"
+
+#: modules/visualization/glspectrum.c:63
+#, fuzzy
+msgid "3D OpenGL spectrum visualization"
+msgstr "موجود ویجوالایزیشن"
+
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
 msgstr "گوم ڈیسپْلے کھجر "
@@ -28245,10 +28693,6 @@ msgstr "کیاہ توہیہ چھیو پْز پأٹھ یژھان بناوْنئ �
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Dialog"
 msgstr "ڈایلاگ "
-
-#: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
-msgid "Update"
-msgstr "اپڈیٹ "
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -29109,6 +29553,273 @@ msgid "Media Manager List"
 msgstr "میڈیا منیجر لِسٹْہ"
 
 #, fuzzy
+#~ msgid "Sox Resampling quality"
+#~ msgstr "ریسیمپیلینگ کالٹی "
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "سیکیلینگ کالتی "
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "رینڈرینگ کالٹی "
+
+#~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+#~ msgstr ""
+#~ "ریسیمپیلینگ کالٹی   (0 =خراب ترین تْہ تیز ترین, 10 = بہترین تْہ آہستْہ).۔ "
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "شروع ٹایم"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "ٹیونر مُلک کوڈ"
+
+#~ msgid "Keep existing file"
+#~ msgstr "موجود فایل تھأیو "
+
+#~ msgid "Overwrite"
+#~ msgstr "اوور رایِٹ کْریو "
+
+#~ msgid ""
+#~ "The output file already exists. If recording continues, the file will be "
+#~ "overridden and its content will be lost."
+#~ msgstr ""
+#~ "آوٹ پُٹ فایل چُھ گوڈے موجود۔ اگر ریکارڈینگ جأری تھاوو، یہ فایل یِیہ اوور "
+#~ "رایِڈ کرنْہ تْہ امیوک کنٹینٹ راوِ۔"
+
+#~ msgid "Overwrite existing file"
+#~ msgstr "اوور رایِٹ کْریو موجود فایل"
+
+#~ msgid "If the file already exists, it will be overwritten."
+#~ msgstr "اگرفایل گوڈے موجود آسِہ، یہ یِیہ اوور رایِٹ کرِنْہ۔"
+
+#~ msgid "Append to file"
+#~ msgstr "فایلہ کْریو جمع "
+
+#~ msgid "Append to file if it exists instead of replacing it."
+#~ msgstr "فایلہ کْریو جمع اگر یہ موجود آسہ یہ بدلاونْچ جاے۔ "
+
+#~ msgid "Format time and date"
+#~ msgstr "فارمیٹ کْریو ٹایم تْہ تأریخ"
+
+#~ msgid "Perform ISO C time and date formatting on the file path"
+#~ msgstr "کْریو آی ایس او سی ٹایِم تْہ ڈیٹ فارمیٹینگ فایل پاتھس پیٹھ"
+
+#~ msgid "Synchronous writing"
+#~ msgstr "سینکرونس لکھأئ"
+
+#~ msgid "Open the file with synchronous writing."
+#~ msgstr "فایل کْریو اوپْن سینکرونس رایٹینگ سْیت۔"
+
+#~ msgid "File stream output"
+#~ msgstr "فایل سِٹریم آوٹ پُٹ "
+
+#~ msgid "MIME returned by the server (autodetected if not specified)."
+#~ msgstr "مایم یوس سْرورن واپس کور ( آٹو ڈیٹیکٹِڈ اگر نْہ مخصوص کرنْہ یِیہ)۔"
+
+#~ msgid "Metacube"
+#~ msgstr "میٹا کیوب "
+
+#~ msgid ""
+#~ "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
+#~ msgstr ""
+#~ "استعمال کْریو میٹاکیوب پروٹوکال۔ ضرورت چُھ سٹریم کرنْہ باپت کیوب میپ "
+#~ "ریفلیکٹرس کُن۔"
+
+#~ msgid "HTTP stream output"
+#~ msgstr "ایچ ٹی ٹی پی سِٹریم آوٹ پُٹ "
+
+#~ msgid "Segment length"
+#~ msgstr "سیگمینٹ زیچھر "
+
+#~ msgid "Length of TS stream segments"
+#~ msgstr "زیچھر ٹی ایس سِٹریم سیگمینٹن ہُند "
+
+#~ msgid "Split segments anywhere"
+#~ msgstr "سُپلِٹ کریو سیگمینٹ کونِہ تِہ جاے "
+
+#~ msgid ""
+#~ "Don't require a keyframe before splitting a segment. Needed for audio "
+#~ "only."
+#~ msgstr ""
+#~ "کی فریم چُھ نْہ ضرورت اکھ سیگمینٹ سُپلِٹ کرنْہ برونہہ۔ ضرورت چُھ صرف آڈیو باپت۔"
+
+#~ msgid "Number of segments"
+#~ msgstr "سیگمینٹن ہُند تعداد "
+
+#~ msgid "Number of segments to include in index"
+#~ msgstr "سیگمینٹن ہُند تعداد یم شأمل کرْنئ چھ اِنڈیکسس منز "
+
+#~ msgid "Allow cache"
+#~ msgstr "کیشے دِیو اجازت "
+
+#~ msgid ""
+#~ "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
+#~ msgstr ""
+#~ "کْریو جمع: کانہہ ڈاریکٹیو چُھ نْہ پْلے لِسٹْہ فایلہ منز اگر یہ ڈیسیبْل کرنْہ یِیہ  "
+#~ "EXT-X-ALLOW-CACHE"
+
+#~ msgid "Index file"
+#~ msgstr "اِنڈیکْس فایل"
+
+#~ msgid "Path to the index file to create"
+#~ msgstr "پاتھ اِنڈیکْس فایلِہ کُن بناونْہ باپت"
+
+#~ msgid "Full URL to put in index file"
+#~ msgstr "فُل یو آر ایل یوس اِنڈیکْس فایلہ منز تھاوُن چُھ "
+
+#~ msgid "Full URL to put in index file. Use #'s to represent segment number"
+#~ msgstr ""
+#~ "فُل یو آر ایل یوس اِنڈیکْس فایلہ منز تھاوُن چُھ۔  #'s کْریو استعمال سیگمینٹ "
+#~ "نمبر ہاونْہ باپت "
+
+#~ msgid "Delete segments"
+#~ msgstr "سیگمینٹ کْریو ڈیلیٹ "
+
+#~ msgid "Delete segments when they are no longer needed"
+#~ msgstr "سیگمینٹ کْریو ڈیلیٹ ییلِہ نْہ تِم وْنئ ضرورت آسن"
+
+#~ msgid "Use muxers rate control mechanism"
+#~ msgstr "استعمال کْریو مکسر ریٹ کنٹرول میکانیزْم"
+
+#~ msgid "AES key URI to place in playlist"
+#~ msgstr "اے ای ایس کی یو آر آی یوس تھاون چُھ پْلے لِسٹس منز "
+
+#~ msgid "AES key file"
+#~ msgstr "اے ای ایس کی فایل"
+
+#~ msgid "File containing the 16 bytes encryption key"
+#~ msgstr "فایل یتھ منز موجود چھ ۱۶ بایِٹ اینکریپشن کی"
+
+#~ msgid "File where vlc reads key-uri and keyfile-location"
+#~ msgstr "فایل ییتنس وی ایل سی ریڈ کران چُھ کی۔یو آر ای تْہ کی فایل۔جاے"
+
+#, fuzzy
+#~ msgid ""
+#~ "File is read when segment starts and is assumed to be in format: key-uri"
+#~ "\\nkey-file. File is read on the segment opening and values are used on "
+#~ "that segment."
+#~ msgstr ""
+#~ "فایل چھ ریڈ کرنْہ یوان ییلہ سیگمینٹ شروع گژھان چُھ تْہ چُھ ماننْہ یوان فارمیٹس "
+#~ "منز: کی۔یو آر آیi\\nکی۔فایل۔ فایل چھ ریڈ کرنْہ یوان سیگمینٹ اوپینینگ پیٹھ "
+#~ "تْہ ویلیو چِھ استعمال کرنْہ یوان تتھ سیگمینٹس  پیٹھ۔ "
+
+#~ msgid "Use randomized IV for encryption"
+#~ msgstr "استعمال کْریو رینڈامایزْڈ آی وی اینکریپشن باپت "
+
+#~ msgid "Generate IV instead using segment-number as IV"
+#~ msgstr ""
+#~ "جنریٹ کْریو آی وی امہ بجاے ذِ توہیہ کْریو استعمال سیگمینٹ نمبر بطور آی وی "
+
+#~ msgid "Number of first segment"
+#~ msgstr "نمبر گوڈنیک سیگمینٹُک "
+
+#~ msgid "The number of the first segment generated"
+#~ msgstr "نمبر گوڈنیک سیگمینٹُک یوس جنریٹ کرنْہ آمُت چُھ   "
+
+#~ msgid "HTTP Live streaming output"
+#~ msgstr "ایچ ٹی ٹی پی لایِو سِٹریمینگ آوٹ پُٹ "
+
+#~ msgid "LiveHTTP"
+#~ msgstr "لایِو ایچ ٹی ٹی پی "
+
+#~ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+#~ msgstr ""
+#~ "ناو یوس یتھ سِٹریم دیون چُھ/چنل یوس شاوُٹ کاسٹس پیٹھ چِھ/آیِس کاسٹْہ سْرور۔"
+
+#~ msgid "Stream description"
+#~ msgstr "سِٹریم وضاحت "
+
+#~ msgid "Description of the stream content or information about your channel."
+#~ msgstr "وضاحت سِٹریم کنٹینٹْچ  یا انفارمیشن تُہنزِ چنلِہ ہْنز۔"
+
+#~ msgid "Stream MP3"
+#~ msgstr "سِٹریم ایم پی ۳ "
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the shoutcast/icecast server."
+#~ msgstr ""
+#~ "توہیہ چھیو نارملی فیڈ کرُن شاوُٹ کاسٹْہ ماڈیول اوگ سِٹریمن سْیت۔ یہ تِہ چُھ مُمکن "
+#~ "ذِ توہیہ کْریو سٹریم ایم پی ۳ امِہ بجاے، یُتھ ذن توہیہ فاروأرڈ کْرتھ ہیکیو ایم "
+#~ "پی ۳ سِٹریم شاوُٹ کاسٹس کُن یا آیِس کاسٹْہ سْرورس کُن۔"
+
+#~ msgid "Genre description"
+#~ msgstr "جنر وضاحت"
+
+#, fuzzy
+#~ msgid "Genre of the content."
+#~ msgstr "کنٹینٹُک جنر۔"
+
+#, fuzzy
+#~ msgid "URL with information about the stream or your channel."
+#~ msgstr "یو آر ایل یتھ منز انفارمیشن چھ سِٹریم ہْنز یا تُہنزِ چنلِہ ہْنز۔"
+
+#, fuzzy
+#~ msgid "Bitrate information of the transcoded stream."
+#~ msgstr "بایٹریٹ انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
+
+#, fuzzy
+#~ msgid "Samplerate information of the transcoded stream."
+#~ msgstr "سیمپْل ریٹ انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
+
+#~ msgid "Number of channels"
+#~ msgstr "چنلن ہُند نمبر "
+
+#, fuzzy
+#~ msgid "Number of channels information of the transcoded stream."
+#~ msgstr "تعداد چنلن ہُند  انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
+
+#~ msgid "Ogg Vorbis Quality"
+#~ msgstr "اوگ ووربِس کالٹی"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Quality information of the transcoded stream."
+#~ msgstr "اوگ ووربِس کالٹی انفارمیشن ٹرانسکوڈیڈ سِٹریمْچ۔"
+
+#~ msgid "Stream public"
+#~ msgstr "سِٹریم پبلِک"
+
+#~ msgid ""
+#~ "Make the server publicly available on the 'Yellow Pages' (directory "
+#~ "listing of streams) on the icecast/shoutcast website. Requires the "
+#~ "bitrate information specified for shoutcast. Requires Ogg streaming for "
+#~ "icecast."
+#~ msgstr ""
+#~ "سْرور بنأیو پبلکلی دستیاب یلو پیجن پیٹھ ( ڈاریکٹری لِسٹینگ سِٹریمن ہْنز)     "
+#~ "شاوٹ کاسٹْہ/آیس کاسٹْہویب سایِٹ پیٹھ اتھ چھ ضرورت بایٹریٹ انفارمیشن یوس "
+#~ "مخصوص کرنْہ آمژ چھ شاوٹ کاسٹس باپت۔ اتھ چھ ضرورت اوگ سِٹریمینگ آیِس کاسٹس "
+#~ "باپت۔"
+
+#~ msgid "IceCAST output"
+#~ msgstr "آیِس کاسٹہ آوٹ پُٹ "
+
+#~ msgid ""
+#~ "Default caching value for outbound UDP streams. This value should be set "
+#~ "in milliseconds."
+#~ msgstr ""
+#~ "ڈیفالٹْہ کیشینگ ویلیو آوٹ باوُنڈ یو ڈی پی سِٹریمن باپت۔ یہ ویلیو چُھ سیٹ کرُن "
+#~ "ملی سیکنڈن منز۔"
+
+#~ msgid "Group packets"
+#~ msgstr "گروپ پیکیٹ "
+
+#~ msgid ""
+#~ "Packets can be sent one by one at the right time or by groups. You can "
+#~ "choose the number of packets that will be sent at a time. It helps "
+#~ "reducing the scheduling load on heavily-loaded systems."
+#~ msgstr ""
+#~ "پیکیٹ ہیکو سوزِتھ اکِہ اکِہ صحیح وقتس پیٹھ یا گروپو ذریعہ۔ توہیہ ہیکیو ژأرتھ "
+#~ "تعداد پیکٹن ہُند یم ذن سوزنْہ یِن اکِہ سات۔ امہ سْیت چُھ ژدولینگ لوڈ کم گژھان "
+#~ "گوبیر والین سِسٹمن پیٹھ۔"
+
+#~ msgid "UDP stream output"
+#~ msgstr "یو ڈی پی سِٹریم آوٹ پُٹ "
+
+#, fuzzy
 #~ msgid "Disable lua"
 #~ msgstr "ڈیسیبْل کْریو "
 
@@ -29124,9 +29835,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "Navigation"
 #~ msgstr "نیویگیشن"
-
-#~ msgid "Be quiet"
-#~ msgstr "ژھوپْہ کْریو"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "بند کْریو تمام آگأہی تْہ انفارمیشن مسیج۔"
@@ -29157,15 +29865,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ msgstr ""
 #~ "یتھ فایلہ منز چُھ اکھ اوپشنل سی آر ایل یوس رُکاوان چُھ ریموٹ کْلاینٹن استعمال "
 #~ "کرنْہ نِش ریووک کرنْہ آمژْ سرٹیفیکیٹ ٹی ایل ایس سیشنن منز۔"
-
-#~ msgid "Log to file"
-#~ msgstr "فایلِہ کُن کْریو لاگ"
-
-#~ msgid "Log all VLC messages to a text file."
-#~ msgstr "لاگ کْریو تمام وی ایل سی مسیج  أکس متن فایلہ کُن۔"
-
-#~ msgid "Log to syslog"
-#~ msgstr "سِسلاگس کُن کْریو لاگ"
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "لاگ کْریو تمام وی ایل سی مسیج سیسلاگس کُن (یونیکْس سسٹم)"
@@ -29211,9 +29910,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "Configure"
 #~ msgstr "کنفیگر کْریو "
-
-#~ msgid "Channel number"
-#~ msgstr "چنل نمبر "
 
 #~ msgid ""
 #~ "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
@@ -29307,19 +30003,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "Video Capture height"
 #~ msgstr "ویڈیو کیپچر تھزر "
-
-#~ msgid "Quicktime Capture"
-#~ msgstr "کویِک ٹایم کیپچر"
-
-#~ msgid "No Input device found"
-#~ msgstr "کانہہ اِنپُٹ ڈیوایِس آو نْہ لبنْہ"
-
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "تُہند میک چُھ نْہ باسان صلأحیت تھاوان اکِہ موأفق اِنپُٹ ڈیواسْچ۔ مہربأنی کْرتھ "
-#~ "کْریو چک پنْینی کنیکٹر تْہ ڈرایور۔"
 
 #~ msgid "RDP auth username"
 #~ msgstr "آر ڈی پی آتھ یوزر ناو "
@@ -29561,90 +30244,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "DRM protected streams are not supported."
 #~ msgstr "ڈی آر ایم سْیت محفوظ کرنْہ آمژْ سٹریمن چُھ نْہ تعاون۔"
-
-#~ msgid "Writer"
-#~ msgstr "لْکھأر "
-
-#~ msgid "Composer"
-#~ msgstr "کمپوزر "
-
-#~ msgid "Producer"
-#~ msgstr "پروڈوسر "
-
-#~ msgid "Disclaimer"
-#~ msgstr "ڈیسکْلیمر "
-
-#~ msgid "Requirements"
-#~ msgstr "ضرورت "
-
-#~ msgid "Original Format"
-#~ msgstr "اصلی فارمیٹ "
-
-#~ msgid "Display Source As"
-#~ msgstr "ڈیسپْلے کْریو سورس بطور "
-
-#~ msgid "Host Computer"
-#~ msgstr "ہوسٹْہ کمپیوٹر "
-
-#~ msgid "Performers"
-#~ msgstr "پْرفارمر "
-
-#~ msgid "Original Performer"
-#~ msgstr "اصلی پْرفارمر "
-
-#~ msgid "Providers Source Content"
-#~ msgstr "فراہم کرن وألی سُند سورس کنٹینٹ "
-
-#~ msgid "Warning"
-#~ msgstr "آگأہی "
-
-#~ msgid "Software"
-#~ msgstr "سافٹْہ وِیر "
-
-#~ msgid "Record Company"
-#~ msgstr "ریکارڈ کمپنی"
-
-#~ msgid "Model"
-#~ msgstr "ماڈل "
-
-#~ msgid "Grouping"
-#~ msgstr "گروپینگ "
-
-#~ msgid "Sub-Title"
-#~ msgstr "سب۔ٹایٹل "
-
-#~ msgid "Arranger"
-#~ msgstr "ارینجر "
-
-#~ msgid "Art Director"
-#~ msgstr "آرٹ ڈاریکٹر "
-
-#~ msgid "Copyright Acknowledgement"
-#~ msgstr "کاپی رایِٹ ایکنالیجمینٹ "
-
-#~ msgid "Conductor"
-#~ msgstr "کنڈکٹر "
-
-#~ msgid "Song Description"
-#~ msgstr "بأتھْچ وضاحت "
-
-#~ msgid "Liner Notes"
-#~ msgstr "لاینر نوٹ "
-
-#~ msgid "Phonogram Rights"
-#~ msgstr "فونوگرام حقوق "
-
-#~ msgid "Sound Engineer"
-#~ msgstr "آواز انجینر "
-
-#~ msgid "Soloist"
-#~ msgstr "سولواِسٹْہ"
-
-#~ msgid "Thanks"
-#~ msgstr "شُکریہ "
-
-#~ msgid "Executive Producer"
-#~ msgstr "ایکزیکیوٹیو پروڈوسر "
 
 #~ msgid "Desired frame rate for the H264 stream."
 #~ msgstr "من پسند فریم ریٹ ایچ ۲۶۴ سِٹریمس باپت "
@@ -30114,9 +30713,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ "یہ ویزارڈ چُھ اجازت دِوان کنفیگر کرنس سادْ سٹریمینگ یا ٹرانسکوڈینگ کرنس منز "
 #~ "سیٹ اپ۔"
 
-#~ msgid "More Info"
-#~ msgstr "مزید اِنفو "
-
 #~ msgid ""
 #~ "This wizard only gives access to a small subset of VLC's streaming and "
 #~ "transcoding capabilities. The Open and 'Saving/Streaming' dialogs will "
@@ -30162,9 +30758,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "Streaming method"
 #~ msgstr "سٹریمینگ میتھڈ "
-
-#~ msgid "Address of the computer to stream to."
-#~ msgstr "ایڈرس کمپیوٹرک  یتھ کُن سٹریم کرُن چُھ "
 
 #~ msgid "UDP Unicast"
 #~ msgstr " یونیکاسٹْہ UDP "
@@ -30411,9 +31004,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ msgid "A->B Loop"
 #~ msgstr "A->B لوپ "
 
-#~ msgid "Current visualization"
-#~ msgstr "موجود ویجوالایزیشن"
-
 #~ msgid "&Write changes to config"
 #~ msgstr "تبدیلی لیکھیو کنفیگس &"
 
@@ -30439,12 +31029,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ msgid "Inhibits power suspend and session idle timeout."
 #~ msgstr "منع کران پاور سسپینڈ تْہ سیشن آیڈل ٹایم آوٹ۔"
 
-#~ msgid "Log format"
-#~ msgstr "لاگ فارمیٹ "
-
-#~ msgid "Specify the logging format."
-#~ msgstr "مخصوص کْریو لاگینگ فارمیٹ۔"
-
 #~ msgid "Syslog ident"
 #~ msgstr "سسی لاگ آّیڈینٹ"
 
@@ -30452,27 +31036,8 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ msgstr ""
 #~ "سیٹ کْریو آیڈینٹ یوس وی ایل سی استعمال کرِ ییلہ لاگ کران آسِہ سیسلاگس کُن۔ "
 
-#~ msgid "Syslog facility"
-#~ msgstr "سیسلاگ فیسلٹی "
-
 #~ msgid "Select the syslog facility where logs will be forwarded."
 #~ msgstr "ژأریو سِسلاگ سہولیت ییتنس لاگ فاروأرڈ کرنْہ یِن۔"
-
-#~ msgid "Verbosity"
-#~ msgstr "وْربوسٹی "
-
-#~ msgid ""
-#~ "Select the verbosity to use for log or -1 to use the same verbosity given "
-#~ "by --verbose."
-#~ msgstr ""
-#~ "ژأریو وْربوسٹی یوس استعمال کرْنئ چھ لاگ باپت یا منفی ۱ استعمال کرنْہ باپت "
-#~ "کونیی وْربوسٹی یوس دِنْہ آمْژ چھ ۔ ۔ وْربوز ذریعہ۔"
-
-#~ msgid "Log filename"
-#~ msgstr "لاگ فایل ناو "
-
-#~ msgid "Specify the log filename."
-#~ msgstr "مخصوص کْریو لاگ فایل ناو "
 
 #~ msgid "Local drives"
 #~ msgstr "لوکل ڈرایوْ"
@@ -30856,9 +31421,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 #~ msgid "Hue windowing"
 #~ msgstr "ہیو وینڈو وینگ "
 
-#~ msgid "Used for statistics."
-#~ msgstr "استعمال گژھان سیٹیٹیسٹیکْس "
-
 #~ msgid "Sat windowing"
 #~ msgstr "سیٹ وینڈووینگ "
 
@@ -31082,9 +31644,6 @@ msgstr "میڈیا منیجر لِسٹْہ"
 
 #~ msgid "Direct2D video output"
 #~ msgstr "ڈاریکٹْہ ۲ڈی ویڈیو آوٹ پُٹ"
-
-#~ msgid "GPU affinity"
-#~ msgstr "جی پی یو ایفینیٹی "
 
 #~ msgid "SDL chroma format"
 #~ msgstr "ایس ڈی ایل کروما فارمیٹ "
