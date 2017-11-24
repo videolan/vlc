@@ -1,5 +1,5 @@
---- ../tarballs/dxva2api.idl	2017-06-13 14:45:14.598269100 +0200
-+++ dxva2api/dxva2api.idl	2017-06-26 10:08:58.732675300 +0200
+--- a/dxva2api/dxva2api.idl	2017-06-13 14:45:14.598269100 +0200
++++ b/dxva2api/dxva2api.idl	2017-06-26 10:08:58.732675300 +0200
 @@ -6,6 +6,8 @@
  
  import "unknwn.idl";
