@@ -2900,26 +2900,30 @@ static void MP4_FreeBox_stsc( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_stsc( stream_t *p_stream, MP4_Box_t *p_box )
 {
+    uint32_t count;
+
     MP4_READBOX_ENTER( MP4_Box_data_stsc_t, MP4_FreeBox_stsc );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_stsc );
+    MP4_GET4BYTES( count );
 
-    MP4_GET4BYTES( p_box->data.p_stsc->i_entry_count );
+    if( UINT64_C(12) * count > (uint64_t)i_read )
+        MP4_READBOX_EXIT( 0 );
 
-    p_box->data.p_stsc->i_first_chunk =
-        calloc( p_box->data.p_stsc->i_entry_count, sizeof(uint32_t) );
-    p_box->data.p_stsc->i_samples_per_chunk =
-        calloc( p_box->data.p_stsc->i_entry_count, sizeof(uint32_t) );
-    p_box->data.p_stsc->i_sample_description_index =
-        calloc( p_box->data.p_stsc->i_entry_count, sizeof(uint32_t) );
+    p_box->data.p_stsc->i_first_chunk = vlc_alloc( count, sizeof(uint32_t) );
+    p_box->data.p_stsc->i_samples_per_chunk = vlc_alloc( count,
+                                                         sizeof(uint32_t) );
+    p_box->data.p_stsc->i_sample_description_index = vlc_alloc( count,
+                                                            sizeof(uint32_t) );
     if( unlikely( p_box->data.p_stsc->i_first_chunk == NULL
      || p_box->data.p_stsc->i_samples_per_chunk == NULL
      || p_box->data.p_stsc->i_sample_description_index == NULL ) )
     {
         MP4_READBOX_EXIT( 0 );
     }
+    p_box->data.p_stsc->i_entry_count = count;
 
-    for( unsigned int i = 0; (i < p_box->data.p_stsc->i_entry_count )&&( i_read >= 12 );i++ )
+    for( uint32_t i = 0; i < count;i++ )
     {
         MP4_GET4BYTES( p_box->data.p_stsc->i_first_chunk[i] );
         MP4_GET4BYTES( p_box->data.p_stsc->i_samples_per_chunk[i] );
