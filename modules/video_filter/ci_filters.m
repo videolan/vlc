@@ -86,7 +86,6 @@ struct  ci_filters_ctx
     video_format_t              cvpx_pool_fmt;
     CVPixelBufferPoolRef        outconv_cvpx_pool;
     CIContext *                 ci_ctx;
-    CGColorSpaceRef             color_space;
     struct filter_chain *       fchain;
     filter_t *                  dst_converter;
 };
@@ -406,13 +405,7 @@ Filter(filter_t *filter, picture_t *src)
         }
 
         [ctx->ci_ctx render: ci_img
-#if !TARGET_OS_IPHONE
-                toIOSurface: CVPixelBufferGetIOSurface(cvpx)
-#else
-            toCVPixelBuffer: cvpx
-#endif
-                     bounds: [ci_img extent]
-                 colorSpace: ctx->color_space];
+            toCVPixelBuffer: cvpx];
     } /* autoreleasepool */
 
     CopyInfoAndRelease(dst, src);
@@ -638,8 +631,6 @@ Open(vlc_object_t *obj, char const *psz_filter)
          && Open_AddConverter(filter, ctx))
             goto error;
 
-        ctx->color_space = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-
 #if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
         if (!glctx)
@@ -691,8 +682,6 @@ Open(vlc_object_t *obj, char const *psz_filter)
 error:
     if (ctx)
     {
-        if (ctx->color_space)
-            CGColorSpaceRelease(ctx->color_space);
         Close_RemoveConverters(filter, ctx);
         if (ctx->cvpx_pool)
             CVPixelBufferPoolRelease(ctx->cvpx_pool);
@@ -762,8 +751,6 @@ Close(vlc_object_t *obj)
         Close_RemoveConverters(filter, ctx);
         if (ctx->cvpx_pool)
             CVPixelBufferPoolRelease(ctx->cvpx_pool);
-        if (ctx->color_space)
-            CGColorSpaceRelease(ctx->color_space);
         free(ctx);
         var_Destroy(filter->obj.parent, "ci-filters-ctx");
     }
