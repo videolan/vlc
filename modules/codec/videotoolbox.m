@@ -387,16 +387,7 @@ static bool CodecSupportedH264(decoder_t *p_dec)
         case PROFILE_H264_HIGH_10:
         {
             if (deviceSupportsAdvancedProfiles())
-            {
-                /* FIXME: There is no YUV420 10bits chroma. The
-                 * decoder seems to output RGBA when decoding 10bits
-                 * content, but there is an unknown crash when
-                 * displaying such output, so force NV12 for now. */
-                if (p_dec->p_sys->i_forced_cvpx_format == 0)
-                    p_dec->p_sys->i_forced_cvpx_format =
-                        kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
                 break;
-            }
             else
             {
                 msg_Err(p_dec, "current device doesn't support H264 10bits");
