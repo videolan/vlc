@@ -963,6 +963,7 @@ static chunk_t* generate_new_chunk(
             if( frun_entry == hds_stream->fragment_run_count - 1 )
             {
                 msg_Err( p_this, "Discontinuity but can't find next timestamp!");
+                chunk_free( chunk );
                 return NULL;
             }
 
