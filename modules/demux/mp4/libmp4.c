@@ -4066,9 +4066,8 @@ static int MP4_ReadBox_sdtp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GETVERSIONFLAGS( p_box->data.p_sdtp );
     i_sample_count = i_read;
 
-    p_sdtp->p_sample_table = calloc( i_sample_count, 1 );
-
-    if( !p_sdtp->p_sample_table )
+    p_sdtp->p_sample_table = malloc( i_sample_count );
+    if( unlikely(p_sdtp->p_sample_table == NULL) )
         MP4_READBOX_EXIT( 0 );
 
     for( uint32_t i = 0; i < i_sample_count; i++ )
