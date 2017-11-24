@@ -566,19 +566,21 @@ static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
 
 static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    /* XXX sometime moov is hiden in a free box */
+    /* XXX sometime moov is hidden in a free box */
     if( p_box->p_father &&
         p_box->p_father->i_type == ATOM_root &&
         p_box->i_type == ATOM_free )
     {
         const uint8_t *p_peek;
-        int     i_read;
+        size_t header_size = mp4_box_headersize( p_box ) + 4;
         vlc_fourcc_t i_fcc;
 
-        i_read  = vlc_stream_Peek( p_stream, &p_peek, 44 );
+        ssize_t i_read = vlc_stream_Peek( p_stream, &p_peek, 44 );
+        if( unlikely(i_read < (ssize_t)header_size) )
+            return 0;
 
-        p_peek += mp4_box_headersize( p_box ) + 4;
-        i_read -= mp4_box_headersize( p_box ) + 4;
+        p_peek += header_size;
+        i_read -= header_size;
 
         if( i_read >= 8 )
         {
