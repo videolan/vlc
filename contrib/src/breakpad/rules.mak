@@ -1,23 +1,20 @@
-# breakpad
+# Breakpad
 
-BREAKPAD_HASH := 94b6309aecaddfcf11672f6cfad9575d68ad3b40
-BREAKPAD_URL := https://chromium.googlesource.com/breakpad/breakpad/+archive/$(BREAKPAD_HASH).tar.gz
+# This is the VideoLAN fork of Breakpad, not Google Breakpad!
+BREAKPAD_VERSION := 0.1.0
+BREAKPAD_URL := http://download.videolan.org/pub/contrib/breakpad/breakpad-$(BREAKPAD_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
 PKGS += breakpad
 endif
 
-$(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz:
+$(TARBALLS)/breakpad-$(BREAKPAD_VERSION).tar.gz:
 	$(call download_pkg,$(BREAKPAD_URL),breakpad)
 
-.sum-breakpad: breakpad-$(BREAKPAD_HASH).tar.gz
-	$(warning $@ not implemented)
-	touch $@
+.sum-breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz
 
-breakpad: breakpad-$(BREAKPAD_HASH).tar.gz .sum-breakpad
-	rm -Rf $@ breakpad-$(BREAKPAD_HASH)
-	mkdir breakpad-$(BREAKPAD_HASH)
-	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C breakpad-$(BREAKPAD_HASH)
+breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
+	$(UNPACK)
 	$(MOVE)
 
 .breakpad: breakpad
