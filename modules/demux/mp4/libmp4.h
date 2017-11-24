@@ -1786,11 +1786,21 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
         + ( p_box->i_type == ATOM_uuid ? 16 : 0 );
 }
 
-#define MP4_GETX_PRIVATE(dst, code, size) do { \
-    if( (i_read) >= (size) ) { dst = (code); p_peek += (size); } \
-    else { dst = 0; }   \
-    i_read -= (size);   \
-  } while(0)
+#define MP4_GETX_PRIVATE(dst, code, size) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            dst = (code); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
 
 #define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
 
