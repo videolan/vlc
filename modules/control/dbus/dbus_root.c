@@ -466,8 +466,14 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     if( vlc_dictionary_has_key( p_changed_properties, "Fullscreen" ) )
-        AddProperty( p_intf, &changed_properties, "Fullscreen", "b",
-                     MarshalFullscreen );
+    {
+        if( AddProperty( p_intf, &changed_properties, "Fullscreen", "b",
+                     MarshalFullscreen ) != VLC_SUCCESS )
+        {
+            dbus_message_iter_abandon_container( &args, &changed_properties );
+            return DBUS_HANDLER_RESULT_NEED_MEMORY;
+        }
+    }
 
     if( !dbus_message_iter_close_container( &args, &changed_properties ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
