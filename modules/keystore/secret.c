@@ -37,7 +37,7 @@ static void Close(vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("libsecret keystore"))
-    set_description(N_("secrets are stored via libsecret"))
+    set_description(N_("Secrets are stored via libsecret"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("keystore", 100)
