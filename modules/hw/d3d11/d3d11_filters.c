@@ -574,6 +574,7 @@ error:
         ID3D11VideoDevice_Release(sys->d3dviddev);
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    free(sys);
 
     return VLC_EGENERIC;
 }
