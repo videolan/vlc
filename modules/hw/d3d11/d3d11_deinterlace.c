@@ -128,8 +128,6 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     HRESULT hr;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    //msg_Dbg(p_filter, "%lx  deinterlace", GetCurrentThreadId());
-
     picture_t *p_prev = p_sys->context.pp_history[0];
     picture_t *p_cur  = p_sys->context.pp_history[1];
     picture_t *p_next = p_sys->context.pp_history[2];
