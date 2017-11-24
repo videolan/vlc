@@ -47,11 +47,10 @@ struct filter_sys_t {
     copy_cache_t      cache;
 
     /* CPU to GPU */
+    d3d9_handle_t     hd3d;
     d3d9_device_t     d3d_dev;
     filter_t          *filter;
     picture_t         *staging;
-
-    HINSTANCE         hd3d_dll;
 };
 
 static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
@@ -291,8 +290,6 @@ VIDEO_FILTER_WRAPPER (YV12_D3D9)
 int D3D9OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    HINSTANCE hd3d_dll = NULL;
-    int err = VLC_EGENERIC;
 
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE )
         return VLC_EGENERIC;
@@ -313,28 +310,19 @@ int D3D9OpenConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    hd3d_dll = LoadLibrary(TEXT("D3D9.DLL"));
-    if (unlikely(!hd3d_dll)) {
+    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    if (!p_sys)
+         return VLC_ENOMEM;
+
+    if (unlikely(D3D9_Create( p_filter, &p_sys->hd3d ) != VLC_SUCCESS)) {
         msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
-        goto done;
+        free(p_sys);
+        return VLC_EGENERIC;
     }
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!p_sys) {
-         err = VLC_ENOMEM;
-         goto done;
-    }
     CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width );
     p_filter->p_sys = p_sys;
-    err = VLC_SUCCESS;
-
-done:
-    if (err != VLC_SUCCESS)
-    {
-        if (hd3d_dll)
-            FreeLibrary(hd3d_dll);
-    }
-    return err;
+    return VLC_SUCCESS;
 }
 
 int D3D9OpenCPUConverter( vlc_object_t *obj )
@@ -344,7 +332,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     LPDIRECT3DSURFACE9 texture = NULL;
     filter_t *p_cpu_filter = NULL;
     picture_t *p_dst = NULL;
-    HINSTANCE hd3d_dll = NULL;
     video_format_t fmt_staging;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D9_OPAQUE )
@@ -364,9 +351,14 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     }
 
     filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!p_sys) {
-         err = VLC_ENOMEM;
-         goto done;
+    if (!p_sys)
+         return VLC_ENOMEM;
+
+    video_format_Init(&fmt_staging, 0);
+    if (unlikely(D3D9_Create( p_filter, &p_sys->hd3d ) != VLC_SUCCESS)) {
+        msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
+        free(p_sys);
+        return VLC_EGENERIC;
     }
 
     D3DSURFACE_DESC texDesc;
@@ -379,7 +371,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     if (texDesc.Format == 0)
         goto done;
 
-    video_format_Init(&fmt_staging, 0);
     if ( p_filter->fmt_in.video.i_chroma != texDesc.Format )
     {
         picture_resource_t res;
@@ -421,15 +412,8 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
             goto done;
     }
 
-    hd3d_dll = LoadLibrary(TEXT("D3D9.DLL"));
-    if (unlikely(!hd3d_dll)) {
-        msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
-        goto done;
-    }
-
     p_sys->filter    = p_cpu_filter;
     p_sys->staging   = p_dst;
-    p_sys->hd3d_dll = hd3d_dll;
     p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
 
@@ -442,8 +426,7 @@ done:
         if (texture)
             IDirect3DSurface9_Release(texture);
         D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
-        if (hd3d_dll)
-            FreeLibrary(hd3d_dll);
+        D3D9_Destroy( &p_sys->hd3d );
         free(p_sys);
     }
     return err;
@@ -452,9 +435,10 @@ done:
 void D3D9CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
-    CopyCleanCache(p_copy_cache);
-    free( p_copy_cache );
+    filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+    CopyCleanCache( &p_sys->cache );
+    D3D9_Destroy( &p_sys->hd3d );
+    free( p_sys );
     p_filter->p_sys = NULL;
 }
 
@@ -465,7 +449,7 @@ void D3D9CloseCPUConverter( vlc_object_t *obj )
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging);
     D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
-    FreeLibrary(p_sys->hd3d_dll);
+    D3D9_Destroy( &p_sys->hd3d );
     free( p_sys );
     p_filter->p_sys = NULL;
 }
