@@ -128,6 +128,8 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     HRESULT hr;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    //msg_Dbg(p_filter, "%lx  deinterlace", GetCurrentThreadId());
+
     picture_t *p_prev = p_sys->context.pp_history[0];
     picture_t *p_cur  = p_sys->context.pp_history[1];
     picture_t *p_next = p_sys->context.pp_history[2];
@@ -296,6 +298,11 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
                     cfg = output_format;
                     break;
                 }
+            }
+            if (unlikely(cfg == NULL))
+            {
+                free(pic->p_sys);
+                return NULL;
             }
 
             /* create the texture that's missing */
@@ -553,6 +560,7 @@ error:
         ID3D11VideoDevice_Release(sys->d3dviddev);
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    free(sys);
 
     return VLC_EGENERIC;
 }
