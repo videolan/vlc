@@ -790,8 +790,8 @@ static int blurayOpen(vlc_object_t *object)
                 "BD-J support: %d, JVM found: %d, JVM usable: %d",
                 disc_info->bdj_supported, disc_info->libjvm_detected, disc_info->bdj_handled);
         vlc_dialog_display_error(p_demux, _("Java required"),
-             _("This Blu-ray disc needs Java for menus.%s\nDisc is played without menus."),
-             !disc_info->libjvm_detected ? _(" Java was not found from your system.") : "");
+             _("This Blu-ray disc requires Java for menus support.%s\nThe disc will be played without menus."),
+             !disc_info->libjvm_detected ? _("Java was not found on your system.") : "");
         p_sys->b_menu = false;
     }
 

@@ -3284,12 +3284,12 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if ( fmt->video.mastering.max_luminance )
        {
-           info_category_AddInfo( p_cat, _("Max luminance"), "%.4f cd/m²",
+           info_category_AddInfo( p_cat, _("Max. luminance"), "%.4f cd/m²",
                fmt->video.mastering.max_luminance / 10000.f );
        }
        if ( fmt->video.mastering.min_luminance )
        {
-           info_category_AddInfo( p_cat, _("Min luminance"), "%.4f cd/m²",
+           info_category_AddInfo( p_cat, _("Min. luminance"), "%.4f cd/m²",
                fmt->video.mastering.min_luminance / 10000.f );
        }
        if ( fmt->video.mastering.primaries[4] &&
@@ -3322,12 +3322,12 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if ( fmt->video.lighting.MaxCLL )
        {
-           info_category_AddInfo( p_cat, _("MaxCLL"), "%d cd/m²",
+           info_category_AddInfo( p_cat, "MaxCLL", "%d cd/m²",
                                   fmt->video.lighting.MaxCLL );
        }
        if ( fmt->video.lighting.MaxFALL )
        {
-           info_category_AddInfo( p_cat, _("MaxFALL"), "%d cd/m²",
+           info_category_AddInfo( p_cat, "MaxFALL", "%d cd/m²",
                                   fmt->video.lighting.MaxFALL );
        }
        break;

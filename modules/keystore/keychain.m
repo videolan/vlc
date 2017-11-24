@@ -54,12 +54,12 @@ static const char *const accessibility_list_text[] = {
 };
 
 #define SYNC_ITEMS_TEXT N_("Synchronize stored items")
-#define SYNC_ITEMS_LONGTEXT N_("Synchronizes stored items via iCloud Keychain if enabled in the user domain. Requires iOS 7 / Mac OS X 10.9 / tvOS 9.0 or higher.")
+#define SYNC_ITEMS_LONGTEXT N_("Synchronizes stored items via iCloud Keychain if enabled in the user domain.")
 
 #define ACCESSIBILITY_TYPE_TEXT N_("Accessibility type for all future passwords saved to the Keychain")
 
 #define ACCESS_GROUP_TEXT N_("Keychain access group")
-#define ACCESS_GROUP_LONGTEXT N_("Keychain access group as defined by the app entitlements. Requires iOS 3 / Mac OS X 10.9 / tvOS 9.0 or higher.")
+#define ACCESS_GROUP_LONGTEXT N_("Keychain access group as defined by the app entitlements.")
 
 /* VLC can be compiled against older SDKs (like before OS X 10.10)
  * but newer features should still be available.

@@ -71,7 +71,7 @@ vlc_module_begin ()
         N_("Search Length"), N_("Length in milliseconds to search for best overlap position"), true )
 #ifdef PITCH_SHIFTER
     add_float_with_range( "pitch-shift", 0, -12, 12,
-        N_("Pitch Shift"), N_("Pitch shift in semitones"), false )
+        N_("Pitch Shift"), N_("Pitch shift in semitones."), false )
     set_callbacks( OpenPitch, ClosePitch )
 #else
     set_callbacks( Open, Close )

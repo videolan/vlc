@@ -211,7 +211,7 @@ static const int i_raise_list[] =
       MainInterface::RAISE_AUDIO, MainInterface::RAISE_AUDIOVIDEO,  };
 
 static const char *const psz_raise_list_text[] =
-    { N_( "Never" ), N_( "Video" ), N_( "Audio" ), _( "Both" ) };
+    { N_( "Never" ), N_( "Video" ), N_( "Audio" ), _( "Audio/Video" ) };
 
 /**********************************************************************/
 vlc_module_begin ()
