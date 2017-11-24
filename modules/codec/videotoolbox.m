@@ -1068,6 +1068,18 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     return decoderConfiguration;
 }
 
+static void PtsInit(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate )
+    {
+        date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
+                   p_dec->fmt_in.video.i_frame_rate_base );
+    }
+    else date_Init( &p_sys->pts, 2 * 30000, 1001 );
+}
+
 static int StartVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1175,12 +1187,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
     if (status == noErr)
         CFRelease(supportedProps);
 
-    if( p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate )
-    {
-        date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
-                   p_dec->fmt_in.video.i_frame_rate_base );
-    }
-    else date_Init( &p_sys->pts, 2 * 30000, 1001 );
+    PtsInit(p_dec);
 
     return VLC_SUCCESS;
 }
@@ -1712,12 +1719,16 @@ static void Drain(decoder_t *p_dec, bool flush)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* draining: return last pictures of the reordered queue */
+    vlc_mutex_lock(&p_sys->lock);
+    DrainDPBLocked(p_dec, flush);
+    vlc_mutex_unlock(&p_sys->lock);
+
     if (p_sys->session)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
-    DrainDPBLocked(p_dec, flush);
     p_sys->b_vt_flush = false;
+    p_sys->b_vt_feed = false;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1726,7 +1737,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->b_vt_flush)
-        RestartVideoToolbox(p_dec, false);
+    {
+        Drain(p_dec, true);
+        PtsInit(p_dec);
+    }
 
     if (p_block == NULL)
     {
