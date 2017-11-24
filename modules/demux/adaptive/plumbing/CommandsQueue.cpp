@@ -28,6 +28,7 @@
 #include <vlc_block.h>
 #include <vlc_meta.h>
 #include <algorithm>
+#include <set>
 
 using namespace adaptive;
 
@@ -94,6 +95,11 @@ mtime_t EsOutSendCommand::getTime() const
         return p_block->i_dts;
     else
         return AbstractCommand::getTime();
+}
+
+const void * EsOutSendCommand::esIdentifier() const
+{
+    return static_cast<const void *>(p_fakeid);
 }
 
 EsOutDelCommand::EsOutDelCommand( FakeESOutID *p_es ) :
@@ -274,6 +280,7 @@ const CommandsFactory * CommandsQueue::factory() const
 mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
 {
     mtime_t lastdts = barrier;
+    std::set<const void *> allowinvalid;
     bool b_datasent = false;
 
     /* We need to filter the current commands list
@@ -306,10 +313,37 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
         in.pop_front();
         b_datasent = true;
 
-        if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND && command->getTime() > barrier )
-            commands.push_back( command );
-        else
-            output.push_back( command );
+        if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND )
+        {
+            EsOutSendCommand *sendcommand = dynamic_cast<EsOutSendCommand *>(command);
+            /* We need a stream identifier to send NON DATED data following DATA for the same ES */
+            const void *id = (sendcommand) ? sendcommand->esIdentifier() : 0;
+
+            /* Not for now */
+            if( command->getTime() > barrier ) /* Not for now */
+            {
+                /* ensure no more non dated for that ES is sent
+                 * since we're sure that data is above barrier */
+                allowinvalid.erase( id );
+                commands.push_back( command );
+            }
+            else if( command->getTime() == VLC_TS_INVALID )
+            {
+                /* Did we sent data already for that ES ? */
+                if( allowinvalid.find( id ) != allowinvalid.end() ||
+                   /* but also include invalid ones at start (other we will never dequeue them) */
+                   (commands.empty() && output.empty()) )
+                    output.push_back( command );
+                else
+                    commands.push_back( command );
+            }
+            else /* Falls below barrier, send */
+            {
+                allowinvalid.insert( id );
+                output.push_back( command );
+            }
+        }
+        else output.push_back( command ); /* will discard below */
     }
 
     /* push remaining ones if broke above */

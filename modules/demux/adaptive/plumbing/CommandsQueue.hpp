@@ -59,6 +59,7 @@ namespace adaptive
             virtual ~EsOutSendCommand();
             virtual void Execute( es_out_t *out );
             virtual mtime_t getTime() const;
+            const void * esIdentifier() const;
 
         protected:
             EsOutSendCommand( FakeESOutID *, block_t * );
