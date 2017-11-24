@@ -1030,6 +1030,33 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
         CFRelease(pixelaspectratio);
     }
 
+    /* Setup YUV->RGB matrix since VT can output BGRA directly. Don't setup
+     * transfer and primaries since the transformation is done via the GL
+     * fragment shader. */
+    CFStringRef yuvmatrix;
+    switch (p_dec->fmt_out.video.space)
+    {
+        case COLOR_SPACE_BT601:
+            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_601_4;
+            break;
+        case COLOR_SPACE_BT2020:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+            if (&kCVImageBufferColorPrimaries_ITU_R_2020 != nil)
+            {
+                yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_2020;
+                break;
+            }
+#pragma clang diagnostic pop
+            /* fall through */
+        case COLOR_SPACE_BT709:
+        default:
+            yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_709_2;
+            break;
+    }
+    CFDictionarySetValue(decoderConfiguration, kCVImageBufferYCbCrMatrixKey,
+                         yuvmatrix);
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
 
