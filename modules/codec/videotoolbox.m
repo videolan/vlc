@@ -181,6 +181,16 @@ struct decoder_sys_t
     h264_poc_context_t          h264_pocctx;
     hevc_poc_ctx_t              hevc_pocctx;
     date_t                      pts;
+
+    struct pic_holder          *pic_holder;
+};
+
+struct pic_holder
+{
+    bool        closed;
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+    uint8_t     nb_out;
 };
 
 #pragma mark - start & stop
@@ -1268,6 +1278,18 @@ static int OpenDecoder(vlc_object_t *p_this)
         free(cvpx_chroma);
     }
 
+    p_sys->pic_holder = malloc(sizeof(struct pic_holder));
+    if (!p_sys->pic_holder)
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
+    vlc_mutex_init(&p_sys->pic_holder->lock);
+    vlc_cond_init(&p_sys->pic_holder->wait);
+    p_sys->pic_holder->nb_out = 0;
+    p_sys->pic_holder->closed = false;
+
     vlc_mutex_init(&p_sys->lock);
 
     p_dec->pf_decode = DecodeBlock;
@@ -1330,6 +1352,13 @@ static int OpenDecoder(vlc_object_t *p_this)
     return i_ret;
 }
 
+static void pic_holder_clean(struct pic_holder *pic_holder)
+{
+    vlc_mutex_destroy(&pic_holder->lock);
+    vlc_cond_destroy(&pic_holder->wait);
+    free(pic_holder);
+}
+
 static void CloseDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
@@ -1341,6 +1370,18 @@ static void CloseDecoder(vlc_object_t *p_this)
         p_sys->pf_codec_clean(p_dec);
 
     vlc_mutex_destroy(&p_sys->lock);
+
+    vlc_mutex_lock(&p_sys->pic_holder->lock);
+    if (p_sys->pic_holder->nb_out == 0)
+    {
+        vlc_mutex_unlock(&p_sys->pic_holder->lock);
+        pic_holder_clean(p_sys->pic_holder);
+    }
+    else
+    {
+        p_sys->pic_holder->closed = true;
+        vlc_mutex_unlock(&p_sys->pic_holder->lock);
+    }
     free(p_sys);
 }
 
@@ -1898,6 +1939,40 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     return 0;
 }
 
+static void pic_holder_on_cvpx_released(void *data)
+{
+    struct pic_holder *pic_holder = data;
+
+    vlc_mutex_lock(&pic_holder->lock);
+    pic_holder->nb_out--;
+    if (pic_holder->nb_out == 0 && pic_holder->closed)
+    {
+        vlc_mutex_unlock(&pic_holder->lock);
+        pic_holder_clean(pic_holder);
+    }
+    else
+    {
+        vlc_cond_broadcast(&pic_holder->wait);
+        vlc_mutex_unlock(&pic_holder->lock);
+    }
+}
+
+static void pic_holder_wait(struct pic_holder *pic_holder, uint8_t pic_reorder_max)
+{
+    static const uint8_t reserved_picture = 2;
+
+    if (pic_reorder_max == 0)
+        pic_reorder_max = 1;
+
+    vlc_mutex_lock(&pic_holder->lock);
+
+    while (pic_holder->nb_out >= pic_reorder_max + reserved_picture)
+        vlc_cond_wait(&pic_holder->wait, &pic_holder->lock);
+    pic_holder->nb_out++;
+
+    vlc_mutex_unlock(&pic_holder->lock);
+}
+
 static void DecoderCallback(void *decompressionOutputRefCon,
                             void *sourceFrameRefCon,
                             OSStatus status,
@@ -1962,15 +2037,39 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     {
         /* Unlock the mutex because decoder_NewPicture() is blocking. Indeed,
          * it can wait indefinitely when the input is paused. */
+
+        uint8_t i_pic_reorder_max = p_sys->i_pic_reorder_max;
+
         vlc_mutex_unlock(&p_sys->lock);
+
         picture_t *p_pic = decoder_NewPicture(p_dec);
+
+        if (!p_pic
+         || cvpxpic_attach_with_cb(p_pic, imageBuffer, pic_holder_on_cvpx_released,
+                                   p_sys->pic_holder) != VLC_SUCCESS)
+        {
+            vlc_mutex_lock(&p_sys->lock);
+            goto end;
+        }
+
+        /* VT is not pacing frame allocation. If we are not fast enough to
+         * render (release) the output pictures, the VT session can end up
+         * allocating way too many frames. This can be problematic for 4K
+         * 10bits. To fix this issue, we ensure that we don't have too many
+         * output frames allocated by waiting for the vout to release them.
+         *
+         * FIXME: A proper way to fix this issue is to allow decoder modules to
+         * specify the dpb and having the vout re-allocating output frames when
+         * this number changes. */
+        pic_holder_wait(p_sys->pic_holder, i_pic_reorder_max);
+
         vlc_mutex_lock(&p_sys->lock);
 
-        if (!p_pic)
+        if (p_sys->b_vt_flush)
+        {
+            picture_Release(p_pic);
             goto end;
-
-        if (cvpxpic_attach(p_pic, imageBuffer) != VLC_SUCCESS)
-            goto end;
+        }
 
         p_info->p_picture = p_pic;
 
