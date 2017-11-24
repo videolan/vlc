@@ -66,6 +66,8 @@ endif
 	$(APPLY) $(SRC)/live555/live555-nosignal.patch
 	# Don't use FormatMessageA on WinRT
 	$(APPLY) $(SRC)/live555/winstore.patch
+	# Don't rely on undefined behaviors
+	$(APPLY) $(SRC)/live555/no-null-reference.patch
 	# Add a pkg-config file
 	$(APPLY) $(SRC)/live555/add-pkgconfig-file.patch
 
