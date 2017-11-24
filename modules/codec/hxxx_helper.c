@@ -79,7 +79,6 @@ hxxx_helper_clean(struct hxxx_helper *hh)
                          hevc_rbsp_release_sps(hnal->hevc_sps));
             RELEASE_NALS(hh->hevc.pps_list, HEVC_PPS_ID_MAX,
                          hevc_rbsp_release_pps(hnal->hevc_pps));
-            free(hh->hevc.p_annexb_config_nal);
             break;
         default:
             vlc_assert_unreachable();
@@ -451,18 +450,6 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
         if (!helper_nal_length_valid(hh))
             return VLC_EGENERIC;
         hh->b_is_xvcC = true;
-
-        size_t i_buf;
-        uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &i_buf,
-                                                 NULL);
-        if (!p_buf)
-        {
-            msg_Dbg(hh->p_obj, "hevc_hvcC_to_AnnexB_NAL failed");
-            return VLC_EGENERIC;
-        }
-
-        hh->hevc.p_annexb_config_nal = p_buf;
-        hh->hevc.i_annexb_config_nal = i_buf;
 
         return helper_process_hvcC_hevc( hh, p_extra, i_extra );
     }

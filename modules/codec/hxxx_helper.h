@@ -66,8 +66,6 @@ struct hxxx_helper
             uint8_t i_sps_count;
             uint8_t i_pps_count;
             uint8_t i_vps_count;
-            void *p_annexb_config_nal;
-            size_t i_annexb_config_nal;
         } hevc;
     };
 
