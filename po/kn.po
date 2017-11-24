@@ -1,23 +1,27 @@
 # Kannada translation
-# Copyright (C) 2014 VideoLAN
+# Copyright (C) 2017 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# chaitra <chaitra.kulkarni2@gmail.com>, 2013
-# Lavakara <hjlava@gmail.com>, 2013
+# chaitra kulkarni <chaitra.kulkarni2@gmail.com>, 2013
 # Karthik C <ckarthik91@gmail.com>, 2013
-# karthiknatesh <karthik_natesh@live.com>, 2013
+# Karthik Natesh <karthik_natesh@live.com>, 2013
+# Lavakara <hjlava@gmail.com>, 2013
 # msj2, 2013
-# yogi <yogesh@karnatakaeducation.org.in>, 2013
+# Sampath Kumar Shetty K <paramamithra@gmail.com>, 2015
+# Srividya, 2014
+# Vikas Hegde <vikashegde82@gmail.com>, 2017
+# Vinay H <winayh@gmail.com>, 2016
+# Yogesh K S <yogesh@karnatakaeducation.org.in>, 2013-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2013-12-15 12:48+0000\n"
-"Last-Translator: Lavakara <hjlava@gmail.com>\n"
-"Language-Team: Kannada (http://www.transifex.com/projects/p/vlc-trans/"
-"language/kn/)\n"
+"PO-Revision-Date: 2017-10-06 11:13+0000\n"
+"Last-Translator: Vikas Hegde <vikashegde82@gmail.com>\n"
+"Language-Team: Kannada (http://www.transifex.com/yaron/vlc-trans/language/"
+"kn/)\n"
 "Language: kn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,15 +35,15 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"ಈ ಪ್ರೋಗ್ರಾಂ ಕಾನೂನು ಅನುಮತಿ ಇರುವ ಮಟ್ಟಿಗೆ ಯಾವುದೇ ಖಾತರಿಗೆ ಬರುವುದಿಲ್ಲ.\n"
-"ನೀವು GNU ಜನರಲ್ ಪಬ್ಲಿಕ್ ಲೈಸೆನ್ಸ್ನ ನಿಬಂಧನೆಗಳ ಅಡಿಯಲ್ಲಿ ಈ ಪ್ರೊಗ್ರಮನ್ನು ಮರುಹಂಚಿಕೆ "
+"ಈ ಪ್ರೋಗ್ರಾಮ್ ಕಾನೂನು ಅನುಮತಿ ಇರುವ ಮಟ್ಟಿಗೆ ಯಾವುದೇ ಖಾತರಿಗೆ ಬರುವುದಿಲ್ಲ.\n"
+"ನೀವು GNU ಜನರಲ್ ಪಬ್ಲಿಕ್ ಲೈಸೆನ್ಸಿನ ನಿಬಂಧನೆಗಳ ಅಡಿಯಲ್ಲಿ ಈ ಪ್ರೋಗ್ರಾಮನ್ನು ಮರುಹಂಚಿಕೆ "
 "ಮಾಡಬಹುದು;\n"
 "ವಿವರಗಳಿಗೆ  COPYING ಹೆಸರಿನ ಫೈಲ್ ನೋಡಿ.\n"
-"ಬರೆದವರು:VideoLAN ತಂಡ AUTHORS ಹೆಸರಿನ ಫೈಲ್ ನೋಡಿ.\n"
+"ಬರೆದವರು: VideoLAN ತಂಡ; AUTHORS ಹೆಸರಿನ ಫೈಲ್ ನೋಡಿ.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLCಯ ಆದ್ಯತೆ"
+msgstr "VLCಯ ಆದ್ಯತೆಗಳು"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -171,9 +175,8 @@ msgid "General video settings"
 msgstr "ಸಾಮಾನ್ಯ ದೃಶ್ಯ ಸಿದ್ಧತೆಗಳು"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "ಧ್ವನಿ output ಘಟಕಗಳ ಸಾಮಾನ್ಯ ಸಿದ್ಧತೆಗಳು "
+msgstr "ವಿಡಿಯೋ ಔಟ್ ಪುಟ್ ಮಾಡ್ಯೂಲ್ ಗಳಿಗೆ ಸಾಮನ್ಯ ಸೆಟ್ಟಿಂಗುಗಳು"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -375,7 +378,7 @@ msgstr "VLC ಯ ಬೇಡಿಕೆಯಮೇಲಿನ ದೃಶ್ಯದ �
 #: modules/gui/qt/components/playlist/selector.cpp:233
 #: modules/gui/qt/dialogs/playlist.cpp:39 modules/gui/qt/menus.cpp:1112
 msgid "Playlist"
-msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಹಾಡುಗಳ ಪಟ್ಟಿ"
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿ"
 
 #: include/vlc_config_cat.h:174
 msgid ""
@@ -421,15 +424,15 @@ msgstr "ಕಡತವನ್ನು ತೆರೆಯಿರಿ..."
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "&amp;ಸುಧಾರಿತವಾಗಿ ತೆರೆಯಿರಿ ..."
+msgstr "ಸುಧಾರಿತವಾಗಿ ತೆರೆಯಿರಿ..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "ತೆರೆಯಿರಿ D&amp;irectory..."
+msgstr "ಕಡತಕೋಶವನ್ನು ತೆರೆಯಿರಿ..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr "ತೆರೆಯಿರಿ &amp;ಕಡತಕೋಶವನ್ನು..."
+msgstr "ಕಡತಕೋಶವನ್ನು ತೆರೆಯಿರಿ..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
@@ -441,15 +444,15 @@ msgstr "ಕೋಶವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
-msgstr "ಕಡತಕೋಶವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+msgstr "ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr "ಮಾಧ್ಯಮ ಮಾಹಿತಿ"
+msgstr "ಮಾಧ್ಯಮ &Information"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
-msgstr "&amp;ಸಂಕೇತಕಗಳ ಮಾಹಿತಿ"
+msgstr "&Codec ಮಾಹಿತಿ"
 
 #: include/vlc_intf_strings.h:57
 msgid "&Messages"
@@ -457,11 +460,11 @@ msgstr "ಸಂದೇಶಗಳು"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr "ಇಲ್ಲಿಗೆ ಹೋಗು &amp;ಸಮಯ"
+msgstr "ಇಲ್ಲಿಗೆ ಹೋಗು &Time"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr "ಇಚ್ಛೆಯ &amp;ಅಚ್ಚುಮೆಚ್ಚು"
+msgstr "ಇಚ್ಛೆಯ &Bookmarks"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
@@ -500,14 +503,12 @@ msgid "Create Folder..."
 msgstr "ಕಡತಕೋಶವನ್ನು ರಚಿಸಿ .."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "ಕೈಪಿಡಿಅನ್ನು ರಚಿಸಿ ..."
+msgstr "ಕೋಶವನ್ನು ಮರುಹೆಸರಿಸು"
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "ಕಡತಕೋಶವನ್ನು ರಚಿಸಿ .."
+msgstr "ಫೋಲ್ಡರ್ ಅನ್ನು ಮರುಹೆಸರಿಸು "
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -905,9 +906,8 @@ msgstr ""
 "ಮುಂದುವರೆಯಲು RETURN ಕೀಲಿಯನ್ನು ಒತ್ತಿರಿ... \n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "ಅಪರಿಚಿತ ವೀಡಿಯೊ"
+msgstr "ಗೊತ್ತಿರದ ದೋಷ"
 
 #: src/input/control.c:203
 #, c-format
@@ -916,27 +916,24 @@ msgstr "ಅಚ್ಚುಮೆಚ್ಚು %i"
 
 #: src/input/decoder.c:1875
 msgid "No description for this codec"
-msgstr ""
+msgstr "ಈ ಕೋಡೆಕ್ ಗೆ ಯಾವುದೇ ವಿವರಣೆ ಇಲ್ಲ "
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "ಗ್ರಾಹಕ ಸಂಪರ್ಕಸ್ಥಾನ"
+msgstr "ಕೋಡೆಕ್ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC could not open the file \"%s\" (%m)."
+msgstr "VLC ಈ ಫಾರ್ಮ್ಯಾಟ್ ಡಿಕೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "ವಿಡಿಯೋ ಸಂಕೇತಕ"
+msgstr "ಗುರುತಿಸಲಾಗದ ಕೊಡೆಕ್"
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC ಗೆ ವಿಸಂಕೇತಕ ಘಟಕವನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ."
+msgstr "VLC ಗೆ ಆಡಿಯೋ ಅಥವಾ ವಿಡಿಯೋ ಕೊಡೆಕ್ ಅನ್ನು ಗುರುತಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ"
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -1392,9 +1389,8 @@ msgid "Track ID"
 msgstr "ಟ್ರ್ಯಾಕ್ ನ ಗುರುತು"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "ಅಡ್ಡ ಸಾಲುಗಳ ಸಂಖ್ಯೆ"
+msgstr "ಟ್ರ್ಯಾಕ್ ಗಳ ಸಂಖ್ಯೆ "
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1402,21 +1398,19 @@ msgstr "ನಿರ್ದೇಶಕ"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "ಭಾಗ "
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "ಸಂಚಿಕೆ "
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "ಮೂಲಭೂತವನ್ನು ತೋರಿಸಿ"
+msgstr "ಹೆಸರು ತೋರಿಸು"
 
 #: src/input/meta.c:78
-#, fuzzy
 msgid "Actors"
-msgstr "ಅಂಶ"
+msgstr "ನಟರು "
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -2734,12 +2728,10 @@ msgstr ""
 "ಅಕ್ಷರಗಳ ದೇಶದ ಕೋಡ್,ಮಾಹಿತಿಗೆ ನೀವು 'any' ಬಳಸಬಹುದು)."
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "ಧ್ವನಿಯ ಭಾಷೆ"
+msgstr "ಮೆನು ಭಾಷೆ"
 
 #: src/libvlc-module.c:604
-#, fuzzy
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
@@ -3262,11 +3254,12 @@ msgid "HTTP/TLS server certificate"
 msgstr "HTTP/TLS ಸರ್ವರ್ ಪ್ರಮಾಣಪತ್ರ"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
-msgstr "ಈ X.509 ಪ್ರಮಾಣಪತ್ರ ಕಡತವನ್ನು (PEM ರೂಪದಲ್ಲಿ) ಸರ್ವರ್ ಪರ TLS ಗೆ ಬಳಸಲಾಗುತ್ತದೆ."
+msgstr ""
+"ಈ X.509 ಪ್ರಮಾಣಪತ್ರ ಕಡತವನ್ನು (PEM ರೂಪದಲ್ಲಿ) ಸರ್ವರ್ ಪರ TLS ಗೆ ಬಳಸಲಾಗುತ್ತದೆ. Os X "
+"ಸ್ಟ್ರಿಂಗ್ ಕೀಚೈನ್ನಲ್ಲಿ ಪ್ರಮಾಣಪತ್ರ ಹುಡುಕಲು ಒಂದು ಲೇಬಲ್ ಬಳಸಲಾಗುತ್ತದೆ."
 
 #: src/libvlc-module.c:849
 msgid "HTTP/TLS server private key"
@@ -3835,7 +3828,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:564
 msgid "Allow metadata network access"
-msgstr ""
+msgstr "ಮೆಟಾಡೇಟಾ ಜಾಲವನ್ನು ಪ್ರವೇಶಿಸಲು ಅನುಮತಿಸು"
 
 #: src/libvlc-module.c:1128
 msgid "Collapse"
@@ -3880,7 +3873,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "ಸಂಕೇತಕದ ವಿವರಗಳು"
+msgstr "ವಿವರಣೆಗಳನ್ನು ತೋರಿಸು"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -5035,9 +5028,8 @@ msgid "print version information"
 msgstr "ಮುದ್ರಣದ ಆವೃತ್ತಿಯ ಮಾಹಿತಿ "
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "ಮುಖ್ಯ ಪ್ರೋಗ್ರಾಂ"
+msgstr "ಪ್ರಮುಖ ಪ್ರೋಗ್ರಾಮ್"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -5269,7 +5261,7 @@ msgstr "ವಿರಾಮ"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "ಮುದ್ರಿಸು"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -6225,17 +6217,15 @@ msgstr "Input ಅನ್ನು ಲಗತ್ತು"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
-msgstr ""
+msgstr "AVIO"
 
 #: modules/access/avio.h:34
-#, fuzzy
 msgid "libavformat AVIO access"
-msgstr "libavformat ಪ್ರವೇಶ output"
+msgstr "libavformat AVIO ಪ್ರವೇಶ"
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "libavformat ಪ್ರವೇಶ output"
+msgstr "libavformat AVIO ಪ್ರವೇಶ ಔಟ್ಪುಟ್"
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
@@ -6247,15 +6237,16 @@ msgstr ""
 "ಬ್ಲೂ ರೇ ಮೆನುಗಳಲ್ಲಿ ಬಳಸಿ. ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿದಲ್ಲಿ, ಚಲನಚಿತ್ರ ನೇರವಾಗಿ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ"
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "ಪ್ರದೇಶದ ಬಲ ಅಂಕಣ"
+msgstr "ಪ್ರಾದೇಶಿಕ ಸಂಕೇತ"
 
 #: modules/access/bluray.c:72
 msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
+"ಬ್ಲೂ ರೇ ಪ್ಲೇಯರ್ ಪ್ರದೇಶದ ಕೋಡ್. ಕೆಲವು ತಟ್ಟೆಗಳು ಮಾತ್ರ ಸರಿಯಾದ ಪ್ರದೇಶದ ಕೋಡ್ನಲ್ಲಿ "
+"ಆಡಲಾಗುತ್ತದೆ."
 
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
@@ -6268,7 +6259,7 @@ msgstr "ಬ್ಲೂ ರೇ ಡಿಸ್ಕ್ ಬೆಂಬಲ (libbluray)"
 
 #: modules/access/bluray.c:715
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "ದಾರಿ ಬ್ಲೂ ರೇ ಎಂದು ಕಾಣುತ್ತಿಲ್ಲ"
 
 #: modules/access/bluray.c:730
 msgid ""
@@ -6333,7 +6324,7 @@ msgstr ""
 
 #: modules/access/bluray.c:817
 msgid "Failed to start bluray playback. Please try without menu support."
-msgstr ""
+msgstr "ಬ್ಲೂ ರೇ ಹಿನ್ನೆಲೆ ಆರಂಭಿಸಲು ವಿಫಲವಾಗಿದೆ. ಮೆನು ಬೆಂಬಲವಿಲ್ಲದೆ ಪ್ರಯತ್ನಿಸಿ."
 
 #: modules/access/bluray.c:845 modules/access/bluray.c:2279
 #: modules/access/bluray.c:2284
@@ -6341,14 +6332,12 @@ msgid "Blu-ray error"
 msgstr "ಬ್ಲೂ ರೇ ದೋಷ"
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "ಮೆನು"
+msgstr "ಮೇಲಿನ ಮೆನು"
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
-msgstr "ಮೊದಲು ಪ್ಲೇ ಮಾಡಿದ"
+msgstr "ಮೊದಲ ಪ್ಲೇ"
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6413,14 +6402,12 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "IIDC ಡಿಜಿಟಲ್ ಕ್ಯಾಮೆರಾ (FireWire) input"
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "RDP"
+msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "ಹೆಚ್ಚುವರಿ ಮೇಲ್ಮೈ ಘಟಕಗಳು"
+msgstr "ಡಿಜಿಟಲ್ ಸಿನಿಮಾ ಪ್ಯಾಕೇಜ್ ಘಟಕ"
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6435,9 +6422,8 @@ msgstr ""
 "0."
 
 #: modules/access/decklink.cpp:49
-#, fuzzy
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "ಬಯಸಿದ input ವಿಡಿಯೋ ವಿಧಾನ"
+msgstr "ಬಯಸಿದ ಇನ್ಪುಟ್ ವೀಡಿಯೊ ಕ್ರಮ. ಸ್ವಯಂ ಪತ್ತೆಗೆ ಖಾಲಿ ಬಿಡಿ."
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -8027,9 +8013,9 @@ msgid "File reading failed"
 msgstr "ಕಡತವನ್ನು ಓದಲು ವಿಫಲವಾಗಿದೆ"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC ಗೆ ಕಡತವನ್ನು ಓದಲು ಸಾಧ್ಯವಿಲ್ಲ."
+msgstr "ವಿ ಎಲ್ ಸಿ ಈ ಕಡತವನ್ನು ಓದಲಾಗಲಿಲ್ಲ : %s "
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -8156,9 +8142,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr "ಸರ್ವರ್ ಮೂಲಕ ಮರಳಿ MIME (ನಿರ್ದಿಷ್ಟಪಡಿಸಿಲ್ಲದಿದ್ದರೆ ಸ್ವಯಂಪತ್ತೆಯಾದಂತ್ತೆ)."
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr "Metacube"
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8268,14 +8253,12 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr "Generate IV instead using segment-number as IV"
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "ಭಾಗಗಳ ಸಂಖ್ಯೆ"
+msgstr "ಮೊದಲ ಭಾಗಗಳ ಸಂಖ್ಯೆ"
 
 #: modules/access_output/livehttp.c:106
-#, fuzzy
 msgid "The number of the first segment generated"
-msgstr "ಎಷ್ಟು ಬಾರಿ ಮಿಶ್ರಣವನ್ನು ಕೈಗೊಳ್ಳಲಾಗಿದೆ"
+msgstr "ರಚಿಸಿದ ಮೊದಲ ವಿಭಾಗದಲ್ಲಿ ಸಂಖ್ಯೆ"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
@@ -8575,12 +8558,11 @@ msgstr "ವಿನಂತಿಸಿದ RTSP ಅಧಿವೇಶನವನ್ನು
 
 #: modules/access/satip.c:60 modules/access/udp.c:59
 msgid "Receive buffer"
-msgstr ""
+msgstr "ಬಫರ್ ಸ್ವೀಕರಿಸಿ"
 
 #: modules/access/satip.c:61 modules/access/udp.c:60
-#, fuzzy
 msgid "UDP receive buffer size (bytes)"
-msgstr "RTSP ಚೌಕಟ್ಟಿನ ತಾತ್ಕಾಲಿಕ ಸಂಗ್ರಹದ ಗಾತ್ರ"
+msgstr ""
 
 #: modules/access/satip.c:63
 #, fuzzy
@@ -8954,7 +8936,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr ""
+msgstr "ಬಳಕೆಗಾಗಿ ಗರಿಷ್ಠ ಫ್ರೇಮ್ ರೇಟ್ (0 = ಮಿತಿ ಇಲ್ಲ)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -9426,14 +9408,14 @@ msgid "VDR recordings"
 msgstr "ವಿಡಿಆರ್ ರೆಕಾರ್ಡಿಂಗ್"
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC (%m) ಕಡತವನ್ನು ಓದಲು ಸಾಧ್ಯವಿಲ್ಲ."
+msgstr "ವಿ ಎಲ್ ಸಿ ಈ ಕಡತವನ್ನು ಓದಲಾಗಲಿಲ್ಲ (%s) "
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC could not open the file \"%s\" (%m)."
+msgstr "ವಿ ಎಲ್ ಸಿ ಈ ಕಡತವನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ \"%s\" (%s)."
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -9519,9 +9501,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "Windows GDI ವಿಡಿಯೋ output"
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9735,9 +9716,8 @@ msgid "Rear center"
 msgstr "ಹಿಂಭಾಗದ ಕೇಂದ್ರ"
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "ಸ್ಟೀರಿಯೋ ಧ್ವನಿ ಕ್ರಮ"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -10666,9 +10646,8 @@ msgid "This linear gain will be applied in software."
 msgstr "ಈ ರೇಖಾತ್ಮಕ ಗಳಿಕೆಯನ್ನು ತಂತ್ರಾಂಶದಲ್ಲಿ ಅನ್ವಯಿಸಲಾಗುತ್ತದೆ."
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "Windows GDI ವಿಡಿಯೋ output"
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10737,7 +10716,7 @@ msgstr "AES3/SMPTE 302M ಧ್ವನಿ ವಿಭಜಕ"
 #: modules/codec/aom.c:50
 #, fuzzy
 msgid "AOM video decoder"
-msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "WebM ವೀಡಿಯೊ ಡೀಕೋಡರ್"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -11268,39 +11247,35 @@ msgid "unknown"
 msgstr "ಅಪರಿಚಿತ"
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "S-ವೀಡಿಯೋ"
+msgstr "ದೃಶ್ಯ"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
 msgstr "ಧ್ವನಿ"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
 msgstr "ಉಪಚಿತ್ರಗಳು"
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "VLC ಗೆ ಸಂಕೇತಕವನ್ನು ತೆರೆಯಲಾಗುತಿಲ್ಲ."
+msgstr "%4.4s %s ಎನ್ಕೋಡರನ್ನು ತೆರೆಯಲು VLCಗೆ  ಸಾಧ್ಯವಿಲ್ಲ"
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "DRM ಮೂಲಕ VA_API ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
 msgid "VA-API video decoder"
-msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "X11 ಮೂಲಕ VA_API ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/bpg.c:49
 #, fuzzy
 msgid "BPG image decoder"
-msgstr "XWD ಚಿತ್ರದ ವಿಸಂಕೇತಕ"
+msgstr "JPEG ಚಿತ್ರ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -11309,9 +11284,8 @@ msgid "Opacity"
 msgstr "ಅಪಾರದರ್ಶಕತೆ"
 
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
-#, fuzzy
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
-msgstr "VBI ಅಪಾರದರ್ಶಕ ಅಬದ್ಧ ಹೊಂದಿಕೆಯಿಂದ  ಪೆಟ್ಟಿಗೆಯ ಪಠ್ಯವನ್ನು ಪಾರದರ್ಶಕ ಮಾಡುತ್ತದೆ."
+msgstr ""
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11367,7 +11341,7 @@ msgstr "ಥಿಯೊರ ವಿಡಿಯೋ ವಿಭಜಕ"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "PNG ವೀಡಿಯೊ ಎನ್ಕೋಡರ್"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11646,9 +11620,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "ವಿಸಂಕೇತಿಸು"
+msgstr "ಡಿಕೋಡ್ ಬಿನ್ ಬಳಸಿ"
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11659,9 +11632,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
-#, fuzzy
 msgid "GStreamer Based Decoder"
-msgstr "ಸ್ಪೀಕ್ಸ್ ಶ್ರಾವ್ಯ ವಿಸಂಕೇತಕ"
+msgstr "GStreamer ಆಧಾರಿತ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -11669,14 +11641,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "XWD ಚಿತ್ರದ ವಿಸಂಕೇತಕ"
+msgstr "JPEG ಚಿತ್ರ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "XWD ಚಿತ್ರದ ವಿಸಂಕೇತಕ"
+msgstr "JPEG ಚಿತ್ರ ಸಂಕೇತಕ"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11987,7 +11957,7 @@ msgstr "ನೇರ ಸಲ್ಲಿಸುವಿಕೆ"
 #: modules/codec/omxil/omxil.c:141
 #, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "ನೇರ ಸಲ್ಲಿಸುವಿಕೆ"
+msgstr "ಆಂಡ್ರಾಯ್ಡ್ ನೇರ ನಿರೂಪಣೆ"
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12010,18 +11980,16 @@ msgid "Opus"
 msgstr "Opus"
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "Opus ಧ್ವನಿ ವಿಸಂಕೇತಕ"
+msgstr " ಓಪಸ್ ಆಡಿಯೊ ಎನ್ಕೋಡರ್"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "PNG ವೀಡಿಯೊ ಎನ್ಕೋಡರ್"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -12276,7 +12244,7 @@ msgstr "ಕೃತಕ ಕಚ್ಚಾ ವಿಡಿಯೋ ವಿಭಜಕ"
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "PNG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "PNG ವೀಡಿಯೊ ಎನ್ಕೋಡರ್"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -13039,14 +13007,12 @@ msgid "USF subtitles decoder"
 msgstr "USF ಉಪಶೀರ್ಷಿಕೆಗಳ ವಿಸಂಕೇತಕ"
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "DVB ಉಪಶೀರ್ಷಿಕೆಗಳು ವಿಸಂಕೇತಕ"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "ಟೆಲಿಪ್ರಸರಣ ಉಪಶೀರ್ಷಿಕೆಗಳು"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -13131,7 +13097,7 @@ msgstr "ಥಿಯೊರ ವಿಡಿಯೋ ಸಂಕೇತಕ"
 #: modules/codec/ttml/ttml.c:45
 #, fuzzy
 msgid "TTML decoder"
-msgstr "ವಿಸಂಕೇತಕ"
+msgstr "MMAL ಡೀಕೋಡರ್"
 
 #: modules/codec/ttml/ttml.c:46
 #, fuzzy
@@ -13211,7 +13177,7 @@ msgstr ""
 #: modules/codec/videotoolbox.m:83
 #, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "WebM ವೀಡಿಯೊ ಡೀಕೋಡರ್"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13263,14 +13229,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "WebM ವೀಡಿಯೊ ಡೀಕೋಡರ್"
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr "WebM ವೀಡಿಯೊ ಡೀಕೋಡರ್"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14198,18 +14163,16 @@ msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr "H.264/MPEG-4 ಭಾಗ 10/AVC ಸಂಕೇತಕ (x264 10-ಬಿಟ್)"
 
 #: modules/codec/x264.c:456
-#, fuzzy
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "H.264/MPEG-4 ಭಾಗ 10/AVC ಸಂಕೇತಕ (x264)"
+msgstr ""
 
 #: modules/codec/x264.c:460
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr "H.264/MPEG-4 ಭಾಗ 10/AVC ಸಂಕೇತಕ (x264)"
 
 #: modules/codec/x265.c:46
-#, fuzzy
 msgid "H.265/HEVC encoder (x265)"
-msgstr "H.264/MPEG-4 ಭಾಗ 10/AVC ಸಂಕೇತಕ (x264)"
+msgstr ""
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -14938,15 +14901,13 @@ msgid "+----[ end of help ]"
 msgstr "+----[ end of help ]"
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
-msgstr "ಮುಂದುವರೆಯಲು ಮೆನು ಆಯ್ಕೆ ಅಥವಾ ವಿರಾಮ ವನ್ನು  ಒತ್ತಿರಿ."
+msgstr ""
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr "ಮುಂದುವರೆಯಲು 'menu select' ಅಥವಾ 'pause' ಅನ್ನು ಛಾಪಿಸಿ"
+msgstr ""
 
 #: modules/control/oldrc.c:1266
 msgid "Error: `goto' needs an argument greater than zero."
@@ -15146,7 +15107,6 @@ msgid "Avformat"
 msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
 msgstr "ಡಿಮಕ್ಸರ್ಸ್"
 
@@ -15253,9 +15213,8 @@ msgid "Fixing AVI Index..."
 msgstr "AVI ಸೂಚಕವನ್ನು ದುರಸ್ತಿಮಾಡಲಾಗುತ್ತಿದೆ ..."
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "AIFF ಡಿಮಕ್ಸರ್"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15562,18 +15521,16 @@ msgid "MPEG-4 video"
 msgstr "MPEG-4 ವೀಡಿಯೊ"
 
 #: modules/demux/mpeg/h26x.c:47
-#, fuzzy
 msgid "Desired frame rate for the stream."
-msgstr "H264 ಸ್ಟ್ರೀಮ್ ಗೆ ನೀವು ಬಯಸುವ ಚೌಕಟ್ಟಿನ ದರ."
+msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53
 msgid "H264 video demuxer"
 msgstr "H264 ವೀಡಿಯೊ demuxer"
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "H264 ವೀಡಿಯೊ demuxer"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15679,14 +15636,12 @@ msgstr ""
 "position. If seeking doesn't work property, turn on this option."
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "ಸ್ಟ್ರೀಮ್ ಗುರುತನ್ನು ಸಾಗಿಸಿ"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
-#, fuzzy
 msgid "Use the stream PCR as a reference."
-msgstr "ಕೆಲವು B ಚೌಕಟ್ಟುಗಳನ್ನು ಪರಾಮರ್ಶನಕ್ಕೆ ಇರಿಸಿಕೊಳ್ಳಿ"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
 #, fuzzy
@@ -15709,8 +15664,9 @@ msgid "Main audio"
 msgstr "ಮೂಲ ಧ್ವನಿ"
 
 #: modules/demux/mpeg/ts_psi.c:422
+#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "ಈ ಕೋಡೆಕ್ ಗೆ ಯಾವುದೇ ವಿವರಣೆ ಇಲ್ಲ "
 
 #: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
@@ -16207,16 +16163,14 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "Podcast parser"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "ಸೇವಾ ಆವಿಷ್ಕಾರ"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
@@ -16248,16 +16202,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "ವೀಡಿಯೊ ನಿರ್ವಾಹಕ"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "ಅನುಸ್ಥಾಪಿಸಿ"
+msgstr "ಅನುಸ್ಥಾಪಿಸಲಾಗಿದೆ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -16272,9 +16224,8 @@ msgid "Author"
 msgstr "ಲೇಖಕ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
-#, fuzzy
 msgid "Uninstall"
-msgstr "ಅನುಸ್ಥಾಪಿಸಿ"
+msgstr "ಅಸ್ಥಾಪಿಸು"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -17103,9 +17054,8 @@ msgstr "ಮುಖ್ಯ ಕಿಟಕಿಯ ಮಾಧ್ಯಮ ಮೂಲಗಳ �
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "ಪ್ಲೇಯರ್ ಗೆ ನಿಯಂತ್ರಣ ಮೆನು"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -17120,14 +17070,12 @@ msgid "Do nothing"
 msgstr "ಏನೂ ಮಾಡಬೇಡಿ"
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause iTunes / Spotify"
-msgstr "iTunes ವಿರಾಮಗೊಳಿಸಿ"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause and resume iTunes / Spotify"
-msgstr "iTunes ಅನ್ನು  ವಿರಾಮಗೊಳಿಸಿ ಮತ್ತು ಪುನರಾರಂಭಿಸಿ"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:139
 msgid "Continue playback where you left off"
@@ -17141,7 +17089,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:207
 msgid "Ask"
-msgstr ""
+msgstr "ಕೇಳಿ"
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:201
 #: modules/gui/qt/qt.cpp:207 modules/keystore/keychain.m:49
@@ -17348,9 +17296,8 @@ msgstr "ಒಂದು ಹೆಜ್ಜೆ ಹಿಂದೆ"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "ಸಮಯಕ್ಕೆ ಹೋಗಿ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -17436,9 +17383,8 @@ msgid "Window"
 msgstr "ಕಿಟಕಿ"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "ಕಿಟಕಿಯನ್ನುಕನಿಷ್ಠೀಕರಿಸಿ"
+msgstr "ಕನಿಷ್ಠೀಕರಿಸಿ"
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -17575,14 +17521,12 @@ msgid "Check for album art and metadata?"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "Enable Metadata Retrieval"
-msgstr "ಹೊಂದಿಕೊಳ್ಳಬಲ್ಲ ಪೂರ್ವ ಶೋಧಕವನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "ವಂದನೆಗಳು"
+msgstr "ಬೇಡ, ಧನ್ಯವಾದಗಳು"
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -17649,25 +17593,24 @@ msgid "Open Audio Effects window"
 msgstr "ಧ್ವನಿ ಪರಿಣಾಮಗಳು"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "BD"
+msgstr "B"
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: modules/gui/macosx/misc.m:315
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: modules/gui/macosx/misc.m:323
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: modules/gui/macosx/misc.m:328
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17753,9 +17696,8 @@ msgid "Custom playback"
 msgstr "ಇಚ್ಛೆಯ ಪ್ಲೇಬ್ಯಾಕ್"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "VIDEO_TS ಕಡತ ಕೋಶವನ್ನು ತೆರೆಯಿರಿ"
+msgstr "VIDEO_TS / BDMV ಕಡತ ಕೋಶವನ್ನು ತೆರೆಯಿರಿ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -17967,9 +17909,8 @@ msgid "URI"
 msgstr "URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "ಎರಡರಷ್ಟು ಗಾತ್ರ"
+msgstr "ಕಡತದ ಗಾತ್ರ"
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -18094,9 +18035,8 @@ msgstr "ಆಯ್ಕೆಮಾಡಿ"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "ಪ್ಲೇಬ್ಯಾಕ್ ಸಮಯದಲ್ಲಿ iTunes ಅನ್ನು ನಿಯಂತ್ರಿಸಿ "
+msgstr "ಪ್ಲೇಬ್ಯಾಕ್ ಅನ್ನು ಮುಂದುವರಿಸಬೇಕೆ?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -18107,13 +18047,12 @@ msgstr "ಮುಂದುವರಿಸಿ"
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 #, fuzzy
 msgid "Always continue media playback"
-msgstr "ಇಚ್ಛೆಯ ಪ್ಲೇಬ್ಯಾಕ್"
+msgstr "ಪ್ಲೇಬ್ಯಾಕ್ ಅನ್ನು ಮುಂದುವರಿಸಿ"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "ಇಚ್ಛೆಯ ಪ್ಲೇಬ್ಯಾಕ್"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -18290,9 +18229,8 @@ msgid "Bright"
 msgstr "ಪ್ರಕಾಶಮಾನ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "ಇಚ್ಛೆಯ ಪ್ಲೇಬ್ಯಾಕ್"
+msgstr "ಪ್ಲೇಬ್ಯಾಕ್ ಅನ್ನು ಮುಂದುವರಿಸಿ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -18960,19 +18898,16 @@ msgid " f                      Toggle Fullscreen"
 msgstr " f                      ಪೂರ್ಣಪರದೆಯನ್ನು ಅದಲುಬದಲು ಮಾಡಿ"
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " c                      Cycle through audio tracks"
-msgstr " l                      ಲೂಪ್ ಪ್ಲೇಪಟ್ಟಿಯನ್ನು ಅದಲುಬದಲು ಮಾಡಿ"
+msgstr ""
 
 #: modules/gui/ncurses.c:890
-#, fuzzy
 msgid " v                      Cycle through subtitles tracks"
-msgstr " [, ]                   ಮುಂದಿನ/ಹಿಂದಿನ ಶೀರ್ಷಿಕೆ"
+msgstr ""
 
 #: modules/gui/ncurses.c:891
-#, fuzzy
 msgid " b                      Cycle through video tracks"
-msgstr " S                     ಅಂಕಿಅಂಶಗಳ ಪೆಟ್ಟಿಗೆಯನ್ನು ತೋರಿಸು/ಮರೆಮಾಡು"
+msgstr ""
 
 #: modules/gui/ncurses.c:892
 msgid " n, p                   Next/Previous playlist item"
@@ -19793,9 +19728,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr "ನೀವು ನಿಜವಾಗಿಯೂ% 1 ಅನ್ಸಬ್ಸ್ಕ್ರೈಬ್ ಮಾಡಲು ಬಯಸುವಿರಾ?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "ಹಾದುಹೋಗು"
+msgstr "ಮುಖಪುಟ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -19814,22 +19748,18 @@ msgid "Enter name for new folder:"
 msgstr "ಹೊಸ ಕಡತದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "ಕೋಶವನ್ನು ರಚಿಸಿ"
+msgstr "ಕೋಶವನ್ನು ಮರುಹೆಸರಿಸಿ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "ಕಡತ ಕೋಶವನ್ನು ರಚಿಸಿ"
+msgstr "ಕಡತ ಕೋಶವನ್ನು ಮರುಹೆಸರಿಸಿ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
-#, fuzzy
 msgid "Enter a new name for the directory:"
-msgstr "ಹೊಸ ಕೋಶದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ:"
+msgstr "ಹೊಸ ಕಡತ ಕೋಶದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
-#, fuzzy
 msgid "Enter a new name for the folder:"
 msgstr "ಹೊಸ ಕಡತದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ:"
 
@@ -20244,9 +20174,8 @@ msgid "&Start"
 msgstr "ಪ್ರಾರಂಭ"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "ಧಾರಕಗಳು (*"
+msgstr "ಧಾರಕಗಳು"
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20293,7 +20222,6 @@ msgid "Privacy and Network Access Policy"
 msgstr "ಗೌಪ್ಯತೆ ಮತ್ತು ಜಾಲಬಂಧದ ಪ್ರವೇಶ ನೀತಿ"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
-#, fuzzy
 msgid ""
 "<p>In order to protect your privacy, <i>VLC media player</i> does <b>not</b> "
 "collect personal data or transmit them, not even in anonymized form, to "
@@ -20306,17 +20234,6 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"&lt;p&gt;In order to protect your privacy, the &lt;i&gt;VLC media player&lt;/"
-"i&gt; does &lt;b&gt;not&lt;/b&gt; collect personal data or transmit them, "
-"not even in anonymized form, to anyone.&lt;/p&gt;\n"
-"&lt;p&gt;Nevertheless, &lt;i&gt;VLC&lt;/i&gt; is able to automatically "
-"retrieve information about the media in your playlist from third party "
-"Internet-based services. That includes covert arts, track names, authoring "
-"and other meta-data.&lt;/p&gt;\n"
-"That may entail identifying some of your media files to third party "
-"entities. Therefore the &lt;i&gt;VLC&lt;/i&gt; developers require your "
-"express consent for the media player to access the Internet automatically."
-"&lt;/p&gt;\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
@@ -20512,9 +20429,8 @@ msgid "Plugins and extensions"
 msgstr "ಪ್ಲಗಿನ್ಗಳು ಮತ್ತು ವಿಸ್ತರಣೆಗಳು"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "ಸಕ್ರಿಯ ಪ್ರದೇಶಗಳು"
+msgstr "ಸಕ್ರಿಯ ವಿಸ್ತರಣೆಗಳು"
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -20566,40 +20482,35 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:417
 msgid "Only installed"
-msgstr ""
+msgstr "ಕೇವಲ ಸ್ಥಾಪಿಸಲಾದ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
-#, fuzzy
 msgid "Retrieving addons..."
-msgstr "ಚಾನೆಲ್ ಮಾಹಿತಿಯನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ ..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "ಯಾವುದೇ ಇನ್ಪುಟ್ ಕಂಡುಬಂದಿಲ್ಲ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "ಆವೃತ್ತಿ"
+msgstr "ಆವೃತ್ತಿ %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
-msgstr ""
+msgstr "%1 ಡೌನ್ಲೋಡ್ ಗಳು"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
-#, fuzzy
 msgid "&Uninstall"
-msgstr "ಅನುಸ್ಥಾಪಿಸಿ"
+msgstr "&ಅಸ್ಥಾಪಿಸಿ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "ಅನುಸ್ಥಾಪಿಸಿ"
+msgstr "&ಅನುಸ್ಥಾಪಿಸಿ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -20758,9 +20669,8 @@ msgid "Flat Button"
 msgstr "ಸಮತಟ್ಟಾದ ಬಟನ್"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "ಮುಂದಿನ ವಿಜೆಟ್‍ನ ಶೈಲಿ:"
+msgstr "ಮುಂದಿನ ವಿಜೆಟ್‍ನ ಶೈಲಿ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -20795,9 +20705,8 @@ msgid "Time Toolbar"
 msgstr "ಸಮಯದ ಪರಿಕರಪಟ್ಟಿ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "ಸುಧಾರಿತ ವಿಜೆಟ್ ಪರಿಕರಪಟ್ಟಿ:"
+msgstr "ಸುಧಾರಿತ ವಿಜೆಟ್"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -20816,9 +20725,8 @@ msgid "Select profile:"
 msgstr "ವಿವರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "ಹಿಂದಿನದು"
+msgstr "ಮುನ್ನೋಟ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -21515,9 +21423,8 @@ msgstr ""
 "This option allows the interface to change its icon on various occasions."
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "ಪೂರ್ಣತೆರೆ ನಿಯಂತ್ರಕ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -21654,18 +21561,16 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "ವಿಸಂಕೇತಕ"
+msgstr "MMAL ಡೀಕೋಡರ್"
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/vout.c:50
-#, fuzzy
 msgid "VideoCore layer where the video is displayed."
-msgstr "ಈ ಕೋಶದದಲ್ಲಿ ವೀಡಿಯೊ ಚಿತ್ರ ಸಂಗ್ರಹಿಸಲಾಗುವುದು."
+msgstr ""
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -21705,76 +21610,64 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Gradfun ವೀಡಿಯೊ ಶೋಧಕ"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
-#, fuzzy
 msgid "Temporal-spatial"
-msgstr "ತಾತ್ಕಾಲಿಕ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:875 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
-msgstr ""
+msgstr "VDPAU"
 
 #: modules/hw/vdpau/chroma.c:876
 msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "Debanding ಕ್ರಮಾವಳಿ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "ಅಮಾನ್ಯ ಆಯ್ಕೆ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "Deinterlace on"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:892
-#, fuzzy
 msgid "Noise reduction level"
-msgstr "ಶಬ್ದ ಕಡಿತ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "ಮರುಮಾದರಿಯ ಗುಣಮಟ್ಟ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "ವೀಡಿಯೋ ಗುಣಮಟ್ಟ ನಂತರದ ಪ್ರಕ್ರಿಯೆಯ ಮಟ್ಟ"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Deinterlacing ವೀಡಿಯೊ ಶೋಧಕ"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "YUV output"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "ವೀಡಿಯೊ ಶೋಧಕವನ್ನು ಚುರುಕುಗೊಳಿಸು"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -21784,7 +21677,7 @@ msgstr "ಧ್ವನಿ ಶೋಧಕಗಳು"
 #: modules/hw/vaapi/filters.c:1188
 #, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "ವೀಡಿಯೊ ವೇಗವರ್ಧನೆ (VA) API"
+msgstr "DirectX ವೀಡಿಯೊ ವೇಗವರ್ಧನೆ (DXVA) 2.0"
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -22815,18 +22708,16 @@ msgid "RTSP VoD"
 msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:78
-#, fuzzy
 msgid "Legacy RTSP VoD server"
-msgstr "RTSP VoD ಸರ್ವರ್"
+msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
 msgstr ""
 
 #: modules/misc/securetransport.c:68
-#, fuzzy
 msgid "TLS server support for OS X"
-msgstr "RTSP ಸರ್ವರ್ ಸಂಪರ್ಕಸ್ಥಾನ"
+msgstr ""
 
 #: modules/misc/securetransport.c:330
 #, c-format
@@ -22933,17 +22824,15 @@ msgstr "ಅಪರಿಚಿತ ವೀಡಿಯೊ"
 
 #: modules/mux/avi.c:55
 msgid "Subject"
-msgstr ""
+msgstr "ವಿಷಯ"
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "ವಿಸಂಕೇತಕ"
+msgstr "ಎನ್ಕೋಡರ್"
 
 #: modules/mux/avi.c:57
-#, fuzzy
 msgid "Keywords"
-msgstr "Podcast Keywords"
+msgstr ""
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23229,9 +23118,8 @@ msgid "Multipart JPEG muxer"
 msgstr "Multipart JPEG ಮಕ್ಸರ್"
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "ರಕ್ಷಕ ಅಂತರ"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -23239,9 +23127,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "ಸೂಚಿಕೆಯ ಕಡತ"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -23320,9 +23207,8 @@ msgid "H.264 video packetizer"
 msgstr "H.264 ವೀಡಿಯೊ ವಿಭಜಕ"
 
 #: modules/packetizer/hevc.c:57
-#, fuzzy
 msgid "HEVC/H.265 video packetizer"
-msgstr "H.264 ವೀಡಿಯೊ ವಿಭಜಕ"
+msgstr ""
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -24440,9 +24326,8 @@ msgid "Read size"
 msgstr "ಗಾತ್ರ ಓದಿನ"
 
 #: modules/stream_filter/prefetch.c:538
-#, fuzzy
 msgid "Prefetch background read size (bytes)"
-msgstr "RTSP ಚೌಕಟ್ಟಿನ ತಾತ್ಕಾಲಿಕ ಸಂಗ್ರಹದ ಗಾತ್ರ"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
 #, fuzzy
@@ -26106,14 +25991,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr "ಚಿತ್ರದ ಬಲಕ್ಕೆ ಸೆರಿಸಲು ಪಿಕ್ಸೆಲ್‍ಗಳ ಸಂಖ್ಯೆ"
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "Cropadd"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "ವೀಡಿಯೊ ಅಳತೆಬದಲಾವಣೆಯ ಶೋಧಕ"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -26267,14 +26150,12 @@ msgid "FPS Converter"
 msgstr "YUVP ಪರಿವರ್ತಕ"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "ಪರಸ್ಪರ ಆಟದ ವೀಡಿಯೊ ಶೋಧಕ ಒಗಟು"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
-#, fuzzy
 msgid "Freeze"
-msgstr "ಮುಕ್ತಶೈಲಿ"
+msgstr "ಸ್ಥಗಿತಗೊಳಿಸು"
 
 #: modules/video_filter/gaussianblur.c:50
 msgid "Gaussian's std deviation"
@@ -26496,13 +26377,12 @@ msgid "Motion detect video filter"
 msgstr "ಚಲನೆಯನ್ನು ಅಸ್ಪಷ್ಟಗೊಳಿಸುವ ವೀಡಿಯೊ ಶೋಧಕ"
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "ಚಲನೆಯನ್ನು ಅಸ್ಪಷ್ಟಗೊಳಿಸುವ ವೀಡಿಯೊ ಶೋಧಕ"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
-msgstr ""
+msgstr "ಹಳೆ ಚಲನಚಿತ್ರ"
 
 #: modules/video_filter/opencv_example.cpp:72
 msgid "OpenCV face detection example filter"
@@ -26939,13 +26819,12 @@ msgid "Rotate or flip the video"
 msgstr "ವೀಡಿಯೋವನ್ನು ತಿರುಗಿಸಿ ಅಥವಾ ತಲೆಕೆಳಗೆ ಮಾಡಿ"
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "ಚಲನೆಯನ್ನು ಅಸ್ಪಷ್ಟಗೊಳಿಸುವ ವೀಡಿಯೊ ಶೋಧಕ"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr ""
+msgstr "VHS ಚಲನಚಿತ್ರ"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
@@ -26966,12 +26845,11 @@ msgstr "ASCII-ಕಲೆಯ ವೀಡಿಯೊ ಉತ್ಪಾದನೆ"
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "ಸಕ್ರಿಯ ಕಿಟಕಿಗಳು"
+msgstr "ಕಿಟಕಿಯನ್ನು ಮುಚ್ಚಿ"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "ಸಕ್ರಿಯ ಕಿಟಕಿಗಳು"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -27208,9 +27086,8 @@ msgid "K Video Acceleration video output"
 msgstr "K ವೀಡಿಯೊ ವೇಗವರ್ಧನೆಯ ವೀಡಿಯೊ ಉತ್ಪಾದನೆ"
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "iOS OpenGL ವೀಡಿಯೊ ಉತ್ಪಾದನೆ"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -27272,16 +27149,15 @@ msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
 msgid "Path to HLSL file"
-msgstr ""
+msgstr "HLSL ಕಡತಕ್ಕೆ ಹಾದಿ"
 
 #: modules/video_output/win32/direct3d9.c:80
 msgid "Path to an HLSL file containing a single pixel shader."
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "ಕಡತವನ್ನು ಉಳಿಸಿ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -28008,18 +27884,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "ಪರಿಣಾಮಗಳ ವಿಡಿಯೋ ಕಿಟಕಿಯ ಏತ್ತರ ಪಿಕ್ಸೆಲ್ ಗಳಲ್ಲಿ."
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "X ಕಿಟಕಿ"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "ಅತಿಕ್ರಮಿಸುವಿಕೆಯ ನಿಯತಾಂಕಗಳು"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -28534,7 +28408,7 @@ msgstr ""
 #: modules/gui/qt/ui/profiles.h:703
 #, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr "MP4/MOV ಮಕ್ಸರ್"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -28545,9 +28419,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -28577,7 +28450,7 @@ msgstr "Webm"
 #: modules/gui/qt/ui/profiles.h:713
 #, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr "MPEG 1 ಸ್ವರೂಪ"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28608,9 +28481,8 @@ msgid "Menus"
 msgstr "ಮೆನುಗಳು"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "ಚೌಕಟ್ಟಿನ ದರ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -28627,7 +28499,7 @@ msgstr "ಇಚ್ಛೆಯ ಆಯ್ಕೆಗಳು"
 #: modules/gui/qt/ui/profiles.h:735
 #, fuzzy
 msgid "&Quality"
-msgstr "ಗುಣಮಟ್ಟ"
+msgstr "VBR ಗುಣಮಟ್ಟ"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28652,7 +28524,7 @@ msgstr "px"
 #: modules/gui/qt/ui/profiles.h:758
 #, fuzzy
 msgid "Sa&mple Rate"
-msgstr "ಮಾದರಿ ದರ"
+msgstr "ಮಾದರಿ ಮಾಡಬೇಕಾಗಿರುವ ದರ"
 
 #: modules/gui/qt/ui/profiles.h:766
 #, fuzzy
@@ -29135,29 +29007,24 @@ msgid "Soften"
 msgstr "ಮೃದುಗೊಳಿಸಿ"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "HQ Denoiser 3D"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Spatial ಲೂಮ strength (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "ಅಲ್ಪಕಾಲಿಕ ಲೂಮ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "ಪ್ರಾದೇಶಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "ಅಲ್ಪಕಾಲಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -29207,10 +29074,6 @@ msgstr "AAAA;"
 msgid "Media Manager List"
 msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಗಳು"
-
 #~ msgid "Display resolution"
 #~ msgstr "ಪರದೆಯ ದೃಶ್ಯ ಸಾಂದ್ರತೆ"
 
@@ -29252,13 +29115,12 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "HTTP/TLS Certificate Revocation List"
 #~ msgstr "HTTP / TLS ಪ್ರಮಾಣಪತ್ರ ವಾಪಾಸಾತಿಯ ಪಟ್ಟಿ"
 
-#, fuzzy
 #~ msgid ""
 #~ "This file contains an optional CRL to prevent remote clients from using "
 #~ "revoked certificates in TLS sessions."
 #~ msgstr ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
+#~ "ಈ ಕಡತ TLS ಅವಧಿಯಲ್ಲಿ ಹಿಂಪಡೆಯಲಾಗಿದೆ ಪ್ರಮಾಣಪತ್ರಗಳನ್ನು ಬಳಸದಂತೆ ರಿಮೋಟ್ ಕ್ಲೈಂಟ್ಗಳು "
+#~ "ತಡೆಗಟ್ಟಲು ಐಚ್ಛಿಕ CRL ಹೊಂದಿದೆ."
 
 #~ msgid "Log to file"
 #~ msgstr "ಕಡತಕ್ಕೆ ಬರೆ"
@@ -29399,9 +29261,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "mydomain:myport/ ; if empty, the http_proxy environment variable will be "
 #~ "tried."
 
-#, fuzzy
 #~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC could not open the file \"%s\" (%m)."
+#~ msgstr "VLC ಕಡತ \"%s\": %s ಎಂಬುದು ತೆರೆಯಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ"
 
 #~ msgid "Video Capture width"
 #~ msgstr "ದೃಶ್ಯ ಸೆರೆಹಿಡಿಯುವಿಕೆಯ ಅಗಲ"
@@ -29560,12 +29421,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "ಪ್ಲೇಪಟ್ಟಿಯನ್ನು ಬಳಸಲು ಸ್ವರೂಪ \"ಶೀರ್ಷಿಕೆr\" ಕ್ಷೇತ್ರ."
 
-#~ msgid "Media in Zip"
-#~ msgstr "ಜಿಪ್ ಮಾಧ್ಯಮ"
-
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "ಜಿಪ್ ಕಡತದ ಮಾಧ್ಯಮಕ್ಕೆ ಹಾದಿ"
-
 #~ msgid "Zip files filter"
 #~ msgstr "ಜಿಪ್ ಕಡತಗಳ ಶೋಧಕ"
 
@@ -29642,9 +29497,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "\"%s\" is no audio encoder."
 #~ msgstr "\"%s\" ಯಾವುದೇ ಧ್ವನಿ ಸಂಕೇತಕ ಅಲ್ಲ"
 
-#, fuzzy
 #~ msgid "Dummy video decoder"
-#~ msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
+#~ msgstr "ನಕಲಿ ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
 
 #~ msgid "420YpCbCr8Planar"
 #~ msgstr "420YpCbCr8Planar"
@@ -29663,18 +29517,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "QuickTime ಗ್ರಂಥಾಲಯದ ವಿಸಂಕೇತಕ"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  ಡಿವಿಡಿ ಮೆನು"
-
-#~ msgid "First Played"
-#~ msgstr "ಮೊದಲು ಪ್ಲೇ ಮಾಡಿದ"
-
-#~ msgid "Video Manager"
-#~ msgstr "ವೀಡಿಯೊ ನಿರ್ವಾಹಕ"
-
-#~ msgid "----- Title"
-#~ msgstr "----- ಶೀರ್ಷಿಕೆ"
 
 #~ msgid "Writer"
 #~ msgstr "ಲೇಖಕ"
@@ -29772,20 +29614,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "ZPL playlist import"
 #~ msgstr "ZPL ಪಟ್ಟಿಯನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಿ"
 
-#~ msgid "Fast udp streaming"
-#~ msgstr "ವೇಗದ udp ಸ್ಟ್ರೀಮಿಂಗ್"
-
-#~ msgid ""
-#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
-#~ msgstr ""
-#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
-
-#~ msgid "MTU for out mode"
-#~ msgstr "ಹೊರಗಿನ ಕ್ರಮಕ್ಕೆ ಫಾರ್ MTU"
-
-#~ msgid "MTU for out mode."
-#~ msgstr "ಹೊರಗಿನ ಕ್ರಮಕ್ಕೆ ಫಾರ್ MTU."
-
 #~ msgid "Compiled by %s with %@"
 #~ msgstr "ಸಂಕಲಿಸಿದವರು %s ಯಿಂದ %@"
 
@@ -29804,9 +29632,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "The stream must be playing or paused for bookmarks to work."
 #~ msgstr "ಅಚ್ಹುಮೆಚ್ಹುಗಳು ಕೆಲಸ ಮಾಡಲು ಸ್ಟ್ರೀಮ್ ಪ್ಲೇ ಆಗಿತಿರಬೇಕು ಅಥವಾ ವಿರಾಮದಲ್ಲಿರಬೇಕು."
 
-#, fuzzy
 #~ msgid "Hide Details"
-#~ msgstr "ಸಂಕೇತಕದ ವಿವರಗಳು"
+#~ msgstr "ವಿವರಣೆಗಳನ್ನು ಅಡಗಿಸು"
 
 #~ msgid "Send"
 #~ msgstr "ಕಳುಹಿಸಿ"
@@ -29996,9 +29823,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Meta-information"
 #~ msgstr "ಪರ್ಯಾಯ ಮಾಹಿತಿ"
 
-#, fuzzy
 #~ msgid "Always continue"
-#~ msgstr "ಯಾವಾಗಲೂ ಮೇಲ್ಭಾಗದಲ್ಲಿ"
+#~ msgstr "ಯಾವಾಗಲೂ ಮುಂದುವರೆಸು"
 
 #~ msgid "Hardware Acceleration"
 #~ msgstr "ಯಂತ್ರಾಂಶದ ವೇಗವರ್ಧಕ"
@@ -30151,18 +29977,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "generally the best thing to do. Other computers can then access the "
 #~ "stream at mms://yourip:8080 by default."
 
-#, fuzzy
-#~ msgid ""
-#~ "Use this to stream to several computers using the Microsoft MMS protocol. "
-#~ "This protocol is used as transport method by many Microsoft's software. "
-#~ "Note that only a small part of the MMS protocol is supported (MMS "
-#~ "encapsulated in HTTP)."
-#~ msgstr ""
-#~ "Use this to stream to several computers using the Microsoft MMS protocol. "
-#~ "This protocol is used as transport method by many Microsoft's softwares. "
-#~ "Note that only a small part of the MMS protocol is supported (MMS "
-#~ "encapsulated in HTTP)."
-
 #~ msgid "Enter the address of the computer to stream to."
 #~ msgstr "ಸ್ಟ್ರೀಮ್ ಮಾಡುವ ಕಂಪ್ಯೂಟರ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ."
 
@@ -30259,6 +30073,9 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
 #~ msgid "This page allows selecting how the input stream will be sent."
 #~ msgstr "ಈ ಪುಟ ಇನ್ಪುಟ್ ಸ್ಟ್ರೀಮ್ ಹೇಗೆ ಕಳುಹಿಸಲಾಗುವುದು ಎಂಬ ಆಯ್ಕೆಯನ್ನು ಅನುಮತಿಸುತ್ತದೆ."
+
+#~ msgid "Streaming method"
+#~ msgstr "ಸ್ಟ್ರೀಮಿಂಗ್ ವಿಧಾನ"
 
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "ಯಾವ ಕಂಪ್ಯೂಟರ್‍ಗೆ ಸ್ಟ್ರೀಮ್ ಮಾಡಬೇಕೋ ಅದರ ವಿಳಾಸ."
@@ -30521,16 +30338,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "&Decrease Volume"
 #~ msgstr "ವಾಲ್ಯೂಮ್ ಅನ್ನು ಕಡಿಮೆಗೊಳಿಸಿ"
 
-#~ msgid "&Post processing"
-#~ msgstr "ನಂತರದ ಪ್ರಕ್ರಿಯೆ"
-
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "ಪ್ಲೇಪಟ್ಟಿಯನ್ನು ಉಳಿಸಿ"
-
-#, fuzzy
 #~ msgid "Recently Played"
-#~ msgstr "ಇತ್ತೀಚೆಗೆ ಆಡಿದ ಐಟಂಗಳನ್ನು ಉಳಿಸಿ"
+#~ msgstr "ಇತ್ತೀಚೆಗೆ ಆಡಿದ"
 
 #~ msgid "Power"
 #~ msgstr "ಶಕ್ತಿ"
@@ -31138,14 +30947,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Bar width in pixel (default : 10)"
 #~ msgstr "ಪಟ್ಟಿಯ ಅಗಲ ಪಿಕ್ಸೆಲ್ ನಲ್ಲಿ (ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ: 10)"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "ಸಕ್ರಿಯ ಕಿಟಕಿಗಳು"
-
-#, fuzzy
-#~ msgid "Android MediaCodec direct rendering video output"
-#~ msgstr "ಆಂಡ್ರಾಯ್ಡ್ ಮೇಲ್ಮೈ ವೀಡಿಯೊ ಉತ್ಪಾದನೆ"
-
 #~ msgid "Force use of a specific chroma for output. Default is RGB32."
 #~ msgstr ""
 #~ "ಉತ್ಪಾದನೆಗೆ ನಿರ್ದಿಷ್ಟ ವರ್ಣಶುದ್ಧತೆಯ ಬಳಕೆಗೆ ಒತ್ತಾಯಪಡಿಸಿ.ಪೂರ್ವನಿಯೋಜಿತ RGB32 ಆಗಿದೆ."
@@ -31155,15 +30956,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "DirectFB ವೀಡಿಯೊ ಉತ್ಪಾದನೆ http://www.directfb.org/"
-
-#~ msgid ""
-#~ "If your framebuffer supports hardware acceleration or does double "
-#~ "buffering in hardware then you must disable this option. It then does "
-#~ "double buffering in software."
-#~ msgstr ""
-#~ "If your framebuffer supports hardware acceleration or does double "
-#~ "buffering in hardware then you must disable this option. It then does "
-#~ "double buffering in software."
 
 #~ msgid "OpenGL ES extension"
 #~ msgstr "OpenGL ES ವಿಸ್ತರಣೆ"
@@ -31202,28 +30994,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "OpenGL GLX video output (XCB)"
 #~ msgstr "OpenGL GLX ವಿಡಿಯೋ output (XCB)"
 
-#~ msgid "Video acceleration not available"
-#~ msgstr "ವೀಡಿಯೊ ವೇಗವರ್ಧನೆ ಲಭ್ಯವಿಲ್ಲ"
-
-#~ msgid ""
-#~ "The XVideo rendering acceleration driver does not support the required "
-#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
-#~ "Acceleration will thus be disabled. Performance may be degraded severely "
-#~ "if the resolution is large."
-#~ msgstr ""
-#~ "The XVideo rendering acceleration driver does not support the required "
-#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
-#~ "Acceleration will thus be disabled. Performance may be degraded severely "
-#~ "if the resolution is large."
-
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "YUV4MPEG2 ಶಿರೋಲೇಖ (ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ)"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
 
 #~ msgid "Black Slot"
 #~ msgstr "ಕಪ್ಪು ಸೀಳುಗಂಡಿ"
@@ -31240,196 +31012,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Filter threshold (%)"
 #~ msgstr "ಶೋಧಕದ ಮಿತಿ (%)"
 
-#, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "ವೀಡಿಯೊ ಸೆರೆಹಿಡಿ"
-
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "ಧ್ವನಿ Ouput ಘಟಕ"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "ಯಾವುದೇ Input ಸಾಧನ"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "ನಿಮ್ಮ ಮ್ಯಾಕ್ ಸೂಕ್ತ ಇನ್ಪುಟ್ ಸಾಧನದಿಂದ ಸಜ್ಜುಗೊಂಡಿಯೆಂದು ತೋರುವುದಿಲ್ಲ. ನಿಮ್ಮ "
-#~ "ಕನೆಕ್ಟರ್ಗಳು ಮತ್ತು ಡ್ರೈವರ್ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ."
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "ಉಪಗ್ರಹದ ವ್ಯಾಪ್ತಿಯ ಸಂಕೇತ"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "ಸುತ್ತುವರಿಯುವ"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "QuickTime ಸೆರೆಹಿಡಿಯುವಿಕೆ"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "ಯಾವುದೇ Input ಸಾಧನ"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "ನಿಮ್ಮ ಮ್ಯಾಕ್ ಸೂಕ್ತ ಇನ್ಪುಟ್ ಸಾಧನದಿಂದ ಸಜ್ಜುಗೊಂಡಿಯೆಂದು ತೋರುವುದಿಲ್ಲ. ನಿಮ್ಮ "
-#~ "ಕನೆಕ್ಟರ್ಗಳು ಮತ್ತು ಡ್ರೈವರ್ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ."
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "ಯಾವುದೇ Input ಸಾಧನ"
-
-#~ msgid "Uncompressed RAR"
-#~ msgstr "ಸಂಕ್ಷೇಪಿಸದ RAR"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "Windows GDI ವಿಡಿಯೋ output"
-
-#, fuzzy
-#~ msgid "Specify the width to decode the image too"
-#~ msgstr "ಭಾಷೆಯನ್ನು ಹೊಂದಿರುವ ಸಾಲನ್ನು ಸೂಚಿಸಿ"
-
-#, fuzzy
-#~ msgid "Specify the height to decode the image too"
-#~ msgstr "Specify the deinterlace module to use."
-
-#, fuzzy
-#~ msgid "Scale factor to apply to image"
-#~ msgstr "Scale factor to apply to the video while transcoding (eg: 0.25)"
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "CDG ವೀಡಿಯೊ ವಿಸಂಕೇತಕ"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "ವಿಂಡೋಸ್ ಸೇವೆಯ ಅಂತರ್ವರ್ತನ"
-
-#~ msgid "Save this Log..."
-#~ msgstr "ಈ ದಾಖಲೆಯನ್ನು ಉಳಿಸಿ "
-
-#~ msgid "VLC Debug Log (%s).rtf"
-#~ msgstr "VLC ಡೀಬಗ್ ದಾಖಲೆ (%s).rtf"
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "ಸಕ್ರಿಯಗೊಳಿಸಿ"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "&amp;ಬೆರಳಿನ ಗುರುತು"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "ಯಾವುದೇ ಇನ್ಪುಟ್ ಕಂಡುಬಂದಿಲ್ಲ"
-
-#, fuzzy
-#~ msgid "Fingerprinting track..."
-#~ msgstr "&amp;ಬೆರಳಿನ ಗುರುತು"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "ತೆರವುಗೊಳಿಸಿ"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "ಗರಿಷ್ಠ ಸ್ಥಳೀಯ ಬಿಟ್‍ದರ"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "ವೀಡಿಯೊ ರೂಪಾಂತರದ ಶೋಧಕ"
-
-#, fuzzy
-#~ msgid "acoustid"
-#~ msgstr "ಶ್ರವಣಾತ್ಮಕ"
-
-#, fuzzy
-#~ msgid "Duration of the fingerprinting"
-#~ msgstr "ಪ್ರತಿಬಿಂಬಿಸುವ ದಿಕ್ಕು"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "ಪೂರ್ವನಿಯೋಜಿತ ಪ್ರವಾಹಕ"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "ಸ್ಟ್ರೀಮ್ ಉತ್ಪಾದನೆಯನ್ನು ಒಟ್ಟುಗೂಡಿಸಲಾಗುತ್ತಿದೆ"
-
-#~ msgid ""
-#~ "Please wait while your font cache is rebuilt.\n"
-#~ "This should take less than a few minutes."
-#~ msgstr ""
-#~ "ನಿಮ್ಮ ಅಕ್ಷರಶೈಲಿಯ ಸಂಗ್ರಹ ಮರುನಿರ್ಮಾಣ ಮಾಡಲಾಗುತ್ತಿದೆ ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ.\n"
-#~ "ಇದು ಕೆಲವು ನಿಮಿಷಗಳಿಗಿಂತ ಕಡಿಮೆ ತೆಗೆದುಕೊಳ್ಳಬೇಕು."
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "ವೀಡಿಯೊ ಕಿಟಕಿಯ ಅಗಲ ಪಿಕ್ಸೆಲ್ಗಳಲ್ಲಿ ,."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "ವೀಡಿಯೊ ಕಿಟಕಿಯ ಎತ್ತರ ಪಿಕ್ಸೆಲ್‍ಗಳಲ್ಲಿ."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "ವರ್ಣಪಟಲ"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "ಪ್ರಸ್ತುತ ದೃಶ್ಯೀಕರಣ"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "ಮೇಲೆ ತೇಲಿಸಿ"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "VLC ಮೀಡಿಯಾ ಪ್ಲೇಯರ್ - ಅಂತರ್ಜಾಲ ಮೇಲ್ಮೈ"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "ಸ್ಟ್ರೀಮ್ ಉತ್ಪಾದನೆ"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "ನಿಮ್ಮ ಮೆಚ್ಚಿನ ವೀಡಿಯೊ Output ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಮತ್ತು ಅದನ್ನು ಇಲ್ಲಿ ಸಂರಚಿಸಬಹುದು."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ಈ ಘಟಕಗಳು VLC ಎಲ್ಲಾ ಇತರ ಭಾಗಗಳಿಗೆ ಜಾಲಬಂಧದ ಕಾರ್ಯಗಳನ್ನು ಒದಗಿಸುತ್ತವೆ."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "ಇವು ವೀಡಿಯೋ/ಧ್ವನಿ/ಉಪಶೀರ್ಷಿಕೆಗಳ ಸಂಕೇತೀಕರಣದ  ಸಾಮಾನ್ಯ ಸಂಯೋಜನೆಗಳಾಗಿವೆ."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "ಸಂವಾದ ಪೂರೈಕೆದಾರರನ್ನು ಇಲ್ಲಿ ಸಂರಚಿಸಬಹುದು."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "ಈ ವಿಭಾಗದಲ್ಲಿ ನೀವು ಉಪಶೀರ್ಷಿಕೆಯ ಡಿಮಕ್ಸರ್‍ಗಳ ವರ್ತನೆಯನ್ನು ಬಲವಂತಪಡಿಸಬಹುದು,ಉದಾಹರಣೆಗೆ "
-#~ "ಉಪಶೀರ್ಷಿಕೆ ಮಾದರಿ ಅಥವಾ ಕಡತದ ಹೆಸರು ಹೊಂದಿಸುವ ಮೂಲಕ."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "ಯಾವುದೇ ಸೂಕ್ತ ವಿಸಂಕೇತಕ ಘಟಕ ಇಲ್ಲ"
-
 #~ msgid ""
 #~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
 #~ "there is no way for you to fix this."
@@ -31444,23 +31026,14 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "Additional path for VLC to look for its modules. You can add several "
 #~ "paths by concatenating them using \" PATH_SEP \" as separator"
 
-#~ msgid "Album art policy"
-#~ msgstr "Album art policy"
-
 #~ msgid "Choose how album art will be downloaded."
 #~ msgstr "ಆಲ್ಬಮ್ ಕಲೆ ಡೌನ್ಲೋಡ್ ಹೇಗೆ ನಡೆಯಲಿ ಎಂಬುದನ್ನು ಆರಿಸಿ."
-
-#~ msgid "Manual download only"
-#~ msgstr "ಹಸ್ತಚಾಲಿತ ಡೌನ್ಲೋಡ್ಗಳು  ಮಾತ್ರ"
 
 #~ msgid "When track starts playing"
 #~ msgstr "ಹಾದುಗಳು ಪ್ಲೇ ಆಗಲು ಪ್ರಾರಂಭಿಸಿದಾಗ"
 
 #~ msgid "As soon as track is added"
 #~ msgstr "ಹಾದುಗಳನ್ನು ಸೇರಿಸಿದ ತಕ್ಷಣ"
-
-#~ msgid "Load Media Library"
-#~ msgstr "ಮಾದ್ಯಮ ಭಂಡಾರವನ್ನುಲೋಡ್ ಮಾಡಿ"
 
 #~ msgid ""
 #~ "Enable this option to load the SQL-based Media Library at VLC startup"
@@ -31470,17 +31043,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
 #~ msgid "FFmpeg"
 #~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg ಪ್ರವೇಶ"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "ನಿಮ್ಮ ವ್ಯವಸ್ಥೆಯ AACS ವಿಸಂಕೇತಿಕರಣದ ಗ್ರಂಥಾಲಯ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಕೀಲಿಗಳನ್ನು "
-#~ "ಕಾಣೆಯಾಗಿವೆಯೆ?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC ಗೆ  \"%s\". (%m) ಕಡತವನ್ನು ತೆರೆಯಲು ಆಗಲಿಲ್ಲ"
 
 #~ msgid "TCP address to use"
 #~ msgstr "ಬಳಸಲು TCP ವಿಳಾಸ"
@@ -31492,9 +31054,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "TCP address to use to communicate with the video part of the Bar Graph "
 #~ "(default localhost). In the case of bargraph incrustation, use localhost."
 
-#~ msgid "TCP port to use"
-#~ msgstr "ಬಳಸಲು TCP ಸಂಪರ್ಕಸ್ಥಾನ"
-
 #~ msgid ""
 #~ "TCP port to use to communicate with the video part of the Bar Graph "
 #~ "(default 12345). Use the same port as the one used in the rc interface."
@@ -31502,36 +31061,18 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "TCP port to use to communicate with the video part of the Bar Graph "
 #~ "(default 12345). Use the same port as the one used in the rc interface."
 
-#~ msgid "Force connection reset regularly"
-#~ msgstr "ಸಂಪರ್ಕವನ್ನು ನಿಯಮಿತವಾಗಿ ಮರುಹೊಂದಿಸಲು ಒತ್ತಾಯಿಸಿ"
-
 #~ msgid ""
 #~ "Defines if the TCP connection should be reset. This is to be used when "
 #~ "using with audiobargraph_v (default 1)."
 #~ msgstr ""
 #~ "Defines if the TCP connection should be reset. This is to be used when "
 #~ "using with audiobargraph_v (default 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "ಸ್ಟೀರಿಯೋ ಮತ್ತು ಮೊನೊ ಪರಿವರ್ತನೆಗೆ ಧ್ವನಿ ಶೋಧಕ"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "ಕತ್ತರಿಸುವ ಮಾಹಿತಿಯನ್ನು ತಿರಸ್ಕರಿಸಿ"
 
 #~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 #~ msgstr "Discard internal cropping parameters (e.g. from H.264 SPS)."
 
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "ವಿಡಿಯೋ ವಿಸಂಕೇತಕ ಮತ್ತು ಯುನಿಕ್ಸ್ ಪ್ರಸ್ತುತಿಯ API (VDPAU)"
-
 #~ msgid "If bitrate=0, use this value for constant quality"
 #~ msgstr "ಒಂದು ವೇಳೆ ಬಿಟ್ ದರ = 0,ಈ ಮೌಲ್ಯವನ್ನು ನಿರಂತರ ಗುಣಮಟ್ಟಕ್ಕೆ ಬಳಸಿ"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "ಒಂದು ಮೌಲ್ಯ &gt; 0 ಸ್ಥಿರ ಬಿಟ್ ದರದ ಕ್ರಮವನ್ನು ಸಕ್ರಿಯಗೊಳಿಸುತ್ತದೆ"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "ನಷ್ಟವಿಲ್ಲದ ಸಂಕೇತಿಸುವ ಕ್ರಮವನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
 
 #~ msgid ""
 #~ "Lossless coding ignores bitrate and quality settings, allowing for "
@@ -31542,18 +31083,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 
 #~ msgid "Diagonal Linear Phase"
 #~ msgstr "ಕರ್ಣೀಯ ರೇಖಾತ್ಮಕ ಹಂತ"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' ಚೌಕಟ್ಟುಗಳ ನಡುವಿನ ಅಂತರ"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "ಪ್ರತಿ GOP ಗೆ  'P' ಚೌಕಟ್ಟುಗಳ ಸಂಖ್ಯೆ"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Width of motion compensation blocks"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Height of motion compensation blocks"
 
 #~ msgid "Block overlap (%)"
 #~ msgstr "ಬ್ಲಾಕ್ ಅತಿಕ್ರಮಣ (%)"
@@ -31574,12 +31103,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Total vertical block length including overlaps"
 #~ msgstr "ಅತಿಕ್ರಮಣ ಸೇರಿದಂತೆ ಒಟ್ಟು ಲಂಬವಾದ ಬ್ಲಾಕ್ಗಳ ಉದ್ದ"
 
-#~ msgid "Motion vector precision"
-#~ msgstr "ಚಲನೆಯ ಸದಿಶ ಪಥದ ನಿಖರತೆ"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "ಚಲನೆಯ ಸದಿಶ ಪಥದ ನಿಖರತೆ pels ನಲ್ಲಿ"
-
 #~ msgid "Simple ME search area x:y"
 #~ msgstr "ಸರಳ ME ಹುಡುಕು ಪ್ರದೇಶ x:y "
 
@@ -31590,29 +31113,8 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "(Not recommended) Perform a simple (non hierarchical block matching "
 #~ "motion vector search with search range of +/-x, +/-y"
 
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "ಪ್ರಾದೇಶಿಕ ವಿಭಜನೆಯನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cycles per degree"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac video encoder using dirac-research library"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash ಬಳಸಿಕೊಂಡು ವಿಡಿಯೋ ವಿಸಂಕೇತಕ"
-
 #~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 #~ msgstr "| menu . . [on|off|up|down|left|right|select] ಮೆನುವನ್ನು ಉಪಯೋಗಿಸಿ"
-
-#~ msgid "Jump to time"
-#~ msgstr "Jump To Time"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "ಘರ್ಷಣಾ ದಾಖಲೆ ಅನ್ನು ತೆರೆಯಿರಿ ..."
-
-#~ msgid "Don't Send"
-#~ msgstr "ಕಳುಹಿಸಬೇಡಿ"
 
 #~ msgid "VLC crashed previously"
 #~ msgstr "VLC ಹಿಂದೆ ಘರ್ಷಣೆಗೆ ಸಿಲುಕಿತ್ತು"
@@ -31649,9 +31151,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ msgid "Couldn't find any trace of a previous crash."
 #~ msgstr "ಹಿಂದಿನ ಘರ್ಷಣೆಯ ಬಗ್ಗೆ ಯಾವುದೇ ಕುರುಹು ಸಿಗಲಿಲ್ಲ."
 
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "VLC ಸಕ್ರಿಯವಾಗಿರುವ ಸಮಯದಲ್ಲಿ iTunes ಅನ್ನು ವಿರಾಮಗೊಳಿಸಿ"
-
 #~ msgid ""
 #~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
 #~ "playback will be resumed again if VLC playback is finished."
@@ -31659,50 +31158,12 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
 #~ "playback will be resumed again if VLC playback is finished."
 
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV ಕಡತ ಕೋಶವನ್ನು ತೆರೆಯಿರಿ"
-
-#~ msgid "Album art download policy"
-#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಡೌನ್ಲೋಡ್ ನೀತಿ"
-
-#~ msgid "Output module"
-#~ msgstr "ಉತ್ಪಾದನೆಯ ಘಟಕ"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "ಗ್ರಾಫಿಕ್ ಸಮಕಾರಿ"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಮಾಧ್ಯಮದ ಮಾಹಿತಿಯನ್ನು ಪಡೆಯಿರಿ"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "ಇದರಿಂದ ಇನ್ನಷ್ಟು ವಿಸ್ತರಣೆಗಳನ್ನು ಪಡೆಯಿರಿ"
-
-#~ msgid "Under the Video"
-#~ msgstr "ವೀಡಿಯೊದ ಕೆಳಗೆ"
-
-#~ msgid "&Help..."
-#~ msgstr "&amp;ಸಹಾಯ..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "ಹಾಡಿನೊಂದಿಗೆ ಹೊಂದಾಣಿಕೆ ಮಾಡಿ"
-
 #~ msgid ""
 #~ "This option will drop/duplicate video frames to synchronise the video "
 #~ "track on the audio track."
 #~ msgstr ""
 #~ "This option will drop/duplicate video frames to synchronise the video "
 #~ "track on the audio track."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "ಧ್ವನಿ ಚಾನಲ್ಗಳ ಮಟ್ಟದ ಮೌಲ್ಯ"
 
 #~ msgid ""
 #~ "Value of the audio level of each channels between 0 and 1. Each level "
@@ -31719,18 +31180,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "ಸಿಗ್ನಲ್ಸ್ ಒಂದು ಮೌನ ಮತ್ತು ಪ್ರದರ್ಶನಗಳು ಮತ್ತು ಎಚ್ಚರಿಕೆಯನ್ನು (0 = ಯಾವುದೇ ಅಲಾರ್ಮ್, 1 = "
 #~ "ಅಲಾರ್ಮ್)."
 
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "ಪ್ರಾದೇಶಿಕ ಲೂಮ ಶಕ್ತಿ (ಪೂರ್ವನಿಯೋಜಿತ 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "ಪ್ರಾದೇಶಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (ಪೂರ್ವನಿಯೋಜಿತ 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "ಅಲ್ಪಕಾಲಿಕ ಲೂಮ ಶಕ್ತಿ (ಪೂರ್ವನಿಯೋಜಿತ 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "ಅಲ್ಪಕಾಲಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (ಪೂರ್ವನಿಯೋಜಿತ 4.5)"
-
 #~ msgid ""
 #~ "Marquee text to display. (Available format strings: Time related: %Y = "
 #~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
@@ -31751,12 +31200,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
 #~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
 #~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES ವೀಡಿಯೊ ಉತ್ಪಾದನೆ (UIView ಅಗತ್ಯವಿದೆ)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL ಉತ್ಪಾದನೆ (requires nsobject ಅಗತ್ಯವಿದೆ)"
 
 #~ msgid "OpenGL acceleration is not supported on your Mac"
 #~ msgstr "OpenGL ವೇಗವರ್ಧನೆ ನಿಮ್ಮ Mac ನಲ್ಲ್ಲಿ ಬೆಂಬಲವಿಲ್ಲ"
@@ -31770,15 +31213,227 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #~ "output. It will still work, but much slower and with possibly unexpected "
 #~ "results."
 
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "ನಿಮ್ಮ ಮೆಚ್ಚಿನ ವೀಡಿಯೊ Output ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಮತ್ತು ಅದನ್ನು ಇಲ್ಲಿ ಸಂರಚಿಸಬಹುದು."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ಈ ಘಟಕಗಳು VLC ಎಲ್ಲಾ ಇತರ ಭಾಗಗಳಿಗೆ ಜಾಲಬಂಧದ ಕಾರ್ಯಗಳನ್ನು ಒದಗಿಸುತ್ತವೆ."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "ಸಂವಾದ ಪೂರೈಕೆದಾರರನ್ನು ಇಲ್ಲಿ ಸಂರಚಿಸಬಹುದು."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "ಈ ವಿಭಾಗದಲ್ಲಿ ನೀವು ಉಪಶೀರ್ಷಿಕೆಯ ಡಿಮಕ್ಸರ್‍ಗಳ ವರ್ತನೆಯನ್ನು ಬಲವಂತಪಡಿಸಬಹುದು,ಉದಾಹರಣೆಗೆ "
+#~ "ಉಪಶೀರ್ಷಿಕೆ ಮಾದರಿ ಅಥವಾ ಕಡತದ ಹೆಸರು ಹೊಂದಿಸುವ ಮೂಲಕ."
+
+#, fuzzy
+#~ msgid "Manual download only"
+#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಡೌನ್ಲೋಡ್ ನೀತಿ"
+
+#~ msgid "Album art download policy"
+#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಡೌನ್ಲೋಡ್ ನೀತಿ"
+
+#, fuzzy
+#~ msgid "Album art download policy:"
+#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಡೌನ್ಲೋಡ್ ನೀತಿ"
+
+#~ msgid "Subtitle track added"
+#~ msgstr "ಸಬ್‍ಟೈಟಲ್ ಟ್ರ್ಯಾಕ್ ಸೇರಿಸಲಾಗಿದೆ"
+
+#, fuzzy
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "ವಿಡಿಯೋ ಔಟ್ ಪುಟ್ ಮಾಡ್ಯೂಲ್ ಗಳಿಗೆ ಸಾಮನ್ಯ ಸೆಟ್ಟಿಂಗುಗಳು"
+
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "CVD ಯ ಉಪಶೀರ್ಷಿಕೆ ವಿಸಂಕೇತಕ"
+
+#, fuzzy
+#~ msgid "Album art policy"
+#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಕಡತದ ಹೆಸರು"
+
+#, fuzzy
+#~ msgid "Load Media Library"
+#~ msgstr "ಮಾದ್ಯಮ ಭಂಡಾರ"
+
+#, fuzzy
+#~ msgid "FFmpeg access"
+#~ msgstr "ಜಿಪ್ ಪ್ರವೇಶ"
+
+#, fuzzy
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "ನಿಮ್ಮ ವ್ಯವಸ್ಥೆಯ-BD + ವಿಸಂಕೇತಿಸುವ ಗ್ರಂಥಾಲಯ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಸಂರಚನಾ "
+#~ "ಕಾಣೆಯಾಗಿದೆಯೆ?"
+
+#, fuzzy
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "ವಿ ಎಲ್ ಸಿ ಈ ಕಡತವನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ \"%s\" (%s)."
+
+#, fuzzy
+#~ msgid "TCP port to use"
+#~ msgstr "ಉಪಯೋಗಿಸಲು CDDB ಸರ್ವರ್ ನ ಸಂಪರ್ಕಸ್ಥಾನ."
+
+#, fuzzy
+#~ msgid "Force connection reset regularly"
+#~ msgstr "ಬಲವಂತದ ವರ್ಣಶುದ್ಧಿ(ಎಚ್ಚರಿಕೆಯಿಂದ ಬಳಸಿ)"
+
+#, fuzzy
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "PCM ಸ್ವರೂಪಕ್ಕೆ ಪರಿವರ್ತನೆಗೆ ಧ್ವನಿ ಶೋಧಕ"
+
+#, fuzzy
+#~ msgid "Discard cropping information"
+#~ msgstr "HRD ಸಮಯದ ಮಾಹಿತಿ"
+
+#, fuzzy
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "ವಿಡಿಯೋ ವಿಸಂಕೇತಕ ವೇಗವರ್ಧನೆ ಚೌಕಟ್ಟು (VDA)"
+
+#, fuzzy
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Target bitrate in kbps when encoding in constant bitrate mode"
+
+#, fuzzy
+#~ msgid "Enable lossless coding"
+#~ msgstr "Megabass ಕ್ರಮವನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+
+#, fuzzy
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "ಚೌಕಟ್ಟುಗಳ ನಡುವೆ ಗರಿಷ್ಠ QP ಹಂತ"
+
+#, fuzzy
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "ಚೌಕಟ್ಟುಗಳ ಸಂಖ್ಯೆ (0 ರಿಂದ 100)"
+
+#, fuzzy
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "ಚಲನೆಯ ಪರಿಹಾರ ಬ್ಲಾಕ್ಗಳ ಗಾತ್ರ"
+
+#, fuzzy
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "ಚಲನೆಯ ಪರಿಹಾರ ಬ್ಲಾಕ್ಗಳ ಗಾತ್ರ"
+
+#, fuzzy
+#~ msgid "Motion vector precision"
+#~ msgstr "ಚಲನೆಯ ಸದಿಶ ನಿಖರತೆ"
+
+#, fuzzy
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "ಚಲನೆಯ ಸದಿಶ ನಿಖರತೆ pels ಗಳಲ್ಲಿ"
+
+#, fuzzy
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "ರೋಹಿತ ಬ್ಯಾಂಡ್ ನಕಲುಮಾಡುವಿಕೆಯನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+
+#, fuzzy
+#~ msgid "cycles per degree"
+#~ msgstr "ಡಿಗ್ರಿಯಲ್ಲಿ ಕೋನ"
+
+#, fuzzy
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Libschroedinger ಬಳಸಿಕೊಂಡು ಡಿರಾಕ್ ವೀಡಿಯೊ ಸಂಕೇತಕ"
+
+#, fuzzy
+#~ msgid "Video decoder using openmash"
+#~ msgstr "ವಿಡಿಯೋ ವಿಸಂಕೇತಕ (OpenMAX IL ಬಳಸಿಕೊಂಡು)"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "ಸಮಯಕ್ಕೆ ಹೋಗಿ"
+
+#, fuzzy
+#~ msgid "Open CrashLog..."
+#~ msgstr "ಡಿಸ್ಕ್ ಅನ್ನು ತೆರೆಯಿರಿ..."
+
+#, fuzzy
+#~ msgid "Don't Send"
+#~ msgstr "ತೋರಿಸಬೇಡಿ"
+
+#, fuzzy
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "ಪ್ಲೇಬ್ಯಾಕ್ ಅನ್ನು ವಿರಾಮಗೊಳಿಸಿ"
+
+#, fuzzy
+#~ msgid "Open BDMV folder"
+#~ msgstr "VIDEO_TS / BDMV ಕಡತ ಕೋಶವನ್ನು ತೆರೆಯಿರಿ"
+
+#, fuzzy
+#~ msgid "Output module"
+#~ msgstr "Output ಘಟಕಗಳು"
+
+#, fuzzy
+#~ msgid "Graphic Equalizer"
+#~ msgstr "ನಿಯತಾಂಕಿಕ ಸಮಕಾರಿ"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "ಸ್ವಯಂಚಾಲಿತವಾಗಿ ವೀಡಿಯೊ ಗಳಿಕೆಯನ್ನು ಹೊಂದಿಸಿ."
+
+#, fuzzy
+#~ msgid "Get more extensions from"
+#~ msgstr "ವಿಸ್ತರಣೆಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ"
+
+#, fuzzy
+#~ msgid "Under the Video"
+#~ msgstr "ವೀಡಿಯೊದ ಮೇಲೆ"
+
+#, fuzzy
+#~ msgid "&Help..."
+#~ msgstr "ಸಹಾಯ"
+
+#, fuzzy
+#~ msgid "Synchronise on audio track"
+#~ msgstr "ಹಾಡನ್ನು ಆವರ್ತಗೊಳಿಸಿ"
+
+#, fuzzy
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "The demuxer will advance timestamps if the input can't keep up with the "
+#~ "rate."
+
+#, fuzzy
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "ಧ್ವನಿ ಚಾನೆಲ್ಗಳ ಸಂಖ್ಯೆ"
+
+#, fuzzy
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Spatial ಲೂಮ strength (0-254)"
+
+#, fuzzy
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "ಪ್ರಾದೇಶಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+
+#, fuzzy
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "ಅಲ್ಪಕಾಲಿಕ ಲೂಮ ಶಕ್ತಿ (0-254)"
+
+#, fuzzy
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "ಅಲ್ಪಕಾಲಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+
+#, fuzzy
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ವೀಡಿಯೊ ಉತ್ಪಾದನೆ"
+
+#, fuzzy
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "OpenGL ವೀಡಿಯೊ ಉತ್ಪಾದನೆ(ಪ್ರಾಯೋಗಿಕ)"
+
 #, fuzzy
 #~ msgid "Add a subtitle file"
 #~ msgstr "ಉಪಶೀರ್ಷಿಕೆಯ ಕಡತವನ್ನು ಬಳಸು"
 
-#~ msgid "Album art download policy:"
-#~ msgstr "ಆಲ್ಬಮ್ ಕಲೆಯ ಡೌನ್ಲೋಡ್ ನೀತಿ:"
-
+#, fuzzy
 #~ msgid "Configure Media Library"
-#~ msgstr "ಮಾಧ್ಯಮ ಭಂಡಾರವನ್ನು ಸಂರಚಿಸಿ"
+#~ msgstr "ಮಾದ್ಯಮ ಭಂಡಾರ"
 
 #, fuzzy
 #~ msgid "Licence"

@@ -1127,7 +1127,7 @@ msgstr "Nano-Les"
 #: src/input/es_out.c:3253
 #, fuzzy
 msgid "Chroma location"
-msgstr "Nokkuu"
+msgstr "Doggol dorƴugol peŋtorol"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -2720,9 +2720,8 @@ msgid "Subtitles text scaling factor"
 msgstr "Lappol Lestiite"
 
 #: src/libvlc-module.c:717
-#, fuzzy
 msgid "Set value to alter subtitles size where possible"
-msgstr "Labo fiilde ndee"
+msgstr ""
 
 #: src/libvlc-module.c:719
 msgid "Enable sub-pictures"
@@ -4006,12 +4005,12 @@ msgstr "Huutoro fiilde lestiite"
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Labo fiilde ndee"
+msgstr "Hurmin les-nate"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Labo fiilde ndee"
+msgstr "Huutoro fiilde lestiite"
 
 #: src/libvlc-module.c:1325
 #, fuzzy
@@ -9866,8 +9865,9 @@ msgid "K Audio Interface audio output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Jaltal ciiɓorol"
 
 #: modules/audio_output/mmdevice.c:1280
 msgid "Output back-end"
@@ -18935,7 +18935,7 @@ msgstr "Ponnditte e Pilte"
 #: modules/gui/qt/dialogs/extended.cpp:80
 #, fuzzy
 msgid "Stereo Widener"
-msgstr "Esterewo"
+msgstr "Ceɗe ciiɓorol"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -22071,7 +22071,7 @@ msgstr "Momtu Doggol"
 #: modules/services_discovery/upnp.cpp:78
 #, fuzzy
 msgid "Custom List"
-msgstr "Peŋtoro"
+msgstr "Doggol dorƴugol peŋtorol"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -26488,8 +26488,9 @@ msgid "Dialog"
 msgstr "Haaldorde"
 
 #: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
+#, fuzzy
 msgid "Update"
-msgstr ""
+msgstr "&Hesɗitin"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -26509,12 +26510,14 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
+#, fuzzy
 msgid "&Verbosity:"
-msgstr ""
+msgstr "Oljitannde (0,1,2)"
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "Ceggol:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26639,12 +26642,14 @@ msgid "Audio and Subtitles"
 msgstr "Ojoo e Lestiite"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "Huutoro fiilde lestiite"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "Labo fiilde ndee"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -26671,8 +26676,9 @@ msgid "Please enter a network URL:"
 msgstr "Tiiɗno naatnu URL laylaytol:"
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "Innde heftinirde"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26739,20 +26745,24 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
+#, fuzzy
 msgid "Features"
-msgstr ""
+msgstr "Nokito"
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "Ciiɓorol"
 
 #: modules/gui/qt/ui/profiles.h:720
+#, fuzzy
 msgid "Chapters"
-msgstr ""
+msgstr "Taƴre"
 
 #: modules/gui/qt/ui/profiles.h:723
+#, fuzzy
 msgid "Menus"
-msgstr ""
+msgstr "Dosol"
 
 #: modules/gui/qt/ui/profiles.h:730
 #, fuzzy
@@ -26760,36 +26770,41 @@ msgid "Fra&me Rate"
 msgstr "Cookol Kaarewe"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "Iwdi"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "Doggol dorƴugol peŋtorol"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
+#, fuzzy
 msgid "Not Used"
-msgstr ""
+msgstr "Teeltaaka"
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
+#, fuzzy
 msgid "Encoding parameters"
-msgstr ""
+msgstr "Boowinirde Yaajoonde"
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "Cookol kaarewe"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -26806,16 +26821,19 @@ msgid "Profile &Name"
 msgstr "Innde heftinirde"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Labo ciiɓorol"
 
 #: modules/gui/qt/ui/sout.h:205
+#, fuzzy
 msgid "Destination Setup"
-msgstr ""
+msgstr "Tiindol"
 
 #: modules/gui/qt/ui/sout.h:206
+#, fuzzy
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "Labo ciiɓorol"
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -26832,24 +26850,28 @@ msgid "Display locally"
 msgstr "Jaytin e nokku"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "Cuɓe dokkitagol"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "Cuɓe Ciiɓorol e Dokkitagol"
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "Hurmin Dokkitol"
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "Cuɓe"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Labo ciiɓorol"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -27008,24 +27030,27 @@ msgid "Show controls in full screen mode"
 msgstr "Hollu gine e mbayka njaajeendi yaynirde"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
+#, fuzzy
 msgid "Pause playback when minimized"
-msgstr ""
+msgstr "Suppitere jigeyuɓɓo so taggaama"
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
+#, fuzzy
 msgid "Start in minimal view mode"
-msgstr ""
+msgstr "Fuɗɗoro jiytol pamɗinangol (alaa dosi)"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Force window style:"
 msgstr "Forsu pannol henorde:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "Daartorɗe arwannde"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -27041,8 +27066,9 @@ msgid "Skin resource file:"
 msgstr "Fiilde jeyol wutte:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "Piille Tarorgol"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -27065,16 +27091,18 @@ msgid "Save recently played items"
 msgstr "Danndu teme tartaaɗe sakket"
 
 #: modules/gui/qt/ui/sprefs_interface.h:563
+#, fuzzy
 msgid "Activate updates notifier"
-msgstr ""
+msgstr "Hurmin tintingol goodal kesɗitine"
 
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Operating System Integration"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:566
+#, fuzzy
 msgid "File extensions association"
-msgstr ""
+msgstr "Nawdondiral piille"
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
 msgid "Set up associations..."
@@ -27089,20 +27117,23 @@ msgid "Show media title on video start"
 msgstr "Hollu tiitoonde mejaare e puɗɗol widewoo"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "Hurmin les-nate"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Lestiite"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr "Dokkitol goowangol"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Lestiite"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27137,8 +27168,9 @@ msgid "Display device"
 msgstr "Kaɓirgol jaytino"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
+#, fuzzy
 msgid "KVA"
-msgstr ""
+msgstr "MKV"
 
 #: modules/gui/qt/ui/sprefs_video.h:337
 msgid "Force Aspect Ratio"
@@ -27197,8 +27229,9 @@ msgid "Clear List"
 msgstr "Momtu Doggol"
 
 #: modules/gui/qt/ui/update.h:148
+#, fuzzy
 msgid "Check for VLC updates"
-msgstr ""
+msgstr "Yuurno &Kesɗitine..."
 
 #: modules/gui/qt/ui/update.h:149
 msgid "Launching an update request..."
@@ -27218,12 +27251,14 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
+#, fuzzy
 msgid "Negate colors"
-msgstr ""
+msgstr "Waklit goobuuji"
 
 #: modules/gui/qt/ui/video_effects.h:1256
+#, fuzzy
 msgid "Colors"
-msgstr ""
+msgstr "Goobu"
 
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Interactive Zoom"
@@ -27235,8 +27270,9 @@ msgstr "Lompol"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
+#, fuzzy
 msgid "..."
-msgstr ""
+msgstr "Ɓeydu..."
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -27259,16 +27295,18 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
+#, fuzzy
 msgid "Mirror"
-msgstr ""
+msgstr "Juume"
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Ejagol muumaare"
 
 #: modules/gui/qt/ui/video_effects.h:1295
+#, fuzzy
 msgid "Spatial blur"
-msgstr ""
+msgstr "Weeytinirde"
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -27284,20 +27322,24 @@ msgid "Denoiser"
 msgstr "Dillere"
 
 #: modules/gui/qt/ui/video_effects.h:1302
+#, fuzzy
 msgid "Spatial luma strength"
-msgstr ""
+msgstr "Weeytinirde"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Weeytinirde"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Weeytinirde"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Weeytinirde"
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -27516,6 +27558,9 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgid "To"
 #~ msgstr "Fayde"
 
+#~ msgid "Streaming method"
+#~ msgstr "Feere ciiɓorol"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Ñiiɓirde ordinateer ɗo ciiɓorol hucci."
 
@@ -27621,12 +27666,12 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgid "Current visualization"
 #~ msgstr "Lewñinirɗe wonaande"
 
-#~ msgid "&Post processing"
-#~ msgstr "&Ɓaawo juɓɓinol"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Danndu Tarorgol"
+
+#~ msgid "&Post processing"
+#~ msgstr "&Ɓaawo juɓɓinol"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -27648,11 +27693,9 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgid "ANativeWindow"
 #~ msgstr "Henorde"
 
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
+#, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "Ɓaleejo"
 
 #~ msgid "Output Color Filtermode"
 #~ msgstr "Mbayka Ceɗol Jaltal Goobu"
@@ -27665,6 +27708,12 @@ msgstr "Doggol Toppitorde Mejaaje"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Keerol Ceɗe (%)"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
 
 #, fuzzy
 #~ msgid "AVFoundation video capture module."
@@ -27689,10 +27738,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #, fuzzy
 #~ msgid "No audio input device found"
 #~ msgstr "Hay naatna yiytaaka"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "Jaltal ciiɓorol"
 
 #, fuzzy
 #~ msgid "SVG video decoder"
@@ -27887,9 +27932,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgid "Enqueue files when in one instance mode"
 #~ msgstr "Ɓeydu piille e doggol so e mbayka yerinnde wootere wonaa"
 
-#~ msgid "Systray popup when minimized"
-#~ msgstr "Suppitere jigeyuɓɓo so taggaama"
-
 #, fuzzy
 #~ msgid "Low Pass Ffilter"
 #~ msgstr "Ceɗe jaltal widewoo"
@@ -27965,9 +28007,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #, fuzzy
 #~ msgid "No item currently playing"
 #~ msgstr "Ngol tarorgol alaa teme"
-
-#~ msgid "&Update"
-#~ msgstr "&Hesɗitin"
 
 #~ msgid "XSPF playlist (*.xspf)"
 #~ msgstr "Tarorgol XSPF (*.xspf)"
@@ -28087,10 +28126,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgstr "Kuuɓal"
 
 #, fuzzy
-#~ msgid "CPU features"
-#~ msgstr "Nokito"
-
-#, fuzzy
 #~ msgid "Chroma modules settings"
 #~ msgstr "Teelte widewoo kuumnuɗe"
 
@@ -28199,10 +28234,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgstr "Jowe"
 
 #, fuzzy
-#~ msgid "Maemo hildon interface"
-#~ msgstr "Daartorɗe arwannde"
-
-#, fuzzy
 #~ msgid "Automatically save the volume on exit"
 #~ msgstr "Jaajnu Loowgol wulnde timmitte ndee e kurminal"
 
@@ -28271,10 +28302,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgstr "Ɓetol fontere"
 
 #, fuzzy
-#~ msgid "Subtitle Languages"
-#~ msgstr "Lestiite"
-
-#, fuzzy
 #~ msgid "Preferred Subtitle Language"
 #~ msgstr "Ɗemngal Ojoo Ɓuranngol"
 
@@ -28289,10 +28316,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #, fuzzy
 #~ msgid "Show playlist"
 #~ msgstr "Danndu tarorgol"
-
-#, fuzzy
-#~ msgid "Open subtitles file"
-#~ msgstr "Huutoro fiilde lestiite"
 
 #, fuzzy
 #~ msgid "Preamp\n"
@@ -28359,14 +28382,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #~ msgstr "Jamirol"
 
 #, fuzzy
-#~ msgid "Verbosity:"
-#~ msgstr "Oljitannde (0,1,2)"
-
-#, fuzzy
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Huutoro fiilde lestiite"
-
-#, fuzzy
 #~ msgid "Destinations"
 #~ msgstr "Tiindol"
 
@@ -28385,14 +28400,6 @@ msgstr "Doggol Toppitorde Mejaaje"
 #, fuzzy
 #~ msgid "Preferred subtitles language"
 #~ msgstr "Ɗemngal Ojoo Ɓuranngol"
-
-#, fuzzy
-#~ msgid "Subtitles effects"
-#~ msgstr "Lestiite"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "Ɓaleejo"
 
 #, fuzzy
 #~ msgid "Advance of subtitles over video:"

@@ -1109,7 +1109,7 @@ msgstr "Tere piny-Lacuc"
 #: src/input/es_out.c:3253
 #, fuzzy
 msgid "Chroma location"
-msgstr "Kabedo"
+msgstr "Nyut yore &mukene"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -3981,7 +3981,7 @@ msgstr "Ket wie matino"
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Fail me Wie matino"
+msgstr "Ket wie matino"
 
 #: src/libvlc-module.c:1325
 msgid "Select the key to change subtitles text scaling"
@@ -16549,7 +16549,7 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #, fuzzy
 msgid "Select a subtitle file"
-msgstr "Fail me Wie matino"
+msgstr "Yer fail"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18887,8 +18887,9 @@ msgid "Adjustments and Effects"
 msgstr "Kite me yiko"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
+#, fuzzy
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Dwiro pa Jami maceto kacel"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20067,7 +20068,7 @@ msgstr ""
 #: modules/gui/qt/qt.cpp:189
 #, fuzzy
 msgid "When to raise the interface"
-msgstr "Ka anena"
+msgstr "Kaneno me Mac OS X"
 
 #: modules/gui/qt/qt.cpp:190
 msgid ""
@@ -22019,7 +22020,7 @@ msgstr "Ruc nying jami "
 #: modules/services_discovery/upnp.cpp:78
 #, fuzzy
 msgid "Custom List"
-msgstr "Lakite meri"
+msgstr "Nyut yore &mukene"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -26456,12 +26457,14 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
+#, fuzzy
 msgid "&Verbosity:"
-msgstr ""
+msgstr "Rwom me Kit nyukta"
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "Kii:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26586,12 +26589,14 @@ msgid "Audio and Subtitles"
 msgstr "Wer kede Wie matino"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "Fail me Wie matino"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "Yer fail"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -26618,8 +26623,9 @@ msgid "Please enter a network URL:"
 msgstr "Ket URL me kakube"
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "Nying ngec makiryeyo"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26686,20 +26692,24 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
+#, fuzzy
 msgid "Features"
-msgstr ""
+msgstr "Mak"
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "Dwiro pa Jami maceto kacel"
 
 #: modules/gui/qt/ui/profiles.h:720
+#, fuzzy
 msgid "Chapters"
-msgstr ""
+msgstr "Dul"
 
 #: modules/gui/qt/ui/profiles.h:723
+#, fuzzy
 msgid "Menus"
-msgstr ""
+msgstr "Lacim"
 
 #: modules/gui/qt/ui/profiles.h:730
 #, fuzzy
@@ -26707,36 +26717,41 @@ msgid "Fra&me Rate"
 msgstr "Rwom me Purem"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "Ka ma oa iye"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "Nyut yore &mukene"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
+#, fuzzy
 msgid "Not Used"
-msgstr ""
+msgstr "Pe Gitero"
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
+#, fuzzy
 msgid "Encoding parameters"
-msgstr ""
+msgstr "Nyayo Lapok akina ne"
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "Rwom me Purem"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -26753,16 +26768,19 @@ msgid "Profile &Name"
 msgstr "Nying ngec makiryeyo"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Yer mapol"
 
 #: modules/gui/qt/ui/sout.h:205
+#, fuzzy
 msgid "Destination Setup"
-msgstr ""
+msgstr "Ka ceto"
 
 #: modules/gui/qt/ui/sout.h:206
+#, fuzzy
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "Yer mapol"
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -26779,24 +26797,28 @@ msgid "Display locally"
 msgstr "Ten ki cing"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "Yore me kano"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "Kit me gwoko ki niango"
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "Mi cwalo obed makiti"
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "Kite me yero"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Yer mapol"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -26963,16 +26985,18 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
+#, fuzzy
 msgid "Start in minimal view mode"
-msgstr ""
+msgstr "Cak i neno maromrom(Labongo acaki)"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Force window style:"
 msgstr "Dii kit me dirija:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "Kaneno me Mac OS X"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -26987,8 +27011,9 @@ msgid "Skin resource file:"
 msgstr "Fail pi lok ikom neno:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "Buk me wer"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -27011,8 +27036,9 @@ msgid "Save recently played items"
 msgstr "Gwok wer ma ituko mukato"
 
 #: modules/gui/qt/ui/sprefs_interface.h:563
+#, fuzzy
 msgid "Activate updates notifier"
-msgstr ""
+msgstr "Ket kwenyoro pi tye a ngec manyen"
 
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Operating System Integration"
@@ -27035,20 +27061,23 @@ msgid "Show media title on video start"
 msgstr "Nyut wi video"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "Ket wie matino"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Wi wer Maditu"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr "Gonyo iyi kite majwi"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Wie maditu"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27083,8 +27112,9 @@ msgid "Display device"
 msgstr "Gitic me nyuto"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
+#, fuzzy
 msgid "KVA"
-msgstr ""
+msgstr "MKV"
 
 #: modules/gui/qt/ui/sprefs_video.h:337
 msgid "Force Aspect Ratio"
@@ -27143,8 +27173,9 @@ msgid "Clear List"
 msgstr "Ruc nying jami "
 
 #: modules/gui/qt/ui/update.h:148
+#, fuzzy
 msgid "Check for VLC updates"
-msgstr ""
+msgstr "Rot pi &Ngec manyen..."
 
 #: modules/gui/qt/ui/update.h:149
 msgid "Launching an update request..."
@@ -27164,12 +27195,14 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
+#, fuzzy
 msgid "Negate colors"
-msgstr ""
+msgstr "Lok rangi"
 
 #: modules/gui/qt/ui/video_effects.h:1256
+#, fuzzy
 msgid "Colors"
-msgstr ""
+msgstr "Rangi"
 
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Interactive Zoom"
@@ -27181,8 +27214,9 @@ msgstr "Lakinane "
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
+#, fuzzy
 msgid "..."
-msgstr ""
+msgstr "Med..."
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -27205,16 +27239,18 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
+#, fuzzy
 msgid "Mirror"
-msgstr ""
+msgstr "Bal"
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Ngeyo mol ne"
 
 #: modules/gui/qt/ui/video_effects.h:1295
+#, fuzzy
 msgid "Spatial blur"
-msgstr ""
+msgstr "Gipoko"
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -27230,20 +27266,24 @@ msgid "Denoiser"
 msgstr "Woo"
 
 #: modules/gui/qt/ui/video_effects.h:1302
+#, fuzzy
 msgid "Spatial luma strength"
-msgstr ""
+msgstr "Gipoko"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Gipoko"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Gipoko"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Gipoko"
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -27452,6 +27492,9 @@ msgstr "Nying Ludito lakub"
 #~ msgid "To"
 #~ msgstr "Naka iyi"
 
+#~ msgid "Streaming method"
+#~ msgstr "Yore me cwalo mapol"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Address pa kompiuta me cwalo iyi."
 
@@ -27503,6 +27546,9 @@ msgstr "Nying Ludito lakub"
 #~ msgid "Save file to"
 #~ msgstr "Kan fail iyi"
 
+#~ msgid "Include subtitles"
+#~ msgstr "Ket wie matino"
+
 #~ msgid "No input selected"
 #~ msgstr "Jami aketa pe giyero"
 
@@ -27548,12 +27594,12 @@ msgstr "Nying Ludito lakub"
 #~ msgid "Current visualization"
 #~ msgstr "Kite me neno ma kombedi"
 
-#~ msgid "&Post processing"
-#~ msgstr "&Ket yenyo"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "kan nying wer"
+
+#~ msgid "&Post processing"
+#~ msgstr "&Ket yenyo"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -27575,11 +27621,9 @@ msgstr "Nying Ludito lakub"
 #~ msgid "ANativeWindow"
 #~ msgstr "Dirija"
 
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
+#, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "Col"
 
 #~ msgid "Output Color Filtermode"
 #~ msgstr "Kite me yero rangi"
@@ -27592,6 +27636,12 @@ msgstr "Nying Ludito lakub"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Yer kite ne (%)"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
 
 #, fuzzy
 #~ msgid "No video devices found"
@@ -27878,9 +27928,6 @@ msgstr "Nying Ludito lakub"
 #~ msgid "No item currently playing"
 #~ msgstr "Jami mo pe i nying wer"
 
-#~ msgid "Verbosity Level"
-#~ msgstr "Rwom me Kit nyukta"
-
 #~ msgid "XSPF playlist (*.xspf)"
 #~ msgstr "Nyig wer me M3U8 (*.m3u)"
 
@@ -28126,10 +28173,6 @@ msgstr "Nying Ludito lakub"
 #~ msgstr "Tam amia"
 
 #, fuzzy
-#~ msgid "Maemo hildon interface"
-#~ msgstr "Kaneno me Mac OS X"
-
-#, fuzzy
 #~ msgid "Automatically save the volume on exit"
 #~ msgstr "Ket nyayo dul matime pire kene ki kom acaki"
 
@@ -28140,6 +28183,10 @@ msgstr "Nying Ludito lakub"
 #, fuzzy
 #~ msgid "Image width:"
 #~ msgstr "Rib Cal manok"
+
+#, fuzzy
+#~ msgid "Load subtitles file:"
+#~ msgstr "Fail me Wie matino"
 
 #, fuzzy
 #~ msgid "HTML Playlist"
@@ -28310,10 +28357,6 @@ msgstr "Nying Ludito lakub"
 #~ msgstr "Ki Ikom yaro lanyut me neno kamaler"
 
 #, fuzzy
-#~ msgid "Stream Name"
-#~ msgstr "Dwiro pa Jami maceto kacel"
-
-#, fuzzy
 #~ msgid "Video Codec"
 #~ msgstr "Nyonyo me yungo Cal anena"
 
@@ -28372,14 +28415,6 @@ msgstr "Nying Ludito lakub"
 #, fuzzy
 #~ msgid "Group name"
 #~ msgstr "Nying pa Latic kwede"
-
-#, fuzzy
-#~ msgid "Subtitles Language"
-#~ msgstr "Wi wer Maditu"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "Col"
 
 #, fuzzy
 #~ msgid "Duration in second"
@@ -28516,6 +28551,10 @@ msgstr "Nying Ludito lakub"
 #, fuzzy
 #~ msgid "key"
 #~ msgstr "Kadiyo pire"
+
+#, fuzzy
+#~ msgid "Telnet Interface"
+#~ msgstr "Ka anena"
 
 #, fuzzy
 #~ msgid "Transponder FEC"

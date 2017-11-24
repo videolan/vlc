@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# ppanhh <vietnamesel10n@gmail.com>, 2009-2010,2013
-# thanhpk <thanhpk@live.com>, 2013
+# Anh Phan <vietnamesel10n@gmail.com>, 2009-2010,2013-2014
+# Sortale <sortale.zerok@gmail.com>, 2014
+# Pham Kieu Thanh <thanhpk@live.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2013-12-08 08:16+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
+"PO-Revision-Date: 2014-06-27 23:01+0000\n"
+"Last-Translator: Sortale <sortale.zerok@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/vlc-trans/"
 "language/vi/)\n"
 "Language: vi\n"
@@ -503,14 +504,12 @@ msgid "Create Folder..."
 msgstr "Tạo thư mục..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "Tạo thư mục..."
+msgstr "Đổi tên ổ đĩa..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "Tạo thư mục..."
+msgstr "Đổi tên thư mục..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -960,9 +959,8 @@ msgstr ""
 "Nhấn phím QUAY LẠI để tiếp tục...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "Không biết video này"
+msgstr "Lỗi chưa biết"
 
 #: src/input/control.c:203
 #, c-format
@@ -971,27 +969,24 @@ msgstr "Phần đánh dấu %i"
 
 #: src/input/decoder.c:1875
 msgid "No description for this codec"
-msgstr ""
+msgstr "Không có mô tả cho codec này"
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "Cổng kết nối phía client"
+msgstr "Codec này không được hỗ trợ"
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC không thể tương tác với tập tin \"%s\" (%m)."
+msgstr "VLC không thể giải mã định dạng \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "Codec của video"
+msgstr "Codec chưa được nhận dạng"
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC không thể mở module giải mã dữ liệu này."
+msgstr "VLC không thể xác định được dạng audio hoặc codec của video"
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -1448,9 +1443,8 @@ msgid "Track ID"
 msgstr "ID của track"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "Số lượng dòng"
+msgstr "Số lượng track"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1458,21 +1452,19 @@ msgstr "Đạo diễn"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "Phần"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "Tập"
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "Hiển thị cơ bản"
+msgstr "Tên chương trình"
 
 #: src/input/meta.c:78
-#, fuzzy
 msgid "Actors"
-msgstr "Hệ số"
+msgstr "Diễn viên"
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -2842,19 +2834,17 @@ msgstr ""
 "tránh xung đột)."
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "Ngôn ngữ của Audio"
+msgstr "Ngôn ngữ hiển thị"
 
 #: src/libvlc-module.c:604
-#, fuzzy
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"Ngôn ngữ phụ đề của track mà bạn muốn sử dụng (tách biệt bởi dấu phẩy, gồm "
-"hai hoặc ba ký tự đại diện cho mã quốc giá, bạn có thể chọn 'bất kỳ' để "
-"tránh xung đột)."
+"Ngôn ngữ hiển thị trên menu điều khiển của đĩa DVD/BluRay (tác biệt bằng dấu "
+"phẩy, 2 hoặc 3 ký tự tùy theo quốc gia, bạn có thể sử dụng 'any' theo mặc "
+"định)."
 
 #: src/libvlc-module.c:608
 msgid "Audio track ID"
@@ -3383,13 +3373,10 @@ msgid "HTTP/TLS server certificate"
 msgstr "Chứng nhận máy chủ HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
 msgstr ""
-"Tập tin chứng nhận X.509 (theo định dạng PEM) được sử dụng cho phía máy chủ "
-"TLS."
 
 #: src/libvlc-module.c:849
 msgid "HTTP/TLS server private key"
@@ -4041,7 +4028,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "Chi tiết về codec"
+msgstr "Hiển thị chi tiết"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -5209,9 +5196,8 @@ msgid "print version information"
 msgstr "in thông tin về phiên bản"
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "chương trình chính"
+msgstr "chương trình gốc"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -5443,7 +5429,7 @@ msgstr "Tạm dừng"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "In"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -6399,14 +6385,12 @@ msgid "AVIO"
 msgstr ""
 
 #: modules/access/avio.h:34
-#, fuzzy
 msgid "libavformat AVIO access"
-msgstr "Truy cập dữ liệu đầu ra dạng libavformat"
+msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "Truy cập dữ liệu đầu ra dạng libavformat"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
@@ -6418,15 +6402,15 @@ msgstr ""
 "Sử dụng menu của đĩa Blu-ray. Nếu bị tắt, phần phim sẽ được bắt đầu trực tiếp"
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "Vùng ở dòng trên cùng"
+msgstr "Mã vùng"
 
 #: modules/access/bluray.c:72
 msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
+"Mã vùng để chạy Blu-Ray. Một số dĩa chỉ có thể chạy với mã vùng phù hợp."
 
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
@@ -6439,7 +6423,7 @@ msgstr "Hỗ trợ đĩa Blu-ray (libbluray)"
 
 #: modules/access/bluray.c:715
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "Đường dẫn không chỉ tới Blu-Ray"
 
 #: modules/access/bluray.c:730
 msgid ""
@@ -6514,14 +6498,12 @@ msgid "Blu-ray error"
 msgstr "Lỗi "
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "Menu"
+msgstr ""
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
-msgstr "Phát đầu tiên"
+msgstr ""
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6586,14 +6568,12 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "Dữ liệu đầu vào cho IIDC Digital Camera (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "RDP"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "Module Giao Diện bổ sung"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6608,9 +6588,8 @@ msgstr ""
 "card được đánh số từ 0 trở lên."
 
 #: modules/access/decklink.cpp:49
-#, fuzzy
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "Chế độ nhập dữ liệu video yêu thích"
+msgstr ""
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -8215,9 +8194,9 @@ msgid "File reading failed"
 msgstr "Thao tác với tập tin thất bại"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC không thể thao tác với tập tin."
+msgstr ""
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -8347,9 +8326,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr "MIME được trả về từ phía server (tự động xác nhận nếu chưa thiết lập)"
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8462,9 +8440,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr "Sử dụng IV thay vì sử dụng số-mảnh dạng IV"
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Số lượng mảnh"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -8783,9 +8760,8 @@ msgid "Receive buffer"
 msgstr ""
 
 #: modules/access/satip.c:61 modules/access/udp.c:60
-#, fuzzy
 msgid "UDP receive buffer size (bytes)"
-msgstr "Kích thước khung đệm RTSP"
+msgstr ""
 
 #: modules/access/satip.c:63
 #, fuzzy
@@ -9643,14 +9619,14 @@ msgid "VDR recordings"
 msgstr "Ghi hình VDR"
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC không thể đọc được tập tin (%m)."
+msgstr ""
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC không thể tương tác với tập tin \"%s\" (%m)."
+msgstr ""
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -9736,9 +9712,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "Xuất dữ liệu video của Windows GDI"
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9958,9 +9933,8 @@ msgid "Rear center"
 msgstr "Đằng sau ở giữa"
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "Chế độ stereo audio"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -10909,9 +10883,8 @@ msgid "This linear gain will be applied in software."
 msgstr "This linear gain will be applied in software."
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "Xuất dữ liệu video của Windows GDI"
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -11529,29 +11502,25 @@ msgid "unknown"
 msgstr "chưa rõ"
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "S-video"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
-msgstr "Audio"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "Hình ảnh phụ đề"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "VLC không thể mở phần mã hóa."
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "Giải mã video PNG"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
@@ -11627,7 +11596,7 @@ msgstr "Trình đóng gói video dạng Theora"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "Giải mã video PNG"
+msgstr "Giải mã video CDG"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11909,9 +11878,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "Giải mã"
+msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11922,9 +11890,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
-#, fuzzy
 msgid "GStreamer Based Decoder"
-msgstr "Giải mã audio Speex"
+msgstr ""
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -11932,14 +11899,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "Trình giải mã hình ảnh XWD"
+msgstr ""
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "Trình giải mã hình ảnh XWD"
+msgstr ""
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -12238,9 +12203,8 @@ msgid "MPEG audio layer I/II/III decoder"
 msgstr "Giải mã MPEG audio layer I/II/III"
 
 #: modules/codec/mft.c:62
-#, fuzzy
 msgid "Media Foundation Transform decoder"
-msgstr "Giải mã thư viện QuickTime"
+msgstr ""
 
 #: modules/codec/mpg123.c:67
 #, fuzzy
@@ -12278,18 +12242,16 @@ msgid "Opus"
 msgstr "Opus"
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "Giải mã audio dạng Opus"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr "Giải mã video PNG"
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "Giải mã video PNG"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -12370,7 +12332,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
-msgstr ""
+msgstr "Phương pháp điều khiển tốc độ"
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -12454,7 +12416,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:139
 msgid "Number of slices per frame"
-msgstr ""
+msgstr "Số lượng lát cắt cho từng khung hình"
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -12462,6 +12424,9 @@ msgid ""
 "block rows. If numslice is not set, the encoder may choose any slice "
 "partitioning allowed by the codec standard."
 msgstr ""
+"Số lượng lát cắt cho từng khung hình; mỗi lát cắt chứa một hàng macro-block "
+"hay nhiều hơn. Nếu lượng lát cắt không được xác lập, trình mã hóa có thể "
+"chọn bất kì giá trị nào được cho phép bởi chuẩn Codec."
 
 #: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:143
 msgid "Number of reference frames"
@@ -12469,7 +12434,7 @@ msgstr "Số lượng hệ quy chiếu"
 
 #: modules/codec/qsv.c:148
 msgid "Number of parallel operations"
-msgstr ""
+msgstr "Số lượng phép tính được thực hiện song song"
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12493,7 +12458,7 @@ msgstr "Đóng gói video Pseudo raw"
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Giải mã video PNG"
+msgstr "Trình mã hóa video dạng Theora"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -13271,14 +13236,12 @@ msgid "USF subtitles decoder"
 msgstr "Giải mã phụ đề USF"
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Giải mã phụ đề DVB"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "Phụ đề Teletext"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -13446,7 +13409,7 @@ msgstr ""
 #: modules/codec/videotoolbox.m:83
 #, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "Giải mã video CDG"
+msgstr "Trình giải mã video Theora"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13500,14 +13463,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "Giải mã video CDG"
+msgstr "Trình mã hóa video dạng Theora"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -14475,18 +14437,16 @@ msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr "H.264/MPEG-4 Phần 10/AVC trình mã hóa (x264 10-bit)"
 
 #: modules/codec/x264.c:456
-#, fuzzy
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "H.264/MPEG-4 Phần 10/AVC trình mã hóa (x264)"
+msgstr ""
 
 #: modules/codec/x264.c:460
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr "H.264/MPEG-4 Phần 10/AVC trình mã hóa (x264)"
 
 #: modules/codec/x265.c:46
-#, fuzzy
 msgid "H.265/HEVC encoder (x265)"
-msgstr "H.264/MPEG-4 Phần 10/AVC trình mã hóa (x264)"
+msgstr ""
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -15213,17 +15173,13 @@ msgid "+----[ end of help ]"
 msgstr ""
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
 msgstr ""
-"\n"
-"Nhấn phím QUAY LẠI để tiếp tục...\n"
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr "Go 'chon menu' hoac 'dung lai' de tiep tuc."
+msgstr ""
 
 #: modules/control/oldrc.c:1266
 msgid "Error: `goto' needs an argument greater than zero."
@@ -15422,9 +15378,8 @@ msgid "Avformat"
 msgstr "Định dạng AV"
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "Tách tín hiệu"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -15529,9 +15484,8 @@ msgid "Fixing AVI Index..."
 msgstr "Đang sửa lại chỉ mục AVI..."
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "Tách kênh XA"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15828,18 +15782,16 @@ msgid "MPEG-4 video"
 msgstr "Video dạng MPEG-4"
 
 #: modules/demux/mpeg/h26x.c:47
-#, fuzzy
 msgid "Desired frame rate for the stream."
-msgstr "Tỉ lệ khung hình mong muốn với luồng dữ liệu H264."
+msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53
 msgid "H264 video demuxer"
 msgstr "Bộ tách tín hiệu video H264"
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "Bộ tách tín hiệu video H264"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15934,14 +15886,12 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "Thông số luồng dữ liệu truyền tải"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
-#, fuzzy
 msgid "Use the stream PCR as a reference."
-msgstr "Giữ tham chiếu đối với một số khung hình-B"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
 #, fuzzy
@@ -15964,8 +15914,9 @@ msgid "Main audio"
 msgstr "Tắt âm thanh audio."
 
 #: modules/demux/mpeg/ts_psi.c:422
+#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "Không có mô tả cho codec này"
 
 #: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
@@ -16476,16 +16427,14 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "Phân tích Podcast"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "Khám Phá các dịch vụ khác"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
@@ -16507,9 +16456,8 @@ msgid "Extensions"
 msgstr "Phần mở rộng"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:115
-#, fuzzy
 msgid "Show Installed Only"
-msgstr "Giao diện"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:117
 #: modules/gui/qt/dialogs/plugins.cpp:423
@@ -16518,16 +16466,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "Quản lý video"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "Cài đặt"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -16542,9 +16488,8 @@ msgid "Author"
 msgstr "Tác giả"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
-#, fuzzy
 msgid "Uninstall"
-msgstr "Cài đặt"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -17389,9 +17334,8 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "Menu điều khiển của VLC"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -17406,14 +17350,12 @@ msgid "Do nothing"
 msgstr "Không thao tác gì hết"
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause iTunes / Spotify"
-msgstr "Tạm dừng iTunes"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause and resume iTunes / Spotify"
-msgstr "Tạm dừng và phát lại iTunes"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:139
 msgid "Continue playback where you left off"
@@ -17635,9 +17577,8 @@ msgstr "Lùi về"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "Nhảy đến thời gian"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -17723,9 +17664,8 @@ msgid "Window"
 msgstr "Cửa sổ"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "Thu nhỏ cửa sổ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -17863,14 +17803,12 @@ msgid "Check for album art and metadata?"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "Enable Metadata Retrieval"
-msgstr "Bật tính năng lọic trước khi gắn kết"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "Cảm ơn"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -17937,9 +17875,8 @@ msgid "Open Audio Effects window"
 msgstr "Hiệu ứng Audio"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "BD"
+msgstr ""
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
@@ -18041,9 +17978,8 @@ msgid "Custom playback"
 msgstr "Tùy chọn phát lại"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "Mở thư mục VIDEO_TS"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -18255,9 +18191,8 @@ msgid "URI"
 msgstr "URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "Kích thước gấp đôi"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -18382,9 +18317,8 @@ msgstr "Chọn"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "Tùy chọn phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -18395,13 +18329,12 @@ msgstr "Tiếp tục"
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 #, fuzzy
 msgid "Always continue media playback"
-msgstr "Tùy chọn phát lại"
+msgstr "Chế độ phát lại của VLC"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "Tùy chọn phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -18579,9 +18512,8 @@ msgid "Bright"
 msgstr "Sáng"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "Tùy chọn phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -19250,19 +19182,16 @@ msgid " f                      Toggle Fullscreen"
 msgstr " f                      Chuyen doi sang che do toan man hinh"
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " c                      Cycle through audio tracks"
-msgstr " l                      Chuyen doi viec lap lai danh sach"
+msgstr ""
 
 #: modules/gui/ncurses.c:890
-#, fuzzy
 msgid " v                      Cycle through subtitles tracks"
-msgstr " [, ]                   Tieu de tiep theo/truoc do"
+msgstr ""
 
 #: modules/gui/ncurses.c:891
-#, fuzzy
 msgid " b                      Cycle through video tracks"
-msgstr " S                      Hien thi/An hop thoai thong ke"
+msgstr ""
 
 #: modules/gui/ncurses.c:892
 msgid " n, p                   Next/Previous playlist item"
@@ -19795,9 +19724,8 @@ msgid "Force update of this dialog's values"
 msgstr "Băt buộc thiết lập của giá trị trong phần cập nhật"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "Sẵn có tốt nhất"
+msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -20090,9 +20018,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr "Bạn có thực sự muốn bỏ đăng ký theo dõi từ %1?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "Crossover"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -20111,24 +20038,20 @@ msgid "Enter name for new folder:"
 msgstr "Điền vào tên cho thư mục mới:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "Tạo thư mục"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "Tạo thư mục"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
-#, fuzzy
 msgid "Enter a new name for the directory:"
-msgstr "Điền tên cho thư mục mới:"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
-#, fuzzy
 msgid "Enter a new name for the folder:"
-msgstr "Điền vào tên cho thư mục mới:"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -20544,9 +20467,8 @@ msgid "&Start"
 msgstr "&Bắt đầu"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "Dạng lưu (*"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -20593,7 +20515,6 @@ msgid "Privacy and Network Access Policy"
 msgstr "Chính sách về Riêng Tư và Quyền Truy Cập Mạng"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
-#, fuzzy
 msgid ""
 "<p>In order to protect your privacy, <i>VLC media player</i> does <b>not</b> "
 "collect personal data or transmit them, not even in anonymized form, to "
@@ -20606,26 +20527,6 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>Chúng tôi hoàn toàn tuân thủ quy định về tính riêng tư của người sử dụng "
-"<i>chương trình VLC</i> không <b>hề</b> thu thập bất kỳ thông tin về hoạt "
-"động người dùng, ở bất kỳ dạng nào, đối với bất kỳ ai.</p>\n"
-"<p>Việc thu thập thông tin, <i>được VLC tiến hành</i> đó là thu thập các "
-"thông tin về những tập tin nhạc hoặc phim từ mạng internet hoặc từ nguồn mà "
-"bạn thêm tập tin đó vào sau đó hiển thị thông tin này trong thư viện của "
-"riêng bạn và VLC chỉ đóng vai trò thu thập thông tin mỗi khi bạn yêu cầu. "
-"Những phần thông tin này bao gồm các poster, tên của tập tin hoặc track, tác "
-"giả cũng như các thông tin bổ sung khác.</p>\n"
-"Do những phần thông tin này đòi hỏi việc xác định và so sánh dữ liệu nhằm "
-"đưa ra sự đối chiếu chính xác về thông tin về tài nguyên mà bạn hiện có. Do "
-"đó chương trình <i>VLC</i> cần có quyền được truy cập mạng internet nhằm "
-"giúp bổ sung cho thư viện bạn hiện có các thông tin đối chiếu cần thiết về "
-"tài nguyên mà bạn đang hiện có.</p>\n"
-"<p>Song hành kèm theo những điều đó, chúng tôi muốn nhắc nhở bạn rằng, trong "
-"thời đại ngày nay, việc bảo mật và bảo toàn thông tin là một điều cực kỳ "
-"quan trọng dù cho vị trí hay công việc mà bạn đang thực hiện là ở dạng nào "
-"đi chăng nữa, bảo mật thông tin không bao giờ là một vấn đề quá cũ để lưu ý "
-"đến</p>\n"
-"\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
@@ -20823,9 +20724,8 @@ msgid "Plugins and extensions"
 msgstr "Tiện ích và định dạng"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "Kích hoạt vùng"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -20880,37 +20780,32 @@ msgid "Only installed"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
-#, fuzzy
 msgid "Retrieving addons..."
-msgstr "Đang nhận thông tin về kênh dữ liệu..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "Không tìm thấy dữ liệu nhập vào"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "Phiên bản"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
-#, fuzzy
 msgid "&Uninstall"
-msgstr "Cài đặt"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "Cài đặt"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -21072,9 +20967,8 @@ msgid "Flat Button"
 msgstr "Nút dạng phẳng"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "Kiểu hỗ trợ tiếp theo:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -21109,9 +21003,8 @@ msgid "Time Toolbar"
 msgstr "Thanh công cụ thời gian"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "Thanh công cụ bổ sung nâng cao:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -21130,9 +21023,8 @@ msgid "Select profile:"
 msgstr "Chọn hồ sơ:"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "Lùi"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -21836,9 +21728,8 @@ msgstr ""
 "những dịp lễ, tết, hay sự kiện nào đó."
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "Điều khiển toàn màn hình"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -21975,18 +21866,16 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "giải mã"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/vout.c:50
-#, fuzzy
 msgid "VideoCore layer where the video is displayed."
-msgstr "Thư mục lưu trữ các hình chụp từ video."
+msgstr ""
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -22026,14 +21915,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Bộ lọc mặt nạ video dạng alpha"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
 msgid "Temporal-spatial"
@@ -22048,53 +21935,44 @@ msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "Chống quét mành"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "Phần lựa chọn không hợp lệ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "Mở chế độ chống quét mành"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:892
-#, fuzzy
 msgid "Noise reduction level"
-msgstr "Giảm độ nhiễu hoặc ồn"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "Chất lượng chuyển đổi"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "Cấp độ video tiền xử lý"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Bộ lọc chống quét mành video"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "Xuất dữ liệu YUV"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Làm bóng bộ lọc video"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -22104,7 +21982,7 @@ msgstr "Bộ lọc Video"
 #: modules/hw/vaapi/filters.c:1188
 #, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Giao diện lập trình gia tốc video"
+msgstr "Tăng tốc DirectX Video (DXVA) 2.0"
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -23133,9 +23011,8 @@ msgid "TLS support for OS X and iOS"
 msgstr ""
 
 #: modules/misc/securetransport.c:68
-#, fuzzy
 msgid "TLS server support for OS X"
-msgstr "Cổng kết nối máy chủ RTSP"
+msgstr ""
 
 #: modules/misc/securetransport.c:330
 #, c-format
@@ -23243,19 +23120,16 @@ msgid "Unknown Video"
 msgstr "Không biết video này"
 
 #: modules/mux/avi.c:55
-#, fuzzy
 msgid "Subject"
-msgstr "Đối tượng"
+msgstr ""
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "giải mã"
+msgstr ""
 
 #: modules/mux/avi.c:57
-#, fuzzy
 msgid "Keywords"
-msgstr "Từ khóa liên quan đến Podcast"
+msgstr ""
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23511,9 +23385,8 @@ msgid "Multipart JPEG muxer"
 msgstr ""
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "Guard interval"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -23521,9 +23394,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "Tập tin chỉ mục"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -23601,9 +23473,8 @@ msgid "H.264 video packetizer"
 msgstr ""
 
 #: modules/packetizer/hevc.c:57
-#, fuzzy
 msgid "HEVC/H.265 video packetizer"
-msgstr "Trình đóng gói video dạng Theora"
+msgstr ""
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -24668,9 +24539,8 @@ msgid "Read size"
 msgstr "Đọc kích thước"
 
 #: modules/stream_filter/prefetch.c:538
-#, fuzzy
 msgid "Prefetch background read size (bytes)"
-msgstr "Kích thước khung đệm RTSP"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
 #, fuzzy
@@ -26226,14 +26096,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "Bỏ"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "Cắt nhỏ video"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -26369,14 +26237,12 @@ msgid "FPS Converter"
 msgstr "Chuyển đổi YUVP"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Bộ lọc video cho phần giao tiếp với trò giải đố"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
-#, fuzzy
 msgid "Freeze"
-msgstr "Freestyle"
+msgstr ""
 
 #: modules/video_filter/gaussianblur.c:50
 msgid "Gaussian's std deviation"
@@ -26595,9 +26461,8 @@ msgid "Motion detect video filter"
 msgstr ""
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "Bộ lọc video tường"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -27034,9 +26899,8 @@ msgid "Rotate or flip the video"
 msgstr ""
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "Bộ lọc cảnh video"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
@@ -27061,12 +26925,11 @@ msgstr "Xuất dữ liệu video ASCII"
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "Kích hoạt cửa sổ"
+msgstr "Đóng lại cửa sổ"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "Kích hoạt cửa sổ"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -27291,9 +27154,8 @@ msgid "K Video Acceleration video output"
 msgstr ""
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "Xuất dữ liệu video của OpenGL"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -27352,24 +27214,20 @@ msgid "Pixel Shader"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:78
-#, fuzzy
 msgid "Choose a pixel shader to apply."
-msgstr "Bạn có thể chọn kiểu cắt bỏ để áp dụng"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
-#, fuzzy
 msgid "Path to HLSL file"
-msgstr "Đường dẫn đến hình ảnh của menu HTTMH"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:80
-#, fuzzy
 msgid "Path to an HLSL file containing a single pixel shader."
-msgstr "Đường dẫn đến tập tin dạng nén"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "Lưu tập tin"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -28087,18 +27945,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "Chiều cao của cửa sổ hiệu ứng tính bằng pixcel."
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "Cửa sổ"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "Các thông số được ghi đè dữ liệu"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -28921,8 +28777,9 @@ msgid "Default caching policy"
 msgstr "Chính sách đối với bộ nhớ đệm theo mặc định"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
+#, fuzzy
 msgid "Menus language:"
-msgstr ""
+msgstr "Ngôn ngữ hiển thị"
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Look and feel"
@@ -29162,8 +29019,9 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
+#, fuzzy
 msgid "Negate colors"
-msgstr ""
+msgstr "Chuyển màu"
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
@@ -29203,24 +29061,28 @@ msgid "Anaglyph 3D"
 msgstr "Anaglyph 3D"
 
 #: modules/gui/qt/ui/video_effects.h:1290
+#, fuzzy
 msgid "Mirror"
-msgstr ""
+msgstr "Lỗi"
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Xác định chuyển động"
 
 #: modules/gui/qt/ui/video_effects.h:1295
+#, fuzzy
 msgid "Spatial blur"
-msgstr ""
+msgstr "Spatializer"
 
 #: modules/gui/qt/ui/video_effects.h:1299
+#, fuzzy
 msgid "Anti-Flickering"
-msgstr ""
+msgstr "antiflicker"
 
 #: modules/gui/qt/ui/video_effects.h:1300
+#, fuzzy
 msgid "Soften"
-msgstr ""
+msgstr "Mềm"
 
 #: modules/gui/qt/ui/video_effects.h:1301
 #, fuzzy
@@ -29228,8 +29090,9 @@ msgid "Denoiser"
 msgstr "Noise"
 
 #: modules/gui/qt/ui/video_effects.h:1302
+#, fuzzy
 msgid "Spatial luma strength"
-msgstr ""
+msgstr "Spatializer"
 
 #: modules/gui/qt/ui/video_effects.h:1303
 msgid "Temporal luma strength"
@@ -29290,10 +29153,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Danh sách quản lý tập tin"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Track phụ đề"
 
 #~ msgid "Display resolution"
 #~ msgstr "Hiển thị độ phân giải"
@@ -29486,10 +29345,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ "mydomain:myport/ ; nếu rỗng, biến môi trường http_proxy sẽ được đem vào "
 #~ "thử."
 
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC không thể tương tác với tập tin \"%s\" (%m)."
-
 #~ msgid "Video Capture width"
 #~ msgstr "Chiều rộng của video được ghi hình"
 
@@ -29652,12 +29507,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "Định dạng sử dụng trong danh sách phần thông tin \"tiêu đề\"."
 
-#~ msgid "Media in Zip"
-#~ msgstr "Tập tin dạng nén Zip"
-
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Đường dẫn đến tập tin dạng nén"
-
 #~ msgid "Zip files filter"
 #~ msgstr "Bộ lọc tập tin nén"
 
@@ -29728,10 +29577,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "\"%s\" is no audio encoder."
 #~ msgstr "\"%s\" không phải là phần mã hóa audio."
 
-#, fuzzy
-#~ msgid "Dummy video decoder"
-#~ msgstr "Giải mã video CDG"
-
 #~ msgid "420YpCbCr8Planar"
 #~ msgstr "420YpCbCr8Planar"
 
@@ -29749,18 +29594,6 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Giải mã thư viện QuickTime"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  DVD Menu"
-
-#~ msgid "First Played"
-#~ msgstr "Phát đầu tiên"
-
-#~ msgid "Video Manager"
-#~ msgstr "Quản lý video"
-
-#~ msgid "----- Title"
-#~ msgstr "----- Title"
 
 #~ msgid "Writer"
 #~ msgstr "Tác giả"
@@ -29858,17 +29691,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "ZPL playlist import"
 #~ msgstr "Nhập danh sách ZPL"
 
-#~ msgid ""
-#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
-#~ msgstr ""
-#~ "Gửi TS đến ip xác định: cổng bởi UDP (bạn phải biết chắc bạn đang làm gì)."
-
-#~ msgid "MTU for out mode"
-#~ msgstr "MTU cho chế độ xuất ra"
-
-#~ msgid "MTU for out mode."
-#~ msgstr "MTU cho chế độ nhập vào."
-
 #~ msgid "Compiled by %s with %@"
 #~ msgstr "Được biên soạn bởi %s với %@"
 
@@ -29889,12 +29711,30 @@ msgstr "Danh sách quản lý tập tin"
 #~ "Luồng dữ liệu phải được phát hoặc là tạm dừng để phần đánh dấu có thể "
 #~ "hoạt động."
 
-#, fuzzy
 #~ msgid "Hide Details"
-#~ msgstr "Chi tiết về codec"
+#~ msgstr "Ẩn chi tiết"
 
 #~ msgid "Send"
 #~ msgstr "Gửi"
+
+#~ msgid ""
+#~ "%@ unexpectedly quit the last time it was run. Would you like to send a "
+#~ "crash report to %@?"
+#~ msgstr ""
+#~ "%@ bị đóng bất thình lình ở lần chạy trước. Bạn có muốn gửi báo cáo tới "
+#~ "%@?"
+
+#~ msgid "Problem details and system configuration"
+#~ msgstr "Chi tiết vấn đề và thiết lập hệ thống"
+
+#~ msgid "Problem Report for %@"
+#~ msgstr "Bản báo cáo vấn đề cho %@"
+
+#~ msgid "Please describe any steps needed to trigger the problem"
+#~ msgstr "Xin miêu tả các bước để tái lập vấn đề"
+
+#~ msgid "No personal information will be sent with this report."
+#~ msgstr "Thông tin cá nhân sẽ không bị chuyển cùng với bản báo cáo này."
 
 #~ msgid ""
 #~ "Click to go to the previous playlist item. Hold to skip backward through "
@@ -29981,9 +29821,6 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "(no item is being played)"
 #~ msgstr "(hiện không bật đối tượng nào)"
-
-#~ msgid "VLC media playback"
-#~ msgstr "Chế độ phát lại của VLC"
 
 #~ msgid "Streaming/Exporting Wizard..."
 #~ msgstr "Hướng dẫn Phân Luồng/Xuất dữ liệu đầu ra..."
@@ -30088,10 +29925,6 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "Meta-information"
 #~ msgstr "Thông tin - bổ sung"
-
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "Luôn luôn đặt trên cùng"
 
 #~ msgid "Hardware Acceleration"
 #~ msgstr "Tăng tốc phần cứng"
@@ -30280,6 +30113,9 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "To"
 #~ msgstr "Đến"
+
+#~ msgid "Streaming method"
+#~ msgstr "Phương pháp phân luồng"
 
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Địa chỉ của máy tính để phân luồng."
@@ -30495,14 +30331,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "&Post processing"
 #~ msgstr "&Tiền xử lý"
 
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "Lưu danh sách"
-
-#, fuzzy
-#~ msgid "Recently Played"
-#~ msgstr "Lưu các tập tin được mở gần đây"
-
 #~ msgid "Power"
 #~ msgstr "Năng lượng"
 
@@ -30664,25 +30492,8 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "Choose Devicetype and Connection"
 #~ msgstr "Chọn loại thiết bị và kết nối"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "Kích hoạt cửa sổ"
-
-#, fuzzy
-#~ msgid "Android MediaCodec direct rendering video output"
-#~ msgstr "Định dạng audio đầu ra cho "
-
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "Nhập dữ liệu video trực tiếp từ http://www.directfb.org/"
-
-#~ msgid ""
-#~ "If your framebuffer supports hardware acceleration or does double "
-#~ "buffering in hardware then you must disable this option. It then does "
-#~ "double buffering in software."
-#~ msgstr ""
-#~ "Nếu bộ khung đệm không hỗ trỡ tăng tốc phần cứng hoặc việc gấp đôi phần "
-#~ "đệm trong phần cứng thì bạn phải tắt lựa chọn này. Điều này sẽ gấp đôi bộ "
-#~ "đệm trong VLC."
 
 #~ msgid "SDL chroma format"
 #~ msgstr "Định dạng đơn sắc của SDL"
@@ -30700,176 +30511,53 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "Tiêu đề YUV4MPEG2 ("
 
+#~ msgid "Black Slot"
+#~ msgstr "Rãnh đen"
+
+#, fuzzy
+#~ msgid "Output Color Filtermode"
+#~ msgstr "Phương thức xuất dữ liệu"
+
+#, fuzzy
+#~ msgid "Brightness (%)"
+#~ msgstr "Độ sáng"
+
+#, fuzzy
+#~ msgid "Filter threshold (%)"
+#~ msgstr "Ngưỡng màu"
+
 #~ msgid "MKV"
 #~ msgstr "MKV"
 
 #~ msgid "FLV"
 #~ msgstr "FLV"
 
-#~ msgid "Black Slot"
-#~ msgstr "Rãnh đen"
+#~ msgid "---  DVD Menu"
+#~ msgstr "---  DVD Menu"
 
-#, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "Ghi hình Video"
+#~ msgid "First Played"
+#~ msgstr "Phát đầu tiên"
 
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "Module xuất dữ liệu dạng audio"
+#~ msgid "Video Manager"
+#~ msgstr "Quản lý video"
 
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
+#~ msgid "----- Title"
+#~ msgstr "----- Title"
 
-#, fuzzy
 #~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
+#~ "If your framebuffer supports hardware acceleration or does double "
+#~ "buffering in hardware then you must disable this option. It then does "
+#~ "double buffering in software."
 #~ msgstr ""
-#~ "Máy tính Mac không được trang bị thiết bị dữ liệu đầu vào tương thích với "
-#~ "VLC. Kiểm tra lại dây kết nối cũng như driver của thiết bị bạn với máy "
-#~ "Mac."
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "Dải mã vùng vệ tinh"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
+#~ "Nếu bộ khung đệm không hỗ trỡ tăng tốc phần cứng hoặc việc gấp đôi phần "
+#~ "đệm trong phần cứng thì bạn phải tắt lựa chọn này. Điều này sẽ gấp đôi bộ "
+#~ "đệm trong VLC."
 
 #, fuzzy
 #~ msgid ""
 #~ "%.1f MHz (%d services)\n"
 #~ "~%s remaining"
 #~ msgstr "%.1f MHz (%d dịch vụ)"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "Soundtrack"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Ghi hình bằng Quicktime"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Máy tính Mac không được trang bị thiết bị dữ liệu đầu vào tương thích với "
-#~ "VLC. Kiểm tra lại dây kết nối cũng như driver của thiết bị bạn với máy "
-#~ "Mac."
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
-
-#~ msgid "Uncompressed RAR"
-#~ msgstr "Ngưng giải nén tập tin RAR"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "Xuất dữ liệu video của Windows GDI"
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "Giải mã video CDG"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "Giao diện dịch vụ của Windows"
-
-#~ msgid "Save this Log..."
-#~ msgstr "Lưu thông tin này vào tập tin log..."
-
-#~ msgid "VLC Debug Log (%s).rtf"
-#~ msgstr "Nhật trình lỗi của VLC (%s).rtf"
-
-#, fuzzy
-#~ msgid "Empty"
-#~ msgstr "-trống rỗng-"
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "Kích hoạt"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "&Dấu vân tay"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "Không tìm thấy dữ liệu nhập vào"
-
-#, fuzzy
-#~ msgid "Fingerprinting track..."
-#~ msgstr "&Dấu vân tay"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Dọn dẹp"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "Bitrate tối đa tại hệ thống hiện tại"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "Bộ lọc chuyển dạng video"
-
-#, fuzzy
-#~ msgid "acoustid"
-#~ msgstr "Acoustic"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "Luồng dữ liệu mặc định"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "Xuất tập tin luồng dữ liệu"
-
-#~ msgid ""
-#~ "Please wait while your font cache is rebuilt.\n"
-#~ "This should take less than a few minutes."
-#~ msgstr ""
-#~ "Xin vui lòng chờ đợi  trong giây lát khi bộ nhớ đệm phần kiểu chữ được "
-#~ "xây dựng lại.\n"
-#~ "Thao tác này sẽ không kéo dài lâu."
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "Chiều rộng của cửa sổ hiệu ứng tính bằng pixcel."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "Chiều cao của cửa sổ hiệu ứng tính bằng pixcel."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "Quang phổ"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "Hiệu ứng hiện tại"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "Nổi lên trên cùng"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "Chương trình VLC - Giao diện web"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "Xuất dữ liệu luồng"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31753,34 +31441,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "%d Hz"
 #~ msgstr "%d Hz"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Chọn cách xuất dữ liệu cho Video và chỉnh sửa tại đây."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Các phương thức này cung cấp các chức năng truy cập mạng đến các phần "
-#~ "điều khiển khác trong VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Đây là các thiết lập chung dành cho module mã hóa video/audio/phụ đề"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr ""
-#~ "Nội dung về cửa sổ thông báo của chương trình có thể chỉnh sửa tại đây."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Trong phần này bạn có thể hiệu chỉnh phần phụ đề và ghép lại các phần phụ "
-#~ "đề với nhau theo ý bạn, ví dụ như thay đổi thiết lập đối với loại phụ đề "
-#~ "hoặc tên tập tin gắn với phụ đề đó."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Module giải mã không phù hợp"
-
 #~ msgid ""
 #~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
 #~ "there is no way for you to fix this."
@@ -31796,23 +31456,14 @@ msgstr "Danh sách quản lý tập tin"
 #~ "vào một hoặc nhiều đường dẫn bằng cách nối chúng lại với nhau sử dụng \" "
 #~ "PATH_SEP \" để phân tách"
 
-#~ msgid "Album art policy"
-#~ msgstr "Chính sách về Album art"
-
 #~ msgid "Choose how album art will be downloaded."
 #~ msgstr "Chọn lựa cách tải về các album art."
-
-#~ msgid "Manual download only"
-#~ msgstr "Chỉ được tải khi người dùng cho phép"
 
 #~ msgid "When track starts playing"
 #~ msgstr "Khi track bắt đầu được bật"
 
 #~ msgid "As soon as track is added"
 #~ msgstr "Ngay khi track vừa được thêm vào"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Nạp Thư viện Media"
 
 #~ msgid ""
 #~ "Enable this option to load the SQL-based Media Library at VLC startup"
@@ -31822,17 +31473,6 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "FFmpeg"
 #~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Truy cập FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Hệ thống thư viện giải mã AACS của bạn không hoạt động. Có thể có một vài "
-#~ "từ khóa bị thiếu?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC không thể tương tác với tập tin \"%s\". (%m)"
 
 #~ msgid "TCP address to use"
 #~ msgstr "Địa chỉ TCP được dùng"
@@ -31844,9 +31484,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ "Địa chỉ TCP được sử dụng để giao tiếp với phần video dạng Biểu Đồ Thanh "
 #~ "(mặc định localhost). Trong trường hợp biểu đồ thanh chỉ là phần bên "
 #~ "ngoài, sử dụng localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Cổng kết nối TCP được dùng"
 
 #~ msgid ""
 #~ "TCP port to use to communicate with the video part of the Bar Graph "
@@ -31863,24 +31500,12 @@ msgstr "Danh sách quản lý tập tin"
 #~ "Xác định cho phần kết nối TCP khi bị thiết đặt lại. Nêu sử dụng phần này "
 #~ "khi dùng chung với audiobargraph_v (mặc định là 1)."
 
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Bộ lọc audio chuyển từ stereo thành mono"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Bỏ qua thông tin bị cắt bỏ"
-
 #~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 #~ msgstr ""
 #~ "Bỏ qua các thông số liên quan đến phần được cắt bỏ (ví dụ từ H.264 SPS)."
 
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Giải mã Video và Presentation API cho Unix (VDPAU)"
-
 #~ msgid "If bitrate=0, use this value for constant quality"
 #~ msgstr "Nếu bitrate=0, sử dụng giá trị này hằng số chất lượng"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Nếu giá trị > 0 sẽ bật chế độ hằng số bitrate"
 
 #~ msgid "Enable lossless coding"
 #~ msgstr "Bật chế độ mã hóa nguyên bản"
@@ -31894,18 +31519,6 @@ msgstr "Danh sách quản lý tập tin"
 
 #~ msgid "Diagonal Linear Phase"
 #~ msgstr "Nét kẻ tuyến tính chéo"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Khoảng cách giữa các khung 'P'"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Số khung 'P' trên một GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Độ rộng của các khối bù trừ chuyển động"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Độ cao của các khối bù trừ chuyển động"
 
 #~ msgid "Block overlap (%)"
 #~ msgstr "Khóa phần chồng dữ liệu (%)"
@@ -31928,12 +31541,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgstr ""
 #~ "Tổng số chiều dài khối theo chiều thẳng đứng bao gồm phần chồng dữ liệu"
 
-#~ msgid "Motion vector precision"
-#~ msgstr "Độ chính xác vétơ chuyển động"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Độ chính xác vétơ chuyển động tính bằng pels."
-
 #~ msgid "Simple ME search area x:y"
 #~ msgstr "Khu vực tìm kiếm ME dạng đơn giản x:y"
 
@@ -31943,27 +31550,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgstr ""
 #~ "(Not recommended) Perform a simple (non hierarchical block matching "
 #~ "motion vector search with search range of +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Bật tính phân cách phân vùng"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cycles per degree"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Trình mã hóa video dạng Dirac sử dụng thư viện dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Giải mã video dùng openmash"
-
-#~ msgid "Jump to time"
-#~ msgstr "Nhảy đến thời gian"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Mở tập tin lưu trữ thông tin lỗi..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Đừng gửi"
 
 #~ msgid "VLC crashed previously"
 #~ msgstr "VLC đã bị lỗi gần đây"
@@ -32003,9 +31589,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgid "Couldn't find any trace of a previous crash."
 #~ msgstr "Không tìm thấy dấu vết về lần bị tắt đột ngột trước đó."
 
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Dừng lại iTunes trong suốt chế độ phát lại của VLC"
-
 #~ msgid ""
 #~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
 #~ "playback will be resumed again if VLC playback is finished."
@@ -32013,34 +31596,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ "Dừng lại chế độ phát lại của iTunes khi chế độ phát lại của VLC được bắt "
 #~ "đầu. Nếu chọn phần này, chế độ phát lại của iTunes sẽ được bật lại khi "
 #~ "chế độ phát lại của VLC đã kết thúc"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Mở thư mục BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Chính sách tải Album Art"
-
-#~ msgid "Output module"
-#~ msgstr "Phương thức xuất dữ liệu"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Bộ cân bằng đồ họa"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Tự động thiết lập độ tăng của video."
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Tải thêm các tiện ích từ"
-
-#~ msgid "Under the Video"
-#~ msgstr "Bên dưới video"
-
-#~ msgid "&Help..."
-#~ msgstr "&Trợ giúp..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Đồng bộ hóa đối với track audio"
 
 #~ msgid ""
 #~ "This option will drop/duplicate video frames to synchronise the video "
@@ -32076,20 +31631,241 @@ msgstr "Danh sách quản lý tập tin"
 #~ "trí (in %), $R = xếp hạng, $S = tỉ lệ mẫu audio (tính bằng kHz), $T = "
 #~ "thời gian, $U = nhà phát hành, $V = âm lượng, $_ = dòng mới) "
 
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#, fuzzy
+#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
 #~ msgstr ""
 #~ "Chế độ xuất dữ liệu dành trong OpenGL ES thuộc iOS (yêu cầu tính năng "
 #~ "UIView)"
 
 #, fuzzy
+#~ msgid "Don't repair"
+#~ msgstr "Đừng gửi"
+
+#~ msgid "Subtitle track added"
+#~ msgstr "Đã thêm vào track phụ đề"
+
+#~ msgid "Media in Zip"
+#~ msgstr "Tập tin dạng nén Zip"
+
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Đường dẫn đến tập tin dạng nén"
+
+#~ msgid ""
+#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
+#~ msgstr ""
+#~ "Gửi TS đến ip xác định: cổng bởi UDP (bạn phải biết chắc bạn đang làm gì)."
+
+#~ msgid "MTU for out mode"
+#~ msgstr "MTU cho chế độ xuất ra"
+
+#~ msgid "MTU for out mode."
+#~ msgstr "MTU cho chế độ nhập vào."
+
+#~ msgid "Uncompressed RAR"
+#~ msgstr "Ngưng giải nén tập tin RAR"
+
+#~ msgid "Save this Log..."
+#~ msgstr "Lưu thông tin này vào tập tin log..."
+
+#~ msgid "VLC Debug Log (%s).rtf"
+#~ msgstr "Nhật trình lỗi của VLC (%s).rtf"
+
+#~ msgid "Empty"
+#~ msgstr "-trống rỗng-"
+
+#~ msgctxt "Tooltip|Clear"
+#~ msgid "Clear"
+#~ msgstr "Xóa"
+
+#~ msgid ""
+#~ "Please wait while your font cache is rebuilt.\n"
+#~ "This should take less than a few minutes."
+#~ msgstr ""
+#~ "Xin vui lòng chờ đợi  trong giây lát khi bộ nhớ đệm phần kiểu chữ được "
+#~ "xây dựng lại.\n"
+#~ "Thao tác này sẽ không kéo dài lâu."
+
+#~ msgid "VLC media player - Flash Viewer"
+#~ msgstr "Chương trình VLC -  Chương trình xem Flash"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Chọn cách xuất dữ liệu cho Video và chỉnh sửa tại đây."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Các phương thức này cung cấp các chức năng truy cập mạng đến các phần "
+#~ "điều khiển khác trong VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Đây là các thiết lập chung dành cho module mã hóa video/audio/phụ đề"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr ""
+#~ "Nội dung về cửa sổ thông báo của chương trình có thể chỉnh sửa tại đây."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Trong phần này bạn có thể hiệu chỉnh phần phụ đề và ghép lại các phần phụ "
+#~ "đề với nhau theo ý bạn, ví dụ như thay đổi thiết lập đối với loại phụ đề "
+#~ "hoặc tên tập tin gắn với phụ đề đó."
+
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "Giải mã phụ đề CVD"
+
+#, fuzzy
+#~ msgid "Album art policy"
+#~ msgstr "Chính sách tải Album Art"
+
+#, fuzzy
+#~ msgid "Manual download only"
+#~ msgstr "Chính sách tải Album Art"
+
+#, fuzzy
+#~ msgid "Load Media Library"
+#~ msgstr "Thư viện"
+
+#, fuzzy
+#~ msgid "FFmpeg access"
+#~ msgstr "Truy cập nén"
+
+#, fuzzy
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Hệ thống giải mã thư viện BD của bạn không hoạt động. Bạn có thể đã thiếu "
+#~ "thiết lập cho phần này?"
+
+#, fuzzy
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC không thở mở module %s."
+
+#, fuzzy
+#~ msgid "TCP port to use"
+#~ msgstr "Cổng  Server CDDB để sử dụng"
+
+#, fuzzy
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Bộ lọc audio cho phần chuyển đổi định dạng PCM"
+
+#, fuzzy
+#~ msgid "Discard cropping information"
+#~ msgstr "Thông tin về thời gian HRD"
+
+#, fuzzy
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Video Decode Acceleration Framework (VDA)"
+
+#, fuzzy
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr ""
+#~ "Bitrate mong muốn tínhb ằng kbps khi đang mã hóa ở chế độ hằng số bitrate"
+
+#, fuzzy
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Bước QP tối đa giữa các khung hình."
+
+#, fuzzy
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Số lượng khung hình (0 đến 100)"
+
+#, fuzzy
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Kích thước của các khối bù trừ chuyển động"
+
+#, fuzzy
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Kích thước của các khối bù trừ chuyển động"
+
+#, fuzzy
+#~ msgid "Motion vector precision"
+#~ msgstr "Dự đoán véttơ chuyển động"
+
+#, fuzzy
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Độ chính xác vétơ chuyển động tính bằng pels."
+
+#, fuzzy
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Bật tính năng tái tạo băng tần quang phổ"
+
+#, fuzzy
+#~ msgid "cycles per degree"
+#~ msgstr "Số đo góc"
+
+#, fuzzy
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Trình giải mã video dạng Dirac sử dụng libschroedinger"
+
+#, fuzzy
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Mã hóa Video (sử dụng OpenMAX IL)"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "Đi đến thời gian"
+
+#, fuzzy
+#~ msgid "Open CrashLog..."
+#~ msgstr "Mở đĩa...."
+
+#, fuzzy
+#~ msgid "Don't Send"
+#~ msgstr "Không hiển thị"
+
+#, fuzzy
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Tạm dừng chế độ phát lại"
+
+#, fuzzy
+#~ msgid "Open BDMV folder"
+#~ msgstr "Mở thư mục"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Chính sách tải Album Art"
+
+#, fuzzy
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Thông số Bộ Cân Bằng"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Tự động thiết lập độ tăng của video."
+
+#, fuzzy
+#~ msgid "Get more extensions from"
+#~ msgstr "Các phần mở rộng bị bỏ qua"
+
+#, fuzzy
+#~ msgid "Under the Video"
+#~ msgstr "Phía trên Video"
+
+#, fuzzy
+#~ msgid "&Help..."
+#~ msgstr "&Trợ giúp"
+
+#, fuzzy
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Đảo audio track"
+
+#, fuzzy
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Xuất dữ liệu video của OpenGL"
+
+#, fuzzy
 #~ msgid "Add a subtitle file"
 #~ msgstr "Sử dụng tập t&in phụ đề"
 
+#, fuzzy
 #~ msgid "Album art download policy:"
-#~ msgstr "Chính sách tải album art:"
+#~ msgstr "Chính sách tải Album Art"
 
+#, fuzzy
 #~ msgid "Configure Media Library"
-#~ msgstr "Chỉnh sửa Thư Viện"
+#~ msgstr "Thư viện"
 
 #, fuzzy
 #~ msgid "     <left>      Seek -1%%"
@@ -32149,7 +31925,7 @@ msgstr "Danh sách quản lý tập tin"
 
 #, fuzzy
 #~ msgid "Add to Media Library"
-#~ msgstr "Nạp Thư viện Media"
+#~ msgstr "Thư viện"
 
 #, fuzzy
 #~ msgid "Advanced Open..."
@@ -32398,12 +32174,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgstr "Bật tính năng Video"
 
 #, fuzzy
-#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
-#~ msgstr ""
-#~ "Chế độ xuất dữ liệu dành trong OpenGL ES thuộc iOS (yêu cầu tính năng "
-#~ "UIView)"
-
-#, fuzzy
 #~ msgid "      input bitrate    :   %6.0f kb/s"
 #~ msgstr "| so bitrate dang gui  :   %6.0f kb/s"
 
@@ -32565,7 +32335,7 @@ msgstr "Danh sách quản lý tập tin"
 
 #, fuzzy
 #~ msgid "Number of lines for change"
-#~ msgstr "Số lượng các kênh audio"
+#~ msgstr "Số lượng lát cắt cho từng khung hình"
 
 #, fuzzy
 #~ msgid "Crop video filter"
@@ -32797,7 +32567,7 @@ msgstr "Danh sách quản lý tập tin"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
-#~ msgstr "Bộ cân bằng đồ họa"
+#~ msgstr "Thông số Bộ Cân Bằng"
 
 #, fuzzy
 #~ msgid "Create Stream"
@@ -32882,10 +32652,6 @@ msgstr "Danh sách quản lý tập tin"
 #~ msgstr ""
 #~ "Ẩn biểu tượng chuột và bộ điều khiển khi đang ở chế độ toàn màn hình sau "
 #~ "phần nghìn giây."
-
-#, fuzzy
-#~ msgid "Video output filter module"
-#~ msgstr "Module xuất Video"
 
 #, fuzzy
 #~ msgid "UDP port"
@@ -32982,10 +32748,6 @@ msgstr "Danh sách quản lý tập tin"
 #, fuzzy
 #~ msgid "HTTP SSL"
 #~ msgstr "HTTP(S)"
-
-#, fuzzy
-#~ msgid "Don't repair"
-#~ msgstr "Đừng gửi"
 
 #, fuzzy
 #~ msgid "Subtitles (asa demuxer)"

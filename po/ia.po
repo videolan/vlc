@@ -726,8 +726,9 @@ msgid ""
 msgstr ""
 
 #: src/config/help.c:490
+#, fuzzy
 msgid "(default enabled)"
-msgstr ""
+msgstr "Fluxo predefinite"
 
 #: src/config/help.c:491
 #, fuzzy
@@ -1020,9 +1021,8 @@ msgid "Right top"
 msgstr "Dextra"
 
 #: src/input/es_out.c:3187
-#, fuzzy
 msgid "Orientation"
-msgstr "Description"
+msgstr ""
 
 #: src/input/es_out.c:3193 src/input/es_out.c:3211 src/input/es_out.c:3229
 #: src/input/es_out.c:3243 src/playlist/tree.c:67
@@ -1102,8 +1102,9 @@ msgid "Bottom Center"
 msgstr "Basso a Sinistra"
 
 #: src/input/es_out.c:3253
+#, fuzzy
 msgid "Chroma location"
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -2682,9 +2683,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:716
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Tracia de subtitulos"
+msgstr ""
 
 #: src/libvlc-module.c:717
 msgid "Set value to alter subtitles size where possible"
@@ -3953,17 +3953,19 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
 #: src/libvlc-module.c:1322
+#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Tracia de subtitulos"
+msgstr "Subtitulo"
 
 #: src/libvlc-module.c:1324
+#, fuzzy
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Subtitulo"
 
 #: src/libvlc-module.c:1325
 msgid "Select the key to change subtitles text scaling"
@@ -12138,8 +12140,9 @@ msgid "Use Hardware decoders only"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:74 modules/gui/qt/ui/sprefs_video.h:335
+#, fuzzy
 msgid "Deinterlacing"
-msgstr ""
+msgstr "Interlingue"
 
 #: modules/codec/videotoolbox.m:75
 msgid ""
@@ -16469,8 +16472,9 @@ msgid "Setup subtitle playback details"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
+#, fuzzy
 msgid "Select a subtitle file"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18780,7 +18784,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/extended.cpp:80
 #, fuzzy
 msgid "Stereo Widener"
-msgstr "Stereo"
+msgstr "Filtros de fluxo"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19948,8 +19952,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
+#, fuzzy
 msgid "When to raise the interface"
-msgstr ""
+msgstr "Interaction de interfacie"
 
 #: modules/gui/qt/qt.cpp:190
 msgid ""
@@ -21875,8 +21880,9 @@ msgid "Server List"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
+#, fuzzy
 msgid "Custom List"
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24263,8 +24269,9 @@ msgid "Edge detection video filter"
 msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
+#, fuzzy
 msgid "Edge detection"
-msgstr ""
+msgstr "Position"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -25075,16 +25082,18 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:242
+#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr ""
+msgstr "Entrata:"
 
 #: modules/video_output/decklink.cpp:247
 msgid "DeckLink Video Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:270
+#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr ""
+msgstr "Entrata:"
 
 #: modules/video_output/decklink.cpp:275
 msgid "DeckLink Audio Options"
@@ -26262,8 +26271,9 @@ msgstr ""
 
 #: modules/gui/qt/ui/about.h:288 modules/gui/qt/ui/open.h:260
 #: modules/gui/qt/ui/podcast_configuration.h:100
+#, fuzzy
 msgid "Dialog"
-msgstr ""
+msgstr "Tagalog"
 
 #: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
 msgid "Update"
@@ -26291,8 +26301,9 @@ msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "Filtros"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26303,12 +26314,14 @@ msgid "Modules Tree"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:263
+#, fuzzy
 msgid "Show extended options"
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: modules/gui/qt/ui/open.h:265
+#, fuzzy
 msgid "Show &more options"
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: modules/gui/qt/ui/open.h:268
 msgid "Change the caching for the media"
@@ -26323,8 +26336,9 @@ msgid "MRL"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:272
+#, fuzzy
 msgid "Start Time"
-msgstr ""
+msgstr "Tempore de initio"
 
 #: modules/gui/qt/ui/open.h:273
 #, fuzzy
@@ -26332,8 +26346,9 @@ msgid "Stop Time"
 msgstr "Tempore de fin"
 
 #: modules/gui/qt/ui/open.h:274
+#, fuzzy
 msgid "Edit Options"
-msgstr ""
+msgstr "Configurationes de audio"
 
 #: modules/gui/qt/ui/open.h:275
 msgid "Extra media"
@@ -26372,24 +26387,28 @@ msgid "Select the capture device type"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
+#, fuzzy
 msgid "Device Selection"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/open_capture.h:102
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "Configurationes de audio"
 
 #: modules/gui/qt/ui/open_capture.h:104
 msgid "Access advanced options to tweak the device"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:106
+#, fuzzy
 msgid "Advanced options..."
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: modules/gui/qt/ui/open_disk.h:297
+#, fuzzy
 msgid "Disc Selection"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/open_disk.h:301
 msgid "SVCD/VCD"
@@ -26404,32 +26423,38 @@ msgid "No disc menus"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:306
+#, fuzzy
 msgid "Disc device"
-msgstr ""
+msgstr "Dispositivos predeterminate"
 
 #: modules/gui/qt/ui/open_disk.h:308
+#, fuzzy
 msgid "Starting Position"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/open_disk.h:311
+#, fuzzy
 msgid "Audio and Subtitles"
-msgstr ""
+msgstr "Canales de audio"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
 msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:151
+#, fuzzy
 msgid "File Selection"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/open_file.h:152
 msgid "You can select local files with the following list and buttons."
@@ -26448,8 +26473,9 @@ msgid "Please enter a network URL:"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26516,20 +26542,23 @@ msgid "Features"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "Filtros de fluxo"
 
 #: modules/gui/qt/ui/profiles.h:720
+#, fuzzy
 msgid "Chapters"
-msgstr ""
+msgstr "Capitulo"
 
 #: modules/gui/qt/ui/profiles.h:723
 msgid "Menus"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:730
+#, fuzzy
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "Frequentia de photogramma"
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -26540,8 +26569,9 @@ msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "Monstrar optiones de configuration avantiate"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
@@ -26552,16 +26582,18 @@ msgid "Not Used"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
+#, fuzzy
 msgid " kb/s"
-msgstr ""
+msgstr "%u kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
 msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "Frequentia de photogramma"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -26573,16 +26605,18 @@ msgid "Sa&mple Rate"
 msgstr "Frequentia de exemplo"
 
 #: modules/gui/qt/ui/profiles.h:766
+#, fuzzy
 msgid "Profile &Name"
-msgstr ""
+msgstr "Position"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
+#, fuzzy
 msgid "Destination Setup"
-msgstr ""
+msgstr "Description"
 
 #: modules/gui/qt/ui/sout.h:206
 msgid "Select destinations to stream to"
@@ -26595,16 +26629,19 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:208
+#, fuzzy
 msgid "New destination"
-msgstr ""
+msgstr "Description"
 
 #: modules/gui/qt/ui/sout.h:210
+#, fuzzy
 msgid "Display locally"
-msgstr ""
+msgstr "Dispositivos predeterminate"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "Configurationes de audio"
 
 #: modules/gui/qt/ui/sout.h:213
 msgid "Select and choose transcoding options"
@@ -26615,16 +26652,18 @@ msgid "Activate Transcoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "Description"
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:217
+#, fuzzy
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "Miscellanea"
 
 #: modules/gui/qt/ui/sout.h:218
 msgid "Stream all elementary streams"
@@ -26639,8 +26678,9 @@ msgid " %"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:431
+#, fuzzy
 msgid "Output module:"
-msgstr ""
+msgstr "Entrata:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:434
 msgid "Use S/PDIF when available"
@@ -26679,8 +26719,9 @@ msgid "Tracks"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:443
+#, fuzzy
 msgid "Preferred audio language:"
-msgstr ""
+msgstr "Lingua"
 
 #: modules/gui/qt/ui/sprefs_audio.h:444
 msgid "Password:"
@@ -26695,8 +26736,9 @@ msgid "Submit played tracks stats to Last.fm"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:346
+#, fuzzy
 msgid "Codecs"
-msgstr ""
+msgstr "Codec"
 
 #: modules/gui/qt/ui/sprefs_input.h:347
 msgid "x264 profile and level selection"
@@ -26723,8 +26765,9 @@ msgid "Optical drive"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:353
+#, fuzzy
 msgid "Default optical device"
-msgstr ""
+msgstr "Dispositivos predeterminate"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Damaged or incomplete AVI file"
@@ -26747,8 +26790,9 @@ msgid "Live555 stream transport"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
+#, fuzzy
 msgid "Default caching policy"
-msgstr ""
+msgstr "Fluxo predefinite"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
 #, fuzzy
@@ -26768,16 +26812,18 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
+#, fuzzy
 msgid "Use native style"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Resize interface to video size"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
+#, fuzzy
 msgid "Show controls in full screen mode"
-msgstr ""
+msgstr "Initiar video in modo schermo complete"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Pause playback when minimized"
@@ -26788,16 +26834,19 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
+#, fuzzy
 msgid "Start in minimal view mode"
-msgstr ""
+msgstr "Initiar video in modo schermo complete"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
+#, fuzzy
 msgid "Force window style:"
-msgstr ""
+msgstr "Proxime titulo"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "Interaction de interfacie"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -26817,8 +26866,9 @@ msgid "Playlist and Instances"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
+#, fuzzy
 msgid "Allow only one instance"
-msgstr ""
+msgstr "Permitte sol un computator de tempore per vice"
 
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Pause on the last frame of a video"
@@ -26861,20 +26911,24 @@ msgid "Show media title on video start"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "Subtitulo"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Tracia de subtitulos"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
+#, fuzzy
 msgid "Default encoding"
-msgstr ""
+msgstr "Fluxo predefinite"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Tracia de subtitulos"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -26905,8 +26959,9 @@ msgid "DirectX"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:330
+#, fuzzy
 msgid "Display device"
-msgstr ""
+msgstr "Dispositivos predeterminate"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "KVA"
@@ -26925,12 +26980,14 @@ msgid "Stuff"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:173
+#, fuzzy
 msgid "Edit settings"
-msgstr ""
+msgstr "Configurationes de audio"
 
 #: modules/gui/qt/ui/streampanel.h:174
+#, fuzzy
 msgid "Control"
-msgstr ""
+msgstr "Controlo de tempore"
 
 #: modules/gui/qt/ui/streampanel.h:175
 msgid "Run manually"
@@ -26953,16 +27010,19 @@ msgid "P/P"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:182
+#, fuzzy
 msgid "Prev"
-msgstr ""
+msgstr "Previe"
 
 #: modules/gui/qt/ui/streampanel.h:183
+#, fuzzy
 msgid "Add Input"
-msgstr ""
+msgstr "Entrata"
 
 #: modules/gui/qt/ui/streampanel.h:184
+#, fuzzy
 msgid "Edit Input"
-msgstr ""
+msgstr "Entrata"
 
 #: modules/gui/qt/ui/streampanel.h:185
 msgid "Clear List"
@@ -26998,8 +27058,9 @@ msgid "Colors"
 msgstr "Colores"
 
 #: modules/gui/qt/ui/video_effects.h:1257
+#, fuzzy
 msgid "Interactive Zoom"
-msgstr ""
+msgstr "Interfacie"
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27071,8 +27132,9 @@ msgid "Temporal chroma strength"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
+#, fuzzy
 msgid "VLM configurator"
-msgstr ""
+msgstr "Configuration de &VLM"
 
 #: modules/gui/qt/ui/vlm.h:287
 msgid "Media Manager Edition"
@@ -27087,24 +27149,28 @@ msgid "Input:"
 msgstr "Entrata:"
 
 #: modules/gui/qt/ui/vlm.h:291
+#, fuzzy
 msgid "Select Input"
-msgstr ""
+msgstr "Entrata"
 
 #: modules/gui/qt/ui/vlm.h:292
+#, fuzzy
 msgid "Output:"
-msgstr ""
+msgstr "Entrata:"
 
 #: modules/gui/qt/ui/vlm.h:293
+#, fuzzy
 msgid "Select Output"
-msgstr ""
+msgstr "Entrata:"
 
 #: modules/gui/qt/ui/vlm.h:294
 msgid "Time Control"
 msgstr "Controlo de tempore"
 
 #: modules/gui/qt/ui/vlm.h:295
+#, fuzzy
 msgid "Mux Control"
-msgstr ""
+msgstr "Controlo de tempore"
 
 #: modules/gui/qt/ui/vlm.h:296
 msgid "Muxer:"
@@ -27137,10 +27203,6 @@ msgstr ""
 #~ msgstr "Configurationes de audio"
 
 #, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "Fluxo predefinite"
-
-#, fuzzy
 #~ msgid "VLC media player - Flash Viewer"
 #~ msgstr "Adjuta del reproductor de media VLC..."
 
@@ -27150,7 +27212,3 @@ msgstr ""
 #, fuzzy
 #~ msgid "Instances"
 #~ msgstr "Installar"
-
-#, fuzzy
-#~ msgid "Subtitles Language"
-#~ msgstr "Tracia de subtitulos"

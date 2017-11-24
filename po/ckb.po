@@ -10194,8 +10194,9 @@ msgid "K Audio Interface audio output"
 msgstr "دەرەنجامی بیرگەی ڤیدیۆ"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "دەرەنجامی بیرگەی ڤیدیۆ"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -27751,8 +27752,9 @@ msgid "Profile &Name"
 msgstr "ناوی پەڕگەی لۆگ"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "کرتە لە \"Advanced Options\" بکە بۆ بینینی سەرجەم هەڵبژاردنەکان"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -27799,8 +27801,9 @@ msgid "Option Setup"
 msgstr "ڕێکخستنی پەیوەستبوون"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "کرتە لە \"Advanced Options\" بکە بۆ بینینی سەرجەم هەڵبژاردنەکان"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -27903,8 +27906,9 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:351
+#, fuzzy
 msgid "Video quality post-processing level"
-msgstr ""
+msgstr "ئاستی کوالیتی"
 
 #: modules/gui/qt/ui/sprefs_input.h:352
 msgid "Optical drive"
@@ -27966,8 +27970,9 @@ msgid "Use native style"
 msgstr "پەڕگەی ژێرنووس بەکار ببە"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
+#, fuzzy
 msgid "Resize interface to video size"
-msgstr ""
+msgstr "پاڵێوەری دیمەنی ڤیدیۆ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 #, fuzzy
@@ -28266,8 +28271,9 @@ msgid "Motion detect"
 msgstr "خۆکار گرتن"
 
 #: modules/gui/qt/ui/video_effects.h:1295
+#, fuzzy
 msgid "Spatial blur"
-msgstr ""
+msgstr "هێنانە پێش چاو"
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -28284,20 +28290,24 @@ msgid "Denoiser"
 msgstr "قەرەباڵغی"
 
 #: modules/gui/qt/ui/video_effects.h:1302
+#, fuzzy
 msgid "Spatial luma strength"
-msgstr ""
+msgstr "هێنانە پێش چاو"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "هێنانە پێش چاو"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "هێنانە پێش چاو"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "هێنانە پێش چاو"
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -28351,10 +28361,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "تراکی ژێرنووس"
 
 #~ msgid ""
 #~ "The format of '%s' cannot be detected. Have a look at the log for details."
@@ -28493,14 +28499,6 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 #~ msgstr "زانیارییە درێژکراوەکانی VCD پیشان بدات؟"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "پەڕگەکانی ڕەنگاڵە"
-
-#, fuzzy
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "ڕێڕەوی پێست بۆ بەکارهێنان"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "پاڵێوەری بڕینی ڤیدیۆ"
 
@@ -28519,18 +28517,6 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 #, fuzzy
 #~ msgid "OpenSLES"
 #~ msgstr "کردنەوە"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "--- مێنیوی DVD"
-
-#~ msgid "First Played"
-#~ msgstr "یەکەم لێدان"
-
-#~ msgid "Video Manager"
-#~ msgstr "بەرێوەبەری ڤیدیۆ"
-
-#~ msgid "----- Title"
-#~ msgstr "----- ناونیشان"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -28744,6 +28730,10 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 #~ msgid "Preferred Width"
 #~ msgstr "زمانی دەنگی ویستراو"
 
+#, fuzzy
+#~ msgid "Smooth Streaming"
+#~ msgstr "هیچ پەڕگەیەک دیاری نەکراوە"
+
 #~ msgid "Page"
 #~ msgstr "پەڕە"
 
@@ -28904,14 +28894,6 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 #~ msgstr "دەرەنجامی ڤیدیۆی X11"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "ڕێکخستنەکانی ڤیدیۆ پاشەکەوت نەکراوە"
-
-#, fuzzy
-#~ msgid "MKV"
-#~ msgstr "MOV"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "ڕەش"
 
@@ -28926,6 +28908,38 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "جۆری پاڵاوتن"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "MOV"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "--- مێنیوی DVD"
+
+#~ msgid "First Played"
+#~ msgstr "یەکەم لێدان"
+
+#~ msgid "Video Manager"
+#~ msgstr "بەرێوەبەری ڤیدیۆ"
+
+#~ msgid "----- Title"
+#~ msgstr "----- ناونیشان"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "ڕێکخستنەکانی ڤیدیۆ پاشەکەوت نەکراوە"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "تراکی ژێرنووس"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "پەڕگەکانی ڕەنگاڵە"
+
+#, fuzzy
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "ڕێڕەوی پێست بۆ بەکارهێنان"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

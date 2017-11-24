@@ -1110,8 +1110,9 @@ msgid "Bottom Center"
 msgstr "ତଳ-ବାମ"
 
 #: src/input/es_out.c:3253
+#, fuzzy
 msgid "Chroma location"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -3966,16 +3967,19 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
 #: src/libvlc-module.c:1322
+#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ କରନ୍ତୁ "
 
 #: src/libvlc-module.c:1323
+#, fuzzy
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଗୁଡିକ"
 
 #: src/libvlc-module.c:1324
+#, fuzzy
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଗୁଡିକ"
 
 #: src/libvlc-module.c:1325
 msgid "Select the key to change subtitles text scaling"
@@ -9812,8 +9816,9 @@ msgid "K Audio Interface audio output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "ଷ୍ଟ୍ରିମ୍ ଆଉଟପୁଟ୍"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -12950,7 +12955,7 @@ msgstr ""
 #: modules/codec/x264.c:421
 #, fuzzy
 msgid "x264 advanced options"
-msgstr "ଉନ୍ନତ ସେଟିଂସମୂହ"
+msgstr "&ଉନ୍ନତ ରୁପେ ଖୋଲନ୍ତୁ..."
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2} ."
@@ -16352,8 +16357,9 @@ msgid "Settings..."
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
+#, fuzzy
 msgid "Choose media input type"
-msgstr ""
+msgstr "ଗୋଟିଏ କିମ୍ବା ଅଧିକ ଫାଇଲ ଚୟନ କରନ୍ତୁ ଖୋଲିବା ପାଇଁ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -18819,8 +18825,9 @@ msgid "Adjustments and Effects"
 msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:80
+#, fuzzy
 msgid "Stereo Widener"
-msgstr ""
+msgstr "ଷ୍ଟ୍ରିମ୍ ଫିଲ୍ଟର"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -21926,8 +21933,9 @@ msgid "Server List"
 msgstr "ସୂଚୀକୁ ଖାଲି କରନ୍ତୁ"
 
 #: modules/services_discovery/upnp.cpp:78
+#, fuzzy
 msgid "Custom List"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -26350,8 +26358,9 @@ msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "ଫିଲ୍ଟର"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26366,20 +26375,23 @@ msgid "Show extended options"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:265
+#, fuzzy
 msgid "Show &more options"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/open.h:268
+#, fuzzy
 msgid "Change the caching for the media"
-msgstr ""
+msgstr "ବର୍ତ୍ତମାନର ମିଡିଆ ଅନୁସାରେ ଶୀର୍ଷକ ବଦଳାନ୍ତୁ"
 
 #: modules/gui/qt/ui/open.h:270
 msgid " ms"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:271
+#, fuzzy
 msgid "MRL"
-msgstr ""
+msgstr "URL"
 
 #: modules/gui/qt/ui/open.h:272
 msgid "Start Time"
@@ -26391,8 +26403,9 @@ msgid "Stop Time"
 msgstr "ବନ୍ଦ ସମୟ"
 
 #: modules/gui/qt/ui/open.h:274
+#, fuzzy
 msgid "Edit Options"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/open.h:275
 msgid "Extra media"
@@ -26407,8 +26420,9 @@ msgid "Select the file"
 msgstr "ଫାଇଲ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/open.h:284
+#, fuzzy
 msgid "Change the start time for the media"
-msgstr ""
+msgstr "ବର୍ତ୍ତମାନର ମିଡିଆ ଅନୁସାରେ ଶୀର୍ଷକ ବଦଳାନ୍ତୁ"
 
 #: modules/gui/qt/ui/open.h:286 modules/gui/qt/ui/open.h:290
 msgid "HH'H':mm'm':ss's'.zzz"
@@ -26432,8 +26446,9 @@ msgid "Select the capture device type"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
+#, fuzzy
 msgid "Device Selection"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ"
 
 #: modules/gui/qt/ui/open_capture.h:102
 msgid "Options"
@@ -26444,12 +26459,14 @@ msgid "Access advanced options to tweak the device"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:106
+#, fuzzy
 msgid "Advanced options..."
-msgstr ""
+msgstr "&ଉନ୍ନତ ରୁପେ ଖୋଲନ୍ତୁ..."
 
 #: modules/gui/qt/ui/open_disk.h:297
+#, fuzzy
 msgid "Disc Selection"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ"
 
 #: modules/gui/qt/ui/open_disk.h:301
 msgid "SVCD/VCD"
@@ -26464,28 +26481,33 @@ msgid "No disc menus"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:306
+#, fuzzy
 msgid "Disc device"
-msgstr ""
+msgstr "ଡିଭିଡି ଯନ୍ତ୍ର"
 
 #: modules/gui/qt/ui/open_disk.h:308
 msgid "Starting Position"
 msgstr "ଆରମ୍ଭ ସ୍ଥାନ"
 
 #: modules/gui/qt/ui/open_disk.h:311
+#, fuzzy
 msgid "Audio and Subtitles"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଗୁଡିକ"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/open_file.h:149
+#, fuzzy
 msgid "Choose one or more media file to open"
-msgstr ""
+msgstr "ଗୋଟିଏ କିମ୍ବା ଅଧିକ ଫାଇଲ ଚୟନ କରନ୍ତୁ ଖୋଲିବା ପାଇଁ"
 
 #: modules/gui/qt/ui/open_file.h:151
 msgid "File Selection"
@@ -26508,8 +26530,9 @@ msgid "Please enter a network URL:"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26576,8 +26599,9 @@ msgid "Features"
 msgstr "ବୈଶିଷ୍ଟ୍ୟସମୂହ"
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "ଷ୍ଟ୍ରିମ୍ ଫିଲ୍ଟର"
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -26593,16 +26617,18 @@ msgid "Fra&me Rate"
 msgstr "ଫ୍ରେମ୍ ମାନ"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "ସ୍ରୋତ"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
@@ -26621,8 +26647,9 @@ msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "ଫ୍ରେମ୍ ମାନ"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -26634,20 +26661,24 @@ msgid "Sa&mple Rate"
 msgstr "ନମୂନା ମୂଲ୍ୟ"
 
 #: modules/gui/qt/ui/profiles.h:766
+#, fuzzy
 msgid "Profile &Name"
-msgstr ""
+msgstr "ଫାଇଲ ଚୟନ"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "ସମସ୍ତ ବିକଳ୍ପଗୁଡିକକୁ ଦେଖିବା ପାଇଁ \"ଉନ୍ନତ ବିକଳ୍ପ ସମୂହ\" କୁ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/sout.h:205
+#, fuzzy
 msgid "Destination Setup"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/sout.h:206
+#, fuzzy
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "ସମସ୍ତ ବିକଳ୍ପଗୁଡିକକୁ ଦେଖିବା ପାଇଁ \"ଉନ୍ନତ ବିକଳ୍ପ ସମୂହ\" କୁ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -26656,52 +26687,61 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:208
+#, fuzzy
 msgid "New destination"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/sout.h:210
+#, fuzzy
 msgid "Display locally"
-msgstr ""
+msgstr "ଡିଭିଡି ଯନ୍ତ୍ର"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "ସମସ୍ତ ବିକଳ୍ପଗୁଡିକକୁ ଦେଖିବା ପାଇଁ \"ଉନ୍ନତ ବିକଳ୍ପ ସମୂହ\" କୁ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "ବିକଳ୍ପସମୂହ"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "ସମସ୍ତ ବିକଳ୍ପଗୁଡିକକୁ ଦେଖିବା ପାଇଁ \"ଉନ୍ନତ ବିକଳ୍ପ ସମୂହ\" କୁ ଚୟନ କରନ୍ତୁ "
 
 #: modules/gui/qt/ui/sout.h:217
+#, fuzzy
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "ବିବିଧ"
 
 #: modules/gui/qt/ui/sout.h:218
 msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
+#, fuzzy
 msgid "Generated stream output string"
-msgstr ""
+msgstr "ସାଧାରଣ ଷ୍ଟ୍ରିମ୍ ଆଉଟପୁଟ୍ ସେଟିଂସମୂହ"
 
 #: modules/gui/qt/ui/sprefs_audio.h:428
 msgid " %"
 msgstr "%"
 
 #: modules/gui/qt/ui/sprefs_audio.h:431
+#, fuzzy
 msgid "Output module:"
-msgstr ""
+msgstr "ଆଉଟପୁଟ୍ ମଡ୍ୟୁଲେସ୍‌"
 
 #: modules/gui/qt/ui/sprefs_audio.h:434
 msgid "Use S/PDIF when available"
@@ -26712,12 +26752,14 @@ msgid "Effects"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:436
+#, fuzzy
 msgid "Visualization:"
-msgstr ""
+msgstr "ଦୃଶ୍ୟଲବ୍ଧକରୀ"
 
 #: modules/gui/qt/ui/sprefs_audio.h:437
+#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr ""
+msgstr "ଅଡ଼ିଓ ସକ୍ଷମ କରନ୍ତୁ"
 
 #: modules/gui/qt/ui/sprefs_audio.h:438
 msgid "Dolby Surround:"
@@ -26740,8 +26782,9 @@ msgid "Tracks"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:443
+#, fuzzy
 msgid "Preferred audio language:"
-msgstr ""
+msgstr "ଅଡ଼ିଓ ଭାଷା"
 
 #: modules/gui/qt/ui/sprefs_audio.h:444
 msgid "Password:"
@@ -26784,8 +26827,9 @@ msgid "Optical drive"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:353
+#, fuzzy
 msgid "Default optical device"
-msgstr ""
+msgstr "ଡିଭିଡି ଯନ୍ତ୍ର"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Damaged or incomplete AVI file"
@@ -26828,8 +26872,9 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
+#, fuzzy
 msgid "Use native style"
-msgstr ""
+msgstr "ପରବର୍ତ୍ତୀ ଶୀର୍ଷକ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Resize interface to video size"
@@ -26852,12 +26897,14 @@ msgid "Start in minimal view mode"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
+#, fuzzy
 msgid "Force window style:"
-msgstr ""
+msgstr "ପରବର୍ତ୍ତୀ ଶୀର୍ଷକ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "ମୁଖ୍ୟ ଇଣ୍ଟରଫେସ୍‌ ପାଇଁ ସେଟିଂସମୂହ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -26873,8 +26920,9 @@ msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "ଚାଳନସୂଚୀ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -26917,24 +26965,28 @@ msgid "Enable On Screen Display (OSD)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
+#, fuzzy
 msgid "Show media title on video start"
-msgstr ""
+msgstr "ଭିଡ଼ିଓ ଉପରେ ମିଡିଆ ଶୀର୍ଷକ ପ୍ରଦର୍ଶନ କରନ୍ତୁ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଗୁଡିକ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଭାଷା"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "ଉପଟାଇଟେଲ୍‌ ଗୁଡିକ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -26961,12 +27013,14 @@ msgid "Accelerated video output (Overlay)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
+#, fuzzy
 msgid "DirectX"
-msgstr ""
+msgstr "ଡିରେକ୍ଟୋରୀ"
 
 #: modules/gui/qt/ui/sprefs_video.h:330
+#, fuzzy
 msgid "Display device"
-msgstr ""
+msgstr "ଡିଭିଡି ଯନ୍ତ୍ର"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "KVA"
@@ -26985,12 +27039,14 @@ msgid "Stuff"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:173
+#, fuzzy
 msgid "Edit settings"
-msgstr ""
+msgstr "ଅଡ଼ିଓ ସେଟିଂସମୂହ"
 
 #: modules/gui/qt/ui/streampanel.h:174
+#, fuzzy
 msgid "Control"
-msgstr ""
+msgstr "ସ୍ଥାନ"
 
 #: modules/gui/qt/ui/streampanel.h:175
 msgid "Run manually"
@@ -27021,8 +27077,9 @@ msgid "Add Input"
 msgstr "ଇନପୁଟ୍ ଯୋଡ଼ନ୍ତୁ"
 
 #: modules/gui/qt/ui/streampanel.h:184
+#, fuzzy
 msgid "Edit Input"
-msgstr ""
+msgstr "ଇନପୁଟ୍ ଯୋଡ଼ନ୍ତୁ"
 
 #: modules/gui/qt/ui/streampanel.h:185
 msgid "Clear List"
@@ -27058,8 +27115,9 @@ msgid "Colors"
 msgstr "ରଂଗ"
 
 #: modules/gui/qt/ui/video_effects.h:1257
+#, fuzzy
 msgid "Interactive Zoom"
-msgstr ""
+msgstr "ଇଣ୍ଟରଫେସ୍"
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27091,8 +27149,9 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
+#, fuzzy
 msgid "Mirror"
-msgstr ""
+msgstr "ଭୁଲ:"
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
@@ -27107,8 +27166,9 @@ msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
+#, fuzzy
 msgid "Soften"
-msgstr ""
+msgstr "ସଫ୍ଟୱେୟାର"
 
 #: modules/gui/qt/ui/video_effects.h:1301
 msgid "Denoiser"
@@ -27135,8 +27195,9 @@ msgid "VLM configurator"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:287
+#, fuzzy
 msgid "Media Manager Edition"
-msgstr ""
+msgstr "ମିଡ଼ିଆ &ତଥ୍ୟ"
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
@@ -27159,33 +27220,34 @@ msgid "Select Output"
 msgstr "ଆଉଟପୁଟ୍ ଚୟନ କରନ୍ତୁ"
 
 #: modules/gui/qt/ui/vlm.h:294
+#, fuzzy
 msgid "Time Control"
-msgstr ""
+msgstr "ସ୍ଥାନ"
 
 #: modules/gui/qt/ui/vlm.h:295
+#, fuzzy
 msgid "Mux Control"
-msgstr ""
+msgstr "ସ୍ଥାନ"
 
 #: modules/gui/qt/ui/vlm.h:296
+#, fuzzy
 msgid "Muxer:"
-msgstr ""
+msgstr "ମକ୍ସରସ୍"
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:302
+#, fuzzy
 msgid "Media Manager List"
-msgstr ""
+msgstr "ମିଡ଼ିଆ &ତଥ୍ୟ"
 
 #~ msgid "VLC can't recognize the input's format"
 #~ msgstr "VLC ଇନପୁଟ୍ ର ପ୍ରକାରକୁ ଚିହ୍ନଟ କରିପାରୁନାହିଁ"
 
 #~ msgid "type"
 #~ msgstr "ପ୍ରକାର"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  DVD ମେନୁ"
 
 #~ msgid "Software"
 #~ msgstr "ସଫ୍ଟୱେୟାର"
@@ -27213,16 +27275,23 @@ msgstr ""
 #~ msgstr "ଚାଳନସୂଚୀରେ ଯୋଡନ୍ତୁ"
 
 #, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "କଳା"
+
+#, fuzzy
+#~ msgid "Output Color Filtermode"
+#~ msgstr "ଆଉଟପୁଟ୍ ଫାଇଲ"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "---  DVD ମେନୁ"
+
+#, fuzzy
 #~ msgid "AVFoundation video capture module."
 #~ msgstr "ଅଡ଼ିଓ ଆଉଟପୁଟ୍ ମଡ୍ୟୁଲ"
 
 #, fuzzy
 #~ msgid "No Audio Input device found"
 #~ msgstr "ଅଡ଼ିଓ ସିଡି ଯନ୍ତ୍ର"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "ଷ୍ଟ୍ରିମ୍ ଆଉଟପୁଟ୍"
 
 #, fuzzy
 #~ msgid "Audio Fingerprinting"
@@ -27281,16 +27350,8 @@ msgstr ""
 #~ msgstr "ମିଡିଆ ପାଠାଗାର"
 
 #, fuzzy
-#~ msgid "Advanced Open..."
-#~ msgstr "&ଉନ୍ନତ ରୁପେ ଖୋଲନ୍ତୁ..."
-
-#, fuzzy
 #~ msgid "&Open (advanced)..."
 #~ msgstr "&ଉନ୍ନତ ରୁପେ ଖୋଲନ୍ତୁ..."
-
-#, fuzzy
-#~ msgid "Output File"
-#~ msgstr "ଆଉଟପୁଟ୍ ଫାଇଲ"
 
 #, fuzzy
 #~ msgid "width"

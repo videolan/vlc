@@ -10497,8 +10497,9 @@ msgid "K Audio Interface audio output"
 msgstr "Izilungiselelo zomsindo"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Izilungiselelo zomsindo"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -11181,7 +11182,7 @@ msgstr "I-codec yevidiyo"
 #: modules/codec/daala.c:125
 #, fuzzy
 msgid "Daala video packetizer"
-msgstr "Umugqa wezihlokwana"
+msgstr "amaphakethi"
 
 #: modules/codec/daala.c:132
 #, fuzzy
@@ -28098,8 +28099,9 @@ msgid "Change the caching for the media"
 msgstr "Shintsha i-caching yemidiya"
 
 #: modules/gui/qt/ui/open.h:270
+#, fuzzy
 msgid " ms"
-msgstr ""
+msgstr "s"
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
@@ -28383,8 +28385,9 @@ msgid "Profile &Name"
 msgstr "Igama lephrofayili"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Khetha ukusakaza"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -28430,8 +28433,9 @@ msgid "Option Setup"
 msgstr "Izinketho"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Khetha ukusakaza"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -28890,16 +28894,19 @@ msgid "Spatial luma strength"
 msgstr "i-Spatializer"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "i-Spatializer"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "i-Spatializer"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "i-Spatializer"
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -28948,10 +28955,6 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Isiphathi sohlu semidiya"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Umugqa wezihlokwana"
 
 #, fuzzy
 #~ msgid "Display resolution"
@@ -29109,14 +29112,6 @@ msgstr "Isiphathi sohlu semidiya"
 #~ msgstr "Bonisa izinketho ezinwetshisiwe"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "Amafayela wemidiya"
-
-#, fuzzy
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Indlela eya esihumbeni ongasisebenzisa."
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "Vula ifayela lezihlokwana"
 
@@ -29151,22 +29146,6 @@ msgstr "Isiphathi sohlu semidiya"
 #, fuzzy
 #~ msgid "Dummy video decoder"
 #~ msgstr "I-codec yevidiyo"
-
-#, fuzzy
-#~ msgid "---  DVD Menu"
-#~ msgstr "Awekho amamenyu we-DVD"
-
-#, fuzzy
-#~ msgid "First Played"
-#~ msgstr "Kudlaliwe"
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "Ukuhlunga ividiyo"
-
-#, fuzzy
-#~ msgid "----- Title"
-#~ msgstr "Isihloko"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -29507,6 +29486,9 @@ msgstr "Isiphathi sohlu semidiya"
 #~ msgid "To"
 #~ msgstr "Kuya"
 
+#~ msgid "Streaming method"
+#~ msgstr "Uhlelo lokusakaza"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Ikheli lekhompyutha ozosakazela kuyo."
 
@@ -29638,12 +29620,12 @@ msgstr "Isiphathi sohlu semidiya"
 #~ msgid "&Decrease Volume"
 #~ msgstr "Yehlisa ivolumu"
 
-#~ msgid "&Post processing"
-#~ msgstr "Uku&thunyelwa kuyacubungula"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Gcina uhlu lokudlalwayo"
+
+#~ msgid "&Post processing"
+#~ msgstr "Uku&thunyelwa kuyacubungula"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -29884,16 +29866,6 @@ msgstr "Isiphathi sohlu semidiya"
 #~ "Ukuphuma kwevidiyo ye-Mac OS X OpenGL (ivula iwindo elinganamphetho)"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "Izilungiselelo zevidiyo kazigciniwe"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "Imbotshana emnyama"
 
@@ -29908,6 +29880,44 @@ msgstr "Isiphathi sohlu semidiya"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Hlula udothi (%)"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "Awekho amamenyu we-DVD"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "Kudlaliwe"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "Ukuhlunga ividiyo"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "Isihloko"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "Izilungiselelo zevidiyo kazigciniwe"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Umugqa wezihlokwana"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "Amafayela wemidiya"
+
+#, fuzzy
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Indlela eya esihumbeni ongasisebenzisa."
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

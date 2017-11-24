@@ -29251,8 +29251,9 @@ msgid "Profile &Name"
 msgstr "პროტოკოლის ფაილი"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "ნაკადის ამორჩევა"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -29301,8 +29302,9 @@ msgid "Option Setup"
 msgstr "ოფციები"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "ნაკადის ამორჩევა"
 
 #: modules/gui/qt/ui/sout.h:217
 #, fuzzy
@@ -29748,8 +29750,9 @@ msgid "Interactive Zoom"
 msgstr "ინტერფეისი"
 
 #: modules/gui/qt/ui/video_effects.h:1263
+#, fuzzy
 msgid "Angle"
-msgstr ""
+msgstr "ფაილები"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
@@ -29799,8 +29802,9 @@ msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
+#, fuzzy
 msgid "Soften"
-msgstr ""
+msgstr "წინა"
 
 #: modules/gui/qt/ui/video_effects.h:1301
 #, fuzzy
@@ -29813,16 +29817,19 @@ msgid "Spatial luma strength"
 msgstr "ეკვალაიზერი"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "ეკვალაიზერი"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "ეკვალაიზერი"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "ეკვალაიზერი"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -29881,10 +29888,6 @@ msgstr ""
 #, fuzzy
 msgid "Media Manager List"
 msgstr "Meta-ინფორმაცია"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "ტიტრების კვალი"
 
 #~ msgid "Display resolution"
 #~ msgstr "ეკრანის გარჩევადობა"
@@ -30072,10 +30075,6 @@ msgstr "Meta-ინფორმაცია"
 #~ msgstr "აჩვენე დამატებითი VCD ინფორმაცია?"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "ფაილები"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "ლოგო"
 
@@ -30123,19 +30122,6 @@ msgstr "Meta-ინფორმაცია"
 #, fuzzy
 #~ msgid "Video decoder using Android MediaCodec"
 #~ msgstr "ვიდეო"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---..DVD მენიუ"
-
-#, fuzzy
-#~ msgid "First Played"
-#~ msgstr "პირველი"
-
-#~ msgid "Video Manager"
-#~ msgstr "ვიდეო მმართველი"
-
-#~ msgid "----- Title"
-#~ msgstr "----- სათაური"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -30208,9 +30194,6 @@ msgstr "Meta-ინფორმაცია"
 #, fuzzy
 #~ msgid "ZPL playlist import"
 #~ msgstr "PLS დასაკრავი სიის იმპორტი"
-
-#~ msgid "Fast udp streaming"
-#~ msgstr "სწრაფი udp სტრიმინგი"
 
 #, fuzzy
 #~ msgid "Compiled by %s with %@"
@@ -30486,6 +30469,9 @@ msgstr "Meta-ინფორმაცია"
 #~ msgid "To"
 #~ msgstr "ვის"
 
+#~ msgid "Streaming method"
+#~ msgstr "სტრიმინგის მეთოდი"
+
 #, fuzzy
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "CDDB სერვერის მისამართი."
@@ -30617,12 +30603,12 @@ msgstr "Meta-ინფორმაცია"
 #~ msgstr "ნაგულისხმევი აუდიო ხმის სიმაღლე"
 
 #, fuzzy
-#~ msgid "&Post processing"
-#~ msgstr "კოდირების ხარისხი"
-
-#, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "დასაკრავი სიის შენახვა"
+
+#, fuzzy
+#~ msgid "&Post processing"
+#~ msgstr "კოდირების ხარისხი"
 
 #~ msgid "Log format"
 #~ msgstr "პროტოკოლის ფორმატი"
@@ -30940,16 +30926,8 @@ msgstr "Meta-ინფორმაცია"
 #~ msgstr "X11 ვიდეო გასავალი"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "ვიდეო პარამეტრები"
-
-#, fuzzy
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr " (სტანდარტულად გამორთული)"
-
-#, fuzzy
-#~ msgid "MKV"
-#~ msgstr "MOV"
 
 #, fuzzy
 #~ msgid "Black Slot"
@@ -30966,6 +30944,38 @@ msgstr "Meta-ინფორმაცია"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "სიკაშკაშე"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "MOV"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "---..DVD მენიუ"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "პირველი"
+
+#~ msgid "Video Manager"
+#~ msgstr "ვიდეო მმართველი"
+
+#~ msgid "----- Title"
+#~ msgstr "----- სათაური"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "ვიდეო პარამეტრები"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "ტიტრების კვალი"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "ფაილები"
+
+#~ msgid "Fast udp streaming"
+#~ msgstr "სწრაფი udp სტრიმინგი"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

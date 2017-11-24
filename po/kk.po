@@ -1,18 +1,19 @@
 # Kazakh translation
-# Copyright (C) 2014 VideoLAN
-# This file is distributed under the same license as the VLC package.
+# Copyright (C) 2016 VideoLAN
+# This file is distributed under the same license as the vlc package.
 #
 # Translators:
+# Kerimbekov Galym <kegalym2@mail.ru>, 2015-2016
 # Kypchak Kypchak <kypchak@gmail.com>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2013-12-08 08:16+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Kazakh (http://www.transifex.com/projects/p/vlc-trans/"
-"language/kk/)\n"
+"PO-Revision-Date: 2016-02-05 13:10+0000\n"
+"Last-Translator: Kerimbekov Galym <kegalym2@mail.ru>\n"
+"Language-Team: Kazakh (http://www.transifex.com/yaron/vlc-trans/language/"
+"kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,47 +30,47 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLC теңшелімдері"
+msgstr "VLC бапталымдары"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Парараметрлердің бәрін көру үшін \"Қосымша параметрлер\" бөлектеңіз"
+msgstr " Барлық баптауларды көру үшін \"Қосымша параметрлерді\" таңдаңыз."
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
 #: modules/gui/qt/menus.cpp:1085
 msgid "Interface"
-msgstr "Тілдесу"
+msgstr "Интерфейс"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "VLC тілдесулерінің теңшелімдері"
+msgstr "VLC интерфейс баптаулары"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "Басты тілдесулер теңшелімдері"
+msgstr "Басты интерфейс баптаулары"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "Басты тілдесулер"
+msgstr "Басты интерфейс"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "Басты тілдесу теңшелімдері"
+msgstr "Басты интерфейс баптаулары"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
-msgstr "Басқару тілдесулер"
+msgstr "Басқару интерфейсі"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "VLC басқару тілдесулерінің теңшелімдері"
+msgstr "VLC басқару интерфейсінің баптаулары"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
 msgid "Hotkeys settings"
-msgstr "Тездету пернелерін теңшелімдері"
+msgstr "Жылдамдату пернелерінің баптаулары"
 
 #: include/vlc_config_cat.h:53 src/input/es_out.c:3062 src/input/es_out.c:3103
 #: src/libvlc-module.c:1489 modules/access/imem.c:64
@@ -88,24 +89,24 @@ msgstr "Дыбыс"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
-msgstr "Дыбыстық теңшелімдер"
+msgstr "Дыбыс баптаулары"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
-msgstr "Дыбыстың жалпы теңшелімдері"
+msgstr "Дыбыстың жалпы баптаулары"
 
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:81
 #: modules/gui/qt/ui/profiles.h:750 modules/gui/qt/ui/profiles.h:760
 msgid "Filters"
-msgstr "Сүзгілер"
+msgstr "Фильтрлер"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "Дыбыстық ағынды өңдету үшін қолданатын дыбыстық сүзгілер."
+msgstr "Дыбыс ағын өңдету үшін қолданатын дыбыс фильтрлері."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr ""
+msgstr "Дыбыс ресэмплдеуші"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:258
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
@@ -119,21 +120,21 @@ msgstr "Дыбыстық көрнекі бейнелері"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
-msgstr "Шығасын модульдері"
+msgstr "Шығыс модульдері"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "Дыбыстық шығасын модульдерінің жалпы теңшелімдері."
+msgstr "Дыбыстық шығыс модульдерінің жалпы баптаулары."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2012
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:183
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
-msgstr "Әр түрлі"
+msgstr "Басқа түрлі баптаулар"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "Әр түрлі дыбыстық теңшелімдер және модульдер"
+msgstr "Басқа түрлі дыбыс баптаулары және модульдер"
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3065 src/input/es_out.c:3147
 #: src/libvlc-module.c:142 src/libvlc-module.c:1548 modules/access/imem.c:64
@@ -154,31 +155,29 @@ msgstr "Бейне"
 
 #: include/vlc_config_cat.h:74
 msgid "Video settings"
-msgstr "Бейнелік теңшелімдері"
+msgstr "Бейне баптаулары"
 
 #: include/vlc_config_cat.h:76
 msgid "General video settings"
-msgstr "Бейненің жалпы теңшелімдері"
+msgstr "Бейненің жалпы баптаулары"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "Дыбыстық шығасын модульдерінің жалпы теңшелімдері."
+msgstr "Бейненің шығыс модульдерінің жалпы баптаулары."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейнелік сүзгілер."
+msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
-msgstr ""
+msgstr "Субтитрлер / OSD"
 
 #: include/vlc_config_cat.h:85
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
-"Бейнебеттік мәзірге, субтитрлерге және \"жабынды суретшелерге\" қатысты "
-"теңшелімдер"
+"Экранды меню, субтитрлерге және \"жабынды суретшелерге\" қатысты баптаулар"
 
 #: include/vlc_config_cat.h:88
 #, fuzzy
@@ -191,11 +190,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
-msgstr "Кіресін / Кодектер"
+msgstr "Кіріс ақпарат / Кодектер"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
-msgstr "Кіресін, демультиплекстеу, кодсыздандыру және кодтау теңшелімдері"
+msgstr "Кіріс, демультиплекстеу, декодтау және кодтау баптаулары"
 
 #: include/vlc_config_cat.h:101
 msgid "Access modules"
@@ -206,20 +205,20 @@ msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
-"Қатынаудың әр түрлі әдістеріне қатысты теңшелімдер. Соның ішінде HTTP "
-"проксидің не бүркемелеуін теңшелімдері бар."
+"Қатынаудың түрлі әдістеріне қатысты баптаулар. Жиі қолданатын баптаулар "
+"ішінде HTTP-прокси немесе кэштеу баптаулары бар."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr "Ағындық сүзгілер"
+msgstr "Ағын фильтрлері"
 
 #: include/vlc_config_cat.h:109
 msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"Ағындық сүзгілері - VLC кіресін жағындағы қосымша амалдарына рұқсат ететін "
-"арнаулы модульдер. Абайлап қолданыңыз..."
+"Ағын фильтрлері - VLC-нің кіріс жағындағы қосымша амалдарын рұқсат ететін "
+"арнаулы модульдер. Мұқият қолданыңыз..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
@@ -227,7 +226,7 @@ msgstr "Демуксерлер"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "Демуксерлер қолданауы бейнелік және дыбыстық ағындарын бөліп алу үшін."
+msgstr "Демуксерлер бейнелік және дыбыстық ағындарын бөлу үшін қолданылады."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -243,8 +242,7 @@ msgstr "Дыбыстық кодектер"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr ""
-"Тек қана дыбыстық кодсыздандырғыштардың және кодтауыштардың теңшелімдері."
+msgstr "Тек дыбыстық декодтаушылар және кодтауыштардың баптаулары."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -252,16 +250,16 @@ msgstr ""
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr ""
+msgstr "Субтитрлер, телемәтін және СС декодтаушылар мен кодтаушылар"
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "Жалпы кіресін теңшелімдері. Абайлап қолданыңыз..."
+msgstr "Жалпы кіріс баптаулары. Мұкият қолданыңыз..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1947
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr "Ағындық шығасын"
+msgstr "Ағындық шығыс"
 
 #: include/vlc_config_cat.h:129
 msgid ""
@@ -273,10 +271,17 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
+"Ағындық шығыс баптаулары ағындық сервер ретінде әрекет еткен кезде немесе "
+"кіретін ағындарды сақтау кезінде қолданылады.\n"
+"Ағындар мультиплекс жолмен өнделіп, содан соң \"қатынаулы шығыс\" модулі "
+"арқылы  жіберіледі. Ол ағынды файлға сақтайды немесе ағын ретіне ойнатады "
+"(UDP, HTTP, RTP/RTSP).\n"
+"Қашықталған ағындар модульдері ағынды қосымша өндеуге мүмкіндік береді "
+"(транскодтау, дупликация...)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr "Ағындық шығасындардың жалпы теңшелімдері"
+msgstr "Жалпы ағындық шығыс баптаулары"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
@@ -289,10 +294,15 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
+"Муксерлер барлық элементтік ағындарды (бейне, дыбыс) бірге қосу үшін "
+"арналған инкапсуляция форматтарын жасайды. Бұл баптау белгілі муксерді "
+"мәжбүрлі түрде қолдануға мүмкіндік береді. Сізге мұны таңдауды ұсынбаймыз.\n"
+"Сізге сондай-ақ муксерлердің әрқайсысына әдепкі параметрлерді орнатуыңызға "
+"болады."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
-msgstr "Шығасын қатынау"
+msgstr "Шығыс қатынау"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -301,10 +311,14 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
+"Қатынау шығыс модулдері мультиплексті ағындардың жіберілу әдісін "
+"қадағалайды. Бұл баптау белгілі қатынау шығыс әдісін мәжбүрлі түрде "
+"қолдануға мүмкіндік береді. Сізге мұны таңдауды ұсынбаймыз. Сізге сондай-ақ "
+"қатынау шығысының әрқайсысына әдепкі параметрлерді орнатуыңызға болады."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
-msgstr "Дестелеуіштер"
+msgstr "Пакетизаторлар"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -313,10 +327,14 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
+"Пакетизаторлар элементтік ағындарды мультиплекстеу алдында \"алдын ала өндеу"
+"\" үшін қолданылады. Бұл баптау пакетизаторды мәжбүрлі түрде қолдануға "
+"мүмкіндік береді. Сізге мұны таңдауды ұсынбаймыз. Сізге сондай-ақ "
+"пакетизаторлардың әрқайсысына әдепкі параметрлерді орнатуыңызға болады."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
-msgstr "Ағындық модулдер"
+msgstr "Қашықтық ағындар"
 
 #: include/vlc_config_cat.h:163
 msgid ""
@@ -324,6 +342,10 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
+"Қашықтағы ағындар модулдері қашықтық өндеуіш тізбегін құрастыруға мүмкіндік "
+"береді. Толық ақпарат алу үшін стримингты қалай жасауға болады атты "
+"нұсқаулығын қараңыз. Сізге қашықтық ағын модулінің әрқайсысына әдепкі "
+"параметрлерін мұнда орнатуыңызға болады."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -331,7 +353,7 @@ msgstr "Сұрау салынған бейне"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "Сұрау салынған бейне ісметін қолдау үшін VLC енгізу нұсқасы"
+msgstr "Сұрау салынған бейненің VLC нұсқасы"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2056
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
@@ -349,10 +371,13 @@ msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
+"Ойнату тізіміне (мысалы, ойнату режимі) және модулдерге қатысты ойнатылатын "
+"тармақтарды ойнату тізіміне қосатын баптаулар (\"қызмет әшкерелеу\" "
+"модулдері)."
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
-msgstr "Ойнату тізімі жалпы жүріс-тұрысы"
+msgstr "Ойнату тізімінің жалпы әрекет тәртібі"
 
 #: include/vlc_config_cat.h:179
 msgid "Services discovery"
@@ -363,78 +388,78 @@ msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
-"Қызмет әшекерлеу модульдері - ойнату тізіміне өздігінен бірліктерді үстейтін "
-"құралдар."
+"Қызмет әшкерелеу модулдері - ойнату тізіміне ойнатылатын тармақтарды "
+"автоматты түрде қосатын құралдар."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1847
 #: modules/gui/qt/dialogs/extended.cpp:93
 #: modules/gui/qt/ui/video_effects.h:1308
 msgid "Advanced"
-msgstr "Қосымша"
+msgstr "Қосымша баптаулар"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr "Қосымша теңшелімдер. Абайлап пайдаланыңыз..."
+msgstr "Қосымша баптаулар. Мұқият пайдаланыңыз..."
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
-msgstr "Қосымша теңшелімдер"
+msgstr "Қосымша баптаулар"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
-msgstr "Файл ашу..."
+msgstr "&Файлды ашу..."
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "Басқаша ашу..."
+msgstr "&Басқаша ашу..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "Тізімдеме ашу..."
+msgstr "&Тізімдеме ашу..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr "Қалта ашу..."
+msgstr "&Қалта ашу..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
-msgstr "Ашылатын файлдардың біреуін не бірнешеуін бөлектеу"
+msgstr "Ашылатын файлдың біреуін немесе бірнешеуін таңдау"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
-msgstr "Тізімдеме бөлектеу"
+msgstr "Тізімдеме таңдау"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
-msgstr ""
+msgstr "Қалта таңдау"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr "Қайнар сипаттары"
+msgstr "&Ақпарат сипаттары"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
-msgstr "Кодек сипаттары"
+msgstr "&Кодек сипаттары"
 
 #: include/vlc_intf_strings.h:57
 msgid "&Messages"
-msgstr "Хабарлар"
+msgstr "&Хабарламалар"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr "Өзіндік уақытқа ауысу"
+msgstr "Белгілі &уақытқа ауысу"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr ""
+msgstr "&Жасанды бетбелгілер"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
-msgstr "&VLM ішқұрылымы"
+msgstr "&VLM құрылымы"
 
 #: include/vlc_intf_strings.h:62
 msgid "&About"
-msgstr "VLC туралы"
+msgstr "&VLC туралы"
 
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:64
@@ -450,37 +475,35 @@ msgstr "Ойнату"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr ""
+msgstr "Таңдалғанды алып тастау"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
-msgstr "Сипаттар..."
+msgstr "Деректер..."
 
 #: include/vlc_intf_strings.h:68
 msgid "Create Directory..."
-msgstr ""
+msgstr "Тізімдемені жасау..."
 
 #: include/vlc_intf_strings.h:69
 msgid "Create Folder..."
-msgstr ""
+msgstr "Қалтаны жасау..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "Тізімдеме ашу..."
+msgstr "Тізімдеме атауын ауыстыру..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "Қалта ашу..."
+msgstr "Қалта атауын ауыстыру..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
-msgstr ""
+msgstr "Орналасқан тізімдемені көрсету..."
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
-msgstr ""
+msgstr "Орналасқан қалтаны көрсету..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
@@ -493,7 +516,7 @@ msgstr "Сақтау..."
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
 #: modules/gui/macosx/VLCMainMenu.m:391
 msgid "Repeat All"
-msgstr "Бәрін қайталау"
+msgstr "Барлығын қайталау"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:390
@@ -509,27 +532,27 @@ msgstr "Кездейсоқ"
 
 #: include/vlc_intf_strings.h:82 modules/gui/macosx/VLCCoreInteraction.m:425
 msgid "Random Off"
-msgstr "Кездесөқ өшірілген"
+msgstr "Кездейсоқ өшірілген"
 
 #: include/vlc_intf_strings.h:83
 msgid "Add to Playlist"
-msgstr "Ойнату тізімге үстеу"
+msgstr "Ойнату тізіміне қосу"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:237
 msgid "Add File..."
-msgstr ""
+msgstr "Файлды қосу..."
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr ""
+msgstr "Тізімдемені қосу..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
-msgstr ""
+msgstr "Қалтаны қосу..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr "Ойнату тізімін сақтау..."
+msgstr "Ойнату тізімін &файлға сақтау..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:186
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -572,42 +595,42 @@ msgid ""
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>VLC мультимедия ойнатқышының анықтамасына "
-"қош келіпсіз!</h2><h3>Құжатнама</h3><p>VLC құжатнамасын Сіз VideoLAN <a href="
+"қош келдіңіз!</h2><h3>Құжатнама</h3><p>VLC құжатнамасын Сіз VideoLAN <a href="
 "\"http://wiki.videolan.org\">уики</a> веб-торабынан таба аласыз.</p><p>Егер "
-"Сіз VLC мультимедия ойнатқышына жаңадан келген болсаңыз, <br><a href="
+"Сіз VLC мультимедия ойнатқышымен жаңадан танысқан болсаңыз, <br><a href="
 "\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>VLC "
 "мультимедия ойнатқышына кіріспе</em></a> деген бетті оқып шығыңыз.</"
-"p><p>Ойнатқышты пайдалану туралы қайсыбір ақпарды <br>\"<a href=\"http://"
-"wiki.videolan.org/Documentation:Play_HowTo\"><em>Файлдарды VLC мультимедия "
-"ойнатқышы арқылы қалай ойнатады</em></a>\" құжатынан табасыз.</p><p>Барлық "
-"сақтау, түрлендіру, қайта кодтау, кодтау, мукстеу және ағын жіберу "
+"p><p>Ойнатқышты пайдалану туралы ақпаратты<br>\"<a href=\"http://wiki."
+"videolan.org/Documentation:Play_HowTo\"><em>Файлды VLC мультимедия ойнатқышы "
+"арқылы қалай ойнатуға болады</em></a>\" құжатынан таба аласыз.</p><p>Барлық "
+"сақтау, түрлендіру, қайта кодтау, кодтау, мультиплекстеу және ағын жіберу "
 "максаттары үшін, <a href=\"http://wiki.videolan.org/Documentation:"
-"Streaming_HowTo\">Ағын жіберу құжатнамасы</a> деген бетте өзіңізге пайдалы "
-"ақпарды табуыңызға болады.</p><p>Егер терминология жөнінде бір қалыпты "
-"болмасаңыз, біздің <a href=\"http://wiki.videolan.org/Knowledge_Base\">білім "
-"қорынан</a> кеңес алып шығыңыз.</p><p>Басты тездету пернелерді аңдау үшін, "
-"<a href=\"http://wiki.videolan.org/Hotkeys\">тездету пернелер</a> туралы "
-"бетін оқып шығыңыз.</p><h3>Қолдау</h3><p>Кез келген сауал салудың алдында, "
-"<a href=\"http://www.videolan.org/support/faq.html\">Жиі Анықтылатын "
-"Сауалдар</a> бетіне өзіңіз барып шығыңыз.</p><p>Тек соңда қолдау аласыз "
-"(бересіз де), әлдегідей:  <a href=\"http://forum.videolan.org\">Алқаларда</"
-"a>, <a href=\"http://www.videolan.org/vlc/lists.html\">хат тізімідерінде</a> "
-"не біздің IRC арнамызда (irc.freenode.net серверіндегі <em>#videolan</em>).</"
-"p><h3>Жобаға қатысу</h3><p>VideoLAN жобасына көмектесуіңіз үшін бірнеше жолы "
-"бар: уақытыңызды бөліп жамағағатқа қолғабыс беріп, мұқабалар жасақтап, "
-"құжатнаманың тәржімесін істеп, сынақтап және код жазып. Тағы да бізге "
-"көмектес қаржы және материалдар берп жәрдем істеуіңізге болады. Әлбетте, "
-"Сіздің қолыңызда VLC мультимедия ойнатқышын әрі <b>ілгерілету</b> де бар.</"
-"p></body></html>"
+"Streaming_HowTo\">Ағын жіберу құжаттамасы</a> деген бетте өзіңізге пайдалы "
+"ақпаратты табуыңызға болады.</p><p>Егер терминология жөнінде бір қалыпты "
+"ойыңыз болмаса, біздің <a href=\"http://wiki.videolan.org/Knowledge_Base"
+"\">білім қорынан</a> кеңес алып шығыңыз.</p><p>Басты жылдамдату пернелерімен "
+"қалай жүмыс істеуді түсіну үшін үшін, <a href=\"http://wiki.videolan.org/"
+"Hotkeys\">жылдамдату пернелер</a> туралы бетін оқып шығыңыз.</p><h3>Қолдау</"
+"h3><p>Кез келген сауал салу алдында, <a href=\"http://www.videolan.org/"
+"support/faq.html\">Жиі Анықтылатын Сауалдар</a> бетіне өзіңіз барып шығыңыз."
+"</p><p>Тек соңда қолдау аласыз (бересіз де), әлдегідей:  <a href=\"http://"
+"forum.videolan.org\">Алқаларда</a>, <a href=\"http://www.videolan.org/vlc/"
+"lists.html\">хат тізімідерінде</a> немесе біздің IRC арнамызда (irc.freenode."
+"net серверіндегі <em>#videolan</em>).</p><h3>Жобаға қатысу</h3><p>VideoLAN "
+"жобасына көмектесуіңіз үшін бірнеше жолы бар: уақытыңызды бөліп жамағағатқа "
+"қолғабыс беріп, мұқабалар жасақтап, құжатнаманың тәржімесін істеп, сынақтап "
+"және код жазып. Тағы да бізге көмектес қаржы және материалдар беріп көмек "
+"көрсетуіңізге болады. Әлбетте, сіздің қолыңызда VLC мультимедия ойнатқышын "
+"әрі <b>ілгерілету</b> мүмкіндігі бар.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
-msgstr "Дыбыс сүзгілеуі сәтсіз"
+msgstr "Дыбысты фильтрмен өндеу сәтсіз аяқталды"
 
 #: src/audio_output/filters.c:268
 #, c-format
 msgid "The maximum number of filters (%u) was reached."
-msgstr ""
+msgstr " (%u) фильтрлерінің саны ең шеткі деңгейге жетті."
 
 #: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
@@ -638,17 +661,17 @@ msgstr "Дыбыстық сүзгілер"
 
 #: src/audio_output/output.c:325
 msgid "Replay gain"
-msgstr "Қайталау күшеюі"
+msgstr "Күшейтіп қайталау"
 
 #: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
 msgid "Stereo audio mode"
-msgstr ""
+msgstr "Стереодыбыс режимі"
 
 #: src/audio_output/output.c:419
 #, fuzzy
 msgid "Original"
-msgstr "Бастапқы теңдестіргіш"
+msgstr "Бастапқы ID"
 
 #: src/audio_output/output.c:425 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -708,7 +731,7 @@ msgstr "Бас телефондар"
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
 msgid "Automatic"
-msgstr "Өздігінен"
+msgstr "Автоматты түрде"
 
 #: src/config/file.c:452
 msgid "boolean"
@@ -728,7 +751,7 @@ msgstr "Мәтін"
 
 #: src/config/help.c:164
 msgid "To get exhaustive help, use '-H'."
-msgstr "Толық қамтыған анықтама үшін, '-H' қолданыңыз."
+msgstr "Толық анықтама алу үшін, '-H' қолданыңыз."
 
 #: src/config/help.c:168
 #, c-format
@@ -775,15 +798,15 @@ msgstr "(әдепкі қосылған)"
 #: src/config/help.c:491
 #, fuzzy
 msgid "(default disabled)"
-msgstr "(әдепкі доғарылған)"
+msgstr "(әдепкі істен шығарылған)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
-msgstr "Ескерім:"
+msgstr "Ескерту:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr ""
+msgstr "Қосымша параметрлерді көру үшін --advanced параметрін қолданыңыз."
 
 #: src/config/help.c:656
 #, c-format
@@ -791,22 +814,25 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"%u модулдер олардың тек қосымша параметрлері болғандықтан көрсетілмеді.\n"
 
 #: src/config/help.c:663
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
 msgstr ""
+"Сәйкес келетін модул табылмады. Қол жетімді модулдер тізімін көру үшін --"
+"list немесе --list-verbose параметрлерді қолданыңыз."
 
 #: src/config/help.c:721
 #, c-format
 msgid "VLC version %s (%s)\n"
-msgstr ""
+msgstr "VLC нұсқасы %s (%s)\n"
 
 #: src/config/help.c:722
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
-msgstr ""
+msgstr "%s және %s (%s) құрастырылған.\n"
 
 #: src/config/help.c:724
 #, c-format
@@ -819,6 +845,8 @@ msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+"Мәтін мазмұның vlc-help.txt файлына шығару.\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -829,9 +857,8 @@ msgstr ""
 "Жалғастыру үшін ЕНГІЗУ пернесін басыңыз...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "Беймәлім бейне"
+msgstr "Белгісіз қате"
 
 #: src/input/control.c:203
 #, c-format
@@ -839,29 +866,25 @@ msgid "Bookmark %i"
 msgstr "Бетбелгі %i"
 
 #: src/input/decoder.c:1875
-#, fuzzy
 msgid "No description for this codec"
-msgstr "Жеткілімдік бейнелік кодек"
+msgstr "Бүл кодек бойынша сипаттама жоқ."
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "Тұтынғыш порты"
+msgstr "Қодек қолдаусыз"
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC \"%s:%d\" байланысу мүмкін емес."
+msgstr "VLC \"%4.4s\" (%s) форматын декодтай алмайды"
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "Бейнелік кодек"
+msgstr ""
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "Кодтауышты VLC аша алмады."
+msgstr "VLC дыбыс немесе бейнекодекты анықтай алмайды"
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -875,21 +898,21 @@ msgstr ""
 #: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:885
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr "Ағындық жіберу / Қайта кодтау сәтсіз"
+msgstr "Ағындық жіберу / Транскодтау сәтсіз аяқталды"
 
 #: src/input/decoder.c:1903
 #, c-format
 msgid "VLC could not open the %s module."
-msgstr ""
+msgstr "VLC %s модулін аша алмайды."
 
 #: src/input/decoder.c:2184
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "VLC декодтаушы модулін аша алмайды."
 
 #: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:543
 msgid "Track"
-msgstr "Жолшық"
+msgstr "Трек"
 
 #: src/input/es_out.c:1185
 #, c-format
@@ -938,7 +961,7 @@ msgstr "Түрі"
 
 #: src/input/es_out.c:3079
 msgid "Original ID"
-msgstr "Бастапқы теңдестіргіш"
+msgstr "Бастапқы ID"
 
 #: src/input/es_out.c:3087 src/input/es_out.c:3090 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
@@ -946,7 +969,7 @@ msgstr "Бастапқы теңдестіргіш"
 #: modules/gui/qt/ui/profiles.h:728 modules/gui/qt/ui/profiles.h:754
 #: modules/gui/qt/ui/profiles.h:763
 msgid "Codec"
-msgstr "Кодегі"
+msgstr "Кодек"
 
 #: src/input/es_out.c:3094 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
@@ -959,13 +982,13 @@ msgstr "Тілі"
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
 msgid "Description"
-msgstr "Сипаттамасы"
+msgstr "Сипаттама"
 
 #: src/input/es_out.c:3106
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
 #: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:756
 msgid "Channels"
-msgstr "Арналары"
+msgstr "Арналар"
 
 #: src/input/es_out.c:3111 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
@@ -996,7 +1019,7 @@ msgstr "%u kb/s"
 
 #: src/input/es_out.c:3138
 msgid "Track replay gain"
-msgstr "Жолшық қайталау күшеюі"
+msgstr "Трек қайталау күшеюі"
 
 #: src/input/es_out.c:3140
 msgid "Album replay gain"
@@ -1029,7 +1052,7 @@ msgstr "Кадр қарқыны"
 
 #: src/input/es_out.c:3177
 msgid "Decoded format"
-msgstr ""
+msgstr "Декодталған формат"
 
 #: src/input/es_out.c:3182
 #, fuzzy
@@ -1236,6 +1259,7 @@ msgstr "Сіздің кіресініңіз ашылуы мүмкін емес"
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
+"VLC '%s' MRL-ны аша алмады. Толық ақпарат алу үшін log файлды тексеріңіз."
 
 #: src/input/meta.c:55 src/input/var.c:177 modules/gui/macosx/VLCMainMenu.m:399
 #: modules/gui/macosx/VLCMainMenu.m:400
@@ -1246,17 +1270,17 @@ msgstr ""
 #: modules/gui/qt/components/open_panels.cpp:517 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
-msgstr "Тақырыбы"
+msgstr "Тақырып"
 
 #: src/input/meta.c:56 modules/gui/macosx/VLCPlaylistInfo.m:64
 #: modules/mux/avi.c:49
 msgid "Artist"
-msgstr "Орындаушысы"
+msgstr "Орындаушы"
 
 #: src/input/meta.c:57 modules/gui/macosx/VLCPlaylist.m:110
 #: modules/mux/avi.c:51
 msgid "Genre"
-msgstr "Жанры"
+msgstr "Жанр"
 
 #: src/input/meta.c:58 modules/mux/asf.c:60 modules/mux/avi.c:52
 msgid "Copyright"
@@ -1269,7 +1293,7 @@ msgstr "Альбомы"
 
 #: src/input/meta.c:60
 msgid "Track number"
-msgstr "Жолшық №"
+msgstr "Трек нөмірі"
 
 #: src/input/meta.c:62 modules/mux/asf.c:64
 msgid "Rating"
@@ -1282,7 +1306,7 @@ msgstr "Күн-айы"
 
 #: src/input/meta.c:64
 msgid "Setting"
-msgstr "Теңшелімі"
+msgstr "Баптау"
 
 #: src/input/meta.c:65 modules/gui/macosx/VLCOpenWindowController.m:188
 #: modules/gui/qt/ui/podcast_configuration.h:102
@@ -1295,11 +1319,11 @@ msgstr "Қазір ойнатылуда"
 
 #: src/input/meta.c:69
 msgid "Publisher"
-msgstr "Жариялаушысы"
+msgstr "Жариялаушы"
 
 #: src/input/meta.c:70
 msgid "Encoded by"
-msgstr "Мынаумен кодталған:"
+msgstr "Келесімен кодталған:"
 
 #: src/input/meta.c:71
 msgid "Artwork URL"
@@ -1307,44 +1331,41 @@ msgstr "Сурет URL-мекенжайы"
 
 #: src/input/meta.c:72
 msgid "Track ID"
-msgstr "Жолшық теңдестіргіші"
+msgstr "Трек ID"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "Жол саны"
+msgstr "Тректер саны"
 
 #: src/input/meta.c:74
 msgid "Director"
-msgstr ""
+msgstr "Басқарушы"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "Мезгіл"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "Үзінді"
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "Атауы"
+msgstr "Атауын көрсету"
 
 #: src/input/meta.c:78
-#, fuzzy
 msgid "Actors"
-msgstr "Ықпал"
+msgstr "Актерлер"
 
 #: src/input/meta.c:79
 #, fuzzy
 msgid "Album Artist"
-msgstr "Орындаушысы"
+msgstr "Орындаушы"
 
 #: src/input/meta.c:80
 #, fuzzy
 msgid "Disc number"
-msgstr "Жолшық №"
+msgstr "Трек нөмірі"
 
 #: src/input/var.c:159
 msgid "Bookmark"
@@ -1360,7 +1381,7 @@ msgstr "Бағдарламалар"
 #: modules/gui/macosx/VLCOpenWindowController.m:181
 #: modules/gui/qt/ui/open_disk.h:310
 msgid "Chapter"
-msgstr "Бөлімі"
+msgstr "Бөлім"
 
 #: src/input/var.c:195 modules/gui/macosx/VLCMainMenu.m:425
 #: modules/gui/macosx/VLCMainMenu.m:426
@@ -1370,11 +1391,11 @@ msgstr "Бейнелік жолшық"
 #: src/input/var.c:201 modules/gui/macosx/VLCMainMenu.m:408
 #: modules/gui/macosx/VLCMainMenu.m:409
 msgid "Audio Track"
-msgstr "Дыбыстық жолшығы"
+msgstr "Дыбыстық трек"
 
 #: src/input/var.c:207
 msgid "Subtitle Track"
-msgstr ""
+msgstr "Трек субтитры"
 
 #: src/input/var.c:275
 msgid "Next title"
@@ -1397,7 +1418,7 @@ msgstr "Үзіліс"
 #: src/input/var.c:330
 #, c-format
 msgid "Title %i%s"
-msgstr ""
+msgstr "Тақырып %i%s"
 
 #: src/input/var.c:355 src/input/var.c:412
 #, c-format
@@ -1415,12 +1436,12 @@ msgstr "Алдыңғы бөлім"
 #: src/input/vlm.c:621 src/input/vlm.c:997
 #, c-format
 msgid "Media: %s"
-msgstr "Тасушы: %s"
+msgstr "Медиадерек: %s"
 
 #: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:337
 #: modules/gui/macosx/VLCMainMenu.m:338
 msgid "Add Interface"
-msgstr "Тілдесу үстеу"
+msgstr "Интерфейсті қосу"
 
 #: src/interface/interface.c:89
 msgid "Console"
@@ -1436,17 +1457,19 @@ msgstr ""
 
 #: src/interface/interface.c:99
 msgid "Debug logging"
-msgstr "Жымдастыруды жұрналдау"
+msgstr ""
 
 #: src/interface/interface.c:102
 msgid "Mouse Gestures"
-msgstr "Тінтуір ымдары"
+msgstr "Тышқанның қимыл-шертулері"
 
 #: src/interface/interface.c:225
 msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
+"vlc әдепкі интерфейспен жүргізілді. vlc-ны интерфейссіз жүргізу үшін 'cvlc' "
+"командасын қолданыңыз."
 
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:174
@@ -1481,20 +1504,25 @@ msgid ""
 "select the main interface, additional interface modules, and define various "
 "related options."
 msgstr ""
+"Мына параметрлер VLC-да қолданатын интерфейстерді баптауға мүмкіндік береді. "
+"Сізге басты интерфейс, қосымша интерфейс модульдерін таңдап, әртүрлі қатысты "
+"параметрлердібелгілеуіңізге болады."
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
-msgstr "Тілдесу модулі"
+msgstr "Интерфейс модулі"
 
 #: src/libvlc-module.c:70
 msgid ""
 "This is the main interface used by VLC. The default behavior is to "
 "automatically select the best module available."
 msgstr ""
+"Бұл VLC-да қолданатын басты интерфейс. Оның әдепкі баптамасы қол жетімді "
+"жақсы модулді автоматты түрде таңдайды."
 
 #: src/libvlc-module.c:74 modules/control/ntservice.c:59
 msgid "Extra interface modules"
-msgstr "Қосымша тілдесу модульдері"
+msgstr "Қосымша интерфейс модулдері"
 
 #: src/libvlc-module.c:76
 msgid ""
@@ -1503,10 +1531,14 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
+"Сізге VLC-нің \"қосымша интерфейстерін\" таңдауыңызға болады. Ол әдепкі "
+"интерфейске қосымша фонда жүргізіледі. Интерфейс модулдерінің қос нүктемен "
+"бөлінген тізімін қолданыңыз. (жиі кездесетін мағыналар \"rc\" (remote "
+"control), \"http\", \"gestures\" ...)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
-msgstr "VLC басқару тілдесулерін бөлектей аласыз."
+msgstr "VLC басқару интерфейсін таңдай аласыз."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
@@ -1526,7 +1558,7 @@ msgstr "Әдепкі ағын"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "Мына ағын VLC-нің іске қосу басында ашылатын болады."
 
 #: src/libvlc-module.c:94
 msgid "Color messages"
@@ -1550,13 +1582,15 @@ msgstr ""
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
-msgstr "Тілдесу әрекеттесуі"
+msgstr "Интерфейс арқылы әрекеттесуі"
 
 #: src/libvlc-module.c:107
 msgid ""
 "When this is enabled, the interface will show a dialog box each time some "
 "user input is required."
 msgstr ""
+"Осы параметр қолданған кезде пайдаланушының әр дайым ақпарат енгізуге "
+"қажеттілігі болған сайын интерфейстің сұхбат терезесі ашылады."
 
 #: src/libvlc-module.c:117
 msgid ""
@@ -1565,16 +1599,22 @@ msgid ""
 "(spectrum analyzer, etc.). Enable these filters here, and configure them in "
 "the \"audio filters\" modules section."
 msgstr ""
+"Келесі параметрлер аудио жүйесінің қызмет түрін өзгертуге және "
+"постпроцессинг немесе бейне эффектілер (спектрлік сараптауыш және т.б,) үшін "
+"қолданатын аудио фильтрлерді қосуға мүмкіндік береді. Фильтрлерді осы жерде "
+"іске қосып, оларды \"аудио фильтрлер\" модульдік бөлімінде үйлестіріңіз."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
-msgstr "Дыбыстық шығасын модулі"
+msgstr "Дыбыс шығару модулі"
 
 #: src/libvlc-module.c:125
 msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
+"Бұл VLC-да қолданатын дыбыс шығару тәсілі. Әдепкі қызмет түрі қолданыстағы "
+"ең жақсы тәсілді автоматты түрде таңдауға бейімделген."
 
 #: src/libvlc-module.c:129
 #, fuzzy
@@ -1588,13 +1628,15 @@ msgstr ""
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:261
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:426
 msgid "Enable audio"
-msgstr "Дыбысты қосу"
+msgstr "Дыбысты іске қосу"
 
 #: src/libvlc-module.c:134
 msgid ""
 "You can completely disable the audio output. The audio decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
+"Сіз дыбыс шығарылуын толық сөндіре аласыз. Аудиодекодтау кезені "
+"орындалмайтындықтан, бұл сонымен өндеу қорын шамалы үнемдейді."
 
 #: src/libvlc-module.c:142
 #, fuzzy
@@ -1628,7 +1670,7 @@ msgstr "Жайғасым"
 #: src/libvlc-module.c:144
 #, fuzzy
 msgid "Accessibility"
-msgstr "Шығасын қатынау"
+msgstr "Шығыс қатынау"
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1636,48 +1678,56 @@ msgstr ""
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr ""
+msgstr "Дыбысты күшейту"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr ""
+msgstr "Сызықтық күшейту шығатын дыбысқа қолданатын болады."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
-msgstr "Дыбыстық шығасын деңгейінің қадамы"
+msgstr "Дыбыс шығу деңгейінің қадамы"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
-msgstr ""
+msgstr "Дыбыс мөлшерінің қадам көлемі осы параметр арқылы реттелінеді."
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
-msgstr ""
+msgstr "Дыбыс мөлшерін есте сақтау"
 
 #: src/libvlc-module.c:158
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
+"Дыбыс мөлшері VLC келесі рет пайдаланған жағдайда автоматты түрде жазылып, "
+"қалпына келеді."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr "Дыбыс бейқдамдастырылуның өтемі"
+msgstr "Дыбыс бейқадамдастырылуның өтемі"
 
 #: src/libvlc-module.c:163
 msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
+"Бұл дыбыстың шығуын кідіртеді. Кідірту миллисекундта белгіленуі тиіс. Дыбыс "
+"және бейне арасындағы кідірту байқалған кезде қолдануы мүмкін."
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr ""
+msgstr "Дыбыс ресэмплдеушіні қолдану үшін қосымша бағдарламаны таңдау."
 
 #: src/libvlc-module.c:171
+#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Дыбыс шығару арналарын қолжетімді болғанда әдепкі қалып режимінде қолдануды "
+"белгілейді (мысалы, егер сіздің жабдық мұны қолдаса, сондай-ақ дыбыс ағыны "
+"ойнатылған кезде)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1691,7 +1741,7 @@ msgstr ""
 
 #: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:259
 msgid "Force detection of Dolby Surround"
-msgstr "Dolby Surround байқауын екпіндету"
+msgstr "Dolby Surround анықтауын екпіндету"
 
 #: src/libvlc-module.c:180
 msgid ""
@@ -1700,6 +1750,11 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
+"Осы параметрді егер ағыныңыз Dolby Surround арқылы кодталғаның (немесе "
+"кодталмағаның) білсеңіз, бірақ сол сияқты болғаны анықталмай қалған жағдайда "
+"қолданыңыз. Ағын Dolby Surround арқылы кодталмаған болған жағдайда да, осы "
+"параметрді әсіресе құлаққап арналарының микшерімен бірге іске қосу сіздің "
+"пайдаланушы тәжірибеңізді жақсартуы мүмкін."
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:443
@@ -1726,47 +1781,52 @@ msgstr "Өшірілген"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr ""
+msgstr "Стереодыбыс шығару режимі"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1429
 #: modules/gui/qt/util/customwidgets.cpp:314
 msgid "Unset"
-msgstr "Ысыру"
+msgstr "Белгілеуден алу"
 
 #: src/libvlc-module.c:203
 msgid "This adds audio post processing filters, to modify the sound rendering."
 msgstr ""
+"Дыбыстың көрінісін өзгерту үшін дыбыстық постпроцессинг фильтрлерін қосады."
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr ""
+msgstr "Бейнелеу модулдерін (спектрлік сараптауыш ж.т.б.) қосады."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr "Қайталау күшею режімі"
+msgstr "Қайталауды күшейту режімі"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr "Қайталау күшею режімін бөлектеу"
+msgstr "Қайталауды күшейту режімін белгілеу"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr "Қайталаудың алдын-ала күшеюі"
+msgstr "Қайталауды алдын-ала күшейту"
 
 #: src/libvlc-module.c:218
 msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"Қайталануы күшейтілген жөнінде мәліметі бар ағынның (89 dB) әдепкі нысаналық "
+"деңгейін өзгертуге мүмкіндік береді."
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr "Қайталау әдепкі күшеюі"
+msgstr "Әдепкі қайталауды күшейту"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
+"Бұл күшейту режимі қайталануы күшейтілген жөнінде мәліметі жоқ ағын үшін "
+"қолданылған"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -1774,17 +1834,19 @@ msgstr "Шың қорғанысы"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "Дыбыстың қиылуынан қорғау"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr ""
+msgstr "Уақыты созылған дыбысты іске қосу"
 
 #: src/libvlc-module.c:232
 msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Дыбысты төмен және жоғары жылдамдықта дыбыс тонына әсер етпей ойнатуға "
+"мүмкіндік береді"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1128
 #: modules/access/dshow/dshow.cpp:2077 modules/access/dtv/access.c:107
@@ -1808,6 +1870,11 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
+"Мына параметрлер бейнені шығару жүйесінің әдетін өзгертуге мүмкіндік береді. "
+"Мысалы, бейне фильтрлерді іске қосуға болады (деинтерлейсинг, бейнені реттеу "
+"ж.т.б.). Осы фильтрлерді мұнда іске қосып, оларды модульдердің \"бейне "
+"фильтрлер\" атты бөлімінде баптаңыз. Сондай-ақ осы жерде әртүрлі көптеген "
+"бейне фильтрлерді орнатуға болады."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
@@ -1818,6 +1885,8 @@ msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
+"VLC қолданатын бейнені шығару әдісін орнату. Әдепкі әдетте қолжетімді ең "
+"жақсы әдісті автоматты түрде таңдайды."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:346
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:321
@@ -1829,6 +1898,8 @@ msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
+"Сіз толығымен бейнені шығаруды сөндіре аласыз. Бейнені декодтау кезеңі "
+"жүргізілмейтін болғандықтан, өндеу күші неғұрлым үнемделеді."
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
@@ -1842,6 +1913,8 @@ msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
+"Бейне енің мәжбүрлі түрде белгілей аласыз. Әдетте, (-1) VLC бейне "
+"сипаттамасына бейімдейді."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
@@ -1855,26 +1928,32 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
+"Бейне биіктігін мәжбүрлі түрде белгілей аласыз. Әдетте, (-1) VLC бейне "
+"сипаттамасына бейімдейді."
 
 #: src/libvlc-module.c:273
 msgid "Video X coordinate"
-msgstr "Бейненің X тұрағиаты"
+msgstr "Бейненің X координатасы"
 
 #: src/libvlc-module.c:275
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
 msgstr ""
+"Бейне терезесінің жоғарғы сол бұрыш орналасуын мәжбүрлі түрде белгілей "
+"аласыз (X координатасы)."
 
 #: src/libvlc-module.c:278
 msgid "Video Y coordinate"
-msgstr "Бейненің Y тұрағиаты"
+msgstr "Бейненің Y координатасы"
 
 #: src/libvlc-module.c:280
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
 msgstr ""
+"Бейне терезесінің жоғарғы сол бұрыш орналасуын мәжбүрлі түрде белгілей "
+"аласыз (Y координатасы)."
 
 #: src/libvlc-module.c:283
 msgid "Video title"
@@ -1981,7 +2060,7 @@ msgstr "Ендірілген бейне"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr "Басты тілдесуге бейнелік шығасынды ендіру."
+msgstr "Басты интерфейсте бейне шығысын ендіру."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
@@ -2016,7 +2095,7 @@ msgstr "Тасушы тақырыбын бейнеде көрсету"
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr "Бейне тақырыбы фильм үстінде бейнелейді."
+msgstr "Бейне тақырыбы фильм үстінен бейнелейді."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
@@ -2111,7 +2190,7 @@ msgstr ""
 #: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:351
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Window decorations"
-msgstr "Терезені безендірулері"
+msgstr "Терезе безендірулері"
 
 #: src/libvlc-module.c:380
 msgid ""
@@ -2129,7 +2208,7 @@ msgstr ""
 
 #: src/libvlc-module.c:387
 msgid "Video filter module"
-msgstr "Бейне сүзгілеу модулі"
+msgstr "Бейнефильтр модулі"
 
 #: src/libvlc-module.c:389
 msgid ""
@@ -2139,7 +2218,7 @@ msgstr ""
 
 #: src/libvlc-module.c:393
 msgid "Video snapshot directory (or filename)"
-msgstr "Бейненің лездік түсірме тізімдемесі (не файл аты)"
+msgstr "Бейненің лездік түсірме тізімдемесі (немесе файл аты)"
 
 #: src/libvlc-module.c:395
 msgid "Directory where the video snapshots will be stored."
@@ -2147,7 +2226,7 @@ msgstr ""
 
 #: src/libvlc-module.c:397 src/libvlc-module.c:399
 msgid "Video snapshot file prefix"
-msgstr "Бейненің лездік түсірме файлын префиксі"
+msgstr "Бейненің лездік түсірме файлының префиксі"
 
 #: src/libvlc-module.c:401
 msgid "Video snapshot format"
@@ -2159,7 +2238,7 @@ msgstr ""
 
 #: src/libvlc-module.c:405
 msgid "Display video snapshot preview"
-msgstr "Бейненің лездік түсірмесін алдын-ала қарап алу"
+msgstr "Бейненің лездік түсірмесін алдын-ала қарап шығу"
 
 #: src/libvlc-module.c:407
 msgid "Display the snapshot preview in the screen's top-left corner."
@@ -2364,7 +2443,7 @@ msgstr ""
 
 #: src/libvlc-module.c:521
 msgid "Clock reference average counter"
-msgstr "Уақыт таңбалау орташасын есептеуші"
+msgstr "Уақыт таңбалауының орташа мәнің есептеуші"
 
 #: src/libvlc-module.c:523
 msgid ""
@@ -2454,7 +2533,7 @@ msgstr "Топтық тарату шығасынының тілдесуі"
 
 #: src/libvlc-module.c:561
 msgid "Default multicast interface. This overrides the routing table."
-msgstr "Әдепкі топтық тарату тілдесуі. Бұл бағдарғылау кестесін алмастырады."
+msgstr "Әдепкі топтық тарату интерфейсі. Бұл бағдарғылау кестесін алмастырады."
 
 #: src/libvlc-module.c:563
 msgid "DiffServ Code Point"
@@ -2517,9 +2596,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "Дыбыс тілі"
+msgstr ""
 
 #: src/libvlc-module.c:604
 msgid ""
@@ -2758,9 +2836,8 @@ msgid "Subtitles text scaling factor"
 msgstr "DVB субтитрлер кодтауышы"
 
 #: src/libvlc-module.c:717
-#, fuzzy
 msgid "Set value to alter subtitles size where possible"
-msgstr "Файл бөлектеу"
+msgstr ""
 
 #: src/libvlc-module.c:719
 msgid "Enable sub-pictures"
@@ -3250,7 +3327,7 @@ msgstr "Ағын сүзгілеу модулі"
 #: src/libvlc-module.c:1005
 #, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейнелік сүзгілер."
+msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
 
 #: src/libvlc-module.c:1007
 #, fuzzy
@@ -3260,7 +3337,7 @@ msgstr "Ағын сүзгілеу модулі"
 #: src/libvlc-module.c:1009
 #, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейнелік сүзгілер."
+msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
 
 #: src/libvlc-module.c:1011
 msgid "Demux module"
@@ -3503,7 +3580,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "Кодек егжей-тегжейлері"
+msgstr "Бұру бейнелік сүзгісі"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -3533,7 +3610,7 @@ msgstr "Бәрін қайталау"
 
 #: src/libvlc-module.c:1159
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr ""
+msgstr "VLC тректер тізімін үздіксіз ойнатады."
 
 #: src/libvlc-module.c:1161
 msgid "Repeat current item"
@@ -4066,12 +4143,12 @@ msgstr "Телетекст субтитрлер кодсыздандырғышы
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Файл бөлектеу"
+msgstr "Субтитр жолшығын орайғыту"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Файл бөлектеу"
+msgstr "Субтитр файлын қолдану"
 
 #: src/libvlc-module.c:1325
 #, fuzzy
@@ -4310,14 +4387,12 @@ msgid "Cycle through the available subtitle tracks."
 msgstr "Қатынаулы субтитр жолшықтар арасында орайғыту."
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "Телетекст субтитрлері"
+msgstr ""
 
 #: src/libvlc-module.c:1393
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "Субтитр жолшығын орайғыту"
+msgstr ""
 
 #: src/libvlc-module.c:1394
 msgid "Cycle next program Service ID"
@@ -4647,49 +4722,48 @@ msgid "print version information"
 msgstr "басып шығару үшін нобайының ақпары "
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "басты бағдарлама"
+msgstr ""
 
 #: src/misc/actions.c:52
 msgid "Backspace"
-msgstr ""
+msgstr "Қайтару"
 
 #: src/misc/actions.c:53
 msgid "Brightness Down"
-msgstr ""
+msgstr "Жарқындығын төмендету"
 
 #: src/misc/actions.c:54
 msgid "Brightness Up"
-msgstr ""
+msgstr "Жарқындығын жоғарылату"
 
 #: src/misc/actions.c:55
 msgid "Browser Back"
-msgstr ""
+msgstr "Браузерде қайту "
 
 #: src/misc/actions.c:56
 msgid "Browser Favorites"
-msgstr ""
+msgstr "Браузердің таңдаулы беттері"
 
 #: src/misc/actions.c:57
 msgid "Browser Forward"
-msgstr ""
+msgstr "Браузерде жылдам алға жіберу"
 
 #: src/misc/actions.c:58
 msgid "Browser Home"
-msgstr ""
+msgstr "Браузердің үй парағы"
 
 #: src/misc/actions.c:59
 msgid "Browser Refresh"
-msgstr ""
+msgstr "Браузер бетін жаңарту"
 
 #: src/misc/actions.c:60
 msgid "Browser Search"
-msgstr ""
+msgstr "Браузерде іздеу"
 
 #: src/misc/actions.c:61
 msgid "Browser Stop"
-msgstr ""
+msgstr "Браузерде тоқтату"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
 #: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
@@ -4700,15 +4774,15 @@ msgstr "Жою"
 
 #: src/misc/actions.c:63
 msgid "Down"
-msgstr ""
+msgstr "Төмен"
 
 #: src/misc/actions.c:64 modules/control/oldrc.c:73
 msgid "End"
-msgstr "Ақыр"
+msgstr "Соңы"
 
 #: src/misc/actions.c:65
 msgid "Enter"
-msgstr ""
+msgstr "Енгізу"
 
 #: src/misc/actions.c:66
 msgid "Esc"
@@ -4764,111 +4838,111 @@ msgstr ""
 
 #: src/misc/actions.c:79
 msgid "Home"
-msgstr ""
+msgstr "Үй парағы"
 
 #: src/misc/actions.c:80
 msgid "Insert"
-msgstr ""
+msgstr "Ендіру"
 
 #: src/misc/actions.c:82
 msgid "Media Angle"
-msgstr ""
+msgstr "Медиалық көрініс"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr ""
+msgstr "Мадиа дыбыстық трек"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
-msgstr ""
+msgstr "Медиалық жылдам жіберу"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
-msgstr ""
+msgstr "Медиалық меню"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr ""
+msgstr "Медиалық келесі фрейм"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr ""
+msgstr "Медиалық келесі трек"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
-msgstr ""
+msgstr "Медиалық ойнату паузасы"
 
 #: src/misc/actions.c:89
 msgid "Media Prev Frame"
-msgstr ""
+msgstr "Медиалық алдынғы кадр"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
-msgstr ""
+msgstr "Медиалық алдынғы трек"
 
 #: src/misc/actions.c:91
 msgid "Media Record"
-msgstr ""
+msgstr "Медиалық жазба"
 
 #: src/misc/actions.c:92
 msgid "Media Repeat"
-msgstr ""
+msgstr "Медиалық қайталау"
 
 #: src/misc/actions.c:93
 msgid "Media Rewind"
-msgstr ""
+msgstr "Медиалық кері жылдам жіберу"
 
 #: src/misc/actions.c:94
 msgid "Media Select"
-msgstr ""
+msgstr "Медиалық таңдау"
 
 #: src/misc/actions.c:95
 msgid "Media Shuffle"
-msgstr ""
+msgstr "Медиалық араластыру"
 
 #: src/misc/actions.c:96
 msgid "Media Stop"
-msgstr ""
+msgstr "Медиалық тоқтату"
 
 #: src/misc/actions.c:97
 msgid "Media Subtitle"
-msgstr ""
+msgstr "Медиалық субтитр"
 
 #: src/misc/actions.c:98
 msgid "Media Time"
-msgstr ""
+msgstr "Медиалық уақыт"
 
 #: src/misc/actions.c:99
 msgid "Media View"
-msgstr ""
+msgstr "Медиалық көрініс"
 
 #: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:568
 msgid "Menu"
-msgstr "Мәзір"
+msgstr "Меню"
 
 #: src/misc/actions.c:101
 msgid "Mouse Wheel Down"
-msgstr ""
+msgstr "Тышқан донғалағын төмен бұрау"
 
 #: src/misc/actions.c:102
 msgid "Mouse Wheel Left"
-msgstr ""
+msgstr "Тышқан донғалағын солға тарту"
 
 #: src/misc/actions.c:103
 msgid "Mouse Wheel Right"
-msgstr ""
+msgstr "Тышқан донғалағын оңға тарту"
 
 #: src/misc/actions.c:104
 msgid "Mouse Wheel Up"
-msgstr ""
+msgstr "Тышқан донғалағын жоғары бұрау"
 
 #: src/misc/actions.c:105
 msgid "Page Down"
-msgstr ""
+msgstr "Парақты төмен жылжыту"
 
 #: src/misc/actions.c:106
 msgid "Page Up"
-msgstr ""
+msgstr "Парақты төмен жылжыту"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
@@ -4877,11 +4951,11 @@ msgstr ""
 #: modules/gui/qt/components/playlist/standardpanel.cpp:196
 #: modules/gui/qt/menus.cpp:823
 msgid "Pause"
-msgstr "Аялдату"
+msgstr "Пауза"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "Басып шығару"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -4889,31 +4963,31 @@ msgstr "Талдырмаш"
 
 #: src/misc/actions.c:111
 msgid "Tab"
-msgstr ""
+msgstr "Бет"
 
 #: src/misc/actions.c:113
 msgid "Up"
-msgstr ""
+msgstr "Жоғары"
 
 #: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:499
 msgid "Volume Down"
-msgstr "Деңгей төменге"
+msgstr "Дыбыстық деңгейді төмендету"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr ""
+msgstr "Дыбыстық деңгейді өшіру"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
 msgid "Volume Up"
-msgstr "Деңгей жоғарыға"
+msgstr "Дыбыстық деңгейді жоғарылату"
 
 #: src/misc/actions.c:117
 msgid "Zoom In"
-msgstr ""
+msgstr "Ұлғайту"
 
 #: src/misc/actions.c:118
 msgid "Zoom Out"
-msgstr ""
+msgstr "Кішірейту"
 
 #: src/misc/actions.c:246
 msgid "Ctrl+"
@@ -5832,9 +5906,8 @@ msgid "libavformat AVIO access"
 msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "Шығасын қатынау"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
@@ -5845,9 +5918,8 @@ msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr ""
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "Бейнелік кодек"
+msgstr ""
 
 #: modules/access/bluray.c:72
 msgid ""
@@ -5934,14 +6006,12 @@ msgid "Blu-ray error"
 msgstr ""
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "Мәзір"
+msgstr ""
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
-msgstr "Бірінші ойнатылған"
+msgstr ""
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6005,14 +6075,12 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "SDP"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "Қосымша тілдесу модульдері"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6380,7 +6448,7 @@ msgstr ""
 #: modules/access/dsm/access.c:61
 #, fuzzy
 msgid "Windows networks"
-msgstr "Терезені безендірулері"
+msgstr "Терезе безендірулері"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6592,9 +6660,8 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "Ағындық сүзгілер"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -6859,9 +6926,8 @@ msgid "DVDnav Input"
 msgstr "DVDnav кіресіні"
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "Nuv демуксері"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -7252,7 +7318,7 @@ msgstr ""
 #: modules/access/imem-access.c:159
 #, fuzzy
 msgid "Nemory stream"
-msgstr "Жою"
+msgstr "Таңдалғанды алып тастау"
 
 #: modules/access/imem-access.c:160
 #, fuzzy
@@ -7493,9 +7559,9 @@ msgid "File reading failed"
 msgstr "Файл оқуы сәтсіз"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC файл оқуы іске аспады."
+msgstr ""
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7601,7 +7667,7 @@ msgstr "Ағындық шығасынын файлға жазу"
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 #, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейнелік сүзгілер."
+msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -7617,9 +7683,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Металл"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -7723,9 +7788,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Қоспалау рет саны"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -8824,14 +8888,14 @@ msgid "VDR recordings"
 msgstr ""
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC файл оқуы іске аспады."
+msgstr ""
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC файл оқуы іске аспады."
+msgstr ""
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -8916,9 +8980,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "Windows GDI бейнелік шығасыны "
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9106,9 +9169,8 @@ msgid "Rear center"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "Стерео режімі"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -9996,9 +10058,8 @@ msgid "This linear gain will be applied in software."
 msgstr ""
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "Windows GDI бейнелік шығасыны "
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10525,29 +10586,25 @@ msgid "unknown"
 msgstr ""
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "Бейне"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
-msgstr "Дыбыс"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "Суретшелер"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "Кодтауышты VLC аша алмады."
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "PNG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
@@ -10621,7 +10678,7 @@ msgstr "Theora бейнелік дестелеуіші"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "PNG бейнелік кодсыздандырғыш"
+msgstr "CDG бейнелік кодсыздандырғыш"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -10882,9 +10939,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "Кодсыздандыру"
+msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -10895,9 +10951,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
-#, fuzzy
 msgid "GStreamer Based Decoder"
-msgstr "Speex дыбыстық кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -10905,14 +10960,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "SDL кескін кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "SDL кескін кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11179,9 +11232,8 @@ msgid "MPEG audio layer I/II/III decoder"
 msgstr "MPEG дыбыстық қабат I/II/III кодсыздандыруышы"
 
 #: modules/codec/mft.c:62
-#, fuzzy
 msgid "Media Foundation Transform decoder"
-msgstr "QuickTime кітапхана кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/mpg123.c:67
 #, fuzzy
@@ -11219,18 +11271,16 @@ msgid "Opus"
 msgstr ""
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "Speex дыбыстық кодтауышы"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr "PNG бейнелік кодсыздандырғыш"
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "PNG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11434,7 +11484,7 @@ msgstr "Жалған пішімсіз бейнелік дестелеуіш"
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "PNG бейнелік кодсыздандырғыш"
+msgstr "Theora бейнелік кодтауыш"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12165,7 +12215,7 @@ msgstr ""
 #: modules/codec/subsdec.c:291 modules/demux/avi/avi.c:97
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1251"
+msgstr ""
 
 #: modules/codec/subsusf.c:45
 msgid ""
@@ -12182,14 +12232,12 @@ msgid "USF subtitles decoder"
 msgstr "USF субтитрлер кодсыздандырғышы"
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "DVB субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "Телетекст субтитрлері"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -12266,7 +12314,7 @@ msgstr "Theora бейнелік кодтауыш"
 #: modules/codec/ttml/ttml.c:45
 #, fuzzy
 msgid "TTML decoder"
-msgstr "Кодсыздандырғышы дампын түсіру"
+msgstr "Санақ кодсыздандыруышы"
 
 #: modules/codec/ttml/ttml.c:46
 #, fuzzy
@@ -12392,14 +12440,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr "Theora бейнелік кодтауыш"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13199,18 +13246,16 @@ msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr ""
 
 #: modules/codec/x264.c:456
-#, fuzzy
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "H.264/MPEG4 AVC кодтауыш (x264)"
+msgstr ""
 
 #: modules/codec/x264.c:460
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr ""
 
 #: modules/codec/x265.c:46
-#, fuzzy
 msgid "H.265/HEVC encoder (x265)"
-msgstr "H.264/MPEG4 AVC кодтауыш (x264)"
+msgstr ""
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -13910,15 +13955,13 @@ msgid "+----[ end of help ]"
 msgstr "+----[ анықтама соңы ]"
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
-msgstr "Жалғастыру үшін мәзір бөлектеу не аялдату деп теріңіз."
+msgstr ""
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr "Жалғастыру үшін 'мәзір бөлектеу' не 'аялдату' деп теріңіз."
+msgstr ""
 
 #: modules/control/oldrc.c:1266
 msgid "Error: `goto' needs an argument greater than zero."
@@ -14117,9 +14160,8 @@ msgid "Avformat"
 msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "Демуксерлер"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14214,9 +14256,8 @@ msgid "Fixing AVI Index..."
 msgstr "AVI реттеуішін беркіту..."
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "AIFF демуксері"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -14383,7 +14424,7 @@ msgstr ""
 #: modules/demux/mkv/mkv.cpp:76
 #, fuzzy
 msgid "Preload clusters"
-msgstr "Тізімдеме бөлектеу"
+msgstr "Тізімдеме таңдау"
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -14504,18 +14545,16 @@ msgid "MPEG-4 video"
 msgstr ""
 
 #: modules/demux/mpeg/h26x.c:47
-#, fuzzy
 msgid "Desired frame rate for the stream."
-msgstr "Қармау үшін ұнамды кадр қарқыны."
+msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53
 msgid "H264 video demuxer"
 msgstr "H264 бейнелік демуксер"
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "H264 бейнелік демуксер"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -14605,14 +14644,12 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "Ағындық модулдер"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
-#, fuzzy
 msgid "Use the stream PCR as a reference."
-msgstr "Кейбір B-кадрларды тірек ретінде сақтап қалу"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
@@ -14636,7 +14673,7 @@ msgstr "Шифрланған дыбыс"
 #: modules/demux/mpeg/ts_psi.c:422
 #, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "Жеткілімдік бейнелік кодек"
+msgstr "Бүл кодек бойынша сипаттама жоқ."
 
 #: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
@@ -15112,22 +15149,19 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "Подкаст талдағышы"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "Қызмет әшкерелеу"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
-#, fuzzy
 msgid "Interfaces"
-msgstr "Тілдесу"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15142,9 +15176,8 @@ msgid "Extensions"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:115
-#, fuzzy
 msgid "Show Installed Only"
-msgstr "Тілдесу"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:117
 #: modules/gui/qt/dialogs/plugins.cpp:423
@@ -15153,16 +15186,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "Бейне меңгеру"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "Даналар"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15504,9 +15535,8 @@ msgid "Setup Streaming..."
 msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "Ағындық жіберу әдісі"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -15553,7 +15583,7 @@ msgstr "Бастапқы бейнелік жолшығын сақтап қалу
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:749
 msgid "Resolution"
-msgstr "Ажыратылымдығы"
+msgstr "Ажыратылымдық"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:166
 #: modules/gui/qt/ui/profiles.h:740
@@ -15966,9 +15996,8 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "Ойнатқыштың басқару мәзірі"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -16208,9 +16237,8 @@ msgstr "Артқа аттау"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "Уақытқа ауысу"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -16296,9 +16324,8 @@ msgid "Window"
 msgstr "Терезе"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "Терезені қайыру"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -16433,14 +16460,12 @@ msgid "Check for album art and metadata?"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "Enable Metadata Retrieval"
-msgstr "Бейімделген алғашқы сүзгілеуді қосу"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "Алғыс сөз"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -16504,9 +16529,8 @@ msgid "Open Audio Effects window"
 msgstr "Дыбыстық әсерлер"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "BD"
+msgstr ""
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
@@ -16545,7 +16569,7 @@ msgstr "Ашу"
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 #, fuzzy
 msgid "Stream output:"
-msgstr "Ағындық шығасын"
+msgstr "Ағындық шығыс"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -16605,9 +16629,8 @@ msgid "Custom playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "Тізімдеме ашу"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -16710,7 +16733,7 @@ msgstr "Kate мәтін субтитрлер дестелеуші"
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #, fuzzy
 msgid "Select a subtitle file"
-msgstr "Файл бөлектеу"
+msgstr "Субтитр файлын қолдану"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -16806,9 +16829,8 @@ msgid "URI"
 msgstr "Қайнар көзінің URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "Екі есе мөлшер"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -16933,9 +16955,8 @@ msgstr "Бөлектеу"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "Ойнатуды тоқтату"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -16944,15 +16965,13 @@ msgid "Continue"
 msgstr "Жалғастыру"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "Ойнатуды тоқтату"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "Ойнатуды тоқтату"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -17112,7 +17131,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
 #, fuzzy
 msgid "General settings"
-msgstr "Дыбыстың жалпы теңшелімдері"
+msgstr "Дыбыстың жалпы баптаулары"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
@@ -17127,9 +17146,8 @@ msgid "Bright"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "Ойнатуды тоқтату"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -17271,24 +17289,20 @@ msgid "No check was performed yet."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:685
-#, fuzzy
 msgid "Lowest Latency"
-msgstr "Ең төмен кешігу"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:687
-#, fuzzy
 msgid "Low Latency"
-msgstr "Төмен кешігу"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:691
-#, fuzzy
 msgid "Higher Latency"
-msgstr "Ең жоғары кешігу"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Highest Latency"
-msgstr "Ең жоғары кешігу"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -17778,19 +17792,16 @@ msgid " f                      Toggle Fullscreen"
 msgstr ""
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " c                      Cycle through audio tracks"
-msgstr "     m           Мета-деректер терезесін Көрсету/Жасыру"
+msgstr ""
 
 #: modules/gui/ncurses.c:890
-#, fuzzy
 msgid " v                      Cycle through subtitles tracks"
-msgstr "     m           Мета-деректер терезесін Көрсету/Жасыру"
+msgstr ""
 
 #: modules/gui/ncurses.c:891
-#, fuzzy
 msgid " b                      Cycle through video tracks"
-msgstr "     m           Мета-деректер терезесін Көрсету/Жасыру"
+msgstr ""
 
 #: modules/gui/ncurses.c:892
 msgid " n, p                   Next/Previous playlist item"
@@ -18598,9 +18609,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "Жабынды"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -18619,23 +18629,20 @@ msgid "Enter name for new folder:"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "Тізімдеме ашу"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "Жымдастыру кадрлердің қалтасы"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
-#, fuzzy
 msgid "Enter a new name for the folder:"
-msgstr "Бейінге атау беруіңіз жөн."
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -19036,9 +19043,8 @@ msgid "&Start"
 msgstr "Бастау"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "Жалғастыру"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19289,9 +19295,8 @@ msgid "Plugins and extensions"
 msgstr "Қондырмалар және кеңеймелер"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "Белсенді өңірлер"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -19346,14 +19351,12 @@ msgid "Only installed"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
-#, fuzzy
 msgid "Retrieving addons..."
-msgstr "Арна ақпарын шығаруда..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "Еш кіресін табылмады"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
@@ -19372,9 +19375,8 @@ msgid "&Uninstall"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "Аспаптық"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -19526,9 +19528,8 @@ msgid "Flat Button"
 msgstr "Жалпақ түймешік"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "Саймандың келесі мәнері:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -19563,9 +19564,8 @@ msgid "Time Toolbar"
 msgstr "Уақыт құралдары жолағы"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "Саймандың қосымша құралдар жолағы:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -19584,9 +19584,8 @@ msgid "Select profile:"
 msgstr "Бейін бөлектеу:"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "Алдыңғы"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19713,9 +19712,8 @@ msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:378
-#, fuzzy
 msgid "&Continue"
-msgstr "Жалғастыру"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:1368
 msgid "Control menu for the player"
@@ -20242,7 +20240,7 @@ msgstr ""
 #: modules/gui/qt/qt.cpp:189
 #, fuzzy
 msgid "When to raise the interface"
-msgstr "Басты тілдесу теңшелімдері"
+msgstr "Басты интерфейс баптаулары"
 
 #: modules/gui/qt/qt.cpp:190
 msgid ""
@@ -20251,9 +20249,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "Толық бейнебетті басқару тақтасы"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -20384,9 +20381,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "Кодсыздандырғышы дампын түсіру"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
@@ -20434,19 +20430,16 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Альфа бүркеншігінің бейнелік сүзгісі"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
-#, fuzzy
 msgid "Temporal-spatial"
-msgstr "Кеңістіктендіргіш"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:875 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
@@ -20457,53 +20450,44 @@ msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "Тізбектестіру бейнелік сүзгісі"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "Жарамсыз бөлектеу"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "Тізбектестіру режімі"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:892
-#, fuzzy
 msgid "Noise reduction level"
-msgstr "Шуыл аласаруы"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "Кодтау сапасы"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "Сапа деңгейі"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Тізбектестіру бейнелік сүзгісі"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "YUV шығасыны"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Анықтығын үлкейту бейнелік сүзгісі"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -21499,9 +21483,8 @@ msgid "RTSP VoD"
 msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:78
-#, fuzzy
 msgid "Legacy RTSP VoD server"
-msgstr "RTSP сұрау салынған бейне сервері"
+msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
@@ -21606,14 +21589,12 @@ msgid "Unknown Video"
 msgstr "Беймәлім бейне"
 
 #: modules/mux/avi.c:55
-#, fuzzy
 msgid "Subject"
-msgstr " Зерзаттар"
+msgstr ""
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "Мынаумен кодталған:"
+msgstr ""
 
 #: modules/mux/avi.c:57
 msgid "Keywords"
@@ -21809,7 +21790,7 @@ msgstr "Ең аз B (ұсынылмайтын)"
 
 #: modules/mux/mpeg/ts.c:157 modules/mux/mpeg/ts.c:160
 msgid "This setting is deprecated and not used anymore"
-msgstr "Бұл ұсынылмайтын теңшелім және ол енді қолданыстан шыққан"
+msgstr "Бұл ұсынылмайтын баптау және ол енді қолданыстан шыққан"
 
 #: modules/mux/mpeg/ts.c:159
 msgid "Maximum B (deprecated)"
@@ -21867,9 +21848,8 @@ msgid "Multipart JPEG muxer"
 msgstr "Көпбөлімді JPEG муксері"
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "Мәзірді жаңарту межелдемесі"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21877,9 +21857,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "Пішімдік арақатынасын сақтап қалу"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -21933,9 +21912,8 @@ msgid "A/52 audio packetizer"
 msgstr "A/52 дыбыстық дестелеуіші"
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "Дестелеуішті көшіру"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -21958,9 +21936,8 @@ msgid "H.264 video packetizer"
 msgstr "H.264 бейнелік дестелеуіші"
 
 #: modules/packetizer/hevc.c:57
-#, fuzzy
 msgid "HEVC/H.265 video packetizer"
-msgstr "H.264 бейнелік дестелеуіші"
+msgstr ""
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -22929,7 +22906,7 @@ msgstr ""
 #: modules/stream_filter/adf.c:42
 #, fuzzy
 msgid "ADF stream filter"
-msgstr "Ағындық сүзгілер"
+msgstr "Ағын фильтрлері"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -22969,7 +22946,7 @@ msgstr "Бейнені кейіңгі өңдету сүзгісі"
 #: modules/stream_filter/prefetch.c:531
 #, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Ағындық сүзгілер"
+msgstr "Ағын фильтрлері"
 
 #: modules/stream_filter/prefetch.c:534
 #, fuzzy
@@ -23589,9 +23566,8 @@ msgid "Stream output to memory buffer"
 msgstr ""
 
 #: modules/stream_out/stats.c:42
-#, fuzzy
 msgid "Writes stats to file instead of stdout"
-msgstr "Түрлендіру орнына бұру бейнелік сүзгісін қолдану"
+msgstr ""
 
 #: modules/stream_out/stats.c:43
 msgid "Prefix to show on output line"
@@ -23622,7 +23598,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:51
 msgid "address to bind to (helper setting for dst)"
-msgstr "иемденетін мекенжайы (dst үшін көмекші теңшелім)"
+msgstr "иемденетін мекенжайы (dst үшін көмекші баптау)"
 
 #: modules/stream_out/standard.c:53
 msgid ""
@@ -23632,7 +23608,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:55
 msgid "filename for stream (helper setting for dst)"
-msgstr "ағындың файл аты (dst үшін көмекші теңшелім)"
+msgstr "ағындың файл аты (dst үшін көмекші баптау)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
@@ -24531,14 +24507,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "Шұнтиту"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "Бейне шәкілдестіру сүзгісі"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -24674,9 +24648,8 @@ msgid "FPS Converter"
 msgstr "YUVP түрлендіруіші"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Әрекеттестік пазл ойынының бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -24899,9 +24872,8 @@ msgid "Motion detect video filter"
 msgstr "Қимыл байқаудың бейнелік сүзгісі"
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "Қимыл байқаудың бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -25322,9 +25294,8 @@ msgid "Rotate or flip the video"
 msgstr ""
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "Қимыл байқаудың бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
@@ -25349,12 +25320,11 @@ msgstr "Каллиграмма бейнелік шығасыны"
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "Белсенді терезелер"
+msgstr "Терезені жабу"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "Белсенді терезелер"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -25451,7 +25421,7 @@ msgstr ""
 #: modules/video_output/decklink.cpp:270
 #, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Дыбыстық шығасын модулі"
+msgstr "Дыбыс шығару модулі"
 
 #: modules/video_output/decklink.cpp:275
 msgid "DeckLink Audio Options"
@@ -25572,9 +25542,8 @@ msgid "K Video Acceleration video output"
 msgstr ""
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "OpenGL бейнелік шығасыны"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -25631,24 +25600,20 @@ msgid "Pixel Shader"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:78
-#, fuzzy
 msgid "Choose a pixel shader to apply."
-msgstr "Қолдану үшін шұнтиту мәнерін таңдай аласыз."
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
-#, fuzzy
 msgid "Path to HLSL file"
-msgstr "Бейнебет мәзірі кескін файлдарының жолы"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:80
-#, fuzzy
 msgid "Path to an HLSL file containing a single pixel shader."
-msgstr "Колданбақ мұқаба жолы."
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "Файл сақтау"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -26326,18 +26291,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "Әсерлер бейнелік терезесінің биіктігі, нүкте."
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "Терезе"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "Бетті алмастыру"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -27036,7 +26999,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:434
 msgid "Use S/PDIF when available"
-msgstr "Қатынаулы болғанда S/PDIF қолдану"
+msgstr "Қолжетімді болғанда S/PDIF қолдану"
 
 #: modules/gui/qt/ui/sprefs_audio.h:435
 msgid "Effects"
@@ -27446,9 +27409,8 @@ msgid "Soften"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Шуыл"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
@@ -27514,18 +27476,22 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Тасушы меңгеру тізімі"
 
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Субтитр жолшығы: %s"
-
 #~ msgid "VLC can't recognize the input's format"
-#~ msgstr "Шығасын пішімін VLC тани алмады"
+#~ msgstr "VLC кіріс форматты тани алмады"
+
+#~ msgid ""
+#~ "The format of '%s' cannot be detected. Have a look at the log for details."
+#~ msgstr ""
+#~ " '%s' форматы анықталынбайды. Толық ақпарат алу үшін log файлды қараңыз"
 
 #~ msgid "Navigation"
 #~ msgstr "Шарлау"
 
 #~ msgid "Be quiet"
 #~ msgstr "Дабырсыз болсын"
+
+#~ msgid "Turn off all warning and information messages."
+#~ msgstr "Ескертулерді және ақпараттық хабарламаларды өшіру."
 
 #~ msgid "Log to file"
 #~ msgstr "Файлға жұрналдау"
@@ -27574,10 +27540,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "RTSP password"
 #~ msgstr "RTSP құпия сөзі"
-
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC файл оқуы іске аспады."
 
 #~ msgid "Quicktime Capture"
 #~ msgstr "Quicktime қармау"
@@ -27693,27 +27655,11 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "\"%s\" is no audio encoder."
 #~ msgstr "\"%s\" дыбыстық кодтауышы емес"
 
-#, fuzzy
-#~ msgid "Dummy video decoder"
-#~ msgstr "CDG бейнелік кодсыздандырғыш"
-
 #~ msgid "DTS parser"
 #~ msgstr "DTS талдағышы"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "QuickTime кітапхана кодсыздандырғышы"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  DVD мәзірі"
-
-#~ msgid "First Played"
-#~ msgstr "Бірінші ойнатылған"
-
-#~ msgid "Video Manager"
-#~ msgstr "Бейне меңгеру"
-
-#~ msgid "----- Title"
-#~ msgstr "----- Тақырып"
 
 #~ msgid "Thanks"
 #~ msgstr "Алғыс сөз"
@@ -27723,15 +27669,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "Google Video Playlist importer"
 #~ msgstr "Google бейне ойнату тізімін шеттен әкелуші"
-
-#~ msgid "Fast udp streaming"
-#~ msgstr "Тез udp ағындық жіберу"
-
-#~ msgid "MTU for out mode"
-#~ msgstr "MTU сыртқы режімне үшін"
-
-#~ msgid "MTU for out mode."
-#~ msgstr "MTU сыртқы режімне үшін."
 
 #~ msgid "VLC media player Help"
 #~ msgstr "VLC тасушы ойнатқышының анықтамасы"
@@ -27744,10 +27681,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "No input found"
 #~ msgstr "Еш кіресін табылмады"
-
-#, fuzzy
-#~ msgid "Hide Details"
-#~ msgstr "Кодек егжей-тегжейлері"
 
 #~ msgid "Send"
 #~ msgstr "Жіберу"
@@ -27805,10 +27738,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "Meta-information"
 #~ msgstr "Мета-ақпар"
-
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "Әрқашан ең үстінде"
 
 #~ msgid "Show Fullscreen Controller"
 #~ msgstr "Толық бейнебетті басқару тақтасын көрсету"
@@ -27919,6 +27848,9 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "To"
 #~ msgstr "Мында"
 
+#~ msgid "Streaming method"
+#~ msgstr "Ағындық жіберу әдісі"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Ағын алатын компьютердің мекенжайы"
 
@@ -28005,17 +27937,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "Current visualization"
 #~ msgstr "Ағымдық көрнекі бейне"
-
-#~ msgid "&Post processing"
-#~ msgstr "Кейіңгі өңдету"
-
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "Ойнату тізімін сақтау"
-
-#, fuzzy
-#~ msgid "Recently Played"
-#~ msgstr "Жуырда ойнатылған бірліктерді сақтау"
 
 #~ msgid "Log format"
 #~ msgstr "Жұрнал пішімі"
@@ -28170,10 +28091,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "Change gradients"
 #~ msgstr "Градиенттерді ауыстыру"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "Белсенді терезелер"
-
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "DirectFB бейнелік шығасыны (http://www.directfb.org/)"
 
@@ -28192,21 +28109,21 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "FLV"
 #~ msgstr "FLV"
 
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "Дыбыстық шығасын модулі"
+#~ msgid "First Played"
+#~ msgstr "Бірінші ойнатылған"
 
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "Еш кіресін құрылғысы табылмады."
+#~ msgid "Fast udp streaming"
+#~ msgstr "Тез udp ағындық жіберу"
+
+#~ msgid "MTU for out mode"
+#~ msgstr "MTU сыртқы режімне үшін"
+
+#~ msgid "MTU for out mode."
+#~ msgstr "MTU сыртқы режімне үшін."
 
 #, fuzzy
 #~ msgid "Satellite scanning config"
 #~ msgstr "Серік ауқымы коды"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
 
 #~ msgid "DVB input with v4l2 support"
 #~ msgstr "v4l2 қолдауы бар DVB кіресіні"
@@ -28221,108 +28138,12 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "Scanning DVB"
 #~ msgstr "DVB-T жаймалай тексеру"
 
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "Айнала"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Quicktime қармау"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "Еш кіресін құрылғысы табылмады."
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "Еш кіресін құрылғысы табылмады."
-
 #~ msgid "Uncompressed RAR"
 #~ msgstr "Қысымсыз RAR"
 
 #, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "Windows GDI бейнелік шығасыны "
-
-#, fuzzy
-#~ msgid "Specify the height to decode the image too"
-#~ msgstr "Қолданбақ тізбектестіру модулін тапсыру."
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "CDG бейнелік кодсыздандырғыш"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "Windows қызметінің тілдесуі"
-
-#~ msgid "Save this Log..."
-#~ msgstr "Бұл жұрналды сақтау..."
-
-#, fuzzy
 #~ msgid "Empty"
 #~ msgstr " - Бос - "
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "Белсендіру"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "Дыбыстық кіресінінің түйіспесі"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "Еш кіресін табылмады"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "Аластау"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "Ең көп жергілікті ағындық қарқын"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "Бейне түрлендіру сүзгісі"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "Әдепкі ағын"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "Ағындық шығасынын жинау"
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "Әсерлер бейнелік терезесінің еңі, нүкте."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "Әсерлер бейнелік терезесінің биіктігі, нүкте."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "Спектр"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "Ағымдық көрнекі бейне"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "Үстіне қалқу"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "VLC тасушы ойнатқышының анықтамасы"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "Ағындық шығасын"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -28659,10 +28480,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "Clear overlay framebuffer"
 #~ msgstr "Жабынды кадр сақтағышын аластау"
 
-#, fuzzy
-#~ msgid "Compiled by %@ with %@"
-#~ msgstr "Құрастырған %s"
-
 #~ msgid "VLC Debug Log (%s).rtfd"
 #~ msgstr "VLC жымдастыру жұрналы (%s).rtfd"
 
@@ -28848,16 +28665,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "Enqueue files when in one instance mode"
 #~ msgstr "Бір даналық режімінде файлдарды кезекке қою"
-
-#, fuzzy
-#~ msgid "Systray popup when minimized"
-#~ msgstr "Ойнатуды аялдату"
-
-#, fuzzy
-#~ msgid "Do you want to download it ?"
-#~ msgstr ""
-#~ "\n"
-#~ "Бұны қотарғыңыз келе ме?\n"
 
 #~ msgid "Advance of audio over video:"
 #~ msgstr "Дыбыстың бейнеден ілгерілеуі:"
@@ -29344,9 +29151,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "VLC was brought to you by:"
 #~ msgstr "Сізге VLC апарған:"
 
-#~ msgid "Rewind"
-#~ msgstr "Қайта орау"
-
 #~ msgid "Blur"
 #~ msgstr "Бұлдыр"
 
@@ -29418,9 +29222,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "A new version of VLC("
 #~ msgstr "VLC жаңа нобайы ("
-
-#~ msgid "&Update"
-#~ msgstr "Жаңарту"
 
 #~ msgid "Sca&le"
 #~ msgstr "Шәкілдестіру"
@@ -29821,12 +29622,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ "Мыннан өзіңізге ұнамды бейнелік шығасынын таңдаңыз да және бұны "
 #~ "ішқұрылымдаңыз."
 
-#~ msgid "No suitable decoder module"
-#~ msgstr "Еш жарамды кодсыздандырғыш модулі жоқ"
-
-#~ msgid "Album art policy"
-#~ msgstr "Альбомның мұқаба суреті туралы ереже"
-
 #~ msgid "Choose how album art will be downloaded."
 #~ msgstr "Альбомның қотарып алынатын мұқаба суретіні таңдау."
 
@@ -29839,23 +29634,11 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "As soon as track is added"
 #~ msgstr "Жолшық үстелген бойда"
 
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Стерео -> моно түрлендіруге арналған дыбыстық сүзгі"
-
 #~ msgid "A value > 0 enables constant bitrate mode"
 #~ msgstr "Мәні > 0 болса тұрақты ағындық қарқын режімін қосады."
 
-#~ msgid "Enable lossless coding"
-#~ msgstr "Ысырапсыз кодтауды қосу"
-
 #~ msgid "Diagonal Linear Phase"
 #~ msgstr "Қиғаш сызықтық фаза"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' кадрлер ара қашықтығы"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Бір GOP-қа келетін 'P' кадр саны"
 
 #~ msgid "Width of motion compensation blocks"
 #~ msgstr "Қимыл өтемдейтіні бөліктердің ені"
@@ -29872,32 +29655,11 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgid "yblen"
 #~ msgstr "yblen"
 
-#~ msgid "Motion vector precision"
-#~ msgstr "Қимылдау бағдарынның дәлденуі"
-
 #~ msgid "Simple ME search area x:y"
 #~ msgstr "Қарапайым ME іздеу аумағы x:y"
 
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Кеңістік айырылысуды қосу"
-
-#~ msgid "cycles per degree"
-#~ msgstr "бір градустағы орайғын саны"
-
 #~ msgid "Dirac video encoder using dirac-research library"
 #~ msgstr "dirac-research кітапханасын қолданған Дирак бейнелік кодтауышы"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Бейнелік кодсыздандырғыш (openmash қолданып)"
-
-#~ msgid "Jump to time"
-#~ msgstr "Уақытқа ауысу"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Күйреу жұрналын ашу..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Жіберілмесін"
 
 #~ msgid "VLC crashed previously"
 #~ msgstr "Өткенде VLC күйреген"
@@ -29907,25 +29669,6 @@ msgstr "Тасушы меңгеру тізімі"
 
 #~ msgid "Album art download policy"
 #~ msgstr "Альбомның мұқаба суретін қотару туралы ереже"
-
-#~ msgid "Output module"
-#~ msgstr "Шығасын модулі"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Сызықтық экуалайзер"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Файлдарды өздігінен алдын-ала талдау"
-
-#~ msgid "Under the Video"
-#~ msgstr "Бейне төменінде"
-
-#~ msgid "&Help..."
-#~ msgstr "Анықтама..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Дыбыстық жолшық бойынша қадамдастыру"
 
 #~ msgid ""
 #~ "Marquee text to display. (Available format strings: Time related: %Y = "
@@ -29950,12 +29693,213 @@ msgstr "Тасушы меңгеру тізімі"
 #~ "жол) "
 
 #, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Субтитр файлын қолдану"
+#~ msgid "Don't repair"
+#~ msgstr "Жіберілмесін"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "DVD мәзірлері"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "Бейнелік кодтауыш"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "Тақырып"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Субтитр жолшығы: %s"
+
+#, fuzzy
+#~ msgid "AVFoundation video capture module."
+#~ msgstr "Дыбыс шығару модулі"
+
+#, fuzzy
+#~ msgid "No video devices found"
+#~ msgstr "Еш кіресін құрылғысы табылмады."
+
+#, fuzzy
+#~ msgid "DVB"
+#~ msgstr "DV"
+
+#, fuzzy
+#~ msgid "QTSound"
+#~ msgstr "Айнала"
+
+#, fuzzy
+#~ msgid "QuickTime Sound Capture"
+#~ msgstr "Quicktime қармау"
+
+#, fuzzy
+#~ msgid "No Audio Input device found"
+#~ msgstr "Еш кіресін құрылғысы табылмады."
+
+#, fuzzy
+#~ msgid "No audio input device found"
+#~ msgstr "Еш кіресін құрылғысы табылмады."
+
+#, fuzzy
+#~ msgid "Windows Store audio output"
+#~ msgstr "Windows GDI бейнелік шығасыны "
+
+#, fuzzy
+#~ msgid "Specify the height to decode the image too"
+#~ msgstr "Қолданбақ тізбектестіру модулін тапсыру."
+
+#, fuzzy
+#~ msgid "Windows messages interface"
+#~ msgstr "Windows қызметінің тілдесуі"
+
+#, fuzzy
+#~ msgid "Save this Log..."
+#~ msgstr "Басқаша сақтау..."
+
+#, fuzzy
+#~ msgid "Deactivate"
+#~ msgstr "Белсендіру"
+
+#, fuzzy
+#~ msgid "Audio Fingerprinting"
+#~ msgstr "Дыбыстық кіресінінің түйіспесі"
+
+#, fuzzy
+#~ msgid "No fingerprint has been found"
+#~ msgstr "Еш кіресін табылмады"
+
+#, fuzzy
+#~ msgctxt "Tooltip|Clear"
+#~ msgid "Clear"
+#~ msgstr "Аластау"
+
+#, fuzzy
+#~ msgid "addons local storage"
+#~ msgstr "Ең көп жергілікті ағындық қарқын"
+
+#, fuzzy
+#~ msgid "Videolan.org's addons finder"
+#~ msgstr "Бейне түрлендіру сүзгісі"
+
+#, fuzzy
+#~ msgid "Default: 90sec"
+#~ msgstr "Әдепкі ағын"
+
+#, fuzzy
+#~ msgid "Chromaprint stream output"
+#~ msgstr "Ағындық шығасынын жинау"
+
+#, fuzzy
+#~ msgid "The width of the visualization window, in pixels."
+#~ msgstr "Әсерлер бейнелік терезесінің еңі, нүкте."
+
+#, fuzzy
+#~ msgid "The height of the visualization window, in pixels."
+#~ msgstr "Әсерлер бейнелік терезесінің биіктігі, нүкте."
+
+#, fuzzy
+#~ msgid "glSpectrum"
+#~ msgstr "Спектр"
+
+#, fuzzy
+#~ msgid "3D OpenGL spectrum visualization"
+#~ msgstr "Ағымдық көрнекі бейне"
+
+#, fuzzy
+#~ msgid "Flat Top"
+#~ msgstr "Үстіне қалқу"
+
+#, fuzzy
+#~ msgid "VLC media player - Flash Viewer"
+#~ msgstr "VLC тасушы ойнатқышының анықтамасы"
+
+#, fuzzy
+#~ msgid "Streaming Output"
+#~ msgstr "Ағындық шығасын"
+
+#, fuzzy
+#~ msgid "Compiled by %@ with %@"
+#~ msgstr "%s және %s (%s) құрастырылған.\n"
+
+#, fuzzy
+#~ msgid "Rewind"
+#~ msgstr "Медиалық кері жылдам жіберу"
+
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "CVD субтитр кодсыздандырғышы"
+
+#, fuzzy
+#~ msgid "Album art policy"
+#~ msgstr "Албом қайталау күшеюі"
+
+#, fuzzy
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "PCM пішімін түрлендіруге аналған дыбыстық сүзгі"
+
+#, fuzzy
+#~ msgid "Enable lossless coding"
+#~ msgstr "Ең төменгі жиіліктер режімін қосу"
+
+#, fuzzy
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Кадр арасындағы ең көп QP қадамы."
+
+#, fuzzy
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Тірек кадр саны"
+
+#, fuzzy
+#~ msgid "Motion vector precision"
+#~ msgstr "Қимыл бағдарын ұзындығының ең көп ауқымы"
+
+#, fuzzy
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Бейімделген алғашқы сүзгілеуді қосу"
+
+#, fuzzy
+#~ msgid "cycles per degree"
+#~ msgstr "Бұрыш, градус"
+
+#, fuzzy
+#~ msgid "Video decoder using openmash"
+#~ msgstr "MPEG I/II бейнелік кодсыздандырғыш (libmpeg2 қолданып)"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "Уақытқа өту"
+
+#, fuzzy
+#~ msgid "Open CrashLog..."
+#~ msgstr "Дискі ашу..."
+
+#, fuzzy
+#~ msgid "Don't Send"
+#~ msgstr "Көрсетілмесін"
+
+#, fuzzy
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Параметрлік экуалайзер"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Файлдарды өздігінен алдын-ала талдау"
+
+#, fuzzy
+#~ msgid "Under the Video"
+#~ msgstr "Бейне жоғарысында"
+
+#, fuzzy
+#~ msgid "&Help..."
+#~ msgstr "Анықтама"
+
+#, fuzzy
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Дыбыстық жолшықты орайғыту"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
-#~ msgstr "Субтитрлер"
+#~ msgstr "Субтитрлер / OSD"
 
 #, fuzzy
 #~ msgid "Subtitles codecs"
@@ -29963,8 +29907,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Settings for subtitles, teletext and CC decoders and encoders."
-#~ msgstr ""
-#~ "Тек қана дыбыстық кодсыздандырғыштардың және кодтауыштардың теңшелімдері."
+#~ msgstr "Субтитрлер, телемәтін және СС декодтаушылар мен кодтаушылар"
 
 #, fuzzy
 #~ msgid "General Input"
@@ -29976,11 +29919,11 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Chroma modules settings"
-#~ msgstr "Бейненің жалпы теңшелімдері"
+#~ msgstr "Бейненің жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "Packetizer modules settings"
-#~ msgstr "Бейненің жалпы теңшелімдері"
+#~ msgstr "Бейненің жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "Encoders settings"
@@ -29988,7 +29931,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Dialog providers settings"
-#~ msgstr "Бейненің жалпы теңшелімдері"
+#~ msgstr "Бейненің жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "Subtitle demuxer settings"
@@ -29996,7 +29939,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Quick &Open File..."
-#~ msgstr "Файл ашу..."
+#~ msgstr "&Файлды ашу..."
 
 #, fuzzy
 #~ msgid "&Bookmarks"
@@ -30004,7 +29947,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Fetch Information"
-#~ msgstr "Кодек сипаттары"
+#~ msgstr "&Кодек сипаттары"
 
 #, fuzzy
 #~ msgid "No Repeat"
@@ -30016,7 +29959,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Advanced Open..."
-#~ msgstr "Басқаша ашу..."
+#~ msgstr "&Басқаша ашу..."
 
 #, fuzzy
 #~ msgid "Open Play&list..."
@@ -30024,7 +29967,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Search Filter"
-#~ msgstr "Ағындық сүзгілер"
+#~ msgstr "Ағын фильтрлері"
 
 #, fuzzy
 #~ msgid "Image clone"
@@ -30052,7 +29995,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Default audio volume"
-#~ msgstr "Әдепкі өң түсі"
+#~ msgstr "Дыбыс мөлшерін есте сақтау"
 
 #, fuzzy
 #~ msgid "Audio output frequency (Hz)"
@@ -30197,7 +30140,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Channel"
-#~ msgstr "Арналары"
+#~ msgstr "Арналар"
 
 #, fuzzy
 #~ msgid "RTMP input"
@@ -30424,7 +30367,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Maemo hildon interface"
-#~ msgstr "Басты тілдесулер"
+#~ msgstr "Басты интерфейс"
 
 #, fuzzy
 #~ msgid "Frames per Second:"
@@ -30484,15 +30427,15 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "General Audio Settings"
-#~ msgstr "Дыбыстың жалпы теңшелімдері"
+#~ msgstr "Дыбыстың жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "General Video Settings"
-#~ msgstr "Бейненің жалпы теңшелімдері"
+#~ msgstr "Бейненің жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "Subtitles & OSD"
-#~ msgstr "Субтитрлер"
+#~ msgstr "Субтитрлер / OSD"
 
 #, fuzzy
 #~ msgid "Subtitles & On Screen Display Settings"
@@ -30500,7 +30443,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Input & Codecs"
-#~ msgstr "Кіресін / Кодектер"
+#~ msgstr "Кіріс ақпарат / Кодектер"
 
 #, fuzzy
 #~ msgid "Input & Codec settings"
@@ -30508,7 +30451,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Enable Audio"
-#~ msgstr "Дыбысты қосу"
+#~ msgstr "Дыбысты іске қосу"
 
 #, fuzzy
 #~ msgid "HTTP Proxy"
@@ -30521,10 +30464,6 @@ msgstr "Тасушы меңгеру тізімі"
 #, fuzzy
 #~ msgid "Font Size"
 #~ msgstr "Қаріп мөлшері"
-
-#, fuzzy
-#~ msgid "Subtitle Languages"
-#~ msgstr "Субтитр тілі"
 
 #, fuzzy
 #~ msgid "Preferred Subtitle Language"
@@ -30583,10 +30522,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgstr "Ойнату тізімін сақтау"
 
 #, fuzzy
-#~ msgid "Open subtitles file"
-#~ msgstr "Субтитр файлын қолдану"
-
-#, fuzzy
 #~ msgid "Preamp\n"
 #~ msgstr "Алдын-ала күшейткіш"
 
@@ -30604,7 +30539,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Add to playlist"
-#~ msgstr "Ойнату тізімге үстеу"
+#~ msgstr "Ойнату тізіміне қосу"
 
 #, fuzzy
 #~ msgid "Clear playlist"
@@ -30612,7 +30547,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "List View"
-#~ msgstr "Тізімдік теңдестіргіш"
+#~ msgstr "Медиалық көрініс"
 
 #, fuzzy
 #~ msgid "Select an action to change the associated hotkey"
@@ -30630,19 +30565,15 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Subtitles && OSD"
-#~ msgstr "Субтитрлер"
+#~ msgstr "Субтитрлер / OSD"
 
 #, fuzzy
 #~ msgid "Input && Codecs"
-#~ msgstr "Кіресін / Кодектер"
+#~ msgstr "Кіріс ақпарат / Кодектер"
 
 #, fuzzy
 #~ msgid "Allow downloading media information"
 #~ msgstr "Қайнар көз ақпарын келтіру үшін қос нұқыңыз"
-
-#, fuzzy
-#~ msgid "Allow checking for VLC updates"
-#~ msgstr "Жаңартуларды өздігінен тексеру"
 
 #, fuzzy
 #~ msgid "Save and Continue"
@@ -30658,7 +30589,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "&Codec"
-#~ msgstr "Кодегі"
+#~ msgstr "Кодек"
 
 #, fuzzy
 #~ msgid "&Convert"
@@ -30678,7 +30609,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "&Open (advanced)..."
-#~ msgstr "Файл ашу..."
+#~ msgstr "&Файлды ашу..."
 
 #, fuzzy
 #~ msgid "Audio &Channels"
@@ -30814,7 +30745,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Automatic cropping"
-#~ msgstr "Өздігінен"
+#~ msgstr "Автоматты түрде"
 
 #, fuzzy
 #~ msgid "Manual ratio"
@@ -30917,10 +30848,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgstr "Шығасындың жеткілімі"
 
 #, fuzzy
-#~ msgid "Output File"
-#~ msgstr "Шығасын файл"
-
-#, fuzzy
 #~ msgid "Input Media"
 #~ msgstr "Кіресін ағын"
 
@@ -30965,14 +30892,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgstr "Лицензия мәтіні"
 
 #, fuzzy
-#~ msgid "Verbosity:"
-#~ msgstr "Сөзуарлық (0,1,2)"
-
-#, fuzzy
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Субтитр файлын қолдану"
-
-#, fuzzy
 #~ msgid "Destinations"
 #~ msgstr "Жеткілімі"
 
@@ -30987,14 +30906,6 @@ msgstr "Тасушы меңгеру тізімі"
 #, fuzzy
 #~ msgid "Preferred subtitles language"
 #~ msgstr " Дыбыстың ұнамды тілі"
-
-#, fuzzy
-#~ msgid "Subtitles effects"
-#~ msgstr "Субтитрлер"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "Сұрыптау"
 
 #, fuzzy
 #~ msgid "Low Pass Ffilter"
@@ -31058,7 +30969,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Clear Menu"
-#~ msgstr "Аластау"
+#~ msgstr "Медиалық меню"
 
 #, fuzzy
 #~ msgid "RTSP host address"
@@ -31070,7 +30981,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Media Browser"
-#~ msgstr "Тасушы: %s"
+#~ msgstr "Медиалық жылдам жіберу"
 
 #, fuzzy
 #~ msgid "Full Screen"
@@ -31082,11 +30993,11 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "Басталу уақыты"
+#~ msgstr "Медиалық уақыт"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
-#~ msgstr "Сызықтық экуалайзер"
+#~ msgstr "Параметрлік экуалайзер"
 
 #, fuzzy
 #~ msgid "Create Stream"
@@ -31166,15 +31077,15 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Telnet Interface"
-#~ msgstr "Тілдесу"
+#~ msgstr "Интерфейс"
 
 #, fuzzy
 #~ msgid "Web Interface"
-#~ msgstr "Тілдесу"
+#~ msgstr "Интерфейс"
 
 #, fuzzy
 #~ msgid "Audio output saved volume"
-#~ msgstr "Дыбыстық шығасын деңгейінің қадамы"
+#~ msgstr "Дыбыс шығу деңгейінің қадамы"
 
 #, fuzzy
 #~ msgid "Video output filter module"
@@ -31193,7 +31104,7 @@ msgstr "Тасушы меңгеру тізімі"
 #~ "IPv4 address for the default multicast interface. This overrides the "
 #~ "routing table."
 #~ msgstr ""
-#~ "Әдепкі топтық тарату тілдесуі. Бұл бағдарғылау кестесін алмастырады."
+#~ "Әдепкі топтық тарату интерфейсі. Бұл бағдарғылау кестесін алмастырады."
 
 #, fuzzy
 #~ msgid "Enable CPU MMX support"
@@ -31341,7 +31252,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Auto gain"
-#~ msgstr "Өздігінен"
+#~ msgstr "Дыбысты күшейту"
 
 #, fuzzy
 #~ msgid "Horizontal centering"
@@ -31356,16 +31267,12 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgstr "Жалған/Пішімсіз муксер"
 
 #, fuzzy
-#~ msgid "default"
-#~ msgstr "Әдепкі"
-
-#, fuzzy
 #~ msgid "No Audio Device"
 #~ msgstr "Дыбыстық құрылғы"
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
-#~ msgstr "Беймәлім санат"
+#~ msgstr "Белгісіз қате"
 
 #, fuzzy
 #~ msgid "Roku HD1000 audio output"
@@ -31428,7 +31335,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "POSIX signals handling interface"
-#~ msgstr "Басты тілдесу теңшелімдері"
+#~ msgstr "Басты интерфейс баптаулары"
 
 #, fuzzy
 #~ msgid "VLM remote control interface"
@@ -31445,10 +31352,6 @@ msgstr "Тасушы меңгеру тізімі"
 #, fuzzy
 #~ msgid "AVI Index"
 #~ msgstr "Реттеуіш"
-
-#, fuzzy
-#~ msgid "Don't repair"
-#~ msgstr "Жіберілмесін"
 
 #, fuzzy
 #~ msgid "Subtitles (asa demuxer)"
@@ -31468,7 +31371,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "General editing filters"
-#~ msgstr "Дыбыстың жалпы теңшелімдері"
+#~ msgstr "Дыбыстың жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "Distortion filters"
@@ -31500,7 +31403,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Keep current Equalizer settings"
-#~ msgstr "Бейненің жалпы теңшелімдері"
+#~ msgstr "Бейненің жалпы баптаулары"
 
 #, fuzzy
 #~ msgid "No device connected"
@@ -31508,7 +31411,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
-#~ msgstr "Ойнату тізімге үстеу"
+#~ msgstr "Ойнату тізіміне қосу"
 
 #, fuzzy
 #~ msgid "1 item"
@@ -31532,7 +31435,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Hotkeys not saved"
-#~ msgstr "Тездету пернелерін теңшелімдері"
+#~ msgstr "Жылдамдату пернелерінің баптаулары"
 
 #, fuzzy
 #~ msgid " State    : Paused %s"
@@ -31544,7 +31447,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "[Miscellaneous]"
-#~ msgstr "Әр түрлі"
+#~ msgstr "Басқа түрлі баптаулар"
 
 #, fuzzy
 #~ msgid " Information "
@@ -31676,7 +31579,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Lua Interface Module"
-#~ msgstr "Тілдесу модулі"
+#~ msgstr "Интерфейс модулі"
 
 #, fuzzy
 #~ msgid "Interfaces implemented using lua scripts"
@@ -31741,11 +31644,11 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Enable peaks"
-#~ msgstr "Дыбысты қосу"
+#~ msgstr "Дыбысты іске қосу"
 
 #, fuzzy
 #~ msgid "Enable bands"
-#~ msgstr "Дыбысты қосу"
+#~ msgstr "Дыбысты іске қосу"
 
 #, fuzzy
 #~ msgid "Enable base"
@@ -31797,7 +31700,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "title"
-#~ msgstr "Тақырыбы"
+#~ msgstr "Тақырып"
 
 #, fuzzy
 #~ msgid "Key"
@@ -31825,20 +31728,19 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Settings for audio+video and miscellaneous decoders and encoders."
-#~ msgstr ""
-#~ "Тек қана дыбыстық кодсыздандырғыштардың және кодтауыштардың теңшелімдері."
+#~ msgstr "Тек дыбыстық декодтаушылар және кодтауыштардың баптаулары."
 
 #, fuzzy
 #~ msgid "Random off"
-#~ msgstr "Кездесөқ өшірілген"
+#~ msgstr "Кездейсоқ өшірілген"
 
 #, fuzzy
 #~ msgid "Advanced open..."
-#~ msgstr "Басқаша ашу..."
+#~ msgstr "&Басқаша ашу..."
 
 #, fuzzy
 #~ msgid "Show interface with mouse"
-#~ msgstr "Тілдесу модулі"
+#~ msgstr "Интерфейс модулі"
 
 #, fuzzy
 #~ msgid "Fullscreen-only"
@@ -31878,7 +31780,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Track %i"
-#~ msgstr "Жолшық"
+#~ msgstr "Трек"
 
 #, fuzzy
 #~ msgid "Standard filesystem directory input"
@@ -31911,10 +31813,6 @@ msgstr "Тасушы меңгеру тізімі"
 #~ msgstr "Жасырын титр кодсыздандырғышы"
 
 #, fuzzy
-#~ msgid "Tarkin decoder"
-#~ msgstr "Санақ кодсыздандыруышы"
-
-#, fuzzy
 #~ msgid "MPEG I/II hw video decoder (using libmpeg2)"
 #~ msgstr "MPEG I/II бейнелік кодсыздандырғыш (libmpeg2 қолданып)"
 
@@ -31940,7 +31838,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "BeOS standard API interface"
-#~ msgstr "Тілдесу үстеу"
+#~ msgstr "Интерфейсті қосу"
 
 #, fuzzy
 #~ msgid "Prev Title"
@@ -31956,7 +31854,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Go to Chapter"
-#~ msgstr "Бөлімі"
+#~ msgstr "Бөлім"
 
 #, fuzzy
 #~ msgid "Speed"
@@ -31972,7 +31870,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Select None"
-#~ msgstr "Файл бөлектеу"
+#~ msgstr "Қалта таңдау"
 
 #, fuzzy
 #~ msgid "Sort Reverse"
@@ -32184,7 +32082,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "Select play mode"
-#~ msgstr "Қайталау күшею режімін бөлектеу"
+#~ msgstr "Қайталауды күшейту режімін белгілеу"
 
 #, fuzzy
 #~ msgid "Alignment:"
@@ -32219,7 +32117,7 @@ msgstr "Тасушы меңгеру тізімі"
 #~ "\n"
 #~ "(WinCE interface)\n"
 #~ "\n"
-#~ msgstr "Басты тілдесулер"
+#~ msgstr "Басты интерфейс"
 
 #, fuzzy
 #~ msgid "Compiled by "
@@ -32235,7 +32133,7 @@ msgstr "Тасушы меңгеру тізімі"
 
 #, fuzzy
 #~ msgid "WinCE interface"
-#~ msgstr "Басты тілдесулер"
+#~ msgstr "Басты интерфейс"
 
 #, fuzzy
 #~ msgid "Old playlist export"

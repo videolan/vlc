@@ -1,24 +1,28 @@
 # Persian translation
-# Copyright (C) 2014 VideoLAN
-# This file is distributed under the same license as the VLC package.
+# Copyright (C) 2017 VideoLAN
+# This file is distributed under the same license as the vlc package.
 #
 # Translators:
-# Arshad <hossein.arshad@gmail.com>, 2013
-# djcsaeed <security.registered@gmail.com>, 2013
-# EmadNavy <tiptopland@gmail.com>, 2013
+# Hossein Arshadaghghaleh <hossein.arshad@gmail.com>, 2013
+# saeed farzad <security.registered@gmail.com>, 2013
+# Emad <tiptopland@gmail.com>, 2013
+# Goudarz Jafari <goudarz.jafari@gmail.com>, 2016
 # imni <if90@chmail.ir>, 2014
 # Meelad Zakaria <meelad@farsiweb.info>, 2007
-# M.Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
+# mohammad rahmani <mohammadrahmani2o0@gmail.com>, 2015-2016
+# MM, 2016
 # Pouriya <pouriya.he@ymail.com>, 2014
+# ropy <ropy.nf@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2014-04-29 05:52+0000\n"
-"Last-Translator: imni <if90@chmail.ir>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/vlc-trans/"
-"language/fa/)\n"
+"PO-Revision-Date: 2017-02-06 13:43+0000\n"
+"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
+"Language-Team: Persian (http://www.transifex.com/yaron/vlc-trans/language/"
+"fa/)\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +39,7 @@ msgstr ""
 "این برنامه تا جایی که قانون اجازه می‌دهد بدون هیچ تضمینی ارائه می‌شود.\n"
 "شما می‌توانید آن را تحت شرایط مجوز عمومی همگانی گنو مجدداً توزیع کنید.\n"
 "برای جزئیات بیشتر پروندهٔ COPYING را ببینید.\n"
-"نوشتهٔ تیم ویدئولَن؛ پروندهٔ AUTHORS را ببینید.\n"
+"نوشتهٔ گروه VideoLAN؛ پروندهٔ AUTHORS را ببینید.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -50,7 +54,7 @@ msgstr "برای دیدن همهٔ گزینه‌ها، «گزینه‌های پ�
 #: modules/gui/qt/components/simple_preferences.cpp:222
 #: modules/gui/qt/menus.cpp:1085
 msgid "Interface"
-msgstr "واسط"
+msgstr "رابط کاربری"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
@@ -58,11 +62,11 @@ msgstr "تنظیمات واسط‌های وی‌ال‌سی"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "تنظیمات عمومی واسط"
+msgstr "تنظیمات عمومی رابط کاربر"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "واسط‌های اصلی"
+msgstr "واسط کاربر اصلی"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
@@ -79,7 +83,7 @@ msgstr "تنظیمات واسط‌های کنترلی وی‌ال‌سی"
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
 msgid "Hotkeys settings"
-msgstr "تنظیمات میان‌برها"
+msgstr "تنظیمات میانبُرها"
 
 #: include/vlc_config_cat.h:53 src/input/es_out.c:3062 src/input/es_out.c:3103
 #: src/libvlc-module.c:1489 modules/access/imem.c:64
@@ -107,7 +111,7 @@ msgstr "تنظیمات عمومی صدا"
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:81
 #: modules/gui/qt/ui/profiles.h:750 modules/gui/qt/ui/profiles.h:760
 msgid "Filters"
-msgstr "صافی‌ها"
+msgstr "پالایه‌ها"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
@@ -120,12 +124,12 @@ msgstr "نمونه‌گیر مجدد صدا"
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:258
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
 msgid "Visualizations"
-msgstr "تصویرسازی‌ها"
+msgstr "جلوه‌ها"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:319
 #: src/libvlc-module.c:206
 msgid "Audio visualizations"
-msgstr "تصویر‌سازی‌های صوتی"
+msgstr "جلوه‌های صوتی"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
@@ -171,9 +175,8 @@ msgid "General video settings"
 msgstr "تنظیمات عمومی ویدئو"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "تنظیمات عمومی برای پیمانه‌های خروجی صدا"
+msgstr "تنظیمات عمومی برای پیمانه‌های خروجی تصویر"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -192,7 +195,7 @@ msgstr ""
 #: include/vlc_config_cat.h:88
 #, fuzzy
 msgid "Splitters"
-msgstr "صافی‌ها"
+msgstr "پالایه‌ها"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -227,16 +230,16 @@ msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"فیلترهای استریم ماژول های مخصوصی هستند که امکان عملیات پیشرفته را روی ورودی "
-"VLC می دهند. با احتیاط استفاده کنید..."
+"پالایه‌های جریان پیمانه‌های مخصوصی هستند که امکان انجام عملیات پیشرفته را روی "
+"ورودی VLC می‌دهند. با احتیاط استفاده کنید..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr "جداسازها"
+msgstr "واتافتگرها"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "جداسازها برای تفکیک جریان‌های صدا و تصویر به کار می‌روند."
+msgstr "واتافتگرها برای تفکیک جریان‌های صدا و تصویر به کار می‌روند."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -306,9 +309,9 @@ msgid ""
 msgstr ""
 "همتافتگرها همه جریان‌های اولیه (ویدئو، صدا و...) را به صورت یک قالب واحد جمع "
 "می‌کنند. \n"
-"این کار باعث می‌شود تا همیشه یک همتافتگر خاص را به کار بگیرید. هرچند بهتر است "
-"این کار را نکنید.\n"
-"همچنین می‌توانید پارامترهای پیش‌فرض هر همتافتگر را در تنظیم کنید."
+"این تنظیم باعث می‌شود تا همیشه یک همتافتگر خاص را به کار بگیرید. هرچند بهتر "
+"است این کار را نکنید.\n"
+"همچنین می‌توانید پارامترهای پیش‌فرض هر همتافتگر را تنظیم کنید."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -328,7 +331,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
-msgstr "بسته سازها"
+msgstr "بسته‌سازها"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -337,8 +340,8 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"بسته‌سازها برای پیش‌پردازش جریان‌های اولیه، قبل از همتافتن آنها، به کار می‌روند. "
-"این تنظیمات سبب می‌شوند تا همیشه از یک بسته‌ساز استفاده کنید. هر چند بهتر است "
+"بسته‌سازها برای پیش‌پردازش جریان‌های اولیه قبل از همتافتن آنها به کار می‌روند. "
+"این تنظیمات سبب می‌شود تا همیشه از یک بسته‌ساز استفاده کنید. هر چند بهتر است "
 "این کار را نکنید.\n"
 "همچنین می‌توانید پارامترهای پیش‌فرض هر بسته‌ساز را تنظیم کنید."
 
@@ -352,9 +355,9 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
-"پیمانه‌های جریان Sout برای ایجاد یک زنجیر پردازشی Sout به کار می‌روند. لطفاً "
-"برای اطلاعات بیشتر به راهنمای جریان‌ها مراجعه نمایید. در اینجا می‌توانید "
-"گزینه‌های پیشفرض را برای هر پیمانه‌ی جریان Sout تنظیم نمایید."
+"پیمانه‌های جریان ثوت (Sout) برای ایجاد یک زنجیر پردازشی ثوت به کار می‌روند. "
+"لطفاً برای اطلاعات بیشتر به راهنمای جریان‌ها مراجعه نمایید. در اینجا می‌توانید "
+"گزینه‌های پیشفرض را برای هر پیمانه‌ی جریان ثوت تنظیم نمایید."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -459,7 +462,7 @@ msgstr "پرش به زمانی مشخص..."
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr ""
+msgstr "نشانک‌‌های سفارشی"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
@@ -498,14 +501,12 @@ msgid "Create Folder..."
 msgstr "ایجاد پوشه..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "ایجاد شاخه..."
+msgstr "تغییر نام شاخه..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "ایجاد پوشه..."
+msgstr "تغییر نام پوشه..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -667,7 +668,7 @@ msgstr "پالایه‌های صدا"
 
 #: src/audio_output/output.c:325
 msgid "Replay gain"
-msgstr ""
+msgstr "افزایش بازپخش"
 
 #: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
@@ -812,7 +813,7 @@ msgstr "یادداشت:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr ""
+msgstr "‎--advanced را به خط فرمان اضافه کنید تا گزینه‌های پیشرفته را ببینید."
 
 #: src/config/help.c:656
 #, c-format
@@ -820,6 +821,7 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"پیمانه‌های ‎%u نشان داده نشدند؛ زیرا آنها فقط گزینه‌های پیشرفته دارند.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -855,10 +857,9 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"برای ادامه کلید RETURN را فشار دهید...\n"
+"Press the RETURN key to continue...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
 msgstr "دسته ناشناخته"
 
@@ -869,27 +870,24 @@ msgstr "نشانک %i"
 
 #: src/input/decoder.c:1875
 msgid "No description for this codec"
-msgstr ""
+msgstr "توضیحی برای این کدک وجود ندارد"
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "پیمانهٔ خروجی ویدئو"
+msgstr "این کدک پشتیبانی نمی‌شود"
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
+msgstr "وی‌ال‌سی نتوانست قالب «%4.4s»‏ (%s) را کدگشایی کند."
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "کُدک ویدئو"
+msgstr "کدک ناشناس"
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "وی‌ال‌سی نمی‌تواند کدک ویدیو یا صدا را شناسایی کند."
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -1038,7 +1036,7 @@ msgstr "%.2f dB"
 #: src/input/es_out.c:3151
 #, fuzzy
 msgid "Video resolution"
-msgstr "تفکیک‌پذیری نمایش"
+msgstr "تفکیک‌پذیری دلخواه برای ویدئو"
 
 #: src/input/es_out.c:3156
 msgid "Buffer dimensions"
@@ -1183,7 +1181,7 @@ msgstr "پایین و چپ"
 #: src/input/es_out.c:3253
 #, fuzzy
 msgid "Chroma location"
-msgstr "انتخاب نامعتبر"
+msgstr "گزینه‌های کارآیی"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -1260,8 +1258,7 @@ msgstr "ورودی شما باز نمی‌شود"
 #: src/input/input.c:2656
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr ""
-"وی‌ال‌سی نمی‌تواند MRL '%s' را باز کند. برای دیدن جزییات رخدادنامه را ببینید."
+msgstr "وی‌ال‌سی نمی‌تواند MRL '%s' را باز کند. برای جزییات رخدادنامه را ببینید."
 
 #: src/input/meta.c:55 src/input/var.c:177 modules/gui/macosx/VLCMainMenu.m:399
 #: modules/gui/macosx/VLCMainMenu.m:400
@@ -1308,7 +1305,7 @@ msgstr "تاریخ"
 
 #: src/input/meta.c:64
 msgid "Setting"
-msgstr ""
+msgstr "تنظیم"
 
 #: src/input/meta.c:65 modules/gui/macosx/VLCOpenWindowController.m:188
 #: modules/gui/qt/ui/podcast_configuration.h:102
@@ -1336,9 +1333,8 @@ msgid "Track ID"
 msgstr "شناسه قطعه"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "تعداد ردیف‌ها"
+msgstr "تعداد قطعه‌ها"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1346,20 +1342,19 @@ msgstr ""
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "فصل"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "قسمت"
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "نام"
+msgstr "نمایش نام"
 
 #: src/input/meta.c:78
 msgid "Actors"
-msgstr ""
+msgstr "بازیگران"
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -1453,7 +1448,7 @@ msgstr "پیشانه"
 
 #: src/interface/interface.c:93
 msgid "Telnet"
-msgstr ""
+msgstr "تل‌نت"
 
 #: src/interface/interface.c:96
 msgid "Web"
@@ -1465,7 +1460,7 @@ msgstr "ثبت رخدادهای اشکال‌زدایی"
 
 #: src/interface/interface.c:102
 msgid "Mouse Gestures"
-msgstr "حرکت‌های موشی"
+msgstr "حرکت‌های ماوس"
 
 #: src/interface/interface.c:225
 msgid ""
@@ -2377,6 +2372,10 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
+"این گزینه سبب می‌شود تا قالب ویدئویی HDTV-1080 به شکل درست به کار گرفته شود؛ "
+"حتی اگر کدگشای خراب، به اشتباه ارتفاع را در 1088 خط تنظیم کند. تنها زمانی "
+"این گزینه را غیرفعال کنید که ویدئویتان به خاطر قالب غیراستانداردش به همهٔ "
+"1088 خط نیاز دارد."
 
 #: src/libvlc-module.c:466
 msgid "Monitor pixel aspect ratio"
@@ -2388,26 +2387,32 @@ msgid ""
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
+"این گزینه نسبت طول به عرض نمایشگر را مشخص می‌کند. بیشتر نمایشگرها پیکسل‌های "
+"مربعی (1:1) دارند. اگر صفحه نمایش شما 16:9 است، شاید برای حفظ تناسب لازم "
+"باشد آن را به 4:3 تغییر دهید ."
 
 #: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:294
 msgid "Skip frames"
-msgstr "ردکردن فریم ها"
+msgstr "ردکردن فریم‌ها"
 
 #: src/libvlc-module.c:474
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"نادیده‌گرفتن فریم‌ها را برای جریان MPEG2 فعال می‌کند. نادیده گرفتن فریم‌ها زمانی "
+"رخ می‌دهد که رایانه شما به قدر کافی قدرتمند نیست."
 
 #: src/libvlc-module.c:477
 msgid "Drop late frames"
-msgstr "حذف فریم های آخر"
+msgstr "نادیده‌گرفتن فریم‌های تاخیردار"
 
 #: src/libvlc-module.c:479
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr ""
+"این گزینه فریم‌هایی را که بعد از زمان مقرر به خروجی می‌رسند، نادیده می‌گیرد."
 
 #: src/libvlc-module.c:482
 msgid "Quiet synchro"
@@ -2421,11 +2426,12 @@ msgstr ""
 
 #: src/libvlc-module.c:487
 msgid "Key press events"
-msgstr ""
+msgstr "رخدادهای هنگام زدن کلید"
 
 #: src/libvlc-module.c:489
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
 msgstr ""
+"این گزینه کلیدهای میانبر وی‌ال‌سی را در پنجرهٔ (غیر توکار) ویدئو فعال می‌کند."
 
 #: src/libvlc-module.c:491 modules/spu/remoteosd.c:91
 msgid "Mouse events"
@@ -2433,7 +2439,7 @@ msgstr "رخدادهای ماوس"
 
 #: src/libvlc-module.c:493
 msgid "This enables handling of mouse clicks on the video."
-msgstr ""
+msgstr "این گزینه کارایی کلیک‌های ماوس را روی ویدئو فعال می‌کند."
 
 #: src/libvlc-module.c:501
 msgid ""
@@ -2448,7 +2454,7 @@ msgstr "کشینگ فایل (ms)"
 
 #: src/libvlc-module.c:507
 msgid "Caching value for local files, in milliseconds."
-msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #: src/libvlc-module.c:509
 msgid "Live capture caching (ms)"
@@ -2456,7 +2462,7 @@ msgstr "کشینگ ضبط زنده (ms)"
 
 #: src/libvlc-module.c:511
 msgid "Caching value for cameras and microphones, in milliseconds."
-msgstr "مقدار کشینگ برای دوربین ها و میکروفن ها، به میلی ثانیه."
+msgstr "مقدار کشینگ برای دوربین‌ها و میکروفن‌ها، به میلی‌ثانیه."
 
 #: src/libvlc-module.c:513
 msgid "Disc caching (ms)"
@@ -2464,7 +2470,7 @@ msgstr "کشینگ دیسک (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for optical media, in milliseconds."
-msgstr "مقدار کشینگ برای رسانه نوری، به میلی ثانیه."
+msgstr "مقدار کشینگ برای رسانهٔ نوری، به میلی‌ثانیه."
 
 #: src/libvlc-module.c:517
 msgid "Network caching (ms)"
@@ -2472,7 +2478,7 @@ msgstr "کشینگ شبکه (ms)"
 
 #: src/libvlc-module.c:519
 msgid "Caching value for network resources, in milliseconds."
-msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #: src/libvlc-module.c:521
 msgid "Clock reference average counter"
@@ -2486,17 +2492,19 @@ msgstr ""
 
 #: src/libvlc-module.c:526
 msgid "Clock synchronisation"
-msgstr "همزمان سازی کلاک"
+msgstr "همزمان‌سازی ساعت"
 
 #: src/libvlc-module.c:528
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
+"می‌توانید همزمان‌سازی ساعت را برای ورودی‌های بی‌درنگ غیرفعال کنید. اگر جریان‌های "
+"شبکه‌ای نرم پخش نمی‌شود و پرش دارد از این گزینه استفاده کنید."
 
 #: src/libvlc-module.c:532
 msgid "Clock jitter"
-msgstr ""
+msgstr "لغزش زمان"
 
 #: src/libvlc-module.c:534
 msgid ""
@@ -2506,7 +2514,7 @@ msgstr ""
 
 #: src/libvlc-module.c:537
 msgid "Network synchronisation"
-msgstr "همگام‌سازی شبکه"
+msgstr "همزمان‌سازی شبکه"
 
 #: src/libvlc-module.c:538
 msgid ""
@@ -2597,15 +2605,15 @@ msgstr "قطعه صدا"
 
 #: src/libvlc-module.c:584
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr "شمارهٔ جریان شیار صدای مورد استفاده (از ۰ تا n)"
+msgstr "شمارهٔ جریان قطعه صدای مورد استفاده (از 0 تا n)"
 
 #: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
-msgstr "زیرنویس آهنگ"
+msgstr "قطعه زیرنویس"
 
 #: src/libvlc-module.c:589
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr "شمارهٔ جریان شیار زیرنویس مورد استفاده (از ۰ تا n)"
+msgstr "شمارهٔ جریان قطعه زیرنویس مورد استفاده (از 0 تا n)"
 
 #: src/libvlc-module.c:592 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2617,6 +2625,8 @@ msgid ""
 "letter country code, you may use 'none' to avoid a fallback to another "
 "language)."
 msgstr ""
+"زبان مورد استفاده برای قطعه صوتی (با ویرگول جدا شود، کد دو یا سه حرفی کشور، "
+"برای ممانعت از برگشت به زبان دیگر می‌توانید از none استفاده کنید)."
 
 #: src/libvlc-module.c:597
 msgid "Subtitle language"
@@ -2627,33 +2637,36 @@ msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"زبان مورد استفاده برای قطعه زیرنویس (با ویرگول جدا شود، کد دو یا سه حرفی "
+"کشور، برای برگشت در صورت خطا می‌توانید از any استفاده کنید)."
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "زبان صدا"
+msgstr "زبان منو"
 
 #: src/libvlc-module.c:604
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"زبان مورد استفاده برای دی‌وی‌دی یا بلوری (با ویرگول جدا شود، کد دو یا سه حرفی "
+"کشور، برای برگشت در صورت خطا می‌توانید از any استفاده کنید)."
 
 #: src/libvlc-module.c:608
 msgid "Audio track ID"
-msgstr "شناسهٔ شیار صدا"
+msgstr "شناسهٔ قطعه صدا"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the audio track to use."
-msgstr "شناسهٔ جریان شیار صوتی مورد استفاده."
+msgstr "شناسهٔ جریان قطعه صوتی مورد استفاده."
 
 #: src/libvlc-module.c:612
 msgid "Subtitle track ID"
-msgstr ""
+msgstr "شناسهٔ قطعه زیرنویس"
 
 #: src/libvlc-module.c:614
 msgid "Stream ID of the subtitle track to use."
-msgstr "شناسهٔ جریان شیار زیرنویس مورد استفاده."
+msgstr "شناسهٔ جریان قطعه زیرنویس مورد استفاده."
 
 #: src/libvlc-module.c:616 modules/codec/cc.c:57
 msgid "Closed Captions decoder"
@@ -2674,7 +2687,7 @@ msgstr ""
 
 #: src/libvlc-module.c:621
 msgid "Preferred video resolution"
-msgstr ""
+msgstr "تفکیک‌پذیری دلخواه برای ویدئو"
 
 #: src/libvlc-module.c:623
 msgid ""
@@ -2683,10 +2696,13 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
+"در صورت وجود چندین قالب ویدئویی، نزدیک‌ترین مورد (اما نه بالاتر از) به این "
+"گزینه در تعداد خطوط انتخاب می‌شود. اگر قدرت پردازشگر به حد کافی نیست یا پهنای "
+"باند شبکه امکان پخش تفکیک‌پذیری‌های بالاتر را نمی‌دهد از این گزینه استفاده کنید."
 
 #: src/libvlc-module.c:629
 msgid "Best available"
-msgstr ""
+msgstr "بهترین"
 
 #: src/libvlc-module.c:629
 msgid "Full HD (1080p)"
@@ -2722,7 +2738,7 @@ msgstr "زمان آغاز"
 
 #: src/libvlc-module.c:641
 msgid "The stream will start at this position (in seconds)."
-msgstr "جریان از این موقعیت (به ثانیه) آغاز می‌شود."
+msgstr "جریان از این لحظه (به ثانیه) آغاز می‌شود."
 
 #: src/libvlc-module.c:643 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
@@ -2730,15 +2746,15 @@ msgstr "زمان توقف"
 
 #: src/libvlc-module.c:645
 msgid "The stream will stop at this position (in seconds)."
-msgstr "جریان در این موقعیت (به ثانیه) متوقف می‌شود."
+msgstr "جریان در این لحظه (به ثانیه) متوقف می‌شود."
 
 #: src/libvlc-module.c:647
 msgid "Run time"
-msgstr ""
+msgstr "زمان اجرا"
 
 #: src/libvlc-module.c:649
 msgid "The stream will run this duration (in seconds)."
-msgstr ""
+msgstr "جریان در این مدت اجرا می‌شود (به ثانیه)."
 
 #: src/libvlc-module.c:651
 msgid "Fast seek"
@@ -2750,11 +2766,11 @@ msgstr ""
 
 #: src/libvlc-module.c:655
 msgid "Playback speed"
-msgstr ""
+msgstr "سرعت پخش"
 
 #: src/libvlc-module.c:657
 msgid "This defines the playback speed (nominal speed is 1.0)."
-msgstr ""
+msgstr "سرعت پخش (سرعت اسمی 1.0 است)."
 
 #: src/libvlc-module.c:659
 msgid "Input list"
@@ -2776,10 +2792,12 @@ msgid ""
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
+"با این گزینه می‌توانید چندین ورودی را همزمان پخش کنید. این قابلیت آزمایشی است "
+"و همه قالب‌ها پشتیبانی نشده‌اند. فهرست ورودی‌ها را با # جدا کنید."
 
 #: src/libvlc-module.c:670
 msgid "Bookmarks list for a stream"
-msgstr ""
+msgstr "فهرست نشانک‌ها برای یک جریان"
 
 #: src/libvlc-module.c:672
 msgid ""
@@ -2787,16 +2805,20 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"می‌توانید برای یک جریان فهرستی از نشانک‌ها را به صورت دستی در قالب\n"
+"‪  {name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
+"{...} ‬\n"
+"وارد کنید."
 
 #: src/libvlc-module.c:676
 #, fuzzy
 msgid "Record directory"
-msgstr "یک شاخه انتخاب کنید"
+msgstr "نام فایل یا شاخه ضبط"
 
 #: src/libvlc-module.c:678
 #, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "شاخه‌ای که عکس‌های ویدئو آنجا ذخیره می‌شوند."
+msgstr "نام فایل یا شاخه‌ای که برای ضبط کردن استفاده می‌شود."
 
 #: src/libvlc-module.c:680
 msgid "Prefer native stream recording"
@@ -2828,7 +2850,7 @@ msgstr ""
 
 #: src/libvlc-module.c:694
 msgid "Change title according to current media"
-msgstr ""
+msgstr "تغییر عنوان مطابق با رسانه جاری"
 
 #: src/libvlc-module.c:695
 msgid ""
@@ -2837,6 +2859,9 @@ msgid ""
 "Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z: \"Now playing"
 "\" (Fall back on Title - Artist)"
 msgstr ""
+"این گزینه عنوان را مطابق چیزی که پخش می‌شود تغییر می‌دهد<br>‎$a: هنرمند<br>‎$b: "
+"آلبوم<br>‎$c: حق نشر<br>‎$t: عنوان<br>‎$g: سبک<br>‎$n: شماره قطعه<br>‎$p: در حال "
+"پخش<br>‎$A: تاریخ<br>‎$D: مدت<br>‎$Z: \"در حال پخش\" (برگشت به عنوان - هنرمند)"
 
 #: src/libvlc-module.c:700
 #, fuzzy
@@ -2857,14 +2882,14 @@ msgstr ""
 
 #: src/libvlc-module.c:711 modules/gui/qt/ui/sprefs_subtitles.h:305
 msgid "Force subtitle position"
-msgstr "تعیین اجباری موقعیت زیرنویس"
+msgstr "تعیین موقعیت زیرنویس"
 
 #: src/libvlc-module.c:713
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
-"با این گزینه می‌توانید زیرنویس‌های را به جای روی فیلم، زیر فیلم قرار دهید. چند "
+"با این گزینه می‌توانید زیرنویس‌ها را به جای روی فیلم، زیر فیلم قرار دهید. چند "
 "جای مختلف را امتحان کنید."
 
 #: src/libvlc-module.c:716
@@ -2907,7 +2932,7 @@ msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
 msgstr ""
-"وی‌ال‌سی معمولاً برای رسم متن از فری‌تایپ استفاده می‌کند، ولی با این گزینه "
+"وی‌ال‌سی معمولاً برای رسم متن از FreeType استفاده می‌کند، ولی با این گزینه "
 "می‌توانید مثلاً از svg استفاده کنید."
 
 #: src/libvlc-module.c:732
@@ -2944,7 +2969,7 @@ msgstr ""
 
 #: src/libvlc-module.c:747
 msgid "Subtitle autodetection fuzziness"
-msgstr ""
+msgstr "میزان ابهام تشخیص خودکار زیرنویس"
 
 #: src/libvlc-module.c:749
 msgid ""
@@ -2956,6 +2981,13 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
+"با این گزینه مشخص کنید که نام پروندهٔ فیلم و زیرنویس تا چه حد بر هم منطبق "
+"هستند.\n"
+"0 = زیرنویس به صورت خودکار پیدا نشود\n"
+"1 = هر پروندهٔ زیرنویس\n"
+"2 = هر پروندهٔ زیرنویسی که شامل نام فیلم است\n"
+"3 = نام پروندهٔ زیرنویس منطبق بر نام فیلم باشد به همراه نویسه‌های اضافه دیگر\n"
+"4 = نام پروندهٔ‌زیرنویس دقیقا منطبق بر نام فیلم باشد"
 
 #: src/libvlc-module.c:757
 msgid "Subtitle autodetection paths"
@@ -2967,7 +2999,7 @@ msgid ""
 "found in the current directory."
 msgstr ""
 "در صورتی که پروندهٔ زیرنویس در شاخهٔ فعلی پیدا نشد، در این مسیرها هم به دنبال "
-"زیرنویس جستجو شود."
+"زیرنویس بگرد."
 
 #: src/libvlc-module.c:762
 msgid "Use subtitle file"
@@ -2998,30 +3030,37 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"درایو (یا پرونده) پیش‌فرض دی‌وی‌دی. فراموش نکنید بعد از حرف درایو دونقطه "
+"بگذارید (مثلا D:‎)"
 
 #: src/libvlc-module.c:777
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"درایو (یا پرونده) پیش‌فرض وی‌سی‌دی. فراموش نکنید بعد از حرف درایو دونقطه "
+"بگذارید (مثلا D:‎)"
 
 #: src/libvlc-module.c:780 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
+"درایو (یا پرونده) پیش‌فرض سی‌دی صوتی. فراموش نکنید بعد از حرف درایو دونقطه "
+"بگذارید (مثلا D:‎)"
 
 #: src/libvlc-module.c:787
 msgid "This is the default DVD device to use."
-msgstr "این دستگاه دی‌وی‌دی‌گردان مورد استفادهٔ پیش‌فرض است."
+msgstr "این دستگاه به صورت پیش‌فرض به عنوان دستگاه دی‌وی‌دی‌خوان استفاده می‌شود."
 
 #: src/libvlc-module.c:789
 msgid "This is the default VCD device to use."
-msgstr "این دستگاه وی‌سی‌دی‌خوان مورد استفادهٔ پیش‌فرض است."
+msgstr "این دستگاه به صورت پیش‌فرض به عنوان دستگاه وی‌سی‌دی‌خوان استفاده می‌شود."
 
 #: src/libvlc-module.c:791 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
-msgstr "این دستگاه سی‌دی صوتی مورد استفادهٔ پیش‌فرض است."
+msgstr ""
+"این دستگاه به صورت پیش‌فرض به عنوان دستگاه خوانش سی‌دی صوتی استفاده می‌شود."
 
 #: src/libvlc-module.c:805
 msgid "TCP connection timeout"
@@ -3033,7 +3072,7 @@ msgstr ""
 
 #: src/libvlc-module.c:809
 msgid "HTTP server address"
-msgstr ""
+msgstr "نشانی سرور HTTP"
 
 #: src/libvlc-module.c:811
 msgid ""
@@ -3044,7 +3083,7 @@ msgstr ""
 
 #: src/libvlc-module.c:815
 msgid "RTSP server address"
-msgstr ""
+msgstr "نشانی سرور RTSP"
 
 #: src/libvlc-module.c:817
 msgid ""
@@ -3057,7 +3096,7 @@ msgstr ""
 
 #: src/libvlc-module.c:823
 msgid "HTTP server port"
-msgstr ""
+msgstr "درگاه سرور HTTP"
 
 #: src/libvlc-module.c:825
 msgid ""
@@ -3068,7 +3107,7 @@ msgstr ""
 
 #: src/libvlc-module.c:830
 msgid "HTTPS server port"
-msgstr ""
+msgstr "درگاه سرور HTTPS"
 
 #: src/libvlc-module.c:832
 msgid ""
@@ -3079,7 +3118,7 @@ msgstr ""
 
 #: src/libvlc-module.c:837
 msgid "RTSP server port"
-msgstr ""
+msgstr "درگاه سرور RTSP"
 
 #: src/libvlc-module.c:839
 msgid ""
@@ -3090,7 +3129,7 @@ msgstr ""
 
 #: src/libvlc-module.c:844
 msgid "HTTP/TLS server certificate"
-msgstr ""
+msgstr "گواهی سرور HTTP/TLS"
 
 #: src/libvlc-module.c:846
 msgid ""
@@ -3100,21 +3139,23 @@ msgstr ""
 
 #: src/libvlc-module.c:849
 msgid "HTTP/TLS server private key"
-msgstr ""
+msgstr "کلید خصوصی سرور HTTP/TLS"
 
 #: src/libvlc-module.c:851
 msgid "This private key file (PEM format) is used for server-side TLS."
-msgstr ""
+msgstr "این پروندهٔ کلید خصوصی (قالب PEM) برای TLS در سمت سرور استفاده می‌شود."
 
 #: src/libvlc-module.c:853
 msgid "SOCKS server"
-msgstr ""
+msgstr "سرور SOCKS"
 
 #: src/libvlc-module.c:855
 msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
+"سرور پراکسی SOCKS. باید در قالب address:port باشد. این تنظیم برای همهٔ "
+"اتصالات TCP استفاده می‌شود."
 
 #: src/libvlc-module.c:858
 msgid "SOCKS user name"
@@ -3122,15 +3163,15 @@ msgstr "نام کاربری SOCKS"
 
 #: src/libvlc-module.c:860
 msgid "User name to be used for connection to the SOCKS proxy."
-msgstr "نام کاربری‌ای که برای اتصال به پیشکار SOCKS استفاده شود."
+msgstr "نام کاربری برای اتصال به پراکسی SOCKS."
 
 #: src/libvlc-module.c:862
 msgid "SOCKS password"
-msgstr "گذرواژهٔ SOCKS"
+msgstr "رمز عبور SOCKS"
 
 #: src/libvlc-module.c:864
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr "گذرواژه‌ای که برای اتصال به پیشکار SOCKS استفاده شود."
+msgstr "رمز عبور برای اتصال به پراکسی SOCKS."
 
 #: src/libvlc-module.c:866
 msgid "Title metadata"
@@ -3150,7 +3191,7 @@ msgstr ""
 
 #: src/libvlc-module.c:874
 msgid "Artist metadata"
-msgstr ""
+msgstr "متادادهٔ هنرمند"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify an \"artist\" metadata for an input."
@@ -3158,7 +3199,7 @@ msgstr ""
 
 #: src/libvlc-module.c:878
 msgid "Genre metadata"
-msgstr ""
+msgstr "متادادهٔ سبک"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify a \"genre\" metadata for an input."
@@ -3166,7 +3207,7 @@ msgstr ""
 
 #: src/libvlc-module.c:882
 msgid "Copyright metadata"
-msgstr "متادادهٔ حق تکثیر"
+msgstr "متادادهٔ حق نشر"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"copyright\" metadata for an input."
@@ -3190,7 +3231,7 @@ msgstr ""
 
 #: src/libvlc-module.c:894
 msgid "URL metadata"
-msgstr "متادادهٔ نشانی"
+msgstr "متادادهٔ نشانی اینترنتی"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"url\" metadata for an input."
@@ -3202,6 +3243,9 @@ msgid ""
 "(decompression methods). Only advanced users should alter this option as it "
 "can break playback of all your streams."
 msgstr ""
+"با این گزینه می‌توانید شیوهٔ انتخاب کدگشاها توسط وی‌ال‌سی را تغییر دهید. فقط "
+"کاربران حرفه‌ای باید این گزینه را تغییر دهند زیرا تنظیم اشتباه سبب ایجاد "
+"اختلال در همهٔ جریان‌ها می‌شود."
 
 #: src/libvlc-module.c:904
 msgid "Preferred decoders list"
@@ -3213,6 +3257,10 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
+"فهرست کدگشاهایی که وی‌ال‌سی به ترتیب اولویت استفاده می‌کند. مثلا dummy,a52 باعث "
+"می‌شود که وی‌ال‌سی قبل از بقیه موارد ابتدا dummy و a52 را استفاده کند. فقط "
+"کاربران حرفه‌ای باید این گزینه را تغییر دهند زیرا تنظیم اشتباه سبب ایجاد "
+"اختلال در همهٔ جریان‌ها می‌شود."
 
 #: src/libvlc-module.c:911
 msgid "Preferred encoders list"
@@ -3253,11 +3301,11 @@ msgstr ""
 
 #: src/libvlc-module.c:933
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr ""
+msgstr "جاری‌سازی همهٔ جریان‌های پایه (ویدئو، صدا و زیرنویس)"
 
 #: src/libvlc-module.c:935
 msgid "Display while streaming"
-msgstr "نمایش در حال جریان‌سازی"
+msgstr "نمایش در حین جاری‌سازی"
 
 #: src/libvlc-module.c:937
 msgid "Play locally the stream while streaming it."
@@ -3295,7 +3343,7 @@ msgstr ""
 
 #: src/libvlc-module.c:954
 msgid "Keep stream output open"
-msgstr "باز نگاه داشتن خروجی جریان"
+msgstr "باز نگه‌داشتن خروجی جریان"
 
 #: src/libvlc-module.c:956
 msgid ""
@@ -3316,12 +3364,12 @@ msgstr ""
 
 #: src/libvlc-module.c:965
 msgid "Preferred packetizer list"
-msgstr ""
+msgstr "فهرست بسته‌ساز مرجح"
 
 #: src/libvlc-module.c:967
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
-msgstr ""
+msgstr "ترتیب انتخاب بسته‌سازها را برای وی‌ال‌سی معین می‌کند."
 
 #: src/libvlc-module.c:970
 msgid "Mux module"
@@ -3360,6 +3408,8 @@ msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
+"با این گزینه‌ها پیمانه‌های پیش‌فرض را انتخاب کنید. این قسمت را رها کنید مگر "
+"اینکه واقعا بدانید چه می‌کنید."
 
 #: src/libvlc-module.c:997
 msgid "Access module"
@@ -3374,26 +3424,30 @@ msgstr ""
 
 #: src/libvlc-module.c:1003
 msgid "Stream filter module"
-msgstr ""
+msgstr "پیمانه پالایش جریان"
 
 #: src/libvlc-module.c:1005
 #, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "پالایه‌های ویدئویی برای پالایش جریان ویدئو به کار می‌روند."
+msgstr ""
+"پالایه‌های جریان برای ویرایش جریان‌هایی که در حال خوانده شدن هستند استفاده "
+"می‌شود."
 
 #: src/libvlc-module.c:1007
 #, fuzzy
 msgid "Demux filter module"
-msgstr "پیمانهٔ پالایه ویدئو"
+msgstr "پیمانه پالایش جریان"
 
 #: src/libvlc-module.c:1009
 #, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "پالایه‌های ویدئویی برای پالایش جریان ویدئو به کار می‌روند."
+msgstr ""
+"پالایه‌های جریان برای ویرایش جریان‌هایی که در حال خوانده شدن هستند استفاده "
+"می‌شود."
 
 #: src/libvlc-module.c:1011
 msgid "Demux module"
-msgstr ""
+msgstr "پیمانه واتافتن"
 
 #: src/libvlc-module.c:1013
 msgid ""
@@ -3402,20 +3456,27 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
+"واتافتگرها برای تفکیک جریان‌های پایه (مانند جریان‌های صدا و تصویر) به کار "
+"می‌روند. اگر واتافتگر مناسب به صورت خودکار پیدا نشد از این گزینه استفاده "
+"کنید. این را به عنوان گزینه‌ای سراسری تنظیم نکنید مگر اینکه واقعا بدانید چه "
+"می‌کنید."
 
 #: src/libvlc-module.c:1018
 msgid "VoD server module"
-msgstr ""
+msgstr "پیمانه سرور VoD"
 
 #: src/libvlc-module.c:1020
+#, fuzzy
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"می‌توانید پیمانه سرور VoD مورد استفاده را انتخاب کنید. برای تغییر به پیمانهٔ "
+"قدیمی این را روی vod_rtsp تنظیم کنید."
 
 #: src/libvlc-module.c:1023
 msgid "Allow real-time priority"
-msgstr ""
+msgstr "اولویت‌دهی بی‌درنگ مجاز باشد."
 
 #: src/libvlc-module.c:1025
 msgid ""
@@ -3424,10 +3485,14 @@ msgid ""
 "however lock up your whole machine, or make it very very slow. You should "
 "only activate this if you know what you're doing."
 msgstr ""
+"اجرای وی‌ال‌سی با اولویت بی‌درنگ باعث زمانبندی بسیار دقیق‌تر می‌شود و بازده بهتری "
+"دارد، مخصوصا در حین جاری‌سازی محتوا. ولی به هر حال این کار شاید سبب هنگ کردن "
+"کل رایانه شود، یا آن را به شدت کند کنَد. این را فقط زمانی فعال کنید که واقعا "
+"بدانید چه می‌کنید."
 
 #: src/libvlc-module.c:1031
 msgid "Adjust VLC priority"
-msgstr ""
+msgstr "تنظیم اولویت وی‌ال‌سی"
 
 #: src/libvlc-module.c:1033
 msgid ""
@@ -3440,6 +3505,8 @@ msgstr ""
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr ""
+"اگر می‌خواهید هنگام خواندن یک جریان با تاخیر کمتری مواجه شوید این گزینه مفید "
+"است."
 
 #: src/libvlc-module.c:1041
 msgid "VLM configuration file"
@@ -3470,7 +3537,7 @@ msgstr ""
 #: src/libvlc-module.c:1054
 #, fuzzy
 msgid "Preferred keystore list"
-msgstr "فهرست کدگشاهای مرجح"
+msgstr "فهرست بسته‌ساز مرجح"
 
 #: src/libvlc-module.c:1056
 msgid ""
@@ -3480,15 +3547,15 @@ msgstr ""
 
 #: src/libvlc-module.c:1059
 msgid "Locally collect statistics"
-msgstr ""
+msgstr "جمع‌آوری آمار محلی"
 
 #: src/libvlc-module.c:1061
 msgid "Collect miscellaneous local statistics about the playing media."
-msgstr ""
+msgstr "جمع‌آوری آمار محلی متفرقه درباره پخش رسانه."
 
 #: src/libvlc-module.c:1063
 msgid "Run as daemon process"
-msgstr "اجرای به صورت شبح"
+msgstr "اجرا به صورت شبح"
 
 #: src/libvlc-module.c:1065
 msgid "Runs VLC as a background daemon process."
@@ -3504,7 +3571,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1071
 msgid "Allow only one running instance"
-msgstr "فقط یک نمونه اجرا شود"
+msgstr "فقط اجرای یک نمونه مجاز باشد"
 
 #: src/libvlc-module.c:1073
 msgid ""
@@ -3514,20 +3581,25 @@ msgid ""
 "This option will allow you to play the file with the already running "
 "instance or enqueue it."
 msgstr ""
+"گاهی اجرای فقط یک نمونه از وی‌ال‌سی مفید است؛ مثلا زمانی که وی‌ال‌سی و بعضی از "
+"انواع رسانه را به هم وابسته کرده‌اید و نمی‌خواهید هر بار که پرونده‌ای را باز "
+"می‌کنید نمونه‌ی جدیدی از وی‌ال‌سی باز شود. این گزینه این امکان را اختیارتان "
+"می‌گذارد که پرونده را در نمونه‌ای که هم‌اکنون در حال اجرا است پخش کنید و یا آن "
+"را در صف پخش قرار دهید."
 
 #: src/libvlc-module.c:1079
 msgid "VLC is started from file association"
-msgstr "به دلیل اجرای پرونده آغاز می‌شود VLC"
+msgstr "وی‌ال‌سی به دلیل اجرای پرونده آغاز شده"
 
 #: src/libvlc-module.c:1081
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr ""
-"به وی‌ال‌سی گفته شود به دلیل اتحادش با یک نوع پرونده در سیستم‌عامل راه‌اندازی "
-"می‌شود"
+"به وی‌ال‌سی می‌گوید که به دلیل وابستگی به یک نوع پرونده در سیستم‌عامل اجرا شده "
+"است."
 
 #: src/libvlc-module.c:1084 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Use only one instance when started from file manager"
-msgstr ""
+msgstr "در صورت اجرا از طریق مدیر پرونده فقط از یک نمونه از برنامه استفاده شود"
 
 #: src/libvlc-module.c:1086
 msgid "Increase the priority of the process"
@@ -3545,13 +3617,15 @@ msgstr ""
 
 #: src/libvlc-module.c:1096 modules/gui/qt/ui/sprefs_interface.h:554
 msgid "Enqueue items into playlist in one instance mode"
-msgstr ""
+msgstr "در حالت تک نمونه‌ای موارد را در فهرست پخش به صف کن."
 
 #: src/libvlc-module.c:1098
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
+"در صورت استفاده از گزینه تک نمونه‌ای، موارد جدید را در فهرست پخش به صف کن و "
+"به پخش مورد فعلی ادامه بده."
 
 #: src/libvlc-module.c:1101
 msgid "Expose media player via D-Bus"
@@ -3568,17 +3642,22 @@ msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
 msgstr ""
+"این گزینه‌ها رفتار فهرست پخش را تعریف می‌کنند. می‌توانید بعضی از آنها را از "
+"داخل پنجرهٔ فهرست پخش تنظیم کنید."
 
 #: src/libvlc-module.c:1114
 #, fuzzy
 msgid "Automatically preparse items"
-msgstr "حاشیه‌گیری خودکار"
+msgstr "پیش‌تجزیهٔ خودکار پرونده‌ها"
 
 #: src/libvlc-module.c:1116
+#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
+"پرونده‌های اضافه شده به فهرست پخش را به صورت خودکار تجزیه و تحلیل می‌کند (برای "
+"بازیابی متاداده‌ها)"
 
 #: src/libvlc-module.c:1119
 #, fuzzy
@@ -3630,7 +3709,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "نمایش تنظیمات"
+msgstr "پالایه‌های صدا"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -3690,11 +3769,11 @@ msgstr "وقتی مورد دیگری در فهرست پخش نیست خارج ش
 
 #: src/libvlc-module.c:1173
 msgid "Play and pause"
-msgstr ""
+msgstr "پخش و مکث"
 
 #: src/libvlc-module.c:1175
 msgid "Pause each item in the playlist on the last frame."
-msgstr ""
+msgstr "هر مورد فهرست پخش را روی آخرین فریم نگه دار."
 
 #: src/libvlc-module.c:1177
 #, fuzzy
@@ -3702,8 +3781,9 @@ msgid "Start paused"
 msgstr "زمان آغاز"
 
 #: src/libvlc-module.c:1179
+#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "هر مورد فهرست پخش را روی آخرین فریم نگه دار."
 
 #: src/libvlc-module.c:1181
 msgid "Auto start"
@@ -3711,7 +3791,7 @@ msgstr "آغاز خودکار"
 
 #: src/libvlc-module.c:1182
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr ""
+msgstr "هرگاه فهرست پخش بارگذاری شد موارد فهرست را به صورت خودکار پخش کن."
 
 #: src/libvlc-module.c:1185
 msgid "Pause on audio communication"
@@ -3735,27 +3815,29 @@ msgstr ""
 
 #: src/libvlc-module.c:1195 modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Display playlist tree"
-msgstr "نمايش فهرست پخش"
+msgstr "نمايش درختواره فهرست پخش"
 
 #: src/libvlc-module.c:1197
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr ""
+"فهرست پخش امکان دسته‌بندی موارد را با استفاده از درختواره دارد، مانند محتویات "
+"یک شاخه."
 
 #: src/libvlc-module.c:1206
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr ""
-"این تنظیمات مقیدسازی‌های کلیدی سراسری وی‌ال‌سی هستند که «میان‌بر» نامیده می‌شوند."
+"این تنظیمات مقیدسازی‌های کلیدی سراسری وی‌ال‌سی هستند که «میانبر» نامیده می‌شوند."
 
 #: src/libvlc-module.c:1211 modules/gui/macosx/VLCMain+OldPrefs.m:103
 msgid "Ignore"
-msgstr ""
+msgstr "نادیده گرفتن"
 
 #: src/libvlc-module.c:1211
 #, fuzzy
 msgid "Volume control"
-msgstr "کم کردن صدا"
+msgstr "کنترل شدت صدا"
 
 #: src/libvlc-module.c:1212
 #, fuzzy
@@ -3796,15 +3878,15 @@ msgstr "تمام‌صفحه"
 
 #: src/libvlc-module.c:1224
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr "میان‌بر مورد استفاده برای تعویض حالت پخش تمام‌صفحه را انتخاب کنید."
+msgstr "میانبر مورد استفاده برای تعویض حالت پخش تمام‌صفحه را انتخاب کنید."
 
 #: src/libvlc-module.c:1225
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "خروج از حالت تمام‌صفحه"
 
 #: src/libvlc-module.c:1226
 msgid "Select the hotkey to use to exit fullscreen state."
-msgstr ""
+msgstr "کلید میانبر مورد استفاده برای خروج از حالت تمام‌صفحه را انتخاب کنید."
 
 #: src/libvlc-module.c:1227 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
@@ -3812,7 +3894,7 @@ msgstr "پخش/مکث"
 
 #: src/libvlc-module.c:1228
 msgid "Select the hotkey to use to swap paused state."
-msgstr "میان‌بر مورد استفاده برای تعویض وضعیت مکث را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای تعویض وضعیت مکث را انتخاب کنید."
 
 #: src/libvlc-module.c:1229
 msgid "Pause only"
@@ -3820,7 +3902,7 @@ msgstr "فقط مکث"
 
 #: src/libvlc-module.c:1230
 msgid "Select the hotkey to use to pause."
-msgstr "میان‌بر مورد استفاده برای مکث را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای مکث را انتخاب کنید."
 
 #: src/libvlc-module.c:1231
 msgid "Play only"
@@ -3828,7 +3910,7 @@ msgstr "فقط پخش"
 
 #: src/libvlc-module.c:1232
 msgid "Select the hotkey to use to play."
-msgstr "میان‌بر مورد استفاده برای پخش را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای پخش را انتخاب کنید."
 
 #: src/libvlc-module.c:1233 modules/gui/macosx/VLCMainMenu.m:385
 #: modules/gui/qt/components/controller.hpp:108
@@ -3838,7 +3920,7 @@ msgstr "سریع‌تر"
 
 #: src/libvlc-module.c:1234 src/libvlc-module.c:1240
 msgid "Select the hotkey to use for fast forward playback."
-msgstr "میان‌بر مورد استفاده برای پخش با حرکت سریع را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای پخش سریع را انتخاب کنید."
 
 #: src/libvlc-module.c:1235 modules/gui/macosx/VLCMainMenu.m:383
 #: modules/gui/qt/components/controller.hpp:108
@@ -3848,23 +3930,23 @@ msgstr "آهسته‌تر"
 
 #: src/libvlc-module.c:1236 src/libvlc-module.c:1242
 msgid "Select the hotkey to use for slow motion playback."
-msgstr "میان‌بر مورد استفاده برای پخش با حرکت آهسته را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای پخش آهسته را انتخاب کنید."
 
 #: src/libvlc-module.c:1237
 msgid "Normal rate"
-msgstr ""
+msgstr "طبیعی"
 
 #: src/libvlc-module.c:1238
 msgid "Select the hotkey to set the playback rate back to normal."
-msgstr ""
+msgstr "کلید میانبر مورد استفاده برای پخش با سرعت طبیعی را انتخاب کنید."
 
 #: src/libvlc-module.c:1239 modules/gui/qt/menus.cpp:875
 msgid "Faster (fine)"
-msgstr ""
+msgstr "سریع‌تر (خوب)"
 
 #: src/libvlc-module.c:1241 modules/gui/qt/menus.cpp:883
 msgid "Slower (fine)"
-msgstr ""
+msgstr "آهسته‌تر (خوب)"
 
 #: src/libvlc-module.c:1243 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
@@ -3880,7 +3962,7 @@ msgstr "بعدی"
 #: src/libvlc-module.c:1244
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
-"میان‌بر مورد استفاده برای گذشتن از مورد بعدی در فهرست پخش را انتخاب کنید."
+"کلید میانبر مورد استفاده برای رد کردن مورد بعدی در فهرست پخش را انتخاب کنید."
 
 #: src/libvlc-module.c:1245 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
@@ -3894,7 +3976,7 @@ msgstr "قبلی"
 #: src/libvlc-module.c:1246
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
-"میان‌بر مورد استفاده برای گذشتن از مورد قبلی در فهرست پخش را انتخاب کنید."
+"کلید میانبر مورد استفاده برای رد کردن مورد قبلی در فهرست پخش را انتخاب کنید."
 
 #: src/libvlc-module.c:1247 modules/gui/macosx/VLCMainMenu.m:378
 #: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/macosx/VLCMainMenu.m:495
@@ -3906,7 +3988,7 @@ msgstr "توقف"
 
 #: src/libvlc-module.c:1248
 msgid "Select the hotkey to stop playback."
-msgstr "میان‌بر مورد استفاده برای توقف پخش را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای توقف پخش را انتخاب کنید."
 
 #: src/libvlc-module.c:1249 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
@@ -3920,7 +4002,7 @@ msgstr "موقعیت"
 
 #: src/libvlc-module.c:1250
 msgid "Select the hotkey to display the position."
-msgstr "میان‌بر نمایش موقعیت را انتخاب کنید."
+msgstr "کلید میانبر نمایش موقعیت را انتخاب کنید."
 
 #: src/libvlc-module.c:1252
 msgid "Very short backwards jump"
@@ -3928,7 +4010,7 @@ msgstr "پرش بسیار کوتاه به عقب"
 
 #: src/libvlc-module.c:1254
 msgid "Select the hotkey to make a very short backwards jump."
-msgstr "میان‌بر پرش بسیار کوتاه به عقب را انتخاب کنید."
+msgstr "کلید میانبر پرش بسیار کوتاه به عقب را انتخاب کنید."
 
 #: src/libvlc-module.c:1255
 msgid "Short backwards jump"
@@ -3936,7 +4018,7 @@ msgstr "پرش کوتاه به عقب"
 
 #: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "میان‌بر پرش کوتاه به عقب را انتخاب کنید."
+msgstr "کلید میانبر پرش کوتاه به عقب را انتخاب کنید."
 
 #: src/libvlc-module.c:1258
 msgid "Medium backwards jump"
@@ -3944,7 +4026,7 @@ msgstr "پرش متوسط به عقب"
 
 #: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr "میان‌بر پرش متوسط رو به عقب را انتخاب کنید."
+msgstr "کلید میانبر پرش متوسط رو به عقب را انتخاب کنید."
 
 #: src/libvlc-module.c:1261
 msgid "Long backwards jump"
@@ -3952,7 +4034,7 @@ msgstr "پرش بلند به عقب"
 
 #: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a long backwards jump."
-msgstr "میان‌بر پرش بلند به عقب را انتخاب کنید."
+msgstr "کلید میانبر پرش بلند به عقب را انتخاب کنید."
 
 #: src/libvlc-module.c:1265
 msgid "Very short forward jump"
@@ -3960,7 +4042,7 @@ msgstr "پرش بسیار کوتاه به جلو"
 
 #: src/libvlc-module.c:1267
 msgid "Select the hotkey to make a very short forward jump."
-msgstr "میان‌بر پرش بسیار کوتاه به جلو را انتخاب کنید."
+msgstr "کلید میانبر پرش بسیار کوتاه به جلو را انتخاب کنید."
 
 #: src/libvlc-module.c:1268
 msgid "Short forward jump"
@@ -3968,7 +4050,7 @@ msgstr "پرش کوتاه به جلو"
 
 #: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a short forward jump."
-msgstr "میان‌بر پرش کوتاه به جلو را انتخاب کنید."
+msgstr "کلید میانبر پرش کوتاه به جلو را انتخاب کنید."
 
 #: src/libvlc-module.c:1271
 msgid "Medium forward jump"
@@ -3976,7 +4058,7 @@ msgstr "پرش متوسط به جلو"
 
 #: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a medium forward jump."
-msgstr "میان‌بر پرش متوسط به جلو را انتخاب کنید."
+msgstr "کلید میانبر پرش متوسط به جلو را انتخاب کنید."
 
 #: src/libvlc-module.c:1274
 msgid "Long forward jump"
@@ -3984,15 +4066,15 @@ msgstr "پرش بلند به جلو"
 
 #: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a long forward jump."
-msgstr "میان‌بر پرش بلند به جلو را انتخاب کنید."
+msgstr "کلید میانبر پرش بلند به جلو را انتخاب کنید."
 
 #: src/libvlc-module.c:1277 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr ""
+msgstr "فریم بعدی"
 
 #: src/libvlc-module.c:1279
 msgid "Select the hotkey to got to the next video frame."
-msgstr ""
+msgstr "کلید میانبر رفتن به فریم بعدی ویدئو را انتخاب کنید."
 
 #: src/libvlc-module.c:1281
 msgid "Very short jump length"
@@ -4035,7 +4117,7 @@ msgstr "خروج"
 
 #: src/libvlc-module.c:1291
 msgid "Select the hotkey to quit the application."
-msgstr "میان‌بر مورد استفاده برای خروج از برنامه را انتخاب کنید."
+msgstr "کلید میانبر مورد استفاده برای خروج از برنامه را انتخاب کنید."
 
 #: src/libvlc-module.c:1292
 msgid "Navigate up"
@@ -4047,7 +4129,8 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
-"میان‌بر مورد استفاده برای بالا بردن مکان‌نما در منوی دی‌وی‌دی را انتخاب کنید."
+"کلید میانبر مورد استفاده برای بالا بردن مکان‌نما در منوی دی‌وی‌دی را انتخاب "
+"کنید."
 
 #: src/libvlc-module.c:1294
 msgid "Navigate down"
@@ -4059,7 +4142,8 @@ msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
-"میان‌بر مورد استفاده برای پایین بردن مکان‌نما در منوی دی‌وی‌دی را انتخاب کنید."
+"کلید میانبر مورد استفاده برای پایین بردن مکان‌نما در منوی دی‌وی‌دی را انتخاب "
+"کنید."
 
 #: src/libvlc-module.c:1296
 msgid "Navigate left"
@@ -4071,7 +4155,8 @@ msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
-"میان‌بر مورد استفاده برای بردن مکان‌نما به چپ در منوی دی‌وی‌دی را انتخاب کنید."
+"کلید میانبر مورد استفاده برای بردن مکان‌نما به چپ در منوی دی‌وی‌دی را انتخاب "
+"کنید."
 
 #: src/libvlc-module.c:1298
 msgid "Navigate right"
@@ -4083,7 +4168,8 @@ msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
-"میان‌بر مورد استفاده برای بردن مکان‌نما به راست در منوی دی‌وی‌دی را انتخاب کنید."
+"کلید میانبر مورد استفاده برای بردن مکان‌نما به راست در منوی دی‌وی‌دی را انتخاب "
+"کنید."
 
 #: src/libvlc-module.c:1300
 msgid "Activate"
@@ -4091,7 +4177,8 @@ msgstr "فعال‌سازی"
 
 #: src/libvlc-module.c:1301
 msgid "Select the key to activate selected item in DVD menus."
-msgstr "میان‌بر مورد استفاده برای فعال‌سازی مورد در منوی دی‌وی‌دی را انتخاب کنید."
+msgstr ""
+"کلید میانبر مورد استفاده برای فعال‌سازی مورد در منوی دی‌وی‌دی را انتخاب کنید."
 
 #: src/libvlc-module.c:1302 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
@@ -4099,7 +4186,7 @@ msgstr "رفتن به منوی دی‌وی‌دی"
 
 #: src/libvlc-module.c:1303
 msgid "Select the key to take you to the DVD menu"
-msgstr "میان‌بر مورد استفاده برای رفتن به منوی دی‌وی‌دی را انتخاب کنید"
+msgstr "کلید میانبر مورد استفاده برای رفتن به منوی دی‌وی‌دی را انتخاب کنید"
 
 #: src/libvlc-module.c:1304
 msgid "Select previous DVD title"
@@ -4194,7 +4281,7 @@ msgstr "فعال کردن زیرنویس"
 #: src/libvlc-module.c:1325
 #, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "کلید افزایش تأخیر زیرنویس را انتخاب کنید."
+msgstr "کلید بالا بردن موقعیت زیرنویس را انتخاب کنید."
 
 #: src/libvlc-module.c:1326
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4230,19 +4317,19 @@ msgstr ""
 
 #: src/libvlc-module.c:1334
 msgid "Subtitle position up"
-msgstr ""
+msgstr "بالا بردن موقعیت زیرنویس"
 
 #: src/libvlc-module.c:1335
 msgid "Select the key to move subtitles higher."
-msgstr ""
+msgstr "کلید بالا بردن موقعیت زیرنویس را انتخاب کنید."
 
 #: src/libvlc-module.c:1336
 msgid "Subtitle position down"
-msgstr ""
+msgstr "پایین آوردن موقعیت زیرنویس"
 
 #: src/libvlc-module.c:1337
 msgid "Select the key to move subtitles lower."
-msgstr ""
+msgstr "کلید پایین آوردن موقعیت زیرنویس را انتخاب کنید."
 
 #: src/libvlc-module.c:1338
 msgid "Audio delay up"
@@ -4351,11 +4438,11 @@ msgstr "کلید تنظیم این نشانک فهرست پخش را انتخا�
 #: src/libvlc-module.c:1370
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
-msgstr ""
+msgstr "پاک کردن فهرست پخش"
 
 #: src/libvlc-module.c:1371
 msgid "Select the key to clear the current playlist."
-msgstr ""
+msgstr "کلید پاک کردن فهرست پخش جاری را انتخاب کنید."
 
 #: src/libvlc-module.c:1373
 msgid "Playlist bookmark 1"
@@ -4403,39 +4490,37 @@ msgstr "به این ترتیب می‌توانید نشانک‌های فهرس�
 
 #: src/libvlc-module.c:1386
 msgid "Cycle audio track"
-msgstr "چرخش در شیار صوتی"
+msgstr "چرخش در قطعه صوتی"
 
 #: src/libvlc-module.c:1387
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "چرخیدن در شیارهای صوتی (زبان‌های) موجود"
+msgstr "چرخیدن در قطعه‌های صوتی (زبان‌های) موجود"
 
 #: src/libvlc-module.c:1388
 #, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "چرخش در شیار زیرنویس"
+msgstr "چرخش در قطعه زیرنویس"
 
 #: src/libvlc-module.c:1389
 #, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "چرخیدن در شیارهای زیرنویس موجود."
+msgstr "چرخیدن در قطعه‌های زیرنویس موجود."
 
 #: src/libvlc-module.c:1390
 msgid "Cycle subtitle track"
-msgstr "چرخش در شیار زیرنویس"
+msgstr "چرخش در قطعه زیرنویس"
 
 #: src/libvlc-module.c:1391
 msgid "Cycle through the available subtitle tracks."
-msgstr "چرخیدن در شیارهای زیرنویس موجود."
+msgstr "چرخیدن در قطعه‌های زیرنویس موجود."
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "فعال کردن زیرنویس"
+msgstr ""
 
 #: src/libvlc-module.c:1393
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "چرخش در شیار زیرنویس"
+msgstr ""
 
 #: src/libvlc-module.c:1394
 msgid "Cycle next program Service ID"
@@ -4471,27 +4556,27 @@ msgstr "چرخیدن در فهرست از پیش تعیین شدهٔ قالب‌
 
 #: src/libvlc-module.c:1402
 msgid "Toggle autoscaling"
-msgstr ""
+msgstr "تغییر وضعیت نسبت‌بندی خودکار"
 
 #: src/libvlc-module.c:1403
 msgid "Activate or deactivate autoscaling."
-msgstr ""
+msgstr " فعال یا غیرفعال کردن نسبت‌بندی خودکار"
 
 #: src/libvlc-module.c:1404
 msgid "Increase scale factor"
-msgstr ""
+msgstr "افزایش عامل نسبت"
 
 #: src/libvlc-module.c:1406
 msgid "Decrease scale factor"
-msgstr ""
+msgstr "کاهش عامل نسبت"
 
 #: src/libvlc-module.c:1408
 msgid "Toggle deinterlacing"
-msgstr ""
+msgstr "تغییر وضعیت نادرهم‌بافی"
 
 #: src/libvlc-module.c:1409
 msgid "Activate or deactivate deinterlacing."
-msgstr ""
+msgstr "فعال یا غیرفعال کردن نادرهم‌بافی"
 
 #: src/libvlc-module.c:1410
 msgid "Cycle deinterlace modes"
@@ -4499,27 +4584,27 @@ msgstr "چرخش در حالت‌های نادرهم‌بافی"
 
 #: src/libvlc-module.c:1411
 msgid "Cycle through available deinterlace modes."
-msgstr ""
+msgstr "چرخیدن بین حالت‌های نادرهم‌بافی موجود"
 
 #: src/libvlc-module.c:1412
 msgid "Show controller in fullscreen"
-msgstr ""
+msgstr "نمایش دکمه‌های کنترلی در حالت تمام‌صفحه"
 
 #: src/libvlc-module.c:1413
 msgid "Boss key"
-msgstr ""
+msgstr "کلید مخفی کردن"
 
 #: src/libvlc-module.c:1414
 msgid "Hide the interface and pause playback."
-msgstr ""
+msgstr "مخفی کردن واسط کاربری و مکث در پخش"
 
 #: src/libvlc-module.c:1415
 msgid "Context menu"
-msgstr ""
+msgstr "منوی زمینه"
 
 #: src/libvlc-module.c:1416
 msgid "Show the contextual popup menu."
-msgstr ""
+msgstr "نمایش منوی زمینه"
 
 #: src/libvlc-module.c:1417
 msgid "Take video snapshot"
@@ -4527,7 +4612,7 @@ msgstr "عکس گرفتن از ویدئو"
 
 #: src/libvlc-module.c:1418
 msgid "Takes a video snapshot and writes it to disk."
-msgstr "یک عکس از ویدئو می‌گیرد و آن را در دیسک ذخیره می‌کند."
+msgstr "از ویدئو عکس می‌گیرد و آن را در دیسک ذخیره می‌کند."
 
 #: src/libvlc-module.c:1420 modules/gui/macosx/VLCMainMenu.m:379
 #: modules/gui/qt/components/controller.hpp:110
@@ -4538,7 +4623,7 @@ msgstr "ضبط"
 
 #: src/libvlc-module.c:1421
 msgid "Record access filter start/stop."
-msgstr "آغاز/توقف صافی دسترسی ضبط."
+msgstr "آغاز/توقف پالایه دسترسی ضبط."
 
 #: src/libvlc-module.c:1423
 msgid "Normal/Loop/Repeat"
@@ -4550,7 +4635,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1427
 msgid "Toggle random playlist playback"
-msgstr ""
+msgstr "تغییر حالت پخش تصادفی"
 
 #: src/libvlc-module.c:1432 src/libvlc-module.c:1433
 msgid "Un-Zoom"
@@ -4606,19 +4691,19 @@ msgstr ""
 
 #: src/libvlc-module.c:1461
 msgid "Toggle wallpaper mode in video output"
-msgstr ""
+msgstr "تغییر وضعیت پخش ویدئو روی پس‌زمینه"
 
 #: src/libvlc-module.c:1463
 msgid "Toggle wallpaper mode in video output."
-msgstr ""
+msgstr "تغییر وضعیت پخش ویدئو روی پس‌زمینهٔ صفحه نمایش"
 
 #: src/libvlc-module.c:1465
 msgid "Cycle through audio devices"
-msgstr ""
+msgstr "چرخش بین دستگاه‌های صوتی"
 
 #: src/libvlc-module.c:1466
 msgid "Cycle through available audio devices"
-msgstr ""
+msgstr "چرخیدن بین دستگاه‌های صوتی موجود"
 
 #: src/libvlc-module.c:1595 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:502
@@ -4652,7 +4737,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1710
 msgid "Track settings"
-msgstr "تنظیمات شیار"
+msgstr "تنظیمات قطعه"
 
 #: src/libvlc-module.c:1750 modules/gui/macosx/VLCSimplePrefsController.m:309
 msgid "Playback control"
@@ -4701,11 +4786,11 @@ msgstr "گزینه‌های کارآیی"
 
 #: src/libvlc-module.c:2047
 msgid "Clock source"
-msgstr ""
+msgstr "منبع ساعت"
 
 #: src/libvlc-module.c:2165
 msgid "Hot keys"
-msgstr "میان‌برها"
+msgstr "میانبرها"
 
 #: src/libvlc-module.c:2655
 msgid "Jump sizes"
@@ -4714,10 +4799,11 @@ msgstr "اندازهٔ پرش‌ها"
 #: src/libvlc-module.c:2740
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
+"چاپ راهنما برای وی‌ال‌سی (می‌تواند با ‎--advanced و ‎--help-verbose ترکیب شود)"
 
 #: src/libvlc-module.c:2743
 msgid "Exhaustive help for VLC and its modules"
-msgstr ""
+msgstr "راهنمایی جامع برای وی‌ال‌سی و پیمانه‌هایش"
 
 #: src/libvlc-module.c:2745
 msgid ""
@@ -4753,7 +4839,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2762
 msgid "use alternate config file"
-msgstr ""
+msgstr "استفاده از فابل کانفیگ دیگر"
 
 #: src/libvlc-module.c:2764
 msgid "resets the current plugins cache"
@@ -4764,17 +4850,16 @@ msgid "print version information"
 msgstr ""
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "برنامهٔ اصلی"
+msgstr "هسته برنامه"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
-msgstr "پس‌بَر"
+msgstr "پس‌بر"
 
 #: src/misc/actions.c:53
 msgid "Brightness Down"
-msgstr "کاستن روشنایی"
+msgstr "کاهش روشنایی"
 
 #: src/misc/actions.c:54
 msgid "Brightness Up"
@@ -4949,11 +5034,11 @@ msgstr "Media Stop"
 
 #: src/misc/actions.c:97
 msgid "Media Subtitle"
-msgstr "Media Subtitle"
+msgstr "رسانه زیرنویس"
 
 #: src/misc/actions.c:98
 msgid "Media Time"
-msgstr "زمان رسانه"
+msgstr "Media Time"
 
 #: src/misc/actions.c:99
 msgid "Media View"
@@ -4965,19 +5050,19 @@ msgstr "Menu"
 
 #: src/misc/actions.c:101
 msgid "Mouse Wheel Down"
-msgstr "حرکت موشی به پایین"
+msgstr "حرکت ماوس به پایین"
 
 #: src/misc/actions.c:102
 msgid "Mouse Wheel Left"
-msgstr "حرکت موشی به چپ"
+msgstr "حرکت ماوس به چپ"
 
 #: src/misc/actions.c:103
 msgid "Mouse Wheel Right"
-msgstr "حرکت موشی به راست"
+msgstr "حرکت ماوس به راست"
 
 #: src/misc/actions.c:104
 msgid "Mouse Wheel Up"
-msgstr "حرکت موشی به بالا"
+msgstr "حرکت ماوس به بالا"
 
 #: src/misc/actions.c:105
 msgid "Page Down"
@@ -4998,7 +5083,7 @@ msgstr "مکث"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "چاپ"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -5076,7 +5161,7 @@ msgstr ""
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
-msgstr ""
+msgstr "ذخیره فایل نا موفق بود"
 
 #: src/misc/update.c:581
 #, c-format
@@ -5165,18 +5250,21 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr ""
 
 #: src/misc/update.c:723
+#, fuzzy
 msgid ""
 "The new version was successfully downloaded.Do you want to close VLC and "
 "install it now?"
 msgstr ""
+"نسخه جدید VLC با موفقیت بارگذاری شد. آیا می خواهید با بستن VLC همین حالا "
+"اقدام به نصب کنید؟"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
-msgstr ""
+msgstr "نصب"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
-msgstr ""
+msgstr "به روزرسانی پخش کننده VLC"
 
 #: src/playlist/engine.c:237 src/playlist/loadsave.c:159 lib/media_list.c:237
 #: modules/gui/macosx/VLCMainWindow.m:298
@@ -5187,7 +5275,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
-msgstr ""
+msgstr "بعد"
 
 #: src/text/iso-639_def.h:41
 msgid "Abkhazian"
@@ -5947,9 +6035,8 @@ msgid "libavformat AVIO access"
 msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "دسترسی به خروجی"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
@@ -5960,9 +6047,8 @@ msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr ""
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "کُدک ویدئو"
+msgstr "کد منطقه‌ای"
 
 #: modules/access/bluray.c:72
 msgid ""
@@ -5973,7 +6059,7 @@ msgstr ""
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
 msgid "Blu-ray"
-msgstr ""
+msgstr "بلوری"
 
 #: modules/access/bluray.c:93
 msgid "Blu-ray Disc support (libbluray)"
@@ -5981,7 +6067,7 @@ msgstr ""
 
 #: modules/access/bluray.c:715
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "مسیر مربوط به یک بلوری نمی‌باشد"
 
 #: modules/access/bluray.c:730
 msgid ""
@@ -6048,13 +6134,12 @@ msgid "Blu-ray error"
 msgstr ""
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "Menu"
+msgstr ""
 
 #: modules/access/bluray.c:1670
 msgid "First Play"
-msgstr ""
+msgstr "اولین پخش"
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6117,14 +6202,12 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "RDP"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "دیگر پیمانه‌های واسط"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6528,7 +6611,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:41
 msgid "DVB device"
-msgstr ""
+msgstr "دستگاه DVB"
 
 #: modules/access/dtv/access.c:43
 msgid ""
@@ -6712,9 +6795,8 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "پالایه‌های جریان"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -6981,9 +7063,8 @@ msgid "DVDnav Input"
 msgstr "ورودی DVDnav"
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "جداسازها"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -7160,8 +7241,9 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
+#, fuzzy
 msgid "Cookies forwarding"
-msgstr ""
+msgstr "گام به جلو"
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
@@ -7390,7 +7472,7 @@ msgstr ""
 
 #: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:897
 msgid "Auto connection"
-msgstr ""
+msgstr "اتصال خودکار"
 
 #: modules/access/jack.c:64
 msgid "Automatically connect VLC input ports to available output ports."
@@ -7460,7 +7542,7 @@ msgstr ""
 
 #: modules/access/linsys/linsys_sdi.c:83
 msgid "Teletext language"
-msgstr ""
+msgstr "زبان تلتکس"
 
 #: modules/access/linsys/linsys_sdi.c:85
 msgid "Allows you to set Teletext language (page=lang/type,...)."
@@ -7614,9 +7696,9 @@ msgid "File reading failed"
 msgstr ""
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
+msgstr ""
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7739,9 +7821,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -7845,9 +7926,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "تعداد ردیف‌ها"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -8940,14 +9020,14 @@ msgid "VDR recordings"
 msgstr ""
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
+msgstr ""
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
+msgstr "VLC قادر به باز کردن فایل \"%s\" (%s) نیست٫"
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -9020,7 +9100,7 @@ msgstr ""
 #: modules/access/wasapi.c:485
 #, fuzzy
 msgid "Loopback mode"
-msgstr "تکرار یکی"
+msgstr "حلقه / تکرار دوباره"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
@@ -9031,9 +9111,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "خروجی ویدئوی OpenGL"
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9221,9 +9300,8 @@ msgid "Rear center"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "حالت صدای استریو"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -9356,7 +9434,7 @@ msgstr ""
 #: modules/audio_filter/compressor.c:162
 #, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -10069,9 +10147,8 @@ msgid "K Audio Interface audio output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1274
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "خروجی ویدئوی OpenGL"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -10108,9 +10185,8 @@ msgid "This linear gain will be applied in software."
 msgstr ""
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "خروجی ویدئوی OpenGL"
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10637,39 +10713,35 @@ msgid "unknown"
 msgstr ""
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "S-video"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
 msgstr "صدا"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "پالایه‌های جریان"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
 msgid "VA-API video decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr "کدگذار ویدئو"
 
 #: modules/codec/bpg.c:49
 #, fuzzy
 msgid "BPG image decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr "کدگشای زیرنویس DVB"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -10712,9 +10784,8 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "فایل ایندکس"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
@@ -10733,7 +10804,7 @@ msgstr "بسته‌ساز"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "کدگذار ویدئو"
+msgstr "کدگذار ویدئوی تئورا"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -10994,9 +11065,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "کدگشایی"
+msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11016,14 +11086,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr ""
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "کدگذار ویدئو"
+msgstr ""
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11253,7 +11321,7 @@ msgstr ""
 
 #: modules/codec/libass.c:56
 msgid "Subtitles (advanced)"
-msgstr ""
+msgstr "زیرنویس ها (پیشرفته)"
 
 #: modules/codec/libass.c:57
 msgid "Subtitle renderers using libass"
@@ -11290,9 +11358,8 @@ msgid "MPEG audio layer I/II/III decoder"
 msgstr ""
 
 #: modules/codec/mft.c:62
-#, fuzzy
 msgid "Media Foundation Transform decoder"
-msgstr "کدگذار صدا"
+msgstr ""
 
 #: modules/codec/mpg123.c:67
 #, fuzzy
@@ -11328,18 +11395,16 @@ msgid "Opus"
 msgstr ""
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "کدگذار صدای وُربیس"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr ""
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "کدگذار ویدئو"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11543,7 +11608,7 @@ msgstr ""
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "کدگذار ویدئو"
+msgstr "کدگذار ویدئوی تئورا"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12293,14 +12358,12 @@ msgid "USF subtitles decoder"
 msgstr ""
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "کدگشای زیرنویس DVB"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "زیرنویس‌های SVCD"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -12391,7 +12454,7 @@ msgstr ""
 #: modules/codec/ttml/ttml.c:54
 #, fuzzy
 msgid "TTML demuxer"
-msgstr "جداسازها"
+msgstr "واتافتگرها"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12506,14 +12569,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr "کدگذار ویدئوی تئورا"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13468,7 +13530,7 @@ msgstr ""
 #: modules/gui/qt/components/preferences_widgets.cpp:1145
 #: modules/gui/qt/components/simple_preferences.cpp:232
 msgid "Hotkeys"
-msgstr "میان‌برها"
+msgstr "میانبُرها"
 
 #: modules/control/hotkeys.c:101
 msgid "Hotkeys management interface"
@@ -13604,7 +13666,7 @@ msgstr ""
 #: modules/control/hotkeys.c:1355
 #, fuzzy, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "زیرنویس آهنگ"
+msgstr "قطعه زیرنویس"
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -13668,8 +13730,9 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
+#, fuzzy
 msgid "Master server IP address"
-msgstr ""
+msgstr "نشانی سرور HTTP"
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -13686,27 +13749,27 @@ msgstr ""
 
 #: modules/control/netsync.c:70
 msgid "Network Sync"
-msgstr ""
+msgstr "همگام سازی شبکه"
 
 #: modules/control/netsync.c:71
 msgid "Network synchronization"
-msgstr ""
+msgstr "همگام‌سازی شبکه"
 
 #: modules/control/ntservice.c:45
 msgid "Install Windows Service"
-msgstr ""
+msgstr "نصب سرویس ویندوز "
 
 #: modules/control/ntservice.c:47
 msgid "Install the Service and exit."
-msgstr ""
+msgstr "نصب سرویس و خارج شوید."
 
 #: modules/control/ntservice.c:48
 msgid "Uninstall Windows Service"
-msgstr ""
+msgstr "حذف سرویس ویندوز"
 
 #: modules/control/ntservice.c:50
 msgid "Uninstall the Service and exit."
-msgstr ""
+msgstr "حذف سرویس و خارج شوید."
 
 #: modules/control/ntservice.c:51
 msgid "Display name of the Service"
@@ -14022,11 +14085,8 @@ msgid "+----[ end of help ]"
 msgstr ""
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
 msgstr ""
-"\n"
-"برای ادامه کلید RETURN را فشار دهید...\n"
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
@@ -14165,9 +14225,8 @@ msgid "Connect using http access instead of custom http code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "فعال‌سازی"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
@@ -14229,9 +14288,8 @@ msgid "Avformat"
 msgstr ""
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "جداسازها"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14326,9 +14384,8 @@ msgid "Fixing AVI Index..."
 msgstr ""
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "جداسازها"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -14624,9 +14681,8 @@ msgid "H264 video demuxer"
 msgstr ""
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "دستگاه ویدئوی PVR‏"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -14716,9 +14772,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "جریان ثوت"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
 msgid "Use the stream PCR as a reference."
@@ -14744,8 +14799,9 @@ msgid "Main audio"
 msgstr "رمزنگاری صدا"
 
 #: modules/demux/mpeg/ts_psi.c:422
+#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "توضیحی برای این کدک وجود ندارد"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Clean audio for the hearing impaired"
@@ -15068,15 +15124,15 @@ msgstr ""
 
 #: modules/demux/subtitle.c:80 modules/spu/subsdelay.c:275
 msgid "Subtitle delay"
-msgstr ""
+msgstr "تاخیر زمانی زیرنویس"
 
 #: modules/demux/subtitle.c:82
 msgid "Subtitle format"
-msgstr ""
+msgstr "فرمت زیرنویس"
 
 #: modules/demux/subtitle.c:85
 msgid "Subtitle description"
-msgstr ""
+msgstr "توضیحات زیرنویس"
 
 #: modules/demux/tta.c:46
 msgid "TTA demuxer"
@@ -15219,22 +15275,19 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "فهرست پخش"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "یافتن خدمات"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
-#, fuzzy
 msgid "Interfaces"
-msgstr "واسط"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15249,9 +15302,8 @@ msgid "Extensions"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:115
-#, fuzzy
 msgid "Show Installed Only"
-msgstr "واسط"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:117
 #: modules/gui/qt/dialogs/plugins.cpp:423
@@ -15260,16 +15312,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "مدیر ویدئو"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "واسط"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15285,7 +15335,7 @@ msgstr "مؤلف"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
 msgid "Uninstall"
-msgstr ""
+msgstr "حذف"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -15521,7 +15571,7 @@ msgstr ""
 #: modules/gui/macosx/VLCFSPanelController.m:122
 #, fuzzy
 msgid "Seek backward"
-msgstr "یک قدم به عقی"
+msgstr "گام به عقب"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -15534,7 +15584,7 @@ msgstr ""
 #: modules/gui/macosx/VLCFSPanelController.m:119
 #, fuzzy
 msgid "Seek forward"
-msgstr "یک قدم به جلو"
+msgstr "گام به جلو"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
 #, fuzzy
@@ -15617,7 +15667,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
-msgstr ""
+msgstr "ذخیره به عنوان پرونده"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:149
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:392
@@ -15704,7 +15754,7 @@ msgstr "نشانی"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:187
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:189
 #: modules/gui/macosx/VLCOpenWindowController.m:185
@@ -15719,7 +15769,7 @@ msgstr ""
 #: share/lua/http/dialogs/stream_config_window.html:32
 #: share/lua/http/dialogs/stream_window.html:91
 msgid "Port"
-msgstr ""
+msgstr "پورت"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:190
 #: modules/gui/macosx/VLCOutput.m:103
@@ -16077,9 +16127,8 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "واسط‌های کنترلی"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -16087,7 +16136,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:131
 msgid "Use large text for list views"
-msgstr ""
+msgstr "استفاده از متن بزرگ برای نمایش لیست"
 
 #: modules/gui/macosx/macosx.m:136
 msgid "Do nothing"
@@ -16276,12 +16325,13 @@ msgid "Select All"
 msgstr "انتخاب همه"
 
 #: modules/gui/macosx/VLCMainMenu.m:363
+#, fuzzy
 msgid "Find"
-msgstr ""
+msgstr "یافتن: %s"
 
 #: modules/gui/macosx/VLCMainMenu.m:365
 msgid "View"
-msgstr ""
+msgstr "مشاهده"
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "Playlist Table Columns"
@@ -16319,9 +16369,8 @@ msgstr "یک قدم به عقی"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "پرش به زمان"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -16368,7 +16417,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:441
 msgid "Add Subtitle File..."
-msgstr ""
+msgstr "افزودن پرونده زیرنویس..."
 
 #: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
 msgid "Subtitles Track"
@@ -16407,9 +16456,8 @@ msgid "Window"
 msgstr "پنجره"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "حداقل کردن پنجره"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -16601,7 +16649,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
 #, fuzzy, c-format
 msgid "Volume: %i %%"
-msgstr "کم کردن صدا"
+msgstr "صدا : %3ld%%"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
@@ -16612,9 +16660,8 @@ msgid "Open Audio Effects window"
 msgstr ""
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "دسی بل"
+msgstr ""
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
@@ -16622,15 +16669,15 @@ msgstr ""
 
 #: modules/gui/macosx/misc.m:315
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: modules/gui/macosx/misc.m:323
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: modules/gui/macosx/misc.m:328
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -16710,28 +16757,27 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
-msgstr ""
+msgstr "پخش سفارشی"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "باز کردن شا&خه..."
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
-msgstr ""
+msgstr "قرار دادن دیسک"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:173
 msgid "Disable DVD menus"
-msgstr ""
+msgstr "غیرفعال سازی منوهای DVD"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:176
 msgid "Enable DVD menus"
-msgstr ""
+msgstr "فعال‌سازی منوهای DVD"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
 msgid "IP Address"
-msgstr ""
+msgstr "آدرس آی پی"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:189
 msgid ""
@@ -16808,7 +16854,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:343
 msgid "Add Subtitle File:"
-msgstr ""
+msgstr "افزودن پرونده زیرنویس:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
 msgid "Setup subtitle playback details"
@@ -16817,7 +16863,7 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #, fuzzy
 msgid "Select a subtitle file"
-msgstr "استفاده از پروندهٔ زیرنویس"
+msgstr "انتخاب پرونده زیرنویس"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -16839,7 +16885,7 @@ msgstr "اندازهٔ قلم"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:361
 msgid "Subtitle alignment"
-msgstr ""
+msgstr "موقعیت زیرنویس"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:364
 msgid "Dismiss the subtitle setup dialog"
@@ -16913,9 +16959,8 @@ msgid "URI"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "اندازهٔ دو برابر"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -17040,9 +17085,8 @@ msgstr "انتخاب"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "ادامه"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -17051,9 +17095,8 @@ msgid "Continue"
 msgstr "ادامه"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "ادامه"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -17170,11 +17213,11 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/qt/ui/sprefs_input.h:355
 msgid "Record directory or filename"
-msgstr ""
+msgstr "نام فایل یا شاخه ضبط"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Directory or filename where the records will be stored"
-msgstr ""
+msgstr "نام فایل یا شاخه‌ای که برای ضبط کردن استفاده می‌شود."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:285
 msgid "Repair AVI Files"
@@ -17233,9 +17276,8 @@ msgid "Bright"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "ادامه"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -17258,12 +17300,12 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 #, fuzzy
 msgid "HTTP web interface"
-msgstr "واسط"
+msgstr "رابط کاربری"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
 #, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "خروجی ویدئو را به صورت توکار در واسط اصلی نمایش می‌دهد."
+msgstr "واسط اُ اس ایکس مکینتاش"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -17286,7 +17328,7 @@ msgstr "قلم"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:336
 msgid "Subtitle languages"
-msgstr ""
+msgstr "زبان های زیرنویس"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
@@ -17472,12 +17514,12 @@ msgstr ""
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:54
 #: modules/gui/qt/components/extended_panels.cpp:1396
 msgid "Subtitles/Video"
-msgstr ""
+msgstr "زیرنویس ها/ویدیو"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:55
 #: modules/gui/qt/components/extended_panels.cpp:1400
 msgid "Subtitle track synchronization:"
-msgstr ""
+msgstr "همگام سازی قطعه زیرنویس"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
@@ -17486,7 +17528,7 @@ msgstr ""
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:58
 #: modules/gui/qt/components/extended_panels.cpp:1407
 msgid "Subtitle speed:"
-msgstr ""
+msgstr "سرعت زیرنویس:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:59
 msgid "fps"
@@ -17870,7 +17912,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:887
 msgid " <space>                Pause/Play"
-msgstr ""
+msgstr "<space> ایست/پخش"
 
 #: modules/gui/ncurses.c:888
 msgid " f                      Toggle Fullscreen"
@@ -18030,31 +18072,31 @@ msgstr ""
 
 #: modules/gui/ncurses.c:1104
 msgid " Volume   : Mute"
-msgstr ""
+msgstr "صدا : قطع"
 
 #: modules/gui/ncurses.c:1105
 #, c-format
 msgid " Volume   : %3ld%%"
-msgstr ""
+msgstr "صدا : %3ld%%"
 
 #: modules/gui/ncurses.c:1105
 msgid " Volume   : ----"
-msgstr ""
+msgstr "صدا : ----"
 
 #: modules/gui/ncurses.c:1111
 #, c-format
 msgid " Title    : %<PRId64>/%d"
-msgstr ""
+msgstr " عنوان : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1117
 #, c-format
 msgid " Chapter  : %<PRId64>/%d"
-msgstr ""
+msgstr "فصل : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1122
 #, fuzzy
 msgid " Source: <no current item>"
-msgstr "تکرار همین مورد"
+msgstr "منبع :  <no current item>"
 
 #: modules/gui/ncurses.c:1124
 msgid " [ h for help ]"
@@ -18063,16 +18105,16 @@ msgstr ""
 #: modules/gui/ncurses.c:1145
 #, c-format
 msgid "Open: %s"
-msgstr ""
+msgstr "بازکردن : %s"
 
 #: modules/gui/ncurses.c:1147
 #, c-format
 msgid "Find: %s"
-msgstr ""
+msgstr "یافتن: %s"
 
 #: modules/gui/qt/components/controller.cpp:343
 msgid "Shift+L"
-msgstr ""
+msgstr "Shift+L"
 
 #: modules/gui/qt/components/controller.cpp:448
 msgid "Click to toggle between loop all, loop one and no loop"
@@ -18080,20 +18122,20 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.cpp:549
 msgid "Previous Chapter/Title"
-msgstr ""
+msgstr "فصل قبلی/عنوان"
 
 #: modules/gui/qt/components/controller.cpp:555
 msgid "Next Chapter/Title"
-msgstr ""
+msgstr "فصل بعدی/عنوان"
 
 #: modules/gui/qt/components/controller.cpp:604
 msgid "Teletext Activation"
-msgstr ""
+msgstr "فعال سازی تله تکست"
 
 #: modules/gui/qt/components/controller.cpp:620
 #, fuzzy
 msgid "Toggle Transparency"
-msgstr "شفافیت"
+msgstr "تغییر وضعیت شفاف سازی"
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -18103,11 +18145,11 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Previous / Backward"
-msgstr ""
+msgstr "قبلی / به عقب"
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Next / Forward"
-msgstr ""
+msgstr "بعدی / به جلو"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "De-Fullscreen"
@@ -18119,7 +18161,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Frame By Frame"
-msgstr ""
+msgstr "فریم به فریم"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Trickplay Reverse"
@@ -18128,16 +18170,16 @@ msgstr ""
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Step backward"
-msgstr ""
+msgstr "گام به عقب"
 
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Step forward"
-msgstr ""
+msgstr "گام به جلو"
 
 #: modules/gui/qt/components/controller.hpp:112
 msgid "Loop / Repeat"
-msgstr ""
+msgstr "حلقه / تکرار دوباره"
 
 #: modules/gui/qt/components/controller.hpp:112
 #: modules/gui/qt/components/controller.hpp:124
@@ -18146,7 +18188,7 @@ msgstr "اطلاعات"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
-msgstr ""
+msgstr "باز کردن زیرنویس ها"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Dock fullscreen controller"
@@ -18154,7 +18196,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Stop playback"
-msgstr ""
+msgstr "توقف کردن بازپخش"
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Open a medium"
@@ -18215,7 +18257,7 @@ msgstr ""
 #: modules/gui/qt/components/controller.hpp:126
 #: modules/gui/qt/components/open_panels.cpp:252
 msgid "Open subtitle file"
-msgstr ""
+msgstr "باز کردن پرونده زیرنویس"
 
 #: modules/gui/qt/components/controller.hpp:127
 msgid "Dock/undock fullscreen controller to/from bottom of screen"
@@ -18385,8 +18427,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1326
+#, fuzzy
 msgid "Adjust pitch"
-msgstr ""
+msgstr "تنظیم اولویت وی‌ال‌سی"
 
 #: modules/gui/qt/components/extended_panels.cpp:1360
 msgid "(Hastened)"
@@ -18401,9 +18444,8 @@ msgid "Force update of this dialog's values"
 msgstr ""
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "استفاده از S/PDIF در صورت وجود"
+msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -18658,7 +18700,7 @@ msgstr ""
 
 #: modules/gui/qt/components/playlist/playlist.cpp:114
 msgid "Change playlistview"
-msgstr ""
+msgstr "تغییر نمایش لیست پخش"
 
 #: modules/gui/qt/components/playlist/playlist.cpp:124
 msgid "Search the playlist"
@@ -18674,7 +18716,7 @@ msgstr "دستگاه‌ها"
 
 #: modules/gui/qt/components/playlist/selector.cpp:251
 msgid "Local Network"
-msgstr ""
+msgstr "شبکه‌ی محلی"
 
 #: modules/gui/qt/components/playlist/selector.cpp:252
 msgid "Internet"
@@ -18689,9 +18731,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "هم‌پوشانی"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -18710,14 +18751,12 @@ msgid "Enter name for new folder:"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "باز کردن شا&خه..."
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "انتخاب پوشه"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
@@ -18733,11 +18772,11 @@ msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:261
 msgid "Ascending"
-msgstr ""
+msgstr "صعودی"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:265
 msgid "Descending"
-msgstr ""
+msgstr "نزولی"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:273
 msgid "Display size"
@@ -18753,7 +18792,7 @@ msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:406
 msgid "Playlist View Mode"
-msgstr ""
+msgstr "حالت مشاهده لیست پخش"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:585
 msgid ""
@@ -19101,7 +19140,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:78
 msgid "Browse"
-msgstr ""
+msgstr "مرور"
 
 #: modules/gui/qt/dialogs/convert.cpp:91
 msgid "Append '-converted' to filename"
@@ -19109,11 +19148,11 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
-msgstr ""
+msgstr "تنظیمات"
 
 #: modules/gui/qt/dialogs/convert.cpp:114
 msgid "Display the output"
-msgstr ""
+msgstr "نمایش خروجی"
 
 #: modules/gui/qt/dialogs/convert.cpp:115
 msgid "This display the resulting media, but can slow things down."
@@ -19121,12 +19160,11 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:132
 msgid "&Start"
-msgstr ""
+msgstr "شروع"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "ادامه"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19134,15 +19172,15 @@ msgstr "خطاها"
 
 #: modules/gui/qt/dialogs/errors.cpp:47
 msgid "Cl&ear"
-msgstr ""
+msgstr "واضح"
 
 #: modules/gui/qt/dialogs/errors.cpp:54
 msgid "Hide future errors"
-msgstr ""
+msgstr "مخفی کردن خطاهای آینده"
 
 #: modules/gui/qt/dialogs/extended.cpp:51
 msgid "Adjustments and Effects"
-msgstr ""
+msgstr "تنظیمات و اثرات"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 #, fuzzy
@@ -19151,11 +19189,11 @@ msgstr "حالت استریو"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
-msgstr ""
+msgstr "هماهنگ سازی"
 
 #: modules/gui/qt/dialogs/extended.cpp:116
 msgid "v4l2 controls"
-msgstr ""
+msgstr "کنترل‌های v4l2"
 
 #: modules/gui/qt/dialogs/extended.cpp:125
 #: modules/gui/qt/dialogs/preferences.cpp:95
@@ -19170,7 +19208,7 @@ msgstr "رمزعبور تصدیق RDP"
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
 msgid "Privacy and Network Access Policy"
-msgstr ""
+msgstr "حریم خصوصی و سیاست دسترسی شبکه"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
 msgid ""
@@ -19318,7 +19356,7 @@ msgstr "دیسک"
 
 #: modules/gui/qt/dialogs/open.cpp:94
 msgid "&Network"
-msgstr ""
+msgstr "شبکه"
 
 #: modules/gui/qt/dialogs/open.cpp:96
 msgid "Capture &Device"
@@ -19374,9 +19412,8 @@ msgid "Plugins and extensions"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "ضمیمهٔ AAC‏"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -19435,40 +19472,38 @@ msgid "Retrieving addons..."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "ورودی‌ای پیدا نشد"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "نسخه وی‌ال‌سی %s (%s)\n"
+msgstr "نسخه %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
-msgstr ""
+msgstr "%1 دانلود"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
 msgid "&Uninstall"
-msgstr ""
+msgstr "حذف برنامه"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
 msgid "&Install"
-msgstr ""
+msgstr "نصب"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
 msgid "Version"
-msgstr ""
+msgstr "نسخه"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1411
 #: modules/gui/qt/dialogs/plugins.cpp:1521
 msgid "Website"
-msgstr ""
+msgstr "وب‌گاه"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:354
 msgid "Files"
@@ -19488,11 +19523,11 @@ msgstr "ساده"
 
 #: modules/gui/qt/dialogs/preferences.cpp:77
 msgid "Switch to simple preferences view"
-msgstr ""
+msgstr "تعویض به نمای تنظیمات ساده"
 
 #: modules/gui/qt/dialogs/preferences.cpp:80
 msgid "Switch to full preferences view"
-msgstr ""
+msgstr "تعویض به نمای تنظیمات کامل"
 
 #: modules/gui/qt/dialogs/preferences.cpp:96
 msgid "Save and close the dialog"
@@ -19560,7 +19595,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs_provider.cpp:808
 msgid "Open subtitles..."
-msgstr ""
+msgstr "باز کردن زیرنویس ها..."
 
 #: modules/gui/qt/dialogs_provider.hpp:40
 msgid "Media Files"
@@ -19568,7 +19603,7 @@ msgstr "پرونده‌ها"
 
 #: modules/gui/qt/dialogs_provider.hpp:44
 msgid "Subtitle Files"
-msgstr ""
+msgstr "پرونده های زیرنویس"
 
 #: modules/gui/qt/dialogs_provider.hpp:45
 msgid "All Files"
@@ -19610,9 +19645,8 @@ msgid "Flat Button"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "عنوان بعدی"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -19647,9 +19681,8 @@ msgid "Time Toolbar"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "پیشرفته"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -19668,9 +19701,8 @@ msgid "Select profile:"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "قبل"
+msgstr "پیش نمایش"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19770,7 +19802,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/vlm.cpp:265
 msgid "Save VLM configuration as..."
-msgstr ""
+msgstr "ذخیره پیکربندی VLM در..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:267 modules/gui/qt/dialogs/vlm.cpp:336
 msgid "VLM conf (*.vlm);;All (*)"
@@ -19778,7 +19810,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/vlm.cpp:334
 msgid "Open VLM configuration..."
-msgstr ""
+msgstr "بازکردن پیکربندی VLM..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:533
 msgid "Broadcast: "
@@ -19797,9 +19829,8 @@ msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:378
-#, fuzzy
 msgid "&Continue"
-msgstr "ادامه"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:1368
 msgid "Control menu for the player"
@@ -19827,7 +19858,7 @@ msgstr "&ویدئو"
 
 #: modules/gui/qt/menus.cpp:338 modules/gui/qt/menus.cpp:1055
 msgid "Subti&tle"
-msgstr ""
+msgstr "زیرنویس"
 
 #: modules/gui/qt/menus.cpp:340 modules/gui/qt/menus.cpp:1071
 #, fuzzy
@@ -19836,7 +19867,7 @@ msgstr "تنظیمات"
 
 #: modules/gui/qt/menus.cpp:343 modules/gui/qt/menus.cpp:1078
 msgid "V&iew"
-msgstr ""
+msgstr "دیدن"
 
 #: modules/gui/qt/menus.cpp:345 modules/gui/qt/menus.cpp:779
 msgid "&Help"
@@ -19844,11 +19875,11 @@ msgstr "&راهنما"
 
 #: modules/gui/qt/menus.cpp:358
 msgid "Open &File..."
-msgstr ""
+msgstr "باز کردن پرونده"
 
 #: modules/gui/qt/menus.cpp:360
 msgid "&Open Multiple Files..."
-msgstr ""
+msgstr "باز کردن چندین فایل"
 
 #: modules/gui/qt/menus.cpp:364 modules/gui/qt/menus.cpp:931
 msgid "Open &Disc..."
@@ -19856,7 +19887,7 @@ msgstr "باز کردن &دیسک..."
 
 #: modules/gui/qt/menus.cpp:366
 msgid "Open &Network Stream..."
-msgstr ""
+msgstr "باز کردن جریان شبکه"
 
 #: modules/gui/qt/menus.cpp:368 modules/gui/qt/menus.cpp:935
 msgid "Open &Capture Device..."
@@ -19864,11 +19895,11 @@ msgstr "باز کردن دستگاه &ضبط..."
 
 #: modules/gui/qt/menus.cpp:371
 msgid "Open &Location from clipboard"
-msgstr ""
+msgstr "باز کردن از حافظه موقت"
 
 #: modules/gui/qt/menus.cpp:376
 msgid "Open &Recent Media"
-msgstr ""
+msgstr "باز کردن رسانه های اخیر"
 
 #: modules/gui/qt/menus.cpp:386
 msgid "Conve&rt / Save..."
@@ -19876,7 +19907,7 @@ msgstr "تبدیل و ذخیره"
 
 #: modules/gui/qt/menus.cpp:388
 msgid "&Stream..."
-msgstr ""
+msgstr "جریان..."
 
 #: modules/gui/qt/menus.cpp:393
 msgid "Quit at the end of playlist"
@@ -19916,7 +19947,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:465
 msgid "&View"
-msgstr ""
+msgstr "مشاهده"
 
 #: modules/gui/qt/menus.cpp:486
 msgid "Play&list"
@@ -19985,7 +20016,7 @@ msgstr "جلوه ها"
 
 #: modules/gui/qt/menus.cpp:645
 msgid "Add &Subtitle File..."
-msgstr ""
+msgstr "انتخاب پرونده زیرنویس..."
 
 #: modules/gui/qt/menus.cpp:647
 msgid "Sub &Track"
@@ -20117,7 +20148,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:1183
 msgid "&Open Media"
-msgstr ""
+msgstr "باز کردن رسانه"
 
 #: modules/gui/qt/menus.cpp:1623
 msgid "&Clear"
@@ -20290,7 +20321,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:163
 msgid "Start in minimal view (without menus)"
-msgstr ""
+msgstr "شروع در حداقل نمایش (بدون منوها)"
 
 #: modules/gui/qt/qt.cpp:165
 msgid "Display background cone or art"
@@ -20334,9 +20365,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "نمایش کنترل کنندهٔ تمام‌صفحه"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -20467,18 +20497,16 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "کدگشا"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/vout.c:50
-#, fuzzy
 msgid "VideoCore layer where the video is displayed."
-msgstr "شاخه‌ای که عکس‌های ویدئو آنجا ذخیره می‌شوند."
+msgstr ""
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -20518,14 +20546,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "صافی ویدئوی دیوار"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "کدگذار ویدئو"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
 msgid "Temporal-spatial"
@@ -20540,19 +20566,16 @@ msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "حالت نادرهم‌بافی"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "انتخاب نامعتبر"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "حالت نادرهم‌بافی"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
@@ -20563,29 +20586,24 @@ msgid "Noise reduction level"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "کیفیت کدگذاری"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "سطح کیفی"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "نادرهم‌بافی ویدئو"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "دسترسی به خروجی"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "صافی ویدئوی دیوار"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -20637,8 +20655,9 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:56
+#, fuzzy
 msgid "Synchronize stored items"
-msgstr ""
+msgstr "هماهنگ سازی"
 
 #: modules/keystore/keychain.m:57
 msgid ""
@@ -21414,7 +21433,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:494
 msgid "View certificate"
-msgstr ""
+msgstr "مشاهده گواهی"
 
 #: modules/misc/gnutls.c:495 modules/misc/gnutls.c:516
 #: modules/misc/securetransport.c:340
@@ -21690,9 +21709,8 @@ msgid "Subject"
 msgstr ""
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "کدگشا"
+msgstr ""
 
 #: modules/mux/avi.c:57
 msgid "Keywords"
@@ -21946,9 +21964,8 @@ msgid "Multipart JPEG muxer"
 msgstr ""
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "فایل ایندکس"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21956,9 +21973,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "فایل ایندکس"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -22010,9 +22026,8 @@ msgid "A/52 audio packetizer"
 msgstr ""
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "بسته‌ساز"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -22091,9 +22106,8 @@ msgid "Bonjour Network Discovery"
 msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "یافتن خدمات"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -22897,7 +22911,7 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:45
 msgid "Change subtitle delay"
-msgstr ""
+msgstr "تغییر تاخیر زیرنویس"
 
 #: modules/spu/subsdelay.c:47
 msgid "Delay calculation mode"
@@ -23008,8 +23022,9 @@ msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
+#, fuzzy
 msgid "Block stream cache"
-msgstr ""
+msgstr "منبع ساعت"
 
 #: modules/stream_filter/cache_read.c:570
 #, fuzzy
@@ -23036,7 +23051,7 @@ msgstr "جریان‌سازی"
 #: modules/stream_filter/inflate.c:201
 #, fuzzy
 msgid "Zlib decompression filter"
-msgstr "حاشیه‌گیری ویدئو"
+msgstr "صافی تبدیل ویدئو"
 
 #: modules/stream_filter/prefetch.c:531
 #, fuzzy
@@ -23909,7 +23924,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
-msgstr ""
+msgstr "همپوشانی ها/زیرنویس ها"
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -24601,14 +24616,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "حاشیه‌گیری"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "حاشیه‌گیری ویدئو"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -24686,12 +24699,12 @@ msgstr ""
 #: modules/video_filter/edgedetection.c:39
 #, fuzzy
 msgid "Edge detection video filter"
-msgstr "صافی ویدئوی دیوار"
+msgstr "پالایه‌های صدا"
 
 #: modules/video_filter/edgedetection.c:40
 #, fuzzy
 msgid "Edge detection"
-msgstr "انتخاب نامعتبر"
+msgstr "اتصال تصویری"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -24744,9 +24757,8 @@ msgid "FPS Converter"
 msgstr "تبدیل"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "نادرهم‌بافی ویدئو"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -24967,9 +24979,8 @@ msgid "Motion detect video filter"
 msgstr ""
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "صافی ویدئوی دیوار"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -25140,19 +25151,19 @@ msgstr ""
 
 #: modules/video_filter/puzzle.c:61
 msgid "Small preview"
-msgstr ""
+msgstr "پیش نمایش کوچک"
 
 #: modules/video_filter/puzzle.c:62
 msgid "Show small preview."
-msgstr ""
+msgstr "نمایش پیش نمایش کوچک."
 
 #: modules/video_filter/puzzle.c:63
 msgid "Small preview size"
-msgstr ""
+msgstr "سایز پیش نمایش کوچک"
 
 #: modules/video_filter/puzzle.c:64
 msgid "Show small preview size (percent of source)."
-msgstr ""
+msgstr "نمایش سایز پیش نمایش کوچک (درصد از منبع)"
 
 #: modules/video_filter/puzzle.c:65
 msgid "Piece edge shape size"
@@ -25390,9 +25401,8 @@ msgid "Rotate or flip the video"
 msgstr ""
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "نادرهم‌بافی ویدئو"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
@@ -25417,12 +25427,11 @@ msgstr ""
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "پنجره‌های فعال"
+msgstr "بستن پنجره"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "پنجره‌های فعال"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -25640,9 +25649,8 @@ msgid "K Video Acceleration video output"
 msgstr ""
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "خروجی ویدئوی OpenGL"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -25699,9 +25707,8 @@ msgid "Pixel Shader"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:78
-#, fuzzy
 msgid "Choose a pixel shader to apply."
-msgstr "نامی را برای ذخیره فهرست پخش وارد کنید"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
 msgid "Path to HLSL file"
@@ -25712,9 +25719,8 @@ msgid "Path to an HLSL file containing a single pixel shader."
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "ذخیرهٔ پرونده"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -25911,11 +25917,11 @@ msgstr ""
 #: modules/video_output/xcb/window.c:438
 msgctxt "ASCII"
 msgid "VLC"
-msgstr ""
+msgstr "VLC"
 
 #: modules/video_output/xcb/window.c:467
 msgid "VLC"
-msgstr ""
+msgstr "VLC"
 
 #: modules/video_output/xcb/window.c:700
 msgid "X11 display"
@@ -26391,18 +26397,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "ارتفاع پنجرهٔ ویدئوی نقطه، به نقطه."
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "پنجره"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "ارجحیت بر پارامترها"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -26517,7 +26521,7 @@ msgstr ""
 #: share/lua/http/dialogs/browse_window.html:41
 #: share/lua/http/mobile_browse.html:48
 msgid "Play List"
-msgstr ""
+msgstr "فهرست پخش"
 
 #: share/lua/http/dialogs/create_stream.html:156
 #: modules/gui/qt/ui/sprefs_audio.h:430 modules/gui/qt/ui/sprefs_video.h:328
@@ -26604,32 +26608,32 @@ msgstr ""
 
 #: share/lua/http/dialogs/offset_window.html:76
 msgid "Subtitle Delay"
-msgstr ""
+msgstr "تاخیر زیرنویس"
 
 #: share/lua/http/dialogs/stream_window.html:65
 msgid "Time:"
-msgstr ""
+msgstr "زمان:"
 
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr ""
+msgstr "پخش کننده رسانه ای VLC - رابط کاربری وب"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
-msgstr ""
+msgstr "پنهان / نمایش کتابخانه"
 
 #: share/lua/http/index.html:216
 msgid "Hide / Show Viewer"
-msgstr ""
+msgstr "پنهان / نمایش نمایشگر"
 
 #: share/lua/http/index.html:217
 msgid "Manage Streams"
-msgstr ""
+msgstr "مدیریت جریان ها"
 
 #: share/lua/http/index.html:218
 msgid "Track Synchronisation"
-msgstr ""
+msgstr "هماهنگ سازی قطعه"
 
 #: share/lua/http/index.html:220
 msgid "VLM Batch Commands"
@@ -26637,23 +26641,23 @@ msgstr ""
 
 #: share/lua/http/index.html:240 modules/gui/qt/ui/vlm.h:298
 msgid "Loop"
-msgstr ""
+msgstr "حلقه"
 
 #: share/lua/http/index.html:242
 msgid "Empty Playlist"
-msgstr ""
+msgstr "لیست پخش خالی"
 
 #: share/lua/http/index.html:243
 msgid "Queue Selected"
-msgstr ""
+msgstr "صف انتخاب شده"
 
 #: share/lua/http/index.html:244
 msgid "Play Selected"
-msgstr ""
+msgstr "پخش انتخاب شده"
 
 #: share/lua/http/index.html:245
 msgid "Refresh List"
-msgstr ""
+msgstr "نوسازی لیست"
 
 #: share/lua/http/index.html:252
 msgid "Loading flowplayer..."
@@ -26720,7 +26724,7 @@ msgstr "به‌هنگام‌سازی"
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:320 modules/gui/qt/ui/streampanel.h:167
 msgid "Form"
-msgstr ""
+msgstr "فرم"
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -26800,8 +26804,9 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
+#, fuzzy
 msgid "Change the stop time for the media"
-msgstr ""
+msgstr "تغییر عنوان مطابق با رسانه جاری"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -26857,7 +26862,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:311
 msgid "Audio and Subtitles"
-msgstr ""
+msgstr "صوت و زیرنویس ها"
 
 #: modules/gui/qt/ui/open_file.h:143
 msgid "Use a sub&title file"
@@ -26865,7 +26870,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:145
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "انتخاب پرونده زیرنویس"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -26988,9 +26993,8 @@ msgid "Custom options"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "کیفیت"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27013,14 +27017,12 @@ msgid "px"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "نرخ نمونه"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "نام پرونده"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27234,7 +27236,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Start in minimal view mode"
-msgstr ""
+msgstr "شروع در حداقل نمایش"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Force window style:"
@@ -27517,7 +27519,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
-msgstr ""
+msgstr "تنظیمات VLM"
 
 #: modules/gui/qt/ui/vlm.h:287
 msgid "Media Manager Edition"
@@ -27557,11 +27559,14 @@ msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
-msgstr ""
+msgstr "AAAA;"
 
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
-msgstr ""
+msgstr "مدیریت لیست رسانه"
+
+#~ msgid "Display resolution"
+#~ msgstr "تفکیک‌پذیری نمایش"
 
 #~ msgid "VLC can't recognize the input's format"
 #~ msgstr "وی‌ال‌سی نمی‌تواند قالب ورودی را شناسایی کند."
@@ -27586,6 +27591,19 @@ msgstr ""
 #~ "هر وقت سخت‌افزار شما و همین طور جریان صدای در حال پخش از S/PDIF پشتیبانی "
 #~ "کند، می‌توان به صورت پیش‌فرض از S/PDIF استفاده کرد."
 
+#~ msgid "HTTP/TLS Certificate Authority"
+#~ msgstr "صادرکنندهٔ گواهی HTTP/TLS"
+
+#~ msgid "HTTP/TLS Certificate Revocation List"
+#~ msgstr "فهرست ابطال گواهی HTTP/TLS"
+
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remote clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "این پرونده حاوی یک فهرست ابطال گواهی (CRL) اختیاری است تا نگذارد "
+#~ "سرویس‌گیرنده‌های راه دور از گواهی‌های باطل‌شده در نشست TLS استفاده کنند."
+
 #~ msgid "Log to file"
 #~ msgstr "ثبت در پرونده"
 
@@ -27597,6 +27615,26 @@ msgstr ""
 
 #~ msgid "Log all VLC messages to syslog (UNIX systems)."
 #~ msgstr "ثبت همهٔ پیغام‌های وی‌ال‌سی در syslog (برای سیستم‌های یونیکسی)."
+
+#~ msgid ""
+#~ "Allowing only one running instance of VLC can sometimes be useful, for "
+#~ "example if you associated VLC with some media types and you don't want a "
+#~ "new instance of VLC to be opened each time you open a file in your file "
+#~ "manager. This option will allow you to play the file with the already "
+#~ "running instance or enqueue it. This option requires the D-Bus session "
+#~ "daemon to be active and the running instance of VLC to use D-Bus control "
+#~ "interface."
+#~ msgstr ""
+#~ "گاهی اجرای فقط یک نمونه از وی‌ال‌سی مفید است؛ مثلا زمانی که وی‌ال‌سی و بعضی "
+#~ "از انواع رسانه را به هم وابسته کرده‌اید و نمی‌خواهید هر بار که پرونده‌ای را "
+#~ "باز می‌کنید نمونه‌ی جدیدی از وی‌ال‌سی باز شود. این گزینه این امکان را "
+#~ "اختیارتان می‌گذارد که پرونده را در نمونه‌ای که هم‌اکنون در حال اجرا است پخش "
+#~ "کنید و یا آن را در صف پخش قرار دهید. این گزینه به فعال بودن نشست D-Bus در "
+#~ "پس‌زمینه و استفادهٔ نمونهٔ در حال اجرای وی‌ال‌سی از واسط کنترلی D-Bus نیاز "
+#~ "دارد."
+
+#~ msgid "Downloading ..."
+#~ msgstr "در حال بارگذاری ..."
 
 #~ msgid "Configure"
 #~ msgstr "پیکربندی"
@@ -27615,10 +27653,6 @@ msgstr ""
 
 #~ msgid "RTSP password"
 #~ msgstr "گذرواژهٔ RTSP"
-
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 
 #~ msgid "Video Capture width"
 #~ msgstr "پهنای ضبط ویدیو"
@@ -27689,15 +27723,6 @@ msgstr ""
 #~ msgid "DTS parser"
 #~ msgstr "تجزیه کنندهٔ DTS"
 
-#~ msgid "Video Manager"
-#~ msgstr "مدیر ویدئو"
-
-#~ msgid "----- Title"
-#~ msgstr "----- عنوان"
-
-#~ msgid "Fast udp streaming"
-#~ msgstr "جریان‌سازی UDP سریع"
-
 #~ msgid "Invalid selection"
 #~ msgstr "انتخاب نامعتبر"
 
@@ -27707,15 +27732,14 @@ msgstr ""
 #~ msgid "No input found"
 #~ msgstr "ورودی‌ای پیدا نشد"
 
-#, fuzzy
-#~ msgid "Hide Details"
-#~ msgstr "مخفی کردن بقیه"
-
 #~ msgid "(no item is being played)"
 #~ msgstr "(موردی در حال پخش نیست)"
 
 #~ msgid "Streaming/Exporting Wizard..."
 #~ msgstr "راهنمای گام به گام جریان‌سازی/صدور..."
+
+#~ msgid "No device is selected"
+#~ msgstr "هیچ دستگاهی انتخاب نشده"
 
 #~ msgid "Streaming/Saving:"
 #~ msgstr "جریان‌سازی/ذخیره‌سازی:"
@@ -27731,10 +27755,6 @@ msgstr ""
 
 #~ msgid "Meta-information"
 #~ msgstr "اطلاعات متا"
-
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "همیشه رو"
 
 #~ msgid "Show Fullscreen Controller"
 #~ msgstr "نمایش کنترل کنندهٔ تمام‌صفحه"
@@ -27772,9 +27792,26 @@ msgstr ""
 #~ msgid "Stream to network"
 #~ msgstr "استفاده از این جریان داده ها در یک شبکه"
 
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "ذخیرهٔ فهرست پخش"
+#~ msgid "Finish"
+#~ msgstr "پایان"
+
+#~ msgid "%i items"
+#~ msgstr "%i آیتم‌ها"
+
+#~ msgid "yes"
+#~ msgstr "بله"
+
+#~ msgid "no"
+#~ msgstr "خیر"
+
+#~ msgid "yes: from %@ to %@"
+#~ msgstr "بله: از %@ تا %@"
+
+#~ msgid "A->B Loop"
+#~ msgstr "آ -> ب حلقه"
+
+#~ msgid "&Write changes to config"
+#~ msgstr "نوشتن تغییرات در پیکربندی"
 
 #~ msgid "Log format"
 #~ msgstr "قالب ثبت"
@@ -27794,114 +27831,8 @@ msgstr ""
 #~ msgid "Darkness limit"
 #~ msgstr "حد تاریکی"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "پنجره‌های فعال"
-
 #~ msgid "Brightness (%)"
 #~ msgstr "روشنایی (درصد)"
-
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "پیمانهٔ خروجی صدا"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "دستگاه ورودی یافت نشد"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "ورودی DVB با پشتیبانی v412"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "موسیقی فیلم"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "ضبط Quicktime"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "دستگاه ورودی یافت نشد"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "دستگاه ورودی یافت نشد"
-
-#~ msgid "Uncompressed RAR"
-#~ msgstr "RAR فشرده نشده"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "خروجی صدا در پرونده"
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "کدگذار ویدئو"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "واسط‌های اصلی"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "تنظیمات صدا"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "ورودی‌ای پیدا نشد"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "پاک‌سازی"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "صافی تبدیل ویدئو"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "جریان پیش‌فرض"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "خروجی جریان استاندارد"
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "عرض پنجرهٔ ویدئوی جلوه، به نقطه."
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "ارتفاع پنجرهٔ ویدئوی نقطه، به نقطه."
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "طیف"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "تصویر‌سازی‌های صوتی"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "تخت"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "پخش‌کنندهٔ صدا و تصویر وی‌ال‌سی"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "خروجی جریان"
-
-#~ msgid "CPU features"
-#~ msgstr "امکانات پردازنده"
 
 #, fuzzy
 #~ msgid ""
@@ -28131,10 +28062,6 @@ msgstr ""
 #~ msgstr "کدگشایی"
 
 #, fuzzy
-#~ msgid "Icon View"
-#~ msgstr "نمایش"
-
-#, fuzzy
 #~ msgid ""
 #~ "This version of VLC was compiled by:\n"
 #~ " "
@@ -28185,10 +28112,6 @@ msgstr ""
 #~ msgstr "پروندهٔ پیکربندی"
 
 #, fuzzy
-#~ msgid "MUX Options"
-#~ msgstr "گزینه‌ها"
-
-#, fuzzy
 #~ msgid "Rows:"
 #~ msgstr "چپ"
 
@@ -28222,19 +28145,8 @@ msgstr ""
 #~ msgstr "تخلیه"
 
 #, fuzzy
-#~ msgid "Open a Media"
-#~ msgstr "باز کردن رسانه"
-
-#, fuzzy
 #~ msgid "Elasped time"
 #~ msgstr "زمان نوسازی"
-
-#~ msgid "RTSP host address"
-#~ msgstr "نشانی میزبان RTSP"
-
-#, fuzzy
-#~ msgid "Viewer"
-#~ msgstr "نمایش"
 
 #, fuzzy
 #~ msgid "Library"
@@ -28243,14 +28155,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Create Mosaic"
 #~ msgstr "وسط"
-
-#, fuzzy
-#~ msgid "Create New Stream"
-#~ msgstr "پروندهٔ کلید خصوصی"
-
-#, fuzzy
-#~ msgid "Motion blue"
-#~ msgstr "پروندهٔ شرح"
 
 #~ msgid ""
 #~ "This saves the audio output volume when you use the mute function. You "
@@ -28417,10 +28321,6 @@ msgstr ""
 #~ msgid "Tuner to use, if there are several ones."
 #~ msgstr "تیونر مورد استفاده، اگر چند تیونر موجود است."
 
-#, fuzzy
-#~ msgid "Set this option if the capture device outputs MJPEG"
-#~ msgstr "یک شاخه انتخاب کنید"
-
 #~ msgid "Quality of the stream."
 #~ msgstr "کیفیت جریان."
 
@@ -28530,10 +28430,6 @@ msgstr ""
 #~ "کار کرد."
 
 #, fuzzy
-#~ msgid "1 item"
-#~ msgstr "ن&مایش موارد"
-
-#, fuzzy
 #~ msgid "Add controls to the video window"
 #~ msgstr "کنتراست ورودی ویدئو"
 
@@ -28544,10 +28440,6 @@ msgstr ""
 #, fuzzy
 #~ msgid " Logs "
 #~ msgstr "حلقهٔ"
-
-#, fuzzy
-#~ msgid "Privacy and Network Warning"
-#~ msgstr "تعامل با واسط"
 
 #, fuzzy
 #~ msgid "A new version of VLC("
@@ -28670,10 +28562,6 @@ msgstr ""
 #~ "اگر پردازندهٔ شما واحد محاسبات ممیز شناور داشته باشد، وی‌ال‌سی می‌تواند از آن "
 #~ "استفادهٔ بهینه کند."
 
-#, fuzzy
-#~ msgid "VLC could not get a new block of size: %i."
-#~ msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
-
 #~ msgid ""
 #~ "How many CD blocks to get on a single CD read. Generally on newer/faster "
 #~ "CDs, this increases throughput at the expense of a little more memory "
@@ -28788,24 +28676,13 @@ msgstr ""
 #~ msgid "Take Screen Shot"
 #~ msgstr "عکس گرفتن از صفحه"
 
-#~ msgid "Download now"
-#~ msgstr "بارگیری فوری"
-
 #, fuzzy
 #~ msgid "This version of VLC is outdated."
 #~ msgstr "این نسخه آخرین نسخهٔ موجود وی‌ال‌سی است."
 
 #, fuzzy
-#~ msgid "Permissions"
-#~ msgstr "فارسی"
-
-#, fuzzy
 #~ msgid "Owner"
 #~ msgstr "تیونر"
-
-#, fuzzy
-#~ msgid "Port:"
-#~ msgstr "مرتب‌سازی"
 
 #, fuzzy
 #~ msgid "unicast"
@@ -28818,10 +28695,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "sout"
 #~ msgstr "درباره"
-
-#, fuzzy
-#~ msgid "Protocol:"
-#~ msgstr "همگام‌سازی شبکه"
 
 #, fuzzy
 #~ msgid "secam"
@@ -28905,10 +28778,6 @@ msgstr ""
 #~ msgstr "تعداد ستاره‌هایی که همراه با جلوهٔ تصادفی رسم شوند."
 
 #, fuzzy
-#~ msgid "Processing"
-#~ msgstr "کیفیت کدگذاری"
-
-#, fuzzy
 #~ msgid "Shaping delay"
 #~ msgstr "مقدار حافظهٔ نهان (میلی‌ثانیه)‏"
 
@@ -28927,9 +28796,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "New Node"
 #~ msgstr "گرهٔ جدید"
-
-#~ msgid "UDP/RTP"
-#~ msgstr "‏‎UDP/RTP‏"
 
 #~ msgid "UDP/RTP Multicast"
 #~ msgstr "مولتی‌کَست UDP/RTP"
@@ -28988,10 +28854,6 @@ msgstr ""
 #~ msgid "Login"
 #~ msgstr "ورود به سیستم:"
 
-#, fuzzy
-#~ msgid "Choose a filename to save the VLM configuration..."
-#~ msgstr "فهرست پخش پیدا نمی‌شود"
-
 #~ msgid "Cylinder"
 #~ msgstr "استوانه"
 
@@ -29010,16 +28872,34 @@ msgstr ""
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "زمان باقی‌مانده: %Ii ثانیه"
 
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "وی‌ال‌سی قالب صوتی یا ویدئویی «%4.4s» را پشتیبانی نمی‌کند. متأسفانه راهی "
+#~ "برای انجام این کار وجود ندارد."
+
+#~ msgid "No CrashLog found"
+#~ msgstr "ثبت فروپاشی پیدا نشد"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "اثری از فروپاشی قبلی دیده نمی‌شود."
+
+#~ msgid "Fast udp streaming"
+#~ msgstr "جریان‌سازی UDP سریع"
+
+#~ msgid "DVB input with v4l2 support"
+#~ msgstr "ورودی DVB با پشتیبانی v412"
+
+#~ msgid "Uncompressed RAR"
+#~ msgstr "RAR فشرده نشده"
+
 #~ msgid "Choose your preferred video output and configure it here."
 #~ msgstr "پیمانه خروجی دلخواهتان را، برای ویدئو، انتخاب و پیکربندی کنید."
 
 #~ msgid "These modules provide network functions to all other parts of VLC."
 #~ msgstr ""
 #~ "این پیمانه‌ها کارکردهای شبکه را برای همهٔ بخش‌های دیگر وی‌ال‌سی فراهم می‌کنند."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "اینها تنظیمات عمومی برای پیمانه‌های کدگذاری صدا/ویدئو/زیرنویس هستند."
 
 #~ msgid "Dialog providers can be configured here."
 #~ msgstr "سازندگان محاورات را اینجا پیکربندی کنید."
@@ -29031,27 +28911,86 @@ msgstr ""
 #~ "در این بخش می‌توانید رفتار واتافتگر زیرنویس را مشخص نمایید؛ مثلا نوع "
 #~ "زیرنویس یا نام پرونده زیرنویس را."
 
-#~ msgid "No suitable decoder module"
-#~ msgstr "کدگشای مناسبی برای این قالب موجود نیست."
+#, fuzzy
+#~ msgid "Open a Media"
+#~ msgstr "باز کردن رسانه"
 
+#, fuzzy
+#~ msgid "Create New Stream"
+#~ msgstr "باز کردن جریان شبکه"
+
+#, fuzzy
+#~ msgid "1 item"
+#~ msgstr "%i آیتم‌ها"
+
+#, fuzzy
+#~ msgid "Privacy and Network Warning"
+#~ msgstr "حریم خصوصی و سیاست دسترسی شبکه"
+
+#, fuzzy
+#~ msgid "VLC could not get a new block of size: %i."
+#~ msgstr "VLC قادر به باز کردن فایل \"%s\" (%s) نیست٫"
+
+#, fuzzy
+#~ msgid "Download now"
+#~ msgstr "در حال بارگذاری ..."
+
+#, fuzzy
+#~ msgid "Permissions"
+#~ msgstr "نسخه"
+
+#, fuzzy
+#~ msgid "Port:"
+#~ msgstr "پورت"
+
+#, fuzzy
+#~ msgid "Choose a filename to save the VLM configuration..."
+#~ msgstr "ذخیره پیکربندی VLM در..."
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "استاندارد ویدیویی"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "عنوان"
+
+#, fuzzy
+#~ msgid "Icon View"
+#~ msgstr "مشاهده"
+
+#, fuzzy
+#~ msgid "Viewer"
+#~ msgstr "مشاهده"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "پیش‌تجزیهٔ خودکار پرونده‌ها"
+
+#, fuzzy
+#~ msgid "RTSP host address"
+#~ msgstr "نشانی سرور RTSP"
+
+#, fuzzy
 #~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "وی‌ال‌سی قالب صوتی یا ویدئویی «%4.4s» را پشتیبانی نمی‌کند. متأسفانه راهی "
-#~ "برای انجام این کار وجود ندارد."
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "تنظیمات عمومی برای پیمانه‌های خروجی تصویر"
 
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "کدگشای زیرنویس CVD"
+
+#, fuzzy
 #~ msgid "Jump to time"
-#~ msgstr "پرش به زمان"
+#~ msgstr "زمان توقف"
 
-#~ msgid "No CrashLog found"
-#~ msgstr "ثبت فروپاشی پیدا نشد"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "اثری از فروپاشی قبلی دیده نمی‌شود."
-
+#, fuzzy
 #~ msgid "&Help..."
-#~ msgstr "راهنما"
+#~ msgstr "&راهنما"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "افزودن پرونده زیرنویس:"
 
 #, fuzzy
 #~ msgid "Display XOSD output at the bottom of the screen instead of the top."
@@ -29072,139 +29011,139 @@ msgstr ""
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for Alsa captures. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DVB streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Default caching value for Audio CDs. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DirectShow streams. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DV streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Caching value for DVDs. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for EyeTV captures. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for fake streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Supplementary caching value for remote files, in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for FTP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for GnomeVFS streams.This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for HTTP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for imem streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for MMS streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Caching value for files. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for OSS captures. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Default caching value for PVR streams. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for RTMP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for RTSP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for screen capture. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for SFTP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for SMB streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for TCP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for UDP streams. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for V4L captures. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for V4L2 captures. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Caching value for VCDs. This value should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
@@ -29214,7 +29153,7 @@ msgstr ""
 #~ msgid ""
 #~ "Caching value for CDDA streams. This value should be set in millisecond "
 #~ "units."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Transcode:"
@@ -29223,7 +29162,7 @@ msgstr ""
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DV streams. Thisvalue should be set in milliseconds."
-#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای منابع شبکه، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Minimal View..."
@@ -29291,7 +29230,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Subtitle demuxer settings"
-#~ msgstr "جلوه‌های  زیرنویس"
+#~ msgstr "توضیحات زیرنویس"
 
 #, fuzzy
 #~ msgid "Quick &Open File..."
@@ -29339,7 +29278,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Audio visualizations "
-#~ msgstr "تصویر‌سازی‌های صوتی"
+#~ msgstr "جلوه‌های صوتی"
 
 #, fuzzy
 #~ msgid "Memory copy module"
@@ -29347,7 +29286,8 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Allow only one running instance when started from file."
-#~ msgstr "فقط یک نمونه اجرا شود"
+#~ msgstr ""
+#~ "در صورت اجرا از طریق مدیر پرونده فقط از یک نمونه از برنامه استفاده شود"
 
 #, fuzzy
 #~ msgid "Select current widget"
@@ -29371,11 +29311,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Refresh list"
-#~ msgstr "زمان نوسازی"
+#~ msgstr "نوسازی لیست"
 
 #, fuzzy
 #~ msgid "Auto Connection"
-#~ msgstr "اتصال صوتی"
+#~ msgstr "اتصال خودکار"
 
 #, fuzzy
 #~ msgid "RTMP stream output"
@@ -29399,7 +29339,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "B Frames"
-#~ msgstr "ردکردن فریم ها"
+#~ msgstr "فریم به فریم"
 
 #, fuzzy
 #~ msgid "Bitrate peak"
@@ -29508,10 +29448,6 @@ msgstr ""
 #~ msgstr "Command+"
 
 #, fuzzy
-#~ msgid "Maemo hildon interface"
-#~ msgstr "واسط‌های اصلی"
-
-#, fuzzy
 #~ msgid "Image width:"
 #~ msgstr "عرض تصویر"
 
@@ -29605,7 +29541,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Hotkey for "
-#~ msgstr "میان‌برها"
+#~ msgstr "میانبُرها"
 
 #, fuzzy
 #~ msgid "Subtitles && OSD"
@@ -29669,7 +29605,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "SQLite database module"
-#~ msgstr "پیمانهٔ نادرهم‌بافی"
+#~ msgstr "پیمانه پالایش جریان"
 
 #, fuzzy
 #~ msgid "MSN Now-Playing"
@@ -29728,10 +29664,6 @@ msgstr ""
 #~ msgstr "تعدد نقاط خالی بین نوارها."
 
 #, fuzzy
-#~ msgid "Luminance threshold "
-#~ msgstr "آستانهٔ روشنی"
-
-#, fuzzy
 #~ msgid "Deinterlace method to use for local playback."
 #~ msgstr "حالت نادرهم‌بافی برای پردازش ویدئو"
 
@@ -29762,10 +29694,6 @@ msgstr ""
 #~ msgstr "فعال کردن حالت پس‌زمینه"
 
 #, fuzzy
-#~ msgid "Stream Name"
-#~ msgstr "نرخ بیتی جریان"
-
-#, fuzzy
 #~ msgid "Video Codec"
 #~ msgstr "کُدک ویدئو"
 
@@ -29794,10 +29722,6 @@ msgstr ""
 #~ msgstr "مقصد خروجی"
 
 #, fuzzy
-#~ msgid "Output File"
-#~ msgstr "پروندهٔ خروجی"
-
-#, fuzzy
 #~ msgid "x offset"
 #~ msgstr "فاصلهٔ X"
 
@@ -29818,16 +29742,8 @@ msgstr ""
 #~ msgstr "مجوز"
 
 #, fuzzy
-#~ msgid "Destinations"
-#~ msgstr "شرح"
-
-#, fuzzy
 #~ msgid "Subtitles Language"
 #~ msgstr "زبان زیرنویس"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "سیاه"
 
 #, fuzzy
 #~ msgid "Duration in second"
@@ -29835,11 +29751,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Previous/Backward"
-#~ msgstr "فصل قبلی"
+#~ msgstr "قبلی / به عقب"
 
 #, fuzzy
 #~ msgid "Next/Forward"
-#~ msgstr "یک قدم به جلو"
+#~ msgstr "بعدی / به جلو"
 
 #, fuzzy
 #~ msgid "Video Filters..."
@@ -29847,7 +29763,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Speed of the subtitles:"
-#~ msgstr "شناسهٔ جریان شیار زیرنویس مورد استفاده."
+#~ msgstr "انتخاب پرونده زیرنویس"
 
 #, fuzzy
 #~ msgid "Front speakers"
@@ -29863,7 +29779,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&Open a Media"
-#~ msgstr "رسانه"
+#~ msgstr "باز کردن رسانه"
 
 #, fuzzy
 #~ msgid "Live Update"
@@ -29887,7 +29803,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "زمان رسانه"
+#~ msgstr "Media Time"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
@@ -29895,7 +29811,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Create Stream"
-#~ msgstr "جریان پیش‌فرض"
+#~ msgstr "مدیریت جریان ها"
 
 #, fuzzy
 #~ msgid "Capture Screen"
@@ -29943,15 +29859,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "key"
-#~ msgstr "میان‌برها"
+#~ msgstr "میانبُرها"
 
 #, fuzzy
 #~ msgid "Telnet Interface"
-#~ msgstr "واسط"
-
-#, fuzzy
-#~ msgid "Video output filter module"
-#~ msgstr "پیمانهٔ خروجی ویدئو"
+#~ msgstr "رابط کاربری"
 
 #, fuzzy
 #~ msgid "UDP port"
@@ -29959,7 +29871,8 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "This is the default port used for UDP streams. Default is 1234."
-#~ msgstr "این دستگاه سی‌دی صوتی مورد استفادهٔ پیش‌فرض است."
+#~ msgstr ""
+#~ "این دستگاه به صورت پیش‌فرض به عنوان دستگاه خوانش سی‌دی صوتی استفاده می‌شود."
 
 #, fuzzy
 #~ msgid "Enable CPU MMX support"
@@ -29982,14 +29895,16 @@ msgstr ""
 #~ "Select the key to go back (to the previous media item) in the browsing "
 #~ "history."
 #~ msgstr ""
-#~ "میان‌بر مورد استفاده برای گذشتن از مورد قبلی در فهرست پخش را انتخاب کنید."
+#~ "کلید میانبر مورد استفاده برای رد کردن مورد قبلی در فهرست پخش را انتخاب "
+#~ "کنید."
 
 #, fuzzy
 #~ msgid ""
 #~ "Select the key to go forward (to the next media item) in the browsing "
 #~ "history."
 #~ msgstr ""
-#~ "میان‌بر مورد استفاده برای گذشتن از مورد بعدی در فهرست پخش را انتخاب کنید."
+#~ "کلید میانبر مورد استفاده برای رد کردن مورد بعدی در فهرست پخش را انتخاب "
+#~ "کنید."
 
 #, fuzzy
 #~ msgid "Caching value in ms"
@@ -30064,10 +29979,6 @@ msgstr ""
 #~ msgstr "آستانهٔ روشنی"
 
 #, fuzzy
-#~ msgid "default"
-#~ msgstr "پیش‌فرض"
-
-#, fuzzy
 #~ msgid "No Audio Device"
 #~ msgstr "دستگاه صدا"
 
@@ -30101,7 +30012,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Host address"
-#~ msgstr "نشانی"
+#~ msgstr "نشانی سرور HTTP"
 
 #, fuzzy
 #~ msgid "HTTP remote control interface"
@@ -30121,7 +30032,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Subtitles (asa demuxer)"
-#~ msgstr "زیرنویس ها (تصاویر)"
+#~ msgstr "زیرنویس ها (پیشرفته)"
 
 #, fuzzy
 #~ msgid "CSA ck"
@@ -30165,7 +30076,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "دستگاه ورودی یافت نشد"
+#~ msgstr "هیچ دستگاهی انتخاب نشده"
 
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
@@ -30189,7 +30100,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Hotkeys not saved"
-#~ msgstr "تنظیمات میان‌برها"
+#~ msgstr "تنظیمات میانبُرها"
 
 #, fuzzy
 #~ msgid " Help "
@@ -30208,16 +30119,8 @@ msgstr ""
 #~ msgstr "ورودی تغییر کرد"
 
 #, fuzzy
-#~ msgid "&Extra Metadata"
-#~ msgstr "متاداده"
-
-#, fuzzy
 #~ msgid "C&lear"
 #~ msgstr "پاک‌سازی"
-
-#, fuzzy
-#~ msgid "Verbosity Level"
-#~ msgstr "تفصیل (۰‏،۱،‏۲)"
 
 #, fuzzy
 #~ msgid "Message filter"
@@ -30321,7 +30224,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Default port (server mode)"
-#~ msgstr "جریان پیش‌فرض"
+#~ msgstr "پیمانه سرور VoD"
 
 #, fuzzy
 #~ msgid "Color fun"
@@ -30350,10 +30253,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "SDL video driver name"
 #~ msgstr "نام دستگاه ویدئو"
-
-#, fuzzy
-#~ msgid "Select the port used"
-#~ msgstr "کلید قطع صدا را انتخاب کنید."
 
 #, fuzzy
 #~ msgid "Other codecs"
@@ -30405,11 +30304,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Audio Compact Disc"
-#~ msgstr "شناسهٔ شیار صدا"
+#~ msgstr "شناسهٔ قطعه صدا"
 
 #, fuzzy
 #~ msgid "Caching value in microseconds"
-#~ msgstr "مقدار کشینگ برای فایلهای محلی، به میلی ثانیه."
+#~ msgstr "مقدار کشینگ برای فایل‌های محلی، به میلی‌ثانیه."
 
 #, fuzzy
 #~ msgid "Use CD audio controls and output?"
@@ -30429,7 +30328,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "CDDB server timeout"
-#~ msgstr "کارگزار CDDB"
+#~ msgstr "پیمانه سرور VoD"
 
 #, fuzzy
 #~ msgid "Track %i"
@@ -30492,11 +30391,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "VLC media player: Open Media Files"
-#~ msgstr "پخش‌کنندهٔ صدا و تصویر وی‌ال‌سی"
+#~ msgstr "پخش کننده رسانه ای VLC - رابط کاربری وب"
 
 #, fuzzy
 #~ msgid "VLC media player: Open Subtitle File"
-#~ msgstr "پخش‌کنندهٔ صدا و تصویر وی‌ال‌سی"
+#~ msgstr "پخش کننده رسانه ای VLC - رابط کاربری وب"
 
 #, fuzzy
 #~ msgid "Select None"
@@ -30515,20 +30414,12 @@ msgstr ""
 #~ msgstr "حذف"
 
 #, fuzzy
-#~ msgid "Correct Aspect Ratio"
-#~ msgstr "نسبت طول به عرض"
-
-#, fuzzy
 #~ msgid "PDA Linux Gtk2+ interface"
-#~ msgstr "واسط‌های اصلی"
+#~ msgstr "واسط کاربر اصلی"
 
 #, fuzzy
 #~ msgid "Address:"
 #~ msgstr "نشانی"
-
-#, fuzzy
-#~ msgid "Network: "
-#~ msgstr "شبکه"
 
 #, fuzzy
 #~ msgid "enable"
@@ -30560,7 +30451,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Quality:"
-#~ msgstr "کیفیت"
+#~ msgstr "سطح کیفی"
 
 #, fuzzy
 #~ msgid "Tuner:"
@@ -30639,20 +30530,12 @@ msgstr ""
 #~ msgstr "درگاه ویدئو"
 
 #, fuzzy
-#~ msgid "Select play mode"
-#~ msgstr "انتخاب پوشه"
-
-#, fuzzy
 #~ msgid "Alignment:"
 #~ msgstr "چینش ویدئو"
 
 #, fuzzy
 #~ msgid "Default volume"
 #~ msgstr "دستگاه‌های پیش‌فرض"
-
-#, fuzzy
-#~ msgid "Disc Devices"
-#~ msgstr "دستگاه‌ها"
 
 #, fuzzy
 #~ msgid "Server default port"
@@ -30667,7 +30550,7 @@ msgstr ""
 #~ "\n"
 #~ "(WinCE interface)\n"
 #~ "\n"
-#~ msgstr "واسط‌های اصلی"
+#~ msgstr "واسط کاربر اصلی"
 
 #, fuzzy
 #~ msgid "Open:"
@@ -30675,7 +30558,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "WinCE interface"
-#~ msgstr "واسط‌های اصلی"
+#~ msgstr "واسط کاربر اصلی"
 
 #, fuzzy
 #~ msgid "Old playlist export"
@@ -30700,10 +30583,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "video-filter-event"
 #~ msgstr "صافی ویدئو"
-
-#, fuzzy
-#~ msgid "Xinerama option"
-#~ msgstr "گزینه‌های کارآیی"
 
 #, fuzzy
 #~ msgid "Matrox Graphic Array video output"
@@ -30752,10 +30631,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Video On Demand"
 #~ msgstr "کدگذار ویدئو"
-
-#, fuzzy
-#~ msgid "Autodetect"
-#~ msgstr "اتصال مجدد خودکار"
 
 #, fuzzy
 #~ msgid "textFormat"
@@ -30866,10 +30741,6 @@ msgstr ""
 #~ "نکنید، دستگاه پیش‌فرض استفاده خواهد شد."
 
 #, fuzzy
-#~ msgid "spatializer"
-#~ msgstr "تصویرساز"
-
-#, fuzzy
 #~ msgid "EsounD audio output"
 #~ msgstr "خروجی صدای ALSA"
 
@@ -30894,10 +30765,6 @@ msgstr ""
 #~ msgstr "تنظیم نشانک ۱ فهرست پخش"
 
 #, fuzzy
-#~ msgid "Raw DTS demuxer"
-#~ msgstr "جداسازها"
-
-#, fuzzy
 #~ msgid "16:9 subtitles"
 #~ msgstr "زیرنویس‌های SVCD"
 
@@ -30915,7 +30782,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Open playlist file"
-#~ msgstr "نمايش فهرست پخش"
+#~ msgstr "باز کردن پرونده زیرنویس"
 
 #, fuzzy
 #~ msgid "Open a VLM Configuration File"
@@ -30987,4 +30854,4 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Open Subtitles"
-#~ msgstr "زیرنویس‌ها"
+#~ msgstr "باز کردن زیرنویس ها"

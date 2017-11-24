@@ -29213,10 +29213,6 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Спіс медыякіраўніка"
 
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Дарожка субтытраў"
-
 #~ msgid "Display resolution"
 #~ msgstr "Разрозненне манітора"
 
@@ -29564,12 +29560,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "Фармат поля \"назва\" элементаў плэйліста."
 
-#~ msgid "Media in Zip"
-#~ msgstr "Медыяфайлы ў Zip"
-
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Шлях да Zip-архіва з медыяфайламі"
-
 #~ msgid "Zip files filter"
 #~ msgstr "Zip-файлы"
 
@@ -29669,18 +29659,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Знешні дэкодар QuickTime"
 
-#~ msgid "---  DVD Menu"
-#~ msgstr "--- Меню DVD "
-
-#~ msgid "First Played"
-#~ msgstr "Першыя сыграныя"
-
-#~ msgid "Video Manager"
-#~ msgstr "Кіраўнік відэа"
-
-#~ msgid "----- Title"
-#~ msgstr "----- Назва"
-
 #~ msgid "Writer"
 #~ msgstr "Аўтар"
 
@@ -29776,20 +29754,6 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "ZPL playlist import"
 #~ msgstr "Імпарт плэйлісту ZPL"
-
-#~ msgid "Fast udp streaming"
-#~ msgstr "Хуткае UDP-вяшчанне"
-
-#~ msgid ""
-#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
-#~ msgstr ""
-#~ "Пасылае TS на вызначаны ip:port праз UDP (вы павінны валодаць тэматыкай)"
-
-#~ msgid "MTU for out mode"
-#~ msgstr "MTU выхаду"
-
-#~ msgid "MTU for out mode."
-#~ msgstr "MTU выхаду."
 
 #~ msgid "Compiled by %s with %@"
 #~ msgstr "Скампілявана %s пры дапамозе %@"
@@ -30256,6 +30220,9 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "This page allows selecting how the input stream will be sent."
 #~ msgstr "На гэтай старонцы можна абраць метад адпраўкі ўваходнага патоку."
 
+#~ msgid "Streaming method"
+#~ msgstr "Метад вяшчання"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Увядзіце адрас камп'ютара, на які трансляваць."
 
@@ -30518,12 +30485,12 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "&Decrease Volume"
 #~ msgstr "Па&вялічыць гучнасць"
 
-#~ msgid "&Post processing"
-#~ msgstr "&Постапрацоўка"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Захаваць плэйліст"
+
+#~ msgid "&Post processing"
+#~ msgstr "&Постапрацоўка"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -31149,15 +31116,6 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "Вывад відэа цераз DirectFB"
 
-#~ msgid ""
-#~ "If your framebuffer supports hardware acceleration or does double "
-#~ "buffering in hardware then you must disable this option. It then does "
-#~ "double buffering in software."
-#~ msgstr ""
-#~ "Калі буфер кадраў не падтрымлівае апаратнае паскарэнне і не ажыццяўляе "
-#~ "падвойную буферызацыю апаратна, гэты параметр варта адключыць. Тады "
-#~ "падвойная буферызацыя будзе выконвацца праграмна."
-
 #~ msgid "OpenGL ES extension"
 #~ msgstr "Пашырэнне OpenGL ES "
 
@@ -31195,29 +31153,8 @@ msgstr "Спіс медыякіраўніка"
 #~ msgid "OpenGL GLX video output (XCB)"
 #~ msgstr "Вывад відэа цераз OpenGL GLX (XCB)"
 
-#~ msgid "Video acceleration not available"
-#~ msgstr "Паскарэнне відэа не падтрымліваецца"
-
-#~ msgid ""
-#~ "The XVideo rendering acceleration driver does not support the required "
-#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
-#~ "Acceleration will thus be disabled. Performance may be degraded severely "
-#~ "if the resolution is large."
-#~ msgstr ""
-#~ "Драйвер акселерацыі вываду XVideo не падтрымлівае патрабаванае "
-#~ "разрозненне: %ux%u пікселяў. Максімальна магчымае разрозненне: %<PRIu32>x"
-#~ "%<PRIu32>.\n"
-#~ "Акселерацыя будзе адключана. Прадукцыйнасць пры вялікім разрозненні можа "
-#~ "істотна пацярпець."
-
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "Загаловак YUV4MPEG2 (стандартна выключана)"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
 
 #~ msgid "Black Slot"
 #~ msgstr "Пятнашки"
@@ -31233,6 +31170,72 @@ msgstr "Спіс медыякіраўніка"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Парог фільтра"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "--- Меню DVD "
+
+#~ msgid "First Played"
+#~ msgstr "Першыя сыграныя"
+
+#~ msgid "Video Manager"
+#~ msgstr "Кіраўнік відэа"
+
+#~ msgid "----- Title"
+#~ msgstr "----- Назва"
+
+#~ msgid ""
+#~ "If your framebuffer supports hardware acceleration or does double "
+#~ "buffering in hardware then you must disable this option. It then does "
+#~ "double buffering in software."
+#~ msgstr ""
+#~ "Калі буфер кадраў не падтрымлівае апаратнае паскарэнне і не ажыццяўляе "
+#~ "падвойную буферызацыю апаратна, гэты параметр варта адключыць. Тады "
+#~ "падвойная буферызацыя будзе выконвацца праграмна."
+
+#~ msgid "Video acceleration not available"
+#~ msgstr "Паскарэнне відэа не падтрымліваецца"
+
+#~ msgid ""
+#~ "The XVideo rendering acceleration driver does not support the required "
+#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
+#~ "Acceleration will thus be disabled. Performance may be degraded severely "
+#~ "if the resolution is large."
+#~ msgstr ""
+#~ "Драйвер акселерацыі вываду XVideo не падтрымлівае патрабаванае "
+#~ "разрозненне: %ux%u пікселяў. Максімальна магчымае разрозненне: %<PRIu32>x"
+#~ "%<PRIu32>.\n"
+#~ "Акселерацыя будзе адключана. Прадукцыйнасць пры вялікім разрозненні можа "
+#~ "істотна пацярпець."
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Дарожка субтытраў"
+
+#~ msgid "Media in Zip"
+#~ msgstr "Медыяфайлы ў Zip"
+
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Шлях да Zip-архіва з медыяфайламі"
+
+#~ msgid "Fast udp streaming"
+#~ msgstr "Хуткае UDP-вяшчанне"
+
+#~ msgid ""
+#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
+#~ msgstr ""
+#~ "Пасылае TS на вызначаны ip:port праз UDP (вы павінны валодаць тэматыкай)"
+
+#~ msgid "MTU for out mode"
+#~ msgstr "MTU выхаду"
+
+#~ msgid "MTU for out mode."
+#~ msgstr "MTU выхаду."
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

@@ -2861,9 +2861,8 @@ msgid "Subtitles text scaling factor"
 msgstr "Ecôdeu des sortites"
 
 #: src/libvlc-module.c:717
-#, fuzzy
 msgid "Set value to alter subtitles size where possible"
-msgstr "Tchoezi l' fitchî"
+msgstr ""
 
 #: src/libvlc-module.c:719
 msgid "Enable sub-pictures"
@@ -4201,12 +4200,12 @@ msgstr "Discôdeu des sortites teletecse"
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Tchoezi l' fitchî"
+msgstr "Mete en alaedje les dzo-imådjes"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Tchoezi l' fitchî"
+msgstr "Drovi les sortites"
 
 #: src/libvlc-module.c:1325
 #, fuzzy
@@ -22489,7 +22488,7 @@ msgstr "Siervices"
 #: modules/services_discovery/upnp.cpp:78
 #, fuzzy
 msgid "Custom List"
-msgstr "Da vosse"
+msgstr "Tchuzes d' apontiaedje"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -26973,8 +26972,9 @@ msgid "Dialog"
 msgstr "Divize"
 
 #: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
+#, fuzzy
 msgid "Update"
-msgstr ""
+msgstr "&Metaedje a djoû"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -26994,12 +26994,14 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
+#, fuzzy
 msgid "&Verbosity:"
-msgstr ""
+msgstr "Tchafiaedje"
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "Passete:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -27125,12 +27127,14 @@ msgid "Audio and Subtitles"
 msgstr "Odio eyet Sortites"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "Eployî l' fitchî des sortites"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "Tchoezi l' fitchî"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -27158,8 +27162,9 @@ msgid "Please enter a network URL:"
 msgstr "S' i vs plait intrez on URL rantoele:"
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr " Li No do Profil Manke"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27226,20 +27231,24 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
+#, fuzzy
 msgid "Features"
-msgstr ""
+msgstr "Movmints"
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "No do floû"
 
 #: modules/gui/qt/ui/profiles.h:720
+#, fuzzy
 msgid "Chapters"
-msgstr ""
+msgstr "Tchaptrê"
 
 #: modules/gui/qt/ui/profiles.h:723
+#, fuzzy
 msgid "Menus"
-msgstr ""
+msgstr "Dressêye"
 
 #: modules/gui/qt/ui/profiles.h:730
 #, fuzzy
@@ -27247,16 +27256,18 @@ msgid "Fra&me Rate"
 msgstr "Frecwince do cåde"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "Macsimom sourdants RTP"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr " cps"
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "Tchuzes d' apontiaedje"
 
 #: modules/gui/qt/ui/profiles.h:735
 #, fuzzy
@@ -27264,24 +27275,28 @@ msgid "&Quality"
 msgstr "Livea di cwålité"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
+#, fuzzy
 msgid "Not Used"
-msgstr ""
+msgstr "Nén defini"
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
 msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
+#, fuzzy
 msgid "Encoding parameters"
-msgstr ""
+msgstr "Ecôdaedje del cordinêye X"
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "Frecwince do cåde "
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
+#, fuzzy
 msgid "px"
-msgstr ""
+msgstr " px"
 
 #: modules/gui/qt/ui/profiles.h:758
 #, fuzzy
@@ -27294,16 +27309,18 @@ msgid "Profile &Name"
 msgstr "No do Profil"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Tchoezi on floû"
 
 #: modules/gui/qt/ui/sout.h:205
 msgid "Destination Setup"
 msgstr "Apontiaedje del Destinåcion"
 
 #: modules/gui/qt/ui/sout.h:206
+#, fuzzy
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "Tchoezi on floû"
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27320,24 +27337,28 @@ msgid "Display locally"
 msgstr "Håyner locålmint"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "Sipepieusès Tchuzes"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "Tchoezi \"Sipepieusès Tchuzes\" po vey totes les tchuzes."
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "Mete en alaedje li transcodaedje"
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "Apontiaedje del Destinåcion"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Tchoezi on floû"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -27348,8 +27369,9 @@ msgid "Stream all elementary streams"
 msgstr "Mete e floû tos les floûs soûmintreces"
 
 #: modules/gui/qt/ui/sout.h:219
+#, fuzzy
 msgid "Generated stream output string"
-msgstr ""
+msgstr "Djenerås apontiaedjes del rexhowe do floû"
 
 #: modules/gui/qt/ui/sprefs_audio.h:428
 msgid " %"
@@ -27372,8 +27394,9 @@ msgid "Visualization:"
 msgstr "Voeyaedje:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:437
+#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr ""
+msgstr "Enonder l' odio"
 
 #: modules/gui/qt/ui/sprefs_audio.h:438
 msgid "Dolby Surround:"
@@ -27420,16 +27443,19 @@ msgid "x264 profile and level selection"
 msgstr "Tchoe do profile et do livea x264"
 
 #: modules/gui/qt/ui/sprefs_input.h:348
+#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr ""
+msgstr "Tchoe do profile et do livea x264"
 
 #: modules/gui/qt/ui/sprefs_input.h:349
+#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr ""
+msgstr "Discôdaedje di l' éndjolreye"
 
 #: modules/gui/qt/ui/sprefs_input.h:350
+#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr ""
+msgstr "Passer houte li passete blouke"
 
 #: modules/gui/qt/ui/sprefs_input.h:351
 msgid "Video quality post-processing level"
@@ -27533,8 +27559,9 @@ msgid "Skin resource file:"
 msgstr "Fitchî rissoûce des tinmes:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "Analijheu del sintake Podcast"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -27581,20 +27608,23 @@ msgid "Show media title on video start"
 msgstr "Mostrer l' tite do media a l' enondaedje del videyo"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "Mete en alaedje les dzo-imådjes"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Sortite do lingaedje"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr "Prémetou ecôdaedje"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Sortites"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27697,8 +27727,9 @@ msgid "Launching an update request..."
 msgstr "Enondaedje d' ene dimande di metaedje a djoû..."
 
 #: modules/gui/qt/ui/update.h:150
+#, fuzzy
 msgid "Do you want to download it?"
-msgstr ""
+msgstr "Voloz vs l' aberweter?"
 
 #: modules/gui/qt/ui/video_effects.h:1228
 msgid "Essential"
@@ -27800,8 +27831,9 @@ msgid "VLM configurator"
 msgstr "Apontiaedje VLM"
 
 #: modules/gui/qt/ui/vlm.h:287
+#, fuzzy
 msgid "Media Manager Edition"
-msgstr ""
+msgstr "Djivêye do manaedjeu des medias"
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
@@ -27842,10 +27874,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Djivêye do manaedjeu des medias"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Boket do sortite: %s"
 
 #~ msgid "Display resolution"
 #~ msgstr "Finté do håynaedje"
@@ -28078,12 +28106,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "Cogne a eployî dins l' tchamp \"tite\" del djivêye a djouwer."
 
-#~ msgid "Media in Zip"
-#~ msgstr "Media e Zip"
-
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Tchmin do media po-z ariver al årtchive Zip"
-
 #~ msgid "Zip files filter"
 #~ msgstr "Passete des fitchîs ZIP"
 
@@ -28123,18 +28145,6 @@ msgstr "Djivêye do manaedjeu des medias"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Discôdeu del livreye QuickTime"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  Dressêye DVD"
-
-#~ msgid "First Played"
-#~ msgstr "Djouwé pol prumî côp"
-
-#~ msgid "Video Manager"
-#~ msgstr "Manaedjeu del Videyo"
-
-#~ msgid "----- Title"
-#~ msgstr "----- Tite"
 
 #~ msgid "Writer"
 #~ msgstr "Sicrijheu"
@@ -28389,6 +28399,9 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgid "To"
 #~ msgstr "Po"
 
+#~ msgid "Streaming method"
+#~ msgstr "Metôde do kissemaedje e floû"
+
 #~ msgid "UDP Unicast"
 #~ msgstr "Unicast UDP"
 
@@ -28480,12 +28493,12 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgid "Current visualization"
 #~ msgstr "Voeyaedje do moumint"
 
-#~ msgid "&Post processing"
-#~ msgstr "&Après traitmint"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Schaper l' djivêye a djouwer"
+
+#~ msgid "&Post processing"
+#~ msgstr "&Après traitmint"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -28819,11 +28832,9 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "YUV4MPEG2 tiestire (prémetou dismetou)"
 
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
+#, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "Black Metal"
 
 #~ msgid "Output Color Filtermode"
 #~ msgstr "Môde del passete del coleur di rexhowe"
@@ -28836,6 +28847,34 @@ msgstr "Djivêye do manaedjeu des medias"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Soû do passete (%)"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "---  Dressêye DVD"
+
+#~ msgid "First Played"
+#~ msgstr "Djouwé pol prumî côp"
+
+#~ msgid "Video Manager"
+#~ msgstr "Manaedjeu del Videyo"
+
+#~ msgid "----- Title"
+#~ msgstr "----- Tite"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Boket do sortite: %s"
+
+#~ msgid "Media in Zip"
+#~ msgstr "Media e Zip"
+
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Tchmin do media po-z ariver al årtchive Zip"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"
@@ -29674,9 +29713,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ "Ecawer des cayets dins l' djivêye a djouwer cwand c' est l' môde ene "
 #~ "instance"
 
-#~ msgid "Do you want to download it ?"
-#~ msgstr "Voloz vs l' aberweter?"
-
 #~ msgid ""
 #~ "Specify the log format. Available choices are \"text\" (default), \"html"
 #~ "\", and \"syslog\" (special mode to send to syslog instead of file."
@@ -30118,9 +30154,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ "après des <b>metaedjes a djoû</b> disponibes.</p>\n"
 #~ "<p><b>L' djouweu d' media VLC</i> <b>n'</b> evoye nén ou n' ramexhne nén "
 #~ "des informåcion, minme anonimmint, åd fwait da vost eployaedje.</p>\n"
-
-#~ msgid "&Update"
-#~ msgstr "&Metaedje a djoû"
 
 #~ msgid "Sca&le"
 #~ msgstr "Schå&le"
@@ -31360,10 +31393,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgstr "Grandeu del fonte"
 
 #, fuzzy
-#~ msgid "Subtitle Languages"
-#~ msgstr "Sortite do lingaedje"
-
-#, fuzzy
 #~ msgid "Preferred Subtitle Language"
 #~ msgstr "Lingaedje odio mia inmé"
 
@@ -31470,10 +31499,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #, fuzzy
 #~ msgid "Show playlist"
 #~ msgstr "Mostrer/Catchî  l' djivêye a djouwer"
-
-#, fuzzy
-#~ msgid "Open subtitles file"
-#~ msgstr "Drovi les sortites"
 
 #, fuzzy
 #~ msgid "Preamp\n"
@@ -31840,14 +31865,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #~ msgstr "Licince"
 
 #, fuzzy
-#~ msgid "Verbosity:"
-#~ msgstr "Tchafiaedje"
-
-#, fuzzy
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Eployî l' fitchî des sortites"
-
-#, fuzzy
 #~ msgid "Destinations"
 #~ msgstr "Destinåcion"
 
@@ -31866,14 +31883,6 @@ msgstr "Djivêye do manaedjeu des medias"
 #, fuzzy
 #~ msgid "Preferred subtitles language"
 #~ msgstr "Lingaedje odio mia inmé"
-
-#, fuzzy
-#~ msgid "Subtitles effects"
-#~ msgstr "Sortites"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "Black Metal"
 
 #, fuzzy
 #~ msgid "Advance of subtitles over video:"

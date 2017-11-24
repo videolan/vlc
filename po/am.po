@@ -10497,8 +10497,9 @@ msgid "K Audio Interface audio output"
 msgstr "የተሰሚ ቅንብሮች "
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "የተሰሚ ቅንብሮች "
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -11181,7 +11182,7 @@ msgstr "የቪድዮ ኮዴክ "
 #: modules/codec/daala.c:125
 #, fuzzy
 msgid "Daala video packetizer"
-msgstr "የጽሁፋዊ ትርጉሞች ሙዚቃ "
+msgstr "ፓኮዎች "
 
 #: modules/codec/daala.c:132
 #, fuzzy
@@ -28081,8 +28082,9 @@ msgid "Change the caching for the media"
 msgstr "ለማህደረ መረጃው መሸጎጫ ለውጥ "
 
 #: modules/gui/qt/ui/open.h:270
+#, fuzzy
 msgid " ms"
-msgstr ""
+msgstr "ኤስ "
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
@@ -28365,8 +28367,9 @@ msgid "Profile &Name"
 msgstr "የመገለጫ ስም፡"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "ዥረት ምረጥ "
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -28412,8 +28415,9 @@ msgid "Option Setup"
 msgstr "ምርጫዎች "
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "ዥረት ምረጥ "
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -28872,16 +28876,19 @@ msgid "Spatial luma strength"
 msgstr "ጠፈርተኛ "
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "ጠፈርተኛ "
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "ጠፈርተኛ "
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "ጠፈርተኛ "
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
@@ -28930,10 +28937,6 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "ጽሁፋዊ ትርጉሞች ያለው ሙዚቃ "
 
 #, fuzzy
 #~ msgid "Display resolution"
@@ -29091,14 +29094,6 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 #~ msgstr "የተራዘሙ አማራጮችን አሳይ  "
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "የማህደረ መረጃ ፋይሎች "
-
-#, fuzzy
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "skin ለመጠቀም ዱካውን አሳይ "
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "የጽሁፋዊ ትርጉሞች ፋይል ክፈት  "
 
@@ -29133,22 +29128,6 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 #, fuzzy
 #~ msgid "Dummy video decoder"
 #~ msgstr "የቪድዮ ኮዴክ "
-
-#, fuzzy
-#~ msgid "---  DVD Menu"
-#~ msgstr "የዲቪዲ ምናሌዎች የሉም"
-
-#, fuzzy
-#~ msgid "First Played"
-#~ msgstr "የተጫወተ "
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "የቪድዮ ማጣሪያ "
-
-#, fuzzy
-#~ msgid "----- Title"
-#~ msgstr "ርዕስ  "
 
 #, fuzzy
 #~ msgid "Composer"
@@ -29477,6 +29456,9 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 #~ msgid "To"
 #~ msgstr "ወደ   "
 
+#~ msgid "Streaming method"
+#~ msgstr "የልቀት ዘዴ "
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "የሚለቀቅበት ኮምፒውተር አድራሻ። "
 
@@ -29602,12 +29584,12 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 #~ msgid "&Decrease Volume"
 #~ msgstr "የድምፅ መጠኑን ቀንስ "
 
-#~ msgid "&Post processing"
-#~ msgstr "&ድህረ ቅንበራ "
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "የሙዚቃዎች ዝርዝር አስቀምጥ"
+
+#~ msgid "&Post processing"
+#~ msgstr "&ድህረ ቅንበራ "
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -29846,16 +29828,6 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 #~ msgstr "ትንሹ የ Mac OS X OpenGL  ቪድዮ ውፅአት (ክፈፍ የሌለው መስኮት ይከፍታል ) "
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "የቪድዮ ቅንብሮች አልተቀመጡም "
-
-#~ msgid "MKV"
-#~ msgstr "ኤምኬቪ "
-
-#~ msgid "FLV"
-#~ msgstr "ኤፍኤልቪ"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "ጥቁር ቀዳዳ  "
 
@@ -29870,6 +29842,44 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "የማጣሪያ መጀመሪያ (%) "
+
+#~ msgid "MKV"
+#~ msgstr "ኤምኬቪ "
+
+#~ msgid "FLV"
+#~ msgstr "ኤፍኤልቪ"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "የዲቪዲ ምናሌዎች የሉም"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "የተጫወተ "
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "የቪድዮ ማጣሪያ "
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "ርዕስ  "
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "የቪድዮ ቅንብሮች አልተቀመጡም "
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "ጽሁፋዊ ትርጉሞች ያለው ሙዚቃ "
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "የማህደረ መረጃ ፋይሎች "
+
+#, fuzzy
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "skin ለመጠቀም ዱካውን አሳይ "
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

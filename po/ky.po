@@ -729,8 +729,9 @@ msgid ""
 msgstr ""
 
 #: src/config/help.c:490
+#, fuzzy
 msgid "(default enabled)"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
@@ -1103,7 +1104,7 @@ msgstr ""
 #: src/input/es_out.c:3253
 #, fuzzy
 msgid "Chroma location"
-msgstr "Жайгашкан жери"
+msgstr "Автотуташуу"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -2685,9 +2686,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:716
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Субтитрлер"
+msgstr ""
 
 #: src/libvlc-module.c:717
 msgid "Set value to alter subtitles size where possible"
@@ -3965,8 +3965,9 @@ msgid "Scale up subtitles text"
 msgstr "Субтитрлер"
 
 #: src/libvlc-module.c:1324
+#, fuzzy
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: src/libvlc-module.c:1325
 msgid "Select the key to change subtitles text scaling"
@@ -7930,8 +7931,9 @@ msgid "Capture region width"
 msgstr ""
 
 #: modules/access/screen/screen.c:65
+#, fuzzy
 msgid "Capture region heigh"
-msgstr ""
+msgstr "Тынч режим"
 
 #: modules/access/screen/screen.c:67 modules/access/screen/xcb.c:59
 #: modules/gui/macosx/VLCOpenWindowController.m:214
@@ -16504,7 +16506,7 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #, fuzzy
 msgid "Select a subtitle file"
-msgstr "Субтитр файлы"
+msgstr "Файлды тандаңыз"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -20002,8 +20004,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
+#, fuzzy
 msgid "When to raise the interface"
-msgstr ""
+msgstr "Негизги интерфейстер"
 
 #: modules/gui/qt/qt.cpp:190
 msgid ""
@@ -21939,8 +21942,9 @@ msgid "Server List"
 msgstr "Тизмени тазалоо"
 
 #: modules/services_discovery/upnp.cpp:78
+#, fuzzy
 msgid "Custom List"
-msgstr ""
+msgstr "Автотуташуу"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24328,8 +24332,9 @@ msgid "Edge detection video filter"
 msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
+#, fuzzy
 msgid "Edge detection"
-msgstr ""
+msgstr "Өлчөм"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -26333,8 +26338,9 @@ msgstr ""
 
 #: modules/gui/qt/ui/about.h:288 modules/gui/qt/ui/open.h:260
 #: modules/gui/qt/ui/podcast_configuration.h:100
+#, fuzzy
 msgid "Dialog"
-msgstr ""
+msgstr "Тагалог"
 
 #: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
 msgid "Update"
@@ -26346,8 +26352,9 @@ msgstr ""
 #: modules/gui/qt/ui/sprefs_interface.h:528
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:320 modules/gui/qt/ui/streampanel.h:167
+#, fuzzy
 msgid "Form"
-msgstr ""
+msgstr "Формат"
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -26362,8 +26369,9 @@ msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "Фильтр:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26374,12 +26382,14 @@ msgid "Modules Tree"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:263
+#, fuzzy
 msgid "Show extended options"
-msgstr ""
+msgstr "Кодек маалыматы"
 
 #: modules/gui/qt/ui/open.h:265
+#, fuzzy
 msgid "Show &more options"
-msgstr ""
+msgstr "Кодек маалыматы"
 
 #: modules/gui/qt/ui/open.h:268
 msgid "Change the caching for the media"
@@ -26394,8 +26404,9 @@ msgid "MRL"
 msgstr "MRL"
 
 #: modules/gui/qt/ui/open.h:272
+#, fuzzy
 msgid "Start Time"
-msgstr ""
+msgstr "Башталыш убакыты"
 
 #: modules/gui/qt/ui/open.h:273
 #, fuzzy
@@ -26403,8 +26414,9 @@ msgid "Stop Time"
 msgstr "Токтоо убакыты"
 
 #: modules/gui/qt/ui/open.h:274
+#, fuzzy
 msgid "Edit Options"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/open.h:275
 msgid "Extra media"
@@ -26435,16 +26447,18 @@ msgid "Play another media synchronously (extra audio file, ...)"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:97
+#, fuzzy
 msgid "Capture mode"
-msgstr ""
+msgstr "Тынч режим"
 
 #: modules/gui/qt/ui/open_capture.h:99
 msgid "Select the capture device type"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
+#, fuzzy
 msgid "Device Selection"
-msgstr ""
+msgstr "Тандоо"
 
 #: modules/gui/qt/ui/open_capture.h:102
 msgid "Options"
@@ -26455,12 +26469,14 @@ msgid "Access advanced options to tweak the device"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:106
+#, fuzzy
 msgid "Advanced options..."
-msgstr ""
+msgstr "&Кең. башкаруу элементтери"
 
 #: modules/gui/qt/ui/open_disk.h:297
+#, fuzzy
 msgid "Disc Selection"
-msgstr ""
+msgstr "Тандоо"
 
 #: modules/gui/qt/ui/open_disk.h:301
 msgid "SVCD/VCD"
@@ -26475,8 +26491,9 @@ msgid "No disc menus"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:306
+#, fuzzy
 msgid "Disc device"
-msgstr ""
+msgstr "Көрсөтүү түзмөгү"
 
 #: modules/gui/qt/ui/open_disk.h:308
 msgid "Starting Position"
@@ -26487,20 +26504,23 @@ msgid "Audio and Subtitles"
 msgstr "Аудио жана субтитрлер"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "Субтитр файлы"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "Файлды тандаңыз"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
 msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:151
+#, fuzzy
 msgid "File Selection"
-msgstr ""
+msgstr "Өлчөм"
 
 #: modules/gui/qt/ui/open_file.h:152
 msgid "You can select local files with the following list and buttons."
@@ -26511,16 +26531,18 @@ msgid "Add..."
 msgstr "Кошуу..."
 
 #: modules/gui/qt/ui/open_net.h:97
+#, fuzzy
 msgid "Network Protocol"
-msgstr ""
+msgstr "Протокол"
 
 #: modules/gui/qt/ui/open_net.h:98
 msgid "Please enter a network URL:"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "Профиль аты"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26587,8 +26609,9 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
+#, fuzzy
 msgid "Features"
-msgstr ""
+msgstr "CPU өзгөчөлүктөрү"
 
 #: modules/gui/qt/ui/profiles.h:719
 msgid "Streamable"
@@ -26608,16 +26631,18 @@ msgid "Fra&me Rate"
 msgstr "Кадр жыштыгы"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "Булак"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr " к/с"
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "Автотуташуу"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
@@ -26636,8 +26661,9 @@ msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "Кадр жыштыгы"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -26658,8 +26684,9 @@ msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
+#, fuzzy
 msgid "Destination Setup"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/sout.h:206
 msgid "Select destinations to stream to"
@@ -26672,28 +26699,34 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:208
+#, fuzzy
 msgid "New destination"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/sout.h:210
+#, fuzzy
 msgid "Display locally"
-msgstr ""
+msgstr "Көрсөтүү"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/sout.h:214
+#, fuzzy
 msgid "Activate Transcoding"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: modules/gui/qt/ui/sout.h:215
+#, fuzzy
 msgid "Option Setup"
-msgstr ""
+msgstr "Параметрлер"
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -26756,8 +26789,9 @@ msgid "Tracks"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:443
+#, fuzzy
 msgid "Preferred audio language:"
-msgstr ""
+msgstr "Аудио тили"
 
 #: modules/gui/qt/ui/sprefs_audio.h:444
 msgid "Password:"
@@ -26800,8 +26834,9 @@ msgid "Optical drive"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:353
+#, fuzzy
 msgid "Default optical device"
-msgstr ""
+msgstr "Көрсөтүү түзмөгү"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Damaged or incomplete AVI file"
@@ -26824,8 +26859,9 @@ msgid "Live555 stream transport"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
+#, fuzzy
 msgid "Default caching policy"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Menus language:"
@@ -26844,8 +26880,9 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
+#, fuzzy
 msgid "Use native style"
-msgstr ""
+msgstr "Кийинки аталыш"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Resize interface to video size"
@@ -26868,12 +26905,14 @@ msgid "Start in minimal view mode"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
+#, fuzzy
 msgid "Force window style:"
-msgstr ""
+msgstr "Кийинки аталыш"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "Негизги интерфейстер"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -26889,8 +26928,9 @@ msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "плейлист файлдары"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -26925,8 +26965,9 @@ msgid "File extensions association"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
+#, fuzzy
 msgid "Set up associations..."
-msgstr ""
+msgstr "Ырастоолор..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Enable On Screen Display (OSD)"
@@ -26937,20 +26978,24 @@ msgid "Show media title on video start"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
+#, fuzzy
 msgid "Enable subtitles"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
+#, fuzzy
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Субтитр тили"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
+#, fuzzy
 msgid "Default encoding"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Субтитрлер"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -26989,8 +27034,9 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:337
+#, fuzzy
 msgid "Force Aspect Ratio"
-msgstr ""
+msgstr "Тараптар ара катышы"
 
 #: modules/gui/qt/ui/sprefs_video.h:342
 msgid "vlc-snap"
@@ -27053,8 +27099,9 @@ msgid "Launching an update request..."
 msgstr "Жаңылоо процессин жүргүзүү..."
 
 #: modules/gui/qt/ui/update.h:150
+#, fuzzy
 msgid "Do you want to download it?"
-msgstr ""
+msgstr "Аны жүктөп аласызбы?"
 
 #: modules/gui/qt/ui/video_effects.h:1228
 msgid "Essential"
@@ -27066,16 +27113,18 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
+#, fuzzy
 msgid "Negate colors"
-msgstr ""
+msgstr "Контур түсү"
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
 msgstr "Түстөр"
 
 #: modules/gui/qt/ui/video_effects.h:1257
+#, fuzzy
 msgid "Interactive Zoom"
-msgstr ""
+msgstr "Интерфейс"
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27151,8 +27200,9 @@ msgid "VLM configurator"
 msgstr "VLM конфигуратору"
 
 #: modules/gui/qt/ui/vlm.h:287
+#, fuzzy
 msgid "Media Manager Edition"
-msgstr ""
+msgstr "Медиа-менеджер тизмеси"
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
@@ -27179,8 +27229,9 @@ msgid "Time Control"
 msgstr "Убакытты башкаруу"
 
 #: modules/gui/qt/ui/vlm.h:295
+#, fuzzy
 msgid "Mux Control"
-msgstr ""
+msgstr "Башкаруу"
 
 #: modules/gui/qt/ui/vlm.h:296
 msgid "Muxer:"
@@ -27276,6 +27327,14 @@ msgstr "Медиа-менеджер тизмеси"
 #~ msgid "OpenGL ES"
 #~ msgstr "OpenGL ES"
 
+#, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "кара"
+
+#, fuzzy
+#~ msgid "Output Color Filtermode"
+#~ msgstr "Чыгыш файлы"
+
 #~ msgid "MKV"
 #~ msgstr "MKV"
 
@@ -27314,9 +27373,6 @@ msgstr "Медиа-менеджер тизмеси"
 #, fuzzy
 #~ msgid "VLC media player - Flash Viewer"
 #~ msgstr "VLC media player"
-
-#~ msgid "CPU features"
-#~ msgstr "CPU өзгөчөлүктөрү"
 
 #~ msgid "Sort"
 #~ msgstr "Сорттоо"
@@ -27463,9 +27519,6 @@ msgstr "Медиа-менеджер тизмеси"
 #~ msgid "00000; "
 #~ msgstr "00000; "
 
-#~ msgid "Do you want to download it ?"
-#~ msgstr "Аны жүктөп аласызбы?"
-
 #~ msgid "FFmpeg"
 #~ msgstr "FFmpeg"
 
@@ -27529,10 +27582,6 @@ msgstr "Медиа-менеджер тизмеси"
 #, fuzzy
 #~ msgid "Font Color"
 #~ msgstr "Арип түсү"
-
-#, fuzzy
-#~ msgid "Subtitle Languages"
-#~ msgstr "Субтитр тили"
 
 #, fuzzy
 #~ msgid "Outline Color"
@@ -27601,10 +27650,6 @@ msgstr "Медиа-менеджер тизмеси"
 #, fuzzy
 #~ msgid "Video Scale"
 #~ msgstr "Видео кодеги"
-
-#, fuzzy
-#~ msgid "Output File"
-#~ msgstr "Чыгыш файлы"
 
 #, fuzzy
 #~ msgid "File Name"

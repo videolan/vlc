@@ -10497,8 +10497,9 @@ msgid "K Audio Interface audio output"
 msgstr "Entegeka za Maloboozi"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Entegeka za Maloboozi"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -11181,7 +11182,7 @@ msgstr "Ebikka ya vidiyo"
 #: modules/codec/daala.c:125
 #, fuzzy
 msgid "Daala video packetizer"
-msgstr "Goberera obuntu bwe mitwe"
+msgstr "Obusawo"
 
 #: modules/codec/daala.c:132
 #, fuzzy
@@ -28114,8 +28115,9 @@ msgid "Change the caching for the media"
 msgstr "Kyusa ekwata kulwe mpuuliziganya"
 
 #: modules/gui/qt/ui/open.h:270
+#, fuzzy
 msgid " ms"
-msgstr ""
+msgstr "s"
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
@@ -28412,8 +28414,9 @@ msgid "Profile &Name"
 msgstr "Erinnya ly`Ebikukwatako"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Londa ekingobberera"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -28460,8 +28463,9 @@ msgid "Option Setup"
 msgstr "Ebilala"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Londa ekingobberera"
 
 #: modules/gui/qt/ui/sout.h:217
 #, fuzzy
@@ -28954,16 +28958,19 @@ msgid "Spatial luma strength"
 msgstr "Egaziya vidiyo"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Egaziya vidiyo"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Egaziya vidiyo"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Egaziya vidiyo"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -29016,10 +29023,6 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Olukalala lwe Mpulizinganya Enfugga"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Goberera obutwe"
 
 #, fuzzy
 #~ msgid "Display resolution"
@@ -29177,14 +29180,6 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #~ msgstr "Laga ebolondwamu ebigazidwa"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "Fayiro ye Mpuuliziganya"
-
-#, fuzzy
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Yitawo ku bika ekonzesa."
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "Ggulawo emitwe gya fayiro ejjidirira"
 
@@ -29219,22 +29214,6 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #, fuzzy
 #~ msgid "Dummy video decoder"
 #~ msgstr "Ebikka ya vidiyo"
-
-#, fuzzy
-#~ msgid "---  DVD Menu"
-#~ msgstr "Tteri DVD ebirimu"
-
-#, fuzzy
-#~ msgid "First Played"
-#~ msgstr "Azanye"
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "Segejja Vidiyo"
-
-#, fuzzy
-#~ msgid "----- Title"
-#~ msgstr "Omutwe"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -29571,6 +29550,9 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #~ msgid "To"
 #~ msgstr "Ku"
 
+#~ msgid "Streaming method"
+#~ msgstr "Ekubbo lyo ngobberera"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Endagiriro ya kompyuta wo ngobberera ku."
 
@@ -29699,12 +29681,12 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #~ msgid "&Decrease Volume"
 #~ msgstr "Kendeeza Kuuugi"
 
-#~ msgid "&Post processing"
-#~ msgstr "Kikoledwawo &oluvanyuma"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Tereka Olukalala lwe nyimba"
+
+#~ msgid "&Post processing"
+#~ msgstr "Kikoledwawo &oluvanyuma"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -29949,16 +29931,6 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #~ "bodda)"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "Entegeka ya Maloboozi tteterese"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "Akanya akadugavu"
 
@@ -29977,6 +29949,44 @@ msgstr "Olukalala lwe Mpulizinganya Enfugga"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Seegejja ekimpimo (%)"
+
+#~ msgid "MKV"
+#~ msgstr "MKV"
+
+#~ msgid "FLV"
+#~ msgstr "FLV"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "Tteri DVD ebirimu"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "Azanye"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "Segejja Vidiyo"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "Omutwe"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "Entegeka ya Maloboozi tteterese"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Goberera obutwe"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "Fayiro ye Mpuuliziganya"
+
+#, fuzzy
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Yitawo ku bika ekonzesa."
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

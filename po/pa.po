@@ -1,18 +1,20 @@
 # Punjabi translation
-# Copyright (C) 2014 VideoLAN
-# This file is distributed under the same license as the VLC package.
+# Copyright (C) 2017 VideoLAN
+# This file is distributed under the same license as the vlc package.
 #
 # Translators:
-# A S Alam <apreet.alam@gmail.com>, 2009-2014
+# A S Alam <apreet.alam@gmail.com>, 2009-2016
+# Navpreet Kaur <passionate.preet3@gmail.com>, 2014
+# Punjabi Fied <towtruckerwiki@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2014-04-04 03:30+0000\n"
-"Last-Translator: A S Alam <apreet.alam@gmail.com>\n"
-"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/projects/p/vlc-"
-"trans/language/pa/)\n"
+"PO-Revision-Date: 2017-02-06 13:43+0000\n"
+"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
+"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/yaron/vlc-trans/"
+"language/pa/)\n"
 "Language: pa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -88,7 +90,7 @@ msgstr "ਹਾਟ-ਕੀ ਸੈਟਿੰਗ"
 #: share/lua/http/dialogs/create_stream.html:150
 #: modules/gui/qt/ui/profiles.h:721 modules/gui/qt/ui/profiles.h:752
 msgid "Audio"
-msgstr "ਆਡਿਓ"
+msgstr "ਆਡੀਓ"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
@@ -158,16 +160,15 @@ msgstr "ਵਿਡੀਓ"
 
 #: include/vlc_config_cat.h:74
 msgid "Video settings"
-msgstr "ਵਿਡੀਓ ਸਥਾਪਨ"
+msgstr "ਵਿਡੀਓ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:76
 msgid "General video settings"
-msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹਨ।"
+msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲਾਂ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹੈ।"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -247,7 +248,7 @@ msgstr "ਕੇਵਲ ਆਡੀਓ ਡੀਕੋਡਰ ਅਤੇ ਇੰਕੋਡ�
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਕੋਡਕਸ"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
@@ -463,14 +464,12 @@ msgid "Create Folder..."
 msgstr "ਫੋਲਡਰ ਬਣਾਓ..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "ਡਾਇਰੈਕਟਰੀ ਬਣਾਓ..."
+msgstr "...ਡਾਇਰੈਕਟਰੀ ਦਾ ਨਾਂ ਬਦਲੋ"
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "ਫੋਲਡਰ ਬਣਾਓ..."
+msgstr "...ਫੋਲਡਰ ਦਾ ਨਾਂ ਬਦਲੋ"
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -612,7 +611,7 @@ msgstr "ਰੀਪਲੇਅ ਗੇਨ"
 #: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
 msgid "Stereo audio mode"
-msgstr ""
+msgstr "ਸਟੀਰਿਓ ਆਡੀਓ ਮੋਡ"
 
 #: src/audio_output/output.c:419
 #, fuzzy
@@ -771,12 +770,12 @@ msgstr ""
 #: src/config/help.c:721
 #, c-format
 msgid "VLC version %s (%s)\n"
-msgstr "VLC ਵਰਜਨ %s (%s)\n"
+msgstr "VLC ਵਰਜ਼ਨ %s (%s)\n"
 
 #: src/config/help.c:722
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
-msgstr "ਕੰਪਾਇਲ ਕੀਤਾ %s ਵਲੋਂ %s (%s) ਉੱਤੇ\n"
+msgstr "%s ਵਲੋਂ %s (%s) ਉੱਤੇ ਕੰਪਾਇਲ ਕੀਤਾ\n"
 
 #: src/config/help.c:724
 #, c-format
@@ -801,9 +800,8 @@ msgstr ""
 "ਜਾਰੀ ਰੱਖਣ ਵਾਸਤੇ RETURN ਸਵਿੱਚ ਦੱਬੋ...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "ਅਣਜਾਣ ਵਿਡੀਓ"
+msgstr "ਅਣਜਾਣ ਗਲਤੀ"
 
 #: src/input/control.c:203
 #, c-format
@@ -812,27 +810,24 @@ msgstr "ਬੁੱਕਮਾਰਕ %i"
 
 #: src/input/decoder.c:1875
 msgid "No description for this codec"
-msgstr ""
+msgstr "ਇਸ codec ਲਈ ਕੋਈ ਵੇਰਵਾ ਨਹੀਂ ਹੈ"
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "ਕਲਾਈਟ ਪੋਰਟ"
+msgstr "codec ਸਹਾਇਕ ਨਹੀਂ ਹੈ"
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC ਫਾਇਲ \"%s\" ਨੂੰ ਖੋਲ੍ਹ ਨਹੀਂ ਸਕਿਆ।(%m)"
+msgstr "VLC %4.4s\" (%s) ਫਾਰਮੈਟ ਨੂੰ ਡੀਕੋਡ ਨਹੀਂ ਕਰ ਸਕਿਆ"
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "ਵਿਡੀਓ codec"
+msgstr "ਅਣਪਛਾਤਾ codec"
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC ਡੀਕੋਡਰ ਮੋਡੀਊਲ ਖੋਲ੍ਹ ਨਹੀਂ ਸਕਿਆ"
+msgstr "VLC ਆਡੀਓ ਜਾਂ ਵੀਡੀਓ codec ਦੀ ਪਛਾਣ ਨਹੀਂ ਕਰ ਸਕਿਆ"
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -880,7 +875,7 @@ msgstr "ਸਟਰੀਮ %d"
 
 #: src/input/es_out.c:1468 src/input/es_out.c:1470
 msgid "Scrambled"
-msgstr ""
+msgstr "ਅਵਿਵਸਥਿਤ"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
 msgid "Yes"
@@ -889,12 +884,12 @@ msgstr "ਹਾਂ"
 #: src/input/es_out.c:2130
 #, fuzzy, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "ਬੰਦ ਸੁਰਖੀਆਂ %u"
+msgstr "%u ਸੁਰਖੀਆਂ ਬੰਦ ਕੀਤੀਆਂ"
 
 #: src/input/es_out.c:2132
 #, c-format
 msgid "Closed captions %u"
-msgstr "ਬੰਦ ਸੁਰਖੀਆਂ %u"
+msgstr "%u ਸੁਰਖੀਆਂ ਬੰਦ ਕੀਤੀਆਂ"
 
 #: src/input/es_out.c:3068 src/input/es_out.c:3336 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1284,9 +1279,8 @@ msgid "Track ID"
 msgstr "ਟਰੈਕ ID"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "ਕਤਾਰਾਂ ਦੀ ਗਿਣਤੀ"
+msgstr "ਟਰੈਕਾਂ ਦੀ ਗਿਣਤੀ"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1294,21 +1288,19 @@ msgstr "ਡਾਇਰੈਕਟਰ"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "ਸੀਜ਼ਨ"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "ਐਪੀਸੋਡ"
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "ਬੇਸਿਕ ਵੇਖੋ"
+msgstr "ਨਾਂ ਵੇਖਾਓ"
 
 #: src/input/meta.c:78
-#, fuzzy
 msgid "Actors"
-msgstr "ਫੈਕਟਰ"
+msgstr "ਐਕਟਰ"
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -1348,7 +1340,7 @@ msgstr "ਆਡੀਓ ਟਰੈਕ"
 
 #: src/input/var.c:207
 msgid "Subtitle Track"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਟਰੈਕ"
 
 #: src/input/var.c:275
 msgid "Next title"
@@ -1621,7 +1613,7 @@ msgstr ""
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr ""
+msgstr "ਆਡੀਓ ਗੇਨ"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
@@ -2509,9 +2501,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "ਮੇਨੂ ਭਾਸ਼ਾ:"
+msgstr "ਮੇਨੂ ਭਾਸ਼ਾ"
 
 #: src/libvlc-module.c:604
 msgid ""
@@ -2753,7 +2744,7 @@ msgstr "DVB ਸਬ-ਟਾਈਟਲ ਇੰਕੋਡਰ"
 #: src/libvlc-module.c:717
 #, fuzzy
 msgid "Set value to alter subtitles size where possible"
-msgstr "ਫਾਈਲ ਚੁਣੋ"
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਚੁਣੋ"
 
 #: src/libvlc-module.c:719
 msgid "Enable sub-pictures"
@@ -2989,7 +2980,7 @@ msgstr ""
 
 #: src/libvlc-module.c:858
 msgid "SOCKS user name"
-msgstr "SOCKS ਯੂਜ਼ਰ ਨਾਂ"
+msgstr "SOCKS ਵਰਤੋਂਕਾਰ ਨਾਂ"
 
 #: src/libvlc-module.c:860
 msgid "User name to be used for connection to the SOCKS proxy."
@@ -3389,7 +3380,7 @@ msgstr "VLC ਨੂੰ ਦੱਸੋ ਕਿ ਇਸ ਨੂੰ OS ਵਿੱਚ ਫ�
 
 #: src/libvlc-module.c:1084 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Use only one instance when started from file manager"
-msgstr ""
+msgstr "ਜਦੋਂ ਫਾਇਲ ਮੈਨੇਜਰ ਤੋਂ ਸ਼ੁਰੂ ਕੀਤਾ ਹੋਵੇ ਤਾਂ ਇੱਕ ਹੀ ਪਲੇਅਰ ਵਰਤੋਂ"
 
 #: src/libvlc-module.c:1086
 msgid "Increase the priority of the process"
@@ -3407,7 +3398,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1096 modules/gui/qt/ui/sprefs_interface.h:554
 msgid "Enqueue items into playlist in one instance mode"
-msgstr ""
+msgstr "ਇੱਕ ਹੀ ਪਲੇਅਰ ਚਲਾਉਣ ਦੇ ਮੋਡ ਵਿੱਚ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
 
 #: src/libvlc-module.c:1098
 msgid ""
@@ -3497,7 +3488,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "Codec ਵੇਰਵਾ"
+msgstr "ਵੇਰਵਾ ਵੇਖੋ"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -3567,8 +3558,9 @@ msgid "Start paused"
 msgstr "ਸਟਾਰਟ ਟਾਈਮ"
 
 #: src/libvlc-module.c:1179
+#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "ਇੱਕ ਹੀ ਪਲੇਅਰ ਚਲਾਉਣ ਦੇ ਮੋਡ ਵਿੱਚ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
 
 #: src/libvlc-module.c:1181
 msgid "Auto start"
@@ -4045,12 +4037,12 @@ msgstr "ਟੈਲੀਟੈਕਸਟ ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "ਫਾਈਲ ਚੁਣੋ"
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਚੁਣੋ"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "ਫਾਈਲ ਚੁਣੋ"
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਚੁਣੋ"
 
 #: src/libvlc-module.c:1325
 #, fuzzy
@@ -4212,7 +4204,7 @@ msgstr ""
 #: src/libvlc-module.c:1370
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
-msgstr ""
+msgstr "ਪਲੇਅਲਿਸਟ ਸਾਫ਼ ਕਰੋ"
 
 #: src/libvlc-module.c:1371
 msgid "Select the key to clear the current playlist."
@@ -4289,14 +4281,12 @@ msgid "Cycle through the available subtitle tracks."
 msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "ਟੈਲੀਟੈਕਸਟ ਸਬ-ਟਾਈਟਲ"
+msgstr "ਸਬ-ਟਾਈਟਲਾਂ ਨੂੰ ਬਦਲੋ"
 
 #: src/libvlc-module.c:1393
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "ਸਬ-ਟਾਈਟਲ ਟਰੈਕ ਚੱਕਰ"
+msgstr ""
 
 #: src/libvlc-module.c:1394
 msgid "Cycle next program Service ID"
@@ -4562,7 +4552,7 @@ msgstr "ਕਾਰਗੁਜ਼ਾਰੀ ਚੋਣਾਂ"
 
 #: src/libvlc-module.c:2047
 msgid "Clock source"
-msgstr ""
+msgstr "ਘੜੀ ਸਰੋਤ"
 
 #: src/libvlc-module.c:2165
 msgid "Hot keys"
@@ -4625,49 +4615,48 @@ msgid "print version information"
 msgstr "ਵਰਜਨ ਜਾਣਕਾਰੀ ਪਰਿੰਟ ਕਰੋ"
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "ਮੇਨ ਪਰੋਗਰਾਮ"
+msgstr "ਮੂਲ ਪਰੋਗਰਾਮ"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
-msgstr ""
+msgstr "Backspace"
 
 #: src/misc/actions.c:53
 msgid "Brightness Down"
-msgstr ""
+msgstr "ਚਮਕ ਘਟਾਓ"
 
 #: src/misc/actions.c:54
 msgid "Brightness Up"
-msgstr ""
+msgstr "ਚਮਕ ਵਧਾਓ"
 
 #: src/misc/actions.c:55
 msgid "Browser Back"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਪਿੱਛੇ"
 
 #: src/misc/actions.c:56
 msgid "Browser Favorites"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਪਸੰਦਾਂ"
 
 #: src/misc/actions.c:57
 msgid "Browser Forward"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਅੱਗੇ"
 
 #: src/misc/actions.c:58
 msgid "Browser Home"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਮੁੱਖ ਸਫ਼ਾ"
 
 #: src/misc/actions.c:59
 msgid "Browser Refresh"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਤਾਜ਼ਾ"
 
 #: src/misc/actions.c:60
 msgid "Browser Search"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਖੋਜ"
 
 #: src/misc/actions.c:61
 msgid "Browser Stop"
-msgstr ""
+msgstr "ਬਰਾਊਜ਼ਰ ਰੋਕੋ"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
 #: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
@@ -4678,7 +4667,7 @@ msgstr "ਹਟਾਓ"
 
 #: src/misc/actions.c:63
 msgid "Down"
-msgstr ""
+msgstr "Down"
 
 #: src/misc/actions.c:64 modules/control/oldrc.c:73
 msgid "End"
@@ -4686,11 +4675,11 @@ msgstr "ਅੰਤ"
 
 #: src/misc/actions.c:65
 msgid "Enter"
-msgstr ""
+msgstr "Enter"
 
 #: src/misc/actions.c:66
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: src/misc/actions.c:67
 msgid "F1"
@@ -4742,23 +4731,23 @@ msgstr "F9"
 
 #: src/misc/actions.c:79
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: src/misc/actions.c:80
 msgid "Insert"
-msgstr ""
+msgstr "Insert"
 
 #: src/misc/actions.c:82
 msgid "Media Angle"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਕੋਣ"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਆਡੀਓ ਟਰੈਕ"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਅੱਗੇ"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
@@ -4766,59 +4755,59 @@ msgstr "ਮੀਡਿਆ ਮੇਨੂ"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਅਗਲਾ ਫਰੇਮ"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਅੱਗੇ ਟਰੈਕ"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਪਲੇਅਰ ਵਿਰਾਮ"
 
 #: src/misc/actions.c:89
 msgid "Media Prev Frame"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਪਿਛਲਾ ਫਰੇਮ"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਪਿਛਲਾ ਟਰੈਕ"
 
 #: src/misc/actions.c:91
 msgid "Media Record"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਰਿਕਾਰਡ"
 
 #: src/misc/actions.c:92
 msgid "Media Repeat"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਦੁਹਰਾਓ"
 
 #: src/misc/actions.c:93
 msgid "Media Rewind"
-msgstr ""
+msgstr "ਮੀਡੀਆ ਰਿਵਾਇੰਡ"
 
 #: src/misc/actions.c:94
 msgid "Media Select"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਚੋਣ"
 
 #: src/misc/actions.c:95
 msgid "Media Shuffle"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਰਲਵਾਂ"
 
 #: src/misc/actions.c:96
 msgid "Media Stop"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਰੋਕੋ"
 
 #: src/misc/actions.c:97
 msgid "Media Subtitle"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਸਬ-ਟਾਈਟਲ"
 
 #: src/misc/actions.c:98
 msgid "Media Time"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਸਮਾਂ"
 
 #: src/misc/actions.c:99
 msgid "Media View"
-msgstr ""
+msgstr "ਮੀਡਿਆ ਝਲਕ"
 
 #: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:568
 msgid "Menu"
@@ -4826,27 +4815,27 @@ msgstr "ਮੇਨੂ"
 
 #: src/misc/actions.c:101
 msgid "Mouse Wheel Down"
-msgstr ""
+msgstr "ਮਾਊਸ ਵੀਲ ਥੱਲੇ"
 
 #: src/misc/actions.c:102
 msgid "Mouse Wheel Left"
-msgstr ""
+msgstr "ਮਾਊਸ ਵੀਲ ਖੱਬੇ"
 
 #: src/misc/actions.c:103
 msgid "Mouse Wheel Right"
-msgstr ""
+msgstr "ਮਾਊਸ ਵੀਲ ਸੱਜੇ"
 
 #: src/misc/actions.c:104
 msgid "Mouse Wheel Up"
-msgstr ""
+msgstr "ਮਾਊਸ ਵੀਲ ਉੱਪਰ"
 
 #: src/misc/actions.c:105
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: src/misc/actions.c:106
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
@@ -4859,7 +4848,7 @@ msgstr "ਵਿਰਾਮ"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "ਛਾਪੋ"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -4867,11 +4856,11 @@ msgstr "ਸਪੇਸ"
 
 #: src/misc/actions.c:111
 msgid "Tab"
-msgstr ""
+msgstr "ਟੈਬ"
 
 #: src/misc/actions.c:113
 msgid "Up"
-msgstr ""
+msgstr "ਉੱਤੇ"
 
 #: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:499
 msgid "Volume Down"
@@ -4879,7 +4868,7 @@ msgstr "ਵਾਲੀਅਮ ਘਟਾਓ"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr ""
+msgstr "ਵਾਲੀਅਮ ਮੌਨ"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
 msgid "Volume Up"
@@ -4887,11 +4876,11 @@ msgstr "ਵਾਲੀਅਮ ਵਧਾਓ"
 
 #: src/misc/actions.c:117
 msgid "Zoom In"
-msgstr ""
+msgstr "ਜ਼ੂਮ ਇਨ"
 
 #: src/misc/actions.c:118
 msgid "Zoom Out"
-msgstr ""
+msgstr "ਜ਼ੂਮ ਆਉਟ"
 
 #: src/misc/actions.c:246
 msgid "Ctrl+"
@@ -4911,7 +4900,7 @@ msgstr "Meta+"
 
 #: src/misc/actions.c:250
 msgid "Command+"
-msgstr ""
+msgstr "ਕਮਾਂਡ+"
 
 #: src/misc/update.c:482
 #, c-format
@@ -5793,7 +5782,7 @@ msgstr "ALSA"
 
 #: modules/access/alsa.c:57
 msgid "ALSA audio capture"
-msgstr ""
+msgstr "ALSA ਆਡੀਓ ਕੈਪਚਰ"
 
 #: modules/access/attachment.c:44
 msgid "Attachment"
@@ -5805,30 +5794,27 @@ msgstr "ਅਟੈਚਮੈਂਟ ਇੰਪੁੱਟ"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
-msgstr ""
+msgstr "AVIO"
 
 #: modules/access/avio.h:34
-#, fuzzy
 msgid "libavformat AVIO access"
-msgstr "libavformat ਅਸੈਸ ਫਾਰਮੈਟ"
+msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "libavformat ਅਸੈਸ ਫਾਰਮੈਟ"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
-msgstr ""
+msgstr "ਬਲਿਉ-ਰੇ ਮੇਨੂ"
 
 #: modules/access/bluray.c:69
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
-msgstr ""
+msgstr "ਬਲਿਉ-ਰੇ ਮੇਨੂ ਵਰਤੋਂ। ਜੇ ਬੰਦ ਹੈ ਤਾਂ ਮੂਵੀ ਸਿੱਧੀ ਸ਼ੁਰੂ ਹੋਵੇਗੀ।"
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "ਖੇਤਰ ਉੱਤੇ ਕਤਾਰ"
+msgstr "ਖੇਤਰ ਕੋਡ"
 
 #: modules/access/bluray.c:72
 msgid ""
@@ -5839,7 +5825,7 @@ msgstr ""
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
 msgid "Blu-ray"
-msgstr ""
+msgstr "ਬਲਿਉ-ਰੇ"
 
 #: modules/access/bluray.c:93
 msgid "Blu-ray Disc support (libbluray)"
@@ -5911,15 +5897,13 @@ msgstr ""
 #: modules/access/bluray.c:845 modules/access/bluray.c:2279
 #: modules/access/bluray.c:2284
 msgid "Blu-ray error"
-msgstr ""
+msgstr "ਬਲਿਉ-ਰੇ ਗਲਤੀ"
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "ਮੇਨੂ"
+msgstr "ਟਾਪ ਮੇਨੂ"
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
 msgstr "ਪਹਿਲਾਂ ਚਲਾਇਆ"
 
@@ -5978,21 +5962,19 @@ msgstr "TCP ਕਮਾਂਡ ਇੰਪੁੱਟ"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
-msgstr ""
+msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "SDP"
+msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "ਵਾਧੂ ਇੰਟਰਫੇਸ ਮੋਡੀਊਲ"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6005,9 +5987,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/decklink.cpp:49
-#, fuzzy
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "ਚਾਹੀਦਾ ਇੰਪੁੱਟ ਵਿਡੀਓ ਮੋਡ"
+msgstr ""
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -6107,7 +6088,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:118 modules/video_output/decklink.cpp:115
 msgid "10 bits"
-msgstr ""
+msgstr "10 ਬਿਟ"
 
 #: modules/access/decklink.cpp:353 modules/demux/ty.c:769
 msgid "Closed captions 1"
@@ -6389,7 +6370,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:41
 msgid "DVB device"
-msgstr ""
+msgstr "DVB ਜੰਤਰ"
 
 #: modules/access/dtv/access.c:43
 msgid ""
@@ -6573,13 +6554,12 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "ਨੈੱਟਵਰਕ ਐਂਡਟੀਫਾਈਰ"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
-msgstr ""
+msgstr "ਪਾਇਲਟ"
 
 #: modules/access/dtv/access.c:158
 msgid "Roll-off factor"
@@ -6721,7 +6701,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:223
 msgid "Satellite elevation"
-msgstr ""
+msgstr "ਸੈਟੇਲਾਈਟ ਉਚਾਈ"
 
 #: modules/access/dtv/access.c:224
 msgid "Satellite elevation in tenths of degree"
@@ -6729,7 +6709,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:225
 msgid "Satellite longitude"
-msgstr ""
+msgstr "ਸੈਟੇਲਾਈਟ ਲੰਬਕਾਰ"
 
 #: modules/access/dtv/access.c:227
 msgid "Satellite longitude in tenths of degree. West is negative."
@@ -6840,9 +6820,8 @@ msgid "DVDnav Input"
 msgstr "DVDnav ਇੰਪੁੱਟ"
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "Nuv demuxer"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -7226,7 +7205,7 @@ msgstr "ਸਾਈਜ਼"
 
 #: modules/access/imem.c:115
 msgid "Size of stream in bytes"
-msgstr ""
+msgstr "ਬਾਈਟਸ ਵਿੱਚ ਸਟਰੀਮ ਦਾ ਆਕਾਰ"
 
 #: modules/access/imem.c:118 modules/access/imem.c:119
 msgid "Memory input"
@@ -7417,7 +7396,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:639
 msgid "RTSP authentication"
-msgstr ""
+msgstr "RTSP ਪ੍ਰਮਾਣਿਕਤਾ"
 
 #: modules/access/live555.cpp:640
 msgid "Please enter a valid login name and a password."
@@ -7476,9 +7455,9 @@ msgid "File reading failed"
 msgstr "ਫਾਇਲ ਪੜ੍ਹਨ ਲਈ ਫੇਲ੍ਹ ਹੈ"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC ਫਾਇਲ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ।"
+msgstr "VLC ਫਾਈਲ ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7550,11 +7529,11 @@ msgstr ""
 
 #: modules/access_output/file.c:375
 msgid "Overwrite existing file"
-msgstr ""
+msgstr "ਮੌਜੂਦਾ ਫਾਈਲ ਉੱਤੇ ਲਿਖੋ"
 
 #: modules/access_output/file.c:377
 msgid "If the file already exists, it will be overwritten."
-msgstr ""
+msgstr "ਜੇ ਫਾਈਲ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ ਤਾਂ ਇਸ ਉੱਤੇ ਲਿਖਿਆ ਜਾਵੇਗਾ।"
 
 #: modules/access_output/file.c:378
 msgid "Append to file"
@@ -7566,7 +7545,7 @@ msgstr "ਜੇ ਫਾਇਲ ਮੌਜੂਦਾ ਹੋਵੇ ਤਾਂ ਉਸ ਨ
 
 #: modules/access_output/file.c:381
 msgid "Format time and date"
-msgstr ""
+msgstr "ਸਮਾਂ ਤੇ ਮਿਤੀ ਫਾਰਮੈਟ"
 
 #: modules/access_output/file.c:382
 msgid "Perform ISO C time and date formatting on the file path"
@@ -7603,9 +7582,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr "ਮੈਟਾਕਿਯੂਬ"
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -7635,7 +7613,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:74
 msgid "Number of segments"
-msgstr ""
+msgstr "ਹਿੱਸਿਆਂ ਦੀ ਗਿਣਤੀ"
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
@@ -7643,7 +7621,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
-msgstr ""
+msgstr "ਕੈਸ਼ ਦੀ ਇਜ਼ਾਜ਼ਤ"
 
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
@@ -7651,7 +7629,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:80
 msgid "Index file"
-msgstr ""
+msgstr "ਇੰਡੈਕਸ ਫਾਇਲ"
 
 #: modules/access_output/livehttp.c:81
 msgid "Path to the index file to create"
@@ -7667,7 +7645,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:87
 msgid "Delete segments"
-msgstr ""
+msgstr "ਹਿੱਸੇ ਹਟਾਓ"
 
 #: modules/access_output/livehttp.c:88
 msgid "Delete segments when they are no longer needed"
@@ -7709,9 +7687,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "ਕਤਾਰਾਂ ਦੀ ਗਿਣਤੀ"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -7723,7 +7700,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
-msgstr ""
+msgstr "LiveHTTP"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:380
@@ -7863,11 +7840,11 @@ msgstr ""
 
 #: modules/access/rdp.c:85
 msgid "RDP"
-msgstr ""
+msgstr "RDP"
 
 #: modules/access/rdp.c:89
 msgid "RDP Remote Desktop"
-msgstr ""
+msgstr "RDP ਰਿਮੋਟ ਡੈਸਕਟਾਪ"
 
 #: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
@@ -8253,7 +8230,7 @@ msgstr "ਕੁਨੈਕਸ਼ਨ ਲਈ ਵਰਤਣ ਵਾਸਤੇ ਡੋਮ�
 #: modules/access/smb_common.h:31
 #, fuzzy
 msgid "SMB authentication required"
-msgstr "SFTP ਪਰਮਾਣਕਿਤਾ"
+msgstr "RTSP ਪ੍ਰਮਾਣਿਕਤਾ"
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8274,7 +8251,7 @@ msgstr "TCP ਇੰਪੁੱਟ"
 
 #: modules/access/timecode.c:42
 msgid "Time code"
-msgstr ""
+msgstr "ਟਾਈਮ ਕੋਡ"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
@@ -8783,7 +8760,7 @@ msgstr "VCD ਇੰਪੁੱਟ"
 
 #: modules/access/vcd/vcd.c:54
 msgid "[vcd:][device][#[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][device][#[title][,[chapter]]]"
 
 #: modules/access/vdr.c:72
 msgid "Support for VDR recordings (http://www.tvdr.de/)."
@@ -8810,14 +8787,14 @@ msgid "VDR recordings"
 msgstr "VDR ਰਿਕਾਰਡਿੰਗ"
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC ਫਾਇਲ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ।"
+msgstr "VLC ਫਾਈਲ (%s) ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ।"
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC ਫਾਇਲ \"%s\" ਨੂੰ ਖੋਲ੍ਹ ਨਹੀਂ ਸਕਿਆ।(%m)"
+msgstr "VLC ਫਾਈਲ \"%s\" (%s) ਨੂੰ ਖੋਲ੍ਹ ਨਹੀਂ ਸਕਿਆ।"
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -8890,7 +8867,7 @@ msgstr "VNC ਕਲਾਇਟ ਵਰਤੋਂ"
 #: modules/access/wasapi.c:485
 #, fuzzy
 msgid "Loopback mode"
-msgstr "ਰਪੀਡ ਡੀਲੇਅ:"
+msgstr "ਲੂਪ / ਰਪੀਟ"
 
 #: modules/access/wasapi.c:486
 #, fuzzy
@@ -8902,9 +8879,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "Windows GDI ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9092,9 +9068,8 @@ msgid "Rear center"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "ਸਟੀਰਿਓ ਮੋਡ"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -9223,7 +9198,7 @@ msgstr "ਡਿਫਾਲਟ TCP ਕੁਨੈਕਸ਼ਨ ਟਾਈਮ-ਆਉਟ (
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
-msgstr ""
+msgstr "ਰੀਲਿਜ਼ ਸਮਾਂ"
 
 #: modules/audio_filter/compressor.c:162
 #, fuzzy
@@ -9589,7 +9564,7 @@ msgstr ""
 #: modules/audio_filter/scaletempo.c:53
 #, fuzzy
 msgid "Audio pitch changer"
-msgstr "ਆਡੀਓ ਚੈਨਲ"
+msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਚੈਨਲ"
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:271
@@ -9702,7 +9677,7 @@ msgstr ""
 #: modules/audio_filter/stereo_widen.c:64
 #: modules/gui/qt/components/extended_panels.cpp:1311
 msgid "Crossfeed"
-msgstr ""
+msgstr "ਕਰੌਸਫੀਡ"
 
 #: modules/audio_filter/stereo_widen.c:65
 msgid ""
@@ -9743,7 +9718,7 @@ msgstr "ਫ਼ਰਜ਼ੀ ਆਡੀਓ ਆਉਟਪੁੱਟ"
 
 #: modules/audio_output/alsa.c:64 modules/audio_output/oss.c:69
 msgid "Audio output device"
-msgstr ""
+msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਜੰਤਰ"
 
 #: modules/audio_output/alsa.c:65
 msgid "Audio output device (using ALSA syntax)."
@@ -9751,7 +9726,7 @@ msgstr ""
 
 #: modules/audio_output/alsa.c:67 modules/audio_output/waveout.c:140
 msgid "Audio output channels"
-msgstr ""
+msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਚੈਨਲ"
 
 #: modules/audio_output/alsa.c:68 modules/audio_output/waveout.c:141
 msgid ""
@@ -9809,7 +9784,7 @@ msgstr "ਸੈਂਪਲ ਫਾਰਮੈਟ"
 
 #: modules/audio_output/auhal.c:45
 msgid "Last audio device"
-msgstr ""
+msgstr "ਆਖਰੀ ਆਡੀਓ ਜੰਤਰ"
 
 #: modules/audio_output/auhal.c:53
 msgid "HAL AudioUnit output"
@@ -9949,12 +9924,12 @@ msgstr "Windows GDI ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Output back-end"
-msgstr "ਆਉਟਪੁੱਟ ਜੰਤਰ"
+msgstr "ਆਉਟਪੁੱਟ ਕਾਰਡ"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Audio output back-end interface."
-msgstr "ਮਲਟੀਕਾਸਟ ਆਉਟਪੁੱਟ ਇੰਟਰਫੇਸ"
+msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਜੰਤਰ"
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -9974,16 +9949,15 @@ msgstr ""
 
 #: modules/audio_output/volume.h:30
 msgid "Software gain"
-msgstr ""
+msgstr "ਸਾਫਟਵੇਅਰ ਗੇਨ"
 
 #: modules/audio_output/volume.h:31
 msgid "This linear gain will be applied in software."
 msgstr ""
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "Windows GDI ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10070,7 +10044,7 @@ msgstr "CoreText ਫੋਂਟ ਰੈਂਡਰ"
 #: modules/codec/arib/aribsub.c:49
 #, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ(&t)"
 
 #: modules/codec/arib/aribsub.c:53
 #, fuzzy
@@ -10225,7 +10199,7 @@ msgstr "FFmpeg ਡੀਬੱਗ ਮਾਸਕ ਸੈੱਟ ਕਰੋ"
 
 #: modules/codec/avcodec/avcodec.h:105
 msgid "Codec name"
-msgstr ""
+msgstr "Codec ਨਾਂ"
 
 #: modules/codec/avcodec/avcodec.h:106
 msgid "Internal libavcodec codec name"
@@ -10488,7 +10462,7 @@ msgstr ""
 #: modules/codec/avcodec/d3d11va.c:63
 #, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "ਕੇ ਵਿਡੀਓ ਐਕਸਰਲੇਟਰ ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
+msgstr "ਹਾਰਡਵੇਅਰ ਐਕਸਰਲੇਸ਼ਨ"
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -10511,29 +10485,25 @@ msgid "unknown"
 msgstr "ਅਣਜਾਣ"
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "ਐਸ-ਵਿਡੀਓ"
+msgstr "ਵਿਡੀਓ"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
-msgstr "ਆਡਿਓ"
+msgstr "ਆਡੀਓ"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "ਸਬ-ਤਸਵੀਰਾਂ"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "VLC ਇੰਕੋਡਰ ਨਹੀਂ ਖੋਲ੍ਹ ਸਕਿਆ।"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
@@ -10586,9 +10556,8 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "ਮੇਨੂ ਅੱਪਡੇਟ ਇੰਟਰਵਲ"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
@@ -10607,7 +10576,7 @@ msgstr "H.264 ਵਿਡੀਓ ਪੈਕਟਾਈਜ਼ਰ"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -10868,9 +10837,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "ਡੀਕੋਡਿੰਗ"
+msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -10881,9 +10849,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
-#, fuzzy
 msgid "GStreamer Based Decoder"
-msgstr "Stats ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -10891,14 +10858,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "SDL ਚਿੱਤਰ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "SDL ਚਿੱਤਰ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11203,21 +11168,19 @@ msgstr ""
 
 #: modules/codec/opus.c:64 modules/codec/opus.c:71
 msgid "Opus"
-msgstr ""
+msgstr "ਓਪਸ"
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "ਰਾਅ ਆਡੀਓ ਇੰਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11242,7 +11205,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
-msgstr ""
+msgstr "Codec ਪੱਧਰ"
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11421,7 +11384,7 @@ msgstr ""
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr "ਥੀਉਰਾ ਵਿਡੀਓ ਇੰਕੋਡਰ"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12169,14 +12132,12 @@ msgid "USF subtitles decoder"
 msgstr "USF ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "DVB ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "ਟੈਲੀਟੈਕਸਟ ਸਬ-ਟਾਈਟਲ"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -12329,7 +12290,7 @@ msgstr ""
 #: modules/codec/videotoolbox.m:83
 #, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr "ਥੀਉਰਾ ਵਿਡੀਓ ਡੀਕੋਡਰ"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12379,14 +12340,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr "ਥੀਉਰਾ ਵਿਡੀਓ ਇੰਕੋਡਰ"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13129,7 +13089,7 @@ msgstr "tesa"
 
 #: modules/codec/x264.c:438
 msgid "Fast"
-msgstr ""
+msgstr "ਤੇਜ਼"
 
 #: modules/codec/x264.c:438 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
@@ -13142,7 +13102,7 @@ msgstr "ਨਾਰਮਲ"
 
 #: modules/codec/x264.c:438
 msgid "Slow"
-msgstr ""
+msgstr "ਹੌਲੀ"
 
 #: modules/codec/x264.c:443
 msgid "Spatial"
@@ -13186,18 +13146,16 @@ msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr ""
 
 #: modules/codec/x264.c:456
-#, fuzzy
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "H.264/MPEG4 AVC ਇੰਕੋਡਰ (x264)"
+msgstr ""
 
 #: modules/codec/x264.c:460
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr ""
 
 #: modules/codec/x265.c:46
-#, fuzzy
 msgid "H.265/HEVC encoder (x265)"
-msgstr "H.264/MPEG4 AVC ਇੰਕੋਡਰ (x264)"
+msgstr ""
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -13352,17 +13310,17 @@ msgstr "ਹਾਟ-ਸਵਿੱਚਾਂ ਪਰਬੰਧ ਇੰਟਰਫੇਸ"
 
 #: modules/control/hotkeys.c:390
 msgid "One"
-msgstr ""
+msgstr "ਇੱਕ"
 
 #: modules/control/hotkeys.c:397
 #, c-format
 msgid "Loop: %s"
-msgstr ""
+msgstr "ਚੱਕਰ: %s"
 
 #: modules/control/hotkeys.c:404
 #, c-format
 msgid "Random: %s"
-msgstr ""
+msgstr "ਰਲਵਾਂ:  %s"
 
 #: modules/control/hotkeys.c:530
 #, c-format
@@ -13896,15 +13854,13 @@ msgid "+----[ end of help ]"
 msgstr "+----[ end of help ]"
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
-msgstr "ਜਾਰੀ ਰੱਖਣ ਲਈ ਮੇਨੂ ਚੁਣੋ (select) ਜਾਂ ਪੋਜ਼ ਦੱਬੋ।"
+msgstr ""
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr "ਜਾਰੀ ਰੱਖਣ ਲਈ ਮੇਨੂ ਚੁਣੋ (select) ਜਾਂ ਪੋਜ਼ ਦੱਬੋ।"
+msgstr ""
 
 #: modules/control/oldrc.c:1266
 msgid "Error: `goto' needs an argument greater than zero."
@@ -14029,7 +13985,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:74
 #, fuzzy
 msgid "Adaptive Logic"
-msgstr "ਇੰਟਰਐਕਟਿਵ ਜ਼ੂਮ"
+msgstr "ਅਲਟਰਨੇਟਿਵ"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -14040,9 +13996,8 @@ msgid "Connect using http access instead of custom http code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "ਐਕਟੀਵੇਟ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
@@ -14069,7 +14024,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:112
 #, fuzzy
 msgid "Adaptive"
-msgstr "ਨੈਗਟਿਵ"
+msgstr "ਅਲਟਰਨੇਟਿਵ"
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -14104,9 +14059,8 @@ msgid "Avformat"
 msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "ਡੀਮੁਕਸਰ"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14201,9 +14155,8 @@ msgid "Fixing AVI Index..."
 msgstr "AVI ਇੰਡੈਕਸ ਠੀਕ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "AIFF ਡੀਮੁਕਸਰ"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -14492,18 +14445,16 @@ msgid "MPEG-4 video"
 msgstr "MPEG-4 ਵਿਡੀਓ"
 
 #: modules/demux/mpeg/h26x.c:47
-#, fuzzy
 msgid "Desired frame rate for the stream."
-msgstr "ਕੈਪਚਰ ਲਈ ਲੋੜੀਦੀ ਫਰੇਮ ਰੇਟ ਹੈ।"
+msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53
 msgid "H264 video demuxer"
 msgstr "H264 ਵਿਡੀਓ ਡੀਮੁਕਸਰ"
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "H264 ਵਿਡੀਓ ਡੀਮੁਕਸਰ"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -14593,9 +14544,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "ਟਰਾਂਸਪੋਰਟ ਸਟਰੀਮ ID"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
 msgid "Use the stream PCR as a reference."
@@ -14621,8 +14571,9 @@ msgid "Main audio"
 msgstr "ਕ੍ਰਿਪਟੂ ਆਡੀਓ"
 
 #: modules/demux/mpeg/ts_psi.c:422
+#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "ਇਸ codec ਲਈ ਕੋਈ ਵੇਰਵਾ ਨਹੀਂ ਹੈ"
 
 #: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
@@ -15098,20 +15049,17 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "ਪੋਡਕਾਸਟ ਪਾਰਸਰ"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "ਸਰਵਿਸ ਖੋਜ"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
-#, fuzzy
 msgid "Interfaces"
 msgstr "ਇੰਟਰਫੇਸ"
 
@@ -15128,27 +15076,24 @@ msgid "Extensions"
 msgstr "ਇਕਸਟੈਨਸ਼ਨ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:115
-#, fuzzy
 msgid "Show Installed Only"
-msgstr "ਇੰਟਰਫੇਸ"
+msgstr "ਕੇਵਲ ਇੰਸਟਾਲ ਹੀ ਵੇਖਾਓ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:117
 #: modules/gui/qt/dialogs/plugins.cpp:423
 msgid "Find more addons online"
-msgstr ""
+msgstr "ਹੋਰ ਐਡ-ਆਨ ਆਨਲਾਈਨ ਲੱਭੋ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "ਵਿਡੀਓ ਮੈਨੇਜਰ"
+msgstr "ਐਡ-ਐਨ ਮੈਨੇਜਰ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "ਇੰਸਟਾਲ"
+msgstr "ਇੰਸਟਾਲ ਹਨ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15163,9 +15108,8 @@ msgid "Author"
 msgstr "ਲੇਖਕ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
-#, fuzzy
 msgid "Uninstall"
-msgstr "ਇੰਸਟਾਲ"
+msgstr "ਅਣ-ਇੰਸਟਾਲ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -15182,7 +15126,7 @@ msgstr "2 ਪਾਸ"
 #: modules/gui/qt/components/extended_panels.cpp:1104
 #: modules/gui/qt/ui/equalizer.h:136
 msgid "Preamp"
-msgstr ""
+msgstr "ਪ੍ਰੀਐਮਪ"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
 msgid "Enable dynamic range compressor"
@@ -15246,7 +15190,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:316
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1037
 msgid "Organize Profiles..."
-msgstr ""
+msgstr "....ਪਰੋਫਾਇਲ ਪਰਬੰਧ"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:477
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:737
@@ -15438,7 +15382,7 @@ msgstr "ਟਾਈਮ ਉੱਤੇ ਜਾਓ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
-msgstr ""
+msgstr " ਬਦਲੋ ਤੇ ਸਟਰੀਮ ਕਰੋ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:137
 msgid "Go!"
@@ -15491,9 +15435,8 @@ msgid "Setup Streaming..."
 msgstr "...ਸਟਰੀਮ ਸੈਟਅੱਪ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "ਸਟਰੀਮ ਢੰਗ"
+msgstr "ਸਟਰੀਮ ਕਰਨ ਦਾ ਢੰਗ ਚੁਣੋ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -15584,7 +15527,7 @@ msgstr "ਐਡਰੈੱਸ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:187
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:189
 #: modules/gui/macosx/VLCOpenWindowController.m:185
@@ -15643,15 +15586,15 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:336
 msgid "Remove a profile"
-msgstr ""
+msgstr "ਪਰੋਫਾਈਲ ਨੂੰ ਹਟਾਓ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:337
 msgid "Select the profile you would like to remove:"
-msgstr ""
+msgstr "ਉਹ ਪਰੋਫਾਈਲ ਨੂੰ ਚੁਣੋ, ਜਿਸ ਨੂੰ ਤੁਸੀਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ:"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:473
 msgid "Save as new profile"
-msgstr ""
+msgstr "ਨਵੇਂ ਪਰੋਫਾਈਲ ਵਜੋਂ ਸੰਭਾਲੋ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:522
 msgid "%@ stream to %@:%@"
@@ -15711,8 +15654,9 @@ msgid "Clean up"
 msgstr "ਸਾਫ਼ ਕਰੋ"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
+#, fuzzy
 msgid "Play/Pause the current media"
-msgstr ""
+msgstr "ਮੌਜੂਦਾ ਮੀਡਿਆ ਨੂੰ ਚਲਾਉਣ ਜਾਂ ਰੋਕਣ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
 #, fuzzy
@@ -15953,9 +15897,8 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "ਪਲੇਅਰ ਲਈ ਕੰਟਰੋਲ ਮੇਨੂ"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -16196,9 +16139,8 @@ msgstr "ਪਿੱਛੇ ਜਾਓ"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "ਟਾਈਮ ਉੱਤੇ ਜਾਓ"
+msgstr "ਸਮੇਂ ਉੱਤੇ ਜਾਓ"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -16284,9 +16226,8 @@ msgid "Window"
 msgstr "ਵਿੰਡੋ"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "ਵਿੰਡੋ ਘੱਟੋ-ਘੱਟ"
+msgstr "ਘੱਟੋ-ਘੱਟ"
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -16425,9 +16366,8 @@ msgid "Enable Metadata Retrieval"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "ਧੰਨਵਾਦ"
+msgstr "ਨਹੀਂ, ਧੰਨਵਾਦ"
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -16473,7 +16413,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: share/lua/http/index.html:239
 msgid "Shuffle"
-msgstr ""
+msgstr "ਰਲਵਾਂ"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
@@ -16491,25 +16431,24 @@ msgid "Open Audio Effects window"
 msgstr "ਆਡੀਓ ਪਰਭਾਵ"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "BD"
+msgstr "B"
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: modules/gui/macosx/misc.m:315
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: modules/gui/macosx/misc.m:323
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: modules/gui/macosx/misc.m:328
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -16592,9 +16531,8 @@ msgid "Custom playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "VIDEO_TS ਫੋਲਡਰ ਖੋਲ੍ਹੋ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -16696,7 +16634,7 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #, fuzzy
 msgid "Select a subtitle file"
-msgstr "ਫਾਈਲ ਚੁਣੋ"
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਚੁਣੋ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -16792,9 +16730,8 @@ msgid "URI"
 msgstr "URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "ਡਬਲ ਸਾਈਜ਼"
+msgstr "ਫਾਈਲ ਆਕਾਰ"
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -16919,9 +16856,8 @@ msgstr "ਚੁਣੋ"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "ਪਲੇਅਬੈਕ ਰੋਕੋ"
+msgstr "ਕੀ ਪਲੇਅਬੈਕ ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -16932,13 +16868,12 @@ msgstr "ਜਾਰੀ ਰੱਖੋ"
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 #, fuzzy
 msgid "Always continue media playback"
-msgstr "ਪਲੇਅਬੈਕ ਰੋਕੋ"
+msgstr "ਪਲੇਅਬੈਕ ਜਾਰੀ ਰੱਖੋ"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "ਪਲੇਅਬੈਕ ਰੋਕੋ"
+msgstr "ਪਲੇਅਬੈਕ ਮੁੜ-ਚਾਲੂ ਕਰੋ"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -17093,7 +17028,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Note that these are system-wide settings."
-msgstr ""
+msgstr "ਯਾਦ ਰੱਖੋ ਕਿ ਇਹ ਪੂਰੇ ਸਿਸਟਮ ਲਈ ਸੈਟਿੰਗਾਂ ਹਨ।"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
 #, fuzzy
@@ -17106,16 +17041,15 @@ msgstr "ਇੰਟਰਫੇਸ ਸਟਾਇਲ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Dark"
-msgstr ""
+msgstr "ਗੂੜ੍ਹਾ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Bright"
 msgstr "ਚਮਕ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "ਪਲੇਅਬੈਕ ਰੋਕੋ"
+msgstr "ਪਲੇਅਬੈਕ ਜਾਰੀ ਰੱਖੋ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -17167,12 +17101,12 @@ msgstr "ਫੋਂਟ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:336
 msgid "Subtitle languages"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾਵਾਂ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Preferred subtitle language"
-msgstr ""
+msgstr "ਪਸੰਦੀਦਾ ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:339
 msgid "Enable OSD"
@@ -17257,24 +17191,20 @@ msgid "No check was performed yet."
 msgstr "ਕੋਈ ਚੈੱਕ ਨਹੀਂ ਕੀਤਾ ਗਿਆ ਹੈ।"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:685
-#, fuzzy
 msgid "Lowest Latency"
-msgstr "ਘੱਟ ਲੇਟਨਸੀ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:687
-#, fuzzy
 msgid "Low Latency"
-msgstr "ਘੱਟ ਲੇਟਨਸੀ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:691
-#, fuzzy
 msgid "Higher Latency"
-msgstr "ਉੱਚ ਲੇਟਨਸੀ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Highest Latency"
-msgstr "ਉੱਚ ਲੇਟਨਸੀ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -17459,7 +17389,7 @@ msgstr ""
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:200
 #: modules/video_filter/gradfun.c:50 modules/gui/qt/ui/video_effects.h:1225
 msgid "Radius"
-msgstr ""
+msgstr "ਵਿਆਸ"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:201
 #: modules/gui/qt/ui/video_effects.h:1226
@@ -17665,7 +17595,7 @@ msgstr "ਟਰਾਂਸਪਰੇਸੀ"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:364
 msgid "Organize profiles..."
-msgstr ""
+msgstr "...ਪਰੋਫਾਈਲਾਂ ਦਾ ਪਰਬੰਧ ਕਰੋ"
 
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:52
 msgid "sec."
@@ -17764,19 +17694,16 @@ msgid " f                      Toggle Fullscreen"
 msgstr " f                      Toggle Fullscreen"
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " c                      Cycle through audio tracks"
-msgstr " l                      Toggle Loop Playlist"
+msgstr ""
 
 #: modules/gui/ncurses.c:890
-#, fuzzy
 msgid " v                      Cycle through subtitles tracks"
-msgstr " [, ]                   Next/Previous title"
+msgstr ""
 
 #: modules/gui/ncurses.c:891
-#, fuzzy
 msgid " b                      Cycle through video tracks"
-msgstr " S                      Show/Hide statistics box"
+msgstr ""
 
 #: modules/gui/ncurses.c:892
 msgid " n, p                   Next/Previous playlist item"
@@ -17993,11 +17920,11 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Previous / Backward"
-msgstr ""
+msgstr "ਪਿਛਲਾ / ਪਿੱਛੇ ਵੱਲ"
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Next / Forward"
-msgstr ""
+msgstr "ਅਗਲਾ / ਅੱਗੇ ਵੱਲ"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "De-Fullscreen"
@@ -18027,7 +17954,7 @@ msgstr "ਸਟੈਪ ਅੱਗੇ"
 
 #: modules/gui/qt/components/controller.hpp:112
 msgid "Loop / Repeat"
-msgstr ""
+msgstr "ਲੂਪ / ਰਪੀਟ"
 
 #: modules/gui/qt/components/controller.hpp:112
 #: modules/gui/qt/components/controller.hpp:124
@@ -18036,7 +17963,7 @@ msgstr "ਜਾਣਕਾਰੀ"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Open subtitles"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਖੋਲ੍ਹੋ"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Dock fullscreen controller"
@@ -18105,7 +18032,7 @@ msgstr "ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਕੋਈ ਮੀਡਿਆ ਨਹ�
 #: modules/gui/qt/components/controller.hpp:126
 #: modules/gui/qt/components/open_panels.cpp:252
 msgid "Open subtitle file"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਖੋਲ੍ਹੋ"
 
 #: modules/gui/qt/components/controller.hpp:127
 msgid "Dock/undock fullscreen controller to/from bottom of screen"
@@ -18247,7 +18174,7 @@ msgstr "500 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1098
 msgid "2 KHz"
-msgstr ""
+msgstr "2 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1099
 msgid "4 KHz"
@@ -18420,15 +18347,15 @@ msgstr "ਕਵਰ ਆਰਟ ਡਾਊਨਲੋਡ ਕਰੋ"
 
 #: modules/gui/qt/components/interface_widgets.cpp:788
 msgid "Add cover art from file"
-msgstr ""
+msgstr "ਕਵਰ ਆਰਟ ਨੂੰ ਫਾਇਲ ਤੋਂ ਜੋੜੋ"
 
 #: modules/gui/qt/components/interface_widgets.cpp:854
 msgid "Choose Cover Art"
-msgstr ""
+msgstr "ਕਵਰ ਆਰਟ ਚੁਣੋ"
 
 #: modules/gui/qt/components/interface_widgets.cpp:855
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
-msgstr ""
+msgstr "ਚਿੱਤਰ ਫਾਇਲਾਂ (*.gif *.jpg *.jpeg *.png)"
 
 #: modules/gui/qt/components/interface_widgets.cpp:879
 #: modules/gui/qt/dialogs/toolbar.cpp:564
@@ -18580,9 +18507,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr "ਕੀ ਤੁਸੀਂ %1 ਤੋਂ ਮੈਂਬਰਸ਼ਿਪ ਹਟਾਉਣੀ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "ਓਵਰਲੇ"
+msgstr "ਕਵਰ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -18601,24 +18527,20 @@ msgid "Enter name for new folder:"
 msgstr "ਨਵੇਂ ਫੋਲਡਰ ਲਈ ਨਾਂ ਦਿਓ:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "ਡਾਇਰੈਕਟਰੀ ਬਣਾਓ"
+msgstr "ਡਾਇਰੈਕਟਰੀ ਦਾ ਨਾਂ ਬਦਲੋ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "ਫੋਲਡਰ ਬਣਾਓ"
+msgstr "ਫੋਲਡਰ ਦਾ ਨਾਂ ਬਦਲੋ"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
-#, fuzzy
 msgid "Enter a new name for the directory:"
-msgstr "ਨਵੀਂ ਡਾਇਰੈਕਟਰੀ ਲਈ ਨਾਂ ਦਿਓ:"
+msgstr "ਡਾਇਰੈਕਟਰੀ ਲਈ ਨਵਾਂ ਨਾਂ ਦਿਉ:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
-#, fuzzy
 msgid "Enter a new name for the folder:"
-msgstr "ਨਵੇਂ ਫੋਲਡਰ ਲਈ ਨਾਂ ਦਿਓ:"
+msgstr "ਫੋਲਡਰ ਲਈ ਨਵਾਂ ਨਾਂ ਦਿਉ:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -19019,9 +18941,8 @@ msgid "&Start"
 msgstr "ਸ਼ੁਰੂ(&S)"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "ਜਾਰੀ ਰੱਖੋ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19060,7 +18981,7 @@ msgstr "ਸੰਭਾਲੋ(&S)"
 #: modules/gui/qt/dialogs/external.cpp:219
 #, fuzzy
 msgid "Store the Password"
-msgstr "ਪਾਸਵਰਡ"
+msgstr "RDP ਪ੍ਰਮਾਣਕਿਤਾ ਪਾਸਵਰਡ"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19246,7 +19167,7 @@ msgstr "ਬਦਲੋ(&o)"
 
 #: modules/gui/qt/dialogs/open.cpp:207
 msgid "C&onvert / Save"
-msgstr ""
+msgstr "ਬਦਲੋ/ਸੰਭਾਲੋ(&o)"
 
 #: modules/gui/qt/dialogs/openurl.cpp:47
 msgid "Open URL"
@@ -19258,7 +19179,7 @@ msgstr "URL ਇੱਥੇ ਦਿਓ..."
 
 #: modules/gui/qt/dialogs/openurl.cpp:67
 msgid "Please enter the URL or path to the media you want to play."
-msgstr ""
+msgstr "ਮੀਡੀਏ ਲਈ URL ਜਾਂ ਮਾਰਗ ਦਿਓ, ਜਿਸ ਨੂੰ ਤੁਸੀਂ ਚਲਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ।"
 
 #: modules/gui/qt/dialogs/openurl.cpp:71
 msgid ""
@@ -19272,9 +19193,8 @@ msgid "Plugins and extensions"
 msgstr "ਪਲੱਗਇਨ ਅਤੇ ਐਕਸਟੈਨਸ਼ਨ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "ਐਕਟਿਵ ਖੇਤਰ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -19326,40 +19246,35 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:417
 msgid "Only installed"
-msgstr ""
+msgstr "ਕੇਵਲ ਇੰਸਟਾਲ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
-#, fuzzy
 msgid "Retrieving addons..."
-msgstr "ਚੈਨਲ ਜਾਣਕਾਰੀ ਲਈ ਜਾ ਰਹੀ ਹੈ..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "ਕੋਈ ਇੰਪੁੱਟ ਨਹੀਂ ਲੱਭੀ"
+msgstr "ਕੋਈ ਐਡ-ਆਨ ਨਹੀਂ ਲੱਭੀ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "ਵਰਜਨ"
+msgstr "ਵਰਜਨ %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
-msgstr ""
+msgstr "%1 ਡਾਊਨਲੋਡ"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
-#, fuzzy
 msgid "&Uninstall"
-msgstr "ਇੰਸਟਾਲ"
+msgstr "ਅਣ-ਇੰਸਟਾਲ(&U)"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "ਇੰਸਟਾਲ"
+msgstr "ਇੰਸਟਾਲ(&I)"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -19469,7 +19384,7 @@ msgstr "ਮੀਡਿਆ ਫਾਇਲਾਂ"
 
 #: modules/gui/qt/dialogs_provider.hpp:44
 msgid "Subtitle Files"
-msgstr ""
+msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲਾਂ"
 
 #: modules/gui/qt/dialogs_provider.hpp:45
 msgid "All Files"
@@ -19511,9 +19426,8 @@ msgid "Flat Button"
 msgstr "ਸਮਤਲ ਬਟਨ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "ਅੱਗੇ ਵਿਦਜੈੱਟ ਸਟਾਈਲ:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -19548,9 +19462,8 @@ msgid "Time Toolbar"
 msgstr "ਟਾਈਮ ਟੂਲਬਾਰ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "ਮਾਹਰ ਵਿਦਜੈੱਟ ਟੂਲਬਾਰ:"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -19569,9 +19482,8 @@ msgid "Select profile:"
 msgstr "ਪਰੋਫਾਇਲ ਚੁਣੋ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "ਪਿੱਛੇ"
+msgstr "ਝਲਕ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19695,12 +19607,11 @@ msgstr "VOD: "
 
 #: modules/gui/qt/main_interface.cpp:372
 msgid "Do you want to restart the playback where left off?"
-msgstr ""
+msgstr "ਕੀ ਤੁਸੀਂ ਉੱਥੋਂ ਹੀ ਵਾਪਿਸ ਚਲਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ, ਜਿੱਥੇ ਛੱਡਿਆ ਸੀ?"
 
 #: modules/gui/qt/main_interface.cpp:378
-#, fuzzy
 msgid "&Continue"
-msgstr "ਜਾਰੀ ਰੱਖੋ"
+msgstr "ਜਾਰੀ ਰੱਖੋ(&C)"
 
 #: modules/gui/qt/main_interface.cpp:1368
 msgid "Control menu for the player"
@@ -19857,7 +19768,7 @@ msgstr "ਵਿਜੁਲਾਈਜੇਸ਼ਨ ਚੋਣਕਾਰ"
 
 #: modules/gui/qt/menus.cpp:588
 msgid "&Increase Volume"
-msgstr ""
+msgstr "ਵਾਲੀਅਮ ਵਧਾਓ(&I)"
 
 #: modules/gui/qt/menus.cpp:591
 #, fuzzy
@@ -19866,7 +19777,7 @@ msgstr "ਵਾਲੀਅਮ ਘਟਾਓ"
 
 #: modules/gui/qt/menus.cpp:594
 msgid "&Mute"
-msgstr ""
+msgstr "ਚੁੱਪ(&M)"
 
 #: modules/gui/qt/menus.cpp:610
 msgid "Audio &Device"
@@ -19878,7 +19789,7 @@ msgstr "ਆਡੀਓ ਟਰੈਕ(&T)"
 
 #: modules/gui/qt/menus.cpp:616
 msgid "&Stereo Mode"
-msgstr ""
+msgstr "ਸਟੀਰਿਓ ਮੋਡ(&S)"
 
 #: modules/gui/qt/menus.cpp:619
 msgid "&Visualizations"
@@ -19970,7 +19881,7 @@ msgstr "ਅੱਗੇ(&x)"
 
 #: modules/gui/qt/menus.cpp:861
 msgid "Sp&eed"
-msgstr ""
+msgstr "ਗਤੀ(&e)"
 
 #: modules/gui/qt/menus.cpp:867
 msgid "&Faster"
@@ -20235,9 +20146,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "ਪੂਰੀ-ਸਕਰੀਨ ਕੰਟਰੋਲਰ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -20368,18 +20278,16 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/vout.c:50
-#, fuzzy
 msgid "VideoCore layer where the video is displayed."
-msgstr "ਡਾਇਰੈਕਟਰੀ, ਜਿੱਥੇ ਵਿਡੀਓ ਸਨੈਪਸ਼ਾਟ ਸਟੋਰ ਕੀਤੇ ਜਾਣਗੇ।"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -20419,14 +20327,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "ਐਲਫ਼ਾ ਮਾਸਕ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
 msgid "Temporal-spatial"
@@ -20434,60 +20340,51 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:875 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
-msgstr ""
+msgstr "VDPAU"
 
 #: modules/hw/vdpau/chroma.c:876
 msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "ਡੀ-ਇੰਟਰਫੇਸ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "ਗਲਤ ਚੋਣ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "ਡਿ-ਇੰਟਰਲੇਸ ਚਾਲੂ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:892
-#, fuzzy
 msgid "Noise reduction level"
-msgstr "ਨੋਵਾਇਸ ਘਟਾਉਣਾ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "ਇੰਕੋਡਿੰਗ ਕੁਆਲਟੀ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "ਵਿਡੀਓ ਕੁਆਥਟੀ ਪੋਸਟ ਪਰੋਸੈੱਸ ਲੈਵਲ"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "ਡੀਇੰਟਰਲੇਸਿੰਗ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "YUV ਆਉਟਪੁੱਟ"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "ਉਘੜਵਾਂ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -20497,7 +20394,7 @@ msgstr "ਵਿਡੀਓ ਫਿਲਟਰ"
 #: modules/hw/vaapi/filters.c:1188
 #, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "ਵਿਡੀਓ ਐਕਸਲੇਸ਼ਨ ਉਪਲੱਬਧ ਨਹੀਂ ਹੈ"
+msgstr "ਕੇ ਵਿਡੀਓ ਐਕਸਰਲੇਟਰ ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -20718,7 +20615,7 @@ msgstr "ਬਲਿਊ"
 
 #: modules/meta_engine/ID3Genres.h:34
 msgid "Classic Rock"
-msgstr ""
+msgstr "ਕਲਾਸਿਕ ਰੌਕ"
 
 #: modules/meta_engine/ID3Genres.h:35
 msgid "Country"
@@ -20738,7 +20635,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:40
 msgid "Hip-Hop"
-msgstr ""
+msgstr "ਹਿੱਪ - ਹੋਪ"
 
 #: modules/meta_engine/ID3Genres.h:41
 msgid "Jazz"
@@ -20774,7 +20671,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:53
 msgid "Alternative"
-msgstr ""
+msgstr "ਅਲਟਰਨੇਟਿਵ"
 
 #: modules/meta_engine/ID3Genres.h:55
 msgid "Death Metal"
@@ -20886,7 +20783,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:85
 msgid "Electronic"
-msgstr ""
+msgstr "ਇਲੈਕਟ੍ਰਾਨਿਕ"
 
 #: modules/meta_engine/ID3Genres.h:86
 msgid "Pop-Folk"
@@ -20922,11 +20819,11 @@ msgstr "ਟਾਪ ੪੦"
 
 #: modules/meta_engine/ID3Genres.h:94
 msgid "Christian Rap"
-msgstr ""
+msgstr "ਮਸੀਹੀ ਰੈਪ"
 
 #: modules/meta_engine/ID3Genres.h:95
 msgid "Pop/Funk"
-msgstr ""
+msgstr "ਪੋਪ/ਫੰਕ"
 
 #: modules/meta_engine/ID3Genres.h:96
 msgid "Jungle"
@@ -20942,7 +20839,7 @@ msgstr "ਕੈਬਰੇਟ"
 
 #: modules/meta_engine/ID3Genres.h:99
 msgid "New Wave"
-msgstr ""
+msgstr "ਨਵੀਂ ਵੇਵ"
 
 #: modules/meta_engine/ID3Genres.h:101
 msgid "Rave"
@@ -20966,11 +20863,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:106
 msgid "Acid Punk"
-msgstr ""
+msgstr "ਐਸਿਡ ਪੰਕ"
 
 #: modules/meta_engine/ID3Genres.h:107
 msgid "Acid Jazz"
-msgstr ""
+msgstr "ਐਸਿਡ ਜੈਜ਼"
 
 #: modules/meta_engine/ID3Genres.h:108
 msgid "Polka"
@@ -20978,7 +20875,7 @@ msgstr "ਪੋਲਕਾ"
 
 #: modules/meta_engine/ID3Genres.h:109
 msgid "Retro"
-msgstr ""
+msgstr "ਰੈਟਰੋ"
 
 #: modules/meta_engine/ID3Genres.h:110
 msgid "Musical"
@@ -20990,23 +20887,23 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:112
 msgid "Hard Rock"
-msgstr ""
+msgstr "ਹਾਰਡ ਰੌਕ"
 
 #: modules/meta_engine/ID3Genres.h:113
 msgid "Folk"
-msgstr ""
+msgstr "ਫੋਲਕ"
 
 #: modules/meta_engine/ID3Genres.h:114
 msgid "Folk-Rock"
-msgstr ""
+msgstr "ਫੋਲਕ-ਰੌਕ "
 
 #: modules/meta_engine/ID3Genres.h:115
 msgid "National Folk"
-msgstr ""
+msgstr "ਨੈਸ਼ਨਲ ਫੋਕ"
 
 #: modules/meta_engine/ID3Genres.h:116
 msgid "Swing"
-msgstr ""
+msgstr "ਸਵਿੰਗ"
 
 #: modules/meta_engine/ID3Genres.h:117
 msgid "Fast Fusion"
@@ -21078,7 +20975,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
-msgstr ""
+msgstr "ਓਪੇਰਾ"
 
 #: modules/meta_engine/ID3Genres.h:137
 msgid "Chamber Music"
@@ -21086,7 +20983,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:138
 msgid "Sonata"
-msgstr ""
+msgstr "ਸੋਨਾਟਾ"
 
 #: modules/meta_engine/ID3Genres.h:139
 msgid "Symphony"
@@ -21146,7 +21043,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:154
 msgid "Punk Rock"
-msgstr ""
+msgstr "ਪੰਕ ਰੌਕ "
 
 #: modules/meta_engine/ID3Genres.h:155
 msgid "Drum Solo"
@@ -21166,7 +21063,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:159
 msgid "Goa"
-msgstr ""
+msgstr "ਗੋਆ"
 
 #: modules/meta_engine/ID3Genres.h:160
 msgid "Drum & Bass"
@@ -21202,7 +21099,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:168
 msgid "Beat"
-msgstr ""
+msgstr "ਬੀਟ"
 
 #: modules/meta_engine/ID3Genres.h:169
 msgid "Christian Gangsta Rap"
@@ -21234,7 +21131,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:176
 msgid "Salsa"
-msgstr ""
+msgstr "ਸਾਲਸਾ"
 
 #: modules/meta_engine/ID3Genres.h:177
 msgid "Thrash Metal"
@@ -21242,15 +21139,15 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:178
 msgid "Anime"
-msgstr ""
+msgstr "ਐਨੀਮੇ"
 
 #: modules/meta_engine/ID3Genres.h:179
 msgid "JPop"
-msgstr ""
+msgstr "ਜੇ-ਪੌਪ"
 
 #: modules/meta_engine/ID3Genres.h:180
 msgid "Synthpop"
-msgstr ""
+msgstr "ਸਿਨਥਪੌਪ"
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -21491,9 +21388,8 @@ msgid "TLS support for OS X and iOS"
 msgstr ""
 
 #: modules/misc/securetransport.c:68
-#, fuzzy
 msgid "TLS server support for OS X"
-msgstr "RTSP ਸਰਵਰ ਪੋਰਟ"
+msgstr ""
 
 #: modules/misc/securetransport.c:330
 #, c-format
@@ -21590,19 +21486,16 @@ msgid "Unknown Video"
 msgstr "ਅਣਜਾਣ ਵਿਡੀਓ"
 
 #: modules/mux/avi.c:55
-#, fuzzy
 msgid "Subject"
-msgstr " ਆਬਜੈਕਟ"
+msgstr "ਵਿਸ਼ਾ"
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "ਡੀਕੋਡਰ"
+msgstr "ਇੰਕੋਡਰ"
 
 #: modules/mux/avi.c:57
-#, fuzzy
 msgid "Keywords"
-msgstr "ਪੋਡਕਾਸਟ ਸ਼ਬਦ"
+msgstr "ਸ਼ਬਦ"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -21852,9 +21745,8 @@ msgid "Multipart JPEG muxer"
 msgstr ""
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "ਮੇਨੂ ਅੱਪਡੇਟ ਇੰਟਰਵਲ"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21862,9 +21754,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "ਅਕਾਰ ਅਨੁਪਾਤ ਰੱਖੋ"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -21918,9 +21809,8 @@ msgid "A/52 audio packetizer"
 msgstr ""
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "ਕਾਪੀ ਪੈਕਟਾਈਜ਼ਰ"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -21943,9 +21833,8 @@ msgid "H.264 video packetizer"
 msgstr "H.264 ਵਿਡੀਓ ਪੈਕਟਾਈਜ਼ਰ"
 
 #: modules/packetizer/hevc.c:57
-#, fuzzy
 msgid "HEVC/H.265 video packetizer"
-msgstr "H.264 ਵਿਡੀਓ ਪੈਕਟਾਈਜ਼ਰ"
+msgstr ""
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -22389,7 +22278,7 @@ msgstr ""
 
 #: modules/spu/marq.c:94
 msgid "Text file"
-msgstr ""
+msgstr "ਟੈਕਸਟ ਫਾਈਲ"
 
 #: modules/spu/marq.c:95
 msgid "File to read the marquee text from."
@@ -22918,8 +22807,9 @@ msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
+#, fuzzy
 msgid "Block stream cache"
-msgstr ""
+msgstr "ਘੜੀ ਸਰੋਤ"
 
 #: modules/stream_filter/cache_read.c:570
 #, fuzzy
@@ -24508,14 +24398,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "ਕਰੋਪ-ਕੀਤਾ"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "ਵਿਡੀਓ ਸਕੇਲਿੰਗ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -24651,9 +24539,8 @@ msgid "FPS Converter"
 msgstr "YUVP ਕਨਵਰਟਰ"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "ਡੀਇੰਟਰਲੇਸਿੰਗ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -24874,13 +24761,12 @@ msgid "Motion detect video filter"
 msgstr ""
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "ਕਲੋਨ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
-msgstr ""
+msgstr "ਪੁਰਾਣੀ ਮੂਵੀ"
 
 #: modules/video_filter/opencv_example.cpp:72
 msgid "OpenCV face detection example filter"
@@ -25297,13 +25183,12 @@ msgid "Rotate or flip the video"
 msgstr "ਵਿਡੀਓ ਘੁੰਮਾਉ ਜਾਂ ਪਲਟੋ"
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "ਸੀਨ ਵਿਡੀਓ ਫਿਲਟਰ"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr ""
+msgstr "VHS ਮੂਵੀ"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
@@ -25324,12 +25209,11 @@ msgstr "ASCII-ਕਲਾ ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "ਐਕਟਿਵ ਵਿੰਡੋਜ਼"
+msgstr "ਵਿੰਡੋ ਬੰਦ ਕਰੋ"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "ਐਕਟਿਵ ਵਿੰਡੋਜ਼"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -25363,7 +25247,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:85
 msgid "Output card"
-msgstr ""
+msgstr "ਆਉਟਪੁੱਟ ਕਾਰਡ"
 
 #: modules/video_output/decklink.cpp:87
 msgid "DeckLink output card, if multiple exist. The cards are numbered from 0."
@@ -25422,7 +25306,7 @@ msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
 #: modules/video_output/decklink.cpp:247
 #, fuzzy
 msgid "DeckLink Video Options"
-msgstr "ਵਿਡੀਓ ਸਥਾਪਨ"
+msgstr "ਵਿਡੀਓ ਸੈਟਿੰਗਾਂ"
 
 #: modules/video_output/decklink.cpp:270
 #, fuzzy
@@ -25432,7 +25316,7 @@ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
 #: modules/video_output/decklink.cpp:275
 #, fuzzy
 msgid "DeckLink Audio Options"
-msgstr "ਵਿਡੀਓ ਸਥਾਪਨ"
+msgstr "ਵਿਡੀਓ ਸੈਟਿੰਗਾਂ"
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -25522,7 +25406,7 @@ msgstr ""
 
 #: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:333
 msgid "Video mode"
-msgstr ""
+msgstr "ਵਿਡੀਓ ਮੋਡ"
 
 #: modules/video_output/kva.c:57
 msgid "Select a proper video mode to be used by KVA."
@@ -25549,9 +25433,8 @@ msgid "K Video Acceleration video output"
 msgstr "ਕੇ ਵਿਡੀਓ ਐਕਸਰਲੇਟਰ ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "OpenGL ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -25567,7 +25450,7 @@ msgstr ""
 
 #: modules/video_output/opengl/display.c:49
 msgid "OpenGL ES2"
-msgstr ""
+msgstr "OpenGL ES2"
 
 #: modules/video_output/opengl/display.c:50
 msgid "OpenGL for Embedded Systems 2 video output"
@@ -25575,7 +25458,7 @@ msgstr ""
 
 #: modules/video_output/opengl/display.c:61
 msgid "OpenGL"
-msgstr ""
+msgstr "OpenGL"
 
 #: modules/video_output/opengl/display.c:62
 msgid "OpenGL video output"
@@ -25583,7 +25466,7 @@ msgstr "OpenGL ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
 
 #: modules/video_output/opengl/egl.c:438
 msgid "EGL"
-msgstr ""
+msgstr "EGL"
 
 #: modules/video_output/opengl/egl.c:439
 msgid "EGL extension for OpenGL"
@@ -25608,23 +25491,20 @@ msgid "Pixel Shader"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:78
-#, fuzzy
 msgid "Choose a pixel shader to apply."
-msgstr "ਲਾਗੂ ਕਰਨ ਵਾਸਤੇ ਤੁਸੀਂ ਕਰੋਪ ਸਟਾਈਲ ਚੁਣ ਸਕਦੇ ਹੋ।"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
-#, fuzzy
 msgid "Path to HLSL file"
-msgstr "ਫਾਇਲ ਸੰਭਾਲੋ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:80
 msgid "Path to an HLSL file containing a single pixel shader."
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "ਫਾਇਲ ਸੰਭਾਲੋ"
+msgstr "HLSL ਫਾਇਲ"
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -26302,18 +26182,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "ਪਰਭਾਵ  ਵਿਡੀਓ ਵਿੰਡੋ ਦੀ ਉਚਾਈ, ਪਿਕਸਲ ਵਿੱਚ।"
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "X ਵਿੰਡੋ"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "ਪੈਰਾਮੀਟਰ ਅਣ-ਡਿੱਠੇ"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -26415,7 +26293,7 @@ msgstr "ਸਪੈਕਟਰ ਐਨਲੇਸਾਈਜ਼ਰ"
 
 #: modules/visualization/vsxu.cpp:59 modules/visualization/vsxu.cpp:60
 msgid "vsxu"
-msgstr ""
+msgstr "vsxu"
 
 #: share/lua/http/dialogs/batch_window.html:28
 msgid "#paste your VLM commands here"
@@ -26428,7 +26306,7 @@ msgstr ""
 #: share/lua/http/dialogs/browse_window.html:41
 #: share/lua/http/mobile_browse.html:48
 msgid "Play List"
-msgstr ""
+msgstr "ਸੂਚੀ ਚਲਾਓ"
 
 #: share/lua/http/dialogs/create_stream.html:156
 #: modules/gui/qt/ui/sprefs_audio.h:430 modules/gui/qt/ui/sprefs_video.h:328
@@ -26453,7 +26331,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:297
 msgid "MUX options"
-msgstr ""
+msgstr "MUX ਚੋਣਾਂ"
 
 #: share/lua/http/dialogs/create_stream.html:303
 msgid "Video scale"
@@ -26524,7 +26402,7 @@ msgstr "ਸਮਾਂ:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr ""
+msgstr "VLC ਮੀਡਿਆ ਪਲੇਅਰ - ਵੈੱਬ ਇੰਟਰਫੇਸ"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -26556,7 +26434,7 @@ msgstr "ਖਾਲੀ ਪਲੇਅਲਿਸਟ"
 
 #: share/lua/http/index.html:243
 msgid "Queue Selected"
-msgstr ""
+msgstr "ਚੁਣਿਆ ਦੀ ਕਤਾਰ"
 
 #: share/lua/http/index.html:244
 msgid "Play Selected"
@@ -26564,7 +26442,7 @@ msgstr "ਚੁਣੀ ਚਲਾਓ"
 
 #: share/lua/http/index.html:245
 msgid "Refresh List"
-msgstr ""
+msgstr "ਸੂਚੀ ਤਾਜ਼ਾ ਕਰੋ"
 
 #: share/lua/http/index.html:252
 msgid "Loading flowplayer..."
@@ -26613,7 +26491,7 @@ msgstr ""
 
 #: share/lua/http/index.html:278
 msgid "Are you sure you wish to create the stream?"
-msgstr ""
+msgstr "ਕੀ ਤੁਸੀਂ ਸਟਰੀਮ ਬਣਾਉਣੀ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #: modules/gui/qt/ui/about.h:288 modules/gui/qt/ui/open.h:260
 #: modules/gui/qt/ui/podcast_configuration.h:100
@@ -26643,11 +26521,11 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Verbosity:"
-msgstr ""
+msgstr "ਵੇਰਵਾ(&V):"
 
 #: modules/gui/qt/ui/messages_panel.h:140
 msgid "&Filter:"
-msgstr ""
+msgstr "ਫਿਲਟਰ(&F):"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26753,11 +26631,11 @@ msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
 msgid "Disable Disc Menus"
-msgstr ""
+msgstr "ਡਿਸਕ ਮੇਨੂ ਬੰਦ ਕਰੋ"
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
-msgstr ""
+msgstr "ਕੋਈ ਡਿਸਕ ਮੇਨੂ ਨਹੀਂ"
 
 #: modules/gui/qt/ui/open_disk.h:306
 msgid "Disc device"
@@ -26773,11 +26651,11 @@ msgstr "ਆਡੀਓ ਅਤੇ ਸਬ-ਟਾਈਟਲ"
 
 #: modules/gui/qt/ui/open_file.h:143
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ(&t)"
 
 #: modules/gui/qt/ui/open_file.h:145
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਚੁਣੋ"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -26805,16 +26683,15 @@ msgstr "ਨੈੱਟਵਰਕ URL ਦਿਉ ਜੀ:"
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "Profile edition"
-msgstr ""
+msgstr "ਪਰੋਫਾਇਲ ਐਡੀਸ਼ਨ"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -26825,9 +26702,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -26838,9 +26714,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -26855,9 +26730,8 @@ msgid "Webm"
 msgstr "ਵੈੱਬਐਮ"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -26888,9 +26762,8 @@ msgid "Menus"
 msgstr "ਮੇਨੂ"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "ਫਰੇਮ ਰੇਟ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -26905,9 +26778,8 @@ msgid "Custom options"
 msgstr "ਪਸੰਦ ਚੋਣਾਂ"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "ਕੁਆਲਟੀ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -26919,7 +26791,7 @@ msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
 msgid "Encoding parameters"
-msgstr ""
+msgstr "ਇੰਕੋਡਿੰਗ ਪੈਰਾਮੀਟਰ"
 
 #: modules/gui/qt/ui/profiles.h:742
 msgid "Frame size"
@@ -26930,14 +26802,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "ਸੈਂਪਲ ਰੇਟ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ਪਰੋਫਾਇਲ ਨਾਂ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -26967,7 +26837,7 @@ msgstr "ਲੋਕਲ ਹੀ ਵੇਖਾਓ"
 
 #: modules/gui/qt/ui/sout.h:212
 msgid "Transcoding Options"
-msgstr ""
+msgstr "ਟਰਾਂਸਕੋਡਿੰਗ ਚੋਣਾਂ"
 
 #: modules/gui/qt/ui/sout.h:213
 msgid "Select and choose transcoding options"
@@ -27151,7 +27021,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Start in minimal view mode"
-msgstr ""
+msgstr "ਘੱਟੋ-ਘੱਟ ਮੋਡ ਨਾਲ ਸ਼ੁਰੂ ਕਰੋ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Force window style:"
@@ -27178,7 +27048,7 @@ msgstr "ਸਕਿਨ ਸਰੋਤ ਫਾਈਲ:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "ਪਲੇਅਲਿਸਟ ਤੇ ਮੌਕੇ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -27226,11 +27096,11 @@ msgstr "ਵਿਡੀਓ ਸ਼ੁਰੂ ਹੋਣ ਉੱਤੇ ਮਿਡੀਆ �
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Enable subtitles"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਚਾਲੂ ਕਰੋ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
 msgid "Subtitle Language"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
@@ -27238,11 +27108,11 @@ msgstr "ਡਿਫਾਲਟ ਇੰਕੋਡਿੰਗ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Subtitle effects"
-msgstr ""
+msgstr "ਸਬ-ਟਾਈਟਲ ਪ੍ਰਭਾਵ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
-msgstr ""
+msgstr "ਸ਼ੈਡੋ ਜੋੜੋ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:306
 #: modules/gui/qt/ui/video_effects.h:1230
@@ -27258,7 +27128,7 @@ msgstr " px"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:307
 msgid "Add a background"
-msgstr ""
+msgstr "ਬੈਕਗਰਾਊਂਡ ਜੋੜੋ"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
 msgid "Accelerated video output (Overlay)"
@@ -27274,7 +27144,7 @@ msgstr "ਡਿਸਪਲੇਅ ਜੰਤਰ"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "KVA"
-msgstr ""
+msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:337
 msgid "Force Aspect Ratio"
@@ -27286,7 +27156,7 @@ msgstr "vlc-snap"
 
 #: modules/gui/qt/ui/streampanel.h:171
 msgid "Stuff"
-msgstr ""
+msgstr "ਸਮਗਰੀ "
 
 #: modules/gui/qt/ui/streampanel.h:173
 msgid "Edit settings"
@@ -27346,7 +27216,7 @@ msgstr "ਕੀ ਤੁਸੀਂ ਡਾਊਨਲੋਡ ਕਰਨਾ ਚਾਹੁ�
 
 #: modules/gui/qt/ui/video_effects.h:1228
 msgid "Essential"
-msgstr ""
+msgstr "ਜ਼ਰੂਰੀ"
 
 #: modules/gui/qt/ui/video_effects.h:1242
 #: modules/gui/qt/ui/video_effects.h:1251
@@ -27415,9 +27285,8 @@ msgid "Soften"
 msgstr "ਸਾਫਟਨ"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "ਨੋਵਾਇਸ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
@@ -27483,10 +27352,6 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਟਰੈਕ: %s"
-
 #~ msgid "Display resolution"
 #~ msgstr "ਡਿਸਪਲੇਅ ਰੈਜ਼ੋਲੂਸ਼ਨ"
 
@@ -27543,6 +27408,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "BD"
 #~ msgstr "BD"
 
+#~ msgid "Blu-ray Disc Input"
+#~ msgstr "ਬਲਿਉ-ਰੇ ਡਿਸਕ ਇੰਪੁੱੱਟ"
+
 #~ msgid "Configure"
 #~ msgstr "ਸੰਰਚਨਾ"
 
@@ -27551,6 +27419,12 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "EyeTV input"
 #~ msgstr "EyeTV ਇੰਪੁੱਟ"
+
+#~ msgid "Do not sort the items."
+#~ msgstr "ਆਈਟਮਾਂ ਨੂੰ ਲੜੀਬੱਧ ਨਾ ਕਰੋ।"
+
+#~ msgid "Directory sort order"
+#~ msgstr "ਡਾਇਰੈਕਟਰੀ ਲੜੀਬੱਧ ਕ੍ਰਮ"
 
 #~ msgid "FTP user name"
 #~ msgstr "FTP ਯੂਜ਼ਰ ਨਾਂ"
@@ -27576,9 +27450,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "RTSP password"
 #~ msgstr "RTSP ਪਾਸਵਰਡ"
 
-#, fuzzy
 #~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC ਫਾਇਲ \"%s\" ਨੂੰ ਖੋਲ੍ਹ ਨਹੀਂ ਸਕਿਆ।(%m)"
+#~ msgstr "VLC ਫਾਈਲ \"%s\" ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ: %s"
 
 #~ msgid "Video Capture width"
 #~ msgstr "ਵਿਡੀਓ ਕੈਪਰਚ ਚੌੜਾਈ"
@@ -27591,6 +27464,12 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "No Input device found"
 #~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
+
+#~ msgid "RDP auth username"
+#~ msgstr "RDP ਪਰਮਾਣਕਿਤਾ ਵਰਤੋਂਕਾਰ-ਨਾਂ"
+
+#~ msgid "RDP Password"
+#~ msgstr "RDP ਪਾਸਵਰਡ"
 
 #~ msgid "Subscreen top left corner"
 #~ msgstr "ਸਬ-ਸਕਰੀਨ ਉੱਤੇ ਖੱਬੇ ਕੋਨਾ"
@@ -27676,9 +27555,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Show extended VCD info?"
 #~ msgstr "ਵਾਧੂ VCD ਜਾਣਕਾਰੀ ਵੇਖਣੀ ਹੈ?"
 
-#~ msgid "Media in Zip"
-#~ msgstr "ਜ਼ਿਪ ਵਿੱਚ ਮੀਡਿਆ"
-
 #~ msgid "Zip files filter"
 #~ msgstr "ਜ਼ਿਪ ਫਾਇਲਾਂ ਫਿਲਟਰ"
 
@@ -27703,10 +27579,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "\"%s\" is no audio encoder."
 #~ msgstr "\"%s\" ਕੋਈ ਆਡੀਓ ਡੀਕੋਡਰ ਨਹੀਂ ਹੈ।"
 
-#, fuzzy
-#~ msgid "Dummy video decoder"
-#~ msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
-
 #~ msgid "420YpCbCr8Planar"
 #~ msgstr "420YpCbCr8Planar"
 
@@ -27719,17 +27591,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "QuickTime library decoder"
 #~ msgstr "QuickTime ਲਾਇਬਰੇਰੀ ਡੀਕੋਡਰ"
 
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  DVD ਮੇਨੂ"
-
-#~ msgid "First Played"
-#~ msgstr "ਪਹਿਲਾਂ ਚਲਾਇਆ"
-
-#~ msgid "Video Manager"
-#~ msgstr "ਵਿਡੀਓ ਮੈਨੇਜਰ"
-
-#~ msgid "----- Title"
-#~ msgstr "----- ਟਾਈਟਲ"
+#~ msgid "Writer"
+#~ msgstr "ਲੇਖਕ"
 
 #~ msgid "Disclaimer"
 #~ msgstr "ਦਾਅਵਾ"
@@ -27779,6 +27642,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "ZPL playlist import"
 #~ msgstr "ZPL ਪਲੇਅਲਿਸਟ ਇੰਪੋਰਟ"
 
+#~ msgid "Compiled by %s with %@"
+#~ msgstr "%@ ਨਾਲ %s ਰਾਹੀਂ ਕੰਪਾਇਲ ਕੀਤਾ"
+
 #~ msgid "VLC media player Help"
 #~ msgstr "VLC ਮੀਡਿਆ ਪਲੇਅਰ ਮੱਦਦ"
 
@@ -27791,15 +27657,23 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "No input found"
 #~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਨਹੀਂ ਲੱਭੀ"
 
-#, fuzzy
 #~ msgid "Hide Details"
-#~ msgstr "Codec ਵੇਰਵਾ"
+#~ msgstr "ਵੇਰਵਾ ਓਹਲੇ"
 
 #~ msgid "Send"
 #~ msgstr "ਭੇਜੋ"
 
+#~ msgid "Problem details and system configuration"
+#~ msgstr "ਸਮੱਸਿਆ ਵੇਰਵਾ ਅਤੇ ਸਿਸਟਮ ਸੰਰਚਨਾ"
+
+#~ msgid "Problem Report for %@"
+#~ msgstr "%@ ਨੂੰ ਸਮੱਸਿਆ ਜਾਣਕਾਰੀ ਦਿਓ"
+
 #~ msgid "Click to enable fullscreen video playback."
 #~ msgstr "ਪੂਰੀ ਸਕਰੀਨ ਵਿਡੀਓ ਪਲੇਅਬੈਕ ਚਾਲੂ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ।"
+
+#~ msgid "Click to stop playback."
+#~ msgstr "ਪਲੇਅਬੈਕ ਰੋਕਣ ਲਈ ਕਲਿੱਕ ਕਰੋ।"
 
 #~ msgid "User name"
 #~ msgstr "ਯੂਜ਼ਰ ਨਾਂ"
@@ -27864,9 +27738,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Meta-information"
 #~ msgstr "ਮੇਟਾ-ਜਾਣਕਾਰੀ"
 
-#, fuzzy
 #~ msgid "Always continue"
-#~ msgstr "ਹਮੇਸ਼ਾ ਉੱਤੇ ਰੱਖੋ"
+#~ msgstr "ਹਮੇਸ਼ਾ ਜਾਰੀ ਰੱਖੋ"
 
 #~ msgid "Show Fullscreen Controller"
 #~ msgstr "ਪੂਰਾ-ਸਕਰੀਨ ਕੰਟਰੋਲਰ ਵੇਖੋ"
@@ -27906,6 +27779,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "To"
 #~ msgstr "ਤੱਕ"
+
+#~ msgid "Streaming method"
+#~ msgstr "ਸਟਰੀਮ ਢੰਗ"
 
 #~ msgid "UDP Multicast"
 #~ msgstr "UDP ਮਲਟੀਕਾਸਟ"
@@ -27973,6 +27849,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "no"
 #~ msgstr "ਨਹੀਂ"
 
+#~ msgid "yes: from %@ to %@"
+#~ msgstr "ਹਾਂ:  %@ ਤੋਂ %@ ਤੱਕ"
+
 #~ msgid "yes: %@ @ %@ kb/s"
 #~ msgstr "ਹਾਂ: %@ @ %@ kb/s"
 
@@ -27994,16 +27873,14 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "T&ools"
 #~ msgstr "ਟੂਲ(&o)"
 
-#~ msgid "&Post processing"
-#~ msgstr "ਪੋਸਟ ਪਰੋਸੈਸਿੰਗ(&P)"
+#~ msgid "&Decrease Volume"
+#~ msgstr "ਵਾਲੀਅਮ ਘਟਾਓ(&D)"
 
-#, fuzzy
 #~ msgid "&Save To Playlist"
-#~ msgstr "ਪਲੇਅ-ਲਿਸਟ ਸੰਭਾਲੋ"
+#~ msgstr "ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਸੰਭਾਲੋ(&S)"
 
-#, fuzzy
 #~ msgid "Recently Played"
-#~ msgstr "ਤਾਜ਼ਾ ਚਲਾਈਆਂ ਆਈਟਮਾਂ ਸੰਭਾਲੋ"
+#~ msgstr "ਤਾਜ਼ਾ ਚਲਾਏ"
 
 #~ msgid "Power"
 #~ msgstr "ਊਰਜਾ"
@@ -28025,6 +27902,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "Local drives"
 #~ msgstr "ਲੋਕਲ ਡਰਾਇਵਾਂ"
+
+#~ msgid "Magazine"
+#~ msgstr "ਮੈਗਜ਼ੀਨ"
 
 #~ msgid "Page"
 #~ msgstr "ਪੇਜ਼"
@@ -28215,9 +28095,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Change gradients"
 #~ msgstr "ਗਰੇਡੀਐਂਟ ਬਦਲੋ"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "ਐਕਟਿਵ ਵਿੰਡੋਜ਼"
+#~ msgid "OpenGL ES"
+#~ msgstr "OpenGL ES"
 
 #~ msgid "SDL chroma format"
 #~ msgstr "SDL ਕਰੋਮਾ ਫਾਰਮੈਟ"
@@ -28227,12 +28106,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "YUV4MPEG2 ਹੈੱਡਰ (ਡਿਫਾਲਟ ਆਯੋਗ ਹੈ)"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
 
 #~ msgid "Black Slot"
 #~ msgstr "ਕਾਲਾ ਸਲਾਟ"
@@ -28246,132 +28119,14 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Filter threshold (%)"
 #~ msgstr "ਫਿਲਟਰ ਥਰੈਸ਼ਹੋਲਡ (%)"
 
-#, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "ਵਿਡੀਓ ਕੈਪਚਰ"
-
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
-
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "ਸਮੱਰਥਾ ਲਈ DVB ਕਾਰਡ ਜਾਂਚੋ"
-
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "ਬਦਲਾਅ config ਵਿੱਚ ਲਿਖੋ(&W)"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
+#~ msgid "FLV"
+#~ msgstr "FLV"
 
 #, fuzzy
 #~ msgid ""
 #~ "%.1f MHz (%d services)\n"
 #~ "~%s remaining"
 #~ msgstr "%.1f MHz (%d ਸਰਵਿਸਾਂ)"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "ਸਰਾਊਂਡਿੰਗ"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Quicktime ਕੈਪਚਰ"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
-
-#~ msgid "Uncompressed RAR"
-#~ msgstr "ਅਣ-ਕੰਪਰੈੱਸ RAR"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "Windows GDI ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "CDG ਵਿਡੀਓ ਡੀਕੋਡਰ"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "ਵਿੰਡੋਜ਼ ਸਰਵਿਸ ਇੰਟਰਫੇਸ"
-
-#~ msgid "Save this Log..."
-#~ msgstr "ਇਹ ਲਾਗ ਸੰਭਾਲੋ..."
-
-#, fuzzy
-#~ msgid "Empty"
-#~ msgstr " - ਖਾਲੀ - "
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "ਆਡਿਓ ਇੰਪੁੱਟ ਪਿੰਨ"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਨਹੀਂ ਲੱਭੀ"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "ਸਾਫ਼ ਕਰੋ"
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "ਵਿਡੀਓ ਟਰਾਂਸਫਰ ਫਿਲਟਰ"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "ਡਿਫਾਲਟ ਸਟਰੀਮ"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "ਵੇਰਵਾ ਸਟਰੀਮ ਆਉਟਪੁੱਟ"
-
-#~ msgid ""
-#~ "Please wait while your font cache is rebuilt.\n"
-#~ "This should take less than a few minutes."
-#~ msgstr ""
-#~ "ਤੁਹਾਡੀ ਫੋਂਟ ਕੈਸ਼ ਮੁੜ-ਬਿਲਡ ਹੋਣ ਤੱਕ ਉਡੀਕੋ ਜੀ।\n"
-#~ "ਇਸ ਨੂੰ ਇੱਕ ਮਿੰਟ ਤੋਂ ਘੱਟ ਸਮਾਂ ਲੱਗ ਸਕਦਾ ਹੈ।"
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "ਵਿਡੀਓ ਵਿੰਡੋ ਦੀ ਚੌੜਾਈ, ਪਿਕਸਲ ਵਿੱਚ।"
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "ਵਿਡੀਓ ਵਿੰਡੋ ਦੀ ਉਚਾਈ, ਪਿਕਸਲ ਵਿੱਚ।"
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "ਸਪੈਕਟਰਮ"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "ਮੌਜੂਦਾ ਦਿੱਖ"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "ਉੱਤੇ ਤੈਰਦਾ ਰੱਖੋ"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "VLC ਮੀਡਿਆ ਪਲੇਅਰ ਮੱਦਦ"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "ਸਟਰੀਮ ਆਉਟਪੁੱਟ"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -28438,12 +28193,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "Data search path"
 #~ msgstr "ਡਾਟਾ ਖੋਜ ਪਾਥ"
-
-#~ msgid "One instance when started from file"
-#~ msgstr "ਜਦੋਂ ਫਾਇਲ ਤੋਂ ਚੱਲੇ ਤਾਂ ਇੱਕ ਹੀ ਮੌਕਾ"
-
-#~ msgid "Enqueue items to playlist when in one instance mode"
-#~ msgstr "ਜਦੋਂ ਇੱਕ ਹੀ ਮੌਕਾ ਮੋਡ ਹੋਵੇ ਤਾਂ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
 
 #~ msgid "Raise the interface above all other windows."
 #~ msgstr "ਇੰਟਰਫੇਸ ਨੂੰ ਹੋਰ ਸਭ ਵਿੰਡੋ ਦੇ ਉੱਤੇ ਰੱਖੋ।"
@@ -28535,16 +28284,9 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "PCM F64 BE"
 #~ msgstr "PCM F64 BE"
 
-#~ msgid "Blu-Ray Disc Input"
-#~ msgstr "ਬਲਿਉ-ਰੇ ਡਿਸਕ ਇੰਪੁੱਟ"
-
 #, fuzzy
 #~ msgid "Blu-Ray Disc support (libbluray)"
 #~ msgstr "ਬਲਿਉ-ਰੇ ਡਿਸਕ ਇੰਪੁੱਟ"
-
-#, fuzzy
-#~ msgid "Blu-Ray error"
-#~ msgstr "ਬਲਿਉ-ਰੇ"
 
 #~ msgid "VLC cannot use the device \"%s\", because its type is not supported."
 #~ msgstr "VLC \"%s\" ਜੰਤਰ ਨੂੰ ਨਹੀਂ ਵਰਤ ਸਕਦਾ ਹੈ, ਕਿਉਂਕਿ ਇਸ ਟਾਈਪ ਸਹਾਇਕ ਨਹੀਂ ਹੈ।"
@@ -28683,20 +28425,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 #~ msgstr "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 
-#~ msgid "Playlist has only %d elements"
-#~ msgstr "ਪਲੇਅਲਿਸਟ 'ਚ ਕੇਵਲ %d ਭਾਗ ਹਨ"
-
 #~ msgid "Please provide one of the following parameters:"
 #~ msgstr "ਅੱਗੇ ਦਿੱਤੇ ਪੈਰਾਮੀਟਰਾਂ ਵਿੱਚ ਇੱਕ ਦਿਓ ਜੀ:"
-
-#~ msgid "Pop/funk"
-#~ msgstr "ਪੋਪ/ਫੰਕ"
-
-#~ msgid "Hard rock"
-#~ msgstr "ਹਾਰਡ ਰੌਕ"
-
-#~ msgid "VLC Debug Log (%s).rtfd"
-#~ msgstr "VLC ਡੀਬੱਗ ਲਾਗ (%s).rtfd"
 
 #~ msgid "Use the native fullscreen mode on OS X Lion"
 #~ msgstr "OS X Lion ਉੱਤੇ ਨੇਟਿਵ ਪੂਰੀ ਸਕਰਨੀ ਮੋਡ ਵਰਤੋਂ"
@@ -28754,9 +28484,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "libc memcpy"
 #~ msgstr "libc memcpy"
 
-#~ msgid "Blu-Ray"
-#~ msgstr "ਬਲਿਉ-ਰੇ"
-
 #~ msgid "Crop geometry (pixels)"
 #~ msgstr "ਕਰੋਪ ਜੁਮੈਟਰੀ (ਪਿਕਸਲ)"
 
@@ -28784,9 +28511,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #, fuzzy
 #~ msgid "Use GPU accelerated decoding"
 #~ msgstr "GPU ਐਕਸਲੇਸ਼ਨ ਵਰਤੋਂ (ਤਜਰਬੇ ਅਧੀਨ)"
-
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "ਜਦੋਂ ਇੱਕ ਹੀ ਮੌਕਾ ਮੋਡ ਹੋਵੇ ਤਾਂ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
 
 #~ msgid "Error when sending the Crash Report"
 #~ msgstr "ਕਰੈਸ਼ ਰਿਪੋਰਟ ਭੇਜਣ ਦੌਰਾਨ ਗਲਤੀ ਹੈ"
@@ -29000,9 +28724,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #~ msgid "VLC was brought to you by:"
 #~ msgstr "VLC ਨੂੰ ਤੁਹਾਡੇ ਲਈ ਲੈ ਕੇ ਆਏ ਹਨ:"
-
-#~ msgid "Rewind"
-#~ msgstr "ਰੀਵਾਈਡ"
 
 #~ msgid "Shows more information about the available video filters."
 #~ msgstr "ਉਪਲੱਬਧ ਵਿਡੀਓ ਫਿਲਟਰਾਂ ਬਾਰੇ ਹੋਰ ਜਾਣਕਾਰੀ ਵੇਖੋ।"
@@ -29384,18 +29105,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Charset"
 #~ msgstr "ਮਿਤੀ"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "ਆਪਣੀ ਪਸੰਦੀਦਾ ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਨੂੰ ਚੁਣੋ ਅਤੇ ਇੱਥੇ ਸੰਰਚਿਤ ਕਰੋ।"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ਇਹ ਮੋਡੀਊਲ VLC ਦੇ ਹੋਰ ਸਭ ਭਾਗਾਂ ਲਈ ਨੈੱਟਵਰਕ ਸਹੂਲਤਾਂ ਦਿੰਦੇ ਹਨ।"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "ਡਾਈਲਾਗ ਪਰੋਵਾਈਡਰ ਇੱਥੇ ਸੰਰਚਿਤ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "ਕੋਈ ਢੁੱਕਵਾਂ ਡੀਕੋਡਰ ਮੋਡੀਊਲ ਨਹੀਂ ਲੱਭਿਆ"
-
 #~ msgid ""
 #~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
 #~ "there is no way for you to fix this."
@@ -29403,14 +29112,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ "VLC \"%4.4s\" ਆਡੀਓ ਜਾਂ ਵਿਡੀਓ ਫਾਰਮੈਟ ਲਈ ਸਹਾਇਕ ਨਹੀਂ ਹੈ। ਅਫਸੋਸ ਰਹੇਗਾ ਕਿ ਇਸ ਨੂੰ ਠੀਕ "
 #~ "ਕਰਨ ਦਾ ਤੁਹਾਡੇ ਕੋਲ ਕੋਈ ਵੀ ਢੰਗ ਨਹੀਂ ਹੈ।"
 
-#~ msgid "Album art policy"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਪਾਲਸੀ"
-
 #~ msgid "Choose how album art will be downloaded."
 #~ msgstr "ਚੋਣ ਕਰੋ ਕਿ ਐਲਬਮ ਆਰਟ ਕਿਵੇਂ ਡਾਊਨਲੋਡ ਕਰਨਾ ਹੈ।"
-
-#~ msgid "Manual download only"
-#~ msgstr "ਕੇਵਲ ਖੁਦ ਹੀ ਡਾਊਨਲੋਡ ਕਰੋ"
 
 #~ msgid "When track starts playing"
 #~ msgstr "ਜਦੋਂ ਟਰੈਕ ਚੱਲ ਰਿਹਾ ਹੋਵੇ"
@@ -29418,17 +29121,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "As soon as track is added"
 #~ msgstr "ਜਦੋਂ ਵੀ ਟਰੈਕ ਸ਼ਾਮਲ ਕੀਤਾ ਜਾਵੇ"
 
-#~ msgid "Load Media Library"
-#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਲੋਡ ਕਰੋ"
-
 #~ msgid "FFmpeg"
 #~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg ਅਸੈੱਸ"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "ਸਟੀਰਿਓ ਨੂੰ ਮੋਨੋ ਵਿੱਚ ਬਦਲਣ ਲਈ ਆਡੀਓ ਫਿਲਟਰ"
 
 #~ msgid "Enable lossless coding"
 #~ msgstr "ਲੂਜ਼-ਲਿਸ ਕੋਡਿੰਗ ਚਾਲੂ"
@@ -29442,26 +29136,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "yblen"
 #~ msgstr "yblen"
 
-#~ msgid "Motion vector precision"
-#~ msgstr "ਮੋਸ਼ਨ ਵੈਕਟਰ ਸ਼ੁੱਧਤਾ"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ਪ੍ਰਤੀ ਡਿਗਰੀ ਸਾਈਕਲ"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਵਿਡੀਓ ਡੀਕੋਡਰ"
-
 #~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 #~ msgstr "| menu . . [on|off|up|down|left|right|select] use menu"
-
-#~ msgid "Jump to time"
-#~ msgstr "ਟਾਈਮ ਉੱਤੇ ਜਾਓ"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "ਕਰੈਸ਼-ਲਾਗ ਖੋਲ੍ਹੋ..."
-
-#~ msgid "Don't Send"
-#~ msgstr "ਨਾ ਭੇਜੋ"
 
 #~ msgid "VLC crashed previously"
 #~ msgstr "VLC ਪਹਿਲਾਂ ਕਰੈਸ਼ ਹੋ ਗਿਆ ਸੀ"
@@ -29472,37 +29148,6 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgid "Don't ask again"
 #~ msgstr "ਫੇਰ ਨਾ ਪੁੱਛੋ"
 
-#~ msgid "No CrashLog found"
-#~ msgstr "ਕੋਈ ਕਰੈਸ਼-ਲਾਗ ਨਹੀਂ ਹੈ"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV ਫੋਲਡਰ ਖੋਲ੍ਹੋ"
-
-#~ msgid "Album art download policy"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
-
-#~ msgid "Output module"
-#~ msgstr "ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "ਗਰਾਫਿਕਸ ਇਕੂਲਾਈਜ਼ਰ"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "ਵਿਡੀਓ ਆਟੋਮੈਟਿਕ ਹੀ ਮੁੜ-ਆਕਾਰ ਅਤੇ ਪੈੱਡ ਕਰੋ"
-
-#~ msgid "Under the Video"
-#~ msgstr "ਵਿਡੀਓ ਹੇਠ"
-
-#~ msgid "&Help..."
-#~ msgstr "ਮੱਦਦ(&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "ਆਡੀਓ ਟਰੈਕ ਉੱਤੇ ਸੈਕਰੋਨਾਈਜ਼"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "ਆਡੀਓ ਚੈਨਲ ਲੈਵਲ ਦਾ ਮੁੱਲ"
-
 #~ msgid "Alarm"
 #~ msgstr "ਅਲਾਰਮ"
 
@@ -29510,14 +29155,253 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgstr "Mac OS X OpenGL ਵਿਡੀਓ ਆਉਟਪੁੱਟ (drawable-nsobject ਚਾਹੀਦਾ ਹੈ)"
 
 #, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+#~ msgid "Ffmpeg mux"
+#~ msgstr "FFmpeg"
 
+#, fuzzy
+#~ msgid "Don't repair"
+#~ msgstr "ਨਾ ਭੇਜੋ"
+
+#~ msgid "Probe DVB card for capabilities"
+#~ msgstr "ਸਮੱਰਥਾ ਲਈ DVB ਕਾਰਡ ਜਾਂਚੋ"
+
+#~ msgid "Uncompressed RAR"
+#~ msgstr "ਅਣ-ਕੰਪਰੈੱਸ RAR"
+
+#~ msgid "VLC Debug Log (%s).rtf"
+#~ msgstr "VLC Debug Log (%s).rtf "
+
+#~ msgid "Empty"
+#~ msgstr "ਖਾਲੀ"
+
+#, fuzzy
+#~ msgid "VLC Debug Log (%s).rtfd"
+#~ msgstr "VLC Debug Log (%s).rtf "
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "ਆਪਣੀ ਪਸੰਦੀਦਾ ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਨੂੰ ਚੁਣੋ ਅਤੇ ਇੱਥੇ ਸੰਰਚਿਤ ਕਰੋ।"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ਇਹ ਮੋਡੀਊਲ VLC ਦੇ ਹੋਰ ਸਭ ਭਾਗਾਂ ਲਈ ਨੈੱਟਵਰਕ ਸਹੂਲਤਾਂ ਦਿੰਦੇ ਹਨ।"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "ਡਾਈਲਾਗ ਪਰੋਵਾਈਡਰ ਇੱਥੇ ਸੰਰਚਿਤ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।"
+
+#, fuzzy
+#~ msgid "Manual download only"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
+
+#~ msgid "Album art download policy"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
+
+#, fuzzy
 #~ msgid "Album art download policy:"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ:"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
 
+#, fuzzy
+#~ msgid "MJPEG:"
+#~ msgstr "MJPEG"
+
+#, fuzzy
+#~ msgid "MOV"
+#~ msgstr "MKV"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "KVA"
+
+#, fuzzy
+#~ msgid "Pop/funk"
+#~ msgstr "ਪੋਪ/ਫੰਕ"
+
+#, fuzzy
+#~ msgid "Hard rock"
+#~ msgstr "ਹਾਰਡ ਰੌਕ"
+
+#, fuzzy
+#~ msgid "Rewind"
+#~ msgstr "ਮੀਡੀਆ ਰਿਵਾਇੰਡ"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "DVD ਮੇਨੂ"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "ਪਹਿਲਾਂ ਚਲਾਇਆ"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "ਐਡ-ਐਨ ਮੈਨੇਜਰ"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "ਟਾਇਟਲ"
+
+#, fuzzy
+#~ msgid "Playlist has only %d elements"
+#~ msgstr "ਪਲੇਅਲਿਸਟ ਤੇ ਮੌਕੇ"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "ਮੀਡੀਆ ਰਿਵਾਇੰਡ"
+
+#, fuzzy
+#~ msgid "No video devices found"
+#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
+
+#, fuzzy
+#~ msgid "DVB"
+#~ msgstr "DV"
+
+#, fuzzy
+#~ msgid "QTSound"
+#~ msgstr "ਸਰਾਊਂਡਿੰਗ"
+
+#, fuzzy
+#~ msgid "QuickTime Sound Capture"
+#~ msgstr "Quicktime ਕੈਪਚਰ"
+
+#, fuzzy
+#~ msgid "No Audio Input device found"
+#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
+
+#, fuzzy
+#~ msgid "No audio input device found"
+#~ msgstr "ਕੋਈ ਇੰਪੁੱਟ ਜੰਤਰ ਨਹੀਂ ਲੱਭਿਆ"
+
+#, fuzzy
+#~ msgid "Save this Log..."
+#~ msgstr "...ਵਾਂਗ ਸੰਭਾਲੋ(&S)"
+
+#, fuzzy
+#~ msgctxt "Tooltip|Clear"
+#~ msgid "Clear"
+#~ msgstr "ਸਾਫ਼ ਕਰੋ"
+
+#, fuzzy
+#~ msgid ""
+#~ "Please wait while your font cache is rebuilt.\n"
+#~ "This should take less than a few minutes."
+#~ msgstr ""
+#~ "ਤੁਹਾਡੀ ਫੋਂਟ ਕੈਸ਼ ਮੁੜ-ਬਿਲਡ ਹੋਣ ਤੱਕ ਉਡੀਕੋ ਜੀ।\n"
+#~ "ਇਸ ਨੂੰ ਇੱਕ ਮਿੰਟ ਤੋਂ ਘੱਟ ਸਮਾਂ ਲੱਗ ਸਕਦਾ ਹੈ।"
+
+#, fuzzy
+#~ msgid "VLC media player - Flash Viewer"
+#~ msgstr "VLC ਮੀਡਿਆ ਪਲੇਅਰ - ਵੈੱਬ ਇੰਟਰਫੇਸ"
+
+#, fuzzy
+#~ msgid "One instance when started from file"
+#~ msgstr "ਜਦੋਂ ਫਾਇਲ ਮੈਨੇਜਰ ਤੋਂ ਸ਼ੁਰੂ ਕੀਤਾ ਹੋਵੇ ਤਾਂ ਇੱਕ ਹੀ ਪਲੇਅਰ ਵਰਤੋਂ"
+
+#, fuzzy
+#~ msgid "Enqueue items to playlist when in one instance mode"
+#~ msgstr "ਇੱਕ ਹੀ ਪਲੇਅਰ ਚਲਾਉਣ ਦੇ ਮੋਡ ਵਿੱਚ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
+
+#, fuzzy
+#~ msgid "Blu-Ray Disc Input"
+#~ msgstr "ਬਲਿਉ-ਰੇ ਡਿਸਕ ਇੰਪੁੱੱਟ"
+
+#, fuzzy
+#~ msgid "Blu-Ray error"
+#~ msgstr "ਬਲਿਉ-ਰੇ ਗਲਤੀ"
+
+#, fuzzy
+#~ msgid "Blu-Ray"
+#~ msgstr "ਬਲਿਉ-ਰੇ"
+
+#, fuzzy
+#~ msgid "Enqueue files when in one instance mode"
+#~ msgstr "ਇੱਕ ਹੀ ਪਲੇਅਰ ਚਲਾਉਣ ਦੇ ਮੋਡ ਵਿੱਚ ਆਈਟਮਾਂ ਨੂੰ ਪਲੇਅਲਿਸਟ ਵਿੱਚ ਜੋੜੋ"
+
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "CVD ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
+
+#, fuzzy
+#~ msgid "Album art policy"
+#~ msgstr "ਐਲਬਮ ਕਲਾ ਫਾਇਲ ਨਾਂ"
+
+#, fuzzy
+#~ msgid "Load Media Library"
+#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ"
+
+#, fuzzy
+#~ msgid "FFmpeg access"
+#~ msgstr "ਜ਼ਿੱਪ ਅਸੈੱਸ"
+
+#, fuzzy
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "ਸਧਾਰਨ ਚੈਨਲ ਮਿਕਸਿੰਗ ਲਈ ਆਡੀਓ ਫਿਲਟਰ"
+
+#, fuzzy
+#~ msgid "Motion vector precision"
+#~ msgstr "ਮੋਸ਼ਨ ਵੈਕਟਰ ਸ਼ੁੱਧਤਾ"
+
+#, fuzzy
+#~ msgid "cycles per degree"
+#~ msgstr "ਡਿਗਰੀ ਵਿੱਚ ਕੋਣ"
+
+#, fuzzy
+#~ msgid "Video decoder using openmash"
+#~ msgstr "ਵਿਡੀਓ ਇੰਕੋਡਰ (OpenMAX IL ਦੀ ਵਰਤੋਂ)"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "ਸਮੇਂ ਉੱਤੇ ਜਾਓ"
+
+#, fuzzy
+#~ msgid "Open CrashLog..."
+#~ msgstr "ਡਿਸਕ ਖੋਲ੍ਹੋ..."
+
+#, fuzzy
+#~ msgid "Don't Send"
+#~ msgstr "ਨਾ ਵੇਖੋ"
+
+#, fuzzy
+#~ msgid "No CrashLog found"
+#~ msgstr "ਕੋਈ ਐਡ-ਆਨ ਨਹੀਂ ਲੱਭੀ"
+
+#, fuzzy
+#~ msgid "Open BDMV folder"
+#~ msgstr "ਫੋਲਡਰ ਖੋਲ੍ਹੋ"
+
+#, fuzzy
+#~ msgid "Output module"
+#~ msgstr "ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
+
+#, fuzzy
+#~ msgid "Graphic Equalizer"
+#~ msgstr "ਇਕੂਲਾਈਜ਼ਰ"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "ਵਿਡੀਓ ਆਟੋਮੈਟਿਕ ਹੀ ਮੁੜ-ਆਕਾਰ ਅਤੇ ਪੈੱਡ ਕਰੋ"
+
+#, fuzzy
+#~ msgid "Under the Video"
+#~ msgstr "ਵਿਡੀਓ ਉੱਤੇ"
+
+#, fuzzy
+#~ msgid "&Help..."
+#~ msgstr "ਮੱਦਦ(&H)"
+
+#, fuzzy
+#~ msgid "Synchronise on audio track"
+#~ msgstr "ਆਡੀਓ ਟਰੈਕ ਵਾਰ ਵਾਰ ਚਲਾਓ"
+
+#, fuzzy
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "ਆਡੀਓ ਚੈਨਲ ਦੀ ਗਿਣਤੀ"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ(&t)"
+
+#, fuzzy
 #~ msgid "Configure Media Library"
-#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਸੰਰਚਨਾ"
+#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ"
 
 #, fuzzy
 #~ msgid "Secondary language (Analog TV tuners only)"
@@ -29541,7 +29425,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Subtitles codecs"
-#~ msgstr "USF ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਕੋਡਕਸ"
 
 #, fuzzy
 #~ msgid "Settings for subtitles, teletext and CC decoders and encoders."
@@ -29557,11 +29441,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Chroma modules settings"
-#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #, fuzzy
 #~ msgid "Packetizer modules settings"
-#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #, fuzzy
 #~ msgid "Encoders settings"
@@ -29570,19 +29454,15 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #, fuzzy
 #~ msgid ""
 #~ "These are general settings for video/audio/subtitles encoding modules."
-#~ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹਨ।"
+#~ msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲਾਂ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹੈ।"
 
 #, fuzzy
 #~ msgid "Dialog providers settings"
-#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #, fuzzy
 #~ msgid "Subtitle demuxer settings"
-#~ msgstr "ਸਬਟਾਈਟਲ ਦੇਰੀ %i ms"
-
-#, fuzzy
-#~ msgid "No help available"
-#~ msgstr "ਸਭ ਤੋਂ ਵਧੀਆ ਉਪਲੱਬਧ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਪ੍ਰਭਾਵ"
 
 #, fuzzy
 #~ msgid "There is no help available for these modules."
@@ -29610,7 +29490,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Add to Media Library"
-#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਲੋਡ ਕਰੋ"
+#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ"
 
 #, fuzzy
 #~ msgid "Advanced Open..."
@@ -29654,7 +29534,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Audio output channels mode"
-#~ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਅਸੈੱਸ ਢੰਗ"
+#~ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਚੈਨਲ"
 
 #, fuzzy
 #~ msgid "Audio visualizations "
@@ -29678,7 +29558,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Allow only one running instance when started from file."
-#~ msgstr "ਕੇਵਲ ਹੀ ਇੱਕ ਹੀ ਮੌਕਾ (instance) ਚੱਲਦਾ ਰੱਖੋ"
+#~ msgstr "ਜਦੋਂ ਫਾਇਲ ਮੈਨੇਜਰ ਤੋਂ ਸ਼ੁਰੂ ਕੀਤਾ ਹੋਵੇ ਤਾਂ ਇੱਕ ਹੀ ਪਲੇਅਰ ਵਰਤੋਂ"
 
 #, fuzzy
 #~ msgid "Select the hotkey to use to leave fullscreen state."
@@ -29706,7 +29586,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "CPU"
-#~ msgstr "TCP"
+#~ msgstr "DCP"
 
 #, fuzzy
 #~ msgid "Aspect-ratio"
@@ -29722,11 +29602,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "GSM Audio"
-#~ msgstr "ਆਡਿਓ"
+#~ msgstr "ਆਡੀਓ"
 
 #, fuzzy
 #~ msgid "ALSA audio capture input"
-#~ msgstr "ਅਲਸਾ ਆਡੀਓ ਆਉਟਪੁੱਟ"
+#~ msgstr "ALSA ਆਡੀਓ ਕੈਪਚਰ"
 
 #, fuzzy
 #~ msgid "BluRay Disc is corrupted."
@@ -29742,7 +29622,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Refresh list"
-#~ msgstr "ਤਾਜ਼ਾ ਟਾਈਮ"
+#~ msgstr "ਸੂਚੀ ਤਾਜ਼ਾ ਕਰੋ"
 
 #, fuzzy
 #~ msgid "VLC cannot open ANY capture device.Check the error log for details."
@@ -29846,7 +29726,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "[vcd:][device][@[title][,[chapter]]]"
-#~ msgstr "[cdda:][device][@[track]]"
+#~ msgstr "[vcd:][device][#[title][,[chapter]]]"
 
 #, fuzzy
 #~ msgid "Float32 audio mixer"
@@ -29962,7 +29842,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Classic rock"
-#~ msgstr "ਕਲਾਸਿਕ"
+#~ msgstr "ਕਲਾਸਿਕ ਰੌਕ"
 
 #, fuzzy
 #~ msgid "Sound clip"
@@ -29970,7 +29850,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "New wave"
-#~ msgstr "ਨਿਊ ਏਜ਼"
+#~ msgstr "ਨਵੀਂ ਵੇਵ"
 
 #, fuzzy
 #~ msgid "Text subtitles parser"
@@ -30018,7 +29898,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Commands"
-#~ msgstr "ਟਿੱਪਣੀਆਂ"
+#~ msgstr "ਕਮਾਂਡ+"
 
 #, fuzzy
 #~ msgid "GNU/Linux osd/overlay framebuffer interface"
@@ -30030,7 +29910,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Compiled by %@ with %@"
-#~ msgstr "ਕੰਪਾਇਲ ਕੀਤਾ %s ਵਲੋਂ %s (%s) ਉੱਤੇ\n"
+#~ msgstr "%@ ਨਾਲ %s ਰਾਹੀਂ ਕੰਪਾਇਲ ਕੀਤਾ"
 
 #, fuzzy
 #~ msgid "Automatically save the volume on exit"
@@ -30074,7 +29954,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Subtitles encoding"
-#~ msgstr "DVB ਸਬ-ਟਾਈਟਲ ਇੰਕੋਡਰ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਕੋਡਕਸ"
 
 #, fuzzy
 #~ msgid "Subtitles alignment"
@@ -30094,7 +29974,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "General Video Settings"
-#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #, fuzzy
 #~ msgid "Subtitles & OSD"
@@ -30130,11 +30010,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Subtitle Languages"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #, fuzzy
 #~ msgid "Preferred Subtitle Language"
-#~ msgstr "ਆਡੀਓ ਭਾਸ਼ਾ ਪਸੰਦ"
+#~ msgstr "ਪਸੰਦੀਦਾ ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #, fuzzy
 #~ msgid "Force Bold"
@@ -30246,11 +30126,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Open subtitles file"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਖੋਲ੍ਹੋ"
 
 #, fuzzy
 #~ msgid "Preamp\n"
-#~ msgstr "ਡਰੀਮ"
+#~ msgstr "ਪ੍ਰੀਐਮਪ"
 
 #, fuzzy
 #~ msgid " dB"
@@ -30266,7 +30146,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Clear playlist"
-#~ msgstr "ਲਿਸਟ ਸਾਫ਼ ਕਰੋ"
+#~ msgstr "ਪਲੇਅਲਿਸਟ ਸਾਫ਼ ਕਰੋ"
 
 #, fuzzy
 #~ msgid "Icon View"
@@ -30278,7 +30158,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "List View"
-#~ msgstr "ਲਿਸਟ ID"
+#~ msgstr "ਮੀਡਿਆ ਝਲਕ"
 
 #, fuzzy
 #~ msgid "Subtitles && OSD"
@@ -30318,11 +30198,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "&Convert / Save"
-#~ msgstr "ਬਦਲੋ /ਸੰਭਾਲੋ(&r)..."
+#~ msgstr "ਬਦਲੋ/ਸੰਭਾਲੋ(&o)"
 
 #, fuzzy
 #~ msgid "Subtitles Files"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ"
+#~ msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲਾਂ"
 
 #, fuzzy
 #~ msgid "&Tools"
@@ -30434,7 +30314,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Command"
-#~ msgstr "ਟਿੱਪਣੀ"
+#~ msgstr "ਕਮਾਂਡ+"
 
 #, fuzzy
 #~ msgid "GOP size"
@@ -30502,7 +30382,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Subtitle Codec"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਕੋਡਕਸ"
 
 #, fuzzy
 #~ msgid "Output Method"
@@ -30522,7 +30402,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "MUX Options"
-#~ msgstr "DMX ਚੋਣਾਂ"
+#~ msgstr "MUX ਚੋਣਾਂ"
 
 #, fuzzy
 #~ msgid "Video Scale"
@@ -30578,19 +30458,15 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Preamp: "
-#~ msgstr "ਡਰੀਮ"
+#~ msgstr "ਪ੍ਰੀਐਮਪ"
 
 #, fuzzy
 #~ msgid "Licence"
 #~ msgstr "ਲਾਈਸੈਂਸ"
 
 #, fuzzy
-#~ msgid "Verbosity:"
-#~ msgstr "ਵੇਰਵਾ"
-
-#, fuzzy
 #~ msgid "Use a sub&titles file"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+#~ msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ(&t)"
 
 #, fuzzy
 #~ msgid "Destinations"
@@ -30602,23 +30478,19 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Instances"
-#~ msgstr "ਇੰਸਟਾਲ"
-
-#, fuzzy
-#~ msgid "Systray popup when minimized"
-#~ msgstr "ਜਦੋਂ ਘੱਟੋ-ਘੱਟ ਹੋਵੇ"
+#~ msgstr "ਇੰਸਟਾਲ ਹਨ"
 
 #, fuzzy
 #~ msgid "Subtitles Language"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #, fuzzy
 #~ msgid "Preferred subtitles language"
-#~ msgstr "ਆਡੀਓ ਭਾਸ਼ਾ ਪਸੰਦ"
+#~ msgstr "ਪਸੰਦੀਦਾ ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
 
 #, fuzzy
 #~ msgid "Subtitles effects"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਪ੍ਰਭਾਵ"
 
 #, fuzzy
 #~ msgid "Black slot"
@@ -30634,15 +30506,15 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "yes: from %@ to %@ secs"
-#~ msgstr "ਹਾਂ: %@ @ %@ kb/s"
+#~ msgstr "ਹਾਂ:  %@ ਤੋਂ %@ ਤੱਕ"
 
 #, fuzzy
 #~ msgid "Previous/Backward"
-#~ msgstr "ਪਿੱਛੇ ਚੈਪਟਰ"
+#~ msgstr "ਪਿਛਲਾ / ਪਿੱਛੇ ਵੱਲ"
 
 #, fuzzy
 #~ msgid "Next/Forward"
-#~ msgstr "ਅੱਗੇ"
+#~ msgstr "ਅਗਲਾ / ਅੱਗੇ ਵੱਲ"
 
 #, fuzzy
 #~ msgid "Video Filters..."
@@ -30706,7 +30578,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Media Browser"
-#~ msgstr "ਮੀਡਿਆ: %s"
+#~ msgstr "ਮੀਡਿਆ ਅੱਗੇ"
 
 #, fuzzy
 #~ msgid "Full Screen"
@@ -30718,15 +30590,15 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "ਸਟਾਰਟ ਟਾਈਮ"
+#~ msgstr "ਮੀਡਿਆ ਸਮਾਂ"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
-#~ msgstr "ਗਰਾਫਿਕਸ ਇਕੂਲਾਈਜ਼ਰ"
+#~ msgstr "ਇਕੂਲਾਈਜ਼ਰ"
 
 #, fuzzy
 #~ msgid "Create Stream"
-#~ msgstr "ਸਟਰੀਮ ਪਰਬੰਧ"
+#~ msgstr " ਬਦਲੋ ਤੇ ਸਟਰੀਮ ਕਰੋ"
 
 #, fuzzy
 #~ msgid "Capture Screen"
@@ -30750,7 +30622,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Create New Stream"
-#~ msgstr "ਨਵਾਂ ਪਰੋਫਾਇਲ ਬਣਾਓ"
+#~ msgstr " ਬਦਲੋ ਤੇ ਸਟਰੀਮ ਕਰੋ"
 
 #, fuzzy
 #~ msgid "Delete All Streams"
@@ -30969,7 +30841,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Auto gain"
-#~ msgstr "ਆਟੋਮੈਟਿਕ"
+#~ msgstr "ਆਡੀਓ ਗੇਨ"
 
 #, fuzzy
 #~ msgid "Horizontal centering"
@@ -30989,7 +30861,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
-#~ msgstr "ਅਣਜਾਣ ਕੈਟਾਗਰੀ"
+#~ msgstr "ਅਣਜਾਣ ਗਲਤੀ"
 
 #, fuzzy
 #~ msgid "UNIX OSS audio output"
@@ -31048,16 +30920,8 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #~ msgstr "AIFF ਡੀਮੁਕਸਰ"
 
 #, fuzzy
-#~ msgid "Ffmpeg mux"
-#~ msgstr "FFmpeg"
-
-#, fuzzy
 #~ msgid "AVI Index"
 #~ msgstr "ਇੰਡੈਕਸ"
-
-#, fuzzy
-#~ msgid "Don't repair"
-#~ msgstr "ਨਾ ਭੇਜੋ"
 
 #, fuzzy
 #~ msgid "Subtitles (asa demuxer)"
@@ -31101,7 +30965,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Keep current Equalizer settings"
-#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ ਸਥਾਪਨ"
+#~ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #, fuzzy
 #~ msgid "No device connected"
@@ -31261,7 +31125,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Direct3D Desktop mode"
-#~ msgstr "Direct3D ਵਿਡੀਓ ਆਉਟਪੁੱਟ"
+#~ msgstr "ਡਾਇਰੈਕਟਰੀ ਲੜੀਬੱਧ ਕ੍ਰਮ"
 
 #, fuzzy
 #~ msgid "Sna&pshot"
@@ -31502,7 +31366,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "VLC could not get a new block of size: %i."
-#~ msgstr "VLC ਫਾਇਲ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ।"
+#~ msgstr "VLC ਫਾਈਲ ਪੜ੍ਹ ਨਹੀਂ ਸਕਿਆ: %s"
 
 #, fuzzy
 #~ msgid "cddax://[device-or-file][@[T]track]"
@@ -31510,7 +31374,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Audio Compact Disc"
-#~ msgstr "ਆਡਿਓ ਆਉਟਪੁੱਟ ਪਿੰਨ"
+#~ msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਜੰਤਰ"
 
 #, fuzzy
 #~ msgid "Use CD audio controls and output?"
@@ -31558,7 +31422,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "MPEG-4 V"
-#~ msgstr "MPEG 1"
+#~ msgstr "MPEG-4 ਵਿਡੀਓ"
 
 #, fuzzy
 #~ msgid "Prev Title"
@@ -31686,7 +31550,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Audio:"
-#~ msgstr "ਆਡਿਓ"
+#~ msgstr "ਆਡੀਓ"
 
 #, fuzzy
 #~ msgid "Channel:"
@@ -31710,15 +31574,11 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Quality:"
-#~ msgstr "ਕੁਆਲਟੀ"
+#~ msgstr "VBR ਕੁਆਲਟੀ"
 
 #, fuzzy
 #~ msgid "Tuner:"
 #~ msgstr "ਟਿਊਨਰ"
-
-#, fuzzy
-#~ msgid "MJPEG:"
-#~ msgstr "MJPEG"
 
 #, fuzzy
 #~ msgid "pal"
@@ -31738,11 +31598,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "MPEG1"
-#~ msgstr "MPEG 1"
-
-#, fuzzy
-#~ msgid "MOV"
-#~ msgstr "MKV"
+#~ msgstr "MPEG-PS"
 
 #, fuzzy
 #~ msgid "ASF"
@@ -31833,7 +31689,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Compiled by "
-#~ msgstr "ਕੰਪਾਇਲਰ: %s\n"
+#~ msgstr "%@ ਨਾਲ %s ਰਾਹੀਂ ਕੰਪਾਇਲ ਕੀਤਾ"
 
 #, fuzzy
 #~ msgid "Open:"
@@ -31953,7 +31809,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Use a sub&amp;titles file"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+#~ msgstr "ਸਬਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ(&t)"
 
 #, fuzzy
 #~ msgid "textFormat"
@@ -32049,7 +31905,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Compiled by %s, based on Git commit %s"
-#~ msgstr "ਕੰਪਾਇਲ ਕੀਤਾ %s ਵਲੋਂ %s (%s) ਉੱਤੇ\n"
+#~ msgstr "%s ਵਲੋਂ %s (%s) ਉੱਤੇ ਕੰਪਾਇਲ ਕੀਤਾ\n"
 
 #, fuzzy
 #~ msgid "Quick Open File..."
@@ -32089,7 +31945,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Minimal View..."
-#~ msgstr "ਘੱਟੋ-ਘੱਟ ਪੀਰੀਅਡ"
+#~ msgstr "ਮੀਡਿਆ ਝਲਕ"
 
 #, fuzzy
 #~ msgid "Card Selection"
@@ -32109,7 +31965,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "VLC could not find encoder \"%s\"."
-#~ msgstr "VLC ਇੰਕੋਡਰ ਨਹੀਂ ਖੋਲ੍ਹ ਸਕਿਆ।"
+#~ msgstr "VLC \"%s:%d\" ਨਾਲ ਕੁਨੈਕਟ ਨਹੀਂ ਹੋ ਸਕਿਆ।"
 
 #, fuzzy
 #~ msgid "Audio CD - Track "
@@ -32161,7 +32017,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Subtitles languages"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾ"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਭਾਸ਼ਾਵਾਂ"
 
 #, fuzzy
 #~ msgid "Skip Frames"
@@ -32229,7 +32085,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Unable to find playlist"
-#~ msgstr "ਪਲੇਅਲਿਸਟ ਖੋਲ੍ਹੋ"
+#~ msgstr "ਪਲੇਅਲਿਸਟ ਸਾਫ਼ ਕਰੋ"
 
 #, fuzzy
 #~ msgid "Image inversion"
@@ -32277,7 +32133,7 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Play faster"
-#~ msgstr "ਚਲਾਓ ਅਤੇ ਰੋਕੋ"
+#~ msgstr "ਸੂਚੀ ਚਲਾਓ"
 
 #, fuzzy
 #~ msgid "Preference&s...\tCtrl-S"
@@ -32329,8 +32185,12 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 
 #, fuzzy
 #~ msgid "Open Subtitles"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਖੋਲ੍ਹੋ..."
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਖੋਲ੍ਹੋ"
 
 #, fuzzy
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "ਕੁੱਲ/ਬਾਕੀ ਸਮਾਂ"
+
+#, fuzzy
+#~ msgid "Addon Manager"
+#~ msgstr "ਐਡ-ਐਨ ਮੈਨੇਜਰ"

@@ -1143,7 +1143,7 @@ msgstr "క్రింద-ఎడమవైపు"
 #: src/input/es_out.c:3253
 #, fuzzy
 msgid "Chroma location"
-msgstr "స్థానము"
+msgstr "స్వరూపణం ఐచ్ఛికాలు"
 
 #: src/input/es_out.c:3262
 msgid "Rectangular"
@@ -2734,9 +2734,8 @@ msgid "Subtitles text scaling factor"
 msgstr "ఉపశీర్షికను స్వయంగాకనిపెట్ట పథాలు"
 
 #: src/libvlc-module.c:717
-#, fuzzy
 msgid "Set value to alter subtitles size where possible"
-msgstr "దస్త్రాన్ని ఎంచుకొను"
+msgstr ""
 
 #: src/libvlc-module.c:719
 msgid "Enable sub-pictures"
@@ -4013,17 +4012,16 @@ msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడ�
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "దస్త్రాన్ని ఎంచుకొను"
+msgstr "ఉపశీర్షికలను చేతనించు"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "దస్త్రాన్ని ఎంచుకొను"
+msgstr "ఉపశీర్షికలను తెరువు"
 
 #: src/libvlc-module.c:1325
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "దస్త్రాన్ని ఎంచుకొను"
+msgstr ""
 
 #: src/libvlc-module.c:1326
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -9882,8 +9880,9 @@ msgid "K Audio Interface audio output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "డైరెక్ట్X ఆడియో అవుట్‌పుట్"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -22083,7 +22082,7 @@ msgstr "జాబితా శుభ్రపరుచు"
 #: modules/services_discovery/upnp.cpp:78
 #, fuzzy
 msgid "Custom List"
-msgstr "అనురూపితం"
+msgstr "స్వరూపణం ఐచ్ఛికాలు"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -26506,8 +26505,9 @@ msgstr "నవీకరించు"
 #: modules/gui/qt/ui/sprefs_interface.h:528
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:320 modules/gui/qt/ui/streampanel.h:167
+#, fuzzy
 msgid "Form"
-msgstr ""
+msgstr "ఆకృతి"
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -26522,8 +26522,9 @@ msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
+#, fuzzy
 msgid "&Filter:"
-msgstr ""
+msgstr "వడబోత:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -26542,8 +26543,9 @@ msgid "Show &more options"
 msgstr "మరిన్ని ఐచ్ఛికాలను చూపించు (&m)"
 
 #: modules/gui/qt/ui/open.h:268
+#, fuzzy
 msgid "Change the caching for the media"
-msgstr ""
+msgstr "మాధ్యమం ప్రారంభ సమయాన్ని మార్చు"
 
 #: modules/gui/qt/ui/open.h:270
 msgid " ms"
@@ -26648,12 +26650,14 @@ msgid "Audio and Subtitles"
 msgstr "ఆడియో మరియు ఉపశీర్షికలు"
 
 #: modules/gui/qt/ui/open_file.h:143
+#, fuzzy
 msgid "Use a sub&title file"
-msgstr ""
+msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడు"
 
 #: modules/gui/qt/ui/open_file.h:145
+#, fuzzy
 msgid "Select the subtitle file"
-msgstr ""
+msgstr "దస్త్రాన్ని ఎంచుకొను"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -26680,8 +26684,9 @@ msgid "Please enter a network URL:"
 msgstr "దయచేసి ఒక నెట్‌వర్క్ URL ప్రవేశపెట్టండి:"
 
 #: modules/gui/qt/ui/profiles.h:701
+#, fuzzy
 msgid "Profile edition"
-msgstr ""
+msgstr "ప్రవర పేరు"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -26752,16 +26757,18 @@ msgid "Features"
 msgstr "విశిష్టతలు"
 
 #: modules/gui/qt/ui/profiles.h:719
+#, fuzzy
 msgid "Streamable"
-msgstr ""
+msgstr "ప్రవాహం పేరు"
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
 msgstr "అధ్యాయాలు"
 
 #: modules/gui/qt/ui/profiles.h:723
+#, fuzzy
 msgid "Menus"
-msgstr ""
+msgstr "మెను"
 
 #: modules/gui/qt/ui/profiles.h:730
 #, fuzzy
@@ -26769,16 +26776,18 @@ msgid "Fra&me Rate"
 msgstr "చట్రం రేటు"
 
 #: modules/gui/qt/ui/profiles.h:731
+#, fuzzy
 msgid "Same as source"
-msgstr ""
+msgstr "వనరు"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr " fps"
 
 #: modules/gui/qt/ui/profiles.h:734
+#, fuzzy
 msgid "Custom options"
-msgstr ""
+msgstr "స్వరూపణం ఐచ్ఛికాలు"
 
 #: modules/gui/qt/ui/profiles.h:735
 #, fuzzy
@@ -26786,8 +26795,9 @@ msgid "&Quality"
 msgstr "నాణ్యత"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
+#, fuzzy
 msgid "Not Used"
-msgstr ""
+msgstr "అమర్చలేదు"
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
@@ -26798,12 +26808,14 @@ msgid "Encoding parameters"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
+#, fuzzy
 msgid "Frame size"
-msgstr ""
+msgstr "చట్రం రేటు"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
+#, fuzzy
 msgid "px"
-msgstr ""
+msgstr " px"
 
 #: modules/gui/qt/ui/profiles.h:758
 #, fuzzy
@@ -26816,16 +26828,18 @@ msgid "Profile &Name"
 msgstr "ప్రవర పేరు"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "ఒక ప్రవాహాన్ని ఎన్నుకొను"
 
 #: modules/gui/qt/ui/sout.h:205
 msgid "Destination Setup"
 msgstr "గమ్యం అమరిక"
 
 #: modules/gui/qt/ui/sout.h:206
+#, fuzzy
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "ఒక ప్రవాహాన్ని ఎన్నుకొను"
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -26842,12 +26856,14 @@ msgid "Display locally"
 msgstr "స్థానికంగా ప్రదర్శించు"
 
 #: modules/gui/qt/ui/sout.h:212
+#, fuzzy
 msgid "Transcoding Options"
-msgstr ""
+msgstr "అధునాతన ఐచ్ఛికాలు"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "అన్ని ఐచ్ఛికాలను చూచుటకు \"అధునాతన ఐచ్ఛికాలు\" ఎంచుకోండి."
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -26858,8 +26874,9 @@ msgid "Option Setup"
 msgstr "ఐచ్ఛిక అమరిక"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "ఒక ప్రవాహాన్ని ఎన్నుకొను"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -26870,8 +26887,9 @@ msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
+#, fuzzy
 msgid "Generated stream output string"
-msgstr ""
+msgstr "సాధారణ ప్రవాహం అవుట్‌పుట్ అమరికలు"
 
 #: modules/gui/qt/ui/sprefs_audio.h:428
 msgid " %"
@@ -26894,8 +26912,9 @@ msgid "Visualization:"
 msgstr "దృశ్యమానములు:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:437
+#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr ""
+msgstr "ఆడియోని చేతనపరుచు"
 
 #: modules/gui/qt/ui/sprefs_audio.h:438
 msgid "Dolby Surround:"
@@ -26982,8 +27001,9 @@ msgid "RTP over RTSP (TCP)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:363
+#, fuzzy
 msgid "Live555 stream transport"
-msgstr ""
+msgstr "HTTP ప్రత్యక్ష ప్రవాహం అవుట్‌పుట్"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Default caching policy"
@@ -27034,8 +27054,9 @@ msgid "Force window style:"
 msgstr "బలవంతపు కిటికీ శైలి:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
+#, fuzzy
 msgid "Integrate video in interface"
-msgstr ""
+msgstr "ప్రధాన అంతరవర్తికి అమరికలు"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -27053,8 +27074,9 @@ msgid "Skin resource file:"
 msgstr "తొడుగు మూల దస్త్రం:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
+#, fuzzy
 msgid "Playlist and Instances"
-msgstr ""
+msgstr "ప్రదర్శనజాబితా దస్త్రాలు"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Allow only one instance"
@@ -27113,8 +27135,9 @@ msgid "Default encoding"
 msgstr "అప్రమేయ ఎన్కోడింగ్"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
+#, fuzzy
 msgid "Subtitle effects"
-msgstr ""
+msgstr "ఉపశీర్షికలు"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27230,16 +27253,18 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
+#, fuzzy
 msgid "Negate colors"
-msgstr ""
+msgstr "సంచయాన్ని సృష్టించు"
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
 msgstr "రంగులు"
 
 #: modules/gui/qt/ui/video_effects.h:1257
+#, fuzzy
 msgid "Interactive Zoom"
-msgstr ""
+msgstr "అంతరవర్తి"
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27271,8 +27296,9 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
+#, fuzzy
 msgid "Mirror"
-msgstr ""
+msgstr "దోషం"
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
@@ -27287,8 +27313,9 @@ msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
+#, fuzzy
 msgid "Soften"
-msgstr ""
+msgstr "సాఫ్ట్"
 
 #: modules/gui/qt/ui/video_effects.h:1301
 msgid "Denoiser"
@@ -27357,10 +27384,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "మాధ్యమ నిర్వాహకం జాబితా"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "ఉపశీర్షిక ట్రాక్: %s"
 
 #~ msgid "Display resolution"
 #~ msgstr "ప్రదర్శన విభాజకత"
@@ -27451,9 +27474,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgid "(Super) Video CD"
 #~ msgstr "(సూపర్) వీడియో సీడీ"
 
-#~ msgid "Media in Zip"
-#~ msgstr "జిప్ లోనున్న మాధ్యమం"
-
 #~ msgid "Zip files filter"
 #~ msgstr "జిప్ దస్త్రాల వడబోతకం"
 
@@ -27465,15 +27485,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 
 #~ msgid "OpenSLES"
 #~ msgstr "OpenSLES"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  డీవీడీ మెను"
-
-#~ msgid "Video Manager"
-#~ msgstr "వీడియో నిర్వాహకం"
-
-#~ msgid "----- Title"
-#~ msgstr "----- శీర్షిక"
 
 #~ msgid "Writer"
 #~ msgstr "రచయిత"
@@ -27573,6 +27584,9 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgid "From"
 #~ msgstr "నుండి"
 
+#~ msgid "Streaming method"
+#~ msgstr "ప్రవహించు విధానం"
+
 #~ msgid "Transcode audio"
 #~ msgstr "ఆడియోని ట్రాన్సుకోడ్ చేయి"
 
@@ -27612,12 +27626,12 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgid "T&ools"
 #~ msgstr "పనిముట్లు (&o)"
 
-#~ msgid "&Post processing"
-#~ msgstr "పోస్ట్ ప్రోసెసింగ్ (&P)"
-
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "ప్రదర్శనజాబితాను భద్రపరుచు"
+
+#~ msgid "&Post processing"
+#~ msgstr "పోస్ట్ ప్రోసెసింగ్ (&P)"
 
 #, fuzzy
 #~ msgid "Recently Played"
@@ -27693,14 +27707,38 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgid "OpenGL ES"
 #~ msgstr "OpenGL ES"
 
+#, fuzzy
+#~ msgid "Black Slot"
+#~ msgstr "నలుపు"
+
+#, fuzzy
+#~ msgid "Output Color Filtermode"
+#~ msgstr "అవుట్‌పుట్ దస్త్రం"
+
+#~ msgid "Brightness (%)"
+#~ msgstr "ప్రకాశత (%)"
+
 #~ msgid "MKV"
 #~ msgstr "MKV"
 
 #~ msgid "FLV"
 #~ msgstr "FLV"
 
-#~ msgid "Brightness (%)"
-#~ msgstr "ప్రకాశత (%)"
+#~ msgid "---  DVD Menu"
+#~ msgstr "---  డీవీడీ మెను"
+
+#~ msgid "Video Manager"
+#~ msgstr "వీడియో నిర్వాహకం"
+
+#~ msgid "----- Title"
+#~ msgstr "----- శీర్షిక"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "ఉపశీర్షిక ట్రాక్: %s"
+
+#~ msgid "Media in Zip"
+#~ msgstr "జిప్ లోనున్న మాధ్యమం"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"
@@ -27729,10 +27767,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #, fuzzy
 #~ msgid "No audio input device found"
 #~ msgstr "ఏ ఇన్‌పుట్ పరికరం కనపడలేదు"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "డైరెక్ట్X ఆడియో అవుట్‌పుట్"
 
 #, fuzzy
 #~ msgid "SVG video decoder"
@@ -28445,10 +28479,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgstr "ప్రదర్శనజాబితా చూపించు/దాయి"
 
 #, fuzzy
-#~ msgid "Open subtitles file"
-#~ msgstr "ఉపశీర్షికలను తెరువు"
-
-#, fuzzy
 #~ msgid " dB"
 #~ msgstr "dB"
 
@@ -28625,10 +28655,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgstr "గమ్యం"
 
 #, fuzzy
-#~ msgid "Output File"
-#~ msgstr "అవుట్‌పుట్ దస్త్రం"
-
-#, fuzzy
 #~ msgid "Input Media"
 #~ msgstr "ఇన్‌పుట్ జాబితా"
 
@@ -28657,10 +28683,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #~ msgstr "లైసెన్స్"
 
 #, fuzzy
-#~ msgid "Use a sub&titles file"
-#~ msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడు"
-
-#, fuzzy
 #~ msgid "Destinations"
 #~ msgstr "గమ్యం"
 
@@ -28679,14 +28701,6 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #, fuzzy
 #~ msgid "Preferred subtitles language"
 #~ msgstr "ప్రాధాన్య ఆడియో భాష"
-
-#, fuzzy
-#~ msgid "Subtitles effects"
-#~ msgstr "ఉపశీర్షికలు"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "నలుపు"
 
 #, fuzzy
 #~ msgid "Composr"

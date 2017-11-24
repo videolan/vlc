@@ -28984,8 +28984,9 @@ msgid "Chapters"
 msgstr "Cjapitul"
 
 #: modules/gui/qt/ui/profiles.h:723
+#, fuzzy
 msgid "Menus"
-msgstr ""
+msgstr "Dopre i menus DVD"
 
 #: modules/gui/qt/ui/profiles.h:730
 #, fuzzy
@@ -29047,8 +29048,9 @@ msgid "Profile &Name"
 msgstr "Non dal file di regjistri"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Sielç un flus"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -29617,16 +29619,19 @@ msgid "Spatial luma strength"
 msgstr "spaziâl"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "spaziâl"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "spaziâl"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "spaziâl"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -29686,10 +29691,6 @@ msgstr ""
 #, fuzzy
 msgid "Media Manager List"
 msgstr "Meta-informazions"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Trace dai sot titui"
 
 #~ msgid "Display resolution"
 #~ msgstr "Risoluzion dal visôr"
@@ -29897,14 +29898,6 @@ msgstr "Meta-informazions"
 #~ "nol rispuint"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "Meditative"
-
-#, fuzzy
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "Troi de mascare di doprâ"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "Filtri video"
 
@@ -29947,19 +29940,6 @@ msgstr "Meta-informazions"
 #, fuzzy
 #~ msgid "Video decoder using Android MediaCodec"
 #~ msgstr "Codec video di destinazion"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "Dopre menu DVD"
-
-#~ msgid "First Played"
-#~ msgstr "Prime riproduzion"
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "Filtri video"
-
-#~ msgid "----- Title"
-#~ msgstr "Titul"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -30024,10 +30004,6 @@ msgstr "Meta-informazions"
 #, fuzzy
 #~ msgid "ZPL playlist import"
 #~ msgstr "La liste di riproduzion e je vueide"
-
-#, fuzzy
-#~ msgid "Fast udp streaming"
-#~ msgstr "Met in pause flus"
 
 #, fuzzy
 #~ msgid "Compiled by %s with %@"
@@ -30206,6 +30182,9 @@ msgstr "Meta-informazions"
 #~ "Cheste pagjine e lasse sielzi cemût che il flus in jentrade vignarà "
 #~ "mandât."
 
+#~ msgid "Streaming method"
+#~ msgstr "Metodi streaming"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Direzion dal ordenadôr a cui inviâ il flus."
 
@@ -30369,12 +30348,12 @@ msgstr "Meta-informazions"
 #~ msgstr "Volum predeterminât dal audio"
 
 #, fuzzy
-#~ msgid "&Post processing"
-#~ msgstr "Filtri video"
-
-#, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Salve liste di riproduzion"
+
+#, fuzzy
+#~ msgid "&Post processing"
+#~ msgstr "Filtri video"
 
 #, fuzzy
 #~ msgid "Power"
@@ -30676,16 +30655,8 @@ msgstr "Meta-informazions"
 #~ msgstr "Jessude video su dit il visôr"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "Impostanzions pal video"
-
-#, fuzzy
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr " (predeterminât disativât)"
-
-#, fuzzy
-#~ msgid "MKV"
-#~ msgstr "MOV"
 
 #, fuzzy
 #~ msgid "Black Slot"
@@ -30702,6 +30673,43 @@ msgstr "Meta-informazions"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Liminâr"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "MOV"
+
+#~ msgid "---  DVD Menu"
+#~ msgstr "Dopre menu DVD"
+
+#~ msgid "First Played"
+#~ msgstr "Prime riproduzion"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "Filtri video"
+
+#~ msgid "----- Title"
+#~ msgstr "Titul"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "Impostanzions pal video"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Trace dai sot titui"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "Meditative"
+
+#, fuzzy
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "Troi de mascare di doprâ"
+
+#, fuzzy
+#~ msgid "Fast udp streaming"
+#~ msgstr "Met in pause flus"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"

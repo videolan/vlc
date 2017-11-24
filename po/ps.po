@@ -10113,8 +10113,9 @@ msgid "K Audio Interface audio output"
 msgstr "د ويډيو ياد وتۍ"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "د ويډيو ياد وتۍ"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -19454,7 +19455,7 @@ msgstr "برابرونې او اغېزې"
 #: modules/gui/qt/dialogs/extended.cpp:80
 #, fuzzy
 msgid "Stereo Widener"
-msgstr "غږيز اکر"
+msgstr "د ځال امستنې"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -27297,8 +27298,9 @@ msgid "Change the caching for the media"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
+#, fuzzy
 msgid " ms"
-msgstr ""
+msgstr " س"
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
@@ -27318,8 +27320,9 @@ msgid "Edit Options"
 msgstr "سمون غوراوي"
 
 #: modules/gui/qt/ui/open.h:275
+#, fuzzy
 msgid "Extra media"
-msgstr ""
+msgstr "ننوتۍ لړ"
 
 #: modules/gui/qt/ui/open.h:277
 msgid "Complete MRL for VLC internal"
@@ -27586,8 +27589,9 @@ msgid "Profile &Name"
 msgstr "د خبرال دوتنې نوم"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "هغه پوښۍ وټاکئ چې ساتل يې په کې غواړﺉ"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -27620,8 +27624,9 @@ msgid "Transcoding Options"
 msgstr "بريونلي غوراوي"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "بريونلي غوراوي"
 
 #: modules/gui/qt/ui/sout.h:214
 #, fuzzy
@@ -27634,8 +27639,9 @@ msgid "Option Setup"
 msgstr "غوراوي"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "هغه پوښۍ وټاکئ چې ساتل يې په کې غواړﺉ"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -27729,8 +27735,9 @@ msgid "x264 preset and tuning selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:349
+#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr ""
+msgstr "_نويكيد"
 
 #: modules/gui/qt/ui/sprefs_input.h:350
 msgid "Skip H.264 in-loop deblocking filter"
@@ -27795,8 +27802,9 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
+#, fuzzy
 msgid "Use native style"
-msgstr ""
+msgstr "څېرمه سرليک"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 #, fuzzy
@@ -27891,8 +27899,9 @@ msgid "Set up associations..."
 msgstr "د دوتنې نښلونه:"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
+#, fuzzy
 msgid "Enable On Screen Display (OSD)"
-msgstr ""
+msgstr "_فايل"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
 msgid "Show media title on video start"
@@ -28095,36 +28104,42 @@ msgid "Motion detect"
 msgstr "_وديو"
 
 #: modules/gui/qt/ui/video_effects.h:1295
+#, fuzzy
 msgid "Spatial blur"
-msgstr ""
+msgstr "ليديزونې"
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
+#, fuzzy
 msgid "Soften"
-msgstr ""
+msgstr "څېرمه انځورونه"
 
 #: modules/gui/qt/ui/video_effects.h:1301
 msgid "Denoiser"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
+#, fuzzy
 msgid "Spatial luma strength"
-msgstr ""
+msgstr "ليديزونې"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "ليديزونې"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "ليديزونې"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "ليديزونې"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -28178,10 +28193,6 @@ msgstr "AAAA; "
 #, fuzzy
 msgid "Media Manager List"
 msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "د څېرمه سرليک پلنيوی"
 
 #~ msgid "Display resolution"
 #~ msgstr "ښوون ژورکوت"
@@ -28299,10 +28310,6 @@ msgstr "_نويكيد"
 #~ msgstr "لړ پېژند"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "رسنۍ دوتنې"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "د دوتنې ساتل پاتې راغلل"
 
@@ -28329,12 +28336,6 @@ msgstr "_نويكيد"
 #, fuzzy
 #~ msgid "Video decoder using Android MediaCodec"
 #~ msgstr "_وديو"
-
-#~ msgid "Video Manager"
-#~ msgstr "ويډيو سمبالګر"
-
-#~ msgid "----- Title"
-#~ msgstr "----- سرليک"
 
 #, fuzzy
 #~ msgid "Requirements"
@@ -28470,6 +28471,10 @@ msgstr "_نويكيد"
 #~ msgstr "غږون لړ ساتل"
 
 #, fuzzy
+#~ msgid "&Post processing"
+#~ msgstr "_وديو"
+
+#, fuzzy
 #~ msgid "Power"
 #~ msgstr "ورو"
 
@@ -28489,6 +28494,10 @@ msgstr "_نويكيد"
 #, fuzzy
 #~ msgid "Preferred Width"
 #~ msgstr "د غږيز غوره ژبه"
+
+#, fuzzy
+#~ msgid "Smooth Streaming"
+#~ msgstr "د وزلې ټاکنه"
 
 #~ msgid "Page"
 #~ msgstr "مخ"
@@ -28679,10 +28688,6 @@ msgstr "_نويكيد"
 #~ msgstr "ويډيو وتۍ OpenGL"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "د ويډيو امستنې ونه ساتل شوې"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "تور کچ"
 
@@ -28697,6 +28702,24 @@ msgstr "_نويكيد"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "د چاڼ اکر"
+
+#~ msgid "Video Manager"
+#~ msgstr "ويډيو سمبالګر"
+
+#~ msgid "----- Title"
+#~ msgstr "----- سرليک"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "د ويډيو امستنې ونه ساتل شوې"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "د څېرمه سرليک پلنيوی"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "رسنۍ دوتنې"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"
@@ -29655,10 +29678,6 @@ msgstr "_نويكيد"
 
 #~ msgid "XCB"
 #~ msgstr "XCB"
-
-#, fuzzy
-#~ msgid "Processing"
-#~ msgstr "_وديو"
 
 #, fuzzy
 #~ msgid "Autodetect"

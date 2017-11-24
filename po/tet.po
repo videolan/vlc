@@ -10201,8 +10201,9 @@ msgid "K Audio Interface audio output"
 msgstr "_Formas"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "_Formas"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -12729,7 +12730,7 @@ msgstr ""
 #: modules/codec/vpx.c:53
 #, fuzzy
 msgid "Quality mode"
-msgstr "_Audio"
+msgstr "_Navigação"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -19772,7 +19773,7 @@ msgstr "_Video"
 #: modules/gui/qt/dialogs/extended.cpp:80
 #, fuzzy
 msgid "Stereo Widener"
-msgstr "_Audio"
+msgstr "_Formas"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -27799,8 +27800,9 @@ msgid "Change the caching for the media"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
+#, fuzzy
 msgid " ms"
-msgstr ""
+msgstr " "
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
@@ -27822,8 +27824,9 @@ msgid "Edit Options"
 msgstr "_Formas"
 
 #: modules/gui/qt/ui/open.h:275
+#, fuzzy
 msgid "Extra media"
-msgstr ""
+msgstr "_Audio"
 
 #: modules/gui/qt/ui/open.h:277
 msgid "Complete MRL for VLC internal"
@@ -28058,8 +28061,9 @@ msgid "Custom options"
 msgstr "Kona ba applikação ida ne'e"
 
 #: modules/gui/qt/ui/profiles.h:735
+#, fuzzy
 msgid "&Quality"
-msgstr ""
+msgstr "_Navigação"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 #, fuzzy
@@ -28096,8 +28100,9 @@ msgid "Profile &Name"
 msgstr "_Archivo"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "_Video"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -28131,8 +28136,9 @@ msgid "Transcoding Options"
 msgstr "_Formas"
 
 #: modules/gui/qt/ui/sout.h:213
+#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr ""
+msgstr "_Formas"
 
 #: modules/gui/qt/ui/sout.h:214
 #, fuzzy
@@ -28145,8 +28151,9 @@ msgid "Option Setup"
 msgstr "_Formas"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "_Video"
 
 #: modules/gui/qt/ui/sout.h:217
 #, fuzzy
@@ -28312,8 +28319,9 @@ msgid "This is VLC's default interface, with a native look and feel."
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
+#, fuzzy
 msgid "Use native style"
-msgstr ""
+msgstr "_Audio"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 #, fuzzy
@@ -28580,8 +28588,9 @@ msgid "Interactive Zoom"
 msgstr "_Formas"
 
 #: modules/gui/qt/ui/video_effects.h:1263
+#, fuzzy
 msgid "Angle"
-msgstr ""
+msgstr "_Archivo"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
@@ -28643,16 +28652,19 @@ msgid "Spatial luma strength"
 msgstr "Kona ba applikação ida ne'e"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Kona ba applikação ida ne'e"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Kona ba applikação ida ne'e"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Kona ba applikação ida ne'e"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -28699,8 +28711,9 @@ msgid "Mux Control"
 msgstr "Sai husi programa ida ne'e"
 
 #: modules/gui/qt/ui/vlm.h:296
+#, fuzzy
 msgid "Muxer:"
-msgstr ""
+msgstr "_Video"
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
@@ -28710,10 +28723,6 @@ msgstr ""
 #, fuzzy
 msgid "Media Manager List"
 msgstr "_Navigação"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "_Archivo"
 
 #, fuzzy
 #~ msgid "Navigation"
@@ -28784,10 +28793,6 @@ msgstr "_Navigação"
 #~ msgstr "_Formas"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "_Archivo"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "_Video"
 
@@ -28818,14 +28823,6 @@ msgstr "_Navigação"
 #, fuzzy
 #~ msgid "Video decoder using Android MediaCodec"
 #~ msgstr "_Video"
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "_Video"
-
-#, fuzzy
-#~ msgid "----- Title"
-#~ msgstr "_Archivo"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -28924,6 +28921,10 @@ msgstr "_Navigação"
 #~ msgstr "_Archivo"
 
 #, fuzzy
+#~ msgid "Streaming method"
+#~ msgstr "_Formas"
+
+#, fuzzy
 #~ msgid "Transcode video"
 #~ msgstr "_Video"
 
@@ -28960,12 +28961,12 @@ msgstr "_Navigação"
 #~ msgstr "_Video"
 
 #, fuzzy
-#~ msgid "&Post processing"
-#~ msgstr "_Video"
-
-#, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "_Archivo"
+
+#, fuzzy
+#~ msgid "&Post processing"
+#~ msgstr "_Video"
 
 #, fuzzy
 #~ msgid "Log format"
@@ -29168,10 +29169,6 @@ msgstr "_Navigação"
 #~ msgstr "_Formas"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "_Formas"
-
-#, fuzzy
 #~ msgid "Output Color Filtermode"
 #~ msgstr "_Archivo"
 
@@ -29181,6 +29178,26 @@ msgstr "_Navigação"
 
 #, fuzzy
 #~ msgid "Filter threshold (%)"
+#~ msgstr "_Archivo"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "_Video"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "_Archivo"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "_Formas"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "_Archivo"
+
+#, fuzzy
+#~ msgid "Media in Zip"
 #~ msgstr "_Archivo"
 
 #, fuzzy

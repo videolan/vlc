@@ -1,18 +1,22 @@
 # Tamil translation
-# Copyright (C) 2014 VideoLAN
-# This file is distributed under the same license as the VLC package.
+# Copyright (C) 2017 VideoLAN
+# This file is distributed under the same license as the vlc package.
 #
 # Translators:
 # Abdul Fousan <abdulfousan@gmail.com>, 2009-2010
-# suthir <suthir.g@gmail.com>, 2013
+# Arun K <arunkarnaa@gmail.com>, 2016
+# Praveen Thangamuthu (பிரவீன்) <praveenindia@gmx.com>, 2015
+# srravya <srravya.c@gmail.com>, 2016
+# Suthir <suthir.g@gmail.com>, 2013
+# Ve. Elanjelian <tamiliam@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2013-12-08 08:16+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Tamil (http://www.transifex.com/projects/p/vlc-trans/language/"
+"PO-Revision-Date: 2017-02-06 13:43+0000\n"
+"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
+"Language-Team: Tamil (http://www.transifex.com/yaron/vlc-trans/language/"
 "ta/)\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
@@ -50,11 +54,11 @@ msgstr "இடைமுகப்பு"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "விஎல்சியின் இடைமுகப்புகளுக்கான அமைப்புகள்"
+msgstr "விஎல்சியின் இடைமுகப்புகளுக்கான அமைவுகள்"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "முதன்மை இடைமுகப்புகளு‍க்கான அமைப்புகள்"
+msgstr "முதன்மை இடைமுகப்புகளு‍க்கான அமைவுகள்"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
@@ -62,7 +66,7 @@ msgstr "முதன்மை இடைமுகப்புகள்"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "முதன்மை இடைமுகப்புக்கான அமைப்புகள்"
+msgstr "முதன்மை இடைமுகப்புக்கான அமைவுகள்"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
@@ -111,7 +115,7 @@ msgstr "ஒலி வடிப்பான்கள் ஒலி தகவலர
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr ""
+msgstr "ஒலி மறுமாதிரி"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:258
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
@@ -167,9 +171,8 @@ msgid "General video settings"
 msgstr "பொது நிகழ்பட அமைப்புகள்"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "ஒலி வெளியீடு‍ தொகுதிக் கூறுகளுக்கான பொது அமைப்புகள்"
+msgstr "பொது அமைப்புகள் வீடியோ வெளியீடு தொகுதிகள்."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -182,7 +185,7 @@ msgstr "துணைத் தலைப்புகள் / திரையி�
 #: include/vlc_config_cat.h:85
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
-msgstr ""
+msgstr "திரை-காட்சி, வசனங்கள் மற்றும் \"overlay subpictures\"  தொடர்பான அமைப்புகள்."
 
 #: include/vlc_config_cat.h:88
 #, fuzzy
@@ -199,7 +202,7 @@ msgstr "உள்ளீடு / கோடக்"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
-msgstr ""
+msgstr "உள்ளீடு, demultiplexing, குறிநீக்கம் மற்றும் குறியீட்டு அமைப்புகள்"
 
 #: include/vlc_config_cat.h:101
 msgid "Access modules"
@@ -210,6 +213,8 @@ msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
+"பல்வேறு அணுகல் முறைகள் தொடர்பான அமைப்புகள். நீங்கள் மாற்ற விரும்பும் பொதுவான அமைப்புகள் "
+"HTTP பதிலாள் அல்லது கேச் அமைப்புகள்."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
@@ -220,14 +225,16 @@ msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
+"ஸ்ட்ரீம் வடிகட்டிகளில்  VLC உள்ளீடு மேம்பட்ட செயல்பாடுகளை அனுமதிக்கும் சிறப்பு தொகுதிகள் "
+"உள்ளன. கவனத்துடன் பயன்படுத்தவும் ..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr ""
+msgstr "Demuxers"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr ""
+msgstr "Demuxers ஒலி மற்றும் நிகழ்பட ஓடைகள் பிரிக்க பயன்படுத்தப்படுகின்றன."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -236,6 +243,8 @@ msgstr "நிகழ்பட கோடக்கள்"
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
 msgstr ""
+"வீடியோ, படங்கள் அல்லது வீடியோ   ஆடியோ குறிவிலக்கிகளுக்கு மற்றும் "
+"குறியீட்டாளர்களுக்காகப் அமைப்புகள்."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -243,15 +252,16 @@ msgstr "ஒலித கோடக்கள்"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr ""
+msgstr "ஆடியோ மட்டும் குறிவிலக்கிகளுக்கு மற்றும் குறியீட்டாளர்களுக்காகப் அமைப்புகள்."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr ""
+msgstr "வசனங்கள் கோடக்கள்"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
 msgstr ""
+"வசன, தொலைஉரை மற்றும் CC குறிவிலக்கிகளுக்கு மற்றும் குறியீட்டாளர்களுக்காகப் அமைப்புகள்."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -279,7 +289,7 @@ msgstr "பொது ஓடை வெளிப்போத்து அமைப
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
-msgstr ""
+msgstr "Muxers"
 
 #: include/vlc_config_cat.h:141
 msgid ""
@@ -330,7 +340,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr ""
+msgstr "VLC செயல்படுத்தும் வீடியோ ஆன் டிமாண்ட்"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2056
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
@@ -423,7 +433,7 @@ msgstr "திட்டவட்டமான&நேரம் க்கு தா
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr ""
+msgstr "விருப்பம் & நினைவுக்குறி"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
@@ -462,14 +472,12 @@ msgid "Create Folder..."
 msgstr "உறையை உருவாக்கு..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "உருவாக்கு கோப்பகத்தை..."
+msgstr "கோப்பகம் மறுபெயரிடு ..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "உறையை உருவாக்கு..."
+msgstr "கோப்புறை மறுபெயரிடு ..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -567,6 +575,31 @@ msgid ""
 "code. You can also give funds and material to help us. And of course, you "
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf-8\" /></head><body><h2>Welcome to VLC media player Help</"
+"h2><h3>Documentation</h3><p>You can find VLC documentation on VideoLAN's <a "
+"href=\"http://wiki.videolan.org\">wiki</a> website.</p><p>If you are a "
+"newcomer to VLC media player, please read the<br><a href=\"http://wiki."
+"videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media "
+"player</em></a>.</p><p>You will find some information on how to use the "
+"player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:"
+"Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document."
+"</p><p>For all the saving, converting, transcoding, encoding, muxing and "
+"streaming tasks, you should find useful information in the <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</"
+"a>.</p><p>If you are unsure about terminology, please consult the <a href="
+"\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</p><p>To "
+"understand the main keyboard shortcuts, read the <a href=\"http://wiki."
+"videolan.org/Hotkeys\">shortcuts</a> page.</p><h3>Help</h3><p>Before asking "
+"any question, please refer yourself to the <a href=\"http://www.videolan.org/"
+"support/faq.html\">FAQ</a>.</p><p>You might then get (and give) help on the "
+"<a href=\"http://forum.videolan.org\">Forums</a>, the <a href=\"http://www."
+"videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC channel "
+"(<em>#videolan</em> on irc.freenode.net).</p><h3>Contribute to the project</"
+"h3><p>You can help the VideoLAN project giving some of your time to help the "
+"community, to design skins, to translate the documentation, to test and to "
+"code. You can also give funds and material to help us. And of course, you "
+"can <b>promote</b> VLC media player.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -575,7 +608,7 @@ msgstr "ஒலித சல்லடை தோல்வி"
 #: src/audio_output/filters.c:268
 #, c-format
 msgid "The maximum number of filters (%u) was reached."
-msgstr ""
+msgstr "வடிகட்டிகள் (% u) அதிகபட்ச அடைந்தது."
 
 #: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
@@ -585,19 +618,20 @@ msgstr "செயலிளக்க செய்"
 
 #: src/audio_output/output.c:264 modules/visualization/visual/visual.c:142
 msgid "Spectrometer"
-msgstr ""
+msgstr "ஸ்பெக்ட்ரோமீட்டர்"
 
 #: src/audio_output/output.c:267
 msgid "Scope"
-msgstr ""
+msgstr "நோக்கம்"
 
 #: src/audio_output/output.c:270
 msgid "Spectrum"
-msgstr ""
+msgstr "ஸ்பெக்ட்ரம்"
 
 #: src/audio_output/output.c:273
+#, fuzzy
 msgid "VU meter"
-msgstr ""
+msgstr "வூ மீட்டர்"
 
 #: src/audio_output/output.c:312 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -605,12 +639,12 @@ msgstr "ஒலிதம் சல்லடைகள்"
 
 #: src/audio_output/output.c:325
 msgid "Replay gain"
-msgstr ""
+msgstr "ரீபிளே ஈட்டம்"
 
 #: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
 msgid "Stereo audio mode"
-msgstr ""
+msgstr "ஸ்டீரியோ ஒலி முறையில்"
 
 #: src/audio_output/output.c:419
 #, fuzzy
@@ -619,14 +653,14 @@ msgstr "அசல் ID"
 
 #: src/audio_output/output.c:425 src/libvlc-module.c:197
 msgid "Dolby Surround"
-msgstr ""
+msgstr "டால்பி சரவுண்ட்"
 
 #: src/audio_output/output.c:430 src/libvlc-module.c:196
 #: modules/access/alsa.c:38 modules/access/oss.c:64
 #: modules/access/v4l2/v4l2.c:268 modules/audio_output/alsa.c:76
 #: modules/codec/twolame.c:70
 msgid "Stereo"
-msgstr ""
+msgstr "ஸ்டீரியோ"
 
 #: src/audio_output/output.c:439 src/input/es_out.c:3244
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
@@ -679,15 +713,15 @@ msgstr "தானாக"
 
 #: src/config/file.c:452
 msgid "boolean"
-msgstr ""
+msgstr "பூலியன்"
 
 #: src/config/file.c:452 src/config/help.c:426
 msgid "integer"
-msgstr ""
+msgstr "முழு எண்"
 
 #: src/config/file.c:460 src/config/help.c:476
 msgid "float"
-msgstr ""
+msgstr "மிதவை"
 
 #: src/config/file.c:473 src/config/help.c:383
 msgid "string"
@@ -695,7 +729,7 @@ msgstr "சரம்"
 
 #: src/config/help.c:164
 msgid "To get exhaustive help, use '-H'."
-msgstr ""
+msgstr "பூரணமான உதவியைப் பெற,  '-H' பயன்படுத்த."
 
 #: src/config/help.c:168
 #, c-format
@@ -750,7 +784,7 @@ msgstr "குறிப்பு:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr ""
+msgstr "மேம்பட்ட விருப்பங்கள் பார்க்க உங்கள் கட்டளை வரியில் --advanced சேர்க்க."
 
 #: src/config/help.c:656
 #, c-format
@@ -793,11 +827,12 @@ msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
+"\n"
+"தொடர்வதற்கு ரிட்டன் விசையை அழுத்தவும்...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "தெரியாத நிகழ்படம்"
+msgstr "தெரியாத பிழை"
 
 #: src/input/control.c:203
 #, c-format
@@ -806,50 +841,47 @@ msgstr "நினைவுக்குறி %i"
 
 #: src/input/decoder.c:1875
 msgid "No description for this codec"
-msgstr ""
+msgstr "இந்த கோடெக் இல்லை விளக்கம்"
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "நுகர்வி வாசல்"
+msgstr "கோடெக் ஆதரவு இல்லை "
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC யால் கோப்புகளை வாசிக்க முடியவில்லை"
+msgstr "VLC குறிநீக்க முடியவில்லை \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "நிகழ்பட கோடக்கள்"
+msgstr "அடையாளம் தெரியாத கோடெக்"
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC யால் திறக்க முடியவில்லை %s module"
+msgstr "VLC  அடையாளம் தெரியாத ஆடியோ அல்லது வீடியோ கோடெக்"
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
-msgstr ""
+msgstr "பொட்டணம்"
 
 #: src/input/decoder.c:1894
 msgid "decoder"
-msgstr ""
+msgstr "குறிவிலக்கி"
 
 #: src/input/decoder.c:1902 src/input/decoder.c:2183
 #: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:885
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr ""
+msgstr "வனலயாடல் / குறியீடு மாற்றம்"
 
 #: src/input/decoder.c:1903
 #, c-format
 msgid "VLC could not open the %s module."
-msgstr "VLC யால் திறக்க முடியவில்லை %s module"
+msgstr "VLC யால் திறக்க முடியவில்லை %s தொகுதி"
 
 #: src/input/decoder.c:2184
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "VLC யால் திறக்க முடியவில்லை குறிவிலக்கி தொகுதி"
 
 #: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:543
@@ -874,21 +906,21 @@ msgstr "ஓடை %d"
 
 #: src/input/es_out.c:1468 src/input/es_out.c:1470
 msgid "Scrambled"
-msgstr ""
+msgstr "துருவல்"
 
 #: src/input/es_out.c:1468 modules/keystore/keychain.m:40
 msgid "Yes"
 msgstr "ஆம்"
 
 #: src/input/es_out.c:2130
-#, c-format
+#, fuzzy, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "மூடப்பட்ட தலைப்புகள் %u"
 
 #: src/input/es_out.c:2132
 #, c-format
 msgid "Closed captions %u"
-msgstr ""
+msgstr "மூடப்பட்ட தலைப்புகள் %u"
 
 #: src/input/es_out.c:3068 src/input/es_out.c:3336 modules/access/imem.c:64
 msgid "Subtitle"
@@ -944,7 +976,7 @@ msgstr "%u Hz"
 
 #: src/input/es_out.c:3121
 msgid "Bits per sample"
-msgstr ""
+msgstr "மாதிரி ஒன்றுக்கு Bits"
 
 #: src/input/es_out.c:3126 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
@@ -952,7 +984,7 @@ msgstr ""
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:729 modules/gui/qt/ui/profiles.h:755
 msgid "Bitrate"
-msgstr ""
+msgstr "பிட்ரேட்"
 
 #: src/input/es_out.c:3126
 #, c-format
@@ -961,11 +993,11 @@ msgstr "%u kb/s"
 
 #: src/input/es_out.c:3138
 msgid "Track replay gain"
-msgstr ""
+msgstr "ட்ராக் ரீபிளே ஈட்டம்"
 
 #: src/input/es_out.c:3140
 msgid "Album replay gain"
-msgstr ""
+msgstr "தொகுப்பு ரீபிளே ஈட்டம்"
 
 #: src/input/es_out.c:3141
 #, c-format
@@ -975,7 +1007,7 @@ msgstr "%.2f dB"
 #: src/input/es_out.c:3151
 #, fuzzy
 msgid "Video resolution"
-msgstr "காட்சி பிரிதிறன்"
+msgstr "விருப்பமான வீடியோ தீர்மானம்"
 
 #: src/input/es_out.c:3156
 msgid "Buffer dimensions"
@@ -994,7 +1026,7 @@ msgstr "வடிவம் அளவு"
 
 #: src/input/es_out.c:3177
 msgid "Decoded format"
-msgstr ""
+msgstr "டிகோடெட் வடிவம்"
 
 #: src/input/es_out.c:3182
 #, fuzzy
@@ -1038,13 +1070,13 @@ msgstr "வலது"
 #: src/input/es_out.c:3187
 #, fuzzy
 msgid "Orientation"
-msgstr "காலம்"
+msgstr "சுழற்சி"
 
 #: src/input/es_out.c:3193 src/input/es_out.c:3211 src/input/es_out.c:3229
 #: src/input/es_out.c:3243 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:75 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
-msgstr ""
+msgstr "வரையறுக்கப்படாத"
 
 #: src/input/es_out.c:3195
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
@@ -1164,16 +1196,19 @@ msgid "Min luminance"
 msgstr ""
 
 #: src/input/es_out.c:3300
+#, fuzzy
 msgid "Primary R"
-msgstr ""
+msgstr "முதன்மை மொழி"
 
 #: src/input/es_out.c:3307
+#, fuzzy
 msgid "Primary G"
-msgstr ""
+msgstr "முதன்மை மொழி"
 
 #: src/input/es_out.c:3314
+#, fuzzy
 msgid "Primary B"
-msgstr ""
+msgstr "முதன்மை மொழி"
 
 #: src/input/es_out.c:3321
 #, fuzzy
@@ -1190,12 +1225,12 @@ msgstr ""
 
 #: src/input/input.c:2655
 msgid "Your input can't be opened"
-msgstr ""
+msgstr "உங்கள் உள்ளீடு திறக்க முடியவில்லை"
 
 #: src/input/input.c:2656
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr ""
+msgstr "VLC யால் MRL திறக்க முடியவில்லை '%s'.  விவரங்கள் பதிவு சரிபார்க்கவும்."
 
 #: src/input/meta.c:55 src/input/var.c:177 modules/gui/macosx/VLCMainMenu.m:399
 #: modules/gui/macosx/VLCMainMenu.m:400
@@ -1270,30 +1305,28 @@ msgid "Track ID"
 msgstr "சுவடு ID"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "அலைவரிசை இலக்கம்"
+msgstr "சுவடுகள் எண்ணிக்கை"
 
 #: src/input/meta.c:74
 msgid "Director"
-msgstr ""
+msgstr "இயக்குனர்"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "சீசன்"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "பாகம்"
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "பெயர்"
+msgstr "பெயர் காட்டு"
 
 #: src/input/meta.c:78
 msgid "Actors"
-msgstr ""
+msgstr "நடிகர்கள்"
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -1333,7 +1366,7 @@ msgstr "ஒலித சுவடு"
 
 #: src/input/var.c:207
 msgid "Subtitle Track"
-msgstr ""
+msgstr "வசன சுவடு"
 
 #: src/input/var.c:275
 msgid "Next title"
@@ -1355,7 +1388,7 @@ msgstr ""
 #: src/input/var.c:330
 #, c-format
 msgid "Title %i%s"
-msgstr ""
+msgstr "தலைப்பு %i%s"
 
 #: src/input/var.c:355 src/input/var.c:412
 #, c-format
@@ -1386,15 +1419,15 @@ msgstr "முனையம்"
 
 #: src/interface/interface.c:93
 msgid "Telnet"
-msgstr ""
+msgstr "டெல்நெட்"
 
 #: src/interface/interface.c:96
 msgid "Web"
-msgstr ""
+msgstr "வலை"
 
 #: src/interface/interface.c:99
 msgid "Debug logging"
-msgstr ""
+msgstr "பிழைத்திருத்துக பதிவு"
 
 #: src/interface/interface.c:102
 msgid "Mouse Gestures"
@@ -1405,6 +1438,8 @@ msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
+"இயல்புநிலை இடைமுகத்துடன் VLC இயக்குதல். இடைமுகம் இல்லாமல் VLC பயன்படுத்த 'cvlc' "
+"பயன்படுத்தவும்."
 
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:174
@@ -1464,11 +1499,11 @@ msgstr ""
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
-msgstr ""
+msgstr "நீங்கள் VLC கட்டுப்பாடு இடைமுகங்களை தேர்ந்தெடுக்க முடியும்."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
-msgstr ""
+msgstr "வெர்போஸ் (0,1,2)"
 
 #: src/libvlc-module.c:87
 msgid ""
@@ -1482,7 +1517,7 @@ msgstr "கோடநிலை ஓடை"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "இந்த ஓடை எப்போதும் VLC தொடக்கத்தில் திறக்கப்படும்."
 
 #: src/libvlc-module.c:94
 msgid "Color messages"
@@ -1506,7 +1541,7 @@ msgstr ""
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
-msgstr ""
+msgstr "இடைமுகம் தொடர்பு"
 
 #: src/libvlc-module.c:107
 msgid ""
@@ -1535,7 +1570,7 @@ msgstr ""
 #: src/libvlc-module.c:129
 #, fuzzy
 msgid "Media role"
-msgstr "ஊடக கோப்புகள்"
+msgstr "ஊடக கோணம்"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1591,7 +1626,7 @@ msgstr ""
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr ""
+msgstr "ஒலி ஈட்டம்"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
@@ -1599,7 +1634,7 @@ msgstr ""
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
-msgstr ""
+msgstr "ஆடியோ வெளியீடு தொகுதி படி"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
@@ -1607,7 +1642,7 @@ msgstr ""
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
-msgstr ""
+msgstr "ஆடியோ தொகுதி நினைவில் கொள்க"
 
 #: src/libvlc-module.c:158
 msgid ""
@@ -1616,7 +1651,7 @@ msgstr ""
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr ""
+msgstr "ஆடியோ desynchronization இழப்பீடு"
 
 #: src/libvlc-module.c:163
 msgid ""
@@ -1646,7 +1681,7 @@ msgstr ""
 
 #: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:259
 msgid "Force detection of Dolby Surround"
-msgstr ""
+msgstr "டால்பி சரவுண்ட் முக்கியமாக கண்டறிதல் "
 
 #: src/libvlc-module.c:180
 msgid ""
@@ -1681,13 +1716,13 @@ msgstr "அமத்து"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr ""
+msgstr "ஸ்டீரியோ ஒலி வெளியீடு முறையில்"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1429
 #: modules/gui/qt/util/customwidgets.cpp:314
 msgid "Unset"
-msgstr ""
+msgstr "அமைக்காமல்"
 
 #: src/libvlc-module.c:203
 msgid "This adds audio post processing filters, to modify the sound rendering."
@@ -1699,15 +1734,15 @@ msgstr ""
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr ""
+msgstr "ரீபிளே ஈட்டம் முறையில்"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "ரீபிளே ஈட்டம் முறையைத் தேர்ந்தெடு"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr ""
+msgstr "ரீபிளே preamp"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -1717,7 +1752,7 @@ msgstr ""
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr ""
+msgstr "இயல்புநிலை ரீபிளே ஈட்டம்"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
@@ -1725,15 +1760,15 @@ msgstr ""
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
-msgstr ""
+msgstr "உச்ச பாதுகாப்பு"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "ஒலி கிளிப்பிங் எதிராக பாதுகாக்கவும்"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr ""
+msgstr "ஆடியோ நீட்சி நேரம் இயக்கு"
 
 #: src/libvlc-module.c:232
 msgid ""
@@ -1914,7 +1949,7 @@ msgstr "கீழே-வலது"
 
 #: src/libvlc-module.c:298
 msgid "Zoom video"
-msgstr "நிகழ்பட உரு அளவு"
+msgstr "நிகழ்பட உருப்பெருக்க"
 
 #: src/libvlc-module.c:300
 msgid "You can zoom the video by the specified factor."
@@ -1922,7 +1957,7 @@ msgstr ""
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
-msgstr ""
+msgstr "சாம்பல்நிலை வீடியோ வெளியீடு"
 
 #: src/libvlc-module.c:304
 msgid ""
@@ -1932,7 +1967,7 @@ msgstr ""
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
-msgstr ""
+msgstr "பதிக்கப்பட்ட வீடியோ"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
@@ -1944,7 +1979,7 @@ msgstr "முழுத்திரை நிகழ்படம் வெளி�
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr ""
+msgstr "முழுத்திரை பயன்முறையில் வீடியோ தொடங்கவும்"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 #: modules/gui/qt/ui/sprefs_video.h:326
@@ -1971,11 +2006,11 @@ msgstr "நிகழ்படத்துடன் ஊடகத்தலைப�
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr ""
+msgstr "படத்தின் மேலே வீடியோ தலைப்பை காட்டுக."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
-msgstr ""
+msgstr "X மில்லிநொடிகளுக்கு வீடியோ தலைப்பு காட்டு"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
@@ -2005,18 +2040,18 @@ msgstr ""
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr ""
+msgstr "காரம்"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:436
 #: modules/gui/macosx/VLCSimplePrefsController.m:366
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
-msgstr ""
+msgstr "காரம் முறையில்"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr ""
+msgstr "காரம் முறை வீடியோ செயலாக்க பயன்படுத்த வேண்டும்."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2029,7 +2064,7 @@ msgstr "கலவை"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Mean"
-msgstr "இறந்த"
+msgstr "சராசரி"
 
 #: src/libvlc-module.c:361 modules/hw/vdpau/chroma.c:871
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -2038,15 +2073,15 @@ msgstr "பாப்"
 
 #: src/libvlc-module.c:362 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Phosphor"
-msgstr ""
+msgstr "பாஸ்பர்"
 
 #: src/libvlc-module.c:363 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Film NTSC (IVTC)"
-msgstr ""
+msgstr "படம் NTSC (IVTC)"
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr ""
+msgstr "முடக்கு  மறைதிரை ஓவியங்கள்"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
@@ -2065,7 +2100,7 @@ msgstr ""
 #: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:351
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Window decorations"
-msgstr ""
+msgstr "சாளர அலங்காரம்"
 
 #: src/libvlc-module.c:380
 msgid ""
@@ -2075,7 +2110,7 @@ msgstr ""
 
 #: src/libvlc-module.c:383
 msgid "Video splitter module"
-msgstr ""
+msgstr "வீடியோ பிரிவுக்கான தொகுதி"
 
 #: src/libvlc-module.c:385
 msgid "This adds video splitters like clone or wall"
@@ -2101,7 +2136,7 @@ msgstr ""
 
 #: src/libvlc-module.c:397 src/libvlc-module.c:399
 msgid "Video snapshot file prefix"
-msgstr ""
+msgstr "வீடியோ நிழற்படக் கோப்பினை முன்னொட்டு"
 
 #: src/libvlc-module.c:401
 msgid "Video snapshot format"
@@ -2113,7 +2148,7 @@ msgstr ""
 
 #: src/libvlc-module.c:405
 msgid "Display video snapshot preview"
-msgstr ""
+msgstr "காட்டு வீடியோ நொடிப்பு முன்னோட்டம்"
 
 #: src/libvlc-module.c:407
 msgid "Display the snapshot preview in the screen's top-left corner."
@@ -2173,7 +2208,7 @@ msgstr ""
 
 #: src/libvlc-module.c:440
 msgid "Video Auto Scaling"
-msgstr ""
+msgstr "வீடியோ தானாக அளக்க"
 
 #: src/libvlc-module.c:442
 msgid "Let the video scale to fit a given window or fullscreen."
@@ -2181,7 +2216,7 @@ msgstr ""
 
 #: src/libvlc-module.c:444
 msgid "Video scaling factor"
-msgstr ""
+msgstr "வீடியோ அளவிடுதல் காரணியாக"
 
 #: src/libvlc-module.c:446
 msgid ""
@@ -2211,7 +2246,7 @@ msgstr ""
 
 #: src/libvlc-module.c:459
 msgid "Fix HDTV height"
-msgstr ""
+msgstr "சரிசெய் எச்டிடிவி உயரம்"
 
 #: src/libvlc-module.c:461
 msgid ""
@@ -2233,7 +2268,7 @@ msgstr ""
 
 #: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:294
 msgid "Skip frames"
-msgstr ""
+msgstr "பிரேம்கள் தவிர்க்கவும்"
 
 #: src/libvlc-module.c:474
 msgid ""
@@ -2253,7 +2288,7 @@ msgstr ""
 
 #: src/libvlc-module.c:482
 msgid "Quiet synchro"
-msgstr ""
+msgstr "அமைதியாக synchro"
 
 #: src/libvlc-module.c:484
 msgid ""
@@ -2263,7 +2298,7 @@ msgstr ""
 
 #: src/libvlc-module.c:487
 msgid "Key press events"
-msgstr ""
+msgstr "முக்கிய விசை நிகழ்வுகள்"
 
 #: src/libvlc-module.c:489
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
@@ -2271,7 +2306,7 @@ msgstr ""
 
 #: src/libvlc-module.c:491 modules/spu/remoteosd.c:91
 msgid "Mouse events"
-msgstr ""
+msgstr "சுட்டி நிகழ்வுகள்"
 
 #: src/libvlc-module.c:493
 msgid "This enables handling of mouse clicks on the video."
@@ -2286,7 +2321,7 @@ msgstr ""
 
 #: src/libvlc-module.c:505
 msgid "File caching (ms)"
-msgstr ""
+msgstr "கோப்பு பற்றுவதற்கு (MS)"
 
 #: src/libvlc-module.c:507
 msgid "Caching value for local files, in milliseconds."
@@ -2294,7 +2329,7 @@ msgstr ""
 
 #: src/libvlc-module.c:509
 msgid "Live capture caching (ms)"
-msgstr ""
+msgstr "நேரடி பிடிப்பு பற்றுவதற்கு (MS)"
 
 #: src/libvlc-module.c:511
 msgid "Caching value for cameras and microphones, in milliseconds."
@@ -2302,15 +2337,15 @@ msgstr ""
 
 #: src/libvlc-module.c:513
 msgid "Disc caching (ms)"
-msgstr ""
+msgstr "டிஸ்க் பற்றுவதற்கு (MS)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for optical media, in milliseconds."
-msgstr ""
+msgstr "மில்லி விநாடிகளில், ஆப்டிகல் ஊடக மதிப்பு தேக்ககப்படுத்தும்."
 
 #: src/libvlc-module.c:517
 msgid "Network caching (ms)"
-msgstr ""
+msgstr "பிணையம் பற்றுவதற்கு (MS)"
 
 #: src/libvlc-module.c:519
 msgid "Caching value for network resources, in milliseconds."
@@ -2328,7 +2363,7 @@ msgstr ""
 
 #: src/libvlc-module.c:526
 msgid "Clock synchronisation"
-msgstr ""
+msgstr "கடிகார ஒத்திசைவு"
 
 #: src/libvlc-module.c:528
 msgid ""
@@ -2348,7 +2383,7 @@ msgstr ""
 
 #: src/libvlc-module.c:537
 msgid "Network synchronisation"
-msgstr ""
+msgstr "பிணையம் ஒத்திசைவு"
 
 #: src/libvlc-module.c:538
 msgid ""
@@ -2383,7 +2418,7 @@ msgstr "செயல்பட வை"
 
 #: src/libvlc-module.c:546
 msgid "MTU of the network interface"
-msgstr ""
+msgstr "பிணைய இடைமுகப்பிற்கான எம்.டி.யூ"
 
 #: src/libvlc-module.c:548
 msgid ""
@@ -2393,7 +2428,7 @@ msgstr ""
 
 #: src/libvlc-module.c:553 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
-msgstr ""
+msgstr "ஹாப் எல்லை (TTL)"
 
 #: src/libvlc-module.c:555 modules/stream_out/rtp.c:126
 msgid ""
@@ -2443,7 +2478,7 @@ msgstr ""
 
 #: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
-msgstr ""
+msgstr "வசன சுவடு"
 
 #: src/libvlc-module.c:589
 msgid "Stream number of the subtitle track to use (from 0 to n)."
@@ -2471,9 +2506,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "ஒலிதம் மொழி"
+msgstr "மெனு மொழி"
 
 #: src/libvlc-module.c:604
 msgid ""
@@ -2491,7 +2525,7 @@ msgstr ""
 
 #: src/libvlc-module.c:612
 msgid "Subtitle track ID"
-msgstr ""
+msgstr "வசன சுவடு ID"
 
 #: src/libvlc-module.c:614
 msgid "Stream ID of the subtitle track to use."
@@ -2502,8 +2536,9 @@ msgid "Closed Captions decoder"
 msgstr ""
 
 #: src/libvlc-module.c:617
+#, fuzzy
 msgid "Preferred closed captions decoder"
-msgstr ""
+msgstr "விருப்பமான குறிவிலக்கிகளுக்கு பட்டியல்"
 
 #: src/libvlc-module.c:619
 msgid "EIA/CEA 608"
@@ -2515,7 +2550,7 @@ msgstr ""
 
 #: src/libvlc-module.c:621
 msgid "Preferred video resolution"
-msgstr ""
+msgstr "விருப்பமான வீடியோ தீர்மானம்"
 
 #: src/libvlc-module.c:623
 msgid ""
@@ -2527,31 +2562,31 @@ msgstr ""
 
 #: src/libvlc-module.c:629
 msgid "Best available"
-msgstr ""
+msgstr "கிடைக்கக்கூடிய சிறந்த"
 
 #: src/libvlc-module.c:629
 msgid "Full HD (1080p)"
-msgstr ""
+msgstr "முழு எச்டி (1080p)"
 
 #: src/libvlc-module.c:629
 msgid "HD (720p)"
-msgstr ""
+msgstr "எச்டி (720p)"
 
 #: src/libvlc-module.c:630
 msgid "Standard Definition (576 or 480 lines)"
-msgstr ""
+msgstr "நிலையான வரையறை (576 அல்லது 480 வரிகள்)"
 
 #: src/libvlc-module.c:631
 msgid "Low Definition (360 lines)"
-msgstr ""
+msgstr "குறைந்த வரையறை (360 வரிகள்)"
 
 #: src/libvlc-module.c:632
 msgid "Very Low Definition (240 lines)"
-msgstr ""
+msgstr "மிக குறைந்த வரையறை (240 வரிகள்)"
 
 #: src/libvlc-module.c:635
 msgid "Input repetitions"
-msgstr ""
+msgstr "உள்ளீடு மறுபடியும் மறுபடியும்"
 
 #: src/libvlc-module.c:637
 msgid "Number of time the same input will be repeated"
@@ -2609,7 +2644,7 @@ msgstr ""
 
 #: src/libvlc-module.c:664
 msgid "Input slave (experimental)"
-msgstr ""
+msgstr "உள்ளீடு அடிமை (சோதனை)"
 
 #: src/libvlc-module.c:666
 msgid ""
@@ -2706,8 +2741,9 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:716
+#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "வீடியோ அளவிடுதல் காரணியாக"
 
 #: src/libvlc-module.c:717
 msgid "Set value to alter subtitles size where possible"
@@ -2725,7 +2761,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
-msgstr ""
+msgstr "திரை காட்சி"
 
 #: src/libvlc-module.c:725
 msgid ""
@@ -2852,15 +2888,16 @@ msgstr ""
 
 #: src/libvlc-module.c:805
 msgid "TCP connection timeout"
-msgstr ""
+msgstr "TCP இணைப்பு காலாவதியானது"
 
 #: src/libvlc-module.c:807
+#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "இயல்புநிலை TCP இணைப்பு காலாவதியானது (மில்லி விநாடிகளில்)."
 
 #: src/libvlc-module.c:809
 msgid "HTTP server address"
-msgstr ""
+msgstr "HTTP சேவையகம் முகவரி"
 
 #: src/libvlc-module.c:811
 msgid ""
@@ -2871,7 +2908,7 @@ msgstr ""
 
 #: src/libvlc-module.c:815
 msgid "RTSP server address"
-msgstr ""
+msgstr "RTSP சேவையகம் முகவரி"
 
 #: src/libvlc-module.c:817
 msgid ""
@@ -2884,7 +2921,7 @@ msgstr ""
 
 #: src/libvlc-module.c:823
 msgid "HTTP server port"
-msgstr ""
+msgstr "HTTP சேவையக முணையம்"
 
 #: src/libvlc-module.c:825
 msgid ""
@@ -2895,7 +2932,7 @@ msgstr ""
 
 #: src/libvlc-module.c:830
 msgid "HTTPS server port"
-msgstr ""
+msgstr "HTTPS சேவையக முணையம்"
 
 #: src/libvlc-module.c:832
 msgid ""
@@ -2906,7 +2943,7 @@ msgstr ""
 
 #: src/libvlc-module.c:837
 msgid "RTSP server port"
-msgstr ""
+msgstr "RTSP சேவையக முணையம்"
 
 #: src/libvlc-module.c:839
 msgid ""
@@ -2917,7 +2954,7 @@ msgstr ""
 
 #: src/libvlc-module.c:844
 msgid "HTTP/TLS server certificate"
-msgstr ""
+msgstr "HTTP / TLS சர்வர் சான்றிதழ்"
 
 #: src/libvlc-module.c:846
 msgid ""
@@ -2927,7 +2964,7 @@ msgstr ""
 
 #: src/libvlc-module.c:849
 msgid "HTTP/TLS server private key"
-msgstr ""
+msgstr "HTTP / TLS சேவையக தனிப்பட்ட விசை"
 
 #: src/libvlc-module.c:851
 msgid "This private key file (PEM format) is used for server-side TLS."
@@ -3032,7 +3069,7 @@ msgstr ""
 
 #: src/libvlc-module.c:904
 msgid "Preferred decoders list"
-msgstr ""
+msgstr "விருப்பமான குறிவிலக்கிகளுக்கு பட்டியல்"
 
 #: src/libvlc-module.c:906
 msgid ""
@@ -3043,7 +3080,7 @@ msgstr ""
 
 #: src/libvlc-module.c:911
 msgid "Preferred encoders list"
-msgstr ""
+msgstr "விருப்பமான குறியீடாக்கிகள் பட்டியல்"
 
 #: src/libvlc-module.c:913
 msgid ""
@@ -3058,7 +3095,7 @@ msgstr ""
 
 #: src/libvlc-module.c:925
 msgid "Default stream output chain"
-msgstr ""
+msgstr "இயல்புநிலை ஸ்ட்ரீம் வெளியீடு சங்கிலி"
 
 #: src/libvlc-module.c:927
 msgid ""
@@ -3077,7 +3114,7 @@ msgstr ""
 
 #: src/libvlc-module.c:935
 msgid "Display while streaming"
-msgstr ""
+msgstr "காட்டுக ஸ்ட்ரீமிங் போது"
 
 #: src/libvlc-module.c:937
 msgid "Play locally the stream while streaming it."
@@ -3085,7 +3122,7 @@ msgstr ""
 
 #: src/libvlc-module.c:939
 msgid "Enable video stream output"
-msgstr ""
+msgstr "வீடியோ ஸ்ட்ரீம் வெளியீட்டை செயல்படுத்து"
 
 #: src/libvlc-module.c:941
 msgid ""
@@ -3095,7 +3132,7 @@ msgstr ""
 
 #: src/libvlc-module.c:944
 msgid "Enable audio stream output"
-msgstr ""
+msgstr "ஆடியோ ஸ்ட்ரீம் வெளியீட்டை செயல்படுத்து"
 
 #: src/libvlc-module.c:946
 msgid ""
@@ -3105,7 +3142,7 @@ msgstr ""
 
 #: src/libvlc-module.c:949
 msgid "Enable SPU stream output"
-msgstr ""
+msgstr "SPU ஸ்ட்ரீம் வெளியீட்டை செயல்படுத்து"
 
 #: src/libvlc-module.c:951
 msgid ""
@@ -3136,7 +3173,7 @@ msgstr ""
 
 #: src/libvlc-module.c:965
 msgid "Preferred packetizer list"
-msgstr ""
+msgstr "விருப்பமான packetizer பட்டியலில்"
 
 #: src/libvlc-module.c:967
 msgid ""
@@ -3167,7 +3204,7 @@ msgstr ""
 
 #: src/libvlc-module.c:983
 msgid "SAP announcement interval"
-msgstr ""
+msgstr "SAP அறிவிப்பு இடைவெளி"
 
 #: src/libvlc-module.c:985
 msgid ""
@@ -3225,7 +3262,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1018
 msgid "VoD server module"
-msgstr ""
+msgstr "VoD சர்வர் தொகுதி"
 
 #: src/libvlc-module.c:1020
 msgid ""
@@ -3235,7 +3272,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1023
 msgid "Allow real-time priority"
-msgstr ""
+msgstr "நிகழ் நேர முன்னுரிமை அனுமதி"
 
 #: src/libvlc-module.c:1025
 msgid ""
@@ -3247,7 +3284,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1031
 msgid "Adjust VLC priority"
-msgstr ""
+msgstr "VLC முன்னுரிமை ஒழுங்குபடுத்தவும்"
 
 #: src/libvlc-module.c:1033
 msgid ""
@@ -3288,8 +3325,9 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1054
+#, fuzzy
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "விருப்பமான packetizer பட்டியலில்"
 
 #: src/libvlc-module.c:1056
 msgid ""
@@ -3307,7 +3345,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1063
 msgid "Run as daemon process"
-msgstr ""
+msgstr "டேமன் செயல்முறை என இயக்கவும்"
 
 #: src/libvlc-module.c:1065
 msgid "Runs VLC as a background daemon process."
@@ -3390,7 +3428,7 @@ msgstr ""
 #: src/libvlc-module.c:1114
 #, fuzzy
 msgid "Automatically preparse items"
-msgstr "தானாக புதுப்பிக்க சோதனை"
+msgstr "தானாகவே preparse கோப்புகளை"
 
 #: src/libvlc-module.c:1116
 msgid ""
@@ -3399,8 +3437,9 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1119
+#, fuzzy
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "TCP இணைப்பு காலாவதியானது"
 
 #: src/libvlc-module.c:1121
 msgid "Maximum time (in milliseconds) allowed to preparse an item"
@@ -3410,15 +3449,15 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:564
 msgid "Allow metadata network access"
-msgstr ""
+msgstr "மெட்டாடேட்டா நெட்வொர்க் அணுகல் அனுமதி"
 
 #: src/libvlc-module.c:1128
 msgid "Collapse"
-msgstr ""
+msgstr "சுருக்கு"
 
 #: src/libvlc-module.c:1128
 msgid "Expand"
-msgstr ""
+msgstr "விரிவாக்கு"
 
 #: src/libvlc-module.c:1130
 msgid "Subdirectory behavior"
@@ -3447,7 +3486,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "&கோடக் தகவல்"
+msgstr "சுழல் ஒலித வெளிப்போத்து"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -3455,7 +3494,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1148
 msgid "Services discovery modules"
-msgstr ""
+msgstr "சேவைகள் கண்டுபிடிப்பு தொகுதிகள்"
 
 #: src/libvlc-module.c:1150
 msgid ""
@@ -3465,7 +3504,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1153
 msgid "Play files randomly forever"
-msgstr ""
+msgstr "தோராயமாக எப்போதும் கோப்புகளை ஓடு "
 
 #: src/libvlc-module.c:1155
 msgid "VLC will randomly play files in the playlist until interrupted."
@@ -3611,15 +3650,16 @@ msgstr "முழுத்திரை"
 
 #: src/libvlc-module.c:1224
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr ""
+msgstr "முழு திரை நிலை இடமாற்றம் பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1225
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "விலக்கு முழுத்திரை "
 
 #: src/libvlc-module.c:1226
 msgid "Select the hotkey to use to exit fullscreen state."
 msgstr ""
+"முழுத்திரையிலிருந்து வெளியேறு நிலை பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1227 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
@@ -3627,7 +3667,7 @@ msgstr "ஓடு/நிறுத்து"
 
 #: src/libvlc-module.c:1228
 msgid "Select the hotkey to use to swap paused state."
-msgstr ""
+msgstr "இடமாற்று இடைநிறுத்து நிலை பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1229
 msgid "Pause only"
@@ -3635,7 +3675,7 @@ msgstr "நிறுத்து மட்டும்"
 
 #: src/libvlc-module.c:1230
 msgid "Select the hotkey to use to pause."
-msgstr ""
+msgstr "இடைநிறுத்து பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1231
 msgid "Play only"
@@ -3643,7 +3683,7 @@ msgstr "ஓடு மட்டும்"
 
 #: src/libvlc-module.c:1232
 msgid "Select the hotkey to use to play."
-msgstr ""
+msgstr "இயக்கு பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1233 modules/gui/macosx/VLCMainMenu.m:385
 #: modules/gui/qt/components/controller.hpp:108
@@ -3653,7 +3693,7 @@ msgstr "விரைவாக"
 
 #: src/libvlc-module.c:1234 src/libvlc-module.c:1240
 msgid "Select the hotkey to use for fast forward playback."
-msgstr ""
+msgstr "முன்னோக்கி வேகமாக பிளேபேக் பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1235 modules/gui/macosx/VLCMainMenu.m:383
 #: modules/gui/qt/components/controller.hpp:108
@@ -3663,7 +3703,7 @@ msgstr "மெதுவாக"
 
 #: src/libvlc-module.c:1236 src/libvlc-module.c:1242
 msgid "Select the hotkey to use for slow motion playback."
-msgstr ""
+msgstr "மெதுவாக இயக்கம் பிளேபேக்  பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1237
 msgid "Normal rate"
@@ -3671,7 +3711,7 @@ msgstr "வழக்கமான அளவு"
 
 #: src/libvlc-module.c:1238
 msgid "Select the hotkey to set the playback rate back to normal."
-msgstr ""
+msgstr "மீண்டும் சாதாரண பிளேபேக் விகிதம் அமைக்க குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1239 modules/gui/qt/menus.cpp:875
 msgid "Faster (fine)"
@@ -3695,6 +3735,7 @@ msgstr "அடுத்த "
 #: src/libvlc-module.c:1244
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
+"பிளேலிஸ்ட்டில் அடுத்த உருப்படியை தவிர்க்க பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1245 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
@@ -3708,6 +3749,7 @@ msgstr "முந்தைய"
 #: src/libvlc-module.c:1246
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
+"பிளேலிஸ்ட்டில் முந்தைய உருப்படியை தவிர்க்க பயன்படுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1247 modules/gui/macosx/VLCMainMenu.m:378
 #: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/macosx/VLCMainMenu.m:495
@@ -3719,7 +3761,7 @@ msgstr "நில்"
 
 #: src/libvlc-module.c:1248
 msgid "Select the hotkey to stop playback."
-msgstr ""
+msgstr "பிளேபேக் நிறுத்த குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1249 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
@@ -3733,111 +3775,111 @@ msgstr "நிலை"
 
 #: src/libvlc-module.c:1250
 msgid "Select the hotkey to display the position."
-msgstr ""
+msgstr "நிலையை காட்ட குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1252
 msgid "Very short backwards jump"
-msgstr ""
+msgstr "மிக குறுகிய பின்னோக்கி குதி"
 
 #: src/libvlc-module.c:1254
 msgid "Select the hotkey to make a very short backwards jump."
-msgstr ""
+msgstr "ஒரு மிக குறுகிய பின்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1255
 msgid "Short backwards jump"
-msgstr ""
+msgstr "குறுகிய பின்னோக்கி குதி"
 
 #: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a short backwards jump."
-msgstr ""
+msgstr "ஒரு குறுகிய பின்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1258
 msgid "Medium backwards jump"
-msgstr ""
+msgstr "நடுத்தர பின்னோக்கி குதி"
 
 #: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr ""
+msgstr "ஒரு நடுத்தர பின்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1261
 msgid "Long backwards jump"
-msgstr ""
+msgstr "நீண்ட பின்னோக்கி குதி"
 
 #: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a long backwards jump."
-msgstr ""
+msgstr "ஒரு நீண்ட பின்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1265
 msgid "Very short forward jump"
-msgstr ""
+msgstr "மிக குறுகிய முன்னோக்கி குதி"
 
 #: src/libvlc-module.c:1267
 msgid "Select the hotkey to make a very short forward jump."
-msgstr ""
+msgstr "ஒரு மிக குறுகிய முன்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1268
 msgid "Short forward jump"
-msgstr ""
+msgstr "குறுகிய முன்னோக்கி குதி"
 
 #: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a short forward jump."
-msgstr ""
+msgstr "ஒரு குறுகிய முன்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1271
 msgid "Medium forward jump"
-msgstr ""
+msgstr "நடுத்தர முன்னோக்கி குதி"
 
 #: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a medium forward jump."
-msgstr ""
+msgstr "ஒரு நடுத்தர முன்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1274
 msgid "Long forward jump"
-msgstr ""
+msgstr "நீண்ட முன்னோக்கி குதி"
 
 #: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a long forward jump."
-msgstr ""
+msgstr "ஒரு நீண்ட முன்னோக்கி குதி செய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1277 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr ""
+msgstr "அடுத்த  சட்டம்"
 
 #: src/libvlc-module.c:1279
 msgid "Select the hotkey to got to the next video frame."
-msgstr ""
+msgstr "அடுத்த வீடியோ பிரேம் செல்ல குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1281
 msgid "Very short jump length"
-msgstr ""
+msgstr "மிக குறுகிய குதி நீளம்"
 
 #: src/libvlc-module.c:1282
 msgid "Very short jump length, in seconds."
-msgstr ""
+msgstr "மிக குறுகிய குதி நீளம், விநாடிகள் "
 
 #: src/libvlc-module.c:1283
 msgid "Short jump length"
-msgstr ""
+msgstr "குறுகிய குதி நீளம்"
 
 #: src/libvlc-module.c:1284
 msgid "Short jump length, in seconds."
-msgstr ""
+msgstr "குறுகிய குதி நீளம்,. விநாடிகள் "
 
 #: src/libvlc-module.c:1285
 msgid "Medium jump length"
-msgstr ""
+msgstr "நடுத்தர குதி நீளம்"
 
 #: src/libvlc-module.c:1286
 msgid "Medium jump length, in seconds."
-msgstr ""
+msgstr "நடுத்தர குதி நீளம்,. விநாடிகள் "
 
 #: src/libvlc-module.c:1287
 msgid "Long jump length"
-msgstr ""
+msgstr "நீண்ட குதி நீளம் "
 
 #: src/libvlc-module.c:1288
 msgid "Long jump length, in seconds."
-msgstr ""
+msgstr "நீண்ட குதி நீளம்,. விநாடிகள் "
 
 #: src/libvlc-module.c:1290 modules/control/hotkeys.c:361
 #: modules/gui/qt/components/controller.hpp:111
@@ -3848,47 +3890,51 @@ msgstr "வெளியேறு"
 
 #: src/libvlc-module.c:1291
 msgid "Select the hotkey to quit the application."
-msgstr ""
+msgstr "பயன்பாடு நிறுத்தசெய்ய குறுக்குவிசையாக தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1292
 msgid "Navigate up"
 msgstr "மேலே ஓட்டு"
 
 #: src/libvlc-module.c:1293
+#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr ""
+msgstr "டிவிடி மெனுக்களில் உள்ள தேர்வுக்குழு மேல் செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1294
 msgid "Navigate down"
 msgstr "ஓட்டு கீழே"
 
 #: src/libvlc-module.c:1295
+#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr ""
+msgstr "டிவிடி மெனுக்களில் உள்ள தேர்வுக்குழு கீழே செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1296
 msgid "Navigate left"
 msgstr "ஓட்டு இடது"
 
 #: src/libvlc-module.c:1297
+#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr ""
+msgstr "டிவிடி மெனுக்களில் உள்ள தேர்வுக்குழு இடது செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1298
 msgid "Navigate right"
 msgstr "ஓட்டு வலது"
 
 #: src/libvlc-module.c:1299
+#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr ""
+msgstr "டிவிடி மெனுக்களில் உள்ள தேர்வுக்குழு வலது செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1300
 msgid "Activate"
@@ -3896,7 +3942,7 @@ msgstr "செயற்படுத்து"
 
 #: src/libvlc-module.c:1301
 msgid "Select the key to activate selected item in DVD menus."
-msgstr ""
+msgstr "டிவிடி மெனுக்களை தேர்ந்தெடுக்கப்பட்ட உருப்படியை செயலாக்கவிசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1302 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
@@ -3904,15 +3950,15 @@ msgstr "DVD வகைப்பட்டிக்குச் செல்லவ�
 
 #: src/libvlc-module.c:1303
 msgid "Select the key to take you to the DVD menu"
-msgstr ""
+msgstr "டிவிடி மெனு நீங்கள் செல்ல விசையை தேர்ந்தெடுக்கவும்"
 
 #: src/libvlc-module.c:1304
 msgid "Select previous DVD title"
-msgstr ""
+msgstr "முந்தைய DVD தலைப்பு தேர்வு"
 
 #: src/libvlc-module.c:1305
 msgid "Select the key to choose the previous title from the DVD"
-msgstr ""
+msgstr "டிவிடி இருந்து முந்தைய தலைப்பு தேர்வு விசையை தேர்ந்தெடுக்கவும்"
 
 #: src/libvlc-module.c:1306
 msgid "Select next DVD title"
@@ -3920,7 +3966,7 @@ msgstr "அடுத்த DVD தலைப்பை தெரிவு செ�
 
 #: src/libvlc-module.c:1307
 msgid "Select the key to choose the next title from the DVD"
-msgstr ""
+msgstr "டிவிடி இருந்து அடுத்த தலைப்பு தேர்வு விசையை தேர்ந்தெடுக்கவும்"
 
 #: src/libvlc-module.c:1308
 msgid "Select prev DVD chapter"
@@ -3928,7 +3974,7 @@ msgstr "முந்தைய DVD அத்தியாயத்தை தெர
 
 #: src/libvlc-module.c:1309
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr ""
+msgstr "டிவிடி இருந்து முந்தைய அத்தியாயத்தில் தேர்வுவிசையை தேர்ந்தெடுக்கவும்"
 
 #: src/libvlc-module.c:1310
 msgid "Select next DVD chapter"
@@ -3936,7 +3982,7 @@ msgstr "அடுத்த DVD அத்தியாயத்தை தெரி
 
 #: src/libvlc-module.c:1311
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr ""
+msgstr "டிவிடி இருந்து அடுத்த அத்தியாயம் தேர்வுவிசையை தேர்ந்தெடுக்கவும்"
 
 #: src/libvlc-module.c:1312
 msgid "Volume up"
@@ -3944,7 +3990,7 @@ msgstr "ஒலிச்சத்தம் மேலே"
 
 #: src/libvlc-module.c:1313
 msgid "Select the key to increase audio volume."
-msgstr ""
+msgstr "ஆடியோ தொகுதி அதிகரிக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1314
 msgid "Volume down"
@@ -3952,7 +3998,7 @@ msgstr "ஒலிச்சத்தம் கீழே"
 
 #: src/libvlc-module.c:1315
 msgid "Select the key to decrease audio volume."
-msgstr ""
+msgstr "ஆடியோ தொகுதி குறைக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1316 modules/access/v4l2/v4l2.c:181
 #: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:491
@@ -3963,7 +4009,7 @@ msgstr "சத்தத்தை குறை"
 
 #: src/libvlc-module.c:1317
 msgid "Select the key to mute audio."
-msgstr ""
+msgstr "ஆடியோ முடக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1318
 msgid "Subtitle delay up"
@@ -3971,7 +4017,7 @@ msgstr "துணை உரை தாமதமாக முன்னேறு"
 
 #: src/libvlc-module.c:1319
 msgid "Select the key to increase the subtitle delay."
-msgstr ""
+msgstr "வசன வரிகள் தாமதம் அதிகரிக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1320
 msgid "Subtitle delay down"
@@ -3979,7 +4025,7 @@ msgstr "துணை உரை தாமதமாக கீழே"
 
 #: src/libvlc-module.c:1321
 msgid "Select the key to decrease the subtitle delay."
-msgstr ""
+msgstr "வசன வரிகள் தாமதம் குறைக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1322
 #, fuzzy
@@ -3989,48 +4035,53 @@ msgstr "துணை உரை கோப்புகளை உபயோகி"
 #: src/libvlc-module.c:1323
 #, fuzzy
 msgid "Scale up subtitles text"
-msgstr "துணை உரை கோப்புகளை உபயோகி"
+msgstr "துணைஉரைகளை இயலச்செய்"
 
 #: src/libvlc-module.c:1324
 #, fuzzy
 msgid "Scale down subtitles text"
-msgstr "துணை உரை கோப்புகளை உபயோகி"
+msgstr "துணைஉரைகளை இயலச்செய்"
 
 #: src/libvlc-module.c:1325
+#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "வசனம் மேல் செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1326
 msgid "Subtitle sync / bookmark audio timestamp"
-msgstr ""
+msgstr "வரிகள் ஒத்திசைவு / புக்மார்க்கைச் ஆடியோ நேர முத்திரை"
 
 #: src/libvlc-module.c:1327
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr ""
+"வசன ஒத்திசைவை போது புக்மார்க் செய்ய ஆடியோ நேர முத்திரைவிசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1328
 msgid "Subtitle sync / bookmark subtitle timestamp"
-msgstr ""
+msgstr "வரிகள் ஒத்திசைவு / புக்மார்க் வசன நேர முத்திரை"
 
 #: src/libvlc-module.c:1329
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
-msgstr ""
+msgstr "வசன ஒத்திசைவை போது புக்மார்க் செய்ய வசன நேர முத்திரைவிசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1330
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr ""
+msgstr "வரிகள் ஒத்திசைவு / ஆடியோ மற்றும் வசன வரிகள் முத்திரைகள் ஒருங்கிணைக்க"
 
 #: src/libvlc-module.c:1331
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr ""
+"புக்மார்க் இடப்பட்ட ஆடியோ மற்றும் வசன வரிகள் முத்திரைகள் ஒருங்கிணைக்க விசையை "
+"தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1332
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "வரிகள் ஒத்திசைவு / ஆடியோ மற்றும் வசன வரிகள் ஒத்திசைவு மீட்டமைக்க"
 
 #: src/libvlc-module.c:1333
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr ""
+"ஆடியோ மற்றும் வசன வரிகள் முத்திரைகள் ஒத்திசைவு மீட்டமைக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1334
 msgid "Subtitle position up"
@@ -4038,7 +4089,7 @@ msgstr "துணை உரை நிலை முன்னேறு"
 
 #: src/libvlc-module.c:1335
 msgid "Select the key to move subtitles higher."
-msgstr ""
+msgstr "வசனம் மேல் செல்ல விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1336
 msgid "Subtitle position down"
@@ -4046,7 +4097,7 @@ msgstr "துணை உரை நிலை கீழே"
 
 #: src/libvlc-module.c:1337
 msgid "Select the key to move subtitles lower."
-msgstr ""
+msgstr "வசனம் கீழே நகர்த்த விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1338
 msgid "Audio delay up"
@@ -4054,7 +4105,7 @@ msgstr "ஒலிதம் தாமதமாக முன்னேறு"
 
 #: src/libvlc-module.c:1339
 msgid "Select the key to increase the audio delay."
-msgstr ""
+msgstr "ஆடியோ தாமதம் அதிகரிக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1340
 msgid "Audio delay down"
@@ -4062,7 +4113,7 @@ msgstr "ஒலிதம் தாமதமாக கீழே"
 
 #: src/libvlc-module.c:1341
 msgid "Select the key to decrease the audio delay."
-msgstr ""
+msgstr "ஆடியோ தாமதம் குறைக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1348
 msgid "Play playlist bookmark 1"
@@ -4106,7 +4157,7 @@ msgstr "நினைவுக்குறி தொகுப்பு பட்�
 
 #: src/libvlc-module.c:1358
 msgid "Select the key to play this bookmark."
-msgstr ""
+msgstr "இந்நினைவுக்குறி இயக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1359
 msgid "Set playlist bookmark 1"
@@ -4150,16 +4201,16 @@ msgstr "உருவாக்கு நினைவுக்குறி தொ�
 
 #: src/libvlc-module.c:1369
 msgid "Select the key to set this playlist bookmark."
-msgstr ""
+msgstr "இந்த பிளேலிஸ்ட்டில் புக்மார்க் அமைக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1370
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
-msgstr ""
+msgstr "பிளேலிஸ்ட் அழி"
 
 #: src/libvlc-module.c:1371
 msgid "Select the key to clear the current playlist."
-msgstr ""
+msgstr "தற்போதைய பிளேலிஸ்ட் அழிக்க விசையை தேர்ந்தெடுக்கவும்."
 
 #: src/libvlc-module.c:1373
 msgid "Playlist bookmark 1"
@@ -4203,11 +4254,11 @@ msgstr "நினைவுக்குறி தொகுப்பு பட்�
 
 #: src/libvlc-module.c:1384
 msgid "This allows you to define playlist bookmarks."
-msgstr ""
+msgstr "இது நீங்கள் பிளேலிஸ்ட் புக்மார்க்குகளை வரையறுக்க அனுமதிக்கிறது."
 
 #: src/libvlc-module.c:1386
 msgid "Cycle audio track"
-msgstr ""
+msgstr "சுழற்சி ஒலிதம் டிராக்"
 
 #: src/libvlc-module.c:1387
 msgid "Cycle through the available audio tracks(languages)."
@@ -4230,9 +4281,8 @@ msgid "Cycle through the available subtitle tracks."
 msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "DVB துணை உரை"
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Toggle subtitle track visibility."
@@ -4355,7 +4405,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1432 src/libvlc-module.c:1433
 msgid "Un-Zoom"
-msgstr ""
+msgstr "சிறிதாக்கு"
 
 #: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Crop one pixel from the top of the video"
@@ -4477,7 +4527,7 @@ msgstr "பெருதரவு"
 
 #: src/libvlc-module.c:1922
 msgid "Decoders"
-msgstr ""
+msgstr "குறிவிலக்கி"
 
 #: src/libvlc-module.c:1929 modules/access/avio.h:40
 #: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:85
@@ -4490,19 +4540,19 @@ msgstr "VLM"
 
 #: src/libvlc-module.c:2011
 msgid "Special modules"
-msgstr ""
+msgstr "சிறப்பு தொகுதிகள்"
 
 #: src/libvlc-module.c:2016 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
-msgstr ""
+msgstr "நிரல்கள்"
 
 #: src/libvlc-module.c:2028
 msgid "Performance options"
-msgstr ""
+msgstr "செயல்திறன் விருப்பங்களை"
 
 #: src/libvlc-module.c:2047
 msgid "Clock source"
-msgstr ""
+msgstr "மூல கோப்பகம்"
 
 #: src/libvlc-module.c:2165
 msgid "Hot keys"
@@ -4510,7 +4560,7 @@ msgstr "முக்கிய விசை"
 
 #: src/libvlc-module.c:2655
 msgid "Jump sizes"
-msgstr ""
+msgstr "தாவி அளவுகள்"
 
 #: src/libvlc-module.c:2740
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
@@ -4565,49 +4615,48 @@ msgid "print version information"
 msgstr ""
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "முதன்மை நிகழ்ச்சி"
+msgstr ""
 
 #: src/misc/actions.c:52
 msgid "Backspace"
-msgstr ""
+msgstr "பின் வாங்கு"
 
 #: src/misc/actions.c:53
 msgid "Brightness Down"
-msgstr ""
+msgstr "பிரகாசம் ஒடுக்கு"
 
 #: src/misc/actions.c:54
 msgid "Brightness Up"
-msgstr ""
+msgstr "பிரகாசம் பெருக்கு"
 
 #: src/misc/actions.c:55
 msgid "Browser Back"
-msgstr ""
+msgstr "உலாவி திரும்ப"
 
 #: src/misc/actions.c:56
 msgid "Browser Favorites"
-msgstr ""
+msgstr "உலாவி பிடித்தவை"
 
 #: src/misc/actions.c:57
 msgid "Browser Forward"
-msgstr ""
+msgstr "உலாவி முன்னோக்கி"
 
 #: src/misc/actions.c:58
 msgid "Browser Home"
-msgstr ""
+msgstr "உலாவி முகப்பு"
 
 #: src/misc/actions.c:59
 msgid "Browser Refresh"
-msgstr ""
+msgstr "உலாவி புத்துணர்வு"
 
 #: src/misc/actions.c:60
 msgid "Browser Search"
-msgstr ""
+msgstr "உலாவி தேடல்"
 
 #: src/misc/actions.c:61
 msgid "Browser Stop"
-msgstr ""
+msgstr "உலாவி நிறுத்து"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
 #: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
@@ -4618,7 +4667,7 @@ msgstr "நிக்கு"
 
 #: src/misc/actions.c:63
 msgid "Down"
-msgstr ""
+msgstr "கீழ்"
 
 #: src/misc/actions.c:64 modules/control/oldrc.c:73
 msgid "End"
@@ -4626,167 +4675,167 @@ msgstr "இறுதி"
 
 #: src/misc/actions.c:65
 msgid "Enter"
-msgstr ""
+msgstr "உள்ளிடவும்"
 
 #: src/misc/actions.c:66
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: src/misc/actions.c:67
 msgid "F1"
-msgstr ""
+msgstr "எப்1"
 
 #: src/misc/actions.c:68
 msgid "F10"
-msgstr ""
+msgstr "எப்10"
 
 #: src/misc/actions.c:69
 msgid "F11"
-msgstr ""
+msgstr "எப்11"
 
 #: src/misc/actions.c:70
 msgid "F12"
-msgstr ""
+msgstr "எப்12"
 
 #: src/misc/actions.c:71
 msgid "F2"
-msgstr ""
+msgstr "எப்2"
 
 #: src/misc/actions.c:72
 msgid "F3"
-msgstr ""
+msgstr "எப்3"
 
 #: src/misc/actions.c:73
 msgid "F4"
-msgstr ""
+msgstr "எப்4"
 
 #: src/misc/actions.c:74
 msgid "F5"
-msgstr ""
+msgstr "எப்5"
 
 #: src/misc/actions.c:75
 msgid "F6"
-msgstr ""
+msgstr "எப்6"
 
 #: src/misc/actions.c:76
 msgid "F7"
-msgstr ""
+msgstr "எப்7"
 
 #: src/misc/actions.c:77
 msgid "F8"
-msgstr ""
+msgstr "எப்8"
 
 #: src/misc/actions.c:78
 msgid "F9"
-msgstr ""
+msgstr "எப்9"
 
 #: src/misc/actions.c:79
 msgid "Home"
-msgstr ""
+msgstr "முகப்பு"
 
 #: src/misc/actions.c:80
 msgid "Insert"
-msgstr ""
+msgstr "நுழைக்க"
 
 #: src/misc/actions.c:82
 msgid "Media Angle"
-msgstr ""
+msgstr "ஊடக கோணம்"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr ""
+msgstr "ஊடக ஒலி சுவடு"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
-msgstr ""
+msgstr "ஊடக முன்னோக்கி"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
-msgstr ""
+msgstr "ஊடக விருப்பம்"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr ""
+msgstr "ஊடக அடுத்த  சட்டம்"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr ""
+msgstr "ஊடக அடுத்த பாதை"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
-msgstr ""
+msgstr "ஊடக ஓடு நிறுத்து"
 
 #: src/misc/actions.c:89
 msgid "Media Prev Frame"
-msgstr ""
+msgstr "ஊடக முந்தைய சட்டம்"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
-msgstr ""
+msgstr "ஊடக முந்தைய பாதை"
 
 #: src/misc/actions.c:91
 msgid "Media Record"
-msgstr ""
+msgstr "ஊடக பதிவு"
 
 #: src/misc/actions.c:92
 msgid "Media Repeat"
-msgstr ""
+msgstr "ஊடக மீண்டும் செய்"
 
 #: src/misc/actions.c:93
 msgid "Media Rewind"
-msgstr ""
+msgstr "ஊடக முன்னோக்கிச்செலுத்து"
 
 #: src/misc/actions.c:94
 msgid "Media Select"
-msgstr ""
+msgstr "ஊடக தேர்வு"
 
 #: src/misc/actions.c:95
 msgid "Media Shuffle"
-msgstr ""
+msgstr "ஊடக சுழற்சி"
 
 #: src/misc/actions.c:96
 msgid "Media Stop"
-msgstr ""
+msgstr "ஊடகம் நிறுத்து"
 
 #: src/misc/actions.c:97
 msgid "Media Subtitle"
-msgstr ""
+msgstr "ஊடக வசனம்"
 
 #: src/misc/actions.c:98
 msgid "Media Time"
-msgstr ""
+msgstr "ஊடக நேரம்"
 
 #: src/misc/actions.c:99
 msgid "Media View"
-msgstr ""
+msgstr "ஊடக நோக்கு"
 
 #: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:568
 msgid "Menu"
-msgstr ""
+msgstr "மெனு"
 
 #: src/misc/actions.c:101
 msgid "Mouse Wheel Down"
-msgstr ""
+msgstr "சுட்டி சக்கரம் கீழே"
 
 #: src/misc/actions.c:102
 msgid "Mouse Wheel Left"
-msgstr ""
+msgstr "சுட்டி சக்கரம் இடது"
 
 #: src/misc/actions.c:103
 msgid "Mouse Wheel Right"
-msgstr ""
+msgstr "சுட்டி சக்கரம் வலது"
 
 #: src/misc/actions.c:104
 msgid "Mouse Wheel Up"
-msgstr ""
+msgstr "சுட்டி சக்கரம் மேலே"
 
 #: src/misc/actions.c:105
 msgid "Page Down"
-msgstr ""
+msgstr "பக்கம் கீழ்"
 
 #: src/misc/actions.c:106
 msgid "Page Up"
-msgstr ""
+msgstr "பக்கம் மேலே"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
@@ -4799,19 +4848,19 @@ msgstr "நிறுத்து"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr ""
+msgstr "அச்சிடு"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
-msgstr ""
+msgstr "இடைவெளி"
 
 #: src/misc/actions.c:111
 msgid "Tab"
-msgstr ""
+msgstr "தாவல்"
 
 #: src/misc/actions.c:113
 msgid "Up"
-msgstr ""
+msgstr "மேலே"
 
 #: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:499
 msgid "Volume Down"
@@ -4819,7 +4868,7 @@ msgstr "ஒலிச்சத்தம் கீழே"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr ""
+msgstr "ஒலிச்சத்தம் தடு"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
 msgid "Volume Up"
@@ -4827,31 +4876,31 @@ msgstr "ஒலிச்சத்தம் உயரே"
 
 #: src/misc/actions.c:117
 msgid "Zoom In"
-msgstr ""
+msgstr "பெரிதாக்கு"
 
 #: src/misc/actions.c:118
 msgid "Zoom Out"
-msgstr ""
+msgstr "சிறிதாக்கு"
 
 #: src/misc/actions.c:246
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl"
 
 #: src/misc/actions.c:247
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: src/misc/actions.c:248
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: src/misc/actions.c:249
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: src/misc/actions.c:250
 msgid "Command+"
-msgstr ""
+msgstr "கட்டளை+"
 
 #: src/misc/update.c:482
 #, c-format
@@ -4927,7 +4976,7 @@ msgstr ""
 
 #: src/misc/update.c:649
 msgid "File could not be verified"
-msgstr ""
+msgstr "கோப்பு உறுதிப்படுத்த முடியவில்லை"
 
 #: src/misc/update.c:650
 #, c-format
@@ -4938,7 +4987,7 @@ msgstr ""
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
-msgstr ""
+msgstr "தவறான கையெழுத்து"
 
 #: src/misc/update.c:662 src/misc/update.c:674
 #, c-format
@@ -4949,7 +4998,7 @@ msgstr ""
 
 #: src/misc/update.c:686
 msgid "File not verifiable"
-msgstr ""
+msgstr "சரிபார்க்கக்கூடிய கோப்பு இல்லை"
 
 #: src/misc/update.c:687
 #, c-format
@@ -4960,7 +5009,7 @@ msgstr ""
 
 #: src/misc/update.c:698 src/misc/update.c:710
 msgid "File corrupted"
-msgstr ""
+msgstr "கோப்பு சிதைந்துள்ளது"
 
 #: src/misc/update.c:699 src/misc/update.c:711
 #, c-format
@@ -4990,455 +5039,455 @@ msgstr "ஊடகநூலகம்"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
-msgstr ""
+msgstr "Afar"
 
 #: src/text/iso-639_def.h:41
 msgid "Abkhazian"
-msgstr ""
+msgstr "Abkhazian"
 
 #: src/text/iso-639_def.h:42
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans"
 
 #: src/text/iso-639_def.h:43
 msgid "Albanian"
-msgstr ""
+msgstr "Albanian"
 
 #: src/text/iso-639_def.h:44
 msgid "Amharic"
-msgstr ""
+msgstr "Amharic"
 
 #: src/text/iso-639_def.h:45
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: src/text/iso-639_def.h:46
 msgid "Armenian"
-msgstr ""
+msgstr "Armenian"
 
 #: src/text/iso-639_def.h:47
 msgid "Assamese"
-msgstr ""
+msgstr "Assamese"
 
 #: src/text/iso-639_def.h:48
 msgid "Avestan"
-msgstr ""
+msgstr "Avestan"
 
 #: src/text/iso-639_def.h:49
 msgid "Aymara"
-msgstr ""
+msgstr "Aymara"
 
 #: src/text/iso-639_def.h:50
 msgid "Azerbaijani"
-msgstr ""
+msgstr "Azerbaijani"
 
 #: src/text/iso-639_def.h:51
 msgid "Bashkir"
-msgstr ""
+msgstr "Bashkir"
 
 #: src/text/iso-639_def.h:52
 msgid "Basque"
-msgstr ""
+msgstr "Basque"
 
 #: src/text/iso-639_def.h:53
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: src/text/iso-639_def.h:54
 msgid "Bengali"
-msgstr ""
+msgstr "Bengali"
 
 #: src/text/iso-639_def.h:55
 msgid "Bihari"
-msgstr ""
+msgstr "Bihari"
 
 #: src/text/iso-639_def.h:56
 msgid "Bislama"
-msgstr ""
+msgstr "Bislama"
 
 #: src/text/iso-639_def.h:57
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosnian"
 
 #: src/text/iso-639_def.h:58
 msgid "Breton"
-msgstr ""
+msgstr "Breton"
 
 #: src/text/iso-639_def.h:59
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgarian"
 
 #: src/text/iso-639_def.h:60
 msgid "Burmese"
-msgstr ""
+msgstr "Burmese"
 
 #: src/text/iso-639_def.h:61
 msgid "Catalan"
-msgstr ""
+msgstr "Catalan"
 
 #: src/text/iso-639_def.h:62
 msgid "Chamorro"
-msgstr ""
+msgstr "Chamorro"
 
 #: src/text/iso-639_def.h:63
 msgid "Chechen"
-msgstr ""
+msgstr "Chechen"
 
 #: src/text/iso-639_def.h:64
 msgid "Chinese"
-msgstr ""
+msgstr "Chinese"
 
 #: src/text/iso-639_def.h:65
 msgid "Church Slavic"
-msgstr ""
+msgstr "Church Slavic"
 
 #: src/text/iso-639_def.h:66
 msgid "Chuvash"
-msgstr ""
+msgstr "Chuvash"
 
 #: src/text/iso-639_def.h:67
 msgid "Cornish"
-msgstr ""
+msgstr "Cornish"
 
 #: src/text/iso-639_def.h:68
 msgid "Corsican"
-msgstr ""
+msgstr "Corsican"
 
 #: src/text/iso-639_def.h:69
 msgid "Czech"
-msgstr ""
+msgstr "Czech"
 
 #: src/text/iso-639_def.h:70
 msgid "Danish"
-msgstr ""
+msgstr "Danish"
 
 #: src/text/iso-639_def.h:71
 msgid "Dutch"
-msgstr ""
+msgstr "Dutch"
 
 #: src/text/iso-639_def.h:72
 msgid "Dzongkha"
-msgstr ""
+msgstr "Dzongkha"
 
 #: src/text/iso-639_def.h:73
 msgid "English"
-msgstr ""
+msgstr "English"
 
 #: src/text/iso-639_def.h:74
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 #: src/text/iso-639_def.h:75
 msgid "Estonian"
-msgstr ""
+msgstr "Estonian"
 
 #: src/text/iso-639_def.h:76
 msgid "Faroese"
-msgstr ""
+msgstr "Faroese"
 
 #: src/text/iso-639_def.h:77
 msgid "Fijian"
-msgstr ""
+msgstr "Fijian"
 
 #: src/text/iso-639_def.h:78
 msgid "Finnish"
-msgstr ""
+msgstr "Finnish"
 
 #: src/text/iso-639_def.h:79
 msgid "French"
-msgstr ""
+msgstr "French"
 
 #: src/text/iso-639_def.h:80
 msgid "Frisian"
-msgstr ""
+msgstr "Frisian"
 
 #: src/text/iso-639_def.h:81
 msgid "Georgian"
-msgstr ""
+msgstr "Georgian"
 
 #: src/text/iso-639_def.h:82
 msgid "German"
-msgstr ""
+msgstr "German"
 
 #: src/text/iso-639_def.h:83
 msgid "Gaelic (Scots)"
-msgstr ""
+msgstr "Gaelic (Scots)"
 
 #: src/text/iso-639_def.h:84
 msgid "Irish"
-msgstr ""
+msgstr "Irish"
 
 #: src/text/iso-639_def.h:85
 msgid "Gallegan"
-msgstr ""
+msgstr "Gallegan"
 
 #: src/text/iso-639_def.h:86
 msgid "Manx"
-msgstr ""
+msgstr "Manx"
 
 #: src/text/iso-639_def.h:87
 msgid "Greek, Modern"
-msgstr ""
+msgstr "Greek, Modern"
 
 #: src/text/iso-639_def.h:88
 msgid "Guarani"
-msgstr ""
+msgstr "Guarani"
 
 #: src/text/iso-639_def.h:89
 msgid "Gujarati"
-msgstr ""
+msgstr "Gujarati"
 
 #: src/text/iso-639_def.h:90
 msgid "Hebrew"
-msgstr ""
+msgstr "Hebrew"
 
 #: src/text/iso-639_def.h:91
 msgid "Herero"
-msgstr ""
+msgstr "Herero"
 
 #: src/text/iso-639_def.h:92
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: src/text/iso-639_def.h:93
 msgid "Hiri Motu"
-msgstr ""
+msgstr "Hiri Motu"
 
 #: src/text/iso-639_def.h:94
 msgid "Hungarian"
-msgstr ""
+msgstr "Hungarian"
 
 #: src/text/iso-639_def.h:95
 msgid "Icelandic"
-msgstr ""
+msgstr "Icelandic"
 
 #: src/text/iso-639_def.h:96
 msgid "Inuktitut"
-msgstr ""
+msgstr "Inuktitut"
 
 #: src/text/iso-639_def.h:97
 msgid "Interlingue"
-msgstr ""
+msgstr "Interlingue"
 
 #: src/text/iso-639_def.h:98
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 #: src/text/iso-639_def.h:99
 msgid "Indonesian"
-msgstr ""
+msgstr "Indonesian"
 
 #: src/text/iso-639_def.h:100
 msgid "Inupiaq"
-msgstr ""
+msgstr "Inupiaq"
 
 #: src/text/iso-639_def.h:101
 msgid "Italian"
-msgstr ""
+msgstr "Italian"
 
 #: src/text/iso-639_def.h:102
 msgid "Javanese"
-msgstr ""
+msgstr "Javanese"
 
 #: src/text/iso-639_def.h:103
 msgid "Japanese"
-msgstr ""
+msgstr "Japanese"
 
 #: src/text/iso-639_def.h:104
 msgid "Greenlandic, Kalaallisut"
-msgstr ""
+msgstr "Greenlandic, Kalaallisut"
 
 #: src/text/iso-639_def.h:105
 msgid "Kannada"
-msgstr ""
+msgstr "Kannada"
 
 #: src/text/iso-639_def.h:106
 msgid "Kashmiri"
-msgstr ""
+msgstr "Kashmiri"
 
 #: src/text/iso-639_def.h:107
 msgid "Kazakh"
-msgstr ""
+msgstr "Kazakh"
 
 #: src/text/iso-639_def.h:108
 msgid "Khmer"
-msgstr ""
+msgstr "Khmer"
 
 #: src/text/iso-639_def.h:109
 msgid "Kikuyu"
-msgstr ""
+msgstr "Kikuyu"
 
 #: src/text/iso-639_def.h:110
 msgid "Kinyarwanda"
-msgstr ""
+msgstr "Kinyarwanda"
 
 #: src/text/iso-639_def.h:111
 msgid "Kirghiz"
-msgstr ""
+msgstr "Kirghiz"
 
 #: src/text/iso-639_def.h:112
 msgid "Komi"
-msgstr ""
+msgstr "Komi"
 
 #: src/text/iso-639_def.h:113
 msgid "Korean"
-msgstr ""
+msgstr "Korean"
 
 #: src/text/iso-639_def.h:114
 msgid "Kuanyama"
-msgstr ""
+msgstr "Kuanyama"
 
 #: src/text/iso-639_def.h:115
 msgid "Kurdish"
-msgstr ""
+msgstr "Kurdish"
 
 #: src/text/iso-639_def.h:116
 msgid "Lao"
-msgstr ""
+msgstr "Lao"
 
 #: src/text/iso-639_def.h:117 modules/meta_engine/ID3Genres.h:119
 msgid "Latin"
-msgstr ""
+msgstr "Latin"
 
 #: src/text/iso-639_def.h:118
 msgid "Latvian"
-msgstr ""
+msgstr "Latvian"
 
 #: src/text/iso-639_def.h:119
 msgid "Lingala"
-msgstr ""
+msgstr "Lingala"
 
 #: src/text/iso-639_def.h:120
 msgid "Lithuanian"
-msgstr ""
+msgstr "Lithuanian"
 
 #: src/text/iso-639_def.h:121
 msgid "Letzeburgesch"
-msgstr ""
+msgstr "Letzeburgesch"
 
 #: src/text/iso-639_def.h:122
 msgid "Macedonian"
-msgstr ""
+msgstr "Macedonian"
 
 #: src/text/iso-639_def.h:123
 msgid "Marshall"
-msgstr ""
+msgstr "Marshall"
 
 #: src/text/iso-639_def.h:124
 msgid "Malayalam"
-msgstr ""
+msgstr "Malayalam"
 
 #: src/text/iso-639_def.h:125
 msgid "Maori"
-msgstr ""
+msgstr "Maori"
 
 #: src/text/iso-639_def.h:126
 msgid "Marathi"
-msgstr ""
+msgstr "Marathi"
 
 #: src/text/iso-639_def.h:127
 msgid "Malay"
-msgstr ""
+msgstr "Malay"
 
 #: src/text/iso-639_def.h:128
 msgid "Malagasy"
-msgstr ""
+msgstr "Malagasy"
 
 #: src/text/iso-639_def.h:129
 msgid "Maltese"
-msgstr ""
+msgstr "Maltese"
 
 #: src/text/iso-639_def.h:130
 msgid "Moldavian"
-msgstr ""
+msgstr "Moldavian"
 
 #: src/text/iso-639_def.h:131
 msgid "Mongolian"
-msgstr ""
+msgstr "Mongolian"
 
 #: src/text/iso-639_def.h:132
 msgid "Nauru"
-msgstr ""
+msgstr "Nauru"
 
 #: src/text/iso-639_def.h:133
 msgid "Navajo"
-msgstr ""
+msgstr "Navajo"
 
 #: src/text/iso-639_def.h:134
 msgid "Ndebele, South"
-msgstr ""
+msgstr "Ndebele, South"
 
 #: src/text/iso-639_def.h:135
 msgid "Ndebele, North"
-msgstr ""
+msgstr "Ndebele, North"
 
 #: src/text/iso-639_def.h:136
 msgid "Ndonga"
-msgstr ""
+msgstr "Ndonga"
 
 #: src/text/iso-639_def.h:137
 msgid "Nepali"
-msgstr ""
+msgstr "Nepali"
 
 #: src/text/iso-639_def.h:138
 msgid "Norwegian"
-msgstr ""
+msgstr "Norwegian"
 
 #: src/text/iso-639_def.h:139
 msgid "Norwegian Nynorsk"
-msgstr ""
+msgstr "Norwegian Nynorsk"
 
 #: src/text/iso-639_def.h:140
 msgid "Norwegian Bokmaal"
-msgstr ""
+msgstr "Norwegian Bokmaal"
 
 #: src/text/iso-639_def.h:141
 msgid "Chichewa; Nyanja"
-msgstr ""
+msgstr "Chichewa; Nyanja"
 
 #: src/text/iso-639_def.h:142
 msgid "Occitan; Provençal"
-msgstr ""
+msgstr "Occitan; Provençal"
 
 #: src/text/iso-639_def.h:143
 msgid "Oriya"
-msgstr ""
+msgstr "Oriya"
 
 #: src/text/iso-639_def.h:144
 msgid "Oromo"
-msgstr ""
+msgstr "Oromo"
 
 #: src/text/iso-639_def.h:146
 msgid "Ossetian; Ossetic"
-msgstr ""
+msgstr "Ossetian; Ossetic"
 
 #: src/text/iso-639_def.h:147
 msgid "Panjabi"
-msgstr ""
+msgstr "Panjabi"
 
 #: src/text/iso-639_def.h:148
 msgid "Persian"
-msgstr ""
+msgstr "Persian"
 
 #: src/text/iso-639_def.h:149
 msgid "Pali"
-msgstr ""
+msgstr "Pali"
 
 #: src/text/iso-639_def.h:150
 msgid "Polish"
-msgstr ""
+msgstr "Polish"
 
 #: src/text/iso-639_def.h:151
 msgid "Portuguese"
-msgstr ""
+msgstr "Portuguese"
 
 #: src/text/iso-639_def.h:152
 msgid "Pushto"
-msgstr ""
+msgstr "Pushto"
 
 #: src/text/iso-639_def.h:153
 msgid "Quechua"
-msgstr ""
+msgstr "Quechua"
 
 #: src/text/iso-639_def.h:154
 msgid "Original audio"
@@ -5446,207 +5495,207 @@ msgstr ""
 
 #: src/text/iso-639_def.h:155
 msgid "Raeto-Romance"
-msgstr ""
+msgstr "Raeto-Romance"
 
 #: src/text/iso-639_def.h:156
 msgid "Romanian"
-msgstr ""
+msgstr "Romanian"
 
 #: src/text/iso-639_def.h:157
 msgid "Rundi"
-msgstr ""
+msgstr "Rundi"
 
 #: src/text/iso-639_def.h:158
 msgid "Russian"
-msgstr ""
+msgstr "Russian"
 
 #: src/text/iso-639_def.h:159
 msgid "Sango"
-msgstr ""
+msgstr "Sango"
 
 #: src/text/iso-639_def.h:160
 msgid "Sanskrit"
-msgstr ""
+msgstr "Sanskrit"
 
 #: src/text/iso-639_def.h:161
 msgid "Serbian"
-msgstr ""
+msgstr "Serbian"
 
 #: src/text/iso-639_def.h:162
 msgid "Croatian"
-msgstr ""
+msgstr "Croatian"
 
 #: src/text/iso-639_def.h:163
 msgid "Sinhalese"
-msgstr ""
+msgstr "Sinhalese"
 
 #: src/text/iso-639_def.h:164
 msgid "Slovak"
-msgstr ""
+msgstr "Slovak"
 
 #: src/text/iso-639_def.h:165
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenian"
 
 #: src/text/iso-639_def.h:166
 msgid "Northern Sami"
-msgstr ""
+msgstr "Northern Sami"
 
 #: src/text/iso-639_def.h:167
 msgid "Samoan"
-msgstr ""
+msgstr "Samoan"
 
 #: src/text/iso-639_def.h:168
 msgid "Shona"
-msgstr ""
+msgstr "Shona"
 
 #: src/text/iso-639_def.h:169
 msgid "Sindhi"
-msgstr ""
+msgstr "Sindhi"
 
 #: src/text/iso-639_def.h:170
 msgid "Somali"
-msgstr ""
+msgstr "Somali"
 
 #: src/text/iso-639_def.h:171
 msgid "Sotho, Southern"
-msgstr ""
+msgstr "Sotho, Southern"
 
 #: src/text/iso-639_def.h:172
 msgid "Spanish"
-msgstr ""
+msgstr "Spanish"
 
 #: src/text/iso-639_def.h:173
 msgid "Sardinian"
-msgstr ""
+msgstr "Sardinian"
 
 #: src/text/iso-639_def.h:174
 msgid "Swati"
-msgstr ""
+msgstr "Swati"
 
 #: src/text/iso-639_def.h:175
 msgid "Sundanese"
-msgstr ""
+msgstr "Sundanese"
 
 #: src/text/iso-639_def.h:176
 msgid "Swahili"
-msgstr ""
+msgstr "Swahili"
 
 #: src/text/iso-639_def.h:177
 msgid "Swedish"
-msgstr ""
+msgstr "Swedish"
 
 #: src/text/iso-639_def.h:178
 msgid "Tahitian"
-msgstr ""
+msgstr "Tahitian"
 
 #: src/text/iso-639_def.h:179
 msgid "Tamil"
-msgstr ""
+msgstr "தமிழ்"
 
 #: src/text/iso-639_def.h:180
 msgid "Tatar"
-msgstr ""
+msgstr "Tatar"
 
 #: src/text/iso-639_def.h:181
 msgid "Telugu"
-msgstr ""
+msgstr "Telugu"
 
 #: src/text/iso-639_def.h:182
 msgid "Tajik"
-msgstr ""
+msgstr "Tajik"
 
 #: src/text/iso-639_def.h:183
 msgid "Tagalog"
-msgstr ""
+msgstr "Tagalog"
 
 #: src/text/iso-639_def.h:184
 msgid "Thai"
-msgstr ""
+msgstr "Thai"
 
 #: src/text/iso-639_def.h:185
 msgid "Tibetan"
-msgstr ""
+msgstr "Tibetan"
 
 #: src/text/iso-639_def.h:186
 msgid "Tigrinya"
-msgstr ""
+msgstr "Tigrinya"
 
 #: src/text/iso-639_def.h:187
 msgid "Tonga (Tonga Islands)"
-msgstr ""
+msgstr "Tonga (Tonga Islands)"
 
 #: src/text/iso-639_def.h:188
 msgid "Tswana"
-msgstr ""
+msgstr "Tswana"
 
 #: src/text/iso-639_def.h:189
 msgid "Tsonga"
-msgstr ""
+msgstr "Tsonga"
 
 #: src/text/iso-639_def.h:190
 msgid "Turkish"
-msgstr ""
+msgstr "Turkish"
 
 #: src/text/iso-639_def.h:191
 msgid "Turkmen"
-msgstr ""
+msgstr "Turkmen"
 
 #: src/text/iso-639_def.h:192
 msgid "Twi"
-msgstr ""
+msgstr "Twi"
 
 #: src/text/iso-639_def.h:193
 msgid "Uighur"
-msgstr ""
+msgstr "Uighur"
 
 #: src/text/iso-639_def.h:194
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: src/text/iso-639_def.h:195
 msgid "Urdu"
-msgstr ""
+msgstr "Urdu"
 
 #: src/text/iso-639_def.h:196
 msgid "Uzbek"
-msgstr ""
+msgstr "Uzbek"
 
 #: src/text/iso-639_def.h:197
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamese"
 
 #: src/text/iso-639_def.h:198
 msgid "Volapuk"
-msgstr ""
+msgstr "Volapuk"
 
 #: src/text/iso-639_def.h:199
 msgid "Welsh"
-msgstr ""
+msgstr "Welsh"
 
 #: src/text/iso-639_def.h:200
 msgid "Wolof"
-msgstr ""
+msgstr "Wolof"
 
 #: src/text/iso-639_def.h:201
 msgid "Xhosa"
-msgstr ""
+msgstr "Xhosa"
 
 #: src/text/iso-639_def.h:202
 msgid "Yiddish"
-msgstr ""
+msgstr "Yiddish"
 
 #: src/text/iso-639_def.h:203
 msgid "Yoruba"
-msgstr ""
+msgstr "Yoruba"
 
 #: src/text/iso-639_def.h:204
 msgid "Zhuang"
-msgstr ""
+msgstr "Zhuang"
 
 #: src/text/iso-639_def.h:205
 msgid "Zulu"
-msgstr ""
+msgstr "Zulu"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
@@ -5675,97 +5724,95 @@ msgstr ""
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
-msgstr ""
+msgstr "192000 Hz"
 
 #: modules/access/alsa.c:49
 msgid "176400 Hz"
-msgstr ""
+msgstr "176400 Hz"
 
 #: modules/access/alsa.c:50
 msgid "96000 Hz"
-msgstr ""
+msgstr "96000 Hz"
 
 #: modules/access/alsa.c:50
 msgid "88200 Hz"
-msgstr ""
+msgstr "96000 Hz"
 
 #: modules/access/alsa.c:50
 msgid "48000 Hz"
-msgstr ""
+msgstr "48000 Hz"
 
 #: modules/access/alsa.c:50
 msgid "44100 Hz"
-msgstr ""
+msgstr "44100 Hz"
 
 #: modules/access/alsa.c:51
 msgid "32000 Hz"
-msgstr ""
+msgstr "32000 Hz"
 
 #: modules/access/alsa.c:51
 msgid "22050 Hz"
-msgstr ""
+msgstr "22050 Hz"
 
 #: modules/access/alsa.c:51
 msgid "24000 Hz"
-msgstr ""
+msgstr "24000 Hz"
 
 #: modules/access/alsa.c:51
 msgid "16000 Hz"
-msgstr ""
+msgstr "16000 Hz"
 
 #: modules/access/alsa.c:52
 msgid "11025 Hz"
-msgstr ""
+msgstr "11025 Hz"
 
 #: modules/access/alsa.c:52
 msgid "8000 Hz"
-msgstr ""
+msgstr "8000 Hz"
 
 #: modules/access/alsa.c:52
 msgid "4000 Hz"
-msgstr ""
+msgstr "4000 Hz"
 
 #: modules/access/alsa.c:56
 msgid "ALSA"
-msgstr ""
+msgstr "ALSA"
 
 #: modules/access/alsa.c:57
 msgid "ALSA audio capture"
-msgstr ""
+msgstr "ALSA ஆடியோ பிடிப்பு"
 
 #: modules/access/attachment.c:44
 msgid "Attachment"
-msgstr ""
+msgstr "இணைப்பு"
 
 #: modules/access/attachment.c:45
 msgid "Attachment input"
-msgstr ""
+msgstr "இணைப்பு உள்ளீடு"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
-msgstr ""
+msgstr "AVIO"
 
 #: modules/access/avio.h:34
 msgid "libavformat AVIO access"
 msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "வெளிப்போத்தை உபயோகி"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
-msgstr ""
+msgstr "ப்ளூ-ரே மெனுக்கள்"
 
 #: modules/access/bluray.c:69
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr ""
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "நிகழ்பட கோடக்கள்"
+msgstr "பகுதி குறியீடு"
 
 #: modules/access/bluray.c:72
 msgid ""
@@ -5776,11 +5823,11 @@ msgstr ""
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
 msgid "Blu-ray"
-msgstr ""
+msgstr "ப்ளூ-ரே"
 
 #: modules/access/bluray.c:93
 msgid "Blu-ray Disc support (libbluray)"
-msgstr ""
+msgstr "ப்ளூ-ரே டிஸ்க் ஆதரவு (libbluray)"
 
 #: modules/access/bluray.c:715
 msgid "Path doesn't appear to be a Blu-ray"
@@ -5794,7 +5841,7 @@ msgstr ""
 
 #: modules/access/bluray.c:736
 msgid "Blu-ray Disc is corrupted."
-msgstr ""
+msgstr "ப்ளூ-ரே டிஸ்க் சிதைந்துள்ளது."
 
 #: modules/access/bluray.c:738
 msgid "Missing AACS configuration file!"
@@ -5814,7 +5861,7 @@ msgstr ""
 
 #: modules/access/bluray.c:746
 msgid "AACS MMC failed."
-msgstr ""
+msgstr "AACS MMC தோல்வி"
 
 #: modules/access/bluray.c:756
 msgid ""
@@ -5827,8 +5874,9 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 
 #: modules/access/bluray.c:792
+#, fuzzy
 msgid "Java required"
-msgstr ""
+msgstr "SDP தேவை"
 
 #: modules/access/bluray.c:793
 #, c-format
@@ -5848,14 +5896,13 @@ msgstr ""
 #: modules/access/bluray.c:845 modules/access/bluray.c:2279
 #: modules/access/bluray.c:2284
 msgid "Blu-ray error"
-msgstr ""
+msgstr "ப்ளூ-ரே பிழை"
 
 #: modules/access/bluray.c:1667
 msgid "Top Menu"
 msgstr ""
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
 msgstr "முதல்ல ஓடியது"
 
@@ -5867,11 +5914,11 @@ msgstr "ஒலிதம் வட்டு - சுவடு %02i"
 #: modules/access/cdda.c:720 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:300
 msgid "Audio CD"
-msgstr "ஒலித வட்டு"
+msgstr "ஒலி வட்டு"
 
 #: modules/access/cdda.c:721
 msgid "Audio CD input"
-msgstr "ஒலித வட்டு உள்ளீடு"
+msgstr "ஒலி வட்டு உள்ளீடு"
 
 #: modules/access/cdda.c:730
 msgid "[cdda:][device][@[track]]"
@@ -5913,21 +5960,19 @@ msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
-msgstr ""
+msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "SDP"
+msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "மிகையான முகப்பு மாடுல்"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -5951,7 +5996,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:55 modules/video_output/decklink.cpp:96
 msgid "Audio connection"
-msgstr ""
+msgstr "ஒலி இணைப்பு"
 
 #: modules/access/decklink.cpp:57
 msgid ""
@@ -5982,7 +6027,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:71 modules/video_output/decklink.cpp:111
 msgid "Video connection"
-msgstr ""
+msgstr "நிகழ்படம் இணைப்பு"
 
 #: modules/access/decklink.cpp:73
 msgid ""
@@ -5992,56 +6037,56 @@ msgstr ""
 
 #: modules/access/decklink.cpp:82 modules/access/linsys/linsys_sdi.c:94
 msgid "SDI"
-msgstr ""
+msgstr "SDI"
 
 #: modules/access/decklink.cpp:82
 msgid "HDMI"
-msgstr ""
+msgstr "HDMI"
 
 #: modules/access/decklink.cpp:82
 msgid "Optical SDI"
-msgstr ""
+msgstr "ஆப்டிகல் SDI"
 
 #: modules/access/decklink.cpp:82
 msgid "Component"
-msgstr ""
+msgstr "உபகரண"
 
 #: modules/access/decklink.cpp:82
 msgid "Composite"
-msgstr ""
+msgstr "கலப்புருப் பொருள்"
 
 #: modules/access/decklink.cpp:82
 #, fuzzy
 msgid "S-Video"
-msgstr "நிகழ்படம்"
+msgstr "எஸ்-வீடியோ"
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
-msgstr ""
+msgstr "பதிக்கப்பட்ட"
 
 #: modules/access/decklink.cpp:89
 msgid "AES/EBU"
-msgstr ""
+msgstr "AES/EBU"
 
 #: modules/access/decklink.cpp:89
 msgid "Analog"
-msgstr ""
+msgstr "அனலாக்"
 
 #: modules/access/decklink.cpp:94 modules/demux/rawvid.c:60
 msgid "Aspect ratio (4:3, 16:9). Default assumes square pixels."
-msgstr ""
+msgstr "விகிதம் (4: 3, 16: 9). இயல்புநிலை சதுர பிக்சல்கள் கருதுகிறது."
 
 #: modules/access/decklink.cpp:97
 msgid "DeckLink"
-msgstr ""
+msgstr "DeckLink"
 
 #: modules/access/decklink.cpp:98
 msgid "Blackmagic DeckLink SDI input"
-msgstr ""
+msgstr "Blackmagic DeckLink SDI உள்ளீடு"
 
 #: modules/access/decklink.cpp:118 modules/video_output/decklink.cpp:115
 msgid "10 bits"
-msgstr ""
+msgstr "10 பிட்கள்"
 
 #: modules/access/decklink.cpp:353 modules/demux/ty.c:769
 msgid "Closed captions 1"
@@ -6145,7 +6190,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
-msgstr ""
+msgstr "ட்யூனர் பண்புகள்"
 
 #: modules/access/dshow/dshow.cpp:161
 msgid "Show the tuner properties [channel selection] page."
@@ -6161,7 +6206,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:166
 msgid "Tuner Frequency"
-msgstr ""
+msgstr "ட்யூனர்  அலைவரிசை"
 
 #: modules/access/dshow/dshow.cpp:167
 msgid "This overrides the channel. Measured in Hz."
@@ -6171,11 +6216,11 @@ msgstr ""
 #: modules/gui/qt/components/open_panels.cpp:845
 #: modules/gui/qt/components/open_panels.cpp:1066
 msgid "Video standard"
-msgstr ""
+msgstr "வீடியோ தரம்"
 
 #: modules/access/dshow/dshow.cpp:169
 msgid "Tuner country code"
-msgstr ""
+msgstr "ட்யூனர் நாட்டின் குறியீடு"
 
 #: modules/access/dshow/dshow.cpp:171
 msgid ""
@@ -6185,7 +6230,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:173
 msgid "Tuner input type"
-msgstr ""
+msgstr "ட்யூனர் உள்ளீடு வகை"
 
 #: modules/access/dshow/dshow.cpp:175
 msgid "Select the tuner input type (Cable/Antenna)."
@@ -6246,7 +6291,7 @@ msgstr ""
 #: modules/stream_out/transcode/transcode.c:94
 #: share/lua/http/dialogs/create_stream.html:281
 msgid "Audio sample rate"
-msgstr ""
+msgstr "ஆடியோ மாதிரி விகிதம்"
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
@@ -6294,7 +6339,7 @@ msgstr ""
 #: modules/access/dsm/access.c:61
 #, fuzzy
 msgid "Windows networks"
-msgstr "சாரள உடமைகள்"
+msgstr "சாளர அலங்காரம்"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6306,12 +6351,13 @@ msgid "libdsm SMB input"
 msgstr "SMB உள்ளீடு"
 
 #: modules/access/dsm/access.c:80
+#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "சேவைகள் கண்டுபிடிப்பு தொகுதிகள்"
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
-msgstr ""
+msgstr "டிவிபி அடாப்டர்"
 
 #: modules/access/dtv/access.c:38
 msgid ""
@@ -6321,7 +6367,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:41
 msgid "DVB device"
-msgstr ""
+msgstr "டிவிபி சாதனம்"
 
 #: modules/access/dtv/access.c:43
 msgid ""
@@ -6341,7 +6387,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:50
 msgid "Network name"
-msgstr ""
+msgstr "பிணைய பெயர்"
 
 #: modules/access/dtv/access.c:51
 msgid "Unique network name in the System Tuning Spaces"
@@ -6357,7 +6403,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:56
 msgid "Frequency (Hz)"
-msgstr ""
+msgstr "அலைவரிசை (Hz)"
 
 #: modules/access/dtv/access.c:58
 msgid ""
@@ -6446,7 +6492,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:124
 msgid "10 MHz"
-msgstr ""
+msgstr "10 MHz"
 
 #: modules/access/dtv/access.c:124
 msgid "8 MHz"
@@ -6462,11 +6508,11 @@ msgstr "6 MHz"
 
 #: modules/access/dtv/access.c:125
 msgid "5 MHz"
-msgstr ""
+msgstr "5 MHz"
 
 #: modules/access/dtv/access.c:125
 msgid "1.712 MHz"
-msgstr ""
+msgstr "1.712 MHz"
 
 #: modules/access/dtv/access.c:128
 msgid "Guard interval"
@@ -6505,9 +6551,8 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "ஓடை சல்லடைகள்"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -6523,11 +6568,11 @@ msgstr ""
 
 #: modules/access/dtv/access.c:163
 msgid "0.20"
-msgstr ""
+msgstr "0.20"
 
 #: modules/access/dtv/access.c:163
 msgid "0.25"
-msgstr ""
+msgstr "0.25"
 
 #: modules/access/dtv/access.c:166
 msgid "Transport stream ID"
@@ -6689,7 +6734,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:242
 msgid "DTV"
-msgstr ""
+msgstr "DTV"
 
 #: modules/access/dtv/access.c:243
 msgid "Digital Television and Radio"
@@ -6772,9 +6817,8 @@ msgid "DVDnav Input"
 msgstr ""
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "AVI demuxer"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -6817,7 +6861,7 @@ msgstr ""
 
 #: modules/access/fs.c:34
 msgid "File input"
-msgstr ""
+msgstr "கோப்பு உள்ளீடு"
 
 #: modules/access/fs.c:35 modules/access_output/file.c:389
 #: modules/audio_output/file.c:113
@@ -6833,11 +6877,12 @@ msgstr "கோப்பு"
 
 #: modules/access/fs.c:44 modules/gui/qt/ui/sprefs_video.h:339
 msgid "Directory"
-msgstr ""
+msgstr "கோப்பகம்"
 
 #: modules/access/fs.c:53
+#, fuzzy
 msgid "List special files"
-msgstr ""
+msgstr "சிறப்பு தொகுதிகள்"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -6890,7 +6935,7 @@ msgstr ""
 #: modules/access/ftp.c:78
 #, fuzzy
 msgid "FTP authentication"
-msgstr "HTTP உறுதிப்படுத்துதல்"
+msgstr "SFTP உறுதிப்படுத்துதல்"
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7034,7 +7079,7 @@ msgstr ""
 
 #: modules/access/imem.c:53 modules/demux/image.c:48
 msgid "Group"
-msgstr ""
+msgstr "குழு"
 
 #: modules/access/imem.c:55 modules/demux/image.c:50
 msgid "Set the group of the elementary stream"
@@ -7042,7 +7087,7 @@ msgstr ""
 
 #: modules/access/imem.c:57
 msgid "Category"
-msgstr ""
+msgstr "வகை"
 
 #: modules/access/imem.c:59
 msgid "Set the category of the elementary stream"
@@ -7050,11 +7095,11 @@ msgstr ""
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
 msgid "Unknown"
-msgstr ""
+msgstr "தெரியாத"
 
 #: modules/access/imem.c:64
 msgid "Data"
-msgstr ""
+msgstr "தரவு"
 
 #: modules/access/imem.c:69
 msgid "Set the codec of the elementary stream"
@@ -7151,7 +7196,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:244
 #: modules/gui/qt/components/extended_panels.cpp:1289
 msgid "Size"
-msgstr ""
+msgstr "அளவு"
 
 #: modules/access/imem.c:115
 msgid "Size of stream in bytes"
@@ -7172,7 +7217,7 @@ msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
-msgstr ""
+msgstr "பேஸ்"
 
 #: modules/access/jack.c:61
 msgid "Read the audio stream at VLC pace rather than Jack pace."
@@ -7197,7 +7242,7 @@ msgstr "JACK உள்ளீடு"
 #: modules/access/linsys/linsys_hdsdi.c:72
 #: modules/access/linsys/linsys_sdi.c:68
 msgid "Link #"
-msgstr ""
+msgstr "இணைப்பு #"
 
 #: modules/access/linsys/linsys_hdsdi.c:74
 #: modules/access/linsys/linsys_sdi.c:70
@@ -7209,7 +7254,7 @@ msgstr ""
 #: modules/access/linsys/linsys_hdsdi.c:75
 #: modules/access/linsys/linsys_sdi.c:71
 msgid "Video ID"
-msgstr ""
+msgstr "நிகழ்படம் ID"
 
 #: modules/access/linsys/linsys_hdsdi.c:77
 #: modules/access/linsys/linsys_sdi.c:73
@@ -7233,15 +7278,15 @@ msgstr ""
 
 #: modules/access/linsys/linsys_hdsdi.c:89
 msgid "HD-SDI Input"
-msgstr ""
+msgstr "HD-SDI உள்ளீடு"
 
 #: modules/access/linsys/linsys_hdsdi.c:90
 msgid "HD-SDI"
-msgstr ""
+msgstr "HD-SDI"
 
 #: modules/access/linsys/linsys_sdi.c:80
 msgid "Teletext configuration"
-msgstr ""
+msgstr "Teletext அமைப்புகள்"
 
 #: modules/access/linsys/linsys_sdi.c:82
 msgid ""
@@ -7250,7 +7295,7 @@ msgstr ""
 
 #: modules/access/linsys/linsys_sdi.c:83
 msgid "Teletext language"
-msgstr ""
+msgstr "Teletext மொழி"
 
 #: modules/access/linsys/linsys_sdi.c:85
 msgid "Allows you to set Teletext language (page=lang/type,...)."
@@ -7258,11 +7303,11 @@ msgstr ""
 
 #: modules/access/linsys/linsys_sdi.c:93
 msgid "SDI Input"
-msgstr ""
+msgstr "SDI உள்ளீடு"
 
 #: modules/access/linsys/linsys_sdi.c:114
 msgid "SDI Demux"
-msgstr ""
+msgstr "SDI Demux"
 
 #: modules/access/live555.cpp:73
 msgid "Kasenna RTSP dialect"
@@ -7337,7 +7382,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:125
 msgid "HTTP tunnel port"
-msgstr ""
+msgstr "HTTP tunnel முணையம்"
 
 #: modules/access/live555.cpp:126
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
@@ -7353,7 +7398,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:665
 msgid "RTSP connection failed"
-msgstr ""
+msgstr "RTSP ணைப்பு தோல்வி"
 
 #: modules/access/live555.cpp:666
 msgid "Access to the stream is denied by the server configuration."
@@ -7404,9 +7449,9 @@ msgid "File reading failed"
 msgstr "கோப்பு வாசிப்பு தோல்வி"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC யால் கோப்புகளை வாசிக்க முடியவில்லை"
+msgstr ""
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7431,7 +7476,7 @@ msgstr "உள்ளீடு இல்லை"
 #: modules/access/nfs.c:114
 #, fuzzy
 msgid "NFS operation failed"
-msgstr "இணைப்பு தோல்வி"
+msgstr "RTSP ணைப்பு தோல்வி"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7480,7 +7525,7 @@ msgstr ""
 
 #: modules/access_output/file.c:377
 msgid "If the file already exists, it will be overwritten."
-msgstr ""
+msgstr "கோப்பு ஏற்கனவே உள்ளது என்றால், அது மறைந்து விடும்."
 
 #: modules/access_output/file.c:378
 msgid "Append to file"
@@ -7608,7 +7653,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:94
 msgid "AES key file"
-msgstr ""
+msgstr "AES key கோப்பு"
 
 #: modules/access_output/livehttp.c:95
 msgid "File containing the 16 bytes encryption key"
@@ -7647,7 +7692,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
-msgstr ""
+msgstr "LiveHTTP"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:380
@@ -7783,7 +7828,7 @@ msgstr ""
 
 #: modules/access/rdp.c:85
 msgid "RDP"
-msgstr ""
+msgstr "RDP"
 
 #: modules/access/rdp.c:89
 msgid "RDP Remote Desktop"
@@ -7875,7 +7920,7 @@ msgstr ""
 
 #: modules/access/rtp/rtp.c:770
 msgid "SDP required"
-msgstr ""
+msgstr "SDP தேவை"
 
 #: modules/access/rtp/rtp.c:771
 #, c-format
@@ -7997,7 +8042,7 @@ msgstr ""
 
 #: modules/access/screen/screen.c:80
 msgid "Display ID"
-msgstr ""
+msgstr "காட்சி ID"
 
 #: modules/access/screen/screen.c:82
 msgid "Display ID. If not specified, main display ID is used."
@@ -8072,7 +8117,7 @@ msgstr "SFTP  உள்ளீடு"
 
 #: modules/access/sftp.c:394
 msgid "SFTP authentication"
-msgstr ""
+msgstr "SFTP உறுதிப்படுத்துதல்"
 
 #: modules/access/sftp.c:395
 #, c-format
@@ -8127,23 +8172,23 @@ msgstr ""
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "8 bits"
-msgstr ""
+msgstr "8 பிட்கள்"
 
 #: modules/access/shm.c:76
 msgid "15 bits"
-msgstr ""
+msgstr "15 பிட்கள்"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "16 bits"
-msgstr ""
+msgstr "16 பிட்கள்"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "24 bits"
-msgstr ""
+msgstr "24 பிட்கள்"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "32 bits"
-msgstr ""
+msgstr "32 பிட்கள்"
 
 #: modules/access/shm.c:83
 msgid "Framebuffer input"
@@ -8213,7 +8258,7 @@ msgstr "UDP உள்ளீடு"
 
 #: modules/access/v4l2/controls.c:770
 msgid "Reset defaults"
-msgstr ""
+msgstr "இயல்புநிலைக்கு மீட்டமை"
 
 #: modules/access/v4l2/v4l2.c:44
 msgid "Video capture device"
@@ -8287,7 +8332,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
-msgstr ""
+msgstr "ஆடியோ பயன்முறை"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
@@ -8295,11 +8340,11 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
-msgstr ""
+msgstr "மீட்டமை கட்டுப்பாடுகள்"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
-msgstr ""
+msgstr "இயல்புநிலைக்கு கட்டுப்பாடுகள் மீட்டமை."
 
 #: modules/access/v4l2/v4l2.c:84
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:192
@@ -8313,11 +8358,11 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
-msgstr ""
+msgstr "தானியங்கி பிரகாசம்"
 
 #: modules/access/v4l2/v4l2.c:88
 msgid "Automatically adjust the picture brightness."
-msgstr ""
+msgstr "தானாகவே படப்பிரகாசம் சரிசெய்."
 
 #: modules/access/v4l2/v4l2.c:89
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:191
@@ -8345,23 +8390,23 @@ msgstr ""
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:190
 #: modules/gui/qt/ui/video_effects.h:1216
 msgid "Hue"
-msgstr "Hue"
+msgstr "சாயல்"
 
 #: modules/access/v4l2/v4l2.c:94
 msgid "Hue or color balance."
-msgstr ""
+msgstr "சாயல் அல்லது வண்ண சமநிலை."
 
 #: modules/access/v4l2/v4l2.c:95
 msgid "Automatic hue"
-msgstr ""
+msgstr "தானியங்கி சாயல்"
 
 #: modules/access/v4l2/v4l2.c:97
 msgid "Automatically adjust the picture hue."
-msgstr ""
+msgstr "தானாகவே படத்தை சாயல் சரி."
 
 #: modules/access/v4l2/v4l2.c:98
 msgid "White balance temperature (K)"
-msgstr ""
+msgstr "வெள்ளை சமநிலை வெப்பநிலை (கே)"
 
 #: modules/access/v4l2/v4l2.c:100
 msgid ""
@@ -8371,27 +8416,27 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:102
 msgid "Automatic white balance"
-msgstr ""
+msgstr "தானியங்கி வெள்ளை சமநிலை"
 
 #: modules/access/v4l2/v4l2.c:104
 msgid "Automatically adjust the picture white balance."
-msgstr ""
+msgstr "தானாகவே படத்தை வெள்ளை சமநிலை சரிசெய்."
 
 #: modules/access/v4l2/v4l2.c:105
 msgid "Red balance"
-msgstr ""
+msgstr "சிவப்பு சமநிலை"
 
 #: modules/access/v4l2/v4l2.c:107
 msgid "Red chroma balance."
-msgstr ""
+msgstr "சிவப்பு நிறமி சமநிலை."
 
 #: modules/access/v4l2/v4l2.c:108
 msgid "Blue balance"
-msgstr ""
+msgstr "நீலம் சமநிலை"
 
 #: modules/access/v4l2/v4l2.c:110
 msgid "Blue chroma balance."
-msgstr ""
+msgstr "நீலம் நிறமி சமநிலை."
 
 #: modules/access/v4l2/v4l2.c:111
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:195
@@ -8405,7 +8450,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
-msgstr ""
+msgstr "தானியங்கி ஈட்டம்"
 
 #: modules/access/v4l2/v4l2.c:116
 msgid "Automatically set the video gain."
@@ -8413,7 +8458,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:117 modules/audio_filter/gain.c:62
 msgid "Gain"
-msgstr ""
+msgstr "ஈட்டம்"
 
 #: modules/access/v4l2/v4l2.c:119
 msgid "Picture gain."
@@ -8453,12 +8498,12 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:137
 msgid "50 Hz"
-msgstr ""
+msgstr "50 Hz"
 
 #: modules/access/v4l2/v4l2.c:137
 #: modules/gui/qt/components/extended_panels.cpp:1079
 msgid "60 Hz"
-msgstr ""
+msgstr "60 Hz"
 
 #: modules/access/v4l2/v4l2.c:139
 msgid "Backlight compensation"
@@ -8516,7 +8561,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:164
 msgid "Black & white"
-msgstr ""
+msgstr "கருப்பு மற்றும் வெள்ளை"
 
 #: modules/access/v4l2/v4l2.c:164
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:242
@@ -8555,7 +8600,7 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:169 modules/audio_output/auhal.c:42
 #: modules/audio_output/directsound.c:69 modules/audio_output/waveout.c:145
 msgid "Audio volume"
-msgstr ""
+msgstr "ஒலிச்சத்தம்"
 
 #: modules/access/v4l2/v4l2.c:171
 msgid "Volume of the audio input."
@@ -8563,7 +8608,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:172
 msgid "Audio balance"
-msgstr ""
+msgstr "ஒலி சமநிலை"
 
 #: modules/access/v4l2/v4l2.c:174
 msgid "Balance of the audio input."
@@ -8649,31 +8694,31 @@ msgstr "Mono"
 
 #: modules/access/v4l2/v4l2.c:269
 msgid "Primary language"
-msgstr ""
+msgstr "முதன்மை மொழி"
 
 #: modules/access/v4l2/v4l2.c:270
 msgid "Secondary language or program"
-msgstr ""
+msgstr "இரண்டாம் நிலை மொழி அல்லது நிரல்"
 
 #: modules/access/v4l2/v4l2.c:271 modules/codec/twolame.c:70
 msgid "Dual mono"
-msgstr ""
+msgstr "இரட்டை மோனோ"
 
 #: modules/access/v4l2/v4l2.c:275
 msgid "V4L"
-msgstr ""
+msgstr "V4L"
 
 #: modules/access/v4l2/v4l2.c:276
 msgid "Video4Linux input"
-msgstr ""
+msgstr "Video4Linux  உள்ளீடு"
 
 #: modules/access/v4l2/v4l2.c:280
 msgid "Video input"
-msgstr ""
+msgstr "நிகழ்படம் உள்ளீடு"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr ""
+msgstr "ட்யூனர் "
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
@@ -8721,21 +8766,21 @@ msgstr ""
 
 #: modules/access/vdr.c:84
 msgid "VDR"
-msgstr ""
+msgstr "VDR"
 
 #: modules/access/vdr.c:87
 msgid "VDR recordings"
 msgstr ""
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC யால் கோப்புகளை வாசிக்க முடியவில்லை"
+msgstr ""
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC யால் திறக்க முடியவில்லை %s module"
+msgstr ""
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -8743,7 +8788,7 @@ msgstr ""
 
 #: modules/access/vdr.c:886
 msgid "Start"
-msgstr ""
+msgstr "தொடக்கம் "
 
 #: modules/access/vnc.c:48
 msgid "X.509 Certificate Authority"
@@ -8799,7 +8844,7 @@ msgstr ""
 
 #: modules/access/vnc.c:78
 msgid "VNC"
-msgstr ""
+msgstr "VNC"
 
 #: modules/access/vnc.c:82
 msgid "VNC client access"
@@ -8979,12 +9024,12 @@ msgstr ""
 #: modules/audio_filter/channel_mixer/mono.c:90
 #: modules/audio_filter/channel_mixer/remap.c:62
 msgid "Rear left"
-msgstr ""
+msgstr "மேலே இடது"
 
 #: modules/audio_filter/channel_mixer/mono.c:90
 #: modules/audio_filter/channel_mixer/remap.c:62
 msgid "Rear right"
-msgstr ""
+msgstr "மேலே வலது"
 
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:63
@@ -9131,16 +9176,18 @@ msgid "Attack time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:159
+#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr ""
+msgstr "இயல்புநிலை TCP இணைப்பு காலாவதியானது (மில்லி விநாடிகளில்)."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:162
+#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr ""
+msgstr "இயல்புநிலை TCP இணைப்பு காலாவதியானது (மில்லி விநாடிகளில்)."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9154,7 +9201,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:237
 #: modules/gui/qt/components/extended_panels.cpp:1271
 msgid "Ratio"
-msgstr ""
+msgstr "விகிதம்"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
@@ -9182,7 +9229,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:280
 #: modules/gui/qt/dialogs/extended.cpp:71
 msgid "Compressor"
-msgstr ""
+msgstr "அமுக்கி"
 
 #: modules/audio_filter/compressor.c:178
 msgid "Dynamic range compressor"
@@ -9254,7 +9301,7 @@ msgstr "சரிசமமாக்குதல்"
 
 #: modules/audio_filter/equalizer_presets.h:54
 msgid "Flat"
-msgstr ""
+msgstr "பிளாட்"
 
 #: modules/audio_filter/equalizer_presets.h:54
 #: modules/meta_engine/ID3Genres.h:65
@@ -9317,7 +9364,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:57
 msgid "Soft"
-msgstr ""
+msgstr "மென்மையான"
 
 #: modules/audio_filter/equalizer_presets.h:57
 msgid "Soft rock"
@@ -9672,23 +9719,23 @@ msgstr ""
 
 #: modules/audio_output/alsa.c:76
 msgid "Surround 4.0"
-msgstr ""
+msgstr "சரவுண்ட் 4.0"
 
 #: modules/audio_output/alsa.c:76
 msgid "Surround 4.1"
-msgstr ""
+msgstr "சரவுண்ட் 4.1"
 
 #: modules/audio_output/alsa.c:77
 msgid "Surround 5.0"
-msgstr ""
+msgstr "சரவுண்ட் 5.0"
 
 #: modules/audio_output/alsa.c:77
 msgid "Surround 5.1"
-msgstr ""
+msgstr "சரவுண்ட் 5.1"
 
 #: modules/audio_output/alsa.c:77
 msgid "Surround 7.1"
-msgstr ""
+msgstr "சரவுண்ட் 7.1"
 
 #: modules/audio_output/alsa.c:82
 msgid "ALSA audio output"
@@ -9851,8 +9898,9 @@ msgid "K Audio Interface audio output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "ஒலித வெளிப்போத்து கோப்பு"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -9980,7 +10028,7 @@ msgstr ""
 #: modules/codec/arib/aribsub.c:53
 #, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "துணை உரை கோப்பு"
+msgstr "வசனங்கள் கோடக்கள்"
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1084
 #: modules/demux/mpeg/ts_psi.c:1091
@@ -10006,7 +10054,7 @@ msgstr "rd"
 
 #: modules/codec/avcodec/avcodec.c:59
 msgid "bits"
-msgstr ""
+msgstr " பிட்கள்"
 
 #: modules/codec/avcodec/avcodec.c:59
 msgid "simple"
@@ -10413,27 +10461,24 @@ msgstr ""
 
 #: modules/codec/avcodec/encoder.c:872
 msgid "unknown"
-msgstr ""
+msgstr "தெரியாத"
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
 msgstr "நிகழ்படம்"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
 msgstr "ஒலி"
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "துணை புகைப்படங்கள்"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "VLC யால் திறக்க முடியவில்லை %s module"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
 msgid "VA-API video decoder via DRM"
@@ -10461,7 +10506,7 @@ msgstr ""
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
-msgstr ""
+msgstr "CC 608/708"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
@@ -10490,9 +10535,8 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "QT முகப்பு"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
@@ -10504,13 +10548,14 @@ msgid "Daala video decoder"
 msgstr "ஒலித சாதனம்"
 
 #: modules/codec/daala.c:125
+#, fuzzy
 msgid "Daala video packetizer"
-msgstr ""
+msgstr "பொட்டணம்"
 
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "நிகழ்பட கோடக்கள்"
+msgstr "ஒலித சாதனம்"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -10669,27 +10714,27 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
-msgstr ""
+msgstr "AAC-LC"
 
 #: modules/codec/fdkaac.c:97
 msgid "HE-AAC"
-msgstr ""
+msgstr "HE-AAC"
 
 #: modules/codec/fdkaac.c:97
 msgid "HE-AAC-v2"
-msgstr ""
+msgstr "HE-AAC-v2"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LD"
-msgstr ""
+msgstr "AAC-LD"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-ELD"
-msgstr ""
+msgstr "AAC-ELD"
 
 #: modules/codec/fdkaac.c:100
 msgid "FDKAAC"
-msgstr ""
+msgstr "FDKAAC"
 
 #: modules/codec/fdkaac.c:101
 msgid "FDK-AAC Audio encoder"
@@ -11100,18 +11145,16 @@ msgid "Opus"
 msgstr ""
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "ஒலித கோடக்கள்"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr ""
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "நிகழ்பட கோடக்கள்"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11315,7 +11358,7 @@ msgstr ""
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "நிகழ்பட கோடக்கள்"
+msgstr "ஒலித சாதனம்"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -11689,8 +11732,9 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr ""
 
 #: modules/codec/scte18.c:41
+#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "குறிவிலக்கி"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -11833,7 +11877,7 @@ msgstr ""
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:100
 msgid "Default (Windows-1252)"
-msgstr ""
+msgstr "இயல்புநிலை  (Windows-1252)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
@@ -12062,14 +12106,12 @@ msgid "USF subtitles decoder"
 msgstr ""
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "துணை உரை கோப்பு"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB துணை உரை"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -12146,12 +12188,12 @@ msgstr ""
 #: modules/codec/ttml/ttml.c:45
 #, fuzzy
 msgid "TTML decoder"
-msgstr "ஒலித சாதனம்"
+msgstr "குறிவிலக்கி"
 
 #: modules/codec/ttml/ttml.c:46
 #, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "துணை உரை கோப்பு"
+msgstr "வசனங்கள் கோடக்கள்"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
@@ -12205,8 +12247,9 @@ msgid "Ulead DV audio decoder"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:73
+#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr ""
+msgstr "விருப்பமான குறிவிலக்கிகளுக்கு பட்டியல்"
 
 #: modules/codec/videotoolbox.m:74 modules/gui/qt/ui/sprefs_video.h:335
 msgid "Deinterlacing"
@@ -12271,9 +12314,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "ஒலித சாதனம்"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
@@ -12993,7 +13035,7 @@ msgstr ""
 #: modules/codec/x264.c:421
 #, fuzzy
 msgid "x264 advanced options"
-msgstr "மேம்பட்ட அமைப்புகள்"
+msgstr "மேம்பட்ட கோப்புகளை காட்டு"
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2} ."
@@ -13369,7 +13411,7 @@ msgstr ""
 #: modules/control/hotkeys.c:1355
 #, fuzzy, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "துணை உரை சுவடு: %s"
+msgstr "வசன சுவடு"
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -13432,7 +13474,7 @@ msgstr ""
 #: modules/control/netsync.c:61
 #, fuzzy
 msgid "Master server IP address"
-msgstr "VNC புரவலர்பெயர் அல்லது இணையமுகவரி"
+msgstr "HTTP சேவையகம் முகவரி"
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -13988,9 +14030,8 @@ msgid "Avformat"
 msgstr ""
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "AVI demuxer"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14085,9 +14126,8 @@ msgid "Fixing AVI Index..."
 msgstr "சரிசெய்ய AVI உள்ளடக்கம் "
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "AVI demuxer"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -14473,9 +14513,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "Sout ஓடை"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
 msgid "Use the stream PCR as a reference."
@@ -14501,8 +14540,9 @@ msgid "Main audio"
 msgstr "ஒலி"
 
 #: modules/demux/mpeg/ts_psi.c:422
+#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "இந்த கோடெக் இல்லை விளக்கம்"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Clean audio for the hearing impaired"
@@ -14976,22 +15016,19 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "Podcast பார்ஸர்"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "பணிவிடைகளின் கண்டுபிடிப்பு"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
-#, fuzzy
 msgid "Interfaces"
-msgstr "இடைமுகப்பு"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15016,16 +15053,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "நிகழ்பட நிர்வாகி"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "நிறுவுதல்"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15040,9 +15075,8 @@ msgid "Author"
 msgstr "நூலாசிரியர்"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
-#, fuzzy
 msgid "Uninstall"
-msgstr "நிறுவுதல்"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -15368,9 +15402,8 @@ msgid "Setup Streaming..."
 msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "ஓடை வழிமுறை"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -15461,7 +15494,7 @@ msgstr "முகவரி"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:187
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:189
 #: modules/gui/macosx/VLCOpenWindowController.m:185
@@ -15614,7 +15647,7 @@ msgstr "ஒலிச்சத்தம்"
 #: modules/gui/macosx/VLCFSPanelController.m:128
 #, fuzzy
 msgid "Adjust the volume"
-msgstr "உருவ சரியாக்கல்"
+msgstr "ஒலிச்சத்தம்"
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -15830,9 +15863,8 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "கட்டுப்பாடு இடைமுகப்புகள்"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -16073,9 +16105,8 @@ msgstr "பின்னோக்கிய அடி"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "நேரம் க்கு தாவு"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -16161,9 +16192,8 @@ msgid "Window"
 msgstr "சாரளம்"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "சாரள சிறிதாக்கு"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -16302,9 +16332,8 @@ msgid "Enable Metadata Retrieval"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "நன்றிகள்"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -16350,7 +16379,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: share/lua/http/index.html:239
 msgid "Shuffle"
-msgstr ""
+msgstr "கலக்கு"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
@@ -16368,25 +16397,24 @@ msgid "Open Audio Effects window"
 msgstr "ஒலித விளைவு"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "dB"
+msgstr "B"
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: modules/gui/macosx/misc.m:315
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: modules/gui/macosx/misc.m:323
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: modules/gui/macosx/misc.m:328
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -16668,18 +16696,18 @@ msgid "URI"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "இரட்டிப்பு அளவு"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
 msgid "Expand All"
-msgstr "மீண்டும் செய்(All)"
+msgstr "விரிவாக்கு"
 
 #: modules/gui/macosx/VLCPlaylist.m:233
+#, fuzzy
 msgid "Collapse All"
-msgstr ""
+msgstr "சுருக்கு"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -16794,9 +16822,8 @@ msgstr "&தேர்வு"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "பின்னனி‎ தோல்வி"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -16805,15 +16832,13 @@ msgid "Continue"
 msgstr "தொடர்ந்து"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "பின்னனி‎ தோல்வி"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "பின்னனி‎ தோல்வி"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -16841,8 +16866,9 @@ msgid "Renderer discovery on"
 msgstr "பணிவிடைகளின் கண்டுபிடிப்பு"
 
 #: modules/gui/macosx/VLCRendererMenuController.m:135
+#, fuzzy
 msgid "Disable renderer discovery"
-msgstr ""
+msgstr "முடக்கு  மறைதிரை ஓவியங்கள்"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
@@ -16923,7 +16949,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/qt/ui/sprefs_input.h:355
 msgid "Record directory or filename"
-msgstr ""
+msgstr "பதி டைரக்டரி அல்லது கோப்புப்பெயர்"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Directory or filename where the records will be stored"
@@ -16986,9 +17012,8 @@ msgid "Bright"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "பின்னனி‎ தோல்வி"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -17084,7 +17109,7 @@ msgstr "முழுத்திரை"
 #: modules/gui/macosx/VLCSimplePrefsController.m:354
 #, fuzzy
 msgid "Start in fullscreen"
-msgstr "விலக்கு முழுத்திரை "
+msgstr "முழுத்திரை பயன்முறையில் வீடியோ தொடங்கவும்"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Black screens in Fullscreen mode"
@@ -17141,9 +17166,8 @@ msgid "Higher Latency"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Highest Latency"
-msgstr "உயரமானது"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -18052,73 +18076,73 @@ msgstr "dB"
 
 #: modules/gui/qt/components/extended_panels.cpp:1080
 msgid "170 Hz"
-msgstr ""
+msgstr "170 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1081
 msgid "310 Hz"
-msgstr ""
+msgstr "310 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1082
 msgid "600 Hz"
-msgstr ""
+msgstr "600 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1083
 #: modules/gui/qt/components/extended_panels.cpp:1097
 msgid "1 KHz"
-msgstr ""
+msgstr "1 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1084
 msgid "3 KHz"
-msgstr ""
+msgstr "3 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1085
 msgid "6 KHz"
-msgstr ""
+msgstr "6 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1086
 msgid "12 KHz"
-msgstr ""
+msgstr "12 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1087
 msgid "14 KHz"
-msgstr ""
+msgstr "14 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1088
 #: modules/gui/qt/components/extended_panels.cpp:1101
 msgid "16 KHz"
-msgstr ""
+msgstr "16 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1092
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1093
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1094
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1095
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1096
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1098
 msgid "2 KHz"
-msgstr ""
+msgstr "2 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1099
 msgid "4 KHz"
-msgstr ""
+msgstr "4 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1100
 msgid "8 KHz"
-msgstr ""
+msgstr "8 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1268
 #: modules/gui/qt/components/extended_panels.cpp:1269
@@ -18138,8 +18162,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1326
+#, fuzzy
 msgid "Adjust pitch"
-msgstr ""
+msgstr "VLC முன்னுரிமை ஒழுங்குபடுத்தவும்"
 
 #: modules/gui/qt/components/extended_panels.cpp:1360
 msgid "(Hastened)"
@@ -18462,14 +18487,12 @@ msgid "Enter name for new folder:"
 msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "உருவாக்கு கோப்பகத்தை..."
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "உறையை உருவாக்கு..."
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
@@ -18876,9 +18899,8 @@ msgid "&Start"
 msgstr "&தொடக்கம் "
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "தொடர்ந்து"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -18897,8 +18919,9 @@ msgid "Adjustments and Effects"
 msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:80
+#, fuzzy
 msgid "Stereo Widener"
-msgstr ""
+msgstr "ஸ்டீரியோ ஒலி முறையில்"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19125,9 +19148,8 @@ msgid "Plugins and extensions"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "AAC நீடிப்பு"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -19194,23 +19216,20 @@ msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "பதிப்பு"
+msgstr "பதிப்பு  %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
-#, fuzzy
 msgid "&Uninstall"
-msgstr "நிறுவுதல்"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "நிறுவுதல்"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -19362,9 +19381,8 @@ msgid "Flat Button"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "அடுத்த தலைப்பு"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -19399,9 +19417,8 @@ msgid "Time Toolbar"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "மேம்பட்ட"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -19420,9 +19437,8 @@ msgid "Select profile:"
 msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "முந்தைய"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19549,13 +19565,12 @@ msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:378
-#, fuzzy
 msgid "&Continue"
-msgstr "தொடர்ந்து"
+msgstr "தொடர்"
 
 #: modules/gui/qt/main_interface.cpp:1368
 msgid "Control menu for the player"
-msgstr ""
+msgstr "பிலேயருக்கான கட்டுப்பாடு பட்டி"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Paused"
@@ -19579,12 +19594,12 @@ msgstr "&நிகழ்படம்"
 
 #: modules/gui/qt/menus.cpp:338 modules/gui/qt/menus.cpp:1055
 msgid "Subti&tle"
-msgstr ""
+msgstr "துணைத்தலைப்பு"
 
 #: modules/gui/qt/menus.cpp:340 modules/gui/qt/menus.cpp:1071
 #, fuzzy
 msgid "Tool&s"
-msgstr "கருவி"
+msgstr "கருவிகள்"
 
 #: modules/gui/qt/menus.cpp:343 modules/gui/qt/menus.cpp:1078
 msgid "V&iew"
@@ -19596,11 +19611,11 @@ msgstr "&உதவி"
 
 #: modules/gui/qt/menus.cpp:358
 msgid "Open &File..."
-msgstr ""
+msgstr "கோப்பைத் திற"
 
 #: modules/gui/qt/menus.cpp:360
 msgid "&Open Multiple Files..."
-msgstr ""
+msgstr "பல கோப்புகளைத் திற..."
 
 #: modules/gui/qt/menus.cpp:364 modules/gui/qt/menus.cpp:931
 msgid "Open &Disc..."
@@ -19616,7 +19631,7 @@ msgstr "திற & கைப்பற்று கைப்பற்று..."
 
 #: modules/gui/qt/menus.cpp:371
 msgid "Open &Location from clipboard"
-msgstr ""
+msgstr "ஒட்டுப்பலகையிலிருந்து இடத்தைத் திற"
 
 #: modules/gui/qt/menus.cpp:376
 msgid "Open &Recent Media"
@@ -19644,7 +19659,7 @@ msgstr "&வெளியேறு"
 
 #: modules/gui/qt/menus.cpp:414
 msgid "&Effects and Filters"
-msgstr ""
+msgstr "விளைவுகளும் வடிகட்டிகளும்"
 
 #: modules/gui/qt/menus.cpp:417
 msgid "&Track Synchronization"
@@ -19656,11 +19671,11 @@ msgstr "நிகழ்ச்சி வழிகாட்டி"
 
 #: modules/gui/qt/menus.cpp:436
 msgid "Plu&gins and extensions"
-msgstr ""
+msgstr "செருகுநிரல்களும் நீட்சிகளும்"
 
 #: modules/gui/qt/menus.cpp:441
 msgid "Customi&ze Interface..."
-msgstr ""
+msgstr "முகப்பைத் தனிப்பயனாக்கு"
 
 #: modules/gui/qt/menus.cpp:444
 msgid "&Preferences"
@@ -19684,7 +19699,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Mi&nimal Interface"
-msgstr ""
+msgstr "எளிய இடைமுகப்பு"
 
 #: modules/gui/qt/menus.cpp:502
 msgid "Ctrl+H"
@@ -19700,7 +19715,7 @@ msgstr "&மேம்பட்ட அமைப்புகள்"
 
 #: modules/gui/qt/menus.cpp:525
 msgid "Status Bar"
-msgstr ""
+msgstr "நிலைப்பட்டை"
 
 #: modules/gui/qt/menus.cpp:530
 msgid "Visualizations selector"
@@ -19708,7 +19723,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:588
 msgid "&Increase Volume"
-msgstr ""
+msgstr "சத்தத்தை அதிகரி"
 
 #: modules/gui/qt/menus.cpp:591
 #, fuzzy
@@ -19717,7 +19732,7 @@ msgstr "ஒலிச்சத்ததை இறக்கு"
 
 #: modules/gui/qt/menus.cpp:594
 msgid "&Mute"
-msgstr ""
+msgstr "அமைதியாக்கு"
 
 #: modules/gui/qt/menus.cpp:610
 msgid "Audio &Device"
@@ -19737,7 +19752,7 @@ msgstr "&பார்வைக்கள்"
 
 #: modules/gui/qt/menus.cpp:645
 msgid "Add &Subtitle File..."
-msgstr ""
+msgstr "துணைத்தலைப்பு கோப்பைச் சேர்..."
 
 #: modules/gui/qt/menus.cpp:647
 msgid "Sub &Track"
@@ -19753,15 +19768,15 @@ msgstr "&முழுத்திரை"
 
 #: modules/gui/qt/menus.cpp:680
 msgid "Always Fit &Window"
-msgstr ""
+msgstr "எப்போதும் சாளரத்தைப் பொருத்து"
 
 #: modules/gui/qt/menus.cpp:681
 msgid "Always &on Top"
-msgstr ""
+msgstr "எப்போதும் மேலே"
 
 #: modules/gui/qt/menus.cpp:682
 msgid "Set as Wall&paper"
-msgstr ""
+msgstr "சுவர்க்காகிதமாக அமை"
 
 #: modules/gui/qt/menus.cpp:686
 msgid "&Zoom"
@@ -19801,7 +19816,7 @@ msgstr "&நிகழ்ச்சி"
 
 #: modules/gui/qt/menus.cpp:723
 msgid "&Manage"
-msgstr ""
+msgstr "நிர்வகி"
 
 #: modules/gui/qt/menus.cpp:782
 msgid "Check for &Updates..."
@@ -19821,7 +19836,7 @@ msgstr "அடு&த்த"
 
 #: modules/gui/qt/menus.cpp:861
 msgid "Sp&eed"
-msgstr ""
+msgstr "வேகம்"
 
 #: modules/gui/qt/menus.cpp:867
 msgid "&Faster"
@@ -19845,7 +19860,7 @@ msgstr "பின்னோக்கிய தாவு"
 
 #: modules/gui/qt/menus.cpp:918
 msgid "Ctrl+T"
-msgstr ""
+msgstr "Ctrl+T"
 
 #: modules/gui/qt/menus.cpp:933
 msgid "Open &Network..."
@@ -19861,15 +19876,15 @@ msgstr "&பின்னனி"
 
 #: modules/gui/qt/menus.cpp:1166
 msgid "&Hide VLC media player in taskbar"
-msgstr ""
+msgstr "VLC ஊடக ஓட்டியைப் பணிப்பட்டையில் மறை"
 
 #: modules/gui/qt/menus.cpp:1172
 msgid "Sho&w VLC media player"
-msgstr ""
+msgstr "VLC ஊடக ஓட்டியைக் காட்டு"
 
 #: modules/gui/qt/menus.cpp:1183
 msgid "&Open Media"
-msgstr ""
+msgstr "ஊடகத்தைத் திற"
 
 #: modules/gui/qt/menus.cpp:1623
 msgid "&Clear"
@@ -20061,7 +20076,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:172
 msgid "Ignore keyboard volume buttons."
-msgstr ""
+msgstr "விசைப்பலகை சத்த பொத்தான்களைத் தவிர்"
 
 #: modules/gui/qt/qt.cpp:174
 msgid ""
@@ -20074,7 +20089,7 @@ msgstr ""
 #: modules/gui/qt/qt.cpp:189
 #, fuzzy
 msgid "When to raise the interface"
-msgstr "முதன்மை இடைமுகப்புக்கான அமைப்புகள்"
+msgstr "முதன்மை இடைமுகப்புக்கான அமைவுகள்"
 
 #: modules/gui/qt/qt.cpp:190
 msgid ""
@@ -20100,15 +20115,15 @@ msgstr "QT முகப்பு"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
-msgstr ""
+msgstr "பிழைகள்"
 
 #: modules/gui/qt/util/customwidgets.cpp:82
 msgid "warnings"
-msgstr ""
+msgstr "எச்சரிக்கைகள்"
 
 #: modules/gui/qt/util/customwidgets.cpp:83
 msgid "debug"
-msgstr ""
+msgstr "வழுநீக்கு"
 
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
@@ -20145,7 +20160,7 @@ msgstr "தோல்களை உபயோகி"
 
 #: modules/gui/skins2/src/skin_main.cpp:485
 msgid "Path to the skin to use."
-msgstr ""
+msgstr "பயன்படுத்தவுள்ள தோலுக்கான பாதை."
 
 #: modules/gui/skins2/src/skin_main.cpp:486
 msgid "Config of last used skin"
@@ -20247,7 +20262,7 @@ msgstr ""
 #: modules/hw/mmal/vout.c:63
 #, fuzzy
 msgid "Force interlaced video mode."
-msgstr "சுழல் ஒலித வெளிப்போத்து"
+msgstr "காரம் முறையில்"
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -20264,14 +20279,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "அழி நிகழ்பட சல்லடை"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "ஒலித சாதனம்"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
 msgid "Temporal-spatial"
@@ -20290,9 +20303,8 @@ msgid "Deinterlacing algorithm"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "வரிசைப்படுத்தவும் "
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
 msgid "Deinterlace chroma skip"
@@ -20319,14 +20331,12 @@ msgid "VDPAU deinterlacing filter"
 msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "YUV வெளிப்போத்து"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "நீலதிரை நிகழ்பட சல்லடை"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -20350,7 +20360,7 @@ msgstr ""
 #: modules/keystore/keychain.m:46
 #, fuzzy
 msgid "System default"
-msgstr "அமைப்பு Id"
+msgstr "இயல்புநிலைக்கு மீட்டமை"
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
@@ -20476,7 +20486,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
-msgstr ""
+msgstr "Lua"
 
 #: modules/lua/vlc.c:86
 msgid "Lua interpreter"
@@ -20488,7 +20498,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:107
 msgid "Lua CLI"
-msgstr ""
+msgstr "Lua CLI"
 
 #: modules/lua/vlc.c:111
 msgid "Command-line interface"
@@ -21249,8 +21259,9 @@ msgid "Playing some media."
 msgstr ""
 
 #: modules/misc/inhibit/dbus.c:232
+#, fuzzy
 msgid "D-Bus screensaver"
-msgstr ""
+msgstr "முடக்கு  மறைதிரை ஓவியங்கள்"
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -21429,9 +21440,8 @@ msgid "Subject"
 msgstr ""
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "குறியீடு ஆக்கு by"
+msgstr ""
 
 #: modules/mux/avi.c:57
 msgid "Keywords"
@@ -21507,7 +21517,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:107
 msgid "SPU PID"
-msgstr ""
+msgstr "SPU PID"
 
 #: modules/mux/mpeg/ts.c:108
 msgid "Assign a fixed PID to the SPU."
@@ -21515,7 +21525,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:109
 msgid "PMT PID"
-msgstr ""
+msgstr "PMT PID"
 
 #: modules/mux/mpeg/ts.c:110
 msgid "Assign a fixed PID to the PMT"
@@ -21523,7 +21533,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:111
 msgid "TS ID"
-msgstr ""
+msgstr "TS ID"
 
 #: modules/mux/mpeg/ts.c:112
 msgid "Assign a fixed Transport Stream ID."
@@ -21531,7 +21541,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:113
 msgid "NET ID"
-msgstr ""
+msgstr "NET ID"
 
 #: modules/mux/mpeg/ts.c:114
 msgid "Assign a fixed Network ID (for SDT table)"
@@ -21685,9 +21695,8 @@ msgid "Multipart JPEG muxer"
 msgstr ""
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "QT முகப்பு"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21695,9 +21704,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "வை தோற்றவிகிதம்"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -21748,9 +21756,8 @@ msgid "A/52 audio packetizer"
 msgstr ""
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "தகவல் பெட்டகங்கள்"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -21829,9 +21836,8 @@ msgid "Bonjour Network Discovery"
 msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "பணிவிடைகளின் கண்டுபிடிப்பு"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -22741,8 +22747,9 @@ msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
+#, fuzzy
 msgid "Block stream cache"
-msgstr ""
+msgstr "மூல கோப்பகம்"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
@@ -22766,9 +22773,8 @@ msgid "HTTP Dynamic Streaming"
 msgstr "ஓடை"
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "நிகழ்பட வெட்டுகள்"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
 #, fuzzy
@@ -23754,7 +23760,7 @@ msgstr ""
 #: modules/text_renderer/freetype/freetype.c:151
 #, fuzzy
 msgid "Left to right"
-msgstr "இடது முன் பக்கம்"
+msgstr "மேலே வலது"
 
 #: modules/text_renderer/freetype/freetype.c:151
 #, fuzzy
@@ -24327,14 +24333,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr ""
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "வெட்டு"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "நிகழ்பட வெட்டுகள்"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -24412,7 +24416,7 @@ msgstr ""
 #: modules/video_filter/edgedetection.c:39
 #, fuzzy
 msgid "Edge detection video filter"
-msgstr "நகலி நிகழ்பட சல்லடை"
+msgstr "சின்னம் நிகழ்பட சல்லடை"
 
 #: modules/video_filter/edgedetection.c:40
 #, fuzzy
@@ -24470,9 +24474,8 @@ msgid "FPS Converter"
 msgstr "செயல்லாக்கு"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "சுழல் ஒலித வெளிப்போத்து"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -24693,9 +24696,8 @@ msgid "Motion detect video filter"
 msgstr ""
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "நகலி நிகழ்பட சல்லடை"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -24727,7 +24729,7 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
-msgstr ""
+msgstr "RGB32"
 
 #: modules/video_filter/opencv_wrapper.c:65
 msgid "Don't display any video"
@@ -24906,7 +24908,7 @@ msgstr ""
 
 #: modules/video_filter/puzzle.c:71
 msgid "Rotation"
-msgstr ""
+msgstr "சுழற்சி"
 
 #: modules/video_filter/puzzle.c:72
 msgid "Rotation parameter: none;180;90-270;mirror"
@@ -24930,15 +24932,15 @@ msgstr ""
 
 #: modules/video_filter/puzzle.c:77
 msgid "0"
-msgstr ""
+msgstr "0"
 
 #: modules/video_filter/puzzle.c:77
 msgid "0/180"
-msgstr ""
+msgstr "0/180"
 
 #: modules/video_filter/puzzle.c:77
 msgid "0/90/180/270"
-msgstr ""
+msgstr "0/90/180/270"
 
 #: modules/video_filter/puzzle.c:77
 msgid "0/90/180/270/mirror"
@@ -25116,9 +25118,8 @@ msgid "Rotate or flip the video"
 msgstr ""
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "நகலி நிகழ்பட சல்லடை"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
@@ -25346,36 +25347,35 @@ msgstr ""
 
 #: modules/video_output/kva.c:62
 msgid "SNAP"
-msgstr ""
+msgstr "SNAP"
 
 #: modules/video_output/kva.c:62
 msgid "WarpOverlay!"
-msgstr ""
+msgstr "WarpOverlay!"
 
 #: modules/video_output/kva.c:62
 msgid "VMAN"
-msgstr ""
+msgstr "VMAN"
 
 #: modules/video_output/kva.c:62
 msgid "DIVE"
-msgstr ""
+msgstr "DIVE"
 
 #: modules/video_output/kva.c:72
 msgid "K Video Acceleration video output"
 msgstr ""
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "OpenGL நிகழ்பட வெளிப்போத்து"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
-msgstr ""
+msgstr "ஓப்பன் GL நீட்சி"
 
 #: modules/video_output/opengl/display.c:41
 msgid "OpenGL ES 2 extension"
-msgstr ""
+msgstr "ஓப்பன்GL ES 2 நீட்சி"
 
 #: modules/video_output/opengl/display.c:43
 msgid "Extension through which to use the Open Graphics Library (OpenGL)."
@@ -25383,7 +25383,7 @@ msgstr ""
 
 #: modules/video_output/opengl/display.c:49
 msgid "OpenGL ES2"
-msgstr ""
+msgstr "ஓப்பன்GL ES2"
 
 #: modules/video_output/opengl/display.c:50
 msgid "OpenGL for Embedded Systems 2 video output"
@@ -25391,7 +25391,7 @@ msgstr ""
 
 #: modules/video_output/opengl/display.c:61
 msgid "OpenGL"
-msgstr ""
+msgstr "ஓப்பன் GL"
 
 #: modules/video_output/opengl/display.c:62
 msgid "OpenGL video output"
@@ -25436,9 +25436,8 @@ msgid "Path to an HLSL file containing a single pixel shader."
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "சேமி  கோப்பு"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -25471,7 +25470,7 @@ msgstr ""
 
 #: modules/video_output/win32/directdraw.c:70
 msgid "Overlay video output"
-msgstr ""
+msgstr "மேலடுக்கு வீடியோ வெளியீடு"
 
 #: modules/video_output/win32/directdraw.c:72
 msgid ""
@@ -25610,7 +25609,7 @@ msgstr ""
 #: modules/video_output/wayland/shm.c:509
 #, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "முழுத்திரை நிகழ்படம் வெளிப்போத்து "
+msgstr "சாம்பல்நிலை வீடியோ வெளியீடு"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -26115,9 +26114,8 @@ msgid "The height of the effects video window, in pixels."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "Xசாரளம்"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
@@ -26240,12 +26238,12 @@ msgstr ""
 #: share/lua/http/dialogs/browse_window.html:41
 #: share/lua/http/mobile_browse.html:48
 msgid "Play List"
-msgstr ""
+msgstr "தொகுப்புபட்டியல்"
 
 #: share/lua/http/dialogs/create_stream.html:156
 #: modules/gui/qt/ui/sprefs_audio.h:430 modules/gui/qt/ui/sprefs_video.h:328
 msgid "Output"
-msgstr ""
+msgstr "வெளியீடு"
 
 #: share/lua/http/dialogs/create_stream.html:193
 msgid "Subtitle codec"
@@ -26286,7 +26284,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Error:"
-msgstr ""
+msgstr "பிழை:"
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Sample ui-state-error style."
@@ -26294,7 +26292,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:390
 msgid "File name"
-msgstr ""
+msgstr "கோப்பு பெயர்"
 
 #: share/lua/http/dialogs/equalizer_window.html:49
 #: share/lua/http/mobile_equalizer.html:62
@@ -26331,7 +26329,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/stream_window.html:65
 msgid "Time:"
-msgstr ""
+msgstr "நேரம்:"
 
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
@@ -26360,7 +26358,7 @@ msgstr ""
 
 #: share/lua/http/index.html:240 modules/gui/qt/ui/vlm.h:298
 msgid "Loop"
-msgstr ""
+msgstr "திருப்பியனுப்புதல் சுற்று"
 
 #: share/lua/http/index.html:242
 msgid "Empty Playlist"
@@ -26434,7 +26432,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/about.h:289 modules/gui/qt/ui/about.h:290
 msgid "Update"
-msgstr ""
+msgstr "புதுப்பி"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
@@ -26451,19 +26449,19 @@ msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:137
 msgid "0.00 dB"
-msgstr ""
+msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Verbosity:"
-msgstr ""
+msgstr "வெர்போஸ்"
 
 #: modules/gui/qt/ui/messages_panel.h:140
 msgid "&Filter:"
-msgstr ""
+msgstr "&நிகழ்பட சல்லடை"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
-msgstr "&சேமி as"
+msgstr "& இவ்வாறு சேமி ..."
 
 #: modules/gui/qt/ui/messages_panel.h:143
 msgid "Modules Tree"
@@ -26487,7 +26485,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
-msgstr ""
+msgstr "MRL"
 
 #: modules/gui/qt/ui/open.h:272
 msgid "Start Time"
@@ -26560,7 +26558,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:301
 msgid "SVCD/VCD"
-msgstr ""
+msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
 msgid "Disable Disc Menus"
@@ -26628,7 +26626,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
-msgstr ""
+msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "M&KV"
@@ -26640,7 +26638,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
-msgstr ""
+msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "F&LV"
@@ -26652,15 +26650,15 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
-msgstr ""
+msgstr "RAW"
 
 #: modules/gui/qt/ui/profiles.h:711
 msgid "WAV"
-msgstr ""
+msgstr "WAV"
 
 #: modules/gui/qt/ui/profiles.h:712
 msgid "Webm"
-msgstr ""
+msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
 msgid "MPEG &1"
@@ -26668,11 +26666,11 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
-msgstr ""
+msgstr "AVI"
 
 #: modules/gui/qt/ui/profiles.h:715
 msgid "ASF/WMV"
-msgstr ""
+msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:716
 msgid "MP&3"
@@ -26704,16 +26702,15 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
-msgstr ""
+msgstr " fps"
 
 #: modules/gui/qt/ui/profiles.h:734
 msgid "Custom options"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "தரம்"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -26721,7 +26718,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
-msgstr ""
+msgstr "kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
 msgid "Encoding parameters"
@@ -26729,21 +26726,19 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
 msgid "Frame size"
-msgstr ""
+msgstr "சட்டம் அளவு"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
-msgstr ""
+msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "மாதிரி அளவு"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "கோப்பு பெயர்"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -26805,7 +26800,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:428
 msgid " %"
-msgstr ""
+msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:431
 msgid "Output module:"
@@ -26813,7 +26808,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:434
 msgid "Use S/PDIF when available"
-msgstr ""
+msgstr "கிடைக்கும் போது S/PDIF உபயோகிக்க"
 
 #: modules/gui/qt/ui/sprefs_audio.h:435
 msgid "Effects"
@@ -26853,11 +26848,11 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:444
 msgid "Password:"
-msgstr ""
+msgstr "கடவுச்சொல்:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:445
 msgid "Username:"
-msgstr ""
+msgstr "பயனர்பெயர்:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:446
 msgid "Submit played tracks stats to Last.fm"
@@ -26974,7 +26969,7 @@ msgstr ""
 #: modules/gui/qt/ui/sprefs_interface.h:546
 #, fuzzy
 msgid "Auto raising the interface:"
-msgstr "முதன்மை இடைமுகப்புக்கான அமைப்புகள்"
+msgstr "முதன்மை இடைமுகப்புக்கான அமைவுகள்"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -26994,7 +26989,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:557
 msgid "Every "
-msgstr ""
+msgstr "ஒவ்வொரு"
 
 #: modules/gui/qt/ui/sprefs_interface.h:560
 msgid "Separate words by | (without space)"
@@ -27022,7 +27017,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Enable On Screen Display (OSD)"
-msgstr ""
+msgstr "திரை காட்சி இயலச்செய்"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
 msgid "Show media title on video start"
@@ -27030,15 +27025,15 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Enable subtitles"
-msgstr ""
+msgstr "துணைஉரைகளை இயலச்செய்"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
 msgid "Subtitle Language"
-msgstr ""
+msgstr "துணை உரை மொழி"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
-msgstr ""
+msgstr "முன்னிருப்பு குறியாக்கம்"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Subtitle effects"
@@ -27046,7 +27041,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
-msgstr ""
+msgstr "ஒரு நிழல் செருக"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:306
 #: modules/gui/qt/ui/video_effects.h:1230
@@ -27058,11 +27053,11 @@ msgstr ""
 #: modules/gui/qt/ui/video_effects.h:1284
 #: modules/gui/qt/ui/video_effects.h:1285
 msgid " px"
-msgstr ""
+msgstr "px"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:307
 msgid "Add a background"
-msgstr ""
+msgstr "ஒரு பின்னணி சேர்"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
 msgid "Accelerated video output (Overlay)"
@@ -27070,15 +27065,15 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "DirectX"
-msgstr ""
+msgstr "DirectX"
 
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Display device"
-msgstr ""
+msgstr "காட்சி சாதனம்"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "KVA"
-msgstr ""
+msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:337
 msgid "Force Aspect Ratio"
@@ -27138,24 +27133,24 @@ msgstr "துடை பட்டியல்"
 
 #: modules/gui/qt/ui/update.h:148
 msgid "Check for VLC updates"
-msgstr ""
+msgstr "VLC புதுப்பிக்க சோதனை"
 
 #: modules/gui/qt/ui/update.h:149
 msgid "Launching an update request..."
-msgstr ""
+msgstr "VLC புதுப்பிக்க சோதனை..."
 
 #: modules/gui/qt/ui/update.h:150
 msgid "Do you want to download it?"
-msgstr ""
+msgstr "இதை பதிவிறக்க விரும்புகிறீர்களா?"
 
 #: modules/gui/qt/ui/video_effects.h:1228
 msgid "Essential"
-msgstr ""
+msgstr "அத்தியாவசிய"
 
 #: modules/gui/qt/ui/video_effects.h:1242
 #: modules/gui/qt/ui/video_effects.h:1251
 msgid ">HHHHHH;#"
-msgstr ""
+msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
 msgid "Negate colors"
@@ -27163,7 +27158,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
-msgstr ""
+msgstr "நிறங்கள்"
 
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Interactive Zoom"
@@ -27176,7 +27171,7 @@ msgstr ""
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -27248,27 +27243,27 @@ msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
-msgstr ""
+msgstr "பெயர்:"
 
 #: modules/gui/qt/ui/vlm.h:290
 msgid "Input:"
-msgstr ""
+msgstr "உள்ளீடு:"
 
 #: modules/gui/qt/ui/vlm.h:291
 msgid "Select Input"
-msgstr ""
+msgstr "உள்ளீடு தேர்வு"
 
 #: modules/gui/qt/ui/vlm.h:292
 msgid "Output:"
-msgstr ""
+msgstr "வெளியீடு:"
 
 #: modules/gui/qt/ui/vlm.h:293
 msgid "Select Output"
-msgstr ""
+msgstr "வெளியீடு தேர்வு "
 
 #: modules/gui/qt/ui/vlm.h:294
 msgid "Time Control"
-msgstr ""
+msgstr "நேரம் கட்டுப்பாடு"
 
 #: modules/gui/qt/ui/vlm.h:295
 msgid "Mux Control"
@@ -27280,17 +27275,33 @@ msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
-msgstr ""
+msgstr "AAAA; "
 
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr ""
+
+#~ msgid "Display resolution"
+#~ msgstr "காட்சி பிரிதிறன்"
+
+#~ msgid "VLC can't recognize the input's format"
+#~ msgstr "VLC உள்ளீடு வடிவம் அங்கீகரிக்க முடியவில்லை"
+
+#~ msgid ""
+#~ "The format of '%s' cannot be detected. Have a look at the log for details."
+#~ msgstr "'%s' வடிவம் கண்டறிய இயலாது. விவரங்கள் பதிவு பாருங்கள்."
 
 #~ msgid "Navigation"
 #~ msgstr "ஓட்டு"
 
 #~ msgid "Be quiet"
 #~ msgstr "அமைதியாக இரு"
+
+#~ msgid "Turn off all warning and information messages."
+#~ msgstr "அனைத்து எச்சரிக்கை மற்றும் தகவல் செய்திகளை அணைக்க."
+
+#~ msgid "HTTP/TLS Certificate Authority"
+#~ msgstr "HTTP / TLS சான்றிதழ் அதிகாரம்"
 
 #~ msgid "%ld B"
 #~ msgstr "%ld B"
@@ -27304,6 +27315,15 @@ msgstr ""
 #~ msgstr ""
 #~ "%s\n"
 #~ "பதிவிறக்கம்... %s/%s %.1f%% முடிநதது"
+
+#~ msgid "Scale factor"
+#~ msgstr "அளவுமாற்றுக்காரணி"
+
+#~ msgid "BD"
+#~ msgstr "BD"
+
+#~ msgid "Blu-ray Disc Input"
+#~ msgstr "ப்ளூ-ரே டிஸ்க் உள்ளீடு"
 
 #~ msgid "Configure"
 #~ msgstr "அமைவடிவம்"
@@ -27329,15 +27349,14 @@ msgstr ""
 #~ msgid "RTSP password"
 #~ msgstr "RTSP கடவுச்சொல்"
 
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC யால் திறக்க முடியவில்லை %s module"
-
 #~ msgid "Quicktime Capture"
 #~ msgstr "Quicktime கைப்பற்று"
 
 #~ msgid "No Input device found"
 #~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
+
+#~ msgid "RDP Password"
+#~ msgstr "RDP கடவுச்சொல்"
 
 #~ msgid "SMB user name"
 #~ msgstr "SMB பயனர்பெயர்"
@@ -27365,6 +27384,9 @@ msgstr ""
 
 #~ msgid "Volume Set"
 #~ msgstr "ஒலிச்சத்ததை அமை"
+
+#~ msgid "System Id"
+#~ msgstr "அமைப்பு Id"
 
 #~ msgid "Entries"
 #~ msgstr "அனுமதித்தல்"
@@ -27405,23 +27427,20 @@ msgstr ""
 #~ msgid "Use playback control?"
 #~ msgstr "பயன்படுத்து பின்னனி‎ கட்டுப்பாடு? "
 
+#~ msgid "OpenSLES"
+#~ msgstr "OpenSLES"
+
 #~ msgid "A/52 parser"
 #~ msgstr "A/52 பார்ஸர்"
 
+#~ msgid "420YpCbCr8Planar"
+#~ msgstr "420YpCbCr8Planar"
+
+#~ msgid "422YpCbCr8"
+#~ msgstr "422YpCbCr8"
+
 #~ msgid "DTS parser"
 #~ msgstr "DTS பார்ஸர்"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  DVD Menu"
-
-#~ msgid "First Played"
-#~ msgstr "முதல்ல ஓடியது"
-
-#~ msgid "Video Manager"
-#~ msgstr "நிகழ்பட நிர்வாகி"
-
-#~ msgid "----- Title"
-#~ msgstr "---- தலைப்பு"
 
 #~ msgid "Thanks"
 #~ msgstr "நன்றிகள்"
@@ -27435,10 +27454,6 @@ msgstr ""
 #~ msgid "VLC media player Help"
 #~ msgstr "VLC ஊடகஇயக்கி உதவி"
 
-#, fuzzy
-#~ msgid "Hide Details"
-#~ msgstr "&கோடக் தகவல்"
-
 #~ msgid "Send"
 #~ msgstr "அனுப்பு"
 
@@ -27451,15 +27466,20 @@ msgstr ""
 #~ msgid "EyeTV is not launched"
 #~ msgstr "EyeTV is not launched"
 
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "எப்போதும் மேலே"
-
 #~ msgid "More Info"
 #~ msgstr "திட்ட விவரம்"
 
 #~ msgid "To"
 #~ msgstr "க்கு"
+
+#~ msgid "Streaming method"
+#~ msgstr "ஓடை வழிமுறை"
+
+#~ msgid "UDP Unicast"
+#~ msgstr "UDP ஒற்றைப்பரப்பல்"
+
+#~ msgid "UDP Multicast"
+#~ msgstr "UDP பல்பரப்பல்"
 
 #~ msgid "Summary"
 #~ msgstr "சுருக்கம்"
@@ -27479,9 +27499,11 @@ msgstr ""
 #~ msgid "yes: %@ @ %@ kb/s"
 #~ msgstr "ஆம்: %@ @ %@ kb/s"
 
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "சேமி தொகுப்பு பட்டியல்"
+#~ msgid "T&ools"
+#~ msgstr "கருவிகள்"
+
+#~ msgid "&Decrease Volume"
+#~ msgstr "சத்தத்தைக் குறை"
 
 #~ msgid "Page"
 #~ msgstr "பக்கம்"
@@ -27564,25 +27586,14 @@ msgstr ""
 #~ msgid "DMX options"
 #~ msgstr "DMX விருப்பம்"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "சாரளம்"
+#~ msgid "OpenGL ES extension"
+#~ msgstr "ஓப்பன் GL ES நீட்சி"
 
-#, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "நிகழ்பட கைப்பற்றுதல்"
+#~ msgid "OpenGL ES"
+#~ msgstr "ஓப்பன்GL ES"
 
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "ஒலித வெளிப்போத்து மாடுல்"
-
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
-
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
+#~ msgid "FLV"
+#~ msgstr "FLV"
 
 #, fuzzy
 #~ msgid ""
@@ -27591,70 +27602,14 @@ msgstr ""
 #~ msgstr "%.1f MHz (%d பணிவிடைகள்)"
 
 #, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "Quicktime கைப்பற்று"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "ஒலித வெளிப்போத்து கோப்பு"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "முக்கியவிசைகள் கட்டுப்பாடு முகப்பு"
-
-#, fuzzy
 #~ msgid "Empty"
 #~ msgstr "- காலி -"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "ஒலி அமைப்புகள்"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "துடைக்க"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "கோடநிலை ஓடை"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "பாலம் ஓடை வெளிப்போத்து "
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "VLC ஊடகஇயக்கி உதவி"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "ஓடை வெளிப்போத்து"
 
 #~ msgid "Modules search path"
 #~ msgstr "மாடுல்கள் தேடல் வழி"
 
-#, fuzzy
-#~ msgid "Coffee pot control"
-#~ msgstr "நீட்டிக்கப்பட்ட அமைப்புகள்"
-
 #~ msgid "RTMP"
 #~ msgstr "RTMP"
-
-#~ msgid "Audio volume (0-65535)."
-#~ msgstr "ஒலித ஒலிச்சத்தம் (0-65535)."
 
 #~ msgid "SECAM"
 #~ msgstr "SECAM"
@@ -27670,9 +27625,6 @@ msgstr ""
 
 #~ msgid "cbr"
 #~ msgstr "cbr"
-
-#~ msgid "PVR"
-#~ msgstr "PVR"
 
 #~ msgid "Use libv4l2"
 #~ msgstr "உபயோகி  libv4l2"
@@ -27706,9 +27658,6 @@ msgstr ""
 #~ msgid "Ignored extensions in the media library"
 #~ msgstr "AAC நீடிப்பு"
 
-#~ msgid "Sizes"
-#~ msgstr "அளவுகள்"
-
 #~ msgid "GOP size"
 #~ msgstr "GOP அளவு"
 
@@ -27725,10 +27674,6 @@ msgstr ""
 
 #~ msgid "dbus"
 #~ msgstr "dbus"
-
-#, fuzzy
-#~ msgid "Live Update"
-#~ msgstr "&புதுப்பி"
 
 #~ msgid ""
 #~ "One of \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be"
@@ -27849,6 +27794,9 @@ msgstr ""
 #~ msgid "VLC was brought to you by:"
 #~ msgstr "உங்களிடம் VLC வழங்கியது:"
 
+#~ msgid "Adjust Image"
+#~ msgstr "உருவ சரியாக்கல்"
+
 #~ msgid " Playlist (All, one level) "
 #~ msgstr "தொகுப்பு பட்டியல் (All, one level) "
 
@@ -27857,9 +27805,6 @@ msgstr ""
 
 #~ msgid " Playlist (Manually added) "
 #~ msgstr "தொகுப்பு பட்டியல்(Manually added) "
-
-#~ msgid "&Update"
-#~ msgstr "&புதுப்பி"
 
 #~ msgid "Sca&le"
 #~ msgstr "அளவு&கோல்"
@@ -27874,21 +27819,121 @@ msgstr ""
 #~ msgid "Manual download only"
 #~ msgstr "கையால் பதிவிறக்கம் மட்டும்"
 
-#~ msgid "Jump to time"
-#~ msgstr "நேரம் க்கு தாவு"
-
 #~ msgid "Don't Send"
 #~ msgstr "அனுப்பாதே"
 
-#~ msgid "Output module"
-#~ msgstr "வெளிப்போத்து மாடுல்"
+#, fuzzy
+#~ msgid "Don't repair"
+#~ msgstr "அனுப்பாதே"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "KVA"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "DVD வகைப்பட்டிகள்"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "முதல்ல ஓடியது"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "வீடியோ தரம்"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "தலைப்பு"
+
+#, fuzzy
+#~ msgid "PVR"
+#~ msgstr "VDR"
+
+#, fuzzy
+#~ msgid "AVFoundation Video Capture"
+#~ msgstr "நிகழ்பட கைப்பற்றுதல்"
+
+#, fuzzy
+#~ msgid "AVFoundation video capture module."
+#~ msgstr "ஒலித வெளிப்போத்து மாடுல்"
+
+#, fuzzy
+#~ msgid "No video devices found"
+#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
+
+#, fuzzy
+#~ msgid "DVB"
+#~ msgstr "DV"
+
+#, fuzzy
+#~ msgid "QuickTime Sound Capture"
+#~ msgstr "Quicktime கைப்பற்று"
+
+#, fuzzy
+#~ msgid "No Audio Input device found"
+#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
+
+#, fuzzy
+#~ msgid "No audio input device found"
+#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
+
+#, fuzzy
+#~ msgid "Windows messages interface"
+#~ msgstr "முக்கியவிசைகள் கட்டுப்பாடு முகப்பு"
+
+#, fuzzy
+#~ msgid "Audio Fingerprinting"
+#~ msgstr "ஒலி அமைப்புகள்"
+
+#, fuzzy
+#~ msgid "No fingerprint has been found"
+#~ msgstr "உள்ளீடு சாதனம் ஒன்றுமில்லை"
+
+#, fuzzy
+#~ msgctxt "Tooltip|Clear"
+#~ msgid "Clear"
+#~ msgstr "துடைக்க"
+
+#, fuzzy
+#~ msgid "Chromaprint stream output"
+#~ msgstr "பாலம் ஓடை வெளிப்போத்து "
+
+#, fuzzy
+#~ msgid "VLC media player - Flash Viewer"
+#~ msgstr "VLC ஊடகஇயக்கி உதவி"
+
+#, fuzzy
+#~ msgid "Streaming Output"
+#~ msgstr "ஓடை வெளிப்போத்து"
+
+#, fuzzy
+#~ msgid "Coffee pot control"
+#~ msgstr "மீட்டமை கட்டுப்பாடுகள்"
+
+#, fuzzy
+#~ msgid "Audio volume (0-65535)."
+#~ msgstr "ஒலிச்சத்தம்"
+
+#, fuzzy
+#~ msgid "Sizes"
+#~ msgstr "அளவு"
+
+#, fuzzy
+#~ msgid "Live Update"
+#~ msgstr "புதுப்பி"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "நேரம் க்கு செல்"
 
 #, fuzzy
 #~ msgid "Automatically retrieve media infos"
-#~ msgstr "தானாக புதுப்பிக்க சோதனை"
+#~ msgstr "தானாகவே preparse கோப்புகளை"
 
+#, fuzzy
 #~ msgid "&Help..."
-#~ msgstr "&உதவி..."
+#~ msgstr "&உதவி"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
@@ -27956,7 +28001,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "CPU"
-#~ msgstr "TCP"
+#~ msgstr "DCP"
 
 #, fuzzy
 #~ msgid "Aspect-ratio"
@@ -28020,7 +28065,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Commands"
-#~ msgstr "கருத்துரைகள்"
+#~ msgstr "கட்டளை+"
 
 #, fuzzy
 #~ msgid "Subscreen width:"
@@ -28037,6 +28082,10 @@ msgstr ""
 #, fuzzy
 #~ msgid "Image height:"
 #~ msgstr "உருவ உயரம்"
+
+#, fuzzy
+#~ msgid "Load subtitles file:"
+#~ msgstr "துணை உரை கோப்புகளை உபயோகி"
 
 #, fuzzy
 #~ msgid "HTML Playlist"
@@ -28191,10 +28240,6 @@ msgstr ""
 #~ msgstr " வெளிப்போத்து சேருமிடம்"
 
 #, fuzzy
-#~ msgid "Output File"
-#~ msgstr "வெளிப்போத்து கோப்பு"
-
-#, fuzzy
 #~ msgid "x offset"
 #~ msgstr "X ஈடுசெய்"
 
@@ -28216,19 +28261,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Group name"
-#~ msgstr "பிணைய பெயர்"
+#~ msgstr "குழு"
 
 #, fuzzy
 #~ msgid "Instances"
 #~ msgstr "நிறுவுதல்"
-
-#, fuzzy
-#~ msgid "Subtitles Language"
-#~ msgstr "துணை உரை மொழி"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "கறுப்பு "
 
 #, fuzzy
 #~ msgid "Low Pass Ffilter"
@@ -28272,7 +28309,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&Open a Media"
-#~ msgstr "ஊடகத்தை  திற"
+#~ msgstr "ஊடகத்தைத் திற"
 
 #, fuzzy
 #~ msgid "Display on &Desktop"
@@ -28300,7 +28337,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "நேரம்"
+#~ msgstr "ஊடக நேரம்"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
@@ -28324,7 +28361,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Stream Input Configuration"
-#~ msgstr "&VLM வடிவமைப்பு"
+#~ msgstr "Teletext அமைப்புகள்"
 
 #, fuzzy
 #~ msgid "Create New Stream"
@@ -28355,10 +28392,6 @@ msgstr ""
 #~ msgstr "அமைதி அளவை"
 
 #, fuzzy
-#~ msgid "Effect"
-#~ msgstr "ஒலித விளைவு"
-
-#, fuzzy
 #~ msgid "Zoom playlist"
 #~ msgstr "தொகுப்புபட்டியல்"
 
@@ -28369,10 +28402,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Telnet Interface"
 #~ msgstr "இடைமுகப்பு"
-
-#, fuzzy
-#~ msgid "Video output filter module"
-#~ msgstr "ஒலித வெளிப்போத்து மாடுல்"
 
 #, fuzzy
 #~ msgid "UDP port"
@@ -28404,7 +28433,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
-#~ msgstr "தெரியாத வகை"
+#~ msgstr "தெரியாத பிழை"
 
 #, fuzzy
 #~ msgid "UNIX OSS audio output"
@@ -28412,7 +28441,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Host address"
-#~ msgstr "புரவலர் முகவரி"
+#~ msgstr "HTTP சேவையகம் முகவரி"
 
 #, fuzzy
 #~ msgid "HTTP remote control interface"
@@ -28429,10 +28458,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "AVI Index"
 #~ msgstr "உள்ளடக்கம்"
-
-#, fuzzy
-#~ msgid "Don't repair"
-#~ msgstr "அனுப்பாதே"
 
 #, fuzzy
 #~ msgid "Audio Filter"

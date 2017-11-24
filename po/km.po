@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Sutha <sutha@open.org.kh>, 2014
 # khoemsokhem <sokhem@open.org.kh>, 2012-2013
-# soksophea <sksophea@gmail.com>, 2012-2014
+# Sok Sophea <sksophea@gmail.com>, 2012-2014
+# Seng Sutha <sutha@open.org.kh>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-11-23 10:11+0100\n"
-"PO-Revision-Date: 2014-04-02 04:57+0000\n"
-"Last-Translator: soksophea <sksophea@gmail.com>\n"
+"PO-Revision-Date: 2014-09-03 10:44+0000\n"
+"Last-Translator: Sok Sophea <sksophea@gmail.com>\n"
 "Language-Team: Khmer (http://www.transifex.com/projects/p/vlc-trans/language/"
 "km/)\n"
 "Language: km\n"
@@ -28,10 +28,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"កម្មវិធី​នេះ​បង្កើត​ឡើង​ដោយ​គ្មាន​ការ​ធានា​ចំពោះ​វិសាលភាព​ដែល​បាន​អនុញ្ញាត​ដោយ​ច្បាប់​ទេ។\n"
+"កម្មវិធី​នេះ​បង្កើត​ឡើង​ដោយ​គ្មាន​ការ​ធានា​ចំពោះ​វិសាលភាព​ដែល​បាន​អនុញ្ញាត​ដោយ​ច្បាប់​ឡើយ។\n"
 "អ្នក​អាច​ចែកចាយ​ឡើងវិញ​ក្រោម​លក្ខខណ្ឌ​អាជ្ញាប័ណ្ណ​សាធារណៈ​ទូទៅ GNU ។\n"
 "ចំពោះ​ព័ត៌មាន​លម្អិត ​សូម​មើល​ឯកសារ​​ឈ្មោះ COPYING ។\n"
-"បាន​បង្កើត​ដោយ​ក្រុម VideoLAN  ។ សូម​មើល​ឯកសារ​អ្នក​និពន្ធ ។\n"
+"សរសេរ​ដោយ​ក្រុម VideoLAN សូម​មើល​ឯកសារ​អ្នក​និពន្ធ ។\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -39,38 +39,38 @@ msgstr "ចំណូលចិត្ត VLC"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "ជ្រើស \"ជម្រើស​កម្រិត​ខ្ពស់\" ដើម្បី​មើល​ជម្រើស​ទាំងអស់ ។"
+msgstr "ជ្រើស \"ជម្រើស​កម្រិត​ខ្ពស់\" ដើម្បី​មើល​ជម្រើស​ទាំងអស់។"
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
 #: modules/gui/qt/components/simple_preferences.cpp:222
 #: modules/gui/qt/menus.cpp:1085
 msgid "Interface"
-msgstr "ចំណុច​ប្រទាក់"
+msgstr "ចំណុចប្រទាក់"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់ VLC"
+msgstr "ការ​កំណត់​ចំណុចប្រទាក់ VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​មេ"
+msgstr "ការ​កំណត់​ចំណុចប្រទាក់​មេ"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "ចំណុច​ប្រទាក់​មេ"
+msgstr "ចំណុចប្រទាក់​មេ"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​មេ"
+msgstr "ការ​កំណត់​ចំណុចប្រទាក់​មេ"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
-msgstr "​គ្រប់គ្រងចំណុច​ប្រទាក់"
+msgstr "ចំណុចប្រទាក់​វត្ថុ​បញ្ជា"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​គ្រប់គ្រង VLC"
+msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​វត្ថុ​បញ្ជា VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
@@ -107,7 +107,7 @@ msgstr "តម្រង"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "តម្រង​អូឌីយ៉ូ​ត្រូវ​បាន​ប្រើ​​ដើម្បី​ដំណើរការ​ស្ទ្រីម​អូឌីយ៉ូ ។"
+msgstr "តម្រង​អូឌីយ៉ូ​ត្រូវ​បាន​ប្រើ​​ដើម្បី​ដំណើរការ​ស្ទ្រីម​អូឌីយ៉ូ។"
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
@@ -116,12 +116,12 @@ msgstr "ឧបករណ៍​ធ្វើ​គំរូ​អូឌីយ៉ូ
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:258
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
 msgid "Visualizations"
-msgstr "រូបភាព​មើល​ឃើញ"
+msgstr "រូបភាព​មើលឃើញ"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:319
 #: src/libvlc-module.c:206
 msgid "Audio visualizations"
-msgstr "រូបភាព​មើល​ឃើញ​អូឌីយ៉ូ"
+msgstr "រូបភាព​មើលឃើញ​អូឌីយ៉ូ"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
@@ -129,7 +129,7 @@ msgstr "ម៉ូឌុល​បង្ហាញ"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​លទ្ធផល​អូឌីយ៉ូ ។"
+msgstr "ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​បង្ហាញ​អូឌីយ៉ូ។"
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2012
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:183
@@ -139,7 +139,7 @@ msgstr "ផ្សេងៗ"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "ម៉ូឌុល និង​ការ​កំណត់​អូឌីយ៉ូ​ផ្សេងៗ ។"
+msgstr "ការ​កំណត់​អូឌីយ៉ូ​ផ្សេងៗ និង​ម៉ូឌុល។"
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3065 src/input/es_out.c:3147
 #: src/libvlc-module.c:142 src/libvlc-module.c:1548 modules/access/imem.c:64
@@ -169,20 +169,20 @@ msgstr "ការ​កំណត់​វីដេអូ​ទូទៅ"
 #: include/vlc_config_cat.h:79
 #, fuzzy
 msgid "General settings for video output modules."
-msgstr "ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​លទ្ធផល​អូឌីយ៉ូ ។"
+msgstr "ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​បង្ហាញ​អូឌីយ៉ូ។"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "តម្រង​វីដេអូ​ត្រូវ​បាន​ប្រើ​ដើម្បី​ដំណើរការ​ស្ទ្រីម​វីដេអូ ។"
+msgstr "តម្រង​វីដេអូ​ត្រូវ​បាន​ប្រើ​ដើម្បី​ដំណើរការ​ស្ទ្រីម​វីដេអូ។"
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
-msgstr "ចំណងជើង​រង / OSD"
+msgstr "ចំណងជើង​រង/OSD"
 
 #: include/vlc_config_cat.h:85
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
-msgstr "ការ​កំណត់​ផ្សេងៗ​ដែល​ទាក់​ទង​នឹង​ការ​បង្ហាញ​លើ​អេក្រង់ ចំណង​ជើង​រង និង​ \"រូបភាព​រង​ត្រួត​លើ​គ្នា\" ។"
+msgstr "ការ​កំណត់​ផ្សេងៗ​ទាក់​ទង​នឹង​ការ​បង្ហាញ​លើ​អេក្រង់ ចំណងជើង​រង និង​ \"រូបភាព​រង​ត្រួត​គ្នា\""
 
 #: include/vlc_config_cat.h:88
 #, fuzzy
@@ -195,7 +195,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
-msgstr "ព័ត៌មាន​បញ្ចូល / កូឌិដ"
+msgstr "ព័ត៌មាន​បញ្ចូល/កូដិក"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
@@ -210,19 +210,19 @@ msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
-"ការ​កំណត់​ដែល​ទាក់ទង​នឹង​វិធីសាស្ត្រ​ចូល​ដំណើរការ​ផ្សេងៗ ។ ការ​កំណត់​ទូទៅ​ដែល​អ្នក​ចង់​ប្ដូរ គឺ​ប្រូកស៊ី HTTP ឬ​ការ​"
-"កំណត់​ឃ្លាំង​សម្ងាត់ ។"
+"ការ​កំណត់​ដែល​ទាក់ទង​នឹង​វិធីសាស្ត្រ​ចូល​ដំណើរការ។ ការ​កំណត់​ទូទៅ​ដែល​អ្នក​ចង់​ប្ដូរ គឺ​ប្រូកស៊ី HTTP ឬ​ការ​កំណត់​ឃ្លាំង​"
+"សម្ងាត់។"
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr "តម្រង​ចរន្ត"
+msgstr "តម្រង​ស្ទ្រីម"
 
 #: include/vlc_config_cat.h:109
 msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"តម្រង​ស្ទ្រីម​គឺជា​ម៉ូឌុល​ពិសេស​ដែល​អនុញ្ញាត​​ប្រតិបត្តិការ​កម្រិត​ខ្ពស់​នៅ​លើ​ផ្នែក​បញ្ចូល​របស់ VLC ។ ប្រើ​ដោយ​"
+"តម្រង​ស្ទ្រីម​គឺជា​ម៉ូឌុល​ពិសេស​ដែល​អនុញ្ញាត​ប្រតិបត្តិការ​កម្រិត​ខ្ពស់​នៅ​លើ​ផ្នែក​បញ្ចូល​របស់ VLC ។ ប្រើ​ដោយ​"
 "ប្រុងប្រយ័ត្ន..."
 
 #: include/vlc_config_cat.h:112
@@ -231,23 +231,23 @@ msgstr "កម្មវិធី​មិន​ទ្វេ​ទិស"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "កម្មវិធី​មិន​ទ្វេ​ទិស​ត្រូវ​បាន​ប្រើ​ដើម្បី​បំបែក​ស្ទ្រីម​អូឌីយ៉ូ និង​វីដេអូ ។"
+msgstr "កម្មវិធី​មិន​ទ្វេ​ទិស​ត្រូវ​បាន​ប្រើ​ដើម្បី​ញែក​ស្ទ្រីម​អូឌីយ៉ូ និង​វីដេអូ។"
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
-msgstr "កូឌិក​​វីដេអូ"
+msgstr "កូដិក​​វីដេអូ"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
-msgstr "ការ​កំណត់​សម្រាប់​វីដេអូ រូបភាព ឬ​ឌិកូឌ័រ និង​អ៊ិនកូឌ័រ​​វីដេអូ+អូឌីយ៉ូ ។"
+msgstr "ការ​កំណត់​សម្រាប់​វីដេអូ រូបភាព ឬ​ឌិកូឌ័រ និង​អ៊ិនកូឌ័រ​​វីដេអូ+អូឌីយ៉ូ។"
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
-msgstr "កូឌិដអូឌីយ៉ូ"
+msgstr "កូដិក​អូឌីយ៉ូ"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "ការ​កំណត់​សម្រាប់​អ៊ិនកូឌ័រ និង​ឌិកូឌ័រ​អូឌីយ៉ូ​តែ​ប៉ុណ្ណោះ ។"
+msgstr "ការ​កំណត់​សម្រាប់​អ៊ិនកូឌ័រ និង​ឌិកូឌ័រ​អូឌីយ៉ូ​តែ​ប៉ុណ្ណោះ។"
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -255,16 +255,16 @@ msgstr "កូដិក​ចំណងជើង​រង"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr "ការ​កំណត់​ចំណងជើង​រង, អត្ថបទ​ទូរទស្សន៍ និង​អ៊ិនកូឌ័រ ឌិកូឌ័រ CC ។"
+msgstr "ការ​កំណត់​សម្រាប់​ចំណងជើង​រង, អត្ថបទ​ទូរទស្សន៍ និង​អ៊ិនកូឌ័រ ឌិកូឌ័រ CC ។"
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "ការ​កំណត់​ព័រ៌មាន​បញ្ចូល​ទូទៅ ។ ប្រើ​ដោយ​ប្រុងប្រយ័ត្ន..."
+msgstr "ការ​កំណត់​ព័ត៌មាន​បញ្ចូល​ទូទៅ។ ប្រើ​ដោយ​ប្រុងប្រយ័ត្ន..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1947
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr "លទ្ធផល​ចរន្ត"
+msgstr "លទ្ធផល​ស្ទ្រីម"
 
 #: include/vlc_config_cat.h:129
 msgid ""
@@ -276,15 +276,14 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"ការ​កំណត់​លទ្ធផល​ស្ទ្រីម​ត្រូវ​បាន​ប្រើ​នៅ​ពេល​ដែល VLC ដើរតួ​ជា​ម៉ាស៊ីន​បម្រើ​ស្ទ្រីម ឬ​នៅ​ពេល​រក្សាទុក​ស្ទ្រីម​ព័ត៌មាន​"
-"បញ្ចូល ។\n"
+"ការ​កំណត់​លទ្ធផល​ស្ទ្រីម​ត្រូវ​បាន​ប្រើ​នៅ​ពេល​ដែល VLC ដើរតួ​ជា​ម៉ាស៊ីន​មេ​ស្ទ្រីម ឬ​នៅ​ពេល​រក្សាទុក​ស្ទ្រីម​ចូល។\n"
 "ជា​ដំបូង​ស្ទ្រីម​ត្រូវ​បាន​ទ្វេ​ទិស និង​​ផ្ញើ​តាម​ម៉ូឌុល \"លទ្ធផល​ចូល​ដំណើរការ\" ដែល​អាច​រក្សាទុក​ស្ទ្រីម​ទៅកាន់​"
 "ឯកសារ ឬ​ស្ទ្រីម​វា (UDP, HTTP, RTP/RTSP) ។\n"
-"ម៉ូឌុល​ស្ទ្រីម Sout អនុញ្ញាត​ដល់​ដំណើរការ​ស្ទ្រីម​កម្រិត​ខ្ពស់ (ការ​បម្លែង​ត្រឡប់ ស្ទួន...) ។"
+"ម៉ូឌុល​ស្ទ្រីម Sout អនុញ្ញាត​ដល់​ដំណើរការ​ស្ទ្រីម​កម្រិត​ខ្ពស់ (ការ​បម្លែង​ត្រឡប់ ស្ទួន...)។"
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr "ការ​កំណត់​លទ្ធផល​​រចន្ត​​ទូទៅ"
+msgstr "ការ​កំណត់​លទ្ធផល​​ស្ទ្រីម​​ទូទៅ"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
@@ -297,9 +296,9 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"កម្មវិធី​ទ្វេ​ទិស​បង្កើត​ទ្រង់ទ្រាយ​ស្រោប​ដែល​ត្រូវ​បាន​ប្រើ​ដើម្បី​ដាក់​​ស្ទ្រីម​ដំបូង​ទាំងអស់ (វីដេអូ អូឌីយ៉ូ...)ចូល​គ្នា "
-"។ ការ​កំណត់​នេះ​អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​កម្មវិធី​ទ្វេ​ទិស​ជាក់លាក់​ជានិច្ច ។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ ។\n"
-"អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​កម្មវិធី​ទ្វេ​ទិស​នីមួយៗ​បាន​ផង​ដែរ ។"
+"កម្មវិធី​ទ្វេ​ទិស​បង្កើត​ទ្រង់ទ្រាយ​ស្រោប​ដែល​ត្រូវ​បាន​ប្រើ​ដើម្បី​ដាក់​​ស្ទ្រីម​ដំបូង​ទាំងអស់ (វីដេអូ អូឌីយ៉ូ...) ចូល​"
+"គ្នា។ ការ​កំណត់​នេះ​អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​កម្មវិធី​ទ្វេ​ទិស​ជាក់លាក់​ជានិច្ច។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ។\n"
+"អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​កម្មវិធី​ទ្វេ​ទិស​នីមួយៗ​បាន​ផង​ដែរ។"
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -312,9 +311,9 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"ម៉ូឌុល​លទ្ធផល​ចូល​ដំណើរការ​គ្រប់គ្រង​លើ​វិធី​ផ្ញើ​ស្ទ្រីម​ដែល​បាន​ទ្វេ​ទិស ។ ការ​កំណត់​នេះ​អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​"
-"វិធីសាស្ត្រ​លទ្ធផល​ចូល​ដំណើរការ​ជាក់លាក់ ។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ ។\n"
-"អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​លទ្ធផល​ចូល​ដំណើរការ​នីមួយៗ​បាន​ផង​ដែរ ។"
+"ម៉ូឌុល​លទ្ធផល​ចូល​ដំណើរការ​គ្រប់គ្រង​វិធី​ផ្ញើ​ស្ទ្រីម​ដែល​បាន​ទ្វេ​ទិស។ ការ​កំណត់​នេះ​អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​វិធីសាស្ត្រ​"
+"លទ្ធផល​ចូល​ដំណើរការ​ជាក់លាក់​ជានិច្ច។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ។\n"
+"អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​លទ្ធផល​ចូល​ដំណើរការ​នីមួយៗ​បាន​ផង​ដែរ។"
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
@@ -327,13 +326,13 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"កម្មវិធី​វេច​ខ្ចប់​ត្រូវ​បាន​ប្រើ​ដើម្បី \"ចូល​ដំណើរការ​ជាមុន\" នូវ​ស្ទ្រីម​ដំបូង​មុន​ពេល​ទ្វេ​ទិស ។ ការ​កំណត់​នេះ​"
-"អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​កម្មវិធី​វេច​ខ្ចប់​ជានិច្ច ។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ ។\n"
-"​អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​កម្មវិធី​វេច​ខ្ចប់​នីមួយៗ​បាន​ផង​ដែរ ។"
+"កម្មវិធី​វេច​ខ្ចប់​ត្រូវ​បាន​ប្រើ​ដើម្បី \"ចូល​ដំណើរការ​ជាមុន\" នូវ​ស្ទ្រីម​ដំបូង​មុន​ពេល​ទ្វេ​ទិស។ ការ​កំណត់​នេះ​"
+"អនុញ្ញាត​ឲ្យ​អ្នក​បង្ខំ​កម្មវិធី​វេច​ខ្ចប់​ជានិច្ច។ អ្នក​មិន​គួរ​ធ្វើ​ដូចនោះ​ទេ។\n"
+"​អ្នក​ក៏​អាច​កំណត់​ប៉ារ៉ាម៉ែត្រ​លំនាំដើម​សម្រាប់​កម្មវិធី​វេច​ខ្ចប់​នីមួយៗ​បាន​ផង​ដែរ។"
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
-msgstr "រចន្ត Sout"
+msgstr "ស្ទ្រីម Sout"
 
 #: include/vlc_config_cat.h:163
 msgid ""
@@ -341,8 +340,8 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
-"ម៉ូឌុលចរន្ត Sout អនុញ្ញាត​ឲ្យ​បង្កើត​ច្រវាក់​ដំណើរការ sout ។ សូម​មើល​លើ Streaming Howto សម្រាប់​"
-"ព័ត៌មាន​បន្ថែម ។ អ្នក​អាច​កំណត់​រចនា​សម្ព័ន្ធ​ជម្រើស​លំនាំដើម​សម្រាប់​ម៉ូឌុល​ចរន្ត sout នីមួយៗ​នៅ​ទីនេះ​បាន ។"
+"ម៉ូឌុល​ស្ទ្រីម Sout អនុញ្ញាត​ឲ្យ​បង្កើត​ច្រវាក់​ដំណើរការ sout ។ សូម​មើល Streaming Howto សម្រាប់​"
+"ព័ត៌មាន​បន្ថែម។ អ្នក​អាច​កំណត់​រចនា​សម្ព័ន្ធ​ជម្រើស​លំនាំដើម​សម្រាប់​ម៉ូឌុល​ចរន្ត sout នីមួយៗ​នៅ​ទីនេះ​បាន។"
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -368,8 +367,8 @@ msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
-"ការ​កំណត់​ដែល​ទាក់ទង​ទៅ​នឹង​ឥរិយាបថ​របស់​បញ្ជី​ចាក់ (ឧ. របៀប​ចាក់​ឡើងវិញ) និង​ម៉ូឌុល​ដែល​បន្ថែម​ធាតុ​ទៅកាន់​បញ្ជី​"
-"ចាក់​ដោយ​ស្វ័យប្រវត្តិ (ម៉ូឌុល \"ការ​រក​ឃើញ​សេវា\") ។"
+"ការ​កំណត់​ដែល​ទាក់ទង​ទៅ​នឹង​ឥរិយាបថ​បញ្ជី​ចាក់ (ឧ. របៀប​ចាក់​ឡើងវិញ) និង​ម៉ូឌុល​ដែល​បន្ថែម​ធាតុ​ទៅកាន់​បញ្ជី​ចាក់​"
+"ដោយ​ស្វ័យប្រវត្តិ (ម៉ូឌុល \"ការ​រក​ឃើញ​សេវា\")។"
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
@@ -383,7 +382,7 @@ msgstr "ការ​រក​ឃើញ​សេវា"
 msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
-msgstr "ម៉ូឌុល​ការ​រក​ឃើញ​សេវា​គឺ​ងាយស្រួល​ត្រង់ថា វា​បន្ថែម​ធាតុ​ដោយ​ស្វ័យប្រវត្តិ​ទៅកាន់​បញ្ជី​ចាក់ ។"
+msgstr "ម៉ូឌុល​ការ​រក​ឃើញ​សេវា​គឺ​ងាយស្រួល​ត្រង់ថា វា​បន្ថែម​ធាតុ​ដោយ​ស្វ័យប្រវត្តិ​ទៅកាន់​បញ្ជី​ចាក់។"
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1847
 #: modules/gui/qt/dialogs/extended.cpp:93
@@ -393,7 +392,7 @@ msgstr "កម្រិត​ខ្ពស់"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr "ការ​កំណត់​កម្រិត​ខ្ពស់ ។ ប្រើ​ដោយ​​ប្រុង​ប្រយ័ត្ន..."
+msgstr "ការ​កំណត់​កម្រិត​ខ្ពស់។ ប្រើ​ដោយ​​ប្រុង​ប្រយ័ត្ន..."
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
@@ -484,14 +483,12 @@ msgid "Create Folder..."
 msgstr "បង្កើត​ថត..."
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Rename Directory..."
-msgstr "បង្កើត​ថត..."
+msgstr "ប្ដូរ​ឈ្មោះ​ថត..."
 
 #: include/vlc_intf_strings.h:71
-#, fuzzy
 msgid "Rename Folder..."
-msgstr "បង្កើត​ថត..."
+msgstr "ប្ដូរ​ឈ្មោះ​ថត..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -517,7 +514,7 @@ msgstr "ចាក់​ឡើងវិញ​ទាំងអស់"
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:390
 msgid "Repeat One"
-msgstr "ចាក់​ឡើងវិញ​តែ​មួយ​បទ"
+msgstr "ចាក់​ឡើងវិញ​មួយ​បទ"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1426
 #: modules/gui/macosx/VLCMainMenu.m:389
@@ -592,30 +589,30 @@ msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>សូម​ស្វាគមន៍​មកកាន់​ជំនួយ​កម្មវិធី​ចាក់​មេឌៀ VLC​</"
 "h2><h3>ឯកសារ</h3><p>អ្នក​អាច​​រកមើល​ឯកសារ VLC នៅ​លើ​តំបន់បណ្ដាញ <a href=\"http://wiki."
-"videolan.org\">វិគី</a> របស់ VideoLAN បាន ។</p><p>ប្រសិន​បើ​អ្នក​ទើប​តែ​ប្រើ​កម្មវិធី​ចាក់​មេឌៀ "
-"VLC សូម​អាន <br><a href=\"http://wiki.videolan.org/Documentation:"
+"videolan.org\">វិគី</a> របស់ VideoLAN បាន ។</p><p>បើ​អ្នក​ទើប​ចាប់ផ្ដើម​ប្រើ​កម្មវិធី​ចាក់​"
+"មេឌៀ VLC សូម​អាន <br><a href=\"http://wiki.videolan.org/Documentation:"
 "VLC_for_dummies\"><em>សេចក្ដី​ណែនាំ​អំពី​កម្មវិធី​ចាក់​មេឌៀ VLC</em></a> ។</p><p>អ្នក​នឹង​ឃើញ​"
 "ព័ត៌មាន​មួយ​ចំនួន​ស្ដី​អំពី​របៀប​ប្រើប្រាស់​កម្មវិធី​ចាក់​មេឌៀ​នេះ នៅ​ក្នុង​ឯកសារ​ <br>\"<a href=\"http://"
 "wiki.videolan.org/Documentation:Play_HowTo\"><em>របៀប​ចាក់​ឯកសារ​ជាមួយ​នឹង​កម្មវិធី​ចាក់​"
-"មេឌៀ VLC</em></a>\" ។</p><p>ចំពោះ​កិច្ចការ​រក្សាទុក ការ​បម្លែង ការ​បម្លែង​ត្រឡប់ ការ​អ៊ិនកូដ "
-"ការ​ទ្វេ​ទិស និង​ការ​ស្ទ្រីម អ្នក​គួរតែ​រក​វា​នៅ​ក្នុង <a href=\"http://wiki.videolan.org/"
-"Documentation:Streaming_HowTo\">ឯកសារ​ការ​ស្ទ្រីម</a> ។</p><p>ប្រសិន​បើ​អ្នក​មិន​ច្បាស់​ជាមួយ​"
-"ប្រជុំ​សព្ទ​បច្ចេកទេស​សូម​ចូល​មើល <a href=\"http://wiki.videolan.org/Knowledge_Base"
-"\">មូលដ្ឋាន​ចំណេះដឹង</a> ។</p><p>ដើម្បី​ស្វែងយល់​អំពី​ផ្លូវកាត់​គ្រាប់ចុច​មេ សូម​អាន​ទំព័រ <a href="
-"\"http://wiki.videolan.org/Hotkeys\">ផ្លូវកាត់</a> ។</p><h3>ជំនួយ</h3><p> សូម​មើល "
-"<a href=\"http://wiki.videolan.org/Frequently_Asked_Questions\">FAQ (សំណួរ​ដែល​សួរ​"
-"ជា​ញឹកញាប់)</a> មុន​នឹង​សួរ​សំណួរ​ណាមួយ ។</p><p>អ្នក​អាច​ទទួល​បាន (និង​ផ្ដល់) ជំនួយ​តាម​រយៈ <a href="
-"\"http://forum.videolan.org\">វេទិកា</a> <a href=\"http://www.videolan.org/"
-"vlc/lists.html\">បញ្ជី​សំបុត្រ​រួម</a> ឬ​ឆានែល IRC ( <a href=\"http://www.videolan."
-"org/webirc/\"><em>#videolan</em></a> irc.freenode.net ) ។</p><h3>ការ​ចូលរួម​ជាមួយ​"
-"គម្រោង</h3><p>អ្នក​អាច​ជួយ​គម្រោង VideoLAN បាន ដោយ​ចំណាយ​ពេលវេលា​ដើម្បី​ជួយ​សហគមន៍ ក្នុង​ការរចនា​"
-"រូបរាង ការ​បកប្រែ​ឯកសារ ការ​ធ្វើ​តេស្ដ និង​ការ​សរសេរ​កូដ​ជា​ដើម ។ ឬ​អ្នក​អាច​ផ្ដល់​ជា​ថវិកា និង​សម្ភារៈ​"
-"ដើម្បី​ជួយ​ដល់​ពួក​យើង​ក៏បាន ។ ហើយ​ជា​ការ​ពិត​អ្នក​ក៏​អាច​<b>ផ្សព្វផ្សាយ</b>​កម្មវិធី​ចាក់ VLC បាន​ផង​ដែរ ។</"
-"p></body></html>"
+"មេឌៀ VLC</em></a>\" ។</p><p>ចំពោះ​ការ​រក្សាទុក ការ​បម្លែង ការ​បម្លែង​ត្រឡប់ ការ​អ៊ិនកូដ ការ​"
+"ទ្វេ​ទិស និង​ការ​ស្ទ្រីម អ្នក​គួរតែ​រក​វា​នៅ​ក្នុង <a href=\"http://wiki.videolan.org/"
+"Documentation:Streaming_HowTo\">ឯកសារ​ការ​ស្ទ្រីម</a> ។</p><p>បើ​អ្នក​មិន​ច្បាស់​ជាមួយ​ប្រជុំ​"
+"សព្ទ​បច្ចេកទេស​សូម​ចូល​មើល <a href=\"http://wiki.videolan.org/Knowledge_Base\">មូលដ្ឋាន​"
+"ចំណេះដឹង</a> ។</p><p>ដើម្បី​ស្វែងយល់​អំពី​ផ្លូវកាត់​គ្រាប់ចុច​មេ សូម​អាន​ទំព័រ <a href=\"http://wiki."
+"videolan.org/Hotkeys\">ផ្លូវកាត់</a> ។</p><h3>ជំនួយ</h3><p> សូម​មើល <a href="
+"\"http://wiki.videolan.org/Frequently_Asked_Questions\">FAQ (សំណួរ​ដែល​សួរ​រឿយៗ)</"
+"a> មុន​នឹង​សួរ​សំណួរ​ណាមួយ។</p><p>អ្នក​អាច​ទទួល​បាន (និង​ផ្ដល់) ជំនួយ​តាម​រយៈ <a href=\"http://"
+"forum.videolan.org\">វេទិកា</a> <a href=\"http://www.videolan.org/vlc/lists."
+"html\">បញ្ជី​សំបុត្រ​រួម</a> ឬ​ឆានែល IRC ( <a href=\"http://www.videolan.org/webirc/"
+"\"><em>#videolan</em></a> irc.freenode.net ) ។</p><h3>ការ​ចូលរួម​​គម្រោង គឺ</"
+"h3><p>អ្នក​អាច​ជួយ​គម្រោង VideoLAN បាន ដោយ​ចំណាយ​ពេលវេលា​ដើម្បី​ជួយ​សហគមន៍ ក្នុង​ការរចនា​រូបរាង "
+"ការ​បកប្រែ​ឯកសារ ការ​ធ្វើ​តេស្ដ និង​ការ​សរសេរ​កូដ​ជា​ដើម។ ឬ​អ្នក​អាច​ផ្ដល់​ជា​ថវិកា និង​សម្ភារៈ​ដើម្បី​ជួយ​ដល់​"
+"ពួក​យើង​ក៏បាន។ ហើយ​ជា​ការ​ពិត​អ្នក​ក៏​អាច​<b>ផ្សព្វផ្សាយ</b>​កម្មវិធី​ចាក់ VLC បាន​ផង​ដែរ។</p></"
+"body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
-msgstr "តម្រង​អូឌីយ៉ូ​​បាន​បរាជ័យ"
+msgstr "ការ​ត្រង​អូឌីយ៉ូ​​បាន​បរាជ័យ"
 
 #: src/audio_output/filters.c:268
 #, c-format
@@ -651,7 +648,7 @@ msgstr "តម្រង​អូឌីយ៉ូ"
 
 #: src/audio_output/output.c:325
 msgid "Replay gain"
-msgstr "Replay gain"
+msgstr "កម្រិត​សំឡេង​ចាក់​ឡើងវិញ"
 
 #: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
@@ -708,7 +705,7 @@ msgstr "ស្ដាំ"
 
 #: src/audio_output/output.c:446 src/libvlc-module.c:196
 msgid "Reverse stereo"
-msgstr "បញ្ច្រាស​ស្តេរ៉េអូ"
+msgstr "ស្តេរ៉េអូ​បញ្ច្រាស"
 
 #: src/audio_output/output.c:454 src/libvlc-module.c:198
 #: modules/audio_filter/equalizer_presets.h:55
@@ -741,7 +738,7 @@ msgstr "ខ្សែ​អក្សរ"
 
 #: src/config/help.c:164
 msgid "To get exhaustive help, use '-H'."
-msgstr "ដើម្បី​មើល​ជំនួយ​ឲ្យ​លម្អិត សូម​ប្រើ '-H' ។"
+msgstr "ដើម្បី​មើល​ជំនួយ​លម្អិត សូម​ប្រើ '-H' ។"
 
 #: src/config/help.c:168
 #, c-format
@@ -780,22 +777,22 @@ msgid ""
 "\n"
 msgstr ""
 "ការ​ប្រើប្រាស់ ៖ %s [options] [stream] ...\n"
-"អ្នក​អាច​បញ្ជាក់​ស្ទ្រីម​ច្រើន​នៅ​លើ​បន្ទាត់​ពាក្យ​បញ្ជា ។\n"
-"ពូកវា​នឹង​តម្រៀប​ជា​ជួរ​នៅ​ក្នុង​បញ្ជី​ចាក់ ។\n"
-"ធាតុ​ដែល​បាន​បញ្ជាក់​ដំបូង​នឹង​ត្រូវ​បាន​ចាក់​មុនគេ ។\n"
+"អ្នក​អាច​បញ្ជាក់​ស្ទ្រីម​ច្រើន​នៅ​លើ​បន្ទាត់​ពាក្យ​បញ្ជា។\n"
+"ពូក​វា​នឹង​តម្រៀប​ជា​ជួរ​នៅ​ក្នុង​បញ្ជី​ចាក់។\n"
+"ធាតុ​ដែល​បាន​បញ្ជាក់​មុន​គេ​នឹង​ត្រូវ​បាន​ចាក់​មុនគេ។\n"
 "\n"
 "ជម្រើស​រចនាប័ទ្ម ៖\n"
 "  --option  ជម្រើស​សាកល​ដែល​ត្រូវ​បាន​កំណត់​សម្រាប់​ថិរវេលា​របស់​កម្មវិធី ។\n"
-"   -option  កំណែ​អក្សរ​ទោល​របស់ --option សាកល ។\n"
-"   ៖ ជ្រើស​ជម្រើស​ដែល​អនុវត្ត​ទៅលើ​ស្ទ្រីម​ដោយ​ផ្ទាល់​មុន​វា​តែប៉ុណ្ណោះ\n"
-"            និង​បដិសេធ​ការ​កំណត់​ពីមុន ។\n"
+"   -option  កំណែ​អក្សរ​ទោល​របស់ --option សាកល។\n"
+"   :option ជម្រើស​ដែល​អនុវត្ត​ទៅលើ​ស្ទ្រីម​ដោយ​ផ្ទាល់​មុន​វា​តែប៉ុណ្ណោះ\n"
+"            និង​បដិសេធ​ការ​កំណត់​ពីមុន។\n"
 "\n"
 "វាក្យសម្ពន្ធ​ស្ទ្រីម MRL ៖\n"
 "  [[access][/demux]://]URL[#[title][:chapter][-[title][:chapter]]]\n"
 "  [:option=value ...]\n"
 "\n"
-"  មាន --options សាកល​ជាច្រើន​ដែល​ត្រូវ​បាន​ប្រើ​ជា MRL ជាក់លាក់ ៖ ជម្រើស ។\n"
-"  ច្រើន ៖ ជម្រើស=គូ​តម្លៃ​ដែល​បាន​បញ្ជាក់ ។\n"
+"  មាន --options សាកល​ជាច្រើន​ដែល​ត្រូវ​បាន​ប្រើ​ជា MRL ជាក់លាក់៖ ជម្រើស។\n"
+"  ច្រើន៖ ជម្រើស=គូ​តម្លៃ​ដែល​បាន​បញ្ជាក់។\n"
 "\n"
 "វាក្យសម្ពន្ធ URL ៖\n"
 "  file:///path/file              ឯកសារ​មេឌៀ​ធម្មតា\n"
@@ -824,11 +821,11 @@ msgstr " (លំនាំដើម បិទ)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
-msgstr "ចំណាំ ៖"
+msgstr "ចំណាំ៖"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr "វាយ​ពាក្យ​បញ្ជា --advanced ទៅកាន់​បន្ទាត់​ពាក្យ​បញ្ជា​របស់​អ្នក ដើម្បី​មើល​ជម្រើស​កម្រិត​ខ្ពស់ ។"
+msgstr "វាយ​ពាក្យ​បញ្ជា --advanced នៅ​ក្នុង​បន្ទាត់​ពាក្យ​បញ្ជា​របស់​អ្នក ដើម្បី​មើល​ជម្រើស​កម្រិត​ខ្ពស់។"
 
 #: src/config/help.c:656
 #, c-format
@@ -841,22 +838,22 @@ msgstr[0] "%u ម៉ូឌុល​មិន​ត្រូវ​បាន​ប
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
-msgstr "រក​មិន​ឃើញ​ម៉ូឌុល​ផ្គូផ្គង​ទេ ។ ប្រើ --list ឬ --list-verbose ដើម្បី​រាយ​ម៉ូឌុល​ដែលមាន ។"
+msgstr "រក​មិន​ឃើញ​ម៉ូឌុល​ដែល​ផ្គូផ្គង។ ប្រើ --list ឬ --list-verbose ដើម្បី​រាយ​ម៉ូឌុល​ដែល​មាន។"
 
 #: src/config/help.c:721
 #, c-format
 msgid "VLC version %s (%s)\n"
-msgstr "កំណែ VLC %s (%s)\n"
+msgstr "VLC កំណែ %s (%s)\n"
 
 #: src/config/help.c:722
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
-msgstr "បាន​ចងក្រោយ​ដោយ %s នៅ​លើ %s (%s)\n"
+msgstr "បាន​ចងក្រង​ដោយ %s នៅ​លើ %s (%s)\n"
 
 #: src/config/help.c:724
 #, c-format
 msgid "Compiler: %s\n"
-msgstr "អ្នក​ចងក្រង ៖ %s\n"
+msgstr "អ្នក​ចងក្រង៖ %s\n"
 
 #: src/config/help.c:753
 #, c-format
@@ -865,7 +862,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"មាតិការ​ដែល​បាន​បោះបង់ចោល​ទៅកាន់​ឯកសារ vlc-help.txt ។\n"
+"មាតិកា​ដែល​បាន​បោះបង់ចោល​ទៅកាន់​ឯកសារ vlc-help.txt ។\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -876,9 +873,8 @@ msgstr ""
 "ចុច​គ្រាប់ចុច​បញ្ចូល (Enter) ដើម្បី​បន្ត...\n"
 
 #: src/darwin/error.c:37
-#, fuzzy
 msgid "Unknown error"
-msgstr "មិនស្គាល់​វីដេអូ"
+msgstr ""
 
 #: src/input/control.c:203
 #, c-format
@@ -886,29 +882,25 @@ msgid "Bookmark %i"
 msgstr "ចំណាំ %i"
 
 #: src/input/decoder.c:1875
-#, fuzzy
 msgid "No description for this codec"
-msgstr "ការ​ដាក់​លេខ​កូដ​ចំណងជើង​រង​ទិសដៅ"
+msgstr ""
 
 #: src/input/decoder.c:1877
-#, fuzzy
 msgid "Codec not supported"
-msgstr "ម៉ូឌុល​ការ​បង្ហាញ​វីដេអូ"
+msgstr ""
 
 #: src/input/decoder.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC មិន​អាច​បើក​ឯកសារ \"%s\" (%m) ។"
+msgstr ""
 
 #: src/input/decoder.c:1882
-#, fuzzy
 msgid "Unidentified codec"
-msgstr "កូដិក​វីដេអូ​"
+msgstr ""
 
 #: src/input/decoder.c:1883
-#, fuzzy
 msgid "VLC could not identify the audio or video codec"
-msgstr "VLC មិន​អាច​បើក​ម៉ូឌុល​ឌិកូឌ័រ​បានទេ ។"
+msgstr ""
 
 #: src/input/decoder.c:1894
 msgid "packetizer"
@@ -1363,9 +1355,8 @@ msgid "Track ID"
 msgstr "លេខ​សម្គាល់​បទ"
 
 #: src/input/meta.c:73
-#, fuzzy
 msgid "Number of Tracks"
-msgstr "ចំនួន​ជួរដេក"
+msgstr ""
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1380,14 +1371,12 @@ msgid "Episode"
 msgstr ""
 
 #: src/input/meta.c:77
-#, fuzzy
 msgid "Show Name"
-msgstr "បង្ហាញ​មូលដ្ឋាន"
+msgstr ""
 
 #: src/input/meta.c:78
-#, fuzzy
 msgid "Actors"
-msgstr "កត្តា"
+msgstr ""
 
 #: src/input/meta.c:79
 #, fuzzy
@@ -2652,18 +2641,14 @@ msgstr ""
 "'ណាមួយ' ជា​ការ​ជាន់គ្នា) ។"
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Menu language"
-msgstr "ភាសា​ម៉ឺនុយ ៖"
+msgstr ""
 
 #: src/libvlc-module.c:604
-#, fuzzy
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"ភាសា​បទ​ចំណង​ជើង​រង​ដែល​អ្នក​ចង់​ប្រើ (បំបែក​ដោយ​សញ្ញា​ក្បៀស កូដ​ប្រទេស​ពីរ ឬ​បី​តួអក្សរ អ្នក​អាច​ប្រើ​ "
-"'ណាមួយ' ជា​ការ​ជាន់គ្នា) ។"
 
 #: src/libvlc-module.c:608
 msgid "Audio track ID"
@@ -3162,11 +3147,10 @@ msgid "HTTP/TLS server certificate"
 msgstr "វិញ្ញាបនបត្រ​ម៉ាស៊ីន​មេ HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
-msgstr "ឯកសារ​វិញ្ញាបនបត្រ X.509 (ទ្រង់ទ្រាយ PEM) នេះ ត្រូវ​បាន​ប្រើ​សម្រាប់​ផ្នែក​ម៉ាស៊ីន​មេ TLS ។"
+msgstr ""
 
 #: src/libvlc-module.c:849
 msgid "HTTP/TLS server private key"
@@ -3743,7 +3727,7 @@ msgstr ""
 #: src/libvlc-module.c:1144
 #, fuzzy
 msgid "Show hidden files"
-msgstr "សេចក្ដី​លម្អិត​កូដិក"
+msgstr "បង្វិល​តម្រង​វីដេអូ"
 
 #: src/libvlc-module.c:1146
 msgid "Ignore files starting with '.'"
@@ -4884,9 +4868,8 @@ msgid "print version information"
 msgstr "បោះពុម្ព​ព័ត៌មាន​កំណែ"
 
 #: src/libvlc-module.c:2806
-#, fuzzy
 msgid "core program"
-msgstr "កម្មវិធី​មេ"
+msgstr ""
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -6072,14 +6055,12 @@ msgid "AVIO"
 msgstr ""
 
 #: modules/access/avio.h:34
-#, fuzzy
 msgid "libavformat AVIO access"
-msgstr "លទ្ធផល​ក្នុង​ការ​ចូល​ដំណើរការ​ libavformat"
+msgstr ""
 
 #: modules/access/avio.h:44
-#, fuzzy
 msgid "libavformat AVIO access output"
-msgstr "លទ្ធផល​ក្នុង​ការ​ចូល​ដំណើរការ​ libavformat"
+msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
@@ -6090,9 +6071,8 @@ msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr "ប្រើ​ម៉ឺនុយ Blu-ray ។ បើ​បិទ ភាពយន្ត​នឹង​ចាប់ផ្ដើម​ដោយ​ផ្ទាល់"
 
 #: modules/access/bluray.c:71
-#, fuzzy
 msgid "Region code"
-msgstr "តំបន់​ជួរដេក​ខាងលើ"
+msgstr ""
 
 #: modules/access/bluray.c:72
 msgid ""
@@ -6179,14 +6159,12 @@ msgid "Blu-ray error"
 msgstr "Blu-ray មាន​បញ្ហា"
 
 #: modules/access/bluray.c:1667
-#, fuzzy
 msgid "Top Menu"
-msgstr "ម៉ឺនុយ"
+msgstr ""
 
 #: modules/access/bluray.c:1670
-#, fuzzy
 msgid "First Play"
-msgstr "បាន​ចាក់​ដំបូង"
+msgstr ""
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6251,14 +6229,12 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "ព័ត៌មាន​បញ្ចូល IIDC Digital Camera (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:77
-#, fuzzy
 msgid "DCP"
-msgstr "RDP"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:80
-#, fuzzy
 msgid "Digital Cinema Package module"
-msgstr "ម៉ូឌុល​ចំណុច​ប្រទាក់​បន្ថែម"
+msgstr ""
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6271,9 +6247,8 @@ msgid ""
 msgstr "កាត​ចាប់​យក DeckLink ដែល​ត្រូវ​ប្រើ ប្រសិនបើ​មាន​ច្រើន។ កាត​ត្រូវ​​ដាក់​លេខ​ចាប់ពី ០ ទៅ។"
 
 #: modules/access/decklink.cpp:49
-#, fuzzy
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr "របៀប​វីដេអូ​បញ្ចូល​ដែល​ចង់​បាន"
+msgstr ""
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -7820,9 +7795,9 @@ msgid "File reading failed"
 msgstr "បាន​បរាជ័យ​ក្នុង​ការ​អាន​ឯកសារ"
 
 #: modules/access/mtp.c:168
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file: %s"
-msgstr "VLC មិនអាច​អាន​ឯកសារ​បានទេ។"
+msgstr ""
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7947,9 +7922,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr "បាន​ត្រឡប់ MIME ដោយ​ម៉ាស៊ីន​មេ (រក​ឃើញ​ដោយ​ស្វ័យប្រវត្តិ ប្រសិន​បើ​មិន​បាន​បញ្ជាក់) ។"
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8056,9 +8030,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr "បង្កើត IV ជំនួស​ឲ្យ​ការ​ប្រើ​លេខ​ចម្រៀក​ជា IV"
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "ចំនួន​ចម្រៀក"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 #, fuzzy
@@ -8363,9 +8336,8 @@ msgid "Receive buffer"
 msgstr ""
 
 #: modules/access/satip.c:61 modules/access/udp.c:60
-#, fuzzy
 msgid "UDP receive buffer size (bytes)"
-msgstr "ទំហំ​ទ្រនាប់​ស៊ុម RTSP"
+msgstr ""
 
 #: modules/access/satip.c:63
 #, fuzzy
@@ -9198,14 +9170,14 @@ msgid "VDR recordings"
 msgstr "VDR ថត"
 
 #: modules/access/vdr.c:380
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "VLC មិន​អាច​អាន​ឯកសារ (%m) ។"
+msgstr ""
 
 #: modules/access/vdr.c:545
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "VLC មិន​អាច​បើក​ឯកសារ \"%s\" (%m) ។"
+msgstr ""
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -9292,9 +9264,8 @@ msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "ការ​បង្ហាញ​វីដេអូ វីនដូ GDI"
+msgstr ""
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9504,9 +9475,8 @@ msgid "Rear center"
 msgstr "កណ្ដាល​ផ្នែក​ខាង​ក្រោយ"
 
 #: modules/audio_filter/channel_mixer/mono.c:99
-#, fuzzy
 msgid "Stereo to mono downmixer"
-msgstr "របៀប​សំឡេង​ស្តេរ៉េអូ"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -10424,9 +10394,8 @@ msgid "This linear gain will be applied in software."
 msgstr "ការ​ទទួល​យក​លីនេអ៊ែ​នេះ​នឹង​ត្រូវ​បាន​អនុវត្ត​នៅ​ក្នុង​កម្មវិធី។"
 
 #: modules/audio_output/wasapi.c:645
-#, fuzzy
 msgid "Windows Audio Session API output"
-msgstr "ការ​បង្ហាញ​វីដេអូ វីនដូ GDI"
+msgstr ""
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -11012,29 +10981,25 @@ msgid "unknown"
 msgstr "មិន​ស្គាល់"
 
 #: modules/codec/avcodec/encoder.c:872
-#, fuzzy
 msgid "video"
-msgstr "S-video"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "audio"
-msgstr "អូឌីយ៉ូ"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:873
-#, fuzzy
 msgid "subpicture"
-msgstr "រូបភាព​រង"
+msgstr ""
 
 #: modules/codec/avcodec/encoder.c:886
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr "VLC មិន​អាច​បើក​អ៊ិនកូឌ័រ​បានទេ ។"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:385
-#, fuzzy
 msgid "VA-API video decoder via DRM"
-msgstr "ឌិកូឌ័រ​វីដេអូ PNG"
+msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:390
 #, fuzzy
@@ -11053,9 +11018,8 @@ msgid "Opacity"
 msgstr "ភាព​ស្រអាប់​"
 
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
-#, fuzzy
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
-msgstr "កំណត់ vbi-opaque ទៅ​មិន​ពិត គឺ​ធ្វើ​ឲ្យ​អត្ថបទ​ប្រអប់​ថ្លា ។"
+msgstr ""
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11111,7 +11075,7 @@ msgstr "ឧបករណ៍​ចងក្រង​វីដេអូ Theora"
 #: modules/codec/daala.c:132
 #, fuzzy
 msgid "Daala video encoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ PNG"
+msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11381,9 +11345,8 @@ msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
-#, fuzzy
 msgid "Use DecodeBin"
-msgstr "ការ​ឌិកូដ"
+msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11394,9 +11357,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
-#, fuzzy
 msgid "GStreamer Based Decoder"
-msgstr "ឌិកូឌ័រ​អូឌីយ៉ូ Speex"
+msgstr ""
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -11404,14 +11366,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/jpeg.c:111
-#, fuzzy
 msgid "JPEG image decoder"
-msgstr "កម្មវិធី​ដោះ​លេខ​កូដ XWD"
+msgstr ""
 
 #: modules/codec/jpeg.c:120
-#, fuzzy
 msgid "JPEG image encoder"
-msgstr "កម្មវិធី​ដោះ​លេខ​កូដ XWD"
+msgstr ""
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11735,18 +11695,16 @@ msgid "Opus"
 msgstr "ស្នាដៃ"
 
 #: modules/codec/opus.c:69
-#, fuzzy
 msgid "Opus audio encoder"
-msgstr "ស្នាដៃ​កម្មវិធី​ដោះ​លេខ​កូដ​អូឌីយ៉ូ"
+msgstr ""
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
 msgstr "ឌិកូឌ័រ​វីដេអូ PNG"
 
 #: modules/codec/png.c:100
-#, fuzzy
 msgid "PNG video encoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ PNG"
+msgstr ""
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11994,7 +11952,7 @@ msgstr "កម្មវិធី​វេច​ខ្ចប់​វីដេអ
 #: modules/codec/rtpvideo.c:45
 #, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "ឌិកូឌ័រ​វីដេអូ PNG"
+msgstr "អ៊ិនកូឌ័រ​វីដេអូ Theora"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12749,14 +12707,12 @@ msgid "USF subtitles decoder"
 msgstr "ឌិកូឌ័រ​ចំណងជើង​រង USF"
 
 #: modules/codec/substx3g.c:40
-#, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "កម្មវិធី​ដោះ​លេខ​កូដ​ចំណងជើង​រង​អត្ថបទ"
+msgstr ""
 
 #: modules/codec/substx3g.c:41
-#, fuzzy
 msgid "tx3g subtitles"
-msgstr "ចំណងជើង​ព័ត៌មាន​ទូរទស្សន៍"
+msgstr ""
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -12917,7 +12873,7 @@ msgstr ""
 #: modules/codec/videotoolbox.m:83
 #, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
+msgstr "ឌិកូឌ័រ​វីដេអូ Theora"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12968,14 +12924,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/vpx.c:66
-#, fuzzy
 msgid "WebM video decoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
+msgstr ""
 
 #: modules/codec/vpx.c:75
 #, fuzzy
 msgid "WebM video encoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
+msgstr "អ៊ិនកូឌ័រ​វីដេអូ Theora"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13881,18 +13836,16 @@ msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr "ផ្នែក H.264/MPEG-4 កម្មវិធី​ដាក់​លេខ​កូដ 10/AVC (x264 10-bit)"
 
 #: modules/codec/x264.c:456
-#, fuzzy
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "ផ្នែក H.264/MPEG-4 កម្មវិធី​ដាក់​លេខ​កូដ 10/AVC (x264)"
+msgstr ""
 
 #: modules/codec/x264.c:460
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr "ផ្នែក H.264/MPEG-4 កម្មវិធី​ដាក់​លេខ​កូដ 10/AVC (x264)"
 
 #: modules/codec/x265.c:46
-#, fuzzy
 msgid "H.265/HEVC encoder (x265)"
-msgstr "ផ្នែក H.264/MPEG-4 កម្មវិធី​ដាក់​លេខ​កូដ 10/AVC (x264)"
+msgstr ""
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -14201,8 +14154,8 @@ msgid ""
 "go to the directory where you installed VLC and run \"vlc -I qt\"\n"
 msgstr ""
 "\n"
-"ការ​ព្រមាន ៖ ប្រសិនបើ​អ្នក​មិន​អាច​ចូល​ដំណើរការ GUI បាន​ទេ​នោះ បើក​បង្អួច​​បន្ទាត់​ពាក្យ​បញ្ជា ទៅ​កាន់​ថត​"
-"ដែល​អ្នក​បាន​ដំឡើង VLC ហើយ​ដំណើរការ \"vlc -I qt\"\n"
+"ព្រមាន៖ បើ​អ្នក​មិន​អាច​ចូល​ដំណើរការ GUI បាន សូម​បើក​បង្អួច​​បន្ទាត់​ពាក្យ​បញ្ជា ចូល​ទៅ​ថត​ដែល​អ្នក​បាន​"
+"ដំឡើង VLC រួច​ដំណើរការ \"vlc -I qt\"\n"
 
 #: modules/control/lirc.c:47
 msgid "Change the lirc configuration file"
@@ -14612,15 +14565,13 @@ msgid "+----[ end of help ]"
 msgstr "+----[ end of help ]"
 
 #: modules/control/oldrc.c:956
-#, fuzzy
 msgid "Press pause to continue."
-msgstr "ចុច​ម៉ឺនុយ​ជ្រើស ឬ​ផ្អាក​ដើម្បី​បន្ត ។"
+msgstr ""
 
 #: modules/control/oldrc.c:1177 modules/control/oldrc.c:1426
 #: modules/control/oldrc.c:1470
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr "វាយ​បញ្ចូល 'menu select' ឬ 'pause' ដើម្បី​បន្ត ។"
+msgstr ""
 
 #: modules/control/oldrc.c:1266
 msgid "Error: `goto' needs an argument greater than zero."
@@ -14820,9 +14771,8 @@ msgid "Avformat"
 msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
-#, fuzzy
 msgid "Demuxer"
-msgstr "កម្មវិធី​មិន​ទ្វេ​ទិស"
+msgstr ""
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14926,9 +14876,8 @@ msgid "Fixing AVI Index..."
 msgstr "កំពុង​ជួសជុល​លិបិក្រម AVI..."
 
 #: modules/demux/caf.c:53
-#, fuzzy
 msgid "CAF demuxer"
-msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស AIFF"
+msgstr ""
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15225,18 +15174,16 @@ msgid "MPEG-4 video"
 msgstr "វីដេអូ MPEG-4"
 
 #: modules/demux/mpeg/h26x.c:47
-#, fuzzy
 msgid "Desired frame rate for the stream."
-msgstr "អត្រា​ស៊ុម​ដែល​ចង់បាន​សម្រាប់​ស្ទ្រីម H264 ។"
+msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53
 msgid "H264 video demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​វីដេអូ H264"
 
 #: modules/demux/mpeg/h26x.c:63
-#, fuzzy
 msgid "HEVC/H.265 video demuxer"
-msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​វីដេអូ H264"
+msgstr ""
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15336,14 +15283,12 @@ msgstr ""
 "ប្រសិនបើ​ការ​ស្វែងរក​មិន​ដំណើរការ​ល្អ​ទេ សូម​បិទ​ជម្រើស​នេះ ។"
 
 #: modules/demux/mpeg/ts.c:114
-#, fuzzy
 msgid "Trust in-stream PCR"
-msgstr "លេខ​សម្គាល់​ស្ទ្រីម​ដឹកជញ្ជូន"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:115
-#, fuzzy
 msgid "Use the stream PCR as a reference."
-msgstr "រក្សាទុក​​ B-frames មួយ​ចំនួន​ជា​សេចក្ដី​យោង"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
 #, fuzzy
@@ -15366,9 +15311,8 @@ msgid "Main audio"
 msgstr "បិទ​សំឡេង​អូឌីយ៉ូ។"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "ការ​ដាក់​លេខ​កូដ​ចំណងជើង​រង​ទិសដៅ"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
@@ -15858,22 +15802,20 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
-#, fuzzy
 msgid "Playlist parsers"
-msgstr "កម្មវិធី​ញែកផតខាស"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
-#, fuzzy
 msgid "Service Discovery"
-msgstr "ការ​រក​ឃើញ​សេវា"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #, fuzzy
 msgid "Interfaces"
-msgstr "ចំណុច​ប្រទាក់"
+msgstr "ចំណុចប្រទាក់"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15899,16 +15841,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
-#, fuzzy
 msgid "Addons Manager"
-msgstr "កម្មវិធី​គ្រប់គ្រង​វីដេអូ"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
-#, fuzzy
 msgid "Installed"
-msgstr "ដំឡើង"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15923,9 +15863,8 @@ msgid "Author"
 msgstr "អ្នក​និពន្ធ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
-#, fuzzy
 msgid "Uninstall"
-msgstr "ដំឡើង"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -16737,9 +16676,8 @@ msgstr "បង្ហាញ​របារ​ចំហៀង​នៅ​ក្ន
 
 #: modules/gui/macosx/macosx.m:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
-#, fuzzy
 msgid "Control external music players"
-msgstr "ម៉ឺនុយ​បញ្ជា​សម្រាប់​កម្មវិធី​ចាក់"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:129
 msgid "VLC will pause and resume supported music players on playback."
@@ -16754,14 +16692,12 @@ msgid "Do nothing"
 msgstr "កុំ​ធ្វើ​អ្វី​ទាំងអស់"
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause iTunes / Spotify"
-msgstr "ផ្អាក iTunes"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:136
-#, fuzzy
 msgid "Pause and resume iTunes / Spotify"
-msgstr "ផ្អាក និង​ធ្វើ​បន្ត iTunes"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:139
 msgid "Continue playback where you left off"
@@ -16982,9 +16918,8 @@ msgstr "ថយ​ក្រោយ​មួយ​ជំហាន"
 
 #: modules/gui/macosx/VLCMainMenu.m:396
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
-#, fuzzy
 msgid "Jump to Time"
-msgstr "ទៅកាន់​ពេលវេលា"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Increase Volume"
@@ -17070,9 +17005,8 @@ msgid "Window"
 msgstr "បង្អួច"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
-#, fuzzy
 msgid "Minimize"
-msgstr "បង្រួម​បង្អួចអប្បបរមា"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -17208,14 +17142,12 @@ msgid "Check for album art and metadata?"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "Enable Metadata Retrieval"
-msgstr "បើក​ការ​ត្រង​ជាមុន​ដែល​អាច​ប្រែប្រួល"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
-#, fuzzy
 msgid "No, Thanks"
-msgstr "អរគុណ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid ""
@@ -17281,9 +17213,8 @@ msgid "Open Audio Effects window"
 msgstr "បែបផែន​អូឌីយ៉ូ"
 
 #: modules/gui/macosx/misc.m:301
-#, fuzzy
 msgid "B"
-msgstr "BD"
+msgstr ""
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
@@ -17322,7 +17253,7 @@ msgstr "បើក"
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 #, fuzzy
 msgid "Stream output:"
-msgstr "លទ្ធផល​ចរន្ត"
+msgstr "លទ្ធផល​ស្ទ្រីម"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -17383,9 +17314,8 @@ msgid "Custom playback"
 msgstr "ប្ដូរ​ការ​ចាក់​តាម​តម្រូវការ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
-#, fuzzy
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr "បើក​ថត VIDEO_TS"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -17593,9 +17523,8 @@ msgid "URI"
 msgstr "URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
-#, fuzzy
 msgid "File Size"
-msgstr "ទំហំ​ទ្វេ"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
 #, fuzzy
@@ -17720,9 +17649,8 @@ msgstr "ជ្រើស"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:195
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Continue playback?"
-msgstr "វត្ថុ​​បញ្ជា iTunes នៅ​ពេល​ចាក់​សារ​ថ្មី"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:814
@@ -17733,13 +17661,12 @@ msgstr "បន្ត"
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 #, fuzzy
 msgid "Always continue media playback"
-msgstr "ប្ដូរ​ការ​ចាក់​តាម​តម្រូវការ"
+msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
-#, fuzzy
 msgid "Restart playback"
-msgstr "ប្ដូរ​ការ​ចាក់​តាម​តម្រូវការ"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
@@ -17916,9 +17843,8 @@ msgid "Bright"
 msgstr "ភ្លឺ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "Continue playback"
-msgstr "ប្ដូរ​ការ​ចាក់​តាម​តម្រូវការ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 #, fuzzy
@@ -18583,19 +18509,16 @@ msgid " f                      Toggle Fullscreen"
 msgstr " f                      បិទ/បើក​ពេញ​អេក្រង់"
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " c                      Cycle through audio tracks"
-msgstr " l                      បិទ/បើក​បញ្ជី​ចាក់​វិល​ជុំ"
+msgstr ""
 
 #: modules/gui/ncurses.c:890
-#, fuzzy
 msgid " v                      Cycle through subtitles tracks"
-msgstr " [, ]                   ចំណងជើង​បន្ទាប់/មុន"
+msgstr ""
 
 #: modules/gui/ncurses.c:891
-#, fuzzy
 msgid " b                      Cycle through video tracks"
-msgstr " S                      បង្ហាញ/លាក់​ប្រអប់​ស្ថិតិ"
+msgstr ""
 
 #: modules/gui/ncurses.c:892
 msgid " n, p                   Next/Previous playlist item"
@@ -19123,9 +19046,8 @@ msgid "Force update of this dialog's values"
 msgstr "បង្ខំ​បច្ចុប្បន្នភាព​នៃ​តម្លៃ​របស់​ប្រអប់​នេះ"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "ល្អ​បំផុត"
+msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19415,9 +19337,8 @@ msgid "Do you really want to unsubscribe from %1?"
 msgstr "តើ​អ្នក​ពិតជា​ចង់​ឈប់​​ជាវ​ពី %1 មែន​ឬ ?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
-#, fuzzy
 msgid "Cover"
-msgstr "Crossover"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -19436,24 +19357,20 @@ msgid "Enter name for new folder:"
 msgstr "បញ្ចូល​ឈ្មោះ​សម្រាប់​ថត​ថ្មី ៖"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Directory"
-msgstr "បង្កើត​ថត"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
-#, fuzzy
 msgid "Rename Folder"
-msgstr "បង្កើត​ថត"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
-#, fuzzy
 msgid "Enter a new name for the directory:"
-msgstr "បញ្ចូល​​ឈ្មោះ​សម្រាប់​ថត​ថ្មី ៖"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
-#, fuzzy
 msgid "Enter a new name for the folder:"
-msgstr "បញ្ចូល​ឈ្មោះ​សម្រាប់​ថត​ថ្មី ៖"
+msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -19862,9 +19779,8 @@ msgid "&Start"
 msgstr "ចាប់ផ្ដើម"
 
 #: modules/gui/qt/dialogs/convert.cpp:159
-#, fuzzy
 msgid "Containers"
-msgstr "ឧបករណ៍​ផ្ទុក (*"
+msgstr ""
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19911,7 +19827,6 @@ msgid "Privacy and Network Access Policy"
 msgstr "គោលការណ៍​ចូល​ដំណើរការ​បណ្ដាញ និង​ភាព​ឯកជន"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
-#, fuzzy
 msgid ""
 "<p>In order to protect your privacy, <i>VLC media player</i> does <b>not</b> "
 "collect personal data or transmit them, not even in anonymized form, to "
@@ -19924,14 +19839,6 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>ដើម្បី​ការពារ​ភាព​ឯកជន​របស់​អ្នក <i>កម្មវិធី​ចាក់​មេឌៀ VLC</i><b>មិន</b> ប្រមូល​ទិន្នន័យ​ផ្ទាល់ខ្លួន "
-"ឬ​បញ្ជូន​សូម្បីតែ​សំណុំ​បែបបទ​ដែល​បាន​លុប​ទៅកាន់​នរណា​ម្នាក់​ឡើយ។</p>\n"
-"<p>ទោះជា​ដូច្នេះ​ក្ដី <i>VLC</i> គឺ​អាច​ទៅ​យក​​ព័ត៌មាន​អំពី​មេឌៀ​នៅ​ក្នុង​បញ្ជី​ចាក់​របស់​អ្នក​ដោយ​ស្វ័យប្រវត្តិ​ពី​"
-"ភាគី​ទី​បី​ដោយ​ផ្អែក​តាម​សេវាកម្ម​អ៊ីនធឺណិត។ មាន​ដូចជា​សិល្បៈ​គម្រប ឈ្មោះ​បទ ការ​និពន្ធ និង​ទិន្នន័យ​មេតា​"
-"ផ្សេងទៀត។</p>\n"
-"វា​អាច​តម្រូវឲ្យ​មាន​ការ​កំណត់​អត្តសញ្ញាណ​ឯកសារ​មេឌៀ​មួយ​ចំនួន​របស់​អ្នក​ចំពោះ​ធាតុ​ភាគី​ទី​បី។ ដូច្នេះ អ្នក​"
-"អភិវឌ្ឍន៍ <i>VLC</i> ទាមទារ​បញ្ជាក់​ការ​យល់ព្រម​របស់​អ្នក​សម្រាប់​កម្មវិធី​ចាក់​មេឌៀ​ដើម្បី​ចូល​ដំណើរការ​"
-"អ៊ីនធឺណិត​ដោយ​ស្វ័យប្រវត្តិ។</p>\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
@@ -20127,9 +20034,8 @@ msgid "Plugins and extensions"
 msgstr "កម្មវិធី​ជំនួយ និង​ផ្នែក​បន្ថែម"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
-#, fuzzy
 msgid "Active Extensions"
-msgstr "តំបន់​សកម្ម"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -20184,37 +20090,32 @@ msgid "Only installed"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
-#, fuzzy
 msgid "Retrieving addons..."
-msgstr "កំពុង​ប្រមូល​យក​ព័ត៌មាន​ឆានែល..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
-#, fuzzy
 msgid "No addons found"
-msgstr "រក​មិន​ឃើញ​ព័ត៌មាន​បញ្ចូល"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
-#, fuzzy
 msgid "Version %1"
-msgstr "កំណែ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
 msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
-#, fuzzy
 msgid "&Uninstall"
-msgstr "ដំឡើង"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
-#, fuzzy
 msgid "&Install"
-msgstr "ដំឡើង"
+msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -20373,9 +20274,8 @@ msgid "Flat Button"
 msgstr "ប៊ុតុង​រាបស្មើ"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
-#, fuzzy
 msgid "Next widget style"
-msgstr "រចនាប័ទ្ម​ធាតុក្រាហ្វិក​បន្ទាប់ ៖"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -20410,9 +20310,8 @@ msgid "Time Toolbar"
 msgstr "របារ​ឧបករណ៍​ពេលវេលា"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
-#, fuzzy
 msgid "Advanced Widget"
-msgstr "របារ​ឧបករណ៍​ធាតុក្រាហ្វិក​កម្រិត​ខ្ពស់ ៖"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -20431,9 +20330,8 @@ msgid "Select profile:"
 msgstr "ជ្រើស​ទម្រង់ ៖"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Preview"
-msgstr "មុន​"
+msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -21112,7 +21010,7 @@ msgstr ""
 #: modules/gui/qt/qt.cpp:189
 #, fuzzy
 msgid "When to raise the interface"
-msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​មេ"
+msgstr "ការ​កំណត់​ចំណុចប្រទាក់​មេ"
 
 #: modules/gui/qt/qt.cpp:190
 #, fuzzy
@@ -21122,9 +21020,8 @@ msgid ""
 msgstr "ជម្រើស​នេះ​​អនុញ្ញាត​ឲ្យ​​ចំណុចប្រទាក់​ផ្លាស់ប្ដូរ​រូបតំណាង​របស់​វា​​តាម​ពេល​វេលា ។"
 
 #: modules/gui/qt/qt.cpp:193
-#, fuzzy
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "ឧបករណ៍​បញ្ជា​ពេញ​អេក្រង់"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:201
 msgid "When minimized"
@@ -21261,18 +21158,16 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/codec.c:58
-#, fuzzy
 msgid "MMAL decoder"
-msgstr "ឌិកូឌ័រ"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/vout.c:50
-#, fuzzy
 msgid "VideoCore layer where the video is displayed."
-msgstr "ថត​ដែល​នឹង​ត្រូវ​រក្សាទុក​រូបថត​វីដេអូ។"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -21312,19 +21207,16 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
-#, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "តម្រង​វីដេអូ Gradfun"
+msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
-#, fuzzy
 msgid "VDPAU video decoder"
-msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:871
-#, fuzzy
 msgid "Temporal-spatial"
-msgstr "Temporal"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:875 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
@@ -21335,53 +21227,44 @@ msgid "VDPAU surface conversions"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:884
-#, fuzzy
 msgid "Deinterlacing algorithm"
-msgstr "ក្បួន​ដោះស្រាយ Debanding"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887
-#, fuzzy
 msgid "Inverse telecine"
-msgstr "ជម្រើស​មិន​ត្រឹមត្រូវ"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:889
-#, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "បើក​មិន​ត្របាញ់"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:890
 msgid "Whether temporal deinterlacing applies to luma only"
 msgstr ""
 
 #: modules/hw/vdpau/chroma.c:892
-#, fuzzy
 msgid "Noise reduction level"
-msgstr "ការ​កាត់​បន្ថយ​ភាព​រំខាន"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "Scaling quality"
-msgstr "គុណភាព"
+msgstr ""
 
 #: modules/hw/vdpau/chroma.c:894
-#, fuzzy
 msgid "High quality scaling level"
-msgstr "ការ​ធ្វើ​គំរូ​អូឌីយ៉ូ​គុណភាព​ខ្ពស់​ឡើងវិញ"
+msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
-#, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "តម្រង​​វីដេអូ​មិន​ត្របាញ់"
+msgstr ""
 
 #: modules/hw/vdpau/display.c:46
-#, fuzzy
 msgid "VDPAU output"
-msgstr "លទ្ធផល YUV"
+msgstr ""
 
 #: modules/hw/vdpau/sharpen.c:143
-#, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "តម្រង​វីដេអូ​ច្បាស់"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
 #, fuzzy
@@ -21391,7 +21274,7 @@ msgstr "តម្រង​វីដេអូ"
 #: modules/hw/vaapi/filters.c:1188
 #, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Video Acceleration (VA) API"
+msgstr "DirectX Video Acceleration (DXVA) 2.0"
 
 #: modules/keystore/keychain.m:40
 #, fuzzy
@@ -22414,18 +22297,16 @@ msgid "RTSP VoD"
 msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:78
-#, fuzzy
 msgid "Legacy RTSP VoD server"
-msgstr "ម៉ាស៊ីន​មេ RTSP VoD"
+msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
 msgstr ""
 
 #: modules/misc/securetransport.c:68
-#, fuzzy
 msgid "TLS server support for OS X"
-msgstr "ច្រក​ម៉ាស៊ីន​មេ RTSP"
+msgstr ""
 
 #: modules/misc/securetransport.c:330
 #, c-format
@@ -22529,19 +22410,16 @@ msgid "Unknown Video"
 msgstr "មិនស្គាល់​វីដេអូ"
 
 #: modules/mux/avi.c:55
-#, fuzzy
 msgid "Subject"
-msgstr "វត្ថុ"
+msgstr ""
 
 #: modules/mux/avi.c:56
-#, fuzzy
 msgid "Encoder"
-msgstr "ឌិកូឌ័រ"
+msgstr ""
 
 #: modules/mux/avi.c:57
-#, fuzzy
 msgid "Keywords"
-msgstr "ពាក្យ​គន្លឹះ​ផតខាស់"
+msgstr ""
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -22814,9 +22692,8 @@ msgid "Multipart JPEG muxer"
 msgstr "ឧបករណ៍​ទ្វេទិស JPEG ច្រើន​ផ្នែក"
 
 #: modules/mux/ogg.c:47
-#, fuzzy
 msgid "Index interval"
-msgstr "ចន្លោះ​ពេល IDR"
+msgstr ""
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -22824,9 +22701,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/ogg.c:50
-#, fuzzy
 msgid "Index size ratio"
-msgstr "រក្សា​សមាមាត្រ"
+msgstr ""
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -22905,9 +22781,8 @@ msgid "H.264 video packetizer"
 msgstr "កម្មវិធី​វេចខ្ចប់​វីដេអូ H.264"
 
 #: modules/packetizer/hevc.c:57
-#, fuzzy
 msgid "HEVC/H.265 video packetizer"
-msgstr "កម្មវិធី​វេចខ្ចប់​វីដេអូ H.264"
+msgstr ""
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -23934,7 +23809,7 @@ msgstr ""
 #: modules/stream_filter/adf.c:42
 #, fuzzy
 msgid "ADF stream filter"
-msgstr "តម្រង​ចរន្ត"
+msgstr "តម្រង​ស្ទ្រីម"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -23975,7 +23850,7 @@ msgstr "ការ​មិន​បង្ហាប់ LZMA"
 #: modules/stream_filter/prefetch.c:531
 #, fuzzy
 msgid "Stream prefetch filter"
-msgstr "តម្រង​ចរន្ត"
+msgstr "តម្រង​ស្ទ្រីម"
 
 #: modules/stream_filter/prefetch.c:534
 #, fuzzy
@@ -23992,9 +23867,8 @@ msgid "Read size"
 msgstr "ទំហំ​អាន"
 
 #: modules/stream_filter/prefetch.c:538
-#, fuzzy
 msgid "Prefetch background read size (bytes)"
-msgstr "ទំហំ​ទ្រនាប់​ស៊ុម RTSP"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
 #, fuzzy
@@ -24644,9 +24518,8 @@ msgid "Stream output to memory buffer"
 msgstr "ស្ទ្រីម​លទ្ធផល​ទៅកាន់​អង្គ​ចងចាំ​បណ្ដោះអាសន្ន"
 
 #: modules/stream_out/stats.c:42
-#, fuzzy
 msgid "Writes stats to file instead of stdout"
-msgstr "ប្រើ​តម្រង​វីដេអូ​បង្វិល​ជំនួស​ការ​ប្លែង"
+msgstr ""
 
 #: modules/stream_out/stats.c:43
 msgid "Prefix to show on output line"
@@ -25626,14 +25499,12 @@ msgid "Number of pixels to padd to the right of the image after cropping."
 msgstr "ចំនួន​ភីកសែល​ដែល​ត្រូវ​កល់ទៅ​ខាងស្ដាំ​រូបភាព​បន្ទាប់ពី​ច្រឹប ។"
 
 #: modules/video_filter/croppadd.c:79
-#, fuzzy
 msgid "Croppadd"
-msgstr "Cropadd"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:80
-#, fuzzy
 msgid "Video cropping filter"
-msgstr "តម្រង​មាត្រដ្ឋាន​វីដេអូ"
+msgstr ""
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -25784,14 +25655,12 @@ msgid "FPS Converter"
 msgstr "កម្មវិធី​បម្លែង YUVP"
 
 #: modules/video_filter/freeze.c:78
-#, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "តម្រង​​វីដេអូ​មិន​ត្របាញ់"
+msgstr ""
 
 #: modules/video_filter/freeze.c:79
-#, fuzzy
 msgid "Freeze"
-msgstr "Freestyle"
+msgstr ""
 
 #: modules/video_filter/gaussianblur.c:50
 msgid "Gaussian's std deviation"
@@ -26010,9 +25879,8 @@ msgid "Motion detect video filter"
 msgstr "តម្រង​វីដេអូ​រក​ឃើញ​ចលនា"
 
 #: modules/video_filter/oldmovie.c:179
-#, fuzzy
 msgid "Old movie effect video filter"
-msgstr "តម្រង​វីដេអូ​រក​ឃើញ​ចលនា"
+msgstr ""
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
@@ -26444,9 +26312,8 @@ msgid "Rotate or flip the video"
 msgstr "បង្វិល ឬ​ត្រឡប់​​វីដេអូ"
 
 #: modules/video_filter/vhs.c:105
-#, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "តម្រង​វីដេអូ​រក​ឃើញ​ចលនា"
+msgstr ""
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
@@ -26471,12 +26338,11 @@ msgstr "លទ្ធផល​វីដេអូ​សិល្បៈ ASCII"
 #: modules/video_output/android/window.c:50
 #, fuzzy
 msgid "Android Window"
-msgstr "បង្អួច​សកម្ម"
+msgstr "បិទ​បង្អួច"
 
 #: modules/video_output/android/window.c:51
-#, fuzzy
 msgid "Android native window"
-msgstr "បង្អួច​សកម្ម"
+msgstr ""
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -26707,9 +26573,8 @@ msgid "K Video Acceleration video output"
 msgstr "លទ្ធផល​វីដេអូ​ការ​បង្កើន​ល្បឿន​វីដេអូ K"
 
 #: modules/video_output/macosx.m:75
-#, fuzzy
 msgid "Mac OS X OpenGL video output"
-msgstr "លទ្ធផល​វីដេអូ iOS OpenGL"
+msgstr ""
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -26770,19 +26635,16 @@ msgid "Choose a pixel shader to apply."
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:79
-#, fuzzy
 msgid "Path to HLSL file"
-msgstr "ផ្លូវ​ទៅកាន់​រូបភាព​ម៉ឺនុយ OSD"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:80
-#, fuzzy
 msgid "Path to an HLSL file containing a single pixel shader."
-msgstr "ផ្លូវ​ទៅកាន់​មេឌៀ​នៅ​ក្នុង​ប័ណ្ណសារ​ហ្ស៊ីប"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:82
-#, fuzzy
 msgid "HLSL File"
-msgstr "រក្សាទុក​ឯកសារ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:84
 msgid "Recommended video output for Windows Vista and later versions"
@@ -27492,18 +27354,16 @@ msgid "The height of the effects video window, in pixels."
 msgstr "កម្ពស់​បង្អួច​វីដេអូ​បែបផែន គិត​ជា​ភីកសែល ។"
 
 #: modules/visualization/visual/visual.c:61
-#, fuzzy
 msgid "FFT window"
-msgstr "បង្អួច X"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:65
-#, fuzzy
 msgid "Kaiser window parameter"
-msgstr "បដិសេធ​ប៉ារ៉ាម៉ែត្រ"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -28683,10 +28543,6 @@ msgstr "AAAA;"
 msgid "Media Manager List"
 msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "បទ​ចំណងជើង​រង"
-
 #~ msgid "Display resolution"
 #~ msgstr "បង្ហាញ​គុណភាព​បង្ហាញ"
 
@@ -28725,13 +28581,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "HTTP/TLS Certificate Revocation List"
 #~ msgstr "បញ្ជី​ដក​ហូត​វិញ្ញាបនបត្រ HTTP/TLS"
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remote clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "ឯកសារ​នេះ​មាន CRL ជា​ជម្រើស​ដើម្បី​ការពារ​ម៉ាស៊ីន​កូន​ពី​ការ​ប្រើ​វិញ្ញាបនបត្រ​ដក​ហូត​នៅ​ក្នុង​សម័យ TLS ។"
 
 #~ msgid "Log to file"
 #~ msgstr "ចុះ​​កំណត់ហេតុ​ទៅកាន់​ឯកសារ"
@@ -28866,10 +28715,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgstr ""
 #~ "ប្រូកស៊ី HTTP ដែល​ត្រូវ​ប្រើ។ វា​ត្រូវតែ​មាន​ទម្រង់​ជា http://[user[:pass]@]myproxy."
 #~ "mydomain:myport/ ; ប្រសិន​បើ​ទទេ អថេរ http_proxy នឹង​ត្រូវ​បាន​សាកល្បង។"
-
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC មិន​អាច​បើក​ឯកសារ \"%s\" (%m) ។"
 
 #~ msgid "Video Capture width"
 #~ msgstr "ការ​ចាប់​យក​ទទឹង​វីដេអូ"
@@ -29026,12 +28871,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "ទ្រង់ទ្រាយ​ដែល​ត្រូវ​ប្រើ​នៅ​ក្នុង​វាល \"ចំណងជើង\" របស់​បញ្ជី​ចាក់។"
 
-#~ msgid "Media in Zip"
-#~ msgstr "មេឌៀ​​នៅ​ក្នុង​ហ្ស៊ីប"
-
-#~ msgid "Path to the media in the Zip archive"
-#~ msgstr "ផ្លូវ​ទៅកាន់​មេឌៀ​នៅ​ក្នុង​ប័ណ្ណសារ​ហ្ស៊ីប"
-
 #~ msgid "Zip files filter"
 #~ msgstr "តម្រង​ឯកសារ​ហ្ស៊ីប"
 
@@ -29108,10 +28947,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "\"%s\" is no audio encoder."
 #~ msgstr "\"%s\" គឺ​គ្មាន​អ៊ិនកូឌ័រ​អូឌីយ៉ូ​ទេ ។"
 
-#, fuzzy
-#~ msgid "Dummy video decoder"
-#~ msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
-
 #~ msgid "420YpCbCr8Planar"
 #~ msgstr "420YpCbCr8Planar"
 
@@ -29129,18 +28964,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "ឌិកូឌ័រ​បណ្ណាល័យ QuickTime"
-
-#~ msgid "---  DVD Menu"
-#~ msgstr "---  ម៉ឺនុយ​ឌីវីឌី"
-
-#~ msgid "First Played"
-#~ msgstr "បាន​ចាក់​ដំបូង"
-
-#~ msgid "Video Manager"
-#~ msgstr "កម្មវិធី​គ្រប់គ្រង​វីដេអូ"
-
-#~ msgid "----- Title"
-#~ msgstr "----- ចំណងជើង"
 
 #~ msgid "Writer"
 #~ msgstr "អ្នកនិពន្ធ"
@@ -29238,19 +29061,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "ZPL playlist import"
 #~ msgstr "ការ​នាំចូល​បញ្ជី​ចាក់ ZPL"
 
-#~ msgid "Fast udp streaming"
-#~ msgstr "ការ​ស្ទ្រីម udp រហ័ស"
-
-#~ msgid ""
-#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
-#~ msgstr "ផ្ញើ TS ដើម្បី​បញ្ជាក់ ip:port តាម udp (អ្នក​ត្រូវតែ​ដឹង​ថា​អ្នក​កំពុង​ធ្វើ) ។"
-
-#~ msgid "MTU for out mode"
-#~ msgstr "MTU សម្រាប់​របៀប​ខាងក្រៅ"
-
-#~ msgid "MTU for out mode."
-#~ msgstr "MTU សម្រាប់​របៀប​ខាងក្រៅ ។"
-
 #~ msgid "Compiled by %s with %@"
 #~ msgstr "បាន​ចង​ក្រង​ដោយ %s ជាមួយ %@"
 
@@ -29268,10 +29078,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "The stream must be playing or paused for bookmarks to work."
 #~ msgstr "ស្ទ្រីម​ត្រូវតែ​បាន​ចាក់ ឬ​ផ្អាក​ទើប​អាច​ចំណាំ​បាន ។"
-
-#, fuzzy
-#~ msgid "Hide Details"
-#~ msgstr "សេចក្ដី​លម្អិត​កូដិក"
 
 #~ msgid "Send"
 #~ msgstr "ផ្ញើ"
@@ -29345,9 +29151,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "(no item is being played)"
 #~ msgstr "(ពុំមាន​ធាតុ​ដែល​កំពុង​ចាក់​ទេ)"
-
-#~ msgid "VLC media playback"
-#~ msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC"
 
 #~ msgid "Streaming/Exporting Wizard..."
 #~ msgstr "អ្នកជំនួយការ​ស្ទ្រីម/នាំចេញ..."
@@ -29447,10 +29250,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Meta-information"
 #~ msgstr "ព័ត៌មាន​មេតា"
-
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "នៅ​លើ​គេ​ជានិច្ច"
 
 #~ msgid "Hardware Acceleration"
 #~ msgstr "ការ​បង្កើន​ល្បឿន​ផ្នែក​រឹង"
@@ -29586,17 +29385,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "ប្រទាក់​បណ្ដាញ​ទាំងអស់ ។ ជាទូទៅ វា​ជា​កិច្ចការ​ល្អ​បំផុត​ដែល​ត្រូវ​ធ្វើ ។ កុំព្យូទ័រ​ផ្សេងទៀត​អាច​ចូល​"
 #~ "ដំណើរការ​ស្ទ្រីម​នៅ mms://yourip:8080 បាន​តាម​លំនាំដើម ។"
 
-#, fuzzy
-#~ msgid ""
-#~ "Use this to stream to several computers using the Microsoft MMS protocol. "
-#~ "This protocol is used as transport method by many Microsoft's software. "
-#~ "Note that only a small part of the MMS protocol is supported (MMS "
-#~ "encapsulated in HTTP)."
-#~ msgstr ""
-#~ "ប្រើ​វា​ដើម្បី​ស្ទ្រីម​កុំព្យូទ័រ​មួយ​ចំនួន​ដោយ​ប្រើ​ពិធីការ Microsoft MMS ។ ពិធីការ​នេះ​ត្រូវ​បាន​ប្រើ​ជា​"
-#~ "វិធីសាស្ត្រ​ដឹកជញ្ជូន​ដោយ​កម្មវិធី​ជាច្រើន​របស់ Microsoft ។ ចងចាំ​ថា​មានតែ​ផ្នែក​តូច​មួយ​នៃ​ពិធីការ MMS "
-#~ "ប៉ុណ្ណោះ​ដែល​ត្រូវ​បាន​គាំទ្រ (MMS បាន​ខ្ចប់​នៅ​ក្នុង HTTP) ។"
-
 #~ msgid "Enter the address of the computer to stream to."
 #~ msgstr "បញ្ចូល​អាសយដ្ឋាន​កុំព្យូទ័រ​ដែល​ត្រូវ​ស្ទ្រីម​ទៅ​កាន់ ។"
 
@@ -29686,6 +29474,9 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "This page allows selecting how the input stream will be sent."
 #~ msgstr "ទំព័រ​នេះ​អនុញ្ញាត​ឲ្យ​ជ្រើស​របៀប​ផ្ញើ​ស្ទ្រីម​ព័ត៌មាន​បញ្ចូល ។"
+
+#~ msgid "Streaming method"
+#~ msgstr "វិធីសាស្ត្រ​ស្ទ្រីម"
 
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "អាសយដ្ឋាន​កុំព្យូទ័រ​ដែល​ត្រូវ​ស្ទ្រីម​ទៅ​កាន់ ។"
@@ -29934,14 +29725,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "&Post processing"
 #~ msgstr "ដំណើរការ​តាម​ក្រោយ"
-
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "រក្សាទុក​បញ្ជី​ចាក់"
-
-#, fuzzy
-#~ msgid "Recently Played"
-#~ msgstr "រក្សាទុក​ធាតុ​ដែល​បាន​ចាក់​បច្ចុប្បន្ន"
 
 #~ msgid "Power"
 #~ msgstr "ថាមពល"
@@ -30525,14 +30308,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Bar width in pixel (default : 10)"
 #~ msgstr "ទទឹង​របារ​គិតជា​ភីកសែល (លំនាំដើម ៖ ១០)"
 
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "បង្អួច​សកម្ម"
-
-#, fuzzy
-#~ msgid "Android MediaCodec direct rendering video output"
-#~ msgstr "លទ្ធផល​វីដេអូ​ផ្ទៃ​ខាងក្រៅ​របស់ Android"
-
 #~ msgid "Force use of a specific chroma for output. Default is RGB32."
 #~ msgstr "តម្រូវឲ្យ​ប្រើ​ក្រូម៉ា​ជាក់លាក់​សម្រាប់​លទ្ធផល។ លំនាំដើម​គឺ RGB32 ។"
 
@@ -30541,15 +30316,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "លទ្ធផល​វីដេអូ DirectFB http://www.directfb.org/"
-
-#~ msgid ""
-#~ "If your framebuffer supports hardware acceleration or does double "
-#~ "buffering in hardware then you must disable this option. It then does "
-#~ "double buffering in software."
-#~ msgstr ""
-#~ "ប្រសិន​បើ​ស៊ុម​អង្គ​ចងចាំ​បណ្ដោះអាសន្ន​របស់​អ្នក​គាំទ្រ​ការ​បង្កើន​ល្បឿន​ផ្នែក​រឹង ឬ​បង្កើន​អង្គ​ចងចាំ​"
-#~ "បណ្ដោះអាសន្ន​ទ្វេដង​​នៅ​ក្នុង​ផ្នែក​រឹង នោះ​អ្នក​ត្រូវ​តែ​បិទ​ជម្រើស​នេះ ។ បន្ទាប់មក​វា​បង្កើន​អង្គ​ចងចាំ​"
-#~ "បណ្ដោះអាសន្ន​ទ្វេដង​នៅ​ក្នុង​កម្មវិធី ។"
 
 #~ msgid "OpenGL ES extension"
 #~ msgstr "ផ្នែក​បន្ថែម​របស់ OpenGL ES"
@@ -30588,27 +30354,8 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "OpenGL GLX video output (XCB)"
 #~ msgstr "លទ្ធផល OpenGL GLX (XCB)"
 
-#~ msgid "Video acceleration not available"
-#~ msgstr "មិន​មាន​ការ​បង្កើន​ល្បឿន​វីដេអូ​ទេ"
-
-#~ msgid ""
-#~ "The XVideo rendering acceleration driver does not support the required "
-#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
-#~ "Acceleration will thus be disabled. Performance may be degraded severely "
-#~ "if the resolution is large."
-#~ msgstr ""
-#~ "កម្មវិធី​បញ្ចា​បង្កើន​ល្បឿន​ការ​បង្ហាញ XVideo មិន​គាំទ្រ​គុណភាព​បង្ហាញ​​ដែល​បាន​ទាមទារ %ux%u "
-#~ "ភីកសែល ហើយ​វា​បាន​ជំនួស​ដោយ %<PRIu32>x%<PRIu32> ភីកសែល។\n"
-#~ "ការ​បង្កើន​ល្បឿន​នឹង​ត្រូវ​បាន​បិទ។ ការ​ដំណើរការ​អាច​យឺត​ខ្លាំង បើ​គុណភាព​បង្ហាញ​ធំ។"
-
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "បឋមកថា​របស់ YUV4MPEG2 (លំនាំដើម​គឺ​បិទ)"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
 
 #~ msgid "Black Slot"
 #~ msgstr "រន្ធ​ពណ៌ខ្មៅ"
@@ -30625,45 +30372,45 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Filter threshold (%)"
 #~ msgstr "តម្រង​កម្រិត​ពន្លឺ (%)"
 
-#, fuzzy
-#~ msgid "AVFoundation Video Capture"
-#~ msgstr "ការ​ចាប់​យក​វីដេអូ"
+#~ msgid "MKV"
+#~ msgstr "MKV"
 
-#, fuzzy
-#~ msgid "AVFoundation video capture module."
-#~ msgstr "VLC មិន​អាច​បើក​ម៉ូឌុល​ឌិកូឌ័រ​បានទេ ។"
+#~ msgid "FLV"
+#~ msgstr "FLV"
 
-#, fuzzy
-#~ msgid "No video devices found"
-#~ msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
+#~ msgid "---  DVD Menu"
+#~ msgstr "---  ម៉ឺនុយ​ឌីវីឌី"
 
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable video input device. "
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
-#~ "កម្មវិធី​បញ្ជា​របស់​អ្នក។"
+#~ msgid "First Played"
+#~ msgstr "បាន​ចាក់​ដំបូង"
 
-#~ msgid "Probe DVB card for capabilities"
-#~ msgstr "ស្ទង់​រក​ចំណុះ​កាត DVB"
+#~ msgid "Video Manager"
+#~ msgstr "កម្មវិធី​គ្រប់គ្រង​វីដេអូ"
+
+#~ msgid "----- Title"
+#~ msgstr "----- ចំណងជើង"
 
 #~ msgid ""
-#~ "Some DVB cards do not like to be probed for their capabilities, you can "
-#~ "disable this feature if you experience some trouble."
+#~ "If your framebuffer supports hardware acceleration or does double "
+#~ "buffering in hardware then you must disable this option. It then does "
+#~ "double buffering in software."
 #~ msgstr ""
-#~ "កាត DVB មិន​ហាក់ដូចជា​ត្រូវបាន​ស្ទង់​មើល​ចំណុះ​ទេ អ្នក​អាច​បិទ​លក្ខណៈ​ពិសេស​នេះ ប្រសិន​បើ​អ្នក​មាន​បញ្ហា ។"
+#~ "ប្រសិន​បើ​ស៊ុម​អង្គ​ចងចាំ​បណ្ដោះអាសន្ន​របស់​អ្នក​គាំទ្រ​ការ​បង្កើន​ល្បឿន​ផ្នែក​រឹង ឬ​បង្កើន​អង្គ​ចងចាំ​"
+#~ "បណ្ដោះអាសន្ន​ទ្វេដង​​នៅ​ក្នុង​ផ្នែក​រឹង នោះ​អ្នក​ត្រូវ​តែ​បិទ​ជម្រើស​នេះ ។ បន្ទាប់មក​វា​បង្កើន​អង្គ​ចងចាំ​"
+#~ "បណ្ដោះអាសន្ន​ទ្វេដង​នៅ​ក្នុង​កម្មវិធី ។"
 
-#, fuzzy
-#~ msgid "Satellite scanning config"
-#~ msgstr "លេខ​កូដ​ជួរ​ផ្កាយ​រណប"
+#~ msgid "Video acceleration not available"
+#~ msgstr "មិន​មាន​ការ​បង្កើន​ល្បឿន​វីដេអូ​ទេ"
 
-#, fuzzy
-#~ msgid "DVB"
-#~ msgstr "DV"
-
-#~ msgid "DVB input with v4l2 support"
-#~ msgstr "ព័ត៌មាន​បញ្ចូល DVB ជាមួយ​នឹង​ការ​គាំទ្រ v4l2"
+#~ msgid ""
+#~ "The XVideo rendering acceleration driver does not support the required "
+#~ "resolution of %ux%u pixels but %<PRIu32>x%<PRIu32> pixels instead.\n"
+#~ "Acceleration will thus be disabled. Performance may be degraded severely "
+#~ "if the resolution is large."
+#~ msgstr ""
+#~ "កម្មវិធី​បញ្ចា​បង្កើន​ល្បឿន​ការ​បង្ហាញ XVideo មិន​គាំទ្រ​គុណភាព​បង្ហាញ​​ដែល​បាន​ទាមទារ %ux%u "
+#~ "ភីកសែល ហើយ​វា​បាន​ជំនួស​ដោយ %<PRIu32>x%<PRIu32> ភីកសែល។\n"
+#~ "ការ​បង្កើន​ល្បឿន​នឹង​ត្រូវ​បាន​បិទ។ ការ​ដំណើរការ​អាច​យឺត​ខ្លាំង បើ​គុណភាព​បង្ហាញ​ធំ។"
 
 #, fuzzy
 #~ msgid ""
@@ -30673,170 +30420,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Scanning DVB"
 #~ msgstr "DVB"
-
-#, fuzzy
-#~ msgid "QTSound"
-#~ msgstr "ជុំវិញ"
-
-#, fuzzy
-#~ msgid "QuickTime Sound Capture"
-#~ msgstr "ការ​ចាប់​យក Quicktime"
-
-#, fuzzy
-#~ msgid "No Audio Input device found"
-#~ msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
-
-#, fuzzy
-#~ msgid ""
-#~ "Your Mac does not seem to be equipped with a suitable audio input device."
-#~ "Please check your connectors and drivers."
-#~ msgstr ""
-#~ "Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
-#~ "កម្មវិធី​បញ្ជា​របស់​អ្នក។"
-
-#, fuzzy
-#~ msgid "No audio input device found"
-#~ msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
-
-#~ msgid "Uncompressed RAR"
-#~ msgstr "RAR ដែល​មិន​បាន​បង្ហាប់"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "ការ​បង្ហាញ​វីដេអូ វីនដូ GDI"
-
-#, fuzzy
-#~ msgid "Specify the width to decode the image too"
-#~ msgstr "បញ្ជាក់​ជួរដេក​ដែល​មាន​ភាសា"
-
-#, fuzzy
-#~ msgid "Specify the height to decode the image too"
-#~ msgstr "បញ្ជាក់​ម៉ូឌុល​មិន​ត្របាញ់​ដែល​ត្រូវប្រើ ។"
-
-#, fuzzy
-#~ msgid "Scale factor to apply to image"
-#~ msgstr "កត្តា​មាត្រដ្ឋាន​ដែល​ត្រូវ​អនុវត្ត​ទៅកាន់​វីដេអូ ខណៈ​ពេល​កំពុង​បម្លែង​ត្រឡប់ (ឧ ៖ ០.២៥)"
-
-#, fuzzy
-#~ msgid "SVG video decoder"
-#~ msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
-
-#, fuzzy
-#~ msgid "Windows messages interface"
-#~ msgstr "ចំណុច​ប្រទាក់​សេវា​វីនដូ"
-
-#~ msgid "Save this Log..."
-#~ msgstr "រក្សាទុក​កំណត់​ហេតុ​នេះ..."
-
-#~ msgid "VLC Debug Log (%s).rtf"
-#~ msgstr "កំណត់​ហេតុ​បំបាត់​កំហុស VLC (%s).rtf"
-
-#, fuzzy
-#~ msgid "Empty"
-#~ msgstr " - ទទេ - "
-
-#, fuzzy
-#~ msgid "Deactivate"
-#~ msgstr "ធ្វើឲ្យ​សកម្ម"
-
-#, fuzzy
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "&ស្នាម​ម្រាមដៃ"
-
-#, fuzzy
-#~ msgid "No fingerprint has been found"
-#~ msgstr "រក​មិន​ឃើញ​ព័ត៌មាន​បញ្ចូល"
-
-#, fuzzy
-#~ msgid "Fingerprinting track..."
-#~ msgstr "&ស្នាម​ម្រាមដៃ"
-
-#, fuzzy
-#~ msgctxt "Tooltip|Clear"
-#~ msgid "Clear"
-#~ msgstr "សម្អាត"
-
-#, fuzzy
-#~ msgid "addons local storage"
-#~ msgstr "អត្រា​ប៊ីត​មូលដ្ឋាន​អតិ."
-
-#, fuzzy
-#~ msgid "Videolan.org's addons finder"
-#~ msgstr "តម្រង​ការ​ប្លែង​ភាព​វីដេអូ"
-
-#, fuzzy
-#~ msgid "acoustid"
-#~ msgstr "Acoustic"
-
-#, fuzzy
-#~ msgid "Duration of the fingerprinting"
-#~ msgstr "ទិស​នៃ​ការ​ឆ្លុះ"
-
-#, fuzzy
-#~ msgid "Default: 90sec"
-#~ msgstr "ស្ទ្រីម​លំនាំដើម"
-
-#, fuzzy
-#~ msgid "Chromaprint stream output"
-#~ msgstr "ប្រមូល​លទ្ធផល​ស្ទ្រីម"
-
-#~ msgid ""
-#~ "Please wait while your font cache is rebuilt.\n"
-#~ "This should take less than a few minutes."
-#~ msgstr ""
-#~ "សូម​រង់ចាំ ខណៈ​ពេល​ដែល​ឃ្លាំង​សម្ងាត់​ពុម្ពអក្សរ​របស់​អ្នក​កំពុង​ត្រូវ​បាន​ស្ថាបនា ។\n"
-#~ "វា​គួរតែ​ចំណាយ​ពេល​បន្តិចបន្តួចប៉ុណ្ណោះ ។"
-
-#, fuzzy
-#~ msgid "The width of the visualization window, in pixels."
-#~ msgstr "ទទឹង​បង្អួច​វីដេអូ​ គិត​ជា​ភីកសែល ។"
-
-#, fuzzy
-#~ msgid "The height of the visualization window, in pixels."
-#~ msgstr "កម្ពស់​បង្អួច​វីដេអូ គិត​ជា​ភីកសែល ។"
-
-#, fuzzy
-#~ msgid "glSpectrum"
-#~ msgstr "វិសាលគម"
-
-#, fuzzy
-#~ msgid "3D OpenGL spectrum visualization"
-#~ msgstr "រូបភាព​មើល​ឃើញ​បច្ចុប្បន្ន"
-
-#, fuzzy
-#~ msgid "Flat Top"
-#~ msgstr "អណ្ដែត​នៅលើ​កំពូល"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC - ចំណុច​ប្រទាក់​បណ្ដាញ"
-
-#, fuzzy
-#~ msgid "Streaming Output"
-#~ msgstr "លទ្ធផល​ស្ទ្រីម"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "ជ្រើស​លទ្ធផល​វីដេអូ​ដែល​អ្នក​ពេញចិត្ត ហើយ​កំណត់​រចនា​សម្ព័ន្ធ​វា​នៅ​ទីនេះ ។"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ម៉ូឌុល​ទាំង​នេះ​ផ្ដល់​នូវ​មុខងារ​បណ្ដាញ​ដល់​ផ្នែក​ទាំងអស់​របស់ VLC ។"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "ទាំងនេះ​ជា​ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​ការ​អ៊ិនកូដ​វីដេអូ/អូឌីយ៉ូ/ចំណងជើង​រង។"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "នៅ​ទីនេះ​អ្នក​អាច​កំណត់​រចនា​សម្ព័ន្ធ​កម្មវិធី​ផ្ដល់​ប្រអប់ ។"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "នៅ​ក្នុង​ផ្នែក​នេះ អ្នក​អាច​បង្ខំ​ឥរិយាបថ​របស់​កម្មវិធី​ទ្វេ​ទិស​ចំណងជើង​រង​បាន ឧទាហរណ៍ ដោយ​កំណត់​ប្រភេទ​"
-#~ "ចំណងជើង​រង ឬ​ឈ្មោះ​ឯកសារ។"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "គ្មាន​ម៉ូឌុល​ឌិកូដ​ត្រឹមត្រូវ​ទេ"
 
 #~ msgid ""
 #~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
@@ -30859,14 +30442,8 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "ផ្លូវ​បន្ថែម​សម្រាប់ VLC ដើម្បី​រកមើល​ម៉ូឌុល​របស់​វា។ អ្នក​អាច​បន្ថែម​ផ្លូវ​ច្រើន​បាន​ដោយ​ដាក់​ពួកវា​បន្ត​"
 #~ "គ្នា និង​ដោយ​ប្រើ​សញ្ញា​បំបែក \" PATH_SEP \""
 
-#~ msgid "Album art policy"
-#~ msgstr "គោលនយោបាយ​សិល្បៈ​អាល់ប៊ុម"
-
 #~ msgid "Choose how album art will be downloaded."
 #~ msgstr "ជ្រើស​របៀប​ទាញ​យក​សិល្បៈ​អាល់ប៊ុម។"
-
-#~ msgid "Manual download only"
-#~ msgstr "បានតែ​ទាញ​យក​ដោយ​ដៃ​ប៉ុណ្ណោះ"
 
 #~ msgid "When track starts playing"
 #~ msgstr "នៅ​ពេល​ចាប់ផ្ដើម​ចាក់​បទ"
@@ -30874,24 +30451,12 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "As soon as track is added"
 #~ msgstr "ភ្លាមៗ​នៅ​ពេល​បាន​បន្ថែម​បទ"
 
-#~ msgid "Load Media Library"
-#~ msgstr "ផ្ទុក​បណ្ណាល័យ​មេឌៀ"
-
 #~ msgid ""
 #~ "Enable this option to load the SQL-based Media Library at VLC startup"
 #~ msgstr "បើក​ជម្រើស​នេះ ដើម្បី​ផ្ទុក​បណ្ណាល័យ​មេឌៀ SQL-based នៅ​ពេល​ចាប់ផ្ដើម​ VLC"
 
 #~ msgid "FFmpeg"
 #~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "ចូល​ដំណើរការ FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr "បណ្ណាល័យ​ឌិកូដ​ប្រព័ន្ធ​ AACS របស់​អ្នក​មិន​ដំណើរការ​ទេ។ ភ្លេច​ពាក្យសម្ងាត់​ឬ?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC មិន​អាច​បើក​ឯកសារ \"%s\". (%m) បាន​ទេ"
 
 #~ msgid "TCP address to use"
 #~ msgstr "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ"
@@ -30903,18 +30468,12 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទាក់ទង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម "
 #~ "localhost)។ ក្នុង​ករណី​ដែល​របារ​ក្រាហ្វិក​ជាប់​ស្អិត សូម​ប្រើ localhost ។"
 
-#~ msgid "TCP port to use"
-#~ msgstr "ច្រក TCP ដែល​ត្រូវ​ប្រើ"
-
 #~ msgid ""
 #~ "TCP port to use to communicate with the video part of the Bar Graph "
 #~ "(default 12345). Use the same port as the one used in the rc interface."
 #~ msgstr ""
 #~ "ច្រក​ TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទំនាក់ទំនង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម 12345) ។ ប្រើ​"
 #~ "ដូចគ្នា​ជាមួយ​ច្រក​ដែល​បាន​ប្រើ​នៅ​ក្នុង​ចំណុច​ប្រទាក់ rc ។"
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "តម្រូវ​ឲ្យ​​កំណត់​ការ​តភ្ជាប់​ឡើងវិញ​យ៉ាង​ទៀងទាត់"
 
 #~ msgid ""
 #~ "Defines if the TCP connection should be reset. This is to be used when "
@@ -30923,26 +30482,11 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "កំណត់ ប្រសិនបើ​ការ​តភ្ជាប់ TCP គួរ​ត្រូវ​បាន​កំណត់​ឡើងវិញ ។ វា​ត្រូវ​បាន​ប្រើ​ជាមួយ audiobargraph_v "
 #~ "(លំនាំដើម ១) ។"
 
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "តម្រង​អូឌីយ៉ូ​សម្រាប់​ការ​បម្លែង​ពី​ស្តេរ៉េអូ​​ទៅ​ម៉ូណូ"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "បោះបង់​ព័ត៌មាន​ច្រឹប"
-
 #~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 #~ msgstr "បោះបង់​ប៉ារ៉ាម៉ែត្រ​ច្រឹប​ខាងក្នុង (ឧ. ពី H.264 SPS)។"
 
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Video Decode and Presentation API for Unix (VDPAU)"
-
 #~ msgid "If bitrate=0, use this value for constant quality"
 #~ msgstr "ប្រសិនបើ​អត្រា​ប៊ីត=០ ប្រើ​តម្លៃ​នេះ​សម្រាប់​គុណភាព​ថេរ"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "តម្លៃ > ០ បើក​របៀប​អត្រា​ប៊ីត​ថេរ"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "បើក​ការ​សរសេរ​កូដ​ដែល​គ្មាន​ការ​បាត់បង់"
 
 #~ msgid ""
 #~ "Lossless coding ignores bitrate and quality settings, allowing for "
@@ -30953,18 +30497,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Diagonal Linear Phase"
 #~ msgstr "ដំណាក់កាល​លីនេអ៊ែរ​អង្កត់ទ្រូង"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "ចម្ងាយ​ស៊ុម​​ចន្លោះ 'P'"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "ចំនួន​ស៊ុម 'P' ក្នុង​មួយ GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "ទទឹង​ប្លុក​ការ​ប៉ះប៉ូវ​​ចលនា"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "កម្ពស់​របស់​ប្លុក​ការ​ប៉ះប៉ូវ​​ចលនា"
 
 #~ msgid "Block overlap (%)"
 #~ msgstr "ប្លុក​ត្រួត​លើ​គ្នា (%)"
@@ -30984,12 +30516,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Total vertical block length including overlaps"
 #~ msgstr "ប្រវែង​ប្លុក​បញ្ឈរ​សរុប​រួម​ទាំង​ការ​ត្រួត​លើ​គ្នា"
 
-#~ msgid "Motion vector precision"
-#~ msgstr "ចំនួន​ខ្ទង់​វ៉ិចទ័រ​ចលនា"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "ចំនួន​ខ្ទង់​វ៉ិចទ័រ​ចលនា​នៅ​ក្នុង pels ។"
-
 #~ msgid "Simple ME search area x:y"
 #~ msgstr "ផ្ទៃស្វែងរក ME ធម្មតា x:y"
 
@@ -31000,29 +30526,8 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "(មិនបានផ្ដល់​អនុសាសន៍​ទេ) អនុវត្តការ​ស្វែងរក​ចលនា​វ៉ិចទ័រ​ដែល​ផ្គូផ្គង​នឹង​ប្លុក​ឋានានុក្រម​ជា​មួយ​នឹង​ជួរ​"
 #~ "ស្វែងរក​ +/-x, +/-y"
 
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "បើក​ការ​កំណត់​ទីតាំង​ទំហំ"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ជុំ​ក្នុង​មួយ​​ដឺក្រេ"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "អ៊ិនកូដឌ័រ​វីដេអូ Dirac ដោយ​ប្រើ​បណ្ណាល័យ​ស្វែងរក dirac"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "អ៊ិនកូឌ័រ​វីដេអូ​ដោយ​ប្រើ openmash"
-
 #~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 #~ msgstr "| menu . . [on|off|up|down|left|right|select] ប្រើ​ម៉ឺនុយ"
-
-#~ msgid "Jump to time"
-#~ msgstr "ទៅកាន់​ពេលវេលា"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "បើក​កំណត់ហេតុ​ការ​គាំង..."
-
-#~ msgid "Don't Send"
-#~ msgstr "កុំ​ផ្ញើ"
 
 #~ msgid "VLC crashed previously"
 #~ msgstr "VLC ដែល​បាន​គាំង​ពី​មុន"
@@ -31058,9 +30563,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgid "Couldn't find any trace of a previous crash."
 #~ msgstr "មិន​អាច​រក​ឃើញ​ដាន​នៃ​ការ​គាំង​ពី​មុន​ទេ ។"
 
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "ផ្អាក iTunes ពេល​ចាក់ VLC"
-
 #~ msgid ""
 #~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
 #~ "playback will be resumed again if VLC playback is finished."
@@ -31068,46 +30570,10 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "ផ្អាក​ការ​ចាក់ iTunes ពេល​ចាប់ផ្ដើម​ចាក់ VLC ។ បើ​បាន​ជ្រើស ការ​ចាក់ iTunes នឹង​ត្រូវ​បាន​ធ្វើ​"
 #~ "បន្ត​ម្ដងទៀត ពេល​ការ​ចាក់ VLC បាន​បញ្ចប់។"
 
-#~ msgid "Open BDMV folder"
-#~ msgstr "បើក​ថត BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "គោលការ​ទាញយក​សិល្បៈ​អាល់ប៊ុម"
-
-#~ msgid "Output module"
-#~ msgstr "ម៉ូឌុល​លទ្ធផល"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "អេហ្គុយ​ក្រាហ្វិក"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "ទៅ​យក​ព័ត៌មាន​មេឌៀ​ដោយ​ស្វ័យប្រវត្តិ"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "យក​ផ្នែក​បន្ថែម​ផ្សេង​ទៀត​ពី"
-
-#~ msgid "Under the Video"
-#~ msgstr "ខាងក្រោម​វីដេអូ"
-
-#~ msgid "&Help..."
-#~ msgstr "ជំនួយ..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "ធ្វើ​សមកាលកម្ម​នៅលើ​បទ​អូឌីយ៉ូ"
-
 #~ msgid ""
 #~ "This option will drop/duplicate video frames to synchronise the video "
 #~ "track on the audio track."
 #~ msgstr "ជម្រើស​នេះ​នឹង​ទម្លាក់/​ស្ទួន​ស៊ុម​វីដេអូ ដើម្បី​ធ្វើ​សមកាលកម្ម​បទ​វីដេអូ នៅ​លើ​បទ​អូឌីយ៉ូ ។"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr "កម្មវិធី​បម្លែង​ត្រឡប់ នឹង​ទម្លាក់​ស៊ុម​ប្រសិនបើ​ស៊ីភីយូ​របស់​អ្នក​មិន​អាច​តាម​ទាន់​អត្រា​អ៊ិនកូដ ។"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "តម្លៃ​កម្រិត​ឆានែល​អូឌីយ៉ូ"
 
 #~ msgid ""
 #~ "Value of the audio level of each channels between 0 and 1. Each level "
@@ -31120,18 +30586,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
 #~ msgstr "សញ្ញា​ស្ងាត់ ការ​បង្ហាញ និង​ការ​ព្រមាន (០=មិន​ជូនដំណឹង ១=ជូនដំណឹង) ។"
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "ទំហំ​កម្លាំង​លូម៉ា (លំនាំដើម ៤)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "ទំហំ​កម្លាំង​ក្រូម៉ា (លំនាំដើម ៣)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "កម្លាំង​លូម៉ា​បណ្ដោះអាសន្ន (លំនាំដើម ៦)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "កម្លាំង​ក្រូម៉ា​បណ្ដោះអាសន្ន (លំនាំដើម ៤.៥)"
 
 #~ msgid ""
 #~ "Marquee text to display. (Available format strings: Time related: %Y = "
@@ -31153,12 +30607,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ "អត្រា $S = អត្រា​គំរូ​អូឌីយ៉ូ (គិត​ជា kHz) $T = ពេលវេលា $U = អ្នក​បោះពុម្ពផ្សាយ $V = កម្រិត​"
 #~ "សំឡេង $_ = បន្ទាត់​ថ្មី)"
 
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "លទ្ធផល​វីដេអូ iOS OpenGL ES (ទាមទារ UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "លទ្ធផល​វីដេអូ Mac OS X OpenGL (ទាមទារ drawable-nsobject)"
-
 #~ msgid "OpenGL acceleration is not supported on your Mac"
 #~ msgstr "ការ​បង្កើន​ល្បឿន OpenGL មិន​ត្រូវ​បាន​គាំទ្រ​នៅ​លើ Mac របស់​អ្នក​ទេ"
 
@@ -31169,16 +30617,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgstr ""
 #~ "Mac របស់​អ្នក​ខ្វះ​ការ​បង្កើន​ល្បឿន Quartz Extreme ដែល​ត្រូវ​បាន​ទាមទារ​សម្រាប់​ការ​បង្ហាញ​វីដេអូ "
 #~ "។ វា​នឹង​នៅតែ​ដំណើរការ​ប៉ុន្តែ​យឺត និង​អាច​កើត​មាន​លទ្ធផល​ដែល​មិន​រំពឹង ។"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "ប្រើ​ឯកសារ​ចំណងជើង​រង"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "គោលការណ៍​​ទាញ​យក​សិល្បៈ​អាល់ប៊ុម ៖"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "កំណត់​រចនាសម្ព័ន្ធ​បណ្ណាល័យ​មេឌៀ"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32898,6 +32336,328 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgstr "ច្រឹប​ផ្នែក​ដែល​បាន​កំណត់​របស់​រូបភាព"
 
 #, fuzzy
+#~ msgid "TCP address to use (default localhost)"
+#~ msgstr "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ"
+
+#, fuzzy
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost).In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទាក់ទង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម "
+#~ "localhost)។ ក្នុង​ករណី​ដែល​របារ​ក្រាហ្វិក​ជាប់​ស្អិត សូម​ប្រើ localhost ។"
+
+#, fuzzy
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345).Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "ច្រក​ TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទំនាក់ទំនង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម 12345) ។ ប្រើ​"
+#~ "ដូចគ្នា​ជាមួយ​ច្រក​ដែល​បាន​ប្រើ​នៅ​ក្នុង​ចំណុច​ប្រទាក់ rc ។"
+
+#, fuzzy
+#~ msgid "Force connection reset regularly (default 1)"
+#~ msgstr "តម្រូវ​ឲ្យ​​កំណត់​ការ​តភ្ជាប់​ឡើងវិញ​យ៉ាង​ទៀងទាត់"
+
+#, fuzzy
+#~ msgid "TCP port to use (default 12345)"
+#~ msgstr "ច្រក TCP ដែល​ត្រូវ​ប្រើ"
+
+#, fuzzy
+#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
+#~ msgstr "លទ្ធផល​វីដេអូ Mac OS X OpenGL (ទាមទារ drawable-nsobject)"
+
+#, fuzzy
+#~ msgid "Ffmpeg mux"
+#~ msgstr "FFmpeg"
+
+#, fuzzy
+#~ msgid "Don't repair"
+#~ msgstr "កុំ​ផ្ញើ"
+
+#, fuzzy
+#~ msgid ""
+#~ "Format of the string to send to Telepathy.Defaults to \"Artist - Title"
+#~ "\" ($a - $t). You can use the following substitutions: $a Artist, $b "
+#~ "Album, $c Copyright, $d Description, $e Encoder, $g Genre, $l Language, "
+#~ "$n number, $p Now Playing, $r Rating, $s Subtitles language, $t Title, $u "
+#~ "URL, $A Date, $B Bitrate, $C Chapter, $D Duration, $F URI, $I Video "
+#~ "Title, $L Time Remaining, $N Name, $O Audio language, $P Position, $R "
+#~ "Rate, $S Sample rate, $T Time elapsed, $U Publisher, $V Volume"
+#~ msgstr ""
+#~ "អត្ថបទ​ម៉ារគី​ដែល​ត្រូវ​បង្ហាញ ។ (តួអក្សរ​ទ្រង់ទ្រាយ​ដែល​មាន ៖ %Y = ឆ្នាំ %m = ខែ %d = ថ្ងៃ %H "
+#~ "= ម៉ោង %M = នាទី %S = វិនាទី... ទិន្នន័យ​មេតា​ដែល​ពាក់ព័ន្ធ ៖ $a = សិល្បករ $b = អាល់ប៊ុម $c "
+#~ "= រក្សាសិទ្ធិ $d = សេចក្ដី​ពណ៌នា $e = អ៊ិនកូដ​ដោយ $g = ចង្វាក់ $l = ភាសា $n = លេខ​បទ $p "
+#~ "= កំពុង​ចាក់ $r = អត្រា $s = ភាសា​ចំណង​ជើង​រង $t = ចំណង​ជើង $u = url, $A = កាលបរិច្ឆេទ "
+#~ "$B = អត្រា​ប៊ីត​អូឌីយ៉ូ (គិត​ជា​គីឡូប៊ីត/វិ.) $C = ជំពូក $D = ថិរវេលា $F = ឈ្មោះ​ពេញ​រួម​ទាំង​ផ្លូវ $I "
+#~ "= ចំណងជើង $L = ពេលវេលា​នៅសល់ $N = ឈ្មោះ $O = ភាសា​អូឌីយ៉ូ $P = ទីតាំង (គិត​ជា %) $R = "
+#~ "អត្រា $S = អត្រា​គំរូ​អូឌីយ៉ូ (គិត​ជា kHz) $T = ពេលវេលា $U = អ្នក​បោះពុម្ពផ្សាយ $V = កម្រិត​"
+#~ "សំឡេង $_ = បន្ទាត់​ថ្មី)"
+
+#~ msgid "Subtitle track added"
+#~ msgstr "បាន​បន្ថែម​បទ​ចំណងជើង​រង"
+
+#~ msgid "Media in Zip"
+#~ msgstr "មេឌៀ​​នៅ​ក្នុង​ហ្ស៊ីប"
+
+#~ msgid "Path to the media in the Zip archive"
+#~ msgstr "ផ្លូវ​ទៅកាន់​មេឌៀ​នៅ​ក្នុង​ប័ណ្ណសារ​ហ្ស៊ីប"
+
+#~ msgid "Fast udp streaming"
+#~ msgstr "ការ​ស្ទ្រីម udp រហ័ស"
+
+#~ msgid ""
+#~ "Sends TS to specific ip:port by udp (you must know what you are doing)."
+#~ msgstr "ផ្ញើ TS ដើម្បី​បញ្ជាក់ ip:port តាម udp (អ្នក​ត្រូវតែ​ដឹង​ថា​អ្នក​កំពុង​ធ្វើ) ។"
+
+#~ msgid "MTU for out mode"
+#~ msgstr "MTU សម្រាប់​របៀប​ខាងក្រៅ"
+
+#~ msgid "MTU for out mode."
+#~ msgstr "MTU សម្រាប់​របៀប​ខាងក្រៅ ។"
+
+#~ msgid "Probe DVB card for capabilities"
+#~ msgstr "ស្ទង់​រក​ចំណុះ​កាត DVB"
+
+#~ msgid ""
+#~ "Some DVB cards do not like to be probed for their capabilities, you can "
+#~ "disable this feature if you experience some trouble."
+#~ msgstr ""
+#~ "កាត DVB មិន​ហាក់ដូចជា​ត្រូវបាន​ស្ទង់​មើល​ចំណុះ​ទេ អ្នក​អាច​បិទ​លក្ខណៈ​ពិសេស​នេះ ប្រសិន​បើ​អ្នក​មាន​បញ្ហា ។"
+
+#~ msgid "DVB input with v4l2 support"
+#~ msgstr "ព័ត៌មាន​បញ្ចូល DVB ជាមួយ​នឹង​ការ​គាំទ្រ v4l2"
+
+#~ msgid "Uncompressed RAR"
+#~ msgstr "RAR ដែល​មិន​បាន​បង្ហាប់"
+
+#~ msgid "Save this Log..."
+#~ msgstr "រក្សាទុក​កំណត់​ហេតុ​នេះ..."
+
+#~ msgid "VLC Debug Log (%s).rtf"
+#~ msgstr "កំណត់​ហេតុ​បំបាត់​កំហុស VLC (%s).rtf"
+
+#~ msgid ""
+#~ "Please wait while your font cache is rebuilt.\n"
+#~ "This should take less than a few minutes."
+#~ msgstr ""
+#~ "សូម​រង់ចាំ ខណៈ​ពេល​ដែល​ឃ្លាំង​សម្ងាត់​ពុម្ពអក្សរ​របស់​អ្នក​កំពុង​ត្រូវ​បាន​ស្ថាបនា ។\n"
+#~ "វា​គួរតែ​ចំណាយ​ពេល​បន្តិចបន្តួចប៉ុណ្ណោះ ។"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "ជ្រើស​ការ​បង្ហាញ​វីដេអូ​ដែល​អ្នក​ពេញចិត្ត ហើយ​កំណត់​រចនា​សម្ព័ន្ធ​វា​នៅ​ទីនេះ។"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ម៉ូឌុល​ទាំង​នេះ​ផ្ដល់​មុខងារ​បណ្ដាញ​ដល់​ផ្នែក​ទាំងអស់​របស់ VLC ។"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "ទាំងនេះ​ជា​ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​ការ​អ៊ិនកូដ​វីដេអូ/អូឌីយ៉ូ/ចំណងជើង​រ។"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "នៅ​ទីនេះ​អ្នក​អាច​កំណត់​រចនា​សម្ព័ន្ធ​កម្មវិធី​ផ្ដល់​ប្រអប់។"
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "នៅ​ក្នុង​ផ្នែក​នេះ អ្នក​អាច​បង្ខំ​ឥរិយាបថ​របស់​កម្មវិធី​ទ្វេ​ទិស​ចំណងជើង​រង​បាន ឧទាហរណ៍ ដោយ​កំណត់​ប្រភេទ​"
+#~ "ចំណងជើង​រង ឬ​ឈ្មោះ​ឯកសារ។"
+
+#, fuzzy
+#~ msgid "No suitable decoder module"
+#~ msgstr "ឌិកូឌ័រ​ចំណងជើង​រង CVD"
+
+#, fuzzy
+#~ msgid "Album art policy"
+#~ msgstr "គោលការ​ទាញយក​សិល្បៈ​អាល់ប៊ុម"
+
+#, fuzzy
+#~ msgid "Manual download only"
+#~ msgstr "គោលការ​ទាញយក​សិល្បៈ​អាល់ប៊ុម"
+
+#, fuzzy
+#~ msgid "Load Media Library"
+#~ msgstr "បណ្ណាល័យ​មេឌៀ"
+
+#, fuzzy
+#~ msgid "FFmpeg access"
+#~ msgstr "ចូល​ដំណើរការ​ហ្ស៊ីប"
+
+#, fuzzy
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr "បណ្ណាល័យ​ឌិកូដ​ប្រព័ន្ធ BD+ របស់​អ្នក​មិន​ដំណើរការ​ទេ។ មិន​បាន​កំណត់​រចនាសម្ព័ន្ធ​ឬ?"
+
+#, fuzzy
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC មិន​អាច​បើក​ម៉ូឌុល %s បាន​ទេ ។"
+
+#, fuzzy
+#~ msgid "TCP port to use"
+#~ msgstr "ច្រក​ម៉ាស៊ីន​មេ CDDB ដែល​ត្រូវ​ប្រើ។"
+
+#, fuzzy
+#~ msgid "Force connection reset regularly"
+#~ msgstr "បង្ខំ​ក្រូម៉ា (ប្រើ​ដោយ​ប្រុងប្រយ័ត្ន)"
+
+#, fuzzy
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "តម្រង​អូឌីយ៉ូ​សម្រាប់​ការ​បម្លែង​ទ្រង់ទ្រាយ PCM"
+
+#, fuzzy
+#~ msgid "Discard cropping information"
+#~ msgstr "ព័ត៌មាន HRD-timing"
+
+#, fuzzy
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "ក្របខណ្ឌ​ការងារ Video Decode Acceleration (VDA)"
+
+#, fuzzy
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "អត្រា​​ប៊ីត​គោលដៅ​នៅ​ក្នុង kbps នៅ​ពេល​​អ៊ិនកូដ​​នៅ​ក្នុង​អត្រា​ប៊ីត​ថេរ"
+
+#, fuzzy
+#~ msgid "Enable lossless coding"
+#~ msgstr "បើក​របៀប​មេហ្កាបាស់"
+
+#, fuzzy
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "ជំហាន QP អតិបរមា​រវាង​ស៊ុម ។"
+
+#, fuzzy
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "ចំនួន​ស៊ុម (ពី ០ ទៅ ១០០)"
+
+#, fuzzy
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "ទំហំ ចលនា ទប់ស្កាត់"
+
+#, fuzzy
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "ទំហំ ចលនា ទប់ស្កាត់"
+
+#, fuzzy
+#~ msgid "Motion vector precision"
+#~ msgstr "ចំនួន​ខ្ទង់​វ៉ិចទ័រ​ចលនា"
+
+#, fuzzy
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "ចំនួន​ខ្ទង់​វ៉ិចទ័រ​​ចលនា​គិត​​ជាភីសែល"
+
+#, fuzzy
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "បើក​ការ​ឆ្លើយតប​បន្ទះ​វិសាលគម"
+
+#, fuzzy
+#~ msgid "cycles per degree"
+#~ msgstr "មុំ​គិតជា​ដឺក្រេ"
+
+#, fuzzy
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "អ៊ិនកូឌ័រ Dirac ប្រើ libschroedinger"
+
+#, fuzzy
+#~ msgid "Video decoder using openmash"
+#~ msgstr "អ៊ិនកូឌ័រ​វីដេអូ (ដោយ​ប្រើ OpenMAX IL)"
+
+#, fuzzy
+#~ msgid "Jump to time"
+#~ msgstr "ទៅកាន់​ពេលវេលា"
+
+#, fuzzy
+#~ msgid "Open CrashLog..."
+#~ msgstr "បើក​ថាស..."
+
+#, fuzzy
+#~ msgid "Don't Send"
+#~ msgstr "កុំ​បង្ហាញ"
+
+#, fuzzy
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "ផ្អាក​ការ​ចាក់​ឡើងវិញ"
+
+#, fuzzy
+#~ msgid "Open BDMV folder"
+#~ msgstr "បើក​ថត"
+
+#~ msgid "Album art download policy"
+#~ msgstr "គោលការ​ទាញយក​សិល្បៈ​អាល់ប៊ុម"
+
+#, fuzzy
+#~ msgid "Output module"
+#~ msgstr "ម៉ូឌុល​បង្ហាញ"
+
+#, fuzzy
+#~ msgid "Graphic Equalizer"
+#~ msgstr "អេហ្គុយ​ប៉ារ៉ាម៉ែត្រ"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "កំណត់​ការ​កើនឡើង​វីដេអូ​ស្វ័យប្រវត្តិ។"
+
+#, fuzzy
+#~ msgid "Get more extensions from"
+#~ msgstr "កន្ទុយ​ឯកសារ​ដែល​មិន​អើពើ"
+
+#, fuzzy
+#~ msgid "Under the Video"
+#~ msgstr "ខា​ងលើ​វីដេអូ"
+
+#, fuzzy
+#~ msgid "&Help..."
+#~ msgstr "ជំនួយ"
+
+#, fuzzy
+#~ msgid "Synchronise on audio track"
+#~ msgstr "បង្វិល​បទ​អូឌីយ៉ូ"
+
+#, fuzzy
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​នឹង​ធ្វើ​តែម​ពេលវេលា​ជាមុន ប្រសិន​បើ​ព័ត៌មាន​បញ្ចូល​មិន​អាច​​តាម​ទាន់​អត្រា ។"
+
+#, fuzzy
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "ចំនួន​ឆានែល​អូឌីយ៉ូ"
+
+#, fuzzy
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "ទំហំ​កម្លាំង​លូម៉ា (០-២៥៤)"
+
+#, fuzzy
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "ទំហំ​កម្លាំង​ក្រូម៉ា (០-២៥៤)"
+
+#, fuzzy
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "កម្លាំង​លូម៉ា​បណ្ដោះអាសន្ន (០-២៥៤)"
+
+#, fuzzy
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "កម្លាំង​ក្រូម៉ា​បណ្ដោះអាសន្ន (០-២៥៤)"
+
+#, fuzzy
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "លទ្ធផល​វីដេអូ iOS OpenGL"
+
+#, fuzzy
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "លទ្ធផល​វីដេអូ OpenGL (ពិសោធន៍)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "ប្រើ​ឯកសារ​ចំណងជើង​រង"
+
+#, fuzzy
+#~ msgid "Album art download policy:"
+#~ msgstr "គោលការ​ទាញយក​សិល្បៈ​អាល់ប៊ុម"
+
+#, fuzzy
+#~ msgid "Configure Media Library"
+#~ msgstr "បណ្ណាល័យ​មេឌៀ"
+
+#, fuzzy
 #~ msgid "One instance when started from file"
 #~ msgstr "ប្រើ​តែ​ធាតុ​មួយ​ប៉ុណ្ណោះ​ពេល​ចាប់ផ្ដើម​ពី​កម្មវិធី​គ្រប់គ្រង​ឯកសារ"
 
@@ -32960,36 +32720,12 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgstr "ពង្រីក"
 
 #, fuzzy
-#~ msgid "TCP address to use (default localhost)"
-#~ msgstr "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ"
-
-#, fuzzy
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost).In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "អាសយដ្ឋាន TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទាក់ទង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម "
-#~ "localhost)។ ក្នុង​ករណី​ដែល​របារ​ក្រាហ្វិក​ជាប់​ស្អិត សូម​ប្រើ localhost ។"
-
-#, fuzzy
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345).Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "ច្រក​ TCP ដែល​ត្រូវ​ប្រើ​ដើម្បី​ទំនាក់ទំនង​ជាមួយ​ផ្នែក​វីដេអូ​នៃ​របារ​ក្រាហ្វិក (លំនាំដើម 12345) ។ ប្រើ​"
-#~ "ដូចគ្នា​ជាមួយ​ច្រក​ដែល​បាន​ប្រើ​នៅ​ក្នុង​ចំណុច​ប្រទាក់ rc ។"
-
-#, fuzzy
 #~ msgid "Time window to use in ms (default 5000)"
 #~ msgstr "បង្អួច​ពេលវេលា​ដែល​ត្រូវ​ប្រើ​គិតជា​ មិ.វិ."
 
 #, fuzzy
 #~ msgid "Minimum Audio level to raise the alarm (default 0.1)"
 #~ msgstr "កម្រិត​អូឌីយ៉ូ​អប្បបរមា​ដែល​ត្រូវ​ឲ្យ​កើត​មាន​ការ​ជូនដំណឹង"
-
-#, fuzzy
-#~ msgid "Force connection reset regularly (default 1)"
-#~ msgstr "តម្រូវ​ឲ្យ​​កំណត់​ការ​តភ្ជាប់​ឡើងវិញ​យ៉ាង​ទៀងទាត់"
 
 #, fuzzy
 #~ msgid "Feedback Gain"
@@ -33283,7 +33019,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
-#~ msgstr "ចំណងជើង​រង / OSD"
+#~ msgstr "ចំណងជើង​រង/OSD"
 
 #, fuzzy
 #~ msgid "Subtitles codecs"
@@ -33291,7 +33027,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Settings for subtitles, teletext and CC decoders and encoders."
-#~ msgstr "ការ​កំណត់​ចំណងជើង​រង, អត្ថបទ​ទូរទស្សន៍ និង​អ៊ិនកូឌ័រ ឌិកូឌ័រ CC ។"
+#~ msgstr "ការ​កំណត់​សម្រាប់​ចំណងជើង​រង, អត្ថបទ​ទូរទស្សន៍ និង​អ៊ិនកូឌ័រ ឌិកូឌ័រ CC ។"
 
 #, fuzzy
 #~ msgid "General Input"
@@ -33316,7 +33052,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid ""
 #~ "These are general settings for video/audio/subtitles encoding modules."
-#~ msgstr "ទាំងនេះ​ជា​ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​ការ​អ៊ិនកូដ​វីដេអូ/អូឌីយ៉ូ/ចំណងជើង​រង។"
+#~ msgstr "ទាំងនេះ​ជា​ការ​កំណត់​ទូទៅ​សម្រាប់​ម៉ូឌុល​ការ​អ៊ិនកូដ​វីដេអូ/អូឌីយ៉ូ/ចំណងជើង​រ។"
 
 #, fuzzy
 #~ msgid "Dialog providers settings"
@@ -33360,7 +33096,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Add to Media Library"
-#~ msgstr "ផ្ទុក​បណ្ណាល័យ​មេឌៀ"
+#~ msgstr "បណ្ណាល័យ​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Advanced Open..."
@@ -33372,7 +33108,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Search Filter"
-#~ msgstr "តម្រង​ចរន្ត"
+#~ msgstr "តម្រង​ស្ទ្រីម"
 
 #, fuzzy
 #~ msgid "Image clone"
@@ -33423,7 +33159,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Audio visualizations "
-#~ msgstr "រូបភាព​មើល​ឃើញ​អូឌីយ៉ូ"
+#~ msgstr "រូបភាព​មើលឃើញ​អូឌីយ៉ូ"
 
 #, fuzzy
 #~ msgid "Subtitles track"
@@ -33721,10 +33457,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "ARM NEON audio format conversions"
 #~ msgstr "ការ​បម្លែង​ក្រូម៉ា​វីដេអូ ARM NEON"
-
-#, fuzzy
-#~ msgid "TCP port to use (default 12345)"
-#~ msgstr "ច្រក TCP ដែល​ត្រូវ​ប្រើ"
 
 #, fuzzy
 #~ msgid "Defines if BarGraph information should be sent (default 1)"
@@ -34037,7 +33769,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Maemo hildon interface"
-#~ msgstr "ចំណុច​ប្រទាក់​មេ"
+#~ msgstr "ចំណុចប្រទាក់​មេ"
 
 #, fuzzy
 #~ msgid "Compiled by %@ with %@"
@@ -34117,7 +33849,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Subtitles & OSD"
-#~ msgstr "ចំណងជើង​រង / OSD"
+#~ msgstr "ចំណងជើង​រង/OSD"
 
 #, fuzzy
 #~ msgid "Subtitles & On Screen Display Settings"
@@ -34125,7 +33857,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Input & Codecs"
-#~ msgstr "ព័ត៌មាន​បញ្ចូល / កូឌិដ"
+#~ msgstr "ព័ត៌មាន​បញ្ចូល/កូដិក"
 
 #, fuzzy
 #~ msgid "Input & Codec settings"
@@ -34182,10 +33914,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "SAP Announce"
 #~ msgstr "ការប្រកាស SAP"
-
-#, fuzzy
-#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
-#~ msgstr "លទ្ធផល​វីដេអូ Mac OS X OpenGL (ទាមទារ drawable-nsobject)"
 
 #, fuzzy
 #~ msgid "  [Incoming]"
@@ -34323,11 +34051,11 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Subtitles && OSD"
-#~ msgstr "ចំណងជើង​រង / OSD"
+#~ msgstr "ចំណងជើង​រង/OSD"
 
 #, fuzzy
 #~ msgid "Input && Codecs"
-#~ msgstr "ព័ត៌មាន​បញ្ចូល / កូឌិដ"
+#~ msgstr "ព័ត៌មាន​បញ្ចូល/កូដិក"
 
 #, fuzzy
 #~ msgid "Allow downloading media information"
@@ -34343,7 +34071,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Compiler: "
-#~ msgstr "អ្នក​ចងក្រង ៖ %s\n"
+#~ msgstr "អ្នក​ចងក្រង៖ %s\n"
 
 #, fuzzy
 #~ msgid "Copyright (C) "
@@ -34427,7 +34155,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Automatically add new medias to ML"
-#~ msgstr "ទៅ​យក​ព័ត៌មាន​មេឌៀ​ដោយ​ស្វ័យប្រវត្តិ"
+#~ msgstr "បន្ថែម​/​លុប​ស្ទ្រីម​ព័ត៌មាន​បញ្ចូល​ដោយ​ស្វ័យប្រវត្តិ"
 
 #, fuzzy
 #~ msgid "X Screensaver disabler"
@@ -34955,10 +34683,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #~ msgstr "រយៈ​កម្ពស់​ផ្កាយ​រណប"
 
 #, fuzzy
-#~ msgid "Ffmpeg mux"
-#~ msgstr "FFmpeg"
-
-#, fuzzy
 #~ msgid "No item currently playing"
 #~ msgstr "កំពុង​ចាក់​ព័ត៌មាន​បញ្ចូល​ថ្មី"
 
@@ -35016,7 +34740,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
-#~ msgstr "អេហ្គុយ​ក្រាហ្វិក"
+#~ msgstr "អេហ្គុយ​ប៉ារ៉ាម៉ែត្រ"
 
 #, fuzzy
 #~ msgid "Create Stream"
@@ -35088,11 +34812,11 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "Telnet Interface"
-#~ msgstr "ចំណុច​ប្រទាក់"
+#~ msgstr "ចំណុចប្រទាក់"
 
 #, fuzzy
 #~ msgid "Web Interface"
-#~ msgstr "ចំណុច​ប្រទាក់"
+#~ msgstr "ចំណុចប្រទាក់"
 
 #, fuzzy
 #~ msgid "Audio output saved volume"
@@ -35611,7 +35335,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "VLC could not open the ALSA device \"%s\" (%s)."
-#~ msgstr "VLC មិន​អាច​បើក​ឯកសារ \"%s\" (%m) ។"
+#~ msgstr "DVDRead មិន​អាច​បើក​ថាស \"%s\" ។"
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
@@ -35721,7 +35445,7 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
 #, fuzzy
 #~ msgid "POSIX signals handling interface"
-#~ msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​មេ"
+#~ msgstr "ការ​កំណត់​ចំណុចប្រទាក់​មេ"
 
 #, fuzzy
 #~ msgid "VLM remote control interface"
@@ -35738,10 +35462,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "AVI Index"
 #~ msgstr "លិបិក្រម"
-
-#, fuzzy
-#~ msgid "Don't repair"
-#~ msgstr "កុំ​ផ្ញើ"
 
 #, fuzzy
 #~ msgid ""
@@ -35797,10 +35517,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "Audio Filter"
 #~ msgstr "តម្រង​អូឌីយ៉ូ"
-
-#, fuzzy
-#~ msgid "About the video filters"
-#~ msgstr "បង្វិល​តម្រង​វីដេអូ"
 
 #, fuzzy
 #~ msgid "Controller..."
@@ -36036,25 +35752,6 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "Growl UDP Notification Plugin"
 #~ msgstr "កម្មវិធី​ជំនួយ​ការ​ជូន​ដំណឹង Growl"
-
-#, fuzzy
-#~ msgid ""
-#~ "Format of the string to send to Telepathy.Defaults to \"Artist - Title"
-#~ "\" ($a - $t). You can use the following substitutions: $a Artist, $b "
-#~ "Album, $c Copyright, $d Description, $e Encoder, $g Genre, $l Language, "
-#~ "$n number, $p Now Playing, $r Rating, $s Subtitles language, $t Title, $u "
-#~ "URL, $A Date, $B Bitrate, $C Chapter, $D Duration, $F URI, $I Video "
-#~ "Title, $L Time Remaining, $N Name, $O Audio language, $P Position, $R "
-#~ "Rate, $S Sample rate, $T Time elapsed, $U Publisher, $V Volume"
-#~ msgstr ""
-#~ "អត្ថបទ​ម៉ារគី​ដែល​ត្រូវ​បង្ហាញ ។ (តួអក្សរ​ទ្រង់ទ្រាយ​ដែល​មាន ៖ %Y = ឆ្នាំ %m = ខែ %d = ថ្ងៃ %H "
-#~ "= ម៉ោង %M = នាទី %S = វិនាទី... ទិន្នន័យ​មេតា​ដែល​ពាក់ព័ន្ធ ៖ $a = សិល្បករ $b = អាល់ប៊ុម $c "
-#~ "= រក្សាសិទ្ធិ $d = សេចក្ដី​ពណ៌នា $e = អ៊ិនកូដ​ដោយ $g = ចង្វាក់ $l = ភាសា $n = លេខ​បទ $p "
-#~ "= កំពុង​ចាក់ $r = អត្រា $s = ភាសា​ចំណង​ជើង​រង $t = ចំណង​ជើង $u = url, $A = កាលបរិច្ឆេទ "
-#~ "$B = អត្រា​ប៊ីត​អូឌីយ៉ូ (គិត​ជា​គីឡូប៊ីត/វិ.) $C = ជំពូក $D = ថិរវេលា $F = ឈ្មោះ​ពេញ​រួម​ទាំង​ផ្លូវ $I "
-#~ "= ចំណងជើង $L = ពេលវេលា​នៅសល់ $N = ឈ្មោះ $O = ភាសា​អូឌីយ៉ូ $P = ទីតាំង (គិត​ជា %) $R = "
-#~ "អត្រា $S = អត្រា​គំរូ​អូឌីយ៉ូ (គិត​ជា kHz) $T = ពេលវេលា $U = អ្នក​បោះពុម្ពផ្សាយ $V = កម្រិត​"
-#~ "សំឡេង $_ = បន្ទាត់​ថ្មី)"
 
 #, fuzzy
 #~ msgid "Use SAP cache"

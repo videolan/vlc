@@ -10418,8 +10418,9 @@ msgid "K Audio Interface audio output"
 msgstr "Entekateeka yamaraka"
 
 #: modules/audio_output/mmdevice.c:1274
+#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Entekateeka yamaraka"
 
 #: modules/audio_output/mmdevice.c:1280
 #, fuzzy
@@ -11095,7 +11096,7 @@ msgstr "Akooma ka filimu"
 #: modules/codec/daala.c:125
 #, fuzzy
 msgid "Daala video packetizer"
-msgstr "Emitwe erimu"
+msgstr "ebicweeka byamakuru"
 
 #: modules/codec/daala.c:132
 #, fuzzy
@@ -28212,8 +28213,9 @@ msgid "Profile &Name"
 msgstr "Eiziina Eryenyanjula"
 
 #: modules/gui/qt/ui/sout.h:203
+#, fuzzy
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Toorana enshohora"
 
 #: modules/gui/qt/ui/sout.h:205
 #, fuzzy
@@ -28262,8 +28264,9 @@ msgid "Option Setup"
 msgstr "Ebyokutooranamu"
 
 #: modules/gui/qt/ui/sout.h:216
+#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr ""
+msgstr "Toorana enshohora"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -28361,8 +28364,9 @@ msgid "x264 preset and tuning selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:349
+#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr ""
+msgstr "Akokurinda furemu"
 
 #: modules/gui/qt/ui/sprefs_input.h:350
 msgid "Skip H.264 in-loop deblocking filter"
@@ -28459,8 +28463,9 @@ msgid "Start in minimal view mode"
 msgstr "Torana sinema aha rutimbe rwijwire"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
+#, fuzzy
 msgid "Force window style:"
-msgstr ""
+msgstr "Omutwe omukuru ogurakurataho"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 #, fuzzy
@@ -28697,8 +28702,9 @@ msgid "Interactive Zoom"
 msgstr "kihangusye nkoku wayenda"
 
 #: modules/gui/qt/ui/video_effects.h:1263
+#, fuzzy
 msgid "Angle"
-msgstr ""
+msgstr "Ebihandiiko byebyokuzaana"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
@@ -28759,16 +28765,19 @@ msgid "Spatial luma strength"
 msgstr "Ekirayamba okuha iraka"
 
 #: modules/gui/qt/ui/video_effects.h:1303
+#, fuzzy
 msgid "Temporal luma strength"
-msgstr ""
+msgstr "Ekirayamba okuha iraka"
 
 #: modules/gui/qt/ui/video_effects.h:1304
+#, fuzzy
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "Ekirayamba okuha iraka"
 
 #: modules/gui/qt/ui/video_effects.h:1305
+#, fuzzy
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "Ekirayamba okuha iraka"
 
 #: modules/gui/qt/ui/vlm.h:286
 #, fuzzy
@@ -28816,8 +28825,9 @@ msgid "Mux Control"
 msgstr "Hakanisa"
 
 #: modules/gui/qt/ui/vlm.h:296
+#, fuzzy
 msgid "Muxer:"
-msgstr ""
+msgstr "Enteekateeka yokushohoza"
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
@@ -28827,10 +28837,6 @@ msgstr ""
 #, fuzzy
 msgid "Media Manager List"
 msgstr "Ekipimo ky'ekirazaana"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "Emitwe egirimu"
 
 #, fuzzy
 #~ msgid "Display resolution"
@@ -28984,10 +28990,6 @@ msgstr "Ekipimo ky'ekirazaana"
 #~ msgstr "Yoreka entebekanisa eyongyeizeho"
 
 #, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "Ebihandiiko byebyokuzaana"
-
-#, fuzzy
 #~ msgid "Zip files filter"
 #~ msgstr "Iguraho ekihandiiko kyemitwe"
 
@@ -29022,22 +29024,6 @@ msgstr "Ekipimo ky'ekirazaana"
 #, fuzzy
 #~ msgid "Dummy video decoder"
 #~ msgstr "Akooma ka filimu"
-
-#, fuzzy
-#~ msgid "---  DVD Menu"
-#~ msgstr "Tihariho rukarara rwa DVD"
-
-#, fuzzy
-#~ msgid "First Played"
-#~ msgstr "Kizaanirwe"
-
-#, fuzzy
-#~ msgid "Video Manager"
-#~ msgstr "Akagyegyena Filimu"
-
-#, fuzzy
-#~ msgid "----- Title"
-#~ msgstr "Omutwe"
 
 #, fuzzy
 #~ msgid "Composer"
@@ -29390,6 +29376,9 @@ msgstr "Ekipimo ky'ekirazaana"
 #~ msgid "To"
 #~ msgstr "Kuza"
 
+#~ msgid "Streaming method"
+#~ msgstr "Omuringo gwokushohora"
+
 #~ msgid "Address of the computer to stream to."
 #~ msgstr "Aduresi ya kanyabwengye eraza kushohozwamu."
 
@@ -29506,6 +29495,10 @@ msgstr "Ekipimo ky'ekirazaana"
 #, fuzzy
 #~ msgid "&Save To Playlist"
 #~ msgstr "Biika orukarara orwemizaano"
+
+#, fuzzy
+#~ msgid "&Post processing"
+#~ msgstr "Kikoreho ahanyima"
 
 #, fuzzy
 #~ msgid "Power"
@@ -29672,10 +29665,6 @@ msgstr "Ekipimo ky'ekirazaana"
 #~ "nsharo)"
 
 #, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "Entekateeka zasinema tiizabiikwa"
-
-#, fuzzy
 #~ msgid "Black Slot"
 #~ msgstr "Ekirikwiragura"
 
@@ -29690,6 +29679,34 @@ msgstr "Ekipimo ky'ekirazaana"
 #, fuzzy
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Okuhindahinduka"
+
+#, fuzzy
+#~ msgid "---  DVD Menu"
+#~ msgstr "Tihariho rukarara rwa DVD"
+
+#, fuzzy
+#~ msgid "First Played"
+#~ msgstr "Kizaanirwe"
+
+#, fuzzy
+#~ msgid "Video Manager"
+#~ msgstr "Akagyegyena Filimu"
+
+#, fuzzy
+#~ msgid "----- Title"
+#~ msgstr "Omutwe"
+
+#, fuzzy
+#~ msgid "Video acceleration not available"
+#~ msgstr "Entekateeka zasinema tiizabiikwa"
+
+#, fuzzy
+#~ msgid "Subtitle track added"
+#~ msgstr "Emitwe egirimu"
+
+#, fuzzy
+#~ msgid "Media in Zip"
+#~ msgstr "Ebihandiiko byebyokuzaana"
 
 #, fuzzy
 #~ msgid "AVFoundation Video Capture"
