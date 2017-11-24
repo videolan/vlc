@@ -3055,26 +3055,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         return;
 
     /* Add information */
-    const char *psz_type;
-    switch( fmt->i_cat )
-    {
-    case AUDIO_ES:
-        psz_type = _("Audio");
-        break;
-    case VIDEO_ES:
-        psz_type = _("Video");
-        break;
-    case SPU_ES:
-        psz_type = _("Subtitle");
-        break;
-    default:
-        psz_type = NULL;
-        break;
-    }
-
-    if( psz_type )
-        info_category_AddInfo( p_cat, _("Type"), "%s", psz_type );
-
     if( es->i_meta_id != es->i_id )
         info_category_AddInfo( p_cat, _("Original ID"),
                        "%d", es->i_id );
