@@ -635,6 +635,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                     hevc_release_sei_pic_timing(sei.p_timing);
             }
 
+            hevc_rbsp_release_slice_header(p_sli);
             return true; /* No need to parse further NAL */
         }
         else if(i_nal_type == HEVC_NAL_PREF_SEI)
