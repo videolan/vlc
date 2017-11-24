@@ -32,8 +32,7 @@
 #include <speex/speex_resampler.h>
 
 #define QUALITY_TEXT N_("Resampling quality")
-#define QUALITY_LONGTEXT N_( \
-    "Resampling quality (0 = worst and fastest, 10 = best and slowest).")
+#define QUALITY_LONGTEXT N_( "Resampling quality, from worst to best" )
 
 static int Open (vlc_object_t *);
 static int OpenResampler (vlc_object_t *);

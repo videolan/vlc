@@ -37,16 +37,17 @@
 #include <math.h>
 #include <soxr.h>
 
-#define SOXR_QUALITY_TEXT N_( "Sox Resampling quality" )
+#define SOXR_QUALITY_TEXT N_( "Resampling quality" )
+#define SOXR_QUALITY_LONGTEXT N_( "Resampling quality, from worst to best" )
 
 static const int soxr_resampler_quality_vlclist[] = { 0, 1, 2, 3, 4 };
 static const char *const soxr_resampler_quality_vlctext[] =
 {
-    N_( "Quick cubic interpolation" ),
-    N_( "Low 16-bit with larger roll-off" ),
-    N_( "Medium 16-bit with medium roll-off" ),
-    N_( "High quality" ),
-    N_( "Very high quality" )
+     "Quick cubic interpolation",
+     "Low 16-bit with larger roll-off",
+     "Medium 16-bit with medium roll-off",
+     "High quality",
+     "Very high quality"
 };
 static const soxr_datatype_t soxr_resampler_quality_list[] =
 {
@@ -63,7 +64,7 @@ static int OpenResampler( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin ()
-    set_shortname( "SoX Resampler" )
+    set_shortname( N_("SoX Resampler") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
     add_integer( "soxr-resampler-quality", 2,
