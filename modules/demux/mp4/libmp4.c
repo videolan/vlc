@@ -3199,25 +3199,24 @@ static void MP4_FreeBox_elst( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
 {
+    uint32_t count;
+
     MP4_READBOX_ENTER( MP4_Box_data_elst_t, MP4_FreeBox_elst );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_elst );
-
-
-    MP4_GET4BYTES( p_box->data.p_elst->i_entry_count );
+    MP4_GET4BYTES( count );
 
     uint32_t i_entries_max = i_read / ((p_box->data.p_elst->i_version == 1) ? 20 : 12);
-    if( p_box->data.p_elst->i_entry_count > i_entries_max )
-        p_box->data.p_elst->i_entry_count = i_entries_max;
+    if( count > i_entries_max )
+        count = i_entries_max;
 
-    p_box->data.p_elst->i_segment_duration =
-        calloc( p_box->data.p_elst->i_entry_count, sizeof(uint64_t) );
-    p_box->data.p_elst->i_media_time =
-        calloc( p_box->data.p_elst->i_entry_count, sizeof(int64_t) );
-    p_box->data.p_elst->i_media_rate_integer =
-        calloc( p_box->data.p_elst->i_entry_count, sizeof(uint16_t) );
-    p_box->data.p_elst->i_media_rate_fraction =
-        calloc( p_box->data.p_elst->i_entry_count, sizeof(uint16_t) );
+    p_box->data.p_elst->i_segment_duration = vlc_alloc( count,
+                                                        sizeof(uint64_t) );
+    p_box->data.p_elst->i_media_time = vlc_alloc( count, sizeof(int64_t) );
+    p_box->data.p_elst->i_media_rate_integer = vlc_alloc( count,
+                                                          sizeof(uint16_t) );
+    p_box->data.p_elst->i_media_rate_fraction = vlc_alloc( count,
+                                                           sizeof(uint16_t) );
     if( p_box->data.p_elst->i_segment_duration == NULL
      || p_box->data.p_elst->i_media_time == NULL
      || p_box->data.p_elst->i_media_rate_integer == NULL
@@ -3225,8 +3224,9 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     {
         MP4_READBOX_EXIT( 0 );
     }
+    p_box->data.p_elst->i_entry_count = count;
 
-    for( uint32_t i = 0; i < p_box->data.p_elst->i_entry_count; i++ )
+    for( uint32_t i = 0; i < count; i++ )
     {
         uint64_t segment_duration;
         int64_t media_time;
