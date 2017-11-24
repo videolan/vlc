@@ -2854,21 +2854,27 @@ static void MP4_FreeBox_stsz( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_stsz( stream_t *p_stream, MP4_Box_t *p_box )
 {
+    uint32_t count;
+
     MP4_READBOX_ENTER( MP4_Box_data_stsz_t, MP4_FreeBox_stsz );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_stsz );
 
     MP4_GET4BYTES( p_box->data.p_stsz->i_sample_size );
-    MP4_GET4BYTES( p_box->data.p_stsz->i_sample_count );
+    MP4_GET4BYTES( count );
+    p_box->data.p_stsz->i_sample_count = count;
 
     if( p_box->data.p_stsz->i_sample_size == 0 )
     {
+        if( UINT64_C(4) * count > (uint64_t)i_read )
+            MP4_READBOX_EXIT( 0 );
+
         p_box->data.p_stsz->i_entry_size =
-            calloc( p_box->data.p_stsz->i_sample_count, sizeof(uint32_t) );
+            vlc_alloc( count, sizeof(uint32_t) );
         if( unlikely( !p_box->data.p_stsz->i_entry_size ) )
             MP4_READBOX_EXIT( 0 );
 
-        for( unsigned int i = 0; (i<p_box->data.p_stsz->i_sample_count)&&(i_read >= 4 ); i++ )
+        for( uint32_t i = 0; i < count; i++ )
         {
             MP4_GET4BYTES( p_box->data.p_stsz->i_entry_size[i] );
         }
