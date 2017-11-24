@@ -187,8 +187,8 @@ static ttml_region_t *ttml_region_New( )
 
     SubpictureUpdaterSysRegionInit( &p_ttml_region->updt );
     p_ttml_region->pp_last_segment = &p_ttml_region->updt.p_segments;
-    /* Align to bottom by default. !Warn: center align is obtained with NO flags */
-    p_ttml_region->updt.align = SUBPICTURE_ALIGN_BOTTOM;
+    /* Align to top by default. !Warn: center align is obtained with NO flags */
+    p_ttml_region->updt.align = SUBPICTURE_ALIGN_TOP;
 
     return p_ttml_region;
 }
@@ -356,10 +356,11 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
     if( !strcasecmp( "tts:displayAlign", psz_attr ) )
     {
         p_region->updt.inner_align &= ~(SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_BOTTOM);
-        if( !strcasecmp ( "before", psz_val ) )
-            p_region->updt.inner_align |= SUBPICTURE_ALIGN_TOP;
-        else if( !strcasecmp ( "after", psz_val ) )
+        if( !strcasecmp( "after", psz_val ) )
             p_region->updt.inner_align |= SUBPICTURE_ALIGN_BOTTOM;
+        else if( strcasecmp( "center", psz_val ) )
+            /* "before" */
+            p_region->updt.inner_align |= SUBPICTURE_ALIGN_TOP;
     }
     else if( !strcasecmp ( "tts:origin", psz_attr ) ||
              !strcasecmp ( "tts:extent", psz_attr ) )
@@ -459,10 +460,12 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
         else if( !strcasecmp ( "right", psz_val ) )
             p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_RIGHT;
-        else if( !strcasecmp ( "start", psz_val ) ) /* FIXME: should be BIDI based */
-            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
         else if( !strcasecmp ( "end", psz_val ) )  /* FIXME: should be BIDI based */
             p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_RIGHT;
+        else if( strcasecmp ( "center", psz_val ) )
+            /* == "start" FIXME: should be BIDI based */
+            p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
+        printf("**%s %x\n", psz_val, p_ttml_style->i_text_align);
     }
     else if( !strcasecmp( "tts:fontSize", psz_attr ) )
     {
@@ -797,6 +800,7 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
             /* we don't have paragraph, so no per text line alignment.
              * Text style brings horizontal textAlign to region.
              * Region itself is styled with vertical displayAlign */
+            p_region->updt.inner_align &= ~(SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
             p_region->updt.inner_align |= s->i_text_align;
 
             ttml_style_Delete( s );
