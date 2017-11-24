@@ -280,7 +280,7 @@ const CommandsFactory * CommandsQueue::factory() const
 mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
 {
     mtime_t lastdts = barrier;
-    std::set<const void *> allowinvalid;
+    std::set<const void *> disabled_esids;
     bool b_datasent = false;
 
     /* We need to filter the current commands list
@@ -324,22 +324,18 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
             {
                 /* ensure no more non dated for that ES is sent
                  * since we're sure that data is above barrier */
-                allowinvalid.erase( id );
+                disabled_esids.insert( id );
                 commands.push_back( command );
             }
             else if( command->getTime() == VLC_TS_INVALID )
             {
-                /* Did we sent data already for that ES ? */
-                if( allowinvalid.find( id ) != allowinvalid.end() ||
-                   /* but also include invalid ones at start (other we will never dequeue them) */
-                   (commands.empty() && output.empty()) )
+                if( disabled_esids.find( id ) == disabled_esids.end() )
                     output.push_back( command );
                 else
                     commands.push_back( command );
             }
             else /* Falls below barrier, send */
             {
-                allowinvalid.insert( id );
                 output.push_back( command );
             }
         }
