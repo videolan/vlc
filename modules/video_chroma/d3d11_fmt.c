@@ -674,7 +674,13 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
             return VLC_EGENERIC;
         }
     }
+#endif
+    return VLC_SUCCESS;
+}
 
+void D3D11_Destroy(d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (IsDebuggerPresent())
     {
@@ -690,13 +696,6 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
         }
     }
 # endif
-#endif
-    return VLC_SUCCESS;
-}
-
-void D3D11_Destroy(d3d11_handle_t *hd3d)
-{
-#if !VLC_WINSTORE_APP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
 
