@@ -935,11 +935,8 @@ typedef struct MP4_Box_data_padb_s
 
     uint32_t i_sample_count;
 
-    uint16_t *i_reserved1;   /* 1bit  */
-    uint16_t *i_pad2;        /* 3bits */
-    uint16_t *i_reserved2;   /* 1bit  */
-    uint16_t *i_pad1;        /* 3bits */
-
+    unsigned char *i_reserved;   /* 1bit  */
+    unsigned char *i_pad;        /* 3bits */
 
 } MP4_Box_data_padb_t;
 

@@ -3138,10 +3138,8 @@ static int MP4_ReadBox_stdp( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_padb( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_padb->i_reserved1 );
-    FREENULL( p_box->data.p_padb->i_pad2 );
-    FREENULL( p_box->data.p_padb->i_reserved2 );
-    FREENULL( p_box->data.p_padb->i_pad1 );
+    FREENULL( p_box->data.p_padb->i_reserved );
+    FREENULL( p_box->data.p_padb->i_pad );
 }
 
 static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
@@ -3151,34 +3149,32 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_padb_t, MP4_FreeBox_padb );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_padb );
+    MP4_GET4BYTES( count );
 
-    MP4_GET4BYTES( p_box->data.p_padb->i_sample_count );
-    count = (p_box->data.p_padb->i_sample_count + 1) / 2;
-
-    p_box->data.p_padb->i_reserved1 = calloc( count, sizeof(uint16_t) );
-    p_box->data.p_padb->i_pad2 = calloc( count, sizeof(uint16_t) );
-    p_box->data.p_padb->i_reserved2 = calloc( count, sizeof(uint16_t) );
-    p_box->data.p_padb->i_pad1 = calloc( count, sizeof(uint16_t) );
-    if( p_box->data.p_padb->i_reserved1 == NULL
-     || p_box->data.p_padb->i_pad2 == NULL
-     || p_box->data.p_padb->i_reserved2 == NULL
-     || p_box->data.p_padb->i_pad1 == NULL )
+    if( ((count / 2) + (count & 1)) > i_read )
     {
         MP4_READBOX_EXIT( 0 );
     }
 
-    for( unsigned int i = 0; i < i_read / 2 ; i++ )
-    {
-        if( i >= count )
-        {
-            MP4_READBOX_EXIT( 0 );
-        }
-        p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 7 )&0x01;
-        p_box->data.p_padb->i_pad2[i] = ( (*p_peek) >> 4 )&0x07;
-        p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 3 )&0x01;
-        p_box->data.p_padb->i_pad1[i] = ( (*p_peek) )&0x07;
+    p_box->data.p_padb->i_reserved = malloc( count );
+    p_box->data.p_padb->i_pad = malloc( count );
+    p_box->data.p_padb->i_sample_count = count;
 
-        p_peek += 1; i_read -= 1;
+    if( unlikely(p_box->data.p_padb->i_reserved == NULL
+              || p_box->data.p_padb->i_pad == NULL) )
+    {
+        MP4_READBOX_EXIT( 0 );
+    }
+
+    for( size_t i = 0; i < count; i += 2 )
+    {
+        p_box->data.p_padb->i_reserved[i] = ( (*p_peek) >> 7 )&0x01;
+        p_box->data.p_padb->i_pad[i + 1] = ( (*p_peek) >> 4 )&0x07;
+        p_box->data.p_padb->i_reserved[i + 1] = ( (*p_peek) >> 3 )&0x01;
+        p_box->data.p_padb->i_pad[i] = ( (*p_peek) )&0x07;
+
+        p_peek++;
+        i_read--;
     }
 
 #ifdef MP4_VERBOSE
