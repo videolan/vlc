@@ -1121,7 +1121,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                  * display, do it preferrably when creating the texture */
                 assert(p_sys->resourceView[0]!=NULL);
             }
-
             if ( sys->picQuad.i_height != texDesc.Height ||
                  sys->picQuad.i_width != texDesc.Width )
             {
@@ -1546,14 +1545,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     sys->picQuad.i_width  = fmt->i_width;
     sys->picQuad.i_height = fmt->i_height;
-    if (is_d3d11_opaque(fmt->i_chroma))
-    {
-        /* worst case scenario we need 128 alignment for HEVC */
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
-    }
-    else if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
         sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
