@@ -786,7 +786,7 @@ done:
             DeleteFilter( p_cpu_filter );
         if (texture)
             ID3D11Texture2D_Release(texture);
-        D3D11_FilterReleaseInstance(&p_sys->d3d_dev);
+        D3D11_FilterReleaseInstance(&d3d_dev);
         free(p_sys);
     }
     else
