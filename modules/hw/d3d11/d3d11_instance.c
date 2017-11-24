@@ -40,12 +40,10 @@ static size_t instances = 0;
 
 void D3D11_FilterHoldInstance(filter_t *filter, d3d11_device_t *out, D3D11_TEXTURE2D_DESC *dstDesc)
 {
+    out->d3dcontext = NULL;
     picture_t *pic = filter_NewPicture(filter);
     if (!pic)
-    {
-        out->d3dcontext = NULL;
         return;
-    }
 
     picture_sys_t *p_sys = ActivePictureSys(pic);
 
