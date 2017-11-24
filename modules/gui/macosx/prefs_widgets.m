@@ -2133,6 +2133,12 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     return strdup([[o_textfield stringValue] UTF8String]);
 }
 
+/* FIXME:
+ * This is supposed to load the module list state from preferences
+ * and set the table items state (selected or unselected) accordingly,
+ * as far as I could figure out by reading the commit in which this was
+ * introduced. (d66f3c874786e9dd4692f9775bdd54b386c583dd)
+ */
 -(void)resetValues
 {
 #warning Reset prefs of the module selector is broken atm.
