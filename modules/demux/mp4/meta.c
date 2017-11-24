@@ -102,12 +102,12 @@ static const struct
     { ATOM_flvr,    N_("Encoding Params") },
     { ATOM_vndr,    N_("Vendor") },
     { ATOM_xid_,    N_("Catalog Number") },
-    { ATOM_gshh,    N_("YouTube Host") },
-    { ATOM_gspm,    N_("YouTube Ping Message") },
-    { ATOM_gspu,    N_("YouTube Ping Url") },
-    { ATOM_gssd,    N_("YouTube Source Data") },
-    { ATOM_gsst,    N_("YouTube Start Time") },
-    { ATOM_gstd,    N_("YouTube Track Duration") },
+    { ATOM_gshh,    "YouTube Host" },
+    { ATOM_gspm,    "YouTube Ping Message" },
+    { ATOM_gspu,    "YouTube Ping Url" },
+    { ATOM_gssd,    "YouTube Source Data" },
+    { ATOM_gsst,    "YouTube Start Time" },
+    { ATOM_gstd,    "YouTube Track Duration" },
 };
 
 static const struct
@@ -372,7 +372,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
             char psz_utf[11];
             snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
                       GetDWBE(BOXDATA(p_data)->p_blob) );
-            vlc_meta_AddExtra( p_meta, N_("iTunes Account ID"), psz_utf );
+            vlc_meta_AddExtra( p_meta, "iTunes Account ID", psz_utf );
         }
         break;
     }
@@ -384,7 +384,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
             char psz_utf[11];
             snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
                       GetDWBE(BOXDATA(p_data)->p_blob) );
-            vlc_meta_AddExtra( p_meta, N_("iTunes Catalog ID"), psz_utf );
+            vlc_meta_AddExtra( p_meta, "iTunes Catalog ID", psz_utf );
         }
         break;
     }
