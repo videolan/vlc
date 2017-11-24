@@ -1,4 +1,4 @@
-List of vlc plugins (492):
+List of vlc plugins (490):
 $Id$
 
  * a52: A/52 audio decoder plugin, using liba52
@@ -90,7 +90,6 @@ $Id$
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
  * cvpx: filter to copy from OS X accelerated surfaces to CPU
- * d3d11_surface: Convert D3D11 GPU textures to YUV planes
  * d3d11va: Direct3D11 hardware-accelerated decoding
  * daala: a daala video decoder/packetizer using libdaala
  * dbus: D-Bus control interface
@@ -109,11 +108,9 @@ $Id$
  * demuxdump: Pseudo-demuxer that dumps the stream
  * diracsys: BBC Dirac demuxer
  * direct3d11: video output module using the Direct3D11 API
- * direct3d11_adjust: adjust filter for Direct3D11 video decoding
- * direct3d11_deinterlace: deinterlacer for Direct3D11 video decoding
+ * direct3d11_filters: adjust|deinterlacer filter for Direct3D11 video decoding
  * direct3d9: video output module using the Direct3D9 API
- * direct3d9_adjust: adjust filter for Direct3D9 video decoding
- * direct3d9_deinterlace: deinterlacer for Direct3D9/DxVA video decoding
+ * direct3d9_filters: adjust|deinterlacer filter for Direct3D9 video decoding
  * directdraw: video output module using the DirectDraw API
  * directory_demux: Ouput folder contents to playlist
  * directsound: audio output module using the DirectSound API
@@ -129,7 +126,6 @@ $Id$
  * dvbsub: decoder module for subs in dvb streams
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread
- * dxa9: Convert D3D9 GPU textures to YUV planes
  * dxva2: DxVA2 hardware-accelerated decoding
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
  * edgedetection: edge detection video filter
@@ -362,7 +358,6 @@ $Id$
  * shm: Shared memory framebuffer access module
  * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
- * simple_channel_mixer_arm_neon: channel mixer, optimized for ARM Neon
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
  * smb: SMB shares access module
