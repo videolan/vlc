@@ -114,7 +114,9 @@ static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
                                           void (*release)( MP4_Box_t * ),
                                           uint64_t readsize )
 {
-    if( unlikely(readsize > SSIZE_MAX) )
+    const size_t headersize = mp4_box_headersize( box );
+
+    if( unlikely(readsize < headersize) || unlikely(readsize > SSIZE_MAX) )
         return NULL;
 
     uint8_t *buf = malloc( readsize );
@@ -3002,35 +3004,28 @@ static void MP4_FreeBox_stco_co64( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_stco_co64( stream_t *p_stream, MP4_Box_t *p_box )
 {
+    const bool sixtyfour = p_box->i_type != ATOM_stco;
+    uint32_t count;
+
     MP4_READBOX_ENTER( MP4_Box_data_co64_t, MP4_FreeBox_stco_co64 );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_co64 );
+    MP4_GET4BYTES( count );
 
-    MP4_GET4BYTES( p_box->data.p_co64->i_entry_count );
-
-    p_box->data.p_co64->i_chunk_offset =
-        calloc( p_box->data.p_co64->i_entry_count, sizeof(uint64_t) );
-    if( p_box->data.p_co64->i_chunk_offset == NULL )
+    if( (sixtyfour ? UINT64_C(8) : UINT64_C(4)) * count > (uint64_t)i_read )
         MP4_READBOX_EXIT( 0 );
 
-    for( unsigned int i = 0; i < p_box->data.p_co64->i_entry_count; i++ )
+    p_box->data.p_co64->i_chunk_offset = vlc_alloc( count, sizeof(uint64_t) );
+    if( unlikely(p_box->data.p_co64->i_chunk_offset == NULL) )
+        MP4_READBOX_EXIT( 0 );
+    p_box->data.p_co64->i_entry_count = count;
+
+    for( uint32_t i = 0; i < count; i++ )
     {
-        if( p_box->i_type == ATOM_stco )
-        {
-            if( i_read < 4 )
-            {
-                break;
-            }
-            MP4_GET4BYTES( p_box->data.p_co64->i_chunk_offset[i] );
-        }
-        else
-        {
-            if( i_read < 8 )
-            {
-                break;
-            }
+        if( sixtyfour )
             MP4_GET8BYTES( p_box->data.p_co64->i_chunk_offset[i] );
-        }
+        else
+            MP4_GET4BYTES( p_box->data.p_co64->i_chunk_offset[i] );
     }
 
 #ifdef MP4_VERBOSE
