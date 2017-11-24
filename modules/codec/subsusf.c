@@ -867,7 +867,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
             {
                 subpicture_region_t *p_image_region = NULL;
 
-                char *psz_end = strcasestr( psz_subtitle, "</image>" );
+                psz_end = strcasestr( psz_subtitle, "</image>" );
                 char *psz_content = strchr( psz_subtitle, '>' );
                 int   i_transparent = -1;
 
