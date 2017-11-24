@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-11-23 10:11+0100\n"
+"POT-Creation-Date: 2017-11-24 15:12+0100\n"
 "PO-Revision-Date: 2017-09-22 02:16+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Assamese (India) (http://www.transifex.com/yaron/vlc-trans/"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/vlc_common.h:1036
+#: include/vlc_common.h:1037
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -75,7 +75,7 @@ msgid "Hotkeys settings"
 msgstr "হটকীবোৰৰ ছেটিংবোৰ"
 
 #: include/vlc_config_cat.h:53 src/input/es_out.c:3062 src/input/es_out.c:3103
-#: src/libvlc-module.c:1489 modules/access/imem.c:64
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:101
@@ -128,7 +128,7 @@ msgstr "আউটপুট মডুলবোৰ"
 msgid "General settings for audio output modules."
 msgstr "অডিঅ' আউটপুট মডুলবোৰৰ বাবে সাধাৰণ ছেটিংবোৰ. "
 
-#: include/vlc_config_cat.h:69 src/libvlc-module.c:2012
+#: include/vlc_config_cat.h:69 src/libvlc-module.c:2009
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:183
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
@@ -139,7 +139,7 @@ msgid "Miscellaneous audio settings and modules."
 msgstr "বিভিন্ন অডিঅ' ছেটিংবোৰ আৰু মডুলবোৰ."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3065 src/input/es_out.c:3147
-#: src/libvlc-module.c:142 src/libvlc-module.c:1548 modules/access/imem.c:64
+#: src/libvlc-module.c:142 src/libvlc-module.c:1545 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
@@ -259,7 +259,7 @@ msgstr "উপশিৰোনাম, টেলিটেক্স আৰু CC �
 msgid "General input settings. Use with care..."
 msgstr "সাধাৰণ ইনপুট ছেটিংবোৰ. যতনৰ সৈতে ব্যৱহাৰ কৰক..."
 
-#: include/vlc_config_cat.h:127 src/libvlc-module.c:1947
+#: include/vlc_config_cat.h:127 src/libvlc-module.c:1944
 #: modules/access/avio.h:50
 msgid "Stream output"
 msgstr "ষ্ট্ৰিম আউটপুট"
@@ -356,7 +356,7 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "দাবী কৰা ভিডিঅ'ৰ VLC ৰ কৰ্য্যকৰীতা"
 
-#: include/vlc_config_cat.h:173 src/libvlc-module.c:2056
+#: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
 #: modules/demux/playlist/playlist.c:65 modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
@@ -392,7 +392,7 @@ msgstr ""
 "সেৱাবোৰ আৱিষ্কাৰ কৰা মডুলবোৰ হল সুবিধাবোৰ যিয়ে প্লেলিষ্টলৈ স্বয়ংক্ৰিয়ভাৱে আইটেমবোৰ "
 "কৰে."
 
-#: include/vlc_config_cat.h:184 src/libvlc-module.c:1847
+#: include/vlc_config_cat.h:184 src/libvlc-module.c:1844
 #: modules/gui/qt/dialogs/extended.cpp:93
 #: modules/gui/qt/ui/video_effects.h:1308
 msgid "Advanced"
@@ -524,7 +524,7 @@ msgstr "সকলোবোৰ পুনৰাবৃত্তি কৰক"
 msgid "Repeat One"
 msgstr "এবাৰ পুনৰাবৃত্তি কৰক"
 
-#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1426
+#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1423
 #: modules/gui/macosx/VLCMainMenu.m:389
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:124
@@ -1249,11 +1249,11 @@ msgid "Field of view"
 msgstr ""
 
 #: src/input/es_out.c:3287
-msgid "Max luminance"
+msgid "Max. luminance"
 msgstr ""
 
 #: src/input/es_out.c:3292
-msgid "Min luminance"
+msgid "Min. luminance"
 msgstr ""
 
 #: src/input/es_out.c:3300
@@ -1275,14 +1275,6 @@ msgstr "প্ৰাথমিক ভাষা"
 #, fuzzy
 msgid "White point"
 msgstr "সূত্ৰ বিন্দু"
-
-#: src/input/es_out.c:3325
-msgid "MaxCLL"
-msgstr ""
-
-#: src/input/es_out.c:3330
-msgid "MaxFALL"
-msgstr ""
 
 #: src/input/input.c:2655
 msgid "Your input can't be opened"
@@ -1507,25 +1499,25 @@ msgstr ""
 msgid "C"
 msgstr "as_IN"
 
-#: src/libvlc.h:164 src/libvlc-module.c:1429 src/libvlc-module.c:1430
-#: src/libvlc-module.c:2645 src/video_output/vout_intf.c:176
+#: src/libvlc.h:164 src/libvlc-module.c:1426 src/libvlc-module.c:1427
+#: src/libvlc-module.c:2642 src/video_output/vout_intf.c:176
 #: modules/gui/macosx/VLCMainMenu.m:465
 msgid "Zoom"
 msgstr "জুম কৰক"
 
-#: src/libvlc.h:165 src/libvlc-module.c:1343 src/video_output/vout_intf.c:87
+#: src/libvlc.h:165 src/libvlc-module.c:1340 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
 msgstr "1:4 এক-চতুৰ্থাংশ"
 
-#: src/libvlc.h:166 src/libvlc-module.c:1344 src/video_output/vout_intf.c:88
+#: src/libvlc.h:166 src/libvlc-module.c:1341 src/video_output/vout_intf.c:88
 msgid "1:2 Half"
 msgstr "1:2 আধা"
 
-#: src/libvlc.h:167 src/libvlc-module.c:1345 src/video_output/vout_intf.c:89
+#: src/libvlc.h:167 src/libvlc-module.c:1342 src/video_output/vout_intf.c:89
 msgid "1:1 Original"
 msgstr "1:1 প্ৰকৃত"
 
-#: src/libvlc.h:168 src/libvlc-module.c:1346 src/video_output/vout_intf.c:90
+#: src/libvlc.h:168 src/libvlc-module.c:1343 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
 msgstr "2:1 দ্বিগুণ"
 
@@ -1791,7 +1783,7 @@ msgstr ""
 "অভিজ্ঞতা বৃদ্ধি কৰিব পাৰে, বিশেষকৈ যেতিয়া হেডফোন চেনেল মিক্সাৰটোৰ সৈতে মিশ্ৰণ কৰে."
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
-#: modules/audio_output/kai.c:106 modules/codec/x264.c:443
+#: modules/audio_output/kai.c:106 modules/codec/x264.c:440
 #: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:65
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
@@ -1879,11 +1871,11 @@ msgid ""
 msgstr ""
 "অডিঅ' পিট্চটোত প্ৰভাৱ নকৰাকৈ উচ্চ বা নিম্ন গতিত অডিঅ' চলাবলৈ এইটোৱে অনুমতি দিয়ে "
 
-#: src/libvlc-module.c:239 src/libvlc-module.c:1128
+#: src/libvlc-module.c:239 src/libvlc-module.c:1125
 #: modules/access/dshow/dshow.cpp:2077 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
-#: modules/codec/kate.c:199 modules/codec/x264.c:438 modules/codec/x264.c:443
+#: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
 #: modules/gui/macosx/VLCOpenWindowController.m:272
@@ -2720,28 +2712,16 @@ msgstr "উপশিৰোনাম পথ ID"
 msgid "Stream ID of the subtitle track to use."
 msgstr "ব্যৱহাৰ কৰিবলৈ উপশিৰোনাম পথটোৰ ষ্ট্ৰিম ID."
 
-#: src/libvlc-module.c:616 modules/codec/cc.c:57
-msgid "Closed Captions decoder"
-msgstr "কেপশ্বনবোৰ ডিকোডাৰ বন্ধ কৰা হল"
-
-#: src/libvlc-module.c:617
+#: src/libvlc-module.c:616
 #, fuzzy
-msgid "Preferred closed captions decoder"
+msgid "Preferred Closed Captions decoder"
 msgstr "কেপশ্বনবোৰ ডিকোডাৰ বন্ধ কৰা হল"
 
-#: src/libvlc-module.c:619
-msgid "EIA/CEA 608"
-msgstr ""
-
-#: src/libvlc-module.c:619
-msgid "CEA 708"
-msgstr ""
-
-#: src/libvlc-module.c:621
+#: src/libvlc-module.c:620
 msgid "Preferred video resolution"
 msgstr "পছন্দ কৰা ভিডিঅ' বিশ্লেষণ"
 
-#: src/libvlc-module.c:623
+#: src/libvlc-module.c:622
 msgid ""
 "When several video formats are available, select one whose resolution is "
 "closest to (but not higher than) this setting, in number of lines. Use this "
@@ -2753,83 +2733,83 @@ msgstr ""
 "বিকল্পটো ব্যৱহাৰ কৰক যদি উচ্চ বিশ্লেষণবোৰ চলাবলৈ আপোনাৰ যথেষ্ট CPU শক্তি বা নেটৱৰ্ক "
 "বেণ্ডউইড নাই."
 
-#: src/libvlc-module.c:629
+#: src/libvlc-module.c:628
 msgid "Best available"
 msgstr "শ্ৰেষ্ঠ উপলব্ধ"
 
-#: src/libvlc-module.c:629
+#: src/libvlc-module.c:628
 msgid "Full HD (1080p)"
 msgstr "সম্পূৰ্ণ HD (1080p)"
 
-#: src/libvlc-module.c:629
+#: src/libvlc-module.c:628
 msgid "HD (720p)"
 msgstr "HD (720p)"
 
-#: src/libvlc-module.c:630
+#: src/libvlc-module.c:629
 msgid "Standard Definition (576 or 480 lines)"
 msgstr "মানবিশিষ্ট স্পষ্টতা (576 বা 480 শাৰী)"
 
-#: src/libvlc-module.c:631
+#: src/libvlc-module.c:630
 msgid "Low Definition (360 lines)"
 msgstr "নিম্ন স্পষ্টতা (360 শাৰী)"
 
-#: src/libvlc-module.c:632
+#: src/libvlc-module.c:631
 msgid "Very Low Definition (240 lines)"
 msgstr "অতি নিম্ন স্পষ্টতা (240 শাৰী)"
 
-#: src/libvlc-module.c:635
+#: src/libvlc-module.c:634
 msgid "Input repetitions"
 msgstr "ইনপুট পুনৰাবৃত্তিবোৰ"
 
-#: src/libvlc-module.c:637
+#: src/libvlc-module.c:636
 msgid "Number of time the same input will be repeated"
 msgstr "বহুবাৰ একেটা ইনপুট পুনৰাবৃত্তি কৰা হব"
 
-#: src/libvlc-module.c:639 modules/gui/macosx/VLCOpenWindowController.m:159
+#: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
 msgstr "আৰম্ভৰ সময়"
 
-#: src/libvlc-module.c:641
+#: src/libvlc-module.c:640
 msgid "The stream will start at this position (in seconds)."
 msgstr "এই স্থানটোত ষ্ট্ৰিমটো আৰম্ভ হব (ছেকেণ্ডত)."
 
-#: src/libvlc-module.c:643 modules/gui/macosx/VLCOpenWindowController.m:161
+#: src/libvlc-module.c:642 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
 msgstr "বন্ধৰ সময়"
 
-#: src/libvlc-module.c:645
+#: src/libvlc-module.c:644
 msgid "The stream will stop at this position (in seconds)."
 msgstr "এই স্থানটোত ষ্ট্ৰিমটো বন্ধ হব (ছেকেণ্ডত)."
 
-#: src/libvlc-module.c:647
+#: src/libvlc-module.c:646
 msgid "Run time"
 msgstr "চলা সময়"
 
-#: src/libvlc-module.c:649
+#: src/libvlc-module.c:648
 msgid "The stream will run this duration (in seconds)."
 msgstr "এই সময়চোৱাত ষ্ট্ৰিমটো চলিব (ছেকেণ্ডত)."
 
-#: src/libvlc-module.c:651
+#: src/libvlc-module.c:650
 msgid "Fast seek"
 msgstr "খৰতকীয়াকৈ বিচৰা"
 
-#: src/libvlc-module.c:653
+#: src/libvlc-module.c:652
 msgid "Favor speed over precision while seeking"
 msgstr "বিচৰোতে সুস্পষ্টতাটোৰ ওপৰত গতিটো সমৰ্থন কৰে"
 
-#: src/libvlc-module.c:655
+#: src/libvlc-module.c:654
 msgid "Playback speed"
 msgstr "প্লেবেকৰ গতি"
 
-#: src/libvlc-module.c:657
+#: src/libvlc-module.c:656
 msgid "This defines the playback speed (nominal speed is 1.0)."
 msgstr "এইটোৱে প্লেবেক গতিটো বাখ্যা কৰে (মনোনীত গতিটো হল 1.0)."
 
-#: src/libvlc-module.c:659
+#: src/libvlc-module.c:658
 msgid "Input list"
 msgstr "ইনপুট তালিকা"
 
-#: src/libvlc-module.c:661
+#: src/libvlc-module.c:660
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
@@ -2837,11 +2817,11 @@ msgstr ""
 "আপুনি ইনপুটবোৰৰ ক'মাৰ দ্বৰা পৃথকীকৃত তালিকা এখন দিব পাৰে যিখন স্বাভাৱিক এটাৰ পিছত "
 "সংযোগ কৰা হব."
 
-#: src/libvlc-module.c:664
+#: src/libvlc-module.c:663
 msgid "Input slave (experimental)"
 msgstr "শ্লেভ ইনপুট কৰক (পৰীক্ষামূলক)"
 
-#: src/libvlc-module.c:666
+#: src/libvlc-module.c:665
 msgid ""
 "This allows you to play from several inputs at the same time. This feature "
 "is experimental, not all formats are supported. Use a '#' separated list of "
@@ -2851,11 +2831,11 @@ msgstr ""
 "পৰীক্ষামূলক, সকলোবোৰ ফৰমেট সমৰ্থন নকৰে. ইনপুটবোৰৰ '#' ৰ দ্বাৰা পৃথকীকৃত তালিকা এখন "
 "ব্যৱহাৰ কৰক."
 
-#: src/libvlc-module.c:670
+#: src/libvlc-module.c:669
 msgid "Bookmarks list for a stream"
 msgstr "ষ্ট্ৰিম এটাৰ বাব পৃষ্ঠাসংকেতবোৰৰ তালিকা"
 
-#: src/libvlc-module.c:672
+#: src/libvlc-module.c:671
 msgid ""
 "You can manually give a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
@@ -2865,40 +2845,40 @@ msgstr ""
 "bytes=optional-byte-offset},{...}\" ৰ ৰূপত আপুনি মেনুৱেলী পৃষ্ঠাসংকেতবোৰৰ তালিকা "
 "এখন দিব পাৰে"
 
-#: src/libvlc-module.c:676
+#: src/libvlc-module.c:675
 #, fuzzy
 msgid "Record directory"
 msgstr "উত্স নিৰ্দেশিকা"
 
-#: src/libvlc-module.c:678
+#: src/libvlc-module.c:677
 #, fuzzy
 msgid "Directory where the records will be stored"
 msgstr "নিৰ্দেশিকা বা ফাইলনাম যত ৰেকৰ্ডবোৰ জমা কৰা হব"
 
-#: src/libvlc-module.c:680
+#: src/libvlc-module.c:679
 msgid "Prefer native stream recording"
 msgstr "স্থানীয় ষ্ট্ৰিম ৰেকৰ্ডিং পছন্দ কৰক"
 
-#: src/libvlc-module.c:682
+#: src/libvlc-module.c:681
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
 "যেতিয়া সম্ভৱ, ষ্ট্ৰিম আউটপুট মডুলটো ব্যৱহাৰ কৰাৰ পৰিৱৰ্তে ইনপুট ষ্ট্ৰিমটো ৰেকৰ্ড কৰা হব"
 
-#: src/libvlc-module.c:685
+#: src/libvlc-module.c:684
 msgid "Timeshift directory"
 msgstr "টাইমছিফ্ট নিৰ্দেশিকা"
 
-#: src/libvlc-module.c:687
+#: src/libvlc-module.c:686
 msgid "Directory used to store the timeshift temporary files."
 msgstr "টাইমছিফ্ট সাময়িক ফাইলবোৰ জমা কৰিবলৈ ব্যৱহাৰ কৰা নিৰ্দেশিকা."
 
-#: src/libvlc-module.c:689
+#: src/libvlc-module.c:688
 msgid "Timeshift granularity"
 msgstr "টাইমছিফ্ট গ্ৰেনুলাৰিটি"
 
-#: src/libvlc-module.c:691
+#: src/libvlc-module.c:690
 msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
@@ -2906,11 +2886,11 @@ msgstr ""
 "এইটো হল সাময়িক ফাইলবোৰৰ বাইটত সৰ্বাধিক আকাৰটো যিটো টাইমছিফ্ট কৰা ষ্ট্ৰিমবোৰ জমা "
 "কৰিবলৈ ব্যৱহাৰ কৰা হব."
 
-#: src/libvlc-module.c:694
+#: src/libvlc-module.c:693
 msgid "Change title according to current media"
 msgstr "চলিত মিডিয়া মতে শিৰোনামটো সলনি কৰক"
 
-#: src/libvlc-module.c:695
+#: src/libvlc-module.c:694
 msgid ""
 "This option allows you to set the title according to what's being played<br>"
 "$a: Artist<br>$b: Album<br>$c: Copyright<br>$t: Title<br>$g: Genre<br>$n: "
@@ -2922,16 +2902,11 @@ msgstr ""
 "পথ সংখ্যা<br>$p: এতিয়া চলি থকাটো<br>$A: তাৰিখ<br>$D: সময়সীমা<br>$Z: \"Now "
 "playing\" (শিৰোনামলৈ উভতি আহক - শিল্পী)"
 
-#: src/libvlc-module.c:700
-#, fuzzy
-msgid "Disable lua"
-msgstr "অক্ষম কৰক"
-
-#: src/libvlc-module.c:701
+#: src/libvlc-module.c:699
 msgid "Disable all lua plugins"
 msgstr ""
 
-#: src/libvlc-module.c:705
+#: src/libvlc-module.c:703
 msgid ""
 "These options allow you to modify the behavior of the subpictures subsystem. "
 "You can for example enable subpictures sources (logo, etc.). Enable these "
@@ -2943,11 +2918,11 @@ msgstr ""
 "ফিল্টাৰবোৰ সক্ষম কৰক আৰু \"subsources filters\" মডুলবোৰৰ খণ্ডত সেইবোৰ ৰূপৰেখা কৰক. "
 "আপুনি লগতে বহুতো বিভিন্ন উপছবিবোৰৰ বিকল্প ছেট কৰিব পাৰে."
 
-#: src/libvlc-module.c:711 modules/gui/qt/ui/sprefs_subtitles.h:305
+#: src/libvlc-module.c:709 modules/gui/qt/ui/sprefs_subtitles.h:305
 msgid "Force subtitle position"
 msgstr "উপশিৰোনামৰ স্থানটো জোৰ কৰক"
 
-#: src/libvlc-module.c:713
+#: src/libvlc-module.c:711
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
@@ -2955,30 +2930,30 @@ msgstr ""
 "উপশিৰোনামবোৰ চলচিত্ৰৰ ওপৰত ৰখাৰ পৰিৱৰ্তে চলচিত্ৰৰ তলত ৰাখিবলৈ আপুনি এই বিকল্পটো "
 "ব্যৱহাৰ কৰিব পাৰে. বিভিন্ন স্থানবোৰ চেষ্টা কৰক."
 
-#: src/libvlc-module.c:716
+#: src/libvlc-module.c:714
 #, fuzzy
 msgid "Subtitles text scaling factor"
 msgstr "উপশিৰোনাম টেক্স এনকোডিং"
 
-#: src/libvlc-module.c:717
-msgid "Set value to alter subtitles size where possible"
+#: src/libvlc-module.c:715
+msgid "Changes the subtitles size where possible"
 msgstr ""
 
-#: src/libvlc-module.c:719
+#: src/libvlc-module.c:717
 msgid "Enable sub-pictures"
 msgstr "উপ-ছবিবোৰ সক্ষম কৰক"
 
-#: src/libvlc-module.c:721
+#: src/libvlc-module.c:719
 msgid "You can completely disable the sub-picture processing."
 msgstr "উপ-ছবি প্ৰক্ৰিয়া কৰাটো আপুনি সম্পূৰ্ণভাৱে অক্ষম কৰিব পাৰে."
 
-#: src/libvlc-module.c:723 src/libvlc-module.c:1671 src/text/iso-639_def.h:145
+#: src/libvlc-module.c:721 src/libvlc-module.c:1668 src/text/iso-639_def.h:145
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
 msgstr "স্ক্ৰীনত প্ৰদৰ্শন"
 
-#: src/libvlc-module.c:725
+#: src/libvlc-module.c:723
 msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
@@ -2986,11 +2961,11 @@ msgstr ""
 "VLC য়ে ভিডিঅ'টোত বাৰ্তাবোৰ প্ৰদৰ্শন কৰিব পাৰে. ইয়াক OSD বুলি কোৱা হয় (স্ক্ৰীনত "
 "প্ৰদৰ্শন)."
 
-#: src/libvlc-module.c:728
+#: src/libvlc-module.c:726
 msgid "Text rendering module"
 msgstr "টেক্সট অনুবাদ কৰা মডুল"
 
-#: src/libvlc-module.c:730
+#: src/libvlc-module.c:728
 msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
@@ -2998,11 +2973,11 @@ msgstr ""
 "VLC য়ে অনুবাদৰ বাবে সাধাৰণতে মুক্ত প্ৰকাৰটো ব্যৱহাৰ কৰে, কিন্তু এইটোৱে আপোনাক "
 "উদাহৰণৰ বাবে svg ব্যৱহাৰ কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:732
+#: src/libvlc-module.c:730
 msgid "Subpictures source module"
 msgstr "উপছবিবোৰৰ উত্স মডুল"
 
-#: src/libvlc-module.c:734
+#: src/libvlc-module.c:732
 msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
@@ -3011,11 +2986,11 @@ msgstr ""
 "ভিডিঅ'টোৰ ওপৰত কিছুমান ছবি বা টেক্সট অভাৰলে কৰে (এটা ল'গ', স্বতন্ত্ৰ টেক্সট, ...ৰ "
 "দৰে)."
 
-#: src/libvlc-module.c:737
+#: src/libvlc-module.c:735
 msgid "Subpictures filter module"
 msgstr "উপছবিবোৰৰ ফিল্টাৰ মডুল"
 
-#: src/libvlc-module.c:739
+#: src/libvlc-module.c:737
 msgid ""
 "This adds so-called \"subpicture filters\". These filter subpictures created "
 "by subtitle decoders or other subpictures sources."
@@ -3023,11 +2998,11 @@ msgstr ""
 "এইটোৱে \"subpicture filters\" হিচাপে কোৱাবোৰ যোগ কৰে. এই ফিল্টাৰ উপছবিবোৰ "
 "উপশিৰোনাম ডিকোডাৰ বা অন্য উপছবিবোৰৰ উত্সৰ দ্বাৰা তৈয়াৰ কৰা হয়."
 
-#: src/libvlc-module.c:742
+#: src/libvlc-module.c:740
 msgid "Autodetect subtitle files"
 msgstr "স্বয়ংক্ৰিয়ভাৱে চিনাক্ত কৰা উপশিৰোনাম ফাইলবোৰ"
 
-#: src/libvlc-module.c:744
+#: src/libvlc-module.c:742
 msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
@@ -3035,11 +3010,11 @@ msgstr ""
 "স্বয়ংক্ৰিয়ভাৱে উপশিৰোনাম ফাইল এটা চিনাক্ত কৰে, যদি কোনো উপশিৰোনাম ফাইল নাম "
 "নিৰ্ধাৰণ কৰা নহয় (চলচিত্ৰৰ ফাইল নামটোৰ ওপৰত ভিত্তি কৰি)."
 
-#: src/libvlc-module.c:747
+#: src/libvlc-module.c:745
 msgid "Subtitle autodetection fuzziness"
 msgstr "উপশিৰোনামৰ স্বয়ংক্ৰিয়ভাৱে চিনাক্ত কৰা অস্পষ্টতা"
 
-#: src/libvlc-module.c:749
+#: src/libvlc-module.c:747
 msgid ""
 "This determines how fuzzy subtitle and movie filename matching will be. "
 "Options are:\n"
@@ -3057,11 +3032,11 @@ msgstr ""
 "3 = অতিৰিক্ত আখৰবোৰৰ সৈতে চলচিত্ৰৰ নামটো মিলোৱা উপশিৰোনাম ফাইল\n"
 "4 = চলচিত্ৰৰ নামটো সঠিকভাৱে মিলোৱা উপশিৰোনাম ফাইল"
 
-#: src/libvlc-module.c:757
+#: src/libvlc-module.c:755
 msgid "Subtitle autodetection paths"
 msgstr "উপশিৰোনামৰ স্বয়ংক্ৰিয়ভাৱে চিনাক্ত কৰা পাথবোৰ"
 
-#: src/libvlc-module.c:759
+#: src/libvlc-module.c:757
 msgid ""
 "Look for a subtitle file in those paths too, if your subtitle file was not "
 "found in the current directory."
@@ -3069,11 +3044,11 @@ msgstr ""
 "উপশিৰোনাম ফাইল এটাৰ বাবে এই পাথবোৰতও বিচাৰক, যদি চলিত নিৰ্দেশিকাটোত আপোনাৰ "
 "উপশিৰোনাম ফাইলটো বিচাৰি পোৱা নাছিল."
 
-#: src/libvlc-module.c:762
+#: src/libvlc-module.c:760
 msgid "Use subtitle file"
 msgstr "উপশিৰোনাম ফাইল ব্যৱহাৰ কৰক"
 
-#: src/libvlc-module.c:764
+#: src/libvlc-module.c:762
 msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
@@ -3081,19 +3056,19 @@ msgstr ""
 "এই উপশিৰোনাম ফাইলটো লোড কৰক. ব্যৱহাৰ কৰা হব যেতিয়া স্বয়ংক্ৰিয়ভাৱে চিনাক্ত "
 "কৰাটোৱে আপোনাৰ উপশিৰোনাম ফাইলটো চিনাক্ত নকৰে."
 
-#: src/libvlc-module.c:768
+#: src/libvlc-module.c:766
 msgid "DVD device"
 msgstr "DVD ডিভাইচ"
 
-#: src/libvlc-module.c:769
+#: src/libvlc-module.c:767
 msgid "VCD device"
 msgstr "VCD ডিভাইচ"
 
-#: src/libvlc-module.c:770 modules/access/cdda.c:701
+#: src/libvlc-module.c:768 modules/access/cdda.c:701
 msgid "Audio CD device"
 msgstr "অডিঅ' CD ডিভাইচ"
 
-#: src/libvlc-module.c:774
+#: src/libvlc-module.c:772
 msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
@@ -3101,7 +3076,7 @@ msgstr ""
 "এইটো হল ব্যৱহাৰ কৰিবলৈ ডিফল্ট DVD ড্ৰাইভ (বা ফাইল). ড্ৰাইভ আখৰটোৰ পিছত কলনটো "
 "দিবলৈ নাপাহৰিব (উদাহৰণ, D:)"
 
-#: src/libvlc-module.c:777
+#: src/libvlc-module.c:775
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
@@ -3109,7 +3084,7 @@ msgstr ""
 "এইটো হল ব্যৱহাৰ কৰিবলৈ ডিফল্ট VCD ড্ৰাইভ (বা ফাইল). ড্ৰাইভ আখৰটোৰ পিছত কলনটো "
 "দিবলৈ নাপাহৰিব (উদাহৰণ, D:)"
 
-#: src/libvlc-module.c:780 modules/access/cdda.c:704
+#: src/libvlc-module.c:778 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
@@ -3117,32 +3092,32 @@ msgstr ""
 "এইটো হল ব্যৱহাৰ কৰিবলৈ ডিফল্ট অডিঅ' CD ড্ৰাইভ (বা ফাইল). ড্ৰাইভ আখৰটোৰ পিছত "
 "কলনটো দিবলৈ নাপাহৰিব (উদাহৰণ, D:)"
 
-#: src/libvlc-module.c:787
+#: src/libvlc-module.c:785
 msgid "This is the default DVD device to use."
 msgstr "এইটো হল ব্যৱহাৰ কৰিবলৈ ডিফল্ট DVD ডিভাইচ."
 
-#: src/libvlc-module.c:789
+#: src/libvlc-module.c:787
 msgid "This is the default VCD device to use."
 msgstr "এইটো হল ব্যৱহাৰ কৰিবলৈ ডিফল্ট VCD ডিভাইচ."
 
-#: src/libvlc-module.c:791 modules/access/cdda.c:709
+#: src/libvlc-module.c:789 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
 msgstr "ব্যৱহাৰ কৰিবলৈ এইটো হল ডিফল্ট অডিঅ' CD ডিভাইচ."
 
-#: src/libvlc-module.c:805
+#: src/libvlc-module.c:803
 msgid "TCP connection timeout"
 msgstr "TCP সংযোগ উকলি গল"
 
-#: src/libvlc-module.c:807
+#: src/libvlc-module.c:805
 #, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
 msgstr "ডিফল্ট TCP সংযোগটো উকলি গল (মিলিছেকেণ্ডত). "
 
-#: src/libvlc-module.c:809
+#: src/libvlc-module.c:807
 msgid "HTTP server address"
 msgstr "HTTP ছাৰ্ভাৰৰ ঠিকনা"
 
-#: src/libvlc-module.c:811
+#: src/libvlc-module.c:809
 msgid ""
 "By default, the server will listen on any local IP address. Specify an IP "
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
@@ -3152,11 +3127,11 @@ msgstr ""
 "ইন্টাফেছলৈ সেইবোৰ সীমিত কৰিবলৈ এটা IP ঠিকনা (উদাহৰণ ::1 বা 127.0.0.1) বা এটা "
 "হষ্ট নাম (উদাহৰণ, স্থানীয় হষ্ট) নিৰ্দিষ্ট কৰক."
 
-#: src/libvlc-module.c:815
+#: src/libvlc-module.c:813
 msgid "RTSP server address"
 msgstr "RTSP ছাৰ্ভাৰৰ ঠিকনা"
 
-#: src/libvlc-module.c:817
+#: src/libvlc-module.c:815
 msgid ""
 "This defines the address the RTSP server will listen on, along with the base "
 "path of the RTSP VOD media. Syntax is address/path. By default, the server "
@@ -3170,11 +3145,11 @@ msgstr ""
 "এটা IP ঠিকনা (উদাহৰণ, ::1 বা 127.0.0.1) বা  এটা হষ্ট নাম (উদাহৰণ, স্থানীয় হষ্ট) "
 "নিৰ্ধাৰণ কৰক."
 
-#: src/libvlc-module.c:823
+#: src/libvlc-module.c:821
 msgid "HTTP server port"
 msgstr "HTTP ছাৰ্ভাৰৰ পোৰ্ট"
 
-#: src/libvlc-module.c:825
+#: src/libvlc-module.c:823
 msgid ""
 "The HTTP server will listen on this TCP port. The standard HTTP port number "
 "is 80. However allocation of port numbers below 1025 is usually restricted "
@@ -3184,11 +3159,11 @@ msgstr ""
 "সেইদৰে 1025 ৰ তলৰ পোৰ্ট সংখ্যাবোৰৰ স্থান নিৰ্ধাৰণ কৰাটো সাধাৰণতে অপাৰেটিং "
 "ছিষ্টেমে সীমিত কৰে."
 
-#: src/libvlc-module.c:830
+#: src/libvlc-module.c:828
 msgid "HTTPS server port"
 msgstr "HTTPS ছাৰ্ভাৰৰ পোৰ্ট"
 
-#: src/libvlc-module.c:832
+#: src/libvlc-module.c:830
 msgid ""
 "The HTTPS server will listen on this TCP port. The standard HTTPS port "
 "number is 443. However allocation of port numbers below 1025 is usually "
@@ -3198,11 +3173,11 @@ msgstr ""
 "সেইদৰে 1025 ৰ তলৰ পোৰ্ট সংখ্যাবোৰৰ স্থান নিৰ্ধাৰণ কৰাটো সাধাৰণতে অপাৰেটিং "
 "ছিষ্টেমে সীমিত কৰে."
 
-#: src/libvlc-module.c:837
+#: src/libvlc-module.c:835
 msgid "RTSP server port"
 msgstr "RTSP ছাৰ্ভাৰৰ পোৰ্ট"
 
-#: src/libvlc-module.c:839
+#: src/libvlc-module.c:837
 msgid ""
 "The RTSP server will listen on this TCP port. The standard RTSP port number "
 "is 554. However allocation of port numbers below 1025 is usually restricted "
@@ -3212,11 +3187,11 @@ msgstr ""
 "সেইদৰে 1025 ৰ তলৰ পোৰ্ট সংখ্যাবোৰৰ স্থান নিৰ্ধাৰণ কৰাটো সাধাৰণতে অপাৰেটিং "
 "ছিষ্টেমে সীমিত কৰে."
 
-#: src/libvlc-module.c:844
+#: src/libvlc-module.c:842
 msgid "HTTP/TLS server certificate"
 msgstr "HTTP/TLS ছাৰ্ভাৰৰ প্ৰমাণপত্ৰ"
 
-#: src/libvlc-module.c:846
+#: src/libvlc-module.c:844
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
@@ -3225,19 +3200,19 @@ msgstr ""
 "X ত, কী শৃংখলটোত প্ৰমাণপত্ৰখন সন্ধান কৰিবলৈ ষ্ট্ৰিংটো এখন লেবেল হিচাপে ব্যৱহাৰ কৰা "
 "হয়."
 
-#: src/libvlc-module.c:849
+#: src/libvlc-module.c:847
 msgid "HTTP/TLS server private key"
 msgstr "HTTP/TLS ছাৰ্ভাৰৰ ব্যক্তিগত কী"
 
-#: src/libvlc-module.c:851
+#: src/libvlc-module.c:849
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr "ছাৰ্ভাৰ-কাষ TLS ৰ বাবে এই ব্যক্তিগত কী ফাইলটো (PEM ফৰমেট) ব্যৱহাৰ কৰা হয়."
 
-#: src/libvlc-module.c:853
+#: src/libvlc-module.c:851
 msgid "SOCKS server"
 msgstr "SOCKS ছাৰ্ভাৰ"
 
-#: src/libvlc-module.c:855
+#: src/libvlc-module.c:853
 msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
@@ -3245,93 +3220,93 @@ msgstr ""
 "ব্যৱহাৰ কৰিবলৈ SOCKS প্ৰক্সি ছাৰ্ভাৰ. এইটো ঠিকনা:পোৰ্টৰ ৰূপত হোৱাটো অপৰিহাৰ্য. এইটো "
 "সকলো TCP সংযোগৰ বাবে ব্যৱহাৰ কৰা হব"
 
-#: src/libvlc-module.c:858
+#: src/libvlc-module.c:856
 msgid "SOCKS user name"
 msgstr "SOCKS ব্যৱহাকৰ্তাৰ নাম"
 
-#: src/libvlc-module.c:860
+#: src/libvlc-module.c:858
 msgid "User name to be used for connection to the SOCKS proxy."
 msgstr "SOCKS প্ৰক্সিটোলৈ সংযোগ কৰিবৰ বাবে ব্যৱহাৰ কৰিবলগীয়া ব্যৱহাৰকৰ্তাৰ নাম."
 
-#: src/libvlc-module.c:862
+#: src/libvlc-module.c:860
 msgid "SOCKS password"
 msgstr "SOCKS পাছৱৰ্ড"
 
-#: src/libvlc-module.c:864
+#: src/libvlc-module.c:862
 msgid "Password to be used for connection to the SOCKS proxy."
 msgstr "SOCKS প্ৰক্সিটোলৈ সংযোগ কৰিবৰ বাবে ব্যৱহাৰ কৰিবলগীয়া পাছৱৰ্ড."
 
-#: src/libvlc-module.c:866
+#: src/libvlc-module.c:864
 msgid "Title metadata"
 msgstr "শিৰোনাম মেটাডাটা"
 
-#: src/libvlc-module.c:868
+#: src/libvlc-module.c:866
 msgid "Allows you to specify a \"title\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"title\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:870
+#: src/libvlc-module.c:868
 msgid "Author metadata"
 msgstr "লেখকৰ মেটাডাটা"
 
-#: src/libvlc-module.c:872
+#: src/libvlc-module.c:870
 msgid "Allows you to specify an \"author\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"author\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:874
+#: src/libvlc-module.c:872
 msgid "Artist metadata"
 msgstr "শিল্পীৰ মেটাডাটা"
 
-#: src/libvlc-module.c:876
+#: src/libvlc-module.c:874
 msgid "Allows you to specify an \"artist\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"artist\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:878
+#: src/libvlc-module.c:876
 msgid "Genre metadata"
 msgstr "গেন্ৰে মেটাডাটা"
 
-#: src/libvlc-module.c:880
+#: src/libvlc-module.c:878
 msgid "Allows you to specify a \"genre\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"genre\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:882
+#: src/libvlc-module.c:880
 msgid "Copyright metadata"
 msgstr "প্ৰতিলিপিস্বত্ব মেটাডাটা"
 
-#: src/libvlc-module.c:884
+#: src/libvlc-module.c:882
 msgid "Allows you to specify a \"copyright\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"copyright\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:886
+#: src/libvlc-module.c:884
 msgid "Description metadata"
 msgstr "বিৱৰণৰ মেটাডাটা"
 
-#: src/libvlc-module.c:888
+#: src/libvlc-module.c:886
 msgid "Allows you to specify a \"description\" metadata for an input."
 msgstr ""
 "ইনপুট এটাৰ বাবে আপোনাক \"description\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:890
+#: src/libvlc-module.c:888
 msgid "Date metadata"
 msgstr "তাৰিখ মেটাডাটা"
 
-#: src/libvlc-module.c:892
+#: src/libvlc-module.c:890
 msgid "Allows you to specify a \"date\" metadata for an input."
 msgstr "ইনপুট এটাৰ বাবে আপোনাক \"date\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:894
+#: src/libvlc-module.c:892
 msgid "URL metadata"
 msgstr "URL মেটাডাটা"
 
-#: src/libvlc-module.c:896
+#: src/libvlc-module.c:894
 msgid "Allows you to specify a \"url\" metadata for an input."
 msgstr "ইনপুট এটাৰ বাবে আপোনাক \"url\" মেটাডাটা এটা নিৰ্দিষ্ট কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:900
+#: src/libvlc-module.c:898
 msgid ""
 "This option can be used to alter the way VLC selects its codecs "
 "(decompression methods). Only advanced users should alter this option as it "
@@ -3341,11 +3316,11 @@ msgstr ""
 "পাৰি (অসংনমন পদ্ধতি). কেৱল উন্নত ব্যৱহাৰকৰ্তাবোৰে এই বিকল্পটো সলনি কৰিব পাৰে "
 "যিহেতু এইটোৱে আপোনাৰ সকলোবোৰ ষ্ট্ৰিমৰ প্লেবেক ভাঙি পেলাব পাৰে."
 
-#: src/libvlc-module.c:904
+#: src/libvlc-module.c:902
 msgid "Preferred decoders list"
 msgstr "পছন্দ কৰা ডিকোডাৰৰ তালিকা"
 
-#: src/libvlc-module.c:906
+#: src/libvlc-module.c:904
 msgid ""
 "List of codecs that VLC will use in priority. For instance, 'dummy,a52' will "
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
@@ -3356,18 +3331,18 @@ msgstr ""
 "ব্যৱহাৰকৰ্তাবোৰে এই বিকল্পটো সলনি কৰিব পাৰে যিহেতু এইটোৱে আপোনাৰ সকলোবোৰ ষ্ট্ৰিমৰ "
 "প্লেবেক ভাঙি পেলাব পাৰে."
 
-#: src/libvlc-module.c:911
+#: src/libvlc-module.c:909
 msgid "Preferred encoders list"
 msgstr "পছন্দ কৰা এনকোডাৰবোৰৰ তালিকা"
 
-#: src/libvlc-module.c:913
+#: src/libvlc-module.c:911
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
 msgstr ""
 "এইটোৱে আপোনাক এনকোডাৰবোৰৰ তালিকা এখন নিৰ্বাচন কৰিবলৈ অনুমতি দিয়ে যিখন VLC য়ে "
 "অগ্ৰাধিকাৰৰ ভিত্তিত ব্যৱহাৰ কৰিব."
 
-#: src/libvlc-module.c:922
+#: src/libvlc-module.c:920
 msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
@@ -3375,11 +3350,11 @@ msgstr ""
 "এই বিকল্পবোৰে আপোনাক ষ্ট্ৰিম আউটপুট উপছিষ্টেমটোৰ বাবে ডিফল্ট সাৰ্বজনীন বিকল্পবোৰ ছেট "
 "কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:925
+#: src/libvlc-module.c:923
 msgid "Default stream output chain"
 msgstr "ডিফল্ট ষ্ট্ৰিম আউটপুট শৃংখল"
 
-#: src/libvlc-module.c:927
+#: src/libvlc-module.c:925
 msgid ""
 "You can enter here a default stream output chain. Refer to the documentation "
 "to learn how to build such chains. Warning: this chain will be enabled for "
@@ -3389,27 +3364,27 @@ msgstr ""
 "কৰে জানিবলৈ ডকুমেন্টেশ্বনটোলৈ পৰামৰ্শ কৰক. সতৰ্কীকৰণ: এই শৃংখলটো সকলোবোৰ ষ্ট্ৰিমৰ "
 "বাবে সক্ষম কৰা হব."
 
-#: src/libvlc-module.c:931
+#: src/libvlc-module.c:929
 msgid "Enable streaming of all ES"
 msgstr "সকলোবোৰ ES ৰ ষ্ট্ৰিমিংটো সক্ষম কৰক"
 
-#: src/libvlc-module.c:933
+#: src/libvlc-module.c:931
 msgid "Stream all elementary streams (video, audio and subtitles)"
 msgstr "সকলোবোৰ প্ৰাথমিক ষ্ট্ৰিম ষ্ট্ৰিম কৰক (ভিডিঅ', অডিঅ' আৰু উপশিৰোনামবোৰ)"
 
-#: src/libvlc-module.c:935
+#: src/libvlc-module.c:933
 msgid "Display while streaming"
 msgstr "ষ্ট্ৰিম কৰি থাকোতে প্ৰদৰ্শন কৰক"
 
-#: src/libvlc-module.c:937
+#: src/libvlc-module.c:935
 msgid "Play locally the stream while streaming it."
 msgstr "ষ্ট্ৰিমটো স্থানীয়ভাৱে চলাওক যেতিয়া এইটো ষ্ট্ৰিম কৰি থাকে."
 
-#: src/libvlc-module.c:939
+#: src/libvlc-module.c:937
 msgid "Enable video stream output"
 msgstr "ভিডিঅ' ষ্ট্ৰিম আউটপুট সক্ষম কৰক"
 
-#: src/libvlc-module.c:941
+#: src/libvlc-module.c:939
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3417,11 +3392,11 @@ msgstr ""
 "যেতিয়া এই অন্তিম সক্ষম কৰে তেতিয়া ভিডিঅ' ষ্ট্ৰিমটো ষ্ট্ৰিম আউটপুট সুবিধাটোলৈ পুনৰ "
 "নিৰ্দেশ কৰা হব নে নাই পছন্দ কৰক."
 
-#: src/libvlc-module.c:944
+#: src/libvlc-module.c:942
 msgid "Enable audio stream output"
 msgstr "অডিঅ' ষ্ট্ৰিম আউটপুট সক্ষম কৰক"
 
-#: src/libvlc-module.c:946
+#: src/libvlc-module.c:944
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3429,11 +3404,11 @@ msgstr ""
 "যেতিয়া এই অন্তিম সক্ষম কৰে তেতিয়া অডিঅ' ষ্ট্ৰিমটো ষ্ট্ৰিম আউটপুট সুবিধাটোলৈ পুনৰ "
 "নিৰ্দেশ কৰা হব নে নাই পছন্দ কৰক."
 
-#: src/libvlc-module.c:949
+#: src/libvlc-module.c:947
 msgid "Enable SPU stream output"
 msgstr "SPU ষ্ট্ৰিম আউটপুট সক্ষম কৰক"
 
-#: src/libvlc-module.c:951
+#: src/libvlc-module.c:949
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3441,11 +3416,11 @@ msgstr ""
 "যেতিয়া এই অন্তিম সক্ষম কৰে তেতিয়া SPU ষ্ট্ৰিমবোৰ ষ্ট্ৰিম আউটপুট সুবিধাটোলৈ পুনৰ "
 "নিৰ্দেশ কৰা হব নে নাই পছন্দ কৰক."
 
-#: src/libvlc-module.c:954
+#: src/libvlc-module.c:952
 msgid "Keep stream output open"
 msgstr "ষ্ট্ৰিম আউটপুটটো খুলি ৰাখক"
 
-#: src/libvlc-module.c:956
+#: src/libvlc-module.c:954
 msgid ""
 "This allows you to keep an unique stream output instance across multiple "
 "playlist item (automatically insert the gather stream output if not "
@@ -3455,11 +3430,11 @@ msgstr ""
 "ৰাখিবলৈ অনুমতি দিয়ে (যদি নিৰ্ধাৰণ নকৰে স্বয়ংক্ৰিয়ভাৱে যুগুত কৰা ষ্ট্ৰিম আউটপুটটো "
 "ভৰাওক)"
 
-#: src/libvlc-module.c:960
+#: src/libvlc-module.c:958
 msgid "Stream output muxer caching (ms)"
 msgstr "ষ্ট্ৰিম আউটপুট মাক্সাৰ কেশ্বিং (ms)"
 
-#: src/libvlc-module.c:962
+#: src/libvlc-module.c:960
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
@@ -3467,35 +3442,35 @@ msgstr ""
 "এইটোৱে আপোনাক ষ্ট্ৰিম আউটপুট মাক্সাৰ বাবে প্ৰাৰম্ভিক কেশ্বিং পৰিমাণটো ৰূপৰেখা কৰিবলৈ "
 "অনুমতি দিয়ে. এই মানটো মিলিছেকেণ্ডত ছেট কৰা হব."
 
-#: src/libvlc-module.c:965
+#: src/libvlc-module.c:963
 msgid "Preferred packetizer list"
 msgstr "পছন্দ কৰা পেকেটাইজাৰ তালিকা"
 
-#: src/libvlc-module.c:967
+#: src/libvlc-module.c:965
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "এইটোৱে আপোনাক ক্ৰম এটা নিৰ্বাচন কৰিবলৈ অনুমতি দিয়ে যত VLC য়ে ইয়াৰ পেকেটাইজাৰবোৰ "
 "পছন্দ কৰিব."
 
-#: src/libvlc-module.c:970
+#: src/libvlc-module.c:968
 msgid "Mux module"
 msgstr "মাক্স মডুল"
 
-#: src/libvlc-module.c:972
+#: src/libvlc-module.c:970
 msgid "This is a legacy entry to let you configure mux modules"
 msgstr "আপোনাক মাক্স মডুলবোৰ ৰূপৰেখা কৰিব দিবৰ বাবে এইটো হল এটা বৈধ প্ৰৱিষ্টি"
 
-#: src/libvlc-module.c:974
+#: src/libvlc-module.c:972
 msgid "Access output module"
 msgstr "আউটপুট মডুলত প্ৰৱেশ কৰক"
 
-#: src/libvlc-module.c:976
+#: src/libvlc-module.c:974
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
 "আপোনাক প্ৰৱেশ আউটপুট মডুলবোৰ ৰূপৰেখা কৰিব দিবৰ বাবে এইটো হল এটা বৈধ প্ৰৱিষ্টি"
 
-#: src/libvlc-module.c:979
+#: src/libvlc-module.c:977
 msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
@@ -3503,11 +3478,11 @@ msgstr ""
 "যদি এই বিকল্পটো সক্ষম কৰে, তেন্তে SAP মাল্টিকাষ্ট ঠিকনাত থকা প্ৰবাহটো নিয়ন্ত্ৰণ কৰা "
 "হব. এইটো প্ৰয়োজনীয় যদি আপুনি MBone টোত ঘোষণা এটা কৰিব বিচাৰে."
 
-#: src/libvlc-module.c:983
+#: src/libvlc-module.c:981
 msgid "SAP announcement interval"
 msgstr "SAP ঘোষণাৰ অন্তৰাল"
 
-#: src/libvlc-module.c:985
+#: src/libvlc-module.c:983
 msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
@@ -3515,7 +3490,7 @@ msgstr ""
 "যেতিয়া SAP প্ৰবাহ নিয়ন্ত্ৰণটো অক্ষম কৰা হয়, এইটোৱে আপোনাক SAP ঘোষণাবোৰৰ মাজত "
 "নিৰ্দিষ্ট অন্তৰাল এটা ছেট কৰিব দিয়ে."
 
-#: src/libvlc-module.c:994
+#: src/libvlc-module.c:992
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
@@ -3523,11 +3498,11 @@ msgstr ""
 "এইবোৰ বিকল্পই আপোনাক ডিফল্ট মডুলবোৰ নিৰ্বাচন কৰিবলৈ অনুমতি দিয়ে. আপুনি কি কৰি আছে "
 "জ্ঞাত নোহোৱালৈকে এইবোৰক অকলশৰীয়াকৈ এৰক."
 
-#: src/libvlc-module.c:997
+#: src/libvlc-module.c:995
 msgid "Access module"
 msgstr "মডুলত প্ৰৱেশ কৰক"
 
-#: src/libvlc-module.c:999
+#: src/libvlc-module.c:997
 msgid ""
 "This allows you to force an access module. You can use it if the correct "
 "access is not automatically detected. You should not set this as a global "
@@ -3537,30 +3512,30 @@ msgstr ""
 "পাৰে যদি শুদ্ধ প্ৰৱেশটো স্বয়ংক্ৰিয়ভাৱে চিনাক্ত নকৰে. আপুনি কি কৰি আছে প্ৰকৃততে আপুনি "
 "জ্ঞাত নোহোৱালৈকে আপুনি এইটো সাৰ্বজনীন বিকল্প এটাৰ দৰে ছেট কৰিব নোৱাৰে."
 
-#: src/libvlc-module.c:1003
+#: src/libvlc-module.c:1001
 msgid "Stream filter module"
 msgstr "ষ্ট্ৰিম ফিল্টাৰ মডুল "
 
-#: src/libvlc-module.c:1005
+#: src/libvlc-module.c:1003
 #, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr "পঢ়ি থকা ষ্ট্ৰিমটো সলনি কৰিবলৈ ষ্ট্ৰিম ফিল্টাৰবোৰ ব্যৱহাৰ কৰা হয়."
 
-#: src/libvlc-module.c:1007
+#: src/libvlc-module.c:1005
 #, fuzzy
 msgid "Demux filter module"
 msgstr "ষ্ট্ৰিম ফিল্টাৰ মডুল "
 
-#: src/libvlc-module.c:1009
+#: src/libvlc-module.c:1007
 #, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr "পঢ়ি থকা ষ্ট্ৰিমটো সলনি কৰিবলৈ ষ্ট্ৰিম ফিল্টাৰবোৰ ব্যৱহাৰ কৰা হয়."
 
-#: src/libvlc-module.c:1011
+#: src/libvlc-module.c:1009
 msgid "Demux module"
 msgstr "ডিমাক্স মডুল"
 
-#: src/libvlc-module.c:1013
+#: src/libvlc-module.c:1011
 msgid ""
 "Demultiplexers are used to separate the \"elementary\" streams (like audio "
 "and video streams). You can use it if the correct demuxer is not "
@@ -3572,11 +3547,11 @@ msgstr ""
 "স্বয়ংক্ৰিয়ভাৱে চিনাক্ত নকৰে. আপুনি কি কৰি আছে প্ৰকৃততে আপুনি জ্ঞাত নোহোৱালৈকে আপুনি "
 "এইটো সাৰ্বজনীন বিকল্প এটাৰ দৰে ছেট কৰিব নোৱাৰে."
 
-#: src/libvlc-module.c:1018
+#: src/libvlc-module.c:1016
 msgid "VoD server module"
 msgstr "VoD ছাৰ্ভাৰ মডুল"
 
-#: src/libvlc-module.c:1020
+#: src/libvlc-module.c:1018
 #, fuzzy
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
@@ -3585,11 +3560,11 @@ msgstr ""
 "আপুনি যিটো VoD ছাৰ্ভাৰ মডুল ব্যৱহাৰ কৰিব বিচাৰে সেইটো নিৰ্বাচন কৰিব পাৰে. পুৰণি, "
 "বৈধ মডুলটোলৈ যাবলৈ এইটোক `vod_rtsp' লৈ ছেট কৰক."
 
-#: src/libvlc-module.c:1023
+#: src/libvlc-module.c:1021
 msgid "Allow real-time priority"
 msgstr "প্ৰকৃত-সময় অগ্ৰাধিকাৰৰ অনুমতি দিয়ক"
 
-#: src/libvlc-module.c:1025
+#: src/libvlc-module.c:1023
 msgid ""
 "Running VLC in real-time priority will allow for much more precise "
 "scheduling and yield better, especially when streaming content. It can "
@@ -3601,11 +3576,11 @@ msgstr ""
 "যন্ত্ৰটো লক কৰিব পাৰে, বা এইটো অতি মন্থৰ কৰি তুলিব পাৰে. আপুনি এইটো কেৱল তেতিয়াহে "
 "সক্ৰিয় কৰিব পাৰিব যদি আপুনি কি কৰি আছে তাৰ বিষয়ে আপুনি জ্ঞাত হয়."
 
-#: src/libvlc-module.c:1031
+#: src/libvlc-module.c:1029
 msgid "Adjust VLC priority"
 msgstr "VLC অগ্ৰাধিকাৰটো মিলাওক"
 
-#: src/libvlc-module.c:1033
+#: src/libvlc-module.c:1031
 msgid ""
 "This option adds an offset (positive or negative) to VLC default priorities. "
 "You can use it to tune VLC priority against other programs, or against other "
@@ -3615,77 +3590,78 @@ msgstr ""
 "কৰে. আপুনি অন্য কাৰ্যসূচী বা অন্য VLC উদাহৰণবোৰৰ বিৰুদ্ধে VLC অগ্ৰাধিকাৰ টিউন কৰিবলৈ "
 "এইটো ব্যৱহাৰ কৰিব পাৰে."
 
-#: src/libvlc-module.c:1038
+#: src/libvlc-module.c:1036
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr "এই বিকল্পটো উপযোগী যদি ষ্ট্ৰিম এটা পঢ়োতে আপুনি বিলম্বটো হ্ৰাস কৰিব বিচাৰে"
 
-#: src/libvlc-module.c:1041
+#: src/libvlc-module.c:1039
 msgid "VLM configuration file"
 msgstr "VLM ৰূপৰেখাকৰণ ফাইল"
 
-#: src/libvlc-module.c:1043
+#: src/libvlc-module.c:1041
 msgid "Read a VLM configuration file as soon as VLM is started."
 msgstr "VLM আৰম্ভ কৰাৰ লগে লগে VLM ৰূপৰেখাকৰণ ফাইল এটা পঢ়ক."
 
-#: src/libvlc-module.c:1045
+#: src/libvlc-module.c:1043
 msgid "Use a plugins cache"
 msgstr "প্লাগইনবোৰৰ কেশ্ব এটা ব্যৱহাৰ কৰক"
 
-#: src/libvlc-module.c:1047
+#: src/libvlc-module.c:1045
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr "প্লাগইনবোৰৰ কেশ্ব এটা ব্যৱহাৰ কৰক যিয়ে VLC ৰ আৰম্ভণিৰ সময়টো উন্নত কৰিব."
 
-#: src/libvlc-module.c:1049
+#: src/libvlc-module.c:1047
 msgid "Scan for new plugins"
 msgstr ""
 
-#: src/libvlc-module.c:1051
+#: src/libvlc-module.c:1049
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
 
-#: src/libvlc-module.c:1054
+#: src/libvlc-module.c:1052
 #, fuzzy
 msgid "Preferred keystore list"
 msgstr "পছন্দ কৰা পেকেটাইজাৰ তালিকা"
 
-#: src/libvlc-module.c:1056
-msgid ""
-"List of keystores that VLC will use in priority. Only advanced users should "
-"alter this option."
+#: src/libvlc-module.c:1054
+#, fuzzy
+msgid "List of keystores that VLC will use in priority."
 msgstr ""
+"এইটোৱে আপোনাক এনকোডাৰবোৰৰ তালিকা এখন নিৰ্বাচন কৰিবলৈ অনুমতি দিয়ে যিখন VLC য়ে "
+"অগ্ৰাধিকাৰৰ ভিত্তিত ব্যৱহাৰ কৰিব."
 
-#: src/libvlc-module.c:1059
+#: src/libvlc-module.c:1056
 msgid "Locally collect statistics"
 msgstr "স্থানীয়ভাৱে সংগ্ৰহ কৰা পৰিসংখ্যাবোৰ "
 
-#: src/libvlc-module.c:1061
+#: src/libvlc-module.c:1058
 msgid "Collect miscellaneous local statistics about the playing media."
 msgstr "চলিত মিডিয়াটোৰ বিষয়ে বিভিন্ন স্থানীয় পৰিসংখ্যাবোৰ যুগুত কৰক."
 
-#: src/libvlc-module.c:1063
+#: src/libvlc-module.c:1060
 msgid "Run as daemon process"
 msgstr "ডেমন প্ৰক্ৰিয়া এটা হিচাপে চলাওক"
 
-#: src/libvlc-module.c:1065
+#: src/libvlc-module.c:1062
 msgid "Runs VLC as a background daemon process."
 msgstr "এটা পটভূমিৰ ডেমন প্ৰক্ৰিয়া দৰে VLC টো চলাওক."
 
-#: src/libvlc-module.c:1067
+#: src/libvlc-module.c:1064
 msgid "Write process id to file"
 msgstr "ফাইললৈ প্ৰক্ৰিয়া id টো লিখক"
 
-#: src/libvlc-module.c:1069
+#: src/libvlc-module.c:1066
 msgid "Writes process id into specified file."
 msgstr "নিৰ্ধাৰিত ফাইলত প্ৰক্ৰিয়া id টো লিখক."
 
-#: src/libvlc-module.c:1071
+#: src/libvlc-module.c:1068
 msgid "Allow only one running instance"
 msgstr "কেৱল এটা চলিত উদাহৰণৰ অনুমতি দিয়ে"
 
-#: src/libvlc-module.c:1073
+#: src/libvlc-module.c:1070
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -3699,23 +3675,23 @@ msgstr ""
 "নিবিচাৰে. এই বিকল্পটোৱে আপোনাক ইতিমধ্যে চলি থকা উদাহৰণ বা এইটো শাৰী কৰাৰ সৈতে "
 "ফাইল এটা চলাবলৈ অনুমতি দিব."
 
-#: src/libvlc-module.c:1079
+#: src/libvlc-module.c:1076
 msgid "VLC is started from file association"
 msgstr "ফাইল সংস্থাৰ পৰা VLC আৰম্ভ কৰা হৈছে"
 
-#: src/libvlc-module.c:1081
+#: src/libvlc-module.c:1078
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr "VLC ক জনাওক যে OS ত ফাইল সংস্থা এটাৰ বাবে ইয়াক আৰম্ভ কৰা হৈছে"
 
-#: src/libvlc-module.c:1084 modules/gui/qt/ui/sprefs_interface.h:551
+#: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Use only one instance when started from file manager"
 msgstr "কেৱল এটা উদাহৰণ ব্যৱহাৰ কৰক যেতিয়া ফাইল পৰিচালকৰ পৰা আৰম্ভ কৰে"
 
-#: src/libvlc-module.c:1086
+#: src/libvlc-module.c:1083
 msgid "Increase the priority of the process"
 msgstr "প্ৰক্ৰিয়াটোৰ অগ্ৰাধিকাৰটো বৃদ্ধি কৰক"
 
-#: src/libvlc-module.c:1088
+#: src/libvlc-module.c:1085
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
@@ -3730,11 +3706,11 @@ msgstr ""
 "পৰিস্থিতিবোৰত (বাগবোৰ) VLC য়ে সকলোবোৰ প্ৰক্ৰিয়াকৰ্তাৰ সময় লব পাৰে আৰু সমগ্ৰ "
 "সঁহাৰিবিহীন ছিষ্টেমটো অনুবাদ কৰে যিটোৱে আপোনাৰ মেচিনটোৰ ৰিবুট এটা দাবী কৰিব পাৰে."
 
-#: src/libvlc-module.c:1096 modules/gui/qt/ui/sprefs_interface.h:554
+#: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:554
 msgid "Enqueue items into playlist in one instance mode"
 msgstr "প্লেলিষ্টত এটা উদাহৰণৰ ধৰণত বস্তুবোৰ শাৰী কৰক"
 
-#: src/libvlc-module.c:1098
+#: src/libvlc-module.c:1095
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
@@ -3742,18 +3718,16 @@ msgstr ""
 "যেতিয়া এটা উদাহৰণ একমাত্ৰ বিকল্পটো ব্যৱহাৰ কৰে, বস্তুবোৰ প্লেলিষ্টত শাৰী কৰক আৰু "
 "চলিত বস্তুটো চলি থাকিবলৈ দিয়ক."
 
-#: src/libvlc-module.c:1101
+#: src/libvlc-module.c:1098
 #, fuzzy
 msgid "Expose media player via D-Bus"
 msgstr "VLC মিডিয়া প্লেয়াৰ আপডেটবোৰ"
 
-#: src/libvlc-module.c:1102
-msgid ""
-"Allow other applications to control the VLC media player using the D-Bus "
-"MPRIS protocol."
+#: src/libvlc-module.c:1099
+msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
 
-#: src/libvlc-module.c:1111
+#: src/libvlc-module.c:1108
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
@@ -3761,12 +3735,12 @@ msgstr ""
 "এই বিকল্পবোৰে প্লেলিষ্টৰ আচৰণটো বাখ্যা কৰে. সেইবোৰৰ কিছুমান প্লেলিষ্টৰ সংলাপ "
 "বাকচটোত অভাৰৰাইড কৰা হব."
 
-#: src/libvlc-module.c:1114
+#: src/libvlc-module.c:1111
 #, fuzzy
 msgid "Automatically preparse items"
 msgstr "ফাইলবোৰ স্বয়ংক্ৰিয়ভাৱে প্ৰিপাৰ্ছ কৰক"
 
-#: src/libvlc-module.c:1116
+#: src/libvlc-module.c:1113
 #, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
@@ -3775,34 +3749,35 @@ msgstr ""
 "প্লেলিষ্টলৈ যোগ কৰা ফাইলবোৰ স্বয়ংক্ৰিয়ভাৱে প্ৰিপাৰ্ছ কৰে (কিছুমান মেটাডাটা পুনৰ "
 "উদ্ধাৰ কৰিবলৈ)."
 
-#: src/libvlc-module.c:1119
+#: src/libvlc-module.c:1116
 #, fuzzy
 msgid "Preparsing timeout"
 msgstr "RTSP অধিৱেশনৰ সময় উকলি গল (বোৰ)"
 
-#: src/libvlc-module.c:1121
-msgid "Maximum time (in milliseconds) allowed to preparse an item"
-msgstr ""
+#: src/libvlc-module.c:1118
+#, fuzzy
+msgid "Maximum time allowed to preparse an item, in milliseconds"
+msgstr "মিলিছেকেণ্ডত কেমেৰাবোৰ আৰু মাইক্ৰফোনবোৰৰ বাবে মান কেশ্ব কৰিছে."
 
-#: src/libvlc-module.c:1123 modules/gui/macosx/VLCSimplePrefsController.m:321
+#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:564
 msgid "Allow metadata network access"
 msgstr "মেটাডাটা নেটৱৰ্ক প্ৰৱেশৰ অনুমতি দিয়ক"
 
-#: src/libvlc-module.c:1128
+#: src/libvlc-module.c:1125
 msgid "Collapse"
 msgstr "খহিছে"
 
-#: src/libvlc-module.c:1128
+#: src/libvlc-module.c:1125
 msgid "Expand"
 msgstr "প্ৰসাৰ কৰক"
 
-#: src/libvlc-module.c:1130
+#: src/libvlc-module.c:1127
 msgid "Subdirectory behavior"
 msgstr "উপনিৰ্দেশিকাৰ আচৰণ"
 
-#: src/libvlc-module.c:1132
+#: src/libvlc-module.c:1129
 msgid ""
 "Select whether subdirectories must be expanded.\n"
 "none: subdirectories do not appear in the playlist.\n"
@@ -3814,11 +3789,11 @@ msgstr ""
 "খহি পৰা: উপনিৰ্দেশিকাবোৰ দৃষ্টিগোচৰ হয় কিন্তু প্ৰথমবাৰ চলাওতে প্ৰসাৰ কৰা হয়.\n"
 "প্ৰসাৰ কৰক: সকলোবোৰ উপনিৰ্দেশিকা প্ৰসাৰ কৰা হয়.\n"
 
-#: src/libvlc-module.c:1137
+#: src/libvlc-module.c:1134
 msgid "Ignored extensions"
 msgstr "সম্প্ৰসাৰণবোৰ অৱজ্ঞা কৰা হল"
 
-#: src/libvlc-module.c:1139
+#: src/libvlc-module.c:1136
 msgid ""
 "Files with these extensions will not be added to playlist when opening a "
 "directory.\n"
@@ -3830,20 +3805,20 @@ msgstr ""
 "এইটো উপযোগী যদি আপুনি নিৰ্দেশিকাবোৰ যোগ কৰে যিয়ে উদাহৰণৰ বাবে প্লেলিষ্ট ফাইলবোৰ "
 "ধাৰণ কৰে. সম্প্ৰসাৰণবোৰৰ বাবে ক'মা-পৃথকীকৃত তালিকা এখন ব্যৱহাৰ কৰক."
 
-#: src/libvlc-module.c:1144
+#: src/libvlc-module.c:1141
 #, fuzzy
 msgid "Show hidden files"
 msgstr "পূংখানুপূংখ বিৱৰণ দেখুৱাওক"
 
-#: src/libvlc-module.c:1146
+#: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
 msgstr ""
 
-#: src/libvlc-module.c:1148
+#: src/libvlc-module.c:1145
 msgid "Services discovery modules"
 msgstr "সেৱাবোৰ আৱিষ্কাৰ মডুলবোৰ"
 
-#: src/libvlc-module.c:1150
+#: src/libvlc-module.c:1147
 msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
@@ -3851,78 +3826,78 @@ msgstr ""
 "আগতীয়াকৈ লোড কৰিবলৈ, কলনবোৰৰ দ্বাৰা পৃথক কৰিবলৈ সেৱাবোৰ আৱিষ্কাৰ মডুলবোৰ নিৰ্ধাৰণ "
 "কৰে. সাধাৰণ মানটো হল \"sap\"."
 
-#: src/libvlc-module.c:1153
+#: src/libvlc-module.c:1150
 msgid "Play files randomly forever"
 msgstr "চিৰদিন ফাইলবোৰ বিশৃংখলভাৱে চলাওক"
 
-#: src/libvlc-module.c:1155
+#: src/libvlc-module.c:1152
 msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr "হস্তক্ষেপ নকৰালৈকে প্লেলিষ্টটোত VLC য়ে ফাইলবোৰ বিশৃংখলভাৱে চলাব."
 
-#: src/libvlc-module.c:1157
+#: src/libvlc-module.c:1154
 msgid "Repeat all"
 msgstr "সকলোবোৰ পুনৰাবৃত্তি কৰক"
 
-#: src/libvlc-module.c:1159
+#: src/libvlc-module.c:1156
 msgid "VLC will keep playing the playlist indefinitely."
 msgstr "VLC য়ে চলিত প্লেলিষ্ট বস্তুটো চিৰদিনৰ বাবে চলিত কৰি ৰাখিব."
 
-#: src/libvlc-module.c:1161
+#: src/libvlc-module.c:1158
 msgid "Repeat current item"
 msgstr "চলিত বস্তুটো পুনৰাবৃত্তি কৰক"
 
-#: src/libvlc-module.c:1163
+#: src/libvlc-module.c:1160
 msgid "VLC will keep playing the current playlist item."
 msgstr "VLC য়ে চলিত প্লেলিষ্ট বস্তুটো চলিত কৰি ৰাখিব."
 
-#: src/libvlc-module.c:1165
+#: src/libvlc-module.c:1162
 msgid "Play and stop"
 msgstr "চলাওক আৰু বন্ধ কৰক"
 
-#: src/libvlc-module.c:1167
+#: src/libvlc-module.c:1164
 msgid "Stop the playlist after each played playlist item."
 msgstr "প্লেলিষ্ট বস্তুৰ প্ৰত্যেকটো চলাৰ পিছত প্লেলিষ্টখন বন্ধ কৰক."
 
-#: src/libvlc-module.c:1169
+#: src/libvlc-module.c:1166
 msgid "Play and exit"
 msgstr "চলাওক আৰু প্ৰস্থান কৰক"
 
-#: src/libvlc-module.c:1171
+#: src/libvlc-module.c:1168
 msgid "Exit if there are no more items in the playlist."
 msgstr "প্ৰস্থান কৰক যদি প্লেলিষ্ট আৰু কোনো বস্তু নাই."
 
-#: src/libvlc-module.c:1173
+#: src/libvlc-module.c:1170
 msgid "Play and pause"
 msgstr "চলাওক আৰু বিৰতি দিয়ক"
 
-#: src/libvlc-module.c:1175
+#: src/libvlc-module.c:1172
 msgid "Pause each item in the playlist on the last frame."
 msgstr "অন্তিম ফ্ৰেমটোত প্লেলিষ্টটোত থকা প্ৰতিটো বস্তুক বিৰতি দিয়ক."
 
-#: src/libvlc-module.c:1177
+#: src/libvlc-module.c:1174
 #, fuzzy
 msgid "Start paused"
 msgstr "আৰম্ভৰ সময়"
 
-#: src/libvlc-module.c:1179
+#: src/libvlc-module.c:1176
 #, fuzzy
 msgid "Pause each item in the playlist on the first frame."
 msgstr "অন্তিম ফ্ৰেমটোত প্লেলিষ্টটোত থকা প্ৰতিটো বস্তুক বিৰতি দিয়ক."
 
-#: src/libvlc-module.c:1181
+#: src/libvlc-module.c:1178
 msgid "Auto start"
 msgstr "স্বয়ংক্ৰিয়ভাৱে আৰম্ভ কৰক"
 
-#: src/libvlc-module.c:1182
+#: src/libvlc-module.c:1179
 msgid "Automatically start playing the playlist content once it's loaded."
 msgstr ""
 "এইটো এবাৰ লোড হোৱাৰ পিছত প্লেলিষ্টৰ উপাদানবোৰ স্বয়ংক্ৰিয়ভাৱে চলিবলৈ আৰম্ভ কৰে."
 
-#: src/libvlc-module.c:1185
+#: src/libvlc-module.c:1182
 msgid "Pause on audio communication"
 msgstr "অডিঅ' যোগাযোগত বিৰতি দিয়ক"
 
-#: src/libvlc-module.c:1187
+#: src/libvlc-module.c:1184
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
@@ -3930,11 +3905,11 @@ msgstr ""
 "যদি বাকী থকা অডিঅ' যোগাযোগটো চিনাক্ত কৰে, তেন্তে প্লেবেকটোক স্বয়ক্ৰিয়ংভাৱে বিৰতি "
 "দিয়া হব."
 
-#: src/libvlc-module.c:1190
+#: src/libvlc-module.c:1187
 msgid "Use media library"
 msgstr "মিডিয়া লাইব্ৰেৰী ব্যৱহাৰ কৰক"
 
-#: src/libvlc-module.c:1192
+#: src/libvlc-module.c:1189
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
@@ -3942,11 +3917,11 @@ msgstr ""
 "আপুনি প্ৰতিবাৰ VLC টো আৰম্ভ কৰিলে মিডিয়া লাইব্ৰেৰীটো স্বয়ংক্ৰিয়ভাৱে ছেভ কৰা আৰু পুনৰ "
 "লোড কৰা হয়."
 
-#: src/libvlc-module.c:1195 modules/gui/qt/ui/sprefs_interface.h:552
+#: src/libvlc-module.c:1192 modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Display playlist tree"
 msgstr "প্লেলিষ্টৰ বিন্যাস প্ৰদৰ্শন কৰক"
 
-#: src/libvlc-module.c:1197
+#: src/libvlc-module.c:1194
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
@@ -3954,35 +3929,35 @@ msgstr ""
 "নিৰ্দেশিকা এটাৰ উপাদানবোৰৰ দৰে কিছুমান বস্তু শ্ৰেণীবিভাগ কৰিবলৈ প্লেলিষ্টখনে বিন্যাস "
 "এটা ব্যৱহাৰ কৰিব পাৰে."
 
-#: src/libvlc-module.c:1206
+#: src/libvlc-module.c:1203
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr "এই ছেটিংবোৰ হল সাৰ্বজনীন VLC কী বাইণ্ডিংবোৰ, \"hotkeys\" হিচাপে জনাজায়."
 
-#: src/libvlc-module.c:1211 modules/gui/macosx/VLCMain+OldPrefs.m:103
+#: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:103
 msgid "Ignore"
 msgstr "অৱজ্ঞা কৰক"
 
-#: src/libvlc-module.c:1211
+#: src/libvlc-module.c:1208
 #, fuzzy
 msgid "Volume control"
 msgstr "প্ৰসাৰ নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1212
+#: src/libvlc-module.c:1209
 #, fuzzy
 msgid "Position control"
 msgstr "স্থান নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1212
+#: src/libvlc-module.c:1209
 #, fuzzy
 msgid "Position control reversed"
 msgstr "স্থান নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1215
+#: src/libvlc-module.c:1212
 #, fuzzy
 msgid "Mouse wheel vertical axis control"
 msgstr "মাউছৰ চকা ওপৰ-তল অক্ষৰ নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1217
+#: src/libvlc-module.c:1214
 #, fuzzy
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
@@ -3991,12 +3966,12 @@ msgstr ""
 "মাউছৰ চকা ওপৰ-তল (উলম্ব) অক্ষই প্ৰসাৰ, স্থান নিয়ন্ত্ৰণ কৰিব পাৰে বা মাউছৰ চকাৰ "
 "ঘটনা অৱজ্ঞা কৰিব পাৰি"
 
-#: src/libvlc-module.c:1219
+#: src/libvlc-module.c:1216
 #, fuzzy
 msgid "Mouse wheel horizontal axis control"
 msgstr "মাউছৰ চকা ওপৰ-তল অক্ষৰ নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1221
+#: src/libvlc-module.c:1218
 #, fuzzy
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
@@ -4005,7 +3980,7 @@ msgstr ""
 "মাউছৰ চকা ওপৰ-তল (উলম্ব) অক্ষই প্ৰসাৰ, স্থান নিয়ন্ত্ৰণ কৰিব পাৰে বা মাউছৰ চকাৰ "
 "ঘটনা অৱজ্ঞা কৰিব পাৰি"
 
-#: src/libvlc-module.c:1223 src/video_output/vout_intf.c:268
+#: src/libvlc-module.c:1220 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
 #: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:501
 #: modules/gui/qt/components/controller.hpp:108
@@ -4013,79 +3988,79 @@ msgstr ""
 msgid "Fullscreen"
 msgstr "সম্পূৰ্ণ দৃশ্য"
 
-#: src/libvlc-module.c:1224
+#: src/libvlc-module.c:1221
 msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "সম্পূৰ্ণ দৃশ্য অৱস্থা শ্বুৱাপ কৰিবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1225
+#: src/libvlc-module.c:1222
 msgid "Exit fullscreen"
 msgstr "সম্পূৰ্ণ দৃশ্য বন্ধ কৰক"
 
-#: src/libvlc-module.c:1226
+#: src/libvlc-module.c:1223
 msgid "Select the hotkey to use to exit fullscreen state."
 msgstr "সম্পূৰ্ণ দৃশ্য অৱস্থা বন্ধ কৰিবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1227 modules/gui/macosx/VLCFSPanelController.m:109
+#: src/libvlc-module.c:1224 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
 msgstr "চলাওক/বিৰতি দিয়ক"
 
-#: src/libvlc-module.c:1228
+#: src/libvlc-module.c:1225
 msgid "Select the hotkey to use to swap paused state."
 msgstr "বিৰতি অৱস্থাটো শ্বুৱাপ কৰিবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1229
+#: src/libvlc-module.c:1226
 msgid "Pause only"
 msgstr "কেৱল বিৰতি দিয়ক"
 
-#: src/libvlc-module.c:1230
+#: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to pause."
 msgstr "বিৰতি দিবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1231
+#: src/libvlc-module.c:1228
 msgid "Play only"
 msgstr "কেৱল চলাওক"
 
-#: src/libvlc-module.c:1232
+#: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to play."
 msgstr "চলাবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1233 modules/gui/macosx/VLCMainMenu.m:385
+#: src/libvlc-module.c:1230 modules/gui/macosx/VLCMainMenu.m:385
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Faster"
 msgstr "খৰতকীয়া"
 
-#: src/libvlc-module.c:1234 src/libvlc-module.c:1240
+#: src/libvlc-module.c:1231 src/libvlc-module.c:1237
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "খৰতীয়াকৈ আগলৈ প্লেবেক কৰিবৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1235 modules/gui/macosx/VLCMainMenu.m:383
+#: src/libvlc-module.c:1232 modules/gui/macosx/VLCMainMenu.m:383
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
 msgstr "মন্থৰ"
 
-#: src/libvlc-module.c:1236 src/libvlc-module.c:1242
+#: src/libvlc-module.c:1233 src/libvlc-module.c:1239
 msgid "Select the hotkey to use for slow motion playback."
 msgstr "মন্থৰ গতিত প্লেবেকৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1237
+#: src/libvlc-module.c:1234
 msgid "Normal rate"
 msgstr "স্বাভাৱিক হাৰ"
 
-#: src/libvlc-module.c:1238
+#: src/libvlc-module.c:1235
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr "প্লেবেকৰ হাৰ স্বাভাৱিক অৱস্থালৈ ঘূৰাই নিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1239 modules/gui/qt/menus.cpp:875
+#: src/libvlc-module.c:1236 modules/gui/qt/menus.cpp:875
 msgid "Faster (fine)"
 msgstr "খৰতকীয়া (উত্তম)"
 
-#: src/libvlc-module.c:1241 modules/gui/qt/menus.cpp:883
+#: src/libvlc-module.c:1238 modules/gui/qt/menus.cpp:883
 msgid "Slower (fine)"
 msgstr "মন্থৰ (উত্তম)"
 
-#: src/libvlc-module.c:1243 modules/control/hotkeys.c:410
+#: src/libvlc-module.c:1240 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
 #: modules/gui/macosx/VLCFSPanelController.m:112
 #: modules/gui/macosx/VLCMainMenu.m:388 modules/gui/macosx/VLCMainMenu.m:489
@@ -4096,11 +4071,11 @@ msgstr "মন্থৰ (উত্তম)"
 msgid "Next"
 msgstr "পৰৱৰ্তী"
 
-#: src/libvlc-module.c:1244
+#: src/libvlc-module.c:1241
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr "প্লেলিষ্টটোত পৰৱৰ্তী বস্তুটোলৈ যোৱাৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1245 modules/control/hotkeys.c:414
+#: src/libvlc-module.c:1242 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
 #: modules/gui/macosx/VLCFSPanelController.m:115
 #: modules/gui/macosx/VLCMainMenu.m:387 modules/gui/macosx/VLCMainMenu.m:490
@@ -4109,11 +4084,11 @@ msgstr "প্লেলিষ্টটোত পৰৱৰ্তী বস্ত�
 msgid "Previous"
 msgstr "আগৰ"
 
-#: src/libvlc-module.c:1246
+#: src/libvlc-module.c:1243
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr "প্লেলিষ্টটোত আগৰ বস্তুটোলৈ যোৱাৰ বাবে ব্যৱহাৰ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1247 modules/gui/macosx/VLCMainMenu.m:378
+#: src/libvlc-module.c:1244 modules/gui/macosx/VLCMainMenu.m:378
 #: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/macosx/VLCMainMenu.m:495
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:61
 #: modules/gui/qt/components/controller.hpp:107
@@ -4121,11 +4096,11 @@ msgstr "প্লেলিষ্টটোত আগৰ বস্তুটোল�
 msgid "Stop"
 msgstr "বন্ধ কৰক"
 
-#: src/libvlc-module.c:1248
+#: src/libvlc-module.c:1245
 msgid "Select the hotkey to stop playback."
 msgstr "প্লেবেক বন্ধ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1249 modules/gui/macosx/VLCControlsBarCommon.m:75
+#: src/libvlc-module.c:1246 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:273
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:295
@@ -4135,725 +4110,725 @@ msgstr "প্লেবেক বন্ধ কৰিবলৈ হটকীটো
 msgid "Position"
 msgstr "স্থান"
 
-#: src/libvlc-module.c:1250
+#: src/libvlc-module.c:1247
 msgid "Select the hotkey to display the position."
 msgstr "স্থানটো প্ৰদৰ্শন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1252
+#: src/libvlc-module.c:1249
 msgid "Very short backwards jump"
 msgstr "বৰ চুটিকৈ পিছলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1254
+#: src/libvlc-module.c:1251
 msgid "Select the hotkey to make a very short backwards jump."
 msgstr "বৰ চুটিকৈ পিছলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1255
+#: src/libvlc-module.c:1252
 msgid "Short backwards jump"
 msgstr "চুটিকৈ পিছলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1257
+#: src/libvlc-module.c:1254
 msgid "Select the hotkey to make a short backwards jump."
 msgstr "চুটিকৈ পিছলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1258
+#: src/libvlc-module.c:1255
 msgid "Medium backwards jump"
 msgstr "মধ্যমভাৱে পিছলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1260
+#: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a medium backwards jump."
 msgstr "মধ্যমভাৱে পিছলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1261
+#: src/libvlc-module.c:1258
 msgid "Long backwards jump"
 msgstr "দীঘলকৈ পিছলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1263
+#: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a long backwards jump."
 msgstr "দীঘলকৈ পিছলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1265
+#: src/libvlc-module.c:1262
 msgid "Very short forward jump"
 msgstr "বৰ চুটিকৈ আগলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1267
+#: src/libvlc-module.c:1264
 msgid "Select the hotkey to make a very short forward jump."
 msgstr "বৰ চুটিকৈ আগলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1268
+#: src/libvlc-module.c:1265
 msgid "Short forward jump"
 msgstr "চুটিকৈ আগলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1270
+#: src/libvlc-module.c:1267
 msgid "Select the hotkey to make a short forward jump."
 msgstr "চুটিকৈ আগলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1271
+#: src/libvlc-module.c:1268
 msgid "Medium forward jump"
 msgstr "মধ্যমভাৱে আগলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1273
+#: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a medium forward jump."
 msgstr "মধ্যমভাৱে আগলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1274
+#: src/libvlc-module.c:1271
 msgid "Long forward jump"
 msgstr "দীঘলকৈ আগলৈ জপিওৱা"
 
-#: src/libvlc-module.c:1276
+#: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a long forward jump."
 msgstr "দীঘলকৈ আগলৈ জপিওৱা এটা সম্পন্ন কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1277 modules/control/hotkeys.c:599
+#: src/libvlc-module.c:1274 modules/control/hotkeys.c:599
 msgid "Next frame"
 msgstr "পৰৱৰ্তী ফ্ৰেম"
 
-#: src/libvlc-module.c:1279
+#: src/libvlc-module.c:1276
 msgid "Select the hotkey to got to the next video frame."
 msgstr "পৰৱৰ্তী ভিডিঅ' ফ্ৰেমটোলৈ যাবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1281
+#: src/libvlc-module.c:1278
 msgid "Very short jump length"
 msgstr "বৰ চুটিকৈ জপিওৱাৰ দৈৰ্ঘ্য"
 
-#: src/libvlc-module.c:1282
+#: src/libvlc-module.c:1279
 msgid "Very short jump length, in seconds."
 msgstr "বৰ চুটিকৈ জপিওৱাৰ দৈৰ্ঘ্য, ছেকণ্ডত."
 
-#: src/libvlc-module.c:1283
+#: src/libvlc-module.c:1280
 msgid "Short jump length"
 msgstr "চুটিকৈ জপিওৱাৰ দৈৰ্ঘ্য"
 
-#: src/libvlc-module.c:1284
+#: src/libvlc-module.c:1281
 msgid "Short jump length, in seconds."
 msgstr "চুটিকৈ জপিওৱাৰ দৈৰ্ঘ্য, ছেকণ্ডত."
 
-#: src/libvlc-module.c:1285
+#: src/libvlc-module.c:1282
 msgid "Medium jump length"
 msgstr "মধ্যমভাৱে জপিওৱাৰ দৈৰ্ঘ্য"
 
-#: src/libvlc-module.c:1286
+#: src/libvlc-module.c:1283
 msgid "Medium jump length, in seconds."
 msgstr "মধ্যমভাৱে জপিওৱাৰ দৈৰ্ঘ্য, ছেকণ্ডত."
 
-#: src/libvlc-module.c:1287
+#: src/libvlc-module.c:1284
 msgid "Long jump length"
 msgstr "দীঘলকৈ জপিওৱাৰ দৈৰ্ঘ্য"
 
-#: src/libvlc-module.c:1288
+#: src/libvlc-module.c:1285
 msgid "Long jump length, in seconds."
 msgstr "দীঘলকৈ জপিওৱাৰ দৈৰ্ঘ্য, ছেকণ্ডত."
 
-#: src/libvlc-module.c:1290 modules/control/hotkeys.c:361
+#: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:946
 #: modules/gui/qt/menus.cpp:1132 modules/gui/skins2/commands/cmd_quit.cpp:45
 msgid "Quit"
 msgstr "ত্যাগ কৰক"
 
-#: src/libvlc-module.c:1291
+#: src/libvlc-module.c:1288
 msgid "Select the hotkey to quit the application."
 msgstr "আবেদন ত্যাগ কৰিবলৈ হটকীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1292
+#: src/libvlc-module.c:1289
 msgid "Navigate up"
 msgstr "ওপৰলৈ নেভিগেট কৰক"
 
-#: src/libvlc-module.c:1293
+#: src/libvlc-module.c:1290
 #, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr "DVD তালিকাবোৰত নিৰ্বাচকক ওপৰলৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1294
+#: src/libvlc-module.c:1291
 msgid "Navigate down"
 msgstr "তললৈ নেভিগেট কৰক"
 
-#: src/libvlc-module.c:1295
+#: src/libvlc-module.c:1292
 #, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr "DVD তালিকাবোৰত নিৰ্বাচকক তললৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1296
+#: src/libvlc-module.c:1293
 msgid "Navigate left"
 msgstr "বাওঁফালে নেভিগেট কৰক"
 
-#: src/libvlc-module.c:1297
+#: src/libvlc-module.c:1294
 #, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr "DVD তালিকাবোৰত নিৰ্বাচকক বাওঁফালে নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1298
+#: src/libvlc-module.c:1295
 msgid "Navigate right"
 msgstr "সোঁফালে নেভিগেট কৰক"
 
-#: src/libvlc-module.c:1299
+#: src/libvlc-module.c:1296
 #, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr "DVD তালিকাবোৰত নিৰ্বাচকক সোঁফালে নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1300
+#: src/libvlc-module.c:1297
 msgid "Activate"
 msgstr "সক্ৰিয় কৰক"
 
-#: src/libvlc-module.c:1301
+#: src/libvlc-module.c:1298
 msgid "Select the key to activate selected item in DVD menus."
 msgstr "DVD তালিকাবোৰত নিৰ্বাচিত বস্তুটো সক্ৰিয় কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1302 modules/gui/qt/dialogs/toolbar.cpp:500
+#: src/libvlc-module.c:1299 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
 msgstr "DVD তালিকাটোলৈ যাওক"
 
-#: src/libvlc-module.c:1303
+#: src/libvlc-module.c:1300
 msgid "Select the key to take you to the DVD menu"
 msgstr "আপোনাক DVD তালিকাটোলৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1304
+#: src/libvlc-module.c:1301
 msgid "Select previous DVD title"
 msgstr "আগৰ DVD শিৰোনাম নিৰ্বাচন কৰক"
 
-#: src/libvlc-module.c:1305
+#: src/libvlc-module.c:1302
 msgid "Select the key to choose the previous title from the DVD"
 msgstr "DVD ৰ পৰা আগৰ শিৰোনামটো পছন্দ কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1306
+#: src/libvlc-module.c:1303
 msgid "Select next DVD title"
 msgstr "পৰৱৰ্তী DVD শিৰোনাম নিৰ্বাচন কৰক"
 
-#: src/libvlc-module.c:1307
+#: src/libvlc-module.c:1304
 msgid "Select the key to choose the next title from the DVD"
 msgstr "DVD ৰ পৰা পৰৱৰ্তী শিৰোনামটো পছন্দ কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1308
+#: src/libvlc-module.c:1305
 msgid "Select prev DVD chapter"
 msgstr "আগৰ DVD পাঠ নিৰ্বাচন কৰক"
 
-#: src/libvlc-module.c:1309
+#: src/libvlc-module.c:1306
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr "DVD ৰ পৰা আগৰ পাঠটো পছন্দ কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1310
+#: src/libvlc-module.c:1307
 msgid "Select next DVD chapter"
 msgstr "পৰৱৰ্তী DVD পাঠ নিৰ্বাচন কৰক"
 
-#: src/libvlc-module.c:1311
+#: src/libvlc-module.c:1308
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr "DVD ৰ পৰা পৰৱৰ্তী পাঠটো পছন্দ কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1312
+#: src/libvlc-module.c:1309
 msgid "Volume up"
 msgstr "প্ৰসাৰ বঢ়াওক"
 
-#: src/libvlc-module.c:1313
+#: src/libvlc-module.c:1310
 msgid "Select the key to increase audio volume."
 msgstr "অডিঅ’ প্ৰসাৰ বৃদ্ধি কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1314
+#: src/libvlc-module.c:1311
 msgid "Volume down"
 msgstr "প্ৰসাৰ কমাওক"
 
-#: src/libvlc-module.c:1315
+#: src/libvlc-module.c:1312
 msgid "Select the key to decrease audio volume."
 msgstr "অডিঅ’ প্ৰসাৰ হ্ৰাস কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1316 modules/access/v4l2/v4l2.c:181
+#: src/libvlc-module.c:1313 modules/access/v4l2/v4l2.c:181
 #: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:491
 #: modules/gui/macosx/VLCMainMenu.m:500
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 msgid "Mute"
 msgstr "নিস্তব্দ কৰক"
 
-#: src/libvlc-module.c:1317
+#: src/libvlc-module.c:1314
 msgid "Select the key to mute audio."
 msgstr "অডিঅ’ নিস্তব্দ কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1318
+#: src/libvlc-module.c:1315
 msgid "Subtitle delay up"
 msgstr "উপশিৰোনামৰ বিলম্ব ওপৰলৈ"
 
-#: src/libvlc-module.c:1319
+#: src/libvlc-module.c:1316
 msgid "Select the key to increase the subtitle delay."
 msgstr "উপশিৰোনামৰ বিলম্বটো বঢ়াবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1320
+#: src/libvlc-module.c:1317
 msgid "Subtitle delay down"
 msgstr "উপশিৰোনামৰ বিলম্ব তললৈ"
 
-#: src/libvlc-module.c:1321
+#: src/libvlc-module.c:1318
 msgid "Select the key to decrease the subtitle delay."
 msgstr "উপশিৰোনামৰ বিলম্বটো হ্ৰাস কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1322
+#: src/libvlc-module.c:1319
 #, fuzzy
 msgid "Reset subtitles text scale"
 msgstr "টেলিটেক্স উপশিৰোনামবোৰৰ ডিকোডাৰ"
 
-#: src/libvlc-module.c:1323
+#: src/libvlc-module.c:1320
 #, fuzzy
 msgid "Scale up subtitles text"
 msgstr "উপশিৰোনামবোৰ সক্ষম কৰক"
 
-#: src/libvlc-module.c:1324
+#: src/libvlc-module.c:1321
 #, fuzzy
 msgid "Scale down subtitles text"
 msgstr "উপশিৰোনামবোৰ সক্ষম কৰক"
 
-#: src/libvlc-module.c:1325
+#: src/libvlc-module.c:1322
 #, fuzzy
 msgid "Select the key to change subtitles text scaling"
 msgstr "উপশিৰোনামবোৰ অধিক উচ্চলৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1326
+#: src/libvlc-module.c:1323
 msgid "Subtitle sync / bookmark audio timestamp"
 msgstr "উপশিৰোনাম ছিনক্ৰনাইজেশ্বন / পৃষ্ঠাসংকেত অডিঅ' টাইমষ্টেম্প"
 
-#: src/libvlc-module.c:1327
+#: src/libvlc-module.c:1324
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr ""
 "পৃষ্ঠাসংকেত অডিঅ' টাইমষ্টেম্পলৈ কীটো নিৰ্বাচন কৰক যেতিয়া উপশিৰোনামবোৰ ছিনক্ৰনাইজ "
 "কৰে."
 
-#: src/libvlc-module.c:1328
+#: src/libvlc-module.c:1325
 msgid "Subtitle sync / bookmark subtitle timestamp"
 msgstr "উপশিৰোনাম ছিনক্ৰনাইজেশ্বন / পৃষ্ঠাসংকেত উপশিৰোনাম টাইমষ্টেম্প"
 
-#: src/libvlc-module.c:1329
+#: src/libvlc-module.c:1326
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
 msgstr ""
 "পৃষ্ঠাসংকেত উপশিৰোনাম টাইমষ্টেম্পলৈ কীটো নিৰ্বাচন কৰক যেতিয়া উপশিৰোনামবোৰ "
 "ছিনক্ৰনাইজ কৰে."
 
-#: src/libvlc-module.c:1330
+#: src/libvlc-module.c:1327
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
 msgstr "উপশিৰোনাম ছিনক্ৰনাইজেশ্বন / ছিনক্ৰনাইজ অডিঅ' & উপশিৰোনাম টাইমষ্টেম্পবোৰ"
 
-#: src/libvlc-module.c:1331
+#: src/libvlc-module.c:1328
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr "ছিনক্ৰনাইজ পৃষ্ঠাসংকেত অডিঅ' & উপশিৰোনাম টাইমষ্টেম্পবোৰল কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1332
+#: src/libvlc-module.c:1329
 msgid "Subtitle sync / reset audio & subtitle synchronization"
 msgstr "উপশিৰোনাম ছিনক্ৰনাইজেশ্বন / পুনৰ ছেট অডিঅ' & উপশিৰোনাম ছিনক্ৰনাইজেশ্বন"
 
-#: src/libvlc-module.c:1333
+#: src/libvlc-module.c:1330
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr ""
 "অডিঅ' & উপশিৰোনাম টাইমষ্টেম্পবোৰৰ ছিনক্ৰনাইজেশ্বন পুনৰ ছেট কৰিবলৈ কীটো নিৰ্বাচন "
 "কৰক."
 
-#: src/libvlc-module.c:1334
+#: src/libvlc-module.c:1331
 msgid "Subtitle position up"
 msgstr "উপশিৰোনামৰ স্থান ওপৰলৈ"
 
-#: src/libvlc-module.c:1335
+#: src/libvlc-module.c:1332
 msgid "Select the key to move subtitles higher."
 msgstr "উপশিৰোনামবোৰ অধিক উচ্চলৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1336
+#: src/libvlc-module.c:1333
 msgid "Subtitle position down"
 msgstr "উপশিৰোনামৰ স্থান তললৈ"
 
-#: src/libvlc-module.c:1337
+#: src/libvlc-module.c:1334
 msgid "Select the key to move subtitles lower."
 msgstr "উপশিৰোনামবোৰ অধিক তললৈ নিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1338
+#: src/libvlc-module.c:1335
 msgid "Audio delay up"
 msgstr "অডিঅ' বিলম্ব ওপৰলৈ"
 
-#: src/libvlc-module.c:1339
+#: src/libvlc-module.c:1336
 msgid "Select the key to increase the audio delay."
 msgstr "অডিঅ' বিলম্বটো বঢ়াবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1340
+#: src/libvlc-module.c:1337
 msgid "Audio delay down"
 msgstr "অডিঅ' বিলম্ব তললৈ"
 
-#: src/libvlc-module.c:1341
+#: src/libvlc-module.c:1338
 msgid "Select the key to decrease the audio delay."
 msgstr "অডিঅ' বিলম্বটো হ্ৰাস কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1348
+#: src/libvlc-module.c:1345
 msgid "Play playlist bookmark 1"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 1"
 
-#: src/libvlc-module.c:1349
+#: src/libvlc-module.c:1346
 msgid "Play playlist bookmark 2"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 2"
 
-#: src/libvlc-module.c:1350
+#: src/libvlc-module.c:1347
 msgid "Play playlist bookmark 3"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 3"
 
-#: src/libvlc-module.c:1351
+#: src/libvlc-module.c:1348
 msgid "Play playlist bookmark 4"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 4"
 
-#: src/libvlc-module.c:1352
+#: src/libvlc-module.c:1349
 msgid "Play playlist bookmark 5"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 5"
 
-#: src/libvlc-module.c:1353
+#: src/libvlc-module.c:1350
 msgid "Play playlist bookmark 6"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 6"
 
-#: src/libvlc-module.c:1354
+#: src/libvlc-module.c:1351
 msgid "Play playlist bookmark 7"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 7"
 
-#: src/libvlc-module.c:1355
+#: src/libvlc-module.c:1352
 msgid "Play playlist bookmark 8"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 8"
 
-#: src/libvlc-module.c:1356
+#: src/libvlc-module.c:1353
 msgid "Play playlist bookmark 9"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 9"
 
-#: src/libvlc-module.c:1357
+#: src/libvlc-module.c:1354
 msgid "Play playlist bookmark 10"
 msgstr "চলিত প্লেলিষ্টৰ পৃষ্ঠাসংকেত 10"
 
-#: src/libvlc-module.c:1358
+#: src/libvlc-module.c:1355
 msgid "Select the key to play this bookmark."
 msgstr "এই পৃষ্ঠাসংকেতটো চলাবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1359
+#: src/libvlc-module.c:1356
 msgid "Set playlist bookmark 1"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 1 ছেট কৰক"
 
-#: src/libvlc-module.c:1360
+#: src/libvlc-module.c:1357
 msgid "Set playlist bookmark 2"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 2 ছেট কৰক"
 
-#: src/libvlc-module.c:1361
+#: src/libvlc-module.c:1358
 msgid "Set playlist bookmark 3"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 3 ছেট কৰক"
 
-#: src/libvlc-module.c:1362
+#: src/libvlc-module.c:1359
 msgid "Set playlist bookmark 4"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 4 ছেট কৰক"
 
-#: src/libvlc-module.c:1363
+#: src/libvlc-module.c:1360
 msgid "Set playlist bookmark 5"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 5 ছেট কৰক"
 
-#: src/libvlc-module.c:1364
+#: src/libvlc-module.c:1361
 msgid "Set playlist bookmark 6"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 6 ছেট কৰক"
 
-#: src/libvlc-module.c:1365
+#: src/libvlc-module.c:1362
 msgid "Set playlist bookmark 7"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 7 ছেট কৰক"
 
-#: src/libvlc-module.c:1366
+#: src/libvlc-module.c:1363
 msgid "Set playlist bookmark 8"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 8 ছেট কৰক"
 
-#: src/libvlc-module.c:1367
+#: src/libvlc-module.c:1364
 msgid "Set playlist bookmark 9"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 9 ছেট কৰক"
 
-#: src/libvlc-module.c:1368
+#: src/libvlc-module.c:1365
 msgid "Set playlist bookmark 10"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 10 ছেট কৰক"
 
-#: src/libvlc-module.c:1369
+#: src/libvlc-module.c:1366
 msgid "Select the key to set this playlist bookmark."
 msgstr "এই প্লেলিষ্ট পৃষ্ঠাসংকেতটো ছেট কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1370
+#: src/libvlc-module.c:1367
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
 msgstr "প্লেলিষ্টখন খালী কৰক"
 
-#: src/libvlc-module.c:1371
+#: src/libvlc-module.c:1368
 msgid "Select the key to clear the current playlist."
 msgstr "চলিত প্লেলিষ্টখন খলী কৰিবলৈ কীটো নিৰ্বাচন কৰক."
 
-#: src/libvlc-module.c:1373
+#: src/libvlc-module.c:1370
 msgid "Playlist bookmark 1"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 1"
 
-#: src/libvlc-module.c:1374
+#: src/libvlc-module.c:1371
 msgid "Playlist bookmark 2"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 2"
 
-#: src/libvlc-module.c:1375
+#: src/libvlc-module.c:1372
 msgid "Playlist bookmark 3"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 3"
 
-#: src/libvlc-module.c:1376
+#: src/libvlc-module.c:1373
 msgid "Playlist bookmark 4"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 4"
 
-#: src/libvlc-module.c:1377
+#: src/libvlc-module.c:1374
 msgid "Playlist bookmark 5"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 5"
 
-#: src/libvlc-module.c:1378
+#: src/libvlc-module.c:1375
 msgid "Playlist bookmark 6"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 6"
 
-#: src/libvlc-module.c:1379
+#: src/libvlc-module.c:1376
 msgid "Playlist bookmark 7"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 7"
 
-#: src/libvlc-module.c:1380
+#: src/libvlc-module.c:1377
 msgid "Playlist bookmark 8"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 8"
 
-#: src/libvlc-module.c:1381
+#: src/libvlc-module.c:1378
 msgid "Playlist bookmark 9"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 9"
 
-#: src/libvlc-module.c:1382
+#: src/libvlc-module.c:1379
 msgid "Playlist bookmark 10"
 msgstr "প্লেলিষ্টৰ পৃষ্ঠাসংকেত 10"
 
-#: src/libvlc-module.c:1384
+#: src/libvlc-module.c:1381
 msgid "This allows you to define playlist bookmarks."
 msgstr "এইটোৱে আপোনাক প্লেলিষ্টৰ পৃষ্ঠাসংকেত বাখ্যা কৰিবলৈ অনুমতি দিয়ে."
 
-#: src/libvlc-module.c:1386
+#: src/libvlc-module.c:1383
 msgid "Cycle audio track"
 msgstr "অডিঅ' পথ চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1387
+#: src/libvlc-module.c:1384
 msgid "Cycle through the available audio tracks(languages)."
 msgstr "উপলব্ধ অডিঅ' পথবোৰৰ(ভাষাবোৰ) মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1388
+#: src/libvlc-module.c:1385
 #, fuzzy
 msgid "Cycle subtitle track in reverse order"
 msgstr "উপশিৰোনাম পথ চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1389
+#: src/libvlc-module.c:1386
 #, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
 msgstr "উপলব্ধ উপশিৰোনাম পথবোৰৰ মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1390
+#: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
 msgstr "উপশিৰোনাম পথ চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1391
+#: src/libvlc-module.c:1388
 msgid "Cycle through the available subtitle tracks."
 msgstr "উপলব্ধ উপশিৰোনাম পথবোৰৰ মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1392
+#: src/libvlc-module.c:1389
 #, fuzzy
 msgid "Toggle subtitles"
 msgstr "টেলিটেক্সট উপশিৰোনামবোৰ"
 
-#: src/libvlc-module.c:1393
+#: src/libvlc-module.c:1390
 #, fuzzy
 msgid "Toggle subtitle track visibility."
 msgstr "উপশিৰোনাম পথ চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1394
+#: src/libvlc-module.c:1391
 msgid "Cycle next program Service ID"
 msgstr "পৰৱৰ্তী কাৰ্যসূচী সেৱা ID চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1395
+#: src/libvlc-module.c:1392
 msgid "Cycle through the available next program Service IDs (SIDs)."
 msgstr "উপলব্ধ পৰৱৰ্তী সেৱা IDবোৰৰ (SIDবোৰ) মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1396
+#: src/libvlc-module.c:1393
 msgid "Cycle previous program Service ID"
 msgstr "আগৰ কাৰ্যসূচী সেৱা ID চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1397
+#: src/libvlc-module.c:1394
 msgid "Cycle through the available previous program Service IDs (SIDs)."
 msgstr "উপলব্ধ আগৰ সেৱা IDবোৰৰ (SIDবোৰ) মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1398
+#: src/libvlc-module.c:1395
 msgid "Cycle source aspect ratio"
 msgstr "উত্স দৃষ্টিকোণ অনুপাত চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1399
+#: src/libvlc-module.c:1396
 msgid "Cycle through a predefined list of source aspect ratios."
 msgstr "উত্স দৃষ্টিকোণ অনুপাতবোৰৰ পূৰ্বনিৰ্ধাৰিত তালিকা এখনৰ মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1400
+#: src/libvlc-module.c:1397
 msgid "Cycle video crop"
 msgstr "ভিডিঅ' ক্ৰোপ চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1401
+#: src/libvlc-module.c:1398
 msgid "Cycle through a predefined list of crop formats."
 msgstr "ক্ৰোপ ফৰমেটবোৰৰ পূৰ্বনিৰ্ধাৰিত তালিকা এখনৰ মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1402
+#: src/libvlc-module.c:1399
 msgid "Toggle autoscaling"
 msgstr "স্বয়ংক্ৰিয়ভাৱে জোখাটো টগুল কৰক"
 
-#: src/libvlc-module.c:1403
+#: src/libvlc-module.c:1400
 msgid "Activate or deactivate autoscaling."
 msgstr "স্বয়ংক্ৰিয়ভাৱে জোখাটো সক্ৰিয় বা নিষ্ক্ৰিয় কৰক."
 
-#: src/libvlc-module.c:1404
+#: src/libvlc-module.c:1401
 msgid "Increase scale factor"
 msgstr "জোখৰ কাৰক বৃদ্ধি কৰক"
 
-#: src/libvlc-module.c:1406
+#: src/libvlc-module.c:1403
 msgid "Decrease scale factor"
 msgstr "জোখৰ কাৰক হ্ৰাস কৰক"
 
-#: src/libvlc-module.c:1408
+#: src/libvlc-module.c:1405
 msgid "Toggle deinterlacing"
 msgstr "ডিইন্টাৰলেচিং টগুল কৰক"
 
-#: src/libvlc-module.c:1409
+#: src/libvlc-module.c:1406
 msgid "Activate or deactivate deinterlacing."
 msgstr "ডিইন্টাৰলেচিং সক্ৰিয় বা নিষ্ক্ৰিয় কৰক."
 
-#: src/libvlc-module.c:1410
+#: src/libvlc-module.c:1407
 msgid "Cycle deinterlace modes"
 msgstr "চক্ৰ ডিইন্টাৰলেচ ধৰণবোৰ"
 
-#: src/libvlc-module.c:1411
+#: src/libvlc-module.c:1408
 msgid "Cycle through available deinterlace modes."
 msgstr "উপলব্ধ ডিইন্টাৰলেচ ধৰণবোৰৰ মাজেৰে চক্ৰ কৰক."
 
-#: src/libvlc-module.c:1412
+#: src/libvlc-module.c:1409
 msgid "Show controller in fullscreen"
 msgstr "সম্পূৰ্ণ দৃশ্যত নিয়ন্ত্ৰণকৰ্তা দেখুৱাওক"
 
-#: src/libvlc-module.c:1413
+#: src/libvlc-module.c:1410
 msgid "Boss key"
 msgstr "বছ কী"
 
-#: src/libvlc-module.c:1414
+#: src/libvlc-module.c:1411
 msgid "Hide the interface and pause playback."
 msgstr "ইন্টাৰফেছটো লুকাওক আৰু প্লেবেকটোক বিৰতি দিয়ক."
 
-#: src/libvlc-module.c:1415
+#: src/libvlc-module.c:1412
 msgid "Context menu"
 msgstr "প্ৰসংগ মেনু"
 
-#: src/libvlc-module.c:1416
+#: src/libvlc-module.c:1413
 msgid "Show the contextual popup menu."
 msgstr "প্ৰাসংগিক প'পআপ তালিকাটো দেখুৱাওক."
 
-#: src/libvlc-module.c:1417
+#: src/libvlc-module.c:1414
 msgid "Take video snapshot"
 msgstr "ভিডিঅ' স্নেপশ্বট লওক"
 
-#: src/libvlc-module.c:1418
+#: src/libvlc-module.c:1415
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "ভিডিঅ' স্নেপশ্বট এটা লয় আৰু ডিস্কত লিখে."
 
-#: src/libvlc-module.c:1420 modules/gui/macosx/VLCMainMenu.m:379
+#: src/libvlc-module.c:1417 modules/gui/macosx/VLCMainMenu.m:379
 #: modules/gui/qt/components/controller.hpp:110
 #: modules/gui/qt/components/controller.hpp:121 modules/gui/qt/menus.cpp:849
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "ৰেকৰ্ড কৰক"
 
-#: src/libvlc-module.c:1421
+#: src/libvlc-module.c:1418
 msgid "Record access filter start/stop."
 msgstr "প্ৰৱেশ ফিল্টাৰ আৰম্ভ/বন্ধ ৰেকৰ্ড কৰক."
 
-#: src/libvlc-module.c:1423
+#: src/libvlc-module.c:1420
 msgid "Normal/Loop/Repeat"
 msgstr "স্বাভাৱিক/লুপ/পুনৰাবৃত্তি"
 
-#: src/libvlc-module.c:1424
+#: src/libvlc-module.c:1421
 msgid "Toggle Normal/Loop/Repeat playlist modes"
 msgstr "স্বাভাৱিক/লুপ/পুনৰাবৃত্তি কৰা প্লেলিষ্ট ধৰণবোৰ টগুল কৰক"
 
-#: src/libvlc-module.c:1427
+#: src/libvlc-module.c:1424
 msgid "Toggle random playlist playback"
 msgstr "বিশৃংখল প্লেলিষ্ট প্লেবেকটো টগুল কৰক"
 
-#: src/libvlc-module.c:1432 src/libvlc-module.c:1433
+#: src/libvlc-module.c:1429 src/libvlc-module.c:1430
 msgid "Un-Zoom"
 msgstr "জুম নকৰিব"
 
-#: src/libvlc-module.c:1435 src/libvlc-module.c:1436
+#: src/libvlc-module.c:1432 src/libvlc-module.c:1433
 msgid "Crop one pixel from the top of the video"
 msgstr "ভিডিঅ'টোৰ ওপৰ পৰা পিক্সেল এটা ক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1437 src/libvlc-module.c:1438
+#: src/libvlc-module.c:1434 src/libvlc-module.c:1435
 msgid "Uncrop one pixel from the top of the video"
 msgstr "ভিডিঅ'টোৰ ওপৰ পৰা পিক্সেল এটা আনক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1440 src/libvlc-module.c:1441
+#: src/libvlc-module.c:1437 src/libvlc-module.c:1438
 msgid "Crop one pixel from the left of the video"
 msgstr "ভিডিঅ'টোৰ বাওঁফালৰ পৰা পিক্সেল এটা ক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1442 src/libvlc-module.c:1443
+#: src/libvlc-module.c:1439 src/libvlc-module.c:1440
 msgid "Uncrop one pixel from the left of the video"
 msgstr "ভিডিঅ'টোৰ বাওঁফালৰ পৰা পিক্সেল এটা আনক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1445 src/libvlc-module.c:1446
+#: src/libvlc-module.c:1442 src/libvlc-module.c:1443
 msgid "Crop one pixel from the bottom of the video"
 msgstr "ভিডিঅ'টোৰ তলৰ পৰা পিক্সেল এটা ক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1447 src/libvlc-module.c:1448
+#: src/libvlc-module.c:1444 src/libvlc-module.c:1445
 msgid "Uncrop one pixel from the bottom of the video"
 msgstr "ভিডিঅ'টোৰ তলৰ পৰা পিক্সেল এটা আনক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1450 src/libvlc-module.c:1451
+#: src/libvlc-module.c:1447 src/libvlc-module.c:1448
 msgid "Crop one pixel from the right of the video"
 msgstr "ভিডিঅ'টোৰ সোঁফালৰ পৰা পিক্সেল এটা ক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1452 src/libvlc-module.c:1453
+#: src/libvlc-module.c:1449 src/libvlc-module.c:1450
 msgid "Uncrop one pixel from the right of the video"
 msgstr "ভিডিঅ'টোৰ সোঁফালৰ পৰা পিক্সেল এটা আনক্ৰোপ কৰক"
 
-#: src/libvlc-module.c:1456
+#: src/libvlc-module.c:1453
 msgid "Shrink the viewpoint field of view (360°)"
 msgstr ""
 
-#: src/libvlc-module.c:1457
+#: src/libvlc-module.c:1454
 msgid "Expand the viewpoint field of view (360°)"
 msgstr ""
 
-#: src/libvlc-module.c:1458
+#: src/libvlc-module.c:1455
 msgid "Roll the viewpoint clockwise (360°)"
 msgstr ""
 
-#: src/libvlc-module.c:1459
+#: src/libvlc-module.c:1456
 msgid "Roll the viewpoint anti-clockwise (360°)"
 msgstr ""
 
-#: src/libvlc-module.c:1461
+#: src/libvlc-module.c:1458
 msgid "Toggle wallpaper mode in video output"
 msgstr "ভিডিঅ' আউটপুটত ৱালপেপাৰ ধৰণটো টগুল কৰক"
 
-#: src/libvlc-module.c:1463
+#: src/libvlc-module.c:1460
 msgid "Toggle wallpaper mode in video output."
 msgstr "ভিডিঅ' আউটপুটত ৱালপেপাৰ ধৰণটো টগুল কৰক."
 
-#: src/libvlc-module.c:1465
+#: src/libvlc-module.c:1462
 msgid "Cycle through audio devices"
 msgstr "অডিঅ' ডিভাইচবোৰৰ মাজেৰে চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1466
+#: src/libvlc-module.c:1463
 msgid "Cycle through available audio devices"
 msgstr "উপলব্ধ অডিঅ' ডিভাইচবোৰৰ মাজেৰে চক্ৰ কৰক"
 
-#: src/libvlc-module.c:1595 src/video_output/vout_intf.c:274
+#: src/libvlc-module.c:1592 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:502
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Snapshot"
 msgstr "স্নেপশ্বট"
 
-#: src/libvlc-module.c:1612
+#: src/libvlc-module.c:1609
 msgid "Window properties"
 msgstr "উইণ্ডো সম্পত্তিবোৰ"
 
-#: src/libvlc-module.c:1672
+#: src/libvlc-module.c:1669
 msgid "Subpictures"
 msgstr "উপছবিবোৰ"
 
-#: src/libvlc-module.c:1680 modules/codec/subsdec.c:181
+#: src/libvlc-module.c:1677 modules/codec/subsdec.c:181
 #: modules/demux/subtitle.c:71 modules/demux/xiph_metadata.h:49
 #: modules/demux/xiph_metadata.h:62
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:158
@@ -4865,81 +4840,81 @@ msgstr "উপছবিবোৰ"
 msgid "Subtitles"
 msgstr "উপশিৰোনামবোৰ"
 
-#: src/libvlc-module.c:1700 modules/stream_out/transcode/transcode.c:116
+#: src/libvlc-module.c:1697 modules/stream_out/transcode/transcode.c:116
 msgid "Overlays"
 msgstr "অভাৰলেবোৰ"
 
-#: src/libvlc-module.c:1710
+#: src/libvlc-module.c:1707
 msgid "Track settings"
 msgstr "পথ ছেটিংবোৰ"
 
-#: src/libvlc-module.c:1750 modules/gui/macosx/VLCSimplePrefsController.m:309
+#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:309
 msgid "Playback control"
 msgstr "প্লেবেক নিয়ন্ত্ৰণ"
 
-#: src/libvlc-module.c:1779
+#: src/libvlc-module.c:1776
 msgid "Default devices"
 msgstr "ডিফল্ট ডিভাইচবোৰ"
 
-#: src/libvlc-module.c:1786
+#: src/libvlc-module.c:1783
 msgid "Network settings"
 msgstr "নেটৱৰ্ক ছেটিংবোৰ"
 
-#: src/libvlc-module.c:1812
+#: src/libvlc-module.c:1809
 msgid "Socks proxy"
 msgstr "শ্বকছ প্ৰক্সি"
 
-#: src/libvlc-module.c:1821 modules/demux/xiph_metadata.h:55
+#: src/libvlc-module.c:1818 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
 msgstr "মেটাডাটা"
 
-#: src/libvlc-module.c:1922
+#: src/libvlc-module.c:1919
 msgid "Decoders"
 msgstr "ডিকোডাৰবোৰ"
 
-#: src/libvlc-module.c:1929 modules/access/avio.h:40
+#: src/libvlc-module.c:1926 modules/access/avio.h:40
 #: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:85
 msgid "Input"
 msgstr "ইনপুট"
 
-#: src/libvlc-module.c:1965
+#: src/libvlc-module.c:1962
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:2011
+#: src/libvlc-module.c:2008
 msgid "Special modules"
 msgstr "বিশেষ মডুলবোৰ"
 
-#: src/libvlc-module.c:2016 modules/gui/qt/dialogs/plugins.cpp:89
+#: src/libvlc-module.c:2013 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
 msgstr "প্লাগইনবোৰ"
 
-#: src/libvlc-module.c:2028
+#: src/libvlc-module.c:2025
 msgid "Performance options"
 msgstr "কাৰ্যদক্ষতাৰ বিকল্পবোৰ"
 
-#: src/libvlc-module.c:2047
+#: src/libvlc-module.c:2044
 msgid "Clock source"
 msgstr "ঘড়ী উত্স"
 
-#: src/libvlc-module.c:2165
+#: src/libvlc-module.c:2162
 msgid "Hot keys"
 msgstr "হট কীবোৰ"
 
-#: src/libvlc-module.c:2655
+#: src/libvlc-module.c:2652
 msgid "Jump sizes"
 msgstr "জপিওৱাৰ আকাৰবোৰ"
 
-#: src/libvlc-module.c:2740
+#: src/libvlc-module.c:2737
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 "VLC ৰ বাবে সহায় ছপা কৰক ( --উন্নত আৰু --সহায়-ভাৰ্বোছৰ সৈতে মিশ্ৰণ কৰিব পাৰি)"
 
-#: src/libvlc-module.c:2743
+#: src/libvlc-module.c:2740
 msgid "Exhaustive help for VLC and its modules"
 msgstr "VLC আৰু ইয়াৰ মডুলবোৰৰ বাবে সম্পূৰ্ণ সহায়"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2742
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
@@ -4947,19 +4922,19 @@ msgstr ""
 "VLC আৰু ইয়াৰ সকলোবোৰ মডুলৰ বাবে সহায় ছপা কৰক (--উন্নত আৰু --সহায়-ভাৰ্বোছৰ সৈতে "
 "মিশ্ৰণ কৰিব পাৰি)"
 
-#: src/libvlc-module.c:2748
+#: src/libvlc-module.c:2745
 msgid "ask for extra verbosity when displaying help"
 msgstr "যেতিয়া সহায়টো প্ৰদৰ্শন কৰে অতিৰিক্ত ভাৰ্বোছিটিৰ বাবে সোধক"
 
-#: src/libvlc-module.c:2750
+#: src/libvlc-module.c:2747
 msgid "print a list of available modules"
 msgstr "উপলব্ধ মডুলবোৰৰ তালিকা এখন ছপা কৰক"
 
-#: src/libvlc-module.c:2752
+#: src/libvlc-module.c:2749
 msgid "print a list of available modules with extra detail"
 msgstr "অতিৰিক্ত বিৱৰণৰ সৈতে উপলব্ধ মডুলবোৰৰ তালিকা এখন ছপা কৰক"
 
-#: src/libvlc-module.c:2754
+#: src/libvlc-module.c:2751
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
@@ -4967,27 +4942,27 @@ msgstr ""
 "এটা বিশেষ মডুলত সহায়টো ছপা কৰক (--উন্নত আৰু --সহায়-ভাৰ্বোজৰ সৈতে মিশ্ৰণ কৰিব "
 "পাৰি). কোঠৰ মিলবোৰৰ বাবে  = ৰ সৈতে মডুল নামটো উপসৰ্গ কৰক."
 
-#: src/libvlc-module.c:2758
+#: src/libvlc-module.c:2755
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr "ফাইল ৰূপৰেখা কৰিবলৈ কোনো ৰূপৰেখাকৰণ বিকল্প লোড বা ছেভ কৰা নহব"
 
-#: src/libvlc-module.c:2760
+#: src/libvlc-module.c:2757
 msgid "reset the current config to the default values"
 msgstr "মানবোৰ ডিফল্ট কৰিবলৈ চলিত ৰূপৰেখাটো পুনৰ ছেট কৰক"
 
-#: src/libvlc-module.c:2762
+#: src/libvlc-module.c:2759
 msgid "use alternate config file"
 msgstr "বেলেগ ৰূপৰেখা ফাইল ব্যৱহাৰ কৰক"
 
-#: src/libvlc-module.c:2764
+#: src/libvlc-module.c:2761
 msgid "resets the current plugins cache"
 msgstr "চলিত প্লাগইন কেশ্ববোৰ পুনৰ ছেট কৰে"
 
-#: src/libvlc-module.c:2766
+#: src/libvlc-module.c:2763
 msgid "print version information"
 msgstr "ছপা সংস্কৰণৰ তথ্য"
 
-#: src/libvlc-module.c:2806
+#: src/libvlc-module.c:2803
 msgid "core program"
 msgstr "মুখ্য কাৰ্যসূচী"
 
@@ -6272,12 +6247,12 @@ msgstr "SDP দাবী কৰে"
 #: modules/access/bluray.c:793
 #, c-format
 msgid ""
-"This Blu-ray disc needs Java for menus.%s\n"
-"Disc is played without menus."
+"This Blu-ray disc requires Java for menus support.%s\n"
+"The disc will be played without menus."
 msgstr ""
 
 #: modules/access/bluray.c:794
-msgid " Java was not found from your system."
+msgid "Java was not found on your system."
 msgstr ""
 
 #: modules/access/bluray.c:817
@@ -7321,8 +7296,7 @@ msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead য়ে \"%s\" ডিস্কটো খুলিব নোৱাৰিলে."
 
 #: modules/access/dvdread.c:217
-#, c-format
-msgid "Cannot play a non UDF mastered DVD. (Found ISO9660 '%s')"
+msgid "Cannot play a non-UDF mastered DVD."
 msgstr ""
 
 #: modules/access/dvdread.c:472
@@ -7969,8 +7943,8 @@ msgstr ""
 
 #: modules/access/nfs.c:50
 msgid ""
-"If uid/gid are not specified in the url, this module will try to "
-"automatically set a uid/gid."
+"If uid/gid are not specified in the url, VLC will automatically set a uid/"
+"gid."
 msgstr ""
 
 #: modules/access/nfs.c:57
@@ -8785,9 +8759,8 @@ msgstr "RTSP বৈধতা"
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
-"Please provide a username (and ideally a domain name using the format DOMAIN;"
-"username)\n"
-" and a password"
+"Please provide a username (ideally a domain name using the format DOMAIN;"
+"username) and a password."
 msgstr ""
 
 #: modules/access/tcp.c:116
@@ -9234,7 +9207,7 @@ msgstr ""
 "কৰিবলৈ, ভাৰ্বোছিটি বৃদ্ধি (-vvv) কৰক বা v4l2-ctl আবেদনটো ব্যৱহাৰ কৰক."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
-#: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:438
+#: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
 #: modules/control/hotkeys.c:395
 #: modules/gui/macosx/VLCAddonsWindowController.m:99
 #: modules/gui/qt/dialogs/convert.cpp:160
@@ -9669,12 +9642,11 @@ msgid "Audio filter for simple channel mixing"
 msgstr "সাধাৰণ চেনেল মিক্সিংৰ বাবে অডিঅ' ফিল্টাৰ"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
-msgid "HRTF SOFA file for the binauralization"
+msgid "HRTF file for the binauralization"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
-msgid ""
-"To use a custom HRTF (Head-related transfer function)in the SOFA format."
+msgid "Custom HRTF (Head-related transfer function) filein the SOFA format."
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
@@ -10214,7 +10186,7 @@ msgid "Pitch Shift"
 msgstr "পিট্চ"
 
 #: modules/audio_filter/scaletempo.c:74
-msgid "Pitch shift in semitones"
+msgid "Pitch shift in semitones."
 msgstr ""
 
 #: modules/audio_filter/spatializer/spatializer.cpp:54
@@ -11237,6 +11209,10 @@ msgstr ""
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
 msgstr "CC 608/708"
+
+#: modules/codec/cc.c:57
+msgid "Closed Captions decoder"
+msgstr "কেপশ্বনবোৰ ডিকোডাৰ বন্ধ কৰা হল"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
@@ -13105,22 +13081,22 @@ msgstr "Libtwolame অডিঅ' এনকোডাৰ"
 msgid "Ulead DV audio decoder"
 msgstr "ইউলীড DV অডিঅ' ডিকোডাৰ"
 
-#: modules/codec/videotoolbox.m:73
+#: modules/codec/videotoolbox.m:77
 #, fuzzy
 msgid "Use Hardware decoders only"
 msgstr "হাৰ্ডৱেৰ ডিকোডিং"
 
-#: modules/codec/videotoolbox.m:74 modules/gui/qt/ui/sprefs_video.h:335
+#: modules/codec/videotoolbox.m:78 modules/gui/qt/ui/sprefs_video.h:335
 msgid "Deinterlacing"
 msgstr "ডিইন্টাৰলেচিং কৰিছে"
 
-#: modules/codec/videotoolbox.m:75
+#: modules/codec/videotoolbox.m:79
 msgid ""
 "If interlaced content is detected, temporal deinterlacing is enabled at the "
 "expense of a pipeline delay."
 msgstr ""
 
-#: modules/codec/videotoolbox.m:83
+#: modules/codec/videotoolbox.m:87
 #, fuzzy
 msgid "VideoToolbox video decoder"
 msgstr "ৱেবM ভিডিঅ' ডিকোডাৰ"
@@ -14047,11 +14023,11 @@ msgstr "esa"
 msgid "tesa"
 msgstr "tesa"
 
-#: modules/codec/x264.c:438
+#: modules/codec/x264.c:435
 msgid "Fast"
 msgstr "খৰতকীয়া"
 
-#: modules/codec/x264.c:438 modules/gui/macosx/VLCMainMenu.m:281
+#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
 #: modules/gui/macosx/VLCSimplePrefsController.m:689
 #: modules/gui/qt/components/simple_preferences.cpp:646
@@ -14060,55 +14036,55 @@ msgstr "খৰতকীয়া"
 msgid "Normal"
 msgstr "স্বাভাৱিক"
 
-#: modules/codec/x264.c:438
+#: modules/codec/x264.c:435
 msgid "Slow"
 msgstr "মন্থৰ"
 
-#: modules/codec/x264.c:443
+#: modules/codec/x264.c:440
 msgid "Spatial"
 msgstr "স্পাশ্বিয়েল"
 
-#: modules/codec/x264.c:443 modules/hw/vdpau/chroma.c:871
+#: modules/codec/x264.c:440 modules/hw/vdpau/chroma.c:871
 msgid "Temporal"
 msgstr "সাময়িক"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "checkerboard"
 msgstr "পৰীক্ষাকৰ্তা বোৰ্ড"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "column alternation"
 msgstr "স্তম্ভ সলনিকৰণ"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "row alternation"
 msgstr "শাৰী সলনিকৰণ"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "side by side"
 msgstr "কাষে কাষে"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "top bottom"
 msgstr "ওপৰ তল"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "frame alternation"
 msgstr "ফ্ৰেম সলনিকৰণ"
 
-#: modules/codec/x264.c:448
+#: modules/codec/x264.c:445
 msgid "2D"
 msgstr ""
 
-#: modules/codec/x264.c:452
+#: modules/codec/x264.c:449
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr "H.264/MPEG-4 অংশ 10/AVC এনকোডাৰ (x264 10-বিট)"
 
-#: modules/codec/x264.c:456
+#: modules/codec/x264.c:453
 msgid "H.262/MPEG-2 encoder (x262)"
 msgstr "H.262/MPEG-2 এনকোডাৰ (x262)"
 
-#: modules/codec/x264.c:460
+#: modules/codec/x264.c:457
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr "H.264/MPEG-4 অংশ 10/AVC এনকোডাৰ (x264)"
 
@@ -18382,12 +18358,12 @@ msgstr "দুখজনকভাৱে, এই কীবোৰক হটকী �
 msgid "This combination is already taken by \"%@\"."
 msgstr "এই যুটীটো ইতিমধ্যে \"%@\" ৰ দ্বাৰ লোৱা হৈছে."
 
-#: modules/gui/macosx/VLCStringUtility.m:260
+#: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
 msgstr "ছেট কৰা নাই"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1384
+#: modules/gui/qt/components/extended_panels.cpp:1384 modules/gui/qt/qt.cpp:214
 msgid "Audio/Video"
 msgstr "অডিঅ'/ভিডিঅ'"
 
@@ -21363,10 +21339,6 @@ msgstr "সম্পূৰ্ণদৃশ্য নিয়ন্ত্ৰক ম�
 msgid "When minimized"
 msgstr "যেতিয়া সৰু কৰে"
 
-#: modules/gui/qt/qt.cpp:214
-msgid "Both"
-msgstr ""
-
 #: modules/gui/qt/qt.cpp:219
 msgid "Qt interface"
 msgstr "Qt ইন্টাৰফেছ"
@@ -21662,8 +21634,7 @@ msgstr "ওপৰ আৰু তললৈ ছিনক্ৰনাইজ কৰ�
 
 #: modules/keystore/keychain.m:57
 msgid ""
-"Synchronizes stored items via iCloud Keychain if enabled in the user domain. "
-"Requires iOS 7 / Mac OS X 10.9 / tvOS 9.0 or higher."
+"Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
 
 #: modules/keystore/keychain.m:59
@@ -21675,9 +21646,7 @@ msgid "Keychain access group"
 msgstr ""
 
 #: modules/keystore/keychain.m:62
-msgid ""
-"Keychain access group as defined by the app entitlements. Requires iOS 3 / "
-"Mac OS X 10.9 / tvOS 9.0 or higher."
+msgid "Keychain access group as defined by the app entitlements."
 msgstr ""
 
 #: modules/keystore/keychain.m:108
@@ -28948,6 +28917,10 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "মিডিয়া পৰিচালকৰ তালিকা"
+
+#, fuzzy
+#~ msgid "Disable lua"
+#~ msgstr "অক্ষম কৰক"
 
 #~ msgid "Display resolution"
 #~ msgstr "বিশ্লেষণ প্ৰদৰ্শন কৰক"
