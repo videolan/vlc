@@ -35,11 +35,11 @@
 
 struct priv
 {
-    picture_t *last_pic;
 #if TARGET_OS_IPHONE
     CVOpenGLESTextureCacheRef cache;
     CVOpenGLESTextureRef last_cvtexs[PICTURE_PLANE_MAX];
 #else
+    picture_t *last_pic;
     CGLContextObj gl_ctx;
 #endif
 };
@@ -55,6 +55,15 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
     struct priv *priv = tc->priv;
 
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
+
+    for (unsigned i = 0; i < tc->tex_count; ++i)
+    {
+        if (likely(priv->last_cvtexs[i]))
+        {
+            CFRelease(priv->last_cvtexs[i]);
+            priv->last_cvtexs[i] = NULL;
+        }
+    }
 
     CVOpenGLESTextureCacheFlush(priv->cache, 0);
 
@@ -79,17 +88,10 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        if (likely(priv->last_cvtexs[i]))
-            CFRelease(priv->last_cvtexs[i]);
+        tc->vt->BindTexture(tc->tex_target, 0);
         priv->last_cvtexs[i] = cvtex;
     }
 
-    if (priv->last_pic != pic)
-    {
-        if (priv->last_pic != NULL)
-            picture_Release(priv->last_pic);
-        priv->last_pic = picture_Hold(pic);
-    }
     return VLC_SUCCESS;
 }
 
@@ -144,10 +146,16 @@ Close(vlc_object_t *obj)
     opengl_tex_converter_t *tc = (void *)obj;
     struct priv *priv = tc->priv;
 
+#if TARGET_OS_IPHONE
+    for (unsigned i = 0; i < tc->tex_count; ++i)
+    {
+        if (likely(priv->last_cvtexs[i]))
+            CFRelease(priv->last_cvtexs[i]);
+    }
+    CFRelease(priv->cache);
+#else
     if (priv->last_pic != NULL)
         picture_Release(priv->last_pic);
-#if TARGET_OS_IPHONE
-    CFRelease(priv->cache);
 #endif
     free(tc->priv);
 }
