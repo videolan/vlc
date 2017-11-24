@@ -1197,6 +1197,24 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
         CFRelease(p_sys->session);
         p_sys->session = nil;
 
+#if TARGET_OS_IPHONE
+        /* In case of 4K 10bits (BGRA), we can easily reach the device max
+         * memory when flushing. Indeed, we'll create a new VT session that
+         * will reallocate frames while previous frames are still used by the
+         * vout (and not released). To work-around this issue, we force a vout
+         * change. */
+        if (p_dec->fmt_out.i_codec == VLC_CODEC_CVPX_BGRA
+         && p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height >= 8000000)
+        {
+            const video_format_t orig = p_dec->fmt_out.video;
+            p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height =
+            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_visible_height = 64;
+            (void) decoder_UpdateVideoFormat(p_dec);
+            p_dec->fmt_out.video = orig;
+            b_reset_format = true;
+        }
+#endif
+
         if (b_reset_format)
         {
             p_sys->b_format_propagated = false;
