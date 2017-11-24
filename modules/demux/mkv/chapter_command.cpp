@@ -180,12 +180,12 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         case 7:
             if ( ((p_command[1] >> 4) & 0x7) == 0)
             {
-                i_cr1 = p_command[2];
+                i_cr1 = p_command[4];
                 i_cr2 = (p_command[6] << 8) + p_command[7];
             }
             else
             {
-                i_cr1 = p_command[2];
+                i_cr1 = p_command[5];
                 i_cr2 = (p_command[6] << 8) + p_command[7];
             }
             break;
