@@ -366,7 +366,7 @@ static bool CodecSupportedH264(decoder_t *p_dec)
 
     uint8_t i_profile, i_level;
     if (hxxx_helper_get_current_profile_level(&p_sys->hh, &i_profile, &i_level))
-	return true;
+        return true;
 
     switch (i_profile) {
         case PROFILE_H264_BASELINE:
