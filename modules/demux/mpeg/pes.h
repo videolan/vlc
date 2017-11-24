@@ -22,10 +22,13 @@
 
 static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, mtime_t *ret )
 {
-    i_flags = (i_flags << 4) | 0x01; /* check marker bits, and i_flags = b 0010, 0011 or 0001 */
-    if((p_data[0] & 0xF1) != i_flags ||
+    /* !warn broken muxers set incorrect flags. see #17773 and #19140 */
+    /* check marker bits, and i_flags = b 0010, 0011 or 0001 */
+    if((p_data[0] & 0xC1) != 0x01 ||
        (p_data[2] & 0x01) != 0x01 ||
-       (p_data[4] & 0x01) != 0x01)
+       (p_data[4] & 0x01) != 0x01 ||
+       (p_data[0] & 0x30) == 0 || /* at least needs one bit */
+       (p_data[0] >> 5) > i_flags ) /* needs flags 1x => 1x or flags 01 => 01 */
         return false;
 
 
