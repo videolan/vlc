@@ -70,7 +70,6 @@ static void srt_wait_interrupted(void *p_data)
 
 static int Control(stream_t *p_stream, int i_query, va_list args)
 {
-    stream_sys_t *p_sys = p_stream->p_sys;
     int i_ret = VLC_SUCCESS;
 
     switch( i_query )
