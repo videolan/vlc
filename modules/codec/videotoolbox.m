@@ -60,7 +60,7 @@
 
 #endif
 
-#ifndef MAC_OS_X_VERSION_10_13
+#ifndef MAC_OS_X_VERSION_10_11
 enum { kCMVideoCodecType_HEVC = 'hvc1' };
 #endif
 
