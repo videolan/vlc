@@ -60,19 +60,29 @@
 
 #endif
 
-#ifndef MAC_OS_X_VERSION_10_11
+// Define stuff for older SDKs
+#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED < 101100) || \
+    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED < 90000) || \
+    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED < 90000)
 enum { kCMVideoCodecType_HEVC = 'hvc1' };
+#endif
+
+#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED < 101300) || \
+    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED < 110000) || \
+    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED < 110000)
+Boolean
+VTIsHardwareDecodeSupported( CMVideoCodecType codecType ) API_AVAILABLE(macosx(10.13), ios(11.0), tvos(11.0));
+#endif
+
+#if (!TARGET_OS_OSX || MAC_OS_X_VERSION_MAX_ALLOWED < 1090)
+const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
+const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
 #endif
 
 #pragma mark - module descriptor
 
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
-
-#if MAC_OS_X_VERSION_MIN_ALLOWED < 1090
-const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
-const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
-#endif
 
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #define VT_TEMPO_DEINTERLACE N_("Deinterlacing")
