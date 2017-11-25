@@ -99,7 +99,6 @@ struct vout_display_sys_t
     RECTL              client_rect;
     vout_window_t     *parent_window;
     HWND               parent;
-    RECTL              parent_rect;
     picture_pool_t    *pool;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
@@ -1146,15 +1145,16 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
      * parent window size */
     if( sys->parent_window )
     {
+        RECTL rect;
+
         WinQueryWindowRect( sys->parent, &rcl );
+        WinQueryWindowRect( sys->client, &rect);
 
-        if( rcl.xLeft   != sys->parent_rect.xLeft   ||
-            rcl.yBottom != sys->parent_rect.yBottom ||
-            rcl.xRight  != sys->parent_rect.xRight  ||
-            rcl.yTop    != sys->parent_rect.yTop)
+        if( rcl.xLeft   != rect.xLeft   ||
+            rcl.yBottom != rect.yBottom ||
+            rcl.xRight  != rect.xRight  ||
+            rcl.yTop    != rect.yTop)
         {
-            sys->parent_rect = rcl;
-
             WinCalcFrameRect( sys->frame, &rcl, FALSE );
 
             WinSetWindowPos( sys->frame, NULLHANDLE,
