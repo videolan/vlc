@@ -468,7 +468,9 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             /* == "start" FIXME: should be BIDI based */
             p_ttml_style->i_text_align |= SUBPICTURE_ALIGN_LEFT;
         p_ttml_style->b_text_align_set = true;
+#ifdef TTML_DEBUG
         printf("**%s %x\n", psz_val, p_ttml_style->i_text_align);
+#endif
     }
     else if( !strcasecmp( "tts:fontSize", psz_attr ) )
     {
