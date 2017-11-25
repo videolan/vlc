@@ -47,6 +47,16 @@
 /* The default latency is 125
  * which uses srt library internally */
 #define SRT_DEFAULT_LATENCY 125
+/* Crypto key length in bytes. */
+#define SRT_KEY_LENGTH_TEXT N_("Crypto key length in bytes")
+#define SRT_DEFAULT_KEY_LENGTH 16
+static const int srt_key_lengths[] = {
+    16, 24, 32,
+};
+
+static const char *const srt_key_length_names[] = {
+    N_("16 bytes"), N_("24 bytes"), N_("32 bytes"),
+};
 
 struct sout_access_out_sys_t
 {
@@ -159,6 +169,7 @@ static int Open( vlc_object_t *p_this )
     char                    *psz_dst_addr = NULL;
     int                      i_dst_port;
     int                      stat;
+    char                    *psz_passphrase = NULL;
 
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
@@ -182,6 +193,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_poll_id = -1;
 
     p_access->p_sys = p_sys;
+
+    psz_passphrase = var_InheritString( p_access, "passphrase" );
 
     i_dst_port = SRT_DEFAULT_PORT;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
@@ -234,6 +247,15 @@ static int Open( vlc_object_t *p_this )
     /* Set latency */
     srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY, &p_sys->i_latency, sizeof( int ) );
 
+    if ( psz_passphrase != NULL && psz_passphrase[0] != '\0')
+    {
+        int i_key_length = var_InheritInteger( p_access, "key-length" );
+        srt_setsockopt( p_sys->sock, 0, SRTO_PASSPHRASE,
+            psz_passphrase, strlen( psz_passphrase ) );
+        srt_setsockopt( p_sys->sock, 0, SRTO_PBKEYLEN,
+            &i_key_length, sizeof( int ) );
+    }
+
     p_sys->i_poll_id = srt_epoll_create();
     if ( p_sys->i_poll_id == -1 )
     {
@@ -266,12 +288,15 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_write = Write;
     p_access->pf_control = Control;
 
+    free( psz_passphrase );
     free( psz_dst_addr );
     freeaddrinfo( res );
 
     return VLC_SUCCESS;
 
 failed:
+    free( psz_passphrase );
+
     if ( psz_dst_addr != NULL)
         free( psz_dst_addr );
 
@@ -318,6 +343,10 @@ vlc_module_begin()
     add_integer( "poll-timeout", SRT_DEFAULT_POLL_TIMEOUT,
             N_("Return poll wait after timeout milliseconds (-1 = infinite)"), NULL, true )
     add_integer( "latency", SRT_DEFAULT_LATENCY, N_("SRT latency (ms)"), NULL, true )
+    add_password( "passphrase", "", N_("Password for stream encryption"), NULL, false )
+    add_integer( "key-length", SRT_DEFAULT_KEY_LENGTH,
+            SRT_KEY_LENGTH_TEXT, SRT_KEY_LENGTH_TEXT, false )
+        change_integer_list( srt_key_lengths, srt_key_length_names )
 
     set_capability( "sout access", 0 )
     add_shortcut( "srt" )
