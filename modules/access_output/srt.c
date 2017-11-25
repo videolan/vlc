@@ -142,7 +142,8 @@ out:
 
 static int Control( sout_access_out_t *p_access, int i_query, va_list args )
 {
-    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    VLC_UNUSED (p_access);
+
     int i_ret = VLC_SUCCESS;
 
     switch( i_query )
