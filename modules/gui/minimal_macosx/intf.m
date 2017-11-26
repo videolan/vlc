@@ -35,9 +35,9 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_interface.h>
 #include <vlc_vout_window.h>
 
-#import "VLCMain.h"
 #import "VLCMinimalVoutWindow.h"
 
 /*****************************************************************************
@@ -53,11 +53,7 @@ int OpenIntf (vlc_object_t *p_this)
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
     msg_Dbg(p_intf, "Using minimal macosx interface");
 
-    p_intf->p_sys = malloc(sizeof(intf_sys_t));
-    if (p_intf->p_sys == NULL)
-        return VLC_ENOMEM;
-
-    memset(p_intf->p_sys, 0, sizeof(*p_intf->p_sys));
+    p_intf->p_sys = NULL;
 
     Run(p_intf);
 
