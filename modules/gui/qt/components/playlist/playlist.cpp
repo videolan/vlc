@@ -138,7 +138,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( selector, SDCategorySelected(bool), mainView, setWaiting(bool) );
 
     /* */
-    split = new PlaylistSplitter( this );
+    split = new QSplitter( this );
 
     /* Add the two sides of the QSplitter */
     split->addWidget( leftSplitter );
@@ -413,26 +413,3 @@ QSize LocationButton::sizeHint() const
 }
 
 #undef PADDING
-
-#ifdef Q_OS_MAC
-QSplitterHandle *PlaylistSplitter::createHandle()
-{
-    return new SplitterHandle( orientation(), this );
-}
-
-SplitterHandle::SplitterHandle( Qt::Orientation orientation, QSplitter * parent )
-               : QSplitterHandle( orientation, parent)
-{
-};
-
-QSize SplitterHandle::sizeHint() const
-{
-    return (orientation() == Qt::Horizontal) ? QSize( 1, height() ) : QSize( width(), 1 );
-}
-
-void SplitterHandle::paintEvent(QPaintEvent *event)
-{
-    QPainter painter( this );
-    painter.fillRect( event->rect(), QColor(81, 81, 81) );
-}
-#endif /* __APPLE__ */
