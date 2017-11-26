@@ -67,13 +67,6 @@
 enum { kCMVideoCodecType_HEVC = 'hvc1' };
 #endif
 
-#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED < 101300) || \
-    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED < 110000) || \
-    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED < 110000)
-Boolean
-VTIsHardwareDecodeSupported( CMVideoCodecType codecType ) API_AVAILABLE(macosx(10.13), ios(11.0), tvos(11.0));
-#endif
-
 #if (!TARGET_OS_OSX || MAC_OS_X_VERSION_MAX_ALLOWED < 1090)
 const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
@@ -1445,10 +1438,15 @@ static BOOL deviceSupportsHEVC()
 {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
+
+#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED >= 101300) || \
+    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000) || \
+    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED >= 110000)
     if (VTIsHardwareDecodeSupported != nil)
         return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
-#pragma clang diagnostic pop
     else
+#endif
+#pragma clang diagnostic pop
         return NO;
 }
 
