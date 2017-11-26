@@ -149,25 +149,28 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         }
         case VOUT_WINDOW_SET_SIZE:
         {
+            unsigned int i_width  = va_arg(args, unsigned int);
+            unsigned int i_height = va_arg(args, unsigned int);
             @autoreleasepool {
-                NSRect theFrame = [o_window frame];
-                unsigned int i_width  = va_arg(args, unsigned int);
-                unsigned int i_height = va_arg(args, unsigned int);
-                theFrame.size.width = i_width;
-                theFrame.size.height = i_height;
-                [o_window setFrame: theFrame display: YES animate: YES];
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    NSRect theFrame = [o_window frame];
+                    theFrame.size.width = i_width;
+                    theFrame.size.height = i_height;
+                    [o_window setFrame:theFrame display: YES animate: YES];
+                });
             }
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_FULLSCREEN:
         {
+            int i_full = va_arg(args, int);
             @autoreleasepool {
-                int i_full = va_arg(args, int);
-
-                if (i_full)
-                    [o_window performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
-                else
-                    [o_window performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    if (i_full)
+                        [(VLCMinimalVoutWindow*)o_window enterFullscreen];
+                    else
+                        [(VLCMinimalVoutWindow*)o_window leaveFullscreen];
+                });
             }
             return VLC_SUCCESS;
         }
