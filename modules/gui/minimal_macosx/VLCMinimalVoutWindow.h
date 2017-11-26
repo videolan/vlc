@@ -24,8 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <vlc_common.h>
-
 @interface VLCMinimalVoutWindow : NSWindow
 {
     NSRect initialFrame;

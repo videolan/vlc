@@ -25,18 +25,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import <stdlib.h>                                      /* malloc(), free() */
-#import <sys/param.h>                                    /* for MAXPATHLEN */
+#import <stdlib.h>
 #import <string.h>
+#import <unistd.h>
+
 #ifdef HAVE_CONFIG_H
 # import "config.h"
 #endif
-#include <unistd.h>
 
-#include <vlc_common.h>
-#include <vlc_playlist.h>
-#include <vlc_interface.h>
-#include <vlc_vout_window.h>
+#import <vlc_common.h>
+#import <vlc_playlist.h>
+#import <vlc_interface.h>
+#import <vlc_vout_window.h>
 
 #import "VLCMinimalVoutWindow.h"
 
