@@ -34,12 +34,15 @@
 @implementation VLCMinimalVoutWindow
 - (id)initWithContentRect:(NSRect)contentRect
 {
-    if( self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])
+    if( self = [super initWithContentRect:contentRect
+                                styleMask:NSBorderlessWindowMask
+                                  backing:NSBackingStoreBuffered
+                                    defer:NO])
     {
         initialFrame = contentRect;
         [self setBackgroundColor:[NSColor blackColor]];
         [self setHasShadow:YES];
-        [self setMovableByWindowBackground: YES];
+        [self setMovableByWindowBackground:YES];
         [self center];
     }
     return self;

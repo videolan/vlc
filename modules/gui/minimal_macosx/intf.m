@@ -132,7 +132,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
 static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 {
-    NSWindow * o_window = [(__bridge id)p_wnd->handle.nsobject window];
+    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
     if (!o_window) {
         msg_Err(p_wnd, "failed to recover cocoa window");
         return VLC_EGENERIC;
@@ -143,7 +143,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         {
             unsigned i_state = va_arg(args, unsigned);
 
-            [o_window setLevel: i_state];
+            [o_window setLevel:i_state];
 
             return VLC_SUCCESS;
         }
@@ -156,7 +156,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                     NSRect theFrame = [o_window frame];
                     theFrame.size.width = i_width;
                     theFrame.size.height = i_height;
-                    [o_window setFrame:theFrame display: YES animate: YES];
+                    [o_window setFrame:theFrame display:YES animate:YES];
                 });
             }
             return VLC_SUCCESS;
