@@ -40,7 +40,6 @@
 
 #include <vlc_intf_strings.h>
 
-#ifndef Q_OS_MAC
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {
     clearButton = new QFramelessButton( this );
@@ -138,5 +137,3 @@ void SearchLineEdit::searchEditingFinished()
 {
     emit searchDelayedChanged( text() );
 }
-
-#endif
