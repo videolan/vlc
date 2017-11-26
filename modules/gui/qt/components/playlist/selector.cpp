@@ -124,12 +124,6 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
 
-#ifdef Q_OS_MAC
-    setAutoFillBackground( true );
-    QPalette palette;
-    palette.setColor( QPalette::Window, QColor(209,215,226) );
-    setPalette( palette );
-#endif
     setMinimumHeight( 120 );
 
     /* Podcasts */
