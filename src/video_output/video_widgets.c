@@ -36,11 +36,23 @@
 
 #include <vlc_filter.h>
 
+#include "vout_spuregion_helper.h"
+
 #define STYLE_EMPTY 0
 #define STYLE_FILLED 1
 
+#define RGB_BLUE        0x2badde
+
 #define COL_TRANSPARENT 0
 #define COL_WHITE       1
+#define COL_BLUE        2
+#define COL_BLUE_SHADE  3
+
+#define SET_PALETTE_COLOR(id, rgb, alpha) \
+{\
+    uint8_t color[4] = { HEX2YUV(rgb), alpha };\
+    memcpy( &palette.palette[id], &color, 4 );\
+}
 
 /**
  * Draws a rectangle at the given position in the region.
@@ -103,13 +115,15 @@ static void DrawTriangle(subpicture_region_t *r, int fill, uint8_t color,
  */
 static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
 {
-    video_palette_t palette = {
-        .i_entries = 2,
-        .palette = {
-            [COL_TRANSPARENT] = { 0xff, 0x80, 0x80, 0x00 },
-            [COL_WHITE]       = { 0xff, 0x80, 0x80, 0xff },
-        },
-    };
+    if( width == 0 || height == 0 )
+        return NULL;
+
+    video_palette_t palette;
+    SET_PALETTE_COLOR(COL_WHITE,       0xffffff, STYLE_ALPHA_OPAQUE)
+    SET_PALETTE_COLOR(COL_TRANSPARENT, 0xffffff, STYLE_ALPHA_TRANSPARENT)
+    SET_PALETTE_COLOR(COL_BLUE,        RGB_BLUE, STYLE_ALPHA_OPAQUE)
+    SET_PALETTE_COLOR(COL_BLUE_SHADE,  RGB_BLUE, 0x40)
+    palette.i_entries = 4;
 
     video_format_t fmt;
     video_format_Init(&fmt, VLC_CODEC_YUVP);
@@ -126,7 +140,6 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
         return NULL;
     r->i_x = x;
     r->i_y = y;
-    memset(r->p_picture->p->p_pixels, 0, r->p_picture->p->i_pitch * height);
 
     return r;
 }
@@ -135,11 +148,14 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
  * Create the region for an OSD slider.
  * Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  */
+#define SLIDER_MARGIN_BASE 0.10
 static subpicture_region_t *OSDSlider(int type, int position,
                                       const video_format_t *fmt)
 {
     const int size = __MAX(fmt->i_visible_width, fmt->i_visible_height);
-    const int margin = size * 0.10;
+    const int margin = size * SLIDER_MARGIN_BASE;
+    const int marginbottom = size * SLIDER_MARGIN_BASE * 0.6;
+    uint8_t i_padding = __MIN(5, size * 0.25); /* small sizes */
 
     int x, y;
     int width, height;
@@ -147,7 +163,7 @@ static subpicture_region_t *OSDSlider(int type, int position,
         width  = __MAX(fmt->i_visible_width - 2 * margin, 1);
         height = __MAX(fmt->i_visible_height * 0.05,      1);
         x      = __MIN(fmt->i_x_offset + margin, fmt->i_visible_width - width);
-        y      = __MAX(fmt->i_y_offset + fmt->i_visible_height - margin, 0);
+        y      = __MAX(fmt->i_y_offset + fmt->i_visible_height - marginbottom, 0);
     } else {
         width  = __MAX(fmt->i_visible_width * 0.025,       1);
         height = __MAX(fmt->i_visible_height - 2 * margin, 1);
@@ -155,22 +171,29 @@ static subpicture_region_t *OSDSlider(int type, int position,
         y      = __MIN(fmt->i_y_offset + margin, fmt->i_visible_height - height);
     }
 
+    if( (width < 1 + 2 * i_padding) || (height < 1 + 2 * i_padding) )
+        return NULL;
+
     subpicture_region_t *r = OSDRegion(x, y, width, height);
     if( !r)
         return NULL;
 
-    if (type == OSD_HOR_SLIDER) {
-        int pos_x = (width - 2) * position / 100;
-        DrawRect(r, STYLE_FILLED, COL_WHITE, pos_x - 1, 2, pos_x + 1, height - 3);
-        DrawRect(r, STYLE_EMPTY,  COL_WHITE,         0, 0, width - 1, height - 1);
+    int pos_x = i_padding;
+    int pos_y, pos_xend;
+    int pos_yend = height - 1 - i_padding;
+
+    if (type == OSD_HOR_SLIDER ) {
+        pos_y = i_padding;
+        pos_xend = pos_x + (width - 2 * i_padding) * position / 100;
     } else {
-        int pos_mid = height / 2;
-        int pos_y   = height - (height - 2) * position / 100;
-        DrawRect(r, STYLE_FILLED, COL_WHITE,         2, pos_y,   width - 3, height - 3);
-        DrawRect(r, STYLE_FILLED, COL_WHITE,         1, pos_mid,         1, pos_mid   );
-        DrawRect(r, STYLE_FILLED, COL_WHITE, width - 2, pos_mid, width - 2, pos_mid   );
-        DrawRect(r, STYLE_EMPTY,  COL_WHITE,         0,       0, width - 1, height - 1);
+        pos_y = height - (height - 2 * i_padding) * position / 100;
+        pos_xend = width - 1 - i_padding;
     }
+
+    /* one full fill is faster than drawing outline */
+    DrawRect(r, STYLE_FILLED, COL_BLUE_SHADE, 0, 0, width - 1, height - 1);
+    DrawRect(r, STYLE_FILLED, COL_BLUE, pos_x, pos_y, pos_xend, pos_yend);
+
     return r;
 }
 
@@ -195,6 +218,8 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
     if (!r)
         return NULL;
 
+    DrawRect(r, STYLE_FILLED, COL_TRANSPARENT, 0, 0, width, height);
+
     if (type == OSD_PAUSE_ICON) {
         int bar_width = width / 3;
         DrawRect(r, STYLE_FILLED, COL_WHITE, 0, 0, bar_width - 1, height -1);
@@ -211,12 +236,8 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
         DrawRect(r, STYLE_FILLED, COL_WHITE, delta, mid / 2, width - delta, height - 1 - mid / 2);
         DrawTriangle(r, STYLE_FILLED, COL_WHITE, width - delta, 0, delta, y2);
         if (type == OSD_MUTE_ICON) {
-            uint8_t *a    = r->p_picture->A_PIXELS;
-            int     pitch = r->p_picture->A_PITCH;
-            for (int i = 1; i < pitch; i++) {
-                int k = i + (height - i - 1) * pitch;
-                a[k] = 0xff - a[k];
-            }
+            for(int y1 = 0; y1 <= height -1; y1++)
+                DrawRect(r, STYLE_FILLED, COL_BLUE, y1, y1, __MIN(y1 + delta, width - 1), y1);
         }
     }
     return r;
