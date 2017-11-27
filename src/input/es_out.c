@@ -2039,6 +2039,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
 
+    assert( p_block->p_next == NULL );
+
     if( libvlc_stats( p_input ) )
     {
         uint64_t i_total;
