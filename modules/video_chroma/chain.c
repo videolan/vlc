@@ -195,6 +195,8 @@ static int ActivateFilter( vlc_object_t *p_this )
 
     /* Force only one level of iteration when using the chain converter from a
      * filter. */
+    if( var_InheritInteger( p_filter, "chain-level" ) > 0 )
+        return VLC_EGENERIC;
     var_Create( p_filter, "chain-level", VLC_VAR_INTEGER );
     var_SetInteger( p_filter, "chain-level", CHAIN_LEVEL_MAX - 1 );
 
