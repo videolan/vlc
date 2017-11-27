@@ -594,6 +594,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
         {
             hevc_slice_segment_header_t *p_sli =
                     hevc_decode_slice_header(p_nal, i_nal, true, GetxPSHEVC, p_sys);
+            if(!p_sli)
+                return false;
 
             hevc_sequence_parameter_set_t *p_sps;
             hevc_picture_parameter_set_t *p_pps;
