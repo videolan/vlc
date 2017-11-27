@@ -57,7 +57,10 @@ void filter_AddProxyCallbacks( vlc_object_t *obj, filter_t *filter,
         char *name = *pname;
         int var_type = var_Type(filter, name);
         if (var_Type(obj, name))
+        {
+            free(name);
             continue;
+        }
         var_Create(obj, name,
                    var_type | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
         if ((var_type & VLC_VAR_ISCOMMAND))
