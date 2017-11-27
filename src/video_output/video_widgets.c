@@ -79,43 +79,21 @@ static void DrawTriangle(subpicture_region_t *r, int fill, uint8_t color,
     uint8_t *p    = r->p_picture->p->p_pixels;
     int     pitch = r->p_picture->p->i_pitch;
     const int mid = y1 + (y2 - y1) / 2;
+    const bool b_swap = (x1 > x2);
 
-    /* TODO factorize it */
-    if (x2 >= x1) {
+    for (int y = y1; y <= mid; y++) {
+        const int h = y - y1;
         if (fill == STYLE_FILLED) {
-            for (int y = y1; y <= mid; y++) {
-                int h = y - y1;
-                for (int x = x1; x <= x1 + h && x <= x2; x++) {
-                    p[x + pitch * y         ] = color;
-                    p[x + pitch * (y2 - h)] = color;
-                }
-            }
+            const int w = b_swap ? __MAX(x1 - h, x2) : __MIN(x1 + h, x2);
+            DrawRect(r, STYLE_FILLED, color,
+                     (b_swap) ? w : x1, y, (b_swap) ? x1 : w, y);
+            DrawRect(r, STYLE_FILLED, color,
+                     (b_swap) ? w : x1, y2 - h, (b_swap) ? x1 : w, y2 - h);
         } else {
-            for (int y = y1; y <= mid; y++) {
-                int h = y - y1;
-                p[x1 +     pitch * y         ] = color;
-                p[x1 + h + pitch * y         ] = color;
-                p[x1 +     pitch * (y2 - h)] = color;
-                p[x1 + h + pitch * (y2 - h)] = color;
-            }
-        }
-    } else {
-        if( fill == STYLE_FILLED) {
-            for (int y = y1; y <= mid; y++) {
-                int h = y - y1;
-                for (int x = x1; x >= x1 - h && x >= x2; x--) {
-                    p[x + pitch * y       ] = color;
-                    p[x + pitch * (y2 - h)] = color;
-                }
-            }
-        } else {
-            for (int y = y1; y <= mid; y++) {
-                int h = y - y1;
-                p[ x1 +     pitch * y       ] = color;
-                p[ x1 - h + pitch * y       ] = color;
-                p[ x1 +     pitch * (y2 - h)] = color;
-                p[ x1 - h + pitch * (y2 - h)] = color;
-            }
+            p[x1 +                     pitch * y       ] = color;
+            p[x1 + (b_swap ? -h : h) + pitch * y       ] = color;
+            p[x1 +                     pitch * (y2 - h)] = color;
+            p[x1 + (b_swap ? -h : h) + pitch * (y2 - h)] = color;
         }
     }
 }
