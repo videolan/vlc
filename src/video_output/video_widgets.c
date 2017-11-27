@@ -39,11 +39,14 @@
 #define STYLE_EMPTY 0
 #define STYLE_FILLED 1
 
+#define COL_TRANSPARENT 0
+#define COL_WHITE       1
+
 /**
  * Draws a rectangle at the given position in the region.
  * It may be filled (fill == STYLE_FILLED) or empty (fill == STYLE_EMPTY).
  */
-static void DrawRect(subpicture_region_t *r, int fill,
+static void DrawRect(subpicture_region_t *r, int fill, uint8_t color,
                      int x1, int y1, int x2, int y2)
 {
     uint8_t *p    = r->p_picture->p->p_pixels;
@@ -52,16 +55,16 @@ static void DrawRect(subpicture_region_t *r, int fill,
     if (fill == STYLE_FILLED) {
         for (int y = y1; y <= y2; y++) {
             for (int x = x1; x <= x2; x++)
-                p[x + pitch * y] = 1;
+                p[x + pitch * y] = color;
         }
     } else {
         for (int y = y1; y <= y2; y++) {
-            p[x1 + pitch * y] = 1;
-            p[x2 + pitch * y] = 1;
+            p[x1 + pitch * y] = color;
+            p[x2 + pitch * y] = color;
         }
         for (int x = x1; x <= x2; x++) {
-            p[x + pitch * y1] = 1;
-            p[x + pitch * y2] = 1;
+            p[x + pitch * y1] = color;
+            p[x + pitch * y2] = color;
         }
     }
 }
@@ -70,7 +73,7 @@ static void DrawRect(subpicture_region_t *r, int fill,
  * Draws a triangle at the given position in the region.
  * It may be filled (fill == STYLE_FILLED) or empty (fill == STYLE_EMPTY).
  */
-static void DrawTriangle(subpicture_region_t *r, int fill,
+static void DrawTriangle(subpicture_region_t *r, int fill, uint8_t color,
                          int x1, int y1, int x2, int y2)
 {
     uint8_t *p    = r->p_picture->p->p_pixels;
@@ -83,17 +86,17 @@ static void DrawTriangle(subpicture_region_t *r, int fill,
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
                 for (int x = x1; x <= x1 + h && x <= x2; x++) {
-                    p[x + pitch * y         ] = 1;
-                    p[x + pitch * (y2 - h)] = 1;
+                    p[x + pitch * y         ] = color;
+                    p[x + pitch * (y2 - h)] = color;
                 }
             }
         } else {
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
-                p[x1 +     pitch * y         ] = 1;
-                p[x1 + h + pitch * y         ] = 1;
-                p[x1 +     pitch * (y2 - h)] = 1;
-                p[x1 + h + pitch * (y2 - h)] = 1;
+                p[x1 +     pitch * y         ] = color;
+                p[x1 + h + pitch * y         ] = color;
+                p[x1 +     pitch * (y2 - h)] = color;
+                p[x1 + h + pitch * (y2 - h)] = color;
             }
         }
     } else {
@@ -101,17 +104,17 @@ static void DrawTriangle(subpicture_region_t *r, int fill,
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
                 for (int x = x1; x >= x1 - h && x >= x2; x--) {
-                    p[x + pitch * y       ] = 1;
-                    p[x + pitch * (y2 - h)] = 1;
+                    p[x + pitch * y       ] = color;
+                    p[x + pitch * (y2 - h)] = color;
                 }
             }
         } else {
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
-                p[ x1 +     pitch * y       ] = 1;
-                p[ x1 - h + pitch * y       ] = 1;
-                p[ x1 +     pitch * (y2 - h)] = 1;
-                p[ x1 - h + pitch * (y2 - h)] = 1;
+                p[ x1 +     pitch * y       ] = color;
+                p[ x1 - h + pitch * y       ] = color;
+                p[ x1 +     pitch * (y2 - h)] = color;
+                p[ x1 - h + pitch * (y2 - h)] = color;
             }
         }
     }
@@ -125,8 +128,8 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
     video_palette_t palette = {
         .i_entries = 2,
         .palette = {
-            [0] = { 0xff, 0x80, 0x80, 0x00 },
-            [1] = { 0xff, 0x80, 0x80, 0xff },
+            [COL_TRANSPARENT] = { 0xff, 0x80, 0x80, 0x00 },
+            [COL_WHITE]       = { 0xff, 0x80, 0x80, 0xff },
         },
     };
 
@@ -180,15 +183,15 @@ static subpicture_region_t *OSDSlider(int type, int position,
 
     if (type == OSD_HOR_SLIDER) {
         int pos_x = (width - 2) * position / 100;
-        DrawRect(r, STYLE_FILLED, pos_x - 1, 2, pos_x + 1, height - 3);
-        DrawRect(r, STYLE_EMPTY,  0,         0, width - 1, height - 1);
+        DrawRect(r, STYLE_FILLED, COL_WHITE, pos_x - 1, 2, pos_x + 1, height - 3);
+        DrawRect(r, STYLE_EMPTY,  COL_WHITE,         0, 0, width - 1, height - 1);
     } else {
         int pos_mid = height / 2;
         int pos_y   = height - (height - 2) * position / 100;
-        DrawRect(r, STYLE_FILLED, 2,         pos_y,   width - 3, height - 3);
-        DrawRect(r, STYLE_FILLED, 1,         pos_mid, 1,         pos_mid   );
-        DrawRect(r, STYLE_FILLED, width - 2, pos_mid, width - 2, pos_mid   );
-        DrawRect(r, STYLE_EMPTY,  0,         0,       width - 1, height - 1);
+        DrawRect(r, STYLE_FILLED, COL_WHITE,         2, pos_y,   width - 3, height - 3);
+        DrawRect(r, STYLE_FILLED, COL_WHITE,         1, pos_mid,         1, pos_mid   );
+        DrawRect(r, STYLE_FILLED, COL_WHITE, width - 2, pos_mid, width - 2, pos_mid   );
+        DrawRect(r, STYLE_EMPTY,  COL_WHITE,         0,       0, width - 1, height - 1);
     }
     return r;
 }
@@ -216,19 +219,19 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
 
     if (type == OSD_PAUSE_ICON) {
         int bar_width = width / 3;
-        DrawRect(r, STYLE_FILLED, 0, 0, bar_width - 1, height -1);
-        DrawRect(r, STYLE_FILLED, width - bar_width, 0, width - 1, height - 1);
+        DrawRect(r, STYLE_FILLED, COL_WHITE, 0, 0, bar_width - 1, height -1);
+        DrawRect(r, STYLE_FILLED, COL_WHITE, width - bar_width, 0, width - 1, height - 1);
     } else if (type == OSD_PLAY_ICON) {
         int mid   = height >> 1;
         int delta = (width - mid) >> 1;
         int y2    = ((height - 1) >> 1) * 2;
-        DrawTriangle(r, STYLE_FILLED, delta, 0, width - delta, y2);
+        DrawTriangle(r, STYLE_FILLED, COL_WHITE, delta, 0, width - delta, y2);
     } else {
         int mid   = height >> 1;
         int delta = (width - mid) >> 1;
         int y2    = ((height - 1) >> 1) * 2;
-        DrawRect(r, STYLE_FILLED, delta, mid / 2, width - delta, height - 1 - mid / 2);
-        DrawTriangle(r, STYLE_FILLED, width - delta, 0, delta, y2);
+        DrawRect(r, STYLE_FILLED, COL_WHITE, delta, mid / 2, width - delta, height - 1 - mid / 2);
+        DrawTriangle(r, STYLE_FILLED, COL_WHITE, width - delta, 0, delta, y2);
         if (type == OSD_MUTE_ICON) {
             uint8_t *a    = r->p_picture->A_PIXELS;
             int     pitch = r->p_picture->A_PITCH;
