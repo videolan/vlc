@@ -46,6 +46,8 @@ vlc_module_begin ()
         change_volatile ()
     add_bool ("fastseek", true, "forces result of the CAN_FASTSEEK control", NULL, false)
         change_volatile ()
+    add_bool("stream-size", true, "expose stream size if known", NULL, false)
+        change_volatile()
     add_shortcut("tweaks")
 vlc_module_end ()
 
@@ -53,6 +55,7 @@ struct stream_sys_t
 {
     bool b_seek;
     bool b_fastseek;
+    bool b_size;
 };
 
 /**
@@ -78,7 +81,10 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
             return VLC_SUCCESS;
         }
         break;
-
+    case STREAM_GET_SIZE:
+        if (!p_sys->b_size)
+            return VLC_EGENERIC;
+        break;
     default:
         break;
     }
@@ -109,6 +115,7 @@ static int Open( vlc_object_t *p_object )
 
     p_sys->b_seek = var_InheritBool( p_stream, "seek" );
     p_sys->b_fastseek = var_InheritBool( p_stream, "fastseek" );
+    p_sys->b_size = var_InheritBool(p_stream, "stream-size");
 
     p_stream->pf_read = Read;
     p_stream->pf_seek = p_sys->b_seek ? Seek : NULL;
