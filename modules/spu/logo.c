@@ -411,8 +411,8 @@ static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = false;
     }
 
-    p_region->i_x = p_sys->i_pos_x;
-    p_region->i_y = p_sys->i_pos_y;
+    p_region->i_x = p_sys->i_pos_x > 0 ? p_sys->i_pos_x : 0;
+    p_region->i_y = p_sys->i_pos_y > 0 ? p_sys->i_pos_y : 0;
 
     p_spu->p_region = p_region;
 
