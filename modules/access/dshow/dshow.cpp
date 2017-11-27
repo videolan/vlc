@@ -659,12 +659,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     if( p_sys->pp_streams.empty() ) return VLC_EGENERIC;
 
-    if( vlc_mta_acquire( p_this ) == false )
-    {
-        msg_Err( p_this, "Failed to acquire MTA" );
-        return VLC_EGENERIC;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -682,6 +676,12 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->p_sys = (demux_sys_t *)p_sys;
 
     ComContext ctx( COINIT_MULTITHREADED );
+
+    if( vlc_mta_acquire( p_this ) == false )
+    {
+        msg_Err( p_this, "Failed to acquire MTA" );
+        return VLC_EGENERIC;
+    }
 
     if( CommonOpen( p_this, p_sys, true ) != VLC_SUCCESS )
     {
@@ -789,6 +789,12 @@ static int AccessOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     ComContext ctx( COINIT_MULTITHREADED );
+
+    if( vlc_mta_acquire( p_this ) == false )
+    {
+        msg_Err( p_this, "Failed to acquire MTA" );
+        return VLC_EGENERIC;
+    }
 
     if( CommonOpen( p_this, p_sys, false ) != VLC_SUCCESS )
     {
