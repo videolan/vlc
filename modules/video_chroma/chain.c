@@ -155,8 +155,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     {
         /* Hum ... looks like this really isn't going to work. Too bad. */
         if (p_sys->p_video_filter)
-            filter_DelProxyCallbacks( p_filter->obj.parent,
-                                      p_sys->p_video_filter,
+            filter_DelProxyCallbacks( p_filter, p_sys->p_video_filter,
                                       RestartFilterCallback );
         filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
@@ -209,8 +208,7 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
 
     if (p_filter->p_sys->p_video_filter)
-        filter_DelProxyCallbacks( p_filter->obj.parent,
-                                  p_filter->p_sys->p_video_filter,
+        filter_DelProxyCallbacks( p_filter, p_filter->p_sys->p_video_filter,
                                   RestartFilterCallback );
     filter_chain_Delete( p_filter->p_sys->p_chain );
     free( p_filter->p_sys );
@@ -354,7 +352,7 @@ static int BuildFilterChain( filter_t *p_filter )
                                            &fmt_mid, &fmt_mid );
             if( p_filter->p_sys->p_video_filter )
             {
-                filter_AddProxyCallbacks( p_filter->obj.parent,
+                filter_AddProxyCallbacks( p_filter,
                                           p_filter->p_sys->p_video_filter,
                                           RestartFilterCallback );
                 if (p_filter->p_sys->p_video_filter->pf_video_mouse != NULL)
