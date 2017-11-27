@@ -164,7 +164,20 @@ EbmlElement *EbmlParser::Get( int n_call )
     else if (!m_el[mi_level-1]->IsFiniteSize())
         i_max_read = UINT64_MAX;
     else if (!p_prev)
+    {
         i_max_read = m_el[mi_level-1]->GetSize();
+        if (i_max_read == 0)
+        {
+            /* check if the parent still has data to read */
+            if ( mi_level > 1 &&
+                 m_el[mi_level-1]->GetEndPosition() < m_el[mi_level-2]->GetEndPosition() )
+            {
+                uint64 top = m_el[mi_level-2]->GetEndPosition();
+                uint64 bom = m_el[mi_level-1]->GetEndPosition();
+                i_max_read = top - bom;
+            }
+        }
+    }
     else {
         size_t size_lvl = mi_level;
         while ( size_lvl && m_el[size_lvl-1]->IsFiniteSize() &&
