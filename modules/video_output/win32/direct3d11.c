@@ -1543,19 +1543,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
 
-    sys->picQuad.i_width  = fmt->i_width;
-    sys->picQuad.i_height = fmt->i_height;
-    if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
-    }
-
-    BEFORE_UPDATE_RECTS;
-    UpdateRects(vd, NULL, true);
-    AFTER_UPDATE_RECTS;
-
     if (Direct3D11CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
         Direct3D11DestroyResources(vd);
@@ -2002,12 +1989,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D11Device_SetPrivateData( sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, sizeof( sys->context_lock ), &sys->context_lock );
 #endif
 
-    hr = UpdateBackBuffer(vd);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
     spuBlendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -2072,6 +2053,33 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
             msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
+    }
+
+    if (!is_d3d11_opaque(vd->fmt.i_chroma) || sys->legacy_shader)
+    {
+        sys->picQuad.i_width  = fmt->i_visible_width;
+        sys->picQuad.i_height = fmt->i_visible_height;
+    }
+    else
+    {
+        sys->picQuad.i_width  = fmt->i_width;
+        sys->picQuad.i_height = fmt->i_height;
+    }
+    if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
+    }
+
+    BEFORE_UPDATE_RECTS;
+    UpdateRects(vd, NULL, true);
+    AFTER_UPDATE_RECTS;
+
+    hr = UpdateBackBuffer(vd);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
+       return VLC_EGENERIC;
     }
 
     if (sys->d3dregion_format != NULL)
