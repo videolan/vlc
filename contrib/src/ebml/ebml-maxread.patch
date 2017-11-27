@@ -1,0 +1,29 @@
+--- ebml/src/EbmlElement.cpp	2017-11-27 09:12:56.891612600 +0100
++++ ebml/src/EbmlElement.cpp.maxread	2017-11-27 09:29:17.335279000 +0100
+@@ -404,12 +404,14 @@ EbmlElement * EbmlElement::FindNextEleme
+         memmove(&PossibleIdNSize[0],&PossibleIdNSize[1], --ReadIndex);
+       }
+ 
++      if (MaxDataSize <= ReadSize)
++          break;
+       if (DataStream.read(&PossibleIdNSize[ReadIndex++], 1) == 0) {
+         return NULL; // no more data ?
+       }
+       ReadSize++;
+ 
+-    } while (!bFound && MaxDataSize > ReadSize);
++    } while (!bFound);
+ 
+     if (!bFound)
+       // we reached the maximum we could read without a proper ID
+@@ -432,6 +434,10 @@ EbmlElement * EbmlElement::FindNextEleme
+         bFound = false;
+         break;
+       }
++      if (MaxDataSize <= ReadSize) {
++        bFound = false;
++        break;
++      }
+       if( DataStream.read( &PossibleIdNSize[SizeIdx++], 1 ) == 0 ) {
+         return NULL; // no more data ?
+       }
