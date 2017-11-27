@@ -492,7 +492,8 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
 
     return VLC_SUCCESS;
 error:
-    CoTaskMemFree(processorGUIDs);
+    if (processorGUIDs)
+        CoTaskMemFree(processorGUIDs);
     if (sys && sys->processor)
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
