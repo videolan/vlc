@@ -2072,9 +2072,9 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
     char **texts = (char **)xmalloc( count * sizeof(*texts) );
 
     values[0] = strdup( "" );
-    texts[0] = strdup( N_("Default") );
+    texts[0] = strdup( _("Default") );
     values[1] = strdup( "none" );
-    texts[1] = strdup( N_("None") );
+    texts[1] = strdup( _("None") );
 
     for( std::list<std::string>::iterator iter = list_devices.begin();
          iter != list_devices.end();
