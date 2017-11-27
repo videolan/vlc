@@ -327,7 +327,6 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
     catch(...)
     {
         msg_Err( &sys.demuxer, "Error while reading Tag ");
-        delete ep;
         return false;
     }
 
