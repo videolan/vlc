@@ -51,21 +51,21 @@ static void DrawRect(subpicture_region_t *r, int fill, uint8_t color,
 {
     uint8_t *p    = r->p_picture->p->p_pixels;
     int     pitch = r->p_picture->p->i_pitch;
+    if( x1 > x2 || y1 > y2 )
+        return;
 
     if (fill == STYLE_FILLED) {
-        for (int y = y1; y <= y2; y++) {
-            for (int x = x1; x <= x2; x++)
-                p[x + pitch * y] = color;
+        if(x1 == 0 && x2 + 1 == r->p_picture->p->i_visible_pitch) {
+            memset(&p[pitch * y1], color, pitch * (y2 - y1 + 1));
+        } else {
+            for (int y = y1; y <= y2; y++)
+                memset(&p[x1 + pitch * y], color, x2 - x1 + 1);
         }
     } else {
-        for (int y = y1; y <= y2; y++) {
-            p[x1 + pitch * y] = color;
-            p[x2 + pitch * y] = color;
-        }
-        for (int x = x1; x <= x2; x++) {
-            p[x + pitch * y1] = color;
-            p[x + pitch * y2] = color;
-        }
+        DrawRect(r, STYLE_FILLED, color, x1, y1, x1, y2);
+        DrawRect(r, STYLE_FILLED, color, x2, y1, x2, y2);
+        DrawRect(r, STYLE_FILLED, color, x1, y1, x2, y1);
+        DrawRect(r, STYLE_FILLED, color, x1, y2, x2, y2);
     }
 }
 
