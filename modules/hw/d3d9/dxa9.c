@@ -421,8 +421,6 @@ done:
     video_format_Clean(&fmt_staging);
     if (err != VLC_SUCCESS)
     {
-        if (p_cpu_filter)
-            DeleteFilter( p_cpu_filter );
         if (texture)
             IDirect3DSurface9_Release(texture);
         D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
