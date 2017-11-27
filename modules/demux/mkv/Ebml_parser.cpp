@@ -187,7 +187,8 @@ EbmlElement *EbmlParser::Get( int n_call )
             : EBML_CONTEXT(m_el[mi_level - 1]);
 
     /* Ignore unknown level 0 or 1 elements */
-    m_el[mi_level] = m_es->FindNextElement( e_context,
+    m_el[mi_level] = unlikely(!i_max_read) ? NULL :
+                     m_es->FindNextElement( e_context,
                                             i_ulev, i_max_read,
                                             (  mb_dummy | (mi_level > 1) ), 1 );
     if( i_ulev > 0 )
