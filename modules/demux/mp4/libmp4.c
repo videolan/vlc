@@ -1119,7 +1119,13 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
     if( p_trun->i_flags & MP4_TRUN_FIRST_FLAGS )
         MP4_GET4BYTES( p_trun->i_first_sample_flags );
 
-    if( UINT64_C(16) * count > i_read )
+    uint64_t i_entry_size =
+        !!(p_trun->i_flags & MP4_TRUN_SAMPLE_DURATION) +
+        !!(p_trun->i_flags & MP4_TRUN_SAMPLE_SIZE) +
+        !!(p_trun->i_flags & MP4_TRUN_SAMPLE_FLAGS) +
+        !!(p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET);
+
+    if( i_entry_size * 4 * count > i_read )
         MP4_READBOX_EXIT( 0 );
 
     p_trun->p_samples = vlc_alloc( count, sizeof(MP4_descriptor_trun_sample_t) );
