@@ -1443,9 +1443,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.SampleDesc.Count = 1;
     scd.SampleDesc.Quality = 0;
-    scd.Width = fmt->i_visible_width;
-    scd.Height = fmt->i_visible_height;
-    switch(fmt->i_chroma)
+    scd.Width = vd->source.i_visible_width;
+    scd.Height = vd->source.i_visible_height;
+    switch(vd->source.i_chroma)
     {
     case VLC_CODEC_D3D11_OPAQUE_10B:
         scd.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
@@ -1458,7 +1458,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
     hr = D3D11_CreateDevice(vd, &sys->hd3d,
-                            is_d3d11_opaque(fmt->i_chroma),
+                            is_d3d11_opaque(vd->source.i_chroma),
                             &sys->d3d_dev);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
