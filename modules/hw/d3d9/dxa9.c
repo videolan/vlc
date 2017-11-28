@@ -78,14 +78,15 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (!GetLock(p_filter, p_sys->surface, &lock, &desc))
         return;
 
-    if (dst->format.i_chroma == VLC_CODEC_I420) {
-        uint8_t *tmp = dst->p[1].p_pixels;
-        dst->p[1].p_pixels = dst->p[2].p_pixels;
-        dst->p[2].p_pixels = tmp;
-    }
-
     if (desc.Format == MAKEFOURCC('Y','V','1','2') ||
         desc.Format == MAKEFOURCC('I','M','C','3')) {
+
+        if (dst->format.i_chroma == VLC_CODEC_I420) {
+            uint8_t *tmp = dst->p[1].p_pixels;
+            dst->p[1].p_pixels = dst->p[2].p_pixels;
+            dst->p[2].p_pixels = tmp;
+        }
+
         bool imc3 = desc.Format == MAKEFOURCC('I','M','C','3');
         size_t chroma_pitch = imc3 ? lock.Pitch : (lock.Pitch / 2);
 
@@ -108,6 +109,12 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             plane[2] = V;
         }
         Copy420_P_to_P(dst, plane, pitch, src->format.i_height, p_copy_cache);
+
+        if (dst->format.i_chroma == VLC_CODEC_I420) {
+            uint8_t *tmp = dst->p[1].p_pixels;
+            dst->p[1].p_pixels = dst->p[2].p_pixels;
+            dst->p[2].p_pixels = tmp;
+        }
     } else if (desc.Format == MAKEFOURCC('N','V','1','2')) {
         const uint8_t *plane[2] = {
             lock.pBits,
@@ -122,12 +129,6 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         picture_SwapUV(dst);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to YV12", desc.Format);
-    }
-
-    if (dst->format.i_chroma == VLC_CODEC_I420) {
-        uint8_t *tmp = dst->p[1].p_pixels;
-        dst->p[1].p_pixels = dst->p[2].p_pixels;
-        dst->p[2].p_pixels = tmp;
     }
 
     /* */
