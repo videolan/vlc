@@ -199,11 +199,6 @@ static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 
 int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
-    /* Prevent prefetch breakage */
-    uint64_t i_size = stream_Size( p_stream );
-    if( i_size > 0 && i_pos >= i_size )
-        return VLC_EGENERIC;
-
     bool b_canseek = false;
     if ( vlc_stream_Control( p_stream, STREAM_CAN_SEEK, &b_canseek ) != VLC_SUCCESS ||
          b_canseek )
@@ -4921,8 +4916,8 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         return NULL;
 
     p_vroot->i_shortsize = 1;
-    int64_t i_size = stream_Size( p_stream );
-    if( i_size > 0 )
+    uint64_t i_size;
+    if( vlc_stream_GetSize( p_stream, &i_size ) == 0 )
         p_vroot->i_size = i_size;
 
     /* First get the moov */
