@@ -515,6 +515,11 @@ static int Open(vlc_object_t *object)
     video_format_Clean(&vd->fmt);
     vd->fmt = fmt;
 
+#if !VLC_WINSTORE_APP
+    EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
+#endif
+    msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
+
     vd->info.has_double_click     = true;
     vd->info.has_pictures_invalid = vd->info.is_slow;
 
@@ -1546,11 +1551,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-#if !VLC_WINSTORE_APP
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
-#endif
-
-    msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
     return VLC_SUCCESS;
 }
 
