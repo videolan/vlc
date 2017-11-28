@@ -275,7 +275,7 @@ vlc_LogSet
 vlc_vaLog
 vlc_strerror
 vlc_strerror_c
-vlc_obj_alloc
+vlc_obj_malloc
 vlc_obj_calloc
 vlc_obj_free
 msleep

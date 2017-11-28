@@ -156,7 +156,7 @@ static int Open( vlc_object_t *p_this )
     int ret = VLC_EGENERIC;
     vlc_credential credential;
 
-    access_sys_t *p_sys = vlc_obj_alloc( p_this, 1, sizeof(*p_sys) );
+    access_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 

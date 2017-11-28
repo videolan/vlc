@@ -128,7 +128,7 @@ static int Open( vlc_object_t *p_this )
     /* Set up p_access */
     ACCESS_SET_CALLBACKS( NULL, Block, Control, NULL );
 
-    p_access->p_sys = p_sys = vlc_obj_alloc( p_this, 1, sizeof( access_sys_t ) );
+    p_access->p_sys = p_sys = vlc_obj_malloc( p_this, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_EGENERIC;
 

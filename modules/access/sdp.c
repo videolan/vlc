@@ -55,7 +55,7 @@ static int Open (vlc_object_t *obj)
     stream_t *access = (stream_t *)obj;
     size_t len = strlen (access->psz_location);
 
-    access_sys_t *sys = vlc_obj_alloc(obj, 1, sizeof(*sys) + len);
+    access_sys_t *sys = vlc_obj_malloc(obj, sizeof(*sys) + len);
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 

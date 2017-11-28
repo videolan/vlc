@@ -53,7 +53,7 @@ struct access_sys_t
  *****************************************************************************/
 int DirInit (stream_t *access, DIR *dir)
 {
-    access_sys_t *sys = vlc_obj_alloc(VLC_OBJECT(access), 1, sizeof (*sys));
+    access_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(access), sizeof (*sys));
     if (unlikely(sys == NULL))
         goto error;
 

@@ -183,7 +183,7 @@ static int Open(vlc_object_t *this)
             goto bailout;
 
         struct gl_sys *glsys = sys->gl->sys =
-            vlc_obj_alloc(this, 1, sizeof(struct gl_sys));
+            vlc_obj_malloc(this, sizeof(struct gl_sys));
         if (unlikely(!sys->gl->sys))
             goto bailout;
         glsys->glESView = sys->glESView;

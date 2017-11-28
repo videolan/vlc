@@ -83,7 +83,7 @@ struct sout_access_out_sys_t {
 int OpenAvio(vlc_object_t *object)
 {
     stream_t *access = (stream_t*)object;
-    access_sys_t *sys = vlc_obj_alloc(object, 1, sizeof(*sys));
+    access_sys_t *sys = vlc_obj_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
     sys->context = NULL;
@@ -159,7 +159,7 @@ int OutOpenAvio(vlc_object_t *object)
 
     config_ChainParse( access, "sout-avio-", ppsz_sout_options, access->p_cfg );
 
-    sout_access_out_sys_t *sys = vlc_obj_alloc(object, 1, sizeof(*sys));
+    sout_access_out_sys_t *sys = vlc_obj_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
     sys->context = NULL;

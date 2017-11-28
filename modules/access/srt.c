@@ -172,7 +172,7 @@ static int Open(vlc_object_t *p_this)
     }, *res = NULL;
     int stat;
 
-    p_sys = vlc_obj_alloc( p_this, 1, sizeof( *p_sys ) );
+    p_sys = vlc_obj_malloc( p_this, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 

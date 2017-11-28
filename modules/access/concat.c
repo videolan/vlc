@@ -188,7 +188,7 @@ static int Open(vlc_object_t *obj)
     if (list == NULL)
         return VLC_EGENERIC;
 
-    access_sys_t *sys = vlc_obj_alloc(obj, 1, sizeof (*sys));
+    access_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
         free(list);

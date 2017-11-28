@@ -205,7 +205,7 @@ int FileOpen( vlc_object_t *p_this )
 #endif
     }
 
-    access_sys_t *p_sys = vlc_obj_alloc(p_this, 1, sizeof (*p_sys));
+    access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
     if (unlikely(p_sys == NULL))
         goto error;
     p_access->pf_read = Read;

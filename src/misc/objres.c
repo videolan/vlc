@@ -133,6 +133,14 @@ static bool ptrcmp(void *a, void *b)
     return a == b;
 }
 
+void *vlc_obj_malloc(vlc_object_t *obj, size_t size)
+{
+    void *ptr = vlc_objres_new(size, dummy_release);
+    if (likely(ptr != NULL))
+        vlc_objres_push(obj, ptr);
+    return ptr;
+}
+
 static void *vlc_obj_alloc_common(vlc_object_t *obj, size_t nmemb, size_t size,
                                   bool do_memset)
 {
@@ -151,11 +159,6 @@ static void *vlc_obj_alloc_common(vlc_object_t *obj, size_t nmemb, size_t size,
         vlc_objres_push(obj, ptr);
     }
     return ptr;
-}
-
-void *vlc_obj_alloc(vlc_object_t *obj, size_t nmemb, size_t size)
-{
-    return vlc_obj_alloc_common(obj, nmemb, size, false);
 }
 
 void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
