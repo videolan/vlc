@@ -1481,7 +1481,11 @@ static int Direct3D11Open(vout_display_t *vd)
     int err = SetupOutputFormat(vd, &fmt);
     if (err != VLC_SUCCESS)
     {
-        if (!is_d3d11_opaque(vd->source.i_chroma) && vd->obj.force )
+        if (!is_d3d11_opaque(vd->source.i_chroma)
+#if !VLC_WINSTORE_APP
+            && vd->obj.force
+#endif
+                )
         {
             const vlc_fourcc_t *list = vlc_fourcc_IsYUV(vd->source.i_chroma) ?
                         vlc_fourcc_GetYUVFallback(vd->source.i_chroma) :
