@@ -357,9 +357,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     if (!vd->sys)
         return VLC_EGENERIC;
 
-    if (!sys->embed)
-        return VLC_EGENERIC;
-
     @autoreleasepool {
         switch (query)
         {
