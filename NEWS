@@ -113,6 +113,8 @@ Decoders:
  * BluRay text subtitles (HDMV) are now decoded
  * Improved Closed Captions detection, notably inside the video streams
  * CEA-708 decoder
+ * New MIDI decoder for macOS and iOS using the AudioToolbox framework, works
+   without a soundfont or with SoundFont2 and DLS soundfonts
 
 Demuxers:
  * Important rework of the MP4 demuxer, including:

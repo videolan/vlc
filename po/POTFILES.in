@@ -292,6 +292,7 @@ modules/codec/adpcm.c
 modules/codec/aes3.c
 modules/codec/aom.c
 modules/codec/araw.c
+modules/codec/audiotoolbox_midi.c
 modules/codec/arib/aribsub.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h

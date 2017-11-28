@@ -60,6 +60,12 @@ if HAVE_DARWIN
 libfluidsynth_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,CoreServices
 endif
 
+libaudiotoolboxmidi_plugin_la_SOURCES = codec/audiotoolbox_midi.c
+libaudiotoolboxmidi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libaudiotoolboxmidi_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,AudioUnit,-framework,AudioToolbox
+EXTRA_LTLIBRARIES += libaudiotoolboxmidi_plugin.la
+codec_LTLIBRARIES += $(LTLIBaudiotoolboxmidi)
+
 liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
 
