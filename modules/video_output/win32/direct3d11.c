@@ -215,9 +215,10 @@ static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static HINSTANCE Direct3D11LoadShaderLibrary(void);
 static void Direct3D11Destroy(vout_display_t *);
 
-static int  Direct3D11Open (vout_display_t *, video_format_t *);
+static int  Direct3D11Open (vout_display_t *);
 static void Direct3D11Close(vout_display_t *);
 
+static int SetupOutputFormat(vout_display_t *, video_format_t *);
 static int  Direct3D11CreateFormatResources (vout_display_t *, video_format_t *);
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
@@ -506,15 +507,10 @@ static int Open(vlc_object_t *object)
     vd->sys->sys.pf_GetRect = GetRect;
 #endif
 
-    video_format_t fmt;
-    video_format_Copy(&fmt, &vd->source);
-    if (Direct3D11Open(vd, &fmt)) {
+    if (Direct3D11Open(vd)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
     }
-
-    video_format_Clean(&vd->fmt);
-    vd->fmt = fmt;
 
 #if !VLC_WINSTORE_APP
     EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
@@ -1418,7 +1414,7 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, 0, false, supportFlags );
 }
 
-static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D11Open(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
@@ -1480,6 +1476,28 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     D3D11SetColorSpace(vd);
 
+    video_format_t fmt;
+    video_format_Copy(&fmt, &vd->source);
+    int err = SetupOutputFormat(vd, &fmt);
+    if (err != VLC_SUCCESS)
+        return err;
+
+    if (Direct3D11CreateGenericResources(vd)) {
+        msg_Err(vd, "Failed to allocate resources");
+        Direct3D11DestroyResources(vd);
+        return VLC_EGENERIC;
+    }
+
+    video_format_Clean(&vd->fmt);
+    vd->fmt = fmt;
+
+    return VLC_SUCCESS;
+}
+
+static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+
     // look for the requested pixel format first
     sys->picQuadConfig = GetDirectRenderingFormat(vd, fmt->i_chroma);
 
@@ -1539,12 +1557,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
-
-    if (Direct3D11CreateGenericResources(vd)) {
-        msg_Err(vd, "Failed to allocate resources");
-        Direct3D11DestroyResources(vd);
-        return VLC_EGENERIC;
-    }
+    vd->fmt = *fmt;
 
     return VLC_SUCCESS;
 }
