@@ -404,8 +404,8 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     if (tc->fshader == 0)
         goto error;
 
-    /* Fix the UV plane texture scale factor for GR32 */
-    if (vlc_sw_chroma == VLC_CODEC_P010)
+    /* Fix the UV plane texture scale factor for GR */
+    if (vlc_sw_chroma == VLC_CODEC_NV12 || vlc_sw_chroma == VLC_CODEC_P010)
         tc->texs[1].h = (vlc_rational_t) { 1, 2 };
 
     return VLC_SUCCESS;
