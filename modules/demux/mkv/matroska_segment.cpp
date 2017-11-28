@@ -208,20 +208,15 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
             if( track_id != 0 && cue_mk_time != -1 && cue_position != static_cast<uint64_t>( -1 ) ) {
 
-                if( tracks.find( track_id ) != tracks.end() )
+                SegmentSeeker::Seekpoint::TrustLevel level = SegmentSeeker::Seekpoint::DISABLED;
+
+                if( ! b_invalid_cue && tracks.find( track_id ) != tracks.end() )
                 {
-                    SegmentSeeker::Seekpoint::TrustLevel level = SegmentSeeker::Seekpoint::DISABLED;
-
-                    if( ! b_invalid_cue )
-                    {
-                        level = SegmentSeeker::Seekpoint::QUESTIONABLE; // TODO: var_InheritBool( ..., "mkv-trust-cues" );
-                    }
-
-                    _seeker.add_seekpoint( track_id,
-                        SegmentSeeker::Seekpoint( cue_position, cue_mk_time, level ) );
+                    level = SegmentSeeker::Seekpoint::QUESTIONABLE; // TODO: var_InheritBool( ..., "mkv-trust-cues" );
                 }
-                else
-                    msg_Warn( &sys.demuxer, "Found cue with invalid track id = %u", track_id );
+
+                _seeker.add_seekpoint( track_id,
+                    SegmentSeeker::Seekpoint( cue_position, cue_mk_time, level ) );
             }
         }
         else
