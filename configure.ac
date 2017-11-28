@@ -4090,14 +4090,6 @@ AS_IF([test "${enable_kwallet}" != "no" -a "${have_dbus}" = "yes"], [
 ])
 
 dnl
-dnl  Developers helper modules (should be hidden from configure help)
-dnl
-AC_ARG_ENABLE(devtools, [], [], [enable_devtools="no"])
-AS_IF([test "${enable_devtools}" != "no"], [
-  VLC_ADD_PLUGIN([accesstweaks])
-])
-
-dnl
 dnl update checking system
 dnl
 AC_ARG_ENABLE(update-check,

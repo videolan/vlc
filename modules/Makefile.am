@@ -1,4 +1,5 @@
 noinst_LTLIBRARIES =
+check_LTLIBRARIES =
 pkglib_LTLIBRARIES =
 noinst_HEADERS =
 check_PROGRAMS =

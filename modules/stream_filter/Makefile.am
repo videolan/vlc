@@ -45,10 +45,8 @@ stream_filter_LTLIBRARIES += $(LTLIBaribcam)
 EXTRA_LTLIBRARIES += libaribcam_plugin.la
 
 libaccesstweaks_plugin_la_SOURCES = stream_filter/accesstweaks.c
-libaccesstweaks_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccesstweaks_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(stream_filterdir)'
-stream_filter_LTLIBRARIES += $(LTLIBaccesstweaks)
-EXTRA_LTLIBRARIES += libaccesstweaks_plugin.la
+check_LTLIBRARIES += libaccesstweaks_plugin.la
 
 libadf_plugin_la_SOURCES = stream_filter/adf.c
 stream_filter_LTLIBRARIES += libadf_plugin.la
