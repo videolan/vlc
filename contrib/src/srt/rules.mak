@@ -24,7 +24,8 @@ srt: $(SRT_TARBALL) .sum-srt
 
 DEPS_srt = $(DEPS_gnutls)
 
-.srt: srt
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-gnutls
+.srt: srt toolchain.cmake
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
+		-DENABLE_SHARED=OFF -DUSE_GNUTLS=ON
 	cd $< && $(MAKE) install
 	touch $@
