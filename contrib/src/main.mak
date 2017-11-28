@@ -502,8 +502,10 @@ endif
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> $@
+ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
+endif
 
 # Default pattern rules
 .sum-%: $(SRC)/%/SHA512SUMS
