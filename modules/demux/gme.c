@@ -70,8 +70,10 @@ static gme_err_t ReaderBlock (void *, void *, int);
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
+    uint64_t size;
 
-    int64_t size = stream_Size (demux->s);
+    if (vlc_stream_GetSize(demux->s, &size))
+        return VLC_EGENERIC;
     if (size > LONG_MAX /* too big for GME */)
         return VLC_EGENERIC;
 
