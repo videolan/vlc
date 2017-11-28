@@ -1,8 +1,8 @@
 # srt
 
 SRT_VERSION := 1.2.2
-SRT_TARBALL := v$(SRT_VERSION).tar.gz
-SRT_URL := $(GITHUB)/Haivision/srt/archive/$(SRT_TARBALL)
+SRT_TARBALL := srt-v$(SRT_VERSION).tar.gz
+SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifndef HAVE_WIN32
 ifdef BUILD_NETWORK
