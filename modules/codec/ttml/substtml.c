@@ -1065,6 +1065,7 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
                     p_spu_sys->region.align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_TOP);
                     p_spu_sys->region.inner_align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
                 }
+                p_spu_sys->margin_ratio = 0.0;
 
                 /* copy and take ownership of pointeds */
                 *p_updtregion = p_region->updt;
