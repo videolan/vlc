@@ -4926,8 +4926,10 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         p_vroot->i_size = i_size;
 
     /* First get the moov */
-    const uint32_t stoplist[] = { ATOM_moov, ATOM_mdat, 0 };
-    i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, stoplist );
+    {
+        const uint32_t stoplist[] = { ATOM_moov, ATOM_mdat, 0 };
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, stoplist );
+    }
 
     /* mdat appeared first */
     if( i_result && !MP4_BoxGet( p_vroot, "moov" ) )
