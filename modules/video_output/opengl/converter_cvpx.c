@@ -231,6 +231,7 @@ Open(vlc_object_t *obj)
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_NV12,
                                             tc->fmt.space);
+            tc->texs[1].h = (vlc_rational_t) { 1, 2 };
             break;
         }
         case VLC_CODEC_CVPX_I420:
