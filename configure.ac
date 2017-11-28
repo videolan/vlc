@@ -3894,6 +3894,12 @@ AC_CHECK_HEADERS(VideoToolbox/VideoToolbox.h, [
   ])
 
 dnl
+dnl  AudioToolbox MIDI plugin
+AC_CHECK_HEADERS([AudioToolbox/AudioToolbox.h], [
+  VLC_ADD_PLUGIN([audiotoolboxmidi])
+])
+
+dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
