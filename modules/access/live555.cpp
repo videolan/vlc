@@ -177,7 +177,13 @@ typedef struct
     int64_t         i_pcr;
     double          f_npt;
 
-    bool            b_selected;
+    enum
+    {
+        STATE_NONE,
+        STATE_SELECTED,
+        STATE_IGNORED,
+        STATE_TEARDOWN,
+    } state;
 
 } live_track_t;
 
@@ -843,7 +849,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->i_lastpts   = VLC_TS_INVALID;
             tk->i_pcr       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
-            tk->b_selected  = true;
+            tk->state       = live_track_t::STATE_SELECTED;
             tk->i_buffer    = i_frame_buffer;
             tk->p_buffer    = (uint8_t *)malloc( i_frame_buffer );
 
@@ -1258,6 +1264,63 @@ static int Play( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * HasSharedSession: returns if the session is shared with another stream
+ *****************************************************************************/
+static bool HasSharedSession( MediaSubsession *session )
+{
+    MediaSubsessionIterator *it =
+            new MediaSubsessionIterator( session->parentSession() );
+    MediaSubsession *subsession;
+    bool b_shared = false;
+    while( (subsession = it->next()) != NULL )
+    {
+        if( session == subsession )
+            continue;
+        if( !strcmp( session->sessionId(), subsession->sessionId() ) )
+        {
+            b_shared = true;
+            break;
+        }
+    }
+    delete it;
+    return b_shared;
+}
+
+/*****************************************************************************
+ * ResumeTrack: setup or resume a silenced track
+ *****************************************************************************/
+static void ResumeTrack( demux_t *p_demux, live_track_t *tk )
+{
+    demux_sys_t    *p_sys = p_demux->p_sys;
+
+    bool b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
+            var_GetBool( p_demux, "rtsp-http" );
+    p_sys->rtsp->sendSetupCommand( *tk->sub, default_live555_callback, False,
+                                   toBool( b_rtsp_tcp ),
+                                   toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
+    if( !wait_Live555_response( p_demux ) )
+    {
+        msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
+                 tk->sub->mediumName(), tk->sub->codecName(),
+                 p_sys->env->getResultMsg() );
+    }
+    else
+    {
+        p_sys->rtsp->sendPlayCommand( *tk->sub, default_live555_callback, -1, -1, p_sys->ms->scale() );
+        if( !wait_Live555_response(p_demux) )
+        {
+            msg_Err( p_demux, "RTSP PLAY failed %s", p_sys->env->getResultMsg() );
+            if( !HasSharedSession( tk->sub ) )
+            {
+                tk->state = live_track_t::STATE_TEARDOWN;
+                p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
+            }
+        }
+        else
+            tk->state = live_track_t::STATE_SELECTED;
+    }
+}
 
 /*****************************************************************************
  * Demux:
@@ -1282,36 +1345,23 @@ static int Demux( demux_t *p_demux )
         {
             bool b;
             es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
-            if( !b && tk->b_selected && p_sys->rtsp )
+            if( !b && (tk->state == live_track_t::STATE_SELECTED) && p_sys->rtsp )
             {
-                tk->b_selected = false;
-                p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
+                if( !HasSharedSession( tk->sub ) )
+                {
+                    tk->state = live_track_t::STATE_TEARDOWN;
+                    p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
+                }
+                else tk->state = live_track_t::STATE_IGNORED;
             }
-            else if( b && !tk->b_selected)
+            else if( b && tk->state != live_track_t::STATE_SELECTED )
             {
-                bool b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
-                                  var_GetBool( p_demux, "rtsp-http" );
-                p_sys->rtsp->sendSetupCommand( *tk->sub, default_live555_callback, False,
-                                               toBool( b_rtsp_tcp ),
-                                               toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
-                if( !wait_Live555_response( p_demux ) )
-                {
-                    msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
-                             tk->sub->mediumName(), tk->sub->codecName(),
-                             p_sys->env->getResultMsg() );
-                }
+                if( tk->state != live_track_t::STATE_IGNORED )
+                    ResumeTrack( p_demux, tk );
                 else
-                {
-                    p_sys->rtsp->sendPlayCommand( *tk->sub, default_live555_callback, -1, -1, p_sys->ms->scale() );
-                    if( !wait_Live555_response(p_demux) )
-                    {
-                        msg_Err( p_demux, "RTSP PLAY failed %s", p_sys->env->getResultMsg() );
-                        p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
-                    }
-                    else
-                        tk->b_selected = true;
-                }
-                if( !tk->b_selected )
+                    tk->state = live_track_t::STATE_SELECTED;
+
+                if( tk->state != live_track_t::STATE_SELECTED )
                     es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
             }
         }
@@ -1355,7 +1405,7 @@ static int Demux( demux_t *p_demux )
         {
             live_track_t *tk = p_sys->track[i];
 
-            if( !tk->b_selected ||
+            if( tk->state != live_track_t::STATE_SELECTED ||
                (p_sys->b_rtcp_sync && !tk->b_rtcp_sync) )
                 continue;
 
@@ -2102,7 +2152,7 @@ static void StreamClose( void *p_private )
     live_track_t   *tk = (live_track_t*)p_private;
     demux_t        *p_demux = tk->p_demux;
     demux_sys_t    *p_sys = p_demux->p_sys;
-    tk->b_selected = false;
+    tk->state = live_track_t::STATE_IGNORED;
     p_sys->event_rtsp = 0xff;
     p_sys->event_data = 0xff;
 
@@ -2112,7 +2162,7 @@ static void StreamClose( void *p_private )
     int nb_tracks = 0;
     for( int i = 0; i < p_sys->i_track; i++ )
     {
-        if( p_sys->track[i]->b_selected )
+        if( p_sys->track[i]->state == live_track_t::STATE_SELECTED )
             nb_tracks++;
     }
     msg_Dbg( p_demux, "RTSP track Close, %d track remaining", nb_tracks );
