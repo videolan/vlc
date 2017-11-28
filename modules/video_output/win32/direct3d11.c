@@ -630,19 +630,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (!is_d3d11_opaque(surface_fmt.i_chroma) || sys->legacy_shader)
-    {
-        /* we need a staging texture */
-        if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->picQuadConfig, &surface_fmt, 1, textures))
-            goto error;
-
-        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
-            sys->stagingSys.texture[plane] = textures[plane];
-
-        if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
-                               textures, 0, sys->stagingSys.resourceView))
-            goto error;
-    } else
+    if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
 #endif
     {
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
@@ -2024,6 +2012,33 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, video_format_t *f
         sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
+
+#ifdef HAVE_ID3D11VIDEODECODER
+    if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
+    {
+        /* we need a staging texture */
+        ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+        video_format_t surface_fmt = *fmt;
+        surface_fmt.i_width  = sys->picQuad.i_width;
+        surface_fmt.i_height = sys->picQuad.i_height;
+
+        if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->picQuadConfig, &surface_fmt, 1, textures))
+        {
+            msg_Err(vd, "Failed to allocate the staging texture");
+            return VLC_EGENERIC;
+        }
+
+        if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
+                               textures, 0, sys->stagingSys.resourceView))
+        {
+            msg_Err(vd, "Failed to allocate the staging shader view");
+            return VLC_EGENERIC;
+        }
+
+        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
+            sys->stagingSys.texture[plane] = textures[plane];
+    }
+#endif
 
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuadConfig->formatTexture != DXGI_FORMAT_UNKNOWN;
     return VLC_SUCCESS;
