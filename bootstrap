@@ -50,6 +50,25 @@ Otherwise, you will not be able to build a source tarball.
 EOF
 fi
 
+# Check for flex and bison
+if ! flex --version >/dev/null 2>&1; then
+	cat << EOF
+NOTE: flex appears to be missing. Please install it.
+Otherwise, you might not be able to build properly.
+==========================================================================
+
+EOF
+fi
+
+if ! bison --version >/dev/null 2>&1; then
+	cat << EOF
+NOTE: bison appears to be missing. Please install it.
+Otherwise, you might not be able to build properly.
+==========================================================================
+
+EOF
+fi
+
 ###
 ###  classic bootstrap stuff
 ###
