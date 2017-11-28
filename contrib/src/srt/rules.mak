@@ -22,7 +22,7 @@ srt: $(SRT_TARBALL) .sum-srt
 	$(UNPACK)
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
-DEPS_srt = $(DEPS_gnutls)
+DEPS_srt = gnutls $(DEPS_gnutls)
 
 .srt: srt toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
