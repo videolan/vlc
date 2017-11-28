@@ -238,25 +238,24 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 if((unsigned)rep->getStreamFormat() == StreamFormat::UNKNOWN)
                     setFormatFromExtension(rep, uritag->getValue().value);
 
+                /* Need to use EXTXTARGETDURATION as default as some can't properly set segment one */
+                double duration = rep->targetDuration;
                 if(ctx_extinf)
                 {
-                    const Attribute *attribute = ctx_extinf->getAttributeByName("DURATION");
-                    if(attribute)
-                    {
-                        const double duration = attribute->floatingPoint();
-                        const mtime_t nzDuration = CLOCK_FREQ * duration;
-                        segment->duration.Set(duration * (uint64_t) rep->getTimescale());
-                        segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
-                        nzStartTime += nzDuration;
-                        totalduration += nzDuration;
-
-                        if(absReferenceTime > VLC_TS_INVALID)
-                        {
-                            segment->utcTime = absReferenceTime;
-                            absReferenceTime += nzDuration;
-                        }
-                    }
+                    const Attribute *durAttribute = ctx_extinf->getAttributeByName("DURATION");
+                    if(durAttribute)
+                        duration = durAttribute->floatingPoint();
                     ctx_extinf = NULL;
+                }
+                const mtime_t nzDuration = CLOCK_FREQ * duration;
+                segment->duration.Set(duration * (uint64_t) rep->getTimescale());
+                segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
+                nzStartTime += nzDuration;
+                totalduration += nzDuration;
+                if(absReferenceTime > VLC_TS_INVALID)
+                {
+                    segment->utcTime = absReferenceTime;
+                    absReferenceTime += nzDuration;
                 }
 
                 segmentList->addSegment(segment);
