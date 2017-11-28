@@ -218,7 +218,8 @@ static void Direct3D11Destroy(vout_display_t *);
 static int  Direct3D11Open (vout_display_t *, video_format_t *);
 static void Direct3D11Close(vout_display_t *);
 
-static int  Direct3D11CreateResources (vout_display_t *, video_format_t *);
+static int  Direct3D11CreateFormatResources (vout_display_t *, video_format_t *);
+static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
 static void Direct3D11DestroyPool(vout_display_t *);
@@ -1545,7 +1546,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
 
-    if (Direct3D11CreateResources(vd, fmt)) {
+    if (Direct3D11CreateFormatResources(vd, fmt)) {
+        msg_Err(vd, "Failed to allocate format resources");
+        Direct3D11DestroyResources(vd);
+        return VLC_EGENERIC;
+    }
+
+    if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
@@ -1976,7 +1983,53 @@ static bool CanUseTextureArray(vout_display_t *vd)
 
 /* TODO : handle errors better
    TODO : seperate out into smaller functions like createshaders */
-static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D11CreateFormatResources(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    sys->legacy_shader = !CanUseTextureArray(vd);
+
+    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
+    if (FAILED(hr))
+    {
+#ifdef HAVE_ID3D11VIDEODECODER
+        if (!sys->legacy_shader)
+        {
+            sys->legacy_shader = true;
+            msg_Dbg(vd, "fallback to legacy shader mode");
+            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
+        }
+#endif
+        if (FAILED(hr))
+        {
+            msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
+    }
+
+    if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
+    {
+        sys->picQuad.i_width  = fmt->i_visible_width;
+        sys->picQuad.i_height = fmt->i_visible_height;
+    }
+    else
+    {
+        sys->picQuad.i_width  = fmt->i_width;
+        sys->picQuad.i_height = fmt->i_height;
+    }
+    if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
+    }
+
+    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuadConfig->formatTexture != DXGI_FORMAT_UNKNOWN;
+    return VLC_SUCCESS;
+}
+
+static int Direct3D11CreateGenericResources(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
@@ -2029,44 +2082,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     if (SUCCEEDED(hr)) {
         ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
-    }
-
-    sys->legacy_shader = !CanUseTextureArray(vd);
-    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuadConfig->formatTexture != DXGI_FORMAT_UNKNOWN;
-
-    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
-    if (FAILED(hr))
-    {
-#ifdef HAVE_ID3D11VIDEODECODER
-        if (!sys->legacy_shader)
-        {
-            sys->legacy_shader = true;
-            msg_Dbg(vd, "fallback to legacy shader mode");
-            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
-        }
-#endif
-        if (FAILED(hr))
-        {
-            msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
-            return VLC_EGENERIC;
-        }
-    }
-
-    if (!is_d3d11_opaque(vd->fmt.i_chroma) || sys->legacy_shader)
-    {
-        sys->picQuad.i_width  = fmt->i_visible_width;
-        sys->picQuad.i_height = fmt->i_visible_height;
-    }
-    else
-    {
-        sys->picQuad.i_width  = fmt->i_width;
-        sys->picQuad.i_height = fmt->i_height;
-    }
-    if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
     BEFORE_UPDATE_RECTS;
