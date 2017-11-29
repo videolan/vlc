@@ -38,7 +38,7 @@
 #include <set>
 #include <string>
 
-#if UPNP_VERSION < 10800
+#if UPNP_VERSION < 10623
 /*
  * Compat functions and typedefs for libupnp prior to 1.8
  */
