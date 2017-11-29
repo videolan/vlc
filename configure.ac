@@ -2612,7 +2612,7 @@ AS_IF([test "${enable_faad}" != "no"], [
 dnl
 dnl  AOM decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [experimental AV1 codec], [disabled])
+PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [experimental AV1 codec (default auto)])
 
 dnl
 dnl libvpx decoder plugin
