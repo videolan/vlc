@@ -208,7 +208,8 @@ static int Decode(decoder_t *dec, block_t *block)
         case AOM_CS_SMPTE_240:
             v->space = COLOR_SPACE_BT601;
             break;
-        case AOM_CS_BT_2020:
+        case AOM_CS_BT_2020_CL:
+        case AOM_CS_BT_2020_NCL:
             v->space = COLOR_SPACE_BT2020;
             break;
         default:
