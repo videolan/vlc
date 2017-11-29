@@ -129,7 +129,7 @@ struct filter_sys_t
 #define COLS_TEXT N_("Number of columns")
 #define COLS_LONGTEXT N_( \
         "Number of image columns in the mosaic (only used if " \
-        "positioning method is set to \"fixed\".)" )
+        "positioning method is set to \"fixed\")." )
 
 #define AR_TEXT N_("Keep aspect ratio")
 #define AR_LONGTEXT N_( \
@@ -142,7 +142,7 @@ struct filter_sys_t
 #define ORDER_TEXT N_("Elements order" )
 #define ORDER_LONGTEXT N_( \
         "You can enforce the order of the elements on " \
-        "the mosaic. You must give a comma-separated list of picture ID(s)." \
+        "the mosaic. You must give a comma-separated list of picture ID(s). " \
         "These IDs are assigned in the \"mosaic-bridge\" module." )
 
 #define OFFSETS_TEXT N_("Offsets in order" )

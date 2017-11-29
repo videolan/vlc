@@ -212,7 +212,7 @@ void Dialogs::showChangeSkin()
 void Dialogs::showPlaylistLoad()
 {
     std::stringstream fileTypes;
-    fileTypes << _("Playlist Files|") << EXTENSIONS_PLAYLIST  << _("|All Files|*");
+    fileTypes << _("Playlist Files |") << EXTENSIONS_PLAYLIST  << _("|All Files |*");
     showFileGeneric( _("Open playlist"),
                      fileTypes.str(),
                      showPlaylistLoadCB, kOPEN );
@@ -221,9 +221,9 @@ void Dialogs::showPlaylistLoad()
 
 void Dialogs::showPlaylistSave()
 {
-    showFileGeneric( _("Save playlist"), _("XSPF playlist|*.xspf|"
-                                           "M3U file|*.m3u|"
-                                           "HTML playlist|*.html"),
+    showFileGeneric( _("Save playlist"), _("XSPF playlist |*.xspf|"
+                                           "M3U file |*.m3u|"
+                                           "HTML playlist |*.html"),
                      showPlaylistSaveCB, kSAVE );
 }
 

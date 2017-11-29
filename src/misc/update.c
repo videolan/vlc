@@ -720,8 +720,8 @@ static void* update_DownloadReal( void *obj )
 
 #ifdef _WIN32
     const char *psz_msg =
-        _("The new version was successfully downloaded."
-        "Do you want to close VLC and install it now?");
+        _("The new version was successfully downloaded. "
+          "Do you want to close VLC and install it now?");
     int answer = vlc_dialog_wait_question( p_udt, VLC_DIALOG_QUESTION_NORMAL,
                                            _("Cancel"), _("Install"), NULL,
                                            _("Update VLC media player"), "%s",

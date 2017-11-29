@@ -69,7 +69,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 /* Frame-type options */
 
 #define KEYINT_TEXT N_("Maximum GOP size")
-#define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames." \
+#define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames. " \
     "Larger values save bits, thus improving quality for a given bitrate at " \
     "the cost of seeking precision. Use -1 for infinite." )
 
@@ -271,7 +271,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 /* Analysis */
 
 #define ANALYSE_TEXT N_("Partitions to consider")
-#define ANALYSE_LONGTEXT N_( "Partitions to consider in analyse mode: \n" \
+#define ANALYSE_LONGTEXT N_( "Partitions to consider in analyse mode:\n" \
     " - none  : \n" \
     " - fast  : i4x4\n" \
     " - normal: i4x4,p8x8,(i8x8)\n" \
@@ -283,7 +283,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define DIRECT_PRED_LONGTEXT DIRECT_PRED_TEXT
 
 #define DIRECT_PRED_SIZE_TEXT N_("Direct prediction size")
-#define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size: "\
+#define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size:\n" \
     " -  0: 4x4\n" \
     " -  1: 8x8\n" \
     " - -1: smallest possible according to level\n" )
@@ -292,7 +292,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #define WEIGHTP_TEXT N_("Weighted prediction for P-frames")
-#define WEIGHTP_LONGTEXT N_("Weighted prediction for P-frames: "\
+#define WEIGHTP_LONGTEXT N_("Weighted prediction for P-frames:\n" \
     " - 0: Disabled\n"\
     " - 1: Blind offset\n"\
     " - 2: Smart analysis\n" )
@@ -349,7 +349,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "SATD-based decision for 8x8 transform in inter-MBs.")
 
 #define TRELLIS_TEXT N_("Trellis RD quantization" )
-#define TRELLIS_LONGTEXT N_( "Trellis RD quantization: \n" \
+#define TRELLIS_LONGTEXT N_( "Trellis RD quantization:\n" \
     " - 0: disabled\n" \
     " - 1: enabled only on the final encode of a MB\n" \
     " - 2: enabled on all mode decisions\n" \
@@ -359,7 +359,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
 
 #define DCT_DECIMATE_TEXT N_("Coefficient thresholding on P-frames")
-#define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames." \
+#define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames. " \
     "Eliminate dct blocks containing only a small single coefficient.")
 
 #define PSY_TEXT N_("Use Psy-optimizations")
@@ -419,7 +419,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define PRESET_TEXT N_("Default preset setting used" )
 
 #define X264_OPTIONS_TEXT N_("x264 advanced options")
-#define X264_OPTIONS_LONGTEXT N_("x264 advanced options, in the form {opt=val,op2=val2} .")
+#define X264_OPTIONS_LONGTEXT N_("x264 advanced options, in the form {opt=val,op2=val2}.")
 
 static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };

@@ -60,7 +60,7 @@ static void Close( vlc_object_t * );
 
 #define PAGE_TEXT N_("Teletext page")
 #define PAGE_LONGTEXT N_("Open the indicated Teletext page. " \
-        "Default page is index 100")
+        "Default page is index 100.")
 
 #define OPAQUE_TEXT N_("Opacity")
 #define OPAQUE_LONGTEXT N_("Setting to true " \
@@ -74,7 +74,7 @@ static void Close( vlc_object_t * );
 
 #define TELX_TEXT N_("Teletext text subtitles")
 #define TELX_LONGTEXT N_( "Output teletext subtitles as text " \
-  "instead of as RGBA" )
+  "instead of as RGBA." )
 
 #define LEVEL_TEXT N_("Presentation Level")
 

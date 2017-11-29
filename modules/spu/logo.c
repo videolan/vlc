@@ -51,7 +51,7 @@
 "<image>[,<delay in ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. " \
 "If you only have one file, simply enter its filename.")
 #define REPEAT_TEXT N_("Logo animation # of loops")
-#define REPEAT_LONGTEXT N_("Number of loops for the logo animation." \
+#define REPEAT_LONGTEXT N_("Number of loops for the logo animation. " \
         "-1 = continuous, 0 = disabled")
 #define DELAY_TEXT N_("Logo individual image time in ms")
 #define DELAY_LONGTEXT N_("Individual image display time of 0 - 60000 ms.")

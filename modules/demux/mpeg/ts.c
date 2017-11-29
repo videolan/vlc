@@ -120,7 +120,7 @@ static const char *const ts_standards_list_text[] =
   { N_("Auto"), "MPEG", "DVB", "ARIB", "ATSC", "T-DMB" };
 
 #define STANDARD_TEXT N_("Digital TV Standard")
-#define STANDARD_LONGTEXT N_( "Selects mode for digital TV standard." \
+#define STANDARD_LONGTEXT N_( "Selects mode for digital TV standard. " \
                               "This feature affects EPG information and subtitles." )
 
 vlc_module_begin ()

@@ -115,10 +115,10 @@
 
 #define SFILTER_TEXT N_("Overlays")
 #define SFILTER_LONGTEXT N_( \
-    "This allows you to add overlays (also known as \"subpictures\" on the "\
+    "This allows you to add overlays (also known as \"subpictures\") on the "\
     "transcoded video stream. The subpictures produced by the filters will "\
     "be overlayed directly onto the video. You can specify a colon-separated "\
-    "list of subpicture modules" )
+    "list of subpicture modules." )
 
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \

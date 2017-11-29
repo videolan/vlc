@@ -190,7 +190,7 @@ static void UpdateTigerFontDesc( decoder_t *p_dec );
 
 #define FORMAT_TEXT N_("Formatted Subtitles")
 #define FORMAT_LONGTEXT N_("Kate streams allow for text formatting. " \
- "VLC partly implements this, but you can choose to disable all formatting." \
+ "VLC partly implements this, but you can choose to disable all formatting. " \
  "Note that this has no effect is rendering via Tiger is enabled.")
 
 #ifdef HAVE_TIGER
