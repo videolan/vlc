@@ -70,11 +70,10 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
     "After this delay we black out the video."\
     )
 
-#define AFD_INDEX_TEXT "Active Format Descriptor"
-#define AFD_INDEX_LONGTEXT AFD_INDEX_TEXT " value"
+#define AFD_INDEX_TEXT N_("Active Format Descriptor value")
 
-#define AR_INDEX_TEXT "Aspect Ratio"
-#define AR_INDEX_LONGTEXT AR_INDEX_TEXT " of the source picture"
+#define AR_INDEX_TEXT N_("Aspect Ratio")
+#define AR_INDEX_LONGTEXT N_("Aspect Ratio of the source picture")
 
 #define AFDLINE_INDEX_TEXT N_("Active Format Descriptor line.")
 #define AFDLINE_INDEX_LONGTEXT N_("VBI line on which to output Active Format Descriptor.")
@@ -257,7 +256,7 @@ vlc_module_begin()
     add_integer(VIDEO_CFG_PREFIX "afd-line", 16,
                 AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT, true)
     add_integer_with_range(VIDEO_CFG_PREFIX "afd", 8, 0, 16,
-                AFD_INDEX_TEXT, AFD_INDEX_LONGTEXT, true)
+                AFD_INDEX_TEXT, AFD_INDEX_TEXT, true)
                 change_integer_list(rgi_afd_values, rgsz_afd_text)
     add_integer_with_range(VIDEO_CFG_PREFIX "ar", 1, 0, 1,
                 AR_INDEX_TEXT, AR_INDEX_LONGTEXT, true)

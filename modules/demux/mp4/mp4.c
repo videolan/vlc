@@ -46,8 +46,8 @@ static void Close( vlc_object_t * );
 
 #define CFG_PREFIX "mp4-"
 
-#define MP4_M4A_TEXT     "M4A audio only"
-#define MP4_M4A_LONGTEXT "Ignore non audio tracks from iTunes audio files"
+#define MP4_M4A_TEXT     N_("M4A audio only")
+#define MP4_M4A_LONGTEXT N_("Ignore non audio tracks from iTunes audio files")
 
 vlc_module_begin ()
     set_category( CAT_INPUT )

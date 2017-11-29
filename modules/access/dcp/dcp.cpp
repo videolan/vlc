@@ -40,8 +40,8 @@
 # include "config.h"
 #endif
 
-#define KDM_HELP_TEXT          "KDM file"
-#define KDM_HELP_LONG_TEXT     "Path to Key Delivery Message XML file"
+#define KDM_HELP_TEXT          N_("KDM file")
+#define KDM_HELP_LONG_TEXT     N_("Path to Key Delivery Message XML file")
 
 /* VLC core API headers */
 #include <vlc_common.h>
