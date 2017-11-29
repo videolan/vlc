@@ -167,7 +167,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
     HRESULT hr = E_NOTIMPL;
     UINT creationFlags = 0;
 
-    if (hw_decoding)
+    if (hw_decoding || !obj->obj.force)
         creationFlags |= D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
 
 #if !defined(NDEBUG)
