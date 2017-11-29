@@ -220,7 +220,7 @@ void FileOpenPanel::dropEvent( QDropEvent *event )
 
 void FileOpenPanel::browseFile()
 {
-    QStringList files = QFileDialog::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath );
+    QStringList files = THEDP->showSimpleOpen( qtr( "Select one or multiple files" ) );
     foreach( const QString &file, files )
     {
         QListWidgetItem *item =
