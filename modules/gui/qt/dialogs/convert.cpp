@@ -55,7 +55,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     }
     else
     {
-        inputBox->setMRL("Multiple files selected.");
+        inputBox->setMRL( qtr( "Multiple files selected." ) );
     }
     mainLayout->addWidget( inputBox, 0, 0, 1, -1  );
 
@@ -83,10 +83,10 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     // but multiple files follow a naming convention
     else
     {
-        fileLine->setText("Multiple Files Selected.");
+        fileLine->setText( qtr( "Multiple Files Selected." ) );
         fileLine->setReadOnly(true);
-        fileLine->setToolTip("Files will be placed in the same directory "
-                "with the same name.");
+        fileLine->setToolTip( qtr( "Files will be placed in the same directory "
+                "with the same name." ) );
 
         appendBox = new QCheckBox( qtr( "Append '-converted' to filename" ) );
         destLayout->addWidget( appendBox, 1, 0 );
