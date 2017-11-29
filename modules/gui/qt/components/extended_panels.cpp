@@ -51,6 +51,7 @@
 #include "input_manager.hpp"
 #include "util/qt_dirs.hpp"
 #include "util/customwidgets.hpp"
+#include "dialogs_provider.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_vout.h>
@@ -357,16 +358,22 @@ void ExtVideo::updateFilters()
 
 void ExtVideo::browseLogo()
 {
+    QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
+                        .arg( qtr("Image Files") )
+                        .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileName( NULL, qtr( "Logo filenames" ),
-                   p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
+                   p_intf->p_sys->filepath, filter );
 
     UPDATE_AND_APPLY_TEXT( logoFileText, file );
 }
 
 void ExtVideo::browseEraseFile()
 {
+    QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
+                        .arg( qtr("Image Files") )
+                        .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileName( NULL, qtr( "Image mask" ),
-                   p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
+                   p_intf->p_sys->filepath, filter );
 
     UPDATE_AND_APPLY_TEXT( eraseMaskText, file );
 }
