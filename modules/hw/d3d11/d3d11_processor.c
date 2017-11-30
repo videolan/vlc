@@ -37,7 +37,10 @@
 
 #if defined(ID3D11VideoContext_VideoProcessorBlt)
 #undef D3D11_CreateProcessor
-int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_processor_t *out)
+int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev,
+                          D3D11_VIDEO_FRAME_FORMAT srcFields,
+                          const video_format_t *fmt_in, const video_format_t *fmt_out,
+                          d3d11_processor_t *out)
 {
     HRESULT hr;
     *out = (d3d11_processor_t) { 0 };
@@ -52,6 +55,29 @@ int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_proces
     if (FAILED(hr)) {
        msg_Err(o, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
        goto error;
+    }
+
+    D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
+        .InputFrameFormat = srcFields,
+        .InputFrameRate = {
+            .Numerator   = fmt_in->i_frame_rate_base ? fmt_in->i_frame_rate : 0,
+            .Denominator = fmt_in->i_frame_rate_base,
+        },
+        .InputWidth   = fmt_in->i_width,
+        .InputHeight  = fmt_in->i_height,
+        .OutputWidth  = fmt_out->i_width,
+        .OutputHeight = fmt_out->i_height,
+        .OutputFrameRate = {
+            .Numerator   = fmt_out->i_frame_rate_base ? fmt_out->i_frame_rate : 0,
+            .Denominator = fmt_out->i_frame_rate_base,
+        },
+        .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
+    };
+    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(out->d3dviddev, &processorDesc, &out->procEnumerator);
+    if ( FAILED(hr) || out->procEnumerator == NULL )
+    {
+        msg_Dbg(o, "Can't get a video processor for the video.");
+        goto error;
     }
 
     return VLC_SUCCESS;

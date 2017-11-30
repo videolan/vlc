@@ -363,36 +363,13 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOOBJ;
     }
 
-    if (D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS)
-        goto error;
+    video_format_t fmt_out = filter->fmt_out.video;
+    fmt_out.i_width  = dstDesc.Width;
+    fmt_out.i_height = dstDesc.Height;
 
-    if (D3D11_CreateProcessor(filter, &sys->d3d_dev, &sys->d3d_proc) != VLC_SUCCESS)
+    if (D3D11_CreateProcessor(filter, &sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
+                              &filter->fmt_out.video, &fmt_out, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
-
-    const video_format_t *fmt = &filter->fmt_out.video;
-
-    D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
-        .InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
-        .InputFrameRate = {
-            .Numerator   = fmt->i_frame_rate,
-            .Denominator = fmt->i_frame_rate_base,
-        },
-        .InputWidth   = fmt->i_width,
-        .InputHeight  = fmt->i_height,
-        .OutputWidth  = dstDesc.Width,
-        .OutputHeight = dstDesc.Height,
-        .OutputFrameRate = {
-            .Numerator   = fmt->i_frame_rate,
-            .Denominator = fmt->i_frame_rate_base,
-        },
-        .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
-    };
-    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &sys->d3d_proc.procEnumerator);
-    if ( sys->d3d_proc.procEnumerator == NULL )
-    {
-        msg_Dbg(filter, "Can't get a video processor for the video.");
-        goto error;
-    }
 
     UINT flags;
 #ifndef NDEBUG

@@ -85,28 +85,9 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
 
-    if (D3D11_CreateProcessor(p_filter, d3d_dev, &sys->d3d_proc) != VLC_SUCCESS)
+    if (D3D11_CreateProcessor(p_filter, d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
+                              &p_filter->fmt_in.video, &p_filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
-
-    const video_format_t *fmt = &p_filter->fmt_in.video;
-    D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
-        .InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
-        .InputFrameRate = {
-            .Numerator   = fmt->i_frame_rate_base > 0 ? fmt->i_frame_rate : 0,
-            .Denominator = fmt->i_frame_rate_base,
-        },
-        .InputWidth   = fmt->i_width,
-        .InputHeight  = fmt->i_height,
-        .OutputWidth  = fmt->i_width,
-        .OutputHeight = fmt->i_height,
-        .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
-    };
-    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &sys->d3d_proc.procEnumerator);
-    if ( sys->d3d_proc.procEnumerator == NULL )
-    {
-        msg_Dbg(p_filter, "Can't get a video processor for the video.");
-        goto error;
-    }
 
     UINT flags;
 #ifndef NDEBUG

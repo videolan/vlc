@@ -36,8 +36,11 @@ typedef struct
     ID3D11VideoProcessor           *videoProcessor;
 } d3d11_processor_t;
 
-int D3D11_CreateProcessor(vlc_object_t *, d3d11_device_t *, d3d11_processor_t *out);
-#define D3D11_CreateProcessor(a,b,c) D3D11_CreateProcessor(VLC_OBJECT(a),b,c)
+int D3D11_CreateProcessor(vlc_object_t *, d3d11_device_t *,
+                          D3D11_VIDEO_FRAME_FORMAT srcFields,
+                          const video_format_t *fmt_in, const video_format_t *fmt_out,
+                          d3d11_processor_t *out);
+#define D3D11_CreateProcessor(a,b,c,d,e,f) D3D11_CreateProcessor(VLC_OBJECT(a),b,c,d,e,f)
 
 void D3D11_ReleaseProcessor(d3d11_processor_t *);
 #endif
