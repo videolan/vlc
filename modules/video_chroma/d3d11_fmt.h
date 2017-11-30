@@ -104,10 +104,17 @@ void D3D11_Destroy(d3d11_handle_t *);
 #define GPU_MANUFACTURER_S3            0x5333
 #define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
 
+/* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
+struct wdmm_version
+{
+    int wddm, d3d_features, revision, build;
+};
 
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
+int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId,
+                            const struct wdmm_version *min_ver);
 
 static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
                                         DXGI_FORMAT format, UINT supportFlags)
