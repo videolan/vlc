@@ -366,17 +366,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     if (D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS)
         goto error;
 
-    hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3d_proc.d3dviddev);
-    if (FAILED(hr)) {
-       msg_Err(filter, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
-       goto error;
-    }
-
-    hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, (void **)&sys->d3d_proc.d3dvidctx);
-    if (FAILED(hr)) {
-       msg_Err(filter, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
-       goto error;
-    }
+    if (D3D11_CreateProcessor(filter, &sys->d3d_dev, &sys->d3d_proc) != VLC_SUCCESS)
+        goto error;
 
     const video_format_t *fmt = &filter->fmt_out.video;
 

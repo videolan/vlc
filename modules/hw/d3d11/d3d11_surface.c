@@ -85,12 +85,7 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
 
-    hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, (void **)&sys->d3d_proc.d3dvidctx);
-    if (unlikely(FAILED(hr)))
-        goto error;
-
-    hr = ID3D11Device_QueryInterface( d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3d_proc.d3dviddev);
-    if (unlikely(FAILED(hr)))
+    if (D3D11_CreateProcessor(p_filter, d3d_dev, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
 
     const video_format_t *fmt = &p_filter->fmt_in.video;
