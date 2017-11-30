@@ -551,6 +551,24 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
+extern const GUID DXVA_ModeHEVC_VLD_Main10;
+static bool CanUseIntelHEVC(vlc_va_t *va)
+{
+    vlc_va_sys_t *sys = va->sys;
+    /* it should be OK starting after driver 20.19.15.4835 */
+    struct wdmm_version WDMM = {
+        .wddm         = 20,
+        .d3d_features = 19,
+        .revision     = 15,
+        .build        = 4836,
+    };
+    if (D3D11CheckDriverVersion(sys->d3d_dev.d3ddevice, GPU_MANUFACTURER_INTEL, &WDMM) == VLC_SUCCESS)
+        return true;
+
+    msg_Dbg(va, "HEVC not supported with these drivers");
+    return false;
+}
+
 static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -565,6 +583,9 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
             msg_Dbg(va, "format %s is supported for output", DxgiFormatToStr(format));
     }
 #endif
+
+    if (IsEqualGUID(input,&DXVA_ModeHEVC_VLD_Main10) && !CanUseIntelHEVC(va))
+        return VLC_EGENERIC;
 
     DXGI_FORMAT processorInput[4];
     int idx = 0;
