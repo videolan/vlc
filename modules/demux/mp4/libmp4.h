@@ -1786,41 +1786,6 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
         + ( p_box->i_type == ATOM_uuid ? 16 : 0 );
 }
 
-#define MP4_GETX_PRIVATE(dst, code, size) \
-    do \
-    { \
-        if( (i_read) >= (size) ) \
-        { \
-            dst = (code); \
-            p_peek += (size); \
-            i_read -= (size); \
-        } \
-        else \
-        { \
-            dst = 0; \
-            i_read = 0; \
-        } \
-    } while(0)
-
-#define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
-
-/* This macro is used when we want to printf the box type
- * APPLE annotation box is :
- *  either 0xA9 + 24-bit ASCII text string (and 0xA9 isn't printable)
- *  either 32-bit ASCII text string
- */
-#define MP4_BOX_TYPE_ASCII() ( ((char*)&p_box->i_type)[0] != (char)0xA9 )
-
-static inline uint32_t Get24bBE( const uint8_t *p )
-{
-    return( ( p[0] <<16 ) + ( p[1] <<8 ) + p[2] );
-}
-
-static inline void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
-{
-    memcpy( p_uuid, p_buff, 16 );
-}
-
 static inline int CmpUUID( const UUID_t *u1, const UUID_t *u2 )
 {
     return memcmp( u1, u2, 16 );

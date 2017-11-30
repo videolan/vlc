@@ -272,10 +272,10 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 
     while( i_read >= 4 )
     {
-        uint16_t i_len, i_lang;
-
-        MP4_GET2BYTES( i_len );
-        MP4_GET2BYTES( i_lang );
+        uint16_t i_len = GetWBE( p_peek );
+        uint16_t i_lang = GetWBE( p_peek + 2 );
+        p_peek += 4;
+        i_read -= 4;
 
         if( i_len > i_read )
             break;

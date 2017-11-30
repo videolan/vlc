@@ -69,16 +69,32 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
 }
 #endif
 
+#define MP4_GETX_PRIVATE(dst, code, size) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            dst = (code); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
+
 #define MP4_GET1BYTE( dst )  MP4_GETX_PRIVATE( dst, *p_peek, 1 )
+#define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
 #define MP4_GET3BYTES( dst ) MP4_GETX_PRIVATE( dst, Get24bBE(p_peek), 3 )
 #define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
 #define MP4_GET8BYTES( dst ) MP4_GETX_PRIVATE( dst, GetQWBE(p_peek), 8 )
-#define MP4_GETFOURCC( dst ) MP4_GETX_PRIVATE( dst, \
-                VLC_FOURCC(p_peek[0],p_peek[1],p_peek[2],p_peek[3]), 4)
 
 #define MP4_GET2BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetWLE(p_peek), 2 )
 #define MP4_GET4BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetDWLE(p_peek), 4 )
 #define MP4_GET8BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetQWLE(p_peek), 8 )
+#define MP4_GETFOURCC( dst )   MP4_GET4BYTESLE( dst )
 
 #define MP4_GETVERSIONFLAGS( p_void ) \
     MP4_GET1BYTE( p_void->i_version ); \
@@ -108,6 +124,23 @@ static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
     do \
         (p_str) = mp4_getstringz( &p_peek, &i_read ); \
     while(0)
+
+/* This macro is used when we want to printf the box type
+ * APPLE annotation box is :
+ *  either 0xA9 + 24-bit ASCII text string (and 0xA9 isn't printable)
+ *  either 32-bit ASCII text string
+ */
+#define MP4_BOX_TYPE_ASCII() ( ((char*)&p_box->i_type)[0] != (char)0xA9 )
+
+static inline uint32_t Get24bBE( const uint8_t *p )
+{
+    return( ( p[0] <<16 ) + ( p[1] <<8 ) + p[2] );
+}
+
+static inline void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
+{
+    memcpy( p_uuid, p_buff, 16 );
+}
 
 static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
                                           size_t typesize,
