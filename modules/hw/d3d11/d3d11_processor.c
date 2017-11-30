@@ -36,6 +36,30 @@
 #include "d3d11_processor.h"
 
 #if defined(ID3D11VideoContext_VideoProcessorBlt)
+#undef D3D11_CreateProcessor
+int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_processor_t *out)
+{
+    HRESULT hr;
+    *out = (d3d11_processor_t) { 0 };
+
+    hr = ID3D11Device_QueryInterface(d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, (void **)&out->d3dviddev);
+    if (FAILED(hr)) {
+       msg_Err(o, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
+       goto error;
+    }
+
+    hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, (void **)&out->d3dvidctx);
+    if (FAILED(hr)) {
+       msg_Err(o, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
+       goto error;
+    }
+
+    return VLC_SUCCESS;
+error:
+    D3D11_ReleaseProcessor(out);
+    return VLC_ENOMOD;
+}
+
 void D3D11_ReleaseProcessor(d3d11_processor_t *out)
 {
     if (out->videoProcessor)
