@@ -372,9 +372,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         goto error;
 
     UINT flags;
-#ifndef NDEBUG
-    D3D11_LogProcessorSupport(filter, sys->d3d_proc.procEnumerator);
-#endif
     hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstDesc.Format, &flags);
     if (!SUCCEEDED(hr))
     {

@@ -136,11 +136,6 @@ int AllocateTextures(vlc_object_t *obj, d3d11_device_t *d3d_dev,
                      const d3d_format_t *cfg, const video_format_t *fmt,
                      unsigned pool_size, ID3D11Texture2D *textures[]);
 
-#ifndef NDEBUG
-void D3D11_LogProcessorSupport(vlc_object_t*, ID3D11VideoProcessorEnumerator*);
-#define D3D11_LogProcessorSupport(a,b) D3D11_LogProcessorSupport( VLC_OBJECT(a), b )
-#endif
-
 static inline void d3d11_device_lock(d3d11_device_t *d3d_dev)
 {
     if( d3d_dev->context_mutex != INVALID_HANDLE_VALUE )

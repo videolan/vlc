@@ -90,9 +90,6 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
         goto error;
 
     UINT flags;
-#ifndef NDEBUG
-    D3D11_LogProcessorSupport(p_filter, sys->d3d_proc.procEnumerator);
-#endif
     /* shortcut for the rendering output */
     hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, srcFormat, &flags);
     if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT))
