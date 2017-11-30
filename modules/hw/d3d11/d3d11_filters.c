@@ -75,7 +75,6 @@ struct filter_sys_t
     ID3D11VideoProcessor           *videoProcessor;
     ID3D11VideoProcessorEnumerator *procEnumerator;
 
-    HANDLE                         context_mutex;
     union {
         ID3D11Texture2D            *texture;
         ID3D11Resource             *resource;
@@ -246,8 +245,8 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 
     picture_CopyProperties( p_outpic, p_pic );
 
-    if( p_sys->context_mutex != INVALID_HANDLE_VALUE )
-        WaitForSingleObjectEx( p_sys->context_mutex, INFINITE, FALSE );
+    if( p_sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
+        WaitForSingleObjectEx( p_sys->d3d_dev.context_mutex, INFINITE, FALSE );
 
     ID3D11VideoProcessorInputView *inputs[4] = {
         p_src_sys->processorInput,
@@ -318,8 +317,8 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                                   NULL);
     }
 
-    if( p_sys->context_mutex  != INVALID_HANDLE_VALUE )
-        ReleaseMutex( p_sys->context_mutex );
+    if( p_sys->d3d_dev.context_mutex  != INVALID_HANDLE_VALUE )
+        ReleaseMutex( p_sys->d3d_dev.context_mutex );
 
     picture_Release( p_pic );
     return p_outpic;
@@ -386,7 +385,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     hr = ID3D11Device_GetPrivateData(sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
     if (FAILED(hr))
         msg_Warn(filter, "No mutex found to lock the decoder");
-    sys->context_mutex = context_lock;
+    sys->d3d_dev.context_mutex = context_lock;
 
     const video_format_t *fmt = &filter->fmt_out.video;
 

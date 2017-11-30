@@ -151,10 +151,6 @@ struct vout_display_sys_t
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
     pD3DCompile                            OurD3DCompile;
 #endif
-#if defined(HAVE_ID3D11VIDEODECODER)
-    HANDLE                   context_lock;     /* D3D11 Context lock necessary
-                                                  for hw decoding */
-#endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     d3d11_device_t           d3d_dev;
@@ -988,9 +984,9 @@ static void UpdateSize(vout_display_t *vd)
     UpdateBackBuffer(vd);
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
     {
-        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+        WaitForSingleObjectEx( sys->d3d_dev.context_mutex, INFINITE, FALSE );
     }
 #endif
 
@@ -1000,9 +996,9 @@ static void UpdateSize(vout_display_t *vd)
                        vd->fmt.orientation);
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
     {
-        ReleaseMutex( sys->context_lock );
+        ReleaseMutex( sys->d3d_dev.context_mutex );
     }
 #endif
 }
@@ -1193,8 +1189,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         picture_sys_t *p_sys = ActivePictureSys(picture);
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-        if (sys->context_lock != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
-            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+        if (sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
+            WaitForSingleObjectEx( sys->d3d_dev.context_mutex, INFINITE, FALSE );
 #endif
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC srcDesc,texDesc;
@@ -1300,9 +1296,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if (sys->context_lock != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
+    if (sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
     {
-        ReleaseMutex( sys->context_lock );
+        ReleaseMutex( sys->d3d_dev.context_mutex );
     }
 #endif
 
@@ -2145,8 +2141,9 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     HRESULT hr;
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-    sys->context_lock = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
-    ID3D11Device_SetPrivateData( sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, sizeof( sys->context_lock ), &sys->context_lock );
+    sys->d3d_dev.context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
+    ID3D11Device_SetPrivateData( sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX,
+                                 sizeof( sys->d3d_dev.context_mutex ), &sys->d3d_dev.context_mutex );
 #endif
 
     ID3D11BlendState *pSpuBlendState;
@@ -3030,10 +3027,10 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
         sys->picQuadPixelShader = NULL;
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
     {
-        CloseHandle( sys->context_lock );
-        sys->context_lock = INVALID_HANDLE_VALUE;
+        CloseHandle( sys->d3d_dev.context_mutex );
+        sys->d3d_dev.context_mutex = INVALID_HANDLE_VALUE;
     }
 #endif
 

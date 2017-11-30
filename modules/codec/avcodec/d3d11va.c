@@ -111,8 +111,6 @@ struct vlc_va_sys_t
     ID3D11VideoContext           *d3dvidctx;
     DXGI_FORMAT                  render;
 
-    HANDLE                       context_mutex;
-
     /* pool */
     picture_t                    *extern_pics[MAX_SURFACE_COUNT];
 
@@ -150,7 +148,7 @@ void SetupAVCodecContext(vlc_va_t *va)
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = dx_sys->va_pool.surface_count;
     sys->hw.surface = dx_sys->hw_surface;
-    sys->hw.context_mutex = sys->context_mutex;
+    sys->hw.context_mutex = sys->d3d_dev.context_mutex;
 
     if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
@@ -353,7 +351,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             hr = ID3D11Device_GetPrivateData(sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
             if (FAILED(hr))
                 msg_Warn(va, "No mutex found to lock the decoder");
-            sys->context_mutex = context_lock;
+            sys->d3d_dev.context_mutex = context_lock;
 
             sys->d3d_dev.d3dcontext = p_sys->context;
             sys->d3d_dev.owner = false;
