@@ -1,6 +1,14 @@
 Changes between 3.0.x and 4.0.0-git:
 --------------------------------
 
+Platform support changes:
+ * 4.0.x requires:
+     - Windows 7/2008 R2 or later
+     - macOS 10.10 or later
+     - iOS 9 or later
+     - Android 4.1.x or later (API-16)
+     - GCC 5.0 or Clang 3.4 (or equivalent)
+
 
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------
