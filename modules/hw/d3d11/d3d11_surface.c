@@ -198,7 +198,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
     ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
 
     texDesc.MipLevels = 1;
-    //texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0;
     texDesc.ArraySize = 1;
     texDesc.Usage = D3D11_USAGE_STAGING;
@@ -744,7 +744,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     picture_Setup(p_dst, &p_dst->format);
 
     texDesc.MipLevels = 1;
-    //texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0;
     texDesc.ArraySize = 1;
     texDesc.Usage = D3D11_USAGE_STAGING;
