@@ -70,6 +70,8 @@ endif
 	$(APPLY) $(SRC)/live555/no-null-reference.patch
 	# Add a pkg-config file
 	$(APPLY) $(SRC)/live555/add-pkgconfig-file.patch
+	# Expose Server:
+	$(APPLY) $(SRC)/live555/expose_server_string.patch
 
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
