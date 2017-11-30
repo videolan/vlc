@@ -271,9 +271,8 @@ bool isNvidiaHardware(ID3D11Device *d3ddev)
 
     bool result = false;
     DXGI_ADAPTER_DESC adapterDesc;
-    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-        result = adapterDesc.VendorId == 0x10DE;
-    }
+    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
+        result = adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA;
 
     IDXGIAdapter_Release(p_adapter);
     return result;

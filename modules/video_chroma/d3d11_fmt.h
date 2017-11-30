@@ -97,6 +97,14 @@ int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
 
 void D3D11_Destroy(d3d11_handle_t *);
 
+#define GPU_MANUFACTURER_AMD           0x1002
+#define GPU_MANUFACTURER_NVIDIA        0x10DE
+#define GPU_MANUFACTURER_VIA           0x1106
+#define GPU_MANUFACTURER_INTEL         0x8086
+#define GPU_MANUFACTURER_S3            0x5333
+#define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
+
+
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
