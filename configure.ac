@@ -541,21 +541,15 @@ dnl Check for broken versions of mingw-runtime compatability library
     ])
 
     dnl Check for fnative-struct or mms-bitfields support for mingw32
-    VLC_SAVE_FLAGS
-    CFLAGS="${CFLAGS} -mms-bitfields"
-    CXXFLAGS="${CXXFLAGS} -mms-bitfields"
-    AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
-        [ac_cv_c_mms_bitfields],
-        [AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes, ac_cv_c_mms_bitfields=no)])
-    if test "${ac_cv_c_mms_bitfields}" = "no"; then
-        VLC_RESTORE_FLAGS
-        CFLAGS="${CFLAGS} -fnative-struct"
-        CXXFLAGS="${CXXFLAGS} -fnative-struct"
-        AC_CACHE_CHECK([if \$CC accepts -fnative-struct],
-            [ac_cv_c_fnative_struct],
-            [AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
-        "${ac_cv_c_fnative_struct}" = "no" && VLC_RESTORE_FLAGS
-    fi
+    AX_CHECK_COMPILE_FLAG([-mms-bitfields], [
+        AX_APPEND_FLAG([-mms-bitfields], [CFLAGS])
+        AX_APPEND_FLAG([-mms-bitfields], [CXXFLAGS])
+    ], [
+        AX_CHECK_COMPILE_FLAG([-fnative-struct], [
+            AX_APPEND_FLAG([-fnative-struct], [CFLAGS])
+            AX_APPEND_FLAG([-fnative-struct], [CXXFLAGS])
+        ])
+    ])
 ])
 
 
