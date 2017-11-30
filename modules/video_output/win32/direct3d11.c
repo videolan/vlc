@@ -1930,74 +1930,21 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     return hr;
 }
 
-#if (!VLC_WINSTORE_APP) && defined (HAVE_ID3D11VIDEODECODER)
-
-static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
-{
-    HKEY hKey;
-    TCHAR key[128];
-    TCHAR szData[256], lookup[256];
-    DWORD len = 256;
-
-    _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x&rev_cf"), adapterDesc->VendorId, adapterDesc->DeviceId);
-    for (int i=0;;i++)
-    {
-        _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
-        if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
-            return NULL;
-
-        len = sizeof(szData);
-        if( RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
-            if (_tcscmp(lookup, szData) == 0)
-                return hKey;
-        }
-
-        RegCloseKey(hKey);
-    }
-    return NULL;
-}
-#endif
-
 static bool CanUseTextureArray(vout_display_t *vd)
 {
 #ifndef HAVE_ID3D11VIDEODECODER
     (void) vd;
     return false;
 #else
-    vout_display_sys_t *sys = vd->sys;
-    TCHAR szData[256];
-    DWORD len = 256;
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (!pAdapter)
-        return false;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-        return false;
-
-    /* ATI/AMD hardware has issues with pixel shaders with Texture2DArray */
-    if (adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
+    struct wdmm_version WDDM = {
+        .wddm         = 22,
+        .d3d_features = 19,
+        .revision     = 162,
+        .build        = 0,
+    };
+    if (D3D11CheckDriverVersion(vd->sys->d3d_dev.d3ddevice, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
         return true;
 
-#if !VLC_WINSTORE_APP
-    HKEY hKey = GetAdapterRegistry(&adapterDesc);
-    if (hKey == NULL)
-        return false;
-
-    LONG err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
-    RegCloseKey(hKey);
-
-    if (err == ERROR_SUCCESS )
-    {
-        int wddm, d3d_features, revision, build;
-        /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
-        if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) == 4)
-            /* it should be OK starting from driver 22.19.162.xxx */
-            return wddm > 22 || (wddm == 22 && (d3d_features > 19 || (d3d_features == 19 && revision >= 162)));
-    }
-#endif
     msg_Dbg(vd, "fallback to legacy shader mode for old AMD drivers");
     return false;
 #endif
