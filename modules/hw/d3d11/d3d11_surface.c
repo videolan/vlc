@@ -81,19 +81,18 @@ typedef struct
 } filter_sys_t;
 
 #if CAN_PROCESSOR
-static int SetupProcessor(filter_t *p_filter, ID3D11Device *d3ddevice,
-                          ID3D11DeviceContext *d3dctx,
+static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
                           DXGI_FORMAT srcFormat, DXGI_FORMAT dstFormat)
 {
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
     ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
-    hr = ID3D11DeviceContext_QueryInterface(d3dctx, &IID_ID3D11VideoContext, (void **)&sys->d3dvidctx);
+    hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, (void **)&sys->d3dvidctx);
     if (unlikely(FAILED(hr)))
         goto error;
 
-    hr = ID3D11Device_QueryInterface( d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
+    hr = ID3D11Device_QueryInterface( d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
     if (unlikely(FAILED(hr)))
         goto error;
 
@@ -232,7 +231,8 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
                 hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->procOutTexture);
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, p_sys->context)))
                 {
-                    if (SetupProcessor(p_filter, p_device, p_sys->context, srcFormat, new_fmt->formatTexture))
+                    d3d11_device_t d3d_dev = { .d3ddevice = p_device, .d3dcontext = p_sys->context };
+                    if (SetupProcessor(p_filter, &d3d_dev, srcFormat, new_fmt->formatTexture))
                     {
                         ID3D11Texture2D_Release(sys->procOutTexture);
                         ID3D11Texture2D_Release(sys->staging);
