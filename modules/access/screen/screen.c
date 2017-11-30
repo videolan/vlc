@@ -62,7 +62,7 @@
 
 #define WIDTH_TEXT N_( "Capture region width" )
 
-#define HEIGHT_TEXT N_( "Capture region heigh" )
+#define HEIGHT_TEXT N_( "Capture region height" )
 
 #define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
 #define FOLLOW_MOUSE_LONGTEXT N_( \
