@@ -1978,7 +1978,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
         return false;
 
     /* ATI/AMD hardware has issues with pixel shaders with Texture2DArray */
-    if (adapterDesc.VendorId != 0x1002)
+    if (adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
         return true;
 
 #if !VLC_WINSTORE_APP

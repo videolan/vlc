@@ -441,6 +441,7 @@ static void D3dDestroyDevice(vlc_va_t *va)
         ID3D11VideoContext_Release(sys->d3dvidctx);
     D3D11_ReleaseDevice( &sys->d3d_dev );
 }
+
 /**
  * It describes our Direct3D object
  */
@@ -450,12 +451,12 @@ static char *DxDescribe(vlc_va_sys_t *sys)
         unsigned id;
         char     name[32];
     } vendors [] = {
-        { 0x1002, "ATI" },
-        { 0x10DE, "NVIDIA" },
-        { 0x1106, "VIA" },
-        { 0x8086, "Intel" },
-        { 0x5333, "S3 Graphics" },
-        { 0x4D4F4351, "Qualcomm" },
+        { GPU_MANUFACTURER_AMD,      "ATI"         },
+        { GPU_MANUFACTURER_NVIDIA,   "NVIDIA"      },
+        { GPU_MANUFACTURER_VIA,      "VIA"         },
+        { GPU_MANUFACTURER_INTEL,    "Intel"       },
+        { GPU_MANUFACTURER_S3,       "S3 Graphics" },
+        { GPU_MANUFACTURER_QUALCOMM, "Qualcomm"    },
         { 0, "" }
     };
 
@@ -663,7 +664,7 @@ static bool CanUseDecoderPadding(vlc_va_sys_t *sys)
 
     /* Qualcomm hardware has issues with textures and pixels that should not be
     * part of the decoded area */
-    return adapterDesc.VendorId != 0x4D4F4351;
+    return adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
 }
 
 /**
