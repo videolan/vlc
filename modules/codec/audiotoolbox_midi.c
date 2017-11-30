@@ -363,7 +363,8 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         break;
 
         case kMidiMessage_SysEx:
-            // SysEx not handled
+            if (p_block->i_buffer < UINT32_MAX)
+                MusicDeviceSysEx(p_sys->synthUnit, p_block->p_buffer, (UInt32)p_block->i_buffer);
         break;
 
         default:
