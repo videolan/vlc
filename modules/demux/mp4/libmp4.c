@@ -2385,9 +2385,14 @@ static int MP4_ReadBox_dac3( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_dvc1( MP4_Box_t *p_box )
+{
+    free( p_box->data.p_dvc1->p_vc1 );
+}
+
 static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_READBOX_ENTER( MP4_Box_data_dvc1_t, NULL );
+    MP4_READBOX_ENTER( MP4_Box_data_dvc1_t, MP4_FreeBox_dvc1 );
     if( i_read < 7 )
         MP4_READBOX_EXIT( 0 );
 
