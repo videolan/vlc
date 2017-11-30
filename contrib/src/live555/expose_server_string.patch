@@ -1,0 +1,84 @@
+diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/include/RTSPClient.hh
+--- live555/liveMedia/include/RTSPClient.hh	2017-11-30 19:34:25.210638324 +0100
++++ live555.modified/liveMedia/include/RTSPClient.hh	2017-11-30 19:32:06.322693792 +0100
+@@ -36,6 +36,8 @@
+ #endif
+ #endif
+ 
++#define VLC_PATCH_RTSPCLIENT_SERVERSTRING
++
+ class RTSPClient: public Medium {
+ public:
+   static RTSPClient* createNew(UsageEnvironment& env, char const* rtspURL,
+@@ -186,6 +188,7 @@
+   unsigned sessionTimeoutParameter() const { return fSessionTimeoutParameter; }
+ 
+   char const* url() const { return fBaseURL; }
++  char const* serverString() const { return fserverString; }
+ 
+   static unsigned responseBufferSize;
+ 
+@@ -238,6 +241,7 @@
+ 
+   void reset();
+   void setBaseURL(char const* url);
++  void setServerString(char const* str);
+   int grabSocket(); // allows a subclass to reuse our input socket, so that it won't get closed when we're deleted
+   virtual unsigned sendRequest(RequestRecord* request);
+   virtual Boolean setRequestFields(RequestRecord* request,
+@@ -334,6 +338,7 @@
+   unsigned fUserAgentHeaderStrLen;
+   int fInputSocketNum, fOutputSocketNum;
+   char* fBaseURL;
++  char *fserverString;
+   unsigned char fTCPStreamIdCount; // used for (optional) RTP/TCP
+   char* fLastSessionId;
+   unsigned fSessionTimeoutParameter; // optionally set in response "Session:" headers
+diff -Naur live555/liveMedia/RTSPClient.cpp live555.modified/liveMedia/RTSPClient.cpp
+--- live555/liveMedia/RTSPClient.cpp	2017-11-30 19:34:25.210638324 +0100
++++ live555.modified/liveMedia/RTSPClient.cpp	2017-11-30 19:28:18.691423659 +0100
+@@ -366,7 +366,7 @@
+     fAllowBasicAuthentication(True), fServerAddress(0),
+     fTunnelOverHTTPPortNum(tunnelOverHTTPPortNum),
+     fUserAgentHeaderStr(NULL), fUserAgentHeaderStrLen(0),
+-    fInputSocketNum(-1), fOutputSocketNum(-1), fBaseURL(NULL), fTCPStreamIdCount(0),
++    fInputSocketNum(-1), fOutputSocketNum(-1), fBaseURL(NULL), fserverString(NULL), fTCPStreamIdCount(0),
+     fLastSessionId(NULL), fSessionTimeoutParameter(0), fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False) {
+   setBaseURL(rtspURL);
+ 
+@@ -416,6 +416,7 @@
+   fServerAddress = 0;
+ 
+   setBaseURL(NULL);
++  setServerString(NULL);
+ 
+   fCurrentAuthenticator.reset();
+ 
+@@ -426,6 +427,10 @@
+   delete[] fBaseURL; fBaseURL = strDup(url);
+ }
+ 
++void RTSPClient::setServerString(char const* str) {
++  delete[] fserverString; fserverString = strDup(str);
++}
++
+ int RTSPClient::grabSocket() {
+   int inputSocket = fInputSocketNum;
+   fInputSocketNum = -1;
+@@ -1655,6 +1660,7 @@
+     char const* rtpInfoParamsStr = NULL;
+     char const* wwwAuthenticateParamsStr = NULL;
+     char const* publicParamsStr = NULL;
++    char const* serverStr = NULL;
+     char* bodyStart = NULL;
+     unsigned numBodyBytes = 0;
+     responseSuccess = False;
+@@ -1725,6 +1731,8 @@
+ 	} else if (checkForHeader(lineStart, "Transport:", 10, transportParamsStr)) {
+ 	} else if (checkForHeader(lineStart, "Scale:", 6, scaleParamsStr)) {
+ 	} else if (checkForHeader(lineStart, "Speed:", 6, speedParamsStr)) {
++    } else if (checkForHeader(lineStart, "Server:", 7, serverStr)) {
++        setServerString(serverStr);
+ 	} else if (checkForHeader(lineStart, "Range:", 6, rangeParamsStr)) {
+ 	} else if (checkForHeader(lineStart, "RTP-Info:", 9, rtpInfoParamsStr)) {
+ 	} else if (checkForHeader(lineStart, "WWW-Authenticate:", 17, headerParamsStr)) {
