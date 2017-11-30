@@ -382,13 +382,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
        goto error;
     }
 
-    HANDLE context_lock = INVALID_HANDLE_VALUE;
-    UINT dataSize = sizeof(context_lock);
-    hr = ID3D11Device_GetPrivateData(sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
-    if (FAILED(hr))
-        msg_Warn(filter, "No mutex found to lock the decoder");
-    sys->d3d_dev.context_mutex = context_lock;
-
     const video_format_t *fmt = &filter->fmt_out.video;
 
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
