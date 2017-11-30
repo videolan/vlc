@@ -1,5 +1,5 @@
 /*****************************************************************************
- * d3d11_processor.h: D3D11 VideoProcessor helper
+ * d3d11_processor.c: D3D11 VideoProcessor helper
  *****************************************************************************
  * Copyright © 2017 VLC authors, VideoLAN and VideoLabs
  *
@@ -20,23 +20,43 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_D3D11_PROCESSOR_H
-#define VLC_D3D11_PROCESSOR_H
-
-#include <vlc_common.h>
-
-#include "../../video_chroma/d3d11_fmt.h"
-
-#ifdef ID3D11VideoContext_VideoProcessorBlt
-typedef struct
-{
-    ID3D11VideoDevice              *d3dviddev;
-    ID3D11VideoContext             *d3dvidctx;
-    ID3D11VideoProcessorEnumerator *procEnumerator;
-    ID3D11VideoProcessor           *videoProcessor;
-} d3d11_processor_t;
-
-void D3D11_ReleaseProcessor(d3d11_processor_t *);
+#ifdef HAVE_CONFIG_H
+# include "config.h"
 #endif
 
-#endif /* VLC_D3D11_PROCESSOR_H */
+#include <vlc_filter.h>
+#include <vlc_picture.h>
+
+#include <assert.h>
+
+#define COBJMACROS
+#include <initguid.h>
+#include <d3d11.h>
+
+#include "d3d11_processor.h"
+
+#if defined(ID3D11VideoContext_VideoProcessorBlt)
+void D3D11_ReleaseProcessor(d3d11_processor_t *out)
+{
+    if (out->videoProcessor)
+    {
+        ID3D11VideoProcessor_Release(out->videoProcessor);
+        out->videoProcessor = NULL;
+    }
+    if (out->procEnumerator)
+    {
+        ID3D11VideoProcessorEnumerator_Release(out->procEnumerator);
+        out->procEnumerator = NULL;
+    }
+    if (out->d3dviddev)
+    {
+        ID3D11VideoDevice_Release(out->d3dviddev);
+        out->d3dviddev = NULL;
+    }
+    if (out->d3dvidctx)
+    {
+        ID3D11VideoContext_Release(out->d3dvidctx);
+        out->d3dvidctx = NULL;
+    }
+}
+#endif
