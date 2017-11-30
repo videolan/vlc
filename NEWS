@@ -57,12 +57,12 @@ Access:
  * New SMB access module using libdsm
  * Adaptive streaming:
    * Rewrite MPEG-DASH (Dynamic Adaptive Streaming over HTTP) support, including
-     MPEG2TS and ISOFF profiles
+     MPEG2TS and ISOBMFF profiles
    * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
    * Large rework of the Smooth Streaming module
    * Replaced httplive stream filter with new HLS demuxer, replaced smooth
      stream filter with new Smooth demuxer, both using unified adaptive module
-   * Support HLSv4-7, including TS and raw muxing and ID3 tags
+   * Support HLSv4-7, including MP4 and raw muxing and ID3 tags
  * Support decompression and extraction through libarchive (tar, zip, rar...)
  * New HTTP/TLS access module for HTTP 2.0 support
  * Improvements of cookie handling (share cookies between playlist items,
@@ -138,7 +138,7 @@ Demuxers:
     * Support for XiphQT(MP4) vorbis and Flac
     * Support for VP8/VP9/VP10/AV1 in MP4
     * Support GoPro HiLight chapters
-    * Support for TTML and WebVTT in ISOBMF/MP4 and DASH
+    * Support for TTML and WebVTT in ISOBMFF/MP4 and DASH
     * Add new metadata fields
  * Important rework of the TS demuxer, including:
     * Support Opus in MPEG Transport Stream
