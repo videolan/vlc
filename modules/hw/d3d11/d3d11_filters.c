@@ -35,7 +35,6 @@
 #include <vlc_picture.h>
 
 #define COBJMACROS
-#include <initguid.h>
 #include <d3d11.h>
 
 #include "d3d11_filters.h"
@@ -565,14 +564,7 @@ error:
         ID3D11Texture2D_Release(sys->out[0].texture);
     if (sys->out[1].texture)
         ID3D11Texture2D_Release(sys->out[1].texture);
-    if (sys->d3d_proc.videoProcessor)
-        ID3D11VideoProcessor_Release(sys->d3d_proc.videoProcessor);
-    if (sys->d3d_proc.procEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
-    if (sys->d3d_proc.d3dvidctx)
-        ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
-    if (sys->d3d_proc.d3dviddev)
-        ID3D11VideoDevice_Release(sys->d3d_proc.d3dviddev);
+    D3D11_ReleaseProcessor(&sys->d3d_proc);
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
     free(sys);
@@ -600,11 +592,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     }
     ID3D11Texture2D_Release(sys->out[0].texture);
     ID3D11Texture2D_Release(sys->out[1].texture);
-    ID3D11VideoProcessor_Release(sys->d3d_proc.videoProcessor);
-    ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
-    ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
-    ID3D11VideoDevice_Release(sys->d3d_proc.d3dviddev);
-
+    D3D11_ReleaseProcessor( &sys->d3d_proc );
     D3D11_FilterReleaseInstance(&sys->d3d_dev);
 
     free(sys);

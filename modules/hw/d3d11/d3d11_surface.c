@@ -163,12 +163,7 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     }
 
 error:
-    if (sys->d3d_proc.procEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
-    if (sys->d3d_proc.d3dvidctx)
-        ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
-    if (sys->d3d_proc.d3dviddev)
-        ID3D11VideoDevice_Release(sys->d3d_proc.d3dviddev);
+    D3D11_ReleaseProcessor(&sys->d3d_proc);
     return VLC_EGENERIC;
 }
 #endif
@@ -895,14 +890,7 @@ void D3D11CloseConverter( vlc_object_t *obj )
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
 #if CAN_PROCESSOR
-    if (p_sys->d3d_proc.d3dviddev)
-        ID3D11VideoDevice_Release(p_sys->d3d_proc.d3dviddev);
-    if (p_sys->d3d_proc.d3dvidctx)
-        ID3D11VideoContext_Release(p_sys->d3d_proc.d3dvidctx);
-    if (p_sys->d3d_proc.procEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(p_sys->d3d_proc.procEnumerator);
-    if (p_sys->d3d_proc.videoProcessor)
-        ID3D11VideoProcessor_Release(p_sys->d3d_proc.videoProcessor);
+    D3D11_ReleaseProcessor( &p_sys->d3d_proc );
 #endif
     CopyCleanCache(&p_sys->cache);
     vlc_mutex_destroy(&p_sys->staging_lock);
