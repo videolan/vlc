@@ -1393,29 +1393,30 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( i_reserved );
     p_box->data.p_hdlr->psz_name = NULL;
 
+    if( i_read >= SSIZE_MAX )
+        MP4_READBOX_EXIT( 0 );
+
     if( i_read > 0 )
     {
-        uint8_t *psz = p_box->data.p_hdlr->psz_name = malloc( i_read + 1 );
-        if( unlikely( psz == NULL ) )
-            MP4_READBOX_EXIT( 0 );
+        size_t i_copy;
 
         /* Yes, I love .mp4 :( */
         if( p_box->data.p_hdlr->i_predefined == VLC_FOURCC( 'm', 'h', 'l', 'r' ) )
         {
             uint8_t i_len;
-            int i_copy;
 
             MP4_GET1BYTE( i_len );
-            i_copy = __MIN( i_read, i_len );
-
-            memcpy( psz, p_peek, i_copy );
-            p_box->data.p_hdlr->psz_name[i_copy] = '\0';
+            i_copy = (i_len <= i_read) ? i_len : i_read;
         }
         else
-        {
-            memcpy( psz, p_peek, i_read );
-            p_box->data.p_hdlr->psz_name[i_read] = '\0';
-        }
+            i_copy = i_read;
+
+        uint8_t *psz = p_box->data.p_hdlr->psz_name = malloc( i_copy + 1 );
+        if( unlikely( psz == NULL ) )
+            MP4_READBOX_EXIT( 0 );
+
+        memcpy( psz, p_peek, i_copy );
+        p_box->data.p_hdlr->psz_name[i_copy] = '\0';
     }
 
 #ifdef MP4_VERBOSE
