@@ -84,35 +84,6 @@ static struct filter_mode_t filter_mode [] = {
                  { true,  true,  false, false } },
 };
 
-static int assert_ProcessorInput(filter_t *p_filter, picture_sys_t *p_sys_src)
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-    if (!p_sys_src->processorInput)
-    {
-        D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc = {
-            .FourCC = 0,
-            .ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D,
-            .Texture2D.MipSlice = 0,
-            .Texture2D.ArraySlice = p_sys_src->slice_index,
-        };
-        HRESULT hr;
-
-        hr = ID3D11VideoDevice_CreateVideoProcessorInputView(p_sys->d3d_proc.d3dviddev,
-                                                             p_sys_src->resource[KNOWN_DXGI_INDEX],
-                                                             p_sys->d3d_proc.procEnumerator,
-                                                             &inDesc,
-                                                             &p_sys_src->processorInput);
-        if (FAILED(hr))
-        {
-#ifndef NDEBUG
-            msg_Dbg(p_filter,"Failed to create processor input for slice %d. (hr=0x%lX)", p_sys_src->slice_index, hr);
-#endif
-            return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
 static void Flush(filter_t *filter)
 {
     filter_sys_t *p_sys = filter->p_sys;
@@ -145,17 +116,17 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     if( p_cur && p_next )
     {
         picture_sys_t *picsys_next = ActivePictureSys(p_next);
-        if ( unlikely(!picsys_next) || assert_ProcessorInput(p_filter, picsys_next) )
+        if ( unlikely(!picsys_next) || FAILED(D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_next) ))
             return VLC_EGENERIC;
 
         picture_sys_t *picsys_cur = ActivePictureSys(p_cur);
-        if ( unlikely(!picsys_cur) || assert_ProcessorInput(p_filter, picsys_cur) )
+        if ( unlikely(!picsys_cur) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_cur) ))
             return VLC_EGENERIC;
 
         if ( p_prev )
         {
             picture_sys_t *picsys_prev = ActivePictureSys(p_prev);
-            if ( unlikely(!picsys_prev) || assert_ProcessorInput(p_filter, picsys_prev) )
+            if ( unlikely(!picsys_prev) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_prev) ))
                 return VLC_EGENERIC;
 
             stream.pInputSurface    = picsys_cur->processorInput;
@@ -176,7 +147,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     else
     {
         picture_sys_t *p_sys_src = ActivePictureSys(p_pic);
-        if ( unlikely(!p_sys_src) || assert_ProcessorInput(p_filter, p_sys_src) )
+        if ( unlikely(!p_sys_src) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_sys_src) ))
             return VLC_EGENERIC;
 
         /* first single frame */

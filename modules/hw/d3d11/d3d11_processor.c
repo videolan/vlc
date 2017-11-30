@@ -143,4 +143,30 @@ void D3D11_ReleaseProcessor(d3d11_processor_t *out)
         out->d3dvidctx = NULL;
     }
 }
+
+#undef D3D11_Assert_ProcessorInput
+HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *o, d3d11_processor_t *d3d_proc, picture_sys_t *p_sys)
+{
+    if (p_sys->processorInput)
+        return S_OK;
+
+    D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc = {
+        .FourCC = 0,
+        .ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D,
+        .Texture2D.MipSlice = 0,
+        .Texture2D.ArraySlice = p_sys->slice_index,
+    };
+    HRESULT hr;
+
+    hr = ID3D11VideoDevice_CreateVideoProcessorInputView(d3d_proc->d3dviddev,
+                                                         p_sys->resource[KNOWN_DXGI_INDEX],
+                                                         d3d_proc->procEnumerator,
+                                                         &inDesc,
+                                                         &p_sys->processorInput);
+#ifndef NDEBUG
+    if (FAILED(hr))
+        msg_Dbg(o,"Failed to create processor input for slice %d. (hr=0x%lX)", p_sys->slice_index, hr);
+#endif
+    return hr;
+}
 #endif

@@ -100,35 +100,6 @@ static const char *const ppsz_filter_options[] = {
     "brightness-threshold", NULL
 };
 
-static int assert_ProcessorInput(filter_t *p_filter, picture_sys_t *p_sys_src)
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-    if (!p_sys_src->processorInput)
-    {
-        D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc = {
-            .FourCC = 0,
-            .ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D,
-            .Texture2D.MipSlice = 0,
-            .Texture2D.ArraySlice = p_sys_src->slice_index,
-        };
-        HRESULT hr;
-
-        hr = ID3D11VideoDevice_CreateVideoProcessorInputView(p_sys->d3d_proc.d3dviddev,
-                                                             p_sys_src->resource[KNOWN_DXGI_INDEX],
-                                                             p_sys->d3d_proc.procEnumerator,
-                                                             &inDesc,
-                                                             &p_sys_src->processorInput);
-        if (FAILED(hr))
-        {
-#ifndef NDEBUG
-            msg_Dbg(p_filter,"Failed to create processor input for slice %d. (hr=0x%lX)", p_sys_src->slice_index, hr);
-#endif
-            return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
 static bool ApplyFilter( filter_sys_t *p_sys,
                          D3D11_VIDEO_PROCESSOR_FILTER filter,
                          struct filter_level *p_level,
@@ -220,7 +191,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     filter_sys_t *p_sys = p_filter->p_sys;
 
     picture_sys_t *p_src_sys = ActivePictureSys(p_pic);
-    if ( assert_ProcessorInput(p_filter, ActivePictureSys(p_pic) ) )
+    if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_src_sys) ))
     {
         picture_Release( p_pic );
         return NULL;
