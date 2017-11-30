@@ -84,7 +84,6 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
 {
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
-    ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
     hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, (void **)&sys->d3d_proc.d3dvidctx);
     if (unlikely(FAILED(hr)))
@@ -107,8 +106,8 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
         .OutputHeight = fmt->i_height,
         .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
     };
-    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &processorEnumerator);
-    if ( processorEnumerator == NULL )
+    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &sys->d3d_proc.procEnumerator);
+    if ( sys->d3d_proc.procEnumerator == NULL )
     {
         msg_Dbg(p_filter, "Can't get a video processor for the video.");
         goto error;
@@ -116,16 +115,16 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
 
     UINT flags;
 #ifndef NDEBUG
-    D3D11_LogProcessorSupport(p_filter, processorEnumerator);
+    D3D11_LogProcessorSupport(p_filter, sys->d3d_proc.procEnumerator);
 #endif
     /* shortcut for the rendering output */
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, srcFormat, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, srcFormat, &flags);
     if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT))
     {
         msg_Dbg(p_filter, "processor format %s not supported for output", DxgiFormatToStr(srcFormat));
         goto error;
     }
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, dstFormat, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstFormat, &flags);
     if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
     {
         msg_Dbg(p_filter, "processor format %s not supported for input", DxgiFormatToStr(dstFormat));
@@ -133,11 +132,11 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     }
 
     D3D11_VIDEO_PROCESSOR_CAPS processorCaps;
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(processorEnumerator, &processorCaps);
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(sys->d3d_proc.procEnumerator, &processorCaps);
     for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
     {
         hr = ID3D11VideoDevice_CreateVideoProcessor(sys->d3d_proc.d3dviddev,
-                                                    processorEnumerator, type, &sys->d3d_proc.videoProcessor);
+                                                    sys->d3d_proc.procEnumerator, type, &sys->d3d_proc.videoProcessor);
         if (SUCCEEDED(hr))
         {
             D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
@@ -146,14 +145,13 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
 
             hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3d_proc.d3dviddev,
                                                              sys->procOutResource,
-                                                             processorEnumerator,
+                                                             sys->d3d_proc.procEnumerator,
                                                              &outDesc,
                                                              &sys->processorOutput);
             if (FAILED(hr))
                 msg_Err(p_filter, "Failed to create the processor output. (hr=0x%lX)", hr);
             else
             {
-                sys->d3d_proc.procEnumerator  = processorEnumerator;
                 return VLC_SUCCESS;
             }
         }
@@ -165,8 +163,8 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     }
 
 error:
-    if (processorEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(processorEnumerator);
+    if (sys->d3d_proc.procEnumerator)
+        ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
     if (sys->d3d_proc.d3dvidctx)
         ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
     if (sys->d3d_proc.d3dviddev)

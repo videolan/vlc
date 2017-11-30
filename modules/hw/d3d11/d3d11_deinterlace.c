@@ -344,7 +344,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
-    ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
     if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
@@ -398,8 +397,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         },
         .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
     };
-    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &processorEnumerator);
-    if ( processorEnumerator == NULL )
+    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &sys->d3d_proc.procEnumerator);
+    if ( sys->d3d_proc.procEnumerator == NULL )
     {
         msg_Dbg(filter, "Can't get a video processor for the video.");
         goto error;
@@ -407,9 +406,9 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     UINT flags;
 #ifndef NDEBUG
-    D3D11_LogProcessorSupport(filter, processorEnumerator);
+    D3D11_LogProcessorSupport(filter, sys->d3d_proc.procEnumerator);
 #endif
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, dstDesc.Format, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstDesc.Format, &flags);
     if (!SUCCEEDED(hr))
     {
         msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dstDesc.Format));
@@ -423,7 +422,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     }
 
     D3D11_VIDEO_PROCESSOR_CAPS processorCaps;
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(processorEnumerator, &processorCaps);
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(sys->d3d_proc.procEnumerator, &processorCaps);
     if (FAILED(hr))
         goto error;
 
@@ -440,12 +439,12 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
     for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
     {
-        ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(processorEnumerator, type, &rateCaps);
+        ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(sys->d3d_proc.procEnumerator, type, &rateCaps);
         if (!(rateCaps.ProcessorCaps & p_mode->i_mode))
             continue;
 
         hr = ID3D11VideoDevice_CreateVideoProcessor(sys->d3d_proc.d3dviddev,
-                                                    processorEnumerator, type, &sys->d3d_proc.videoProcessor);
+                                                    sys->d3d_proc.procEnumerator, type, &sys->d3d_proc.videoProcessor);
         if (SUCCEEDED(hr))
             break;
         sys->d3d_proc.videoProcessor = NULL;
@@ -457,12 +456,12 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         p_mode = GetFilterMode("bob");
         for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
         {
-            ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(processorEnumerator, type, &rateCaps);
+            ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(sys->d3d_proc.procEnumerator, type, &rateCaps);
             if (!(rateCaps.ProcessorCaps & D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BOB))
                 continue;
 
             hr = ID3D11VideoDevice_CreateVideoProcessor(sys->d3d_proc.d3dviddev,
-                                                        processorEnumerator, type, &sys->d3d_proc.videoProcessor);
+                                                        sys->d3d_proc.procEnumerator, type, &sys->d3d_proc.videoProcessor);
             if (SUCCEEDED(hr))
                 break;
             sys->d3d_proc.videoProcessor = NULL;
@@ -501,7 +500,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3d_proc.d3dviddev,
                                                          sys->outResource,
-                                                         processorEnumerator,
+                                                         sys->d3d_proc.procEnumerator,
                                                          &outDesc,
                                                          &sys->processorOutput);
     if (FAILED(hr))
@@ -509,8 +508,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         msg_Dbg(filter,"Failed to create processor output. (hr=0x%lX)", hr);
         goto error;
     }
-
-    sys->d3d_proc.procEnumerator  = processorEnumerator;
 
     InitDeinterlacingContext( &sys->context );
 
@@ -547,8 +544,8 @@ error:
         ID3D11Texture2D_Release(sys->outTexture);
     if (sys->d3d_proc.videoProcessor)
         ID3D11VideoProcessor_Release(sys->d3d_proc.videoProcessor);
-    if (processorEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(processorEnumerator);
+    if (sys->d3d_proc.procEnumerator)
+        ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
     if (sys->d3d_proc.d3dvidctx)
         ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
     if (sys->d3d_proc.d3dviddev)

@@ -344,7 +344,6 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
-    ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
     if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
@@ -395,8 +394,8 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         },
         .Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL,
     };
-    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &processorEnumerator);
-    if ( processorEnumerator == NULL )
+    hr = ID3D11VideoDevice_CreateVideoProcessorEnumerator(sys->d3d_proc.d3dviddev, &processorDesc, &sys->d3d_proc.procEnumerator);
+    if ( sys->d3d_proc.procEnumerator == NULL )
     {
         msg_Dbg(filter, "Can't get a video processor for the video.");
         goto error;
@@ -404,9 +403,9 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 
     UINT flags;
 #ifndef NDEBUG
-    D3D11_LogProcessorSupport(filter, processorEnumerator);
+    D3D11_LogProcessorSupport(filter, sys->d3d_proc.procEnumerator);
 #endif
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, dstDesc.Format, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstDesc.Format, &flags);
     if (!SUCCEEDED(hr))
     {
         msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dstDesc.Format));
@@ -420,7 +419,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     }
 
     D3D11_VIDEO_PROCESSOR_CAPS processorCaps;
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(processorEnumerator, &processorCaps);
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorCaps(sys->d3d_proc.procEnumerator, &processorCaps);
     if (FAILED(hr))
         goto error;
 
@@ -434,25 +433,25 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         goto error;
     }
 
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(processorEnumerator,
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(sys->d3d_proc.procEnumerator,
                                                                      D3D11_VIDEO_PROCESSOR_FILTER_BRIGHTNESS,
                                                                      &sys->Brightness.Range);
     if (FAILED(hr))
         goto error;
 
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(processorEnumerator,
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(sys->d3d_proc.procEnumerator,
                                                                      D3D11_VIDEO_PROCESSOR_FILTER_CONTRAST,
                                                                      &sys->Contrast.Range);
     if (FAILED(hr))
         goto error;
 
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(processorEnumerator,
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(sys->d3d_proc.procEnumerator,
                                                                      D3D11_VIDEO_PROCESSOR_FILTER_HUE,
                                                                      &sys->Hue.Range);
     if (FAILED(hr))
         goto error;
 
-    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(processorEnumerator,
+    hr = ID3D11VideoProcessorEnumerator_GetVideoProcessorFilterRange(sys->d3d_proc.procEnumerator,
                                                                      D3D11_VIDEO_PROCESSOR_FILTER_SATURATION,
                                                                      &sys->Saturation.Range);
     if (FAILED(hr))
@@ -479,7 +478,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
                                              AdjustCallback, sys );
 
     hr = ID3D11VideoDevice_CreateVideoProcessor(sys->d3d_proc.d3dviddev,
-                                                processorEnumerator, 0,
+                                                sys->d3d_proc.procEnumerator, 0,
                                                 &sys->d3d_proc.videoProcessor);
     if (FAILED(hr) || sys->d3d_proc.videoProcessor == NULL)
     {
@@ -527,7 +526,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     {
         hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3d_proc.d3dviddev,
                                                              sys->out[i].resource,
-                                                             processorEnumerator,
+                                                             sys->d3d_proc.procEnumerator,
                                                              &outDesc,
                                                              &sys->procOutput[i]);
         if (FAILED(hr))
@@ -538,7 +537,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 
         hr = ID3D11VideoDevice_CreateVideoProcessorInputView(sys->d3d_proc.d3dviddev,
                                                              sys->out[0].resource,
-                                                             processorEnumerator,
+                                                             sys->d3d_proc.procEnumerator,
                                                              &inDesc,
                                                              &sys->procInput[i]);
 
@@ -548,8 +547,6 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
             goto error;
         }
     }
-
-    sys->d3d_proc.procEnumerator  = processorEnumerator;
 
     filter->pf_video_filter = Filter;
     filter->p_sys = sys;
@@ -570,8 +567,8 @@ error:
         ID3D11Texture2D_Release(sys->out[1].texture);
     if (sys->d3d_proc.videoProcessor)
         ID3D11VideoProcessor_Release(sys->d3d_proc.videoProcessor);
-    if (processorEnumerator)
-        ID3D11VideoProcessorEnumerator_Release(processorEnumerator);
+    if (sys->d3d_proc.procEnumerator)
+        ID3D11VideoProcessorEnumerator_Release(sys->d3d_proc.procEnumerator);
     if (sys->d3d_proc.d3dvidctx)
         ID3D11VideoContext_Release(sys->d3d_proc.d3dvidctx);
     if (sys->d3d_proc.d3dviddev)
