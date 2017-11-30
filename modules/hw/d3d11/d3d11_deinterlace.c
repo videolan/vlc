@@ -226,13 +226,11 @@ static picture_t *Deinterlace(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
-        WaitForSingleObjectEx( p_sys->d3d_dev.context_mutex, INFINITE, FALSE );
+    d3d11_device_lock( &p_sys->d3d_dev );
 
     picture_t *res = DoDeinterlacing( p_filter, &p_sys->context, p_pic );
 
-    if( p_sys->d3d_dev.context_mutex  != INVALID_HANDLE_VALUE )
-        ReleaseMutex( p_sys->d3d_dev.context_mutex );
+    d3d11_device_unlock( &p_sys->d3d_dev );
 
     return res;
 }

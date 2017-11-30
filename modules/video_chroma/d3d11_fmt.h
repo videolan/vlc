@@ -139,4 +139,16 @@ void D3D11_LogProcessorSupport(vlc_object_t*, ID3D11VideoProcessorEnumerator*);
 #define D3D11_LogProcessorSupport(a,b) D3D11_LogProcessorSupport( VLC_OBJECT(a), b )
 #endif
 
+static inline void d3d11_device_lock(d3d11_device_t *d3d_dev)
+{
+    if( d3d_dev->context_mutex != INVALID_HANDLE_VALUE )
+        WaitForSingleObjectEx( d3d_dev->context_mutex, INFINITE, FALSE );
+}
+
+static inline void d3d11_device_unlock(d3d11_device_t *d3d_dev)
+{
+    if( d3d_dev->context_mutex  != INVALID_HANDLE_VALUE )
+        ReleaseMutex( d3d_dev->context_mutex );
+}
+
 #endif /* include-guard */

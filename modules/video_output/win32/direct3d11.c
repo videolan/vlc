@@ -983,24 +983,14 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdateBackBuffer(vd);
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
-    {
-        WaitForSingleObjectEx( sys->d3d_dev.context_mutex, INFINITE, FALSE );
-    }
-#endif
+    d3d11_device_lock( &sys->d3d_dev );
 
     UpdatePicQuadPosition(vd);
 
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
                        vd->fmt.orientation);
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
-    {
-        ReleaseMutex( sys->d3d_dev.context_mutex );
-    }
-#endif
+    d3d11_device_unlock( &sys->d3d_dev );
 }
 
 static inline bool RectEquals(const RECT *r1, const RECT *r2)
@@ -1188,10 +1178,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     {
         picture_sys_t *p_sys = ActivePictureSys(picture);
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if (sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
-            WaitForSingleObjectEx( sys->d3d_dev.context_mutex, INFINITE, FALSE );
-#endif
+        if (is_d3d11_opaque(picture->format.i_chroma))
+            d3d11_device_lock( &sys->d3d_dev );
+
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC srcDesc,texDesc;
             if (!is_d3d11_opaque(picture->format.i_chroma))
@@ -1295,12 +1284,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         }
     }
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if (sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
-    {
-        ReleaseMutex( sys->d3d_dev.context_mutex );
-    }
-#endif
+    if (is_d3d11_opaque(picture->format.i_chroma))
+        d3d11_device_unlock( &sys->d3d_dev );
 
     ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
 }

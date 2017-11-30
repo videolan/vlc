@@ -245,9 +245,6 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 
     picture_CopyProperties( p_outpic, p_pic );
 
-    if( p_sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
-        WaitForSingleObjectEx( p_sys->d3d_dev.context_mutex, INFINITE, FALSE );
-
     ID3D11VideoProcessorInputView *inputs[4] = {
         p_src_sys->processorInput,
         p_sys->procInput[0],
@@ -261,6 +258,8 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         p_sys->procOutput[0],
         p_sys->procOutput[1]
     };
+
+    d3d11_device_lock( &p_sys->d3d_dev );
 
     size_t idx = 0, count = 0;
     /* contrast */
@@ -317,8 +316,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                                   NULL);
     }
 
-    if( p_sys->d3d_dev.context_mutex  != INVALID_HANDLE_VALUE )
-        ReleaseMutex( p_sys->d3d_dev.context_mutex );
+    d3d11_device_unlock( &p_sys->d3d_dev );
 
     picture_Release( p_pic );
     return p_outpic;
