@@ -27,7 +27,7 @@
 
 #include <vlc_renderer_discovery.h>
 
-const vlc_renderer_item_t *
-libvlc_renderer_item_to_vlc( const libvlc_renderer_item_t *p_item );
+vlc_renderer_item_t *
+libvlc_renderer_item_to_vlc( libvlc_renderer_item_t *p_item );
 
 #endif

@@ -47,6 +47,7 @@ struct libvlc_media_player_t
     {
         input_thread_t   *p_thread;
         input_resource_t *p_resource;
+        vlc_renderer_item_t *p_renderer;
         vlc_mutex_t       lock;
     } input;
 
