@@ -159,6 +159,12 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     if(rep)
     {
         parseSegments(p_obj, rep, tagslist);
+        if(rep->isLive())
+        {
+            /* avoid update playlist immediately */
+            uint64_t startseq = rep->getLiveStartSegmentNumber(0);
+            rep->scheduleNextUpdate(startseq);
+        }
         adaptSet->addRepresentation(rep);
     }
 }
