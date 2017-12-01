@@ -1318,14 +1318,8 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
     // look for the requested pixel format first
     sys->picQuad.formatInfo = GetDirectRenderingFormat(vd, fmt->i_chroma);
 
-    /* look for a decoder format that can be decoded but not used in shaders */
-    const d3d_format_t *decoder_format = NULL;
-    if ( !sys->picQuad.formatInfo && is_d3d11_opaque(fmt->i_chroma) )
-        decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
-    else
-        decoder_format = sys->picQuad.formatInfo;
-
     // look for any pixel format that we can handle with enough pixels per channel
+    const d3d_format_t *decoder_format = NULL;
     if ( !sys->picQuad.formatInfo )
     {
         uint8_t bits_per_channel;
@@ -1346,6 +1340,12 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
             }
             break;
         }
+
+        /* look for a decoder format that can be decoded but not used in shaders */
+        if ( is_d3d11_opaque(fmt->i_chroma) )
+            decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
+        else
+            decoder_format = sys->picQuad.formatInfo;
 
         bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
         sys->picQuad.formatInfo = GetDisplayFormatByDepth(vd, bits_per_channel, decoder_format!=NULL, is_rgb);
