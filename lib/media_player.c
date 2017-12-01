@@ -728,6 +728,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
     mp->input.p_thread = NULL;
+    mp->input.p_renderer = NULL;
     mp->input.p_resource = input_resource_New(VLC_OBJECT(mp));
     if (unlikely(mp->input.p_resource == NULL))
     {
@@ -808,6 +809,9 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
         release_input_thread(p_mi);
     input_resource_Terminate( p_mi->input.p_resource );
     input_resource_Release( p_mi->input.p_resource );
+    if( p_mi->input.p_renderer )
+        vlc_renderer_item_release( p_mi->input.p_renderer );
+
     vlc_mutex_destroy( &p_mi->input.lock );
 
     libvlc_event_manager_destroy(&p_mi->event_manager);
@@ -967,7 +971,8 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
     media_attach_preparsed_event( p_mi->p_md );
 
     p_input_thread = input_Create( p_mi, p_mi->p_md->p_input_item, NULL,
-                                   p_mi->input.p_resource, NULL );
+                                   p_mi->input.p_resource,
+                                   p_mi->input.p_renderer );
     unlock(p_mi);
     if( !p_input_thread )
     {
@@ -1064,16 +1069,21 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
 }
 
 int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
-                                      const libvlc_renderer_item_t *p_litem )
+                                      libvlc_renderer_item_t *p_litem )
 {
-    const vlc_renderer_item_t *p_item = libvlc_renderer_item_to_vlc( p_litem );
-    char *psz_sout;
-    if( asprintf( &psz_sout, "#%s", vlc_renderer_item_sout( p_item ) ) == -1 )
-        return -1;
+    vlc_renderer_item_t *p_item =
+        p_litem ? libvlc_renderer_item_to_vlc( p_litem ) : NULL;
 
-    var_SetString( p_mi, "sout", psz_sout );
-    var_SetString( p_mi, "demux-filter", vlc_renderer_item_demux_filter( p_item ) );
-    free( psz_sout );
+    lock_input( p_mi );
+    input_thread_t *p_input_thread = p_mi->input.p_thread;
+    if( p_input_thread )
+        input_Control( p_input_thread, INPUT_SET_RENDERER, p_item );
+
+    if( p_mi->input.p_renderer )
+        vlc_renderer_item_release( p_mi->input.p_renderer );
+    p_mi->input.p_renderer = p_item ? vlc_renderer_item_hold( p_item ) : NULL;
+    unlock_input( p_mi );
+
     return 0;
 }
 

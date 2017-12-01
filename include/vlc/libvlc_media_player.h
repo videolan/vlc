@@ -288,7 +288,7 @@ LIBVLC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
  * \version LibVLC 3.0.0 or later
  */
 LIBVLC_API int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
-                                                 const libvlc_renderer_item_t *p_item );
+                                                 libvlc_renderer_item_t *p_item );
 
 /**
  * Callback prototype to allocate and lock a picture buffer.
