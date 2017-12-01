@@ -55,6 +55,14 @@ vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy,
                              VANativeDisplay native,
                              vlc_vaapi_native_destroy_cb native_destroy_cb);
 
+/* Get and Initializes a VADisplay from a DRM device. If device is NULL, this
+ * function will try to open default devices. */
+struct vlc_vaapi_instance *
+vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
+                                VADisplay (*pf_getDisplayDRM)(int),
+                                VADisplay *pdpy, const char *device);
+
+
 /* Increments the VAAPI instance refcount */
 VADisplay
 vlc_vaapi_HoldInstance(struct vlc_vaapi_instance *inst);

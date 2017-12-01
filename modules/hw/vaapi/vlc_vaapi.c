@@ -31,11 +31,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <fcntl.h>
 #include <assert.h>
 
 #include <va/va.h>
 
 #include <vlc_common.h>
+#include <vlc_fs.h>
 #include <vlc_atomic.h>
 #include <vlc_fourcc.h>
 #include <vlc_filter.h>
@@ -107,6 +109,62 @@ error:
         native_destroy_cb(native);
     return NULL;
 }
+
+static void native_drm_destroy_cb(VANativeDisplay native)
+{
+    vlc_close((intptr_t) native);
+}
+
+struct vlc_vaapi_instance *
+vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
+                                VADisplay (*pf_getDisplayDRM)(int),
+                                VADisplay *pdpy, const char *device)
+{
+    static const char *default_drm_device_paths[] = {
+        "/dev/dri/renderD128",
+        "/dev/dri/card0",
+    };
+
+    const char *user_drm_device_paths[] = { device };
+    const char **drm_device_paths;
+    size_t drm_device_paths_count;
+
+    if (device != NULL)
+    {
+        drm_device_paths = user_drm_device_paths;
+        drm_device_paths_count = 1;
+    }
+    else
+    {
+        drm_device_paths = default_drm_device_paths;
+        drm_device_paths_count = ARRAY_SIZE(default_drm_device_paths);
+    }
+
+    for (size_t i = 0; drm_device_paths_count; i++)
+    {
+        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (drm_fd < 0)
+            continue;
+
+        VADisplay dpy = pf_getDisplayDRM(drm_fd);
+        if (dpy)
+        {
+            struct vlc_vaapi_instance *va_inst =
+                vlc_vaapi_InitializeInstance(o, dpy,
+                                             (VANativeDisplay *)(intptr_t)drm_fd,
+                                             native_drm_destroy_cb);
+            if (va_inst)
+            {
+                *pdpy = dpy;
+                return va_inst;
+            }
+        }
+        else
+            vlc_close(drm_fd);
+    }
+    return NULL;
+}
+
 
 VADisplay
 vlc_vaapi_HoldInstance(struct vlc_vaapi_instance *inst)
