@@ -29,6 +29,13 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 
+#define GPU_MANUFACTURER_AMD           0x1002
+#define GPU_MANUFACTURER_NVIDIA        0x10DE
+#define GPU_MANUFACTURER_VIA           0x1106
+#define GPU_MANUFACTURER_INTEL         0x8086
+#define GPU_MANUFACTURER_S3            0x5333
+#define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
+
 #define D3D11_MAX_SHADER_VIEW  3
 
 typedef struct
