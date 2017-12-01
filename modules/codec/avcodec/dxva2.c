@@ -87,9 +87,9 @@ typedef struct {
     const char   *name;
     D3DFORMAT    format;
     vlc_fourcc_t codec;
-} d3d_format_t;
+} d3d9_format_t;
 /* XXX Prefered format must come first */
-static const d3d_format_t d3d_formats[] = {
+static const d3d9_format_t d3d_formats[] = {
     { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
     { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
     { "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
@@ -98,7 +98,7 @@ static const d3d_format_t d3d_formats[] = {
     { NULL, 0, 0 }
 };
 
-static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
+static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
 {
     for (unsigned i = 0; d3d_formats[i].name; i++) {
         if (d3d_formats[i].format == format)
@@ -530,7 +530,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 
     for (unsigned j = 0; j < output_count; j++) {
         const D3DFORMAT f = output_list[j];
-        const d3d_format_t *format = D3dFindFormat(f);
+        const d3d9_format_t *format = D3dFindFormat(f);
         if (format) {
             msg_Dbg(va, "%s is supported for output", format->name);
         } else {
@@ -542,7 +542,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     for (unsigned pass = 0; pass < 2 && err != VLC_SUCCESS; ++pass)
     {
         for (unsigned j = 0; d3d_formats[j].name; j++) {
-            const d3d_format_t *format = &d3d_formats[j];
+            const d3d9_format_t *format = &d3d_formats[j];
 
             /* */
             bool is_supported = false;

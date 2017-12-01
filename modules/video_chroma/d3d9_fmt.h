@@ -27,6 +27,8 @@
 
 #include <d3d9.h>
 
+#include "dxgi_fmt.h"
+
 /* owned by the vout for VLC_CODEC_D3D9_OPAQUE */
 struct picture_sys_t
 {
