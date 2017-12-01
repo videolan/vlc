@@ -370,38 +370,12 @@ x11_init_vaapi_instance(opengl_tex_converter_t *tc, struct priv *priv)
 #endif
 
 #ifdef HAVE_VA_DRM
-static void
-drm_native_destroy_cb(VANativeDisplay native)
-{
-    vlc_close((intptr_t) native);
-}
 static int
 drm_init_vaapi_instance(opengl_tex_converter_t *tc, struct priv *priv)
 {
-    static const char *const drm_device_paths[] = {
-        "/dev/dri/renderD128",
-        "/dev/dri/card0"
-    };
-
-    for (size_t i = 0; i < ARRAY_SIZE(drm_device_paths); i++)
-    {
-        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
-        if (drm_fd == -1)
-            continue;
-
-        priv->vadpy = vaGetDisplayDRM(drm_fd);
-        if (priv->vadpy)
-        {
-            priv->vainst =
-                vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
-                                             (VANativeDisplay) (intptr_t)drm_fd,
-                                             drm_native_destroy_cb);
-            if (priv->vainst != NULL)
-                break;
-        }
-        else
-            vlc_close(drm_fd);
-    }
+    priv->vainst =
+        vlc_vaapi_InitializeInstanceDRM(VLC_OBJECT(tc->gl), vaGetDisplayDRM,
+                                        &priv->vadpy, NULL);
     return priv->vainst != NULL ? VLC_SUCCESS : VLC_EGENERIC;
 }
 #endif
