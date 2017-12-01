@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_memstream.h>
+#include <vlc_renderer_discovery.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -576,7 +577,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_SET_RENDERER:
         {
             vlc_renderer_item_t* p_item = va_arg( args, vlc_renderer_item_t* );
-            val.p_address = p_item;
+            val.p_address = p_item ? vlc_renderer_item_hold( p_item ) : NULL;
             input_ControlPush( p_input, INPUT_CONTROL_SET_RENDERER, &val );
             return VLC_SUCCESS;
         }
