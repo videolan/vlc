@@ -550,6 +550,8 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
     p_pps->i_pic_order_present_flag = bs_read( p_bs, 1 );
 
     unsigned num_slice_groups = bs_read_ue( p_bs ) + 1;
+    if( num_slice_groups > 8 ) /* never has value > 7. Annex A, G & J */
+        return false;
     if( num_slice_groups > 1 )
     {
         unsigned slice_group_map_type = bs_read_ue( p_bs );
