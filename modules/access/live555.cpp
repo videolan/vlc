@@ -563,6 +563,14 @@ static void continueAfterDESCRIBE( RTSPClient* client, int result_code,
         p_sys->b_error = true;
     delete[] result_string;
     p_sys->event_rtsp = 1;
+#ifdef VLC_PATCH_RTSPCLIENT_SERVERSTRING
+    if( client_vlc->serverString() )
+    {
+        if( !strncmp(client_vlc->serverString(), "Kasenna", 7) ||
+            !strncmp(client_vlc->serverString(), "WMServer", 8) )
+            p_sys->capabilities &= ~CAP_RATE_CONTROL;
+    }
+#endif
 }
 
 static void continueAfterOPTIONS( RTSPClient* client, int result_code,
