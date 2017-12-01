@@ -53,5 +53,6 @@ const char *DxgiFormatToStr(DXGI_FORMAT format);
 vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format);
 const d3d_format_t *GetRenderFormatList(void);
 void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
+const char *DxgiVendorStr(int gpu_vendor);
 
 #endif /* include-guard */

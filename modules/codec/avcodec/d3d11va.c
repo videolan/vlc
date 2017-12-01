@@ -447,18 +447,6 @@ static void D3dDestroyDevice(vlc_va_t *va)
  */
 static char *DxDescribe(vlc_va_sys_t *sys)
 {
-    static const struct {
-        unsigned id;
-        char     name[32];
-    } vendors [] = {
-        { GPU_MANUFACTURER_AMD,      "ATI"         },
-        { GPU_MANUFACTURER_NVIDIA,   "NVIDIA"      },
-        { GPU_MANUFACTURER_VIA,      "VIA"         },
-        { GPU_MANUFACTURER_INTEL,    "Intel"       },
-        { GPU_MANUFACTURER_S3,       "S3 Graphics" },
-        { GPU_MANUFACTURER_QUALCOMM, "Qualcomm"    },
-        { 0, "" }
-    };
 
     IDXGIAdapter *p_adapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
     if (!p_adapter) {
@@ -468,20 +456,12 @@ static char *DxDescribe(vlc_va_sys_t *sys)
     char *description = NULL;
     DXGI_ADAPTER_DESC adapterDesc;
     if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-        const char *vendor = "Unknown";
-        for (int i = 0; vendors[i].id != 0; i++) {
-            if (vendors[i].id == adapterDesc.VendorId) {
-                vendor = vendors[i].name;
-                break;
-            }
-        }
-
         char *utfdesc = FromWide(adapterDesc.Description);
         if (likely(utfdesc!=NULL))
         {
             if (asprintf(&description, "D3D11VA (%s, vendor %u(%s), device %u, revision %u)",
                          utfdesc,
-                         adapterDesc.VendorId, vendor, adapterDesc.DeviceId, adapterDesc.Revision) < 0)
+                         adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision) < 0)
                 description = NULL;
             free(utfdesc);
         }
