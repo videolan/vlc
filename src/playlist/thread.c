@@ -217,6 +217,8 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL,
                                                    p_sys->p_input_resource,
                                                    p_renderer );
+    if( p_renderer )
+        vlc_renderer_item_release( p_renderer );
     if( likely(p_input_thread != NULL) )
     {
         var_AddCallback( p_input_thread, "intf-event",
