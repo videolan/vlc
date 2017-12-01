@@ -1245,8 +1245,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
-            block_Release( p_block );
-            p_block = NULL;
             Flush( p_dec );
         }
         else if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )

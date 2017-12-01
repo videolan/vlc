@@ -158,23 +158,20 @@ static int Demux( demux_t *p_demux)
 
     bool b_eof = false;
 
-    if( p_sys->i_state == DIRAC_DEMUX_DISCONT )
+    p_block_in = vlc_stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
+    if( !p_block_in )
     {
-        p_sys->i_state++;
-        p_block_in = block_Alloc( 128 );
-        if( p_block_in )
-        {
-            p_block_in->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
-        }
+        b_eof = true;
     }
     else
     {
-        p_block_in = vlc_stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
-        if( !p_block_in )
+        if( p_sys->i_state == DIRAC_DEMUX_DISCONT )
         {
-            b_eof = true;
+            p_sys->i_state++;
+            p_block_in->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
         }
-        else if ( p_sys->i_state == DIRAC_DEMUX_FIRST)
+
+        if ( p_sys->i_state == DIRAC_DEMUX_FIRST )
         {
             p_sys->i_state++;
             /* by default, timestamps are invalid.
