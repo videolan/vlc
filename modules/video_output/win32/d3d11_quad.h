@@ -37,6 +37,7 @@ typedef struct
     UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;
+    UINT                      vertexStride;
     ID3D11VertexShader        *d3dvertexShader;
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;

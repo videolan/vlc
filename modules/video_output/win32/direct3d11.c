@@ -1096,14 +1096,13 @@ static void UpdateQuadLuminanceScale(vout_display_t *vd, d3d_quad_t *quad, float
 static void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW],
                              ID3D11RenderTargetView *d3drenderTargetView)
 {
-    UINT stride = sizeof(d3d_vertex_t);
     UINT offset = 0;
 
     ID3D11DeviceContext_OMSetRenderTargets(d3d_dev->d3dcontext, 1, &d3drenderTargetView, NULL);
 
     /* Render the quad */
     /* vertex shader */
-    ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
+    ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &quad->vertexStride, &offset);
     ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     if ( quad->pVertexShaderConstants )
         ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexShaderConstants);
@@ -2676,10 +2675,12 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
         return false;
     }
 
+    quad->vertexStride = sizeof(d3d_vertex_t);
+
     D3D11_BUFFER_DESC bd;
     memset(&bd, 0, sizeof(bd));
     bd.Usage = D3D11_USAGE_DYNAMIC;
-    bd.ByteWidth = sizeof(d3d_vertex_t) * quad->vertexCount;
+    bd.ByteWidth = quad->vertexStride * quad->vertexCount;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
