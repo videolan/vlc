@@ -257,11 +257,6 @@ static void DeleteDRM(vlc_va_t *va, void **hwctx)
     free(sys);
 }
 
-static void DRMNativeDestroy(VANativeDisplay native)
-{
-    vlc_close((intptr_t) native);
-}
-
 static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                      const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -293,39 +288,8 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
     sys->va_inst = NULL;
 
     /* Create a VA display */
-    VANativeDisplay native = NULL;
-    vlc_vaapi_native_destroy_cb native_destroy_cb = NULL;
-
-    static const char drm_device_paths[][20] = {
-        "/dev/dri/renderD128",
-        "/dev/dri/card0"
-    };
-
-    for (int i = 0; ARRAY_SIZE(drm_device_paths); i++)
-    {
-        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
-        if (drm_fd < 0)
-            continue;
-
-        sys->hw_ctx.display = vaGetDisplayDRM(drm_fd);
-        if (sys->hw_ctx.display)
-        {
-            native_destroy_cb = DRMNativeDestroy;
-            native = (VANativeDisplay *)(intptr_t) drm_fd;
-            break;
-        }
-
-        vlc_close(drm_fd);
-    }
-
-    if (sys->hw_ctx.display == NULL)
-    {
-        msg_Err(va, "Could not get a VAAPI device");
-        goto error;
-    }
-
-    sys->va_inst = vlc_vaapi_InitializeInstance(o, sys->hw_ctx.display, native,
-                                                native_destroy_cb);
+    sys->va_inst = vlc_vaapi_InitializeInstanceDRM(o, vaGetDisplayDRM,
+                                                   &sys->hw_ctx.display, NULL);
     if (!sys->va_inst)
         goto error;
 
