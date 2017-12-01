@@ -189,6 +189,9 @@ typedef struct
 
 class RTSPClientVlc;
 
+#define CAP_RATE_CONTROL        (1 << 1)
+#define CAPS_DEFAULT            CAP_RATE_CONTROL
+
 struct demux_sys_t
 {
     char            *p_sdp;    /* XXX mallocated */
@@ -199,6 +202,7 @@ struct demux_sys_t
     TaskScheduler    *scheduler;
     UsageEnvironment *env ;
     RTSPClientVlc    *rtsp;
+    int              capabilities; /* Server capabilities workaround */
 
     /* */
     int              i_track;
@@ -338,6 +342,13 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_demux, "version " LIVEMEDIA_LIBRARY_VERSION_STRING );
+
+    p_sys->capabilities = CAPS_DEFAULT;
+    if( var_GetBool( p_demux, "rtsp-kasenna" ) ||
+        var_GetBool( p_demux, "rtsp-wmserver" ) )
+    {
+        p_sys->capabilities &= ~CAP_RATE_CONTROL;
+    }
 
     TAB_INIT( p_sys->i_track, p_sys->track );
     p_sys->b_no_data = true;
@@ -1615,9 +1626,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pb = va_arg( args, bool * );
 
             *pb = (p_sys->rtsp != NULL) &&
-                    (p_sys->f_npt_length > 0) &&
-                    ( !var_GetBool( p_demux, "rtsp-kasenna" ) ||
-                      !var_GetBool( p_demux, "rtsp-wmserver" ) );
+                  (p_sys->f_npt_length > 0) &&
+                  (p_sys->capabilities & CAP_RATE_CONTROL);
             return VLC_SUCCESS;
 
         case DEMUX_SET_RATE:
@@ -1626,8 +1636,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             double f_scale, f_old_scale;
 
             if( !p_sys->rtsp || (p_sys->f_npt_length <= 0) ||
-                var_GetBool( p_demux, "rtsp-kasenna" ) ||
-                var_GetBool( p_demux, "rtsp-wmserver" ) )
+                !(p_sys->capabilities & CAP_RATE_CONTROL) )
                 return VLC_EGENERIC;
 
             /* According to RFC 2326 p56 chapter 12.35 a RTSP server that
