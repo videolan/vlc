@@ -123,6 +123,8 @@ vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
     static const char *default_drm_device_paths[] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0",
+        "/dev/dri/renderD129",
+        "/dev/dri/card1",
     };
 
     const char *user_drm_device_paths[] = { device };
