@@ -1711,6 +1711,10 @@ static void ControlRelease( int i_type, vlc_value_t val )
     case INPUT_CONTROL_UPDATE_VIEWPOINT:
         free( val.p_address );
         break;
+    case INPUT_CONTROL_SET_RENDERER:
+        if( val.p_address )
+            vlc_renderer_item_release( val.p_address );
+        break;
 
     default:
         break;
