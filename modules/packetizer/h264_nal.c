@@ -584,7 +584,7 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
             }
             for( unsigned i = 0; i < pic_size_in_maps_units; i++ )
             {
-                bs_read( p_bs, sliceGroupSize );
+                bs_skip( p_bs, sliceGroupSize );
             }
         }
     }
