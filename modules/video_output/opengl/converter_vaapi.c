@@ -339,25 +339,111 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
     return VLC_SUCCESS;
 }
 
-static int
-tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
-              VANativeDisplay native,
-              vlc_vaapi_native_destroy_cb native_destroy_cb)
+#ifdef HAVE_VA_X11
+static void
+x11_native_destroy_cb(VANativeDisplay native)
 {
-    int ret = VLC_EGENERIC;
-    struct priv *priv = NULL;
+    XCloseDisplay(native);
+}
 
-    if (vadpy == NULL)
-        goto error;
+static int
+x11_init_vaapi_instance(opengl_tex_converter_t *tc, struct priv *priv)
+{
+    if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
+        return VLC_EGENERIC;
 
-    ret = VLC_ENOMEM;
-    priv = tc->priv = calloc(1, sizeof(struct priv));
+    Display *x11dpy = XOpenDisplay(tc->gl->surface->display.x11);
+    if (x11dpy == NULL)
+        return VLC_EGENERIC;
+
+    priv->vadpy = vaGetDisplay(x11dpy);
+    if (priv->vadpy == NULL)
+    {
+        x11_native_destroy_cb(x11dpy);
+        return VLC_EGENERIC;
+    }
+
+    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
+                                                x11dpy, x11_native_destroy_cb);
+    return priv->vainst != NULL ? VLC_SUCCESS : VLC_EGENERIC;
+}
+#endif
+
+#ifdef HAVE_VA_DRM
+static void
+drm_native_destroy_cb(VANativeDisplay native)
+{
+    vlc_close((intptr_t) native);
+}
+static int
+drm_init_vaapi_instance(opengl_tex_converter_t *tc, struct priv *priv)
+{
+    static const char *const drm_device_paths[] = {
+        "/dev/dri/renderD128",
+        "/dev/dri/card0"
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(drm_device_paths); i++)
+    {
+        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (drm_fd == -1)
+            continue;
+
+        priv->vadpy = vaGetDisplayDRM(drm_fd);
+        if (priv->vadpy)
+        {
+            priv->vainst =
+                vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
+                                             (VANativeDisplay) (intptr_t)drm_fd,
+                                             drm_native_destroy_cb);
+            if (priv->vainst != NULL)
+                break;
+        }
+        else
+            vlc_close(drm_fd);
+    }
+    return priv->vainst != NULL ? VLC_SUCCESS : VLC_EGENERIC;
+}
+#endif
+
+#ifdef HAVE_VA_WL
+static int
+wl_init_vaapi_instance(opengl_tex_converter_t *tc, struct priv *priv)
+{
+    priv->vadpy = vaGetDisplayWl(tc->gl->surface->display.wl);
+    if (priv->vadpy == NULL)
+        return VLC_EGENERIC;
+
+    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
+                                                NULL, NULL);
+    return priv->vainst != NULL ? VLC_SUCCESS : VLC_EGENERIC;
+}
+#endif
+
+
+static int
+Open(vlc_object_t *obj)
+{
+    opengl_tex_converter_t *tc = (void *) obj;
+
+    if (!vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
+     || tc->gl->ext != VLC_GL_EXT_EGL
+     || tc->gl->egl.createImageKHR == NULL
+     || tc->gl->egl.destroyImageKHR == NULL)
+        return VLC_EGENERIC;
+
+    if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
+        return VLC_EGENERIC;
+
+    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
+    if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
+        return VLC_EGENERIC;
+
+    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
         goto error;
-
-    ret = VLC_EGENERIC;
-    priv->vadpy = vadpy;
     priv->fourcc = 0;
+    priv->vainst = NULL;
 
     int va_fourcc;
     int vlc_sw_chroma;
@@ -383,18 +469,21 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     if (priv->glEGLImageTargetTexture2DOES == NULL)
         goto error;
 
-    tc->pf_update  = tc_vaegl_update;
-    tc->pf_get_pool = tc_vaegl_get_pool;
+    int ret;
+#if defined (HAVE_VA_X11)
+    if (tc->gl->surface->type == VOUT_WINDOW_TYPE_XID)
+        ret = x11_init_vaapi_instance(tc, priv);
+#elif defined(HAVE_VA_WL)
+    if (tc->gl->surface->type == VOUT_WINDOW_TYPE_WAYLAND)
+        ret = wl_init_vaapi_instance(tc, priv);
+#elif defined (HAVE_VA_DRM)
+    ret = drm_init_vaapi_instance(tc, priv);
+#else
+# error need X11/WL/DRM support
+#endif
 
-    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
-                                                native, native_destroy_cb);
-    if (priv->vainst == NULL)
-    {
-        /* Already released by vlc_vaapi_InitializeInstance */
-        vadpy = NULL;
-        native_destroy_cb = NULL;
+    if (ret != VLC_SUCCESS)
         goto error;
-    }
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
@@ -404,102 +493,19 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     if (tc->fshader == 0)
         goto error;
 
+    tc->pf_update  = tc_vaegl_update;
+    tc->pf_get_pool = tc_vaegl_get_pool;
+
     /* Fix the UV plane texture scale factor for GR */
     if (vlc_sw_chroma == VLC_CODEC_NV12 || vlc_sw_chroma == VLC_CODEC_P010)
         tc->texs[1].h = (vlc_rational_t) { 1, 2 };
 
     return VLC_SUCCESS;
-
 error:
     if (priv && priv->vainst)
         vlc_vaapi_ReleaseInstance(priv->vainst);
-    else
-    {
-        if (vadpy != NULL)
-            vaTerminate(vadpy);
-        if (native != NULL && native_destroy_cb != NULL)
-            native_destroy_cb(native);
-    }
     free(priv);
-    return ret;
-}
-
-#ifdef HAVE_VA_X11
-static void
-x11_native_destroy_cb(VANativeDisplay native)
-{
-    XCloseDisplay(native);
-}
-#endif
-#ifdef HAVE_VA_DRM
-static void
-drm_native_destroy_cb(VANativeDisplay native)
-{
-    vlc_close((intptr_t) native);
-}
-#endif
-
-static int
-Open(vlc_object_t *obj)
-{
-    opengl_tex_converter_t *tc = (void *) obj;
-
-    if (!vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
-     || tc->gl->ext != VLC_GL_EXT_EGL
-     || tc->gl->egl.createImageKHR == NULL
-     || tc->gl->egl.destroyImageKHR == NULL)
-        return VLC_EGENERIC;
-
-    if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
-        return VLC_EGENERIC;
-
-    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
-    if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
-        return VLC_EGENERIC;
-
-    int ret = VLC_EGENERIC;
-#if defined (HAVE_VA_X11)
-    if (tc->gl->surface->type == VOUT_WINDOW_TYPE_XID)
-    {
-        if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
-            return VLC_EGENERIC;
-        Display *x11dpy = XOpenDisplay(tc->gl->surface->display.x11);
-        if (x11dpy == NULL)
-            return VLC_EGENERIC;
-
-        ret = tc_vaegl_init(tc, vaGetDisplay(x11dpy), x11dpy,
-                            x11_native_destroy_cb);
-    }
-#elif defined(HAVE_VA_WL)
-    if (tc->gl->surface->type == VOUT_WINDOW_TYPE_WAYLAND)
-        ret = tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl),
-                            NULL, NULL);
-#elif defined (HAVE_VA_DRM)
-    static const char *const drm_device_paths[] = {
-        "/dev/dri/renderD128",
-        "/dev/dri/card0"
-    };
-
-    for (size_t i = 0; i < ARRAY_SIZE(drm_device_paths); i++)
-    {
-        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
-        if (drm_fd == -1)
-            continue;
-
-        VADisplay dpy = vaGetDisplayDRM(drm_fd);
-        if (dpy)
-        {
-            ret = tc_vaegl_init(tc, dpy, (VANativeDisplay) (intptr_t) drm_fd,
-                                drm_native_destroy_cb);
-            if (ret == VLC_SUCCESS)
-                break;
-        }
-        else
-            vlc_close(drm_fd);
-    }
-#endif
-
-    return ret;
+    return VLC_EGENERIC;
 }
 
 #if defined (HAVE_VA_X11)
