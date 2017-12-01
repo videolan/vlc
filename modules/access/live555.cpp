@@ -190,6 +190,8 @@ typedef struct
 class RTSPClientVlc;
 
 #define CAP_RATE_CONTROL        (1 << 1)
+#define CAP_SUBSESSION_TEARDOWN (1 << 2)
+#define CAP_SUBSESSION_PAUSE    (1 << 3)
 #define CAPS_DEFAULT            CAP_RATE_CONTROL
 
 struct demux_sys_t
@@ -569,6 +571,8 @@ static void continueAfterDESCRIBE( RTSPClient* client, int result_code,
         if( !strncmp(client_vlc->serverString(), "Kasenna", 7) ||
             !strncmp(client_vlc->serverString(), "WMServer", 8) )
             p_sys->capabilities &= ~CAP_RATE_CONTROL;
+        if( !strncmp(client_vlc->serverString(), "VLC/", 4) )
+            p_sys->capabilities |= (CAP_SUBSESSION_TEARDOWN|CAP_SUBSESSION_PAUSE);
     }
 #endif
 }
@@ -1330,7 +1334,8 @@ static void ResumeTrack( demux_t *p_demux, live_track_t *tk )
         if( !wait_Live555_response(p_demux) )
         {
             msg_Err( p_demux, "RTSP PLAY failed %s", p_sys->env->getResultMsg() );
-            if( !HasSharedSession( tk->sub ) )
+            if( (p_sys->capabilities & CAP_SUBSESSION_TEARDOWN) ||
+                !HasSharedSession( tk->sub ) )
             {
                 tk->state = live_track_t::STATE_TEARDOWN;
                 p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
@@ -1366,7 +1371,8 @@ static int Demux( demux_t *p_demux )
             es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
             if( !b && (tk->state == live_track_t::STATE_SELECTED) && p_sys->rtsp )
             {
-                if( !HasSharedSession( tk->sub ) )
+                if( (p_sys->capabilities & CAP_SUBSESSION_TEARDOWN) ||
+                    !HasSharedSession( tk->sub ) )
                 {
                     tk->state = live_track_t::STATE_TEARDOWN;
                     p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
