@@ -167,7 +167,7 @@ static la_int64_t libarchive_seek_cb( libarchive_t* p_arc, void* p_obj,
     {
         case SEEK_SET: whence_pos = 0;                           break;
         case SEEK_CUR: whence_pos = vlc_stream_Tell( p_source ); break;
-        case SEEK_END: whence_pos = stream_Size( p_source ) - 1; break;
+        case SEEK_END: whence_pos = stream_Size( p_source ); break;
               default: vlc_assert_unreachable();
 
     }
