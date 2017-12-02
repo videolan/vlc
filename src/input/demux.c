@@ -217,21 +217,23 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         }
     }
 
-    p_demux->p_input = p_parent_input;
-    p_demux->psz_access = strdup( psz_access );
-    p_demux->psz_demux = strdup( psz_demux );
-    p_demux->psz_location = strdup( psz_location );
-    p_demux->psz_filepath = get_path( psz_location ); /* parse URL */
+    size_t schemelen = strlen(psz_access);
 
-    if( unlikely(p_demux->psz_access == NULL
-              || p_demux->psz_demux == NULL
-              || p_demux->psz_location == NULL) )
+    p_demux->p_input = p_parent_input;
+    p_demux->psz_demux = strdup( psz_demux );
+    if (unlikely(p_demux->psz_demux == NULL))
         goto error;
+
+    if (unlikely(asprintf(&p_demux->psz_url, "%s://%s", psz_access,
+                          psz_location) == -1))
+        goto error;
+
+    p_demux->psz_location = p_demux->psz_url + schemelen + 3;
+    p_demux->psz_filepath = get_path( psz_location ); /* parse URL */
 
     if( !b_preparsing )
         msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
-                 "location='%s' file='%s'",
-                 p_demux->psz_access, p_demux->psz_demux,
+                 "location='%s' file='%s'", psz_access, p_demux->psz_demux,
                  p_demux->psz_location, p_demux->psz_filepath );
 
     p_demux->s              = s;
@@ -267,18 +269,19 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     else
     {
         p_demux->p_module =
-            module_need( p_demux, "access_demux", p_demux->psz_access, true );
+            module_need( p_demux, "access_demux", psz_access, true );
     }
 
     if( p_demux->p_module == NULL )
+    {
+        free( p_demux->psz_filepath );
+        free( p_demux->psz_url );
         goto error;
+    }
 
     return p_demux;
 error:
-    free( p_demux->psz_filepath );
-    free( p_demux->psz_location );
     free( p_demux->psz_demux );
-    free( p_demux->psz_access );
     vlc_object_release( p_demux );
     return NULL;
 }
@@ -294,9 +297,8 @@ void demux_Delete( demux_t *p_demux )
 
     priv->destroy(p_demux);
     free( p_demux->psz_filepath );
-    free( p_demux->psz_location );
+    free( p_demux->psz_url );
     free( p_demux->psz_demux );
-    free( p_demux->psz_access );
     vlc_object_release( p_demux );
 }
 
@@ -585,8 +587,8 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     p_demux->p_next       = p_next;
     p_demux->p_input      = NULL;
     p_demux->p_sys        = NULL;
-    p_demux->psz_access   = NULL;
     p_demux->psz_demux    = NULL;
+    p_demux->psz_url      = NULL;
     p_demux->psz_location = NULL;
     p_demux->psz_filepath = NULL;
     p_demux->out          = NULL;

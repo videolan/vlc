@@ -48,9 +48,9 @@ struct demux_t
     module_t    *p_module;
 
     /* eg informative but needed (we can have access+demux) */
-    char        *psz_access;
     char        *psz_demux;
-    char        *psz_location;
+    char        *psz_url;
+    const char  *psz_location;
     char        *psz_filepath;
 
     union {

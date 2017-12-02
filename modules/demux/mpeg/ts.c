@@ -501,8 +501,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( p_sys->standard == TS_STANDARD_AUTO &&
-       ( !strcmp( p_demux->psz_access, "atsc" ) ||
-         !strcmp( p_demux->psz_access, "usdigital" ) ) )
+       ( !strncasecmp( p_demux->psz_url, "atsc", 4 ) ||
+         !strncasecmp( p_demux->psz_url, "usdigital", 9 ) ) )
     {
         TsChangeStandard( p_sys, TS_STANDARD_ATSC );
     }

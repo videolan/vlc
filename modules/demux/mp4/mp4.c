@@ -803,17 +803,8 @@ static int Open( vlc_object_t * p_this )
                 }
                 else
                 {
-                    char *psz_url;
-                    if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
-                                  p_demux->psz_location ) < 0 )
-                    {
-                        free( psz_ref );
-                        input_item_node_Delete( p_subitems );
-                        return VLC_ENOMEM;
-                    }
-
-                    char *psz_absolute = vlc_uri_resolve( psz_url, psz_ref );
-                    free( psz_url );
+                    char *psz_absolute = vlc_uri_resolve( p_demux->psz_url,
+                                                          psz_ref );
                     free( psz_ref );
                     if( psz_absolute == NULL )
                     {

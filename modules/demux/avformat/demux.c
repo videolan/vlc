@@ -156,7 +156,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     AVInputFormat *fmt = NULL;
     int64_t       i_start_time = -1;
     bool          b_can_seek;
-    char         *psz_url;
+    const char    *psz_url;
     const uint8_t *peek;
     int           error;
 
@@ -176,13 +176,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     memset( pd.buf + pd.buf_size, 0, AVPROBE_PADDING_SIZE );
 
     if( p_demux->psz_filepath )
-        psz_url = strdup( p_demux->psz_filepath );
+        psz_url = p_demux->psz_filepath;
     else
-    {
-        if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
-                      p_demux->psz_location ) == -1)
-            psz_url = NULL;
-    }
+        psz_url = p_demux->psz_url;
 
     if( psz_url != NULL )
         msg_Dbg( p_demux, "trying url: %s", psz_url );
@@ -210,7 +206,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     if( fmt == NULL )
     {
         msg_Dbg( p_demux, "couldn't guess format" );
-        free( psz_url );
         return VLC_EGENERIC;
     }
 
@@ -231,10 +226,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         for( int i = 0; *ppsz_blacklist[i]; i++ )
         {
             if( !strcmp( fmt->name, ppsz_blacklist[i] ) )
-            {
-                free( psz_url );
                 return VLC_EGENERIC;
-            }
         }
     }
 
@@ -244,23 +236,16 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         int i_len;
 
         if( !p_demux->psz_filepath )
-        {
-            free( psz_url );
             return VLC_EGENERIC;
-        }
 
         i_len = strlen( p_demux->psz_filepath );
         if( i_len < 4 )
-        {
-            free( psz_url );
             return VLC_EGENERIC;
-        }
 
         if( strcasecmp( &p_demux->psz_filepath[i_len - 4], ".str" ) &&
             strcasecmp( &p_demux->psz_filepath[i_len - 4], ".xai" ) &&
             strcasecmp( &p_demux->psz_filepath[i_len - 3], ".xa" ) )
         {
-            free( psz_url );
             return VLC_EGENERIC;
         }
     }
@@ -272,10 +257,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
-    {
-        free( psz_url );
         return VLC_ENOMEM;
-    }
+
     p_sys->ic = 0;
     p_sys->fmt = fmt;
     p_sys->tracks = NULL;
@@ -287,7 +270,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     unsigned char * p_io_buffer = av_malloc( AVFORMAT_IOBUFFER_SIZE );
     if( !p_io_buffer )
     {
-        free( psz_url );
         avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
@@ -296,7 +278,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     if( !p_sys->ic )
     {
         av_free( p_io_buffer );
-        free( psz_url );
         avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
@@ -306,7 +287,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     if( !pb )
     {
         av_free( p_io_buffer );
-        free( psz_url );
         avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
@@ -321,11 +301,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         av_free( pb->buffer );
         av_free( pb );
         p_sys->ic = NULL;
-        free( psz_url );
         avformat_CloseDemux( p_this );
         return VLC_EGENERIC;
     }
-    free( psz_url );
 
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
     unsigned nb_streams = p_sys->ic->nb_streams;

@@ -492,11 +492,6 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
     (void)demux;
 }
 
-static void *demux_init (demux_t *demux)
-{
-    return stream_init (demux, demux->psz_demux);
-}
-
 /*
  * Static payload types handler
  */

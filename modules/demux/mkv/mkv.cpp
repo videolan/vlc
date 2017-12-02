@@ -157,7 +157,7 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Dbg( p_demux, "Preloading local dir" );
         /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-        if ( p_demux->psz_filepath && !strcmp( p_demux->psz_access, "file" ) )
+        if ( p_demux->psz_filepath && !strncasecmp( p_demux->psz_url, "file:", 5 ) )
         {
             // assume it's a regular file
             // get the directory path

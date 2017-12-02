@@ -630,10 +630,10 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(!p_demux->p_input))
         return VLC_EGENERIC;
 
-    forced = !strcasecmp(p_demux->psz_access, "bluray");
+    forced = !strncasecmp(p_demux->psz_url, "bluray:", 7);
 
     if (p_demux->s) {
-        if (!strcasecmp(p_demux->psz_access, "file")) {
+        if (!strncasecmp(p_demux->psz_url, "file:", 5)) {
             /* use access_demux for local files */
             return VLC_EGENERIC;
         }

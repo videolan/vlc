@@ -179,7 +179,8 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
+    psz_vobname = strdup( p_demux->psz_url );
+    if( psz_vobname == NULL )
         goto error;
 
     i_len = strlen( psz_vobname );

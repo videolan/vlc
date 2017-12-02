@@ -853,7 +853,7 @@ static int DemuxInit( demux_t *p_demux )
         ASF_fillup_es_bitrate_priorities_ex( p_sys, p_hdr_ext, &fmt_priorities_bitrate_ex );
     }
 
-    const bool b_mms = !strncmp( p_demux->psz_access, "mms", 3 );
+    const bool b_mms = !strncasecmp( p_demux->psz_url, "mms:", 4 );
     bool b_dvrms = false;
 
     if( b_mms )
