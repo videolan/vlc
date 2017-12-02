@@ -455,8 +455,7 @@ static int DemuxOpen ( vlc_object_t *p_this )
     dvdnav_t *p_dvdnav = NULL;
     bool forced = false, b_seekable = false;
 
-    if( p_demux->psz_demux != NULL
-     && !strncmp(p_demux->psz_demux, "dvd", 3) )
+    if( p_demux->psz_name != NULL && !strncmp(p_demux->psz_name, "dvd", 3) )
         forced = true;
 
     /* StreamProbeDVD need FASTSEEK, but if dvd is forced, we don't probe thus

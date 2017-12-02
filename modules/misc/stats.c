@@ -177,7 +177,7 @@ static int OpenDemux ( vlc_object_t *p_this )
     p_demux->p_sys = NULL;
 
     /* Only when selected */
-    if( *p_demux->psz_demux == '\0' )
+    if( *p_demux->psz_name == '\0' )
         return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "Init Stat demux" );

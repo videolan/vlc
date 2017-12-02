@@ -161,7 +161,7 @@ static int Open (vlc_object_t *obj)
     p_sys->conn = conn;
 
    /* Find configured screen */
-    if (!strcasecmp(demux->psz_demux, "screen"))
+    if (!strcasecmp(demux->psz_name, "screen"))
     {
         const xcb_setup_t *setup = xcb_get_setup (conn);
         const xcb_screen_t *scr = NULL;
@@ -184,7 +184,7 @@ static int Open (vlc_object_t *obj)
     }
     else
     /* Determine capture window */
-    if (!strcasecmp(demux->psz_demux, "window"))
+    if (!strcasecmp(demux->psz_name, "window"))
     {
         char *end;
         unsigned long ul = strtoul (demux->psz_location, &end, 0);

@@ -48,7 +48,7 @@ struct demux_t
     module_t    *p_module;
 
     /* eg informative but needed (we can have access+demux) */
-    char        *psz_demux;
+    char        *psz_name;
     char        *psz_url;
     const char  *psz_location;
     char        *psz_filepath;
@@ -412,7 +412,7 @@ static inline bool demux_IsContentType(demux_t *demux, const char *type)
 VLC_USED
 static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
 {
-   if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_name ) )
+   if( p_demux->psz_name == NULL || strcmp( p_demux->psz_name, psz_name ) )
         return false;
     return true;
 }

@@ -162,16 +162,16 @@ static int Open (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     int tp; /* transport protocol */
 
-    if (!strcasecmp(demux->psz_demux, "dccp"))
+    if (!strcasecmp(demux->psz_name, "dccp"))
         tp = IPPROTO_DCCP;
     else
-    if (!strcasecmp(demux->psz_demux, "rtptcp"))
+    if (!strcasecmp(demux->psz_name, "rtptcp"))
         tp = IPPROTO_TCP;
     else
-    if (!strcasecmp(demux->psz_demux, "rtp"))
+    if (!strcasecmp(demux->psz_name, "rtp"))
         tp = IPPROTO_UDP;
     else
-    if (!strcasecmp(demux->psz_demux, "udplite"))
+    if (!strcasecmp(demux->psz_name, "udplite"))
         tp = IPPROTO_UDPLITE;
     else
         return VLC_EGENERIC;
@@ -637,7 +637,7 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
  */
 static void *ts_init (demux_t *demux)
 {
-    char const* name = demux->psz_demux;
+    char const* name = demux->psz_name;
 
     if (*name == '\0' || !strcasecmp(name, "any"))
         name = NULL;
