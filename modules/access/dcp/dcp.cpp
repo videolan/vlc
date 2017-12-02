@@ -304,7 +304,7 @@ static int Open( vlc_object_t *obj )
     es_format_t video_format, audio_format;
     int retval;
 
-    if( !p_demux->psz_file )
+    if( !p_demux->psz_filepath )
         return VLC_EGENERIC;
 
     p_sys = new ( nothrow ) demux_sys_t();
@@ -932,7 +932,7 @@ int dcpInit ( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     dcp_t *p_dcp = p_sys->p_dcp;
 
-    p_dcp->path = p_demux->psz_file;
+    p_dcp->path = p_demux->psz_filepath;
     /* Add a '/' in end of path if needed */
     if ( *(p_dcp->path).rbegin() != '/')
         p_dcp->path.append( "/" );

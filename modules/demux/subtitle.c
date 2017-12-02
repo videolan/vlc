@@ -707,7 +707,7 @@ static int Open ( vlc_object_t *p_this )
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
 
     /* Stupid language detection in the filename */
-    char * psz_language = get_language_from_filename( p_demux->psz_file );
+    char * psz_language = get_language_from_filename( p_demux->psz_filepath );
 
     if( psz_language )
     {

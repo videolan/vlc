@@ -221,7 +221,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->psz_access = strdup( psz_access );
     p_demux->psz_demux = strdup( psz_demux );
     p_demux->psz_location = strdup( psz_location );
-    p_demux->psz_file = get_path( psz_location ); /* parse URL */
+    p_demux->psz_filepath = get_path( psz_location ); /* parse URL */
 
     if( unlikely(p_demux->psz_access == NULL
               || p_demux->psz_demux == NULL
@@ -232,7 +232,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
                  "location='%s' file='%s'",
                  p_demux->psz_access, p_demux->psz_demux,
-                 p_demux->psz_location, p_demux->psz_file );
+                 p_demux->psz_location, p_demux->psz_filepath );
 
     p_demux->s              = s;
     p_demux->out            = out;
@@ -250,9 +250,9 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     {
         const char *psz_module = NULL;
 
-        if( !strcmp( p_demux->psz_demux, "any" ) && p_demux->psz_file )
+        if( !strcmp( p_demux->psz_demux, "any" ) && p_demux->psz_filepath )
         {
-            char const* psz_ext = strrchr( p_demux->psz_file, '.' );
+            char const* psz_ext = strrchr( p_demux->psz_filepath, '.' );
 
             if( psz_ext )
                 psz_module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
@@ -275,7 +275,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     return p_demux;
 error:
-    free( p_demux->psz_file );
+    free( p_demux->psz_filepath );
     free( p_demux->psz_location );
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
@@ -293,7 +293,7 @@ void demux_Delete( demux_t *p_demux )
     module_unneed( p_demux, p_demux->p_module );
 
     priv->destroy(p_demux);
-    free( p_demux->psz_file );
+    free( p_demux->psz_filepath );
     free( p_demux->psz_location );
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
@@ -588,7 +588,7 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     p_demux->psz_access   = NULL;
     p_demux->psz_demux    = NULL;
     p_demux->psz_location = NULL;
-    p_demux->psz_file     = NULL;
+    p_demux->psz_filepath = NULL;
     p_demux->out          = NULL;
     priv->destroy         = demux_DestroyDemuxFilter;
     p_demux->p_module =

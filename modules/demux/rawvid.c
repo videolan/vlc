@@ -149,10 +149,10 @@ static int Open( vlc_object_t * p_this )
     if( !p_demux->obj.force )
     {
         /* guess preset based on file extension */
-        if( !p_demux->psz_file )
+        if( !p_demux->psz_filepath )
             return VLC_EGENERIC;
 
-        const char *psz_ext = strrchr( p_demux->psz_file, '.' );
+        const char *psz_ext = strrchr( p_demux->psz_filepath, '.' );
         if( !psz_ext )
             return VLC_EGENERIC;
         psz_ext++;

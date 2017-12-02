@@ -51,7 +51,7 @@ struct demux_t
     char        *psz_access;
     char        *psz_demux;
     char        *psz_location;
-    char        *psz_file;
+    char        *psz_filepath;
 
     union {
         /**
@@ -395,8 +395,8 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux )
 VLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
-    const char *name = (p_demux->psz_file != NULL) ? p_demux->psz_file
-                                                   : p_demux->psz_location;
+    const char *name = (p_demux->psz_filepath != NULL) ? p_demux->psz_filepath
+                                                       : p_demux->psz_location;
     const char *psz_ext = strrchr ( name, '.' );
     if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
         return false;

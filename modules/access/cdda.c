@@ -217,7 +217,7 @@ static int DemuxOpen(vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     unsigned track;
 
-    vcddev_t *dev = DiscOpen(obj, demux->psz_location, demux->psz_file,
+    vcddev_t *dev = DiscOpen(obj, demux->psz_location, demux->psz_filepath,
                              &track);
     if (dev == NULL)
         return VLC_EGENERIC;

@@ -175,8 +175,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     memcpy( pd.buf, peek, pd.buf_size );
     memset( pd.buf + pd.buf_size, 0, AVPROBE_PADDING_SIZE );
 
-    if( p_demux->psz_file )
-        psz_url = strdup( p_demux->psz_file );
+    if( p_demux->psz_filepath )
+        psz_url = strdup( p_demux->psz_filepath );
     else
     {
         if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
@@ -243,22 +243,22 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     {
         int i_len;
 
-        if( !p_demux->psz_file )
+        if( !p_demux->psz_filepath )
         {
             free( psz_url );
             return VLC_EGENERIC;
         }
 
-        i_len = strlen( p_demux->psz_file );
+        i_len = strlen( p_demux->psz_filepath );
         if( i_len < 4 )
         {
             free( psz_url );
             return VLC_EGENERIC;
         }
 
-        if( strcasecmp( &p_demux->psz_file[i_len - 4], ".str" ) &&
-            strcasecmp( &p_demux->psz_file[i_len - 4], ".xai" ) &&
-            strcasecmp( &p_demux->psz_file[i_len - 3], ".xa" ) )
+        if( strcasecmp( &p_demux->psz_filepath[i_len - 4], ".str" ) &&
+            strcasecmp( &p_demux->psz_filepath[i_len - 4], ".xai" ) &&
+            strcasecmp( &p_demux->psz_filepath[i_len - 3], ".xa" ) )
         {
             free( psz_url );
             return VLC_EGENERIC;

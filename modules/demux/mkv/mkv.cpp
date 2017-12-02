@@ -157,11 +157,11 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Dbg( p_demux, "Preloading local dir" );
         /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-        if ( p_demux->psz_file && !strcmp( p_demux->psz_access, "file" ) )
+        if ( p_demux->psz_filepath && !strcmp( p_demux->psz_access, "file" ) )
         {
             // assume it's a regular file
             // get the directory path
-            s_path = p_demux->psz_file;
+            s_path = p_demux->psz_filepath;
             if (s_path.at(s_path.length() - 1) == DIR_SEP_CHAR)
             {
                 s_path = s_path.substr(0,s_path.length()-1);
@@ -186,9 +186,9 @@ static int Open( vlc_object_t * p_this )
                         s_filename = s_path + DIR_SEP_CHAR + psz_file;
 
 #if defined(_WIN32) || defined(__OS2__)
-                        if (!strcasecmp(s_filename.c_str(), p_demux->psz_file))
+                        if (!strcasecmp(s_filename.c_str(), p_demux->psz_filepath))
 #else
-                        if (!s_filename.compare(p_demux->psz_file))
+                        if (!s_filename.compare(p_demux->psz_filepath))
 #endif
                         {
                             continue; // don't reuse the original opened file

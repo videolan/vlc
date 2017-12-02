@@ -347,7 +347,7 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     if( !strncmp(p_demux->psz_access, "dvd", 3) )
         forced = true;
 
-    if( !p_demux->psz_file || !*p_demux->psz_file )
+    if( !p_demux->psz_filepath || !*p_demux->psz_filepath )
     {
         /* Only when selected */
         if( !forced )
@@ -356,7 +356,7 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
         psz_file = var_InheritString( p_this, "dvd" );
     }
     else
-        psz_file = strdup( p_demux->psz_file );
+        psz_file = strdup( p_demux->psz_filepath );
 
 #if defined( _WIN32 ) || defined( __OS2__ )
     if( psz_file != NULL )

@@ -643,11 +643,11 @@ static int blurayOpen(vlc_object_t *object)
         }
 
     } else if (!forced) {
-        if (!p_demux->psz_file) {
+        if (!p_demux->psz_filepath) {
             return VLC_EGENERIC;
         }
 
-        if (probeFile(p_demux->psz_file) != VLC_SUCCESS) {
+        if (probeFile(p_demux->psz_filepath) != VLC_SUCCESS) {
             return VLC_EGENERIC;
         }
     }
@@ -689,12 +689,12 @@ static int blurayOpen(vlc_object_t *object)
     } else
 #endif
     {
-        if (!p_demux->psz_file) {
+        if (!p_demux->psz_filepath) {
             /* no path provided (bluray://). use default DVD device. */
             p_sys->psz_bd_path = var_InheritString(object, "dvd");
         } else {
             /* store current bd path */
-            p_sys->psz_bd_path = strdup(p_demux->psz_file);
+            p_sys->psz_bd_path = strdup(p_demux->psz_filepath);
         }
 
         /* If we're passed a block device, try to convert it to the mount point. */
