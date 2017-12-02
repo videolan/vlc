@@ -34,6 +34,7 @@
 #include <vlc_aout.h>
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
+#include <vlc_url.h>
 #include <assert.h>
 #include <limits.h>
 #include "../codec/cc.h"
@@ -802,24 +803,24 @@ static int Open( vlc_object_t * p_this )
                 }
                 else
                 {
-                    char *psz_absolute;
-                    char *psz_path = strdup( p_demux->psz_location );
-                    char *end = strrchr( psz_path, '/' );
-                    if( end ) end[1] = '\0';
-                    else *psz_path = '\0';
-
-                    if( asprintf( &psz_absolute, "%s://%s%s",
-                                  p_demux->psz_access, psz_path, psz_ref ) < 0 )
+                    char *psz_url;
+                    if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
+                                  p_demux->psz_location ) < 0 )
                     {
                         free( psz_ref );
-                        free( psz_path );
                         input_item_node_Delete( p_subitems );
                         return VLC_ENOMEM;
                     }
 
+                    char *psz_absolute = vlc_uri_resolve( psz_url, psz_ref );
+                    free( psz_url );
                     free( psz_ref );
+                    if( psz_absolute == NULL )
+                    {
+                        input_item_node_Delete( p_subitems );
+                        return VLC_ENOMEM;
+                    }
                     psz_ref = psz_absolute;
-                    free( psz_path );
                 }
                 msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
                 input_item_t *p_item = input_item_New( psz_ref, NULL );
