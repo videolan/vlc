@@ -166,9 +166,6 @@ static int Open( vlc_object_t *p_this )
     es_format_t   fmt;
     dc1394error_t res;
 
-    if( strncmp(p_demux->psz_access, "dc1394", 6) != 0 )
-        return VLC_EGENERIC;
-
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
