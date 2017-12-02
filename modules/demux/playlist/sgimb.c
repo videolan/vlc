@@ -142,7 +142,7 @@ int Import_SGIMB( vlc_object_t * p_this )
 
     CHECK_FILE(p_demux);
     /* Lets check the content to see if this is a sgi mediabase file */
-    i_size = vlc_stream_Peek( p_demux->p_source, &p_peek, MAX_LINE );
+    i_size = vlc_stream_Peek( p_demux->s, &p_peek, MAX_LINE );
     i_size -= sizeof("sgiNameServerHost=") - 1;
     if ( i_size > 0 )
     {
@@ -324,7 +324,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *node )
     input_item_t    *p_child = NULL;
     char            *psz_line;
 
-    while( ( psz_line = vlc_stream_ReadLine( p_demux->p_source ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
         ParseLine( p_demux, psz_line );
         free( psz_line );

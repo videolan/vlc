@@ -75,7 +75,7 @@ stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
 
     s->p_module = NULL;
     s->psz_url = NULL;
-    s->p_source = NULL;
+    s->s = NULL;
     s->pf_read = NULL;
     s->pf_block = NULL;
     s->pf_readdir = NULL;

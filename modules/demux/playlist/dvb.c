@@ -52,7 +52,7 @@ int Import_DVB(vlc_object_t *p_this)
 
     /* Check if this really is a channels file */
     const uint8_t *peek;
-    int len = vlc_stream_Peek(demux->p_source, &peek, 1023);
+    int len = vlc_stream_Peek(demux->s, &peek, 1023);
     if (len <= 0)
         return VLC_EGENERIC;
 
@@ -82,7 +82,7 @@ static int ReadDir(stream_t *s, input_item_node_t *subitems)
 {
     char *line;
 
-    while ((line = vlc_stream_ReadLine(s->p_source)) != NULL)
+    while ((line = vlc_stream_ReadLine(s->s)) != NULL)
     {
         input_item_t *item = ParseLine(line);
         free(line);

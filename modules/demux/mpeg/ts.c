@@ -560,7 +560,7 @@ static void Close( vlc_object_t *p_this )
 
     if ( p_sys->arib.b25stream )
     {
-        p_sys->arib.b25stream->p_source = NULL; /* don't chain kill demuxer's source */
+        p_sys->arib.b25stream->s = NULL; /* don't chain kill demuxer's source */
         vlc_stream_Delete( p_sys->arib.b25stream );
     }
 

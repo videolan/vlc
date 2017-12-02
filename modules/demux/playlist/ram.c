@@ -80,7 +80,7 @@ int Import_RAM( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Many Real Media Files are misdetected */
-    if( vlc_stream_Peek( p_demux->p_source, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
     if( !memcmp( p_peek, ".ra", 3 ) || !memcmp( p_peek, ".RMF", 4 ) )
     {
@@ -208,7 +208,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     bool b_cleanup = false;
     input_item_t *p_input;
 
-    psz_line = vlc_stream_ReadLine( p_demux->p_source );
+    psz_line = vlc_stream_ReadLine( p_demux->s );
     while( psz_line )
     {
         char *psz_parse = psz_line;
@@ -346,7 +346,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
  error:
         /* Fetch another line */
         free( psz_line );
-        psz_line = vlc_stream_ReadLine( p_demux->p_source );
+        psz_line = vlc_stream_ReadLine( p_demux->s );
         if( !psz_line ) b_cleanup = true;
 
         if( b_cleanup )

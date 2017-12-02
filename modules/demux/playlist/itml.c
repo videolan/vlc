@@ -52,7 +52,7 @@ int Import_iTML( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     const uint8_t *p_peek;
-    const ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 128 );
+    const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 128 );
     if ( i_peek < 32 ||
          !strnstr( (const char *) p_peek, "<!DOCTYPE plist ", i_peek ) )
         return VLC_EGENERIC;
@@ -76,7 +76,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     p_demux->p_sys = (void *)(uintptr_t)0;
 
     /* create new xml parser from stream */
-    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->p_source );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto end;
 

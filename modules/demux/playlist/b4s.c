@@ -72,9 +72,9 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    free( vlc_stream_ReadLine( p_demux->p_source ) );
+    free( vlc_stream_ReadLine( p_demux->s ) );
 
-    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->p_source );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         return -1;
 

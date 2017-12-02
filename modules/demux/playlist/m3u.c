@@ -82,7 +82,7 @@ int Import_M3U( vlc_object_t *p_this )
     int offset = 0;
 
     CHECK_FILE(p_stream);
-    i_peek = vlc_stream_Peek( p_stream->p_source, &p_peek, 1024 );
+    i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 1024 );
     if( i_peek < 8 )
         return VLC_EGENERIC;
 
@@ -104,7 +104,7 @@ int Import_M3U( vlc_object_t *p_this )
     }
 
     /* File type: playlist, or not (HLS manifest or whatever else) */
-    char *type = stream_MimeType(p_stream->p_source);
+    char *type = stream_MimeType(p_stream->s);
     bool match;
 
     if (p_stream->obj.force)
@@ -137,7 +137,7 @@ int Import_M3U( vlc_object_t *p_this )
     if (!match)
         return VLC_EGENERIC;
 
-    if (offset != 0 && vlc_stream_Seek(p_stream->p_source, offset))
+    if (offset != 0 && vlc_stream_Seek(p_stream->s, offset))
         return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );
@@ -226,7 +226,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    psz_line = vlc_stream_ReadLine( p_demux->p_source );
+    psz_line = vlc_stream_ReadLine( p_demux->s );
     while( psz_line )
     {
         char *psz_parse = psz_line;
@@ -327,7 +327,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
         /* Fetch another line */
         free( psz_line );
-        psz_line = vlc_stream_ReadLine( p_demux->p_source );
+        psz_line = vlc_stream_ReadLine( p_demux->s );
         if( !psz_line ) b_cleanup = true;
 
         if( b_cleanup )

@@ -117,7 +117,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char *psz_mimetype = NULL;
     int i_volume = 100;
 
-    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->p_source );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto error;
 

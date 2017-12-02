@@ -149,7 +149,7 @@ static bool SkipTag(stream_t *s, uint_fast32_t (*skipper)(stream_t *),
 
 static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 {
-    return vlc_stream_Read(stream->p_source, buf, buflen);
+    return vlc_stream_Read(stream->s, buf, buflen);
 }
 
 static int ReadDir(stream_t *stream, input_item_node_t *node)
@@ -164,7 +164,7 @@ static int Seek(stream_t *stream, uint64_t offset)
 
     if (unlikely(offset + sys->header_skip < offset))
         return -1;
-    return vlc_stream_Seek(stream->p_source, sys->header_skip + offset);
+    return vlc_stream_Seek(stream->s, sys->header_skip + offset);
 }
 
 static int Control(stream_t *stream, int query, va_list args)
@@ -179,13 +179,13 @@ static int Control(stream_t *stream, int query, va_list args)
         return VLC_SUCCESS;
     }
 
-    return vlc_stream_vaControl(stream->p_source, query, args);
+    return vlc_stream_vaControl(stream->s, query, args);
 }
 
 static int Open(vlc_object_t *obj)
 {
     stream_t *stream = (stream_t *)obj;
-    stream_t *s = stream->p_source;
+    stream_t *s = stream->s;
     struct skiptags_sys_t *sys;
 
     block_t *p_tags = NULL, *p_tag = NULL;

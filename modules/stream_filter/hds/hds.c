@@ -223,7 +223,7 @@ static inline bool isFQUrl( const char* url )
 static bool isHDS( stream_t *s )
 {
     const uint8_t *peek;
-    int i_size = vlc_stream_Peek( s->p_source, &peek, 200 );
+    int i_size = vlc_stream_Peek( s->s, &peek, 200 );
     if( i_size < 200 )
         return false;
 
@@ -1181,7 +1181,7 @@ static void* live_thread( void* p )
 static int init_Manifest( stream_t *s, manifest_t *m )
 {
     memset(m, 0, sizeof(*m));
-    stream_t *st = s->p_source;
+    stream_t *st = s->s;
 
     m->vlc_reader = xml_ReaderCreate( st, st );
     if( !m->vlc_reader )

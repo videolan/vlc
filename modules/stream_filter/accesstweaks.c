@@ -88,12 +88,12 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
         break;
     }
 
-    return vlc_stream_vaControl( p_stream->p_source, i_query, args );
+    return vlc_stream_vaControl( p_stream->s, i_query, args );
 }
 
 static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
-    return vlc_stream_Read( s->p_source, buffer, i_read );
+    return vlc_stream_Read( s->s, buffer, i_read );
 }
 
 static int Seek( stream_t *s, uint64_t offset )
@@ -101,7 +101,7 @@ static int Seek( stream_t *s, uint64_t offset )
     stream_sys_t *p_sys = s->p_sys;
 
     assert( p_sys->b_seek );
-    return vlc_stream_Seek( s->p_source, offset );
+    return vlc_stream_Seek( s->s, offset );
 }
 
 static int Open( vlc_object_t *p_object )
@@ -120,7 +120,7 @@ static int Open( vlc_object_t *p_object )
 
     if (!p_sys->b_seek)
     {
-        if (vlc_stream_Control(p_stream->p_source, STREAM_CAN_SEEK, &b) == 0)
+        if (vlc_stream_Control(p_stream->s, STREAM_CAN_SEEK, &b) == 0)
             used = b;
 
         p_sys->b_fastseek = false;
@@ -129,12 +129,12 @@ static int Open( vlc_object_t *p_object )
     {
         p_sys->b_fastseek = var_InheritBool(p_stream, "fastseek");
         if (!p_sys->b_fastseek
-         && vlc_stream_Control(p_stream->p_source, STREAM_CAN_FASTSEEK,
+         && vlc_stream_Control(p_stream->s, STREAM_CAN_FASTSEEK,
                                &b) == 0)
             used = b;
     }
 
-    if (!p_sys->b_size && vlc_stream_GetSize(p_stream->p_source, &size) == 0)
+    if (!p_sys->b_size && vlc_stream_GetSize(p_stream->s, &size) == 0)
         used = true;
 
     if (!used) /* Nothing to do: skip this filter */

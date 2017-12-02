@@ -49,7 +49,7 @@ int Import_PLS( vlc_object_t *p_this )
 
     CHECK_FILE(p_demux);
 
-    if( vlc_stream_Peek( p_demux->p_source , &p_peek, 10 ) < 10 ) {
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) {
         msg_Dbg( p_demux, "not enough data" );
         return VLC_EGENERIC;
     }
@@ -79,7 +79,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    while( ( psz_line = vlc_stream_ReadLine( p_demux->p_source ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
             !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )

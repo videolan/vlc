@@ -134,7 +134,7 @@ static int AStreamRefillStream(stream_t *s)
             return VLC_EGENERIC;
 
         i_read = __MIN(i_toread, STREAM_CACHE_TRACK_SIZE - i_off);
-        i_read = vlc_stream_Read(s->p_source, &tk->p_buffer[i_off], i_read);
+        i_read = vlc_stream_Read(s->s, &tk->p_buffer[i_off], i_read);
 
         /* msg_Dbg(s, "AStreamRefillStream: read=%d", i_read); */
         if (i_read <  0)
@@ -200,8 +200,7 @@ static void AStreamPrebufferStream(stream_t *s)
 
         i_read = STREAM_CACHE_TRACK_SIZE - i_buffered;
         i_read = __MIN((int)sys->i_read_size, i_read);
-        i_read = vlc_stream_Read(s->p_source, &tk->p_buffer[i_buffered],
-                                 i_read);
+        i_read = vlc_stream_Read(s->s, &tk->p_buffer[i_buffered], i_read);
         if (i_read <  0)
             continue;
         else if (i_read == 0)
@@ -307,7 +306,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
 #endif
 
     bool   b_aseek;
-    vlc_stream_Control(s->p_source, STREAM_CAN_SEEK, &b_aseek);
+    vlc_stream_Control(s->s, STREAM_CAN_SEEK, &b_aseek);
     if (!b_aseek && i_pos < p_current->i_start)
     {
         msg_Warn(s, "AStreamSeekStream: can't seek");
@@ -315,7 +314,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
     }
 
     bool   b_afastseek;
-    vlc_stream_Control(s->p_source, STREAM_CAN_FASTSEEK, &b_afastseek);
+    vlc_stream_Control(s->s, STREAM_CAN_FASTSEEK, &b_afastseek);
 
     /* FIXME compute seek cost (instead of static 'stupid' value) */
     uint64_t i_skip_threshold;
@@ -387,7 +386,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
             /* Seek at the end of the buffer
              * TODO it is stupid to seek now, it would be better to delay it
              */
-            if (vlc_stream_Seek(s->p_source, tk->i_end))
+            if (vlc_stream_Seek(s->s, tk->i_end))
             {
                 msg_Err(s, "AStreamSeekStream: hard seek failed");
                 return VLC_EGENERIC;
@@ -416,7 +415,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
         msg_Err(s, "AStreamSeekStream: hard seek");
 #endif
         /* Nothing good, seek and choose oldest segment */
-        if (vlc_stream_Seek(s->p_source, i_pos))
+        if (vlc_stream_Seek(s->s, i_pos))
         {
             msg_Err(s, "AStreamSeekStream: hard seek failed");
             return VLC_EGENERIC;
@@ -470,12 +469,12 @@ static int AStreamControl(stream_t *s, int i_query, va_list args)
         case STREAM_SET_PRIVATE_ID_STATE:
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
-            return vlc_stream_vaControl(s->p_source, i_query, args);
+            return vlc_stream_vaControl(s->s, i_query, args);
 
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
         {
-            int ret = vlc_stream_vaControl(s->p_source, i_query, args);
+            int ret = vlc_stream_vaControl(s->s, i_query, args);
             if (ret == VLC_SUCCESS)
                 AStreamControlReset(s);
             return ret;

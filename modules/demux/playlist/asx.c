@@ -135,7 +135,7 @@ static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
 static bool PeekASX( stream_t *s )
 {
     const uint8_t *p_peek;
-    return ( vlc_stream_Peek( s->p_source, &p_peek, 12 ) == 12
+    return ( vlc_stream_Peek( s->s, &p_peek, 12 ) == 12
              && !memcmp( p_peek, "<asx version", 12 ) );
 }
 
@@ -149,7 +149,7 @@ int Import_ASX( vlc_object_t *p_this )
 
     CHECK_FILE(p_demux);
 
-    char *type = stream_MimeType( p_demux->p_source );
+    char *type = stream_MimeType( p_demux->s );
 
     if( stream_HasExtension( p_demux, ".asx" )
      || stream_HasExtension( p_demux, ".wax" )
@@ -320,7 +320,7 @@ end:
 
 static stream_t* UTF8Stream( stream_t *p_demux )
 {
-    stream_t *s = p_demux->p_source;
+    stream_t *s = p_demux->s;
     uint64_t streamSize;
 
      if (vlc_stream_GetSize( s, &streamSize ) != VLC_SUCCESS)
@@ -380,7 +380,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     int i_n_entry = 0;
 
     p_xml_reader = xml_ReaderCreate( p_demux, p_stream ? p_stream
-                                                       : p_demux->p_source );
+                                                       : p_demux->s );
     if( !p_xml_reader )
     {
         msg_Err( p_demux, "Cannot parse ASX input file as XML");

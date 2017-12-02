@@ -49,19 +49,19 @@ int Import_podcast( vlc_object_t *p_this )
     stream_t *p_demux = (stream_t *)p_this;
 
     CHECK_FILE(p_demux);
-    if( stream_IsMimeType( p_demux->p_source, "text/xml" )
-     || stream_IsMimeType( p_demux->p_source, "application/xml" ) )
+    if( stream_IsMimeType( p_demux->s, "text/xml" )
+     || stream_IsMimeType( p_demux->s, "application/xml" ) )
     {
         /* XML: check if the root node is "rss". Use a specific peeked
          * probestream in order to not modify the source state while probing.
          * */
         const uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 2048 );
+        ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
         if( unlikely( i_peek <= 0 ) )
             return VLC_EGENERIC;
 
         stream_t *p_probestream =
-            vlc_stream_MemoryNew( p_demux->p_source, (uint8_t *)p_peek, i_peek, true );
+            vlc_stream_MemoryNew( p_demux, (uint8_t *)p_peek, i_peek, true );
         if( unlikely( !p_probestream ) )
             return VLC_EGENERIC;
 
@@ -86,7 +86,7 @@ int Import_podcast( vlc_object_t *p_this )
         vlc_stream_Delete( p_probestream );
         /* SUCCESS: this text/xml is a rss file */
     }
-    else if( !stream_IsMimeType( p_demux->p_source, "application/rss+xml" ) )
+    else if( !stream_IsMimeType( p_demux->s, "application/rss+xml" ) )
         return VLC_EGENERIC;
 
     p_demux->pf_readdir = ReadDir;
@@ -122,7 +122,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->p_source );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto error;
 

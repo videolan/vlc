@@ -64,7 +64,7 @@ int Import_IFO( vlc_object_t *p_this )
         && !strcasecmp( psz_file + strlen( "VTS_00_0" ) , ".IFO" ) ) ) )
     {
         const uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 8 );
+        ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 8 );
 
         if( i_peek != 8 || memcmp( p_peek, "DVDVIDEO", 8 ) )
             return VLC_EGENERIC;
@@ -75,7 +75,7 @@ int Import_IFO( vlc_object_t *p_this )
     else if( len >= 12 && !strcmp( &p_demux->psz_filepath[len-12], "VR_MANGR.IFO" ) )
     {
         const uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 8 );
+        ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 8 );
 
         if( i_peek != 8 || memcmp( p_peek, "DVD_RTR_", 8 ) )
             return VLC_EGENERIC;

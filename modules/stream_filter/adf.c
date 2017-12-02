@@ -45,12 +45,12 @@ vlc_module_end()
 
 static int Control( stream_t *p_stream, int i_query, va_list args )
 {
-    return vlc_stream_vaControl( p_stream->p_source, i_query, args );
+    return vlc_stream_vaControl( p_stream->s, i_query, args );
 }
 
 static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
-    const ssize_t i_ret = vlc_stream_Read( s->p_source, buffer, i_read );
+    const ssize_t i_ret = vlc_stream_Read( s->s, buffer, i_read );
     if( i_ret < 1 ) return i_ret;
 
     uint8_t *p_buffer = buffer;
@@ -62,7 +62,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 
 static int Seek( stream_t *s, uint64_t offset )
 {
-    return vlc_stream_Seek( s->p_source, offset );
+    return vlc_stream_Seek( s->s, offset );
 }
 
 static int Open( vlc_object_t *p_object )
@@ -80,7 +80,7 @@ static int Open( vlc_object_t *p_object )
     }
 
     const uint8_t *peek;
-    if( vlc_stream_Peek( p_stream->p_source, &peek, 3 ) < 3 )
+    if( vlc_stream_Peek( p_stream->s, &peek, 3 ) < 3 )
         return VLC_EGENERIC;
 
     /* Probe for XOR'd ID3 tag. */

@@ -285,11 +285,11 @@ int Import_WPL( vlc_object_t* p_this )
         return VLC_EGENERIC;
 
     const uint8_t *p_peek;
-    ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 2048 );
+    ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
     if( unlikely( i_peek <= 0 ) )
         return VLC_EGENERIC;
 
-    stream_t *p_probestream = vlc_stream_MemoryNew( p_demux->p_source, (uint8_t *)p_peek, i_peek, true );
+    stream_t *p_probestream = vlc_stream_MemoryNew( p_demux, (uint8_t *)p_peek, i_peek, true );
     if( unlikely( !p_probestream ) )
         return VLC_EGENERIC;
 
@@ -315,7 +315,7 @@ int Import_WPL( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
-    p_demux->p_sys = xml_ReaderReset( p_reader, p_demux->p_source );
+    p_demux->p_sys = xml_ReaderReset( p_reader, p_demux->s );
     vlc_stream_Delete( p_probestream );
     if( unlikely( p_demux->p_sys == NULL ) )
         return VLC_EGENERIC;

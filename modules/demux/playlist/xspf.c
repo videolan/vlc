@@ -92,7 +92,7 @@ int Import_xspf(vlc_object_t *p_this)
     CHECK_FILE(p_stream);
 
     if( !stream_HasExtension( p_stream, ".xspf" )
-     && !stream_IsMimeType( p_stream->p_source, "application/xspf+xml" ) )
+     && !stream_IsMimeType( p_stream->s, "application/xspf+xml" ) )
         return VLC_EGENERIC;
 
     xspf_sys_t *sys = calloc(1, sizeof (*sys));
@@ -135,7 +135,7 @@ static int ReadDir(stream_t *p_stream, input_item_node_t *p_subitems)
     sys->psz_base = strdup(p_stream->psz_url);
 
     /* create new xml parser from stream */
-    p_xml_reader = xml_ReaderCreate(p_stream, p_stream->p_source);
+    p_xml_reader = xml_ReaderCreate(p_stream, p_stream->s);
     if (!p_xml_reader)
         goto end;
 

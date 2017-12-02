@@ -71,7 +71,7 @@ static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
     vlc_mutex_unlock(&sys->lock);
     assert(length > 0);
 
-    ssize_t val = vlc_stream_ReadPartial(stream->p_source, buf, length);
+    ssize_t val = vlc_stream_ReadPartial(stream->s, buf, length);
 
     vlc_mutex_lock(&sys->lock);
     vlc_restorecancel(canc);
@@ -85,7 +85,7 @@ static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
 
     vlc_mutex_unlock(&sys->lock);
 
-    int val = vlc_stream_Seek(stream->p_source, seek_offset);
+    int val = vlc_stream_Seek(stream->s, seek_offset);
     if (val != VLC_SUCCESS)
         msg_Err(stream, "cannot seek (to offset %"PRIu64")", seek_offset);
 
@@ -106,7 +106,7 @@ static int ThreadControl(stream_t *stream, int query, ...)
     int ret;
 
     va_start(ap, query);
-    ret = vlc_stream_vaControl(stream->p_source, query, ap);
+    ret = vlc_stream_vaControl(stream->s, query, ap);
     va_end(ap);
 
     vlc_mutex_lock(&sys->lock);
@@ -411,7 +411,7 @@ static int Open(vlc_object_t *obj)
      * caching/prefetching. Also, prefetching with this module could cause
      * undesirable high load at start-up. Lastly, local files may require
      * support for title/seekpoint and meta control requests. */
-    vlc_stream_Control(stream->p_source, STREAM_CAN_FASTSEEK, &fast_seek);
+    vlc_stream_Control(stream->s, STREAM_CAN_FASTSEEK, &fast_seek);
     if (fast_seek)
         return VLC_EGENERIC;
 
@@ -419,7 +419,7 @@ static int Open(vlc_object_t *obj)
      * suffer excessive latency to enable a PID. DVB would also require support
      * for the signal level and Conditional Access controls.
      * TODO? For seekable streams, a forced could work around the problem. */
-    if (vlc_stream_Control(stream->p_source, STREAM_GET_PRIVATE_ID_STATE, 0,
+    if (vlc_stream_Control(stream->s, STREAM_GET_PRIVATE_ID_STATE, 0,
                            &(bool){ false }) == VLC_SUCCESS)
         return VLC_EGENERIC;
 
@@ -431,15 +431,13 @@ static int Open(vlc_object_t *obj)
     stream->pf_seek = Seek;
     stream->pf_control = Control;
 
-    vlc_stream_Control(stream->p_source, STREAM_CAN_SEEK, &sys->can_seek);
-    vlc_stream_Control(stream->p_source, STREAM_CAN_PAUSE, &sys->can_pause);
-    vlc_stream_Control(stream->p_source, STREAM_CAN_CONTROL_PACE,
-                       &sys->can_pace);
-    if (vlc_stream_Control(stream->p_source, STREAM_GET_SIZE, &sys->size))
+    vlc_stream_Control(stream->s, STREAM_CAN_SEEK, &sys->can_seek);
+    vlc_stream_Control(stream->s, STREAM_CAN_PAUSE, &sys->can_pause);
+    vlc_stream_Control(stream->s, STREAM_CAN_CONTROL_PACE, &sys->can_pace);
+    if (vlc_stream_Control(stream->s, STREAM_GET_SIZE, &sys->size))
         sys->size = -1;
-    vlc_stream_Control(stream->p_source, STREAM_GET_PTS_DELAY,
-                       &sys->pts_delay);
-    if (vlc_stream_Control(stream->p_source, STREAM_GET_CONTENT_TYPE,
+    vlc_stream_Control(stream->s, STREAM_GET_PTS_DELAY, &sys->pts_delay);
+    if (vlc_stream_Control(stream->s, STREAM_GET_CONTENT_TYPE,
                            &sys->content_type))
         sys->content_type = NULL;
 
@@ -453,7 +451,7 @@ static int Open(vlc_object_t *obj)
     sys->read_size = var_InheritInteger(obj, "prefetch-read-size");
     sys->seek_threshold = var_InheritInteger(obj, "prefetch-seek-threshold");
 
-    uint64_t size = stream_Size(stream->p_source);
+    uint64_t size = stream_Size(stream->s);
     if (size > 0)
     {   /* No point allocating a buffer larger than the source stream */
         if (sys->buffer_size > size)

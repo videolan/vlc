@@ -55,7 +55,7 @@ static int vlclua_demux_peek( lua_State *L )
     int n = luaL_checkint( L, 1 );
     const uint8_t *p_peek;
 
-    ssize_t val = vlc_stream_Peek(s->p_source, &p_peek, n);
+    ssize_t val = vlc_stream_Peek(s->s, &p_peek, n);
     if (val > 0)
         lua_pushlstring(L, (const char *)p_peek, val);
     else
@@ -71,7 +71,7 @@ static int vlclua_demux_read( lua_State *L )
 
     if (buf != NULL)
     {
-        ssize_t val = vlc_stream_Read(s->p_source, buf, n);
+        ssize_t val = vlc_stream_Read(s->s, buf, n);
         if (val > 0)
             lua_pushlstring(L, buf, val);
         else
@@ -87,7 +87,7 @@ static int vlclua_demux_read( lua_State *L )
 static int vlclua_demux_readline( lua_State *L )
 {
     stream_t *s = (stream_t *)vlclua_get_this(L);
-    char *line = vlc_stream_ReadLine(s->p_source);
+    char *line = vlc_stream_ReadLine(s->s);
 
     if (line != NULL)
     {
@@ -279,7 +279,7 @@ int Import_LuaPlaylist(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     stream_t *s = (stream_t *)obj;
-    if( !vlc_stream_Control( s->p_source, STREAM_IS_DIRECTORY ) )
+    if( !vlc_stream_Control( s->s, STREAM_IS_DIRECTORY ) )
         return VLC_EGENERIC;
 
     struct vlclua_playlist *sys = malloc(sizeof (*sys));

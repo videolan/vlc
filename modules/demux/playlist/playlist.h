@@ -58,7 +58,7 @@ int Import_WPL ( vlc_object_t * );
 void Close_WPL ( vlc_object_t * );
 
 #define GetCurrentItem(obj) input_GetItem((obj)->p_input)
-#define GetSource(obj) ((obj)->p_source)
+#define GetSource(obj) ((obj)->s)
 
 #define CHECK_FILE(obj) \
 do { \

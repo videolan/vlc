@@ -57,7 +57,7 @@ struct stream_t
     bool         b_preparsing; /**< True if this access is used to preparse */
 
     /* Stream source for stream filter */
-    stream_t *p_source;
+    stream_t    *s;
 
     /**
      * Read data.
