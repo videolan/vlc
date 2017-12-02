@@ -384,7 +384,7 @@ static int  Open ( vlc_object_t *p_this )
         goto error;
     }
 
-    if( strcasecmp( p_demux->psz_access, "sdp" ) )
+    if( p_demux->s != NULL )
     {
         char *p = p_sys->psz_pl_url;
         while( (p = strchr( p, ' ' )) != NULL ) *p = '+';
