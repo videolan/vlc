@@ -150,9 +150,6 @@ static int DemuxOpen( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    /* Only when selected */
-    if( *p_demux->psz_access == '\0' ) return VLC_EGENERIC;
-
     /* Set up p_demux */
     p_demux->pf_control = DemuxControl;
     p_demux->pf_demux = Demux;
