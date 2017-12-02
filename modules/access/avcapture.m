@@ -257,10 +257,6 @@ static int Open(vlc_object_t *p_this)
 
     char                    *psz_uid = NULL;
 
-    /* Only when selected */
-    if ( *p_demux->psz_access == '\0' )
-        return VLC_EGENERIC;
-
     @autoreleasepool {
         if (p_demux->psz_location && *p_demux->psz_location)
             psz_uid = strdup(p_demux->psz_location);
