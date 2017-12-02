@@ -162,16 +162,16 @@ static int Open (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     int tp; /* transport protocol */
 
-    if (!strcmp (demux->psz_access, "dccp"))
+    if (!strcasecmp(demux->psz_demux, "dccp"))
         tp = IPPROTO_DCCP;
     else
-    if (!strcmp (demux->psz_access, "rtptcp"))
+    if (!strcasecmp(demux->psz_demux, "rtptcp"))
         tp = IPPROTO_TCP;
     else
-    if (!strcmp (demux->psz_access, "rtp"))
+    if (!strcasecmp(demux->psz_demux, "rtp"))
         tp = IPPROTO_UDP;
     else
-    if (!strcmp (demux->psz_access, "udplite"))
+    if (!strcasecmp(demux->psz_demux, "udplite"))
         tp = IPPROTO_UDPLITE;
     else
         return VLC_EGENERIC;

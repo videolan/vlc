@@ -2494,7 +2494,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
 
     /* first, try to create an access demux */
     p_demux = demux_NewAdvanced( VLC_OBJECT( p_source ), p_input,
-                                 psz_access, psz_demux, psz_path,
+                                 psz_access, psz_access, psz_path,
                                  NULL, priv->p_es_out, priv->b_preparsing );
     if( p_demux )
     {
