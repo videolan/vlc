@@ -729,20 +729,6 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
         break;
 
       default:
-        /*
-         * If the rtp payload type is unknown then check demux if it is specified
-         */
-        if (!strcmp(demux->psz_demux, "h264")
-         || !strcmp(demux->psz_demux, "ts"))
-        {
-            msg_Dbg (demux, "dynamic payload format %s specified by demux",
-                     demux->psz_demux);
-            pt.init = demux_init;
-            pt.destroy = stream_destroy;
-            pt.decode = stream_decode;
-            pt.frequency = 90000;
-            break;
-        }
         if (ptype >= 96)
         {
             char *dynamic = var_InheritString(demux, "rtp-dynamic-pt");
