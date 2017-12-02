@@ -167,13 +167,7 @@ static int Open( vlc_object_t *p_this )
     ifo_handle_t *p_vmg_file;
 
     if( !p_demux->psz_filepath || !*p_demux->psz_filepath )
-    {
-        /* Only when selected */
-        if( !*p_demux->psz_access )
-            return VLC_EGENERIC;
-
         psz_file = var_InheritString( p_this, "dvd" );
-    }
     else
         psz_file = strdup( p_demux->psz_filepath );
 
