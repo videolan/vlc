@@ -55,14 +55,13 @@ int Import_podcast( vlc_object_t *p_this )
         /* XML: check if the root node is "rss". Use a specific peeked
          * probestream in order to not modify the source state while probing.
          * */
-        uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_demux->p_source,
-                                          (const uint8_t **) &p_peek, 2048 );
+        const uint8_t *p_peek;
+        ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, &p_peek, 2048 );
         if( unlikely( i_peek <= 0 ) )
             return VLC_EGENERIC;
 
         stream_t *p_probestream =
-            vlc_stream_MemoryNew( p_demux->p_source, p_peek, i_peek, true );
+            vlc_stream_MemoryNew( p_demux->p_source, (uint8_t *)p_peek, i_peek, true );
         if( unlikely( !p_probestream ) )
             return VLC_EGENERIC;
 
