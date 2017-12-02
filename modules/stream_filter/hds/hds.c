@@ -222,8 +222,8 @@ static inline bool isFQUrl( const char* url )
 
 static bool isHDS( stream_t *s )
 {
-    const char *peek;
-    int i_size = vlc_stream_Peek( s->p_source, (const uint8_t**) &peek, 200 );
+    const uint8_t *peek;
+    int i_size = vlc_stream_Peek( s->p_source, &peek, 200 );
     if( i_size < 200 )
         return false;
 
@@ -238,7 +238,7 @@ static bool isHDS( stream_t *s )
         str = FromCharset( "UTF-16BE", peek, i_size );
     }
     else
-        str = strndup( peek, i_size );
+        str = strndup( (const char *)peek, i_size );
 
     if( str == NULL )
         return false;
