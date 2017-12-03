@@ -176,7 +176,7 @@ static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
 static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
         BMDDetectedVideoInputFormatFlags fmt_flags)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
     uint32_t flags = 0;
     (void)GetFieldDominance(m->GetFieldDominance(), &flags);
 
@@ -413,7 +413,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 
 static int GetAudioConn(demux_t *demux)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     char *opt = var_CreateGetNonEmptyString(demux, "decklink-audio-connection");
     if (!opt)
@@ -442,7 +442,7 @@ static int GetAudioConn(demux_t *demux)
 
 static int GetVideoConn(demux_t *demux)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     char *opt = var_InheritString(demux, "decklink-video-connection");
     if (!opt)
@@ -696,7 +696,7 @@ finish:
 static void Close(vlc_object_t *p_this)
 {
     demux_t     *demux = (demux_t *)p_this;
-    demux_sys_t *sys   = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     if (sys->attributes)
         sys->attributes->Release();
@@ -721,7 +721,7 @@ static void Close(vlc_object_t *p_this)
 
 static int Control(demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
     bool *pb;
     int64_t *pi64;
 
