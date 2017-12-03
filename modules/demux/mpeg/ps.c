@@ -110,6 +110,9 @@ struct demux_sys_t
         CDXA_PS,
         PSMF_PS,
     } format;
+
+    int         current_title;
+    int         current_seekpoint;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -223,6 +226,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->b_bad_scr   = false;
     p_sys->b_seekable  = false;
     p_sys->format      = format;
+    p_sys->current_title = 0;
+    p_sys->current_seekpoint = 0;
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
@@ -664,6 +669,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_CAN_SEEK:
             *va_arg( args, bool * ) = p_sys->b_seekable;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_TITLE:
+            *va_arg( args, int * ) = p_sys->current_title;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_SEEKPOINT:
+            *va_arg( args, int * ) = p_sys->current_seekpoint;
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:

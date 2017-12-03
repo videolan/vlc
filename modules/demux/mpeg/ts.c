@@ -894,6 +894,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         *va_arg( args, bool * ) = p_sys->b_canseek;
         return VLC_SUCCESS;
 
+    case DEMUX_GET_TITLE:
+        *va_arg( args, int * ) = p_sys->current_title;
+        return VLC_SUCCESS;
+
+    case DEMUX_GET_SEEKPOINT:
+        *va_arg( args, int * ) = p_sys->current_seekpoint;
+        return VLC_SUCCESS;
+
     case DEMUX_GET_POSITION:
         pf = va_arg( args, double * );
 

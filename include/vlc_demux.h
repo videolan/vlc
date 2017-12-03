@@ -371,26 +371,32 @@ static inline int demux_Control( demux_t *p_demux, int i_query, ... )
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
-static inline void demux_UpdateTitleFromStream( demux_t *demux )
+#ifndef __cplusplus
+static inline void demux_UpdateTitleFromStream( demux_t *demux,
+    int *restrict titlep, int *restrict seekpointp )
 {
     stream_t *s = demux->s;
     unsigned title, seekpoint;
 
     if( vlc_stream_Control( s, STREAM_GET_TITLE, &title ) == VLC_SUCCESS
-     && title != (unsigned)demux->info.i_title )
+     && title != (unsigned)*titlep )
     {
-        demux->info.i_title = title;
+        *titlep = title;
         demux->info.i_update |= INPUT_UPDATE_TITLE;
     }
 
     if( vlc_stream_Control( s, STREAM_GET_SEEKPOINT,
                             &seekpoint ) == VLC_SUCCESS
-     && seekpoint != (unsigned)demux->info.i_seekpoint )
+     && seekpoint != (unsigned)*seekpointp )
     {
-        demux->info.i_seekpoint = seekpoint;
+        *seekpointp = seekpoint;
         demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
     }
 }
+# define demux_UpdateTitleFromStream(demux) \
+     demux_UpdateTitleFromStream(demux, &(demux)->p_sys->current_title, \
+                                 &(demux)->p_sys->current_seekpoint)
+#endif
 
 VLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
