@@ -258,6 +258,7 @@ static
 int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
 {
     stream_t *s = p_demux->s;
+    demux_sys_t *sys = p_demux->p_sys;
     block_t *block;
     uint8_t first, event;
     unsigned datalen;
@@ -348,9 +349,9 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
     }
 
 send:
-    block->i_dts = block->i_pts = date_Get (&p_demux->p_sys->pts);
+    block->i_dts = block->i_pts = date_Get(&sys->pts);
     if (out != NULL)
-        es_out_Send (out, p_demux->p_sys->es, block);
+        es_out_Send(out, sys->es, block);
     else
         block_Release (block);
 
