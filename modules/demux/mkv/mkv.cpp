@@ -394,8 +394,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL) )
                 {
                     p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
-                    p_demux->info.i_seekpoint = 0;
-                    p_demux->info.i_title = i_idx;
+                    p_sys->i_current_seekpoint = 0;
                     p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
                     return VLC_SUCCESS;
                 }
@@ -417,11 +416,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( i_ret == VLC_SUCCESS )
                 {
                     p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-                    p_demux->info.i_seekpoint = i_skp;
+                    p_sys->i_current_seekpoint = i_skp;
                 }
                 return i_ret;
             }
             return VLC_EGENERIC;
+
+        case DEMUX_GET_TITLE:
+            *va_arg( args, int * ) = p_sys->i_current_title;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_SEEKPOINT:
+            *va_arg( args, int * ) = p_sys->i_current_seekpoint;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
             pf = va_arg( args, double * );
