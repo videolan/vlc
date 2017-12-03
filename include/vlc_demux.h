@@ -87,9 +87,6 @@ struct demux_t
     {
         unsigned int i_update;  /* Demux sets them on change,
                                    Input removes them once take into account*/
-        /* Seekpoint/Title at demux level */
-        int          i_title;       /* idem, start from 0 (could be menu) */
-        int          i_seekpoint;   /* idem, start from 0 */
     } info;
     demux_sys_t *p_sys;
 

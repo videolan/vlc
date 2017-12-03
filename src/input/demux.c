@@ -244,8 +244,6 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
     p_demux->info.i_update = 0;
-    p_demux->info.i_title  = 0;
-    p_demux->info.i_seekpoint = 0;
     priv->destroy = s ? demux_DestroyDemux : demux_DestroyAccessDemux;
 
     if( s != NULL )

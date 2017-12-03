@@ -154,8 +154,6 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->pf_control = DemuxControl;
     p_demux->pf_demux = Demux;
     p_demux->info.i_update = 0;
-    p_demux->info.i_title = 0;
-    p_demux->info.i_seekpoint = 0;
 
     p_demux->p_sys = p_sys = vlc_obj_calloc( p_this, 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;

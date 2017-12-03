@@ -700,8 +700,6 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
-    p_demux->info.i_title = 0;
-    p_demux->info.i_seekpoint = 0;
 
     std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
     std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();

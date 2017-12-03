@@ -490,8 +490,6 @@ static int Open(vlc_object_t *p_this)
     demux->pf_demux = NULL;
     demux->pf_control = Control;
     demux->info.i_update = 0;
-    demux->info.i_title = 0;
-    demux->info.i_seekpoint = 0;
     demux->p_sys = sys = (demux_sys_t*)calloc(1, sizeof(demux_sys_t));
     if (!sys)
         return VLC_ENOMEM;

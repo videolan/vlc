@@ -106,8 +106,6 @@ int DemuxOpen( vlc_object_t *obj )
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
     demux->info.i_update = 0;
-    demux->info.i_title = 0;
-    demux->info.i_seekpoint = 0;
     return VLC_SUCCESS;
 error:
     free (sys);
