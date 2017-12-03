@@ -274,6 +274,7 @@ static rfbCredential* getCredentialHandler( rfbClient *p_client, int i_credentia
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     bool *pb;
     int64_t *pi64;
     double *p_dbl;
@@ -303,7 +304,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            *pi64 = mdate() - p_demux->p_sys->i_starttime;
+            *pi64 = mdate() - p_sys->i_starttime;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
@@ -313,7 +314,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_FPS:
             p_dbl = va_arg( args, double * );
-            *p_dbl = p_demux->p_sys->f_fps;
+            *p_dbl = p_sys->f_fps;
             return VLC_SUCCESS;
 
         case DEMUX_GET_META:
