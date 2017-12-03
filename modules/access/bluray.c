@@ -149,6 +149,8 @@ struct  demux_sys_t
     unsigned int        i_title;
     unsigned int        i_longest_title;
     input_title_t       **pp_title;
+    unsigned            cur_title;
+    unsigned            cur_seekpoint;
 
     vlc_mutex_t             pl_info_lock;
     BLURAY_TITLE_INFO      *p_pl_info;
@@ -281,7 +283,7 @@ static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
 #define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
-#define CUR_LENGTH    p_sys->pp_title[p_demux->info.i_title]->i_length
+#define CUR_LENGTH    p_sys->pp_title[p_sys->cur_title]->i_length
 
 /* */
 static void FindMountPoint(char **file)
@@ -664,8 +666,6 @@ static int blurayOpen(vlc_object_t *object)
 
     /* init demux info fields */
     p_demux->info.i_update    = 0;
-    p_demux->info.i_title     = 0;
-    p_demux->info.i_seekpoint = 0;
 
     TAB_INIT(p_sys->i_title, p_sys->pp_title);
     TAB_INIT(p_sys->i_attachments, p_sys->attachments);
@@ -1840,6 +1840,14 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         break;
     }
 
+    case DEMUX_GET_TITLE:
+        *va_arg(args, int *) = p_sys->cur_title;
+        break;
+
+    case DEMUX_GET_SEEKPOINT:
+        *va_arg(args, int *) = p_sys->cur_seekpoint;
+        break;
+
     case DEMUX_GET_TITLE_INFO:
     {
         input_title_t ***ppp_title = va_arg(args, input_title_t***);
@@ -1869,7 +1877,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_LENGTH:
     {
         int64_t *pi_length = va_arg(args, int64_t *);
-        *pi_length = p_demux->info.i_title < (int)p_sys->i_title ? CUR_LENGTH : 0;
+        *pi_length = p_sys->cur_title < p_sys->i_title ? CUR_LENGTH : 0;
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME:
@@ -1889,7 +1897,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_POSITION:
     {
         double *pf_position = va_arg(args, double *);
-        *pf_position = p_demux->info.i_title < (int)p_sys->i_title && CUR_LENGTH > 0 ?
+        *pf_position = p_sys->cur_title < p_sys->i_title && CUR_LENGTH > 0 ?
                       (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
         return VLC_SUCCESS;
     }
@@ -2179,13 +2187,13 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
 
     /* read title info and init some values */
     if (!p_sys->b_menu)
-        p_demux->info.i_title = bd_get_current_title(p_sys->bluray);
-    p_demux->info.i_seekpoint = 0;
+        p_sys->cur_title = bd_get_current_title(p_sys->bluray);
+    p_sys->cur_seekpoint = 0;
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 
     BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
     if (p_title_info) {
-        blurayUpdateTitleInfo(p_sys->pp_title[p_demux->info.i_title], p_title_info);
+        blurayUpdateTitleInfo(p_sys->pp_title[p_sys->cur_title], p_title_info);
         if (p_sys->b_menu)
             p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
     }
@@ -2226,9 +2234,9 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     switch (e->event) {
     case BD_EVENT_TITLE:
         if (e->param == BLURAY_TITLE_FIRST_PLAY)
-            p_demux->info.i_title = p_sys->i_title - 1;
+            p_sys->cur_title = p_sys->i_title - 1;
         else
-            p_demux->info.i_title = e->param;
+            p_sys->cur_title = e->param;
         /* this is feature title, we don't know yet which playlist it will play (if any) */
         setTitleInfo(p_sys, NULL);
         /* reset title infos here ? */
@@ -2250,9 +2258,9 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         break;
     case BD_EVENT_CHAPTER:
         if (e->param && e->param < 0xffff)
-          p_demux->info.i_seekpoint = e->param - 1;
+          p_sys->cur_seekpoint = e->param - 1;
         else
-          p_demux->info.i_seekpoint = 0;
+          p_sys->cur_seekpoint = 0;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
         break;
     case BD_EVENT_PLAYMARK:
@@ -2335,7 +2343,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
 static bool blurayIsBdjTitle(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    unsigned int i_title = p_demux->info.i_title;
+    unsigned int i_title = p_sys->cur_title;
     const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
 
     if (di && di->titles) {
