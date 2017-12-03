@@ -659,7 +659,8 @@ static int HeaderLoad( demux_t *p_demux, header_t *h )
  */
 static int FrameHeaderLoad( demux_t *p_demux, frame_header_t *h )
 {
-    uint8_t* buffer = p_demux->p_sys->fh_buffer;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    uint8_t* buffer = p_sys->fh_buffer;
 
     if( vlc_stream_Read( p_demux->s, buffer, 12 ) != 12 )
         return VLC_EGENERIC;
