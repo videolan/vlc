@@ -155,6 +155,8 @@ struct demux_sys_t
     /* */
     int           i_title;
     input_title_t **title;
+    int           cur_title;
+    int           cur_seekpoint;
 
     /* length of program group chain */
     mtime_t     i_pgc_length;
@@ -644,13 +646,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             p_demux->info.i_update |=
                 INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-            p_demux->info.i_title = i;
-            p_demux->info.i_seekpoint = 0;
+            p_sys->cur_title = i;
+            p_sys->cur_seekpoint = 0;
             return VLC_SUCCESS;
 
         case DEMUX_SET_SEEKPOINT:
             i = va_arg( args, int );
-            if( p_demux->info.i_title == 0 )
+            if( p_sys->cur_title == 0 )
             {
                 static const int argtab[] = {
                     DVD_MENU_Escape,
@@ -666,15 +668,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                            dvdnav_menu_call(p_sys->dvdnav,argtab[i]) )
                     return VLC_EGENERIC;
             }
-            else if( dvdnav_part_play( p_sys->dvdnav, p_demux->info.i_title,
+            else if( dvdnav_part_play( p_sys->dvdnav, p_sys->cur_title,
                                        i + 1 ) != DVDNAV_STATUS_OK )
             {
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
             }
             p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            p_demux->info.i_seekpoint = i;
+            p_sys->cur_seekpoint = i;
             return VLC_SUCCESS;
+
+        case DEMUX_GET_TITLE:
+            *va_arg( args, int * ) = p_sys->cur_title;
+            break;
+
+        case DEMUX_GET_SEEKPOINT:
+            *va_arg( args, int * ) = p_sys->cur_seekpoint;
+            break;
 
         case DEMUX_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) =
@@ -756,8 +766,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             p_demux->info.i_update |=
                 INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-            p_demux->info.i_title = 0;
-            p_demux->info.i_seekpoint = 2;
+            p_sys->cur_title = 0;
+            p_sys->cur_seekpoint = 2;
             break;
         }
 
@@ -803,7 +813,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "cannot get next block (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
-        if( p_demux->info.i_title == 0 )
+        if( p_sys->cur_title == 0 )
         {
             msg_Dbg( p_demux, "jumping to first title" );
             return ControlInternal( p_demux, DEMUX_SET_TITLE, 1 ) == VLC_SUCCESS ? 1 : -1;
@@ -970,10 +980,10 @@ static int Demux( demux_t *p_demux )
                                        &i_part ) == DVDNAV_STATUS_OK )
         {
             if( i_title >= 0 && i_title < p_sys->i_title &&
-                p_demux->info.i_title != i_title )
+                p_sys->cur_title != i_title )
             {
                 p_demux->info.i_update |= INPUT_UPDATE_TITLE;
-                p_demux->info.i_title = i_title;
+                p_sys->cur_title = i_title;
             }
         }
         break;
@@ -1007,12 +1017,12 @@ static int Demux( demux_t *p_demux )
             if( i_title >= 0 && i_title < p_sys->i_title )
             {
                 p_demux->info.i_update |= INPUT_UPDATE_TITLE;
-                p_demux->info.i_title = i_title;
+                p_sys->cur_title = i_title;
 
                 if( i_part >= 1 && i_part <= p_sys->title[i_title]->i_seekpoint )
                 {
                     p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-                    p_demux->info.i_seekpoint = i_part - 1;
+                    p_sys->cur_seekpoint = i_part - 1;
                 }
             }
         }
