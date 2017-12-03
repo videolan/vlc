@@ -947,6 +947,7 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
 int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
                                  double f, bool b_canfastseek )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     OggDebug( msg_Dbg( p_demux, "=================== Seeking To Blind Pos" ) );
     int64_t i_size = stream_Size( p_demux->s );
     int64_t i_granule;
@@ -967,7 +968,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
          * final seek time */
         i_pagepos = OggBackwardSeekToFrame( p_demux,
                 __MAX ( i_size - MAX_PAGE_SIZE, p_stream->i_data_start ),
-                __MIN ( i_size + MAX_PAGE_SIZE, p_demux->p_sys->i_total_length ),
+                __MIN ( i_size + MAX_PAGE_SIZE, p_sys->i_total_length ),
                 p_stream, i_granule );
     }
     else

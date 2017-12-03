@@ -1201,6 +1201,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                               logical_stream_t *p_stream,
                               ogg_packet *p_oggpacket )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
     bool b_selected;
     int i_header_len = 0;
@@ -1394,7 +1395,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         {
             if( p_stream->i_skip_frames >= p_block->i_nb_samples )
             {
-                if( p_demux->p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
+                if( p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
                     p_block->i_flags |= BLOCK_FLAG_PREROLL;
                 p_stream->i_skip_frames -= p_block->i_nb_samples;
                 p_block->i_nb_samples = 0;
@@ -1407,7 +1408,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
         else
         {
-            if( p_demux->p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
+            if( p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
                 p_block->i_flags |= BLOCK_FLAG_PREROLL;
             p_stream->i_skip_frames--;
         }
@@ -2291,6 +2292,8 @@ static void Ogg_CleanSpecificData( logical_stream_t *p_stream )
  */
 static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_stream )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     if( p_stream->p_es )
         es_out_Del( p_demux->out, p_stream->p_es );
 
@@ -2309,8 +2312,8 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
 
     Ogg_FreeSkeleton( p_stream->p_skel );
     p_stream->p_skel = NULL;
-    if ( p_demux->p_sys->p_skelstream == p_stream )
-        p_demux->p_sys->p_skelstream = NULL;
+    if( p_sys->p_skelstream == p_stream )
+        p_sys->p_skelstream = NULL;
 
     /* Shouldn't happen */
     if ( unlikely( p_stream->p_preparse_block ) )
@@ -3114,29 +3117,32 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
 static void Ogg_ReadSkeletonHeader( demux_t *p_demux, logical_stream_t *p_stream,
                                     ogg_packet *p_oggpacket )
 {
-    p_demux->p_sys->p_skelstream = p_stream;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->p_skelstream = p_stream;
     /* There can be only 1 skeleton for streams */
-    p_demux->p_sys->skeleton.major = GetWLE( &p_oggpacket->packet[8] );
-    p_demux->p_sys->skeleton.minor = GetWLE( &p_oggpacket->packet[10] );
+    p_sys->skeleton.major = GetWLE( &p_oggpacket->packet[8] );
+    p_sys->skeleton.minor = GetWLE( &p_oggpacket->packet[10] );
     if ( asprintf( & p_stream->fmt.psz_description,
-                        "OGG Skeleton version %" PRIu16 ".%" PRIu16,
-                        p_demux->p_sys->skeleton.major,
-                        p_demux->p_sys->skeleton.minor ) < 0 )
+                   "OGG Skeleton version %" PRIu16 ".%" PRIu16,
+                   p_sys->skeleton.major, p_sys->skeleton.minor ) < 0 )
         p_stream->fmt.psz_description = NULL;
 }
 
 static void Ogg_ReadSkeletonBones( demux_t *p_demux, ogg_packet *p_oggpacket )
 {
-    if ( p_demux->p_sys->skeleton.major < 3 || p_oggpacket->bytes < 52 ) return;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if ( p_sys->skeleton.major < 3 || p_oggpacket->bytes < 52 ) return;
 
     /* Find the matching stream for this skeleton data */
     ogg_int32_t i_serialno = GetDWLE( &p_oggpacket->packet[12] );
     logical_stream_t *p_target_stream = NULL;
-    for ( int i=0; i< p_demux->p_sys->i_streams; i++ )
+    for ( int i=0; i< p_sys->i_streams; i++ )
     {
-        if ( p_demux->p_sys->pp_stream[i]->i_serial_no == i_serialno )
+        if ( p_sys->pp_stream[i]->i_serial_no == i_serialno )
         {
-            p_target_stream = p_demux->p_sys->pp_stream[i];
+            p_target_stream = p_sys->pp_stream[i];
             break;
         }
     }
@@ -3196,18 +3202,20 @@ unsigned const char * Read7BitsVariableLE( unsigned const char *p_begin,
 
 static void Ogg_ReadSkeletonIndex( demux_t *p_demux, ogg_packet *p_oggpacket )
 {
-    if ( p_demux->p_sys->skeleton.major < 4
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_sys->skeleton.major < 4
          || p_oggpacket->bytes < 44 /* Need at least 1 index value (42+1+1) */
     ) return;
 
     /* Find the matching stream for this skeleton data */
     int32_t i_serialno = GetDWLE( &p_oggpacket->packet[6] );
     logical_stream_t *p_stream = NULL;
-    for ( int i=0; i< p_demux->p_sys->i_streams; i++ )
+    for ( int i=0; i< p_sys->i_streams; i++ )
     {
-        if ( p_demux->p_sys->pp_stream[i]->i_serial_no == i_serialno )
+        if( p_sys->pp_stream[i]->i_serial_no == i_serialno )
         {
-            p_stream = p_demux->p_sys->pp_stream[i];
+            p_stream = p_sys->pp_stream[i];
             break;
         }
     }
