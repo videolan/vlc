@@ -52,21 +52,17 @@ fi
 
 # Check for flex and bison
 if ! flex --version >/dev/null 2>&1; then
-	cat << EOF
-NOTE: flex appears to be missing. Please install it.
-Otherwise, you might not be able to build properly.
-==========================================================================
-
-EOF
+	echo "ERROR: flex is not installed." >&2
+	if ! test -f modules/codec/webvtt/CSSLexer.c; then
+		exit 1
+	fi
 fi
 
 if ! bison --version >/dev/null 2>&1; then
-	cat << EOF
-NOTE: bison appears to be missing. Please install it.
-Otherwise, you might not be able to build properly.
-==========================================================================
-
-EOF
+	echo "ERROR: GNU bison is not installed." >&2
+	if ! test -f modules/codec/webvtt/CSSGrammar.c; then
+		exit 1
+	fi
 fi
 
 ###
