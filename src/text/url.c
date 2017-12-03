@@ -832,30 +832,6 @@ char *vlc_uri_fixup(const char *str)
 #elif defined (_WIN32)
 # include <windows.h>
 # include <vlc_charset.h>
-
-# if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-#  define IDN_ALLOW_UNASSIGNED 0x01
-static int IdnToAscii(DWORD flags, LPCWSTR str, int len, LPWSTR buf, int size)
-{
-    HMODULE h = LoadLibrary(_T("Normaliz.dll"));
-    if (h == NULL)
-    {
-        errno = ENOSYS;
-        return 0;
-    }
-
-    int (WINAPI *IdnToAsciiReal)(DWORD, LPCWSTR, int, LPWSTR, int);
-    int ret = 0;
-
-    IdnToAsciiReal = GetProcAddress(h, "IdnToAscii");
-    if (IdnToAsciiReal != NULL)
-        ret = IdnToAsciiReal(flags, str, len, buf, size);
-    else
-        errno = ENOSYS;
-    FreeLibrary(h);
-    return ret;
-}
-# endif
 #endif
 
 /**
