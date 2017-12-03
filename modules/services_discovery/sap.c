@@ -391,10 +391,11 @@ static int OpenDemux( vlc_object_t *p_this )
         goto error;
     if( p_sdp->psz_uri == NULL ) goto error;
 
-    p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
-    if( unlikely( !p_demux->p_sys ) )
+    demux_sys_t *p_sys = malloc( sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
         goto error;
-    p_demux->p_sys->p_sdp = p_sdp;
+    p_sys->p_sdp = p_sdp;
+    p_demux->p_sys = p_sys;
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
@@ -440,10 +441,11 @@ static void Close( vlc_object_t *p_this )
 static void CloseDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
+    demux_sys_t *sys = p_demux->p_sys;
 
-    if( p_demux->p_sys->p_sdp )
-        FreeSDP( p_demux->p_sys->p_sdp );
-    free( p_demux->p_sys );
+    if( sys->p_sdp )
+        FreeSDP( sys->p_sdp );
+    free( sys );
 }
 
 /*****************************************************************************
@@ -611,7 +613,8 @@ static void *Run( void *data )
  **********************************************************************/
 static int Demux( demux_t *p_demux )
 {
-    sdp_t *p_sdp = p_demux->p_sys->p_sdp;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    sdp_t *p_sdp = p_sys->p_sdp;
     input_thread_t *p_input = p_demux->p_input;
     input_item_t *p_parent_input;
 
