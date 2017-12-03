@@ -561,7 +561,9 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
                           uint8_t i_ratio_x, uint8_t i_ratio_y )
 {
     demux_t *p_demux = p_packetsys->p_demux;
-    asf_track_t *tk = p_demux->p_sys->track[i_stream_number];
+    demux_sys_t *p_sys = p_demux->p_sys;
+    asf_track_t *tk = p_sys->track[i_stream_number];
+
     if ( tk->p_fmt->video.i_sar_num == i_ratio_x && tk->p_fmt->video.i_sar_den == i_ratio_y )
         return;
 
@@ -582,13 +584,19 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
 
 static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, mtime_t i_time )
 {
-    p_packetsys->p_demux->p_sys->i_sendtime = i_time;
+    demux_t *p_demux = p_packetsys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_sendtime = i_time;
 }
 
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
                                mtime_t i_time )
 {
-    asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
+    demux_t *p_demux = p_packetsys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    asf_track_t *tk = p_sys->track[i_stream_number];
+
     if ( tk )
         tk->i_time = i_time;
 }
@@ -596,7 +604,10 @@ static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_n
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,
                                                uint8_t i_stream_number )
 {
-    asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
+    demux_t *p_demux = p_packetsys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    asf_track_t *tk = p_sys->track[i_stream_number];
+
     if (!tk)
         return NULL;
     else
