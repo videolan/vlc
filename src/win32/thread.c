@@ -670,18 +670,6 @@ void vlc_control_cancel (int cmd, ...)
 /*** Clock ***/
 static union
 {
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-    struct
-    {
-        BOOL (*query) (PULONGLONG);
-    } interrupt;
-#endif
-#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-    struct
-    {
-        ULONGLONG (*get) (void);
-    } tick;
-#endif
     struct
     {
         LARGE_INTEGER freq;
@@ -700,11 +688,7 @@ static mtime_t mdate_interrupt (void)
     ULONGLONG ts;
     BOOL ret;
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
     ret = QueryUnbiasedInterruptTime (&ts);
-#else
-    ret = clk.interrupt.query (&ts);
-#endif
     if (unlikely(!ret))
         abort ();
 
@@ -715,11 +699,7 @@ static mtime_t mdate_interrupt (void)
 
 static mtime_t mdate_tick (void)
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
     ULONGLONG ts = GetTickCount64 ();
-#else
-    ULONGLONG ts = clk.tick.get ();
-#endif
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
@@ -820,29 +800,12 @@ static BOOL SelectClockSource(void *data)
     if (!strcmp (name, "interrupt"))
     {
         msg_Dbg (obj, "using interrupt time as clock source");
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-        HANDLE h = GetModuleHandle (_T("kernel32.dll"));
-        if (unlikely(h == NULL))
-            return FALSE;
-        clk.interrupt.query = (void *)GetProcAddress (h,
-                                                      "QueryUnbiasedInterruptTime");
-        if (unlikely(clk.interrupt.query == NULL))
-            abort ();
-#endif
         mdate_selected = mdate_interrupt;
     }
     else
     if (!strcmp (name, "tick"))
     {
         msg_Dbg (obj, "using Windows time as clock source");
-#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-        HANDLE h = GetModuleHandle (_T("kernel32.dll"));
-        if (unlikely(h == NULL))
-            return FALSE;
-        clk.tick.get = (void *)GetProcAddress (h, "GetTickCount64");
-        if (unlikely(clk.tick.get == NULL))
-            return FALSE;
-#endif
         mdate_selected = mdate_tick;
     }
 #if !VLC_WINSTORE_APP
@@ -906,30 +869,15 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
     char **names = xmalloc (sizeof (*names) * max);
     size_t n = 0;
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-    DWORD version = LOWORD(GetVersion());
-    version = (LOBYTE(version) << 8) | (HIBYTE(version) << 0);
-#endif
-
     values[n] = xstrdup ("");
     names[n] = xstrdup (_("Auto"));
     n++;
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-    if (version >= 0x0601)
-#endif
-    {
-        values[n] = xstrdup ("interrupt");
-        names[n] = xstrdup ("Interrupt time");
-        n++;
-    }
-#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-    if (version >= 0x0600)
-#endif
-    {
-        values[n] = xstrdup ("tick");
-        names[n] = xstrdup ("Windows time");
-        n++;
-    }
+    values[n] = xstrdup ("interrupt");
+    names[n] = xstrdup ("Interrupt time");
+    n++;
+    values[n] = xstrdup ("tick");
+    names[n] = xstrdup ("Windows time");
+    n++;
 #if !VLC_WINSTORE_APP
     values[n] = xstrdup ("multimedia");
     names[n] = xstrdup ("Multimedia timers");
