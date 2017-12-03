@@ -1284,10 +1284,11 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
      * stop vlc discarding them */
     while( (p_block = p_sys->p_outqueue) )
     {
+        p_sys->p_outqueue = p_block->p_next;
+        p_block->p_next = NULL;
+
         if( p_block->i_flags & DIRAC_DISCARD )
         {
-            p_sys->p_outqueue = p_block->p_next;
-            p_block->p_next = NULL;
             block_Release( p_block );
             continue;
         }
@@ -1303,8 +1304,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_dts_last_out = p_block->i_dts;
         p_sys->i_pts_last_out = p_block->i_pts;
 
-        p_sys->p_outqueue = p_block->p_next;
-        p_block->p_next = NULL;
         /* clear any flags we set */
         p_block->i_flags &= ~BLOCK_FLAG_PRIVATE_MASK;
         block_ChainLastAppend( &pp_output, p_block );
