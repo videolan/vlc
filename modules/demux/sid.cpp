@@ -69,6 +69,8 @@ struct demux_sys_t
     int block_size;
     es_out_id_t *es;
     date_t pts;
+
+    int last_title;
 };
 
 
@@ -276,12 +278,16 @@ static int Control (demux_t *demux, int query, va_list args)
             if (!result)
                 return  VLC_EGENERIC;
 
-            demux->info.i_title = i_idx;
+            sys->last_title = i_idx;
             demux->info.i_update = INPUT_UPDATE_TITLE;
             msg_Dbg( demux, "set song %i", i_idx);
 
             return VLC_SUCCESS;
         }
+
+        case DEMUX_GET_TITLE:
+            *va_arg(args, int *) = sys->last_title;
+            return VLC_SUCCESS;
     }
 
     return VLC_EGENERIC;
