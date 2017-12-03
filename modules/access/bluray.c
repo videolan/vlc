@@ -1046,36 +1046,49 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 
 static int esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block)
 {
-    return es_out_Send(p_out->p_sys->p_demux->out, p_es, p_block);
+    demux_t *p_demux = p_out->p_sys->p_demux;
+
+    return es_out_Send(p_demux->out, p_es, p_block);
 }
 
 static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
-    int idx = findEsPairIndexByEs(p_out->p_sys->p_demux->p_sys, p_es);
+    demux_t *p_demux = p_out->p_sys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    int idx = findEsPairIndexByEs(p_sys, p_es);
     if (idx >= 0) {
-        free(vlc_array_item_at_index(&p_out->p_sys->p_demux->p_sys->es, idx));
-        vlc_array_remove(&p_out->p_sys->p_demux->p_sys->es, idx);
+        free(vlc_array_item_at_index(&p_sys->es, idx));
+        vlc_array_remove(&p_sys->es, idx);
     }
-    es_out_Del(p_out->p_sys->p_demux->out, p_es);
+    es_out_Del(p_demux->out, p_es);
 }
 
 static int esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
-    return es_out_vaControl(p_out->p_sys->p_demux->out, i_query, args);
+    demux_t *p_demux = p_out->p_sys->p_demux;
+
+    return es_out_vaControl(p_demux->out, i_query, args);
 }
 
 static void esOutDestroy(es_out_t *p_out)
 {
-    for (size_t i = 0; i < vlc_array_count(&p_out->p_sys->p_demux->p_sys->es); ++i)
-        free(vlc_array_item_at_index(&p_out->p_sys->p_demux->p_sys->es, i));
-    vlc_array_clear(&p_out->p_sys->p_demux->p_sys->es);
+    demux_t *p_demux = p_out->p_sys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
+        free(vlc_array_item_at_index(&p_sys->es, i));
+    vlc_array_clear(&p_sys->es);
     free(p_out->p_sys);
     free(p_out);
 }
 
 static es_out_t *esOutNew(demux_t *p_demux)
 {
-    assert(vlc_array_count(&p_demux->p_sys->es) == 0);
+#ifndef NDEBUG
+    demux_sys_t *p_sys = p_demux->p_sys;
+    assert(vlc_array_count(&p_sys->es) == 0);
+#endif
     es_out_t    *p_out = malloc(sizeof(*p_out));
     if (unlikely(p_out == NULL))
         return NULL;
