@@ -279,14 +279,14 @@ protected:
 
 static int Demux( demux_t *p_demux_filter )
 {
-    demux_sys_t *p_sys = p_demux_filter->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux_filter->p_sys;
 
     return p_sys->Demux();
 }
 
 static int Control( demux_t *p_demux_filter, int i_query, va_list args)
 {
-    demux_sys_t *p_sys = p_demux_filter->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux_filter->p_sys;
 
     return p_sys->Control( p_demux_filter, i_query, args );
 }
@@ -316,7 +316,7 @@ int Open(vlc_object_t *p_this)
 void Close(vlc_object_t *p_this)
 {
     demux_t *p_demux = reinterpret_cast<demux_t*>(p_this);
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     delete p_sys;
 }
