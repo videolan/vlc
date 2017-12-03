@@ -218,14 +218,14 @@ enum demux_query_e
 
     /** Read the title number currently playing
      *
-     * Can fail, in which case demux_t.info.i_title is used
+     * Can fail.
      *
      * arg1= int * */
     DEMUX_GET_TITLE,            /* arg1= int*           can fail */
 
     /* Read the seekpoint/chapter currently playing
      *
-     * Can fail, in which case demux_t.info.i_seekpoint is used
+     * Can fail.
      *
      * arg1= int * */
     DEMUX_GET_SEEKPOINT,        /* arg1= int*           can fail */
