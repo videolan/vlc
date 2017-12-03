@@ -211,6 +211,7 @@ struct demux_sys_t
 
     /* */
     vlc_meta_t          *p_meta;
+    int                 cur_seekpoint;
     int                 i_seekpoints;
     seekpoint_t         **pp_seekpoints;
 

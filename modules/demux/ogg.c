@@ -958,12 +958,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 VLC_TS_0 + i64 );
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-                p_demux->info.i_seekpoint = i_seekpoint;
+                p_sys->cur_seekpoint = i_seekpoint;
                 return VLC_SUCCESS;
             }
             else
                 return VLC_EGENERIC;
         }
+        case DEMUX_GET_TITLE:
+            *va_arg( args, int * ) = 0;
+            return VLC_SUCCESS;
+        case DEMUX_GET_SEEKPOINT:
+            *va_arg( args, int * ) = p_sys->cur_seekpoint;
+            return VLC_SUCCESS;
 
         default:
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
