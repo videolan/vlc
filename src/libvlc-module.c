@@ -952,9 +952,8 @@ static const char *const ppsz_prefres[] = {
 
 // DEPRECATED
 #define CODEC_CAT_LONGTEXT N_( \
-    "This option can be used to alter the way VLC selects " \
-    "its codecs (decompression methods). Only advanced users should " \
-    "alter this option as it can break playback of all your streams." )
+    "These options allow you to control the preferred modules used for " \
+    "accessing, demuxing and decoding (or encoding) inputs." )
 
 #define CODEC_TEXT N_("Preferred decoders list")
 #define CODEC_LONGTEXT N_( \
@@ -1040,11 +1039,6 @@ static const char *const ppsz_prefres[] = {
 /*****************************************************************************
  * Advanced
  ****************************************************************************/
-
-// DEPRECATED
-#define MISC_CAT_LONGTEXT N_( \
-    "These options allow you to select default modules. Leave these " \
-    "alone unless you really know what you are doing." )
 
 #define ACCESS_TEXT N_("Access module")
 #define ACCESS_LONGTEXT N_( \
@@ -1537,6 +1531,8 @@ static const char *const mouse_wheel_texts[] = {
  */
 
 vlc_module_begin ()
+    set_description( N_("core program") )
+
 /* Audio options */
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_GENERAL )
@@ -1771,6 +1767,7 @@ vlc_module_begin ()
 /* Input options */
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_GENERAL )
+    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT )
 
     set_section( N_( "Track settings" ), NULL )
     add_integer( "program", 0,
@@ -2004,25 +2001,29 @@ vlc_module_begin ()
     add_string( "input-title-format", "$Z", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT, false );
 
 /* Decoder options */
+    add_category_hint(N_("Input access and codecs"), CODEC_CAT_LONGTEXT)
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+
+    add_module("access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT)
+
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+
+    add_module("demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT)
+
+    set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    add_category_hint(N_("Decoders"), CODEC_CAT_LONGTEXT)
-    add_string( "codec", NULL, CODEC_TEXT,
-                CODEC_LONGTEXT, true )
+
+    add_string( "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
     add_bool( "hw-dec", true, HW_DEC_TEXT, HW_DEC_LONGTEXT, true )
     add_obsolete_string( "encoder" ) /* since 4.0.0 */
     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
 
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_category_hint(N_("Input"), INPUT_CAT_LONGTEXT)
-    add_module("access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT)
-
-    set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_module("demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT)
-    set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
+
     add_obsolete_bool( "prefer-system-codecs" )
 
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
+
     add_module_list("stream-filter", "stream_filter", NULL,
                     STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT)
 
@@ -2091,10 +2092,10 @@ vlc_module_begin ()
     add_obsolete_bool( "altivec" ) /* since 2.0.0 */
 #endif
 
-/* Misc options */
+/* Advanced options */
     set_subcategory( SUBCAT_ADVANCED_MISC )
+    add_category_hint(N_("Advanced"), NULL)
     set_section( N_("Special modules"), NULL )
-    add_category_hint(N_("Miscellaneous"), MISC_CAT_LONGTEXT)
     add_module("vod-server", "vod server", NULL,
                VOD_SERVER_TEXT, VOD_SERVER_LONGTEXT)
 
@@ -2210,9 +2211,34 @@ vlc_module_begin ()
     add_string( "services-discovery", "", SD_TEXT, SD_LONGTEXT, true )
         change_short('S')
 
+    /* HACK so these don't get displayed in the GUI */
+    set_subcategory( -1 )
+    set_section(N_("Bookmarks"), NULL)
+    add_string( "bookmark1", NULL,
+             BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark2", NULL,
+             BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark3", NULL,
+             BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark4", NULL,
+             BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark5", NULL,
+             BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark6", NULL,
+             BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark7", NULL,
+             BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark8", NULL,
+             BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark9", NULL,
+             BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, false )
+    add_string( "bookmark10", NULL,
+              BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, false )
+
 /* Interface options */
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_GENERAL )
+    add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT )
     add_integer( "verbose", 0, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  false )
         change_short('v')
@@ -2735,9 +2761,7 @@ vlc_module_begin ()
     add_integer( "long-jump-size", 300, JILONG_TEXT,
                                     JILONG_LONGTEXT, false )
 
-    /* HACK so these don't get displayed */
-    set_category( -1 )
-    set_subcategory( -1 )
+    set_section ( N_("Bookmarks"), NULL )
     add_key("key-set-bookmark1", KEY_SET_BOOKMARK1,
             SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT)
     add_key("key-set-bookmark2", KEY_SET_BOOKMARK2,
@@ -2788,26 +2812,11 @@ vlc_module_begin ()
     add_key("key-subtitle-text-scale-down", KEY_SUBTEXT_SCALEDOWN,
             SUBTEXT_SCALEDOWN_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
 
-    add_string( "bookmark1", NULL,
-             BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark2", NULL,
-             BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark3", NULL,
-             BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark4", NULL,
-             BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark5", NULL,
-             BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark6", NULL,
-             BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark7", NULL,
-             BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark8", NULL,
-             BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark9", NULL,
-             BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark10", NULL,
-              BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, false )
+/* Miscellaneous */
+    /* HACK so these don't get displayed in the GUI */
+    set_category( -1 )
+    set_subcategory( -1 )
+    add_category_hint(N_("Miscellaneous"), NULL)
 
 #define HELP_TEXT \
     N_("print help for VLC (can be combined with --help-verbose)")
@@ -2872,7 +2881,6 @@ vlc_module_begin ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()
 
-    set_description( N_("core program") )
 vlc_module_end ()
 
 /*****************************************************************************
