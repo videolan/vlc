@@ -88,7 +88,7 @@ struct demux_t
         unsigned int i_update;  /* Demux sets them on change,
                                    Input removes them once take into account*/
     } info;
-    demux_sys_t *p_sys;
+    void *p_sys;
 
     /* Weak link to parent input */
     input_thread_t *p_input;
