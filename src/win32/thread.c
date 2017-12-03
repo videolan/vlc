@@ -69,33 +69,6 @@ struct vlc_thread
     } wait;
 };
 
-/*** Condition variables (low-level) ***/
-#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-static VOID (WINAPI *InitializeConditionVariable_)(PCONDITION_VARIABLE);
-#define InitializeConditionVariable InitializeConditionVariable_
-static BOOL (WINAPI *SleepConditionVariableCS_)(PCONDITION_VARIABLE,
-                                                PCRITICAL_SECTION, DWORD);
-#define SleepConditionVariableCS SleepConditionVariableCS_
-static VOID (WINAPI *WakeAllConditionVariable_)(PCONDITION_VARIABLE);
-#define WakeAllConditionVariable WakeAllConditionVariable_
-
-static void WINAPI DummyConditionVariable(CONDITION_VARIABLE *cv)
-{
-    (void) cv;
-}
-
-static BOOL WINAPI SleepConditionVariableFallback(CONDITION_VARIABLE *cv,
-                                                  CRITICAL_SECTION *cs,
-                                                  DWORD ms)
-{
-    (void) cv;
-    LeaveCriticalSection(cs);
-    SleepEx(ms > 5 ? 5 : ms, TRUE);
-    EnterCriticalSection(cs);
-    return ms != 0;
-}
-#endif
-
 /*** Mutexes ***/
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
@@ -1042,16 +1015,6 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             if (!LOOKUP(WaitOnAddress)
              || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
             {
-# if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-                if (!LOOKUP(InitializeConditionVariable)
-                 || !LOOKUP(SleepConditionVariableCS)
-                 || !LOOKUP(WakeAllConditionVariable))
-                {
-                    InitializeConditionVariable_ = DummyConditionVariable;
-                    SleepConditionVariableCS_ = SleepConditionVariableFallback;
-                    WakeAllConditionVariable_ = DummyConditionVariable;
-                }
-# endif
                 vlc_wait_addr_init();
                 WaitOnAddress_ = WaitOnAddressFallback;
                 WakeByAddressAll_ = WakeByAddressFallback;
