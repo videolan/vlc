@@ -135,9 +135,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     setvbuf (stderr, NULL, _IONBF, BUFSIZ);
 #endif
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-    SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
     /* SetProcessDEPPolicy, SetDllDirectory, & Co. */

@@ -29,9 +29,6 @@
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
 #endif
-#ifdef _WIN32
-# include <windows.h>
-#endif
 
 static void version (void)
 {
@@ -48,9 +45,6 @@ static void usage (const char *path)
 
 int main (int argc, char *argv[])
 {
-#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN7)
-    SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif
 #ifdef HAVE_GETOPT_H
     static const struct option opts[] =
     {

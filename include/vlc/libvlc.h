@@ -152,14 +152,9 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
    pthread_sigmask(SIG_BLOCK, &set, NULL);
  * @endcode
  *
- * On Microsoft Windows Vista/2008, the process error mode
- * SEM_FAILCRITICALERRORS flag <b>must</b> be set before using LibVLC.
- * On later versions, that is optional and unnecessary.
- * Also on Microsoft Windows (Vista and any later version), setting the default
- * DLL directories to SYSTEM32 exclusively is strongly recommended for
- * security reasons:
+ * On Microsoft Windows, setting the default DLL directories to SYSTEM32
+ * exclusively is strongly recommended for security reasons:
  * @code
-   SetErrorMode(SEM_FAILCRITICALERRORS);
    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
  * @endcode
  *
