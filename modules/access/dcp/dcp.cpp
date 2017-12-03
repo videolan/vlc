@@ -601,7 +601,7 @@ static inline void Close( vlc_object_t *obj )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     block_t *p_video_frame = NULL, *p_audio_frame = NULL;
 
     PCM::FrameBuffer   AudioFrameBuff( p_sys->i_audio_buffer);
@@ -776,7 +776,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
     double f,*pf;
     bool *pb;
     int64_t *pi64, i64;
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     switch ( query )
     {
@@ -875,7 +875,7 @@ static inline void fillVideoFmt( video_format_t * fmt, unsigned int width, unsig
 
 void CloseDcpAndMxf( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     /* close the files */
     switch( p_sys->PictureEssType )
     {
@@ -929,7 +929,7 @@ int dcpInit ( demux_t *p_demux )
 {
     int retval;
 
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     dcp_t *p_dcp = p_sys->p_dcp;
 
     p_dcp->path = p_demux->psz_filepath;
@@ -960,7 +960,8 @@ static std::string assetmapPath( demux_t * p_demux )
 {
     DIR *dir = NULL;
     struct dirent *ent = NULL;
-    dcp_t *p_dcp = p_demux->p_sys->p_dcp;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
+    dcp_t *p_dcp = p_sys->p_dcp;
     std::string result;
 
     if( ( dir = opendir (p_dcp->path.c_str() ) ) != NULL )
@@ -996,6 +997,7 @@ static std::string assetmapPath( demux_t * p_demux )
  */
 int parseXML ( demux_t * p_demux )
 {
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     int retval;
 
     std::string assetmap_path = assetmapPath( p_demux );
@@ -1005,7 +1007,7 @@ int parseXML ( demux_t * p_demux )
 
     /* We parse the ASSETMAP File in order to get CPL File path, PKL File path
      and to store UID/Path of all files in DCP directory (except ASSETMAP file) */
-    AssetMap *assetmap = new (nothrow) AssetMap( p_demux, assetmap_path, p_demux->p_sys->p_dcp );
+    AssetMap *assetmap = new (nothrow) AssetMap( p_demux, assetmap_path, p_sys->p_dcp );
     if( ( retval = assetmap->Parse() ) )
         return retval;
 
