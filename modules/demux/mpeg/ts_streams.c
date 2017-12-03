@@ -190,12 +190,14 @@ ts_es_t * ts_es_New( ts_pmt_t *p_program )
 
 static void ts_pes_es_Clean( demux_t *p_demux, ts_es_t *p_es )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     if( p_es->id )
     {
         /* Ensure we don't wait for overlap hacks #14257 */
         es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, p_es->id, false );
         es_out_Del( p_demux->out, p_es->id );
-        p_demux->p_sys->i_pmt_es--;
+        p_sys->i_pmt_es--;
     }
     es_format_Clean( &p_es->fmt );
 }

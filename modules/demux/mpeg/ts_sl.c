@@ -140,6 +140,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
                                 void *p_pes_cbdata )
 {
     VLC_UNUSED(p_sectiondata); VLC_UNUSED(i_sectiondata);
+    demux_sys_t *p_sys = p_demux->p_sys;
     ts_stream_t *p_pes = (ts_stream_t *) p_pes_cbdata;
     ts_pmt_t *p_pmt = p_pes->p_es->p_program;
 
@@ -187,7 +188,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
         }
 
         if( b_changed )
-            UpdatePESFilters( p_demux, p_demux->p_sys->seltype == PROGRAM_ALL );
+            UpdatePESFilters( p_demux, p_sys->seltype == PROGRAM_ALL );
     }
 }
 

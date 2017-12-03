@@ -700,7 +700,7 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Dbg( p_demux, "Creating delayed ES" );
                 AddAndCreateES( p_demux, p_pid, true );
-                UpdatePESFilters( p_demux, p_demux->p_sys->seltype == PROGRAM_ALL );
+                UpdatePESFilters( p_demux, p_sys->seltype == PROGRAM_ALL );
             }
 
             /* Emulate HW filter */
@@ -1101,7 +1101,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         i_int = va_arg( args, int );
         msg_Dbg( p_demux, "DEMUX_SET_ES %d", i_int );
 
-        if( p_demux->p_sys->seltype != PROGRAM_ALL ) /* Won't change anything */
+        if( p_sys->seltype != PROGRAM_ALL ) /* Won't change anything */
             UpdatePESFilters( p_demux, false );
 
         return VLC_SUCCESS;
@@ -2366,6 +2366,8 @@ int FindPCRCandidate( ts_pmt_t *p_pmt )
 /* Tries to reselect a new PCR when none has been received */
 static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     if ( p_pmt->pcr.b_disable || p_pmt->pcr.b_fix_done )
     {
         return;
@@ -2378,15 +2380,15 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     else if( p_block->i_dts - p_pmt->pcr.i_first_dts > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
     {
         if( p_pmt->pcr.i_current < 0 &&
-            GetPID( p_demux->p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
+            GetPID( p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
         {
             int i_cand = FindPCRCandidate( p_pmt );
             p_pmt->i_pid_pcr = i_cand;
-            if ( GetPID( p_demux->p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
+            if ( GetPID( p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
                 p_pmt->pcr.b_disable = true;
             msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
                       p_pmt->i_number, i_cand );
-            UpdatePESFilters( p_demux, p_demux->p_sys->seltype == PROGRAM_ALL );
+            UpdatePESFilters( p_demux, p_sys->seltype == PROGRAM_ALL );
         }
         p_pmt->pcr.b_fix_done = true;
     }
@@ -2394,6 +2396,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
 
 static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int *pi_skip )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t *p = p_pkt->p_buffer;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
@@ -2423,11 +2426,11 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
 
     if( b_scrambled )
     {
-        if( p_demux->p_sys->csa )
+        if( p_sys->csa )
         {
-            vlc_mutex_lock( &p_demux->p_sys->csa_lock );
-            csa_Decrypt( p_demux->p_sys->csa, p_pkt->p_buffer, p_demux->p_sys->i_csa_pkt_size );
-            vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
+            vlc_mutex_lock( &p_sys->csa_lock );
+            csa_Decrypt( p_sys->csa, p_pkt->p_buffer, p_sys->i_csa_pkt_size );
+            vlc_mutex_unlock( &p_sys->csa_lock );
         }
         else
             p_pkt->i_flags |= BLOCK_FLAG_SCRAMBLED;
@@ -2588,6 +2591,7 @@ static bool MayHaveStartCodeOnEnd( const uint8_t *p_buf, size_t i_buf )
 
 static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size_t i_skip )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     const bool b_unit_start = p_pkt->p_buffer[1]&0x40;
     bool b_ret = false;
     ts_stream_t *p_pes = pid->u.p_stream;
@@ -2609,7 +2613,7 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
     }
 
     /* We'll cannot parse any pes data */
-    if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) && p_demux->p_sys->b_valid_scrambling )
+    if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) && p_sys->b_valid_scrambling )
     {
         block_Release( p_pkt );
         return PushPESBlock( p_demux, pid, NULL, true );

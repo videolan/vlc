@@ -391,8 +391,9 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux,
     }
 }
 # define demux_UpdateTitleFromStream(demux) \
-     demux_UpdateTitleFromStream(demux, &(demux)->p_sys->current_title, \
-                                 &(demux)->p_sys->current_seekpoint)
+     demux_UpdateTitleFromStream(demux, \
+         &((demux_sys_t *)((demux)->p_sys))->current_title, \
+         &((demux_sys_t *)((demux)->p_sys))->current_seekpoint)
 #endif
 
 VLC_USED
