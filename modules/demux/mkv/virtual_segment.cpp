@@ -424,7 +424,7 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
 
 bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
-    demux_sys_t & sys = *demux.p_sys;
+    demux_sys_t & sys = *(demux_sys_t *)demux.p_sys;
     virtual_chapter_c *p_cur_vchapter = NULL;
     virtual_edition_c *p_cur_vedition = veditions[ i_current_edition ];
 
@@ -516,7 +516,7 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bo
 bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
                               virtual_chapter_c *p_vchapter, bool b_precise )
 {
-    demux_sys_t *p_sys = demuxer.p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)demuxer.p_sys;
 
 
     /* find the actual time for an ordered edition */

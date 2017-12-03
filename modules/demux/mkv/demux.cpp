@@ -135,7 +135,7 @@ int event_thread_t::EventInput( vlc_object_t *p_this, char const *,
 
 void event_thread_t::EventThread()
 {
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
     int canc = vlc_savecancel ();
 

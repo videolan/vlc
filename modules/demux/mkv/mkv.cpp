@@ -274,7 +274,7 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = reinterpret_cast<demux_t*>( p_this );
-    demux_sys_t *p_sys   = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     virtual_segment_c *p_vsegment = p_sys->p_current_vsegment;
     if( p_vsegment )
     {
@@ -291,7 +291,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     int64_t     *pi64, i64;
     double      *pf, f;
     int         i_skp;
@@ -464,7 +464,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /* Seek */
 static int Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
 
@@ -505,7 +505,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                   mtime_t i_pts, mtime_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
 
     if( !p_segment ) return;
@@ -690,7 +690,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
  *****************************************************************************/
 static int Demux( demux_t *p_demux)
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
