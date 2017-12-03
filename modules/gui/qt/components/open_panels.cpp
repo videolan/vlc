@@ -384,7 +384,7 @@ void DiscOpenPanel::onFocus()
     if( GetLogicalDriveStringsW( sizeof( szDrives ) / sizeof( *szDrives ) - 1, szDrives ) )
     {
         wchar_t *drive = szDrives;
-        UINT oldMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+        SetThreadErrorMode( SEM_FAILCRITICALERRORS, &oldMode );
         while( *drive )
         {
             if( GetDriveTypeW(drive) == DRIVE_CDROM )
@@ -407,7 +407,7 @@ void DiscOpenPanel::onFocus()
             /* go to next drive */
             while( *(drive++) );
         }
-        SetErrorMode(oldMode);
+        SetThreadErrorMode(oldMode, NULL);
     }
 
     char *psz_config = config_GetPsz( p_intf, "dvd" );
