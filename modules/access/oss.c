@@ -126,14 +126,16 @@ struct demux_sys_t
 
 static int FindMainDevice( demux_t *p_demux )
 {
-    msg_Dbg( p_demux, "opening device '%s'", p_demux->p_sys->psz_device );
-    if( ProbeAudioDevOss( p_demux, p_demux->p_sys->psz_device ) )
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    msg_Dbg( p_demux, "opening device '%s'", p_sys->psz_device );
+    if( ProbeAudioDevOss( p_demux, p_sys->psz_device ) )
     {
-        msg_Dbg( p_demux, "'%s' is an audio device", p_demux->p_sys->psz_device );
-        p_demux->p_sys->i_fd = OpenAudioDev( p_demux );
+        msg_Dbg( p_demux, "'%s' is an audio device", p_sys->psz_device );
+        p_sys->i_fd = OpenAudioDev( p_demux );
     }
 
-    if( p_demux->p_sys->i_fd < 0 )
+    if( p_sys->i_fd < 0 )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -327,10 +329,11 @@ static block_t* GrabAudio( demux_t *p_demux )
  *****************************************************************************/
 static int OpenAudioDevOss( demux_t *p_demux )
 {
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     int i_fd;
     int i_format;
 
-    i_fd = vlc_open( p_demux->p_sys->psz_device, O_RDONLY | O_NONBLOCK );
+    i_fd = vlc_open( p_sys->psz_device, O_RDONLY | O_NONBLOCK );
 
     if( i_fd < 0 )
     {
@@ -349,23 +352,21 @@ static int OpenAudioDevOss( demux_t *p_demux )
         goto adev_fail;
     }
 
-    if( ioctl( i_fd, SNDCTL_DSP_STEREO,
-               &p_demux->p_sys->b_stereo ) < 0 )
+    if( ioctl( i_fd, SNDCTL_DSP_STEREO, &p_sys->b_stereo ) < 0 )
     {
         msg_Err( p_demux, "cannot set audio channels count (%s)",
                  vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
-    if( ioctl( i_fd, SNDCTL_DSP_SPEED,
-               &p_demux->p_sys->i_sample_rate ) < 0 )
+    if( ioctl( i_fd, SNDCTL_DSP_SPEED, &p_sys->i_sample_rate ) < 0 )
     {
         msg_Err( p_demux, "cannot set audio sample rate (%s)",
                  vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
-    p_demux->p_sys->i_max_frame_size = 6 * 1024;
+    p_sys->i_max_frame_size = 6 * 1024;
 
     return i_fd;
 
