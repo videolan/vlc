@@ -193,7 +193,7 @@ error:
 static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     delete sys->player;
     delete sys->config.sidEmulation;
@@ -203,7 +203,7 @@ static void Close (vlc_object_t *obj)
 
 static int Demux (demux_t *demux)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     block_t *block = block_Alloc( sys->block_size);
     if (unlikely(block==NULL))
@@ -234,7 +234,7 @@ static int Demux (demux_t *demux)
 
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *sys = demux->p_sys;
+    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
 
     switch (query)
     {
