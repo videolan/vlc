@@ -77,6 +77,7 @@ struct demux_sys_t
 
     /* Only one title with seekpoints possible atm. */
     input_title_t *p_title;
+    int i_seekpoint;
 };
 
 #define AVFORMAT_IOBUFFER_SIZE 32768  /* FIXME */
@@ -265,6 +266,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     p_sys->i_ssa_order = 0;
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
     p_sys->p_title = NULL;
+    p_sys->i_seekpoint = 0;
 
     /* Create I/O wrapper */
     unsigned char * p_io_buffer = av_malloc( AVFORMAT_IOBUFFER_SIZE );
@@ -879,9 +881,9 @@ static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time )
     }
     i--;
 
-    if( i != p_demux->info.i_seekpoint && i >= 0 )
+    if( i != p_sys->i_seekpoint && i >= 0 )
     {
-        p_demux->info.i_seekpoint = i;
+        p_sys->i_seekpoint = i;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
     }
 }
@@ -1139,7 +1141,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             ResetTime( p_demux, i64 - i_start_time );
             return VLC_SUCCESS;
         }
-
+        case DEMUX_GET_TITLE:
+            if( p_sys->p_title == NULL )
+                return VLC_EGENERIC;
+            *va_arg( args, int * ) = 0;
+            return VLC_SUCCESS;
+        case DEMUX_GET_SEEKPOINT:
+            if( p_sys->p_title == NULL )
+                return VLC_EGENERIC;
+            *va_arg( args, int * ) = p_sys->i_seekpoint;
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
