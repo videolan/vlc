@@ -1213,6 +1213,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
 
                 break;
             }
+            /* fall through */
         case 0x6:
             /* vobu is beginning of ilvu */
         case 0x9:
