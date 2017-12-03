@@ -384,6 +384,7 @@ void DiscOpenPanel::onFocus()
     if( GetLogicalDriveStringsW( sizeof( szDrives ) / sizeof( *szDrives ) - 1, szDrives ) )
     {
         wchar_t *drive = szDrives;
+        DWORD oldMode;
         SetThreadErrorMode( SEM_FAILCRITICALERRORS, &oldMode );
         while( *drive )
         {
