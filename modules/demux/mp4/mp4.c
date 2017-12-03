@@ -108,6 +108,7 @@ struct demux_sys_t
     MP4_Box_t    *p_tref_chap;
 
     /* */
+    int          i_seekpoint;
     input_title_t *p_title;
     vlc_meta_t    *p_meta;
 
@@ -1404,9 +1405,9 @@ static void MP4_UpdateSeekpoint( demux_t *p_demux, int64_t i_time )
     }
     i--;
 
-    if( i != p_demux->info.i_seekpoint && i >= 0 )
+    if( i != p_sys->i_seekpoint && i >= 0 )
     {
-        p_demux->info.i_seekpoint = i;
+        p_sys->i_seekpoint = i;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
     }
 }
@@ -1857,6 +1858,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 *pf = 0.0;
             }
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_SEEKPOINT:
+            *va_arg( args, int * ) = p_sys->i_seekpoint;
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
