@@ -485,8 +485,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( i_query == DEMUX_GET_META )
     {
         vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
-        if( p_demux->p_sys->p_meta )
-            vlc_meta_Merge( p_meta, p_demux->p_sys->p_meta );
+        if( p_sys->p_meta )
+            vlc_meta_Merge( p_meta, p_sys->p_meta );
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
