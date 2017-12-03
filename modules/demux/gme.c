@@ -211,7 +211,6 @@ static int Demux (demux_t *demux)
             return 0;
 
         demux->info.i_update |= INPUT_UPDATE_TITLE;
-        demux->info.i_title = sys->track_id;
         gme_start_track (sys->emu, sys->track_id);
     }
 
@@ -327,10 +326,13 @@ static int Control (demux_t *demux, int query, va_list args)
                 break;
             gme_start_track (sys->emu, track_id);
             demux->info.i_update |= INPUT_UPDATE_TITLE;
-            demux->info.i_title = track_id;
             sys->track_id = track_id;
             return VLC_SUCCESS;
         }
+
+        case DEMUX_GET_TITLE:
+            *va_arg(args, int *) = sys->track_id;
+            return VLC_SUCCESS;
     }
 
     return VLC_EGENERIC;
