@@ -576,6 +576,8 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
 
 static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_block )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     p_block = MP4_Block_Convert( p_demux, p_track, p_block );
     if( p_block == NULL )
         return;
@@ -606,7 +608,7 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
             p_track->i_dts_backup = p_block->i_dts;
             p_track->i_pts_backup = p_block->i_pts;
             /* And demux it as ASF packet */
-            DemuxASFPacket( &p_demux->p_sys->asfpacketsys, p_block->i_buffer, p_block->i_buffer );
+            DemuxASFPacket( &p_sys->asfpacketsys, p_block->i_buffer, p_block->i_buffer );
             vlc_stream_Delete(p_demux->s);
         }
         block_Release(p_block);
@@ -1162,6 +1164,7 @@ static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fo
 static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                        unsigned i_max_preload )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     uint32_t i_nb_samples = 0;
     uint32_t i_samplessize = 0;
 
@@ -1217,10 +1220,10 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
             }
 
             /* !important! Ensure clock is set before sending data */
-            if( p_demux->p_sys->i_pcr == VLC_TS_INVALID )
+            if( p_sys->i_pcr == VLC_TS_INVALID )
             {
                 es_out_SetPCR( p_demux->out, VLC_TS_0 + i_current_nzdts );
-                p_demux->p_sys->i_pcr = VLC_TS_0 + i_current_nzdts;
+                p_sys->i_pcr = VLC_TS_0 + i_current_nzdts;
             }
 
             /* dts */
@@ -2719,10 +2722,12 @@ static void TrackGetESSampleRate( demux_t *p_demux,
                                   unsigned i_sd_index,
                                   unsigned i_chunk )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     *pi_num = 0;
     *pi_den = 0;
 
-    MP4_Box_t *p_trak = MP4_GetTrakByTrackID( MP4_BoxGet( p_demux->p_sys->p_root, "/moov" ),
+    MP4_Box_t *p_trak = MP4_GetTrakByTrackID( MP4_BoxGet( p_sys->p_root,
+                                                          "/moov" ),
                                               p_track->i_track_ID );
     MP4_Box_t *p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
     if ( p_mdhd && BOXDATA(p_mdhd) )
@@ -2823,8 +2828,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                               &p_track->fmt.video.i_frame_rate_base,
                               p_track, i_sample_description_index, i_chunk );
 
-        p_demux->p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
-                                (float)p_track->fmt.video.i_frame_rate_base;
+        p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
+                       (float)p_track->fmt.video.i_frame_rate_base;
 
         break;
 
@@ -4651,7 +4656,8 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
 static int FragGetMoofBySidxIndex( demux_t *p_demux, mtime_t i_target_time,
                                    uint64_t *pi_moof_pos, mtime_t *pi_sampletime )
 {
-    const MP4_Box_t *p_sidx = MP4_BoxGet( p_demux->p_sys->p_root, "sidx" );
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const MP4_Box_t *p_sidx = MP4_BoxGet( p_sys->p_root, "sidx" );
     const MP4_Box_data_sidx_t *p_data;
     if( !p_sidx || !((p_data = BOXDATA(p_sidx))) || !p_data->i_timescale )
         return VLC_EGENERIC;
@@ -4679,7 +4685,8 @@ static int FragGetMoofBySidxIndex( demux_t *p_demux, mtime_t i_target_time,
 static int FragGetMoofByTfraIndex( demux_t *p_demux, const mtime_t i_target_time, unsigned i_track_ID,
                                    uint64_t *pi_moof_pos, mtime_t *pi_sampletime )
 {
-    MP4_Box_t *p_tfra = MP4_BoxGet( p_demux->p_sys->p_root, "mfra/tfra" );
+    demux_sys_t *p_sys = p_demux->p_sys;
+    MP4_Box_t *p_tfra = MP4_BoxGet( p_sys->p_root, "mfra/tfra" );
     for( ; p_tfra; p_tfra = p_tfra->p_next )
     {
         if ( p_tfra->i_type == ATOM_tfra )
