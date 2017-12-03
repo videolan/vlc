@@ -2486,9 +2486,10 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
 static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_offset,
                           avi_chunk_indx_t *p_indx )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     avi_entry_t index;
 
-    p_demux->p_sys->b_indexloaded = true;
+    p_sys->b_indexloaded = true;
 
     msg_Dbg( p_demux, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
     if( p_indx->i_indexsubtype == 0 )
