@@ -467,7 +467,7 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     vlc_timer_destroy(p_sys->timer);
 
@@ -515,7 +515,7 @@ static void default_live555_callback( RTSPClient* client, int result_code, char*
 static bool wait_Live555_response( demux_t *p_demux, int i_timeout = 0 /* ms */ )
 {
     TaskToken task;
-    demux_sys_t * p_sys = p_demux->p_sys;
+    demux_sys_t * p_sys = (demux_sys_t *)p_demux->p_sys;
     p_sys->event_rtsp = 0;
     if( i_timeout > 0 )
     {
@@ -591,7 +591,7 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
  *****************************************************************************/
 static int Connect( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     Authenticator authenticator;
     vlc_credential credential;
     const char *psz_user = NULL;
@@ -706,7 +706,7 @@ bailout:
  *****************************************************************************/
 static int SessionsSetup( demux_t *p_demux )
 {
-    demux_sys_t             *p_sys  = p_demux->p_sys;
+    demux_sys_t *p_sys  = (demux_sys_t *)p_demux->p_sys;
     MediaSubsessionIterator *iter   = NULL;
     MediaSubsession         *sub    = NULL;
 
@@ -1247,7 +1247,7 @@ static int SessionsSetup( demux_t *p_demux )
  *****************************************************************************/
 static int Play( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     if( p_sys->rtsp )
     {
@@ -1308,7 +1308,7 @@ static bool HasSharedSession( MediaSubsession *session )
  *****************************************************************************/
 static void ResumeTrack( demux_t *p_demux, live_track_t *tk )
 {
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     bool b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
             var_GetBool( p_demux, "rtsp-http" );
@@ -1344,7 +1344,7 @@ static void ResumeTrack( demux_t *p_demux, live_track_t *tk )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     TaskToken      task;
 
     bool            b_send_pcr = true;
@@ -1504,7 +1504,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     int64_t *pi64, i64;
     double  *pf, f;
     bool *pb;
@@ -1767,7 +1767,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int RollOverTcp( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     int i, i_return;
 
     var_SetBool( p_demux, "rtsp-tcp", true );
@@ -1834,7 +1834,8 @@ static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
                                 bool b_marker,
                                 const uint8_t *p_data, unsigned i_size )
 {
-    const unsigned i_packet_size = p_demux->p_sys->asfh.i_min_data_packet_size;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
+    const unsigned i_packet_size = p_sys->asfh.i_min_data_packet_size;
     block_t *p_list = NULL;
 
     while( i_size >= 4 )
@@ -1922,7 +1923,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     live_track_t   *tk = (live_track_t*)p_private;
     demux_t        *p_demux = tk->p_demux;
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     block_t        *p_block;
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
@@ -2156,8 +2157,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     /* we have read data */
     tk->waiting = 0;
-    p_demux->p_sys->b_no_data = false;
-    p_demux->p_sys->i_no_data_ti = 0;
+    p_sys->b_no_data = false;
+    p_sys->i_no_data_ti = 0;
 }
 
 /*****************************************************************************
@@ -2167,7 +2168,7 @@ static void StreamClose( void *p_private )
 {
     live_track_t   *tk = (live_track_t*)p_private;
     demux_t        *p_demux = tk->p_demux;
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     tk->state = live_track_t::STATE_IGNORED;
     p_sys->event_rtsp = 0xff;
     p_sys->event_data = 0xff;
@@ -2193,19 +2194,21 @@ static void StreamClose( void *p_private )
 static void TaskInterruptRTSP( void *p_private )
 {
     demux_t *p_demux = (demux_t*)p_private;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     /* Avoid lock */
-    p_demux->p_sys->event_rtsp = 0xff;
+    p_sys->event_rtsp = 0xff;
 }
 
 static void TaskInterruptData( void *p_private )
 {
     demux_t *p_demux = (demux_t*)p_private;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
-    p_demux->p_sys->i_no_data_ti++;
+    p_sys->i_no_data_ti++;
 
     /* Avoid lock */
-    p_demux->p_sys->event_data = 0xff;
+    p_sys->event_data = 0xff;
 }
 
 /*****************************************************************************
@@ -2214,7 +2217,7 @@ static void TaskInterruptData( void *p_private )
 static void TimeoutPrevention( void *p_data )
 {
     demux_t *p_demux = (demux_t *) p_data;
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     char *bye = NULL;
 
     /* Protect Live555 from us calling their functions simultaneously
@@ -2257,7 +2260,7 @@ static void TimeoutPrevention( void *p_data )
  *****************************************************************************/
 static int ParseASF( demux_t *p_demux )
 {
-    demux_sys_t    *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     const char *psz_marker = "a=pgmpu:data:application/vnd.ms.wms-hdr.asfv1;base64,";
     char *psz_asf = strcasestr( p_sys->p_sdp, psz_marker );
