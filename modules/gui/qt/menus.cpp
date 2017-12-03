@@ -539,11 +539,6 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     if( visual_selector_enabled ) adv->setChecked( true );
 #endif
 
-    action = menu->addAction( qtr( "Always on &top" ) );
-    action->setCheckable( true );
-    action->setChecked( mi->isInterfaceAlwaysOnTop() );
-    CONNECT( action, triggered( bool ), mi, setInterfaceAlwaysOnTop( bool ) );
-
     menu->addSeparator();
 
     InterfacesMenu( p_intf, menu );
