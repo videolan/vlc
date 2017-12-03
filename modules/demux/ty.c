@@ -1413,8 +1413,8 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    XdsParse( &p_demux->p_sys->xds, d1, d2 );
-    if( p_demux->p_sys->xds.b_meta_changed )
+    XdsParse( &p_sys->xds, d1, d2 );
+    if( p_sys->xds.b_meta_changed )
     {
         xds_meta_t *m = &p_sys->xds.meta;
         vlc_meta_t *p_meta;
@@ -1458,7 +1458,7 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
             }
         }
     }
-    p_demux->p_sys->xds.b_meta_changed = false;
+    p_sys->xds.b_meta_changed = false;
 }
 
 /* seek to an exact time position within the stream, if possible.
