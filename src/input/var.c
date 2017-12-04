@@ -120,13 +120,6 @@ static const vlc_input_callback_t p_input_title_navigation_callbacks[] =
 
     CALLBACK( NULL, NULL )
 };
-static const vlc_input_callback_t p_input_seekpoint_navigation_callbacks[] =
-{
-    CALLBACK( "next-chapter", SeekpointCallback ),
-    CALLBACK( "prev-chapter", SeekpointCallback ),
-
-    CALLBACK( NULL, NULL )
-};
 #undef CALLBACK
 
 /*****************************************************************************
@@ -233,9 +226,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarStop( input_thread_t *p_input )
 {
-    demux_t* p_demux  = input_priv(p_input)->master->p_demux;
-    int i_cur_title;
-
     if( !input_priv(p_input)->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
 
@@ -250,12 +240,11 @@ void input_ControlVarStop( input_thread_t *p_input )
         var_DelCallback( p_input, name, NavigationCallback, (void *)(intptr_t)i );
     }
 
-    if( !demux_Control( p_demux, DEMUX_GET_TITLE, &i_cur_title ) )
+    if( var_Type( p_input, "next-chapter" ) != 0 )
     {
-        const input_title_t* t = input_priv(p_input)->title[ i_cur_title ];
-
-        if( t->i_seekpoint > 1 )
-            InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
+        assert( var_Type( p_input, "prev-chapter" ) != 0 );
+        var_Destroy( p_input, "next-chapter" );
+        var_Destroy( p_input, "prev-chapter" );
     }
 }
 
