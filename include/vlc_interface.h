@@ -238,10 +238,11 @@ typedef enum vlc_intf_dialog {
                             "*.sub;*.utf;*.ass;" \
                             "*.ssa;*.aqt;" \
                             "*.jss;*.psb;" \
-                            "*.rt;*.smi;*.txt;" \
+                            "*.rt;*.sami;*.smi;*.txt;" \
                             "*.smil;*.stl;*.usf;" \
                             "*.dks;*.pjs;*.mpl2;*.mks;" \
-                            "*.vtt;*.ttml;*.dfxp;"
+                            "*.vtt;*.tt;*.ttml;*.dfxp;" \
+                            "*.scc"
 
 /** \defgroup interaction Interaction
  * \ingroup interface
