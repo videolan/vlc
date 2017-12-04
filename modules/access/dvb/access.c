@@ -68,10 +68,10 @@ static void Close( vlc_object_t *p_this );
 
 /* Satellite */
 #define SATELLITE_TEXT N_("Satellite scanning config")
-#define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s")
+#define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s.")
 
 #define SCANLIST_TEXT N_("Scan tuning list")
-#define SCANLIST_LONGTEXT N_("filename containing initial scan tuning data")
+#define SCANLIST_LONGTEXT N_("filename containing initial scan tuning data.")
 
 #define SCAN_NIT_TEXT N_("Use NIT for scanning services")
 
