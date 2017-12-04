@@ -25,11 +25,11 @@
 #endif
 
 #include <errno.h>
-#include <sys/eventfd.h>
-#include <sys/epoll.h>
+#include <fcntl.h>
 
 #include <vlc_common.h>
 #include <vlc_interrupt.h>
+#include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
@@ -55,7 +55,7 @@ struct sout_access_out_sys_t
     int           i_poll_timeout;
     int           i_latency;
     size_t        i_chunk_size;
-    int           i_event_fd;
+    int           i_pipe_fds[2];
 };
 
 static void srt_wait_interrupted(void *p_data)
@@ -63,7 +63,7 @@ static void srt_wait_interrupted(void *p_data)
     sout_access_out_t *p_access = p_data;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     msg_Dbg( p_access, "Waking up srt_epoll_wait");
-    if ( write( p_sys->i_event_fd, &( bool ) { true }, sizeof( bool ) ) < 0 )
+    if ( write( p_sys->i_pipe_fds[1], &( bool ) { true }, sizeof( bool ) ) < 0 )
     {
         msg_Err( p_access, "Failed to send data to event fd");
     }
@@ -87,11 +87,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             size_t i_write = __MIN( p_buffer->i_buffer, p_sys->i_chunk_size );
             SRTSOCKET ready[2];
 
-            struct epoll_event event[1] = { 0 };
 retry:
             if ( srt_epoll_wait( p_sys->i_poll_id,
                 0, 0, ready, &(int){ 2 }, p_sys->i_poll_timeout,
-                &(int) { p_sys->i_event_fd }, &(int) { 1 }, 0, 0 ) == -1 )
+                &(int) { p_sys->i_pipe_fds[0] }, &(int) { 1 }, NULL, 0 ) == -1 )
             {
                 /* Assuming that timeout error is normal when SRT socket is connected. */
                 if ( srt_getlasterror( NULL ) == SRT_ETIMEOUT &&
@@ -105,21 +104,13 @@ retry:
                 goto out;
             }
 
-            if ( event[0].events & EPOLLIN )
+            bool cancel = 0;
+            int ret = read( p_sys->i_pipe_fds[0], &cancel, sizeof( bool ) );
+            if ( ret > 0 && cancel )
             {
-                bool cancel = 0;
-                int ret = read( event[0].data.fd, &cancel, sizeof( bool ) );
-                if ( ret < 0 )
-                {
-                    goto retry;
-                }
-
-                if ( cancel )
-                {
-                    msg_Dbg( p_access, "Cancelled running" );
-                    i_len = 0;
-                    goto out;
-                }
+                msg_Dbg( p_access, "Cancelled running" );
+                i_len = 0;
+                goto out;
             }
 
             if ( srt_sendmsg2( p_sys->sock, (char *)p_buffer->p_buffer, i_write, 0 ) == SRT_ERROR )
@@ -189,7 +180,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_poll_timeout = var_InheritInteger( p_access, "poll-timeout" );
     p_sys->i_latency = var_InheritInteger( p_access, "latency" );
     p_sys->i_poll_id = -1;
-    p_sys->i_event_fd = -1;
 
     p_access->p_sys = p_sys;
 
@@ -253,11 +243,17 @@ static int Open( vlc_object_t *p_this )
         goto failed;
     }
 
+    if ( vlc_pipe( p_sys->i_pipe_fds ) != 0 )
+    {
+        msg_Err( p_access, "Failed to create pipe fds." );
+        goto failed;
+    }
+    fcntl( p_sys->i_pipe_fds[0], F_SETFL, O_NONBLOCK | fcntl( p_sys->i_pipe_fds[0], F_GETFL ) );
+
     srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock, &(int) { SRT_EPOLL_OUT });
     srt_setsockopt( p_sys->sock, 0, SRTO_SENDER, &(int) { 1 }, sizeof(int) );
 
-    p_sys->i_event_fd = eventfd( 0, EFD_NONBLOCK | EFD_CLOEXEC );
-    srt_epoll_add_ssock( p_sys->i_poll_id, p_sys->i_event_fd, &(int) { EPOLLIN } );
+    srt_epoll_add_ssock( p_sys->i_poll_id, p_sys->i_pipe_fds[0], &(int) { SRT_EPOLL_IN } );
 
     stat = srt_connect( p_sys->sock, res->ai_addr, sizeof (struct sockaddr));
     if ( stat == SRT_ERROR )
@@ -282,11 +278,13 @@ failed:
     if ( res != NULL )
         freeaddrinfo( res );
 
+    vlc_close( p_sys->i_pipe_fds[0] );
+    vlc_close( p_sys->i_pipe_fds[1] );
+
     if ( p_sys != NULL )
     {
         if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
         if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
-        if ( p_sys->i_event_fd != -1 ) close( p_sys->i_event_fd );
 
         free( p_sys );
     }
@@ -302,11 +300,8 @@ static void Close( vlc_object_t * p_this )
     srt_epoll_release( p_sys->i_poll_id );
     srt_close( p_sys->sock );
 
-    if ( p_sys->i_event_fd != -1 )
-    {
-        close( p_sys->i_event_fd );
-        p_sys->i_event_fd = -1;
-    }
+    vlc_close( p_sys->i_pipe_fds[0] );
+    vlc_close( p_sys->i_pipe_fds[1] );
 
     free( p_sys );
 }
