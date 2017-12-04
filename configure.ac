@@ -511,17 +511,17 @@ dnl Check for broken versions of mingw-runtime compatability library
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
 #if defined(__MINGW64_VERSION_MAJOR)
-# if __MINGW64_VERSION_MAJOR < 3
-#  error Attempting to use mingw-runtime with broken vsnprintf support
+# if __MINGW64_VERSION_MAJOR < 5
+#  error Update your mingw-w64! This one is too old.
 # endif
-#elif __MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION < 15
-# error Attempting to use mingw-runtime with broken vsnprintf support
+#else
+# error You cannot compile with Mingw. Use Mingw-w64!
 #endif
     ])], [
         AC_MSG_RESULT([ok])
     ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher, or mingw-w64 version 3.0 or higher!])
+        AC_MSG_ERROR([LibVLC requires Mingw-w64 version 5.0 or higher!])
     ])
 
     dnl force use of mingw provided c99 *printf over msvcrt
