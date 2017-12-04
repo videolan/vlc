@@ -48,14 +48,14 @@
 #define DEST_TEXT N_("Output destination")
 #define DEST_LONGTEXT N_( \
     "Destination (URL) to use for the stream. Overrides path and bind parameters" )
-#define BIND_TEXT N_("address to bind to (helper setting for dst)")
+#define BIND_TEXT N_("Address to bind to (helper setting for dst)")
 #define BIND_LONGTEXT N_( \
   "address:port to bind vlc to listening incoming streams. "\
-  "helper setting for dst, dst=bind+'/'+path. dst-parameter overrides this." )
-#define PATH_TEXT N_("filename for stream (helper setting for dst)")
+  "Helper setting for dst, dst=bind+'/'+path. dst-parameter overrides this." )
+#define PATH_TEXT N_("Filename for stream (helper setting for dst)")
 #define PATH_LONGTEXT N_( \
-  "Filename for stream "\
-  "helper setting for dst, dst=bind+'/'+path. dst-parameter overrides this." )
+  "Filename for stream. "\
+  "Helper setting for dst, dst=bind+'/'+path. dst-parameter overrides this." )
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
     "This is the name of the session that will be announced in the SDP " \
