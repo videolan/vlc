@@ -74,7 +74,7 @@ static void Close   (vlc_object_t *);
 #define ADAPT_LOGIC_TEXT N_("Adaptive Logic")
 
 #define ADAPT_ACCESS_TEXT N_("Use regular HTTP modules")
-#define ADAPT_ACCESS_LONGTEXT N_("Connect using http access instead of custom http code")
+#define ADAPT_ACCESS_LONGTEXT N_("Connect using HTTP access instead of custom HTTP code")
 
 static const AbstractAdaptationLogic::LogicType pi_logics[] = {
                                 AbstractAdaptationLogic::Default,
