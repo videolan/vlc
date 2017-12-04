@@ -684,7 +684,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             for (picture_count = 0; picture_count < pool_size; picture_count++) {
                 if (!pictures[picture_count]->p_sys->texture[0])
                     continue;
-                if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
+                if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuadConfig,
                                        pictures[picture_count]->p_sys->texture, picture_count,
                                        pictures[picture_count]->p_sys->resourceView))
                     goto error;
@@ -2133,8 +2133,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         }
 
         sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuadConfig);
-        if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
-                               textures, 0, sys->stagingSys.resourceView))
+        if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuadConfig,
+                                     textures, 0, sys->stagingSys.resourceView))
         {
             msg_Err(vd, "Failed to allocate the staging shader view");
             return VLC_EGENERIC;
@@ -3131,9 +3131,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
 
             d3dquad->resourceCount = DxgiResourceCount(sys->d3dregion_format);
-            if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->d3dregion_format,
-                                   d3dquad->picSys.texture, 0,
-                                   d3dquad->picSys.resourceView)) {
+            if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->d3dregion_format,
+                                         d3dquad->picSys.texture, 0,
+                                         d3dquad->picSys.resourceView)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 free(d3dquad);

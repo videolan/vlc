@@ -803,7 +803,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                 break;
             }
 
-            AllocateShaderView(VLC_OBJECT(va), sys->d3d_dev.d3ddevice, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->resourceView);
+            D3D11_AllocateShaderView(va, sys->d3d_dev.d3ddevice, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->resourceView);
 
             dx_sys->hw_surface[surface_idx] = pic->p_sys->decoder;
         }
@@ -873,7 +873,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
             {
                 ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
-                AllocateShaderView(VLC_OBJECT(va), sys->d3d_dev.d3ddevice, textureFmt, textures, surface_idx,
+                D3D11_AllocateShaderView(va, sys->d3d_dev.d3ddevice, textureFmt, textures, surface_idx,
                                    &sys->resourceView[surface_idx * D3D11_MAX_SHADER_VIEW]);
             }
         }

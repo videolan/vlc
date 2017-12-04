@@ -87,7 +87,8 @@ void ReleasePictureSys(picture_sys_t *p_sys)
 }
 
 /* map texture planes to resource views */
-int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
+#undef D3D11_AllocateShaderView
+int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                               const d3d_format_t *format,
                               ID3D11Texture2D *p_texture[D3D11_MAX_SHADER_VIEW], UINT slice_index,
                               ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
