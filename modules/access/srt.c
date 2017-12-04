@@ -25,11 +25,11 @@
 #endif
 
 #include <errno.h>
-#include <sys/eventfd.h>
-#include <sys/epoll.h>
+#include <fcntl.h>
 
 #include <vlc_common.h>
 #include <vlc_interrupt.h>
+#include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 
@@ -54,7 +54,7 @@ struct stream_sys_t
     int         i_poll_timeout;
     int         i_latency;
     size_t      i_chunk_size;
-    int         i_event_fd;
+    int         i_pipe_fds[2];
 };
 
 static void srt_wait_interrupted(void *p_data)
@@ -62,9 +62,9 @@ static void srt_wait_interrupted(void *p_data)
     stream_t *p_stream = p_data;
     stream_sys_t *p_sys = p_stream->p_sys;
     msg_Dbg( p_stream, "Waking up srt_epoll_wait");
-    if ( write( p_sys->i_event_fd, &( bool ) { true }, sizeof( bool ) ) < 0 )
+    if ( write( p_sys->i_pipe_fds[1], &( bool ) { true }, sizeof( bool ) ) < 0 )
     {
-        msg_Err( p_stream, "Failed to send data to event fd");
+        msg_Err( p_stream, "Failed to send data to pipe");
     }
 }
 
@@ -106,11 +106,10 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
     vlc_interrupt_register( srt_wait_interrupted, p_stream);
 
     SRTSOCKET ready[2];
-    struct epoll_event event[1] = { 0 };
 
     if ( srt_epoll_wait( p_sys->i_poll_id,
-        ready, &(int) { 2 }, 0, 0, p_sys->i_poll_timeout,
-        &(int) { p_sys->i_event_fd }, &(int) { 1 }, 0, 0 ) == -1 )
+        ready, &(int) { 2 }, NULL, 0, p_sys->i_poll_timeout,
+        &(int) { p_sys->i_pipe_fds[0] }, &(int) { 1 }, NULL, 0 ) == -1 )
     {
         int srt_err = srt_getlasterror( NULL );
 
@@ -124,19 +123,12 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
         goto endofstream;
     }
 
-    if ( event[0].events & EPOLLIN ) {
-        bool cancel = 0;
-        int ret = read( event[0].data.fd, &cancel, sizeof( bool ) );
-        if ( ret < 0 )
-        {
-            goto skip;
-        }
-
-        if ( cancel )
-        {
-            msg_Dbg( p_stream, "Cancelled running" );
-            goto endofstream;
-        }
+    bool cancel = 0;
+    int ret = read( p_sys->i_pipe_fds[0], &cancel, sizeof( bool ) );
+    if ( ret > 0 && cancel )
+    {
+        msg_Dbg( p_stream, "Cancelled running" );
+        goto endofstream;
     }
 
     int stat = srt_recvmsg( p_sys->sock, (char *)pkt->p_buffer, p_sys->i_chunk_size );
@@ -186,7 +178,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_poll_timeout = var_InheritInteger( p_stream, "poll-timeout" );
     p_sys->i_latency = var_InheritInteger( p_stream, "latency" );
     p_sys->i_poll_id = -1;
-    p_sys->i_event_fd = -1;
     p_stream->p_sys = p_sys;
     p_stream->pf_block = BlockSRT;
     p_stream->pf_control = Control;
@@ -224,10 +215,17 @@ static int Open(vlc_object_t *p_this)
         msg_Err( p_stream, "Failed to create poll id for SRT socket." );
         goto failed;
     }
-    srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock, &(int) { SRT_EPOLL_IN } );
 
-    p_sys->i_event_fd = eventfd( 0, EFD_NONBLOCK | EFD_CLOEXEC );
-    srt_epoll_add_ssock( p_sys->i_poll_id, p_sys->i_event_fd, &(int) { EPOLLIN } );
+    if ( vlc_pipe( p_sys->i_pipe_fds ) != 0 )
+    {
+        msg_Err( p_stream, "Failed to create pipe fds." );
+        goto failed;
+    }
+
+    fcntl( p_sys->i_pipe_fds[0], F_SETFL, O_NONBLOCK | fcntl( p_sys->i_pipe_fds[0], F_GETFL ) );
+
+    srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock, &(int) { SRT_EPOLL_IN } );
+    srt_epoll_add_ssock( p_sys->i_poll_id, p_sys->i_pipe_fds[0], &(int) { SRT_EPOLL_IN } );
 
     stat = srt_connect( p_sys->sock, res->ai_addr, sizeof (struct sockaddr) );
 
@@ -255,11 +253,8 @@ failed:
         freeaddrinfo( res );
     }
 
-    if ( p_sys->i_event_fd != -1 )
-    {
-        close( p_sys->i_event_fd );
-        p_sys->i_event_fd = -1;
-    }
+    vlc_close( p_sys->i_pipe_fds[0] );
+    vlc_close( p_sys->i_pipe_fds[1] );
 
     if ( p_sys->i_poll_id != -1 )
     {
@@ -284,11 +279,8 @@ static void Close(vlc_object_t *p_this)
     msg_Dbg( p_stream, "closing server" );
     srt_close( p_sys->sock );
 
-    if ( p_sys->i_event_fd != -1 )
-    {
-        close( p_sys->i_event_fd );
-        p_sys->i_event_fd = -1;
-    }
+    vlc_close( p_sys->i_pipe_fds[0] );
+    vlc_close( p_sys->i_pipe_fds[1] );
 }
 
 /* Module descriptor */
