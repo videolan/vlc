@@ -680,7 +680,15 @@ AC_LINK_IFELSE([
         char dst[[sizeof(struct in_addr)]];
         inet_pton(AF_INET, "127.0.0.1", dst);
     ])],[AC_DEFINE([HAVE_INET_PTON],[1],[Define to 1 if you have inet_pton function])],[AC_LIBOBJ([inet_pton])])
-AC_CHECK_FUNCS([if_nameindex if_nametoindex])
+
+AC_SEARCH_LIBS([if_nametoindex], [iphlpapi], [
+  AS_IF([test "$ac_cv_search_if_nametoindex" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_if_nametoindex $SOCKET_LIBS"
+  ])
+  AC_DEFINE([HAVE_IF_NAMETOINDEX], [1], [Define to 1 if you have if_nametoindex function])
+])
+
+AC_CHECK_FUNCS([if_nameindex])
 VLC_RESTORE_FLAGS
 AC_SUBST(SOCKET_LIBS)
 
