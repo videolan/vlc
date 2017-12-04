@@ -836,6 +836,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_V210, "10-bit 4:2:2 Component YCbCr"),
         A("v210"),
 
+    B(VLC_CODEC_VUYA, "Packed YUV 4:4:4, V:U:Y:A"),
+        A("VUYA"),
+
     B(VLC_CODEC_NV12, "Biplanar 4:2:0 Y/UV"),
         A("NV12"),
     B(VLC_CODEC_NV21, "Biplanar 4:2:0 Y/VU"),
