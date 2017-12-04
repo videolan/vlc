@@ -43,8 +43,8 @@ static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static int Decode( decoder_t *, block_t * );
 
-#define IGNORE_RUBY_TEXT N_("Ignore ruby(furigana)")
-#define IGNORE_RUBY_LONGTEXT N_("Ignore ruby(furigana) in the subtitle.")
+#define IGNORE_RUBY_TEXT N_("Ignore ruby (furigana)")
+#define IGNORE_RUBY_LONGTEXT N_("Ignore ruby (furigana) in the subtitle.")
 #define USE_CORETEXT_TEXT N_("Use Core Text renderer")
 #define USE_CORETEXT_LONGTEXT N_("Use Core Text renderer in the subtitle.")
 

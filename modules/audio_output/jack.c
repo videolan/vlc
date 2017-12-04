@@ -91,7 +91,7 @@ static int  GraphChange  ( void *p_arg );
     "If automatic connection is enabled, only JACK clients whose names " \
     "match this regular expression will be considered for connection." )
 
-#define JACK_NAME_TEXT N_( "Jack client name" )
+#define JACK_NAME_TEXT N_( "JACK client name" )
 
 /*****************************************************************************
  * Module descriptor
