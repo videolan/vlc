@@ -444,7 +444,7 @@ Open(vlc_object_t *obj)
     if (priv->glEGLImageTargetTexture2DOES == NULL)
         goto error;
 
-    int ret;
+    int ret = VLC_EGENERIC;
 #if defined (HAVE_VA_X11)
     if (tc->gl->surface->type == VOUT_WINDOW_TYPE_XID)
         ret = x11_init_vaapi_instance(tc, priv);
@@ -459,6 +459,8 @@ Open(vlc_object_t *obj)
 
     if (ret != VLC_SUCCESS)
         goto error;
+
+    assert(priv->vadpy != NULL && priv->vainst != NULL);
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
