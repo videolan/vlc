@@ -304,6 +304,8 @@
 #define VLC_CODEC_V210            VLC_FOURCC('v','2','1','0')
 /* I420 packed for RTP (RFC 4175) */
 #define VLC_CODEC_R420            VLC_FOURCC('r','4','2','0')
+/* Packed YUV 4:4:4 V:U:Y:A */
+#define VLC_CODEC_VUYA            VLC_FOURCC('V','U','Y','A')
 
 
 /* RGB */
