@@ -305,8 +305,7 @@ Close(vlc_object_t *obj)
     if (priv->last.pic != NULL)
         vaegl_release_last_pic(tc, priv);
 
-    if (priv->vainst)
-        vlc_vaapi_ReleaseInstance(priv->vainst);
+    vlc_vaapi_ReleaseInstance(priv->vainst);
 
     free(tc->priv);
 }
