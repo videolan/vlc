@@ -142,6 +142,18 @@ enum slave_priority
 };
 
 /* Extensions must be in alphabetical order */
+#define MASTER_EXTENSIONS \
+    "asf", "avi", "divx", \
+    "f4v", "flv", "m1v", \
+    "m2v", "m4v", "mkv", \
+    "mov", "mp2", "mp2v", \
+    "mp4", "mp4v", "mpe", \
+    "mpeg", "mpeg1", "mpeg2", \
+    "mpeg4", "mpg", "mpv2", \
+    "mxf", "ogv", "ogx", \
+    "ps", "vro","webm", \
+    "wmv", "wtv"
+
 #define SLAVE_SPU_EXTENSIONS \
     "aqt", "ass",  "cdg", \
     "dks", "idx", "jss", \

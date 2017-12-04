@@ -623,6 +623,18 @@ static int bsearch_strcmp_cb(const void *a, const void *b)
     return strcasecmp(a, *entry);
 }
 
+static bool input_item_IsMaster(const char *psz_filename)
+{
+    static const char *const ppsz_master_exts[] = { MASTER_EXTENSIONS };
+
+    const char *psz_ext = strrchr(psz_filename, '.');
+    if (psz_ext == NULL || *(++psz_ext) == '\0')
+        return false;
+
+    return bsearch(psz_ext, ppsz_master_exts, ARRAY_SIZE(ppsz_master_exts),
+                   sizeof(const char *), bsearch_strcmp_cb) != NULL;
+}
+
 bool input_item_slave_GetType(const char *psz_filename,
                               enum slave_type *p_slave_type)
 {
@@ -1558,7 +1570,8 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh,
         input_item_t *p_item = p_node->p_item;
 
         enum slave_type unused;
-        if (input_item_slave_GetType(p_item->psz_name, &unused))
+        if (!input_item_IsMaster(p_item->psz_name)
+         || input_item_slave_GetType(p_item->psz_name, &unused))
             continue; /* don't match 2 possible slaves between each others */
 
         for (size_t j = 0; j < p_rdh->i_slaves; j++)
