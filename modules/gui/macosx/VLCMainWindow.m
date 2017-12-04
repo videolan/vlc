@@ -882,16 +882,12 @@ static const float f_min_window_height = 307.;
 
     mt_duration = mt_duration / 1000000;
 
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:mt_duration];
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    if (mt_duration >= 86400) {
-        [formatter setDateFormat:@"dd:HH:mm:ss"];
-    } else {
-        [formatter setDateFormat:@"HH:mm:ss"];
-    }
-    [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    NSDateComponentsFormatter *formatter = [[NSDateComponentsFormatter alloc] init];
+    formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
 
-    return [NSString stringWithFormat:@" — %@",[formatter stringFromDate:date]];
+    NSString* outputString = [formatter stringFromTimeInterval:mt_duration];
+
+    return [NSString stringWithFormat:@" — %@", outputString];
 }
 
 - (IBAction)searchItem:(id)sender
