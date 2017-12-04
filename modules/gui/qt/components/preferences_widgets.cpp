@@ -1132,7 +1132,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 {
     label = new QLabel(
         qtr( "Select or double click an action to change the associated "
-             "hotkey. Use delete key to remove hotkeys"), p );
+             "hotkey. Use delete key to remove hotkeys."), p );
 
     label->setWordWrap( true );
     searchLabel = new QLabel( qtr( "Search" ), p );
