@@ -93,7 +93,7 @@ static const char *const ppsz_snap_formats[] =
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
-    "This enables colorization of the messages sent to the console " \
+    "This enables colorization of the messages sent to the console. " \
     "Your terminal needs Linux color support for this to work.")
 
 #define ADVANCED_TEXT N_("Show advanced options")
