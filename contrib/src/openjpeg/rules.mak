@@ -4,7 +4,7 @@ OPENJPEG_VERSION := 2.3.0
 OPENJPEG_URL := https://github.com/uclouvain/openjpeg/archive/v$(OPENJPEG_VERSION).tar.gz
 
 $(TARBALLS)/openjpeg-v$(OPENJPEG_VERSION).tar.gz:
-	$(call download_pkg,v$(OPENJPEG_URL),openjpeg)
+	$(call download_pkg,$(OPENJPEG_URL),openjpeg)
 
 .sum-openjpeg: openjpeg-v$(OPENJPEG_VERSION).tar.gz
 
