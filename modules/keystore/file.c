@@ -51,8 +51,8 @@ static void CloseCrypt(vlc_object_t *);
 #endif
 
 vlc_module_begin()
-    set_shortname(N_("file keystore (plaintext)"))
-    set_description(N_("secrets are stored on a file without any encryption"))
+    set_shortname(N_("File keystore (plaintext)"))
+    set_description(N_("Secrets are stored on a file without any encryption"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_callbacks(Open, Close)
@@ -62,8 +62,8 @@ vlc_module_begin()
     add_shortcut("file_plaintext")
 #ifdef CRYPTFILE
     add_submodule()
-        set_shortname(N_("crypt keystore"))
-        set_description(N_("secrets are stored encrypted on a file"))
+        set_shortname(N_("Crypt keystore"))
+        set_description(N_("Secrets are stored encrypted on a file"))
         set_category(CAT_ADVANCED)
         set_subcategory(SUBCAT_ADVANCED_MISC)
         set_callbacks(OpenCrypt, CloseCrypt)
