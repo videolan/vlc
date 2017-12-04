@@ -247,7 +247,7 @@ public:
 
     virtual HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents events, IDeckLinkDisplayMode *mode, BMDDetectedVideoInputFormatFlags flags)
     {
-        demux_sys_t *sys = demux_->p_sys;
+        demux_sys_t *sys = static_cast<demux_sys_t *>(demux_->p_sys);
 
         if( !(events & bmdVideoInputDisplayModeChanged ))
             return S_OK;
@@ -296,7 +296,7 @@ private:
 
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {
-    demux_sys_t *sys = demux_->p_sys;
+    demux_sys_t *sys = static_cast<demux_sys_t *>(demux_->p_sys);
 
     if (videoFrame) {
         if (videoFrame->GetFlags() & bmdFrameHasNoInputSource) {
