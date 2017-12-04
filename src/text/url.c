@@ -401,7 +401,7 @@ static bool vlc_uri_path_validate(const char *str)
     return vlc_uri_component_validate(str, "/@:");
 }
 
-int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
+static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
 {
     url->psz_protocol = NULL;
     url->psz_username = NULL;
@@ -411,6 +411,7 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
     url->psz_path = NULL;
     url->psz_option = NULL;
     url->psz_buffer = NULL;
+    url->psz_pathbuffer = NULL;
 
     if (str == NULL)
     {
@@ -547,13 +548,46 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
         url->psz_path = cur;
     }
 
+    return ret;
+}
+
+int vlc_UrlParse(vlc_url_t *url, const char *str)
+{
+    int ret = vlc_UrlParseInner(url, str);
+
     if (url->psz_path != NULL && !vlc_uri_path_validate(url->psz_path))
     {
         url->psz_path = NULL;
         errno = EINVAL;
         ret = -1;
     }
+    return ret;
+}
 
+static char *vlc_uri_fixup_inner(const char *str, const char *extras);
+
+int vlc_UrlParseFixup(vlc_url_t *url, const char *str)
+{
+    int ret = vlc_UrlParseInner(url, str);
+
+    static const char pathextras[] = "/@:";
+
+    if (url->psz_path != NULL
+     && !vlc_uri_component_validate(url->psz_path, pathextras))
+    {
+        url->psz_pathbuffer = vlc_uri_fixup_inner(url->psz_path, pathextras);
+        if (url->psz_pathbuffer == NULL)
+        {
+            url->psz_path = NULL;
+            errno = ENOMEM;
+            ret = -1;
+        }
+        else
+        {
+            url->psz_path = url->psz_pathbuffer;
+            assert(vlc_uri_path_validate(url->psz_path));
+        }
+    }
     return ret;
 }
 
@@ -561,6 +595,7 @@ void vlc_UrlClean (vlc_url_t *restrict url)
 {
     free (url->psz_host);
     free (url->psz_buffer);
+    free (url->psz_pathbuffer);
 }
 
 /**
@@ -793,11 +828,9 @@ error:
     return ret;
 }
 
-char *vlc_uri_fixup(const char *str)
+static char *vlc_uri_fixup_inner(const char *str, const char *extras)
 {
-    /* Rule number one is do not change a (potentially) valid URI */
-    if (vlc_uri_component_validate(str, ":/?#[]@"))
-        return strdup(str);
+    assert(str && extras);
 
     bool encode_percent = false;
     for (size_t i = 0; str[i] != '\0'; i++)
@@ -815,7 +848,7 @@ char *vlc_uri_fixup(const char *str)
     {
         unsigned char c = str[i];
 
-        if (isurisafe(c) || isurisubdelim(c) || (strchr(":/?#[]@", c) != NULL)
+        if (isurisafe(c) || isurisubdelim(c) || (strchr(extras, c) != NULL)
          || (c == '%' && !encode_percent))
             vlc_memstream_putc(&stream, c);
         else
@@ -825,6 +858,17 @@ char *vlc_uri_fixup(const char *str)
     if (vlc_memstream_close(&stream))
         return NULL;
     return stream.ptr;
+}
+
+char *vlc_uri_fixup(const char *str)
+{
+    static const char extras[] = ":/?#[]@";
+
+    /* Rule number one is do not change a (potentially) valid URI */
+    if (vlc_uri_component_validate(str, extras))
+        return strdup(str);
+
+    return vlc_uri_fixup_inner(str, extras);
 }
 
 #if defined (HAVE_IDN)
