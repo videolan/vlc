@@ -90,7 +90,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define MINIMIZED_TEXT N_( "Start VLC with only a systray icon" )
 #define MINIMIZED_LONGTEXT N_( "VLC will start with just an icon in " \
-                               "your taskbar" )
+                               "your taskbar." )
 
 #define KEEPSIZE_TEXT N_( "Resize interface to the native video size" )
 #define KEEPSIZE_LONGTEXT N_( "You have two choices:\n" \
@@ -133,7 +133,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define RECENTPLAY_FILTER_TEXT N_( "List of words separated by | to filter" )
 #define RECENTPLAY_FILTER_LONGTEXT N_( "Regular expression used to filter " \
-        "the recent items played in the player" )
+        "the recent items played in the player." )
 
 #define SLIDERCOL_TEXT N_( "Define the colors of the volume slider" )
 #define SLIDERCOL_LONGTEXT N_( "Define the colors of the volume slider\n" \
@@ -153,11 +153,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FULLSCREEN_NUMBER_TEXT N_( "Define which screen fullscreen goes" )
 #define FULLSCREEN_NUMBER_LONGTEXT N_( "Screennumber of fullscreen, instead of " \
-                                       "same screen where interface is" )
+                                       "same screen where interface is." )
 
 #define QT_AUTOLOAD_EXTENSIONS_TEXT N_( "Load extensions on startup" )
 #define QT_AUTOLOAD_EXTENSIONS_LONGTEXT N_( "Automatically load the "\
-                                            "extensions module on startup" )
+                                            "extensions module on startup." )
 
 #define QT_MINIMAL_MODE_TEXT N_("Start in minimal view (without menus)" )
 
@@ -165,8 +165,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_BGCONE_LONGTEXT N_( "Display background cone or current album art " \
                             "when not playing. " \
                             "Can be disabled to prevent burning screen." )
-#define QT_BGCONE_EXPANDS_TEXT N_( "Expanding background cone or art." )
-#define QT_BGCONE_EXPANDS_LONGTEXT N_( "Background art fits window's size" )
+#define QT_BGCONE_EXPANDS_TEXT N_( "Expanding background cone or art" )
+#define QT_BGCONE_EXPANDS_LONGTEXT N_( "Background art fits window's size." )
 
 #define QT_DISABLE_VOLUME_KEYS_TEXT N_( "Ignore keyboard volume buttons." )
 #define QT_DISABLE_VOLUME_KEYS_LONGTEXT N_(                                             \
@@ -187,7 +187,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define AUTORAISE_ON_PLAYBACK_TEXT N_( "When to raise the interface" )
 #define AUTORAISE_ON_PLAYBACK_LONGTEXT N_( "This option allows the interface to be raised automatically " \
-    "when a video/audio playback starts, or never" )
+    "when a video/audio playback starts, or never." )
 
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
