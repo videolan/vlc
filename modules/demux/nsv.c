@@ -442,7 +442,7 @@ static int ReSynch( demux_t *p_demux )
              || !memcmp( p_peek, "NSVs", 4 ) )
             {
                 if( i_skip > 0
-                 && vlc_stream_Read( p_demux->s, NULL, i_skip ) )
+                 && vlc_stream_Read( p_demux->s, NULL, i_skip ) < i_skip )
                     return VLC_EGENERIC;
                 return VLC_SUCCESS;
             }
