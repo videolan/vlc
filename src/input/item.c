@@ -617,18 +617,25 @@ void input_item_ApplyOptions(vlc_object_t *obj, input_item_t *item)
     vlc_mutex_unlock(&item->lock);
 }
 
+static int bsearch_strcmp_cb(const void *a, const void *b)
+{
+    const char *const *entry = b;
+    return strcasecmp(a, *entry);
+}
+
 bool input_item_slave_GetType(const char *psz_filename,
                               enum slave_type *p_slave_type)
 {
-    static const char *const ppsz_sub_exts[] = { SLAVE_SPU_EXTENSIONS, NULL };
-    static const char *const ppsz_audio_exts[] = { SLAVE_AUDIO_EXTENSIONS, NULL };
+    static const char *const ppsz_sub_exts[] = { SLAVE_SPU_EXTENSIONS };
+    static const char *const ppsz_audio_exts[] = { SLAVE_AUDIO_EXTENSIONS };
 
     static struct {
         enum slave_type i_type;
         const char *const *ppsz_exts;
+        size_t nmemb;
     } p_slave_list[] = {
-        { SLAVE_TYPE_SPU, ppsz_sub_exts },
-        { SLAVE_TYPE_AUDIO, ppsz_audio_exts },
+        { SLAVE_TYPE_SPU, ppsz_sub_exts, ARRAY_SIZE(ppsz_sub_exts) },
+        { SLAVE_TYPE_AUDIO, ppsz_audio_exts, ARRAY_SIZE(ppsz_audio_exts) },
     };
 
     const char *psz_ext = strrchr(psz_filename, '.');
@@ -637,14 +644,11 @@ bool input_item_slave_GetType(const char *psz_filename,
 
     for (unsigned int i = 0; i < sizeof(p_slave_list) / sizeof(*p_slave_list); ++i)
     {
-        for (const char *const *ppsz_slave_ext = p_slave_list[i].ppsz_exts;
-             *ppsz_slave_ext != NULL; ppsz_slave_ext++)
+        if (bsearch(psz_ext, p_slave_list[i].ppsz_exts, p_slave_list[i].nmemb,
+                    sizeof(const char *), bsearch_strcmp_cb))
         {
-            if (!strcasecmp(psz_ext, *ppsz_slave_ext))
-            {
-                *p_slave_type = p_slave_list[i].i_type;
-                return true;
-            }
+            *p_slave_type = p_slave_list[i].i_type;
+            return true;
         }
     }
     return false;
