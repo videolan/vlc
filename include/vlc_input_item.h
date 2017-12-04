@@ -141,20 +141,22 @@ enum slave_priority
     SLAVE_PRIORITY_USER
 };
 
+/* Extensions must be in alphabetical order */
 #define SLAVE_SPU_EXTENSIONS \
-    "idx", "sub",  "srt", \
-    "ssa", "ass",  "smi", \
-    "utf", "utf8", "utf-8", \
-    "rt",   "aqt", "txt", \
-    "usf", "jss",  "cdg", \
-    "psb", "mpsub","mpl2", \
-    "pjs", "dks", "stl", \
-    "vtt", "sbv", "ttml",\
-    "scc", "webvtt"
+    "aqt", "ass",  "cdg", \
+    "dks", "idx", "jss", \
+    "mpl2", "mpsub", "pjs", \
+    "psb", "rt", "sbv", \
+    "scc", "smi", "srt", \
+    "ssa",  "stl", "sub", \
+    "ttml", "txt", "usf", \
+    "utf", "utf-8", "utf8", \
+    "vtt", "webvtt"
+
 #define SLAVE_AUDIO_EXTENSIONS \
-    "ac3", "m4a", "aac", \
-    "eac3",  "dtshd", "flac", \
-    "pcm", "dts", "mp3"
+    "aac", "ac3", "dts", \
+    "dtshd", "eac3", "flac", \
+    "m4a", "mp3", "pcm" \
 
 struct input_item_slave
 {
