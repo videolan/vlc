@@ -153,6 +153,7 @@ struct vlc_url_t
     char *psz_option;
 
     char *psz_buffer; /* to be freed */
+    char *psz_pathbuffer; /* to be freed */
 };
 
 /**
@@ -190,6 +191,14 @@ struct vlc_url_t
  * \retval -1 failure
  */
 VLC_API int vlc_UrlParse(vlc_url_t *url, const char *str);
+
+/**
+ * Parses an URI or IRI and fix up the path part.
+ *
+ * \see vlc_UrlParse
+ * \see vlc_uri_fixup
+ */
+VLC_API int vlc_UrlParseFixup(vlc_url_t *url, const char *str);
 
 /**
  * Releases resources allocated by vlc_UrlParse().
