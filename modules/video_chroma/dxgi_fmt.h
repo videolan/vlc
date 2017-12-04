@@ -36,7 +36,7 @@
 #define GPU_MANUFACTURER_S3            0x5333
 #define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
 
-#define D3D11_MAX_SHADER_VIEW  3
+#define D3D11_MAX_SHADER_VIEW  4
 
 typedef struct
 {
