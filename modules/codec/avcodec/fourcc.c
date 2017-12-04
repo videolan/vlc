@@ -182,6 +182,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* AV_CODEC_ID_V210X */
     { VLC_CODEC_TMV, AV_CODEC_ID_TMV },
     { VLC_CODEC_V210, AV_CODEC_ID_V210 },
+    { VLC_CODEC_VUYA, AV_CODEC_ID_AYUV },
     /* AV_CODEC_ID_DPX */
     { VLC_CODEC_MAD, AV_CODEC_ID_MAD },
     { VLC_CODEC_FRWU, AV_CODEC_ID_FRWU },
@@ -263,7 +264,6 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_AVRP */
     /* ffmpeg only: AV_CODEC_ID_012V */
     /* ffmpeg only: AV_CODEC_ID_AVUI */
-    /* ffmpeg only: AV_CODEC_ID_AYUV */
     /* ffmpeg only: AV_CODEC_ID_TARGA_Y216 */
     /* ffmpeg only: AV_CODEC_ID_V308 */
     /* ffmpeg only: AV_CODEC_ID_V408 */
