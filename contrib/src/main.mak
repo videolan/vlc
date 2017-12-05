@@ -458,6 +458,11 @@ help:
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@
+ifndef WITH_OPTIMIZATION
+	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
+else
+	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
+endif
 ifdef HAVE_WIN32
 ifdef HAVE_WINDOWSPHONE
 	echo "set(CMAKE_SYSTEM_NAME WindowsPhone)" >> $@
@@ -467,11 +472,6 @@ ifdef HAVE_WINSTORE
 else
 	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
 endif
-endif
-ifndef WITH_OPTIMIZATION
-	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
-else
-	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
 endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
