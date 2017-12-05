@@ -494,7 +494,7 @@ nfs_mount_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
     if (i_status == -EACCES && p_sys->psz_url_decoded_slash == NULL)
     {
         vlc_url_t url;
-        vlc_UrlParse(&url, p_sys->psz_url_decoded);
+        vlc_UrlParseFixup(&url, p_access->psz_url);
         if (url.psz_path == NULL || url.psz_path[0] == '\0'
          || url.psz_path[strlen(url.psz_path) - 1] == '/'
          || (p_sys->psz_url_decoded_slash = NfsGetUrl(&url, "/")) == NULL)
@@ -635,7 +635,7 @@ Open(vlc_object_t *p_obj)
         goto error;
 
     /* Parse the encoded URL */
-    vlc_UrlParse(&p_sys->encoded_url, p_access->psz_url);
+    vlc_UrlParseFixup(&p_sys->encoded_url, p_access->psz_url);
     if (p_sys->encoded_url.psz_option)
     {
         if (strstr(p_sys->encoded_url.psz_option, "uid")
