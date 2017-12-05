@@ -678,7 +678,7 @@ static text_style_t* DuplicateAndPushStyle(style_stack_t** pp_stack)
     style_stack_t* p_entry = malloc( sizeof( *p_entry ) );
     if ( unlikely( !p_entry ) )
     {
-        free( p_dup );
+        text_style_Delete( p_dup );
         return NULL;
     }
     // Give the style ownership to the segment.
@@ -792,12 +792,14 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         }
                         if ( !strcasecmp( psz_attribute_name, "face" ) )
                         {
+                            free(p_segment->style->psz_fontname);
                             p_segment->style->psz_fontname = psz_attribute_value;
                             // We don't want to free the attribute value since it has become our fontname
                             psz_attribute_value = NULL;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "family" ) )
                         {
+                            free(p_segment->style->psz_monofontname);
                             p_segment->style->psz_monofontname = psz_attribute_value;
                             psz_attribute_value = NULL;
                         }
