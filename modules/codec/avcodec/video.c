@@ -1511,20 +1511,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (hwaccel)
             can_hwaccel = true;
     }
-#if defined(_WIN32) && LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
-    size_t count;
-    for (count = 0; pi_fmt[count] != AV_PIX_FMT_NONE; count++);
-    enum PixelFormat p_fmts[count + 1];
-    if (pi_fmt[0] == AV_PIX_FMT_DXVA2_VLD && pi_fmt[1] == AV_PIX_FMT_D3D11VA_VLD)
-    {
-        /* favor D3D11VA over DXVA2 as the order will decide which vout will be
-         * used */
-        memcpy(p_fmts, pi_fmt, sizeof(p_fmts));
-        p_fmts[0] = AV_PIX_FMT_D3D11VA_VLD;
-        p_fmts[1] = AV_PIX_FMT_DXVA2_VLD;
-        pi_fmt = p_fmts;
-    }
-#endif
 
     /* If the format did not actually change (e.g. seeking), try to reuse the
      * existing output format, and if present, hardware acceleration back-end.
@@ -1570,9 +1556,30 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 
     wait_mt(p_sys);
 
-    for( size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++ )
+    static const enum PixelFormat hwfmts[] =
     {
-        enum PixelFormat hwfmt = pi_fmt[i];
+#ifdef _WIN32
+#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
+        AV_PIX_FMT_D3D11VA_VLD,
+#endif
+        AV_PIX_FMT_DXVA2_VLD,
+#endif
+#if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
+        AV_PIX_FMT_VDPAU,
+#endif
+        AV_PIX_FMT_VAAPI_VLD,
+        AV_PIX_FMT_NONE,
+    };
+
+    for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
+    {
+        enum PixelFormat hwfmt = AV_PIX_FMT_NONE;
+        for( size_t j = 0; hwfmt == AV_PIX_FMT_NONE && pi_fmt[j] != AV_PIX_FMT_NONE; j++ )
+            if( hwfmts[i] == pi_fmt[j] )
+                hwfmt = hwfmts[i];
+
+        if( hwfmt == AV_PIX_FMT_NONE )
+            continue;
 
         p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
         if (p_dec->fmt_out.video.i_chroma == 0)
@@ -1605,7 +1612,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
         p_context->draw_horiz_band = NULL;
-        return pi_fmt[i];
+        return hwfmt;
     }
 
     post_mt(p_sys);
