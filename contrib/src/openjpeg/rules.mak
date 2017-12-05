@@ -15,12 +15,13 @@ ifdef HAVE_VISUALSTUDIO
 #	$(APPLY) $(SRC)/openjpeg/msvc.patch
 endif
 #	$(APPLY) $(SRC)/openjpeg/restrict.patch
+	$(APPLY) $(SRC)/openjpeg/install.patch
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
 
 .openjpeg: openjpeg
 	cd $< && $(HOSTVARS) $(CMAKE) \
-		-DBUILD_SHARED_LIBS=OFF -DBUILD_PKGCONFIG_FILES=ON \
+		-DBUILD_SHARED_LIBS:bool=off -DBUILD_PKGCONFIG_FILES=ON -DCMAKE_BUILD_TYPE=Release \
 		.
 	cd $< && $(MAKE) install
 	touch $@
