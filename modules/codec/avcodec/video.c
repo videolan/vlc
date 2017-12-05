@@ -1564,10 +1564,10 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 #endif
         AV_PIX_FMT_DXVA2_VLD,
 #endif
+        AV_PIX_FMT_VAAPI_VLD,
 #if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
         AV_PIX_FMT_VDPAU,
 #endif
-        AV_PIX_FMT_VAAPI_VLD,
         AV_PIX_FMT_NONE,
     };
 
