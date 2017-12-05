@@ -149,17 +149,12 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
     }
 }
 
-int avformat_OpenDemux( vlc_object_t *p_this )
+static int avformat_ProbeDemux( vlc_object_t *p_this,
+                                AVInputFormat *fmt, const char *psz_url )
 {
     demux_t       *p_demux = (demux_t*)p_this;
-    demux_sys_t   *p_sys;
     AVProbeData   pd = { };
-    AVInputFormat *fmt = NULL;
-    int64_t       i_start_time = -1;
-    bool          b_can_seek;
-    const char    *psz_url;
     const uint8_t *peek;
-    int           error;
 
     /* Init Probe data */
     pd.buf_size = vlc_stream_Peek( p_demux->s, &peek, 2048 + 213 );
@@ -176,17 +171,10 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     memcpy( pd.buf, peek, pd.buf_size );
     memset( pd.buf + pd.buf_size, 0, AVPROBE_PADDING_SIZE );
 
-    if( p_demux->psz_filepath )
-        psz_url = p_demux->psz_filepath;
-    else
-        psz_url = p_demux->psz_url;
-
     if( psz_url != NULL )
         msg_Dbg( p_demux, "trying url: %s", psz_url );
 
     pd.filename = psz_url;
-
-    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
     vlc_init_avformat(p_this);
 
@@ -252,6 +240,29 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_demux, "detected format: %s", fmt->name );
+
+    return VLC_SUCCESS;
+}
+
+int avformat_OpenDemux( vlc_object_t *p_this )
+{
+    demux_t       *p_demux = (demux_t*)p_this;
+    demux_sys_t   *p_sys;
+    AVInputFormat *fmt = NULL;
+    int64_t       i_start_time = -1;
+    bool          b_can_seek;
+    const char    *psz_url;
+    int           error;
+
+    if( p_demux->psz_filepath )
+        psz_url = p_demux->psz_filepath;
+    else
+        psz_url = p_demux->psz_url;
+
+    if( avformat_ProbeDemux( p_demux, fmt, psz_url ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
