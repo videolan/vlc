@@ -1002,6 +1002,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             else if( psz_subtitle[1] == 'F' || psz_subtitle[1] == 'f' )
             {
                 p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                free(p_segment->style->psz_fontname);
                 p_segment->style->psz_fontname = strndup( &psz_subtitle[3], i_len );
             }
             else if( psz_subtitle[1] == 'S' || psz_subtitle[1] == 's' )
