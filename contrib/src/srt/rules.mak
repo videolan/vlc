@@ -13,6 +13,10 @@ ifeq ($(call need_pkg,"srt >= 1.2.2"),)
 PKGS_FOUND += srt
 endif
 
+ifdef HAVE_DARWIN_OS
+SRT_DARWIN=CFLAGS="$(CFLAGS) -Wno-error=partial-availability" CXXFLAGS="$(CXXFLAGS) -Wno-error=partial-availability"
+endif
+
 $(TARBALLS)/$(SRT_TARBALL):
 	$(call download_pkg,$(SRT_URL),srt)
 
@@ -25,7 +29,7 @@ srt: $(SRT_TARBALL) .sum-srt
 DEPS_srt = gnutls $(DEPS_gnutls)
 
 .srt: srt toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
+	cd $< && $(HOSTVARS_PIC) $(SRT_DARWIN) $(CMAKE) \
 		-DENABLE_SHARED=OFF -DUSE_GNUTLS=ON -DENABLE_CXX11=OFF
 	cd $< && $(MAKE) install
 	touch $@
