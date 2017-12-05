@@ -1,0 +1,23 @@
+From 66297f07a43d2770a97c8456d20202f3d051d980 Mon Sep 17 00:00:00 2001
+From: Even Rouault <even.rouault@spatialys.com>
+Date: Mon, 9 Oct 2017 11:40:43 +0200
+Subject: [PATCH] Unix build: fix regression of 2.3.0 where a shared-only or
+ static-only build lacks the installation target for the library (#1019, fixes
+ regression introduced by 3dfc6ca2bcf06fd1adb6b6b4cecc6c092f08ba0b)
+
+---
+ src/lib/openjp2/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib/openjp2/CMakeLists.txt b/src/lib/openjp2/CMakeLists.txt
+index 0b4520384..f8990ccf0 100644
+--- a/src/lib/openjp2/CMakeLists.txt
++++ b/src/lib/openjp2/CMakeLists.txt
+@@ -99,6 +99,7 @@ else()
+     set(INSTALL_LIBS ${OPENJPEG_LIBRARY_NAME} openjp2_static)
+   else()
+     add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
++    set(INSTALL_LIBS ${OPENJPEG_LIBRARY_NAME})
+   endif()
+ endif()
+
