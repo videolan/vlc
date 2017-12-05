@@ -443,7 +443,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
 
     vlc_url_t url;
     vlc_credential credential;
-    vlc_UrlParse( &url, ((stream_t *)p_access)->psz_url );
+    vlc_UrlParseFixup( &url, ((stream_t *)p_access)->psz_url );
     vlc_credential_init( &credential, &url );
     bool b_logged = false;
 
@@ -645,7 +645,7 @@ static int parseURL( vlc_url_t *url, const char *path, enum tls_mode_e mode )
     while( *path == '/' )
         path++;
 
-    vlc_UrlParse( url, path );
+    vlc_UrlParseFixup( url, path );
 
     if( url->psz_host == NULL || *url->psz_host == '\0' )
         return VLC_EGENERIC;
