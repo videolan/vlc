@@ -316,7 +316,7 @@ vlc_module_begin()
     add_integer( "chunk-size", SRT_DEFAULT_CHUNK_SIZE,
             N_("SRT chunk size (bytes)"), NULL, true )
     add_integer( "poll-timeout", SRT_DEFAULT_POLL_TIMEOUT,
-            N_("Return poll wait after timeout miliseconds (-1 = infinite)"), NULL, true )
+            N_("Return poll wait after timeout milliseconds (-1 = infinite)"), NULL, true )
     add_integer( "latency", SRT_DEFAULT_LATENCY, N_("SRT latency (ms)"), NULL, true )
 
     set_capability( "sout access", 0 )
