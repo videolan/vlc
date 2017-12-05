@@ -19,7 +19,7 @@ endif
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
 
-.openjpeg: openjpeg
+.openjpeg: openjpeg toolchain.cmake
 	cd $< && $(HOSTVARS) $(CMAKE) \
 		-DBUILD_SHARED_LIBS:bool=off -DBUILD_PKGCONFIG_FILES=ON \
 		.
