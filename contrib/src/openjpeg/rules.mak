@@ -21,7 +21,7 @@ endif
 
 .openjpeg: openjpeg
 	cd $< && $(HOSTVARS) $(CMAKE) \
-		-DBUILD_SHARED_LIBS:bool=off -DBUILD_PKGCONFIG_FILES=ON -DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_SHARED_LIBS:bool=off -DBUILD_PKGCONFIG_FILES=ON \
 		.
 	cd $< && $(MAKE) install
 	touch $@
