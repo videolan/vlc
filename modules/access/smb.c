@@ -175,7 +175,7 @@ static int Open( vlc_object_t *p_this )
 # undef open
 #endif
 
-    vlc_UrlParse( &url, p_access->psz_url );
+    vlc_UrlParseFixup( &url, p_access->psz_url );
     if( url.psz_path )
     {
         psz_decoded_path = vlc_uri_decode_duplicate( url.psz_path );
