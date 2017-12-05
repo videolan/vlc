@@ -1,7 +1,6 @@
 # srt
 
 SRT_VERSION := 1.2.2
-SRT_TARBALL := srt-v$(SRT_VERSION).tar.gz
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifndef HAVE_WIN32
@@ -17,13 +16,14 @@ ifdef HAVE_DARWIN_OS
 SRT_DARWIN=CFLAGS="$(CFLAGS) -Wno-error=partial-availability" CXXFLAGS="$(CXXFLAGS) -Wno-error=partial-availability"
 endif
 
-$(TARBALLS)/$(SRT_TARBALL):
+$(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 	$(call download_pkg,$(SRT_URL),srt)
 
-.sum-srt: $(SRT_TARBALL)
+.sum-srt: srt-$(SRT_VERSION).tar.gz
 
-srt: $(SRT_TARBALL) .sum-srt
+srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
+	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
 DEPS_srt = gnutls $(DEPS_gnutls)
