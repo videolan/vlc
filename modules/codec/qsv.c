@@ -100,7 +100,7 @@ static void     Close(vlc_object_t *);
 #define RATE_CONTROL_TEXT N_("Rate Control Method")
 #define RATE_CONTROL_LONGTEXT N_( \
     "The rate control method to use when encoding. Can be one of " \
-    "'crb', 'vbr', 'qp', 'avbr'. 'qp' mode isn't supported for mpeg2")
+    "'cbr', 'vbr', 'qp', 'avbr'. 'qp' mode isn't supported for mpeg2")
 
 #define QP_TEXT N_("Quantization parameter")
 #define QP_LONGTEXT N_("Quantization parameter for all types of frames. " \
