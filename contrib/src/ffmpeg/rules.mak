@@ -139,9 +139,6 @@ ifdef HAVE_NEON
 FFMPEGCONF += --as="$(AS)"
 endif
 endif
-ifdef HAVE_MACOSX
-FFMPEGCONF += --enable-vda
-endif
 endif
 
 # Linux
