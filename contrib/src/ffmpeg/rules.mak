@@ -39,7 +39,8 @@ FFMPEGCONF += \
 	--disable-swresample \
 	--disable-iconv \
 	--disable-avisynth \
-	--disable-nvenc
+	--disable-nvenc \
+	--disable-linux-perf
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += \
 	--disable-videotoolbox
