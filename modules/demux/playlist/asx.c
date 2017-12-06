@@ -37,6 +37,7 @@
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
+#include <vlc_memstream.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -352,7 +353,172 @@ end:
     free( psz_description );
 }
 
-static stream_t* UTF8Stream( stream_t *p_demux )
+/// this looks for patterns like &name; &#DEC; or &#xHEX;
+static bool isXmlEncoded(const char* psz_str)
+{
+    //look for special characters
+    if( strpbrk(psz_str, "<>'\"") != NULL )
+        return false;
+
+    bool is_escaped = false;
+    while (psz_str != NULL)
+    {
+        const char* psz_amp = strchr(psz_str, '&');
+        if( psz_amp == NULL )
+            return is_escaped;
+        const char* psz_end = strchr(psz_amp, ';');
+        if(  psz_end == NULL )
+            return false;
+
+        else if(psz_amp[1] == '#')
+        {
+            if( psz_amp[2] == 'x' )
+            {
+                const char* psz_ptr = &psz_amp[3];
+                if( psz_ptr  ==  psz_end )
+                    return false;
+                for (  ; psz_ptr < psz_end; psz_ptr++)
+                    if( ! isxdigit( *psz_ptr ) )
+                        return false;
+            }
+            else
+            {
+                const char* psz_ptr = &(psz_amp[2]);
+                if( psz_ptr ==  psz_end )
+                    return false;
+                for (  ; psz_ptr < psz_end; psz_ptr++)
+                    if( ! isdigit( *psz_ptr ) )
+                        return false;
+            }
+        }
+        else
+        {
+            const char* psz_ptr = &(psz_amp[1]);
+            if( psz_ptr ==  psz_end )
+                return false;
+            for (  ; psz_ptr < psz_end; psz_ptr++)
+                if( ! isalnum( *psz_ptr ) )
+                    return false;
+        }
+        is_escaped = true;
+        psz_str = psz_end;
+    }
+    return is_escaped;
+}
+
+static void memstream_puts_xmlencoded(struct vlc_memstream* p_stream, const char* psz_begin, const char* psz_end)
+{
+    char *psz_tmp = NULL;
+    if(psz_end == NULL)
+        psz_tmp = strdup( psz_begin );
+    else
+        psz_tmp = strndup( psz_begin, psz_end - psz_begin );
+
+    if( isXmlEncoded( psz_tmp ) )
+        vlc_memstream_puts( p_stream, psz_tmp );
+    else
+    {
+        char *psz_tmp_encoded = vlc_xml_encode( psz_tmp );
+        vlc_memstream_puts( p_stream, psz_tmp_encoded );
+        free( psz_tmp_encoded );
+    }
+    free(psz_tmp);
+}
+
+/**
+ * ASX doesn't requires to be a strict XML document, this function will
+ *  - make tags and attributes upercase
+ *  - escape strings when required
+ */
+static char* ASXToXML( char* psz_source )
+{
+    bool b_in_string= false;
+    char *psz_source_cur = psz_source;
+    char *psz_source_old = psz_source;
+    char c_string_delim;
+
+    struct vlc_memstream stream_out;
+    if( vlc_memstream_open( &stream_out ) != 0 )
+        return NULL;
+
+    while ( psz_source_cur != NULL && *psz_source_cur != '\0' )
+    {
+        psz_source_old = psz_source_cur;
+        //search tag start
+        if( ( psz_source_cur = strchr( psz_source_cur, '<' ) ) == NULL )
+        {
+            memstream_puts_xmlencoded(&stream_out, psz_source_old, NULL);
+            //vlc_memstream_puts( &stream_out, psz_source_old );
+            break;
+        }
+
+        memstream_puts_xmlencoded(&stream_out, psz_source_old, psz_source_cur);
+        psz_source_old = psz_source_cur;
+
+        //skip if comment, no need to copy them to the ouput.
+        if( strncmp( psz_source_cur, "<!--", 4 ) == 0 )
+        {
+            psz_source_cur += 4;
+            psz_source_cur =  strstr( psz_source_cur, "-->" );
+            if( psz_source_cur == NULL)
+                break;
+            else
+            {
+                psz_source_cur += 3;
+                continue;
+            }
+        }
+        else
+        {
+            vlc_memstream_putc( &stream_out, '<' );
+            psz_source_cur++;
+        }
+
+        for (  ; *psz_source_cur != '\0'; psz_source_cur++ )
+        {
+            if( b_in_string == false )
+            {
+                if( *psz_source_cur == '>')
+                {
+                    vlc_memstream_putc( &stream_out, '>' );
+                    psz_source_cur++;
+                    break;
+                }
+                if( *psz_source_cur == '"' || *psz_source_cur == '\'' )
+                {
+                    c_string_delim = *psz_source_cur;
+                    b_in_string = true;
+                    vlc_memstream_putc( &stream_out, c_string_delim );
+                }
+                else
+                {
+                    //convert tag and attributes to upper case
+                    vlc_memstream_putc( &stream_out, vlc_ascii_toupper( *psz_source_cur ) );
+                }
+            }
+            else
+            {
+                psz_source_old = psz_source_cur;
+                psz_source_cur = strchr( psz_source_cur, c_string_delim );
+                if( psz_source_cur == NULL )
+                    break;
+
+                memstream_puts_xmlencoded(&stream_out, psz_source_old, psz_source_cur);
+                vlc_memstream_putc( &stream_out, c_string_delim );
+                b_in_string = false;
+            }
+        }
+    }
+    if( vlc_memstream_close( &stream_out ) != 0 )
+    {
+        free( stream_out.ptr );
+        return NULL;
+    }
+
+    return stream_out.ptr;
+}
+
+static stream_t* PreparseStream( stream_t *p_demux )
 {
     stream_t *s = p_demux->s;
     uint64_t streamSize;
@@ -379,17 +545,24 @@ static stream_t* UTF8Stream( stream_t *p_demux )
          i_read += i_ret;
      } while ( streamSize > 0 );
      psz_source[i_read] = 0;
-     if ( IsUTF8( psz_source ) )
-         return vlc_stream_MemoryNew( p_demux, (uint8_t*)psz_source, i_read, false );
 
-     char *psz_utf8 = FromLatin1( psz_source );
-     if( psz_utf8 == NULL )
-     {
-         free( psz_source );
+    char* psz_source_xml = ASXToXML( psz_source );
+    free( psz_source );
+    if( psz_source_xml == NULL )
          return NULL;
-     }
+
+    if( IsUTF8( psz_source_xml ) )
+        return vlc_stream_MemoryNew( p_demux, (uint8_t*)psz_source_xml, strlen(psz_source_xml), false );
+
+    char *psz_utf8 = FromLatin1( psz_source_xml );
+    if( psz_utf8 == NULL )
+    {
+        free( psz_source_xml );
+        return NULL;
+    }
+
      stream_t * p_stream = vlc_stream_MemoryNew( p_demux, (uint8_t*)psz_utf8, strlen(psz_utf8), false );
-     free( psz_source );
+     free( psz_source_xml );
      return p_stream;
 }
 
@@ -409,7 +582,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
     xml_reader_t *p_xml_reader = NULL;
     input_item_t *p_current_input = GetCurrentItem( p_demux );
-    stream_t* p_stream = UTF8Stream( p_demux );
+    stream_t* p_stream = PreparseStream( p_demux );
 
     bool b_first_node = false;
     int i_type;
