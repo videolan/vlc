@@ -180,10 +180,10 @@ EbmlElement *EbmlParser::Get( int n_call )
     }
     else {
         size_t size_lvl = mi_level;
-        while ( size_lvl && m_el[size_lvl-1]->IsFiniteSize() &&
+        while ( size_lvl && m_el[size_lvl-1]->IsFiniteSize() && m_el[size_lvl]->IsFiniteSize() &&
                 m_el[size_lvl-1]->GetEndPosition() == m_el[size_lvl]->GetEndPosition() )
             size_lvl--;
-        if (size_lvl == 0 || !m_el[size_lvl-1]->IsFiniteSize() )
+        if (size_lvl == 0 || !m_el[size_lvl-1]->IsFiniteSize() || !m_el[size_lvl]->IsFiniteSize() )
             i_max_read = UINT64_MAX;
         else {
             uint64 top = m_el[size_lvl-1]->GetEndPosition();
