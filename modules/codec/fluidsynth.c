@@ -44,9 +44,9 @@
 #include <fluidlite.h>
 #endif
 
-#define SOUNDFONT_TEXT N_("Sound fonts")
+#define SOUNDFONT_TEXT N_("SoundFont file")
 #define SOUNDFONT_LONGTEXT N_( \
-    "A sound fonts file is required for software synthesis." )
+    "SoundFont file to use for software synthesis." )
 
 #define CHORUS_TEXT N_("Chorus")
 

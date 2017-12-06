@@ -44,9 +44,9 @@ do { if ((errorCode) != noErr) goto exceptionLabel; \
 } while ( 0 )
 #endif
 
-#define SOUNDFONT_TEXT N_("Sound font file")
+#define SOUNDFONT_TEXT N_("SoundFont file")
 #define SOUNDFONT_LONGTEXT N_( \
-    "The Sound Font file (SF2/DLS) to use for synthesis.")
+    "SoundFont file to use for software synthesis." )
 
 static int  Open  (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -60,7 +60,7 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACODEC)
     set_callbacks(Open, Close)
-    add_loadfile(CFG_PREFIX "soundfont", "",
+    add_loadfile("soundfont", "",
                  SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, false)
 vlc_module_end()
 
