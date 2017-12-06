@@ -1076,6 +1076,12 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 }
 
+void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
+                                  unsigned width, unsigned height)
+{
+    vgl->vt.Viewport(x, y, width, height);
+}
+
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
     GL_ASSERT_NOERROR();
