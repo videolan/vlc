@@ -248,6 +248,6 @@ static void Manage (vout_display_t *vd)
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return VLC_EGENERIC;
     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-    glViewport(0, 0, width, height);
+    vout_display_opengl_Viewport(sys->vgl, 0, 0, width, height);
     vlc_gl_ReleaseCurrent (sys->gl);
 }
