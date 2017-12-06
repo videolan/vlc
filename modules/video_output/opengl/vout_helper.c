@@ -738,7 +738,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->gl = gl;
 
+#if defined(USE_OPENGL_ES2) || defined(HAVE_GL_CORE_SYMBOLS)
 #define GET_PROC_ADDR_CORE(name) vgl->vt.name = gl##name
+#else
+#define GET_PROC_ADDR_CORE(name) GET_PROC_ADDR_EXT(name, true)
+#endif
 #define GET_PROC_ADDR_EXT(name, critical) do { \
     vgl->vt.name = vlc_gl_GetProcAddress(gl, "gl"#name); \
     if (vgl->vt.name == NULL && critical) { \
