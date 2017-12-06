@@ -140,7 +140,8 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_session == NULL )
         goto error;
 
-    vlc_UrlParseFixup( &p_sys->url, p_access->psz_url );
+    if( vlc_UrlParseFixup( &p_sys->url, p_access->psz_url ) != 0 )
+        goto error;
 
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
