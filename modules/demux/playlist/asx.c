@@ -40,6 +40,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "playlist.h"
 
@@ -136,7 +137,7 @@ static bool PeekASX( stream_t *s )
 {
     const uint8_t *p_peek;
     return ( vlc_stream_Peek( s->p_source, &p_peek, 12 ) == 12
-             && !memcmp( p_peek, "<asx version", 12 ) );
+             && !strncasecmp( (const char*) p_peek, "<asx version", 12 ) );
 }
 
 /*****************************************************************************
@@ -154,7 +155,7 @@ int Import_ASX( vlc_object_t *p_this )
     if( stream_HasExtension( p_demux, ".asx" )
      || stream_HasExtension( p_demux, ".wax" )
      || stream_HasExtension( p_demux, ".wvx" )
-     || (type != NULL && (strcasecmp(type, "video-x-ms-asf") == 0
+     || (type != NULL && (strcasecmp(type, "video/x-ms-asf") == 0
                        || strcasecmp(type, "audio/x-ms-wax") == 0)
                       && PeekASX( p_demux ) ) )
     {
