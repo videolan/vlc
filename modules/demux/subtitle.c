@@ -2382,6 +2382,35 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
     VLC_UNUSED( i_idx );
     VLC_UNUSED( p_props );
 
+    static const struct rates
+    {
+        unsigned val;
+        vlc_rational_t rate;
+        bool b_drop_allowed;
+    } framerates[] = {
+        { 2398, { 24000, 1001 }, false },
+        { 2400, { 24, 1 },       false },
+        { 2500, { 25, 1 },       false },
+        { 2997, { 30000, 1001 }, true }, /* encoding rate */
+        { 3000, { 30, 1 },       false },
+        { 5000, { 50, 1 },       false },
+        { 5994, { 60000, 1001 }, true },
+        { 6000, { 60, 1 },       false },
+    };
+    const struct rates *p_rate = &framerates[3];
+    float f_fps = var_GetFloat( p_obj, "sub-fps" );
+    if( f_fps > 1.0 )
+    {
+        for( size_t i=0; i<ARRAY_SIZE(framerates); i++ )
+        {
+            if( (unsigned)(f_fps * 100) == framerates[i].val )
+            {
+                p_rate = &framerates[i];
+                break;
+            }
+        }
+    }
+
     for( ;; )
     {
         const char *psz_line = TextGetLine( txt );
@@ -2389,11 +2418,27 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
 
         unsigned h, m, s, f;
-        if( sscanf( psz_line, "%u:%u:%u%*[:;]%u ", &h, &m, &s, &f ) != 4 )
+        char c;
+        if( sscanf( psz_line, "%u:%u:%u%[:;]%u ", &h, &m, &s, &c, &f ) != 5 )
             continue;
 
-        p_subtitle->i_start = CLOCK_FREQ * ( h * 3600 + m * 60 + s ) +
-                              f * p_props->i_microsecperframe;
+        /* convert everything to seconds */
+        mtime_t i_frames = h * 3600 + m * 60 + s;
+
+        if( c == ';' && p_rate->b_drop_allowed ) /* dropframe */
+        {
+            /* convert to frame # to be accurate between inter drop drift
+             * of 18 frames see http://andrewduncan.net/timecodes/ */
+            const unsigned i_mins = h * 60 + m;
+            i_frames = i_frames * p_rate[+1].rate.num + f
+                    - (p_rate[+1].rate.den * 2 * (i_mins - i_mins % 10));
+        }
+        else
+        {
+            /* convert to frame # at 29.97 */
+            i_frames = i_frames * framerates[3].rate.num / framerates[3].rate.den + f;
+        }
+        p_subtitle->i_start = i_frames * CLOCK_FREQ * p_rate->rate.den / p_rate->rate.num;
         p_subtitle->i_stop = -1;
 
         const char *psz_text = strchr( psz_line, '\t' );
