@@ -11,6 +11,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
 	$(APPLY) $(SRC)/ebml/ebml-maxread.patch
+	$(APPLY) $(SRC)/ebml/unknown-check.patch
 	$(MOVE)
 
 # libebml requires exceptions
