@@ -2438,7 +2438,8 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             /* convert to frame # at 29.97 */
             i_frames = i_frames * framerates[3].rate.num / framerates[3].rate.den + f;
         }
-        p_subtitle->i_start = i_frames * CLOCK_FREQ * p_rate->rate.den / p_rate->rate.num;
+        p_subtitle->i_start = VLC_TS_0 + i_frames * CLOCK_FREQ *
+                                         p_rate->rate.den / p_rate->rate.num;
         p_subtitle->i_stop = -1;
 
         const char *psz_text = strchr( psz_line, '\t' );
