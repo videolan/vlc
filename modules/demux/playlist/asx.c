@@ -49,8 +49,9 @@
  *****************************************************************************/
 static int ReadDir( stream_t *, input_item_node_t * );
 
-static mtime_t ParseTime(xml_reader_t *p_xml_reader)
+static bool ParseTime(xml_reader_t *p_xml_reader, mtime_t* pi_result )
 {
+    assert( pi_result );
     char *psz_value = NULL;
     char *psz_start = NULL;
 
@@ -67,6 +68,9 @@ static mtime_t ParseTime(xml_reader_t *p_xml_reader)
         psz_txt = xml_ReaderNextAttr( p_xml_reader, &psz_node );
     }
     while( psz_txt && strncasecmp( psz_txt, "VALUE", 5 ) );
+
+    if( !psz_txt )
+        return false;
 
     psz_value = strdup( psz_node );
     psz_start = psz_value;
@@ -111,15 +115,18 @@ static mtime_t ParseTime(xml_reader_t *p_xml_reader)
         i_result += i_subresult;
 
     free( psz_start );
-    return i_result;
+    *pi_result = i_result;
+    return true;
 }
 
-static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
+static bool ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
 {
     const char *psz_node = NULL;
 
     /* Read the text node */
-    xml_ReaderNextNode( p_xml_reader, &psz_node );
+    int ret = xml_ReaderNextNode( p_xml_reader, &psz_node );
+    if( ret <= 0 )
+        return false;
     free( *ppsz_txt );
     *ppsz_txt = strdup( psz_node );
     vlc_xml_decode( *ppsz_txt );
@@ -131,6 +138,7 @@ static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
      * This function is only used to read the element that cannot have child
      * according to the reference.
      */
+    return true;
 }
 
 static bool PeekASX( stream_t *s )
@@ -201,15 +209,27 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
     {
         i_type = xml_ReaderNextNode( p_xml_reader, &psz_node );
 
+        if( i_type == XML_READER_ERROR || i_type == XML_READER_NONE )
+            break;
+
         if( i_type == XML_READER_STARTELEM )
         {
             /* Metadata Node */
             if( !strncasecmp( psz_node, "TITLE", 5 ) )
-                ReadElement( p_xml_reader, &psz_title );
+            {
+                if( !ReadElement( p_xml_reader, &psz_title ) )
+                    break;
+            }
             else if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
-                ReadElement( p_xml_reader, &psz_artist );
+            {
+                if( !ReadElement( p_xml_reader, &psz_artist ) )
+                    break;
+            }
             else if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
-                ReadElement( p_xml_reader, &psz_copyright );
+            {
+                if( !ReadElement( p_xml_reader, &psz_copyright ) )
+                    break;
+            }
             else if( !strncasecmp( psz_node,"MOREINFO", 8 ) )
             {
                 do
@@ -219,21 +239,32 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 while(psz_txt && strncasecmp( psz_txt, "HREF", 4 ) );
 
                 if( !psz_txt )
-                    ReadElement( p_xml_reader, &psz_moreinfo );
+                {
+                    if( !ReadElement( p_xml_reader, &psz_moreinfo ) )
+                        break;
+                }
                 else
                     psz_moreinfo = strdup( psz_node );
                 vlc_xml_decode( psz_moreinfo );
             }
             else if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
-                ReadElement( p_xml_reader, &psz_description );
+            {
+                if( !ReadElement( p_xml_reader, &psz_description ) )
+                    break;
+            }
             else if( !strncasecmp( psz_node, "DURATION", 8 ) )
-                i_duration = ParseTime( p_xml_reader );
+            {
+                if( !ParseTime( p_xml_reader, &i_duration ) )
+                   break;
+            }
             else if( !strncasecmp( psz_node, "STARTTIME", 9 ) )
-                i_start = ParseTime( p_xml_reader );
-            else
+            {
+                 if( !ParseTime( p_xml_reader, &i_start ) )
+                     break;
+            }
             /* Reference Node */
             /* All ref node will be converted into an entry */
-            if( !strncasecmp( psz_node, "REF", 3 ) )
+            else if( !strncasecmp( psz_node, "REF", 3 ) )
             {
                 *pi_n_entry = *pi_n_entry + 1;
 
@@ -250,7 +281,9 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 {
                     psz_txt = xml_ReaderNextAttr( p_xml_reader, &psz_node );
                 }
-                while( strncasecmp( psz_txt, "HREF", 4) );
+                while( psz_txt != NULL && strncasecmp( psz_txt, "HREF", 4) );
+                if( psz_txt == NULL )
+                    break;
                 psz_href = strdup( psz_node );
 
                 if( asprintf( &psz_name, "%d. %s", *pi_n_entry, psz_title ) == -1)
@@ -410,17 +443,20 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             /* Metadata Node Handler */
             if( !strncasecmp( psz_node, "TITLE", 5 ) )
             {
-                ReadElement( p_xml_reader, &psz_title_asx );
+                if( ! ReadElement( p_xml_reader, &psz_title_asx ) )
+                    break;
                 input_item_SetTitle( p_current_input, psz_title_asx );
             }
             else if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
             {
-                ReadElement( p_xml_reader, &psz_txt );
+                if( ! ReadElement( p_xml_reader, &psz_txt ) )
+                    break;
                 input_item_SetArtist( p_current_input, psz_txt );
             }
             else if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
             {
-                ReadElement( p_xml_reader, &psz_txt );
+                if( ! ReadElement( p_xml_reader, &psz_txt ) )
+                    break;
                 input_item_SetCopyright( p_current_input, psz_txt );
             }
             else if( !strncasecmp( psz_node, "MOREINFO", 8 ) )
@@ -433,7 +469,10 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 while( psz_tmp && strncasecmp( psz_tmp, "HREF", 4 ) );
 
                 if( !psz_tmp )  // If HREF attribute doesn't exist
-                    ReadElement( p_xml_reader, &psz_txt );
+                {
+                    if( ! ReadElement( p_xml_reader, &psz_txt ) )
+                        break;
+                }
                 else
                     psz_txt = strdup( psz_node );
 
@@ -442,13 +481,17 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             }
             else if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
             {
-                ReadElement( p_xml_reader, &psz_txt );
+                if( ! ReadElement( p_xml_reader, &psz_txt ) )
+                    break;
                 input_item_SetDescription( p_current_input, psz_txt );
             }
             else
             /* Base Node handler */
             if( !strncasecmp( psz_node, "BASE", 4 ) )
-                ReadElement( p_xml_reader, &psz_base );
+            {
+                if( ! ReadElement( p_xml_reader, &psz_base ) )
+                    break;
+            }
             else
             /* Entry Ref Handler */
             if( !strncasecmp( psz_node, "ENTRYREF", 7 ) )
@@ -459,6 +502,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                     psz_tmp = xml_ReaderNextAttr( p_xml_reader, &psz_node );
                 }
                 while( psz_tmp && !strncasecmp( psz_tmp, "HREF", 4 ) );
+                if( ! psz_tmp )
+                    break;
 
                 /* Create new input item */
                 input_item_t *p_input;
