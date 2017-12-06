@@ -443,7 +443,11 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
 
     vlc_url_t url;
     vlc_credential credential;
-    vlc_UrlParseFixup( &url, ((stream_t *)p_access)->psz_url );
+    if( vlc_UrlParseFixup( &url, ((stream_t *)p_access)->psz_url ) != 0 )
+    {
+        vlc_UrlClean( &url );
+        goto error;
+    }
     vlc_credential_init( &credential, &url );
     bool b_logged = false;
 
