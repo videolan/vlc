@@ -1,0 +1,43 @@
+From ff0dc3cc21494578ce731f5d7dcde5fdec23d40f Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Wed, 6 Dec 2017 09:32:13 +0100
+Subject: [PATCH] Do not output an element with size Unknown if it's not
+ allowed
+
+Similar to what is done in FindNextID().
+
+SetSizeInfinite() doesn't actually set anything. SetSizeIsFinite() is the one
+that actually sets it and it is an internal API.
+---
+ src/EbmlElement.cpp | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/src/EbmlElement.cpp b/src/EbmlElement.cpp
+index ae4441e..ac0be41 100644
+--- a/src/EbmlElement.cpp
++++ b/src/EbmlElement.cpp
+@@ -461,15 +461,13 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
+           //  1 : same level
+           //  + : further parent
+           if (Result->ValidateSize() && (SizeFound == SizeUnknown || UpperLevel > 0 || MaxDataSize == 0 || MaxDataSize >= (PossibleID_Length + PossibleSizeLength + SizeFound))) {
+-            if (SizeFound == SizeUnknown) {
+-              Result->SetSizeInfinite();
++            if (SizeFound != SizeUnknown || Result->SetSizeInfinite()) {
++              Result->SizePosition = DataStream.getFilePointer() - SizeIdx + EBML_ID_LENGTH(PossibleID);
++              Result->ElementPosition = Result->SizePosition - EBML_ID_LENGTH(PossibleID);
++              // place the file at the beggining of the data
++              DataStream.setFilePointer(Result->SizePosition + _SizeLength);
++              return Result;
+             }
+-
+-            Result->SizePosition = DataStream.getFilePointer() - SizeIdx + EBML_ID_LENGTH(PossibleID);
+-            Result->ElementPosition = Result->SizePosition - EBML_ID_LENGTH(PossibleID);
+-            // place the file at the beggining of the data
+-            DataStream.setFilePointer(Result->SizePosition + _SizeLength);
+-            return Result;
+           }
+         }
+         delete Result;
+-- 
+2.10.1.windows.1
+
