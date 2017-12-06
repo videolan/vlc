@@ -231,11 +231,9 @@ static int Open( vlc_object_t* p_this )
 {
     stream_t*   p_access = (stream_t*)p_this;
     access_sys_t* p_sys;
-    vlc_url_t credential_url;
     vlc_credential credential;
-    const char* psz_path;
+    char* psz_path = NULL;
     char *psz_session_username = NULL;
-    char* psz_remote_home = NULL;
     char* psz_home = NULL;
     int i_port;
     vlc_url_t url;
@@ -251,12 +249,15 @@ static int Open( vlc_object_t* p_this )
 
     p_sys->i_socket = -1;
 
-    vlc_UrlParse( &credential_url, p_access->psz_url );
-    vlc_credential_init( &credential, &credential_url );
-
     /* Parse the URL */
     vlc_UrlParse( &url, p_access->psz_url );
-    vlc_uri_decode( url.psz_path );
+    vlc_credential_init( &credential, &url );
+    if( url.psz_path != NULL )
+    {
+        psz_path = vlc_uri_decode_duplicate( url.psz_path );
+        if( psz_path == NULL )
+            goto error;
+    }
 
     /* Check for some parameters */
     if( EMPTY_STR( url.psz_host ) )
@@ -405,12 +406,12 @@ static int Open( vlc_object_t* p_this )
     }
 
     /* No path, default to user Home */
-    if( !url.psz_path )
+    if( !psz_path )
     {
         const size_t i_size = 1024;
         int i_read;
 
-        psz_remote_home = malloc( i_size );
+        char* psz_remote_home = malloc( i_size );
         if( !psz_remote_home )
             goto error;
 
@@ -420,6 +421,7 @@ static int Open( vlc_object_t* p_this )
         if( i_read <= 0 )
         {
             msg_Err( p_access, "Impossible to get the Home directory" );
+            free( psz_remote_home );
             goto error;
         }
         psz_remote_home[i_read] = '\0';
@@ -436,8 +438,6 @@ static int Open( vlc_object_t* p_this )
         }
         free( base );
     }
-    else
-        psz_path = url.psz_path;
 
     /* Get some information */
     LIBSSH2_SFTP_ATTRIBUTES attributes;
@@ -485,11 +485,10 @@ static int Open( vlc_object_t* p_this )
 
 error:
     free( psz_home );
-    free( psz_remote_home );
     free( psz_session_username );
-    vlc_UrlClean( &url );
+    free( psz_path );
     vlc_credential_clean( &credential );
-    vlc_UrlClean( &credential_url );
+    vlc_UrlClean( &url );
     if( i_result != VLC_SUCCESS ) {
         Close( p_this );
     }
