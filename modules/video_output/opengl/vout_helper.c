@@ -770,16 +770,16 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
 #define GET_PROC_ADDR_OPTIONAL(name) GET_PROC_ADDR_EXT(name, false) /* GL 3 or more */
 
-    GET_PROC_ADDR_CORE(GetError);
-    GET_PROC_ADDR_CORE(GetString);
-    GET_PROC_ADDR_CORE(GetIntegerv);
     GET_PROC_ADDR_CORE(BindTexture);
-    GET_PROC_ADDR_CORE(TexParameteri);
-    GET_PROC_ADDR_CORE(TexParameterf);
-    GET_PROC_ADDR_CORE(PixelStorei);
-    GET_PROC_ADDR_CORE(GenTextures);
     GET_PROC_ADDR_CORE(DeleteTextures);
+    GET_PROC_ADDR_CORE(GenTextures);
+    GET_PROC_ADDR_CORE(GetError);
+    GET_PROC_ADDR_CORE(GetIntegerv);
+    GET_PROC_ADDR_CORE(GetString);
+    GET_PROC_ADDR_CORE(PixelStorei);
     GET_PROC_ADDR_CORE(TexImage2D);
+    GET_PROC_ADDR_CORE(TexParameterf);
+    GET_PROC_ADDR_CORE(TexParameteri);
     GET_PROC_ADDR_CORE(TexSubImage2D);
 
     GET_PROC_ADDR_CORE_GL(GetTexLevelParameteriv);
