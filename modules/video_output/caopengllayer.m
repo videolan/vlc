@@ -489,7 +489,9 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     CGRect bounds = [self visibleRect];
 
     // x / y are top left corner, but we need the lower left one
-    glViewport (sys->place.x, bounds.size.height - (sys->place.y + sys->place.height), sys->place.width, sys->place.height);
+    vout_display_opengl_Viewport(sys->vgl, sys->place.x,
+                                 bounds.size.height - (sys->place.y + sys->place.height),
+                                 sys->place.width, sys->place.height);
 
     // flush is also done by this method, no need to call super
     vout_display_opengl_Display (sys->vgl, &_voutDisplay->source);
