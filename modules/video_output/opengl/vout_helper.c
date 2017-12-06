@@ -836,6 +836,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GL_ASSERT_NOERROR();
 
     const char *extensions = (const char *)vgl->vt.GetString(GL_EXTENSIONS);
+    assert(extensions);
+    if (!extensions)
+    {
+        msg_Err(gl, "glGetString returned NULL\n");
+        free(vgl);
+        return NULL;
+    }
 #if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = vgl->vt.GetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
