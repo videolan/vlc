@@ -332,7 +332,9 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
                 // x / y are top left corner, but we need the lower left one
                 if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
+                    vout_display_opengl_Viewport(sys->vgl, place.x,
+                                                 cfg_tmp.display.height - (place.y + place.height),
+                                                 place.width, place.height);
                 vlc_gl_ReleaseCurrent(sys->gl);
             }
             return VLC_SUCCESS;
