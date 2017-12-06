@@ -356,11 +356,13 @@ static stream_t* UTF8Stream( stream_t *p_demux )
 {
     stream_t *s = p_demux->s;
     uint64_t streamSize;
+    static const size_t maxsize = 1024 * 1024;
 
-     if (vlc_stream_GetSize( s, &streamSize ) != VLC_SUCCESS)
-         return NULL;
+    if( vlc_stream_GetSize( s, &streamSize ) != VLC_SUCCESS)
+        streamSize = maxsize;
+
      // Don't attempt to convert/store huge streams
-     if( streamSize > 1024 * 1024 )
+     if( streamSize > maxsize )
          return NULL;
      char* psz_source = malloc( streamSize + 1 * sizeof( *psz_source ) );
      if ( unlikely( psz_source == NULL ) )
