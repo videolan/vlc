@@ -694,7 +694,7 @@ int D3D11OpenConverter( vlc_object_t *obj )
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_BGRA )
         return VLC_EGENERIC;
 
-    if ( p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
+    if ( p_filter->fmt_in.video.i_visible_height != p_filter->fmt_out.video.i_visible_height
          || p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width )
         return VLC_EGENERIC;
 
