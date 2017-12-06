@@ -1,0 +1,14 @@
+diff --git a/libavcodec/arm/hevcdsp_idct_neon.S b/libavcodec/arm/hevcdsp_idct_neon.S
+index 139029a256..5ac730c075 100644
+--- a/libavcodec/arm/hevcdsp_idct_neon.S
++++ b/libavcodec/arm/hevcdsp_idct_neon.S
+@@ -1017,8 +1017,8 @@ endfunc
+ tr_16x4 firstpass, 7, 512, 1
+ tr_16x4 secondpass_8, 20 - 8, 512, 1
+ tr_16x4 secondpass_10, 20 - 10, 512, 1
+-tr_16x4 noscale, 0, 2048, 4
+ .ltorg
++tr_16x4 noscale, 0, 2048, 4
+ tr_32x4 firstpass, 7
+ tr_32x4 secondpass_8, 20 - 8
+ tr_32x4 secondpass_10, 20 - 10
