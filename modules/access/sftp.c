@@ -250,7 +250,7 @@ static int Open( vlc_object_t* p_this )
     p_sys->i_socket = -1;
 
     /* Parse the URL */
-    vlc_UrlParse( &url, p_access->psz_url );
+    vlc_UrlParseFixup( &url, p_access->psz_url );
     vlc_credential_init( &credential, &url );
     if( url.psz_path != NULL )
     {
