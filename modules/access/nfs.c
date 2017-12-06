@@ -635,7 +635,8 @@ Open(vlc_object_t *p_obj)
         goto error;
 
     /* Parse the encoded URL */
-    vlc_UrlParseFixup(&p_sys->encoded_url, p_access->psz_url);
+    if (vlc_UrlParseFixup(&p_sys->encoded_url, p_access->psz_url) != 0)
+        goto error;
     if (p_sys->encoded_url.psz_option)
     {
         if (strstr(p_sys->encoded_url.psz_option, "uid")
