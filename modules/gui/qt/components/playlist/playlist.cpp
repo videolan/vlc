@@ -390,9 +390,9 @@ void LocationButton::paintEvent ( QPaintEvent * )
     QString str( text() );
     /* This check is absurd, but either it is not done properly inside elidedText(),
        or boundingRect() is wrong */
-    if( r.width() < fontMetrics().boundingRect( text() ).width() )
-        str = fontMetrics().elidedText( text(), Qt::ElideRight, r.width() );
-    p.drawText( r, Qt::AlignVCenter | Qt::AlignLeft, str );
+    if( r.width() < fontMetrics().size(Qt::TextHideMnemonic, text()).width() )
+        str = fontMetrics().elidedText( text(), Qt::ElideRight, r.width(), Qt::TextHideMnemonic  );
+    p.drawText( r, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextHideMnemonic , str );
 
     if( b_arrow )
     {
@@ -404,7 +404,7 @@ void LocationButton::paintEvent ( QPaintEvent * )
 
 QSize LocationButton::sizeHint() const
 {
-    QSize s( fontMetrics().boundingRect( text() ).size() );
+    QSize s( fontMetrics().size( Qt::TextHideMnemonic, text() ) );
     /* Add two pixels to width: font metrics are buggy, if you pass text through elidation
        with exactly the width of its bounding rect, sometimes it still elides */
     s.setWidth( s.width() + ( 2 * PADDING ) + ( b_arrow ? 10 : 0 ) + 2 );
