@@ -161,8 +161,7 @@ enum slave_priority
     "psb", "rt", "sbv", \
     "scc", "smi", "srt", \
     "ssa",  "stl", "sub", \
-    "ttml", "txt", "usf", \
-    "utf", "utf-8", "utf8", \
+    "ttml", "tt", "usf", \
     "vtt", "webvtt"
 
 #define SLAVE_AUDIO_EXTENSIONS \
