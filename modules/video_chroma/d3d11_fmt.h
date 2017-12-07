@@ -82,7 +82,8 @@ picture_sys_t *ActivePictureSys(picture_t *p_pic);
 static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
 {
     return chroma == VLC_CODEC_D3D11_OPAQUE ||
-           chroma == VLC_CODEC_D3D11_OPAQUE_10B;
+           chroma == VLC_CODEC_D3D11_OPAQUE_10B ||
+           chroma == VLC_CODEC_D3D11_OPAQUE_RGBA;
 }
 
 void AcquirePictureSys(picture_sys_t *p_sys);

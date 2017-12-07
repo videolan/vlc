@@ -1628,6 +1628,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         switch (fmt->i_chroma)
         {
         case VLC_CODEC_D3D11_OPAQUE:
+        case VLC_CODEC_D3D11_OPAQUE_RGBA:
             bits_per_channel = 8;
             break;
         case VLC_CODEC_D3D11_OPAQUE_10B:
