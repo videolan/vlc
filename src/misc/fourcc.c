@@ -412,6 +412,10 @@ static const vlc_fourcc_t p_D3D11_OPAQUE_10B_fallback[] = {
     VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_P010, 0,
 };
 
+static const vlc_fourcc_t p_D3D11_OPAQUE_RGBA_fallback[] = {
+    VLC_CODEC_D3D11_OPAQUE, VLC_CODEC_RGBA, 0,
+};
+
 static const vlc_fourcc_t p_I440_fallback[] = {
     VLC_CODEC_I440,
     VLC_CODEC_YUV_PLANAR_420,
@@ -582,6 +586,7 @@ static const vlc_fourcc_t *pp_RGB_fallback[] = {
     p_RGB15_fallback,
     p_RGB8_fallback,
     p_CVPX_VIDEO_BGRA_fallback,
+    p_D3D11_OPAQUE_RGBA_fallback,
 
     NULL,
 };
@@ -743,7 +748,8 @@ static const struct
     { { VLC_CODEC_ANDROID_OPAQUE, VLC_CODEC_MMAL_OPAQUE,
         VLC_CODEC_D3D9_OPAQUE,    VLC_CODEC_D3D11_OPAQUE },
                                                FAKE_FMT() },
-    { { VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_D3D9_OPAQUE_10B },
+    { { VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_D3D9_OPAQUE_10B,
+        VLC_CODEC_D3D11_OPAQUE_RGBA                       },
                                                FAKE_FMT() },
 
     { { VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_UYVY,
