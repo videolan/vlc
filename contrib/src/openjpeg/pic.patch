@@ -1,0 +1,10 @@
+--- openjpeg/src/lib/openjp2/CMakeLists.txt.ORIG	2017-12-06 00:07:11.830711871 -0500
++++ openjpeg/src/lib/openjp2/CMakeLists.txt	2017-12-06 00:11:45.359362244 -0500
+@@ -1,5 +1,7 @@
+ include_regular_expression("^.*$")
+ 
++set(CMAKE_POSITION_INDEPENDENT_CODE ON)
++
+ #
+ install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
+  DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers)
