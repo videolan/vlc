@@ -25,7 +25,6 @@ FFMPEGCONF = \
 	--disable-encoder=vorbis \
 	--disable-decoder=opus \
 	--enable-libgsm \
-	--enable-libopenjpeg \
 	--disable-debug \
 	--disable-avdevice \
 	--disable-devices \
@@ -49,7 +48,13 @@ FFMPEGCONF += \
 endif
 endif
 
-DEPS_ffmpeg = zlib gsm openjpeg
+DEPS_ffmpeg = zlib gsm
+
+ifndef USE_LIBAV
+FFMPEGCONF += \
+	--enable-libopenjpeg
+DEPS_ffmpeg += openjpeg
+endif
 
 # Optional dependencies
 ifndef BUILD_NETWORK
