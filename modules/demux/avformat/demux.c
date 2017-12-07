@@ -150,7 +150,7 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
 }
 
 static int avformat_ProbeDemux( vlc_object_t *p_this,
-                                AVInputFormat *fmt, const char *psz_url )
+                                AVInputFormat **pp_fmt, const char *psz_url )
 {
     demux_t       *p_demux = (demux_t*)p_this;
     AVProbeData   pd = { };
@@ -182,17 +182,17 @@ static int avformat_ProbeDemux( vlc_object_t *p_this,
     char *psz_format = var_InheritString( p_this, "avformat-format" );
     if( psz_format )
     {
-        if( (fmt = av_find_input_format(psz_format)) )
-            msg_Dbg( p_demux, "forcing format: %s", fmt->name );
+        if( (*pp_fmt = av_find_input_format(psz_format)) )
+            msg_Dbg( p_demux, "forcing format: %s", (*pp_fmt)->name );
         free( psz_format );
     }
 
-    if( fmt == NULL )
-        fmt = av_probe_input_format( &pd, 1 );
+    if( *pp_fmt == NULL )
+        *pp_fmt = av_probe_input_format( &pd, 1 );
 
     free( pd.buf );
 
-    if( fmt == NULL )
+    if( *pp_fmt == NULL )
     {
         msg_Dbg( p_demux, "couldn't guess format" );
         return VLC_EGENERIC;
@@ -214,13 +214,13 @@ static int avformat_ProbeDemux( vlc_object_t *p_this,
 
         for( int i = 0; *ppsz_blacklist[i]; i++ )
         {
-            if( !strcmp( fmt->name, ppsz_blacklist[i] ) )
+            if( !strcmp( (*pp_fmt)->name, ppsz_blacklist[i] ) )
                 return VLC_EGENERIC;
         }
     }
 
     /* Don't trigger false alarms on bin files */
-    if( !p_demux->obj.force && !strcmp( fmt->name, "psxstr" ) )
+    if( !p_demux->obj.force && !strcmp( (*pp_fmt)->name, "psxstr" ) )
     {
         int i_len;
 
@@ -239,7 +239,7 @@ static int avformat_ProbeDemux( vlc_object_t *p_this,
         }
     }
 
-    msg_Dbg( p_demux, "detected format: %s", fmt->name );
+    msg_Dbg( p_demux, "detected format: %s", (*pp_fmt)->name );
 
     return VLC_SUCCESS;
 }
@@ -259,7 +259,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     else
         psz_url = p_demux->psz_url;
 
-    if( avformat_ProbeDemux( p_demux, fmt, psz_url ) != VLC_SUCCESS )
+    if( avformat_ProbeDemux( p_this, &fmt, psz_url ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
