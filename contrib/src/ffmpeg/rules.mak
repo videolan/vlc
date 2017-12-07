@@ -224,7 +224,9 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
 	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
+ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
+endif
 	$(MOVE)
 
 .ffmpeg: ffmpeg
