@@ -1792,7 +1792,7 @@ end
 function add_sub(subMrl)
   if vlc.item or vlc.input.item() then
     vlc.msg.dbg("[VLsub] Adding subtitle :" .. subMrl)
-    return vlc.input.add_subtitle_mrl(subMrl)
+    return vlc.input.add_subtitle_mrl(subMrl, true)
   end
   return false
 end
