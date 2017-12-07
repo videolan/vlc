@@ -31,109 +31,42 @@ apps:
       - mpris
 
 parts:
-  ffmpeg:
-    build-packages: [git, g++, make, yasm, autoconf, libtool, cmake, pkg-config, automake, build-essential, libass-dev, libfreetype6-dev, libvdpau-dev, libsdl1.2-dev, libtheora-dev, libva-dev, libvorbis-dev, libxcb1-dev, libxcb-shm0-dev, libxcb-xfixes0-dev, texinfo, zlib1g-dev, libx264-dev, libmp3lame-dev, libopus-dev, libx265-dev, libvpx-dev]
-    plugin: autotools
-    configflags: 
-      - --prefix=/usr
-      - --enable-gpl
-      - --enable-libass
-      - --enable-libfreetype
-      - --enable-libmp3lame
-      - --enable-libopus
-      - --enable-libtheora
-      - --enable-libvorbis
-      - --enable-libvpx
-      - --enable-libx264
-      - --enable-libx265
-      - --enable-nonfree
-      - --enable-shared
-    source: git://source.ffmpeg.org/ffmpeg.git
-    source-type: git
-    source-tag: 'n3.4'
-  wayland-protocols:
-    source: git://anongit.freedesktop.org/wayland/wayland-protocols
-    source-tag: '1.4'
-    plugin: autotools
-    configflags: [--prefix=/usr]
   vlc:
-    after: [ffmpeg, wayland-protocols, desktop-qt5]
+    after: [desktop-qt5]
     source: ../../../
     source-type: git
     plugin: autotools
     prepare: |
       sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
     build: |
-      export PKG_CONFIG_PATH=$SNAPCRAFT_STAGE/usr/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
+      cd contrib && mkdir linux && cd linux
+      ../bootstrap
+      make -j $(getconf _NPROCESSORS_ONLN) .ffmpeg
+      cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
-      ./configure --disable-chromecast -prefix=$SNAPCRAFT_PART_INSTALL/usr \
-        --enable-a52 \
-        --enable-aa \
-        --enable-bluray \
-        --enable-bonjour \
-        --enable-caca \
-        --enable-chromaprint \
-        --enable-dbus \
-        --enable-dca \
-        --enable-dvbpsi \
-        --enable-dvdnav \
-        --enable-faad \
-        --enable-flac \
-        --enable-fluidsynth \
-        --enable-freerdp \
-        --enable-freetype \
-        --enable-fribidi \
-        --enable-gles2 \
-        --enable-gnutls \
-        --enable-jack \
-        --enable-kate \
-        --enable-libass \
-        --enable-libmpeg2 \
-        --enable-libxml2 \
-        --enable-lirc \
-        --enable-live555 \
-        --enable-mad \
-        --enable-mkv \
-        --enable-mod \
-        --enable-mpc \
-        --enable-mtp \
-        --enable-mux_ogg \
-        --enable-ncurses \
-        --enable-notify \
-        --enable-ogg \
-        --enable-opus \
-        --enable-pulse \
-        --enable-qt \
-        --enable-realrtsp \
-        --enable-samplerate \
-        --enable-sdl \
-        --enable-sdl-image \
-        --enable-sftp \
-        --enable-shine \
-        --enable-shout \
-        --enable-skins2 \
-        --enable-sndio \
-        --enable-speex \
-        --enable-svg \
-        --enable-svgdec \
-        --enable-taglib \
-        --enable-theora \
-        --enable-twolame \
-        --enable-upnp \
-        --enable-vcdx \
-        --enable-vdpau \
-        --enable-vnc \
-        --enable-vorbis \
-        --enable-x264 \
-        --enable-x265 \
-        --enable-zvbi
-      make
+      ./configure \
+          --prefix=$SNAPCRAFT_PART_INSTALL/usr \
+          --disable-chromecast \
+          --disable-wayland
+      make -j $(getconf _NPROCESSORS_ONLN)
     install: |
-      echo daily-$(git rev-parse --short HEAD) > $SNAPCRAFT_STAGE/version
+      echo $(git describe HEAD) > $SNAPCRAFT_STAGE/version
       make install
       sed -i 's|Icon=vlc|Icon=/usr/share/icons/hicolor/256x256/apps/vlc\.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
     build-packages:
+      - git
+      - g++
+      - make
+      - yasm
+      - autoconf
+      - libtool
+      - cmake
+      - automake
+      - build-essential
+      - libxcb-xfixes0-dev
+      - texinfo
+      - libvpx-dev
       - libqt5svg5-dev
       - liba52-0.7.4-dev
       - libaa1-dev
