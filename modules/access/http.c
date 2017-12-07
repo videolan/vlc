@@ -419,55 +419,65 @@ static int ReadData( stream_t *p_access, int *pi_read,
  * p_buffer. Return the actual number of bytes read
  *****************************************************************************/
 static int ReadICYMeta( stream_t *p_access );
+
 static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_read;
+    int i_total_read = 0;
+    int i_remain_toread = i_len;
 
     if( p_sys->fd == -1 )
         return 0;
 
-    if( i_len == 0 )
-        return 0;
-
-    if( p_sys->i_icy_meta > 0 && p_sys->offset - p_sys->i_icy_offset > 0 )
+    while( i_remain_toread > 0 )
     {
-        int i_next = p_sys->i_icy_meta -
-                   (p_sys->offset - p_sys->i_icy_offset) % p_sys->i_icy_meta;
+        int i_chunk = i_remain_toread;
 
-        if( i_next == p_sys->i_icy_meta )
+        if( p_sys->i_icy_meta > 0 )
+        {
+            if( UINT64_MAX - i_chunk < p_sys->offset )
+                i_chunk = i_remain_toread = UINT64_MAX - p_sys->offset;
+
+            if( p_sys->offset + i_chunk > p_sys->i_icy_offset )
+                i_chunk = p_sys->i_icy_offset - p_sys->offset;
+        }
+
+        int i_read = 0;
+        if( ReadData( p_access, &i_read, &((uint8_t*)p_buffer)[i_total_read], i_chunk ) )
+            return 0;
+
+        if( i_read < 0 )
+            return -1; /* EINTR / EAGAIN */
+
+        if( i_read == 0 )
+        {
+            Disconnect( p_access );
+            if( p_sys->b_reconnect )
+            {
+                msg_Dbg( p_access, "got disconnected, trying to reconnect" );
+                if( Connect( p_access ) )
+                    msg_Dbg( p_access, "reconnection failed" );
+                else
+                    return -1;
+            }
+            return 0;
+        }
+
+        assert( i_read >= 0 );
+        p_sys->offset += i_read;
+        i_total_read += i_read;
+        i_remain_toread -= i_read;
+
+        if( p_sys->i_icy_meta > 0 &&
+            p_sys->offset == p_sys->i_icy_offset )
         {
             if( ReadICYMeta( p_access ) )
                 return 0;
+            p_sys->i_icy_offset = p_sys->offset + p_sys->i_icy_meta;
         }
-        if( i_len > (size_t)i_next )
-            i_len = i_next;
     }
 
-    if( ReadData( p_access, &i_read, p_buffer, i_len ) )
-        return 0;
-
-    if( i_read < 0 )
-        return -1; /* EINTR / EAGAIN */
-
-    if( i_read == 0 )
-    {
-        Disconnect( p_access );
-        if( p_sys->b_reconnect )
-        {
-            msg_Dbg( p_access, "got disconnected, trying to reconnect" );
-            if( Connect( p_access ) )
-                msg_Dbg( p_access, "reconnection failed" );
-            else
-                return -1;
-        }
-        return 0;
-    }
-
-    assert( i_read >= 0 );
-    p_sys->offset += i_read;
-
-    return i_read;
+    return i_total_read;
 }
 
 static int ReadICYMeta( stream_t *p_access )
@@ -888,7 +898,10 @@ static int Connect( stream_t *p_access )
             if( p_sys->i_icy_meta < 0 )
                 p_sys->i_icy_meta = 0;
             if( p_sys->i_icy_meta > 0 )
+            {
+                p_sys->i_icy_offset = p_sys->i_icy_meta;
                 p_sys->b_icecast = true;
+            }
 
             msg_Warn( p_access, "ICY metaint=%d", p_sys->i_icy_meta );
         }
