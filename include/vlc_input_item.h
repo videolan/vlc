@@ -158,7 +158,7 @@ enum slave_priority
     "aqt", "ass",  "cdg", \
     "dks", "idx", "jss", \
     "mpl2", "mpsub", "pjs", \
-    "psb", "rt", "sbv", \
+    "psb", "rt", "sami", "sbv", \
     "scc", "smi", "srt", \
     "ssa",  "stl", "sub", \
     "ttml", "tt", "usf", \
