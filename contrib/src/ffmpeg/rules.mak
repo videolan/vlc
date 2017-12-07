@@ -227,6 +227,9 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 endif
+ifdef USE_LIBAV
+	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
+endif
 	$(MOVE)
 
 .ffmpeg: ffmpeg
