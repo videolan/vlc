@@ -1,0 +1,72 @@
+From d66948bc3960b993da55a7899ced91c38fadeed1 Mon Sep 17 00:00:00 2001
+From: Konstantin Pavlov <thresh@videolan.org>
+Date: Thu, 7 Dec 2017 11:29:55 +0300
+Subject: [PATCH] Revert "build: Remove check for gsm/gsm.h for libgsm"
+
+This reverts commit 8e97a8c69162afce47abea96c8c0914f3550e212.
+---
+ configure              | 5 ++++-
+ libavcodec/libgsmdec.c | 5 +++++
+ libavcodec/libgsmenc.c | 5 +++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 7f320fee1..c2bb05c26 100755
+--- a/configure
++++ b/configure
+@@ -1545,6 +1545,7 @@ HEADERS_LIST="
+     direct_h
+     dxgidebug_h
+     dxva_h
++    gsm_h
+     io_h
+     machine_ioctl_bt848_h
+     machine_ioctl_meteor_h
+@@ -4595,7 +4596,9 @@ enabled libfaac           && require libfaac "stdint.h faac.h" faacEncGetVersion
+ enabled libfdk_aac        && require_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen
+ enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
+ enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
+-enabled libgsm            && require libgsm gsm.h gsm_create -lgsm
++enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
++                                   check_lib libgsm "${gsm_hdr}" gsm_create -lgsm && break;
++                               done || die "ERROR: libgsm not found"; }
+ enabled libhdcd           && require_pkg_config libhdcd libhdcd "hdcd/hdcd_simple.h" hdcd_new
+ enabled libilbc           && require libilbc ilbc.h WebRtcIlbcfix_InitDecode -lilbc
+ enabled libkvazaar        && require_pkg_config libkvazaar "kvazaar >= 0.8.1" kvazaar.h kvz_api_get
+diff --git a/libavcodec/libgsmdec.c b/libavcodec/libgsmdec.c
+index e06fe5276..4c21ff672 100644
+--- a/libavcodec/libgsmdec.c
++++ b/libavcodec/libgsmdec.c
+@@ -27,7 +27,12 @@
+
+ // The idiosyncrasies of GSM-in-WAV are explained at http://kbs.cs.tu-berlin.de/~jutta/toast.html
+
++#include "config.h"
++#if HAVE_GSM_H
+ #include <gsm.h>
++#else
++#include <gsm/gsm.h>
++#endif
+
+ #include "libavutil/channel_layout.h"
+ #include "libavutil/common.h"
+diff --git a/libavcodec/libgsmenc.c b/libavcodec/libgsmenc.c
+index 4bb4075b2..8f51321d4 100644
+--- a/libavcodec/libgsmenc.c
++++ b/libavcodec/libgsmenc.c
+@@ -27,7 +27,12 @@
+
+ // The idiosyncrasies of GSM-in-WAV are explained at http://kbs.cs.tu-berlin.de/~jutta/toast.html
+
++#include "config.h"
++#if HAVE_GSM_H
+ #include <gsm.h>
++#else
++#include <gsm/gsm.h>
++#endif
+
+ #include "libavutil/common.h"
+
+--
+2.11.0 (Apple Git-81)
+
