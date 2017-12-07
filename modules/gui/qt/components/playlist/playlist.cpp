@@ -96,17 +96,16 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
 
+    QHBoxLayout *topbarLayout = new QHBoxLayout();
+    topbarLayout->setSpacing( 10 );
+    layout->addLayout( topbarLayout, 0, 0 );
+
     /* Location Bar */
     locationBar = new LocationBar( model );
     locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
-    layout->addWidget( locationBar, 0, 0, 1, 2 );
-    layout->setColumnStretch( 0, 5 );
+    topbarLayout->addWidget( locationBar );
     CONNECT( locationBar, invoked( const QModelIndex & ),
              mainView, browseInto( const QModelIndex & ) );
-
-    QHBoxLayout *topbarLayout = new QHBoxLayout();
-    layout->addLayout( topbarLayout, 0, 1 );
-    topbarLayout->setSpacing( 10 );
 
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
