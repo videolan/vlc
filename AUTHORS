@@ -5,25 +5,29 @@ Programming
 Rémi Denis-Courmont
 Jean-Baptiste Kempf
 Laurent Aimar
+François Cartegnie
 Gildas Bazin
 Felix Paul Kühne
 Rafaël Carré
 Pierre d'Herbemont
+Thomas Guillem
 Rémi Duraffort
 Derk-Jan Hartman
 Antoine Cellerier
 Samuel Hocevar
 Jean-Paul Saman
+Steve Lhomme
 Christophe Mutricy
 Clément Stenac
 Christophe Massiot
 Ilkka Ollakka
 Pierre Ynard
-François Cartegnie
+Filip Roséen
 Damien Fouilleul
 Sigmund Augdal Helberg
 Erwan Tulou
 David Fuhrmann
+Marvin Scholz
 Olivier Teulière
 Cyril Deguet
 Eric Petit
@@ -35,14 +39,15 @@ Pavlov Konstantin
 Jakob Leben
 Benjamin Pracht
 Jean-Philippe André
-Steve Lhomme
 Stéphane Borel
 JP Dinger
 Geoffroy Couprie
 Martin Storsjö
 Marian Ďurkovič
 Ludovic Fauvet
+Petri Hintukainen
 Yoann Peronneau
+Denis Charmet
 Sébastien Escudier
 Jon Lech Johansen
 KO Myung-Hun
@@ -50,7 +55,7 @@ Edward Wang
 Dennis van Amerongen
 Faustino Osuna
 Mirsal Ennaime
-Denis Charmet
+Sean McGovern
 Jérôme Decoodt
 Loïc Minier
 David Flynn
@@ -77,6 +82,8 @@ Alexis de Lattre
 Vincent Penquerc'h
 Arnaud de Bossoreille de Ribou
 Mohammed Adnène Trojette
+Salah-Eddin Shaban
+Vittorio Giovara
 Boris Dorès
 Jai Menon
 Anil Daoud
@@ -271,7 +278,6 @@ Sven Petai
 Tomas Krotil
 Tomer Barletz
 Tristan Leteurtre
-Vittorio Giovara
 Wang Bo
 maxime Ripard
 xxcv
@@ -599,6 +605,220 @@ William Hawkins
 Xavier Maillard
 Ye zhang
 Yuehua Zhao
+Abylay Ospan
+Adam Leggett
+Adrian Haensler
+Ago Allikmaa
+Ajith Manjula Senarathne
+Alain Degreffe
+Alan Pope
+Aleksandr Pasechnik
+Alexandre Fernandez
+Alexandre Pereira Nunes
+Alexandre Perraud
+Alex Peak
+Alex Warhawk
+Alex Woods
+Allan Odgaard
+Ancelot Mark Pinto
+Andrea Giudiceandrea
+Andreas Hartmetz
+Andreas Mieke
+André Silva
+Andrew Clayton
+Andrey Gursky
+Andrii Zui
+Andy Tather
+Antti Ajanki
+Ara Qadir
+Arjun Sreedharan
+Arne de Bruijn
+Arun Pandian G
+A S Alam
+Avani Sharma
+Avishay Spitzer
+Bastien Penavayre
+Benjamin Adolphi
+Ben Littler
+Benoit du Payrat
+Benoît Noël du Payrat
+Bernd Kuhls
+Boris Egorov
+Boy van Amstel
+Brian Schmidt
+Brion Vibber
+Cameron Mozie
+Carlos Fenollosa
+Carola Nitz
+Christian Suloway
+Clemens Werther
+C.W. Betts
+Daniel Amm
+Daniel Verkamp
+Darko Jankovic
+Darrell Walisser
+David Robison
+David R Robison
+Dennis Hamester
+Derek Buitenhuis
+Diogo Silva
+Dominko Azdajic
+Donald Campbell
+Doney den Ouden
+Duncan McNamara
+Duncan McNAMARA
+Elodie Thomann
+Emeric Grange
+Eric Engestrom
+Etienne BRATEAU
+Eugen Geist
+Fabian Yamaguchi
+Fabrizio Ge
+Fabrizio Gennari
+Fahad Al-Saidi
+Felix Abecassis
+Florent Pillet
+Forteve Zepushisti
+Frank Praznik
+Gabriel de Perthuis
+Gal Vinograd
+Gaurav Pruthi
+Geoffrey Métais
+Gian Marco Sibilla
+Gilles Sabourin
+Gina Dobrescu
+Gonzalo Higuera Díaz
+Goran Dokic
+Guillaume Gomez
+Harald Sitter
+Heorhi Valakhanovich
+Ian Chamberlain
+Ibrahima SARR
+Igor Prokopenkov
+Ion Agorria
+Jarrad Whitaker
+Jean-Yves Avenard
+Jed Smith
+Jérémy Carrier
+Jeremy Huddleston Sequoia
+Jerome Forissier
+Jim Bankoski
+Jonas Lundqvist
+Jonatan "jaw" Wallmander
+Jonathan Calmels
+Jonathan Heard
+Jonathan McGowan
+Jonathan Thambidurai
+Joni Räsänen
+Josef Andersson
+Joseph DeVore
+Julian Scheel
+Justin Kim
+Kaarlo Räihä
+Kamil Rytarowski
+Kazuki Yamaguchi
+Konstantin K. Beliak
+Konstantinos Tsanaktsidis
+Konstantin Pavlov
+Kornel Lesiński
+Olivier Langlois
+Lochlin Duperron
+Lukas Juhrich
+Lyndon Brown
+Marc Aldorasi
+Marcel Schnirring
+Marc Etcheverry
+Mariusz Wasak
+Mark Becwar
+Martell Malone
+Mathieu Malaterre
+Mathieu Parent
+Mathieu Velten
+Matthias Keiser
+Matthias Treydte
+Max Dilipovich
+Maxim Bublis
+Maxime CHAPELET
+Maxime Mouchet
+Michael Tänzer
+Miha Sokolov
+Mohammed (Shaan) Huzaifa Danish
+Moti Zilberman
+Nathan Egge
+Niklas Haas
+Odd-Arild Kristensen
+O. Hartmann
+Olaf Hering
+Oliver Collyer
+Paul B Mahol
+Paul Clark
+Paulo Vitor Magacho da Silva
+Pavol Babincak
+Paweł Stankowski
+Petter Reinholdtsen
+Philip Höhlein
+Pierre-Hugues Husson
+Pierre Lamot
+Pyry Kontio
+Radek Vybiral
+Rafael Waldo Delgado Doblas
+Rajeesh K V
+Ray Tiley
+Reka Inovan
+Remita Amine
+Ricardo Ribalda Delgado
+Richard Diamond
+Rinat Ibragimov
+Robert Mourning
+Romain Bentz
+Romain Fliedel
+Romain Vimont
+Ronald S. Bultje
+Ross Finlayson
+Sam Malone
+Samuel Martin
+Samuel Thibault
+Sanchit Arora
+Santiago Gimeno
+Sebastian Ramacher
+Sebastian Roth
+Sergey Bolshakov
+Shaleen Jain
+Shlomi Fish
+Simona-Marinela Prodea
+Stanislas Plessia
+Stefan Pöschel
+Steven Toth
+Sushma Reddy
+Takahito Hirano
+T. Chomphuming
+Thierry Foucu
+Thomas Nigro
+Tim Allen
+Tim Walker
+Tobias Conradi
+Tony Gaillard
+Benoît Tuduri
+Tzu-Jung Lee
+Uwe L. Korn
+Valentin Deniaud
+Valentin Vetter
+Valter Correia
+Vianney Boyer
+Victorien Le Couviour--Tuffet
+Vikram Fugro
+Vinson Lee
+Wayne McDougall
+Wieland Hoffmann
+Wills Wang
+Xabier Aramendi
+Yaşar Tay
+Yidong Ren
+Yuudai Yamashigi
+Zhao Zhili
+أحمد المحم ودي (Ahmed El-Mahmoudy)
+Баярсайхан Энхтайван
+Сергей Дарьичев
 
 Artwork
 -------
