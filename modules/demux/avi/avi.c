@@ -332,9 +332,6 @@ static int Open( vlc_object_t * p_this )
                         &p_sys->b_fastseekable );
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = (p_sys->b_seekable) ? Demux_Seekable : Demux_UnSeekable;
-
     p_sys->b_interleaved = var_InheritBool( p_demux, "avi-interleaved" );
 
     if( AVI_ChunkReadRoot( p_demux->s, &p_sys->ck_root ) )
@@ -404,11 +401,33 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->b_interleaved |= (p_avih->i_flags & AVIF_ISINTERLEAVED);
 
-    if( p_sys->b_interleaved && !p_sys->b_fastseekable )
+    /* Set callbacks */
+    p_demux->pf_control = Control;
+
+    if( p_sys->b_fastseekable )
+    {
+        p_demux->pf_demux = Demux_Seekable;
         p_sys->i_read_increment = READ_LENGTH;
-    else
+    }
+    else if( p_sys->b_seekable && !p_sys->b_interleaved )
+    {
+        p_demux->pf_demux = Demux_Seekable;
         p_sys->i_read_increment = READ_LENGTH_NONINTERLEAVED;
-    /* non seekable and non interleaved case ? well... */
+        msg_Warn( p_demux, "Non seekable non interleaved content over slow seekable, "
+                           "expect bad performance" );
+    }
+    else
+    {
+        p_demux->pf_demux = Demux_UnSeekable;
+        p_sys->i_read_increment = READ_LENGTH_NONINTERLEAVED;
+         /* non seekable and non interleaved case ? well... */
+        if( !p_sys->b_interleaved )
+        {
+            msg_Warn( p_demux, "Non seekable non interleaved content, "
+                               "disabling other tracks" );
+            i_track = __MIN(i_track, 1);
+        }
+    }
 
     AVI_MetaLoad( p_demux, p_riff, p_avih );
     p_sys->i_avih_flags = p_avih->i_flags;
