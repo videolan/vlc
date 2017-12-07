@@ -1632,20 +1632,27 @@ function display_subtitles()
   local mainlist = input_table["mainlist"]
   mainlist:clear()
 
-  if openSub.itemStore == "0" then
-    mainlist:add_value(lang["mess_no_res"], 1)
-    setMessage("<b>"..lang["mess_complete"]..":</b> "..
-      lang["mess_no_res"])
-  elseif openSub.itemStore then
+  if not openSub.itemStore then return end
+  if openSub.itemStore ~= "0" then
+    local nbRes = 0
     for i, item in ipairs(openSub.itemStore) do
-      mainlist:add_value(
-      item.SubFileName..
-      " ["..item.SubLanguageID.."]"..
-      " ("..item.SubSumCD.." CD)", i)
+      if next(item) then
+        mainlist:add_value(
+        item.SubFileName..
+        " ["..item.SubLanguageID.."]"..
+        " ("..item.SubSumCD.." CD)", i)
+        nbRes = nbRes + 1
+      end
     end
-    setMessage("<b>"..lang["mess_complete"]..":</b> "..
-      #(openSub.itemStore).."  "..lang["mess_res"])
+    if nbRes > 0 then
+      setMessage("<b>"..lang["mess_complete"]..":</b> "..
+        #(openSub.itemStore).."  "..lang["mess_res"])
+      return
+    end
   end
+  mainlist:add_value(lang["mess_no_res"], 1)
+  setMessage("<b>"..lang["mess_complete"]..":</b> "..
+    lang["mess_no_res"])
 end
 
 function get_first_sel(list)
