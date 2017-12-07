@@ -78,7 +78,7 @@ esac
 
 #####
 
-JOBS=`nproc --all`
+JOBS=`getconf _NPROCESSORS_ONLN 2>&1`
 TRIPLET=$ARCH-w64-mingw32
 
 info "Building extra tools"

@@ -91,13 +91,16 @@ check flex
 CPUS=
 case `uname` in
     Linux|MINGW32*|MINGW64*)
-        CPUS=`grep -c ^processor /proc/cpuinfo`
+        CPUS=`getconf _NPROCESSORS_ONLN 2>&1`
      ;;
-    Darwin)
-        CPUS=`sysctl hw.ncpu|cut -d" " -f2`
+    Darwin|FreeBSD|NetBSD)
+        CPUS=`getconf NPROCESSORS_ONLN 2>&1`
+    ;;
+    OpenBSD)
+        CPUS=`sysctl -n hw.ncpu 2>&1`
     ;;
     SunOS)
-        CPUS=`/usr/bin/kstat -p :::state | grep 'on-line$' | wc -l | sed 's/ //g'`
+        CPUS=`psrinfo | wc -l 2>&1`
     ;;
     *)
         CPUS=1  # default
