@@ -812,7 +812,7 @@ void DialogsProvider::loadSubtitlesFile()
     free( path2 );
     foreach( const QString &qsUrl, qsl )
     {
-        if( input_AddSlave( p_input, SLAVE_TYPE_SPU, qtu( qsUrl ), true, true, true ) )
+        if( input_AddSlave( p_input, SLAVE_TYPE_SPU, qtu( qsUrl ), true, true, false ) )
             msg_Warn( p_intf, "unable to load subtitles from '%s'",
                       qtu( qsUrl ) );
     }
