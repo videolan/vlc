@@ -511,6 +511,50 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
+static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
+{
+    filter_sys_t *sys = p_filter->p_sys;
+    assert(src->context != NULL);
+    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+
+    D3D11_TEXTURE2D_DESC desc;
+    D3D11_MAPPED_SUBRESOURCE lock;
+
+    vlc_mutex_lock(&sys->staging_lock);
+    if (assert_staging(p_filter, p_sys) != VLC_SUCCESS)
+    {
+        vlc_mutex_unlock(&sys->staging_lock);
+        return;
+    }
+
+    ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
+                                              0, 0, 0, 0,
+                                              p_sys->resource[KNOWN_DXGI_INDEX],
+                                              p_sys->slice_index,
+                                              NULL);
+
+    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
+                                         0, D3D11_MAP_READ, 0, &lock);
+    if (FAILED(hr)) {
+        msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
+        vlc_mutex_unlock(&sys->staging_lock);
+        return;
+    }
+
+    ID3D11Texture2D_GetDesc(sys->staging, &desc);
+
+    plane_t src_planes  = dst->p[0];
+    src_planes.i_lines  = desc.Height;
+    src_planes.i_pitch  = lock.RowPitch;
+    src_planes.p_pixels = lock.pData;
+    plane_CopyPixels( dst->p, &src_planes );
+
+    /* */
+    ID3D11DeviceContext_Unmap(p_sys->context,
+                              p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index);
+    vlc_mutex_unlock(&sys->staging_lock);
+}
+
 static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
@@ -638,13 +682,16 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 
 VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
+VIDEO_FILTER_WRAPPER (D3D11_RGBA)
 VIDEO_FILTER_WRAPPER (NV12_D3D11)
 
 int D3D11OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
 
-    if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
+    if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_RGBA &&
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_BGRA )
         return VLC_EGENERIC;
 
     if ( p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
@@ -654,10 +701,24 @@ int D3D11OpenConverter( vlc_object_t *obj )
     switch( p_filter->fmt_out.video.i_chroma ) {
     case VLC_CODEC_I420:
     case VLC_CODEC_YV12:
+        if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE)
+            return VLC_EGENERIC;
         p_filter->pf_video_filter = D3D11_YUY2_Filter;
         break;
     case VLC_CODEC_NV12:
+        if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE)
+            return VLC_EGENERIC;
         p_filter->pf_video_filter = D3D11_NV12_Filter;
+        break;
+    case VLC_CODEC_RGBA:
+        if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_RGBA)
+            return VLC_EGENERIC;
+        p_filter->pf_video_filter = D3D11_RGBA_Filter;
+        break;
+    case VLC_CODEC_BGRA:
+        if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_BGRA)
+            return VLC_EGENERIC;
+        p_filter->pf_video_filter = D3D11_RGBA_Filter;
         break;
     default:
         return VLC_EGENERIC;
