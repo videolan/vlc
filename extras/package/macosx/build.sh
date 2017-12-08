@@ -117,7 +117,7 @@ export CXX="`xcrun --find clang++`"
 export OBJC="`xcrun --find clang`"
 export OSX_VERSION
 export SDKROOT
-export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:${PATH}"
+export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:/bin:/sbin:/usr/bin:/usr/sbin"
 
 # Select avcodec flavor to compile contribs with
 export USE_FFMPEG=1
