@@ -1977,16 +1977,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, video_format_t *f
         }
     }
 
-    if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
-    {
-        sys->picQuad.i_width  = fmt->i_visible_width;
-        sys->picQuad.i_height = fmt->i_visible_height;
-    }
-    else
-    {
-        sys->picQuad.i_width  = fmt->i_width;
-        sys->picQuad.i_height = fmt->i_height;
-    }
+    sys->picQuad.i_width  = fmt->i_width;
+    sys->picQuad.i_height = fmt->i_height;
     if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
