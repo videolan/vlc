@@ -200,7 +200,7 @@ struct demux_sys_t
 
 #define __EVEN(x) (((x) & 1) ? (x) + 1 : (x))
 
-static mtime_t AVI_PTSToChunk( avi_track_t *, mtime_t i_pts );
+static int64_t AVI_PTSToChunk( avi_track_t *, mtime_t i_pts );
 static int64_t AVI_PTSToByte ( avi_track_t *, mtime_t i_pts );
 static mtime_t AVI_GetDPTS   ( avi_track_t *, int64_t i_count );
 static mtime_t AVI_GetPTS    ( avi_track_t * );
@@ -1790,15 +1790,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Function to convert pts to chunk or byte
  *****************************************************************************/
 
-static mtime_t AVI_PTSToChunk( avi_track_t *tk, mtime_t i_pts )
+static int64_t AVI_PTSToChunk( avi_track_t *tk, mtime_t i_pts )
 {
     if( !tk->i_scale )
-        return (mtime_t)0;
+        return 0;
 
-    return (mtime_t)((int64_t)i_pts *
-                     (int64_t)tk->i_rate /
-                     (int64_t)tk->i_scale /
-                     (int64_t)CLOCK_FREQ );
+    return i_pts *
+           tk->i_rate /
+           tk->i_scale /
+           CLOCK_FREQ;
 }
 static int64_t AVI_PTSToByte( avi_track_t *tk, mtime_t i_pts )
 {
