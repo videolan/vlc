@@ -545,10 +545,13 @@ static int Open( vlc_object_t * p_this )
                     p_auds->p_wf->nSamplesPerSec,
                     p_auds->p_wf->wBitsPerSample );
 
-                if( p_auds->p_wf->cbSize > 0 && p_auds->i_chunk_size > sizeof(WAVEFORMATEX) )
+                const size_t i_cboff = sizeof(WAVEFORMATEX);
+                const size_t i_incboff = ( p_auds->p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE ) ?
+                                          sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX): 0;
+                if( p_auds->i_chunk_size >= i_cboff + p_auds->p_wf->cbSize &&
+                    p_auds->p_wf->cbSize > i_incboff )
                 {
-                    int i_extra = __MIN( p_auds->p_wf->cbSize,
-                                         p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
+                    int i_extra = p_auds->p_wf->cbSize - i_incboff;
                     tk->fmt.p_extra = malloc( i_extra );
                     if( unlikely(tk->fmt.p_extra == NULL) )
                     {
@@ -557,7 +560,7 @@ static int Open( vlc_object_t * p_this )
                         goto error;
                     }
                     tk->fmt.i_extra = i_extra;
-                    memcpy( tk->fmt.p_extra, &p_auds->p_wf[1], tk->fmt.i_extra );
+                    memcpy( tk->fmt.p_extra, ((uint8_t *)(&p_auds->p_wf[1])) + i_incboff, i_extra );
                 }
                 break;
             }
