@@ -198,10 +198,7 @@ struct demux_sys_t
     input_attachment_t **attachment;
 };
 
-static inline off_t __EVEN( off_t i )
-{
-    return (i & 1) ? i + 1 : i;
-}
+#define __EVEN(x) (((x) & 1) ? (x) + 1 : (x))
 
 static mtime_t AVI_PTSToChunk( avi_track_t *, mtime_t i_pts );
 static mtime_t AVI_PTSToByte ( avi_track_t *, mtime_t i_pts );
