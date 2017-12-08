@@ -1,0 +1,42 @@
+diff -urN chromaprint.orig/CMakeLists.txt chromaprint/CMakeLists.txt
+--- chromaprint.orig/CMakeLists.txt	2016-12-28 21:10:42.000000000 +0100
++++ chromaprint/CMakeLists.txt	2017-12-08 14:59:39.000000000 +0100
+@@ -135,12 +135,16 @@
+ if(FFT_LIB STREQUAL "vdsp")
+ 	if(ACCELERATE_LIBRARIES)
+ 		set(USE_VDSP ON)
++		set(CHROMAPRINT_ADDITIONAL_LIBS "-F${ACCELERATE_LIBRARIES} -framework Accelerate")
+ 	else()
+ 		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+ 	endif()
+ elseif(FFT_LIB STREQUAL "avfft")
+ 	if(FFMPEG_LIBAVCODEC_FFT_FOUND)
+ 		set(USE_AVFFT ON)
++		find_package(PkgConfig)
++		pkg_check_modules(AVFFT REQUIRED libavcodec libavutil)
++		string(REPLACE ";" " " CHROMAPRINT_ADDITIONAL_LIBS "${AVFFT_LDFLAGS}")
+ 	else()
+ 		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+ 	endif()
+diff -urN chromaprint.orig/libchromaprint.pc.cmake chromaprint/libchromaprint.pc.cmake
+--- chromaprint.orig/libchromaprint.pc.cmake	2016-12-28 21:10:42.000000000 +0100
++++ chromaprint/libchromaprint.pc.cmake	2017-12-08 14:56:22.000000000 +0100
+@@ -7,6 +7,6 @@
+ Description: Audio fingerprint library
+ URL: http://acoustid.org/chromaprint
+ Version: ${PROJECT_VERSION}
+-Libs: -L${LIB_INSTALL_DIR} -lchromaprint
++Libs: -L${LIB_INSTALL_DIR} -lchromaprint ${CHROMAPRINT_ADDITIONAL_LIBS}
+ Cflags: -I${INCLUDE_INSTALL_DIR}
+ 
+diff -urN chromaprint.orig/src/fft_lib_avfft.h chromaprint/src/fft_lib_avfft.h
+--- chromaprint.orig/src/fft_lib_avfft.h	2016-12-28 21:10:42.000000000 +0100
++++ chromaprint/src/fft_lib_avfft.h	2017-12-08 14:55:35.000000000 +0100
+@@ -5,6 +5,7 @@
+ #define CHROMAPRINT_FFT_LIB_AVFFT_H_
+ 
+ extern "C" {
++#include <libavutil/mem.h>
+ #include <libavcodec/avcodec.h>
+ #include <libavcodec/avfft.h>
+ #include <libavutil/mem.h>
