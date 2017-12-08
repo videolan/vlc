@@ -1819,10 +1819,10 @@ static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
     if( !tk->i_rate )
         return i_dpts;
 
-    i_dpts = (mtime_t)( (int64_t)1000000 *
-                        (int64_t)i_count *
-                        (int64_t)tk->i_scale /
-                        (int64_t)tk->i_rate );
+    i_dpts = CLOCK_FREQ *
+             i_count *
+             tk->i_scale /
+             tk->i_rate;
 
     if( tk->i_samplesize )
     {
