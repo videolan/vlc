@@ -1,0 +1,41 @@
+From 2f96045d17b2fc912d8bece54adf1cbe774166dd Mon Sep 17 00:00:00 2001
+From: Justin Kim <justin.kim@collabora.com>
+Date: Fri, 8 Dec 2017 20:43:54 +0900
+Subject: [PATCH] CMakeLists.txt: substitute link flags for package names
+
+Signed-off-by: Justin Kim <justin.kim@collabora.com>
+---
+ CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e02b58..d9a8a1b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -90,6 +90,7 @@ set_if(LINUX ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ # find OpenSSL
+ if ( USE_GNUTLS )
+ 	pkg_check_modules (SSL REQUIRED gnutls nettle)
++	set (SRT_LIBS_PRIVATE ${SSL_LDFLAGS})
+ 
+ 	add_definitions(
+ 		-DUSE_GNUTLS=1
+@@ -102,6 +103,7 @@ else()
+ 	find_package(OpenSSL REQUIRED)
+ 	set (SSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+ 	set (SSL_LIBRARIES ${OPENSSL_LIBRARIES})
++	set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
+ 
+ 	add_definitions(
+ 		-DHAICRYPT_USE_OPENSSL_EVP=1
+@@ -358,7 +360,6 @@ target_include_directories(${TARGET_haicrypt}
+ 
+ set_target_properties (${TARGET_haicrypt} PROPERTIES VERSION ${SRT_VERSION} SOVERSION ${SRT_VERSION_MAJOR})
+ target_link_libraries(${TARGET_haicrypt} PRIVATE ${SSL_LIBRARIES})
+-set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
+ if (WIN32)
+ 	target_link_libraries(${TARGET_haicrypt} PRIVATE ws2_32.lib)
+ 	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ws2_32.lib)
+-- 
+2.15.1
+

@@ -23,6 +23,7 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
+	$(APPLY) $(SRC)/srt/fix-pc.patch
 	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
