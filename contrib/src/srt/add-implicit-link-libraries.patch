@@ -1,0 +1,25 @@
+--- srt.old/CMakeLists.txt	2017-12-09 09:10:02.000000000 +0100
++++ srt/CMakeLists.txt	2017-12-09 09:18:38.000000000 +0100
+@@ -425,13 +425,15 @@
+ # This may cause trouble when you want to compile your app with static libstdc++;
+ # if your build requires it, you'd probably remove -lstdc++ from the list
+ # obtained by `pkg-config --libs`.
+-#
+-# Some sensible solution for that is desired. Currently turned on only on demand.
+-if (ENABLE_C_DEPS)
+-if ( LINUX )
+-	set (IFNEEDED_SRT_LDFLAGS "${IFNEEDED_SRT_LDFLAGS} -lstdc++ -lm")
+-endif()
+-endif()
++
++message("Adding the following implicit link libraries: ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES}")
++foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
++    if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++	    set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${LIB})
++    else()
++        set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} "-l${LIB}")
++    endif()
++endforeach()
+ 
+ join_arguments(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE})
+ 
