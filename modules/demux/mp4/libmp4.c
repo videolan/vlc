@@ -3246,6 +3246,9 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GETVERSIONFLAGS( p_box->data.p_elst );
     MP4_GET4BYTES( count );
 
+    if( count == 0 )
+        MP4_READBOX_EXIT( 1 );
+
     uint32_t i_entries_max = i_read / ((p_box->data.p_elst->i_version == 1) ? 20 : 12);
     if( count > i_entries_max )
         count = i_entries_max;
