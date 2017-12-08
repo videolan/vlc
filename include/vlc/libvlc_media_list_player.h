@@ -140,6 +140,17 @@ LIBVLC_API
 void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp);
 
 /**
+ * Pause or resume media list
+ *
+ * \param p_mlp media list player instance
+ * \param do_pause play/resume if zero, pause if non-zero
+ * \version LibVLC 3.0.0 or later
+ */
+LIBVLC_API
+void libvlc_media_list_player_set_pause(libvlc_media_list_player_t * p_mlp,
+                                        int do_pause);
+
+/**
  * Is media list playing?
  *
  * \param p_mlp media list player instance
