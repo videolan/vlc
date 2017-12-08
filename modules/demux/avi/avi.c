@@ -201,7 +201,7 @@ struct demux_sys_t
 #define __EVEN(x) (((x) & 1) ? (x) + 1 : (x))
 
 static mtime_t AVI_PTSToChunk( avi_track_t *, mtime_t i_pts );
-static mtime_t AVI_PTSToByte ( avi_track_t *, mtime_t i_pts );
+static int64_t AVI_PTSToByte ( avi_track_t *, mtime_t i_pts );
 static mtime_t AVI_GetDPTS   ( avi_track_t *, int64_t i_count );
 static mtime_t AVI_GetPTS    ( avi_track_t * );
 
@@ -995,7 +995,7 @@ typedef struct
 {
     bool b_ok;
 
-    int i_toread;
+    int64_t i_toread;
 
     int64_t i_posf; /* where we will read :
                    if i_idxposb == 0 : begining of chunk (+8 to acces data)
@@ -1235,7 +1235,7 @@ static int Demux_Seekable( demux_t *p_demux )
         /* read thoses data */
         if( tk->i_samplesize )
         {
-            unsigned int i_toread;
+            int64_t i_toread;
 
             if( ( i_toread = toread[i_track].i_toread ) <= 0 )
             {
@@ -1251,7 +1251,7 @@ static int Demux_Seekable( demux_t *p_demux )
             }
             i_size = __MIN( tk->idx.p_entry[tk->i_idxposc].i_length -
                                 tk->i_idxposb,
-                            i_toread );
+                            (size_t) i_toread );
         }
         else
         {
@@ -1800,16 +1800,16 @@ static mtime_t AVI_PTSToChunk( avi_track_t *tk, mtime_t i_pts )
                      (int64_t)tk->i_scale /
                      (int64_t)CLOCK_FREQ );
 }
-static mtime_t AVI_PTSToByte( avi_track_t *tk, mtime_t i_pts )
+static int64_t AVI_PTSToByte( avi_track_t *tk, mtime_t i_pts )
 {
     if( !tk->i_scale || !tk->i_samplesize )
-        return (mtime_t)0;
+        return 0;
 
-    return (mtime_t)((int64_t)i_pts *
-                     (int64_t)tk->i_rate /
-                     (int64_t)tk->i_scale /
-                     (int64_t)1000000 *
-                     (int64_t)tk->i_samplesize );
+    return i_pts *
+           tk->i_rate /
+           tk->i_scale /
+           CLOCK_FREQ *
+           tk->i_samplesize;
 }
 
 static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
