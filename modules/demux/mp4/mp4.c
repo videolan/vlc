@@ -319,7 +319,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
     }
 
     /* now handle elst */
-    if( p_track->p_elst )
+    if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
     {
         MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
 
