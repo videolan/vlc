@@ -90,9 +90,6 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_packetize = Packetize;
     p_dec->pf_flush = Flush;
 
-    /* Create the output format */
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
-
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
@@ -108,10 +105,11 @@ static int Open( vlc_object_t *p_this )
         break;
     }
 
+    vlc_fourcc_t fcc = p_dec->fmt_out.i_codec;
     /* Fix the value of the fourcc for audio */
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        vlc_fourcc_t fcc = vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
+        fcc = vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
                                                      p_dec->fmt_in.audio.i_bitspersample );
         if( !fcc )
         {
@@ -119,8 +117,11 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        p_dec->fmt_out.i_codec = fcc;
     }
+
+    /* Create the output format */
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    p_dec->fmt_out.i_codec = fcc;
 
     return VLC_SUCCESS;
 }
