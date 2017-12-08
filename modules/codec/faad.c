@@ -550,6 +550,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 DoReordering( (uint32_t *)p_out->p_buffer, samples,
                               frame.samples / frame.channels, frame.channels,
                               pi_neworder_table );
+            else
+                 memcpy( p_out->p_buffer, samples, p_out->i_buffer );
 
             if( p_sys->b_discontinuity )
             {
