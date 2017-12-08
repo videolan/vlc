@@ -654,6 +654,14 @@ void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp)
     unlock(p_mlp);
 }
 
+void libvlc_media_list_player_set_pause(libvlc_media_list_player_t * p_mlp,
+                                        int do_pause)
+{
+    lock(p_mlp);
+    libvlc_media_player_set_pause(p_mlp->p_mi, do_pause);
+    unlock(p_mlp);
+}
+
 /**************************************************************************
  *        is_playing (Public)
  **************************************************************************/
