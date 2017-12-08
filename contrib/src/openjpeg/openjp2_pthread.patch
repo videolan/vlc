@@ -22,10 +22,10 @@
      endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
  endif(BUILD_UNIT_TESTS)
 +
-+if(UNIX)
++if(BUILD_PKGCONFIG_FILES)
 +    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libopenjp2.pc.cmake.in
 +                   ${PROJECT_BINARY_DIR}/libopenjp2.pc @ONLY)
-+endif(UNIX)
++endif(BUILD_PKGCONFIG_FILES)
 --- openjpeg/CMakeLists.txt.ORIG	2017-10-04 18:23:14.000000000 -0400
 +++ openjpeg/CMakeLists.txt	2017-12-05 19:43:35.573788173 -0500
 @@ -359,8 +359,6 @@
