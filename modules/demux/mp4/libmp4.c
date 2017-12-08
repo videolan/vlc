@@ -995,6 +995,8 @@ static int MP4_ReadBox_sidx(  stream_t *p_stream, MP4_Box_t *p_box )
     VLC_UNUSED(i_reserved);
     MP4_GET2BYTES( i_reserved );
     MP4_GET2BYTES( i_count );
+    if( i_count == 0 )
+        MP4_READBOX_EXIT( 1 );
 
     p_sidx_data->i_reference_count = i_count;
     p_sidx_data->p_items = vlc_alloc( i_count, sizeof( MP4_Box_sidx_item_t ) );
