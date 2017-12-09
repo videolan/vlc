@@ -47,9 +47,16 @@
 
 + (void)initialize
 {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3"], @"VideoEffectProfiles",
-                                 [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames", nil];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSArray arrayWithObject:[VLCVideoEffectsWindowController defaultProfileString]], @"VideoEffectProfiles",
+                                 [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames",
+                                 nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+}
+
++ (NSString *)defaultProfileString
+{
+    return @";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3;0;-180.000000";
 }
 
 - (id)init
@@ -680,6 +687,11 @@
     if (i_old_profile_index)
         return [self saveCurrentProfile];
 
+    // A new "Custom profile" is only created if the user wants to load this as new profile at startup ...
+    if (_applyProfileCheckbox.state == NSOffState)
+        return;
+
+    // ... and some settings are changed
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *newProfile = [self generateProfileString];
     if ([newProfile compare:[[defaults objectForKey:@"VideoEffectProfiles"] firstObject]] == NSOrderedSame)
@@ -700,6 +712,8 @@
     workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
     [workArray addObject:newProfileName];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+
+    [defaults setInteger:([workArray count] - 1) forKey:@"VideoEffectSelectedProfile"];
 
     [defaults synchronize];
 }
