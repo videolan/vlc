@@ -153,7 +153,7 @@ vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
         {
             struct vlc_vaapi_instance *va_inst =
                 vlc_vaapi_InitializeInstance(o, dpy,
-                                             (VANativeDisplay *)(intptr_t)drm_fd,
+                                             (VANativeDisplay)(intptr_t)drm_fd,
                                              native_drm_destroy_cb);
             if (va_inst)
             {
