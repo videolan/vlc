@@ -238,6 +238,10 @@ static VLCMain *sharedInstance = nil;
         var_AddCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
         var_AddCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
 
+        // Load them here already to apply stored profiles
+        _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
+        _audioEffectsPanel = [[VLCAudioEffectsWindowController alloc] init];
+
         playlist_t *p_playlist = pl_Get(p_intf);
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
             var_SetBool(p_playlist, "fullscreen", YES);
@@ -509,17 +513,11 @@ static VLCMain *sharedInstance = nil;
 
 - (VLCAudioEffectsWindowController *)audioEffectsPanel
 {
-    if (!_audioEffectsPanel)
-        _audioEffectsPanel = [[VLCAudioEffectsWindowController alloc] init];
-
     return _audioEffectsPanel;
 }
 
 - (VLCVideoEffectsWindowController *)videoEffectsPanel
 {
-    if (!_videoEffectsPanel)
-        _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
-
     return _videoEffectsPanel;
 }
 
