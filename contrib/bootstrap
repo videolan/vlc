@@ -286,7 +286,7 @@ test -z "$GPL" || add_make_enabled "GPL"
 test -z "$GNUV3" || add_make_enabled "GNUV3"
 test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
-test "`uname -o`" != "Msys" || add_make "CMAKE_GENERATOR := -G \"MSYS Makefiles\""
+test "`uname -o 2>/dev/null`" != "Msys" || add_make "CMAKE_GENERATOR := -G \"MSYS Makefiles\""
 
 #
 # Checks
