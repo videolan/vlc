@@ -386,6 +386,9 @@
     if (i_old_profile_index)
         return [self saveCurrentProfile];
 
+    if (_applyProfileCheckbox.state == NSOffState)
+        return;
+
     playlist_t *p_playlist = pl_Get(getIntf());
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *newPresetString = [NSString stringWithCString:var_InheritString(p_playlist, "equalizer-bands") encoding:NSASCIIStringEncoding];
@@ -453,6 +456,8 @@
     workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
     [workArray addObject:newProfileName];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
+
+    [defaults setInteger:([workArray count] - 1) forKey:@"AudioEffectSelectedProfile"];
 
     [defaults synchronize];
 }
