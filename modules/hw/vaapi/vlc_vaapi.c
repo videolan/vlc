@@ -142,7 +142,7 @@ vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
         drm_device_paths_count = ARRAY_SIZE(default_drm_device_paths);
     }
 
-    for (size_t i = 0; drm_device_paths_count; i++)
+    for (size_t i = 0; i < drm_device_paths_count; i++)
     {
         int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
         if (drm_fd < 0)
