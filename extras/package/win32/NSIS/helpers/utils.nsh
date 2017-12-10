@@ -214,6 +214,27 @@ Function un.TrimNewlines
    Exch $R0
 FunctionEnd
 
+Function TrimNewlines
+ Exch $R0
+ Push $R1
+ Push $R2
+ StrCpy $R1 0
+
+ loop:
+   IntOp $R1 $R1 - 1
+   StrCpy $R2 $R0 1 $R1
+   StrCmp $R2 "$\r" loop
+   StrCmp $R2 "$\n" loop
+   IntOp $R1 $R1 + 1
+   IntCmp $R1 0 no_trim_needed
+   StrCpy $R0 $R0 $R1
+
+ no_trim_needed:
+   Pop $R2
+   Pop $R1
+   Exch $R0
+FunctionEnd
+
 Function un.RemoveEmptyDirs
   Pop $9
   !define Index 'Line${__LINE__}'
@@ -228,6 +249,32 @@ Function un.RemoveEmptyDirs
     Push $9
     Push "$9$1\"
     Call un.RemoveEmptyDirs
+    Pop $9
+    Pop $1
+    Pop $0
+    RMDir "$INSTDIR$9$1"
+    "${Index}-Next:"
+    FindNext $0 $1
+    Goto "${Index}-Loop"
+  "${Index}-End:"
+  FindClose $0
+  !undef Index
+FunctionEnd
+
+Function RemoveEmptyDirs
+  Pop $9
+  !define Index 'Line${__LINE__}'
+  FindFirst $0 $1 "$INSTDIR$9*"
+  StrCmp $0 "" "${Index}-End"
+  "${Index}-Loop:"
+    StrCmp $1 "" "${Index}-End"
+    StrCmp $1 "." "${Index}-Next"
+    StrCmp $1 ".." "${Index}-Next"
+    Push $0
+    Push $1
+    Push $9
+    Push "$9$1\"
+    Call RemoveEmptyDirs
     Pop $9
     Pop $1
     Pop $0
