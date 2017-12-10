@@ -83,6 +83,7 @@ static ssize_t Read (stream_t *access, void *buf, size_t len)
     if (len > sys->length - sys->offset)
         len = sys->length - sys->offset;
     memcpy (buf, sys->data + sys->offset, len);
+    sys->offset += len;
     return len;
 }
 
