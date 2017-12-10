@@ -5,7 +5,7 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=5a93a85fd0ad62c6c9cdf69415959f116c015f0e
+FFMPEG_HASH=eaff5fcb7cde8d1614755269773d471d3a3d1bfc
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
@@ -231,8 +231,6 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
 ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
-	$(APPLY) $(SRC)/ffmpeg/lavc-change-HW_CONFIG_HWACCEL-arguments.patch
-	$(APPLY) $(SRC)/ffmpeg/lavc-add-back-AD_HOC-method-for-DXVA2-D3D11-VAAPI-VDPAU.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
