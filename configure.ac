@@ -4114,7 +4114,7 @@ AS_IF([test "${enable_osx_notifications}" != "no"], [
 dnl
 dnl Libnotify notification plugin
 dnl
-PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
+PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-3.0], [libnotify notification], [auto])
 
 dnl
 dnl  libplacebo support
