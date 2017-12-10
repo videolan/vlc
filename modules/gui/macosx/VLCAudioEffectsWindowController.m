@@ -98,10 +98,12 @@
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults boolForKey:@"AudioEffectApplyProfileOnStartup"])
         {
+            // This does not reset the UI (which does not exist yet), but it initalizes needed playlist vars
             [self equalizerUpdated];
             [self resetCompressor];
             [self resetSpatializer];
             [self resetAudioFilters];
+
             [self loadProfile];
         }
         else
