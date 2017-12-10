@@ -33,8 +33,6 @@
 #include <windows.h>
 #include <wchar.h>
 
-extern DWORD LoadLibraryFlags;
-
 static char *GetWindowsError( void )
 {
     wchar_t wmsg[256];
@@ -64,7 +62,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     DWORD mode;
     if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) != 0)
     {
-        handle = LoadLibraryExW (wfile, NULL, LoadLibraryFlags );
+        handle = LoadLibraryExW(wfile, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
         SetThreadErrorMode (mode, NULL);
     }
 #else

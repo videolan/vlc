@@ -39,8 +39,6 @@
 typedef UINT MMRESULT;
 #endif
 
-DWORD LoadLibraryFlags = 0;
-
 static int system_InitWSA(int hi, int lo)
 {
     WSADATA data;
@@ -62,14 +60,6 @@ void system_Init(void)
 {
     if (system_InitWSA(2, 2) && system_InitWSA(1, 1))
         fputs("Error: cannot initialize Winsocks\n", stderr);
-
-#if !VLC_WINSTORE_APP
-# if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-    if (GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
-                                       "SetDefaultDllDirectories") != NULL)
-# endif /* FIXME: not reentrant */
-        LoadLibraryFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
-#endif
 }
 
 /*****************************************************************************
