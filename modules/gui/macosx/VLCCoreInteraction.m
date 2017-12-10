@@ -806,7 +806,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     playlist_t *p_playlist = pl_Get(p_intf);
     if (!p_intf)
         return;
-    int i_type;
+    int i_type = 0;
     bool b_is_command = false;
     char const *psz_filter_type = [self getFilterType: psz_filter];
     if (!psz_filter_type) {
