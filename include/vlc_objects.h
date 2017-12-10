@@ -41,6 +41,12 @@ struct vlc_object_t
     VLC_COMMON_MEMBERS
 };
 
+/* The root object */
+struct libvlc_int_t
+{
+    VLC_COMMON_MEMBERS
+};
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
