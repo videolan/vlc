@@ -71,7 +71,9 @@
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if ([defaults boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
+        // This does not reset the UI (which does not exist yet), but it initalizes needed playlist vars
         [self resetValues];
+
         [self loadProfile];
     }
     else
