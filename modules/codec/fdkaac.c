@@ -65,19 +65,19 @@ static void CloseEncoder(vlc_object_t *);
 #define ENC_CFG_PREFIX "sout-fdkaac-"
 
 #define AOT_TEXT N_("Encoder Profile")
-#define AOT_LONGTEXT N_("Encoder Algorithm to use")
+#define AOT_LONGTEXT N_("Encoder Algorithm to use.")
 
 #define SIDEBAND_TEXT N_("Enable spectral band replication")
-#define SIDEBAND_LONGTEXT N_("This is an optional feature only for the AAC-ELD profile")
+#define SIDEBAND_LONGTEXT N_("This is an optional feature only for the AAC-ELD profile.")
 
 #define VBR_QUALITY_TEXT N_("VBR Quality")
-#define VBR_QUALITY_LONGTEXT N_("Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best")
+#define VBR_QUALITY_LONGTEXT N_("Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best).")
 
 #define AFTERBURNER_TEXT N_("Enable afterburner library")
-#define AFTERBURNER_LONGTEXT N_("This library will produce higher quality audio at the expense of additional CPU usage (default is enabled)")
+#define AFTERBURNER_LONGTEXT N_("This library will produce higher quality audio at the expense of additional CPU usage (default is enabled).")
 
 #define SIGNALING_TEXT N_("Signaling mode of the extension AOT")
-#define SIGNALING_LONGTEXT N_("1 is explicit for SBR and implicit for PS (default), 2 is explicit hierarchical")
+#define SIGNALING_LONGTEXT N_("1 is explicit for SBR and implicit for PS (default), 2 is explicit hierarchical.")
 
 #define  CH_ORDER_MPEG 0  /*!< MPEG channel ordering (e. g. 5.1: C, L, R, SL, SR, LFE)           */
 #define  CH_ORDER_WAV 1   /*!< WAV fileformat channel ordering (e. g. 5.1: L, R, C, LFE, SL, SR) */

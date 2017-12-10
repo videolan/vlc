@@ -106,7 +106,7 @@ static const int format_int[] = {
 };
 
 #define FILE_TEXT N_("Output file")
-#define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
+#define FILE_LONGTEXT N_("File to which the audio samples will be written to (\"-\" for stdout).")
 
 vlc_module_begin ()
     set_description( N_("File audio output") )

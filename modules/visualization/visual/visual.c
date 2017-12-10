@@ -69,7 +69,7 @@
 
 #define NBBANDS_TEXT N_( "Show 80 bands instead of 20" )
 #define SPNBBANDS_LONGTEXT N_( \
-      "More bands for the spectrometer : 80 if enabled else 20." )
+      "More bands for the spectrometer: 80 if enabled, else 20." )
 
 #define SEPAR_TEXT N_( "Number of blank pixels between bands.")
 

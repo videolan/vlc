@@ -62,14 +62,14 @@ static const char *const ppsz_filter_options[] = {
  * Module descriptor
  *****************************************************************************/
 #define ORIENTATION_TEXT N_("Mirror orientation")
-#define ORIENTATION_LONGTEXT N_("Defines orientation of the mirror splitting. \
-    Can be vertical or horizontal" )
+#define ORIENTATION_LONGTEXT N_("Defines orientation of the mirror splitting. " \
+    "Can be vertical or horizontal." )
 static const int pi_orientation_values[] = { 0, 1 };
 static const char *const ppsz_orientation_descriptions[] = {
   N_("Vertical"), N_("Horizontal") };
 
 #define DIRECTION_TEXT N_("Direction")
-#define DIRECTION_LONGTEXT N_("Direction of the mirroring" )
+#define DIRECTION_LONGTEXT N_("Direction of the mirroring." )
 static const int pi_direction_values[] = { 0, 1 };
 static const char *const ppsz_direction_descriptions[] = {
   N_("Left to right/Top to bottom"), N_("Right to left/Bottom to top") };

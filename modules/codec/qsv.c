@@ -79,17 +79,17 @@ static void     Close(vlc_object_t *);
 #define GOP_REF_DIST_TEXT N_("Group of Picture Reference Distance")
 #define GOP_REF_DIST_LONGTEXT N_( \
     "Distance between I- or P- key frames; if it is zero, the GOP " \
-    "structure is unspecified. Note: If GopRefDist = 1, there are no B- " \
+    "structure is unspecified. Note: If GopRefDist = 1, there are no B-" \
     "frames used.")
 
 #define TARGET_USAGE_TEXT N_("Target Usage")
 #define TARGET_USAGE_LONGTEXT N_("The target usage allow to choose between " \
-    "different trade-offs between quality and speed. Allowed values are : " \
+    "different trade-offs between quality and speed. Allowed values are: " \
     "'speed', 'balanced' and 'quality'.")
 
 #define IDR_INTERVAL_TEXT N_("IDR interval")
 #define IDR_INTERVAL_LONGTEXT N_( \
-    "For H.264, IdrInterval specifies IDR-frame interval in terms of I- " \
+    "For H.264, IdrInterval specifies IDR-frame interval in terms of I-" \
     "frames; if IdrInterval=0, then every I-frame is an IDR-frame. If " \
     "IdrInterval=1, then every other I-frame is an IDR-frame, etc. " \
     "For MPEG2, IdrInterval defines sequence header interval in terms " \
@@ -100,7 +100,7 @@ static void     Close(vlc_object_t *);
 #define RATE_CONTROL_TEXT N_("Rate Control Method")
 #define RATE_CONTROL_LONGTEXT N_( \
     "The rate control method to use when encoding. Can be one of " \
-    "'cbr', 'vbr', 'qp', 'avbr'. 'qp' mode isn't supported for mpeg2")
+    "'cbr', 'vbr', 'qp', 'avbr'. 'qp' mode isn't supported for mpeg2.")
 
 #define QP_TEXT N_("Quantization parameter")
 #define QP_LONGTEXT N_("Quantization parameter for all types of frames. " \
@@ -120,15 +120,15 @@ static void     Close(vlc_object_t *);
     "overrides any qp set globally. Used only if rc_method is 'qp'.")
 
 #define MAX_BITRATE_TEXT N_("Maximum Bitrate")
-#define MAX_BITRATE_LONGTEXT N_("Defines the maximum bitrate in Kbps " \
+#define MAX_BITRATE_LONGTEXT N_("Defines the maximum bitrate in kbps " \
     "(1000 bits/s) for VBR rate control method. If not set, this parameter" \
     " is computed from other sources such as bitrate, profile, level, etc.")
 
 #define ACCURACY_TEXT N_("Accuracy of RateControl")
 #define ACCURACY_LONGTEXT N_("Tolerance in percentage of the 'avbr' " \
     " (Average Variable BitRate) method. (e.g. 10 with a bitrate of 800 " \
-    " kpbs means the encoder tries not to  go above 880 kbps and under " \
-    " 730 kpbs. The targeted accuracy is only reached after a certained " \
+    " kbps means the encoder tries not to  go above 880 kbps and under " \
+    " 730 kbps. The targeted accuracy is only reached after a certained " \
     " convergence period. See the convergence parameter")
 
 #define CONVERGENCE_TEXT N_("Convergence time of 'avbr' RateControl")
@@ -148,7 +148,7 @@ static void     Close(vlc_object_t *);
 #define ASYNC_DEPTH_TEXT N_("Number of parallel operations")
 #define ASYNC_DEPTH_LONGTEXT N_("Defines the number of parallel " \
      "encoding operations before we synchronise the result. Higher " \
-     " may result on better throughput depending on hardware. " \
+     "numbers may result on better throughput depending on hardware. " \
      "MPEG2 needs at least 1 here.")
 
 static const int const profile_h264_list[] =

@@ -73,12 +73,12 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
 #define AFD_INDEX_TEXT N_("Active Format Descriptor value")
 
 #define AR_INDEX_TEXT N_("Aspect Ratio")
-#define AR_INDEX_LONGTEXT N_("Aspect Ratio of the source picture")
+#define AR_INDEX_LONGTEXT N_("Aspect Ratio of the source picture.")
 
-#define AFDLINE_INDEX_TEXT N_("Active Format Descriptor line.")
+#define AFDLINE_INDEX_TEXT N_("Active Format Descriptor line")
 #define AFDLINE_INDEX_LONGTEXT N_("VBI line on which to output Active Format Descriptor.")
 
-#define NOSIGNAL_IMAGE_TEXT N_("Picture to display on input signal loss.")
+#define NOSIGNAL_IMAGE_TEXT N_("Picture to display on input signal loss")
 #define NOSIGNAL_IMAGE_LONGTEXT NOSIGNAL_IMAGE_TEXT
 
 #define CARD_INDEX_TEXT N_("Output card")
@@ -232,7 +232,7 @@ static void CloseAudio          (vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("DecklinkOutput"))
-    set_description(N_("output module to write to Blackmagic SDI card"))
+    set_description(N_("Output module to write to Blackmagic SDI card"))
     set_section(N_("DeckLink General Options"), NULL)
     add_integer(CFG_PREFIX "card-index", 0,
                 CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT, true)
