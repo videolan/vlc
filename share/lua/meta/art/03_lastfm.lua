@@ -33,7 +33,7 @@ function fetch_art()
     then return nil end
 
     if meta["artist"] and meta["album"] then
-        title = meta["artist"].."/"..meta["album"]
+        title = vlc.strings.encode_uri_component(meta["artist"]).."/"..vlc.strings.encode_uri_component(meta["album"])
     else
         return nil
     end
