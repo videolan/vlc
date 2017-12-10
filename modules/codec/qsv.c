@@ -104,7 +104,7 @@ static void     Close(vlc_object_t *);
 
 #define QP_TEXT N_("Quantization parameter")
 #define QP_LONGTEXT N_("Quantization parameter for all types of frames. " \
-    "This parameters sets qpi, qpp and qpp. It has less precedence than " \
+    "This parameters sets qpi, qpp and qpb. It has less precedence than " \
     "the forementionned parameters. Used only if rc_method is 'qp'.")
 
 #define QPI_TEXT N_("Quantization parameter for I-frames")
@@ -120,14 +120,14 @@ static void     Close(vlc_object_t *);
     "overrides any qp set globally. Used only if rc_method is 'qp'.")
 
 #define MAX_BITRATE_TEXT N_("Maximum Bitrate")
-#define MAX_BITRATE_LONGTEXT N_("Defines the maximum bitrate in Kpbs " \
+#define MAX_BITRATE_LONGTEXT N_("Defines the maximum bitrate in Kbps " \
     "(1000 bits/s) for VBR rate control method. If not set, this parameter" \
     " is computed from other sources such as bitrate, profile, level, etc.")
 
 #define ACCURACY_TEXT N_("Accuracy of RateControl")
 #define ACCURACY_LONGTEXT N_("Tolerance in percentage of the 'avbr' " \
     " (Average Variable BitRate) method. (e.g. 10 with a bitrate of 800 " \
-    " kpbs means the encoder tries not to  go above 880 kpbs and under " \
+    " kpbs means the encoder tries not to  go above 880 kbps and under " \
     " 730 kpbs. The targeted accuracy is only reached after a certained " \
     " convergence period. See the convergence parameter")
 
