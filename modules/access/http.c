@@ -897,7 +897,7 @@ static int Connect( stream_t *p_access )
             p_sys->i_icy_meta = atoi( p );
             if( p_sys->i_icy_meta < 0 )
                 p_sys->i_icy_meta = 0;
-            if( p_sys->i_icy_meta > 0 )
+            if( p_sys->i_icy_meta > 1 )
             {
                 p_sys->i_icy_offset = p_sys->i_icy_meta;
                 p_sys->b_icecast = true;
