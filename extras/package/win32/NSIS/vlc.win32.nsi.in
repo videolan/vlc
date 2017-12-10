@@ -238,6 +238,26 @@ ${MementoSection} "$(Name_Section01)" SEC01
   DetailPrint "$(Detail_CheckProcesses)"
   Call CheckRunningProcesses
 
+  ; Remove previous version first, if this is update
+  ${If} $ReinstallType == "1"
+    FileOpen $UninstallLog "$INSTDIR\uninstall.log" r
+    UninstallLoop:
+      ClearErrors
+      FileRead $UninstallLog $R0
+      IfErrors UninstallEnd
+      Push $R0
+      Call TrimNewLines
+      Pop $R0
+      Delete "$INSTDIR\$R0"
+      Goto UninstallLoop
+    UninstallEnd:
+    FileClose $UninstallLog
+    Delete "$INSTDIR\uninstall.log"
+    Delete "$INSTDIR\uninstall.exe"
+    Push "\"
+    Call RemoveEmptyDirs
+  ${EndIf}
+
   !insertmacro OpenUninstallLog
 
   ; VLC.exe, libvlc.dll
