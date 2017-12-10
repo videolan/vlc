@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 2.2.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-06 02:55+0100\n"
+"POT-Creation-Date: 2017-12-11 00:15+0100\n"
 "PO-Revision-Date: 2017-11-16 03:18+0100\n"
 "Last-Translator: Dian Li <xslidian@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/yaron/vlc-trans/"
@@ -357,7 +357,7 @@ msgstr "VLC 的视频点播（VoD）实现"
 #: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
-#: modules/gui/qt/components/playlist/playlist.cpp:166
+#: modules/gui/qt/components/playlist/playlist.cpp:165
 #: modules/gui/qt/components/playlist/selector.cpp:227
 #: modules/gui/qt/dialogs/playlist.cpp:39 modules/gui/qt/menus.cpp:1117
 msgid "Playlist"
@@ -620,7 +620,7 @@ msgstr "已达到最大的滤镜数量 (%u)。"
 
 #: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
-#: modules/gui/macosx/VLCMainWindow.m:999 modules/video_filter/postproc.c:235
+#: modules/gui/macosx/VLCMainWindow.m:1006 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "禁用"
 
@@ -715,7 +715,7 @@ msgstr "耳机"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:971
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
 msgid "Automatic"
 msgstr "自动"
 
@@ -924,7 +924,7 @@ msgid "VLC could not open the decoder module."
 msgstr "VLC 无法打开解码器模块。"
 
 #: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
-#: modules/gui/qt/components/open_panels.cpp:544
+#: modules/gui/qt/components/open_panels.cpp:543
 msgid "Track"
 msgstr "轨道"
 
@@ -1281,8 +1281,8 @@ msgstr "VLC 无法打开 MRL「%s」。详情请检查日志。"
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
-#: modules/gui/qt/components/open_panels.cpp:504
-#: modules/gui/qt/components/open_panels.cpp:518
+#: modules/gui/qt/components/open_panels.cpp:503
+#: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
@@ -1754,7 +1754,7 @@ msgstr ""
 "使用此设置。即使流实际上并非采用杜比环绕编码，打开此选项也可能会增强您的体"
 "验，特别是和耳机声道混音器组合使用时。"
 
-#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:873
+#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
 #: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:65
@@ -1840,7 +1840,7 @@ msgid ""
 msgstr "这允许以稍低或稍高的速度播放音频而不影响音频音调"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1125
-#: modules/access/dshow/dshow.cpp:2081 modules/access/dtv/access.c:107
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
@@ -2483,7 +2483,7 @@ msgstr ""
 #: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
-#: modules/access/dshow/dshow.cpp:2079 modules/audio_output/alsa.c:767
+#: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
@@ -2500,7 +2500,7 @@ msgstr "默认"
 
 #: src/libvlc-module.c:544
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
-#: modules/gui/macosx/VLCMainWindow.m:997
+#: modules/gui/macosx/VLCMainWindow.m:1004
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
@@ -5102,7 +5102,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "无法以写入模式打开“%s”"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2681
+#: modules/demux/avi/avi.c:2702
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:479
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:533
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:788
@@ -5127,7 +5127,7 @@ msgstr "无法以写入模式打开“%s”"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
 #: modules/gui/macosx/prefs.m:189
-#: modules/gui/qt/components/open_panels.cpp:1361
+#: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
@@ -5970,17 +5970,17 @@ msgstr "AVFoundation 视频捕获"
 msgid "AVFoundation video capture module."
 msgstr "AVFoundation 视频捕获模块。"
 
-#: modules/access/avcapture.m:280 modules/access/avcapture.m:309
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 msgid "No video devices found"
 msgstr "未找到视频设备"
 
-#: modules/access/avcapture.m:281
+#: modules/access/avcapture.m:287
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr "您的 Mac 似乎未配备合适的视频输入设备。请检查您的接线及驱动程序。"
 
-#: modules/access/avcapture.m:310
+#: modules/access/avcapture.m:316
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
@@ -6089,16 +6089,16 @@ msgstr ""
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr "无法播放蓝光光盘。请尝试关闭菜单支持，再试一次。"
 
-#: modules/access/bluray.c:845 modules/access/bluray.c:2300
-#: modules/access/bluray.c:2305
+#: modules/access/bluray.c:845 modules/access/bluray.c:2279
+#: modules/access/bluray.c:2284
 msgid "Blu-ray error"
 msgstr "蓝光错误"
 
-#: modules/access/bluray.c:1680
+#: modules/access/bluray.c:1667
 msgid "Top Menu"
 msgstr "顶级菜单"
 
-#: modules/access/bluray.c:1683
+#: modules/access/bluray.c:1670
 msgid "First Play"
 msgstr "首先播放"
 
@@ -6329,7 +6329,7 @@ msgid "DSS"
 msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:130
-#: modules/gui/qt/components/open_panels.cpp:818
+#: modules/gui/qt/components/open_panels.cpp:817
 msgid "Video device name"
 msgstr "视频设备名称"
 
@@ -6341,8 +6341,8 @@ msgstr ""
 "DirectShow 插件使用的视频设备名称。如果您不指定任何设备，则将使用默认的设备。"
 
 #: modules/access/dshow/dshow.cpp:135
-#: modules/gui/qt/components/open_panels.cpp:826
-#: modules/gui/qt/components/open_panels.cpp:1047
+#: modules/gui/qt/components/open_panels.cpp:825
+#: modules/gui/qt/components/open_panels.cpp:1046
 msgid "Audio device name"
 msgstr "音频设备名称"
 
@@ -6355,7 +6355,7 @@ msgstr ""
 "DirectShow 插件使用的音频设备名称。如果您不指定任何设备，则将使用默认的设备。"
 
 #: modules/access/dshow/dshow.cpp:140
-#: modules/gui/qt/components/open_panels.cpp:793
+#: modules/gui/qt/components/open_panels.cpp:792
 msgid "Video size"
 msgstr "视频大小"
 
@@ -6433,8 +6433,8 @@ msgid "This overrides the channel. Measured in Hz."
 msgstr "这将覆盖频道设置。单位为 Hz。"
 
 #: modules/access/dshow/dshow.cpp:168
-#: modules/gui/qt/components/open_panels.cpp:846
-#: modules/gui/qt/components/open_panels.cpp:1067
+#: modules/gui/qt/components/open_panels.cpp:845
+#: modules/gui/qt/components/open_panels.cpp:1066
 msgid "Video standard"
 msgstr "视频标准"
 
@@ -6540,7 +6540,7 @@ msgid "DirectShow input"
 msgstr "DirectShow 输入"
 
 #: modules/access/dshow/dshow.cpp:516 modules/access/dshow/dshow.cpp:590
-#: modules/access/dshow/dshow.cpp:1052 modules/access/dshow/dshow.cpp:1123
+#: modules/access/dshow/dshow.cpp:1054 modules/access/dshow/dshow.cpp:1125
 msgid "Capture failed"
 msgstr "捕获失败"
 
@@ -6552,12 +6552,12 @@ msgstr "未选定视频或音频设备。"
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr "VLC 无法打开任何捕获设备。请检查错误日志以获取详情。"
 
-#: modules/access/dshow/dshow.cpp:1053
+#: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
 msgstr "您选择的设备无法使用，因为其类型不受支持。"
 
-#: modules/access/dshow/dshow.cpp:1124
+#: modules/access/dshow/dshow.cpp:1126
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "捕获设备「%s」不支持请求的参数。"
@@ -6638,7 +6638,7 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr "脉冲转发器按给定频率为 TV 频道分组 (即混流)。调谐接收器时需要此项。"
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:967
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "调制 / 组合"
 
@@ -7119,13 +7119,13 @@ msgstr "DVD 导航输入"
 msgid "DVDnav demuxer"
 msgstr "DVD 导航菜单分流器"
 
-#: modules/access/dvdnav.c:296 modules/access/dvdread.c:197
-#: modules/access/dvdread.c:212 modules/access/dvdread.c:476
-#: modules/access/dvdread.c:544
+#: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
+#: modules/access/dvdread.c:216 modules/access/dvdread.c:471
+#: modules/access/dvdread.c:539
 msgid "Playback failure"
 msgstr "播放失败"
 
-#: modules/access/dvdnav.c:297
+#: modules/access/dvdnav.c:295
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr "VLC 无法设置 DVD 标题。可能无法解密整张光盘。"
@@ -7138,21 +7138,21 @@ msgstr "没有菜单的 DVD"
 msgid "DVDRead Input (no menu support)"
 msgstr "DVDRead 输入 (无菜单支持)"
 
-#: modules/access/dvdread.c:198
+#: modules/access/dvdread.c:202
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead 无法打开光碟「%s」。"
 
-#: modules/access/dvdread.c:213
+#: modules/access/dvdread.c:217
 msgid "Cannot play a non-UDF mastered DVD."
 msgstr ""
 
-#: modules/access/dvdread.c:477
+#: modules/access/dvdread.c:472
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVD 读取无法读取块 %d。"
 
-#: modules/access/dvdread.c:545
+#: modules/access/dvdread.c:540
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead 无法读取 %d/%d 块，位于 0x%02x。"
@@ -7253,7 +7253,7 @@ msgstr "FTP 输入"
 msgid "FTP upload output"
 msgstr "FTP 上传输出"
 
-#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
+#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:541
 msgid "Network interaction failed"
 msgstr "网络交互失败"
 
@@ -7265,7 +7265,7 @@ msgstr "VLC 无法连接给定的服务器。"
 msgid "VLC's connection to the given server was rejected."
 msgstr "VLC 到给定服务器的连接被拒绝。"
 
-#: modules/access/ftp.c:538
+#: modules/access/ftp.c:542
 msgid "Your account was rejected."
 msgstr "您的帐号已被拒绝。"
 
@@ -7534,7 +7534,7 @@ msgstr "步调"
 msgid "Read the audio stream at VLC pace rather than Jack pace."
 msgstr "按 VLC 步调而非 Jack 步调读取音频流。"
 
-#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:898
+#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:897
 msgid "Auto connection"
 msgstr "自动连接"
 
@@ -7704,19 +7704,19 @@ msgstr "HTTP 隧道端口"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "用于通过 HTTP 隧道访问 RTSP/RTP 的端口。"
 
-#: modules/access/live555.cpp:661
+#: modules/access/live555.cpp:668
 msgid "RTSP authentication"
 msgstr "RTSP 身份验证"
 
-#: modules/access/live555.cpp:662
+#: modules/access/live555.cpp:669
 msgid "Please enter a valid login name and a password."
 msgstr "请输入有效的登录名和密码。"
 
-#: modules/access/live555.cpp:687
+#: modules/access/live555.cpp:694
 msgid "RTSP connection failed"
 msgstr "RTSP 连接失败"
 
-#: modules/access/live555.cpp:688
+#: modules/access/live555.cpp:695
 msgid "Access to the stream is denied by the server configuration."
 msgstr "对流的访问被服务器配置拒绝。"
 
@@ -7964,11 +7964,11 @@ msgstr "RTP"
 msgid "Real-Time Protocol (RTP) input"
 msgstr "实时协议 (RTP) 输入"
 
-#: modules/access/rtp/rtp.c:751
+#: modules/access/rtp/rtp.c:770
 msgid "SDP required"
 msgstr "要求 SDP 协议"
 
-#: modules/access/rtp/rtp.c:752
+#: modules/access/rtp/rtp.c:771
 #, c-format
 msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
@@ -8026,7 +8026,7 @@ msgid "SAT>IP Receiver Plugin"
 msgstr ""
 
 #: modules/access/screen/screen.c:45
-#: modules/gui/qt/components/open_panels.cpp:1104
+#: modules/gui/qt/components/open_panels.cpp:1103
 msgid "Desired frame rate for the capture."
 msgstr "捕获期望的帧率。"
 
@@ -8162,11 +8162,11 @@ msgstr "服务器端所用的 SFTP 端口号"
 msgid "SFTP input"
 msgstr "SFTP 输入"
 
-#: modules/access/sftp.c:394
+#: modules/access/sftp.c:400
 msgid "SFTP authentication"
 msgstr "SFTP 身份验证"
 
-#: modules/access/sftp.c:395
+#: modules/access/sftp.c:401
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr "请为到 %s 的 sftp 连接输入有效的登录名和密码"
@@ -8346,7 +8346,7 @@ msgstr "VBI 捕获设备"
 
 #: modules/access/v4l2/v4l2.c:48
 #, fuzzy
-msgid "The device node where VBI data can be read  (for closed captions)."
+msgid "The device node where VBI data can be read (for closed captions)."
 msgstr "可读取 VBI 数据的设备节点  (闭路字幕需要) "
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
@@ -8358,11 +8358,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "视频标准 (默认, SECAM, PAL, 或 NTSC)。"
 
 #: modules/access/v4l2/v4l2.c:55
+#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
-"I420 or I422 for raw images, MJPG for M-JPEG compressed input) (Complete "
+"I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
-"I420, I411, I410, MJPG)"
+"I420, I411, I410, MJPG"
 msgstr ""
 "强制 Video4Linux2 视频设备使用指定的色度格式 (例如为 raw 图像使用 I420 或 "
 "I422，为 M-JPEG 压缩输入使用 MJPG) (完整列表: GREY, I240, RV16, RV15, RV24, "
@@ -8398,12 +8399,13 @@ msgstr "电台设备"
 msgid "Radio tuner device node."
 msgstr "无线电调谐器设备节点。"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1074
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "频率"
 
 #: modules/access/v4l2/v4l2.c:77
-msgid "Tuner frequency in Hz or kHz (see debug output)"
+#, fuzzy
+msgid "Tuner frequency in Hz or kHz (see debug output)."
 msgstr "以 Hz 或 kHz 为单位的调谐器频率 (参见调试输出)"
 
 #: modules/access/v4l2/v4l2.c:78
@@ -10305,7 +10307,8 @@ msgid "Output file"
 msgstr "输出文件"
 
 #: modules/audio_output/file.c:109
-msgid "File to which the audio samples will be written to. (\"-\" for stdout"
+#, fuzzy
+msgid "File to which the audio samples will be written to (\"-\" for stdout)."
 msgstr "写入音频采样的文件。 (“-”为标准输出"
 
 #: modules/audio_output/file.c:112
@@ -10363,16 +10366,16 @@ msgstr "若您不希望您的音频被其他音频干扰，请启用本选项。
 msgid "K Audio Interface audio output"
 msgstr "K Audio 接口音频输出"
 
-#: modules/audio_output/mmdevice.c:1269
+#: modules/audio_output/mmdevice.c:1274
 msgid "Windows Multimedia Device output"
 msgstr "Windows 多媒体设备（WMD）输出"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Output back-end"
 msgstr "输出卡"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Audio output back-end interface."
 msgstr "音频输出设备"
@@ -10401,7 +10404,7 @@ msgstr "软件增益"
 msgid "This linear gain will be applied in software."
 msgstr "此处的线性增益将在软件中实现。"
 
-#: modules/audio_output/wasapi.c:640
+#: modules/audio_output/wasapi.c:645
 msgid "Windows Audio Session API output"
 msgstr "Windows 音频会话 API 输出"
 
@@ -10486,7 +10489,7 @@ msgstr "音源文件"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 #, fuzzy
-msgid "SoundFont file to use wor software synthesis."
+msgid "SoundFont file to use for software synthesis."
 msgstr "用于软件合成器的音源文件。"
 
 #: modules/codec/audiotoolbox_midi.c:57
@@ -10522,8 +10525,8 @@ msgstr "渲染字幕的 X 坐标"
 msgid "ARIB subtitles decoder"
 msgstr "DVB 字幕解码器"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1091
-#: modules/demux/mpeg/ts_psi.c:1098
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1084
+#: modules/demux/mpeg/ts_psi.c:1091
 #, fuzzy
 msgid "ARIB subtitles"
 msgstr "DVB 字幕"
@@ -11185,8 +11188,8 @@ msgstr "编码字幕的 Y 坐标"
 msgid "DVB subtitles decoder"
 msgstr "DVB 字幕解码器"
 
-#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:775
-#: modules/demux/mpeg/ts_psi.c:824
+#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:771
+#: modules/demux/mpeg/ts_psi.c:820
 msgid "DVB subtitles"
 msgstr "DVB 字幕"
 
@@ -11211,7 +11214,8 @@ msgid "Encoder Profile"
 msgstr "编码器配置文件"
 
 #: modules/codec/fdkaac.c:68
-msgid "Encoder Algorithm to use"
+#, fuzzy
+msgid "Encoder Algorithm to use."
 msgstr "要使用的编码器算法"
 
 #: modules/codec/fdkaac.c:70
@@ -11219,7 +11223,8 @@ msgid "Enable spectral band replication"
 msgstr "启用SBR（高频重建）"
 
 #: modules/codec/fdkaac.c:71
-msgid "This is an optional feature only for the AAC-ELD profile"
+#, fuzzy
+msgid "This is an optional feature only for the AAC-ELD profile."
 msgstr "仅限 AAC-ELD 配置文件使用的可选特性"
 
 #: modules/codec/fdkaac.c:73
@@ -11227,7 +11232,9 @@ msgid "VBR Quality"
 msgstr "VBR 质量"
 
 #: modules/codec/fdkaac.c:74
-msgid "Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best"
+#, fuzzy
+msgid ""
+"Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr "VBR 编码质量 (0=cbr，1-5 恒定质量 vbr，5 最佳"
 
 #: modules/codec/fdkaac.c:76
@@ -11235,9 +11242,10 @@ msgid "Enable afterburner library"
 msgstr "启用 afterburner 库"
 
 #: modules/codec/fdkaac.c:77
+#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
-"CPU usage (default is enabled)"
+"CPU usage (default is enabled)."
 msgstr "该库可输出更高的音质，代价是额外的 CPU 使用量 (默认启用)"
 
 #: modules/codec/fdkaac.c:79
@@ -11245,9 +11253,10 @@ msgid "Signaling mode of the extension AOT"
 msgstr "扩展 AOT 的信号模型"
 
 #: modules/codec/fdkaac.c:80
+#, fuzzy
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
-"hierarchical"
+"hierarchical."
 msgstr "1 SBR 显式，PS 隐式 (默认)，2 显式继承"
 
 #: modules/codec/fdkaac.c:97
@@ -11778,7 +11787,7 @@ msgstr "画面组参考距离"
 #, fuzzy
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
-"unspecified. Note: If GopRefDist = 1, there are no B- frames used."
+"unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
 "I 或 P 关键帧之间的距离; 若为零，则认为 GOP 结构未指定。注: 若 GopRefDist = "
 "1，则将不使用 B 帧。"
@@ -11788,9 +11797,10 @@ msgid "Target Usage"
 msgstr "目标用途"
 
 #: modules/codec/qsv.c:86
+#, fuzzy
 msgid ""
 "The target usage allow to choose between different trade-offs between "
-"quality and speed. Allowed values are : 'speed', 'balanced' and 'quality'."
+"quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
 "目标用途允许选择质量与速度之间的平衡点。允许的值为 : 'speed'(速"
 "度)、'balanced'(均衡) 及 'quality'(质量)。"
@@ -11802,8 +11812,8 @@ msgstr "IDR 间隔"
 #: modules/codec/qsv.c:92
 #, fuzzy
 msgid ""
-"For H.264, IdrInterval specifies IDR-frame interval in terms of I- frames; "
-"if IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
+"For H.264, IdrInterval specifies IDR-frame interval in terms of I-frames; if "
+"IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
 "every other I-frame is an IDR-frame, etc. For MPEG2, IdrInterval defines "
 "sequence header interval in terms of I-frames. If IdrInterval=N, SDK inserts "
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
@@ -11823,7 +11833,7 @@ msgstr "位率控制方法"
 #, fuzzy
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
-"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2"
+"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
 "编码时使用的位率控制方法。可为 'cbr'、'vbr'、'qp'、'avbr' 之一。mpeg2 不支持 "
 "'qp' 模式"
@@ -11833,9 +11843,10 @@ msgid "Quantization parameter"
 msgstr "量化参数"
 
 #: modules/codec/qsv.c:106
+#, fuzzy
 msgid ""
 "Quantization parameter for all types of frames. This parameters sets qpi, "
-"qpp and qpp. It has less precedence than the forementionned parameters. Used "
+"qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
 "所有类型帧的量化参数。该参数可设置 qpi、qpp 及 qpp。优先级较之前提及的参数"
@@ -11884,7 +11895,7 @@ msgstr "最大比特率"
 #: modules/codec/qsv.c:123
 #, fuzzy
 msgid ""
-"Defines the maximum bitrate in Kpbs (1000 bits/s) for VBR rate control "
+"Defines the maximum bitrate in kbps (1000 bits/s) for VBR rate control "
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
@@ -11896,10 +11907,11 @@ msgid "Accuracy of RateControl"
 msgstr "速率控制精度"
 
 #: modules/codec/qsv.c:128
+#, fuzzy
 msgid ""
 "Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
-"g. 10 with a bitrate of 800  kpbs means the encoder tries not to  go above "
-"880 kpbs and under  730 kpbs. The targeted accuracy is only reached after a "
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
 "'avbr'  (平均可变比特率) 方法所容忍的百分比。(如对 800  kbps 的比特率设为 "
@@ -11941,10 +11953,11 @@ msgid "Number of parallel operations"
 msgstr "并行操作数目"
 
 #: modules/codec/qsv.c:149
+#, fuzzy
 msgid ""
 "Defines the number of parallel encoding operations before we synchronise the "
-"result. Higher  may result on better throughput depending on hardware. MPEG2 "
-"needs at least 1 here."
+"result. Higher numbers may result on better throughput depending on "
+"hardware. MPEG2 needs at least 1 here."
 msgstr ""
 "定义同步结果前并行编码操作的数目。依硬件性能不同，数值越高，吞吐量可能更高。"
 "MPEG2 应至少指定为 1。"
@@ -13977,7 +13990,7 @@ msgstr "D-Bus 控制接口"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1269
+#: modules/gui/macosx/VLCMainWindow.m:1276
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1234
 #: modules/gui/qt/main_interface.cpp:1238
@@ -14810,7 +14823,7 @@ msgstr "AIFF 分流器"
 msgid "ASF/WMV demuxer"
 msgstr "ASF/WMV 分流器"
 
-#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:832
+#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
 msgstr "无法分流 ASF 流"
 
@@ -14895,7 +14908,7 @@ msgstr "需要时修复"
 msgid "AVI demuxer"
 msgstr "AVI 分流器"
 
-#: modules/demux/avi/avi.c:798 modules/demux/mp4/mp4.c:1669
+#: modules/demux/avi/avi.c:820 modules/demux/mp4/mp4.c:1673
 #, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
@@ -14910,28 +14923,28 @@ msgstr ""
 "这一步对于大文件可能要耗费较长时间。\n"
 "您打算如何操作?"
 
-#: modules/demux/avi/avi.c:806
+#: modules/demux/avi/avi.c:828
 msgid "Do not play"
 msgstr "不要播放"
 
-#: modules/demux/avi/avi.c:807
+#: modules/demux/avi/avi.c:829
 msgid "Build index then play"
 msgstr "建立索引再播放"
 
-#: modules/demux/avi/avi.c:808
+#: modules/demux/avi/avi.c:830
 msgid "Play as is"
 msgstr "原样播放"
 
-#: modules/demux/avi/avi.c:809 modules/demux/mp4/mp4.c:1680
+#: modules/demux/avi/avi.c:831 modules/demux/mp4/mp4.c:1684
 #, fuzzy
 msgid "Broken or missing Index"
 msgstr "AVI 索引损坏或丢失"
 
-#: modules/demux/avi/avi.c:2682
+#: modules/demux/avi/avi.c:2703
 msgid "Broken or missing AVI Index"
 msgstr "AVI 索引损坏或丢失"
 
-#: modules/demux/avi/avi.c:2683
+#: modules/demux/avi/avi.c:2704
 msgid "Fixing AVI Index..."
 msgstr "正在修复 AVI 索引..."
 
@@ -15350,29 +15363,29 @@ msgstr ""
 msgid "Clean"
 msgstr "清除"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:49
 #, fuzzy
 msgid "M4A audio only"
 msgstr "音频延迟"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
 msgstr "MP4 串流分流器"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1677
+#: modules/demux/mp4/mp4.c:1681
 #, fuzzy
 msgid "Do not seek"
 msgstr "不要播放"
 
-#: modules/demux/mp4/mp4.c:1678
+#: modules/demux/mp4/mp4.c:1682
 #, fuzzy
 msgid "Build index"
 msgstr "建立索引再播放"
@@ -15531,60 +15544,60 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG 传输流（TS）分流器"
 
-#: modules/demux/mpeg/ts_psi.c:423
+#: modules/demux/mpeg/ts_psi.c:421
 #, fuzzy
 msgid "Main audio"
 msgstr "静音。"
 
-#: modules/demux/mpeg/ts_psi.c:424
+#: modules/demux/mpeg/ts_psi.c:422
 #, fuzzy
 msgid "Audio description for the visually impaired"
 msgstr "该编解码器暂无描述"
 
-#: modules/demux/mpeg/ts_psi.c:425
+#: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
 msgid "Clean audio for the hearing impaired"
 msgstr "Teletext 字幕: 听力辅助"
 
-#: modules/demux/mpeg/ts_psi.c:426
+#: modules/demux/mpeg/ts_psi.c:424
 #, fuzzy
 msgid "Spoken subtitles for the visually impaired"
 msgstr "DVB 字幕: 听力辅助"
 
-#: modules/demux/mpeg/ts_psi.c:608 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:606 modules/gui/macosx/VLCMainMenu.m:455
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "Teletext"
 
-#: modules/demux/mpeg/ts_psi.c:609
+#: modules/demux/mpeg/ts_psi.c:607
 msgid "Teletext subtitles"
 msgstr "Teletext 字幕"
 
-#: modules/demux/mpeg/ts_psi.c:610
+#: modules/demux/mpeg/ts_psi.c:608
 msgid "Teletext: additional information"
 msgstr "Teletext: 附加信息"
 
-#: modules/demux/mpeg/ts_psi.c:611
+#: modules/demux/mpeg/ts_psi.c:609
 msgid "Teletext: program schedule"
 msgstr "Teletext: 节目表"
 
-#: modules/demux/mpeg/ts_psi.c:612
+#: modules/demux/mpeg/ts_psi.c:610
 msgid "Teletext subtitles: hearing impaired"
 msgstr "Teletext 字幕: 听力辅助"
 
-#: modules/demux/mpeg/ts_psi.c:831
+#: modules/demux/mpeg/ts_psi.c:827
 msgid "DVB subtitles: hearing impaired"
 msgstr "DVB 字幕: 听力辅助"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1328
 msgid "clean effects"
 msgstr "清除效果"
 
-#: modules/demux/mpeg/ts_psi.c:1336
+#: modules/demux/mpeg/ts_psi.c:1329
 msgid "hearing impaired"
 msgstr "听力辅助"
 
-#: modules/demux/mpeg/ts_psi.c:1337
+#: modules/demux/mpeg/ts_psi.c:1330
 msgid "visual impaired commentary"
 msgstr "视觉辅助评论"
 
@@ -15838,7 +15851,7 @@ msgstr "Real 分流器"
 msgid "C64 sid demuxer"
 msgstr "C64 sid 分流器"
 
-#: modules/demux/smf.c:728
+#: modules/demux/smf.c:727
 msgid "SMF demuxer"
 msgstr "SMF 分流器"
 
@@ -16288,7 +16301,7 @@ msgstr "时间"
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:359
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
-#: modules/gui/qt/components/open_panels.cpp:1360
+#: modules/gui/qt/components/open_panels.cpp:1359
 msgid "OK"
 msgstr "确定"
 
@@ -19496,68 +19509,68 @@ msgstr "筛选:"
 msgid "Eject the disc"
 msgstr "弹出光盘"
 
-#: modules/gui/qt/components/open_panels.cpp:531
+#: modules/gui/qt/components/open_panels.cpp:530
 msgid "Entry"
 msgstr "条目"
 
-#: modules/gui/qt/components/open_panels.cpp:873
+#: modules/gui/qt/components/open_panels.cpp:872
 msgid "Channels:"
 msgstr "频道:"
 
-#: modules/gui/qt/components/open_panels.cpp:884
+#: modules/gui/qt/components/open_panels.cpp:883
 msgid "Selected ports:"
 msgstr "选择的端口:"
 
-#: modules/gui/qt/components/open_panels.cpp:887
+#: modules/gui/qt/components/open_panels.cpp:886
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt/components/open_panels.cpp:894
+#: modules/gui/qt/components/open_panels.cpp:893
 msgid "Use VLC pace"
 msgstr "使用 VLC 步调"
 
-#: modules/gui/qt/components/open_panels.cpp:914
+#: modules/gui/qt/components/open_panels.cpp:913
 msgid "TV - digital"
 msgstr "TV - 数字"
 
-#: modules/gui/qt/components/open_panels.cpp:917
+#: modules/gui/qt/components/open_panels.cpp:916
 msgid "Tuner card"
 msgstr "调谐卡"
 
-#: modules/gui/qt/components/open_panels.cpp:918
+#: modules/gui/qt/components/open_panels.cpp:917
 msgid "Delivery system"
 msgstr "传输系统"
 
-#: modules/gui/qt/components/open_panels.cpp:948
+#: modules/gui/qt/components/open_panels.cpp:947
 msgid "Transponder/multiplex frequency"
 msgstr "脉冲转发器/混流频率"
 
-#: modules/gui/qt/components/open_panels.cpp:958
+#: modules/gui/qt/components/open_panels.cpp:957
 msgid "Transponder symbol rate"
 msgstr "脉冲转发器符号速率"
 
-#: modules/gui/qt/components/open_panels.cpp:991
+#: modules/gui/qt/components/open_panels.cpp:990
 msgid "Bandwidth"
 msgstr "带宽"
 
-#: modules/gui/qt/components/open_panels.cpp:1035
+#: modules/gui/qt/components/open_panels.cpp:1034
 msgid "TV - analog"
 msgstr "TV - 模拟"
 
-#: modules/gui/qt/components/open_panels.cpp:1038
+#: modules/gui/qt/components/open_panels.cpp:1037
 msgid "Device name"
 msgstr "设备名称"
 
-#: modules/gui/qt/components/open_panels.cpp:1098
+#: modules/gui/qt/components/open_panels.cpp:1097
 msgid "Your display will be opened and played in order to stream or save it."
 msgstr "您计算机上显示的内容将被打开播放以进行流化处理或储存。"
 
 #. xgettext: frames per second
-#: modules/gui/qt/components/open_panels.cpp:1112
+#: modules/gui/qt/components/open_panels.cpp:1111
 msgid " f/s"
 msgstr " 帧/秒"
 
-#: modules/gui/qt/components/open_panels.cpp:1327
+#: modules/gui/qt/components/open_panels.cpp:1326
 msgid "Advanced Options"
 msgstr "高级选项"
 
@@ -19565,11 +19578,11 @@ msgstr "高级选项"
 msgid "Double click to get media information"
 msgstr "双击获取媒体信息"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:114
+#: modules/gui/qt/components/playlist/playlist.cpp:113
 msgid "Change playlistview"
 msgstr "更改播放列表视图"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:124
+#: modules/gui/qt/components/playlist/playlist.cpp:123
 msgid "Search the playlist"
 msgstr "搜索播放列表"
 
@@ -21467,12 +21480,10 @@ msgid "Set the image contrast, between 0 and 2. Defaults to 1."
 msgstr "设置图像对比度, 在 0 和 2 之间。默认为 1。"
 
 #: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
-#: modules/video_filter/adjust.c:67
 msgid "Image hue (0-360)"
 msgstr "图像色调 (0-360)"
 
 #: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
-#: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
 msgstr "设置图像色调, 在 0 和 360 之间。默认为 0。"
 
@@ -23596,15 +23607,15 @@ msgstr "SAP"
 msgid "SDP Descriptions parser"
 msgstr "SDP 描述解析器"
 
-#: modules/services_discovery/sap.c:884 modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:881 modules/services_discovery/sap.c:885
 msgid "Session"
 msgstr "会话"
 
-#: modules/services_discovery/sap.c:884
+#: modules/services_discovery/sap.c:881
 msgid "Tool"
 msgstr "工具"
 
-#: modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:885
 msgid "User"
 msgstr "用户"
 
@@ -24432,7 +24443,7 @@ msgstr ""
 msgid "Block stream cache"
 msgstr "时钟源"
 
-#: modules/stream_filter/cache_read.c:569
+#: modules/stream_filter/cache_read.c:570
 #, fuzzy
 msgid "Byte stream cache"
 msgstr "在本地显示串流"
@@ -24459,36 +24470,36 @@ msgstr "+-[串流]"
 msgid "Zlib decompression filter"
 msgstr "LZMA 解压缩"
 
-#: modules/stream_filter/prefetch.c:529
+#: modules/stream_filter/prefetch.c:531
 #, fuzzy
 msgid "Stream prefetch filter"
 msgstr "串流滤镜"
 
-#: modules/stream_filter/prefetch.c:532
+#: modules/stream_filter/prefetch.c:534
 #, fuzzy
 msgid "Buffer size"
 msgstr "RTSP 帧缓冲尺寸"
 
-#: modules/stream_filter/prefetch.c:533
+#: modules/stream_filter/prefetch.c:535
 #, fuzzy
 msgid "Prefetch buffer size (KiB)"
 msgstr "UDP 接收缓冲区大小 (字节)"
 
-#: modules/stream_filter/prefetch.c:535
+#: modules/stream_filter/prefetch.c:537
 msgid "Read size"
 msgstr "读取大小"
 
-#: modules/stream_filter/prefetch.c:536
+#: modules/stream_filter/prefetch.c:538
 #, fuzzy
 msgid "Prefetch background read size (bytes)"
 msgstr "UDP 接收缓冲区大小 (字节)"
 
-#: modules/stream_filter/prefetch.c:538
+#: modules/stream_filter/prefetch.c:540
 #, fuzzy
 msgid "Seek threshold"
 msgstr "过滤阈值"
 
-#: modules/stream_filter/prefetch.c:539
+#: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
 msgstr ""
 
@@ -25715,6 +25726,16 @@ msgstr "软件缩放"
 msgid "YUVP converter"
 msgstr "YUVP 转换器"
 
+#: modules/video_filter/adjust.c:67
+#, fuzzy
+msgid "Image hue (-180..180)"
+msgstr "图像色调 (0-360)"
+
+#: modules/video_filter/adjust.c:68
+#, fuzzy
+msgid "Set the image hue, between -180 and 180. Defaults to 0."
+msgstr "设置图像色调, 在 0 和 360 之间。默认为 0。"
+
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
 msgstr "图像属性滤镜"
@@ -26436,9 +26457,9 @@ msgid "Mirror orientation"
 msgstr "镜像趋向"
 
 #: modules/video_filter/mirror.c:65
+#, fuzzy
 msgid ""
-"Defines orientation of the mirror splitting.     Can be vertical or "
-"horizontal"
+"Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr "定义镜像切割的趋向。    可以为垂直或水平"
 
 #: modules/video_filter/mirror.c:69
@@ -26454,7 +26475,8 @@ msgid "Direction"
 msgstr "方向"
 
 #: modules/video_filter/mirror.c:72
-msgid "Direction of the mirroring"
+#, fuzzy
+msgid "Direction of the mirroring."
 msgstr "镜像方向"
 
 #: modules/video_filter/mirror.c:75
@@ -26975,11 +26997,11 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:76
 #, fuzzy
-msgid "Aspect Ratio of the source picture"
+msgid "Aspect Ratio of the source picture."
 msgstr "mosaic 图像的透明度。"
 
 #: modules/video_output/decklink.cpp:78
-msgid "Active Format Descriptor line."
+msgid "Active Format Descriptor line"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:79
@@ -26987,7 +27009,8 @@ msgid "VBI line on which to output Active Format Descriptor."
 msgstr ""
 
 #: modules/video_output/decklink.cpp:81
-msgid "Picture to display on input signal loss."
+#, fuzzy
+msgid "Picture to display on input signal loss"
 msgstr "输入信号缺失时要显示的画面。"
 
 #: modules/video_output/decklink.cpp:84
@@ -27036,7 +27059,8 @@ msgid "DecklinkOutput"
 msgstr "Decklink输出"
 
 #: modules/video_output/decklink.cpp:235
-msgid "output module to write to Blackmagic SDI card"
+#, fuzzy
+msgid "Output module to write to Blackmagic SDI card"
 msgstr "写入 Blackmagic SDI 卡的输出模块"
 
 #: modules/video_output/decklink.cpp:236
@@ -28008,7 +28032,8 @@ msgid "Show 80 bands instead of 20"
 msgstr "显示 80 带替代 20"
 
 #: modules/visualization/visual/visual.c:72
-msgid "More bands for the spectrometer : 80 if enabled else 20."
+#, fuzzy
+msgid "More bands for the spectrometer: 80 if enabled, else 20."
 msgstr "频谱仪显示更多波段：如启用则为 80，否则为 20。"
 
 #: modules/visualization/visual/visual.c:74

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-06 02:55+0100\n"
+"POT-Creation-Date: 2017-12-11 00:15+0100\n"
 "PO-Revision-Date: 2015-12-04 10:01+0000\n"
 "Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
 "Language-Team: Asturian (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -363,7 +363,7 @@ msgstr "Implementación de VLC de videu so demanda (Video On Demand)"
 #: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
-#: modules/gui/qt/components/playlist/playlist.cpp:166
+#: modules/gui/qt/components/playlist/playlist.cpp:165
 #: modules/gui/qt/components/playlist/selector.cpp:227
 #: modules/gui/qt/dialogs/playlist.cpp:39 modules/gui/qt/menus.cpp:1117
 msgid "Playlist"
@@ -635,7 +635,7 @@ msgstr "Algamóse'l númberu máximu de filtros (%o)."
 
 #: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
-#: modules/gui/macosx/VLCMainWindow.m:999 modules/video_filter/postproc.c:235
+#: modules/gui/macosx/VLCMainWindow.m:1006 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "Desactivar"
 
@@ -730,7 +730,7 @@ msgstr "Auriculares"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:971
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
 msgid "Automatic"
 msgstr "Automática"
 
@@ -944,7 +944,7 @@ msgid "VLC could not open the decoder module."
 msgstr "VLC nun pudo abrir el módulu decodificador."
 
 #: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
-#: modules/gui/qt/components/open_panels.cpp:544
+#: modules/gui/qt/components/open_panels.cpp:543
 msgid "Track"
 msgstr "Pista"
 
@@ -1293,8 +1293,8 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
-#: modules/gui/qt/components/open_panels.cpp:504
-#: modules/gui/qt/components/open_panels.cpp:518
+#: modules/gui/qt/components/open_panels.cpp:503
+#: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
@@ -1788,7 +1788,7 @@ msgstr ""
 "ameyorar la to esperiencia, especialmente cuando se combina col entemecedor "
 "de canal d'auriculares."
 
-#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:873
+#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
 #: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:65
@@ -1881,7 +1881,7 @@ msgstr ""
 "Permite reproducir audio a menor o mayor velocidá ensin afeutar al tonu"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1125
-#: modules/access/dshow/dshow.cpp:2081 modules/access/dtv/access.c:107
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
@@ -2579,7 +2579,7 @@ msgstr ""
 #: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
-#: modules/access/dshow/dshow.cpp:2079 modules/audio_output/alsa.c:767
+#: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
@@ -2596,7 +2596,7 @@ msgstr "Predetermináu"
 
 #: src/libvlc-module.c:544
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
-#: modules/gui/macosx/VLCMainWindow.m:997
+#: modules/gui/macosx/VLCMainWindow.m:1004
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
@@ -5279,7 +5279,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Fallu al abrir «%s» pa escribir"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2681
+#: modules/demux/avi/avi.c:2702
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:479
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:533
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:788
@@ -5304,7 +5304,7 @@ msgstr "Fallu al abrir «%s» pa escribir"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
 #: modules/gui/macosx/prefs.m:189
-#: modules/gui/qt/components/open_panels.cpp:1361
+#: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
@@ -6154,12 +6154,12 @@ msgstr "Captura de videu"
 msgid "AVFoundation video capture module."
 msgstr "Módulu de salida d'audio"
 
-#: modules/access/avcapture.m:280 modules/access/avcapture.m:309
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 #, fuzzy
 msgid "No video devices found"
 msgstr "Nun hai preséu d'entrada"
 
-#: modules/access/avcapture.m:281
+#: modules/access/avcapture.m:287
 #, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
@@ -6168,7 +6168,7 @@ msgstr ""
 "El to Mac nun paez tar forníu con un preséu d'entrada afayadizu. Comprueba "
 "los tos conectores y controladores."
 
-#: modules/access/avcapture.m:310
+#: modules/access/avcapture.m:316
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
@@ -6281,16 +6281,16 @@ msgstr ""
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
 
-#: modules/access/bluray.c:845 modules/access/bluray.c:2300
-#: modules/access/bluray.c:2305
+#: modules/access/bluray.c:845 modules/access/bluray.c:2279
+#: modules/access/bluray.c:2284
 msgid "Blu-ray error"
 msgstr "Fallu de Blu-ray"
 
-#: modules/access/bluray.c:1680
+#: modules/access/bluray.c:1667
 msgid "Top Menu"
 msgstr "Menú superior"
 
-#: modules/access/bluray.c:1683
+#: modules/access/bluray.c:1670
 msgid "First Play"
 msgstr "Reproducir primero"
 
@@ -6522,7 +6522,7 @@ msgid "DSS"
 msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:130
-#: modules/gui/qt/components/open_panels.cpp:818
+#: modules/gui/qt/components/open_panels.cpp:817
 msgid "Video device name"
 msgstr "Nome del preséu de videu"
 
@@ -6535,8 +6535,8 @@ msgstr ""
 "especifiques res, va usase'l preséu predetermináu."
 
 #: modules/access/dshow/dshow.cpp:135
-#: modules/gui/qt/components/open_panels.cpp:826
-#: modules/gui/qt/components/open_panels.cpp:1047
+#: modules/gui/qt/components/open_panels.cpp:825
+#: modules/gui/qt/components/open_panels.cpp:1046
 msgid "Audio device name"
 msgstr "Nome del preséu d'audio"
 
@@ -6550,7 +6550,7 @@ msgstr ""
 "especifiques res, va usase'l preséu predetermináu."
 
 #: modules/access/dshow/dshow.cpp:140
-#: modules/gui/qt/components/open_panels.cpp:793
+#: modules/gui/qt/components/open_panels.cpp:792
 msgid "Video size"
 msgstr "Tamañu del videu"
 
@@ -6633,8 +6633,8 @@ msgid "This overrides the channel. Measured in Hz."
 msgstr "Esto sobreescribe la canal. Midíu en Hz."
 
 #: modules/access/dshow/dshow.cpp:168
-#: modules/gui/qt/components/open_panels.cpp:846
-#: modules/gui/qt/components/open_panels.cpp:1067
+#: modules/gui/qt/components/open_panels.cpp:845
+#: modules/gui/qt/components/open_panels.cpp:1066
 msgid "Video standard"
 msgstr "Videu estandar"
 
@@ -6747,7 +6747,7 @@ msgid "DirectShow input"
 msgstr "Entrada de DirectShow"
 
 #: modules/access/dshow/dshow.cpp:516 modules/access/dshow/dshow.cpp:590
-#: modules/access/dshow/dshow.cpp:1052 modules/access/dshow/dshow.cpp:1123
+#: modules/access/dshow/dshow.cpp:1054 modules/access/dshow/dshow.cpp:1125
 msgid "Capture failed"
 msgstr "Captura fallida"
 
@@ -6759,13 +6759,13 @@ msgstr "Nun hai nengún preséu de videu o audio escoyíu."
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:1053
+#: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
 msgstr ""
 "Nun pue usase'l preséu qu'esbillesti porque la so triba nun ta sofitada."
 
-#: modules/access/dshow/dshow.cpp:1124
+#: modules/access/dshow/dshow.cpp:1126
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "El preséu de captura «%s» nun soporta los parámetros requeríos."
@@ -6846,7 +6846,7 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:967
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulación / Contelación"
 
@@ -7312,13 +7312,13 @@ msgstr "Entrada DVDnav"
 msgid "DVDnav demuxer"
 msgstr ""
 
-#: modules/access/dvdnav.c:296 modules/access/dvdread.c:197
-#: modules/access/dvdread.c:212 modules/access/dvdread.c:476
-#: modules/access/dvdread.c:544
+#: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
+#: modules/access/dvdread.c:216 modules/access/dvdread.c:471
+#: modules/access/dvdread.c:539
 msgid "Playback failure"
 msgstr "Fallu de reproducción"
 
-#: modules/access/dvdnav.c:297
+#: modules/access/dvdnav.c:295
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
@@ -7333,21 +7333,21 @@ msgstr "DVD ensin menús"
 msgid "DVDRead Input (no menu support)"
 msgstr "Entrada DVBRead (ensin soporte de menús)"
 
-#: modules/access/dvdread.c:198
+#: modules/access/dvdread.c:202
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead nun pudo abrir el discu «%s»"
 
-#: modules/access/dvdread.c:213
+#: modules/access/dvdread.c:217
 msgid "Cannot play a non-UDF mastered DVD."
 msgstr ""
 
-#: modules/access/dvdread.c:477
+#: modules/access/dvdread.c:472
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVDRead nun pudo lleer bloque %d."
 
-#: modules/access/dvdread.c:545
+#: modules/access/dvdread.c:540
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead nun pudo lleer %d%d bloques en 0x%02x."
@@ -7450,7 +7450,7 @@ msgstr "Entrada FTP"
 msgid "FTP upload output"
 msgstr "Salida de xubida FTP"
 
-#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
+#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:541
 msgid "Network interaction failed"
 msgstr "Falló interaición de rede"
 
@@ -7462,7 +7462,7 @@ msgstr "VLC nun pudo coneutar col sirvidor proporcionáu."
 msgid "VLC's connection to the given server was rejected."
 msgstr "La conexón de VLC al sirvidor proporcionáu refugóse."
 
-#: modules/access/ftp.c:538
+#: modules/access/ftp.c:542
 msgid "Your account was rejected."
 msgstr "La to cuenta refugóse."
 
@@ -7730,7 +7730,7 @@ msgstr "Ritmu"
 msgid "Read the audio stream at VLC pace rather than Jack pace."
 msgstr "Lleer la emisión d'audio a ritmu de VLC en cuenta de ritmu Jack."
 
-#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:898
+#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:897
 msgid "Auto connection"
 msgstr "Autoconexón"
 
@@ -7906,19 +7906,19 @@ msgstr "Puertu túnel HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Puertu a usar pa túnel RTSP/RTP sobre HTTP."
 
-#: modules/access/live555.cpp:661
+#: modules/access/live555.cpp:668
 msgid "RTSP authentication"
 msgstr "Autenticación RTSP"
 
-#: modules/access/live555.cpp:662
+#: modules/access/live555.cpp:669
 msgid "Please enter a valid login name and a password."
 msgstr "Introduz un nome de conexón y una contraseña válidu."
 
-#: modules/access/live555.cpp:687
+#: modules/access/live555.cpp:694
 msgid "RTSP connection failed"
 msgstr ""
 
-#: modules/access/live555.cpp:688
+#: modules/access/live555.cpp:695
 msgid "Access to the stream is denied by the server configuration."
 msgstr ""
 
@@ -8176,11 +8176,11 @@ msgstr "RTP"
 msgid "Real-Time Protocol (RTP) input"
 msgstr "Entrada del protocolu en tiempu real (RTP)"
 
-#: modules/access/rtp/rtp.c:751
+#: modules/access/rtp/rtp.c:770
 msgid "SDP required"
 msgstr "SDP requeríu"
 
-#: modules/access/rtp/rtp.c:752
+#: modules/access/rtp/rtp.c:771
 #, c-format
 msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
@@ -8236,7 +8236,7 @@ msgid "SAT>IP Receiver Plugin"
 msgstr ""
 
 #: modules/access/screen/screen.c:45
-#: modules/gui/qt/components/open_panels.cpp:1104
+#: modules/gui/qt/components/open_panels.cpp:1103
 msgid "Desired frame rate for the capture."
 msgstr "Tasa de fotogrames deseyada pa la captura."
 
@@ -8374,11 +8374,11 @@ msgstr "Númberu de puertu SFTP a usar nel sirvidor"
 msgid "SFTP input"
 msgstr "Entrada SFTP"
 
-#: modules/access/sftp.c:394
+#: modules/access/sftp.c:400
 msgid "SFTP authentication"
 msgstr "Autenticación SFTP"
 
-#: modules/access/sftp.c:395
+#: modules/access/sftp.c:401
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr ""
@@ -8556,7 +8556,7 @@ msgid "VBI capture device"
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:48
-msgid "The device node where VBI data can be read  (for closed captions)."
+msgid "The device node where VBI data can be read (for closed captions)."
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
@@ -8568,11 +8568,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "Estándar de videu"
 
 #: modules/access/v4l2/v4l2.c:55
+#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
-"I420 or I422 for raw images, MJPG for M-JPEG compressed input) (Complete "
+"I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
-"I420, I411, I410, MJPG)"
+"I420, I411, I410, MJPG"
 msgstr ""
 "Forciar al preséu de videu Video4Linux2 a usar un formatu cromáticu "
 "específicu (p. ex. I420 ó I422 pa imaxes en brutu, MJPG pa M-JPEG entrada "
@@ -8609,12 +8610,13 @@ msgstr "Preséu de radio"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1074
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Frecuencia"
 
 #: modules/access/v4l2/v4l2.c:77
-msgid "Tuner frequency in Hz or kHz (see debug output)"
+#, fuzzy
+msgid "Tuner frequency in Hz or kHz (see debug output)."
 msgstr "Frecuencia del sintonizador en Hz ó kHz (ver salida de debug)"
 
 #: modules/access/v4l2/v4l2.c:78
@@ -10525,7 +10527,8 @@ msgid "Output file"
 msgstr "Ficheru de salida"
 
 #: modules/audio_output/file.c:109
-msgid "File to which the audio samples will be written to. (\"-\" for stdout"
+#, fuzzy
+msgid "File to which the audio samples will be written to (\"-\" for stdout)."
 msgstr "Ficheru al que se van escribir les amueses d'audio. («-» pa stdout"
 
 #: modules/audio_output/file.c:112
@@ -10588,17 +10591,17 @@ msgstr ""
 msgid "K Audio Interface audio output"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1269
+#: modules/audio_output/mmdevice.c:1274
 #, fuzzy
 msgid "Windows Multimedia Device output"
 msgstr "Salida de videu Windows GDI"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Output back-end"
 msgstr "Preséu de salida"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Audio output back-end interface."
 msgstr "Interfaz de salida multiemisión"
@@ -10627,7 +10630,7 @@ msgstr ""
 msgid "This linear gain will be applied in software."
 msgstr ""
 
-#: modules/audio_output/wasapi.c:640
+#: modules/audio_output/wasapi.c:645
 msgid "Windows Audio Session API output"
 msgstr ""
 
@@ -10716,7 +10719,7 @@ msgstr "Fontes de soníu"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 #, fuzzy
-msgid "SoundFont file to use wor software synthesis."
+msgid "SoundFont file to use for software synthesis."
 msgstr "Requierse un ficheru de fontes de soníu pa síntesis por software."
 
 #: modules/codec/audiotoolbox_midi.c:57
@@ -10752,8 +10755,8 @@ msgstr "Coordenada X del subtítulu xeneráu"
 msgid "ARIB subtitles decoder"
 msgstr "Decodificador de subtítulos DVB"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1091
-#: modules/demux/mpeg/ts_psi.c:1098
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1084
+#: modules/demux/mpeg/ts_psi.c:1091
 #, fuzzy
 msgid "ARIB subtitles"
 msgstr "Subtítulos DVB"
@@ -11421,8 +11424,8 @@ msgstr "Coordenada Y de'l subtítulu codificáu"
 msgid "DVB subtitles decoder"
 msgstr "Decodificador de subtítulos DVB"
 
-#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:775
-#: modules/demux/mpeg/ts_psi.c:824
+#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:771
+#: modules/demux/mpeg/ts_psi.c:820
 msgid "DVB subtitles"
 msgstr "Subtítulos DVB"
 
@@ -11447,7 +11450,7 @@ msgid "Encoder Profile"
 msgstr ""
 
 #: modules/codec/fdkaac.c:68
-msgid "Encoder Algorithm to use"
+msgid "Encoder Algorithm to use."
 msgstr ""
 
 #: modules/codec/fdkaac.c:70
@@ -11455,7 +11458,7 @@ msgid "Enable spectral band replication"
 msgstr ""
 
 #: modules/codec/fdkaac.c:71
-msgid "This is an optional feature only for the AAC-ELD profile"
+msgid "This is an optional feature only for the AAC-ELD profile."
 msgstr ""
 
 #: modules/codec/fdkaac.c:73
@@ -11463,7 +11466,8 @@ msgid "VBR Quality"
 msgstr ""
 
 #: modules/codec/fdkaac.c:74
-msgid "Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best"
+msgid ""
+"Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr ""
 
 #: modules/codec/fdkaac.c:76
@@ -11473,7 +11477,7 @@ msgstr ""
 #: modules/codec/fdkaac.c:77
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
-"CPU usage (default is enabled)"
+"CPU usage (default is enabled)."
 msgstr ""
 
 #: modules/codec/fdkaac.c:79
@@ -11483,7 +11487,7 @@ msgstr ""
 #: modules/codec/fdkaac.c:80
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
-"hierarchical"
+"hierarchical."
 msgstr ""
 
 #: modules/codec/fdkaac.c:97
@@ -12009,7 +12013,7 @@ msgstr ""
 #: modules/codec/qsv.c:81
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
-"unspecified. Note: If GopRefDist = 1, there are no B- frames used."
+"unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
 
 #: modules/codec/qsv.c:85
@@ -12019,7 +12023,7 @@ msgstr ""
 #: modules/codec/qsv.c:86
 msgid ""
 "The target usage allow to choose between different trade-offs between "
-"quality and speed. Allowed values are : 'speed', 'balanced' and 'quality'."
+"quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
 
 #: modules/codec/qsv.c:90
@@ -12028,8 +12032,8 @@ msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
-"For H.264, IdrInterval specifies IDR-frame interval in terms of I- frames; "
-"if IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
+"For H.264, IdrInterval specifies IDR-frame interval in terms of I-frames; if "
+"IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
 "every other I-frame is an IDR-frame, etc. For MPEG2, IdrInterval defines "
 "sequence header interval in terms of I-frames. If IdrInterval=N, SDK inserts "
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
@@ -12043,7 +12047,7 @@ msgstr ""
 #: modules/codec/qsv.c:102
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
-"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2"
+"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
 
 #: modules/codec/qsv.c:105
@@ -12053,7 +12057,7 @@ msgstr ""
 #: modules/codec/qsv.c:106
 msgid ""
 "Quantization parameter for all types of frames. This parameters sets qpi, "
-"qpp and qpp. It has less precedence than the forementionned parameters. Used "
+"qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
 
@@ -12093,7 +12097,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
-"Defines the maximum bitrate in Kpbs (1000 bits/s) for VBR rate control "
+"Defines the maximum bitrate in kbps (1000 bits/s) for VBR rate control "
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
@@ -12105,8 +12109,8 @@ msgstr ""
 #: modules/codec/qsv.c:128
 msgid ""
 "Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
-"g. 10 with a bitrate of 800  kpbs means the encoder tries not to  go above "
-"880 kpbs and under  730 kpbs. The targeted accuracy is only reached after a "
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
 
@@ -12142,8 +12146,8 @@ msgstr ""
 #: modules/codec/qsv.c:149
 msgid ""
 "Defines the number of parallel encoding operations before we synchronise the "
-"result. Higher  may result on better throughput depending on hardware. MPEG2 "
-"needs at least 1 here."
+"result. Higher numbers may result on better throughput depending on "
+"hardware. MPEG2 needs at least 1 here."
 msgstr ""
 
 #: modules/codec/qsv.c:193
@@ -14170,7 +14174,7 @@ msgstr "Interfaz de control D-Bus"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1269
+#: modules/gui/macosx/VLCMainWindow.m:1276
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1234
 #: modules/gui/qt/main_interface.cpp:1238
@@ -15018,7 +15022,7 @@ msgstr "Demuxer AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "Demuxor ASF/WMV"
 
-#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:832
+#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
 msgstr "Nun pudo demuxase la emisión ASF"
 
@@ -15103,7 +15107,7 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr "Demuxor AVI"
 
-#: modules/demux/avi/avi.c:798 modules/demux/mp4/mp4.c:1669
+#: modules/demux/avi/avi.c:820 modules/demux/mp4/mp4.c:1673
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15113,27 +15117,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:806
+#: modules/demux/avi/avi.c:828
 msgid "Do not play"
 msgstr "Nun reproducir"
 
-#: modules/demux/avi/avi.c:807
+#: modules/demux/avi/avi.c:829
 msgid "Build index then play"
 msgstr "Construyir índiz depués reproducir"
 
-#: modules/demux/avi/avi.c:808
+#: modules/demux/avi/avi.c:830
 msgid "Play as is"
 msgstr "Reproducir como"
 
-#: modules/demux/avi/avi.c:809 modules/demux/mp4/mp4.c:1680
+#: modules/demux/avi/avi.c:831 modules/demux/mp4/mp4.c:1684
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2682
+#: modules/demux/avi/avi.c:2703
 msgid "Broken or missing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2683
+#: modules/demux/avi/avi.c:2704
 msgid "Fixing AVI Index..."
 msgstr "Reparar Index AVI..."
 
@@ -15565,29 +15569,29 @@ msgstr ""
 msgid "Clean"
 msgstr "Llimpiar"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:49
 #, fuzzy
 msgid "M4A audio only"
 msgstr "Retrasu d'audio"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
 msgstr "Demuxor MP4 d'emisión"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1677
+#: modules/demux/mp4/mp4.c:1681
 #, fuzzy
 msgid "Do not seek"
 msgstr "Nun reproducir"
 
-#: modules/demux/mp4/mp4.c:1678
+#: modules/demux/mp4/mp4.c:1682
 #, fuzzy
 msgid "Build index"
 msgstr "Construyir índiz depués reproducir"
@@ -15755,60 +15759,60 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "Demuxor d'emisión de tresporte MPEG"
 
-#: modules/demux/mpeg/ts_psi.c:423
+#: modules/demux/mpeg/ts_psi.c:421
 #, fuzzy
 msgid "Main audio"
 msgstr "Silenciar audio."
 
-#: modules/demux/mpeg/ts_psi.c:424
+#: modules/demux/mpeg/ts_psi.c:422
 #, fuzzy
 msgid "Audio description for the visually impaired"
 msgstr "Nun hai descripción pa esti códec"
 
-#: modules/demux/mpeg/ts_psi.c:425
+#: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
 msgid "Clean audio for the hearing impaired"
 msgstr "Subtítulos teletestu: persones con problemes auditivos"
 
-#: modules/demux/mpeg/ts_psi.c:426
+#: modules/demux/mpeg/ts_psi.c:424
 #, fuzzy
 msgid "Spoken subtitles for the visually impaired"
 msgstr "Subtítulos DVB: persones con problemes auditivos"
 
-#: modules/demux/mpeg/ts_psi.c:608 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:606 modules/gui/macosx/VLCMainMenu.m:455
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "Teletestu"
 
-#: modules/demux/mpeg/ts_psi.c:609
+#: modules/demux/mpeg/ts_psi.c:607
 msgid "Teletext subtitles"
 msgstr "Subtítulos de teletestu"
 
-#: modules/demux/mpeg/ts_psi.c:610
+#: modules/demux/mpeg/ts_psi.c:608
 msgid "Teletext: additional information"
 msgstr "Teletestu: información adicional"
 
-#: modules/demux/mpeg/ts_psi.c:611
+#: modules/demux/mpeg/ts_psi.c:609
 msgid "Teletext: program schedule"
 msgstr "Teletestu: axenda de programes"
 
-#: modules/demux/mpeg/ts_psi.c:612
+#: modules/demux/mpeg/ts_psi.c:610
 msgid "Teletext subtitles: hearing impaired"
 msgstr "Subtítulos teletestu: persones con problemes auditivos"
 
-#: modules/demux/mpeg/ts_psi.c:831
+#: modules/demux/mpeg/ts_psi.c:827
 msgid "DVB subtitles: hearing impaired"
 msgstr "Subtítulos DVB: persones con problemes auditivos"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1328
 msgid "clean effects"
 msgstr "llimpiar efeutos"
 
-#: modules/demux/mpeg/ts_psi.c:1336
+#: modules/demux/mpeg/ts_psi.c:1329
 msgid "hearing impaired"
 msgstr "incapacidá auditiva"
 
-#: modules/demux/mpeg/ts_psi.c:1337
+#: modules/demux/mpeg/ts_psi.c:1330
 msgid "visual impaired commentary"
 msgstr "comentariu incapacidá visual"
 
@@ -16071,7 +16075,7 @@ msgstr "Demuxor real"
 msgid "C64 sid demuxer"
 msgstr "Demuxor de videu C64"
 
-#: modules/demux/smf.c:728
+#: modules/demux/smf.c:727
 msgid "SMF demuxer"
 msgstr "Demuxor SMF"
 
@@ -16516,7 +16520,7 @@ msgstr "Hora"
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:359
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
-#: modules/gui/qt/components/open_panels.cpp:1360
+#: modules/gui/qt/components/open_panels.cpp:1359
 msgid "OK"
 msgstr "Aceutar"
 
@@ -19685,68 +19689,68 @@ msgstr "Filtru:"
 msgid "Eject the disc"
 msgstr "Espulsar el discu"
 
-#: modules/gui/qt/components/open_panels.cpp:531
+#: modules/gui/qt/components/open_panels.cpp:530
 msgid "Entry"
 msgstr "Accesu"
 
-#: modules/gui/qt/components/open_panels.cpp:873
+#: modules/gui/qt/components/open_panels.cpp:872
 msgid "Channels:"
 msgstr "Canales:"
 
-#: modules/gui/qt/components/open_panels.cpp:884
+#: modules/gui/qt/components/open_panels.cpp:883
 msgid "Selected ports:"
 msgstr "Puertos escoyíos:"
 
-#: modules/gui/qt/components/open_panels.cpp:887
+#: modules/gui/qt/components/open_panels.cpp:886
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt/components/open_panels.cpp:894
+#: modules/gui/qt/components/open_panels.cpp:893
 msgid "Use VLC pace"
 msgstr "Usar ritmu VLC"
 
-#: modules/gui/qt/components/open_panels.cpp:914
+#: modules/gui/qt/components/open_panels.cpp:913
 msgid "TV - digital"
 msgstr "TV - dixital"
 
-#: modules/gui/qt/components/open_panels.cpp:917
+#: modules/gui/qt/components/open_panels.cpp:916
 msgid "Tuner card"
 msgstr "Tarxeta sintonizador"
 
-#: modules/gui/qt/components/open_panels.cpp:918
+#: modules/gui/qt/components/open_panels.cpp:917
 msgid "Delivery system"
 msgstr ""
 
-#: modules/gui/qt/components/open_panels.cpp:948
+#: modules/gui/qt/components/open_panels.cpp:947
 msgid "Transponder/multiplex frequency"
 msgstr "Frecuencia de trespondedor/multiplex"
 
-#: modules/gui/qt/components/open_panels.cpp:958
+#: modules/gui/qt/components/open_panels.cpp:957
 msgid "Transponder symbol rate"
 msgstr "Tasa símbolu de trespondedor"
 
-#: modules/gui/qt/components/open_panels.cpp:991
+#: modules/gui/qt/components/open_panels.cpp:990
 msgid "Bandwidth"
 msgstr "Anchu de banda"
 
-#: modules/gui/qt/components/open_panels.cpp:1035
+#: modules/gui/qt/components/open_panels.cpp:1034
 msgid "TV - analog"
 msgstr ""
 
-#: modules/gui/qt/components/open_panels.cpp:1038
+#: modules/gui/qt/components/open_panels.cpp:1037
 msgid "Device name"
 msgstr "Nome de preséu"
 
-#: modules/gui/qt/components/open_panels.cpp:1098
+#: modules/gui/qt/components/open_panels.cpp:1097
 msgid "Your display will be opened and played in order to stream or save it."
 msgstr "La to pantalla va abrise y reproducise pa emitila o guardala."
 
 #. xgettext: frames per second
-#: modules/gui/qt/components/open_panels.cpp:1112
+#: modules/gui/qt/components/open_panels.cpp:1111
 msgid " f/s"
 msgstr "f/s"
 
-#: modules/gui/qt/components/open_panels.cpp:1327
+#: modules/gui/qt/components/open_panels.cpp:1326
 msgid "Advanced Options"
 msgstr "Opciones avanzaes"
 
@@ -19754,11 +19758,11 @@ msgstr "Opciones avanzaes"
 msgid "Double click to get media information"
 msgstr "Doble clic pa llograr información multimedia"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:114
+#: modules/gui/qt/components/playlist/playlist.cpp:113
 msgid "Change playlistview"
 msgstr "Camudar vista"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:124
+#: modules/gui/qt/components/playlist/playlist.cpp:123
 msgid "Search the playlist"
 msgstr "Guetar en llista de reproducción"
 
@@ -21654,12 +21658,10 @@ msgid "Set the image contrast, between 0 and 2. Defaults to 1."
 msgstr "Afitar el contraste d'imaxe, ente 0 y 2. Predetermináu a 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
-#: modules/video_filter/adjust.c:67
 msgid "Image hue (0-360)"
 msgstr "Color d'imaxe (0-360)"
 
 #: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
-#: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
 msgstr "Afitar el color d'imaxe, ente 0 y 360. Predetermináu a 0."
 
@@ -23779,15 +23781,15 @@ msgstr "SAP"
 msgid "SDP Descriptions parser"
 msgstr "Analizador de descripciones SDP"
 
-#: modules/services_discovery/sap.c:884 modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:881 modules/services_discovery/sap.c:885
 msgid "Session"
 msgstr "Sesión"
 
-#: modules/services_discovery/sap.c:884
+#: modules/services_discovery/sap.c:881
 msgid "Tool"
 msgstr "Ferramienta"
 
-#: modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:885
 msgid "User"
 msgstr "Usuariu"
 
@@ -24644,7 +24646,7 @@ msgstr ""
 msgid "Block stream cache"
 msgstr "Fonte del reló"
 
-#: modules/stream_filter/cache_read.c:569
+#: modules/stream_filter/cache_read.c:570
 #, fuzzy
 msgid "Byte stream cache"
 msgstr "Amosar la emisión llocalmente"
@@ -24671,34 +24673,34 @@ msgstr "+-[Emisión]"
 msgid "Zlib decompression filter"
 msgstr "Filtru post-procesu de videu"
 
-#: modules/stream_filter/prefetch.c:529
+#: modules/stream_filter/prefetch.c:531
 #, fuzzy
 msgid "Stream prefetch filter"
 msgstr "Filtros d'emisión"
 
-#: modules/stream_filter/prefetch.c:532
+#: modules/stream_filter/prefetch.c:534
 #, fuzzy
 msgid "Buffer size"
 msgstr "Ficheru framebuffer"
 
-#: modules/stream_filter/prefetch.c:533
+#: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:535
+#: modules/stream_filter/prefetch.c:537
 msgid "Read size"
 msgstr "Tamañu de llectura"
 
-#: modules/stream_filter/prefetch.c:536
+#: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:538
+#: modules/stream_filter/prefetch.c:540
 #, fuzzy
 msgid "Seek threshold"
 msgstr "Umbral de filtru"
 
-#: modules/stream_filter/prefetch.c:539
+#: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
 msgstr ""
 
@@ -25961,6 +25963,16 @@ msgstr ""
 msgid "YUVP converter"
 msgstr "Conversor YUVP"
 
+#: modules/video_filter/adjust.c:67
+#, fuzzy
+msgid "Image hue (-180..180)"
+msgstr "Color d'imaxe (0-360)"
+
+#: modules/video_filter/adjust.c:68
+#, fuzzy
+msgid "Set the image hue, between -180 and 180. Defaults to 0."
+msgstr "Afitar el color d'imaxe, ente 0 y 360. Predetermináu a 0."
+
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
 msgstr "Filtru de propiedaes d'imaxe"
@@ -26688,9 +26700,9 @@ msgid "Mirror orientation"
 msgstr "Espeyar orientación"
 
 #: modules/video_filter/mirror.c:65
+#, fuzzy
 msgid ""
-"Defines orientation of the mirror splitting.     Can be vertical or "
-"horizontal"
+"Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
 "Define la orientación de la división espeyu. Pue ser vertical o horizontal"
 
@@ -26707,7 +26719,8 @@ msgid "Direction"
 msgstr "Direición"
 
 #: modules/video_filter/mirror.c:72
-msgid "Direction of the mirroring"
+#, fuzzy
+msgid "Direction of the mirroring."
 msgstr "Direición del espeyu"
 
 #: modules/video_filter/mirror.c:75
@@ -27229,11 +27242,11 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:76
 #, fuzzy
-msgid "Aspect Ratio of the source picture"
+msgid "Aspect Ratio of the source picture."
 msgstr "Tresparencia de la imaxe mosaicu."
 
 #: modules/video_output/decklink.cpp:78
-msgid "Active Format Descriptor line."
+msgid "Active Format Descriptor line"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:79
@@ -27241,7 +27254,7 @@ msgid "VBI line on which to output Active Format Descriptor."
 msgstr ""
 
 #: modules/video_output/decklink.cpp:81
-msgid "Picture to display on input signal loss."
+msgid "Picture to display on input signal loss"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:84
@@ -27290,7 +27303,7 @@ msgid "DecklinkOutput"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:235
-msgid "output module to write to Blackmagic SDI card"
+msgid "Output module to write to Blackmagic SDI card"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:236
@@ -28290,7 +28303,8 @@ msgid "Show 80 bands instead of 20"
 msgstr "Amosar 80 bandes en llugar de 20"
 
 #: modules/visualization/visual/visual.c:72
-msgid "More bands for the spectrometer : 80 if enabled else 20."
+#, fuzzy
+msgid "More bands for the spectrometer: 80 if enabled, else 20."
 msgstr "Más bandes pal espectrómetru : 80 si ta habilitáu sinón 20."
 
 #: modules/visualization/visual/visual.c:74

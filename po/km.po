@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-06 02:55+0100\n"
+"POT-Creation-Date: 2017-12-11 00:15+0100\n"
 "PO-Revision-Date: 2014-09-03 10:44+0000\n"
 "Last-Translator: Sok Sophea <sksophea@gmail.com>\n"
 "Language-Team: Khmer (http://www.transifex.com/projects/p/vlc-trans/language/"
@@ -358,7 +358,7 @@ msgstr "ការ​ប្រតិបត្តិ​​វីដេអូ​ន
 #: modules/gui/macosx/VLCMainWindow.m:296
 #: modules/gui/macosx/VLCMainWindow.m:863
 #: modules/gui/qt/components/controller.hpp:109
-#: modules/gui/qt/components/playlist/playlist.cpp:166
+#: modules/gui/qt/components/playlist/playlist.cpp:165
 #: modules/gui/qt/components/playlist/selector.cpp:227
 #: modules/gui/qt/dialogs/playlist.cpp:39 modules/gui/qt/menus.cpp:1117
 msgid "Playlist"
@@ -623,7 +623,7 @@ msgstr "បាន​ដល់​​ចំនួន​តម្រង​​អត
 
 #: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
-#: modules/gui/macosx/VLCMainWindow.m:999 modules/video_filter/postproc.c:235
+#: modules/gui/macosx/VLCMainWindow.m:1006 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "បិទ"
 
@@ -718,7 +718,7 @@ msgstr "កាស"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:971
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
 msgid "Automatic"
 msgstr "ស្វ័យប្រវត្តិ"
 
@@ -928,7 +928,7 @@ msgid "VLC could not open the decoder module."
 msgstr "VLC មិន​អាច​បើក​ម៉ូឌុល​ឌិកូឌ័រ​បានទេ ។"
 
 #: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
-#: modules/gui/qt/components/open_panels.cpp:544
+#: modules/gui/qt/components/open_panels.cpp:543
 msgid "Track"
 msgstr "បទ"
 
@@ -1284,8 +1284,8 @@ msgstr "VLC មិន​អាច​បើក MRL '%s' បាន​ទេ ។ �
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
-#: modules/gui/qt/components/open_panels.cpp:504
-#: modules/gui/qt/components/open_panels.cpp:518
+#: modules/gui/qt/components/open_panels.cpp:503
+#: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
 #: modules/gui/qt/ui/open_disk.h:309
 msgid "Title"
@@ -1768,7 +1768,7 @@ msgstr ""
 "បង្កើន​បាន​ជា​បទពិសោធន៍​របស់​អ្នក​ដែរ ជា​ពិសេស​នៅ​ពេល​ដែល​បាន​បន្សំ​ជាមួយ​នឹង​កម្មវិធី​លាយ​ឆានែល​កាស​ពាក់​"
 "ត្រចៀក ។"
 
-#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:873
+#: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
 #: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:65
@@ -1855,7 +1855,7 @@ msgid ""
 msgstr "វា​អនុញ្ញាត​ឲ្យ​ចាក់​អូឌីយ៉ូ​ល្បឿន​លឿន ឬ​យឺត​ដោយ​មិន​ប៉ះពាល់​ជម្រេ​អូឌីយ៉ូ​ឡើយ"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1125
-#: modules/access/dshow/dshow.cpp:2081 modules/access/dtv/access.c:107
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
@@ -2517,7 +2517,7 @@ msgstr ""
 #: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
-#: modules/access/dshow/dshow.cpp:2079 modules/audio_output/alsa.c:767
+#: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
@@ -2534,7 +2534,7 @@ msgstr "លំនាំដើម"
 
 #: src/libvlc-module.c:544
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
-#: modules/gui/macosx/VLCMainWindow.m:997
+#: modules/gui/macosx/VLCMainWindow.m:1004
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
@@ -5170,7 +5170,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "បាន​បរាជ័យ​ក្នុង​កា​របើក \"%s\" ដើម្បី​សរសេរ"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2681
+#: modules/demux/avi/avi.c:2702
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:479
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:533
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:788
@@ -5195,7 +5195,7 @@ msgstr "បាន​បរាជ័យ​ក្នុង​កា​របើក
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
 #: modules/gui/macosx/prefs.m:189
-#: modules/gui/qt/components/open_panels.cpp:1361
+#: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
@@ -6044,12 +6044,12 @@ msgstr "ការ​ចាប់​យក​វីដេអូ"
 msgid "AVFoundation video capture module."
 msgstr "ម៉ូឌុល​លទ្ធផល​អូឌីយ៉ូ"
 
-#: modules/access/avcapture.m:280 modules/access/avcapture.m:309
+#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 #, fuzzy
 msgid "No video devices found"
 msgstr "រក​មិន​ឃើញ​ឧបករណ៍​បញ្ចូល"
 
-#: modules/access/avcapture.m:281
+#: modules/access/avcapture.m:287
 #, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
@@ -6058,7 +6058,7 @@ msgstr ""
 "Mac របស់​អ្នក​ហាក់​ដូចជា​មិន​ត្រូវ​បាន​ភ្ជាប់​ជាមួយ​ឧបករណ៍​បញ្ចូល​ដែល​សមរម្យ។ សូម​ពិនិត្យមើល​ឧបករណ៍​ភ្ជាប់ និង​"
 "កម្មវិធី​បញ្ជា​របស់​អ្នក។"
 
-#: modules/access/avcapture.m:310
+#: modules/access/avcapture.m:316
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
@@ -6169,16 +6169,16 @@ msgstr ""
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
 
-#: modules/access/bluray.c:845 modules/access/bluray.c:2300
-#: modules/access/bluray.c:2305
+#: modules/access/bluray.c:845 modules/access/bluray.c:2279
+#: modules/access/bluray.c:2284
 msgid "Blu-ray error"
 msgstr "Blu-ray មាន​បញ្ហា"
 
-#: modules/access/bluray.c:1680
+#: modules/access/bluray.c:1667
 msgid "Top Menu"
 msgstr ""
 
-#: modules/access/bluray.c:1683
+#: modules/access/bluray.c:1670
 msgid "First Play"
 msgstr ""
 
@@ -6410,7 +6410,7 @@ msgid "DSS"
 msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:130
-#: modules/gui/qt/components/open_panels.cpp:818
+#: modules/gui/qt/components/open_panels.cpp:817
 msgid "Video device name"
 msgstr "ឈ្មោះ​ឧបករណ៍​វីដេអូ"
 
@@ -6423,8 +6423,8 @@ msgstr ""
 "ប្រើ​ឧបករណ៍​លំនាំដើម។"
 
 #: modules/access/dshow/dshow.cpp:135
-#: modules/gui/qt/components/open_panels.cpp:826
-#: modules/gui/qt/components/open_panels.cpp:1047
+#: modules/gui/qt/components/open_panels.cpp:825
+#: modules/gui/qt/components/open_panels.cpp:1046
 msgid "Audio device name"
 msgstr "ឈ្មោះ​ឧបករណ៍​អូឌីយ៉ូ"
 
@@ -6438,7 +6438,7 @@ msgstr ""
 "ឧបករណ៍​លំនាំដើម។ "
 
 #: modules/access/dshow/dshow.cpp:140
-#: modules/gui/qt/components/open_panels.cpp:793
+#: modules/gui/qt/components/open_panels.cpp:792
 msgid "Video size"
 msgstr "ទំហំ​វីដេអូ"
 
@@ -6517,8 +6517,8 @@ msgid "This overrides the channel. Measured in Hz."
 msgstr "វា​បដិសេធ​ប៉ុស្តិ៍។ បាន​វាស់ស់​គិតជា Hz ។"
 
 #: modules/access/dshow/dshow.cpp:168
-#: modules/gui/qt/components/open_panels.cpp:846
-#: modules/gui/qt/components/open_panels.cpp:1067
+#: modules/gui/qt/components/open_panels.cpp:845
+#: modules/gui/qt/components/open_panels.cpp:1066
 msgid "Video standard"
 msgstr "ស្តង់ដារ​វីដេអូ"
 
@@ -6624,7 +6624,7 @@ msgid "DirectShow input"
 msgstr "ព័ត៌មាន​បញ្ចូល DirectShow"
 
 #: modules/access/dshow/dshow.cpp:516 modules/access/dshow/dshow.cpp:590
-#: modules/access/dshow/dshow.cpp:1052 modules/access/dshow/dshow.cpp:1123
+#: modules/access/dshow/dshow.cpp:1054 modules/access/dshow/dshow.cpp:1125
 msgid "Capture failed"
 msgstr "បាន​បរាជ័យ​ក្នុង​ការ​ចាប់​យក"
 
@@ -6636,12 +6636,12 @@ msgstr "មិន​បាន​ជ្រើស​ឧបករណ៍​វីដ
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr "VLC មិន​អាច​បើក​ឧបករណ៍​ចាប់​យក​ណាមួយ​បានទេ។ ព័ត៌មាន​លម្អិត សូម​មើល​កំណត់ហេតុ​កំហុស។"
 
-#: modules/access/dshow/dshow.cpp:1053
+#: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
 msgstr "ឧបករណ៍​ដែល​អ្នក​ជ្រើស​មិន​អាច​ប្រើ​បាន​ទេ ព្រោះ​វា​ជា​ប្រភេទ​ដែល​មិន​គាំទ្រ។"
 
-#: modules/access/dshow/dshow.cpp:1124
+#: modules/access/dshow/dshow.cpp:1126
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "ឧបករណ៍​ចាប់​យក \"%s\" មិន​គាំទ្រ​ប៉ារ៉ាម៉ែត្រ​ដែល​បាន​ទាមទារ។"
@@ -6730,7 +6730,7 @@ msgstr ""
 "ប៉ុស្តិ៍​ទូរទស្សន៍​ត្រូវ​បាន​ដាក់​ជា​ក្រុម​ដោយ​ឧបករណ៍​ទទួល/បញ្ជូន​សញ្ញា (a.k.a. multiplex) នៅ​លើ​​ប្រេកង់​ដែល​"
 "បាន​ផ្ដល់។ វា​ត្រូវ​បាន​ទាមទារ​ឲ្យ​មួល​ឧបករណ៍​ទទួល។"
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:967
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "ការ​ប្ដូរ/ការ​ពង្រាយ"
 
@@ -7222,13 +7222,13 @@ msgstr "ព័ត៌មាន​បញ្ចូល DVDnav"
 msgid "DVDnav demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស Nuv"
 
-#: modules/access/dvdnav.c:296 modules/access/dvdread.c:197
-#: modules/access/dvdread.c:212 modules/access/dvdread.c:476
-#: modules/access/dvdread.c:544
+#: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
+#: modules/access/dvdread.c:216 modules/access/dvdread.c:471
+#: modules/access/dvdread.c:539
 msgid "Playback failure"
 msgstr "បរាជ័យ​ក្នុង​ការ​ចាក់​ឡើងវិញ"
 
-#: modules/access/dvdnav.c:297
+#: modules/access/dvdnav.c:295
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr "VLC មិន​អាច​កំណត់​ចំណង​ជើង​របស់​ឌីវីឌី​បានទេ។ ប្រហែលជា​វា​មិន​អាច​ដោះ​លេខ​កូដ​ថាស​ទាំង​មូល​បាន។"
@@ -7241,21 +7241,21 @@ msgstr "ឌីវីឌី​គ្មាន​ម៉ឺនុយ"
 msgid "DVDRead Input (no menu support)"
 msgstr "ព័ត៌មាន​បញ្ចូល DVDRead (គ្មាន​ម៉ឺនុយ​គាំទ្រ)"
 
-#: modules/access/dvdread.c:198
+#: modules/access/dvdread.c:202
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead មិន​អាច​បើក​ថាស \"%s\" ។"
 
-#: modules/access/dvdread.c:213
+#: modules/access/dvdread.c:217
 msgid "Cannot play a non-UDF mastered DVD."
 msgstr ""
 
-#: modules/access/dvdread.c:477
+#: modules/access/dvdread.c:472
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVDRead មិនអាច​អាន​ប្លុក %d ។"
 
-#: modules/access/dvdread.c:545
+#: modules/access/dvdread.c:540
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead មិន​អាច​អាន​ប្លុក %d/%d នៅ 0x%02x ។"
@@ -7358,7 +7358,7 @@ msgstr "ព័ត៌មាន​បញ្ចូល FTP"
 msgid "FTP upload output"
 msgstr "លទ្ធផល​ការ​ផ្ទុក​ឡើង FTP"
 
-#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
+#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:541
 msgid "Network interaction failed"
 msgstr "ការ​ធ្វើ​អន្តរកម្ម​បណ្ដាញ​បាន​បរាជ័យ"
 
@@ -7370,7 +7370,7 @@ msgstr "VLC មិន​អាច​តភ្ជាប់​ទៅកាន់�
 msgid "VLC's connection to the given server was rejected."
 msgstr "ការ​តភ្ជាប់ VLC ទៅកាន់​ម៉ាស៊ីន​មេ​ដែល​បាន​ផ្ដល់ គឺ​ត្រូវ​បាន​បដិសេធ។"
 
-#: modules/access/ftp.c:538
+#: modules/access/ftp.c:542
 msgid "Your account was rejected."
 msgstr "គណនី​របស់​អ្នក​ត្រូវ​បាន​បដិសេធ។"
 
@@ -7639,7 +7639,7 @@ msgstr "ល្បឿន"
 msgid "Read the audio stream at VLC pace rather than Jack pace."
 msgstr "អាន​ស្ទ្រីម​អូឌីយ៉ូ​ដោយ​ល្បឿន​របស់ VLC ជំនួស​ឲ្យ​​ល្បឿន​របស់ Jack ។"
 
-#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:898
+#: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:897
 msgid "Auto connection"
 msgstr "ការ​​តភ្ជាប់​ស្វ័យប្រវត្តិ"
 
@@ -7814,19 +7814,19 @@ msgstr "ច្រក​ធ្យូនែល HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "ច្រក​ដែល​ត្រូវ​ប្រើ​សម្រាប់​ធ្យូនែល RTSP/RTP តាម HTTP ។"
 
-#: modules/access/live555.cpp:661
+#: modules/access/live555.cpp:668
 msgid "RTSP authentication"
 msgstr "ការ​ផ្ទៀង​ផ្ទាត់ RTSP"
 
-#: modules/access/live555.cpp:662
+#: modules/access/live555.cpp:669
 msgid "Please enter a valid login name and a password."
 msgstr "សូម​បញ្ចូល​ឈ្មោះ​ចូល និង​ពាក្យសម្ងាត់​ដែល​ត្រឹមត្រូវ។"
 
-#: modules/access/live555.cpp:687
+#: modules/access/live555.cpp:694
 msgid "RTSP connection failed"
 msgstr "ការ​តភ្ជាប់ RTSP បាន​បរាជ័យ"
 
-#: modules/access/live555.cpp:688
+#: modules/access/live555.cpp:695
 msgid "Access to the stream is denied by the server configuration."
 msgstr "ការ​ចូល​ដំណើរការ​ស្ទ្រីម​ត្រូវ​បាន​បដិសេធ​ដោយ​ការ​កំណត់​រចនាសម្ព័ន្ធ​ម៉ាស៊ីន​មេ។"
 
@@ -8087,11 +8087,11 @@ msgstr "RTP"
 msgid "Real-Time Protocol (RTP) input"
 msgstr "ព័ត៌មាន​បញ្ចូល Real-Time Protocol (RTP)​"
 
-#: modules/access/rtp/rtp.c:751
+#: modules/access/rtp/rtp.c:770
 msgid "SDP required"
 msgstr "បាន​ទាមទារ SDP"
 
-#: modules/access/rtp/rtp.c:752
+#: modules/access/rtp/rtp.c:771
 #, c-format
 msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
@@ -8149,7 +8149,7 @@ msgid "SAT>IP Receiver Plugin"
 msgstr ""
 
 #: modules/access/screen/screen.c:45
-#: modules/gui/qt/components/open_panels.cpp:1104
+#: modules/gui/qt/components/open_panels.cpp:1103
 msgid "Desired frame rate for the capture."
 msgstr "អត្រា​ស៊ុម​ដែល​ចង់បាន​សម្រាប់​ការ​ចាប់​យក។"
 
@@ -8286,11 +8286,11 @@ msgstr "លេខ​ច្រក SFTP ដែល​ត្រូវ​ប្រើ
 msgid "SFTP input"
 msgstr "ព័ត៌មាន​បញ្ចូល SFTP"
 
-#: modules/access/sftp.c:394
+#: modules/access/sftp.c:400
 msgid "SFTP authentication"
 msgstr "ការ​ផ្ទៀងផ្ទាត់ SFTP"
 
-#: modules/access/sftp.c:395
+#: modules/access/sftp.c:401
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr "សូម​បញ្ចូល​ការ​ចូល និង​ពាក្យសម្ងាត់​ត្រឹមត្រូវ​សម្រាប់​ការ​តភ្ជាប់ sftp ទៅ %s"
@@ -8470,7 +8470,7 @@ msgstr "ឧបករណ៍​ចាប់​យក VBI"
 
 #: modules/access/v4l2/v4l2.c:48
 #, fuzzy
-msgid "The device node where VBI data can be read  (for closed captions)."
+msgid "The device node where VBI data can be read (for closed captions)."
 msgstr "តំណ​ឧបករណ៍​ដែល​ទិន្នន័យ VBI អាច​​អាន​បាន (សម្រាប់​ចំណងជើង​បិទ) "
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
@@ -8482,11 +8482,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "ស្តង់ដារ​វីដេអូ (លំនាំដើម SECAM, PAL, ឬ NTSC) ។"
 
 #: modules/access/v4l2/v4l2.c:55
+#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
-"I420 or I422 for raw images, MJPG for M-JPEG compressed input) (Complete "
+"I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
-"I420, I411, I410, MJPG)"
+"I420, I411, I410, MJPG"
 msgstr ""
 "បង្ខំ​ឧបករណ៍​វីដេអូ Video4Linux2 ឲ្យ​ប្រើ​ទ្រង់ទ្រាយ​ក្រូម៉ា​ជាក់លាក់ (ឧ. I420 ឬ I422 សម្រាប់​រូបភាព​"
 "ដើម MJPG សម្រាប់​ព័ត៌មាន​បញ្ចូល​ដែល​បាន​បង្ហាប់ M-JPEG) (បញ្ជី​ពេញលេញ៖ GREY, I240, RV16, "
@@ -8522,12 +8523,13 @@ msgstr "ឧបករណ៍​វិទ្យុ"
 msgid "Radio tuner device node."
 msgstr "តំណ​ឧបករណ៍​មូល​វិទ្យុ។"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1074
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "ប្រេកង់"
 
 #: modules/access/v4l2/v4l2.c:77
-msgid "Tuner frequency in Hz or kHz (see debug output)"
+#, fuzzy
+msgid "Tuner frequency in Hz or kHz (see debug output)."
 msgstr "ប្រេកង់​​ប្រដាប់​​រាវ​ប៉ុស្តិ៍ គិត​ជា Hz ឬ kHz (សូម​មើល​លទ្ធផល​បំបាត់​កំហុស)"
 
 #: modules/access/v4l2/v4l2.c:78
@@ -10449,7 +10451,8 @@ msgid "Output file"
 msgstr "ឯកសារ​លទ្ធផល"
 
 #: modules/audio_output/file.c:109
-msgid "File to which the audio samples will be written to. (\"-\" for stdout"
+#, fuzzy
+msgid "File to which the audio samples will be written to (\"-\" for stdout)."
 msgstr "ឯកសារ​​ដែល​នឹង​ត្រូវ​សរសេរ​គំរូ​អូឌីយ៉ូ​ទៅ ។ (\"-\" សម្រាប់ stdout"
 
 #: modules/audio_output/file.c:112
@@ -10511,17 +10514,17 @@ msgstr "បើក​ជម្រើស​នេះ ប្រសិនបើ​�
 msgid "K Audio Interface audio output"
 msgstr "អូឌីយ៉ូ​ចេញ​របស់​ចំណុច​ប្រទាក់​អូឌីយ៉ូ K"
 
-#: modules/audio_output/mmdevice.c:1269
+#: modules/audio_output/mmdevice.c:1274
 #, fuzzy
 msgid "Windows Multimedia Device output"
 msgstr "ការ​បង្ហាញ​វីដេអូ វីនដូ GDI"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Output back-end"
 msgstr "កាត​លទ្ធផល"
 
-#: modules/audio_output/mmdevice.c:1275
+#: modules/audio_output/mmdevice.c:1280
 #, fuzzy
 msgid "Audio output back-end interface."
 msgstr "ឧបករណ៍​អូឌីយ៉ូ​ចេញ"
@@ -10550,7 +10553,7 @@ msgstr "ការ​ទទួល​យក​កម្មវិធី"
 msgid "This linear gain will be applied in software."
 msgstr "ការ​ទទួល​យក​លីនេអ៊ែ​នេះ​នឹង​ត្រូវ​បាន​អនុវត្ត​នៅ​ក្នុង​កម្មវិធី។"
 
-#: modules/audio_output/wasapi.c:640
+#: modules/audio_output/wasapi.c:645
 msgid "Windows Audio Session API output"
 msgstr ""
 
@@ -10637,7 +10640,7 @@ msgstr "ពុម្ពអក្សរ​សំឡេង"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 #, fuzzy
-msgid "SoundFont file to use wor software synthesis."
+msgid "SoundFont file to use for software synthesis."
 msgstr "បាន​ទាមទារ​ឯកសារ​ពុម្ពអក្សរ​សំឡេង​សម្រាប់​ការ​សំយោគ​កម្មវិធី ។"
 
 #: modules/codec/audiotoolbox_midi.c:57
@@ -10673,8 +10676,8 @@ msgstr "កូអរដោណេ X របស់​ចំណងជើង​រង
 msgid "ARIB subtitles decoder"
 msgstr "ឌិកូឌ័រ​ចំណងជើង​រង DVB"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1091
-#: modules/demux/mpeg/ts_psi.c:1098
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1084
+#: modules/demux/mpeg/ts_psi.c:1091
 #, fuzzy
 msgid "ARIB subtitles"
 msgstr "ចំណងជើង​រង DVB"
@@ -11350,8 +11353,8 @@ msgstr "កូអរដោណេ Y របស់​ចំណងជើង​រង
 msgid "DVB subtitles decoder"
 msgstr "ឌិកូឌ័រ​ចំណងជើង​រង DVB"
 
-#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:775
-#: modules/demux/mpeg/ts_psi.c:824
+#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:771
+#: modules/demux/mpeg/ts_psi.c:820
 msgid "DVB subtitles"
 msgstr "ចំណងជើង​រង DVB"
 
@@ -11376,7 +11379,8 @@ msgid "Encoder Profile"
 msgstr "ទម្រង់​កម្មវិធី​ដាក់​លេខ​កូដ"
 
 #: modules/codec/fdkaac.c:68
-msgid "Encoder Algorithm to use"
+#, fuzzy
+msgid "Encoder Algorithm to use."
 msgstr "ក្បួន​ដោះស្រាយ​កម្មវិធី​ដាក់​លេខ​កូដ​ដែល​ត្រូវ​ប្រើ"
 
 #: modules/codec/fdkaac.c:70
@@ -11384,7 +11388,8 @@ msgid "Enable spectral band replication"
 msgstr "បើក​ការ​ឆ្លើយតប​បន្ទះ​វិសាលគម"
 
 #: modules/codec/fdkaac.c:71
-msgid "This is an optional feature only for the AAC-ELD profile"
+#, fuzzy
+msgid "This is an optional feature only for the AAC-ELD profile."
 msgstr "នេះ​ជា​លក្ខណ​ពិសេស​ជម្រើស​សម្រាប់​តែ​ទម្រង់ AAC-ELD ប៉ុណ្ណោះ"
 
 #: modules/codec/fdkaac.c:73
@@ -11392,7 +11397,9 @@ msgid "VBR Quality"
 msgstr "គុណភាព VBR"
 
 #: modules/codec/fdkaac.c:74
-msgid "Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best"
+#, fuzzy
+msgid ""
+"Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr "គុណភាព​នៃ​ការ​ដាក់​លេខ​កូដ VBR (0=cbr, 1-5 vbr គុណភាព​ថេរ 5 គឺ​ល្អ​បំផុត"
 
 #: modules/codec/fdkaac.c:76
@@ -11400,9 +11407,10 @@ msgid "Enable afterburner library"
 msgstr "បើក​បណ្ណាល័យ afterburner"
 
 #: modules/codec/fdkaac.c:77
+#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
-"CPU usage (default is enabled)"
+"CPU usage (default is enabled)."
 msgstr "បណ្ណាល័យ​នេះ​នឹង​បង្កើត​អូឌីយ៉ូ​គុណភាព​ខ្ពស់​ដោយ​ចំណាយ​ការ​ប្រើប្រាស់​ស៊ីភីយូ​បន្ថែម (លំនាំដើម​គឺ​បើក)"
 
 #: modules/codec/fdkaac.c:79
@@ -11410,9 +11418,10 @@ msgid "Signaling mode of the extension AOT"
 msgstr "របៀប​ដាក់​សញ្ញា​ផ្នែក​បន្ថែម​របស់ AOT"
 
 #: modules/codec/fdkaac.c:80
+#, fuzzy
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
-"hierarchical"
+"hierarchical."
 msgstr "1 គឺ​ច្បាស់​សម្រាប់ SBR ប៉ុន្តែ​មិន​ច្បាស់​សម្រាប់ PS (លំនាំដើម), 2 គឺ​មិន​ច្បាស់​សម្រាប់​លំដាប់"
 
 #: modules/codec/fdkaac.c:97
@@ -11950,7 +11959,7 @@ msgstr "ក្រុម​រូបភាព​ចម្ងាយ​យោង"
 #, fuzzy
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
-"unspecified. Note: If GopRefDist = 1, there are no B- frames used."
+"unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
 "ចម្ងាយ​រវាង I- ឬ P- key frames; ប្រសិនបើ​វា​សូន្យ រចនាសមព័ន្ធ GOP គឺ​មិន​បាន​បញ្ជាក់។ ចំណាំ៖ បើ "
 "GopRefDist = 1 នោះ​គឺ​មិន​មាន B- ណាមួយ​ត្រូវ​បាន​ប្រើ​ទេ។"
@@ -11960,9 +11969,10 @@ msgid "Target Usage"
 msgstr "ទិសដៅ​ប្រើប្រាស់"
 
 #: modules/codec/qsv.c:86
+#, fuzzy
 msgid ""
 "The target usage allow to choose between different trade-offs between "
-"quality and speed. Allowed values are : 'speed', 'balanced' and 'quality'."
+"quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
 "ទិសដៅ​ប្រើប្រាស់​អនុញ្ញាត​ឲ្យ​​ជ្រើស​រវាង​តុល្យភាព រវាង​គុណភាព និង​ល្បឿន។ តម្លៃ​ដែល​អនុញ្ញាត​គឺ៖ 'speed', "
 "'balanced' និង 'quality' ។"
@@ -11974,8 +11984,8 @@ msgstr "ចន្លោះ​ពេល IDR"
 #: modules/codec/qsv.c:92
 #, fuzzy
 msgid ""
-"For H.264, IdrInterval specifies IDR-frame interval in terms of I- frames; "
-"if IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
+"For H.264, IdrInterval specifies IDR-frame interval in terms of I-frames; if "
+"IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
 "every other I-frame is an IDR-frame, etc. For MPEG2, IdrInterval defines "
 "sequence header interval in terms of I-frames. If IdrInterval=N, SDK inserts "
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
@@ -11996,7 +12006,7 @@ msgstr "វិធីសាស្ត្រ​គ្រប់គ្រង​អត
 #, fuzzy
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
-"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2"
+"'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
 "វិធីសាស្ត្រ​គ្រប់គ្រង​អត្រា​ដែល​ត្រូវ​ប្រើ​ពេល​ដាក់​លេខ​កូដ។ អាច​មួយ​ក្នុង​ចំណោម 'crb', 'vbr', 'qp', "
 "'avbr' ។ របៀប 'qp' មិន​ត្រូវ​បាន​គាំទ្រ​សម្រាប់ mpeg2 ទេ"
@@ -12006,9 +12016,10 @@ msgid "Quantization parameter"
 msgstr "ប៉ារ៉ាម៉ែត្រ​ការ​កំណត់​បរិមាណ"
 
 #: modules/codec/qsv.c:106
+#, fuzzy
 msgid ""
 "Quantization parameter for all types of frames. This parameters sets qpi, "
-"qpp and qpp. It has less precedence than the forementionned parameters. Used "
+"qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
 "ប៉ារ៉ាម៉ែត្រ​ការ​កំណត់​បរិមាណ​សម្រាប់​ប្រភេទ​ស៊ុម​ទាំងអស់។ ប៉ារ៉ាម៉ែត្រ​នេះ​កំណត់ qpi, qpp និង qpp ។ វា​មាន​"
@@ -12057,7 +12068,7 @@ msgstr "អត្រា​ប៊ីត​អតិបរមា"
 #: modules/codec/qsv.c:123
 #, fuzzy
 msgid ""
-"Defines the maximum bitrate in Kpbs (1000 bits/s) for VBR rate control "
+"Defines the maximum bitrate in kbps (1000 bits/s) for VBR rate control "
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
@@ -12069,10 +12080,11 @@ msgid "Accuracy of RateControl"
 msgstr "សុក្រឹតភាព​នៃ​ការ​គ្រប់គ្រង​អត្រា"
 
 #: modules/codec/qsv.c:128
+#, fuzzy
 msgid ""
 "Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
-"g. 10 with a bitrate of 800  kpbs means the encoder tries not to  go above "
-"880 kpbs and under  730 kpbs. The targeted accuracy is only reached after a "
+"g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
+"880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
 "ប្រលោះ​គិតជា​ភាគរយ​នៃ​វិធី​សាស្ត្រ 'avbr'  (Average Variable BitRate) ។ (ឧ. 10 ជាមួយ​អត្រា​"
@@ -12114,10 +12126,11 @@ msgid "Number of parallel operations"
 msgstr "ចំនួន​ប្រតិបត្តិការ​ប៉ារ៉ាឡែល"
 
 #: modules/codec/qsv.c:149
+#, fuzzy
 msgid ""
 "Defines the number of parallel encoding operations before we synchronise the "
-"result. Higher  may result on better throughput depending on hardware. MPEG2 "
-"needs at least 1 here."
+"result. Higher numbers may result on better throughput depending on "
+"hardware. MPEG2 needs at least 1 here."
 msgstr ""
 "កំណត់​ចំនួន​ប្រតិបត្តិការ​ការ​ដាក់​លេខ​កូដ​ប៉ារ៉ាឡែល មុន​ពេល​ធ្វើ​សមកាលកម្ម​លទ្ធផល។ តម្លៃ​ខ្ពស់​អាច​មាន​លទ្ធផល​"
 "អត្រា​ល្អ​តែ​អាស្រ័យ​លើ​ផ្នែក​រឹង​ដែរ។ MPEG2 ទាមទារ​យ៉ាង​ហោច 1 ។"
@@ -14177,7 +14190,7 @@ msgstr "ចំណុច​ប្រទាក់​ឧបករណ៍​បញ្
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
-#: modules/gui/macosx/VLCMainWindow.m:1269
+#: modules/gui/macosx/VLCMainWindow.m:1276
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1234
 #: modules/gui/qt/main_interface.cpp:1238
@@ -15016,7 +15029,7 @@ msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស AIFF"
 msgid "ASF/WMV demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស ASF/WMV"
 
-#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:832
+#: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
 msgstr "មិន​អាច​មិន​ទ្វេ​ទិស​ស្ទ្រីម ASF បានទេ"
 
@@ -15101,7 +15114,7 @@ msgstr "ជួសជុល​នៅ​ពេល​ចាំបាច់"
 msgid "AVI demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស AVI"
 
-#: modules/demux/avi/avi.c:798 modules/demux/mp4/mp4.c:1669
+#: modules/demux/avi/avi.c:820 modules/demux/mp4/mp4.c:1673
 #, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
@@ -15117,28 +15130,28 @@ msgstr ""
 "ជំហាន​នេះ​អាច​ប្រើ​ពេលវេលា​យូរ​សម្រាប់​ឯកសារ​ដែល​មាន​ទំហំ​ធំ។\n"
 "តើ​អ្នក​ចង់​ធ្វើ​អ្វី?"
 
-#: modules/demux/avi/avi.c:806
+#: modules/demux/avi/avi.c:828
 msgid "Do not play"
 msgstr "កុំ​ចាក់"
 
-#: modules/demux/avi/avi.c:807
+#: modules/demux/avi/avi.c:829
 msgid "Build index then play"
 msgstr "បង្កើត​លិបិក្រម រួច​ចាក់"
 
-#: modules/demux/avi/avi.c:808
+#: modules/demux/avi/avi.c:830
 msgid "Play as is"
 msgstr "ចាក់"
 
-#: modules/demux/avi/avi.c:809 modules/demux/mp4/mp4.c:1680
+#: modules/demux/avi/avi.c:831 modules/demux/mp4/mp4.c:1684
 #, fuzzy
 msgid "Broken or missing Index"
 msgstr "លិបិក្រម AVI បាន​ខូច ឬ​បាត់"
 
-#: modules/demux/avi/avi.c:2682
+#: modules/demux/avi/avi.c:2703
 msgid "Broken or missing AVI Index"
 msgstr "លិបិក្រម AVI បាន​ខូច ឬ​បាត់"
 
-#: modules/demux/avi/avi.c:2683
+#: modules/demux/avi/avi.c:2704
 msgid "Fixing AVI Index..."
 msgstr "កំពុង​ជួសជុល​លិបិក្រម AVI..."
 
@@ -15560,29 +15573,29 @@ msgstr ""
 msgid "Clean"
 msgstr "សម្អាត"
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:49
 #, fuzzy
 msgid "M4A audio only"
 msgstr "ការ​ពន្យារ​​ពេល​អូឌីយ៉ូ"
 
-#: modules/demux/mp4/mp4.c:51
+#: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​ស្ទ្រីម MP4"
 
-#: modules/demux/mp4/mp4.c:57
+#: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1677
+#: modules/demux/mp4/mp4.c:1681
 #, fuzzy
 msgid "Do not seek"
 msgstr "កុំ​ចាក់"
 
-#: modules/demux/mp4/mp4.c:1678
+#: modules/demux/mp4/mp4.c:1682
 #, fuzzy
 msgid "Build index"
 msgstr "បង្កើត​លិបិក្រម រួច​ចាក់"
@@ -15741,59 +15754,59 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​ស្ទ្រីម​បញ្ជូន MPEG"
 
-#: modules/demux/mpeg/ts_psi.c:423
+#: modules/demux/mpeg/ts_psi.c:421
 #, fuzzy
 msgid "Main audio"
 msgstr "បិទ​សំឡេង​អូឌីយ៉ូ។"
 
-#: modules/demux/mpeg/ts_psi.c:424
+#: modules/demux/mpeg/ts_psi.c:422
 msgid "Audio description for the visually impaired"
 msgstr ""
 
-#: modules/demux/mpeg/ts_psi.c:425
+#: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
 msgid "Clean audio for the hearing impaired"
 msgstr "ចំណង​ជើង​រង​ព័ត៌មាន​ទូរទស្សន៍ ៖ ត្រចៀក​ខ្សោយ"
 
-#: modules/demux/mpeg/ts_psi.c:426
+#: modules/demux/mpeg/ts_psi.c:424
 #, fuzzy
 msgid "Spoken subtitles for the visually impaired"
 msgstr "ចំណងជើង​រង DVB ៖ ត្រចៀក​ខ្សោយ"
 
-#: modules/demux/mpeg/ts_psi.c:608 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:606 modules/gui/macosx/VLCMainMenu.m:455
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "ព័ត៌មាន​ទូរទស្សន៍"
 
-#: modules/demux/mpeg/ts_psi.c:609
+#: modules/demux/mpeg/ts_psi.c:607
 msgid "Teletext subtitles"
 msgstr "ចំណងជើង​ព័ត៌មាន​ទូរទស្សន៍"
 
-#: modules/demux/mpeg/ts_psi.c:610
+#: modules/demux/mpeg/ts_psi.c:608
 msgid "Teletext: additional information"
 msgstr "ព័ត៌មាន​ទួរទស្សន៍​ ៖ ព័ត៌មាន​បន្ថែម"
 
-#: modules/demux/mpeg/ts_psi.c:611
+#: modules/demux/mpeg/ts_psi.c:609
 msgid "Teletext: program schedule"
 msgstr "ព័ត៌មាន​ទូរទស្សន៍ ៖ កាលវិភាគ​កម្មវិធី"
 
-#: modules/demux/mpeg/ts_psi.c:612
+#: modules/demux/mpeg/ts_psi.c:610
 msgid "Teletext subtitles: hearing impaired"
 msgstr "ចំណង​ជើង​រង​ព័ត៌មាន​ទូរទស្សន៍ ៖ ត្រចៀក​ខ្សោយ"
 
-#: modules/demux/mpeg/ts_psi.c:831
+#: modules/demux/mpeg/ts_psi.c:827
 msgid "DVB subtitles: hearing impaired"
 msgstr "ចំណងជើង​រង DVB ៖ ត្រចៀក​ខ្សោយ"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1328
 msgid "clean effects"
 msgstr "សម្អាត​បែបផែន"
 
-#: modules/demux/mpeg/ts_psi.c:1336
+#: modules/demux/mpeg/ts_psi.c:1329
 msgid "hearing impaired"
 msgstr "ត្រចៀក​ខ្សោយ"
 
-#: modules/demux/mpeg/ts_psi.c:1337
+#: modules/demux/mpeg/ts_psi.c:1330
 msgid "visual impaired commentary"
 msgstr "សេចក្ដី​អធិប្បាយ​ភ្នែក​ខ្សោយ"
 
@@ -16047,7 +16060,7 @@ msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស​ពិត"
 msgid "C64 sid demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស C64 sid"
 
-#: modules/demux/smf.c:728
+#: modules/demux/smf.c:727
 msgid "SMF demuxer"
 msgstr "ឧបករណ៍​មិន​ទ្វេ​ទិស SMF"
 
@@ -16503,7 +16516,7 @@ msgstr "ពេលវេលា"
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:359
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
-#: modules/gui/qt/components/open_panels.cpp:1360
+#: modules/gui/qt/components/open_panels.cpp:1359
 msgid "OK"
 msgstr "យល់ព្រម"
 
@@ -19720,68 +19733,68 @@ msgstr "តម្រង ៖"
 msgid "Eject the disc"
 msgstr "ច្រាន​ថាស​ចេញ"
 
-#: modules/gui/qt/components/open_panels.cpp:531
+#: modules/gui/qt/components/open_panels.cpp:530
 msgid "Entry"
 msgstr "ធាតុ"
 
-#: modules/gui/qt/components/open_panels.cpp:873
+#: modules/gui/qt/components/open_panels.cpp:872
 msgid "Channels:"
 msgstr "ឆានែល ៖"
 
-#: modules/gui/qt/components/open_panels.cpp:884
+#: modules/gui/qt/components/open_panels.cpp:883
 msgid "Selected ports:"
 msgstr "ច្រក​ដែល​បាន​ជ្រើស ៖"
 
-#: modules/gui/qt/components/open_panels.cpp:887
+#: modules/gui/qt/components/open_panels.cpp:886
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt/components/open_panels.cpp:894
+#: modules/gui/qt/components/open_panels.cpp:893
 msgid "Use VLC pace"
 msgstr "ប្រើ​ជំហាន VLC"
 
-#: modules/gui/qt/components/open_panels.cpp:914
+#: modules/gui/qt/components/open_panels.cpp:913
 msgid "TV - digital"
 msgstr "ទូរទស្សន៍-ឌីជីថល"
 
-#: modules/gui/qt/components/open_panels.cpp:917
+#: modules/gui/qt/components/open_panels.cpp:916
 msgid "Tuner card"
 msgstr "ការ​របស់​ប្រដាប់​រាវ​ប៉ុស្តិ៍"
 
-#: modules/gui/qt/components/open_panels.cpp:918
+#: modules/gui/qt/components/open_panels.cpp:917
 msgid "Delivery system"
 msgstr "ប្រព័ន្ធ​បញ្ជូន"
 
-#: modules/gui/qt/components/open_panels.cpp:948
+#: modules/gui/qt/components/open_panels.cpp:947
 msgid "Transponder/multiplex frequency"
 msgstr "ប្រេកង់ Transponder/multiplex"
 
-#: modules/gui/qt/components/open_panels.cpp:958
+#: modules/gui/qt/components/open_panels.cpp:957
 msgid "Transponder symbol rate"
 msgstr "អត្រា​សញ្ញា​ឧបករណ៍​ទទួល​/​បញ្ជូន​សញ្ញា"
 
-#: modules/gui/qt/components/open_panels.cpp:991
+#: modules/gui/qt/components/open_panels.cpp:990
 msgid "Bandwidth"
 msgstr "កម្រិត​បញ្ជូន"
 
-#: modules/gui/qt/components/open_panels.cpp:1035
+#: modules/gui/qt/components/open_panels.cpp:1034
 msgid "TV - analog"
 msgstr "ទូរទស្សន៍-អាណាឡូក"
 
-#: modules/gui/qt/components/open_panels.cpp:1038
+#: modules/gui/qt/components/open_panels.cpp:1037
 msgid "Device name"
 msgstr "ឈ្មោះ​ឧបករណ៍"
 
-#: modules/gui/qt/components/open_panels.cpp:1098
+#: modules/gui/qt/components/open_panels.cpp:1097
 msgid "Your display will be opened and played in order to stream or save it."
 msgstr "ការ​បង្ហាញ​របស់​អ្នក​នឹង​ត្រូវ​បាន​បើក​ ហើយ​ចាក់​​ដើម្បី​ស្ទ្រីម ឬ​រក្សាទុក​វា ។"
 
 #. xgettext: frames per second
-#: modules/gui/qt/components/open_panels.cpp:1112
+#: modules/gui/qt/components/open_panels.cpp:1111
 msgid " f/s"
 msgstr " f/s"
 
-#: modules/gui/qt/components/open_panels.cpp:1327
+#: modules/gui/qt/components/open_panels.cpp:1326
 msgid "Advanced Options"
 msgstr "ជម្រើស​កម្រិត​ខ្ពស់"
 
@@ -19789,11 +19802,11 @@ msgstr "ជម្រើស​កម្រិត​ខ្ពស់"
 msgid "Double click to get media information"
 msgstr "ចុច​ទ្វេ​ដង​ដើម្បី​បង្ហាញ​ព័ត៌មាន​មេឌៀ"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:114
+#: modules/gui/qt/components/playlist/playlist.cpp:113
 msgid "Change playlistview"
 msgstr "ប្ដូរ​ទិដ្ឋភាព​បញ្ជី​ចាក់"
 
-#: modules/gui/qt/components/playlist/playlist.cpp:124
+#: modules/gui/qt/components/playlist/playlist.cpp:123
 msgid "Search the playlist"
 msgstr "ស្វែងរក​បញ្ជី​ចាក់"
 
@@ -21705,12 +21718,10 @@ msgid "Set the image contrast, between 0 and 2. Defaults to 1."
 msgstr "កំណត់​​កម្រិត​ពន្លឺ​រូបភាព ចន្លោះ​ពី ០ ទៅ ២ ។ លំនាំដើម​គឺ ១ ។"
 
 #: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
-#: modules/video_filter/adjust.c:67
 msgid "Image hue (0-360)"
 msgstr "ពណ៌​លាំៗ​របស់​រូបភាព (០-៣៦០)"
 
 #: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
-#: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
 msgstr "កំណត់​ពណ៌​លាំៗ​របស់​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣៦០ ។ លំនាំដើម​គឺ ០ ។"
 
@@ -23845,15 +23856,15 @@ msgstr "SAP"
 msgid "SDP Descriptions parser"
 msgstr "កម្មវិធី​ញែក​សេចក្ដី​ពណ៌នា SDP"
 
-#: modules/services_discovery/sap.c:884 modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:881 modules/services_discovery/sap.c:885
 msgid "Session"
 msgstr "សម័យ"
 
-#: modules/services_discovery/sap.c:884
+#: modules/services_discovery/sap.c:881
 msgid "Tool"
 msgstr "ឧបករណ៍"
 
-#: modules/services_discovery/sap.c:888
+#: modules/services_discovery/sap.c:885
 msgid "User"
 msgstr "អ្នក​ប្រើ"
 
@@ -24692,7 +24703,7 @@ msgstr ""
 msgid "Block stream cache"
 msgstr "ប្រភព​នាឡិកា"
 
-#: modules/stream_filter/cache_read.c:569
+#: modules/stream_filter/cache_read.c:570
 #, fuzzy
 msgid "Byte stream cache"
 msgstr "បង្ហាញ​ស្ទ្រីម​ជា​មូលដ្ឋាន"
@@ -24719,35 +24730,35 @@ msgstr "+-[Streaming]"
 msgid "Zlib decompression filter"
 msgstr "ការ​មិន​បង្ហាប់ LZMA"
 
-#: modules/stream_filter/prefetch.c:529
+#: modules/stream_filter/prefetch.c:531
 #, fuzzy
 msgid "Stream prefetch filter"
 msgstr "តម្រង​ស្ទ្រីម"
 
-#: modules/stream_filter/prefetch.c:532
+#: modules/stream_filter/prefetch.c:534
 #, fuzzy
 msgid "Buffer size"
 msgstr "ទំហំ​ទ្រនាប់​ស៊ុម RTSP"
 
-#: modules/stream_filter/prefetch.c:533
+#: modules/stream_filter/prefetch.c:535
 #, fuzzy
 msgid "Prefetch buffer size (KiB)"
 msgstr "ទំហំ​ទ្រនាប់​ស៊ុម RTSP"
 
-#: modules/stream_filter/prefetch.c:535
+#: modules/stream_filter/prefetch.c:537
 msgid "Read size"
 msgstr "ទំហំ​អាន"
 
-#: modules/stream_filter/prefetch.c:536
+#: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:538
+#: modules/stream_filter/prefetch.c:540
 #, fuzzy
 msgid "Seek threshold"
 msgstr "កម្រិត​ពន្លឺ​តម្រង"
 
-#: modules/stream_filter/prefetch.c:539
+#: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
 msgstr ""
 
@@ -26012,6 +26023,16 @@ msgstr "Swscale"
 msgid "YUVP converter"
 msgstr "កម្មវិធី​បម្លែង YUVP"
 
+#: modules/video_filter/adjust.c:67
+#, fuzzy
+msgid "Image hue (-180..180)"
+msgstr "ពណ៌​លាំៗ​របស់​រូបភាព (០-៣៦០)"
+
+#: modules/video_filter/adjust.c:68
+#, fuzzy
+msgid "Set the image hue, between -180 and 180. Defaults to 0."
+msgstr "កំណត់​ពណ៌​លាំៗ​របស់​រូបភាព ចន្លោះ​ពី ០ ទៅ ៣៦០ ។ លំនាំដើម​គឺ ០ ។"
+
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
 msgstr "តម្រង​លក្ខណសម្បត្តិ​រូបភាព"
@@ -26748,9 +26769,9 @@ msgid "Mirror orientation"
 msgstr "ទិស​កញ្ចក់"
 
 #: modules/video_filter/mirror.c:65
+#, fuzzy
 msgid ""
-"Defines orientation of the mirror splitting.     Can be vertical or "
-"horizontal"
+"Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr "កំណត់​ទិស​នៃ​កា​រពុះ​កញ្ចក់ ។     អាច​ជា​បញ្ឈរ ឬ​ផ្ដេក"
 
 #: modules/video_filter/mirror.c:69
@@ -26766,7 +26787,8 @@ msgid "Direction"
 msgstr "ទិស"
 
 #: modules/video_filter/mirror.c:72
-msgid "Direction of the mirroring"
+#, fuzzy
+msgid "Direction of the mirroring."
 msgstr "ទិស​នៃ​ការ​ឆ្លុះ"
 
 #: modules/video_filter/mirror.c:75
@@ -27288,11 +27310,11 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:76
 #, fuzzy
-msgid "Aspect Ratio of the source picture"
+msgid "Aspect Ratio of the source picture."
 msgstr "ភាព​ថ្លា​នៃ​រូបភាព​មូសាអ៊ីក ។"
 
 #: modules/video_output/decklink.cpp:78
-msgid "Active Format Descriptor line."
+msgid "Active Format Descriptor line"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:79
@@ -27300,7 +27322,7 @@ msgid "VBI line on which to output Active Format Descriptor."
 msgstr ""
 
 #: modules/video_output/decklink.cpp:81
-msgid "Picture to display on input signal loss."
+msgid "Picture to display on input signal loss"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:84
@@ -27351,7 +27373,8 @@ msgid "DecklinkOutput"
 msgstr "លទ្ធផល Decklink"
 
 #: modules/video_output/decklink.cpp:235
-msgid "output module to write to Blackmagic SDI card"
+#, fuzzy
+msgid "Output module to write to Blackmagic SDI card"
 msgstr "ម៉ូឌុល​លទ្ធផល​ដើម្បី​សរសេរ​ទៅកាន់​កាត Blackmagic SDI"
 
 #: modules/video_output/decklink.cpp:236
@@ -28342,7 +28365,8 @@ msgid "Show 80 bands instead of 20"
 msgstr "បង្ហាញ ៨០ ក្រុម​ជំនួស​ឲ្យ ២០"
 
 #: modules/visualization/visual/visual.c:72
-msgid "More bands for the spectrometer : 80 if enabled else 20."
+#, fuzzy
+msgid "More bands for the spectrometer: 80 if enabled, else 20."
 msgstr "ក្រុម​ច្រើន​សម្រាប់​ស្ប៉ិចត្រូម៉ែត្រ ៖ ៨០ ប្រសិនបើ​បាន​បើក បើមិនដូច្នោះទេ​ ២០ ។"
 
 #: modules/visualization/visual/visual.c:74
