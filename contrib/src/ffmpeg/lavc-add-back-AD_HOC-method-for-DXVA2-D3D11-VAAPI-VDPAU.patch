@@ -1,0 +1,24 @@
+diff --git a/libavcodec/hwaccel.h b/libavcodec/hwaccel.h
+index 16ee822920..292a87f6b5 100644
+--- a/libavcodec/hwaccel.h
++++ b/libavcodec/hwaccel.h
+@@ -75,15 +75,15 @@ typedef struct AVCodecHWConfigInternal {
+     }
+ 
+ #define HWACCEL_DXVA2(codec) \
+-    HW_CONFIG_HWACCEL(DXVA2_VLD, 0,  DXVA2,   ff_ ## codec ## _dxva2_hwaccel)
++    HW_CONFIG_HWACCEL(DXVA2_VLD, 1,  DXVA2,   ff_ ## codec ## _dxva2_hwaccel)
+ #define HWACCEL_D3D11VA2(codec) \
+-    HW_CONFIG_HWACCEL(D3D11,     0,  D3D11VA, ff_ ## codec ## _d3d11va2_hwaccel)
++    HW_CONFIG_HWACCEL(D3D11,     1,  D3D11VA, ff_ ## codec ## _d3d11va2_hwaccel)
+ #define HWACCEL_NVDEC(codec) \
+     HW_CONFIG_HWACCEL(CUDA,      0, CUDA,    ff_ ## codec ## _nvdec_hwaccel)
+ #define HWACCEL_VAAPI(codec) \
+-    HW_CONFIG_HWACCEL(VAAPI,     0,  VAAPI,   ff_ ## codec ## _vaapi_hwaccel)
++    HW_CONFIG_HWACCEL(VAAPI,     1,  VAAPI,   ff_ ## codec ## _vaapi_hwaccel)
+ #define HWACCEL_VDPAU(codec) \
+-    HW_CONFIG_HWACCEL(VDPAU,     0,  VDPAU,   ff_ ## codec ## _vdpau_hwaccel)
++    HW_CONFIG_HWACCEL(VDPAU,     1,  VDPAU,   ff_ ## codec ## _vdpau_hwaccel)
+ #define HWACCEL_VIDEOTOOLBOX(codec) \
+     HW_CONFIG_HWACCEL(VIDEOTOOLBOX, 0, VIDEOTOOLBOX, ff_ ## codec ## _videotoolbox_hwaccel)
+ 

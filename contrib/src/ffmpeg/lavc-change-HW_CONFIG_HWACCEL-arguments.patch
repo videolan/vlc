@@ -1,0 +1,44 @@
+diff --git a/libavcodec/hwaccel.h b/libavcodec/hwaccel.h
+index ae55527c2f..16ee822920 100644
+--- a/libavcodec/hwaccel.h
++++ b/libavcodec/hwaccel.h
+@@ -42,12 +42,13 @@ typedef struct AVCodecHWConfigInternal {
+ 
+ // These macros are used to simplify AVCodecHWConfigInternal definitions.
+ 
+-#define HW_CONFIG_HWACCEL(format, device, name) \
++#define HW_CONFIG_HWACCEL(format, ad_hoc, device, name) \
+     &(const AVCodecHWConfigInternal) { \
+         .public          = { \
+             .pix_fmt     = AV_PIX_FMT_ ## format, \
+             .methods     = AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX | \
+-                           AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX, \
++                           AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX | \
++                           ad_hoc ? AV_CODEC_HW_CONFIG_METHOD_AD_HOC : 0, \
+             .device_type = AV_HWDEVICE_TYPE_ ## device, \
+         }, \
+         .hwaccel         = &name, \
+@@ -74,17 +75,17 @@ typedef struct AVCodecHWConfigInternal {
+     }
+ 
+ #define HWACCEL_DXVA2(codec) \
+-    HW_CONFIG_HWACCEL(DXVA2_VLD, DXVA2,   ff_ ## codec ## _dxva2_hwaccel)
++    HW_CONFIG_HWACCEL(DXVA2_VLD, 0,  DXVA2,   ff_ ## codec ## _dxva2_hwaccel)
+ #define HWACCEL_D3D11VA2(codec) \
+-    HW_CONFIG_HWACCEL(D3D11,     D3D11VA, ff_ ## codec ## _d3d11va2_hwaccel)
++    HW_CONFIG_HWACCEL(D3D11,     0,  D3D11VA, ff_ ## codec ## _d3d11va2_hwaccel)
+ #define HWACCEL_NVDEC(codec) \
+-    HW_CONFIG_HWACCEL(CUDA,      CUDA,    ff_ ## codec ## _nvdec_hwaccel)
++    HW_CONFIG_HWACCEL(CUDA,      0, CUDA,    ff_ ## codec ## _nvdec_hwaccel)
+ #define HWACCEL_VAAPI(codec) \
+-    HW_CONFIG_HWACCEL(VAAPI,     VAAPI,   ff_ ## codec ## _vaapi_hwaccel)
++    HW_CONFIG_HWACCEL(VAAPI,     0,  VAAPI,   ff_ ## codec ## _vaapi_hwaccel)
+ #define HWACCEL_VDPAU(codec) \
+-    HW_CONFIG_HWACCEL(VDPAU,     VDPAU,   ff_ ## codec ## _vdpau_hwaccel)
++    HW_CONFIG_HWACCEL(VDPAU,     0,  VDPAU,   ff_ ## codec ## _vdpau_hwaccel)
+ #define HWACCEL_VIDEOTOOLBOX(codec) \
+-    HW_CONFIG_HWACCEL(VIDEOTOOLBOX, VIDEOTOOLBOX, ff_ ## codec ## _videotoolbox_hwaccel)
++    HW_CONFIG_HWACCEL(VIDEOTOOLBOX, 0, VIDEOTOOLBOX, ff_ ## codec ## _videotoolbox_hwaccel)
+ 
+ #define HWACCEL_D3D11VA(codec) \
+     HW_CONFIG_AD_HOC_HWACCEL(D3D11VA_VLD, ff_ ## codec ## _d3d11va_hwaccel)

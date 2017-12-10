@@ -231,6 +231,8 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
 ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
+	$(APPLY) $(SRC)/ffmpeg/lavc-change-HW_CONFIG_HWACCEL-arguments.patch
+	$(APPLY) $(SRC)/ffmpeg/lavc-add-back-AD_HOC-method-for-DXVA2-D3D11-VAAPI-VDPAU.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
