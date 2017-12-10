@@ -89,16 +89,14 @@ static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
     assert( *size <= SSIZE_MAX );
 
     size_t len = strnlen( (const char *)*in, *size );
-    if( len == 0 )
+    if( len == 0 || len >= *size )
         return NULL;
 
-    char *ret = malloc( len + 1 );
-    if( likely(ret != NULL) )
-    {
-        memcpy( ret, *in, len );
-        ret[len] = '\0';
-    }
     len++;
+
+    char *ret = malloc( len );
+    if( likely(ret != NULL) )
+        memcpy( ret, *in, len );
     *in += len;
     *size -= len;
     return ret;
