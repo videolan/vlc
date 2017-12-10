@@ -22,6 +22,9 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+#include <string.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
@@ -43,62 +46,44 @@ static ssize_t Read (stream_t *, void *, size_t);
 static int Seek (stream_t *, uint64_t);
 static int Control (stream_t *, int, va_list);
 
-struct access_sys_t
-{
-    size_t offset;
-    size_t length;
-};
-
 static int Open (vlc_object_t *obj)
 {
     stream_t *access = (stream_t *)obj;
-    size_t len = strlen (access->psz_location);
-
-    access_sys_t *sys = vlc_obj_malloc(obj, sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    sys->offset = 0;
-    sys->length = len;
 
     access->pf_read = Read;
     access->pf_block = NULL;
     access->pf_seek = Seek;
     access->pf_control = Control;
-    access->p_sys = sys;
+    access->p_sys = (char *)access->psz_location;
 
     return VLC_SUCCESS;
 }
 
 static ssize_t Read (stream_t *access, void *buf, size_t len)
 {
-    access_sys_t *sys = access->p_sys;
+    char *in = access->p_sys, *out = buf;
+    size_t i;
 
-    if (sys->offset >= sys->length)
-        return 0;
+    for (i = 0; i < len && *in != '\0'; i++)
+        *(out++) = *(in++);
 
-    if (len > sys->length - sys->offset)
-        len = sys->length - sys->offset;
-    memcpy(buf, access->psz_location + sys->offset, len);
-    sys->offset += len;
-    return len;
+    access->p_sys = in;
+    return i;
 }
 
 static int Seek (stream_t *access, uint64_t position)
 {
-    access_sys_t *sys = access->p_sys;
-
-    if (position > sys->length)
-        position = sys->length;
-
-    sys->offset = position;
+#if (UINT64_MAX > SIZE_MAX)
+    if (unlikely(position > SIZE_MAX))
+        position = SIZE_MAX;
+#endif
+    access->p_sys = (char *)access->psz_location
+                    + strnlen(access->psz_location, position);
     return VLC_SUCCESS;
 }
 
 static int Control (stream_t *access, int query, va_list args)
 {
-    access_sys_t *sys = access->p_sys;
-
     switch (query)
     {
         case STREAM_CAN_SEEK:
@@ -106,13 +91,13 @@ static int Control (stream_t *access, int query, va_list args)
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
         {
-            bool *b = va_arg(args, bool*);
+            bool *b = va_arg(args, bool *);
             *b = true;
             return VLC_SUCCESS;
         }
 
         case STREAM_GET_SIZE:
-            *va_arg(args, uint64_t *) = sys->length;
+            *va_arg(args, uint64_t *) = strlen(access->psz_location);
             return VLC_SUCCESS;
 
         case STREAM_GET_PTS_DELAY:
