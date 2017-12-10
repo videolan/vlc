@@ -47,7 +47,6 @@ struct access_sys_t
 {
     size_t offset;
     size_t length;
-    char   data[];
 };
 
 static int Open (vlc_object_t *obj)
@@ -55,14 +54,12 @@ static int Open (vlc_object_t *obj)
     stream_t *access = (stream_t *)obj;
     size_t len = strlen (access->psz_location);
 
-    access_sys_t *sys = vlc_obj_malloc(obj, sizeof(*sys) + len);
+    access_sys_t *sys = vlc_obj_malloc(obj, sizeof(*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    /* NOTE: This copy is not really needed. Better safe than sorry. */
     sys->offset = 0;
     sys->length = len;
-    memcpy (sys->data, access->psz_location, len);
 
     access->pf_read = Read;
     access->pf_block = NULL;
@@ -82,7 +79,7 @@ static ssize_t Read (stream_t *access, void *buf, size_t len)
 
     if (len > sys->length - sys->offset)
         len = sys->length - sys->offset;
-    memcpy (buf, sys->data + sys->offset, len);
+    memcpy(buf, access->psz_location + sys->offset, len);
     sys->offset += len;
     return len;
 }
