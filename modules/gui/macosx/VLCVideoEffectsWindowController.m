@@ -909,8 +909,7 @@
 
 - (IBAction)adjustSliderChanged:(id)sender
 {
-    char const *psz_property;
-
+    char const *psz_property = nil;
     if (sender == _adjustBrightnessSlider)
         psz_property = "brightness";
     else if (sender == _adjustContrastSlider)
@@ -921,6 +920,8 @@
         psz_property = "hue";
     else if (sender == _adjustSaturationSlider)
         psz_property = "saturation";
+    assert(psz_property);
+
     [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: psz_property forFilter: "adjust" withValue: getWidgetFloatValue(sender)];
 
     if (sender == _adjustHueSlider)
