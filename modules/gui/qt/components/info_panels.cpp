@@ -646,6 +646,11 @@ void InputStatsPanel::update( input_item_t *p_item )
 {
     if ( !isVisible() ) return;
     assert( p_item );
+
+    vlc_mutex_locker(&p_item->lock);
+    if( p_item->p_stats == NULL )
+        return;
+
     vlc_mutex_lock( &p_item->p_stats->lock );
 
 #define UPDATE_INT( widget, calc... ) \
