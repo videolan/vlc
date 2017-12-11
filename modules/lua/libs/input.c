@@ -191,7 +191,12 @@ static int vlclua_input_item_stats( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
     lua_newtable( L );
-    if( p_item )
+    if( p_item == NULL )
+        return 1;
+
+    vlc_mutex_lock( &p_item->lock );
+    input_stats_t *p_stats = p_item->p_stats;
+    if( p_stats != NULL )
     {
         vlc_mutex_lock( &p_item->p_stats->lock );
 #define STATS_INT( n ) lua_pushinteger( L, p_item->p_stats->i_ ## n ); \
@@ -221,6 +226,7 @@ static int vlclua_input_item_stats( lua_State *L )
 #undef STATS_FLOAT
         vlc_mutex_unlock( &p_item->p_stats->lock );
     }
+    vlc_mutex_unlock( &p_item->lock );
     return 1;
 }
 
