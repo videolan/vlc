@@ -34,6 +34,15 @@
 #include "input_interface.h"
 #include "misc/interrupt.h"
 
+typedef struct input_rate_t
+{
+    struct
+    {
+        uintmax_t value;
+        mtime_t   date;
+    } samples[2];
+} input_rate_t;
+
 /*****************************************************************************
  *  Private input fields
  *****************************************************************************/
@@ -150,9 +159,9 @@ typedef struct input_thread_private_t
     struct {
         uintmax_t read_packets;
         uintmax_t read_bytes;
-        counter_t *p_input_bitrate;
+        input_rate_t input_bitrate;
         uintmax_t demux_read;
-        counter_t *p_demux_bitrate;
+        input_rate_t demux_bitrate;
         uintmax_t demux_corrupted;
         uintmax_t demux_discontinuity;
         uintmax_t decoded_audio;
@@ -160,7 +169,7 @@ typedef struct input_thread_private_t
         uintmax_t decoded_sub;
         uintmax_t sout_sent_packets;
         uintmax_t sout_sent_bytes;
-        counter_t *p_sout_send_bitrate;
+        input_rate_t sout_send_bitrate;
         uintmax_t played_abuffers;
         uintmax_t lost_abuffers;
         uintmax_t displayed_pictures;
@@ -282,12 +291,8 @@ void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
 void input_item_node_PostAndDelete( input_item_node_t *p_node );
 
 /* stats.c */
-typedef struct counter_t counter_t;
-
-counter_t * stats_CounterCreate(void);
-void stats_Update(counter_t *, uint64_t);
-void stats_CounterClean (counter_t * );
-
-void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
+void input_rate_Init(input_rate_t *rate);
+void input_rate_Update(input_rate_t *, uintmax_t);
+void input_stats_Compute(input_thread_t *, input_stats_t*);
 
 #endif

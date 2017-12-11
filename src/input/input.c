@@ -670,7 +670,7 @@ static void MainLoopStatistics( input_thread_t *p_input )
     vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
     input_priv(p_input)->bookmark.i_time_offset = i_time;
 
-    stats_ComputeInputStats( p_input, input_priv(p_input)->p_item->p_stats );
+    input_stats_Compute( p_input, input_priv(p_input)->p_item->p_stats );
     vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
     input_SendEventStatistics( p_input );
@@ -811,15 +811,11 @@ static void InitStatistics( input_thread_t *p_input )
     if( priv->b_preparsing ) return;
 
     /* Prepare statistics */
-#define INIT_COUNTER( c ) free( priv->counters.p_##c ); \
-    priv->counters.p_##c = stats_CounterCreate( );
     if( libvlc_stats( p_input ) )
     {
         priv->counters.read_bytes = 0;
         priv->counters.read_packets = 0;
         priv->counters.demux_read = 0;
-        INIT_COUNTER( input_bitrate );
-        INIT_COUNTER( demux_bitrate );
         priv->counters.demux_corrupted = 0;
         priv->counters.demux_discontinuity = 0;
         priv->counters.played_abuffers = 0;
@@ -829,9 +825,11 @@ static void InitStatistics( input_thread_t *p_input )
         priv->counters.decoded_audio = 0;
         priv->counters.decoded_video = 0;
         priv->counters.decoded_sub = 0;
-        priv->counters.p_sout_send_bitrate = NULL;
         priv->counters.sout_sent_packets = 0;
         priv->counters.sout_sent_bytes = 0;
+        input_rate_Init( &priv->counters.input_bitrate );
+        input_rate_Init( &priv->counters.demux_bitrate );
+        input_rate_Init( &priv->counters.sout_send_bitrate );
     }
 }
 
@@ -863,10 +861,6 @@ static int InitSout( input_thread_t * p_input )
                               "aborting" );
             free( psz );
             return VLC_EGENERIC;
-        }
-        if( libvlc_stats( p_input ) )
-        {
-            INIT_COUNTER( sout_send_bitrate );
         }
     }
     else
@@ -1415,21 +1409,6 @@ error:
             input_resource_Terminate( input_priv(p_input)->p_resource_private );
     }
 
-    if( !priv->b_preparsing && libvlc_stats( p_input ) )
-    {
-#define EXIT_COUNTER( c ) do { if( input_priv(p_input)->counters.p_##c ) \
-                                   stats_CounterClean( input_priv(p_input)->counters.p_##c );\
-                               input_priv(p_input)->counters.p_##c = NULL; } while(0)
-        EXIT_COUNTER( input_bitrate );
-        EXIT_COUNTER( demux_bitrate );
-
-        if( input_priv(p_input)->p_sout )
-        {
-            EXIT_COUNTER( sout_send_bitrate );
-        }
-#undef EXIT_COUNTER
-    }
-
     /* Mark them deleted */
     input_priv(p_input)->p_es_out = NULL;
     input_priv(p_input)->p_sout = NULL;
@@ -1472,29 +1451,14 @@ static void End( input_thread_t * p_input )
 
     if( !priv->b_preparsing )
     {
-#define CL_CO( c ) \
-do { \
-    stats_CounterClean( priv->counters.p_##c ); \
-    priv->counters.p_##c = NULL; \
-} while (0)
-
         if( libvlc_stats( p_input ) )
         {
             input_item_t *item = priv->p_item;
             /* make sure we are up to date */
             vlc_mutex_lock( &item->lock );
-            stats_ComputeInputStats( p_input, item->p_stats );
+            input_stats_Compute( p_input, item->p_stats );
             vlc_mutex_unlock( &item->lock );
-            CL_CO( input_bitrate );
-            CL_CO( demux_bitrate );
         }
-
-        /* Close optional stream output instance */
-        if( priv->p_sout )
-        {
-            CL_CO( sout_send_bitrate );
-        }
-#undef CL_CO
     }
 
     vlc_mutex_lock( &priv->p_item->lock );
