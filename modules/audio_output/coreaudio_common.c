@@ -51,6 +51,7 @@ ca_Open(audio_output_t *p_aout)
     atomic_init(&p_sys->b_paused, false);
     atomic_init(&p_sys->b_do_flush, false);
     vlc_sem_init(&p_sys->flush_sem, 0);
+    vlc_mutex_init(&p_sys->lock);
 
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
@@ -64,6 +65,7 @@ ca_Close(audio_output_t *p_aout)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     vlc_sem_destroy(&p_sys->flush_sem);
+    vlc_mutex_destroy(&p_sys->lock);
 }
 
 /* Called from render callbacks. No lock, wait, and IO here */
@@ -134,6 +136,12 @@ ca_Flush(audio_output_t *p_aout, bool wait)
 
         while (TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes) != NULL)
         {
+            if (atomic_load(&p_sys->b_paused))
+            {
+                TPCircularBufferClear(&p_sys->circular_buffer);
+                return;
+            }
+
             /* Calculate the duration of the circular buffer, in order to wait
              * for the render thread to play it all */
             const mtime_t i_frame_us =
@@ -144,9 +152,23 @@ ca_Flush(audio_output_t *p_aout, bool wait)
     }
     else
     {
-        /* Request the renderer to flush, and wait for an ACK */
+        /* Request the renderer to flush, and wait for an ACK.
+         * b_do_flush and b_paused need to be locked together in order to not
+         * get stuck here when b_paused is being set after reading. This can
+         * happen when setAliveState() is called from any thread through an
+         * interrupt notification */
+
+        vlc_mutex_lock(&p_sys->lock);
         assert(!atomic_load(&p_sys->b_do_flush));
+         if (atomic_load(&p_sys->b_paused))
+        {
+            vlc_mutex_unlock(&p_sys->lock);
+            TPCircularBufferClear(&p_sys->circular_buffer);
+            return;
+        }
+
         atomic_store_explicit(&p_sys->b_do_flush, true, memory_order_release);
+        vlc_mutex_unlock(&p_sys->lock);
         vlc_sem_wait(&p_sys->flush_sem);
     }
 }
@@ -259,9 +281,26 @@ void
 ca_Uninitialize(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
+}
+
+void
+ca_SetAliveState(audio_output_t *p_aout, bool alive)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    vlc_mutex_lock(&p_sys->lock);
+    atomic_store(&p_sys->b_paused, !alive);
+
+    bool expected = true;
+    if (!alive && atomic_compare_exchange_strong(&p_sys->b_do_flush, &expected, false))
+    {
+        TPCircularBufferClear(&p_sys->circular_buffer);
+        /* Signal that the renderer is flushed */
+        vlc_sem_post(&p_sys->flush_sem);
+    }
+    vlc_mutex_unlock(&p_sys->lock);
 }
 
 AudioUnit
