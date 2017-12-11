@@ -64,13 +64,6 @@ counter_t * stats_CounterCreate( int i_compute_type )
     return p_counter;
 }
 
-static inline int64_t stats_GetTotal(const counter_t *counter)
-{
-    if (counter == NULL || counter->i_samples == 0)
-        return 0;
-    return counter->pp_samples[0]->value;
-}
-
 static inline float stats_GetRate(const counter_t *counter)
 {
     if (counter == NULL || counter->i_samples < 2)
@@ -104,33 +97,33 @@ void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
     vlc_mutex_lock(&st->lock);
 
     /* Input */
-    st->i_read_packets = stats_GetTotal(priv->counters.p_read_packets);
-    st->i_read_bytes = stats_GetTotal(priv->counters.p_read_bytes);
+    st->i_read_packets = priv->counters.read_packets;
+    st->i_read_bytes = priv->counters.read_bytes;
     st->f_input_bitrate = stats_GetRate(priv->counters.p_input_bitrate);
-    st->i_demux_read_bytes = stats_GetTotal(priv->counters.p_demux_read);
+    st->i_demux_read_bytes = priv->counters.demux_read;
     st->f_demux_bitrate = stats_GetRate(priv->counters.p_demux_bitrate);
-    st->i_demux_corrupted = stats_GetTotal(priv->counters.p_demux_corrupted);
-    st->i_demux_discontinuity = stats_GetTotal(priv->counters.p_demux_discontinuity);
+    st->i_demux_corrupted = priv->counters.demux_corrupted;
+    st->i_demux_discontinuity = priv->counters.demux_discontinuity;
 
     /* Decoders */
-    st->i_decoded_video = stats_GetTotal(priv->counters.p_decoded_video);
-    st->i_decoded_audio = stats_GetTotal(priv->counters.p_decoded_audio);
+    st->i_decoded_video = priv->counters.decoded_video;
+    st->i_decoded_audio = priv->counters.decoded_audio;
 
     /* Sout */
     if (priv->counters.p_sout_send_bitrate)
     {
-        st->i_sent_packets = stats_GetTotal(priv->counters.p_sout_sent_packets);
-        st->i_sent_bytes = stats_GetTotal(priv->counters.p_sout_sent_bytes);
+        st->i_sent_packets = priv->counters.sout_sent_packets;
+        st->i_sent_bytes = priv->counters.sout_sent_bytes;
         st->f_send_bitrate = stats_GetRate(priv->counters.p_sout_send_bitrate);
     }
 
     /* Aout */
-    st->i_played_abuffers = stats_GetTotal(priv->counters.p_played_abuffers);
-    st->i_lost_abuffers = stats_GetTotal(priv->counters.p_lost_abuffers);
+    st->i_played_abuffers = priv->counters.played_abuffers;
+    st->i_lost_abuffers = priv->counters.lost_abuffers;
 
     /* Vouts */
-    st->i_displayed_pictures = stats_GetTotal(priv->counters.p_displayed_pictures);
-    st->i_lost_pictures = stats_GetTotal(priv->counters.p_lost_pictures);
+    st->i_displayed_pictures = priv->counters.displayed_pictures;
+    st->i_lost_pictures = priv->counters.lost_pictures;
 
     vlc_mutex_unlock(&st->lock);
     vlc_mutex_unlock(&priv->counters.counters_lock);
@@ -201,24 +194,5 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
         }
         break;
     }
-    case STATS_COUNTER:
-        if( p_counter->i_samples == 0 )
-        {
-            counter_sample_t *p_new = (counter_sample_t*)malloc(
-                                               sizeof( counter_sample_t ) );
-            if (unlikely(p_new == NULL))
-                return; /* NOTE: Losing sample here */
-
-            p_new->value = 0;
-
-            TAB_APPEND(p_counter->i_samples, p_counter->pp_samples, p_new);
-        }
-        if( p_counter->i_samples == 1 )
-        {
-            p_counter->pp_samples[0]->value += val;
-            if( new_val )
-                *new_val = p_counter->pp_samples[0]->value;
-        }
-        break;
     }
 }

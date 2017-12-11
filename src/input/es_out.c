@@ -2046,20 +2046,17 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         uint64_t i_total;
 
         vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock );
-        stats_Update( input_priv(p_input)->counters.p_demux_read,
-                      p_block->i_buffer, &i_total );
+        i_total =
+            (input_priv(p_input)->counters.demux_read += p_block->i_buffer);
         stats_Update( input_priv(p_input)->counters.p_demux_bitrate, i_total, NULL );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        {
-            stats_Update( input_priv(p_input)->counters.p_demux_corrupted, 1, NULL );
-        }
+            input_priv(p_input)->counters.demux_corrupted++;
+
         /* Update number of discontinuities */
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        {
-            stats_Update( input_priv(p_input)->counters.p_demux_discontinuity, 1, NULL );
-        }
+            input_priv(p_input)->counters.demux_discontinuity++;
         vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock );
     }
 

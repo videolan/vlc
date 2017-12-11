@@ -215,7 +215,6 @@ void var_OptionParse (vlc_object_t *, const char *, bool trusted);
  */
 enum
 {
-    STATS_COUNTER,
     STATS_DERIVATIVE,
 };
 

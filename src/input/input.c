@@ -815,23 +815,23 @@ static void InitStatistics( input_thread_t *p_input )
  stats_CounterCreate( STATS_##compute);
     if( libvlc_stats( p_input ) )
     {
-        INIT_COUNTER( read_bytes, COUNTER );
-        INIT_COUNTER( read_packets, COUNTER );
-        INIT_COUNTER( demux_read, COUNTER );
+        priv->counters.read_bytes = 0;
+        priv->counters.read_packets = 0;
+        priv->counters.demux_read = 0;
         INIT_COUNTER( input_bitrate, DERIVATIVE );
         INIT_COUNTER( demux_bitrate, DERIVATIVE );
-        INIT_COUNTER( demux_corrupted, COUNTER );
-        INIT_COUNTER( demux_discontinuity, COUNTER );
-        INIT_COUNTER( played_abuffers, COUNTER );
-        INIT_COUNTER( lost_abuffers, COUNTER );
-        INIT_COUNTER( displayed_pictures, COUNTER );
-        INIT_COUNTER( lost_pictures, COUNTER );
-        INIT_COUNTER( decoded_audio, COUNTER );
-        INIT_COUNTER( decoded_video, COUNTER );
-        INIT_COUNTER( decoded_sub, COUNTER );
+        priv->counters.demux_corrupted = 0;
+        priv->counters.demux_discontinuity = 0;
+        priv->counters.played_abuffers = 0;
+        priv->counters.lost_abuffers = 0;
+        priv->counters.displayed_pictures = 0;
+        priv->counters.lost_pictures = 0;
+        priv->counters.decoded_audio = 0;
+        priv->counters.decoded_video = 0;
+        priv->counters.decoded_sub = 0;
         priv->counters.p_sout_send_bitrate = NULL;
-        priv->counters.p_sout_sent_packets = NULL;
-        priv->counters.p_sout_sent_bytes = NULL;
+        priv->counters.sout_sent_packets = 0;
+        priv->counters.sout_sent_bytes = 0;
     }
 }
 
@@ -866,8 +866,6 @@ static int InitSout( input_thread_t * p_input )
         }
         if( libvlc_stats( p_input ) )
         {
-            INIT_COUNTER( sout_sent_packets, COUNTER );
-            INIT_COUNTER( sout_sent_bytes, COUNTER );
             INIT_COUNTER( sout_send_bitrate, DERIVATIVE );
         }
     }
@@ -1422,25 +1420,11 @@ error:
 #define EXIT_COUNTER( c ) do { if( input_priv(p_input)->counters.p_##c ) \
                                    stats_CounterClean( input_priv(p_input)->counters.p_##c );\
                                input_priv(p_input)->counters.p_##c = NULL; } while(0)
-        EXIT_COUNTER( read_bytes );
-        EXIT_COUNTER( read_packets );
-        EXIT_COUNTER( demux_read );
         EXIT_COUNTER( input_bitrate );
         EXIT_COUNTER( demux_bitrate );
-        EXIT_COUNTER( demux_corrupted );
-        EXIT_COUNTER( demux_discontinuity );
-        EXIT_COUNTER( played_abuffers );
-        EXIT_COUNTER( lost_abuffers );
-        EXIT_COUNTER( displayed_pictures );
-        EXIT_COUNTER( lost_pictures );
-        EXIT_COUNTER( decoded_audio );
-        EXIT_COUNTER( decoded_video );
-        EXIT_COUNTER( decoded_sub );
 
         if( input_priv(p_input)->p_sout )
         {
-            EXIT_COUNTER( sout_sent_packets );
-            EXIT_COUNTER( sout_sent_bytes );
             EXIT_COUNTER( sout_send_bitrate );
         }
 #undef EXIT_COUNTER
@@ -1498,27 +1482,13 @@ do { \
         {
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, priv->p_item->p_stats );
-            CL_CO( read_bytes );
-            CL_CO( read_packets );
-            CL_CO( demux_read );
             CL_CO( input_bitrate );
             CL_CO( demux_bitrate );
-            CL_CO( demux_corrupted );
-            CL_CO( demux_discontinuity );
-            CL_CO( played_abuffers );
-            CL_CO( lost_abuffers );
-            CL_CO( displayed_pictures );
-            CL_CO( lost_pictures );
-            CL_CO( decoded_audio) ;
-            CL_CO( decoded_video );
-            CL_CO( decoded_sub) ;
         }
 
         /* Close optional stream output instance */
         if( priv->p_sout )
         {
-            CL_CO( sout_sent_packets );
-            CL_CO( sout_sent_bytes );
             CL_CO( sout_send_bitrate );
         }
 #undef CL_CO

@@ -148,23 +148,23 @@ typedef struct input_thread_private_t
 
     /* Stats counters */
     struct {
-        counter_t *p_read_packets;
-        counter_t *p_read_bytes;
+        uintmax_t read_packets;
+        uintmax_t read_bytes;
         counter_t *p_input_bitrate;
-        counter_t *p_demux_read;
+        uintmax_t demux_read;
         counter_t *p_demux_bitrate;
-        counter_t *p_demux_corrupted;
-        counter_t *p_demux_discontinuity;
-        counter_t *p_decoded_audio;
-        counter_t *p_decoded_video;
-        counter_t *p_decoded_sub;
-        counter_t *p_sout_sent_packets;
-        counter_t *p_sout_sent_bytes;
+        uintmax_t demux_corrupted;
+        uintmax_t demux_discontinuity;
+        uintmax_t decoded_audio;
+        uintmax_t decoded_video;
+        uintmax_t decoded_sub;
+        uintmax_t sout_sent_packets;
+        uintmax_t sout_sent_bytes;
         counter_t *p_sout_send_bitrate;
-        counter_t *p_played_abuffers;
-        counter_t *p_lost_abuffers;
-        counter_t *p_displayed_pictures;
-        counter_t *p_lost_pictures;
+        uintmax_t played_abuffers;
+        uintmax_t lost_abuffers;
+        uintmax_t displayed_pictures;
+        uintmax_t lost_pictures;
         vlc_mutex_t counters_lock;
     } counters;
 
