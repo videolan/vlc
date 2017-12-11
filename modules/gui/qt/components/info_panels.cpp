@@ -651,8 +651,6 @@ void InputStatsPanel::update( input_item_t *p_item )
     if( p_item->p_stats == NULL )
         return;
 
-    vlc_mutex_lock( &p_item->p_stats->lock );
-
 #define UPDATE_INT( widget, calc... ) \
     { widget->setText( 1, QString::number( (qulonglong)calc ) ); }
 
@@ -685,8 +683,6 @@ void InputStatsPanel::update( input_item_t *p_item )
 
 #undef UPDATE_INT
 #undef UPDATE_FLOAT
-
-    vlc_mutex_unlock(& p_item->p_stats->lock );
 }
 
 void InputStatsPanel::clear()

@@ -593,12 +593,8 @@ char *vlc_strfinput(input_thread_t *input, const char *s)
                 {
                     vlc_mutex_lock(&item->lock);
                     if (item->p_stats != NULL)
-                    {
-                        vlc_mutex_lock(&item->p_stats->lock);
                         vlc_memstream_printf(stream, "%"PRIi64,
                             item->p_stats->i_displayed_pictures);
-                        vlc_mutex_unlock(&item->p_stats->lock);
-                    }
                     else if (!b_empty_if_na)
                         vlc_memstream_putc(stream, '-');
                     vlc_mutex_unlock(&item->lock);

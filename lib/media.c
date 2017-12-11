@@ -712,7 +712,6 @@ int libvlc_media_get_stats( libvlc_media_t *p_md,
         return false;
     }
 
-    vlc_mutex_lock( &p_itm_stats->lock );
     p_stats->i_read_bytes = p_itm_stats->i_read_bytes;
     p_stats->f_input_bitrate = p_itm_stats->f_input_bitrate;
 
@@ -733,7 +732,6 @@ int libvlc_media_get_stats( libvlc_media_t *p_md,
     p_stats->i_sent_packets = p_itm_stats->i_sent_packets;
     p_stats->i_sent_bytes = p_itm_stats->i_sent_bytes;
     p_stats->f_send_bitrate = p_itm_stats->f_send_bitrate;
-    vlc_mutex_unlock( &p_itm_stats->lock );
     vlc_mutex_unlock( &item->lock );
     return true;
 }

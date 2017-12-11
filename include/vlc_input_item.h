@@ -389,8 +389,6 @@ VLC_API void libvlc_MetadataCancel( libvlc_int_t *, void * );
  ******************/
 struct input_stats_t
 {
-    vlc_mutex_t         lock;
-
     /* Input */
     int64_t i_read_packets;
     int64_t i_read_bytes;

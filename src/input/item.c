@@ -486,11 +486,7 @@ void input_item_Release( input_item_t *p_item )
 
     free( p_item->psz_name );
     free( p_item->psz_uri );
-    if( p_item->p_stats != NULL )
-    {
-        vlc_mutex_destroy( &p_item->p_stats->lock );
-        free( p_item->p_stats );
-    }
+    free( p_item->p_stats );
 
     if( p_item->p_meta != NULL )
         vlc_meta_Delete( p_item->p_meta );

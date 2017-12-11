@@ -276,8 +276,6 @@ FREENULL( psz_##foo );
     if (![self.window isVisible])
         return;
 
-    vlc_mutex_lock(&p_item->p_stats->lock);
-
     /* input */
     [_readBytesTextField setStringValue: [NSString stringWithFormat:
                                           @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
@@ -304,8 +302,6 @@ FREENULL( psz_##foo );
     [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];
     [_playedAudioBuffersTextField setIntValue: p_item->p_stats->i_played_abuffers];
     [_lostAudioBuffersTextField setIntValue: p_item->p_stats->i_lost_abuffers];
-
-    vlc_mutex_unlock(&p_item->p_stats->lock);
 }
 
 - (void)updateStreamsList

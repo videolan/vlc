@@ -344,7 +344,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_lock( &p_item->lock );
 
     if( !p_item->p_stats )
-        p_item->p_stats = stats_NewInputStats( p_input );
+        p_item->p_stats = calloc( 1, sizeof(*p_item->p_stats) );
 
     /* setup the preparse depth of the item
      * if we are preparsing, use the i_preparse_depth of the parent item */
@@ -669,9 +669,10 @@ static void MainLoopStatistics( input_thread_t *p_input )
     /* update current bookmark */
     vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
     input_priv(p_input)->bookmark.i_time_offset = i_time;
-    vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
     stats_ComputeInputStats( p_input, input_priv(p_input)->p_item->p_stats );
+    vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+
     input_SendEventStatistics( p_input );
 }
 
@@ -1479,8 +1480,11 @@ do { \
 
         if( libvlc_stats( p_input ) )
         {
+            input_item_t *item = priv->p_item;
             /* make sure we are up to date */
-            stats_ComputeInputStats( p_input, priv->p_item->p_stats );
+            vlc_mutex_lock( &item->lock );
+            stats_ComputeInputStats( p_input, item->p_stats );
+            vlc_mutex_unlock( &item->lock );
             CL_CO( input_bitrate );
             CL_CO( demux_bitrate );
         }

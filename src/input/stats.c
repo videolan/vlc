@@ -67,18 +67,6 @@ static inline float stats_GetRate(const counter_t *counter)
         / (float)(counter->pp_samples[0]->date - counter->pp_samples[1]->date);
 }
 
-input_stats_t *stats_NewInputStats( input_thread_t *p_input )
-{
-    (void)p_input;
-    input_stats_t *p_stats = calloc( 1, sizeof(input_stats_t) );
-    if( !p_stats )
-        return NULL;
-
-    vlc_mutex_init( &p_stats->lock );
-
-    return p_stats;
-}
-
 void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
 {
     input_thread_private_t *priv = input_priv(input);
@@ -87,7 +75,6 @@ void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
         return;
 
     vlc_mutex_lock(&priv->counters.counters_lock);
-    vlc_mutex_lock(&st->lock);
 
     /* Input */
     st->i_read_packets = priv->counters.read_packets;
@@ -118,7 +105,6 @@ void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
     st->i_displayed_pictures = priv->counters.displayed_pictures;
     st->i_lost_pictures = priv->counters.lost_pictures;
 
-    vlc_mutex_unlock(&st->lock);
     vlc_mutex_unlock(&priv->counters.counters_lock);
 }
 

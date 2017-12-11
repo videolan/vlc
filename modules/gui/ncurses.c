@@ -796,7 +796,6 @@ static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
 
     vlc_mutex_lock(&item->lock);
     p_stats = item->p_stats;
-    vlc_mutex_lock(&p_stats->lock);
 
     for (int i = 0; i < item->i_es ; i++) {
         i_audio += (item->es[i]->i_cat == AUDIO_ES);
@@ -851,7 +850,6 @@ static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
             p_stats->f_send_bitrate*8000);
     if (sys->color) color_set(C_DEFAULT, NULL);
 
-    vlc_mutex_unlock(&p_stats->lock);
     vlc_mutex_unlock(&item->lock);
 
     return l;
