@@ -215,8 +215,7 @@ static ttml_length_t ttml_read_length( const char *psz )
 }
 
 static ttml_length_t ttml_rebase_length( ttml_length_t value,
-                                         ttml_length_t reference,
-                                         unsigned i_cell_resolution )
+                                         ttml_length_t reference )
 {
     if( value.unit == TTML_UNIT_PERCENT )
     {
@@ -225,7 +224,7 @@ static ttml_length_t ttml_rebase_length( ttml_length_t value,
     }
     else if( value.unit == TTML_UNIT_CELL )
     {
-        value.i_value *= reference.i_value / i_cell_resolution;
+        value.i_value *= reference.i_value;
         value.unit = reference.unit;
     }
     // pixels as-is
@@ -353,7 +352,7 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
 }
 
 static void FillRegionStyle( const char *psz_attr, const char *psz_val,
-                             ttml_context_t *p_ctx, ttml_region_t *p_region )
+                             ttml_region_t *p_region )
 {
     if( !strcasecmp( "tts:displayAlign", psz_attr ) )
     {
@@ -383,8 +382,8 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
         if ( x.unit != TTML_UNIT_UNKNOWN && y.unit != TTML_UNIT_UNKNOWN )
         {
             ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
-            x = ttml_rebase_length( x, base, p_ctx->i_cell_resolution_h );
-            y = ttml_rebase_length( y, base, p_ctx->i_cell_resolution_v );
+            x = ttml_rebase_length( x, base );
+            y = ttml_rebase_length( y, base );
             if( psz_attr[4] == 'o' )
             {
                 p_region->updt.origin.x = x.i_value / 100.0;
@@ -435,8 +434,7 @@ static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_
      * Default value conversion must also not depend on attribute presence */
     text_style_t *p_text_style = p_ttml_style->font_style;
     ttml_length_t len = p_ttml_style->font_size;
-    len = ttml_rebase_length( len, p_ctx->root_extent_h,
-                              p_ctx->i_cell_resolution_v );
+    len = ttml_rebase_length( len, p_ctx->root_extent_h );
     if( len.unit == TTML_UNIT_CELL )
         p_text_style->f_font_relsize = 100.0 * len.i_value /
                     (p_ctx->i_cell_resolution_v / TTML_LINE_TO_HEIGHT_RATIO);
@@ -743,7 +741,7 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
                           p_entry != NULL; p_entry = p_entry->p_next )
                     {
                         FillRegionStyle( p_entry->psz_key, p_entry->p_value,
-                                         p_ctx, p_region );
+                                         p_region );
                     }
                 }
             }
