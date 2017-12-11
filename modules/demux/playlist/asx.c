@@ -510,10 +510,7 @@ static char* ASXToXML( char* psz_source )
         }
     }
     if( vlc_memstream_close( &stream_out ) != 0 )
-    {
-        free( stream_out.ptr );
         return NULL;
-    }
 
     return stream_out.ptr;
 }
