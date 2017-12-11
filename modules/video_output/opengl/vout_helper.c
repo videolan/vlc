@@ -987,32 +987,32 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    opengl_tex_converter_t *tc = vgl->prgm->tc;
-    if (!tc->handle_texs_gen)
-        DelTextures(tc, vgl->texture);
-
-    tc = vgl->sub_prgm->tc;
-    for (int i = 0; i < vgl->region_count; i++)
-    {
-        if (vgl->region[i].texture)
-            DelTextures(tc, &vgl->region[i].texture);
-    }
-    free(vgl->region);
-
-    vgl->vt.DeleteBuffers(1, &vgl->vertex_buffer_object);
-    vgl->vt.DeleteBuffers(1, &vgl->index_buffer_object);
-    vgl->vt.DeleteBuffers(vgl->prgm->tc->tex_count, vgl->texture_buffer_object);
-
-    if (vgl->subpicture_buffer_object_count > 0)
-        vgl->vt.DeleteBuffers(vgl->subpicture_buffer_object_count,
-                              vgl->subpicture_buffer_object);
-    free(vgl->subpicture_buffer_object);
+    const size_t main_tex_count = vgl->prgm->tc->tex_count;
+    const bool main_del_texs = !vgl->prgm->tc->handle_texs_gen;
 
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
     opengl_deinit_program(vgl, vgl->prgm);
     opengl_deinit_program(vgl, vgl->sub_prgm);
 
+    vgl->vt.DeleteBuffers(1, &vgl->vertex_buffer_object);
+    vgl->vt.DeleteBuffers(1, &vgl->index_buffer_object);
+    vgl->vt.DeleteBuffers(main_tex_count, vgl->texture_buffer_object);
+
+    if (vgl->subpicture_buffer_object_count > 0)
+        vgl->vt.DeleteBuffers(vgl->subpicture_buffer_object_count,
+                              vgl->subpicture_buffer_object);
+    free(vgl->subpicture_buffer_object);
+
+    if (main_del_texs)
+        vgl->vt.DeleteTextures(main_tex_count, vgl->texture);
+
+    for (int i = 0; i < vgl->region_count; i++)
+    {
+        if (vgl->region[i].texture)
+            vgl->vt.DeleteTextures(1, &vgl->region[i].texture);
+    }
+    free(vgl->region);
     GL_ASSERT_NOERROR();
 
     free(vgl);
