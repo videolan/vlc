@@ -75,7 +75,6 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input )
         return NULL;
 
     vlc_mutex_init( &p_stats->lock );
-    stats_ReinitInputStats( p_stats );
 
     return p_stats;
 }
@@ -121,22 +120,6 @@ void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
 
     vlc_mutex_unlock(&st->lock);
     vlc_mutex_unlock(&priv->counters.counters_lock);
-}
-
-void stats_ReinitInputStats( input_stats_t *p_stats )
-{
-    vlc_mutex_lock( &p_stats->lock );
-    p_stats->i_read_packets = p_stats->i_read_bytes =
-    p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
-    p_stats->i_demux_read_packets = p_stats->i_demux_read_bytes =
-    p_stats->f_demux_bitrate = p_stats->f_average_demux_bitrate =
-    p_stats->i_demux_corrupted = p_stats->i_demux_discontinuity =
-    p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
-    p_stats->i_played_abuffers = p_stats->i_lost_abuffers =
-    p_stats->i_decoded_video = p_stats->i_decoded_audio =
-    p_stats->i_sent_bytes = p_stats->i_sent_packets = p_stats->f_send_bitrate
-     = 0;
-    vlc_mutex_unlock( &p_stats->lock );
 }
 
 void stats_CounterClean( counter_t *p_c )

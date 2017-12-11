@@ -220,6 +220,5 @@ void stats_Update(counter_t *, uint64_t);
 void stats_CounterClean (counter_t * );
 
 void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
-void stats_ReinitInputStats(input_stats_t *);
 
 #endif
