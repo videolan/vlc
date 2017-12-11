@@ -356,16 +356,17 @@ end:
 /// this looks for patterns like &name; &#DEC; or &#xHEX;
 static bool isXmlEncoded(const char* psz_str)
 {
+    assert( psz_str != NULL );
     //look for special characters
     if( strpbrk(psz_str, "<>'\"") != NULL )
         return false;
 
     bool is_escaped = false;
-    while (psz_str != NULL)
+    while( true )
     {
         const char* psz_amp = strchr(psz_str, '&');
         if( psz_amp == NULL )
-            return is_escaped;
+            break;
         const char* psz_end = strchr(psz_amp, ';');
         if(  psz_end == NULL )
             return false;
@@ -413,6 +414,9 @@ static void memstream_puts_xmlencoded(struct vlc_memstream* p_stream, const char
         psz_tmp = strdup( psz_begin );
     else
         psz_tmp = strndup( psz_begin, psz_end - psz_begin );
+
+    if ( psz_tmp == NULL )
+        return;
 
     if( isXmlEncoded( psz_tmp ) )
         vlc_memstream_puts( p_stream, psz_tmp );
