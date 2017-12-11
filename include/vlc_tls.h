@@ -66,7 +66,7 @@ typedef struct vlc_tls
  */
 typedef struct vlc_tls_creds
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     module_t *module;
     void *sys;

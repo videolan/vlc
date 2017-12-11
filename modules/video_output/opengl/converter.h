@@ -219,7 +219,7 @@ typedef struct {
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;
 struct opengl_tex_converter_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     module_t *p_module;
 

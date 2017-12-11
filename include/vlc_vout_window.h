@@ -128,7 +128,7 @@ typedef struct vout_window_owner {
  * Finally, it must support some control requests such as for fullscreen mode.
  */
 struct vout_window_t {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
      /**
       * Window handle type

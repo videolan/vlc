@@ -30,7 +30,7 @@ typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
 
 struct vlc_va_t {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     vlc_va_sys_t *sys;
     module_t *module;

@@ -42,7 +42,7 @@
 
 struct demux_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     /* Module properties */
     module_t    *p_module;
@@ -108,7 +108,7 @@ struct demux_t
 /* demux_meta_t is returned by "meta reader" module to the demuxer */
 typedef struct demux_meta_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
     input_item_t *p_item; /***< the input item that is being read */
 
     vlc_meta_t *p_meta;                 /**< meta data */

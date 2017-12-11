@@ -68,7 +68,7 @@ static inline void fingerprint_request_Delete( fingerprint_request_t *p_f )
 
 struct fingerprinter_thread_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     /* Specific interfaces */
     fingerprinter_sys_t * p_sys;

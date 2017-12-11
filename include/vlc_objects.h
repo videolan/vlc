@@ -74,11 +74,6 @@ struct vlc_common_members
 };
 
 /**
- * Backward compatibility macro
- */
-#define VLC_COMMON_MEMBERS struct vlc_common_members obj;
-
-/**
  * Type-safe vlc_object_t cast
  *
  * This macro attempts to cast a pointer to a compound type to a
@@ -106,13 +101,13 @@ struct vlc_common_members
 /** The main vlc_object_t structure */
 struct vlc_object_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 };
 
 /* The root object */
 struct libvlc_int_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 };
 
 /*****************************************************************************

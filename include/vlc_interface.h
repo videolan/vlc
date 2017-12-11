@@ -45,7 +45,7 @@ typedef struct intf_sys_t intf_sys_t;
 /** Describe all interface-specific data of the interface thread */
 typedef struct intf_thread_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     struct intf_thread_t *p_next; /** LibVLC interfaces book keeping */
 

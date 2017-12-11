@@ -54,7 +54,7 @@ typedef struct decoder_cc_desc_t decoder_cc_desc_t;
  */
 struct decoder_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     /* Module properties */
     module_t *          p_module;
@@ -210,7 +210,7 @@ struct decoder_cc_desc_t
 
 struct encoder_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     /* Module properties */
     module_t *          p_module;

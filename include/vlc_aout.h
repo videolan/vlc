@@ -113,7 +113,7 @@
 /** Audio output object */
 struct audio_output
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     struct aout_sys_t *sys; /**< Private data for callbacks */
 

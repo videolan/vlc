@@ -43,7 +43,7 @@
 /* input_source_t: gathers all information per input source */
 typedef struct
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     demux_t  *p_demux; /**< Demux object (most downstream) */
 

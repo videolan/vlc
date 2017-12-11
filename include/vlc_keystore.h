@@ -293,7 +293,7 @@ vlc_keystore_release_entry(vlc_keystore_entry *p_entry)
 typedef struct vlc_keystore_sys vlc_keystore_sys;
 struct vlc_keystore
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
     module_t            *p_module;
     vlc_keystore_sys    *p_sys;
 

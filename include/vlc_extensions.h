@@ -52,7 +52,7 @@ typedef struct extension_t {
 /** Extensions manager object */
 struct extensions_manager_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     module_t *p_module;                /**< Extensions manager module */
     extensions_manager_sys_t *p_sys;   /**< Reserved for the module */

@@ -99,7 +99,7 @@ VLC_API const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 
 typedef struct meta_export_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
     input_item_t *p_item;
     const char *psz_file;
 } meta_export_t;

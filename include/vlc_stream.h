@@ -45,7 +45,7 @@ extern "C" {
 
 struct stream_t
 {
-    VLC_COMMON_MEMBERS
+    struct vlc_common_members obj;
 
     /* Module properties for stream filter */
     module_t    *p_module;
