@@ -91,17 +91,6 @@ package-win-strip: package-win-common package-win-npapi
 	    $(OBJCOPY) --add-gnu-debuglink="$(win32_debugdir)/`basename $$i.dbg`" "$$i" ; \
 	  fi ; \
 	done
-	if test -n "$(SIGNATURE)"; then \
-	  cd $(win32_destdir); find . -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
-	  do if test -n "$$i" ; then \
-	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -h sha1 -in "$$i" -out "$$i.sign"; \
-	    mv "$$i.sign" "$$i" ; \
-	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -nest -h sha2 -in "$$i" -out "$$i.sign"; \
-	    mv "$$i.sign" "$$i" ; \
-	  fi ; \
-	  done \
-	fi
-
 
 package-win32-webplugin-common: package-win-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins/"
@@ -156,12 +145,6 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/
 	fi; \
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
-	if test -n "$(SIGNATURE)"; then \
-		osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -h sha1 -in "$(WINVERSION).exe" -out "$(WINVERSION).exe.sign"; \
-	    mv "$(WINVERSION).exe.sign" "$(WINVERSION).exe" ; \
-		osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -nest -h sha2 -in "$(WINVERSION).exe" -out "$(WINVERSION).exe.sign"; \
-	    mv "$(WINVERSION).exe.sign" "$(WINVERSION).exe" ; \
-	fi
 
 package-win32-zip: package-win-strip
 	rm -f -- $(WINVERSION).zip
