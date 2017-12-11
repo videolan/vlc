@@ -210,15 +210,4 @@ void intf_DestroyAll( libvlc_int_t * );
  */
 void var_OptionParse (vlc_object_t *, const char *, bool trusted);
 
-/*
- * Stats stuff
- */
-typedef struct counter_t counter_t;
-
-counter_t * stats_CounterCreate(void);
-void stats_Update(counter_t *, uint64_t);
-void stats_CounterClean (counter_t * );
-
-void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
-
 #endif

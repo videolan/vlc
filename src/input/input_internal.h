@@ -281,4 +281,13 @@ void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
 /* item.c */
 void input_item_node_PostAndDelete( input_item_node_t *p_node );
 
+/* stats.c */
+typedef struct counter_t counter_t;
+
+counter_t * stats_CounterCreate(void);
+void stats_Update(counter_t *, uint64_t);
+void stats_CounterClean (counter_t * );
+
+void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
+
 #endif
