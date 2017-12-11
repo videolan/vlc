@@ -424,9 +424,21 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys->au_unit = NULL;
 
+    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
+                                             selector:@selector(audioSessionRouteChange:)
+                                                 name:AVAudioSessionRouteChangeNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
+                                             selector:@selector(handleInterruption:)
+                                                 name:AVAudioSessionInterruptionNotification
+                                               object:nil];
+
     /* Activate the AVAudioSession */
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
+    {
+        [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
         return VLC_EGENERIC;
+    }
 
     /* Set the preferred number of channels, then fetch the channel layout that
      * should correspond to this number */
@@ -475,15 +487,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
-    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
-                                             selector:@selector(audioSessionRouteChange:)
-                                                 name:AVAudioSessionRouteChangeNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
-                                             selector:@selector(handleInterruption:)
-                                                 name:AVAudioSessionInterruptionNotification
-                                               object:nil];
-
     free(layout);
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->mute_set  = MuteSet;
@@ -500,6 +503,7 @@ error:
     avas_resetPreferredNumberOfChannels(p_aout);
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
+    [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
     msg_Err(p_aout, "opening AudioUnit output failed");
     return VLC_EGENERIC;
 }
