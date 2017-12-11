@@ -25,21 +25,19 @@
 # include "config.h"
 #endif
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <vlc_common.h>
 #include "input/input_internal.h"
 
-typedef struct counter_sample_t
-{
-    uint64_t value;
-    mtime_t  date;
-} counter_sample_t;
-
 struct counter_t
 {
-    int                 i_samples;
-    counter_sample_t ** pp_samples;
-
-    mtime_t             last_update;
+    struct
+    {
+        uintmax_t value;
+        mtime_t   date;
+    } samples[2];
 };
 
 /**
@@ -47,24 +45,22 @@ struct counter_t
  */
 counter_t * stats_CounterCreate( void )
 {
-    counter_t *p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
+    counter_t *counter = malloc(sizeof (*counter)) ;
+    if (unlikely(counter == NULL))
+        return NULL;
 
-    if( !p_counter ) return NULL;
-    p_counter->i_samples = 0;
-    p_counter->pp_samples = NULL;
-
-    p_counter->last_update = 0;
-
-    return p_counter;
+    counter->samples[0].date = VLC_TS_INVALID;
+    counter->samples[1].date = VLC_TS_INVALID;
+    return counter;
 }
 
-static inline float stats_GetRate(const counter_t *counter)
+static float stats_GetRate(const counter_t *counter)
 {
-    if (counter == NULL || counter->i_samples < 2)
+    if (counter == NULL || counter->samples[1].date == VLC_TS_INVALID)
         return 0.;
 
-    return (counter->pp_samples[0]->value - counter->pp_samples[1]->value)
-        / (float)(counter->pp_samples[0]->date - counter->pp_samples[1]->date);
+    return (counter->samples[0].value - counter->samples[1].value)
+        / (float)(counter->samples[0].date - counter->samples[1].date);
 }
 
 void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
@@ -108,15 +104,9 @@ void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
     vlc_mutex_unlock(&priv->counters.counters_lock);
 }
 
-void stats_CounterClean( counter_t *p_c )
+void stats_CounterClean(counter_t *counter)
 {
-    if( p_c )
-    {
-        for( int i = 0; i < p_c->i_samples; i++ )
-            free( p_c->pp_samples[i] );
-        TAB_CLEAN(p_c->i_samples, p_c->pp_samples);
-        free( p_c );
-    }
+    free(counter);
 }
 
 
@@ -125,29 +115,20 @@ void stats_CounterClean( counter_t *p_c )
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see stats_Create
  */
-void stats_Update( counter_t *p_counter, uint64_t val )
+void stats_Update(counter_t *counter, uint64_t val)
 {
-    if( !p_counter )
+    if (counter == NULL)
         return;
 
-    counter_sample_t *p_new, *p_old;
+    /* Ignore samples within a second of another */
     mtime_t now = mdate();
-    if( now - p_counter->last_update < CLOCK_FREQ )
+    if (counter->samples[0].date != VLC_TS_INVALID
+     && (now - counter->samples[0].date) < CLOCK_FREQ)
         return;
-    p_counter->last_update = now;
-    /* Insert the new one at the beginning */
-    p_new = malloc( sizeof( counter_sample_t ) );
-    if (unlikely(p_new == NULL))
-        return; /* NOTE: Losing sample here */
 
-    p_new->value = val;
-    p_new->date = p_counter->last_update;
-    TAB_INSERT(p_counter->i_samples, p_counter->pp_samples, p_new, 0);
+    memcpy(counter->samples + 1, counter->samples,
+           sizeof (counter->samples[0]));
 
-    if( p_counter->i_samples == 3 )
-    {
-        p_old = p_counter->pp_samples[2];
-        TAB_ERASE(p_counter->i_samples, p_counter->pp_samples, 2);
-        free( p_old );
-    }
+    counter->samples[0].value = val;
+    counter->samples[0].date = now;
 }
