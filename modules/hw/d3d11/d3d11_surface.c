@@ -580,6 +580,12 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
     picture_sys_t *p_sys = dst->p_sys;
+    if (unlikely(p_sys==NULL))
+    {
+        /* the output filter configuration may have changed since the filter
+         * was opened */
+        return;
+    }
 
     D3D11_TEXTURE2D_DESC texDesc;
     ID3D11Texture2D_GetDesc( sys->staging_pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
