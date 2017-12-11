@@ -225,6 +225,13 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         picture_Release( p_pic );
         return NULL;
     }
+    if (unlikely(!p_outpic->p_sys))
+    {
+        /* the output filter configuration may have changed since the filter
+         * was opened */
+        picture_Release( p_pic );
+        return NULL;
+    }
 
     picture_CopyProperties( p_outpic, p_pic );
 

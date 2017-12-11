@@ -146,17 +146,17 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     if( p_cur && p_next )
     {
         picture_sys_t *picsys_next = ActivePictureSys(p_next);
-        if ( assert_ProcessorInput(p_filter, picsys_next) )
+        if ( unlikely(!picsys_next) || assert_ProcessorInput(p_filter, picsys_next) )
             return VLC_EGENERIC;
 
         picture_sys_t *picsys_cur = ActivePictureSys(p_cur);
-        if ( assert_ProcessorInput(p_filter, picsys_cur) )
+        if ( unlikely(!picsys_cur) || assert_ProcessorInput(p_filter, picsys_cur) )
             return VLC_EGENERIC;
 
         if ( p_prev )
         {
             picture_sys_t *picsys_prev = ActivePictureSys(p_prev);
-            if ( assert_ProcessorInput(p_filter, picsys_prev) )
+            if ( unlikely(!picsys_prev) || assert_ProcessorInput(p_filter, picsys_prev) )
                 return VLC_EGENERIC;
 
             stream.pInputSurface    = picsys_cur->processorInput;
@@ -177,7 +177,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     else
     {
         picture_sys_t *p_sys_src = ActivePictureSys(p_pic);
-        if ( assert_ProcessorInput(p_filter, p_sys_src) )
+        if ( unlikely(!p_sys_src) || assert_ProcessorInput(p_filter, p_sys_src) )
             return VLC_EGENERIC;
 
         /* first single frame */
