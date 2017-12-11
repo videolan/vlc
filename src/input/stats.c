@@ -28,6 +28,21 @@
 #include <vlc_common.h>
 #include "input/input_internal.h"
 
+typedef struct counter_sample_t
+{
+    uint64_t value;
+    mtime_t  date;
+} counter_sample_t;
+
+struct counter_t
+{
+    int                 i_compute_type;
+    int                 i_samples;
+    counter_sample_t ** pp_samples;
+
+    mtime_t             last_update;
+};
+
 /**
  * Create a statistics counter
  * \param i_compute_type the aggregation type. One of STATS_LAST (always
