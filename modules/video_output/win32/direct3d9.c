@@ -1812,7 +1812,7 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     HRESULT hr;
 
     picture_sys_t *picsys = ActivePictureSys(pic);
-    if (!picsys)
+    if (unlikely(!picsys || !priv->gl_render))
         return VLC_EGENERIC;
 
     if (!priv->vt.DXUnlockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
@@ -1838,6 +1838,8 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
     {
         msg_Warn(tc->gl, "DXLockObjectsNV failed");
+        priv->vt.DXUnregisterObjectNV(priv->gl_handle_d3d, priv->gl_render);
+        priv->gl_render = NULL;
         return VLC_EGENERIC;
     }
 
