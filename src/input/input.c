@@ -3406,46 +3406,6 @@ static char *input_SubtitleFile2Uri( input_thread_t *p_input,
     return psz_uri;
 }
 
-/*****************************************************************************
- * Statistics
- *****************************************************************************/
-void input_UpdateStatistic( input_thread_t *p_input,
-                            input_statistic_t i_type, int i_delta )
-{
-    assert( input_priv(p_input)->i_state != INIT_S );
-
-    vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock);
-    switch( i_type )
-    {
-#define I(c) stats_Update( input_priv(p_input)->counters.c, i_delta, NULL )
-    case INPUT_STATISTIC_DECODED_VIDEO:
-        I(p_decoded_video);
-        break;
-    case INPUT_STATISTIC_DECODED_AUDIO:
-        I(p_decoded_audio);
-        break;
-    case INPUT_STATISTIC_DECODED_SUBTITLE:
-        I(p_decoded_sub);
-        break;
-    case INPUT_STATISTIC_SENT_PACKET:
-        I(p_sout_sent_packets);
-        break;
-#undef I
-    case INPUT_STATISTIC_SENT_BYTE:
-    {
-        uint64_t bytes;
-
-        stats_Update( input_priv(p_input)->counters.p_sout_sent_bytes, i_delta, &bytes );
-        stats_Update( input_priv(p_input)->counters.p_sout_send_bitrate, bytes, NULL );
-        break;
-    }
-    default:
-        msg_Err( p_input, "Invalid statistic type %d (internal error)", i_type );
-        break;
-    }
-    vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock);
-}
-
 /**/
 /* TODO FIXME nearly the same logic that snapshot code */
 char *input_CreateFilename(input_thread_t *input, const char *dir,

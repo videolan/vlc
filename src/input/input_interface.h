@@ -69,24 +69,4 @@ void input_resource_TerminateSout( input_resource_t *p_resource );
  */
 bool input_resource_HasVout( input_resource_t *p_resource );
 
-/* input.c */
-
-/* */
-typedef enum
-{
-    INPUT_STATISTIC_DECODED_VIDEO,
-    INPUT_STATISTIC_DECODED_AUDIO,
-    INPUT_STATISTIC_DECODED_SUBTITLE,
-
-    /* Use them only if you do not goes through a access_out module */
-    INPUT_STATISTIC_SENT_PACKET,
-    INPUT_STATISTIC_SENT_BYTE,
-
-} input_statistic_t;
-/**
- * It will update internal input statistics from external sources.
- * XXX For now, the only one allowed to do it is stream_out and input core.
- */
-void input_UpdateStatistic( input_thread_t *, input_statistic_t, int i_delta );
-
 #endif
