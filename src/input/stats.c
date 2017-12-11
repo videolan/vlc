@@ -36,7 +36,6 @@ typedef struct counter_sample_t
 
 struct counter_t
 {
-    int                 i_compute_type;
     int                 i_samples;
     counter_sample_t ** pp_samples;
 
@@ -45,17 +44,12 @@ struct counter_t
 
 /**
  * Create a statistics counter
- * \param i_compute_type the aggregation type. One of STATS_LAST (always
- * keep the last value), STATS_COUNTER (increment by the passed value),
- * STATS_MAX (keep the maximum passed value), STATS_MIN, or STATS_DERIVATIVE
- * (keep a time derivative of the value)
  */
-counter_t * stats_CounterCreate( int i_compute_type )
+counter_t * stats_CounterCreate( void )
 {
     counter_t *p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
 
     if( !p_counter ) return NULL;
-    p_counter->i_compute_type = i_compute_type;
     p_counter->i_samples = 0;
     p_counter->pp_samples = NULL;
 
@@ -161,38 +155,30 @@ void stats_CounterClean( counter_t *p_c )
  * \param p_counter the counter to update
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see stats_Create
- * \param val_new a pointer that will be filled with new data
  */
-void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
+void stats_Update( counter_t *p_counter, uint64_t val )
 {
     if( !p_counter )
         return;
 
-    switch( p_counter->i_compute_type )
-    {
-    case STATS_DERIVATIVE:
-    {
-        counter_sample_t *p_new, *p_old;
-        mtime_t now = mdate();
-        if( now - p_counter->last_update < CLOCK_FREQ )
-            return;
-        p_counter->last_update = now;
-        /* Insert the new one at the beginning */
-        p_new = (counter_sample_t*)malloc( sizeof( counter_sample_t ) );
-        if (unlikely(p_new == NULL))
-            return; /* NOTE: Losing sample here */
+    counter_sample_t *p_new, *p_old;
+    mtime_t now = mdate();
+    if( now - p_counter->last_update < CLOCK_FREQ )
+        return;
+    p_counter->last_update = now;
+    /* Insert the new one at the beginning */
+    p_new = malloc( sizeof( counter_sample_t ) );
+    if (unlikely(p_new == NULL))
+        return; /* NOTE: Losing sample here */
 
-        p_new->value = val;
-        p_new->date = p_counter->last_update;
-        TAB_INSERT(p_counter->i_samples, p_counter->pp_samples, p_new, 0);
+    p_new->value = val;
+    p_new->date = p_counter->last_update;
+    TAB_INSERT(p_counter->i_samples, p_counter->pp_samples, p_new, 0);
 
-        if( p_counter->i_samples == 3 )
-        {
-            p_old = p_counter->pp_samples[2];
-            TAB_ERASE(p_counter->i_samples, p_counter->pp_samples, 2);
-            free( p_old );
-        }
-        break;
-    }
+    if( p_counter->i_samples == 3 )
+    {
+        p_old = p_counter->pp_samples[2];
+        TAB_ERASE(p_counter->i_samples, p_counter->pp_samples, 2);
+        free( p_old );
     }
 }

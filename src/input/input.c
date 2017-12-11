@@ -810,16 +810,15 @@ static void InitStatistics( input_thread_t *p_input )
     if( priv->b_preparsing ) return;
 
     /* Prepare statistics */
-#define INIT_COUNTER( c, compute ) free( priv->counters.p_##c ); \
-    priv->counters.p_##c = \
- stats_CounterCreate( STATS_##compute);
+#define INIT_COUNTER( c ) free( priv->counters.p_##c ); \
+    priv->counters.p_##c = stats_CounterCreate( );
     if( libvlc_stats( p_input ) )
     {
         priv->counters.read_bytes = 0;
         priv->counters.read_packets = 0;
         priv->counters.demux_read = 0;
-        INIT_COUNTER( input_bitrate, DERIVATIVE );
-        INIT_COUNTER( demux_bitrate, DERIVATIVE );
+        INIT_COUNTER( input_bitrate );
+        INIT_COUNTER( demux_bitrate );
         priv->counters.demux_corrupted = 0;
         priv->counters.demux_discontinuity = 0;
         priv->counters.played_abuffers = 0;
@@ -866,7 +865,7 @@ static int InitSout( input_thread_t * p_input )
         }
         if( libvlc_stats( p_input ) )
         {
-            INIT_COUNTER( sout_send_bitrate, DERIVATIVE );
+            INIT_COUNTER( sout_send_bitrate );
         }
     }
     else

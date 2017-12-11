@@ -2048,7 +2048,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock );
         i_total =
             (input_priv(p_input)->counters.demux_read += p_block->i_buffer);
-        stats_Update( input_priv(p_input)->counters.p_demux_bitrate, i_total, NULL );
+        stats_Update( input_priv(p_input)->counters.p_demux_bitrate, i_total );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
