@@ -56,6 +56,7 @@ struct aout_sys_common
     atomic_bool         b_paused;
     atomic_bool         b_do_flush;
     vlc_sem_t           flush_sem;
+    vlc_mutex_t         lock;
     int                 i_rate;
     unsigned int        i_bytes_per_frame;
     unsigned int        i_frame_length;
@@ -83,6 +84,8 @@ int  ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                    mtime_t i_dev_latency_us);
 
 void ca_Uninitialize(audio_output_t *p_aout);
+
+void ca_SetAliveState(audio_output_t *p_aout, bool alive);
 
 AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 

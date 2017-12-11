@@ -127,6 +127,23 @@ enum port_type
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 }
 
+- (void)handleInterruption:(NSNotification *)notification
+{
+    audio_output_t *p_aout = [self aout];
+    NSDictionary *userInfo = notification.userInfo;
+    if (!userInfo || !userInfo[AVAudioSessionInterruptionTypeKey]) {
+        return;
+    }
+
+    NSUInteger interruptionType = [userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
+
+    if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+        ca_SetAliveState(p_aout, false);
+    } else if (interruptionType == AVAudioSessionInterruptionTypeEnded
+               && [userInfo[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue] == AVAudioSessionInterruptionOptionShouldResume) {
+        ca_SetAliveState(p_aout, true);
+    }
+}
 @end
 
 static void
@@ -467,8 +484,13 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         Pause(p_aout, true, 0);
 
     [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
-           selector:@selector(audioSessionRouteChange:)
-           name:AVAudioSessionRouteChangeNotification object:nil];
+                                             selector:@selector(audioSessionRouteChange:)
+                                                 name:AVAudioSessionRouteChangeNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
+                                             selector:@selector(handleInterruption:)
+                                                 name:AVAudioSessionInterruptionNotification
+                                               object:nil];
 
     free(layout);
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
