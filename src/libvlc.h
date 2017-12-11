@@ -234,29 +234,6 @@ typedef struct counter_t
     mtime_t             last_update;
 } counter_t;
 
-enum
-{
-    STATS_INPUT_BITRATE,
-    STATS_READ_BYTES,
-    STATS_READ_PACKETS,
-    STATS_DEMUX_READ,
-    STATS_DEMUX_BITRATE,
-    STATS_DEMUX_CORRUPTED,
-    STATS_DEMUX_DISCONTINUITY,
-    STATS_PLAYED_ABUFFERS,
-    STATS_LOST_ABUFFERS,
-    STATS_DECODED_AUDIO,
-    STATS_DECODED_VIDEO,
-    STATS_DECODED_SUB,
-    STATS_CLIENT_CONNECTIONS,
-    STATS_ACTIVE_CONNECTIONS,
-    STATS_SOUT_SENT_PACKETS,
-    STATS_SOUT_SENT_BYTES,
-    STATS_SOUT_SEND_BITRATE,
-    STATS_DISPLAYED_PICTURES,
-    STATS_LOST_PICTURES,
-};
-
 counter_t * stats_CounterCreate (int);
 void stats_Update (counter_t *, uint64_t, uint64_t *);
 void stats_CounterClean (counter_t * );
