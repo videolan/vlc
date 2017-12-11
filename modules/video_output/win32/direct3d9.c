@@ -1860,14 +1860,6 @@ GLConvAllocateTextures(const opengl_tex_converter_t *tc, GLuint *textures,
 {
     VLC_UNUSED(tex_width); VLC_UNUSED(tex_height);
     struct glpriv *priv = tc->priv;
-    tc->vt->GenTextures(1, textures);
-
-    tc->vt->ActiveTexture(GL_TEXTURE0);
-    tc->vt->BindTexture(tc->tex_target, textures[0]);
-    tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     priv->gl_render =
         priv->vt.DXRegisterObjectNV(priv->gl_handle_d3d, priv->dx_render,
