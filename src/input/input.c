@@ -824,11 +824,8 @@ static void InitStatistics( input_thread_t *p_input )
         priv->counters.lost_pictures = 0;
         priv->counters.decoded_audio = 0;
         priv->counters.decoded_video = 0;
-        priv->counters.sout_sent_packets = 0;
-        priv->counters.sout_sent_bytes = 0;
         input_rate_Init( &priv->counters.input_bitrate );
         input_rate_Init( &priv->counters.demux_bitrate );
-        input_rate_Init( &priv->counters.sout_send_bitrate );
     }
 }
 

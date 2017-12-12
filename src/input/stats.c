@@ -72,9 +72,9 @@ void input_stats_Compute(input_thread_t *input, input_stats_t *st)
     st->i_decoded_audio = priv->counters.decoded_audio;
 
     /* Sout */
-    st->i_sent_packets = priv->counters.sout_sent_packets;
-    st->i_sent_bytes = priv->counters.sout_sent_bytes;
-    st->f_send_bitrate = stats_GetRate(&priv->counters.sout_send_bitrate);
+    st->i_sent_packets = 0;
+    st->i_sent_bytes = 0;
+    st->f_send_bitrate = 0.f;
 
     /* Aout */
     st->i_played_abuffers = priv->counters.played_abuffers;

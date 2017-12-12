@@ -166,9 +166,6 @@ typedef struct input_thread_private_t
         uintmax_t demux_discontinuity;
         uintmax_t decoded_audio;
         uintmax_t decoded_video;
-        uintmax_t sout_sent_packets;
-        uintmax_t sout_sent_bytes;
-        input_rate_t sout_send_bitrate;
         uintmax_t played_abuffers;
         uintmax_t lost_abuffers;
         uintmax_t displayed_pictures;
