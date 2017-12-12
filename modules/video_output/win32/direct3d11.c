@@ -2313,14 +2313,6 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
     LONG MidY = output->top + output->bottom; // /2
     LONG MidX = output->left + output->right; // /2
 
-    /* the clamping will not work properly on the side of the texture as it
-     * will have decoder pixels not mean to be displayed but used for interpolation
-     * So we lose the last line that will be partially green */
-    if (src_width != dst_width)
-        src_width += 1;
-    if (src_height != dst_height)
-        src_height += 1;
-
     float top, bottom, left, right;
     top    =  (float)MidY / (float)(MidY - 2*dst_y);
     bottom = -(2.f*src_height - MidY) / (float)(MidY - 2*dst_y);
