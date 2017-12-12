@@ -1061,21 +1061,35 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         D3D11_TEXTURE2D_DESC texDesc;
         int i;
         HRESULT hr;
+        plane_t planes[PICTURE_PLANE_MAX];
 
+        bool b_mapped = true;
         for (i = 0; i < picture->i_planes; i++) {
             hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i],
                                          0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            if( FAILED(hr) )
+            if( unlikely(FAILED(hr)) )
+            {
+                while (i-- > 0)
+                    ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
+                b_mapped = false;
                 break;
+            }
             ID3D11Texture2D_GetDesc(sys->stagingSys.texture[i], &texDesc);
-            plane_t texture_plane;
-            texture_plane.i_lines = texDesc.Height;
-            texture_plane.i_pitch = mappedResource.RowPitch;
-            texture_plane.p_pixels = mappedResource.pData;
-            texture_plane.i_visible_lines = picture->p[i].i_visible_lines;
-            texture_plane.i_visible_pitch = picture->p[i].i_visible_pitch;
-            plane_CopyPixels(&texture_plane, &picture->p[i]);
-            ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
+            planes[i].i_lines = texDesc.Height;
+            planes[i].i_pitch = mappedResource.RowPitch;
+            planes[i].p_pixels = mappedResource.pData;
+
+            planes[i].i_visible_lines = picture->p[i].i_visible_lines;
+            planes[i].i_visible_pitch = picture->p[i].i_visible_pitch;
+        }
+
+        if (b_mapped)
+        {
+            for (i = 0; i < picture->i_planes; i++)
+                plane_CopyPixels(&planes[i], &picture->p[i]);
+
+            for (i = 0; i < picture->i_planes; i++)
+                ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
         }
     }
     else
