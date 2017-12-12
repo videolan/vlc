@@ -49,37 +49,32 @@ static float stats_GetRate(const input_rate_t *rate)
         / (float)(rate->samples[0].date - rate->samples[1].date);
 }
 
-void input_stats_Compute(input_thread_t *input, input_stats_t *st)
+void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
 {
-    input_thread_private_t *priv = input_priv(input);
-
-    if (!libvlc_stats(input))
-        return;
-
-    vlc_mutex_lock(&priv->counters.counters_lock);
+    vlc_mutex_lock(&stats->lock);
 
     /* Input */
-    st->i_read_packets = priv->counters.read_packets;
-    st->i_read_bytes = priv->counters.read_bytes;
-    st->f_input_bitrate = stats_GetRate(&priv->counters.input_bitrate);
-    st->i_demux_read_bytes = priv->counters.demux_read;
-    st->f_demux_bitrate = stats_GetRate(&priv->counters.demux_bitrate);
-    st->i_demux_corrupted = priv->counters.demux_corrupted;
-    st->i_demux_discontinuity = priv->counters.demux_discontinuity;
+    st->i_read_packets = stats->read_packets;
+    st->i_read_bytes = stats->read_bytes;
+    st->f_input_bitrate = stats_GetRate(&stats->input_bitrate);
+    st->i_demux_read_bytes = stats->demux_read;
+    st->f_demux_bitrate = stats_GetRate(&stats->demux_bitrate);
+    st->i_demux_corrupted = stats->demux_corrupted;
+    st->i_demux_discontinuity = stats->demux_discontinuity;
 
     /* Decoders */
-    st->i_decoded_video = priv->counters.decoded_video;
-    st->i_decoded_audio = priv->counters.decoded_audio;
+    st->i_decoded_video = stats->decoded_video;
+    st->i_decoded_audio = stats->decoded_audio;
 
     /* Aout */
-    st->i_played_abuffers = priv->counters.played_abuffers;
-    st->i_lost_abuffers = priv->counters.lost_abuffers;
+    st->i_played_abuffers = stats->played_abuffers;
+    st->i_lost_abuffers = stats->lost_abuffers;
 
     /* Vouts */
-    st->i_displayed_pictures = priv->counters.displayed_pictures;
-    st->i_lost_pictures = priv->counters.lost_pictures;
+    st->i_displayed_pictures = stats->displayed_pictures;
+    st->i_lost_pictures = stats->lost_pictures;
 
-    vlc_mutex_unlock(&priv->counters.counters_lock);
+    vlc_mutex_unlock(&stats->lock);
 }
 
 /** Update a counter element with new values

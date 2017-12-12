@@ -1093,11 +1093,16 @@ static void DecoderUpdateStatVideo( decoder_owner_sys_t *p_owner,
         lost += vout_lost;
     }
 
-    vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock );
-    input_priv(p_input)->counters.decoded_video += decoded;
-    input_priv(p_input)->counters.lost_pictures += lost;
-    input_priv(p_input)->counters.displayed_pictures += displayed;
-    vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock );
+    struct input_stats *stats = input_priv(p_input)->stats;
+
+    if( stats != NULL )
+    {
+        vlc_mutex_lock( &stats->lock );
+        stats->decoded_video += decoded;
+        stats->lost_pictures += lost;
+        stats->displayed_pictures += displayed;
+        vlc_mutex_unlock( &stats->lock );
+    }
 }
 
 static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
@@ -1213,11 +1218,16 @@ static void DecoderUpdateStatAudio( decoder_owner_sys_t *p_owner,
         lost += aout_lost;
     }
 
-    vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock);
-    input_priv(p_input)->counters.lost_abuffers += lost;
-    input_priv(p_input)->counters.played_abuffers += played;
-    input_priv(p_input)->counters.decoded_audio += decoded;
-    vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock);
+    struct input_stats *stats = input_priv(p_input)->stats;
+
+    if( stats != NULL )
+    {
+        vlc_mutex_lock( &stats->lock );
+        stats->lost_abuffers += lost;
+        stats->played_abuffers += played;
+        stats->decoded_audio += decoded;
+        vlc_mutex_unlock( &stats->lock );
+    }
 }
 
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )

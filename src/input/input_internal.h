@@ -34,14 +34,7 @@
 #include "input_interface.h"
 #include "misc/interrupt.h"
 
-typedef struct input_rate_t
-{
-    struct
-    {
-        uintmax_t value;
-        mtime_t   date;
-    } samples[2];
-} input_rate_t;
+struct input_stats;
 
 /*****************************************************************************
  *  Private input fields
@@ -156,22 +149,7 @@ typedef struct input_thread_private_t
     input_resource_t *p_resource_private;
 
     /* Stats counters */
-    struct {
-        uintmax_t read_packets;
-        uintmax_t read_bytes;
-        input_rate_t input_bitrate;
-        uintmax_t demux_read;
-        input_rate_t demux_bitrate;
-        uintmax_t demux_corrupted;
-        uintmax_t demux_discontinuity;
-        uintmax_t decoded_audio;
-        uintmax_t decoded_video;
-        uintmax_t played_abuffers;
-        uintmax_t lost_abuffers;
-        uintmax_t displayed_pictures;
-        uintmax_t lost_pictures;
-        vlc_mutex_t counters_lock;
-    } counters;
+    struct input_stats *stats;
 
     /* Buffer of pending actions */
     vlc_mutex_t lock_control;
@@ -287,8 +265,34 @@ void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
 void input_item_node_PostAndDelete( input_item_node_t *p_node );
 
 /* stats.c */
+typedef struct input_rate_t
+{
+    struct
+    {
+        uintmax_t value;
+        mtime_t   date;
+    } samples[2];
+} input_rate_t;
+
+struct input_stats {
+    uintmax_t read_packets;
+    uintmax_t read_bytes;
+    input_rate_t input_bitrate;
+    uintmax_t demux_read;
+    input_rate_t demux_bitrate;
+    uintmax_t demux_corrupted;
+    uintmax_t demux_discontinuity;
+    uintmax_t decoded_audio;
+    uintmax_t decoded_video;
+    uintmax_t played_abuffers;
+    uintmax_t lost_abuffers;
+    uintmax_t displayed_pictures;
+    uintmax_t lost_pictures;
+    vlc_mutex_t lock;
+};
+
 void input_rate_Init(input_rate_t *rate);
 void input_rate_Update(input_rate_t *, uintmax_t);
-void input_stats_Compute(input_thread_t *, input_stats_t*);
+void input_stats_Compute(struct input_stats *, input_stats_t*);
 
 #endif

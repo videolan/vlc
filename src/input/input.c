@@ -252,7 +252,11 @@ static void input_Destructor( vlc_object_t *obj )
 
     input_item_Release( priv->p_item );
 
-    vlc_mutex_destroy( &priv->counters.counters_lock );
+    if( priv->stats != NULL )
+    {
+        vlc_mutex_destroy( &priv->stats->lock );
+        free( priv->stats );
+    }
 
     for( int i = 0; i < priv->i_control; i++ )
     {
@@ -468,8 +472,19 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_SendEventMeta( p_input );
 
     /* */
-    memset( &priv->counters, 0, sizeof( priv->counters ) );
-    vlc_mutex_init( &priv->counters.counters_lock );
+    struct input_stats *stats = NULL;
+    if( !priv->b_preparsing && libvlc_stats(p_input) )
+    {
+        stats = malloc( sizeof (*stats) );
+        if( likely(stats != NULL) )
+        {
+            memset( stats, 0, sizeof (*stats) );
+            input_rate_Init( &stats->input_bitrate );
+            input_rate_Init( &stats->demux_bitrate );
+            vlc_mutex_init( &stats->lock );
+        }
+    }
+    priv->stats = stats;
 
     priv->p_es_out_display = input_EsOutNew( p_input, priv->i_rate );
     priv->p_es_out = NULL;
@@ -646,32 +661,32 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
  */
 static void MainLoopStatistics( input_thread_t *p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     double f_position = 0.0;
     mtime_t i_time = 0;
     mtime_t i_length = 0;
 
     /* update input status variables */
-    if( demux_Control( input_priv(p_input)->master->p_demux,
+    if( demux_Control( priv->master->p_demux,
                        DEMUX_GET_POSITION, &f_position ) )
         f_position = 0.0;
 
-    if( demux_Control( input_priv(p_input)->master->p_demux,
-                       DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( priv->master->p_demux, DEMUX_GET_TIME, &i_time ) )
         i_time = 0;
     input_priv(p_input)->i_time = i_time;
 
-    if( demux_Control( input_priv(p_input)->master->p_demux,
-                       DEMUX_GET_LENGTH, &i_length ) )
+    if( demux_Control( priv->master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
 
-    es_out_SetTimes( input_priv(p_input)->p_es_out, f_position, i_time, i_length );
+    es_out_SetTimes( priv->p_es_out, f_position, i_time, i_length );
 
     /* update current bookmark */
-    vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-    input_priv(p_input)->bookmark.i_time_offset = i_time;
+    vlc_mutex_lock( &priv->p_item->lock );
+    priv->bookmark.i_time_offset = i_time;
 
-    input_stats_Compute( p_input, input_priv(p_input)->p_item->p_stats );
-    vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+    if( priv->stats != NULL )
+        input_stats_Compute( priv->stats, priv->p_item->p_stats );
+    vlc_mutex_unlock( &priv->p_item->lock );
 
     input_SendEventStatistics( p_input );
 }
@@ -801,31 +816,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( i_wakeup != 0 )
                 i_wakeup = es_out_GetWakeup( input_priv(p_input)->p_es_out );
         }
-    }
-}
-
-static void InitStatistics( input_thread_t *p_input )
-{
-    input_thread_private_t *priv = input_priv(p_input);
-
-    if( priv->b_preparsing ) return;
-
-    /* Prepare statistics */
-    if( libvlc_stats( p_input ) )
-    {
-        priv->counters.read_bytes = 0;
-        priv->counters.read_packets = 0;
-        priv->counters.demux_read = 0;
-        priv->counters.demux_corrupted = 0;
-        priv->counters.demux_discontinuity = 0;
-        priv->counters.played_abuffers = 0;
-        priv->counters.lost_abuffers = 0;
-        priv->counters.displayed_pictures = 0;
-        priv->counters.lost_pictures = 0;
-        priv->counters.decoded_audio = 0;
-        priv->counters.decoded_video = 0;
-        input_rate_Init( &priv->counters.input_bitrate );
-        input_rate_Init( &priv->counters.demux_bitrate );
     }
 }
 
@@ -1306,7 +1296,6 @@ static int Init( input_thread_t * p_input )
         var_SetBool( p_input, "sub-autodetect-file", false );
     }
 
-    InitStatistics( p_input );
 #ifdef ENABLE_SOUT
     if( InitSout( p_input ) )
         goto error;
@@ -1445,16 +1434,13 @@ static void End( input_thread_t * p_input )
         es_out_Delete( priv->p_es_out );
     es_out_SetMode( priv->p_es_out_display, ES_OUT_MODE_END );
 
-    if( !priv->b_preparsing )
+    if( priv->stats != NULL )
     {
-        if( libvlc_stats( p_input ) )
-        {
-            input_item_t *item = priv->p_item;
-            /* make sure we are up to date */
-            vlc_mutex_lock( &item->lock );
-            input_stats_Compute( p_input, item->p_stats );
-            vlc_mutex_unlock( &item->lock );
-        }
+        input_item_t *item = priv->p_item;
+        /* make sure we are up to date */
+        vlc_mutex_lock( &item->lock );
+        input_stats_Compute( priv->stats, item->p_stats );
+        vlc_mutex_unlock( &item->lock );
     }
 
     vlc_mutex_lock( &priv->p_item->lock );
