@@ -165,6 +165,14 @@ package-win32: package-win32-zip package-win32-7zip package-win32-exe package-wi
 
 package-win32-debug: package-win32-debug-zip package-win32-debug-7zip
 
+package-win32-release: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll package-win-sdk
+	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
+	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/languages    		  "$(win32_destdir)/"
+	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      		  "$(win32_destdir)/"
+	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
+
+	7z a $(7Z_OPTS) $(WINVERSION)-release.7z $(win32_debugdir) "$(win32_destdir)/"
 
 #######
 # WinCE
