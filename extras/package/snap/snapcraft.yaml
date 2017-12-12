@@ -41,6 +41,7 @@ parts:
     build: |
       cd contrib && mkdir linux && cd linux
       ../bootstrap
+      make -j $(getconf _NPROCESSORS_ONLN) .libplacebo
       make -j $(getconf _NPROCESSORS_ONLN) .ffmpeg
       cd ../../
       export NOCONFIGURE=1
