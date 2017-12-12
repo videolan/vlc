@@ -294,9 +294,9 @@ FREENULL( psz_##foo );
     /* Sout */
     [_sentPacketsTextField setIntValue: p_item->p_stats->i_sent_packets];
     [_sentBytesTextField setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
-                                          (float)(p_item->p_stats->i_sent_bytes)/1024]];
+                                          0.f]];
     [_sentBitrateTextField setStringValue: [NSString stringWithFormat:
-                                            @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
+                                            @"%6.0f kb/s", 0.f]];
 
     /* Audio */
     [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];

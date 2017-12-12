@@ -409,11 +409,6 @@ struct input_stats_t
     int64_t i_displayed_pictures;
     int64_t i_lost_pictures;
 
-    /* Sout */
-    int64_t i_sent_packets;
-    int64_t i_sent_bytes;
-    float f_send_bitrate;
-
     /* Aout */
     int64_t i_played_abuffers;
     int64_t i_lost_abuffers;

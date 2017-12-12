@@ -71,11 +71,6 @@ void input_stats_Compute(input_thread_t *input, input_stats_t *st)
     st->i_decoded_video = priv->counters.decoded_video;
     st->i_decoded_audio = priv->counters.decoded_audio;
 
-    /* Sout */
-    st->i_sent_packets = 0;
-    st->i_sent_bytes = 0;
-    st->f_send_bitrate = 0.f;
-
     /* Aout */
     st->i_played_abuffers = priv->counters.played_abuffers;
     st->i_lost_abuffers = priv->counters.lost_abuffers;
