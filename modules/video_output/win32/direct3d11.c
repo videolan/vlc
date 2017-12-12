@@ -219,7 +219,7 @@ static int  Direct3D11Open (vout_display_t *);
 static void Direct3D11Close(vout_display_t *);
 
 static int SetupOutputFormat(vout_display_t *, video_format_t *);
-static int  Direct3D11CreateFormatResources (vout_display_t *, video_format_t *);
+static int  Direct3D11CreateFormatResources (vout_display_t *, const video_format_t *);
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
@@ -1952,7 +1952,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
 
 /* TODO : handle errors better
    TODO : seperate out into smaller functions like createshaders */
-static int Direct3D11CreateFormatResources(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
