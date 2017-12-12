@@ -1069,12 +1069,21 @@ void MainInterface::dockPlaylist( bool p_docked )
     if( !p_docked ) /* Previously docked */
     {
         playlistVisible = playlistWidget->isVisible();
-        stackCentralW->removeWidget( playlistWidget );
-        dialog->importPlaylistWidget( playlistWidget );
+
+        /* repositioning the videowidget __before__ exporting the
+           playlistwidget into the playlist dialog avoids two unneeded
+           calls to the server in the qt library to reparent the underlying
+           native window back and forth.
+           For Wayland, this is mandatory since reparenting is not implemented.
+           For X11 or Windows, this is just an optimization. */
         if ( videoWidget && THEMIM->getIM()->hasVideo() )
             showTab(videoWidget);
         else
             showTab(bgWidget);
+
+        /* playlistwidget exported into the playlist dialog */
+        stackCentralW->removeWidget( playlistWidget );
+        dialog->importPlaylistWidget( playlistWidget );
         if ( playlistVisible ) dialog->show();
     }
     else /* Previously undocked */
