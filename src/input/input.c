@@ -473,7 +473,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     struct input_stats *stats = NULL;
-    if( !priv->b_preparsing && libvlc_stats(p_input) )
+    if( !priv->b_preparsing && var_InheritBool( p_input, "stats" ) )
     {
         stats = malloc( sizeof (*stats) );
         if( likely(stats != NULL) )

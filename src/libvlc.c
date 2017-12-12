@@ -229,8 +229,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
 
-    priv->b_stats = var_InheritBool( p_libvlc, "stats" );
-
     /*
      * Initialize hotkey handling
      */

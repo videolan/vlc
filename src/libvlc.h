@@ -178,9 +178,6 @@ typedef struct libvlc_priv_t
 {
     libvlc_int_t       public_data;
 
-    /* Logging */
-    bool               b_stats;     ///< Whether to collect stats
-
     /* Singleton objects */
     vlc_logger_t      *logger;
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
@@ -202,8 +199,6 @@ static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
 int intf_InsertItem(libvlc_int_t *, const char *mrl, unsigned optc,
                     const char * const *optv, unsigned flags);
 void intf_DestroyAll( libvlc_int_t * );
-
-#define libvlc_stats( o ) (libvlc_priv((VLC_OBJECT(o))->obj.libvlc)->b_stats)
 
 /*
  * Variables stuff
