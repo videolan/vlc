@@ -34,7 +34,7 @@
 /**
  * Create a statistics counter
  */
-void input_rate_Init(input_rate_t *rate)
+static void input_rate_Init(input_rate_t *rate)
 {
     rate->samples[0].date = VLC_TS_INVALID;
     rate->samples[1].date = VLC_TS_INVALID;
@@ -47,6 +47,25 @@ static float stats_GetRate(const input_rate_t *rate)
 
     return (rate->samples[0].value - rate->samples[1].value)
         / (float)(rate->samples[0].date - rate->samples[1].date);
+}
+
+struct input_stats *input_stats_Create(void)
+{
+    struct input_stats *stats = malloc(sizeof (*stats));
+    if (unlikely(stats == NULL))
+        return NULL;
+
+    memset(stats, 0, sizeof (*stats));
+    input_rate_Init(&stats->input_bitrate);
+    input_rate_Init(&stats->demux_bitrate);
+    vlc_mutex_init(&stats->lock);
+    return stats;
+}
+
+void input_stats_Destroy(struct input_stats *stats)
+{
+    vlc_mutex_destroy(&stats->lock);
+    free(stats);
 }
 
 void input_stats_Compute(struct input_stats *stats, input_stats_t *st)

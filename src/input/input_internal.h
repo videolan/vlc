@@ -291,7 +291,8 @@ struct input_stats {
     vlc_mutex_t lock;
 };
 
-void input_rate_Init(input_rate_t *rate);
+struct input_stats *input_stats_Create(void);
+void input_stats_Destroy(struct input_stats *);
 void input_rate_Update(input_rate_t *, uintmax_t);
 void input_stats_Compute(struct input_stats *, input_stats_t*);
 

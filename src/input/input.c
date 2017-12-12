@@ -253,10 +253,7 @@ static void input_Destructor( vlc_object_t *obj )
     input_item_Release( priv->p_item );
 
     if( priv->stats != NULL )
-    {
-        vlc_mutex_destroy( &priv->stats->lock );
-        free( priv->stats );
-    }
+        input_stats_Destroy( priv->stats );
 
     for( int i = 0; i < priv->i_control; i++ )
     {
@@ -472,19 +469,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_SendEventMeta( p_input );
 
     /* */
-    struct input_stats *stats = NULL;
     if( !priv->b_preparsing && var_InheritBool( p_input, "stats" ) )
-    {
-        stats = malloc( sizeof (*stats) );
-        if( likely(stats != NULL) )
-        {
-            memset( stats, 0, sizeof (*stats) );
-            input_rate_Init( &stats->input_bitrate );
-            input_rate_Init( &stats->demux_bitrate );
-            vlc_mutex_init( &stats->lock );
-        }
-    }
-    priv->stats = stats;
+        priv->stats = input_stats_Create();
+    else
+        priv->stats = NULL;
 
     priv->p_es_out_display = input_EsOutNew( p_input, priv->i_rate );
     priv->p_es_out = NULL;
