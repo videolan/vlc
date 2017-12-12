@@ -24,7 +24,7 @@ OPTIONS:
    -p            Use a Prebuilt contrib package (speeds up compilation)
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
-   -i <n|r>      Create an Installer (n: nightly, r: release)
+   -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
 EOF
 }
 
@@ -134,4 +134,7 @@ if [ "$INSTALLER" = "n" ]; then
 make package-win32-debug package-win32
 elif [ "$INSTALLER" = "r" ]; then
 make package-win32
+elif [ "$INSTALLER" = "u" ]; then
+make package-win32-release
+sha512sum vlc-*-release.7z
 fi
