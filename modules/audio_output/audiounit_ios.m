@@ -350,15 +350,7 @@ Flush(audio_output_t *p_aout, bool wait)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    if (!p_sys->b_paused)
-        ca_Flush(p_aout, wait);
-    else
-    {
-        /* ca_Flush() can't work while paused since the AudioUnit is Stopped
-         * and the render callback won't be called. But it's safe to clear the
-         * circular buffer from this thread since AU is stopped. */
-        TPCircularBufferClear(&p_sys->c.circular_buffer);
-    }
+    ca_Flush(p_aout, wait);
 }
 
 static int
