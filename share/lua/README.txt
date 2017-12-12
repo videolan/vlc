@@ -116,11 +116,9 @@ input.item(): Get the current input item. Input item methods are:
     .read_packets
     .read_bytes
     .input_bitrate
-    .average_input_bitrate
     .demux_read_packets
     .demux_read_bytes
     .demux_bitrate
-    .average_demux_bitrate
     .demux_corrupted
     .demux_discontinuity
     .decoded_audio
