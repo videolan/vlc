@@ -2044,12 +2044,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     struct input_stats *stats = input_priv(p_input)->stats;
     if( stats != NULL )
     {
-        uint64_t i_total;
-
         vlc_mutex_lock( &stats->lock );
-        i_total =
-            (stats->demux_read += p_block->i_buffer);
-        input_rate_Update( &stats->demux_bitrate, i_total );
+        input_rate_Add( &stats->demux_bitrate, p_block->i_buffer );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )

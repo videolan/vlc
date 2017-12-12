@@ -36,6 +36,7 @@
  */
 static void input_rate_Init(input_rate_t *rate)
 {
+    rate->value = 0;
     rate->samples[0].date = VLC_TS_INVALID;
     rate->samples[1].date = VLC_TS_INVALID;
 }
@@ -80,9 +81,9 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
 
     /* Input */
     st->i_read_packets = stats->read_packets;
-    st->i_read_bytes = stats->read_bytes;
+    st->i_read_bytes = stats->input_bitrate.value;
     st->f_input_bitrate = stats_GetRate(&stats->input_bitrate);
-    st->i_demux_read_bytes = stats->demux_read;
+    st->i_demux_read_bytes = stats->demux_bitrate.value;
     st->f_demux_bitrate = stats_GetRate(&stats->demux_bitrate);
     st->i_demux_corrupted = stats->demux_corrupted;
     st->i_demux_discontinuity = stats->demux_discontinuity;
@@ -111,10 +112,9 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see stats_Create
  */
-void input_rate_Update(input_rate_t *counter, uintmax_t val)
+void input_rate_Add(input_rate_t *counter, uintmax_t val)
 {
-    if (counter == NULL)
-        return;
+    counter->value += val;
 
     /* Ignore samples within a second of another */
     mtime_t now = mdate();
@@ -125,6 +125,6 @@ void input_rate_Update(input_rate_t *counter, uintmax_t val)
     memcpy(counter->samples + 1, counter->samples,
            sizeof (counter->samples[0]));
 
-    counter->samples[0].value = val;
+    counter->samples[0].value = counter->value;
     counter->samples[0].date = now;
 }

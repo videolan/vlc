@@ -203,12 +203,9 @@ static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
 
         if (stats != NULL)
         {
-            uint64_t total;
-
             vlc_mutex_lock(&stats->lock);
-            total = (stats->read_bytes += block->i_buffer);
-            input_rate_Update(&stats->input_bitrate, total);
             stats->read_packets++;
+            input_rate_Add(&stats->input_bitrate, block->i_buffer);
             vlc_mutex_unlock(&stats->lock);
         }
     }
@@ -235,12 +232,9 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 
         if (stats != NULL)
         {
-            uint64_t total;
-
             vlc_mutex_lock(&stats->lock);
-            total = (stats->read_bytes += val);
-            input_rate_Update(&stats->input_bitrate, total);
             stats->read_packets++;
+            input_rate_Add(&stats->input_bitrate, val);
             vlc_mutex_unlock(&stats->lock);
         }
     }
