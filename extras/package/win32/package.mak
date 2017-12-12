@@ -125,7 +125,6 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/
 	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/languages    "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      "$(win32_destdir)/"
-	mkdir -p "$(win32_destdir)/NSIS/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
 
 # Create package
