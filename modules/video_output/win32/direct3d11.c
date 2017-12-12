@@ -403,9 +403,33 @@ static int Direct3D11MapPoolTexture(picture_t *picture)
     return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
 }
 
+/* add black pixels in the padding to ease the interpolation artefacts */
+static void EraseYUVBorders(int i_planes, plane_t planes[PICTURE_PLANE_MAX])
+{
+    for (int i = 0; i < i_planes; i++)
+    {
+        uint8_t val = (i == 0) ? 0x00 : 0x80;
+        if (planes[i].i_visible_lines < planes[i].i_lines)
+        {
+            memset(planes[i].p_pixels + (planes[i].i_visible_lines * planes[i].i_pitch), val, planes[i].i_visible_pitch);
+        }
+
+        if (planes[i].i_visible_pitch < planes[i].i_pitch)
+        {
+            for (int j=0; j<planes[i].i_visible_lines; j++)
+            {
+                planes[i].p_pixels[j * planes[i].i_pitch + (planes[i].i_visible_pitch + 0) ] = val;
+                if (i_planes == 2)
+                    planes[i].p_pixels[j * planes[i].i_pitch + (planes[i].i_visible_pitch + 1) ] = val;
+            }
+        }
+    }
+}
+
 static void Direct3D11UnmapPoolTexture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
+    EraseYUVBorders(picture->i_planes, picture->p);
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
@@ -1087,6 +1111,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         {
             for (i = 0; i < picture->i_planes; i++)
                 plane_CopyPixels(&planes[i], &picture->p[i]);
+
+            EraseYUVBorders(picture->i_planes, planes);
 
             for (i = 0; i < picture->i_planes; i++)
                 ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
