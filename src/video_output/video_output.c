@@ -1545,8 +1545,12 @@ static int ThreadReinit(vout_thread_t *vout,
         ThreadClean(vout);
         return VLC_EGENERIC;
     }
-    /* We ignore crop/ar changes at this point, they are dynamically supported */
-    VideoFormatCopyCropAr(&vout->p->original, &original);
+
+    /* We ignore ar changes at this point, they are dynamically supported.
+     * #19268: don't ignore crop changes (fix vouts using the crop size of the
+     * previous format). */
+    vout->p->original.i_sar_num = original.i_sar_num;
+    vout->p->original.i_sar_den = original.i_sar_den;
     if (video_format_IsSimilar(&original, &vout->p->original)) {
         if (cfg->dpb_size <= vout->p->dpb_size) {
             video_format_Clean(&original);
