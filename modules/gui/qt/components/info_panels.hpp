@@ -131,11 +131,6 @@ private:
     QTreeWidgetItem *vlost_frames_stat;
     QTreeWidgetItem *vfps_stat;
 
-    QTreeWidgetItem *streaming;
-    QTreeWidgetItem *send_stat;
-    QTreeWidgetItem *send_bytes_stat;
-    QTreeWidgetItem *send_bitrate_stat;
-
     QTreeWidgetItem *audio;
     QTreeWidgetItem *adecoded_stat;
     QTreeWidgetItem *aplayed_stat;
