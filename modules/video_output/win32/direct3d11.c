@@ -2459,7 +2459,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
     /* create the vertices */
-      hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to lock the vertex buffer (hr=0x%lX)", hr);
         return false;
