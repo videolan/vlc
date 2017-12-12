@@ -268,6 +268,7 @@ void input_item_node_PostAndDelete( input_item_node_t *p_node );
 /* stats.c */
 typedef struct input_rate_t
 {
+    vlc_mutex_t lock;
     uintmax_t updates;
     uintmax_t value;
     struct
@@ -278,11 +279,10 @@ typedef struct input_rate_t
 } input_rate_t;
 
 struct input_stats {
-    vlc_mutex_t lock;
     input_rate_t input_bitrate;
     input_rate_t demux_bitrate;
-    uintmax_t demux_corrupted;
-    uintmax_t demux_discontinuity;
+    atomic_uintmax_t demux_corrupted;
+    atomic_uintmax_t demux_discontinuity;
     atomic_uintmax_t decoded_audio;
     atomic_uintmax_t decoded_video;
     atomic_uintmax_t played_abuffers;

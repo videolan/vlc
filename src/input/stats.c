@@ -36,6 +36,7 @@
  */
 static void input_rate_Init(input_rate_t *rate)
 {
+    vlc_mutex_init(&rate->lock);
     rate->updates = 0;
     rate->value = 0;
     rate->samples[0].date = VLC_TS_INVALID;
@@ -59,38 +60,41 @@ struct input_stats *input_stats_Create(void)
 
     input_rate_Init(&stats->input_bitrate);
     input_rate_Init(&stats->demux_bitrate);
-    stats->demux_corrupted = 0;
-    stats->demux_discontinuity = 0;
+    atomic_init(&stats->demux_corrupted, 0);
+    atomic_init(&stats->demux_discontinuity, 0);
     atomic_init(&stats->decoded_audio, 0);
     atomic_init(&stats->decoded_video, 0);
     atomic_init(&stats->played_abuffers, 0);
     atomic_init(&stats->lost_abuffers, 0);
     atomic_init(&stats->displayed_pictures, 0);
     atomic_init(&stats->lost_pictures, 0);
-    vlc_mutex_init(&stats->lock);
     return stats;
 }
 
 void input_stats_Destroy(struct input_stats *stats)
 {
-    vlc_mutex_destroy(&stats->lock);
+    vlc_mutex_destroy(&stats->demux_bitrate.lock);
+    vlc_mutex_destroy(&stats->input_bitrate.lock);
     free(stats);
 }
 
 void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
 {
-    vlc_mutex_lock(&stats->lock);
-
     /* Input */
+    vlc_mutex_lock(&stats->input_bitrate.lock);
     st->i_read_packets = stats->input_bitrate.updates;
     st->i_read_bytes = stats->input_bitrate.value;
     st->f_input_bitrate = stats_GetRate(&stats->input_bitrate);
+    vlc_mutex_unlock(&stats->input_bitrate.lock);
+
+    vlc_mutex_lock(&stats->demux_bitrate.lock);
     st->i_demux_read_bytes = stats->demux_bitrate.value;
     st->f_demux_bitrate = stats_GetRate(&stats->demux_bitrate);
-    st->i_demux_corrupted = stats->demux_corrupted;
-    st->i_demux_discontinuity = stats->demux_discontinuity;
-
-    vlc_mutex_unlock(&stats->lock);
+    vlc_mutex_unlock(&stats->demux_bitrate.lock);
+    st->i_demux_corrupted = atomic_load_explicit(&stats->demux_corrupted,
+                                                 memory_order_relaxed);
+    st->i_demux_discontinuity = atomic_load_explicit(
+                    &stats->demux_discontinuity, memory_order_relaxed);
 
     /* Aout */
     st->i_decoded_audio = atomic_load_explicit(&stats->decoded_audio,

@@ -2044,17 +2044,17 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     struct input_stats *stats = input_priv(p_input)->stats;
     if( stats != NULL )
     {
-        vlc_mutex_lock( &stats->lock );
         input_rate_Add( &stats->demux_bitrate, p_block->i_buffer );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-            stats->demux_corrupted++;
+            atomic_fetch_add_explicit(&stats->demux_corrupted, 1,
+                                      memory_order_relaxed);
 
         /* Update number of discontinuities */
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-            stats->demux_discontinuity++;
-        vlc_mutex_unlock( &stats->lock );
+            atomic_fetch_add_explicit(&stats->demux_discontinuity, 1,
+                                      memory_order_relaxed);
     }
 
     vlc_mutex_lock( &p_sys->lock );
