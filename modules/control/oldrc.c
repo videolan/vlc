@@ -454,7 +454,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "achan", STRING, AudioChannel )
 
     /* misc menu commands */
-    ADD( "stats", BOOL, Statistics )
+    ADD( "stats", VOID, Statistics )
 
 #undef ADD
 }
