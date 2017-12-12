@@ -58,6 +58,12 @@ struct input_stats *input_stats_Create(void)
     memset(stats, 0, sizeof (*stats));
     input_rate_Init(&stats->input_bitrate);
     input_rate_Init(&stats->demux_bitrate);
+    atomic_init(&stats->decoded_audio, 0);
+    atomic_init(&stats->decoded_video, 0);
+    atomic_init(&stats->played_abuffers, 0);
+    atomic_init(&stats->lost_abuffers, 0);
+    atomic_init(&stats->displayed_pictures, 0);
+    atomic_init(&stats->lost_pictures, 0);
     vlc_mutex_init(&stats->lock);
     return stats;
 }
@@ -81,19 +87,23 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
     st->i_demux_corrupted = stats->demux_corrupted;
     st->i_demux_discontinuity = stats->demux_discontinuity;
 
-    /* Decoders */
-    st->i_decoded_video = stats->decoded_video;
-    st->i_decoded_audio = stats->decoded_audio;
+    vlc_mutex_unlock(&stats->lock);
 
     /* Aout */
-    st->i_played_abuffers = stats->played_abuffers;
-    st->i_lost_abuffers = stats->lost_abuffers;
+    st->i_decoded_audio = atomic_load_explicit(&stats->decoded_audio,
+                                               memory_order_relaxed);
+    st->i_played_abuffers = atomic_load_explicit(&stats->played_abuffers,
+                                                 memory_order_relaxed);
+    st->i_lost_abuffers = atomic_load_explicit(&stats->lost_abuffers,
+                                               memory_order_relaxed);
 
     /* Vouts */
-    st->i_displayed_pictures = stats->displayed_pictures;
-    st->i_lost_pictures = stats->lost_pictures;
-
-    vlc_mutex_unlock(&stats->lock);
+    st->i_decoded_video = atomic_load_explicit(&stats->decoded_video,
+                                               memory_order_relaxed);
+    st->i_displayed_pictures = atomic_load_explicit(&stats->displayed_pictures,
+                                                    memory_order_relaxed);
+    st->i_lost_pictures = atomic_load_explicit(&stats->lost_pictures,
+                                               memory_order_relaxed);
 }
 
 /** Update a counter element with new values

@@ -25,6 +25,7 @@
 #define LIBVLC_INPUT_INTERNAL_H 1
 
 #include <stddef.h>
+#include <stdatomic.h>
 
 #include <vlc_access.h>
 #include <vlc_demux.h>
@@ -275,6 +276,7 @@ typedef struct input_rate_t
 } input_rate_t;
 
 struct input_stats {
+    vlc_mutex_t lock;
     uintmax_t read_packets;
     uintmax_t read_bytes;
     input_rate_t input_bitrate;
@@ -282,13 +284,12 @@ struct input_stats {
     input_rate_t demux_bitrate;
     uintmax_t demux_corrupted;
     uintmax_t demux_discontinuity;
-    uintmax_t decoded_audio;
-    uintmax_t decoded_video;
-    uintmax_t played_abuffers;
-    uintmax_t lost_abuffers;
-    uintmax_t displayed_pictures;
-    uintmax_t lost_pictures;
-    vlc_mutex_t lock;
+    atomic_uintmax_t decoded_audio;
+    atomic_uintmax_t decoded_video;
+    atomic_uintmax_t played_abuffers;
+    atomic_uintmax_t lost_abuffers;
+    atomic_uintmax_t displayed_pictures;
+    atomic_uintmax_t lost_pictures;
 };
 
 struct input_stats *input_stats_Create(void);

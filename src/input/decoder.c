@@ -1097,11 +1097,12 @@ static void DecoderUpdateStatVideo( decoder_owner_sys_t *p_owner,
 
     if( stats != NULL )
     {
-        vlc_mutex_lock( &stats->lock );
-        stats->decoded_video += decoded;
-        stats->lost_pictures += lost;
-        stats->displayed_pictures += displayed;
-        vlc_mutex_unlock( &stats->lock );
+        atomic_fetch_add_explicit(&stats->decoded_video, decoded,
+                                  memory_order_relaxed);
+        atomic_fetch_add_explicit(&stats->lost_pictures, lost,
+                                  memory_order_relaxed);
+        atomic_fetch_add_explicit(&stats->displayed_pictures, displayed,
+                                  memory_order_relaxed);
     }
 }
 
@@ -1222,11 +1223,12 @@ static void DecoderUpdateStatAudio( decoder_owner_sys_t *p_owner,
 
     if( stats != NULL )
     {
-        vlc_mutex_lock( &stats->lock );
-        stats->lost_abuffers += lost;
-        stats->played_abuffers += played;
-        stats->decoded_audio += decoded;
-        vlc_mutex_unlock( &stats->lock );
+        atomic_fetch_add_explicit(&stats->lost_abuffers, lost,
+                                  memory_order_relaxed);
+        atomic_fetch_add_explicit(&stats->played_abuffers, played,
+                                  memory_order_relaxed);
+        atomic_fetch_add_explicit(&stats->decoded_audio, decoded,
+                                  memory_order_relaxed);
     }
 }
 
