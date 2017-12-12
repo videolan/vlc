@@ -1279,14 +1279,6 @@ static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
 {
     assert( p_spu );
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    input_thread_t *p_input = p_owner->p_input;
-
-    if( p_input != NULL )
-    {
-        vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock );
-        input_priv(p_input)->counters.decoded_sub++;
-        vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock );
-    }
 
     int i_ret = -1;
     vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
