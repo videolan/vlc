@@ -36,6 +36,7 @@
  */
 static void input_rate_Init(input_rate_t *rate)
 {
+    rate->updates = 0;
     rate->value = 0;
     rate->samples[0].date = VLC_TS_INVALID;
     rate->samples[1].date = VLC_TS_INVALID;
@@ -56,9 +57,10 @@ struct input_stats *input_stats_Create(void)
     if (unlikely(stats == NULL))
         return NULL;
 
-    memset(stats, 0, sizeof (*stats));
     input_rate_Init(&stats->input_bitrate);
     input_rate_Init(&stats->demux_bitrate);
+    stats->demux_corrupted = 0;
+    stats->demux_discontinuity = 0;
     atomic_init(&stats->decoded_audio, 0);
     atomic_init(&stats->decoded_video, 0);
     atomic_init(&stats->played_abuffers, 0);
@@ -80,7 +82,7 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
     vlc_mutex_lock(&stats->lock);
 
     /* Input */
-    st->i_read_packets = stats->read_packets;
+    st->i_read_packets = stats->input_bitrate.updates;
     st->i_read_bytes = stats->input_bitrate.value;
     st->f_input_bitrate = stats_GetRate(&stats->input_bitrate);
     st->i_demux_read_bytes = stats->demux_bitrate.value;
@@ -114,6 +116,7 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
  */
 void input_rate_Add(input_rate_t *counter, uintmax_t val)
 {
+    counter->updates++;
     counter->value += val;
 
     /* Ignore samples within a second of another */
