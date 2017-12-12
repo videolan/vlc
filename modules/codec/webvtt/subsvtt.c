@@ -480,14 +480,13 @@ static bool webvtt_domnode_Match_Class( const webvtt_dom_node_t *p_node, const c
     if( p_node->type == NODE_TAG )
     {
         const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
-        while( p_tagnode->psz_attrs && psz )
+        for( const char *p = p_tagnode->psz_attrs; p && psz; p++ )
         {
-            const char *p = strstr( p_tagnode->psz_attrs, psz );
+            p = strstr( p, psz );
             if( !p )
                 return false;
-            if( p > psz && p[-1] == '.' && !isalnum(p[i_len]) )
+            if( p > p_tagnode->psz_attrs && p[-1] == '.' && !isalnum(p[i_len]) )
                 return true;
-            psz = p + 1;
         }
     }
     return false;
