@@ -701,6 +701,20 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         rect = sys->sys.rect_dest_clipped;
     uint32_t i_width = RECTWidth(rect);
     uint32_t i_height = RECTHeight(rect);
+    D3D11_TEXTURE2D_DESC dsc = { 0 };
+
+    if (sys->d3drenderTargetView) {
+        ID3D11Resource *res = NULL;
+        ID3D11RenderTargetView_GetResource(sys->d3drenderTargetView, &res);
+        if (res)
+        {
+            ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
+            ID3D11Resource_Release(res);
+        }
+    }
+
+    if (dsc.Width == i_width && dsc.Height == i_height)
+        return S_OK; /* nothing changed */
 
     if (sys->d3drenderTargetView) {
         ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
