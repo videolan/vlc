@@ -401,11 +401,6 @@ function stats(name,client)
     client:append("| audio decoded    :    "..string.format("%5i",stats_tab["decoded_audio"]))
     client:append("| buffers played   :    "..string.format("%5i",stats_tab["played_abuffers"]))
     client:append("| buffers lost     :    "..string.format("%5i",stats_tab["lost_abuffers"]))
-    client:append("|")
-    client:append("+-[Streaming]")
-    client:append("| packets sent     :    "..string.format("%5i",stats_tab["sent_packets"]))
-    client:append("| bytes sent       : "..string.format("%8.0f KiB",stats_tab["sent_bytes"]/1024))
-    client:append("| sending bitrate  :   "..string.format("%6.0f kb/s",stats_tab["send_bitrate"]*8000))
     client:append("+----[ end of statistical info ]")
 end
 
