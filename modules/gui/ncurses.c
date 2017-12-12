@@ -840,15 +840,6 @@ static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
         MainBoxWrite(sys, l++, _("| buffers lost     :    %5"PRIi64),
                 p_stats->i_lost_abuffers);
     }
-    /* Sout */
-    if (sys->color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(sys, l++, _("+-[Streaming]"));
-    if (sys->color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(sys, l++, _("| packets sent     :    %5"PRIi64), p_stats->i_sent_packets);
-    MainBoxWrite(sys, l++, _("| bytes sent       : %8.0f KiB"),
-            (float)(p_stats->i_sent_bytes)/1025);
-    MainBoxWrite(sys, l++, _("| sending bitrate  :   %6.0f kb/s"),
-            p_stats->f_send_bitrate*8000);
     if (sys->color) color_set(C_DEFAULT, NULL);
 
     vlc_mutex_unlock(&p_stats->lock);
