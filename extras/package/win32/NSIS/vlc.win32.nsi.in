@@ -8,7 +8,7 @@
 !define PRODUCT_VERSION @VERSION@
 !define PRODUCT_GROUP "VideoLAN"
 !define PRODUCT_PUBLISHER "VideoLAN"
-!define PRODUCT_WEB_SITE "http://www.videolan.org/"
+!define PRODUCT_WEB_SITE "https://www.videolan.org/"
 !define PRODUCT_DIR_REGKEY "Software\VideoLAN\VLC"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -104,7 +104,7 @@ RequestExecutionLevel admin
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_FUNCTION AppExecAs
     !define MUI_FINISHPAGE_LINK "$(Link_VisitWebsite)"
-    !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
+    !define MUI_FINISHPAGE_LINK_LOCATION "https://www.videolan.org/vlc/"
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
     !insertmacro MUI_PAGE_FINISH
 
