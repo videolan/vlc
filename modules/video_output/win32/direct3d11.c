@@ -1598,7 +1598,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         default:
             {
                 const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
-                bits_per_channel = p_format == NULL || p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits;
+                bits_per_channel = p_format == NULL || p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits / p_format->pixel_size;
             }
             break;
         }
