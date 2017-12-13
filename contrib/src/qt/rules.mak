@@ -38,10 +38,10 @@ ifdef HAVE_MACOSX
 QT_PLATFORM := -platform darwin-g++
 endif
 ifdef HAVE_WIN32
-ifeq ($(findstring clang, $(shell $(CC) --version)),)
-QT_SPEC := win32-g++
-else
+ifdef HAVE_CLANG
 QT_SPEC := win32-clang-g++
+else
+QT_SPEC := win32-g++
 endif
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 endif
