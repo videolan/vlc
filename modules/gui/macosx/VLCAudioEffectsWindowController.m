@@ -154,17 +154,10 @@
     var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
 
     /* filter handling */
-    NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
-    NSArray *tempArray;
-    NSUInteger count;
-
-    /* enable the new filters */
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
-    }
+    NSString *audioFilters = B64DecNSStr([items objectAtIndex:1]);
+    if (p_aout)
+        var_SetString(p_aout, "audio-filter", audioFilters.UTF8String);
+    var_SetString(p_playlist, "audio-filter", audioFilters.UTF8String);
 
     NSInteger presetIndex = [self getPresetIndexForProfile:profileIndex];
 
@@ -207,15 +200,6 @@
         var_SetFloat(p_aout, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
         var_SetString(p_aout, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
     }
-
-    /* update UI */
-    BOOL b_equalizerEnabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
-    [_equalizerView enableSubviews:b_equalizerEnabled];
-    [_equalizerEnableCheckbox setState:(b_equalizerEnabled ? NSOnState : NSOffState)];
-
-    [_equalizerTwoPassCheckbox setState:[[items objectAtIndex:15] intValue]];
-
-    [defaults synchronize];
 
     if (p_aout)
         vlc_object_release(p_aout);
