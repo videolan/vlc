@@ -1377,7 +1377,6 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
 
     for( ; p_cue; p_cue = (const webvtt_dom_cue_t *) p_cue->p_next )
     {
-        assert( p_cue->type == NODE_CUE );
         if( p_cue->type != NODE_CUE )
             continue;
 
