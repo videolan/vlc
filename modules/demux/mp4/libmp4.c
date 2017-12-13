@@ -1556,6 +1556,10 @@ static int MP4_ReadBox_LtdContainer( stream_t *p_stream, MP4_Box_t *p_box )
             break;
         MP4_BoxAddChild( p_box, p_childbox );
         i_entry++;
+
+        if( i_read < p_childbox->i_size )
+            MP4_READBOX_EXIT( 0 );
+
         i_read -= p_childbox->i_size;
     }
 
