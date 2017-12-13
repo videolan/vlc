@@ -706,6 +706,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         sys->textureHeight = fmt->i_height;
     }
 
+    assert(sys->textureWidth  >= fmt->i_width);
+    assert(sys->textureHeight >= fmt->i_height);
+
     if ((sys->textureWidth != fmt->i_width || sys->textureHeight != fmt->i_height) &&
         !CanUseDecoderPadding(sys))
     {
