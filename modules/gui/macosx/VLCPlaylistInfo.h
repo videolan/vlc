@@ -83,13 +83,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *playedAudioBuffersTextField;
 @property (readwrite, weak) IBOutlet NSTextField *readBytesLabel;
 @property (readwrite, weak) IBOutlet NSTextField *readBytesTextField;
-@property (readwrite, weak) IBOutlet NSTextField *sentBitrateLabel;
-@property (readwrite, weak) IBOutlet NSTextField *sentBitrateTextField;
-@property (readwrite, weak) IBOutlet NSTextField *sentBytesLabel;
-@property (readwrite, weak) IBOutlet NSTextField *sentBytesTextField;
-@property (readwrite, weak) IBOutlet NSTextField *sentPacketsLabel;
-@property (readwrite, weak) IBOutlet NSTextField *sentPacketsTextField;
-@property (readwrite, weak) IBOutlet NSTextField *soutLabel;
 @property (readwrite, weak) IBOutlet NSTextField *videoLabel;
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedLabel;
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;

@@ -93,11 +93,6 @@
     [_displayedLabel setStringValue: _NS("Displayed frames")];
     [_lostFramesLabel setStringValue: _NS("Lost frames")];
 
-    [_soutLabel setStringValue: _NS("Streaming")];
-    [_sentPacketsLabel setStringValue: _NS("Sent packets")];
-    [_sentBytesLabel setStringValue: _NS("Sent bytes")];
-    [_sentBitrateLabel setStringValue: _NS("Send rate")];
-
     [_audioLabel setStringValue: _NS("Audio")];
     [_audioDecodedLabel setStringValue: _NS("Decoded blocks")];
     [_playedAudioBuffersLabel setStringValue: _NS("Played buffers")];
@@ -154,11 +149,6 @@
     [_videoDecodedTextField setIntValue:0];
     [_displayedTextField setIntValue:0];
     [_lostFramesTextField setIntValue:0];
-
-    //Initializing Output Variables
-    [_sentPacketsTextField setIntValue: 0];
-    [_sentBytesTextField setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
-    [_sentBitrateTextField setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
 
     //Initializing Audio Variables
     [_audioDecodedTextField setIntValue:0];
@@ -292,13 +282,6 @@ FREENULL( psz_##foo );
     [_videoDecodedTextField setIntValue: p_item->p_stats->i_decoded_video];
     [_displayedTextField setIntValue: p_item->p_stats->i_displayed_pictures];
     [_lostFramesTextField setIntValue: p_item->p_stats->i_lost_pictures];
-
-    /* Sout */
-    [_sentPacketsTextField setIntValue: p_item->p_stats->i_sent_packets];
-    [_sentBytesTextField setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
-                                          (float)(p_item->p_stats->i_sent_bytes)/1024]];
-    [_sentBitrateTextField setStringValue: [NSString stringWithFormat:
-                                            @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
 
     /* Audio */
     [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];
