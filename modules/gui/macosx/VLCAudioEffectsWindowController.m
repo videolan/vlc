@@ -410,16 +410,21 @@
 
     playlist_t *p_playlist = pl_Get(getIntf());
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([[self generateProfileString] compare:[VLCAudioEffectsWindowController defaultProfileString]] == NSOrderedSame)
+        return;
+
+    // FIXME: Current code does not allow auto save of equalizer profiles, those profiles currently need to be saved
+    // individually with the popup menu, before saving the overall profile.
+    // Below code for auto duplication is not enough to fix current behaviour and results in too many duplicated profiles
+    // For auto-saving of eq profiles, a different stragety needs to be found, involving save also once overall profile changes.
+/*
     NSString *newPresetString = [NSString stringWithCString:var_InheritString(p_playlist, "equalizer-bands") encoding:NSASCIIStringEncoding];
     float newPresetPreamp = var_InheritFloat(p_playlist, "equalizer-preamp");
 
+    // TODO: Comparing against profile 0 is mostly useless and looks wrong (profile 0 is flat usually)
     NSInteger defaultPresetIndex = [self getPresetIndexForProfile:0];
     NSString *defaultPresetString = [[defaults objectForKey:@"EQValues"] objectAtIndex:defaultPresetIndex];
     float defaultPresetPreamp = [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:defaultPresetIndex] floatValue];
-    if ([[self generateProfileString] compare:[VLCAudioEffectsWindowController defaultProfileString]] == NSOrderedSame &&
-        [newPresetString compare:defaultPresetString] == NSOrderedSame &&
-        newPresetPreamp == defaultPresetPreamp)
-        return;
 
     NSMutableArray *workArray;
     int num_custom;
@@ -427,7 +432,7 @@
     if ([newPresetString compare:defaultPresetString] != NSOrderedSame ||
         newPresetPreamp != defaultPresetPreamp)
     {
-        /* preset title */
+        // preset title
         NSArray<NSString *> *presetTitles = [defaults objectForKey:@"EQTitles"];
         NSString *newPresetTitle;
 
@@ -440,24 +445,26 @@
         [workArray addObject:newPresetTitle];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
 
-        /* preset name */
+        // preset name
         NSString *decomposedStringWithCanonicalMapping = [newPresetTitle decomposedStringWithCanonicalMapping];
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
         [workArray addObject:decomposedStringWithCanonicalMapping];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
         var_SetString(p_playlist, "equalizer-preset", [decomposedStringWithCanonicalMapping UTF8String]);
 
-        /* preset bands */
+        // preset bands
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
         [workArray addObject:newPresetString];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQValues"];
 
-        /* preset preamp */
+        // preset preamp
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
         [workArray addObject:[NSString stringWithFormat:@"%.1f", [_equalizerPreampSlider floatValue]]];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
     }
+*/
 
+    NSMutableArray *workArray;
     /* profile string */
     workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
     [workArray addObject:[self generateProfileString]];
@@ -467,7 +474,7 @@
     NSArray<NSString *> *profileNames = [defaults objectForKey:@"AudioEffectProfileNames"];
     NSString *newProfileName;
 
-    num_custom = 0;
+    int num_custom = 0;
     do
         newProfileName = [@"Custom" stringByAppendingString:[NSString stringWithFormat:@"%03i",num_custom++]];
     while ([profileNames containsObject:newProfileName]);
