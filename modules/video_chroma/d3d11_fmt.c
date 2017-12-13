@@ -355,6 +355,7 @@ int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId, const struct wd
 
 const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
                                     vlc_fourcc_t i_src_chroma,
+                                    bool rgb_only,
                                     uint8_t bits_per_channel,
                                     bool allow_opaque,
                                     UINT supportFlags)
@@ -368,6 +369,8 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
         if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
             continue;
         if (!allow_opaque && is_d3d11_opaque(output_format->fourcc))
+            continue;
+        if (rgb_only && vlc_fourcc_IsYUV(output_format->fourcc))
             continue;
 
         DXGI_FORMAT textureFormat;

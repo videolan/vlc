@@ -1445,27 +1445,27 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (is_d3d11_opaque(i_src_chroma))
         supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
+    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
 }
 
 static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
+    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
 }
 
-static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth, bool from_processor)
+static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth, bool from_processor, bool rgb_only)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, 0, bit_depth, false, supportFlags );
+    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, 0, rgb_only, bit_depth, false, supportFlags );
 }
 
 static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, 0, false, supportFlags );
+    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, false, supportFlags );
 }
 
 static int Direct3D11Open(vout_display_t *vd)
@@ -1603,12 +1603,15 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
             break;
         }
 
-        sys->picQuadConfig = GetDisplayFormatByDepth(vd, bits_per_channel, decoder_format!=NULL);
+        bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
+        sys->picQuadConfig = GetDisplayFormatByDepth(vd, bits_per_channel, decoder_format!=NULL, is_rgb);
+        if (!sys->picQuadConfig && is_rgb)
+            sys->picQuadConfig = GetDisplayFormatByDepth(vd, bits_per_channel, decoder_format!=NULL, false);
     }
 
     // look for any pixel format that we can handle
     if ( !sys->picQuadConfig )
-        sys->picQuadConfig = GetDisplayFormatByDepth(vd, 0, false);
+        sys->picQuadConfig = GetDisplayFormatByDepth(vd, 0, false, false);
 
     if ( !sys->picQuadConfig )
     {
