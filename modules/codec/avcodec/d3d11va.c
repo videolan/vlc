@@ -703,6 +703,8 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         msg_Dbg(va, "mismatching external pool sizes use the internal one %dx%d vs %dx%d",
                 sys->textureWidth, sys->textureHeight, fmt->i_width, fmt->i_height);
         dx_sys->can_extern_pool = false;
+        sys->textureWidth  = fmt->i_width;
+        sys->textureHeight = fmt->i_height;
     }
 
     D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
