@@ -1817,7 +1817,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         if (p_sys->b_vt_feed)
         {
             Drain(p_dec, false);
-            RestartVideoToolbox(p_dec, false);
+            PtsInit(p_dec);
         }
         goto skip;
     }
