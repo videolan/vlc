@@ -2306,8 +2306,6 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
 {
     unsigned int dst_x = output->left;
     unsigned int dst_y = output->top;
-    unsigned int dst_width = RECTWidth(*output);
-    unsigned int dst_height = RECTHeight(*output);
     unsigned int src_width = quad->i_width;
     unsigned int src_height = quad->i_height;
     LONG MidY = output->top + output->bottom; // /2
