@@ -492,8 +492,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             lock.RowPitch,
             lock.RowPitch,
         };
-        Copy420_SP_to_SP(dst, plane, pitch,
-                          src->format.i_visible_height + src->format.i_y_offset, &sys->cache);
+        Copy420_SP_to_SP(dst, plane, pitch, desc.Height, &sys->cache);
     } else {
         msg_Err(p_filter, "Unsupported D3D11VA conversion from 0x%08X to NV12", desc.Format);
     }
