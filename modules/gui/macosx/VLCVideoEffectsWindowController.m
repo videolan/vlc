@@ -361,6 +361,16 @@
     return [[NSUserDefaults standardUserDefaults] integerForKey:@"VideoEffectSelectedProfile"];
 }
 
+/// Returns the list of profile names (omitting the Default entry)
+- (NSArray *)nonDefaultProfileNames
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    NSMutableArray *names = [[defaults stringArrayForKey:@"VideoEffectProfileNames"] mutableCopy];
+    [names removeObjectAtIndex:0];
+    return [names copy];
+}
+
 -(void)inputChangedEvent:(NSNotification *)o_notification
 {
     // reset crop values when input changed
@@ -378,16 +388,14 @@
     // Ignore "Default" index 0 from settings
     [_profilePopup addItemWithTitle:_NS("Default")];
 
-    NSMutableArray *profileNames = [[defaults stringArrayForKey:@"VideoEffectProfileNames"] mutableCopy];
-    [profileNames removeObjectAtIndex:0];
-    [_profilePopup addItemsWithTitles:profileNames];
+    [_profilePopup addItemsWithTitles:[self nonDefaultProfileNames]];
 
     [[_profilePopup menu] addItem:[NSMenuItem separatorItem]];
     [_profilePopup addItemWithTitle:_NS("Duplicate current profile...")];
     [[_profilePopup lastItem] setTarget: self];
     [[_profilePopup lastItem] setAction: @selector(addProfile:)];
 
-    if ([profileNames count] > 1) {
+    if ([[self nonDefaultProfileNames] count] > 0) {
         [_profilePopup addItemWithTitle:_NS("Organize profiles...")];
         [[_profilePopup lastItem] setTarget: self];
         [[_profilePopup lastItem] setAction: @selector(removeProfile:)];
@@ -788,8 +796,9 @@
     __unsafe_unretained typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
+        NSInteger currentProfileIndex = [_self currentProfileIndex];
         if (returnCode != NSOKButton) {
-            [_profilePopup selectItemAtIndex:[self currentProfileIndex]];
+            [_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
 
@@ -798,7 +807,7 @@
 
         // duplicate names are not allowed in the popup control
         if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
-            [_profilePopup selectItemAtIndex:[self currentProfileIndex]];
+            [_profilePopup selectItemAtIndex:currentProfileIndex];
 
             NSAlert *alert = [[NSAlert alloc] init];
             [alert setAlertStyle:NSCriticalAlertStyle];
@@ -850,7 +859,7 @@
     [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
     [_popupPanel setOkButtonString:_NS("Remove")];
     [_popupPanel setCancelButtonString:_NS("Cancel")];
-    [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
+    [_popupPanel setPopupButtonContent:[self nonDefaultProfileNames]];
 
     // TODO: Change to weak, when dropping 10.7 support
     __unsafe_unretained typeof(self) _self = self;
@@ -864,10 +873,8 @@
             return;
         }
 
-        if (!selectedIndex) { // TODO: add popup to notify user
-            [_profilePopup selectItemAtIndex:activeProfileIndex];
-            return;
-        }
+        // Popup panel does not contain the "Default" entry
+        selectedIndex++;
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         /* remove selected profile from settings */
