@@ -32,8 +32,12 @@ ifdef HAVE_MACOSX
 QT_PLATFORM := -platform darwin-g++
 endif
 ifdef HAVE_WIN32
+ifdef HAVE_CLANG
+QT_SPEC := win32-clang-g++
+else
 QT_SPEC := win32-g++
-QT_PLATFORM := -xplatform win32-g++ -device-option CROSS_COMPILE=$(HOST)-
+endif
+QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \

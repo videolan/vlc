@@ -140,6 +140,9 @@ ifdef HAVE_WIN32
 ifneq ($(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E __MINGW64_VERSION_MAJOR),)
 HAVE_MINGW_W64 := 1
 endif
+ifneq ($(findstring clang, $(shell $(CC) --version)),)
+HAVE_CLANG := 1
+endif
 endif
 
 ifdef HAVE_SOLARIS
