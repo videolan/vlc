@@ -1,0 +1,103 @@
+From 4cc1f128c4b9894b94ffdd5d0a32257ead7a9cf5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 24 Nov 2017 10:10:23 +0200
+Subject: [PATCH 6/9] moc: Initialize staticMetaObject with the highest
+ user-settable priority
+
+The referenced static meta object for the superclass might be in a
+different DLL. In this case, the whole QMetaObject can't be initialized
+all via preinitialized data in the data section of the binary, but must
+run code at runtime to fill in the value of the dllimported pointer.
+
+In these cases, both GCC and MSVC initialize as much as possible statically,
+while only filling in the dllimported values (QMetaObject::d::superdata)
+at runtime. Clang, on the other side, initializes the whole struct
+at runtime if some part of it needs runtime initialization, leaving
+the struct completely uninitialized before constructors are run.
+
+In C++, there are no guarantees for in what order constructors in
+different translation units are executed. This in particular means
+that there are no guarantees as to whether qRegisterWidgetsVariant()
+in qwidgetsvariants.cpp runs before or after the runtime initialization
+of QWidget::staticMetaObject.
+
+With GCC and MSVC, this doesn't seem to have mattered since only the
+superdata pointer of the staticMetaObject was uninitialized - everything
+else was initialized, and the superdata pointer doesn't seem to be
+accessed during qRegisterWidgetsVariant.
+
+With clang, the whole staticMetaObject is uninitialized, unless the
+staticMetaObject has been initialized before (and the initialization
+order is undefined).
+
+By setting a manual priority (which is a GCC extension that also
+clang supports) for the staticMetaObjects, we can be sure that
+these are initialized before the actual explicit constructor
+invocations (without any explicit initialization priority) that
+can access the staticMetaObjects.
+
+Change-Id: I64a82f12d690528567509791bae088b6304e189b
+Reviewed-by: Olivier Goffart (Woboq GmbH) <ogoffart@woboq.com>
+Backport-Of: 74118a4784569046d5fdf5e08c99f8b1b43e9710 (v5.10.1)
+
+moc: Only use the init_priority attribute when targeting windows
+
+While both GCC and the GCC compatible clang support this attribute in
+general, GCC doesn't support it when targeting macOS, ending up with
+errors like these:
+error: 'init_priority' attribute is not supported on this platform
+
+This error isn't a property of the platform itself though, since
+clang supports the attribute just fine on macOS.
+
+The attribute is only used to work around an issue with dllimport
+on windows, so limit its use to that platform, to avoid issues
+with it potentially being unsupported on platforms other than
+macOS as well.
+
+This fixes compiling with GCC for macOS.
+
+Change-Id: I0235e6365635d73233951566c10ad869b26a0fc6
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: b97765efd452921f75c1d04820c4b5e9e9d49100 (5.11 branch)
+---
+ src/corelib/global/qglobal.h | 6 ++++++
+ src/tools/moc/generator.cpp  | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/global/qglobal.h b/src/corelib/global/qglobal.h
+index 4528005177..3a3f8d40da 100644
+--- a/src/corelib/global/qglobal.h
++++ b/src/corelib/global/qglobal.h
+@@ -499,6 +499,12 @@ typedef qptrdiff qintptr;
+ #  define Q_ALWAYS_INLINE inline
+ #endif
+ 
++#if defined(Q_CC_GNU) && defined(Q_OS_WIN)
++#  define QT_INIT_METAOBJECT __attribute__((init_priority(101)))
++#else
++#  define QT_INIT_METAOBJECT
++#endif
++
+ //defines the type for the WNDPROC on windows
+ //the alignment needs to be forced for sse2 to not crash with mingw
+ #if defined(Q_OS_WIN)
+diff --git a/src/tools/moc/generator.cpp b/src/tools/moc/generator.cpp
+index 99629f0427..8cbeb4ce78 100644
+--- a/src/tools/moc/generator.cpp
++++ b/src/tools/moc/generator.cpp
+@@ -525,9 +525,9 @@ void Generator::generateCode()
+ // Finally create and initialize the static meta object
+ //
+     if (isQt)
+-        fprintf(out, "const QMetaObject QObject::staticQtMetaObject = {\n");
++        fprintf(out, "QT_INIT_METAOBJECT const QMetaObject QObject::staticQtMetaObject = {\n");
+     else
+-        fprintf(out, "const QMetaObject %s::staticMetaObject = {\n", cdef->qualified.constData());
++        fprintf(out, "QT_INIT_METAOBJECT const QMetaObject %s::staticMetaObject = {\n", cdef->qualified.constData());
+ 
+     if (isQObject)
+         fprintf(out, "    { Q_NULLPTR, ");
+-- 
+2.14.3 (Apple Git-98)
+

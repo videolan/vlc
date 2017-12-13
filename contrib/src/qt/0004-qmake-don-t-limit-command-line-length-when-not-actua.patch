@@ -1,0 +1,75 @@
+From 767c2a2e339babcff9383d539f59479586444dd5 Mon Sep 17 00:00:00 2001
+From: Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+Date: Mon, 7 Aug 2017 12:17:06 +0200
+Subject: [PATCH 4/9] qmake: don't limit command line length when not actually
+ on windows
+
+QMAKE_LINK_OBJECT_MAX is actually a property of the host, not the
+target.
+
+this works around binutil's inability to use thin LTO objects in
+conjunction with an MRI script
+(https://sourceware.org/bugzilla/show_bug.cgi?id=21702).
+
+Task-number: QTBUG-61335
+Change-Id: I90a1334b9c905c433b35546e8f3f3b5089d2c65b
+Reviewed-by: Jake Petroules <jake.petroules@qt.io>
+Backport-Of: 8bebded9ab02b8eec67c44bfddf802d6bf9cda3c (v5.9.2)
+
+qmake: Handle QMAKE_LINK_OBJECT_MAX being unset for static libraries
+
+This was missed in 8bebded9.
+
+Task-number: QTBUG-63637
+Change-Id: I6be472430a9aa8f533def4fd6c14c8dbfe8b6f70
+Reviewed-by: Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+Backport-Of: 8cef809b16aac9d4c4163ff2e2e831adf70133c2 (v5.10.1)
+---
+ mkspecs/win32-g++/qmake.conf          | 6 ++++--
+ qmake/generators/win32/mingw_make.cpp | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/mkspecs/win32-g++/qmake.conf b/mkspecs/win32-g++/qmake.conf
+index 2576a58e83..68d773499c 100644
+--- a/mkspecs/win32-g++/qmake.conf
++++ b/mkspecs/win32-g++/qmake.conf
+@@ -87,8 +87,10 @@ QMAKE_LFLAGS_CXX11      =
+ QMAKE_LFLAGS_CXX14      =
+ QMAKE_LFLAGS_CXX1Z      =
+ QMAKE_LFLAGS_GCSECTIONS = -Wl,--gc-sections
+-QMAKE_LINK_OBJECT_MAX   = 10
+-QMAKE_LINK_OBJECT_SCRIPT = object_script
++equals(QMAKE_HOST.os, Windows) {
++    QMAKE_LINK_OBJECT_MAX = 10
++    QMAKE_LINK_OBJECT_SCRIPT = object_script
++}
+ QMAKE_PREFIX_SHLIB      =
+ QMAKE_EXTENSION_SHLIB   = dll
+ QMAKE_PREFIX_STATICLIB  = lib
+diff --git a/qmake/generators/win32/mingw_make.cpp b/qmake/generators/win32/mingw_make.cpp
+index 96fd24cd31..c1609027f3 100644
+--- a/qmake/generators/win32/mingw_make.cpp
++++ b/qmake/generators/win32/mingw_make.cpp
+@@ -284,7 +284,8 @@ void MingwMakefileGenerator::writeLibsPart(QTextStream &t)
+ 
+ void MingwMakefileGenerator::writeObjectsPart(QTextStream &t)
+ {
+-    if (project->values("OBJECTS").count() < var("QMAKE_LINK_OBJECT_MAX").toInt()) {
++    const ProString &objmax = project->first("QMAKE_LINK_OBJECT_MAX");
++    if (objmax.isEmpty() || project->values("OBJECTS").count() < objmax.toInt()) {
+         objectsLinkLine = "$(OBJECTS)";
+     } else if (project->isActiveConfig("staticlib") && project->first("TEMPLATE") == "lib") {
+         QString ar_script_file = var("QMAKE_LINK_OBJECT_SCRIPT") + "." + var("TARGET");
+@@ -323,7 +324,8 @@ void MingwMakefileGenerator::writeBuildRulesPart(QTextStream &t)
+     if(!project->isEmpty("QMAKE_PRE_LINK"))
+         t << "\n\t" <<var("QMAKE_PRE_LINK");
+     if(project->isActiveConfig("staticlib") && project->first("TEMPLATE") == "lib") {
+-        if (project->values("OBJECTS").count() < var("QMAKE_LINK_OBJECT_MAX").toInt()) {
++        const ProString &objmax = project->first("QMAKE_LINK_OBJECT_MAX");
++        if (objmax.isEmpty() || project->values("OBJECTS").count() < objmax.toInt()) {
+             t << "\n\t$(LIB) $(DESTDIR_TARGET) " << objectsLinkLine << " " ;
+         } else {
+             t << "\n\t" << objectsLinkLine << " " ;
+-- 
+2.14.3 (Apple Git-98)
+

@@ -25,6 +25,12 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-Reimplement-calculation-of-window-frames_56.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Use-new-EnableNonClientDpiScaling-for-Wi_56.patch
 	$(APPLY) $(SRC)/qt/0003-QPA-prefer-lower-value-when-rounding-fractional-scaling.patch
+	$(APPLY) $(SRC)/qt/0004-qmake-don-t-limit-command-line-length-when-not-actua.patch
+	$(APPLY) $(SRC)/qt/0005-harfbuzz-Fix-building-for-win64-with-clang.patch
+	$(APPLY) $(SRC)/qt/0006-moc-Initialize-staticMetaObject-with-the-highest-use.patch
+	$(APPLY) $(SRC)/qt/0007-Only-define-QT_FASTCALL-on-x86_32.patch
+	$(APPLY) $(SRC)/qt/0008-Skip-arm-pixman-drawhelpers-on-windows-just-like-on-.patch
+	$(APPLY) $(SRC)/qt/0009-mkspecs-Add-a-win32-clang-g-mkspec-for-clang-targeti.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	$(MOVE)
 

@@ -1,0 +1,39 @@
+From b8ce2e4e77afb42bdb440440e55fe6dbbb5c5851 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 6 Jan 2018 00:37:48 +0200
+Subject: [PATCH 8/9] Skip arm pixman drawhelpers on windows just like on ios
+
+Windows on arm (which uses clang, or msvc, but no gcc is available for
+that setup) can't assemble these sources.
+
+(On linux, builds with clang force deferring it to the external
+assembler, but for windows on arm, no gas compatible external
+assembler is available).
+
+Change-Id: I139572257884cfdc57d3c32061a8c2e28c6e24de
+Reviewed-by: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Backport-Of: 8072c36eebd0648770e0f17fae408f33cb371c02 (v5.10.1)
+
+On revisions after 90f79db90a8db5b872040346bd58a27140b6a7a3 (v5.7.0),
+one also needs to backport f7524d73e33d00c76e55d996cdd4ea841ac6b7fa
+(part of v5.10.1).
+---
+ src/gui/painting/painting.pri | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gui/painting/painting.pri b/src/gui/painting/painting.pri
+index 1e516e4581..3fc3f1e3ef 100644
+--- a/src/gui/painting/painting.pri
++++ b/src/gui/painting/painting.pri
+@@ -104,7 +104,7 @@ AVX2_SOURCES += painting/qdrawhelper_avx2.cpp
+ NEON_SOURCES += painting/qdrawhelper_neon.cpp
+ NEON_HEADERS += painting/qdrawhelper_neon_p.h
+ NEON_ASM += ../3rdparty/pixman/pixman-arm-neon-asm.S painting/qdrawhelper_neon_asm.S
+-!ios:!contains(QT_ARCH, "arm64"): DEFINES += ENABLE_PIXMAN_DRAWHELPERS
++!ios:!win32:!contains(QT_ARCH, "arm64"): DEFINES += ENABLE_PIXMAN_DRAWHELPERS
+ 
+ MIPS_DSP_SOURCES += painting/qdrawhelper_mips_dsp.cpp
+ MIPS_DSP_HEADERS += painting/qdrawhelper_mips_dsp_p.h painting/qt_mips_asm_dsp_p.h
+-- 
+2.14.3 (Apple Git-98)
+

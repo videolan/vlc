@@ -1,0 +1,36 @@
+From abaeb37bc3c7d18b0a74e0c932c9767f074d01d7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 11 Nov 2017 16:59:31 +0200
+Subject: [PATCH 7/9] Only define QT_FASTCALL on x86_32
+
+The __fastcall calling convention is silently ignored on other
+architectures. The GNU attribute regparm is allowed but doesn't
+make sense on x86_64. On other architectures, the attribute isn't
+supported at all.
+
+This fixes building with clang for MinGW/ARM and ARM64.
+
+Change-Id: Ice1c6eadd0e90b2e5e34736542ee49a25dc67fe6
+Reviewed-by: Lars Knoll <lars.knoll@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: bfc96c9c0e103c4fcfda25b9a6eaa80f4f19fba1 (v5.10.1)
+---
+ src/corelib/global/qglobal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/global/qglobal.h b/src/corelib/global/qglobal.h
+index 3523a38ebd..fe59804796 100644
+--- a/src/corelib/global/qglobal.h
++++ b/src/corelib/global/qglobal.h
+@@ -463,7 +463,7 @@ typedef qptrdiff qintptr;
+ #  define QT_ASCII_CAST_WARN
+ #endif
+ 
+-#if defined(__i386__) || defined(_WIN32) || defined(_WIN32_WCE)
++#ifdef Q_PROCESSOR_X86_32
+ #  if defined(Q_CC_GNU)
+ #    define QT_FASTCALL __attribute__((regparm(3)))
+ #  elif defined(Q_CC_MSVC)
+-- 
+2.14.3 (Apple Git-98)
+
