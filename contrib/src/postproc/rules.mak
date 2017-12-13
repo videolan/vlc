@@ -119,6 +119,7 @@ $(TARBALLS)/postproc-$(POSTPROC_VERSION).tar.xz:
 
 postproc: postproc-$(POSTPROC_VERSION).tar.xz .sum-postproc
 	$(UNPACK)
+	$(APPLY) $(SRC)/postproc/win-pic.patch
 	$(MOVE)
 
 .postproc: postproc

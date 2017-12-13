@@ -1,0 +1,22 @@
+diff -urN postproc-orig/configure postproc/configure
+--- postproc-orig/configure	2012-08-21 23:27:39.000000000 +0300
++++ postproc/configure	2018-02-25 23:57:21.100768782 +0200
+@@ -2418,9 +2418,15 @@
+ 
+ enable_pic() {
+     enable pic
+-    add_cppflags -DPIC
+-    add_cflags   -fPIC
+-    add_asflags  -fPIC
++    case "$target_os" in
++    mingw*|cygwin*|win*)
++        ;;
++    *)
++        add_cppflags -DPIC
++        add_cflags   -fPIC
++        add_asflags  -fPIC
++        ;;
++    esac
+ }
+ 
+ enabled pic && enable_pic
