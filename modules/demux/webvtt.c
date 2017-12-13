@@ -36,6 +36,12 @@
  * Prototypes:
  *****************************************************************************/
 
+struct index_entry_s
+{
+    int64_t time;
+    unsigned active;
+};
+
 struct demux_sys_t
 {
     es_out_id_t *es;
@@ -55,54 +61,36 @@ struct demux_sys_t
         webvtt_cue_t *p_array;
         size_t  i_alloc;
         size_t  i_count;
-        size_t  i_current;
     } cues;
+
+    struct
+    {
+        struct index_entry_s *p_array;
+        size_t   i_alloc;
+        size_t   i_count;
+        size_t   i_current;
+    } index;
 
     webvtt_text_parser_t *p_streamparser;
 };
 
+#define WEBVTT_PREALLOC 64
+
 /*****************************************************************************
  *
  *****************************************************************************/
-static int cue_Compare( const void *a, const void *b )
+static int cue_Compare( const void *a_, const void *b_ )
 {
-    const mtime_t diff = ((webvtt_cue_t *)a)->i_start - ((webvtt_cue_t *)b)->i_start;
-    return (diff) ? diff / (( diff > 0 ) ? diff : -diff) : 0;
-}
-
-struct cue_searchkey
-{
-    webvtt_cue_t cue;
-    webvtt_cue_t *p_last;
-};
-
-static int cue_Bsearch_Compare( const void *key, const void *other )
-{
-    struct cue_searchkey *p_key = (struct cue_searchkey *) key;
-    webvtt_cue_t cue = *((webvtt_cue_t *) other);
-    p_key->p_last = (webvtt_cue_t *) other;
-    return cue_Compare( &p_key->cue, &cue );
-}
-
-static size_t cue_GetIndexByTime( demux_sys_t *p_sys, mtime_t i_time )
-{
-    size_t i_index = 0;
-    if( p_sys->cues.p_array )
+    webvtt_cue_t *a = (webvtt_cue_t *)a_;
+    webvtt_cue_t *b = (webvtt_cue_t *)b_;
+    if( a->i_start == b->i_start )
     {
-        struct cue_searchkey key;
-        key.cue.i_start = i_time;
-        key.p_last = NULL;
-
-        webvtt_cue_t *p_cue = bsearch( &key, p_sys->cues.p_array, p_sys->cues.i_count,
-                                      sizeof(webvtt_cue_t), cue_Bsearch_Compare );
-        if( p_cue )
-            key.p_last = p_cue;
-
-        i_index = (key.p_last - p_sys->cues.p_array);
-        if( cue_Compare( key.p_last, &key ) < 0 )
-            i_index++;
+        if( a->i_stop > b->i_stop )
+            return -1;
+        else
+            return ( a->i_stop < b->i_stop ) ? 1 : 0;
     }
-    return i_index;
+    else return a->i_start < b->i_start ? -1 : 1;
 }
 
 static block_t *ConvertWEBVTT( const webvtt_cue_t *p_cue, bool b_continued )
@@ -189,14 +177,15 @@ static webvtt_cue_t * ParserGetCueHandler( void *priv )
         return &p_sys->cues.p_array[p_sys->cues.i_count - 1];
     }
 
-    if( p_sys->cues.i_alloc <= p_sys->cues.i_count )
+    if( p_sys->cues.i_alloc <= p_sys->cues.i_count &&
+       (SIZE_MAX / sizeof(webvtt_cue_t)) - WEBVTT_PREALLOC > p_sys->cues.i_alloc )
     {
         webvtt_cue_t *p_realloc = realloc( p_sys->cues.p_array,
-                sizeof( webvtt_cue_t ) * ( p_sys->cues.i_alloc + 64 ) );
+                sizeof(webvtt_cue_t) * ( p_sys->cues.i_alloc + WEBVTT_PREALLOC ) );
         if( p_realloc )
         {
             p_sys->cues.p_array = p_realloc;
-            p_sys->cues.i_alloc += 64;
+            p_sys->cues.i_alloc += WEBVTT_PREALLOC;
         }
     }
 
@@ -221,6 +210,27 @@ static void ParserCueDoneHandler( void *priv, webvtt_cue_t *p_cue )
     if( p_sys->cues.i_count > 0 &&
         p_sys->cues.p_array[p_sys->cues.i_count - 1].i_start != p_cue->i_start )
         ctx->b_ordered = false;
+
+    /* Store timings */
+    if( p_sys->index.i_alloc <= p_sys->index.i_count &&
+       (SIZE_MAX / sizeof(struct index_entry_s)) - WEBVTT_PREALLOC * 2 > p_sys->index.i_alloc )
+    {
+        void *p_realloc = realloc( p_sys->index.p_array,
+                                   sizeof(struct index_entry_s) *
+                                   ( p_sys->index.i_alloc + WEBVTT_PREALLOC * 2 ) );
+        if( p_realloc )
+        {
+            p_sys->index.p_array = p_realloc;
+            p_sys->index.i_alloc += WEBVTT_PREALLOC * 2;
+        }
+    }
+    if( p_sys->index.i_alloc > p_sys->index.i_count )
+    {
+        p_sys->index.p_array[p_sys->index.i_count].active = 1; /* tmp start tag */
+        p_sys->index.p_array[p_sys->index.i_count++].time = p_cue->i_start;
+        p_sys->index.p_array[p_sys->index.i_count].active = 0;
+        p_sys->index.p_array[p_sys->index.i_count++].time = p_cue->i_stop;
+    }
 }
 
 static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
@@ -272,6 +282,83 @@ static void StreamParserCueDoneHandler( void *priv, webvtt_cue_t *p_cue )
     free( p_cue );
 }
 
+/*****************************************************************************
+ * Demux Index
+ *****************************************************************************/
+
+static int index_Compare( const void *a_, const void *b_ )
+{
+    struct index_entry_s *a = (struct index_entry_s *) a_;
+    struct index_entry_s *b = (struct index_entry_s *) b_;
+    if( a->time == b->time )
+    {
+        if( a->active > b->active )
+            return -1;
+        else
+            return b->active - a->active;
+    }
+    else return a->time < b->time ? -1 : 1;
+}
+
+static size_t getIndexByTime( demux_sys_t *p_sys, mtime_t i_time )
+{
+    for( size_t i=0; i<p_sys->index.i_count; i++ )
+    {
+        if( p_sys->index.p_array[i].time >= i_time )
+            return i;
+    }
+    return 0;
+}
+
+static void BuildIndex( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* Order time entries ascending, start time before end time */
+    qsort( p_sys->index.p_array, p_sys->index.i_count,
+           sizeof(struct index_entry_s), index_Compare );
+
+    /* Build actives count
+    TIME 3000 count 1
+    TIME 14500 count 2 (1 overlap)
+    TIME 16100 count 3 (2 overlaps)
+    TIME 16100 count 2 (1 overlap.. because there next start == end)
+    TIME 18000 count 3
+    TIME 18000 count 2 */
+    unsigned i_overlaps = 0;
+    for( size_t i=0; i<p_sys->index.i_count; i++ )
+    {
+        if( p_sys->index.p_array[i].active )
+            p_sys->index.p_array[i].active = ++i_overlaps;
+        else
+            p_sys->index.p_array[i].active = --i_overlaps;
+    }
+}
+
+static block_t *demux_Range( demux_t *p_demux, mtime_t i_start, mtime_t i_end )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    block_t *p_list = NULL;
+    block_t **pp_append = &p_list;
+    for( size_t i=0; i<p_sys->cues.i_count; i++ )
+    {
+        const webvtt_cue_t *p_cue = &p_sys->cues.p_array[i];
+        if( p_cue->i_start > i_start )
+        {
+            break;
+        }
+        else if( p_cue->i_start <= i_start && p_cue->i_stop > i_start )
+        {
+            *pp_append = ConvertWEBVTT( p_cue, p_sys->index.i_current > 0 );
+            if( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+        }
+    }
+
+    return ( p_list ) ? block_ChainGather( p_list ) : NULL;
+}
+
 static int ReadWEBVTT( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -297,6 +384,8 @@ static int ReadWEBVTT( demux_t *p_demux )
 
     if( !ctx.b_ordered )
         qsort( p_sys->cues.p_array, p_sys->cues.i_count, sizeof(webvtt_cue_t), cue_Compare );
+
+    BuildIndex( p_demux );
 
     memstream_Grab( &ctx.regions, &p_sys->regions_headers.p_data,
                                   &p_sys->regions_headers.i_data );
@@ -348,21 +437,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
             {
-                p_sys->cues.i_current = cue_GetIndexByTime( p_sys, i64 );
+                p_sys->index.i_current = getIndexByTime( p_sys, i64 );
                 p_sys->b_first_time = true;
                 p_sys->i_next_demux_time =
-                        p_sys->cues.p_array[p_sys->cues.i_current].i_start;
+                        p_sys->index.p_array[p_sys->index.i_current].time;
                 p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
                 return VLC_SUCCESS;
             }
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
-            if( p_sys->cues.i_current >= p_sys->cues.i_count )
+            if( p_sys->index.i_current >= p_sys->index.i_count )
             {
                 *pf = 1.0;
             }
-            else if( p_sys->cues.i_count > 0 )
+            else if( p_sys->index.i_count > 0 )
             {
                 *pf = (double) p_sys->i_next_demux_time /
                       (p_sys->i_length + 0.5);
@@ -378,10 +467,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->cues.i_count )
             {
                 i64 = f * p_sys->i_length;
-                p_sys->cues.i_current = cue_GetIndexByTime( p_sys, i64 );
+                p_sys->index.i_current = getIndexByTime( p_sys, i64 );
                 p_sys->b_first_time = true;
                 p_sys->i_next_demux_time =
-                        p_sys->cues.p_array[p_sys->cues.i_current].i_start;
+                        p_sys->index.p_array[p_sys->index.i_current].time;
                 p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
                 return VLC_SUCCESS;
             }
@@ -435,46 +524,59 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     int64_t i_barrier = p_sys->i_next_demux_time;
-    while( p_sys->cues.i_current < p_sys->cues.i_count &&
-           p_sys->cues.p_array[p_sys->cues.i_current].i_start <= i_barrier )
+
+    while( p_sys->index.i_current < p_sys->index.i_count &&
+           p_sys->index.p_array[p_sys->index.i_current].time <= i_barrier )
     {
-        const webvtt_cue_t *p_cue = &p_sys->cues.p_array[p_sys->cues.i_current];
-
-        if ( !p_sys->b_slave && p_sys->b_first_time )
+        /* Find start and end of our interval */
+        mtime_t i_start_time = p_sys->index.p_array[p_sys->index.i_current].time;
+        mtime_t i_end_time = i_start_time;
+        /* use next interval time as end time */
+        while( ++p_sys->index.i_current < p_sys->index.i_count )
         {
-            es_out_SetPCR( p_demux->out, VLC_TS_0 + i_barrier );
-            p_sys->b_first_time = false;
-        }
-
-        if( p_cue->i_start >= 0 )
-        {
-            block_t *p_block = ConvertWEBVTT( p_cue, p_sys->cues.i_current > 0 );
-            if( p_block )
+            if( i_start_time != p_sys->index.p_array[p_sys->index.i_current].time )
             {
-                p_block->i_dts =
-                p_block->i_pts = VLC_TS_0 + p_cue->i_start;
-                if( p_cue->i_stop >= 0 && p_cue->i_stop >= p_cue->i_start )
-                    p_block->i_length = p_cue->i_stop - p_cue->i_start;
-
-                if( p_sys->i_next_block_flags )
-                {
-                    p_block->i_flags = p_sys->i_next_block_flags;
-                    p_sys->i_next_block_flags = 0;
-                }
-                es_out_Send( p_demux->out, p_sys->es, p_block );
+                i_end_time = p_sys->index.p_array[p_sys->index.i_current].time;
+                break;
             }
         }
 
-        p_sys->cues.i_current++;
+        block_t *p_block = demux_Range( p_demux, i_start_time, i_end_time );
+        if( p_block )
+        {
+            p_block->i_length = i_end_time - i_start_time;
+            p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_start_time;
+
+            if( p_sys->i_next_block_flags )
+            {
+                p_block->i_flags = p_sys->i_next_block_flags;
+                p_sys->i_next_block_flags = 0;
+            }
+
+            if ( !p_sys->b_slave && p_sys->b_first_time )
+            {
+                es_out_SetPCR( p_demux->out, p_block->i_dts );
+                p_sys->b_first_time = false;
+            }
+
+            es_out_Send( p_demux->out, p_sys->es, p_block );
+        }
+
+        if( p_sys->index.i_current < p_sys->index.i_count &&
+            p_sys->index.p_array[p_sys->index.i_current].active > 1 )
+        {
+            /* we'll need to clear up overlaps */
+            p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+        }
     }
 
     if ( !p_sys->b_slave )
     {
         es_out_SetPCR( p_demux->out, VLC_TS_0 + i_barrier );
-        p_sys->i_next_demux_time += CLOCK_FREQ / 8;
+        p_sys->i_next_demux_time += CLOCK_FREQ;
     }
 
-    if( p_sys->cues.i_current >= p_sys->cues.i_count )
+    if( p_sys->index.i_current >= p_sys->index.i_count )
         return VLC_DEMUXER_EOF;
 
     return VLC_DEMUXER_SUCCESS;
@@ -608,6 +710,8 @@ void CloseDemux( vlc_object_t *p_this )
     for( size_t i=0; i< p_sys->cues.i_count; i++ )
         webvtt_cue_Clean( &p_sys->cues.p_array[i] );
     free( p_sys->cues.p_array );
+
+    free( p_sys->index.p_array );
 
     if( p_sys->p_streamparser )
     {
