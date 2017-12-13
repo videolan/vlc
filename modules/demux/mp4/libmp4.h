@@ -99,7 +99,6 @@ typedef int64_t stime_t;
 #define ATOM_stss VLC_FOURCC( 's', 't', 's', 's' )
 #define ATOM_stsh VLC_FOURCC( 's', 't', 's', 'h' )
 #define ATOM_stdp VLC_FOURCC( 's', 't', 'd', 'p' )
-#define ATOM_padb VLC_FOURCC( 'p', 'a', 'd', 'b' )
 #define ATOM_edts VLC_FOURCC( 'e', 'd', 't', 's' )
 #define ATOM_elst VLC_FOURCC( 'e', 'l', 's', 't' )
 #define ATOM_mvex VLC_FOURCC( 'm', 'v', 'e', 'x' )
@@ -928,19 +927,6 @@ typedef struct MP4_Box_data_stdp_s
 
 } MP4_Box_data_stdp_t;
 
-typedef struct MP4_Box_data_padb_s
-{
-    uint8_t  i_version;
-    uint32_t i_flags;
-
-    uint32_t i_sample_count;
-
-    unsigned char *i_reserved;   /* 1bit  */
-    unsigned char *i_pad;        /* 3bits */
-
-} MP4_Box_data_padb_t;
-
-
 typedef struct MP4_Box_data_elst_s
 {
     uint8_t  i_version;
@@ -1702,7 +1688,6 @@ typedef union MP4_Box_data_s
     MP4_Box_data_stss_t *p_stss;
     MP4_Box_data_stsh_t *p_stsh;
     MP4_Box_data_stdp_t *p_stdp;
-    MP4_Box_data_padb_t *p_padb;
     MP4_Box_data_elst_t *p_elst;
     MP4_Box_data_cprt_t *p_cprt;
 

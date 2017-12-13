@@ -3146,55 +3146,6 @@ static int MP4_ReadBox_stdp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static void MP4_FreeBox_padb( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_padb->i_reserved );
-    FREENULL( p_box->data.p_padb->i_pad );
-}
-
-static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
-{
-    uint32_t count;
-
-    MP4_READBOX_ENTER( MP4_Box_data_padb_t, MP4_FreeBox_padb );
-
-    MP4_GETVERSIONFLAGS( p_box->data.p_padb );
-    MP4_GET4BYTES( count );
-
-    if( ((count / 2) + (count & 1)) > i_read )
-    {
-        MP4_READBOX_EXIT( 0 );
-    }
-
-    p_box->data.p_padb->i_reserved = malloc( count );
-    p_box->data.p_padb->i_pad = malloc( count );
-    p_box->data.p_padb->i_sample_count = count;
-
-    if( unlikely(p_box->data.p_padb->i_reserved == NULL
-              || p_box->data.p_padb->i_pad == NULL) )
-    {
-        MP4_READBOX_EXIT( 0 );
-    }
-
-    for( size_t i = 0; i < count; i += 2 )
-    {
-        p_box->data.p_padb->i_reserved[i] = ( (*p_peek) >> 7 )&0x01;
-        p_box->data.p_padb->i_pad[i + 1] = ( (*p_peek) >> 4 )&0x07;
-        p_box->data.p_padb->i_reserved[i + 1] = ( (*p_peek) >> 3 )&0x01;
-        p_box->data.p_padb->i_pad[i] = ( (*p_peek) )&0x07;
-
-        p_peek++;
-        i_read--;
-    }
-
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"stdp\" entry-count %"PRIu64,
-                      i_read / 2 );
-
-#endif
-    MP4_READBOX_EXIT( 1 );
-}
-
 static void MP4_FreeBox_elst( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_elst->i_segment_duration );
@@ -4440,7 +4391,6 @@ static const struct
     { ATOM_stss,    MP4_ReadBox_stss,         ATOM_stbl },
     { ATOM_stsh,    MP4_ReadBox_stsh,         ATOM_stbl },
     { ATOM_stdp,    MP4_ReadBox_stdp,         0 },
-    { ATOM_padb,    MP4_ReadBox_padb,         0 },
     { ATOM_elst,    MP4_ReadBox_elst,         ATOM_edts },
     { ATOM_cprt,    MP4_ReadBox_cprt,         0 },
     { ATOM_esds,    MP4_ReadBox_esds,         ATOM_wave }, /* mp4a in wave chunk */
