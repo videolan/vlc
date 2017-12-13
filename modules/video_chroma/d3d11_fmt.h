@@ -119,10 +119,11 @@ static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
 }
 
 const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
-                                                  vlc_fourcc_t i_src_chroma,
-                                                  uint8_t bits_per_channel,
-                                                  bool allow_opaque,
-                                                  UINT supportFlags);
+                                    vlc_fourcc_t i_src_chroma,
+                                    bool rgb_only,
+                                    uint8_t bits_per_channel,
+                                    bool allow_opaque,
+                                    UINT supportFlags);
 
 int AllocateTextures(vlc_object_t *obj, d3d11_device_t *d3d_dev,
                      const d3d_format_t *cfg, const video_format_t *fmt,
