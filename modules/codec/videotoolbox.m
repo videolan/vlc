@@ -1849,11 +1849,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
         if(!p_sys->session)
         {
-            if(!p_sys->pf_codec_supported || p_sys->pf_codec_supported(p_dec))
-            {
-                StartVideoToolbox(p_dec);
-            }
-            else
+            if ((p_sys->pf_codec_supported && !p_sys->pf_codec_supported(p_dec))
+              || StartVideoToolbox(p_dec) != VLC_SUCCESS)
             {
                 /* The current device doesn't handle the profile/level, abort */
                 vlc_mutex_lock(&p_sys->lock);
