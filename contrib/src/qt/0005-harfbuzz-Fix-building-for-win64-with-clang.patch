@@ -1,0 +1,35 @@
+From 43c31ab3146e144eb1938211803476a8fb3e44f2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 11 Nov 2017 16:59:11 +0200
+Subject: [PATCH 5/9] harfbuzz: Fix building for win64 with clang
+
+Clang errors out on casting from a pointer to a smaller integer
+type.
+
+This is an adapted backport of a newer upstream harfbuzz
+commit, 03b7a221f701a9b003890878e730ad175c3fdd86.
+
+Change-Id: I0de62d90008021aed6acf4e946ce1d346f9aac8c
+Reviewed-by: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Reviewed-by: Konstantin Ritt <ritt.ks@gmail.com>
+Backport-Of: f663c83f9d08f21bf6d96405456bd5864422b173 (v5.10.1)
+---
+ src/3rdparty/harfbuzz-ng/src/hb-private.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/harfbuzz-ng/src/hb-private.hh b/src/3rdparty/harfbuzz-ng/src/hb-private.hh
+index 53e0510a92..5170a8f393 100644
+--- a/src/3rdparty/harfbuzz-ng/src/hb-private.hh
++++ b/src/3rdparty/harfbuzz-ng/src/hb-private.hh
+@@ -671,7 +671,7 @@ _hb_debug_msg_va (const char *what,
+   fprintf (stderr, "%-10s", what ? what : "");
+ 
+   if (obj)
+-    fprintf (stderr, "(%0*lx) ", (unsigned int) (2 * sizeof (void *)), (unsigned long) obj);
++    fprintf (stderr, "(%*p) ", (unsigned int) (2 * sizeof (void *)), obj);
+   else
+     fprintf (stderr, " %*s  ", (unsigned int) (2 * sizeof (void *)), "");
+ 
+-- 
+2.14.3 (Apple Git-98)
+
