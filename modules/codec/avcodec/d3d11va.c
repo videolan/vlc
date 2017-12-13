@@ -368,11 +368,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             va->sys->totalTextureSlices = dstDesc.ArraySize;
         }
     }
-    if (!va->sys->textureWidth || !va->sys->textureHeight)
-    {
-        va->sys->textureWidth  = fmt->video.i_width;
-        va->sys->textureHeight = fmt->video.i_height;
-    }
 
     err = D3D11_Create( va, &sys->hd3d );
     if (err != VLC_SUCCESS)
@@ -683,6 +678,12 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     if (SUCCEEDED(hr)) {
         ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
         ID3D10Multithread_Release(pMultithread);
+    }
+
+    if (!sys->textureWidth || !sys->textureHeight)
+    {
+        sys->textureWidth  = fmt->i_width;
+        sys->textureHeight = fmt->i_height;
     }
 
 #if VLC_WINSTORE_APP
