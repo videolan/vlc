@@ -42,6 +42,10 @@
 
 #include <ass/ass.h>
 
+#if LIBASS_VERSION < 0x01300000
+# define ASS_FONTPROVIDER_AUTODETECT 1
+#endif
+
 #if defined(_WIN32)
 #   include <vlc_charset.h>
 #endif
