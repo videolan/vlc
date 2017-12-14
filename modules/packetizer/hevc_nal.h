@@ -248,6 +248,7 @@ typedef struct
         int msb;
     } prevPicOrderCnt, prevTid0PicOrderCnt;
 
+    bool HandleCraAsBlaFlag;
     bool first_picture; /* Must be set on start or on NAL_EOS */
 } hevc_poc_ctx_t;
 
