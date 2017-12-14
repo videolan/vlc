@@ -31,6 +31,10 @@
 #include <vector>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <wincrypt.h>
+#endif
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
 
