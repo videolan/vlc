@@ -1440,6 +1440,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             es_out_Del( p_demux->out, p_stream->p_es );
             p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
         }
+        else if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
+        {
+            /* FIXME: the biggest hack I've ever done */
+            msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
+                      p_block->i_pts, p_block->i_dts );
+            msleep(10000);
+        }
 
         /* Blatant abuse of the i_length field. */
         p_block->i_length = p_stream->i_end_trim;
@@ -1507,15 +1514,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_block->i_buffer -= i_header_len;
         else
             p_block->i_buffer = 0;
-    }
-
-
-    if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
-    {
-        /* FIXME: the biggest hack I've ever done */
-        msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
-                  p_block->i_pts, p_block->i_dts );
-        msleep(10000);
     }
 
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
