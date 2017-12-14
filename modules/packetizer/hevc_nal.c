@@ -1496,7 +1496,7 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     {
         const unsigned maxPocLSB = 1U << (p_sps->log2_max_pic_order_cnt_lsb_minus4 + 4);
         pocMSB = p_ctx->prevPicOrderCnt.msb;
-        int64_t orderDiff = p_slice->pic_order_cnt_lsb - p_ctx->prevPicOrderCnt.lsb;
+        int64_t orderDiff = (int64_t)p_slice->pic_order_cnt_lsb - p_ctx->prevPicOrderCnt.lsb;
         if( orderDiff < 0 && -orderDiff >= maxPocLSB / 2 )
             pocMSB += maxPocLSB;
         else if( orderDiff > maxPocLSB / 2 )
