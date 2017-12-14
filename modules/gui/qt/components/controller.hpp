@@ -257,6 +257,7 @@ public:
     void toggleFullwidth();
     void updateFullwidthGeometry( int number );
     int targetScreen();
+    void setTargetScreen( int );
 
 private:
     static int FullscreenChanged( vlc_object_t *obj,
