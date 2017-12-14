@@ -1484,9 +1484,13 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     /* Not an IRAP with NoRaslOutputFlag == 1 */
     if( !IsIRAP || !NoRaslOutputFlag )
     {
-        pocMSB = 0;
         p_ctx->prevPicOrderCnt.msb = p_ctx->prevTid0PicOrderCnt.msb;
         p_ctx->prevPicOrderCnt.lsb = p_ctx->prevTid0PicOrderCnt.lsb;
+    }
+
+    if( IsIRAP && NoRaslOutputFlag )
+    {
+        pocMSB = 0;
     }
     else
     {
