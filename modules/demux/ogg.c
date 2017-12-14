@@ -1415,10 +1415,24 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     /* Conditional block fixes */
-    if ( p_stream->fmt.i_cat == VIDEO_ES &&
-         Ogg_IsKeyFrame( p_stream, p_oggpacket ) )
+    if ( p_stream->fmt.i_cat == VIDEO_ES )
     {
-         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+        if( Ogg_IsKeyFrame( p_stream, p_oggpacket ) )
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+
+        if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
+        {
+            ogg_int64_t nzdts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, false );
+            ogg_int64_t nzpts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, true );
+            p_block->i_dts = ( nzdts > VLC_TS_INVALID ) ? VLC_TS_0 + nzdts : nzdts;
+            p_block->i_pts = ( nzpts > VLC_TS_INVALID ) ? VLC_TS_0 + nzpts : nzpts;
+            /* granulepos for dirac is possibly broken, this value should be ignored */
+            if( 0 >= p_oggpacket->granulepos )
+            {
+                p_block->i_pts = VLC_TS_INVALID;
+                p_block->i_dts = p_stream->i_pcr;
+            }
+        }
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
@@ -1440,19 +1454,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
         p_block->i_length = 0;
-    }
-    else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
-    {
-        ogg_int64_t nzdts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, false );
-        ogg_int64_t nzpts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, true );
-        p_block->i_dts = ( nzdts > VLC_TS_INVALID ) ? VLC_TS_0 + nzdts : nzdts;
-        p_block->i_pts = ( nzpts > VLC_TS_INVALID ) ? VLC_TS_0 + nzpts : nzpts;
-        /* granulepos for dirac is possibly broken, this value should be ignored */
-        if( 0 >= p_oggpacket->granulepos )
-        {
-            p_block->i_pts = VLC_TS_INVALID;
-            p_block->i_dts = p_stream->i_pcr;
-        }
     }
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
