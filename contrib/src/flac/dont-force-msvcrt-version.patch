@@ -1,0 +1,11 @@
+diff -urN flac-orig/configure.ac flac/configure.ac
+--- flac-orig/configure.ac	2017-01-01 03:46:35.224989057 +0200
++++ flac/configure.ac	2018-02-26 00:37:22.876134887 +0200
+@@ -178,7 +178,6 @@
+ os_is_windows=no
+ case "$host" in
+ 	*-*-cygwin|*mingw*)
+-		CPPFLAGS="-D__MSVCRT_VERSION__=0x0601 $CPPFLAGS"
+ 		os_is_windows=yes
+ 		;;
+ esac
