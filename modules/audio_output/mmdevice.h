@@ -21,6 +21,11 @@
 #ifndef VLC_AOUT_MMDEVICE_H
 # define VLC_AOUT_MMDEVICE_H 1
 
+#define MM_PASSTHROUGH_DISABLED 0
+#define MM_PASSTHROUGH_ENABLED 1
+#define MM_PASSTHROUGH_ENABLED_HD 2
+#define MM_PASSTHROUGH_DEFAULT MM_PASSTHROUGH_ENABLED_HD
+
 typedef struct aout_stream aout_stream_t;
 
 /**
