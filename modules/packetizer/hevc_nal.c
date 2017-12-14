@@ -309,7 +309,7 @@ struct hevc_slice_segment_header_t
 {
     nal_u6_t nal_type;
     nal_u6_t nuh_layer_id;
-    nal_u3_t temporal_id;
+    nal_u3_t temporal_id_plus1;
     nal_u1_t first_slice_segment_in_pic_flag;
     nal_u1_t no_output_of_prior_pics_flag;
     nal_ue_t slice_pic_parameter_set_id;
@@ -1259,8 +1259,8 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
         bs_skip( &bs, 1 );
         p_sh->nal_type = bs_read( &bs, 6 );
         p_sh->nuh_layer_id = bs_read( &bs, 6 );
-        p_sh->temporal_id = bs_read( &bs, 3 );
-        if( p_sh->nuh_layer_id > 62 ||
+        p_sh->temporal_id_plus1 = bs_read( &bs, 3 );
+        if( p_sh->nuh_layer_id > 62 || p_sh->temporal_id_plus1 == 0 ||
            !hevc_parse_slice_segment_header_rbsp( &bs, get_matchedxps, priv, p_sh ) )
         {
             hevc_rbsp_release_slice_header( p_sh );
@@ -1505,7 +1505,7 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     }
 
     /* Set prevTid0Pic for next pic */
-    if( p_slice->temporal_id == 0 &&
+    if( p_slice->temporal_id_plus1 == 1 &&
        !( ( p_slice->nal_type <= HEVC_NAL_RSV_VCL_N14 && p_slice->nal_type % 2 == 0 /* SLNR */ ) ||
           ( p_slice->nal_type >= HEVC_NAL_RADL_N && p_slice->nal_type <= HEVC_NAL_RASL_R ) /* RADL or RASL */ ) )
     {
