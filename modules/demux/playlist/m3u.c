@@ -62,6 +62,7 @@ static bool IsHLS(const unsigned char *buf, size_t length)
         "#EXT-X-VERSION:",
         "#EXT-X-TARGETDURATION:",
         "#EXT-X-MEDIA-SEQUENCE:",
+        "#EXT-X-STREAM-INF:",
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(hlsexts); i++)
