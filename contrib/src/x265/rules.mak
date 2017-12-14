@@ -27,6 +27,7 @@ x265: x265-$(X265_VERSION).tar.bz2 .sum-x265
 	mkdir -p $@-$(X265_VERSION)
 	tar xvjf "$<" --strip-components=1 -C $@-$(X265_VERSION)
 	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
+	$(APPLY) $(SRC)/x265/win-skip-res.patch
 	$(call pkg_static,"source/x265.pc.in")
 ifndef HAVE_WIN32
 	$(APPLY) $(SRC)/x265/x265-pkg-libs.patch
