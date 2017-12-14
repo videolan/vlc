@@ -445,9 +445,9 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
     int i_src_visible_width = p_vid_out->i_visible_width;
     int i_src_visible_height = p_vid_out->i_visible_height;
 
-    if (i_src_visible_width == 0)
+    if (unlikely(i_src_visible_width == 0))
         i_src_visible_width = p_vid_out->i_width;
-    if (i_src_visible_height == 0)
+    if (unlikely(i_src_visible_height == 0))
         i_src_visible_height = p_vid_out->i_height;
 
 
