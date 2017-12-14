@@ -29,6 +29,8 @@
 
 #include <limits.h>
 
+//#define HEVC_POC_DEBUG
+
 typedef uint8_t  nal_u1_t;
 typedef uint8_t  nal_u2_t;
 typedef uint8_t  nal_u3_t;
@@ -1480,6 +1482,13 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
         NoRaslOutputFlag = false;
     }
 
+#ifdef HEVC_POC_DEBUG
+    printf("slice lsb=%"PRIu32" irap=%d norasl=%d tid=%d msb=%d lsb=%d",
+           p_slice->pic_order_cnt_lsb,
+           IsIRAP, NoRaslOutputFlag, p_slice->temporal_id_plus1,
+           p_ctx->prevTid0PicOrderCnt.msb, p_ctx->prevTid0PicOrderCnt.lsb);
+#endif
+
     if( p_slice->nal_type == HEVC_NAL_IDR_N_LP ||
         p_slice->nal_type == HEVC_NAL_IDR_W_RADL )
     {
@@ -1518,6 +1527,10 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     }
 
     p_ctx->first_picture = false;
+
+#ifdef HEVC_POC_DEBUG
+    printf(" POC=%"PRIu32"\n", pocMSB + p_slice->pic_order_cnt_lsb);
+#endif
 
     return pocMSB + p_slice->pic_order_cnt_lsb;
 }
