@@ -866,23 +866,28 @@ void MainInterface::setVideoFullScreen( bool fs )
             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
 
         fullscreenControls->setTargetScreen( numscreen );
-        QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
-        lastWinScreen = windowHandle()->screen();
-        windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
 
-        /* To be sure window is on proper-screen in xinerama */
-        if( !screenres.contains( pos() ) )
+        if ( numscreen >= 0 )
         {
-            lastWinPosition = pos();
-            lastWinSize = size();
-            msg_Dbg( p_intf, "Moving video to correct position");
-            move( QPoint( screenres.x(), screenres.y() ) );
-        }
 
-        /* */
-        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
-        {
-            showTab( videoWidget );
+            QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+            lastWinScreen = windowHandle()->screen();
+            windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+
+            /* To be sure window is on proper-screen in xinerama */
+            if( !screenres.contains( pos() ) )
+            {
+                lastWinPosition = pos();
+                lastWinSize = size();
+                msg_Dbg( p_intf, "Moving video to correct position");
+                move( QPoint( screenres.x(), screenres.y() ) );
+            }
+
+            /* */
+            if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
+            {
+                showTab( videoWidget );
+            }
         }
 
         /* */
