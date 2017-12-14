@@ -1454,6 +1454,11 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
                                        const hevc_slice_segment_header_t *p_slice,
                                        hevc_poc_ctx_t *p_ctx )
 {
+    struct
+    {
+        int lsb;
+        int msb;
+    } prevPicOrderCnt;
     int pocMSB;
     bool NoRaslOutputFlag;
     bool IsIRAP = ( p_slice->nal_type >= HEVC_NAL_BLA_W_LP &&
@@ -1478,15 +1483,14 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     if( p_slice->nal_type == HEVC_NAL_IDR_N_LP ||
         p_slice->nal_type == HEVC_NAL_IDR_W_RADL )
     {
-        p_ctx->prevPicOrderCnt.msb = 0;
-        p_ctx->prevPicOrderCnt.lsb = 0;
+        prevPicOrderCnt.msb = 0;
+        prevPicOrderCnt.lsb = 0;
     }
-
     /* Not an IRAP with NoRaslOutputFlag == 1 */
-    if( !IsIRAP || !NoRaslOutputFlag )
+    else if( !IsIRAP || !NoRaslOutputFlag )
     {
-        p_ctx->prevPicOrderCnt.msb = p_ctx->prevTid0PicOrderCnt.msb;
-        p_ctx->prevPicOrderCnt.lsb = p_ctx->prevTid0PicOrderCnt.lsb;
+        prevPicOrderCnt.msb = p_ctx->prevTid0PicOrderCnt.msb;
+        prevPicOrderCnt.lsb = p_ctx->prevTid0PicOrderCnt.lsb;
     }
 
     if( IsIRAP && NoRaslOutputFlag )
@@ -1496,8 +1500,8 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
     else
     {
         const unsigned maxPocLSB = 1U << (p_sps->log2_max_pic_order_cnt_lsb_minus4 + 4);
-        pocMSB = p_ctx->prevPicOrderCnt.msb;
-        int64_t orderDiff = (int64_t)p_slice->pic_order_cnt_lsb - p_ctx->prevPicOrderCnt.lsb;
+        pocMSB = prevPicOrderCnt.msb;
+        int64_t orderDiff = (int64_t)p_slice->pic_order_cnt_lsb - prevPicOrderCnt.lsb;
         if( orderDiff < 0 && -orderDiff >= maxPocLSB / 2 )
             pocMSB += maxPocLSB;
         else if( orderDiff > maxPocLSB / 2 )
@@ -1513,8 +1517,6 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
         p_ctx->prevTid0PicOrderCnt.lsb = p_slice->pic_order_cnt_lsb;
     }
 
-    p_ctx->prevPicOrderCnt.msb = pocMSB;
-    p_ctx->prevPicOrderCnt.lsb = p_slice->pic_order_cnt_lsb;
     p_ctx->first_picture = false;
 
     return pocMSB + p_slice->pic_order_cnt_lsb;
