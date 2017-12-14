@@ -1514,6 +1514,7 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
 
     p_ctx->prevPicOrderCnt.msb = pocMSB;
     p_ctx->prevPicOrderCnt.lsb = p_slice->pic_order_cnt_lsb;
+    p_ctx->first_picture = false;
 
     return pocMSB + p_slice->pic_order_cnt_lsb;
 }
