@@ -2036,6 +2036,12 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     sys->picQuad.i_width  = fmt->i_width;
     sys->picQuad.i_height = fmt->i_height;
+    if (is_d3d11_opaque(fmt->i_chroma))
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
+    }
+    else
     if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
