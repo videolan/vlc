@@ -482,8 +482,8 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     }
     sys->client = pv;
 
-    if (b_spdif && !b_hdmi && fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif
-     && fmt.i_rate >= 48000)
+    if (fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif && fmt.i_rate >= 48000
+     && var_InheritInteger(s, "mmdevice-passthrough") == MM_PASSTHROUGH_ENABLED_HD)
     {
         /* Try to configure the output rate (IEC958 rate) at 768kHz. Indeed,
          * DTS-HD (and other DTS extensions like DTS-X) can only be transmitted
