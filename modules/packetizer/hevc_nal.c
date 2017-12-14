@@ -1467,7 +1467,8 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
                            p_slice->nal_type == HEVC_NAL_IDR_W_RADL ||
                            p_slice->nal_type == HEVC_NAL_BLA_W_LP ||
                            p_slice->nal_type == HEVC_NAL_BLA_W_RADL ||
-                           p_slice->nal_type == HEVC_NAL_BLA_N_LP);
+                           p_slice->nal_type == HEVC_NAL_BLA_N_LP ||
+                           p_ctx->HandleCraAsBlaFlag );
     }
     else
     {
