@@ -869,6 +869,9 @@ void FullscreenControllerWidget::restoreFSC()
         setMinimumWidth( FSC_WIDTH );
         adjustSize();
 
+        if ( targetScreen() < 0 )
+            return;
+
         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
         windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
 
