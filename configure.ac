@@ -544,6 +544,13 @@ dnl Check for broken versions of mingw-runtime compatability library
     AX_CHECK_COMPILE_FLAG([-mms-bitfields], [
         AX_APPEND_FLAG([-mms-bitfields], [CFLAGS])
         AX_APPEND_FLAG([-mms-bitfields], [CXXFLAGS])
+        # Check for the warning flag without "-Wno-", GCC accepts
+        # -Wno-<anything> for unsupported warnings, which can trigger
+        # other warnings instead.
+        AX_CHECK_COMPILE_FLAG([-Wincompatible-ms-struct], [
+            AX_APPEND_FLAG([-Wno-incompatible-ms-struct], [CFLAGS])
+            AX_APPEND_FLAG([-Wno-incompatible-ms-struct], [CXXFLAGS])
+        ])
     ], [
         AX_CHECK_COMPILE_FLAG([-fnative-struct], [
             AX_APPEND_FLAG([-fnative-struct], [CFLAGS])
