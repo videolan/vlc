@@ -33,6 +33,7 @@
 #include "chromecast.h"
 
 #include <vlc_sout.h>
+#include <vlc_block.h>
 
 #include <cassert>
 
@@ -371,7 +372,10 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
     id = p_sys->GetSubId( p_stream, id );
     if ( id == NULL )
+    {
+        block_Release( p_buffer );
         return VLC_EGENERIC;
+    }
 
     return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
 }
