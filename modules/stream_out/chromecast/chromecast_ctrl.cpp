@@ -229,6 +229,9 @@ void intf_sys_t::mainLoop()
     {
         if ( !handleMessages() )
             break;
+        // Reset the interrupt state to avoid commands not being sent (since
+        // the context is still flagged as interrupted)
+        vlc_interrupt_unregister();
         vlc_mutex_locker lock( &m_lock );
         while ( m_msgQueue.empty() == false )
         {
