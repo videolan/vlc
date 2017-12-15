@@ -270,9 +270,6 @@
          </item>
          <item row="4" column="1">
           <widget class="QComboBox" name="mmdevicePassthroughBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
