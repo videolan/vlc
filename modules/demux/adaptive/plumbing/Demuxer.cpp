@@ -90,6 +90,10 @@ Demuxer::Demuxer(demux_t *p_realdemux_, const std::string &name_, es_out_t *out,
         b_candetectswitches = false;
         b_startsfromzero = true;
     }
+    else if(name == "aac")
+    {
+        b_candetectswitches = false;
+    }
 }
 
 Demuxer::~Demuxer()
