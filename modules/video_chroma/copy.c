@@ -883,11 +883,8 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
             p->i_lines  = picture->format.i_height / 2;
         }
         /* The dx/d3d buffer is always allocated as YV12 */
-        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12)) {
-            uint8_t *p_tmp = picture->p[1].p_pixels;
-            picture->p[1].p_pixels = picture->p[2].p_pixels;
-            picture->p[2].p_pixels = p_tmp;
-        }
+        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12))
+            plane_SwapUV( picture->p );
     }
     return VLC_SUCCESS;
 }

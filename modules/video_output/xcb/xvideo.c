@@ -628,11 +628,8 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
             res.p[i].p_pixels = res.p[0].p_pixels + offsets[i];
 
         if (p_sys->swap_uv)
-        {   /* YVU: swap U and V planes */
-            uint8_t *buf = res.p[2].p_pixels;
-            res.p[2].p_pixels = res.p[1].p_pixels;
-            res.p[1].p_pixels = buf;
-        }
+            /* YVU: swap U and V planes */
+            plane_SwapUV( res.p );
 
         pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res,
                                                         p_sys->conn);

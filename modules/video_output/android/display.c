@@ -316,11 +316,8 @@ static void SetupPictureYV12(picture_t *p_picture, uint32_t i_in_stride)
     }
 
     if (vlc_fourcc_AreUVPlanesSwapped(p_picture->format.i_chroma,
-                                      VLC_CODEC_YV12)) {
-        uint8_t *p_tmp = p_picture->p[1].p_pixels;
-        p_picture->p[1].p_pixels = p_picture->p[2].p_pixels;
-        p_picture->p[2].p_pixels = p_tmp;
-    }
+                                      VLC_CODEC_YV12))
+        plane_SwapUV( p_picture->p );
 }
 
 static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,

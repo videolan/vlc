@@ -989,9 +989,7 @@ static void CopyPicture( picture_t *p_pic, uint8_t *p_in )
     int i_plane, i_line, i_width, i_dst_stride;
     uint8_t *p_dst, *p_src = p_in;
 
-    p_dst = p_pic->p[1].p_pixels;
-    p_pic->p[1].p_pixels = p_pic->p[2].p_pixels;
-    p_pic->p[2].p_pixels = p_dst;
+    plane_SwapUV( p_pic->p );
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
@@ -1007,9 +1005,7 @@ static void CopyPicture( picture_t *p_pic, uint8_t *p_in )
         }
     }
 
-    p_dst = p_pic->p[1].p_pixels;
-    p_pic->p[1].p_pixels = p_pic->p[2].p_pixels;
-    p_pic->p[2].p_pixels = p_dst;
+    plane_SwapUV( p_pic->p );
 }
 
 static void *DecoderThread( void *data )

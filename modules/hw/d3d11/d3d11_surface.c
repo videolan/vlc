@@ -346,11 +346,8 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    if (dst->format.i_chroma == VLC_CODEC_I420) {
-        uint8_t *tmp = dst->p[1].p_pixels;
-        dst->p[1].p_pixels = dst->p[2].p_pixels;
-        dst->p[2].p_pixels = tmp;
-    }
+    if (dst->format.i_chroma == VLC_CODEC_I420)
+        plane_SwapUV( dst->p );
 
     ID3D11Texture2D_GetDesc(sys->staging, &desc);
 
@@ -389,11 +386,8 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         msg_Err(p_filter, "Unsupported D3D11VA conversion from 0x%08X to YV12", desc.Format);
     }
 
-    if (dst->format.i_chroma == VLC_CODEC_I420) {
-        uint8_t *tmp = dst->p[1].p_pixels;
-        dst->p[1].p_pixels = dst->p[2].p_pixels;
-        dst->p[2].p_pixels = tmp;
-    }
+    if (dst->format.i_chroma == VLC_CODEC_I420)
+        plane_SwapUV( dst->p );
 
     /* */
     ID3D11DeviceContext_Unmap(p_sys->context, sys->staging_resource, 0);
