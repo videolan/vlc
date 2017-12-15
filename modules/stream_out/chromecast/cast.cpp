@@ -243,6 +243,8 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
         if ( p_sys_id->p_sub_id == NULL )
         {
             msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
+            es_format_Clean( &p_sys_id->fmt );
+            free( p_sys_id );
             it = streams.erase( it );
         }
         else
