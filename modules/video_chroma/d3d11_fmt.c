@@ -489,7 +489,8 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                      p_chroma_desc->pixel_size * texDesc.Width );
             goto error;
         }
-        if ( mappedResource.RowPitch >=
+        if ( fmt->i_width > 64 &&
+             mappedResource.RowPitch >=
              2* (fmt->i_width * p_chroma_desc->p[0].w.num / p_chroma_desc->p[0].w.den * p_chroma_desc->pixel_size) )
         {
             msg_Err(obj, "Bogus %4.4s pitch detected. %d vs %d", (const char*)&fmt->i_chroma,
