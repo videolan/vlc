@@ -135,7 +135,7 @@ static int assert_ProcessorInput(filter_t *p_filter, picture_sys_t *p_sys_src)
 
 static bool ApplyFilter( filter_sys_t *p_sys,
                          D3D11_VIDEO_PROCESSOR_FILTER filter,
-                         const struct filter_level *p_level,
+                         struct filter_level *p_level,
                          ID3D11VideoProcessorInputView *input,
                          ID3D11VideoProcessorOutputView *output,
                          const video_format_t *fmt)
