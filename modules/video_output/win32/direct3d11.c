@@ -2049,6 +2049,10 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
+    BEFORE_UPDATE_RECTS;
+    UpdateRects(vd, NULL, true);
+    AFTER_UPDATE_RECTS;
+
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
     {
@@ -2134,10 +2138,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
-
-    BEFORE_UPDATE_RECTS;
-    UpdateRects(vd, NULL, true);
-    AFTER_UPDATE_RECTS;
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
