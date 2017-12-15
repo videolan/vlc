@@ -1373,7 +1373,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     if( !( p_block = block_Alloc( p_oggpacket->bytes ) ) ) return;
-    p_block->i_pts = p_stream->i_pcr;
 
     DemuxDebug( msg_Dbg(p_demux, "block set from granule %"PRId64" to pts/pcr %"PRId64" skip %d",
                         p_oggpacket->granulepos, p_stream->i_pcr, p_stream->i_skip_frames); )
@@ -1426,6 +1425,16 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 p_block->i_dts = p_stream->i_pcr;
             }
         }
+        else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+        {
+            p_block->i_pts =
+            p_block->i_dts = p_stream->i_pcr;
+        }
+        else
+        {
+            p_block->i_pts = VLC_TS_INVALID;
+            p_block->i_dts = p_stream->i_pcr;
+        }
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
@@ -1450,10 +1459,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         /* Blatant abuse of the i_length field. */
         p_block->i_length = p_stream->i_end_trim;
+        p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
         p_block->i_length = 0;
+        p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
     }
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
