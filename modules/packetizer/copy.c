@@ -105,7 +105,7 @@ static int Open( vlc_object_t *p_this )
         break;
     }
 
-    vlc_fourcc_t fcc = p_dec->fmt_out.i_codec;
+    vlc_fourcc_t fcc = p_dec->fmt_in.i_codec;
     /* Fix the value of the fourcc for audio */
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
