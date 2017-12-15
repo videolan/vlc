@@ -467,6 +467,17 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
 #endif
 
+#ifdef _WIN32
+            CONFIG_GENERIC( "mmdevice-passthrough", IntegerList,
+                            ui.mmdevicePassthroughLabel, mmdevicePassthroughBox );
+            optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
+            optionWidgets["mmdevicePassthroughB"] = ui.mmdevicePassthroughBox;
+#else
+            ui.mmdevicePassthroughLabel->setVisible( false );
+            ui.mmdevicePassthroughBox->setVisible( false );
+#endif
+
+
 #undef audioControl2
 #undef audioControl
 #undef audioCommon
@@ -486,9 +497,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
                             preferredAudioLanguage );
-
-            CONFIG_GENERIC( "mmdevice-passthrough", IntegerList,
-                            ui.mmdevicePassthroughLabel, mmdevicePassthroughBox );
 
             CONFIG_BOOL( "spdif", spdifBox );
             CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
@@ -519,8 +527,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets["volLW"] = ui.volumeValue;
             optionWidgets["headphoneB"] = ui.headphoneEffect;
-            optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
-            optionWidgets["mmdevicePassthroughB"] = ui.mmdevicePassthroughBox;
             optionWidgets["spdifChB"] = ui.spdifBox;
             optionWidgets["defaultVolume"] = ui.defaultVolume;
             optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
