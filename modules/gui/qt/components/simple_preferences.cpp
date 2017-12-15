@@ -487,6 +487,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
                             preferredAudioLanguage );
 
+            CONFIG_GENERIC( "mmdevice-passthrough", IntegerList,
+                            ui.mmdevicePassthroughLabel, mmdevicePassthroughBox );
+
             CONFIG_BOOL( "spdif", spdifBox );
             CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
                             detectionDolby );
@@ -516,6 +519,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets["volLW"] = ui.volumeValue;
             optionWidgets["headphoneB"] = ui.headphoneEffect;
+            optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
+            optionWidgets["mmdevicePassthroughB"] = ui.mmdevicePassthroughBox;
             optionWidgets["spdifChB"] = ui.spdifBox;
             optionWidgets["defaultVolume"] = ui.defaultVolume;
             optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
@@ -917,6 +922,12 @@ void SPrefsPanel::updateAudioOptions( int number)
     QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
                                             ->itemData( number ).toString();
 #ifdef _WIN32
+    /* Since MMDevice is most likely to be used by default, we show MMDevice
+     * options by default */
+    const bool mmDeviceEnabled = value == "mmdevice" || value == "any";
+    optionWidgets["mmdevicePassthroughL"]->setVisible( mmDeviceEnabled );
+    optionWidgets["mmdevicePassthroughB"]->setVisible( mmDeviceEnabled );
+
     optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
     optionWidgets["directxL"]->setVisible( ( value == "directsound" ) );
     optionWidgets["waveoutW"]->setVisible( ( value == "waveout" ) );
