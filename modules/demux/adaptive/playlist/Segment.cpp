@@ -143,18 +143,21 @@ int ISegment::compare(ISegment *other) const
 {
     if(duration.Get())
     {
-        stime_t diff = startTime.Get() - other->startTime.Get();
-        if(diff)
-            return diff / diff;
+        if(startTime.Get() > other->startTime.Get())
+            return 1;
+        else if(startTime.Get() < other->startTime.Get())
+            return -1;
     }
 
-    size_t diff = startByte - other->startByte;
-    if(diff)
-        return diff / diff;
+    if(startByte > other->startByte)
+        return 1;
+    else if(startByte < other->startByte)
+        return -1;
 
-    diff = endByte - other->endByte;
-    if(diff)
-        return diff / diff;
+    if(endByte > other->endByte)
+        return 1;
+    else if(endByte < other->endByte)
+        return -1;
 
     return 0;
 }
