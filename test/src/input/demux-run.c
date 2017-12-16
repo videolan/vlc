@@ -404,7 +404,6 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(flacsys) \
     f(h26x) \
     f(mjpeg) \
-    f(mkv) \
     f(mp4) \
     f(nsc) \
     f(nsv) \
