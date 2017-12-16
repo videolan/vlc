@@ -1,0 +1,43 @@
+From ed41d6d6fb4551342b22ef763de1bd60e964e186 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 22 Mar 2018 23:32:36 +0200
+Subject: [PATCH 1/2] random: Don't assume that _WIN64 implies x86_64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* random/rndw32.c: Change _WIN64 ifdef into __x86_64__.
+--
+
+This fixes building this file for windows on aarch64.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+---
+ random/rndw32.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/random/rndw32.c b/random/rndw32.c
+index 7e9ac50..08a8867 100644
+--- a/random/rndw32.c
++++ b/random/rndw32.c
+@@ -986,7 +986,7 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+ 
+      On AMD64, TSC is always available and intrinsic is provided for accessing
+      it.  */
+-#ifdef __WIN64__
++#ifdef __x86_64__
+     {
+       unsigned __int64 aint64;
+ 
+@@ -1024,7 +1024,7 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+           (*add) (&aword, sizeof (aword), origin );
+         }
+     }
+-#endif /*__WIN64__*/
++#endif /*__x86_64__*/
+ 
+ 
+ }
+-- 
+2.7.4
+
