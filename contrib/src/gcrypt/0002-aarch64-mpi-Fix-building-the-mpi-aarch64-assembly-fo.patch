@@ -1,0 +1,207 @@
+From ec0a2f25c0f64a7b65b373508ce9081e10461965 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 22 Mar 2018 23:32:37 +0200
+Subject: [PATCH 2/2] aarch64: mpi: Fix building the mpi aarch64 assembly for
+ windows
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* mpi/aarch64/mpih-add1.S: Use ELF macro.
+* mpi/aarch64/mpih-mul1.S: Use ELF macro.
+* mpi/aarch64/mpih-mul2.S: Use ELF macro.
+* mpi/aarch64/mpih-mul3.S: Use ELF macro.
+* mpi/aarch64/mpih-sub1.S: Use ELF macro.
+* mpi/asm-common-aarch64.h: New.
+--
+
+The mpi aarch64 assembly is enabled as soon as the compiler supports
+inline assembly, without checking for .type and .size, as is done
+for the rest of the assembly in cipher/*.S. (The .type and .size
+directives are only supported on ELF.)
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+---
+ mpi/aarch64/mpih-add1.S  |  5 +++--
+ mpi/aarch64/mpih-mul1.S  |  5 +++--
+ mpi/aarch64/mpih-mul2.S  |  5 +++--
+ mpi/aarch64/mpih-mul3.S  |  5 +++--
+ mpi/aarch64/mpih-sub1.S  |  5 +++--
+ mpi/asm-common-aarch64.h | 30 ++++++++++++++++++++++++++++++
+ 6 files changed, 45 insertions(+), 10 deletions(-)
+ create mode 100644 mpi/asm-common-aarch64.h
+
+diff --git a/mpi/aarch64/mpih-add1.S b/mpi/aarch64/mpih-add1.S
+index fa8cd01..4ead1c2 100644
+--- a/mpi/aarch64/mpih-add1.S
++++ b/mpi/aarch64/mpih-add1.S
+@@ -22,6 +22,7 @@
+ 
+ #include "sysdep.h"
+ #include "asm-syntax.h"
++#include "asm-common-aarch64.h"
+ 
+ /*******************
+  *  mpi_limb_t
+@@ -34,7 +35,7 @@
+ .text
+ 
+ .globl _gcry_mpih_add_n
+-.type  _gcry_mpih_add_n,%function
++ELF(.type  _gcry_mpih_add_n,%function)
+ _gcry_mpih_add_n:
+ 	and	x5, x3, #3;
+ 	adds	xzr, xzr, xzr; /* clear carry flag */
+@@ -68,4 +69,4 @@ _gcry_mpih_add_n:
+ .Lend:
+ 	adc	x0, xzr, xzr;
+ 	ret;
+-.size _gcry_mpih_add_n,.-_gcry_mpih_add_n;
++ELF(.size _gcry_mpih_add_n,.-_gcry_mpih_add_n;)
+diff --git a/mpi/aarch64/mpih-mul1.S b/mpi/aarch64/mpih-mul1.S
+index 65e98fe..8a86269 100644
+--- a/mpi/aarch64/mpih-mul1.S
++++ b/mpi/aarch64/mpih-mul1.S
+@@ -22,6 +22,7 @@
+ 
+ #include "sysdep.h"
+ #include "asm-syntax.h"
++#include "asm-common-aarch64.h"
+ 
+ /*******************
+  * mpi_limb_t
+@@ -34,7 +35,7 @@
+ .text
+ 
+ .globl _gcry_mpih_mul_1
+-.type  _gcry_mpih_mul_1,%function
++ELF(.type  _gcry_mpih_mul_1,%function)
+ _gcry_mpih_mul_1:
+ 	and	x5, x2, #3;
+ 	mov	x4, xzr;
+@@ -93,4 +94,4 @@ _gcry_mpih_mul_1:
+ .Lend:
+ 	mov	x0, x4;
+ 	ret;
+-.size _gcry_mpih_mul_1,.-_gcry_mpih_mul_1;
++ELF(.size _gcry_mpih_mul_1,.-_gcry_mpih_mul_1;)
+diff --git a/mpi/aarch64/mpih-mul2.S b/mpi/aarch64/mpih-mul2.S
+index bd3b2c9..c7c08e5 100644
+--- a/mpi/aarch64/mpih-mul2.S
++++ b/mpi/aarch64/mpih-mul2.S
+@@ -22,6 +22,7 @@
+ 
+ #include "sysdep.h"
+ #include "asm-syntax.h"
++#include "asm-common-aarch64.h"
+ 
+ /*******************
+  * mpi_limb_t
+@@ -34,7 +35,7 @@
+ .text
+ 
+ .globl _gcry_mpih_addmul_1
+-.type  _gcry_mpih_addmul_1,%function
++ELF(.type  _gcry_mpih_addmul_1,%function)
+ _gcry_mpih_addmul_1:
+ 	and	x5, x2, #3;
+ 	mov	x6, xzr;
+@@ -105,4 +106,4 @@ _gcry_mpih_addmul_1:
+ .Lend:
+ 	mov	x0, x6;
+ 	ret;
+-.size _gcry_mpih_addmul_1,.-_gcry_mpih_addmul_1;
++ELF(.size _gcry_mpih_addmul_1,.-_gcry_mpih_addmul_1;)
+diff --git a/mpi/aarch64/mpih-mul3.S b/mpi/aarch64/mpih-mul3.S
+index a58bc53..ccc961e 100644
+--- a/mpi/aarch64/mpih-mul3.S
++++ b/mpi/aarch64/mpih-mul3.S
+@@ -22,6 +22,7 @@
+ 
+ #include "sysdep.h"
+ #include "asm-syntax.h"
++#include "asm-common-aarch64.h"
+ 
+ /*******************
+  * mpi_limb_t
+@@ -34,7 +35,7 @@
+ .text
+ 
+ .globl _gcry_mpih_submul_1
+-.type  _gcry_mpih_submul_1,%function
++ELF(.type  _gcry_mpih_submul_1,%function)
+ _gcry_mpih_submul_1:
+ 	and	x5, x2, #3;
+ 	mov	x7, xzr;
+@@ -118,4 +119,4 @@ _gcry_mpih_submul_1:
+ .Loop_end:
+ 	cinc	x0, x7, cc;
+ 	ret;
+-.size _gcry_mpih_submul_1,.-_gcry_mpih_submul_1;
++ELF(.size _gcry_mpih_submul_1,.-_gcry_mpih_submul_1;)
+diff --git a/mpi/aarch64/mpih-sub1.S b/mpi/aarch64/mpih-sub1.S
+index cbf2f08..4a66373 100644
+--- a/mpi/aarch64/mpih-sub1.S
++++ b/mpi/aarch64/mpih-sub1.S
+@@ -22,6 +22,7 @@
+ 
+ #include "sysdep.h"
+ #include "asm-syntax.h"
++#include "asm-common-aarch64.h"
+ 
+ /*******************
+  *  mpi_limb_t
+@@ -34,7 +35,7 @@
+ .text
+ 
+ .globl _gcry_mpih_sub_n
+-.type  _gcry_mpih_sub_n,%function
++ELF(.type  _gcry_mpih_sub_n,%function)
+ _gcry_mpih_sub_n:
+ 	and	x5, x3, #3;
+ 	subs	xzr, xzr, xzr; /* prepare carry flag for sub */
+@@ -68,4 +69,4 @@ _gcry_mpih_sub_n:
+ .Lend:
+ 	cset	x0, cc;
+ 	ret;
+-.size _gcry_mpih_sub_n,.-_gcry_mpih_sub_n;
++ELF(.size _gcry_mpih_sub_n,.-_gcry_mpih_sub_n;)
+diff --git a/mpi/asm-common-aarch64.h b/mpi/asm-common-aarch64.h
+new file mode 100644
+index 0000000..1269413
+--- /dev/null
++++ b/mpi/asm-common-aarch64.h
+@@ -0,0 +1,30 @@
++/* asm-common-aarch64.h  -  Common macros for AArch64 assembly
++ *
++ * Copyright (C) 2018 Martin Storsjö <martin@martin.st>
++ *
++ * This file is part of Libgcrypt.
++ *
++ * Libgcrypt is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as
++ * published by the Free Software Foundation; either version 2.1 of
++ * the License, or (at your option) any later version.
++ *
++ * Libgcrypt is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef MPI_ASM_COMMON_AARCH64_H
++#define MPI_ASM_COMMON_AARCH64_H
++
++#ifdef __ELF__
++# define ELF(...) __VA_ARGS__
++#else
++# define ELF(...) /*_*/
++#endif
++
++#endif /* MPI_ASM_COMMON_AARCH64_H */
+-- 
+2.7.4
+
