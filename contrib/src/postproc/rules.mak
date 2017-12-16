@@ -87,9 +87,10 @@ endif
 # Windows
 ifdef HAVE_WIN32
 POSTPROCCONF += --target-os=mingw32
-ifdef HAVE_WIN64
+ifeq ($(ARCH),x86_86)
 POSTPROCCONF += --cpu=athlon64 --arch=x86_64
-else # !WIN64
+endif
+ifeq ($(ARCH),i386)
 POSTPROCCONF+= --cpu=i686 --arch=x86
 endif
 else
