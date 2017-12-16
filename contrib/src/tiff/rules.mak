@@ -12,6 +12,7 @@ tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
+	mv tiff/config.sub tiff/config.guess tiff/config
 
 .tiff: tiff
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
