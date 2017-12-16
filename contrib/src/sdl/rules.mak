@@ -16,7 +16,9 @@ $(TARBALLS)/SDL-$(SDL_VERSION).tar.gz:
 sdl: SDL-$(SDL_VERSION).tar.gz .sum-sdl
 	$(UNPACK)
 	$(APPLY) $(SRC)/sdl/direct_palette_ref.diff
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
+	mv sdl/config.sub sdl/config.guess sdl/build-scripts
 
 SDLCONF := $(HOSTCONF) \
 	--disable-audio \
