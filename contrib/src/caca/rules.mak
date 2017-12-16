@@ -20,7 +20,9 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/caca-llvm-weak-alias.patch
 	$(APPLY) $(SRC)/caca/caca-osx-sdkofourchoice.patch
 	$(APPLY) $(SRC)/caca/caca-win32-static.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
+	mv caca/config.sub caca/config.guess caca/.auto
 
 CACA_CONF := \
 	--disable-imlib2 \

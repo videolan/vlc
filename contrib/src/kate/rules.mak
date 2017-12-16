@@ -15,7 +15,9 @@ $(TARBALLS)/libkate-$(KATE_VERSION).tar.gz:
 
 libkate: libkate-$(KATE_VERSION).tar.gz .sum-kate
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
+	mv libkate/config.sub libkate/config.guess libkate/misc/autotools
 
 DEPS_kate = ogg $(DEPS_ogg)
 
