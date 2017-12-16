@@ -44,6 +44,9 @@ ARCH := $(shell $(SRC)/get-arch.sh $(HOST))
 ifeq ($(ARCH)-$(HAVE_WIN32),x86_64-1)
 HAVE_WIN64 := 1
 endif
+ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
+HAVE_WIN64 := 1
+endif
 
 ifdef HAVE_CROSS_COMPILE
 need_pkg = 1

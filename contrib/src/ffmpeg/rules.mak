@@ -187,7 +187,7 @@ else
 FFMPEGCONF += --disable-dxva2
 endif
 
-ifdef HAVE_WIN64
+ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else
 ifeq ($(ARCH),i386) # 32bits intel
