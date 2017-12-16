@@ -14,7 +14,6 @@ libpacketizer_h264_plugin_la_SOURCES = \
 libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c \
         packetizer/hxxx_nal.h
 libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
-libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
 libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
 libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
 	packetizer/hevc_nal.h packetizer/hevc_nal.c \
@@ -41,7 +40,6 @@ packetizer_LTLIBRARIES = \
 	libpacketizer_h264_plugin.la \
 	libpacketizer_vc1_plugin.la \
 	libpacketizer_mlp_plugin.la \
-	libpacketizer_dirac_plugin.la \
 	libpacketizer_flac_plugin.la \
 	libpacketizer_hevc_plugin.la \
 	libpacketizer_copy_plugin.la \

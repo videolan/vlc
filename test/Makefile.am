@@ -181,7 +181,6 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/libpacketizer_a52_plugin.la \
 	../modules/libpacketizer_copy_plugin.la \
 	../modules/libpacketizer_dts_plugin.la \
-	../modules/libpacketizer_dirac_plugin.la \
 	../modules/libpacketizer_flac_plugin.la \
 	../modules/libpacketizer_h264_plugin.la \
 	../modules/libpacketizer_hevc_plugin.la \

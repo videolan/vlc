@@ -423,7 +423,6 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(xa) \
     f(a52) \
     f(copy) \
-    f(dirac) \
     f(dts) \
     f(flac) \
     f(h264) \
