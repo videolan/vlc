@@ -117,10 +117,6 @@ libsid_plugin_la_LIBADD = $(LIBS_sid)
 EXTRA_LTLIBRARIES += libsid_plugin.la
 demux_LTLIBRARIES += $(LTLIBsid)
 
-libdiracsys_plugin_la_SOURCES = demux/dirac.c
-libdiracsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-demux_LTLIBRARIES += libdiracsys_plugin.la
-
 libimage_plugin_la_SOURCES = demux/image.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libimage_plugin.la
 

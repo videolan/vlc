@@ -400,7 +400,6 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(au) \
     f(avi) \
     f(caf) \
-    f(diracsys) \
     f(es) \
     f(flacsys) \
     f(h26x) \
