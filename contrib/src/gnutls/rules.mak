@@ -71,7 +71,7 @@ ifdef HAVE_TIZEN
 	GNUTLS_CONF += --with-default-trust-store-dir=/etc/ssl/certs/
 endif
 ifdef HAVE_WINSTORE
-ifdef HAVE_WIN64
+ifeq ($(ARCH),x86_64)
 	GNUTLS_CONF += --disable-hardware-acceleration
 endif
 endif

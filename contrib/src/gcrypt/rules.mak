@@ -34,8 +34,10 @@ GCRYPT_CONF = \
 	--enable-pubkey-ciphers=dsa,rsa,ecc \
 	--disable-docs
 
-ifdef HAVE_WIN64
+ifdef HAVE_WIN32
+ifeq ($(ARCH),x86_64)
 GCRYPT_CONF += --disable-asm --disable-padlock-support
+endif
 endif
 ifdef HAVE_IOS
 GCRYPT_EXTRA_CFLAGS = -fheinous-gnu-extensions
