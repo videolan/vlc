@@ -71,6 +71,7 @@ struct demux_sys_t
     date_t pts;
 
     int last_title;
+    bool title_changed;
 };
 
 
@@ -279,9 +280,20 @@ static int Control (demux_t *demux, int query, va_list args)
                 return  VLC_EGENERIC;
 
             sys->last_title = i_idx;
-            demux->info.i_update = INPUT_UPDATE_TITLE;
+            sys->title_changed = true;
             msg_Dbg( demux, "set song %i", i_idx);
 
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS: {
+            unsigned *restrict flags = va_arg(args, unsigned *);
+
+            if ((*flags & INPUT_UPDATE_TITLE) && sys->title_changed) {
+                *flags = INPUT_UPDATE_TITLE;
+                sys->title_changed = false;
+            } else
+                *flags = 0;
             return VLC_SUCCESS;
         }
 
