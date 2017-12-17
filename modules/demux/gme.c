@@ -59,6 +59,7 @@ struct demux_sys_t
 
     input_title_t **titlev;
     unsigned        titlec;
+    bool            title_changed;
 };
 
 
@@ -154,6 +155,7 @@ static int Open (vlc_object_t *obj)
              title->psz_name = strdup (infos->song);
          gme_free_info (infos);
     }
+    sys->title_changed = false;
 
     /* Callbacks */
     demux->pf_demux = Demux;
@@ -210,7 +212,7 @@ static int Demux (demux_t *demux)
         if (++sys->track_id >= (unsigned)gme_track_count (sys->emu))
             return 0;
 
-        demux->info.i_update |= INPUT_UPDATE_TITLE;
+        sys->title_changed = true;
         gme_start_track (sys->emu, sys->track_id);
     }
 
@@ -325,8 +327,20 @@ static int Control (demux_t *demux, int query, va_list args)
             if (track_id >= gme_track_count (sys->emu))
                 break;
             gme_start_track (sys->emu, track_id);
-            demux->info.i_update |= INPUT_UPDATE_TITLE;
+            sys->title_changed = true;
             sys->track_id = track_id;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg(args, unsigned *);
+
+            if ((*flags & INPUT_UPDATE_TITLE) && sys->title_changed) {
+                *flags = INPUT_UPDATE_TITLE;
+                sys->title_changed = false;
+            } else
+                *flags = 0;
             return VLC_SUCCESS;
         }
 
