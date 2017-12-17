@@ -31,8 +31,12 @@ function try_query(mbid)
 
     found, _ = string.find( page, "<artwork>true</artwork>" )
     if found then
-        return "http://coverartarchive.org/release/"..mbid.."/front-500"
+        front, _ = string.find( page, "<front>true</front>" )
+        if front then
+            return "http://coverartarchive.org/release/"..mbid.."/front-500"
+        end
     end
+
     -- FIXME: multiple results may be available
     _, _, asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
