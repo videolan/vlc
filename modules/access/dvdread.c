@@ -101,6 +101,7 @@ struct demux_sys_t
     ifo_handle_t *p_vmg_file;
     ifo_handle_t *p_vts_file;
 
+    unsigned updates;
     int i_title;
     int cur_title;
     int i_chapter, i_chapters;
@@ -234,6 +235,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_title = NULL;
     p_sys->p_vts_file = NULL;
 
+    p_sys->updates = 0;
     p_sys->i_title = p_sys->i_chapter = -1;
     p_sys->cur_title = p_sys->cur_chapter = 0;
     p_sys->i_mux_rate = 0;
@@ -412,8 +414,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
             }
-            p_demux->info.i_update |=
-                INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_title = i;
             p_sys->cur_chapter = 0;
             return VLC_SUCCESS;
@@ -425,9 +426,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
             }
-            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_chapter = i;
             return VLC_SUCCESS;
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg(args, unsigned *);
+            *flags &= p_sys->updates;
+            p_sys->updates &= ~*flags;
+            return VLC_SUCCESS;
+        }
 
         case DEMUX_GET_TITLE:
             *va_arg( args, int * ) = p_sys->cur_title;
@@ -866,8 +875,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 
         if( p_sys->cur_title != i_title )
         {
-            p_demux->info.i_update |=
-                INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_title = i_title;
             p_sys->cur_chapter = 0;
         }
@@ -1045,7 +1053,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 
         if( p_sys->cur_chapter != i_chapter )
         {
-            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_chapter = i_chapter;
         }
     }
@@ -1117,7 +1125,7 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     if( i_chapter < p_sys->i_chapters &&
         p_sys->cur_chapter != i_chapter )
     {
-        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+        p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
         p_sys->cur_chapter = i_chapter;
     }
 
@@ -1319,7 +1327,7 @@ static void DvdReadFindCell( demux_t *p_demux )
         if( p_sys->i_chapter < p_sys->i_chapters &&
             p_sys->cur_chapter != p_sys->i_chapter )
         {
-            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_chapter = p_sys->i_chapter;
         }
     }
