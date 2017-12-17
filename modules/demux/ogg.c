@@ -1058,9 +1058,22 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
         unsigned i_duration;
         /* no granulepos available, try to interpolate the pcr.
          * If we can't then don't touch the old value. */
-        if( p_stream->fmt.i_cat == VIDEO_ES && p_stream->i_pcr > VLC_TS_INVALID )
+        if( p_stream->b_oggds && p_stream->fmt.i_cat == VIDEO_ES )
         {
-            p_stream->i_pcr += (CLOCK_FREQ / p_stream->f_rate);
+            if( p_stream->i_previous_granulepos > 0 )
+            {
+                p_stream->i_pcr = VLC_TS_0 + p_stream->i_previous_granulepos * CLOCK_FREQ / p_stream->f_rate;
+                p_stream->i_pcr += p_ogg->i_nzpcr_offset;
+            }
+            /* First frame in ogm can be -1 (0 0 -1 2 3 -1 5 ...) */
+            else if( p_stream->i_previous_granulepos == 0 )
+            {
+                p_stream->i_pcr = VLC_TS_0 + p_ogg->i_nzpcr_offset;
+            }
+            else
+            {
+                p_stream->i_pcr += (CLOCK_FREQ / p_stream->f_rate);
+            }
         }
 #ifdef HAVE_LIBVORBIS
         else if ( p_stream->fmt.i_codec == VLC_CODEC_VORBIS &&
@@ -1107,6 +1120,10 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
 
             p_stream->i_pcr = VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
+        }
+        else if( p_stream->fmt.i_cat == VIDEO_ES && p_stream->i_pcr > VLC_TS_UNKNOWN )
+        {
+            p_stream->i_pcr += (CLOCK_FREQ / p_stream->f_rate);
         }
         else if( p_stream->fmt.i_bitrate && p_stream->i_pcr > VLC_TS_UNKNOWN )
         {
