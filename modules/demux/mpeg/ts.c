@@ -1131,6 +1131,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return vlc_stream_vaControl( p_sys->stream, STREAM_SET_SEEKPOINT,
                                      args );
 
+    case DEMUX_TEST_AND_CLEAR_FLAGS:
+    {
+        unsigned *restrict flags = va_arg(args, unsigned *);
+        *flags &= p_sys->updates;
+        p_sys->updates = ~*flags;
+        return VLC_SUCCESS;
+    }
+
     case DEMUX_GET_META:
         return vlc_stream_vaControl( p_sys->stream, STREAM_GET_META, args );
 

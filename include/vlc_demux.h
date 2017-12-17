@@ -370,7 +370,8 @@ static inline int demux_Control( demux_t *p_demux, int i_query, ... )
 
 #ifndef __cplusplus
 static inline void demux_UpdateTitleFromStream( demux_t *demux,
-    int *restrict titlep, int *restrict seekpointp )
+    int *restrict titlep, int *restrict seekpointp,
+    unsigned *restrict updatep )
 {
     stream_t *s = demux->s;
     unsigned title, seekpoint;
@@ -379,7 +380,7 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux,
      && title != (unsigned)*titlep )
     {
         *titlep = title;
-        demux->info.i_update |= INPUT_UPDATE_TITLE;
+        *updatep |= INPUT_UPDATE_TITLE;
     }
 
     if( vlc_stream_Control( s, STREAM_GET_SEEKPOINT,
@@ -387,13 +388,14 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux,
      && seekpoint != (unsigned)*seekpointp )
     {
         *seekpointp = seekpoint;
-        demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+        *updatep |= INPUT_UPDATE_SEEKPOINT;
     }
 }
 # define demux_UpdateTitleFromStream(demux) \
      demux_UpdateTitleFromStream(demux, \
          &((demux_sys_t *)((demux)->p_sys))->current_title, \
-         &((demux_sys_t *)((demux)->p_sys))->current_seekpoint)
+         &((demux_sys_t *)((demux)->p_sys))->current_seekpoint, \
+         &((demux_sys_t *)((demux)->p_sys))->updates)
 #endif
 
 VLC_USED

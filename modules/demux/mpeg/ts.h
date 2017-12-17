@@ -51,6 +51,7 @@ struct demux_sys_t
     bool        b_canfastseek;
     int         current_title;
     int         current_seekpoint;
+    unsigned    updates;
     vlc_mutex_t     csa_lock;
 
     /* TS packet size (188, 192, 204) */

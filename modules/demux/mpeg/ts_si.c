@@ -743,7 +743,7 @@ static void ARIB_CDT_RawCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t
                             if( p_att )
                             {
                                 vlc_dictionary_insert( &p_sys->attachments, psz_name, p_att );
-                                p_demux->info.i_update |= INPUT_UPDATE_META;
+                                p_sys->updates |= INPUT_UPDATE_META;
                             }
                             free( p_png );
                         }
