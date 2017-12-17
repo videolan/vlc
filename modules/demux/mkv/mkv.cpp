@@ -379,7 +379,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( VLC_SUCCESS ==
                     Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL) )
                 {
-                    p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
+                    p_sys->i_updates |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
                     p_sys->i_current_seekpoint = 0;
                     p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
                     return VLC_SUCCESS;
@@ -401,12 +401,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int i_ret = Seek( p_demux, static_cast<int64_t>( p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset ), -1, NULL);
                 if( i_ret == VLC_SUCCESS )
                 {
-                    p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                    p_sys->i_updates |= INPUT_UPDATE_SEEKPOINT;
                     p_sys->i_current_seekpoint = i_skp;
                 }
                 return i_ret;
             }
             return VLC_EGENERIC;
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg( args, unsigned * );
+            *flags &= p_sys->i_updates;
+            p_sys->i_updates &= ~*flags;
+            break;
+        }
 
         case DEMUX_GET_TITLE:
             *va_arg( args, int * ) = p_sys->i_current_title;

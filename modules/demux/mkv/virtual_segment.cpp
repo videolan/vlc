@@ -467,7 +467,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             p_current_vchapter = p_cur_vchapter;
             if ( p_cur_vchapter->i_seekpoint_num > 0 )
             {
-                demux.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+                sys.i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
                 sys.i_current_title = i_sys_title;
                 sys.i_current_seekpoint = p_cur_vchapter->i_seekpoint_num - 1;
             }
@@ -524,7 +524,7 @@ bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
         p_sys->i_mk_chapter_time = i_mk_time_offset - p_vchapter->segment.i_mk_start_time /* + VLC_TS_0 */;
         if ( p_vchapter->p_chapter && p_vchapter->i_seekpoint_num > 0 )
         {
-            demuxer.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_sys->i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_sys->i_current_title = i_sys_title;
             p_sys->i_current_seekpoint = p_vchapter->i_seekpoint_num - 1;
         }

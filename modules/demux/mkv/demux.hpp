@@ -340,6 +340,7 @@ public:
         ,meta(NULL)
         ,i_current_title(0)
         ,i_current_seekpoint(0)
+        ,i_updates(0)
         ,p_current_vsegment(NULL)
         ,dvd_interpretor( *this )
         ,f_duration(-1.0)
@@ -366,6 +367,7 @@ public:
     std::vector<input_title_t*>      titles; // matroska editions
     size_t                           i_current_title;
     size_t                           i_current_seekpoint;
+    unsigned                         i_updates;
 
     std::vector<matroska_stream_c*>  streams;
     std::vector<attachment_c*>       stored_attachments;
