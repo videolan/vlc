@@ -1324,8 +1324,7 @@ struct render_variables_s
 static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue,
-                                               const webvtt_dom_node_t *p_node,
-                                               mtime_t i_start )
+                                               const webvtt_dom_node_t *p_node )
 {
     text_segment_t *p_head = NULL;
     text_segment_t **pp_append = &p_head;
@@ -1351,9 +1350,8 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
         else if( p_node->type == NODE_TAG )
         {
             const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
-            if( p_tag->i_start <= i_start )
-                *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
-                                                     p_tag->p_child, i_start );
+            *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
+                                                 p_tag->p_child );
         }
     }
     return p_head;
@@ -1361,10 +1359,9 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
 
 static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
                                              struct render_variables_s *p_vars,
-                                             const webvtt_dom_cue_t *p_cue,
-                                             mtime_t i_start )
+                                             const webvtt_dom_cue_t *p_cue )
 {
-    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child, i_start );
+    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
 }
 
 static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop,
@@ -1383,7 +1380,7 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
         if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
             continue;
 
-        text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue, i_start );
+        text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue );
         if( p_new )
         {
             while( *pp_append )
