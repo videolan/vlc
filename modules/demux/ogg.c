@@ -957,12 +957,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 Ogg_ResetStreamsHelper( p_sys );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 VLC_TS_0 + i64 );
-                p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
                 p_sys->cur_seekpoint = i_seekpoint;
                 return VLC_SUCCESS;
             }
             else
                 return VLC_EGENERIC;
+        }
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg( args, unsigned * );
+            *flags &= p_sys->updates;
+            p_sys->updates = ~*flags;
+            return VLC_SUCCESS;
         }
         case DEMUX_GET_TITLE:
             *va_arg( args, int * ) = 0;
@@ -2527,7 +2534,7 @@ static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
 
     if( p_ogg->i_seekpoints > 1 )
     {
-        p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
+        p_ogg->updates |= INPUT_UPDATE_TITLE_LIST;
     }
 }
 
@@ -2610,7 +2617,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
         break;
     }
     if( p_ogg->p_meta )
-        p_demux->info.i_update |= INPUT_UPDATE_META;
+        p_ogg->updates |= INPUT_UPDATE_META;
 }
 
 static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,

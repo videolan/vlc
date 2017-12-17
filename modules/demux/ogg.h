@@ -214,6 +214,7 @@ struct demux_sys_t
     int                 cur_seekpoint;
     int                 i_seekpoints;
     seekpoint_t         **pp_seekpoints;
+    unsigned            updates;
 
     /* skeleton */
     struct
