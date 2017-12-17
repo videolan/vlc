@@ -444,7 +444,6 @@ static int Open(vlc_object_t *p_this)
         /* Set up p_demux */
         p_demux->pf_demux = Demux;
         p_demux->pf_control = Control;
-        p_demux->info.i_update = 0;
         
         msg_Dbg(p_demux, "New audio es %d channels %dHz",
                 audiofmt.audio.i_channels, audiofmt.audio.i_rate);

@@ -169,7 +169,6 @@ static int Open( vlc_object_t *p_this )
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->info.i_update = 0;
 
     p_demux->p_sys = p_sys = vlc_obj_calloc( p_this, 1, sizeof( demux_sys_t ) );
     if( !p_sys )

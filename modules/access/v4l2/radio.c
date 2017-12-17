@@ -104,7 +104,6 @@ int RadioOpen (vlc_object_t *obj)
     demux->p_sys = sys;
     demux->pf_demux = NULL;
     demux->pf_control = RadioControl;
-    demux->info.i_update = 0;
     return VLC_SUCCESS;
 
 error:

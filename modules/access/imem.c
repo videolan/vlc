@@ -494,7 +494,6 @@ static int OpenDemux(vlc_object_t *object)
     demux->pf_demux   = Demux;
     demux->p_sys      = (demux_sys_t*)sys;
 
-    demux->info.i_update = 0;
     return VLC_SUCCESS;
 }
 
