@@ -1516,7 +1516,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
     ApplyCSSRules( p_dec, p_dec->p_sys->p_css_rules, i_start );
 #endif
 
-    bool b_has_regionless_cues = false;
+    const webvtt_dom_cue_t *p_rlcue = NULL;
     for( const webvtt_dom_node_t *p_node = p_dec->p_sys->p_root->p_child;
                                   p_node; p_node = p_node->p_next )
     {
@@ -1558,14 +1558,14 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         }
         else if ( p_node->type == NODE_CUE )
         {
-            b_has_regionless_cues = true;
+            if( p_rlcue == NULL )
+                p_rlcue = ( const webvtt_dom_cue_t * ) p_node;
         }
     }
 
     /* regionless cues */
-    if ( b_has_regionless_cues )
+    if ( p_rlcue )
     {
-        const webvtt_dom_cue_t *p_cue = (const webvtt_dom_cue_t *) p_dec->p_sys->p_root->p_child;
         /* Variables */
         struct render_variables_s v;
         v.p_region = NULL;
@@ -1575,7 +1575,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         v.i_top = 0.0;
         /* !Variables */
 
-        text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_cue );
+        text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_rlcue );
         if( p_segments )
         {
             CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
@@ -1586,7 +1586,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
             else
             {
                 p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
-                p_updtregion->inner_align = GetCueTextAlignment( p_cue );
+                p_updtregion->inner_align = GetCueTextAlignment( p_rlcue );
 
                 p_updtregion->p_segments = p_segments;
             }
