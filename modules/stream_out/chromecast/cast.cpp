@@ -31,6 +31,7 @@
 #endif
 
 #include "chromecast.h"
+#include <vlc_dialog.h>
 
 #include <vlc_sout.h>
 #include <vlc_block.h>
@@ -77,7 +78,7 @@ struct sout_stream_sys_t
     std::vector<sout_stream_id_sys_t*> streams;
 
 private:
-    void UpdateOutput( sout_stream_t * );
+    bool UpdateOutput( sout_stream_t * );
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -110,6 +111,8 @@ static const char *const ppsz_sout_options[] = {
 #define MUX_LONGTEXT N_("This sets the muxer used to stream to the Chromecast.")
 #define MIME_TEXT N_("MIME content type")
 #define MIME_LONGTEXT N_("This sets the media MIME content type sent to the Chromecast.")
+#define PERF_TEXT N_( "Performance warning" )
+#define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
 
 #define IP_ADDR_TEXT N_("IP Address")
 #define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
@@ -132,6 +135,8 @@ vlc_module_begin ()
     add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mux", DEFAULT_MUXER, MUX_TEXT, MUX_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mime", "video/x-matroska", MIME_TEXT, MIME_LONGTEXT, false)
+    add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
+
 
 vlc_module_end ()
 
@@ -253,12 +258,12 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
     return streams.empty() == false;
 }
 
-void sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
+bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 {
     assert( p_stream->p_sys == this );
 
     if ( !es_changed )
-        return;
+        return true;
 
     es_changed = false;
 
@@ -293,6 +298,20 @@ void sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     std::stringstream ssout;
     if ( !canRemux )
     {
+        if ( var_InheritInteger( p_stream, SOUT_CFG_PREFIX "show-perf-warning" ) )
+        {
+            int res = vlc_dialog_wait_question( p_stream,
+                          VLC_DIALOG_QUESTION_WARNING,
+                         _("Cancel"), _("OK"), _("Ok, Don't warn me again"),
+                         _("Performance warning"),
+                         _("Casting this video requires conversion. "
+                           "This conversion can use all the available power and "
+                           "could quickly drain your battery." ) );
+            if ( res <= 0 )
+                 return false;
+            if ( res == 2 )
+                config_PutInt(p_stream, SOUT_CFG_PREFIX "show-perf-warning", 0 );
+        }
         /* TODO: provide audio samplerate and channels */
         ssout << "transcode{";
         char s_fourcc[5];
@@ -346,6 +365,7 @@ void sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         p_out = NULL;
         sout = "";
     }
+    return true;
 }
 
 sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
@@ -355,7 +375,8 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
 
     assert( p_stream->p_sys == this );
 
-    UpdateOutput( p_stream );
+    if ( UpdateOutput( p_stream ) == false )
+        return NULL;
 
     for (i = 0; i < streams.size(); ++i)
     {
