@@ -173,21 +173,6 @@ if HAVE_XCB
 access_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
-libwl_screenshooter_plugin_la_SOURCES = \
-	access/screen/wayland.c
-nodist_libwl_screenshooter_plugin_la_SOURCES = \
-	access/screen/screenshooter-protocol.c
-libwl_screenshooter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Iaccess/screen
-libwl_screenshooter_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
-libwl_screenshooter_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) \
-	$(LIBPTHREAD) $(LIBM)
-EXTRA_DIST += access/screen/screenshooter.xml
-CLEANFILES += $(nodist_libwl_screenshooter_plugin_la_SOURCES)
-if HAVE_WAYLAND
-BUILT_SOURCES += access/screen/screenshooter-client-protocol.h
-access_LTLIBRARIES += libwl_screenshooter_plugin.la
-endif
-
 libscreen_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h
 libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_WIN32_DESKTOP

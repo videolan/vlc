@@ -56,7 +56,6 @@ Access:
  * Improvements of cookie handling (share cookies between playlist items,
    domain / path matching, Secure cookies)
  * Support DVB-T2 on Windows BDA
- * Screen capture plugin for Wayland display
  * Support depayloading Opus from RTP
  * New UPnP access module, to list directories without infinite recursions
  * SMB/FTP/SFTP accesses can list directories

@@ -209,7 +209,6 @@ modules/access/rtp/rtp.c
 modules/access/rtsp/access.c
 modules/access/satip.c
 modules/access/screen/screen.c
-modules/access/screen/wayland.c
 modules/access/screen/xcb.c
 modules/access/sdp.c
 modules/access/sftp.c

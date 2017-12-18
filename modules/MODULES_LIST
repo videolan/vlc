@@ -467,7 +467,6 @@ $Id$
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
  * winstore: Windows Store App audio output
- * wl_screenshooter: Wayland screen capture input
  * wl_shell: Wayland shell surface window provider
  * wl_shm: Wayland shared memory video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
