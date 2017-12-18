@@ -41,6 +41,7 @@ vlc_osx_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/plugins/"
 if HAVE_BREAKPAD
 vlc_osx_LDFLAGS += -Wl,-framework,Breakpad
 vlc_osx_OBJCFLAGS = -F$(CONTRIB_DIR)/Frameworks
+vlc_osx_CPPFLAGS = -DHAVE_BREAKPAD
 endif
 vlc_osx_LDADD = ../lib/libvlc.la
 
@@ -56,6 +57,7 @@ vlc_osx_static_LDADD = $(vlc_osx_LDADD)
 if HAVE_BREAKPAD
 vlc_osx_static_LDFLAGS += -Wl,-framework,Breakpad
 vlc_osx_static_OBJCFLAGS += -F$(CONTRIB_DIR)/Frameworks
+vlc_osx_static_CPPFLAGS = -DHAVE_BREAKPAD
 endif
 
 
