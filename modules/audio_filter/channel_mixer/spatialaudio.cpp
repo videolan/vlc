@@ -45,7 +45,7 @@
 
 #define CFG_PREFIX "spatialaudio-"
 
-#define DEFAULT_HRTF_PATH "hrtfs" DIR_SEP "dodeca_and_7channel_FHK_HRTF.sofa"
+#define DEFAULT_HRTF_PATH "hrtfs" DIR_SEP "dodeca_and_7channel_3DSL_HRTF.sofa"
 
 #define HRTF_FILE_TEXT N_("HRTF file for the binauralization")
 #define HRTF_FILE_LONGTEXT N_("Custom HRTF (Head-related transfer function) file " \
