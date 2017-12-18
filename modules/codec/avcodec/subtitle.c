@@ -90,6 +90,29 @@ int InitSubtitleDec(vlc_object_t *obj)
     context->extradata_size = 0;
     context->extradata = NULL;
 
+    if( codec->id == AV_CODEC_ID_DVB_SUBTITLE )
+    {
+        if( dec->fmt_in.i_extra > 3 )
+        {
+            context->extradata = malloc( dec->fmt_in.i_extra );
+            if( context->extradata )
+            {
+                context->extradata_size = dec->fmt_in.i_extra;
+                memcpy( context->extradata, dec->fmt_in.p_extra, dec->fmt_in.i_extra );
+            }
+        }
+        else
+        {
+            context->extradata = malloc( 4 );
+            if( context->extradata )
+            {
+                context->extradata_size = 4;
+                SetWBE( &context->extradata[0], dec->fmt_in.subs.dvb.i_id & 0xFFFF );
+                SetWBE( &context->extradata[2], dec->fmt_in.subs.dvb.i_id >> 16 );
+            }
+        }
+    }
+
 #if LIBAVFORMAT_VERSION_MICRO >= 100
     av_codec_set_pkt_timebase(context, AV_TIME_BASE_Q);
 #endif
@@ -181,6 +204,12 @@ static subpicture_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
         return NULL;
     block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
     memset(&block->p_buffer[block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
+    if( sys->p_codec->id == AV_CODEC_ID_DVB_SUBTITLE && block->i_buffer > 3 )
+    {
+        block->p_buffer += 2; /* drop data identifier / stream id */
+        block->i_buffer -= 3; /* drop 0x3F/FF */
+    }
 
     /* */
     AVSubtitle subtitle;
