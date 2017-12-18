@@ -84,8 +84,11 @@ AOM_CONF := \
 	--disable-unit-tests \
 	--disable-install-bins \
 	--disable-install-docs \
-	--disable-dependency-tracking \
-	--disable-av1-encoder
+	--disable-dependency-tracking
+
+ifndef BUILD_ENCODERS
+AOM_CONF += --disable-av1-encoder
+endif
 
 ifndef HAVE_WIN32
 AOM_CONF += --enable-pic
