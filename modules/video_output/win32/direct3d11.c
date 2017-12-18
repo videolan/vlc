@@ -1131,26 +1131,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             if (!is_d3d11_opaque(picture->format.i_chroma))
                 Direct3D11UnmapPoolTexture(picture);
             ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
-            D3D11_BOX box = {
-                .top = 0,
-                .bottom = picture->format.i_y_offset + picture->format.i_visible_height,
-                .left = 0,
-                .right = picture->format.i_x_offset + picture->format.i_visible_width,
-                .back = 1,
-            };
-            if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-                 sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-            {
-                box.bottom = (box.bottom + 0x01) & ~0x01;
-                box.right  = (box.right  + 0x01) & ~0x01;
-            }
-            assert(box.right <= texDesc.Width);
-            assert(box.bottom <= texDesc.Height);
             ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev.d3dcontext,
                                                       sys->stagingSys.resource[KNOWN_DXGI_INDEX],
                                                       0, 0, 0, 0,
                                                       p_sys->resource[KNOWN_DXGI_INDEX],
-                                                      p_sys->slice_index, &box);
+                                                      p_sys->slice_index, NULL);
         }
         else
         {
