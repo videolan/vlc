@@ -408,14 +408,14 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     void *(*thread)(void *) = Thread;
 
-#ifdef QT5_HAS_WAYLAND
-    if( HasWayland() )
-        thread = ThreadWayland;
-    else
-#endif
 #ifdef QT5_HAS_X11
     if( HasX11( p_this ) )
         thread = ThreadXCB;
+    else
+#endif
+#ifdef QT5_HAS_WAYLAND
+    if( HasWayland() )
+        thread = ThreadWayland;
     else
 #endif
 #if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
