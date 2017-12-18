@@ -152,6 +152,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
 
+#ifdef QT5_HAS_WAYLAND
+    b_hasWayland = QGuiApplication::platformName()
+        .startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
+#endif
+
     /**************************
      *  UI and Widgets design
      **************************/
@@ -872,7 +877,12 @@ void MainInterface::setVideoFullScreen( bool fs )
 
             QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
             lastWinScreen = windowHandle()->screen();
+#ifdef QT5_HAS_WAYLAND
+            if( !b_hasWayland )
+                windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+#else
             windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+#endif
 
             /* To be sure window is on proper-screen in xinerama */
             if( !screenres.contains( pos() ) )
@@ -898,8 +908,13 @@ void MainInterface::setVideoFullScreen( bool fs )
     {
         setMinimalView( b_minimalView );
         setInterfaceFullScreen( b_interfaceFullScreen );
-        if (lastWinScreen != NULL)
+#ifdef QT5_HAS_WAYLAND
+        if( lastWinScreen != NULL && !b_hasWayland )
             windowHandle()->setScreen(lastWinScreen);
+#else
+        if( lastWinScreen != NULL )
+            windowHandle()->setScreen(lastWinScreen);
+#endif
         if( lastWinPosition.isNull() == false )
         {
             move( lastWinPosition );
