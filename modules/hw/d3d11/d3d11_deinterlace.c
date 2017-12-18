@@ -202,9 +202,9 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
 
     D3D11_BOX box = {
         .top = 0,
-        .bottom = p_outpic->format.i_visible_height,
+        .bottom = p_outpic->format.i_height,
         .left = 0,
-        .right = p_outpic->format.i_visible_width,
+        .right = p_outpic->format.i_width,
         .back = 1,
     };
 
