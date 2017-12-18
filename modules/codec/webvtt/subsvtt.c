@@ -1208,6 +1208,7 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
 {
     VLC_UNUSED(p_dec);
     text_style_t *p_style = NULL;
+    text_style_t *p_dfltstyle = NULL;
     mtime_t i_tagtime = -1;
 
     for( const webvtt_dom_node_t *p_node = p_leaf ; p_node; p_node = p_node->p_parent )
@@ -1277,6 +1278,54 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
                         }
                     }
                 }
+                else if( !strcmp( p_tagnode->psz_tag, "c" ) && p_tagnode->psz_attrs )
+                {
+                    static const struct
+                    {
+                        const char *psz;
+                        uint32_t i_color;
+                    } CEAcolors[] = {
+                        { "white",  0xFFFFFF },
+                        { "lime",   0x00FF00 },
+                        { "cyan",   0x00FFFF },
+                        { "red",    0xFF0000 },
+                        { "yellow", 0xFFFF00 },
+                        { "magenta",0xFF00FF },
+                        { "blue",   0x0000FF },
+                        { "black",  0x000000 },
+                    };
+                    char *saveptr = NULL;
+                    char *psz_tok = strtok_r( p_tagnode->psz_attrs, ".", &saveptr );
+                    for( ; psz_tok; psz_tok = strtok_r( NULL, ".", &saveptr ) )
+                    {
+                        bool bg = !strncmp( psz_tok, "bg_", 3 );
+                        const char *psz_class = (bg) ? psz_tok + 3 : psz_tok;
+                        for( size_t i=0; i<ARRAY_SIZE(CEAcolors); i++ )
+                        {
+                            if( strcmp( psz_class, CEAcolors[i].psz ) )
+                                continue;
+                            if( p_dfltstyle ||
+                               (p_dfltstyle = text_style_Create( STYLE_NO_DEFAULTS )) )
+                            {
+                                if( bg )
+                                {
+                                    p_dfltstyle->i_background_color = CEAcolors[i].i_color;
+                                    p_dfltstyle->i_background_alpha = STYLE_ALPHA_OPAQUE;
+                                    p_dfltstyle->i_features |= STYLE_HAS_BACKGROUND_COLOR |
+                                                               STYLE_HAS_BACKGROUND_ALPHA;
+                                    p_dfltstyle->i_style_flags |= STYLE_BACKGROUND;
+                                    p_dfltstyle->i_features |= STYLE_HAS_FLAGS;
+                                }
+                                else
+                                {
+                                    p_dfltstyle->i_font_color = CEAcolors[i].i_color;
+                                    p_dfltstyle->i_features |= STYLE_HAS_FONT_COLOR;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -1287,6 +1336,18 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
                 text_style_Merge( p_style, p_nodestyle, false );
             else if( !b_nooverride )
                 p_style = text_style_Duplicate( p_nodestyle );
+        }
+
+        /* Default classes */
+        if( p_dfltstyle )
+        {
+            if( p_style )
+            {
+                text_style_Merge( p_style, p_dfltstyle, false );
+                text_style_Delete( p_dfltstyle );
+            }
+            else p_style = p_dfltstyle;
+            p_dfltstyle = NULL;
         }
     }
 
