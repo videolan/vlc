@@ -121,7 +121,7 @@
 #define VLC_CODEC_VP8             VLC_FOURCC('V','P','8','0')
 #define VLC_CODEC_VP9             VLC_FOURCC('V','P','9','0')
 #define VLC_CODEC_VP10            VLC_FOURCC('V','P',':','0')
-#define VLC_CODEC_AV1             VLC_FOURCC('a','v','1','0')
+#define VLC_CODEC_AV1             VLC_FOURCC('a','v','0','1')
 #define VLC_CODEC_JPEG2000        VLC_FOURCC('J','P','2','K')
 #define VLC_CODEC_LAGARITH        VLC_FOURCC('L','A','G','S')
 #define VLC_CODEC_FLASHSV2        VLC_FOURCC('F','S','V','2')
