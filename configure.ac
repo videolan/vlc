@@ -3839,24 +3839,27 @@ AS_IF([test "$with_breakpad" != "no"], [
     AC_MSG_ERROR([You need to supply the CrashDragon Server URL as value for --with-breakpad])
   ])
 
-  AS_IF([test "$HAVE_OSX" != "1"], [
-    AC_MSG_ERROR([Breakpad currently only works on macOS])
+  AS_IF([test "$HAVE_OSX" = "1"], [
+    AC_MSG_CHECKING([for Breakpad framework])
+    AS_IF([test ! -d ${CONTRIB_DIR}/Breakpad.framework -a \
+                ! -d ${CONTRIB_DIR}/Frameworks/Breakpad.framework], [
+      AC_MSG_RESULT([no])
+      with_breakpad="no"
+      AC_MSG_ERROR([Breakpad framework is required and was not found in ${CONTRIB_DIR}])
+    ], [
+      AC_MSG_RESULT([yes])
+    ])
+  ],[
+    PKG_CHECK_MODULES([BREAKPAD], [breakpad-client],, [
+      AC_MSG_ERROR(["breakpad not found"])
+    ])
   ])
-
-  AC_MSG_CHECKING([for Breakpad framework])
-  AS_IF([test ! -d ${CONTRIB_DIR}/Breakpad.framework -a \
-              ! -d ${CONTRIB_DIR}/Frameworks/Breakpad.framework], [
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([Breakpad framework is required and was not found in ${CONTRIB_DIR}])
-  ], [
-    AC_MSG_RESULT([yes])
-    AC_DEFINE([HAVE_BREAKPAD], [1], [Define to 1 if breakpad is enabled.])
-    AC_SUBST(BREAKPAD_URL, ["${with_breakpad}"])
-  ])
-
 ])
 
 AM_CONDITIONAL(HAVE_BREAKPAD, [test "$with_breakpad" != "no"])
+AS_IF([test "$with_breakpad" != "no"], [
+  AC_SUBST(BREAKPAD_URL, ["${with_breakpad}"])
+])
 
 dnl
 dnl  Minimal Mac OS X module
