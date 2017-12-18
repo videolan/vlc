@@ -264,7 +264,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->p_sys = sys;
 
     struct aom_codec_dec_cfg deccfg = {
-        .threads = __MIN(vlc_GetCPUCount(), 16)
+        .threads = __MIN(vlc_GetCPUCount(), 16),
+        .allow_lowbitdepth = 1
     };
 
     msg_Dbg(p_this, "AV%d: using libaom version %s (build options %s)",
