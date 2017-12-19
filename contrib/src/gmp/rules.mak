@@ -14,6 +14,12 @@ GMP_CONF += --disable-assembly
 endif
 endif
 
+ifdef HAVE_WIN32
+ifeq ($(ARCH),arm)
+GMP_CONF += --disable-assembly
+endif
+endif
+
 $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 	$(call download_pkg,$(GMP_URL),gmp)
 
