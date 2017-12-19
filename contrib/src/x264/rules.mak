@@ -35,6 +35,9 @@ ifndef HAVE_WIN32
 X264CONF += --enable-pic
 else
 X264CONF += --enable-win32thread
+ifeq ($(ARCH), arm)
+X264_AS = AS="./tools/gas-preprocessor.pl -arch arm -as-type clang -force-thumb -- $(CC) -mimplicit-it=always"
+endif
 endif
 ifdef HAVE_CROSS_COMPILE
 X264CONF += --cross-prefix="$(HOST)-"
@@ -89,7 +92,7 @@ x262: x262-git.tar.gz .sum-x262
 
 .x264: x264
 	$(REQUIRE_GPL)
-	cd $< && $(HOSTVARS) ./configure $(X264CONF)
+	cd $< && $(HOSTVARS) $(X264_AS) ./configure $(X264CONF)
 	cd $< && $(MAKE) install
 	touch $@
 
