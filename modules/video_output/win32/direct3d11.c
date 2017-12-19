@@ -186,7 +186,9 @@ typedef struct d3d_vertex_t {
 
 typedef struct {
     FLOAT Opacity;
-    FLOAT opacityPadding[3];
+    FLOAT BoundaryX;
+    FLOAT BoundaryY;
+    FLOAT padding;
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
@@ -305,7 +307,9 @@ static const char* globPixelShaderDefault = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float opacityPadding[3];\
+    float BoundaryX;\
+    float BoundaryY;\
+    float padding;\
   };\
   cbuffer PS_COLOR_TRANSFORM : register(b1)\
   {\
@@ -377,7 +381,10 @@ static const char* globPixelShaderDefault = "\
   {\
     float4 sample;\
     \
-    sample = sampleTexture( SamplerStates[0], In.Texture );\
+    if (In.Texture.x > BoundaryX || In.Texture.y > BoundaryY) \
+        sample = sampleTexture( SamplerStates[1], In.Texture );\
+    else\
+        sample = sampleTexture( SamplerStates[0], In.Texture );\
     float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\
     float opacity = rgba.a * Opacity;\
     float3 rgb = (float3)rgba;\
@@ -2535,9 +2542,16 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     const bool RGB_shader = IsRGBShader(cfg);
 
     /* pixel shader constant buffer */
-    PS_CONSTANT_BUFFER defaultConstants = {
-      .Opacity = 1,
-    };
+    PS_CONSTANT_BUFFER defaultConstants;
+    defaultConstants.Opacity = 1.0;
+    if (fmt->i_visible_width == fmt->i_width)
+        defaultConstants.BoundaryX = 1.0; /* let texture clamping happen */
+    else
+        defaultConstants.BoundaryX = (FLOAT) (fmt->i_visible_width - 1) / fmt->i_width;
+    if (fmt->i_visible_height == fmt->i_height)
+        defaultConstants.BoundaryY = 1.0; /* let texture clamping happen */
+    else
+        defaultConstants.BoundaryY = (FLOAT) (fmt->i_visible_height - 1) / fmt->i_height;
     static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
     D3D11_BUFFER_DESC constantDesc = {
         .Usage = D3D11_USAGE_DYNAMIC,
