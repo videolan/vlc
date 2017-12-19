@@ -26,6 +26,7 @@
 #endif
 
 #include <assert.h>
+#include <stdatomic.h>
 
 #if defined (HAVE_MNTENT_H) && defined(HAVE_SYS_STAT_H)
 # include <mntent.h>
@@ -44,7 +45,6 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>                      /* demux_t */
 #include <vlc_input.h>                      /* Seekpoints, chapters */
-#include <vlc_atomic.h>
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 #include <vlc_url.h>                        /* vlc_path2uri */

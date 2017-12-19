@@ -23,12 +23,13 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_stream.h>
 #include <vlc_modules.h>
 #include <vlc_interrupt.h>
 #include <vlc_arrays.h>
-#include <vlc_atomic.h>
 #include <vlc_threads.h>
 #include <vlc_memstream.h>
 #include <vlc_meta_fetcher.h>

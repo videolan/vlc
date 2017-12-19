@@ -28,10 +28,10 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_vout.h>
 #include <vlc_spu.h>
 #include <vlc_aout.h>

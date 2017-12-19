@@ -34,8 +34,8 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_cpu.h>
-#include <vlc_atomic.h>
 
+#include <stdatomic.h>
 #include <assert.h>
 #include "filter_picture.h"
 

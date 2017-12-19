@@ -30,11 +30,11 @@
 #endif
 
 #include <math.h>                                            /* sin(), cos() */
+#include <stdatomic.h>
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include "filter_picture.h"

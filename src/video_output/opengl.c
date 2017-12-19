@@ -23,10 +23,10 @@
 #endif
 
 #include <assert.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_opengl.h>
 #include "libvlc.h"
 #include <vlc_modules.h>

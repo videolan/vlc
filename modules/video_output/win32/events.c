@@ -35,8 +35,8 @@
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
-#include <vlc_atomic.h>
 
+#include <stdatomic.h>
 #include <windows.h>
 #include <windowsx.h>                                        /* GET_X_LPARAM */
 #include <shellapi.h>                                         /* ExtractIcon */

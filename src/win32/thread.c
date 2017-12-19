@@ -30,10 +30,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 
 #include "libvlc.h"
 #include <stdarg.h>
+#include <stdatomic.h>
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>

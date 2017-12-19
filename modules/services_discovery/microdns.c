@@ -25,10 +25,10 @@
 # include <config.h>
 #endif
 
+#include <stdatomic.h>
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_services_discovery.h>

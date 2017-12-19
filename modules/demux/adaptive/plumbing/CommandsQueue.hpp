@@ -22,8 +22,8 @@
 
 #include <vlc_common.h>
 #include <vlc_es.h>
-#include <vlc_atomic.h>
 
+#include <atomic>
 #include <list>
 
 namespace adaptive

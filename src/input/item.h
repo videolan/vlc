@@ -25,7 +25,7 @@
 #define LIBVLC_INPUT_ITEM_H 1
 
 #include "input_interface.h"
-#include <vlc_atomic.h>
+#include <stdatomic.h>
 
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error );
 void input_item_UpdateTracksInfo( input_item_t *item, const es_format_t *fmt );

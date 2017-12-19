@@ -24,7 +24,7 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
-# include <vlc_atomic.h>
+# include <stdatomic.h>
 
 /** The plugin handle type */
 typedef void *module_handle_t;

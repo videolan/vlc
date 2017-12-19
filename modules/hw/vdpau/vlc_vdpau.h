@@ -204,10 +204,10 @@ vdp_t *vdp_hold_x11(vdp_t *vdp, VdpDevice *device);
 void vdp_release_x11(vdp_t *);
 
 /* VLC specifics */
+# include <stdatomic.h>
 # include <stdbool.h>
 # include <vlc_common.h>
 # include <vlc_fourcc.h>
-# include <vlc_atomic.h>
 # include <vlc_picture.h>
 
 /** Converts VLC YUV format to VDPAU chroma type and YCbCr format */

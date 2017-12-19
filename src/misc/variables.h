@@ -24,7 +24,7 @@
 # define LIBVLC_VARIABLES_H 1
 
 # include <stdalign.h>
-# include <vlc_atomic.h>
+# include <stdatomic.h>
 
 struct vlc_res;
 

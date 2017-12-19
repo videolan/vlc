@@ -31,9 +31,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_modules.h>
-#include <vlc_atomic.h>
 
 #include <string.h> /* for memset */
 #include <limits.h> /* form INT_MIN */

@@ -29,11 +29,12 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
-#include <vlc_atomic.h>
 #include <assert.h>
 
 #include <libavcodec/avcodec.h>

@@ -18,8 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdatomic.h>
+
 #include <vlc_picture.h>
-#include <vlc_atomic.h>
 
 typedef struct
 {

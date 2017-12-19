@@ -35,7 +35,7 @@
 #import <vlc_aout.h>
 #import <vlc_input.h>
 #import <vlc_vout_window.h>
-#import <vlc_atomic.h>
+#import <stdatomic.h>
 
 #import <Cocoa/Cocoa.h>
 #import "misc.h"

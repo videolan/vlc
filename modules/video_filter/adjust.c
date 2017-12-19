@@ -32,6 +32,7 @@
 #endif
 
 #include <math.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>

@@ -27,11 +27,11 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_atomic.h>
 
 #include "audio_io.h"
 #include "sound_manager.h"

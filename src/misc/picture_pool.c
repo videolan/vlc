@@ -27,11 +27,11 @@
 #endif
 #include <assert.h>
 #include <limits.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
-#include <vlc_atomic.h>
 #include "picture.h"
 
 #define POOL_MAX (CHAR_BIT * sizeof (unsigned long long))

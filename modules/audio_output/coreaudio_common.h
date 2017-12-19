@@ -27,7 +27,7 @@
 #endif
 
 #import <vlc_common.h>
-#import <vlc_atomic.h>
+#import <stdatomic.h>
 #import <vlc_aout.h>
 #import <vlc_threads.h>
 

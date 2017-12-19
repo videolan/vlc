@@ -23,7 +23,7 @@
 
 #ifndef LIBVLC_VOUT_STATISTIC_H
 # define LIBVLC_VOUT_STATISTIC_H
-# include <vlc_atomic.h>
+# include <stdatomic.h>
 
 /* NOTE: Both statistics are atomic on their own, so one might be older than
  * the other one. Currently, only one of them is updated at a time, so this

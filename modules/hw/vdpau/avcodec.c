@@ -23,6 +23,7 @@
 #endif
 
 #include <string.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -34,7 +35,6 @@
 #include <vlc_plugin.h>
 #include <vlc_fourcc.h>
 #include <vlc_picture.h>
-#include <vlc_atomic.h>
 #include <vlc_xlib.h>
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"

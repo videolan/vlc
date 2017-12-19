@@ -22,8 +22,9 @@
 #ifndef LIBVLC_INPUT_SIGNAL_H
 # define LIBVLC_INPUT_SIGNAL_H 1
 
+# include <stdatomic.h>
+
 # include <vlc_interrupt.h>
-# include <vlc_atomic.h>
 
 void vlc_interrupt_init(vlc_interrupt_t *);
 void vlc_interrupt_deinit(vlc_interrupt_t *);

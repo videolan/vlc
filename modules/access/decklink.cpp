@@ -26,10 +26,11 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_atomic.h>
 
 #include <arpa/inet.h>
 

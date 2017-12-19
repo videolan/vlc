@@ -59,7 +59,7 @@ void vlc_global_mutex (unsigned n, bool acquire)
 #endif
 
 #if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
-#include <vlc_atomic.h>
+#include <stdatomic.h>
 
 static void vlc_cancel_addr_prepare(void *addr)
 {
@@ -107,7 +107,7 @@ void (msleep)(mtime_t delay)
 
 static inline atomic_uint *vlc_cond_value(vlc_cond_t *cond)
 {
-    /* XXX: ugly but avoids including vlc_atomic.h in vlc_threads.h */
+    /* XXX: ugly but avoids including stdatomic.h in vlc_threads.h */
     static_assert (sizeof (cond->value) <= sizeof (atomic_uint),
                    "Size mismatch!");
     static_assert ((alignof (cond->value) % alignof (atomic_uint)) == 0,

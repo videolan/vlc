@@ -29,11 +29,11 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 
 #include "libvlc.h"
 #include <signal.h>
 #include <errno.h>
+#include <stdatomic.h>
 #include <time.h>
 #include <assert.h>
 

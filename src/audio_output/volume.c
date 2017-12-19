@@ -31,6 +31,7 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_aout_volume.h>
+#include <vlc_atomic.h>
 #include "aout_internal.h"
 
 struct aout_volume

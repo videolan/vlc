@@ -22,13 +22,13 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <stdnoreturn.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 
 /*
  * POSIX timers are essentially unusable from a library: there provide no safe

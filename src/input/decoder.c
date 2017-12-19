@@ -30,10 +30,9 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
-
-#include <vlc_atomic.h>
 #include <vlc_block.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>

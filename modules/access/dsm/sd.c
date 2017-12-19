@@ -30,8 +30,9 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_services_discovery.h>
 #include <bdsm/bdsm.h>
 

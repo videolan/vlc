@@ -28,6 +28,7 @@
 
 #include "vlc_vaapi.h"
 
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -38,7 +39,6 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
-#include <vlc_atomic.h>
 #include <vlc_fourcc.h>
 #include <vlc_filter.h>
 #include <vlc_picture_pool.h>

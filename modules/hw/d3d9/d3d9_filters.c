@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -31,7 +32,6 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include <vlc_atomic.h>
 
 #define COBJMACROS
 #include <initguid.h>

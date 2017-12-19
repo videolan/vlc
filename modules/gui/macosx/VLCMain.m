@@ -35,8 +35,9 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+#include <stdatomic.h>
+
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_actions.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
