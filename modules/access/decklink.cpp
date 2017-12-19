@@ -26,8 +26,6 @@
 # include "config.h"
 #endif
 
-#include <stdatomic.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -38,6 +36,8 @@
 #include <DeckLinkAPIDispatch.cpp>
 
 #include "sdi.h"
+
+#include <atomic>
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
