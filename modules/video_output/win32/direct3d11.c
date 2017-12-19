@@ -367,11 +367,17 @@ static const char* globPixelShaderDefault = "\
       %s;\
   }\
   \
+  inline float4 sampleTexture(SamplerState samplerState, float4 coords) {\
+      float4 sample;\
+      %s /* sampling routine in sample */\
+      return sample;\
+  }\
+  \
   float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 sample;\
     \
-    %s /* sampling routine in sample */\
+    sample = sampleTexture( SamplerStates[0], In.Texture );\
     float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\
     float opacity = rgba.a * Opacity;\
     float3 rgb = (float3)rgba;\
@@ -1715,15 +1721,15 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     case DXGI_FORMAT_NV12:
     case DXGI_FORMAT_P010:
         psz_sampler =
-                "sample.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
-                sample.yz = shaderTexture[1].Sample(SampleType, In.Texture).xy;\
+                "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
+                sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\
                 sample.a  = 1;";
         break;
     case DXGI_FORMAT_YUY2:
         psz_sampler =
-                "sample.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
-                sample.y  = shaderTexture[0].Sample(SampleType, In.Texture).y;\
-                sample.z  = shaderTexture[0].Sample(SampleType, In.Texture).a;\
+                "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
+                sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\
+                sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\
                 sample.a  = 1;";
         break;
     case DXGI_FORMAT_R8G8B8A8_UNORM:
@@ -1731,13 +1737,13 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_B5G6R5_UNORM:
         psz_sampler =
-                "sample = shaderTexture[0].Sample(SampleType, In.Texture);";
+                "sample = shaderTexture[0].Sample(samplerState, coords);";
         break;
     case DXGI_FORMAT_UNKNOWN:
         psz_sampler =
-               "sample.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
-                sample.y  = shaderTexture[1].Sample(SampleType, In.Texture).x;\
-                sample.z  = shaderTexture[2].Sample(SampleType, In.Texture).x;\
+               "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
+                sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
+                sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
                 sample.a  = 1;";
         break;
     default:
