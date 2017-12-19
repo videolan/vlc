@@ -7,6 +7,12 @@ ifeq ($(call need_pkg,"nettle >= 2.7"),)
 PKGS_FOUND += nettle
 endif
 
+ifdef HAVE_WIN32
+ifeq ($(ARCH),arm)
+NETTLE_CONF += --disable-assembler
+endif
+endif
+
 $(TARBALLS)/nettle-$(NETTLE_VERSION).tar.gz:
 	$(call download_pkg,$(NETTLE_URL),nettle)
 
@@ -24,6 +30,6 @@ DEPS_nettle = gmp $(DEPS_gmp)
 ifndef GPL
 	$(REQUIRE_GNUV3)
 endif
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(NETTLE_CONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -10,6 +10,12 @@ ifeq ($(call need_pkg,"mad"),)
 PKGS_FOUND += mad
 endif
 
+ifdef HAVE_WIN32
+ifeq ($(ARCH),arm)
+MAD_CONF += --disable-aso
+endif
+endif
+
 $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 	$(call download,$(MAD_URL))
 
