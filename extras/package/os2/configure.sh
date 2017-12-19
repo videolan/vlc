@@ -41,7 +41,7 @@ OPTIONS="
       --enable-vlc
 "
 
-export ARCHFLAGS=${ARCHFLAGS-"-march=i486"}
+export ARCHFLAGS=${ARCHFLAGS-"-march=i686"}
 export CFLAGS="${CFLAGS} ${ARCHFLAGS} -std=gnu11"
 export CXXFLAGS="${CXXFLAGS} ${ARCHFLAGS} -std=gnu++11"
 export BUILDCC="gcc -std=gnu11"
