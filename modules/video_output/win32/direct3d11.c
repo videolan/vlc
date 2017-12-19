@@ -313,7 +313,7 @@ static const char* globPixelShaderDefault = "\
     float4x4 Colorspace;\
   };\
   Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
-  SamplerState SampleType;\
+  SamplerState SamplerStates[2];\
   \
   struct PS_INPUT\
   {\
@@ -2201,15 +2201,24 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    ID3D11SamplerState *d3dsampState;
-    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState);
-
+    ID3D11SamplerState *d3dsampState[2];
+    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[0]);
     if (FAILED(hr)) {
       msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
-    ID3D11DeviceContext_PSSetSamplers(sys->d3d_dev.d3dcontext, 0, 1, &d3dsampState);
-    ID3D11SamplerState_Release(d3dsampState);
+
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[1]);
+    if (FAILED(hr)) {
+      msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+      ID3D11SamplerState_Release(d3dsampState[0]);
+      return VLC_EGENERIC;
+    }
+
+    ID3D11DeviceContext_PSSetSamplers(sys->d3d_dev.d3dcontext, 0, 2, d3dsampState);
+    ID3D11SamplerState_Release(d3dsampState[0]);
+    ID3D11SamplerState_Release(d3dsampState[1]);
 
     msg_Dbg(vd, "Direct3D11 resources created");
     return VLC_SUCCESS;
