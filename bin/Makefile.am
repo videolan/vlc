@@ -31,7 +31,7 @@ else
 vlc_SOURCES = winvlc.c
 vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 vlc_LDFLAGS = -mwindows
-vlc_LDADD += -lpsapi vlc_win32_rc.$(OBJEXT)
+vlc_LDADD += vlc_win32_rc.$(OBJEXT)
 endif
 
 vlc_osx_SOURCES = darwinvlc.m
