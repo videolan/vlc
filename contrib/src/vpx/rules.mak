@@ -39,7 +39,8 @@ VPX_ARCH := armv7s
 else
 VPX_ARCH := armv7
 endif
-else
+else ifndef HAVE_WIN32
+# libvpx doesn't support win32/arm with clang yet
 VPX_ARCH := armv7
 endif
 else ifeq ($(ARCH),i386)
