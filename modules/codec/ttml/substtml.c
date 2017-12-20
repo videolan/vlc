@@ -180,7 +180,7 @@ static void ttml_style_Merge( const ttml_style_t *p_src, ttml_style_t *p_dst )
     }
 }
 
-static ttml_region_t *ttml_region_New( )
+static ttml_region_t *ttml_region_New( bool b_root )
 {
     ttml_region_t *p_ttml_region = calloc( 1, sizeof( ttml_region_t ) );
     if( unlikely( !p_ttml_region ) )
@@ -190,7 +190,17 @@ static ttml_region_t *ttml_region_New( )
     p_ttml_region->pp_last_segment = &p_ttml_region->updt.p_segments;
     /* Align to top by default. !Warn: center align is obtained with NO flags */
     p_ttml_region->updt.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
-    p_ttml_region->updt.inner_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+    if( b_root )
+    {
+        p_ttml_region->updt.inner_align = SUBPICTURE_ALIGN_BOTTOM;
+        p_ttml_region->updt.extent.x = 1.0;
+        p_ttml_region->updt.extent.y = 1.0;
+        p_ttml_region->updt.flags = UPDT_REGION_EXTENT_X_IS_RATIO|UPDT_REGION_EXTENT_Y_IS_RATIO;
+    }
+    else
+    {
+        p_ttml_region->updt.inner_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+    }
 
     return p_ttml_region;
 }
@@ -732,7 +742,7 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
             vlc_dictionary_init( &merged, 0 );
             /* Get all attributes, including region > style */
             DictMergeWithRegionID( p_ctx, psz_region_id, &merged );
-            if( (p_region = ttml_region_New()) )
+            if( (p_region = ttml_region_New( false )) )
             {
                 /* Fill from its own attributes */
                 for( int i = 0; i < merged.i_size; ++i )
@@ -749,7 +759,7 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
 
             vlc_dictionary_insert( &p_ctx->regions, psz_region_id, p_region );
         }
-        else if( (p_region = ttml_region_New()) ) /* create default */
+        else if( (p_region = ttml_region_New( true )) ) /* create default */
         {
             vlc_dictionary_insert( &p_ctx->regions, "", p_region );
         }
@@ -1057,12 +1067,10 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
                     SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
                 }
 
-                /* broken legacy align var (can't handle center...) */
+                /* broken legacy align var (can't handle center...). Will change only regions content. */
                 if( p_dec->p_sys->i_align & SUBPICTURE_ALIGN_MASK )
-                {
-                    p_spu_sys->region.align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_TOP);
-                    p_spu_sys->region.inner_align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
-                }
+                    p_spu_sys->region.inner_align = p_dec->p_sys->i_align;
+
                 p_spu_sys->margin_ratio = 0.0;
 
                 /* copy and take ownership of pointeds */
