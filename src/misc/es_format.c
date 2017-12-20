@@ -589,6 +589,8 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
             a1.i_physical_channels != a2.i_physical_channels ||
             a1.i_chan_mode != a2.i_chan_mode )
             return false;
+        if( p_fmt1->i_profile != p_fmt2->i_profile )
+            return false;
         return true;
     }
 
