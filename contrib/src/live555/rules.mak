@@ -10,6 +10,10 @@ PKGS += live555
 endif
 endif
 
+ifeq ($(call need_pkg,"live555"),)
+PKGS_FOUND += live555
+endif
+
 $(TARBALLS)/$(LIVE555_FILE):
 	$(call download_pkg,$(LIVEDOTCOM_URL),live555)
 
