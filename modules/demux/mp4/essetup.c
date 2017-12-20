@@ -27,6 +27,7 @@
 #include "mp4.h"
 #include "avci.h"
 #include "../xiph.h"
+#include "../../packetizer/dts_header.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
@@ -113,9 +114,11 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
     case( 0xa6 ):
         p_track->fmt.i_codec = VLC_CODEC_EAC3;
         break;
-    case( 0xa9 ): /* dts */
     case( 0xaa ): /* DTS-HD HRA */
     case( 0xab ): /* DTS-HD Master Audio */
+        p_track->fmt.i_profile = PROFILE_DTS_HD;
+        /* fallthrough */
+    case( 0xa9 ): /* dts */
         p_track->fmt.i_codec = VLC_CODEC_DTS;
         break;
     case( 0xDD ):
