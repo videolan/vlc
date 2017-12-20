@@ -928,7 +928,8 @@ AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format,
     switch( i_format )
     {
         case VLC_CODEC_DTS:
-            if( MATCH_ENCODING_FLAG( ENCODING_DTS_HD ) )
+            if( MATCH_ENCODING_FLAG( ENCODING_DTS_HD )
+             && var_GetBool( p_aout, "dtshd" ) )
             {
                 *p_dtshd = true;
                 return true;
@@ -971,14 +972,13 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
                 break;
             case VLC_CODEC_DTS:
-                if( b_dtshd && p_sys->fmt.i_rate >= 48000 )
+                p_sys->fmt.i_bytes_per_frame = 4;
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+                if( b_dtshd )
                 {
                     p_sys->fmt.i_rate = 192000;
                     p_sys->fmt.i_bytes_per_frame = 16;
                 }
-                else
-                    p_sys->fmt.i_bytes_per_frame = 4;
-                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
                 break;
             case VLC_CODEC_EAC3:
                 p_sys->fmt.i_rate = 192000;
