@@ -1121,12 +1121,21 @@ AH_BOTTOM([
     AS_IF([test "${ac_cv_c_omit_frame_pointer}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 
+  VLC_SAVE_FLAGS
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong])
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong], [CXXFLAGS])
   dnl Win32 requires linking to ssp for stack-protection
   AS_IF([test "${SYS}" = "mingw32"], [
       LDFLAGS="${LDFLAGS} -lssp"
       AS_IF([test "${vlc_winstore_app}" != 1], [LDFLAGS="${LDFLAGS} -ladvapi32"])
+      AC_CACHE_CHECK([if linker supports stack protectors], [ac_cv_ld_ssp], [
+        AC_TRY_LINK([#include <stdio.h>],[char buf[100]; fgets(buf, sizeof(buf), stdin);], [
+          ac_cv_ld_ssp="yes"
+        ], [
+          ac_cv_ld_ssp="no"
+        ])
+      ])
+      AS_IF([test "${ac_cv_ld_ssp}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 ])
 
