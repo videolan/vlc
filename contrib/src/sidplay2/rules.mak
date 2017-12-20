@@ -7,6 +7,10 @@ ifdef GPL
 PKGS += sidplay2
 endif
 
+ifeq ($(call need_pkg,"libsidplay2"),)
+PKGS_FOUND += sidplay2
+endif
+
 $(TARBALLS)/sidplay-libs-$(SID_VERSION).tar.gz:
 	$(call download_pkg,$(SID_URL),sidplay2)
 
