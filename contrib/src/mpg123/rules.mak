@@ -3,7 +3,7 @@ MPG123_VERSION := 1.25.7
 MPG123_URL := $(SF)/mpg123/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
 
 PKGS += mpg123
-ifeq ($(call need_pkg,"mpg123"),)
+ifeq ($(call need_pkg,"libmpg123"),)
 PKGS_FOUND += mpg123
 endif
 
