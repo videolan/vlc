@@ -499,8 +499,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             preferredAudioLanguage );
 
             CONFIG_BOOL( "spdif", spdifBox );
-            CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
-                            detectionDolby );
 
             CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float, NULL,
                                     volNormSpin );
@@ -526,7 +524,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /*Little mofification of ui.volumeValue to compile with Qt < 4.3 */
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets["volLW"] = ui.volumeValue;
-            optionWidgets["headphoneB"] = ui.headphoneEffect;
             optionWidgets["spdifChB"] = ui.spdifBox;
             optionWidgets["defaultVolume"] = ui.defaultVolume;
             optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
@@ -569,9 +566,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             bool b_enabled = ( qs_filter.contains( "normvol" ) );
             ui.volNormBox->setChecked( b_enabled );
             ui.volNormSpin->setEnabled( b_enabled );
-
-            b_enabled = ( qs_filter.contains( "headphone" ) );
-            ui.headphoneEffect->setChecked( b_enabled );
 
             /* Volume Label */
             updateAudioVolume( ui.defaultVolume->value() ); // First time init
@@ -1054,14 +1048,6 @@ void SPrefsPanel::apply()
             qs_filter.append( "normvol" );
         if( !b_checked && qs_filter.contains( "normvol" ) )
             qs_filter.removeAll( "normvol" );
-
-        b_checked =
-            qobject_cast<QCheckBox *>(optionWidgets["headphoneB"])->isChecked();
-
-        if( b_checked && !qs_filter.contains( "headphone" ) )
-            qs_filter.append( "headphone" );
-        if( !b_checked && qs_filter.contains( "headphone" ) )
-            qs_filter.removeAll( "headphone" );
 
         config_PutPsz( p_intf, "audio-filter", qtu( qs_filter.join( ":" ) ) );
 
