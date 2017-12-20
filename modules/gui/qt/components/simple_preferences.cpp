@@ -362,8 +362,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
 
 #ifdef _WIN32
-            CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
-                            dXdisplayDevice );
             CONFIG_BOOL( "directx-overlay", overlay );
             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
             CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
