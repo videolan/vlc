@@ -986,10 +986,10 @@ static void piccheck(picture_t *pic, const vlc_chroma_description_t *dsc,
 
     assert(pic->i_planes == 2 || pic->i_planes == 3);
     const uint8_t colors_8_P[3] = { 0x42, 0xF1, 0x36 };
-    const uint16_t color_8_UV = 0x36F1;
+    const uint16_t color_8_UV = ntoh16(0xF136);
 
-    const uint16_t colors_16_P[3] = { 0x4210, 0x14F1, 0x4536 };
-    const uint32_t color_16_UV = 0x453614F1;
+    const uint16_t colors_16_P[3] = { ntoh16(0x1042), ntoh16(0xF114), ntoh16(0x3645) };
+    const uint32_t color_16_UV = ntoh32(0xF1143645);
 
     assert(dsc->pixel_size == 1 || dsc->pixel_size == 2);
     if (dsc->pixel_size == 1)
