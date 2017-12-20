@@ -4,7 +4,12 @@ ASDCPLIB_VERSION := 2.7.19
 
 ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSION).tar.gz
 
-#PKGS += asdcplib
+ifndef HAVE_IOS
+ifndef HAVE_ANDROID
+PKGS += asdcplib
+endif
+endif
+
 ifeq ($(call need_pkg,"asdcplib >= 1.12"),)
 PKGS_FOUND += asdcplib
 endif
