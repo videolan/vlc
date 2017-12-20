@@ -42,6 +42,7 @@
 
 #include <QStyleFactory>
 #include <QSettings>
+#include <QScreen>
 #include <QtAlgorithms>
 #include <QDir>
 #include <assert.h>
@@ -360,6 +361,24 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "fullscreen", fullscreen );
             CONFIG_BOOL( "video-deco", windowDecorations );
             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
+
+            optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
+            ui.fullscreenScreenBox->addItem( qtr("Automatic"), -1 );
+            int i_screenCount = 0;
+            foreach( QScreen* screen, QGuiApplication::screens() )
+            {
+                ui.fullscreenScreenBox->addItem( screen->name(), i_screenCount );
+                i_screenCount++;
+            }
+            p_config =  config_FindConfig( "qt-fullscreen-screennumber" );
+            if( p_config )
+            {
+                int i_defaultScreen = p_config->value.i + 1;
+                if ( i_defaultScreen < 0 || i_defaultScreen > ( ui.fullscreenScreenBox->count() - 1 ) )
+                    ui.fullscreenScreenBox->setCurrentIndex( 0 );
+                else
+                    ui.fullscreenScreenBox->setCurrentIndex(p_config->value.i + 1);
+            }
 
 #ifdef _WIN32
             CONFIG_BOOL( "directx-overlay", overlay );
@@ -1034,6 +1053,13 @@ void SPrefsPanel::apply()
 #ifdef _WIN32
     saveLang();
 #endif
+        break;
+    }
+
+    case SPrefsVideo:
+    {
+        int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentData().toInt();
+        config_PutInt( p_intf, "qt-fullscreen-screennumber", i_fullscreenScreen );
         break;
     }
 
