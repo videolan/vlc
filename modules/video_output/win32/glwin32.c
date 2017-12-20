@@ -246,7 +246,7 @@ static void Manage (vout_display_t *vd)
     const int height = sys->sys.rect_dest.bottom - sys->sys.rect_dest.top;
     vlc_gl_Resize (sys->gl, width, height);
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
-        return VLC_EGENERIC;
+        return;
     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
     vout_display_opengl_Viewport(sys->vgl, 0, 0, width, height);
     vlc_gl_ReleaseCurrent (sys->gl);
