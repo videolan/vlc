@@ -365,6 +365,11 @@ static int aout_update_format( decoder_t *p_dec )
         p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
+            /* TODO: 3.0 HACK: we need to put i_profile inside audio_format_t
+             * for 4.0 */
+            if( p_dec->fmt_out.i_codec == VLC_CODEC_DTS )
+                var_SetBool( p_aout, "dtshd", p_dec->fmt_out.i_profile > 0 );
+
             if( aout_DecNew( p_aout, &format,
                              &p_dec->fmt_out.audio_replay_gain,
                              &request_vout ) )
