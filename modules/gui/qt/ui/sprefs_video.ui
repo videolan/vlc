@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>682</width>
-    <height>577</height>
+    <height>679</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,24 +70,10 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="overlay">
-           <property name="text">
-            <string>Accelerated video output (Overlay)</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="0">
           <widget class="QCheckBox" name="windowDecorations">
            <property name="text">
             <string>Window decorations</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="hwYUVBox">
-           <property name="text">
-            <string>Use hardware YUV-&gt;RGB conversions</string>
            </property>
           </widget>
          </item>
@@ -100,7 +86,21 @@
          <string>DirectX</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="hwYUVBox">
+           <property name="text">
+            <string>Use hardware YUV-&gt;RGB conversions</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
+          <widget class="QCheckBox" name="overlay">
+           <property name="text">
+            <string>Accelerated video output (Overlay)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
           <widget class="QLabel" name="dxDeviceLabel">
            <property name="text">
             <string>Display device</string>
@@ -110,7 +110,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="3" column="1">
           <widget class="QComboBox" name="dXdisplayDevice"/>
          </item>
         </layout>
@@ -316,8 +316,10 @@
  <tabstops>
   <tabstop>enableVideo</tabstop>
   <tabstop>fullscreen</tabstop>
-  <tabstop>overlay</tabstop>
+  <tabstop>windowDecorations</tabstop>
   <tabstop>outputModule</tabstop>
+  <tabstop>overlay</tabstop>
+  <tabstop>hwYUVBox</tabstop>
   <tabstop>dXdisplayDevice</tabstop>
   <tabstop>kvaFixT23</tabstop>
   <tabstop>kvaVideoMode</tabstop>
