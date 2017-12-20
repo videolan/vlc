@@ -249,6 +249,8 @@ static tt_node_t * FindNode( tt_node_t *p_node, const char *psz_nodename,
         if( psz_id != NULL )
         {
             char *psz = vlc_dictionary_value_for_key( &p_node->attr_dict, "xml:id" );
+            if( !psz ) /* People can't do xml properly */
+                psz = vlc_dictionary_value_for_key( &p_node->attr_dict, "id" );
             if( psz && !strcmp( psz, psz_id ) )
                 return p_node;
         }
