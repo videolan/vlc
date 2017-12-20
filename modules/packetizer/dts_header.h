@@ -24,6 +24,10 @@
 
 #define VLC_DTS_HEADER_SIZE 14
 
+#define PROFILE_DTS_INVALID -1
+#define PROFILE_DTS 0
+#define PROFILE_DTS_HD 1
+
 typedef struct
 {
     bool            b_substream;
