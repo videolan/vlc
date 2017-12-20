@@ -330,6 +330,7 @@ AM_CONDITIONAL(HAVE_OSX,     test "${HAVE_OSX}" = "1")
 AM_CONDITIONAL(HAVE_TVOS,    test "${HAVE_TVOS}" = "1")
 
 AM_CONDITIONAL(HAVE_NACL,    test "${SYS}" = "nacl")
+AM_CONDITIONAL(HAVE_LIBANL,  test "${HAVE_LIBANL}" = "1")
 
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
@@ -758,6 +759,10 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([_Thread_local int foo = 0;
 dnl __STDC_NO_THREADS__ can't be trusted on some platforms.
 dnl check for its availability explicitely
 AC_CHECK_HEADERS([threads.h])
+
+AC_CHECK_LIB([anl],[getaddrinfo_a],[
+  AC_DEFINE(HAVE_LIBANL, 1, [Define to 1 if you have the anl library])
+])
 
 dnl Check for dynamic plugins
 LIBDL=""
