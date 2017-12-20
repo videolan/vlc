@@ -450,8 +450,8 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
 }
 
 
-static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
-                       const GUID *sid, bool force_dts_spdif)
+static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
+                     const GUID *sid)
 {
     static INIT_ONCE freq_once = INIT_ONCE_STATIC_INIT;
 
@@ -472,6 +472,17 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     audio_sample_format_t fmt = *pfmt;
     bool b_spdif = AOUT_FMT_SPDIF(&fmt);
     bool b_hdmi = AOUT_FMT_HDMI(&fmt);
+    bool b_dtshd = false;
+
+    if (fmt.i_format == VLC_CODEC_DTS)
+    {
+        b_dtshd = var_GetBool(s->obj.parent, "dtshd");
+        if (b_dtshd)
+        {
+            b_hdmi = true;
+            b_spdif = false;
+        }
+    }
 
     void *pv;
     HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
@@ -481,17 +492,6 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         goto error;
     }
     sys->client = pv;
-
-    if (fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif && fmt.i_rate >= 48000
-     && var_InheritInteger(s, "mmdevice-passthrough") == MM_PASSTHROUGH_ENABLED_HD)
-    {
-        /* Try to configure the output rate (IEC958 rate) at 768kHz. Indeed,
-         * DTS-HD (and other DTS extensions like DTS-X) can only be transmitted
-         * at 768kHz. We'll also be able to transmit DTS-Core only at this
-         * rate. */
-        b_spdif = false;
-        b_hdmi = true;
-    }
 
     if (b_spdif)
     {
@@ -549,7 +549,8 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
                      "fallback to 48kHz (S/PDIF)");
             IAudioClient_Release(sys->client);
             free(sys);
-            return Restart(s, pfmt, sid, true);
+            var_SetBool(s->obj.parent, "dtshd", false);
+            return Start(s, pfmt, sid);
         }
         msg_Err(s, "cannot negotiate audio format (error 0x%lx)%s", hr,
                 hr == AUDCLNT_E_UNSUPPORTED_FORMAT
@@ -622,12 +623,6 @@ error:
         IAudioClient_Release(sys->client);
     free(sys);
     return hr;
-}
-
-static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
-                     const GUID *sid)
-{
-    return Restart(s, pfmt, sid, false);
 }
 
 static void Stop(aout_stream_t *s)
