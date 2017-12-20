@@ -4,6 +4,11 @@ MATROSKA_VERSION := 1.4.7
 MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATROSKA_VERSION).tar.bz2
 
 PKGS += matroska
+
+ifeq ($(call need_pkg,"libmatroska"),)
+PKGS_FOUND += matroska
+endif
+
 DEPS_matroska = ebml $(DEPS_ebml)
 
 $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
