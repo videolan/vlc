@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>700</width>
-    <height>757</height>
+    <height>785</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -271,24 +271,13 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="0">
-              <widget class="QLabel" name="continuePlaybackLabel">
-               <property name="text">
-                <string>Continue playback?</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="2" colspan="2">
-              <widget class="QComboBox" name="continuePlaybackComboBox">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
              <item row="11" column="0">
               <widget class="QLabel" name="autoRaiseLabel">
                <property name="text">
                 <string>Auto raising the interface:</string>
+               </property>
+               <property name="buddy">
+                <cstring>autoRaiseComboBox</cstring>
                </property>
               </widget>
              </item>
@@ -440,13 +429,6 @@
       <string>Playlist and Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="OneInterfaceMode">
-        <property name="text">
-         <string>Allow only one instance</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QCheckBox" name="oneInstanceFromFile">
         <property name="text">
@@ -472,6 +454,30 @@
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
          <string>Enqueue items into playlist in one instance mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="continuePlaybackComboBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="continuePlaybackLabel">
+        <property name="text">
+         <string>Continue playback?</string>
+        </property>
+        <property name="buddy">
+         <cstring>continuePlaybackComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="OneInterfaceMode">
+        <property name="text">
+         <string>Allow only one instance</string>
         </property>
        </widget>
       </item>
@@ -688,24 +694,27 @@
   <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>
   <tabstop>embedVideo</tabstop>
-  <tabstop>minimalviewBox</tabstop>
-  <tabstop>systrayBox</tabstop>
   <tabstop>resizingBox</tabstop>
+  <tabstop>minimalviewBox</tabstop>
   <tabstop>pauseMinimizedBox</tabstop>
+  <tabstop>systrayBox</tabstop>
   <tabstop>notificationCombo</tabstop>
   <tabstop>stylesCombo</tabstop>
+  <tabstop>autoRaiseComboBox</tabstop>
+  <tabstop>fileSkin</tabstop>
+  <tabstop>skinBrowse</tabstop>
   <tabstop>OneInterfaceMode</tabstop>
+  <tabstop>EnqueueOneInterfaceMode</tabstop>
   <tabstop>oneInstanceFromFile</tabstop>
   <tabstop>treePlaylist</tabstop>
-  <tabstop>EnqueueOneInterfaceMode</tabstop>
   <tabstop>playPauseBox</tabstop>
+  <tabstop>continuePlaybackComboBox</tabstop>
   <tabstop>updatesBox</tabstop>
-  <tabstop>saveRecentlyPlayed</tabstop>
   <tabstop>updatesDays</tabstop>
+  <tabstop>saveRecentlyPlayed</tabstop>
   <tabstop>recentlyPlayedFilters</tabstop>
+  <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>assoButton</tabstop>
-  <tabstop>skinBrowse</tabstop>
-  <tabstop>fileSkin</tabstop>
  </tabstops>
  <resources/>
  <connections/>
