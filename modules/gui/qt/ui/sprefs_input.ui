@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>737</width>
-    <height>567</height>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -287,6 +287,12 @@
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="2" column="0">
        <widget class="QLabel" name="httpProxyLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>HTTP proxy URL</string>
         </property>
@@ -324,6 +330,12 @@
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="live555TransportLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Live555 stream transport</string>
         </property>
@@ -334,6 +346,12 @@
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Default caching policy</string>
         </property>
