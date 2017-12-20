@@ -180,6 +180,13 @@ typedef int64_t stime_t;
 #define ATOM_eac3 VLC_FOURCC( 'e', 'c', '-', '3' )
 #define ATOM_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
 #define ATOM_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
+#define ATOM_ddts VLC_FOURCC( 'd', 'd', 't', 's' ) /* DTS formats */
+#define ATOM_dtsc VLC_FOURCC( 'd', 't', 's', 'c' )
+#define ATOM_dtsh VLC_FOURCC( 'd', 't', 's', 'h' )
+#define ATOM_dtsl VLC_FOURCC( 'd', 't', 's', 'l' )
+#define ATOM_dtse VLC_FOURCC( 'd', 't', 's', 'e' )
+#define ATOM_dtsm VLC_FOURCC( 'd', 't', 's', '-' )
+#define ATOM_dtsp VLC_FOURCC( 'd', 't', 's', '+' )
 #define ATOM_vc1  VLC_FOURCC( 'v', 'c', '-', '1' )
 #define ATOM_dvc1 VLC_FOURCC( 'd', 'v', 'c', '1' )
 #define ATOM_WMA2 VLC_FOURCC( 'W', 'M', 'A', '2' )

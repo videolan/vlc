@@ -1001,6 +1001,14 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
+        case ATOM_dtse: /* DTS‐HD Lossless formats */
+        case ATOM_dtsh: /* DTS‐HD audio formats */
+        case ATOM_dtsl: /* DTS‐HD Lossless formats */
+        {
+            p_track->fmt.i_profile = PROFILE_DTS_HD;
+            break;
+        }
+
         case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
         case( VLC_FOURCC( 'N', 'O', 'N', 'E' ) ):
         {
