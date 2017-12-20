@@ -28,6 +28,8 @@ asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(APPLY) $(SRC)/asdcplib/win32-dirent.patch
 	$(MOVE)
 
+DEPS_asdcplib = nettle $(DEPS_nettle)
+
 .asdcplib: asdcplib
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-freedist --enable-dev-headers
