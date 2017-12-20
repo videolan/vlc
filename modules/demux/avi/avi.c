@@ -1793,26 +1793,38 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Function to convert pts to chunk or byte
  *****************************************************************************/
 
+static int64_t AVI_Rescale( int64_t i_value, uint32_t i_timescale, uint32_t i_newscale )
+{
+    /* TODO: replace (and mp4) with better global helper (recursive checks) */
+    if( i_timescale == i_newscale )
+        return i_value;
+
+    if( (i_value >= 0 && i_value <= INT64_MAX / i_newscale) ||
+        (i_value < 0  && i_value >= INT64_MIN / i_newscale) )
+        return i_value * i_newscale / i_timescale;
+
+    /* overflow */
+    int64_t q = i_value / i_timescale;
+    int64_t r = i_value % i_timescale;
+    return q * i_newscale + r * i_newscale / i_timescale;
+}
+
 static int64_t AVI_PTSToChunk( avi_track_t *tk, mtime_t i_pts )
 {
     if( !tk->i_scale )
         return 0;
 
-    return i_pts *
-           tk->i_rate /
-           tk->i_scale /
-           CLOCK_FREQ;
+    i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
+    return i_pts / CLOCK_FREQ;
 }
+
 static int64_t AVI_PTSToByte( avi_track_t *tk, mtime_t i_pts )
 {
     if( !tk->i_scale || !tk->i_samplesize )
         return 0;
 
-    return i_pts *
-           tk->i_rate /
-           tk->i_scale /
-           CLOCK_FREQ *
-           tk->i_samplesize;
+    i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
+    return i_pts / CLOCK_FREQ * tk->i_samplesize;
 }
 
 static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
@@ -1822,10 +1834,7 @@ static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
     if( !tk->i_rate )
         return i_dpts;
 
-    i_dpts = CLOCK_FREQ *
-             i_count *
-             tk->i_scale /
-             tk->i_rate;
+    i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
 
     if( tk->i_samplesize )
     {
