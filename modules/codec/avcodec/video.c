@@ -1692,8 +1692,10 @@ no_reuse:
     static const enum PixelFormat hwfmts[] =
     {
 #ifdef _WIN32
-        AV_PIX_FMT_D3D11VA_VLD,
+#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
         AV_PIX_FMT_DXVA2_VLD,
+#endif
+        AV_PIX_FMT_D3D11VA_VLD,
 #endif
         AV_PIX_FMT_VAAPI_VLD,
         AV_PIX_FMT_VDPAU,
