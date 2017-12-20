@@ -75,8 +75,8 @@ static inline void SubpictureUpdaterSysRegionClean(subpicture_updater_sys_region
 static inline void SubpictureUpdaterSysRegionInit(subpicture_updater_sys_region_t *p_updtregion)
 {
     memset(p_updtregion, 0, sizeof(*p_updtregion));
-    p_updtregion->align = SUBPICTURE_ALIGN_TOP;
-    p_updtregion->inner_align = SUBPICTURE_ALIGN_LEFT;
+    p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
+    p_updtregion->inner_align = 0;
 }
 
 static inline subpicture_updater_sys_region_t *SubpictureUpdaterSysRegionNew( )
