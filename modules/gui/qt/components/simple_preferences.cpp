@@ -369,8 +369,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
 #else
             ui.directXBox->setVisible( false );
-            ui.overlay->setVisible( false );
-            ui.hwYUVBox->setVisible( false );
 #endif
 
 #ifdef __OS2__
