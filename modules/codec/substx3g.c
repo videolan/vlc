@@ -434,7 +434,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     p_spu->b_ephemer  = (p_block->i_length == 0);
     p_spu->b_absolute = false;
 
-    p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_BOTTOM;
+    p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
 
     FontSizeConvert( p_dec->fmt_in.subs.p_style,  p_spu_sys->p_default_style );
 
