@@ -627,6 +627,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             else
                 FreeLibrary( hdxva2_dll );
 #endif
+            CONFIG_BOOL( "input-fast-seek", fastSeekBox );
             optionWidgets["inputLE"] = ui.DVDDeviceComboBox;
             optionWidgets["cachingCoB"] = ui.cachingCombo;
             CONFIG_GENERIC( "avcodec-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
