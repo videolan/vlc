@@ -313,7 +313,8 @@ static int aout_update_format( decoder_t *p_dec )
 
     if( p_owner->p_aout &&
        ( !AOUT_FMTS_IDENTICAL(&p_dec->fmt_out.audio, &p_owner->fmt.audio) ||
-         p_dec->fmt_out.i_codec != p_dec->fmt_out.audio.i_format ) )
+         p_dec->fmt_out.i_codec != p_dec->fmt_out.audio.i_format ||
+         p_dec->fmt_out.i_profile != p_owner->fmt.i_profile ) )
     {
         audio_output_t *p_aout = p_owner->p_aout;
 
