@@ -46,20 +46,6 @@
          <string>Display</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="fullscreen">
-           <property name="text">
-            <string>Fullscreen</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="outputModule">
-           <property name="maxVisibleItems">
-            <number>15</number>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="voutLabel">
            <property name="text">
@@ -74,6 +60,33 @@
           <widget class="QCheckBox" name="windowDecorations">
            <property name="text">
             <string>Window decorations</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="fullscreen">
+           <property name="text">
+            <string>Fullscreen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="outputModule">
+           <property name="maxVisibleItems">
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="fullscreenScreenBox"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="fullscreenScreenLabel">
+           <property name="text">
+            <string>Fullscreen Video Device</string>
+           </property>
+           <property name="buddy">
+            <cstring>fullscreenScreenBox</cstring>
            </property>
           </widget>
          </item>
@@ -305,6 +318,7 @@
   <tabstop>fullscreen</tabstop>
   <tabstop>windowDecorations</tabstop>
   <tabstop>outputModule</tabstop>
+  <tabstop>fullscreenScreenBox</tabstop>
   <tabstop>overlay</tabstop>
   <tabstop>hwYUVBox</tabstop>
   <tabstop>kvaFixT23</tabstop>
