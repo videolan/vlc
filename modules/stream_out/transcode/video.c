@@ -87,7 +87,6 @@ static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 
 static picture_t *video_new_buffer_encoder( encoder_t *p_enc )
 {
-    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
     return picture_NewFromFormat( &p_enc->fmt_in.video );
 }
 
@@ -211,7 +210,6 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
                     id->p_decoder->fmt_out.i_codec );
-    id->p_encoder->fmt_in.video.i_chroma = id->p_decoder->fmt_out.i_codec;
 
     /* The dimensions will be set properly later on.
      * Just put sensible values so we can test an encoder is available. */
@@ -263,6 +261,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         id->p_encoder->fmt_out.p_extra = NULL;
         id->p_encoder->fmt_out.i_extra = 0;
     }
+    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
     id->p_encoder->p_module = NULL;
 
     if( p_sys->i_threads <= 0 )
