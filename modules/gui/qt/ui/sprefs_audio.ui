@@ -261,7 +261,7 @@
             </size>
            </property>
            <property name="text">
-            <string>HDMI/SPDIF audio passthrough:</string>
+            <string>HDMI/SPDIF audio passthrough</string>
            </property>
            <property name="buddy">
             <cstring>mmdevicePassthrough</cstring>
