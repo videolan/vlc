@@ -79,6 +79,7 @@ struct sout_stream_id_sys_t
 
     /* Decoder */
     decoder_t       *p_decoder;
+    video_format_t video_dec_out; /* only rw from pf_vout_format_update() */
 
     struct
     {
