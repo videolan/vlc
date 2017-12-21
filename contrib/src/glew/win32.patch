@@ -73,29 +73,30 @@
  
 diff -ruN glew/config/Makefile.mingw glew.new/config/Makefile.mingw
 --- glew/config/Makefile.mingw	2011-08-25 16:17:55.000000000 +0200
-+++ glew.new/config/Makefile.mingw	2012-02-25 16:42:36.603751173 +0100
-@@ -1,8 +1,6 @@
++++ glew.new/config/Makefile.mingw	2017-12-21 21:13:03.115385406 +0000
+@@ -1,8 +1,7 @@
  NAME = glew32
 -CC = gcc
  # use gcc for linking, with ld it does not work
 -LD = gcc
 -CFLAGS.SO = -DGLEW_BUILD
++LD = $(CC)
 +CFLAGS.SO = -DGLEW_BUILD -DSTATIC
  LDFLAGS.GL = -lglu32 -lopengl32 -lgdi32 -luser32 -lkernel32
  LDFLAGS.EXTRA = -L/mingw/lib
  WARN = -Wall -W
-@@ -12,9 +10,9 @@
+@@ -12,9 +11,9 @@
  LIB.DEVLNK    = lib$(NAME).dll.a   # for mingw this is the dll import lib
  LIB.SHARED    = $(NAME).dll
  LIB.STATIC    = lib$(NAME).a       # the static lib will be broken (see CFLAGS.SO)
 -LDFLAGS.SO    = -shared -Wl,-soname,$(LIB.SONAME) -Wl,--out-implib,lib/$(LIB.DEVLNK)
-+#LDFLAGS.SO    = -shared -Wl,-soname,$(LIB.SONAME) -Wl,--out-implib,lib/$(LIB.DEVLNK)
++LDFLAGS.SO    = -shared -Wl,--out-implib,lib/$(LIB.DEVLNK)
  LIB.SONAME.MX = lib$(NAME)mx.dll
  LIB.DEVLNK.MX = lib$(NAME)mx.dll.a # for mingw this is the dll import lib
  LIB.SHARED.MX = $(NAME)mx.dll
  LIB.STATIC.MX = lib$(NAME)mx.a     # the static lib will be broken (see CFLAGS.SO)
 -LDFLAGS.SO.MX = -shared -Wl,-soname,$(LIB.SONAME.MX) -Wl,--out-implib,lib/$(LIB.DEVLNK.MX)
-+#LDFLAGS.SO.MX = -shared -Wl,-soname,$(LIB.SONAME.MX) -Wl,--out-implib,lib/$(LIB.DEVLNK.MX)
++LDFLAGS.SO.MX = -shared -Wl,--out-implib,lib/$(LIB.DEVLNK.MX)
 --- glew/include/GL/glew.h	2011-08-25 16:17:55.000000000 +0200
 +++ glew.new/include/GL/glew.h	2012-02-25 16:39:44.970410007 +0100
 @@ -151,7 +151,7 @@
