@@ -1,0 +1,35 @@
+diff -urN lua-5.1.4-orig/src/Makefile lua-5.1.4/src/Makefile
+--- lua-5.1.4-orig/src/Makefile	2017-12-14 07:30:51.879954115 +0000
++++ lua-5.1.4/src/Makefile	2017-12-14 08:00:29.765126324 +0000
+@@ -23,6 +23,7 @@
+ PLATS= aix ansi bsd freebsd generic linux macosx mingw posix solaris
+ 
+ LUA_A=	liblua.a
++LUA_A_LINK= $(LUA_A)
+ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
+ 	lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o  \
+ 	lundump.o lvm.o lzio.o
+@@ -52,10 +53,10 @@
+ 	$(RANLIB) $@
+ 
+ $(LUA_T): $(LUA_O) $(LUA_A)
+-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
++	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A_LINK) $(LIBS)
+ 
+ $(LUAC_T): $(LUAC_O) $(LUA_A)
+-	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
++	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A_LINK) $(LIBS)
+ 
+ clean:
+ 	$(RM) $(ALL_T) $(ALL_O)
+@@ -107,8 +108,8 @@
+ #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX
+ 
+ mingw:
+-	$(MAKE) "LUA_A=lua51.dll" "LUA_T=lua.exe" \
+-	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
++	$(MAKE) "LUA_A=lua51.dll" "LUA_T=lua.exe" "LUA_A_LINK=lua51.lib" \
++	"AR=$(CC) -shared -Wl,--out-implib,lua51.lib -o" "RANLIB=strip --strip-unneeded" \
+ 	"MYCFLAGS=-DLUA_BUILD_AS_DLL" "MYLIBS=" "MYLDFLAGS=-s" lua.exe
+ 	$(MAKE) "LUAC_T=luac.exe" luac.exe
+ 
