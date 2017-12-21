@@ -19,6 +19,7 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 
 .breakpad: breakpad
 	# Framework
+ifdef HAVE_MACOSX
 	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
 	cd $</src/client/mac/ && \
 		mkdir -p "$(PREFIX)/Frameworks" && \
@@ -28,4 +29,9 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	cd $</src/tools/mac/dump_syms && \
 		xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error && \
 		cp -R build/Release/dump_syms "$(PREFIX)/bin"
+else
+	$(RECONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-processor
+	cd $< && Configuration=Release $(MAKE) install
+endif
 	touch $@
