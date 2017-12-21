@@ -105,6 +105,7 @@ struct vout_display_sys_t
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
 
+    ID3D11InputLayout         *pVertexLayout;
     ID3D11VertexShader        *flatVSShader;
     ID3D11VertexShader        *projectionVSShader;
 
@@ -358,6 +359,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
                    vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->flatVSShader : sys->projectionVSShader,
+                   sys->pVertexLayout,
                    surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
@@ -1598,9 +1600,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
-    ID3D11InputLayout* pVertexLayout = NULL;
     hr = ID3D11Device_CreateInputLayout(sys->d3d_dev.d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), &pVertexLayout);
+                                        ID3D10Blob_GetBufferSize(pVSBlob), &sys->pVertexLayout);
 
     ID3D10Blob_Release(pVSBlob);
 
@@ -1608,8 +1609,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
-    ID3D11DeviceContext_IASetInputLayout(sys->d3d_dev.d3dcontext, pVertexLayout);
-    ID3D11InputLayout_Release(pVertexLayout);
 
     pVSBlob = D3D11_CompileShader(vd, &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection, false);
     if (!pVSBlob)
@@ -1624,8 +1623,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       return VLC_EGENERIC;
     }
     ID3D10Blob_Release(pVSBlob);
-
-    ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3d_dev.d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     UpdatePicQuadPosition(vd);
 
@@ -1683,6 +1680,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     ReleasePictureSys(&sys->stagingSys);
 
+    if (sys->pVertexLayout)
+    {
+        ID3D11InputLayout_Release(sys->pVertexLayout);
+        sys->pVertexLayout = NULL;
+    }
     if (sys->flatVSShader)
     {
         ID3D11VertexShader_Release(sys->flatVSShader);
@@ -1808,7 +1810,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
             d3dquad->formatInfo = sys->d3dregion_format;
             err = D3D11_SetupQuad( vd, &sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
-                             sys->flatVSShader, PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL );
+                             sys->flatVSShader, sys->pVertexLayout, PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);

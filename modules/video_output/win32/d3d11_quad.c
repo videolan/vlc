@@ -50,7 +50,10 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
     ID3D11DeviceContext_OMSetRenderTargets(d3d_dev->d3dcontext, 1, &d3drenderTargetView, NULL);
 
     /* Render the quad */
+    ID3D11DeviceContext_IASetPrimitiveTopology(d3d_dev->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     /* vertex shader */
+    ID3D11DeviceContext_IASetInputLayout(d3d_dev->d3dcontext, quad->pVertexLayout);
     ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &quad->vertexStride, &offset);
     ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     if ( quad->pVertexShaderConstants )
@@ -611,7 +614,7 @@ void D3D11_UpdateQuadLuminanceScale(vlc_object_t *o, d3d11_device_t *d3d_dev, d3
 #undef D3D11_SetupQuad
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat, const RECT *output,
-                    ID3D11VertexShader *d3dvertexShader,
+                    ID3D11VertexShader *d3dvertexShader, ID3D11InputLayout *pVertexLayout,
                     video_projection_mode_t projection, video_orientation_t orientation)
 {
     HRESULT hr;
@@ -772,6 +775,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         goto error;
 
     quad->d3dvertexShader = d3dvertexShader;
+    quad->pVertexLayout   = pVertexLayout;
     quad->resourceCount = DxgiResourceCount(quad->formatInfo);
 
     return VLC_SUCCESS;
