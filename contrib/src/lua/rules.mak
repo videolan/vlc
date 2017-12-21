@@ -46,6 +46,7 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(APPLY) $(SRC)/lua/luac-32bits.patch
 	$(APPLY) $(SRC)/lua/no-localeconv.patch
 	$(APPLY) $(SRC)/lua/lua-ios-support.patch
+	$(APPLY) $(SRC)/lua/implib.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/lua/lua-winrt.patch
 endif
