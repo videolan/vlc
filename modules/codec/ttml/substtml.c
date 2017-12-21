@@ -62,7 +62,9 @@ typedef struct
 {
     text_style_t*   font_style;
     ttml_length_t   font_size;
+    /* sizes override */
     ttml_length_t   extent_h, extent_v;
+    ttml_length_t   origin_h, origin_v;
     int             i_text_align;
     bool            b_text_align_set;
     int             i_direction;
@@ -125,10 +127,10 @@ static ttml_style_t * ttml_style_New( )
     if( unlikely( !p_ttml_style ) )
         return NULL;
 
-    p_ttml_style->extent_h.i_value = 100;
-    p_ttml_style->extent_h.unit = TTML_UNIT_PERCENT;
-    p_ttml_style->extent_v.i_value = 100;
-    p_ttml_style->extent_v.unit = TTML_UNIT_PERCENT;
+    p_ttml_style->extent_h.unit = TTML_UNIT_UNKNOWN;
+    p_ttml_style->extent_v.unit = TTML_UNIT_UNKNOWN;
+    p_ttml_style->origin_h.unit = TTML_UNIT_UNKNOWN;
+    p_ttml_style->origin_v.unit = TTML_UNIT_UNKNOWN;
     p_ttml_style->font_size.i_value = 1.0;
     p_ttml_style->font_size.unit = TTML_UNIT_CELL;
     p_ttml_style->font_style = text_style_Create( STYLE_NO_DEFAULTS );
@@ -239,6 +241,30 @@ static ttml_length_t ttml_rebase_length( ttml_length_t value,
     }
     // pixels as-is
     return value;
+}
+
+static bool ttml_read_coords( const char *value, ttml_length_t *h, ttml_length_t *v )
+{
+    ttml_length_t vals[2] = { { 0.0, TTML_UNIT_UNKNOWN },
+                              { 0.0, TTML_UNIT_UNKNOWN } };
+    char *dup = strdup( value );
+    char* psz_saveptr = NULL;
+    char* token = (dup) ? strtok_r( dup, " ", &psz_saveptr ) : NULL;
+    for(int i=0; i<2 && token != NULL; i++)
+    {
+        vals[i] = ttml_read_length( token );
+        token = strtok_r( NULL, " ", &psz_saveptr );
+    }
+    free( dup );
+
+    if( vals[0].unit != TTML_UNIT_UNKNOWN &&
+        vals[1].unit != TTML_UNIT_UNKNOWN )
+    {
+        *h = vals[0];
+        *v = vals[1];
+        return true;
+    }
+    return false;
 }
 
 static tt_node_t * FindNode( tt_node_t *p_node, const char *psz_nodename,
@@ -363,6 +389,29 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
     }
 }
 
+static void FillUpdaterCoords( ttml_length_t h, ttml_length_t v,
+                               bool b_origin, subpicture_updater_sys_region_t *p_updt )
+{
+    ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
+    ttml_length_t x = ttml_rebase_length( h, base );
+    ttml_length_t y = ttml_rebase_length( v, base );
+    if( b_origin )
+    {
+        p_updt->origin.x = x.i_value / 100.0;
+        p_updt->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO;
+        p_updt->origin.y = y.i_value / 100.0;
+        p_updt->flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
+        p_updt->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+    }
+    else
+    {
+        p_updt->extent.x = x.i_value / 100.0;
+        p_updt->flags |= UPDT_REGION_EXTENT_X_IS_RATIO;
+        p_updt->extent.y = y.i_value / 100.0;
+        p_updt->flags |= UPDT_REGION_EXTENT_Y_IS_RATIO;
+    }
+}
+
 static void FillRegionStyle( const char *psz_attr, const char *psz_val,
                              ttml_region_t *p_region )
 {
@@ -378,63 +427,9 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
     else if( !strcasecmp ( "tts:origin", psz_attr ) ||
              !strcasecmp ( "tts:extent", psz_attr ) )
     {
-        const char *psz_token = psz_val;
-        while( isspace( *psz_token ) )
-            psz_token++;
-
-        ttml_length_t x = ttml_read_length( psz_token );
-
-        while( *psz_token && !isspace( *psz_token ) )
-            psz_token++;
-        while( *psz_token && isspace( *psz_token ) )
-            psz_token++;
-
-        ttml_length_t y = ttml_read_length( psz_token );
-
-        if ( x.unit != TTML_UNIT_UNKNOWN && y.unit != TTML_UNIT_UNKNOWN )
-        {
-            ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
-            x = ttml_rebase_length( x, base );
-            y = ttml_rebase_length( y, base );
-            if( psz_attr[4] == 'o' )
-            {
-                p_region->updt.origin.x = x.i_value / 100.0;
-                p_region->updt.flags |= UPDT_REGION_ORIGIN_X_IS_RATIO;
-                p_region->updt.origin.y = y.i_value / 100.0;
-                p_region->updt.flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
-                p_region->updt.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
-            }
-            else
-            {
-                p_region->updt.extent.x = x.i_value / 100.0;
-                p_region->updt.flags |= UPDT_REGION_EXTENT_X_IS_RATIO;
-                p_region->updt.extent.y = y.i_value / 100.0;
-                p_region->updt.flags |= UPDT_REGION_EXTENT_Y_IS_RATIO;
-            }
-        }
-    }
-}
-
-static void ReadTTMLExtent( const char *value, ttml_length_t *h, ttml_length_t *v )
-{
-    ttml_length_t vals[2] = { { 0.0, TTML_UNIT_UNKNOWN },
-                              { 0.0, TTML_UNIT_UNKNOWN } };
-    char *dup = strdup( value );
-    char* psz_saveptr = NULL;
-    char* token = (dup) ? strtok_r( dup, " ", &psz_saveptr ) : NULL;
-    for(int i=0; i<2 && token != NULL; i++)
-    {
-        token = strtok_r( NULL, " ", &psz_saveptr );
-        if( token != NULL )
-            vals[i] = ttml_read_length( token );
-    }
-    free( dup );
-
-    if( vals[0].unit != TTML_UNIT_UNKNOWN &&
-        vals[1].unit != TTML_UNIT_UNKNOWN )
-    {
-        *h = vals[0];
-        *v = vals[1];
+        ttml_length_t x, y;
+        if( ttml_read_coords( psz_val, &x, &y ) )
+            FillUpdaterCoords( x, y, (psz_attr[4] == 'o'), &p_region->updt );
     }
 }
 
@@ -462,8 +457,13 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
 {
     if( !strcasecmp( "tts:extent", psz_attr ) )
     {
-        ReadTTMLExtent( psz_attr, &p_ttml_style->extent_h,
-                                  &p_ttml_style->extent_v );
+        ttml_read_coords( psz_val, &p_ttml_style->extent_h,
+                                   &p_ttml_style->extent_v );
+    }
+    else if( !strcasecmp( "tts:origin", psz_attr ) )
+    {
+        ttml_read_coords( psz_val, &p_ttml_style->origin_h,
+                                   &p_ttml_style->origin_v );
     }
     else if( !strcasecmp( "tts:textAlign", psz_attr ) )
     {
@@ -941,7 +941,7 @@ static void InitTTMLContext( tt_node_t *p_rootnode, ttml_context_t *p_ctx )
                                                       "tts:extent" );
     if( value != kVLCDictionaryNotFound )
     {
-        ReadTTMLExtent( value, &p_ctx->root_extent_h,
+        ttml_read_coords( value, &p_ctx->root_extent_h,
                                &p_ctx->root_extent_v );
     }
     value = vlc_dictionary_value_for_key( &p_rootnode->attr_dict,
