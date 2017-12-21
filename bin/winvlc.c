@@ -43,7 +43,12 @@
 #include <io.h>
 #include <shlobj.h>
 #define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
-static const wchar_t *crashdump_path;
+
+#ifdef HAVE_BREAKPAD
+void CheckCrashDump( const wchar_t* crashdump_path );
+void* InstallCrashHandler( const wchar_t* crashdump_path );
+void ReleaseCrashHandler( void* handler );
+#endif
 
 static char *FromWide (const wchar_t *wide)
 {
@@ -192,14 +197,18 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argv[argc] = NULL;
     LocalFree (wargv);
 
+    void* eh = NULL;
     if(crash_handling)
     {
+#ifdef HAVE_BREAKPAD
         static wchar_t path[MAX_PATH];
         if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                     NULL, SHGFP_TYPE_CURRENT, path ) )
             fprintf( stderr, "Can't open the vlc conf PATH\n" );
         _snwprintf( path+wcslen( path ), MAX_PATH,  L"%s", L"\\vlc\\crashdump" );
-        crashdump_path = &path[0];
+        CheckCrashDump( &path[0] );
+        eh = InstallCrashHandler( &path[0] );
+#endif
     }
 
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
@@ -248,6 +257,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     MB_OK|MB_ICONERROR);
 
 
+#ifdef HAVE_BREAKPAD
+    ReleaseCrashHandler( eh );
+#endif
     for (int i = 0; i < argc; i++)
         free (argv[i]);
 
