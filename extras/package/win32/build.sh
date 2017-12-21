@@ -25,11 +25,12 @@ OPTIONS:
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
    -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
+   -b <url>      Enable breakpad support and send crash reports to this URL
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:" OPTION
+while getopts "hra:pcli:b:" OPTION
 do
      case $OPTION in
          h)
@@ -54,6 +55,9 @@ do
          ;;
          i)
              INSTALLER=$OPTARG
+         ;;
+         b)
+             BREAKPAD=$OPTARG
          ;;
      esac
 done
@@ -112,7 +116,10 @@ export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
 export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
 echo $PATH
 
-./bootstrap
+if [ ! -z "$BREAKPAD" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
+fi
+./bootstrap $CONTRIBFLAGS
 
 info "Configuring VLC"
 mkdir $SHORTARCH || true
@@ -125,6 +132,10 @@ fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
 fi
+if [ ! -z "$BREAKPAD" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
+fi
+
 ../extras/package/win32/configure.sh --host=$TRIPLET $CONFIGFLAGS
 
 info "Compiling"
