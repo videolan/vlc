@@ -779,13 +779,9 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
              ( i_table_id == 0x4e || /* Current/Following */
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
-        /* Do not attach decoders if we can't decode timestamps */
-        if( p_demux->p_sys->i_network_time > 0 )
-        {
-            if( !dvbpsi_eit_attach( h, i_table_id, i_extension,
-                                    (dvbpsi_eit_callback)EITCallBack, p_demux ) )
-                msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
-        }
+        if( !dvbpsi_eit_attach( h, i_table_id, i_extension,
+                                (dvbpsi_eit_callback)EITCallBack, p_demux ) )
+            msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
     }
     else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
