@@ -326,9 +326,6 @@ static void vout_FillRightPanel(subpicture_updater_sys_t *p_sys,
     float f_progress = 0;
     VLC_UNUSED(ry);
 
-    /* Format the hours */
-    char *psz_network = vout_OSDPrintTime(p_sys->time);
-
     /* Display the name of the channel. */
     *last_ptr = vout_OSDEpgText(p_sys->epg->psz_name,
                                 x,
@@ -393,18 +390,25 @@ static void vout_FillRightPanel(subpicture_updater_sys_t *p_sys,
     if (*last_ptr)
         last_ptr = &(*last_ptr)->p_next;
 
-    *last_ptr = vout_OSDEpgText(psz_network,
-                                rx,
-                                y + height * OSDEPG_ROW(0),
-                                height * EPGOSD_TEXTSIZE_NTWK,
-                                RGB_COLOR1);
-    if(*last_ptr)
+    /* Format the hours */
+    if(p_sys->time)
     {
-        (*last_ptr)->i_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT;
-        last_ptr = &(*last_ptr)->p_next;
+        char *psz_network = vout_OSDPrintTime(p_sys->time);
+        if(psz_network)
+        {
+            *last_ptr = vout_OSDEpgText(psz_network,
+                                        rx,
+                                        y + height * OSDEPG_ROW(0),
+                                        height * EPGOSD_TEXTSIZE_NTWK,
+                                        RGB_COLOR1);
+            free(psz_network);
+            if(*last_ptr)
+            {
+                (*last_ptr)->i_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT;
+                last_ptr = &(*last_ptr)->p_next;
+            }
+        }
     }
-
-    free(psz_network);
 }
 
 static subpicture_region_t * vout_BuildOSDEpg(subpicture_updater_sys_t *p_sys,
