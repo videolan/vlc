@@ -821,6 +821,12 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
                 p_region->updt.inner_align |= s->i_text_align;
             }
 
+            if( s->extent_h.unit != TTML_UNIT_UNKNOWN )
+                FillUpdaterCoords( s->extent_h, s->extent_v, false, &p_region->updt );
+
+            if( s->origin_h.unit != TTML_UNIT_UNKNOWN )
+                FillUpdaterCoords( s->origin_h, s->origin_v, true, &p_region->updt );
+
             ttml_style_Delete( s );
         }
 
