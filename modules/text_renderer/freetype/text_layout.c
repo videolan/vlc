@@ -1553,7 +1553,8 @@ int LayoutText( filter_t *p_filter,
 
             for( ; *pp_line; pp_line = &(*pp_line)->p_next )
             {
-                i_total_height += (*pp_line)->i_height;
+                /* only cut at max i_max_height + 1 line due to
+                 * approximate font sizing vs region size */
                 if( i_max_height > 0 && i_total_height > i_max_height )
                 {
                     i_total_height = i_max_height + 1;
@@ -1572,6 +1573,7 @@ int LayoutText( filter_t *p_filter,
                 {
                     i_max_face_height = (*pp_line)->i_height;
                 }
+                i_total_height += (*pp_line)->i_height;
             }
             i_paragraph_start = i + 1;
         }
