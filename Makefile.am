@@ -60,6 +60,11 @@ EXTRA_DIST += \
 	extras/tools/bootstrap \
 	extras/tools/packages.mak \
 	extras/tools/tools.mak \
+	extras/tools/SHA512SUMS \
+	extras/tools/bison-macOS-7df04f9.patch \
+	extras/tools/bison-macOS-c41f233c.patch \
+	extras/tools/libtool-2.4.2-bitcode.patch \
+	extras/tools/libtool-2.4.2-san.patch \
 	extras/tools/ragel-6.8-javacodegen.patch
 
 ###############################################################################
