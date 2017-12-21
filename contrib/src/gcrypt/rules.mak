@@ -74,6 +74,9 @@ endif
 endif
 
 .gcrypt: gcrypt
+	# Reconfiguring this requires a git repo to be available, to
+	# successfully produce a nonempty mym4_revision_dec.
+	git init && git commit --allow-empty -m "dummy commit"
 	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
