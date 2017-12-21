@@ -6,7 +6,9 @@ ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSIO
 
 ifndef HAVE_IOS
 ifndef HAVE_ANDROID
+ifndef HAVE_WINSTORE
 PKGS += asdcplib
+endif
 endif
 endif
 
