@@ -226,7 +226,8 @@ static ttml_length_t ttml_read_length( const char *psz )
     return len;
 }
 
-static ttml_length_t ttml_rebase_length( ttml_length_t value,
+static ttml_length_t ttml_rebase_length( unsigned i_cell_resolution,
+                                         ttml_length_t value,
                                          ttml_length_t reference )
 {
     if( value.unit == TTML_UNIT_PERCENT )
@@ -236,7 +237,7 @@ static ttml_length_t ttml_rebase_length( ttml_length_t value,
     }
     else if( value.unit == TTML_UNIT_CELL )
     {
-        value.i_value *= reference.i_value;
+        value.i_value *= reference.i_value / i_cell_resolution;
         value.unit = reference.unit;
     }
     // pixels as-is
@@ -389,30 +390,38 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
     }
 }
 
-static void FillUpdaterCoords( ttml_length_t h, ttml_length_t v,
+static void FillCoord( ttml_length_t v, int i_flag, float *p_val, int *pi_flags )
+{
+    *p_val = v.i_value;
+    if( v.unit == TTML_UNIT_PERCENT )
+    {
+        *p_val /= 100.0;
+        *pi_flags |= i_flag;
+    }
+    else *pi_flags &= ~i_flag;
+}
+
+static void FillUpdaterCoords( ttml_context_t *p_ctx, ttml_length_t h, ttml_length_t v,
                                bool b_origin, subpicture_updater_sys_region_t *p_updt )
 {
     ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
-    ttml_length_t x = ttml_rebase_length( h, base );
-    ttml_length_t y = ttml_rebase_length( v, base );
+    ttml_length_t x = ttml_rebase_length( p_ctx->i_cell_resolution_h, h, base );
+    ttml_length_t y = ttml_rebase_length( p_ctx->i_cell_resolution_v, v, base );
     if( b_origin )
     {
-        p_updt->origin.x = x.i_value / 100.0;
-        p_updt->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO;
-        p_updt->origin.y = y.i_value / 100.0;
-        p_updt->flags |= UPDT_REGION_ORIGIN_Y_IS_RATIO;
+        FillCoord( x, UPDT_REGION_ORIGIN_X_IS_RATIO, &p_updt->origin.x, &p_updt->flags );
+        FillCoord( y, UPDT_REGION_ORIGIN_Y_IS_RATIO, &p_updt->origin.y, &p_updt->flags );
         p_updt->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
     }
     else
     {
-        p_updt->extent.x = x.i_value / 100.0;
-        p_updt->flags |= UPDT_REGION_EXTENT_X_IS_RATIO;
-        p_updt->extent.y = y.i_value / 100.0;
-        p_updt->flags |= UPDT_REGION_EXTENT_Y_IS_RATIO;
+        FillCoord( x, UPDT_REGION_EXTENT_X_IS_RATIO, &p_updt->extent.x, &p_updt->flags );
+        FillCoord( y, UPDT_REGION_EXTENT_Y_IS_RATIO, &p_updt->extent.y, &p_updt->flags );
     }
 }
 
-static void FillRegionStyle( const char *psz_attr, const char *psz_val,
+static void FillRegionStyle( ttml_context_t *p_ctx,
+                             const char *psz_attr, const char *psz_val,
                              ttml_region_t *p_region )
 {
     if( !strcasecmp( "tts:displayAlign", psz_attr ) )
@@ -429,7 +438,7 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
     {
         ttml_length_t x, y;
         if( ttml_read_coords( psz_val, &x, &y ) )
-            FillUpdaterCoords( x, y, (psz_attr[4] == 'o'), &p_region->updt );
+            FillUpdaterCoords( p_ctx, x, y, (psz_attr[4] == 'o'), &p_region->updt );
     }
 }
 
@@ -441,7 +450,7 @@ static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_
      * Default value conversion must also not depend on attribute presence */
     text_style_t *p_text_style = p_ttml_style->font_style;
     ttml_length_t len = p_ttml_style->font_size;
-    len = ttml_rebase_length( len, p_ctx->root_extent_h );
+    len = ttml_rebase_length( p_ctx->i_cell_resolution_v, len, p_ctx->root_extent_v );
     if( len.unit == TTML_UNIT_CELL )
         p_text_style->f_font_relsize = 100.0 * len.i_value /
                     (p_ctx->i_cell_resolution_v * TTML_LINE_TO_HEIGHT_RATIO);
@@ -752,7 +761,7 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
                     for ( vlc_dictionary_entry_t* p_entry = merged.p_entries[i];
                           p_entry != NULL; p_entry = p_entry->p_next )
                     {
-                        FillRegionStyle( p_entry->psz_key, p_entry->p_value,
+                        FillRegionStyle( p_ctx, p_entry->psz_key, p_entry->p_value,
                                          p_region );
                     }
                 }
@@ -822,10 +831,10 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
             }
 
             if( s->extent_h.unit != TTML_UNIT_UNKNOWN )
-                FillUpdaterCoords( s->extent_h, s->extent_v, false, &p_region->updt );
+                FillUpdaterCoords( p_ctx, s->extent_h, s->extent_v, false, &p_region->updt );
 
             if( s->origin_h.unit != TTML_UNIT_UNKNOWN )
-                FillUpdaterCoords( s->origin_h, s->origin_v, true, &p_region->updt );
+                FillUpdaterCoords( p_ctx, s->origin_h, s->origin_v, true, &p_region->updt );
 
             ttml_style_Delete( s );
         }
