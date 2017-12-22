@@ -1083,7 +1083,7 @@ int PKL::ParseSigner(string p_node, int p_type)
 
     while( ( type = XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just parse until end of Signer node */
-            if ((node == p_node) && (type = XML_READER_ENDELEM))
+            if ((node == p_node) && (type == XML_READER_ENDELEM))
                 return 0;
     }
 
@@ -1103,7 +1103,7 @@ int PKL::ParseSignature(string p_node, int p_type)
 
     while( ( type = XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just parse until end of Signature node */
-            if ((node == p_node) && (type = XML_READER_ENDELEM))
+            if ((node == p_node) && (type == XML_READER_ENDELEM))
                 return 0;
     }
     msg_Err(this->p_demux, "Parse of Signature finished bad");
@@ -1509,7 +1509,7 @@ int CPL::DummyParse(string p_node, int p_type)
 
     while( ( type = XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just pase until end of input node */
-        if ((node == p_node) && (type = XML_READER_ENDELEM))
+        if ((node == p_node) && (type == XML_READER_ENDELEM))
             return 0;
     }
 
