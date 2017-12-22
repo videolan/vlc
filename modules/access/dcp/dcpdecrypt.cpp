@@ -523,7 +523,7 @@ error:
 int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
 {
     struct tag_info tag_inf;
-    gcry_mpi_t key_params[8];
+    gcry_mpi_t key_params[8] = { NULL };
     gcry_error_t err;
 
     /* parse the ASN1 structure */
