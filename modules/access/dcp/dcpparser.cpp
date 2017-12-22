@@ -981,6 +981,7 @@ int PKL::FindCPLs()
                 break;
             case -1:
                 /* error */
+                delete cpl;
                 return -1;
             case 0:
             default:
