@@ -174,7 +174,9 @@ class demux_sys_t
         frame_no( 0 ),
         frames_total( 0 ),
         i_video_reel( 0 ),
-        i_audio_reel( 0 ) {};
+        i_audio_reel( 0 ),
+        i_pts( 0 )
+    {}
 
     ~demux_sys_t()
     {
