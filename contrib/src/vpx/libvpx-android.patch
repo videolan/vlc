@@ -64,3 +64,13 @@ cpu-features.c. Additionally, we don't need to link with pthread.
      esac
    fi
  
+--- libvpx/vpx_ports/x86_abi_support.asm.orig	2017-12-22 14:13:01.624421364 +0100
++++ libvpx/vpx_ports/x86_abi_support.asm	2017-12-22 14:12:32.152908813 +0100
+@@ -393,6 +393,7 @@
+ 
+ ; On Android platforms use lrand48 when building postproc routines. Prior to L
+ ; rand() was not available.
++%define __ANDROID__
+ %if CONFIG_POSTPROC=1 || CONFIG_VP9_POSTPROC=1
+ %ifdef __ANDROID__
+ extern sym(lrand48)
