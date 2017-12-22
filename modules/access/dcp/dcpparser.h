@@ -198,7 +198,6 @@ private:
     uint32_t    ui_size;
     string      s_type;
     string      s_original_filename;
-    TrackType_t e_track_type;
     string      s_edit_rate;
     int         i_intrisic_duration;
     int         i_entry_point;
