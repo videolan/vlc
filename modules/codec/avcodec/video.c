@@ -1376,7 +1376,15 @@ void EndVideoDec( vlc_object_t *obj )
     avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
+    {
+        /* Hack to force the vout destruction. */
+        const video_format_t orig = p_dec->fmt_out.video;
+        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height =
+        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_visible_height = 64;
+        (void) decoder_UpdateVideoFormat(p_dec);
+        p_dec->fmt_out.video = orig;
         vlc_va_Delete( p_sys->p_va, &hwaccel_context );
+    }
 
     vlc_sem_destroy( &p_sys->sem_mt );
     free( p_sys );
