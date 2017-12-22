@@ -910,7 +910,7 @@ void CloseDcpAndMxf( demux_t *p_demux )
             p_sys->v_audioReader[i].p_AudioMXFReader->Close();
     }
 
-    delete( p_demux->p_sys );
+    delete( p_sys );
 }
 
 
