@@ -38,6 +38,15 @@ X264CONF += --enable-win32thread
 endif
 ifdef HAVE_CROSS_COMPILE
 X264CONF += --cross-prefix="$(HOST)-"
+ifdef HAVE_ANDROID
+# broken text relocations
+ifeq ($(ANDROID_ABI), x86)
+FFMPEGCONF +=  --disable-asm
+endif
+ifeq ($(ANDROID_ABI), x86_64)
+FFMPEGCONF +=  --disable-asm
+endif
+endif
 endif
 
 $(TARBALLS)/x262-git.tar.xz:
