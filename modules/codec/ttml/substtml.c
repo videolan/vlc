@@ -457,7 +457,7 @@ static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_
     else if( len.unit == TTML_UNIT_PERCENT )
         p_text_style->f_font_relsize = len.i_value;
     else if( len.unit == TTML_UNIT_PIXELS )
-        p_text_style->i_font_size = (int)( len.i_value + 0.5 );
+        p_text_style->i_font_size = len.i_value;
 }
 
 static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
