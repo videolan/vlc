@@ -297,17 +297,19 @@ static void FindMountPoint(char **file)
     struct stat st;
     if (lstat (bd_device, &st) == 0 && S_ISBLK (st.st_mode)) {
         FILE *mtab = setmntent ("/proc/self/mounts", "r");
-        struct mntent *m, mbuf;
-        char buf [8192];
+        if (mtab) {
+            struct mntent *m, mbuf;
+            char buf [8192];
 
-        while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
-            if (!strcmp (m->mnt_fsname, bd_device)) {
-                free(device);
-                *file = strdup(m->mnt_dir);
-                break;
+            while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
+                if (!strcmp (m->mnt_fsname, bd_device)) {
+                    free(device);
+                    *file = strdup(m->mnt_dir);
+                    break;
+                }
             }
+            endmntent (mtab);
         }
-        endmntent (mtab);
     }
     free(bd_device);
 
