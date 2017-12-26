@@ -1160,7 +1160,7 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
 
                     /* Close at matched parent node level due to unclosed tags
                      * like <b><v stuff>foo</b> */
-                    p_parent = webvtt_domnode_getParentByTag( p_parent->p_parent, psz_tagname );
+                    p_parent = webvtt_domnode_getParentByTag( p_parent, psz_tagname );
                     if( p_parent ) /* continue as parent next */
                         pp_append = &p_parent->p_next;
                     else /* back as top node */
