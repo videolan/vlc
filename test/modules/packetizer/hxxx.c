@@ -18,12 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef NDEBUG
- #undef NDEBUG
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
+#endif
+
+#ifdef NDEBUG
+ #undef NDEBUG
 #endif
 
 #include <assert.h>
