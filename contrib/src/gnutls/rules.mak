@@ -22,7 +22,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
-	$(APPLY) $(SRC)/gnutls/gnutls-mingw64.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-loadlibrary.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/gnutls/gnutls-winrt.patch
@@ -31,7 +30,6 @@ endif
 endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
-	$(APPLY) $(SRC)/gnutls/gnutls-android.patch
 endif
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 ifdef HAVE_MACOSX
