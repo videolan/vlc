@@ -18,9 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #ifdef NDEBUG
  #undef NDEBUG
 #endif
+
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_block.h>
