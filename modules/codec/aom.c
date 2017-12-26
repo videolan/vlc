@@ -35,11 +35,21 @@
 #include <aom/aom_decoder.h>
 #include <aom/aomdx.h>
 
+#ifdef ENABLE_SOUT
+# include <aom/aomcx.h>
+# include <aom/aom_image.h>
+#endif
+
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
+#ifdef ENABLE_SOUT
+static int OpenEncoder(vlc_object_t *);
+static void CloseEncoder(vlc_object_t *);
+static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -52,6 +62,13 @@ vlc_module_begin ()
     set_callbacks(OpenDecoder, CloseDecoder)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
+#ifdef ENABLE_SOUT
+    add_submodule()
+    set_shortname("aom")
+    set_capability("encoder", 60)
+    set_description(N_("AOM video encoder"))
+    set_callbacks(OpenEncoder, CloseEncoder)
+#endif
 vlc_module_end ()
 
 static void aom_err_msg(vlc_object_t *this, aom_codec_ctx_t *ctx,
@@ -307,3 +324,159 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     free(sys);
 }
+
+#ifdef ENABLE_SOUT
+
+/*****************************************************************************
+ * encoder_sys_t: libaom encoder descriptor
+ *****************************************************************************/
+struct encoder_sys_t
+{
+    struct aom_codec_ctx ctx;
+};
+
+/*****************************************************************************
+ * OpenEncoder: probe the encoder
+ *****************************************************************************/
+static int OpenEncoder(vlc_object_t *p_this)
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys;
+
+    if (p_enc->fmt_out.i_codec != VLC_CODEC_AV1)
+        return VLC_EGENERIC;
+
+    /* Allocate the memory needed to store the encoder's structure */
+    p_sys = malloc(sizeof(*p_sys));
+    if (p_sys == NULL)
+        return VLC_ENOMEM;
+
+    p_enc->p_sys = p_sys;
+
+    const struct aom_codec_iface *iface = &aom_codec_av1_cx_algo;
+
+    struct aom_codec_enc_cfg enccfg = {};
+    aom_codec_enc_config_default(iface, &enccfg, 0);
+    enccfg.g_threads = __MIN(vlc_GetCPUCount(), 4);
+    enccfg.g_w = p_enc->fmt_in.video.i_visible_width;
+    enccfg.g_h = p_enc->fmt_in.video.i_visible_height;
+
+    int enc_flags;
+    switch (p_enc->fmt_in.i_codec) {
+        case VLC_CODEC_I420_10L:
+            enc_flags = AOM_CODEC_USE_HIGHBITDEPTH;
+            /* Profile 1: 10-bit and 12-bit color only, with 4:2:0 sampling. */
+            enccfg.g_profile = 2;
+            enccfg.g_bit_depth = 10;
+            break;
+        case VLC_CODEC_I420:
+            enc_flags = 0;
+            /* Profile 0: 8-bit 4:2:0 only. */
+            enccfg.g_profile = 0;
+            enccfg.g_bit_depth = 8;
+            break;
+        default:
+            msg_Err(p_this, "Unsupported input format %s",
+                    vlc_fourcc_GetDescription(VIDEO_ES, p_enc->fmt_in.i_codec));
+            free(p_sys);
+            return VLC_EGENERIC;
+    }
+
+    msg_Dbg(p_this, "AV1: using libaom version %s (build options %s)",
+        aom_codec_version_str(), aom_codec_build_config());
+
+    struct aom_codec_ctx *ctx = &p_sys->ctx;
+    if (aom_codec_enc_init(ctx, iface, &enccfg, enc_flags) != AOM_CODEC_OK)
+    {
+        AOM_ERR(p_this, ctx, "Failed to initialize encoder");
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+
+    p_enc->pf_encode_video = Encode;
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************/
+static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    struct aom_codec_ctx *ctx = &p_sys->ctx;
+
+    if (!p_pict) return NULL;
+
+    aom_image_t img = {};
+    unsigned i_w = p_enc->fmt_in.video.i_visible_width;
+    unsigned i_h = p_enc->fmt_in.video.i_visible_height;
+    const aom_img_fmt_t img_fmt = p_enc->fmt_in.i_codec == VLC_CODEC_I420_10L ?
+        AOM_IMG_FMT_I42016 : AOM_IMG_FMT_I420;
+
+    /* Create and initialize the aom_image */
+    if (!aom_img_alloc(&img, img_fmt, i_w, i_h, 16))
+    {
+        AOM_ERR(p_enc, ctx, "Failed to allocate image");
+        return NULL;
+    }
+
+    for (int plane = 0; plane < p_pict->i_planes; plane++) {
+        uint8_t *src = p_pict->p[plane].p_pixels;
+        uint8_t *dst = img.planes[plane];
+        int src_stride = p_pict->p[plane].i_pitch;
+        int dst_stride = img.stride[plane];
+
+        int size = __MIN(src_stride, dst_stride);
+        for (int line = 0; line < p_pict->p[plane].i_visible_lines; line++)
+        {
+            /* FIXME: do this in-place */
+            memcpy(dst, src, size);
+            src += src_stride;
+            dst += dst_stride;
+        }
+    }
+
+    aom_codec_err_t res = aom_codec_encode(ctx, &img, p_pict->date, 1, 0,
+                                           AOM_DL_GOOD_QUALITY);
+    if (res != AOM_CODEC_OK) {
+        AOM_ERR(p_enc, ctx, "Failed to encode frame");
+        aom_img_free(&img);
+        return NULL;
+    }
+
+    const aom_codec_cx_pkt_t *pkt = NULL;
+    aom_codec_iter_t iter = NULL;
+    block_t *p_out = NULL;
+    while ((pkt = aom_codec_get_cx_data(ctx, &iter)) != NULL)
+    {
+        if (pkt->kind == AOM_CODEC_CX_FRAME_PKT)
+        {
+            int keyframe = pkt->data.frame.flags & AOM_FRAME_IS_KEY;
+            block_t *p_block = block_Alloc(pkt->data.frame.sz);
+
+            /* FIXME: do this in-place */
+            memcpy(p_block->p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
+            p_block->i_dts = p_block->i_pts = pkt->data.frame.pts;
+            if (keyframe)
+                p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+            block_ChainAppend(&p_out, p_block);
+        }
+    }
+    aom_img_free(&img);
+    return p_out;
+}
+
+/*****************************************************************************
+ * CloseEncoder: encoder destruction
+ *****************************************************************************/
+static void CloseEncoder(vlc_object_t *p_this)
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    if (aom_codec_destroy(&p_sys->ctx))
+        AOM_ERR(p_this, &p_sys->ctx, "Failed to destroy codec");
+    free(p_sys);
+}
+
+#endif  /* ENABLE_SOUT */

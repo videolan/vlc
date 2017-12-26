@@ -41,7 +41,7 @@ $Id$
  * android_logger: logger output to native Android logs (adb logcat)
  * android_window: Android direct/undirect rendering video output
  * antiflicker: anti-flicker video filter
- * aom: AOM decoder (AV1)
+ * aom: AOM encoder and decoder (AV1)
  * araw: Pseudo audio decoder for raw PCM
  * archive: libarchive based access and stream filter and stream_extractor
  * aribcam: ARIB STD-B25 decoder/virtual CAM

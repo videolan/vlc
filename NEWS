@@ -9,6 +9,8 @@ Platform support changes:
      - Android 4.1.x or later (API-16)
      - GCC 5.0 or Clang 3.4 (or equivalent)
 
+Codecs:
+ * Support for experimental AV1 video encoding
 
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------
