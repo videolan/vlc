@@ -1,0 +1,12 @@
+--- gnutls/lib/system/fastopen.c	2017-12-26 18:00:54.041282870 +0100
++++ gnutls/lib/system/fastopen.c.new	2017-12-26 18:00:09.209281540 +0100
+@@ -36,7 +36,8 @@
+ #endif
+ 
+ /* TCP Fast Open on OSX behaves differently from Linux, so define these helpers */
+-#if defined __APPLE__ && defined __MACH__ && defined CONNECT_DATA_IDEMPOTENT && defined CONNECT_RESUME_ON_READ_WRITE
++#if 0
++// defined __APPLE__ && defined __MACH__ && defined CONNECT_DATA_IDEMPOTENT && defined CONNECT_RESUME_ON_READ_WRITE
+ # define TCP_FASTOPEN_OSX
+ #elif defined TCP_FASTOPEN && defined MSG_FASTOPEN
+ # define TCP_FASTOPEN_LINUX
