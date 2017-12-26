@@ -36,6 +36,7 @@ ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gnutls/mac-keychain-lookup.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-osx.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-getentropy-osx.patch
+	$(APPLY) $(SRC)/gnutls/gnutls-disable-connectx-macos.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-libidn.patch
 	$(call pkg_static,"lib/gnutls.pc.in")
