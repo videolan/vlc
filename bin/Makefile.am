@@ -27,6 +27,7 @@ vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
 if !HAVE_WIN32
 vlc_SOURCES = vlc.c override.c
 vlc_LDADD += $(LIBDL)
+vlc_CPPFLAGS = $(AM_CPPFLAGS)
 else
 vlc_SOURCES = winvlc.c
 vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
