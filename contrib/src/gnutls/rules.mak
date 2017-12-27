@@ -33,7 +33,6 @@ ifdef HAVE_ANDROID
 endif
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 ifdef HAVE_MACOSX
-	$(APPLY) $(SRC)/gnutls/mac-keychain-lookup.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-osx.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-getentropy-osx.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-connectx-macos.patch
