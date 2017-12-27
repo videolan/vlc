@@ -53,7 +53,7 @@ $Id$
  * audiobargraph_a: audiobargraph audio plugin
  * audiobargraph_v: audiobargraph video plugin
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
- * audiotoolbox_midi: AudioToolbox MIDI decoder plugin for macOS
+ * audiotoolboxmidi: AudioToolbox MIDI decoder plugin for macOS
  * audiounit_ios: AudioUnit output plugin for iOS
  * auhal: Audio output for Mac OS X based on the AUHAL API
  * avahi: Zeroconf services discovery
