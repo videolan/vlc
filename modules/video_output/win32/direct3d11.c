@@ -1114,15 +1114,23 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
 #endif
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
-            D3D11_TEXTURE2D_DESC texDesc;
+            D3D11_TEXTURE2D_DESC srcDesc,texDesc;
             if (!is_d3d11_opaque(picture->format.i_chroma))
                 Direct3D11UnmapPoolTexture(picture);
+            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
             ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
+            D3D11_BOX box = {
+                .top = 0,
+                .bottom = __MIN(srcDesc.Height, texDesc.Height),
+                .left = 0,
+                .right = __MIN(srcDesc.Width, texDesc.Width),
+                .back = 1,
+            };
             ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev.d3dcontext,
                                                       sys->stagingSys.resource[KNOWN_DXGI_INDEX],
                                                       0, 0, 0, 0,
                                                       p_sys->resource[KNOWN_DXGI_INDEX],
-                                                      p_sys->slice_index, NULL);
+                                                      p_sys->slice_index, &box);
         }
         else
         {
@@ -2008,7 +2016,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     sys->picQuad.i_width  = fmt->i_width;
     sys->picQuad.i_height = fmt->i_height;
-    if (is_d3d11_opaque(fmt->i_chroma))
+    if (!sys->legacy_shader && is_d3d11_opaque(fmt->i_chroma))
     {
         sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
