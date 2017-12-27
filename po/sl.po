@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-11 00:15+0100\n"
+"POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2017-10-08 10:16+0000\n"
 "Last-Translator: Rok Žerdin <zerdin.rok1@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/yaron/vlc-trans/language/"
@@ -50,7 +50,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
-#: modules/gui/qt/components/simple_preferences.cpp:222
+#: modules/gui/qt/components/simple_preferences.cpp:223
 #: modules/gui/qt/menus.cpp:1090
 msgid "Interface"
 msgstr "Vmesnik"
@@ -88,10 +88,10 @@ msgstr "Nastavitve hitrih tipk"
 #: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
-#: modules/gui/macosx/VLCPlaylistInfo.m:101
+#: modules/gui/macosx/VLCPlaylistInfo.m:96
 #: modules/gui/macosx/VLCSimplePrefsController.m:222
 #: modules/gui/qt/components/info_panels.cpp:572
-#: modules/gui/qt/components/simple_preferences.cpp:224
+#: modules/gui/qt/components/simple_preferences.cpp:225
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
 #: modules/stream_out/es.c:94 modules/stream_out/transcode/transcode.c:182
 #: share/lua/http/dialogs/create_stream.html:150
@@ -120,12 +120,12 @@ msgstr "Filtri zvoka so uporabljeni pri obdelavi zvokovnega pretoka."
 msgid "Audio resampler"
 msgstr "Zvokovni prevzorčevalnik"
 
-#: include/vlc_config_cat.h:63 src/audio_output/output.c:258
+#: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
 msgid "Visualizations"
 msgstr "Predočenje"
 
-#: include/vlc_config_cat.h:64 src/audio_output/output.c:319
+#: include/vlc_config_cat.h:64 src/audio_output/output.c:321
 #: src/libvlc-module.c:206
 msgid "Audio visualizations"
 msgstr "Predočenje zvoka"
@@ -139,7 +139,7 @@ msgid "General settings for audio output modules."
 msgstr "Splošne nastavitve za module zvokovnih odvodov."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2009
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:183
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
 msgstr "Razno"
@@ -156,13 +156,13 @@ msgstr "Različne nastavitve zvoka in modulov."
 #: modules/gui/macosx/VLCSimplePrefsController.m:224
 #: modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/gui/qt/components/info_panels.cpp:573
-#: modules/gui/qt/components/simple_preferences.cpp:226
+#: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:106 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:107 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
-#: modules/gui/qt/ui/sprefs_video.h:324
+#: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Video"
 msgstr "Video"
 
@@ -574,7 +574,7 @@ msgid "Search"
 msgstr "Poišči"
 
 #: include/vlc_intf_strings.h:99
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:268
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:281
 #: modules/gui/qt/ui/video_effects.h:1292
 msgid "Waves"
 msgstr "Valovanje"
@@ -643,67 +643,67 @@ msgstr "Filtriranje zvoka je spodletelo"
 msgid "The maximum number of filters (%u) was reached."
 msgstr "Doseženo je največje dovoljeno število filtrov (%u)."
 
-#: src/audio_output/output.c:261 src/config/core.c:380 src/input/es_out.c:943
+#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
 #: modules/gui/macosx/VLCMainWindow.m:1006 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "Onemogoči"
 
-#: src/audio_output/output.c:264 modules/visualization/visual/visual.c:142
+#: src/audio_output/output.c:266 modules/visualization/visual/visual.c:142
 msgid "Spectrometer"
 msgstr "Krožni spektrometer"
 
-#: src/audio_output/output.c:267
+#: src/audio_output/output.c:269
 msgid "Scope"
 msgstr "Osciloskopska krivulja"
 
-#: src/audio_output/output.c:270
+#: src/audio_output/output.c:272
 msgid "Spectrum"
 msgstr "Stolpčni spekter"
 
-#: src/audio_output/output.c:273
+#: src/audio_output/output.c:275
 #, fuzzy
 msgid "VU meter"
 msgstr "VU Meter"
 
-#: src/audio_output/output.c:312 src/libvlc-module.c:201
+#: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
 msgstr "Filtri zvoka"
 
-#: src/audio_output/output.c:325
+#: src/audio_output/output.c:327
 msgid "Replay gain"
 msgstr "Ponovno predvajanje"
 
-#: src/audio_output/output.c:343 modules/gui/macosx/VLCMainMenu.m:410
+#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
 msgid "Stereo audio mode"
 msgstr "Stereo način zvoka"
 
-#: src/audio_output/output.c:419
+#: src/audio_output/output.c:421
 #, fuzzy
 msgid "Original"
 msgstr "Izvorni ID"
 
-#: src/audio_output/output.c:425 src/libvlc-module.c:197
+#: src/audio_output/output.c:427 src/libvlc-module.c:197
 msgid "Dolby Surround"
 msgstr "Dolby Surround"
 
-#: src/audio_output/output.c:430 src/libvlc-module.c:196
+#: src/audio_output/output.c:432 src/libvlc-module.c:196
 #: modules/access/alsa.c:38 modules/access/oss.c:64
 #: modules/access/v4l2/v4l2.c:268 modules/audio_output/alsa.c:76
 #: modules/codec/twolame.c:70
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/audio_output/output.c:439 src/input/es_out.c:3226
+#: src/audio_output/output.c:441 src/input/es_out.c:3226
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
 #: modules/control/gestures.c:85
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:204
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:277
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:299
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:217
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:290
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:312
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1231
@@ -712,26 +712,26 @@ msgstr "Stereo"
 msgid "Left"
 msgstr "Levo"
 
-#: src/audio_output/output.c:442 src/libvlc-module.c:197
+#: src/audio_output/output.c:444 src/libvlc-module.c:197
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 src/misc/actions.c:109
 #: modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
 #: modules/control/gestures.c:85
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:205
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:279
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:301
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:218
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:292
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:314
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1232
 msgid "Right"
 msgstr "Desno"
 
-#: src/audio_output/output.c:446 src/libvlc-module.c:196
+#: src/audio_output/output.c:448 src/libvlc-module.c:196
 msgid "Reverse stereo"
 msgstr "Obratni stereo"
 
-#: src/audio_output/output.c:454 src/libvlc-module.c:198
+#: src/audio_output/output.c:456 src/libvlc-module.c:198
 #: modules/audio_filter/equalizer_presets.h:55
 msgid "Headphones"
 msgstr "Slušalke"
@@ -741,6 +741,7 @@ msgstr "Slušalke"
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Samodejno"
 
@@ -913,47 +914,47 @@ msgstr "Neznana napaka"
 msgid "Bookmark %i"
 msgstr "Zaznamek %i"
 
-#: src/input/decoder.c:1875
+#: src/input/decoder.c:1881
 msgid "No description for this codec"
 msgstr "Za ta kodek opis ni na voljo."
 
-#: src/input/decoder.c:1877
+#: src/input/decoder.c:1883
 msgid "Codec not supported"
 msgstr "Kodek ni podprt"
 
-#: src/input/decoder.c:1878
+#: src/input/decoder.c:1884
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
 msgstr "Zapisa »%4.4s« (%s) ni mogoče odkodirati."
 
-#: src/input/decoder.c:1882
+#: src/input/decoder.c:1888
 msgid "Unidentified codec"
 msgstr "Nedoločljiv kodek"
 
-#: src/input/decoder.c:1883
+#: src/input/decoder.c:1889
 msgid "VLC could not identify the audio or video codec"
 msgstr "Ni mogoče določiti zvokovnega oziroma video kodeka."
 
-#: src/input/decoder.c:1894
+#: src/input/decoder.c:1900
 msgid "packetizer"
 msgstr "paketnik"
 
-#: src/input/decoder.c:1894
+#: src/input/decoder.c:1900
 msgid "decoder"
 msgstr "odkodirnik"
 
-#: src/input/decoder.c:1902 src/input/decoder.c:2183
+#: src/input/decoder.c:1908 src/input/decoder.c:2189
 #: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:885
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "Pretakanje / prekodiranje je spodletelo"
 
-#: src/input/decoder.c:1903
+#: src/input/decoder.c:1909
 #, c-format
 msgid "VLC could not open the %s module."
 msgstr "Ni mogoče odpreti modula %s."
 
-#: src/input/decoder.c:2184
+#: src/input/decoder.c:2190
 msgid "VLC could not open the decoder module."
 msgstr "Ni mogoče odpreti enote odkodiranja."
 
@@ -1012,7 +1013,7 @@ msgstr "Kodek"
 #: src/input/es_out.c:3076 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:304
-#: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:529
+#: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "Jezik"
 
@@ -1088,10 +1089,9 @@ msgstr "Velikost medpomnilnika v sekundah"
 
 #: src/input/es_out.c:3148 src/input/es_out.c:3151 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
-#: modules/access/screen/wayland.c:452 modules/access/screen/xcb.c:39
-#: modules/access/shm.c:42 modules/access/timecode.c:34
-#: modules/access/v4l2/v4l2.c:70 modules/access/vdr.c:78
-#: modules/access/vnc.c:59 modules/demux/image.c:66
+#: modules/access/screen/xcb.c:39 modules/access/shm.c:42
+#: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
+#: modules/access/vdr.c:78 modules/access/vnc.c:59 modules/demux/image.c:66
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:164
 #: modules/video_filter/fps.c:42
 msgid "Frame rate"
@@ -1200,8 +1200,8 @@ msgstr "Polni basi"
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:275
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:297
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:288
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:310
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 msgid "Center"
@@ -1683,7 +1683,7 @@ msgid "Media (player) role for operating system policy."
 msgstr ""
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:261
-#: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:426
+#: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Enable audio"
 msgstr "Omogoči zvok"
 
@@ -1815,7 +1815,7 @@ msgstr ""
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
 #: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
-#: modules/gui/qt/components/simple_preferences.cpp:65
+#: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
 #: modules/video_output/xcb/xvideo.c:821 modules/gui/qt/ui/profiles.h:744
@@ -1945,7 +1945,7 @@ msgstr ""
 "najustreznejšega razpoložljivega načina."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:346
-#: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:312
+#: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:314
 msgid "Enable video"
 msgstr "Omogoči sliko videa"
 
@@ -2036,9 +2036,9 @@ msgstr ""
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:203
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:281
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:303
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:216
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:294
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:316
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1229
@@ -2049,9 +2049,9 @@ msgstr "Na vrhu"
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:283
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:305
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:219
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:296
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:318
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1233
@@ -2060,8 +2060,8 @@ msgstr "Na dnu"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:285
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:307
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:298
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:320
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Top-Left"
@@ -2069,8 +2069,8 @@ msgstr "Zgoraj levo"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:287
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:309
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:300
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:322
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Top-Right"
@@ -2078,8 +2078,8 @@ msgstr "Zgoraj desno"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:289
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:311
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:302
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:324
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Left"
@@ -2087,8 +2087,8 @@ msgstr "Spodaj levo"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:291
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:313
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:304
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:326
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Right"
@@ -2599,10 +2599,12 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
 #: modules/audio_output/directsound.c:1031 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:85
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
 #: modules/gui/macosx/VLCMainMenu.m:592
 #: modules/gui/macosx/VLCSimplePrefsController.m:649
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:51
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
 #: modules/gui/macosx/prefs_widgets.m:1217
 #: modules/gui/macosx/prefs_widgets.m:1274
 #: modules/gui/qt/components/preferences_widgets.cpp:546
@@ -2612,7 +2614,7 @@ msgid "Default"
 msgstr "Privzeto"
 
 #: src/libvlc-module.c:544
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:214
 #: modules/gui/macosx/VLCMainWindow.m:1004
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
@@ -2836,7 +2838,7 @@ msgid "The stream will run this duration (in seconds)."
 msgstr ""
 "Nastavitev določa čas trajanja predvajanja od točke začetka (v sekundah)."
 
-#: src/libvlc-module.c:650
+#: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
 msgstr "Hitro iskanje"
 
@@ -3721,7 +3723,7 @@ msgstr "Predvajalnik VLC je zagnan prek datotečne vezi"
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr "Predvajalnik VLC je zagnan prek sistemske datotečne vezi."
 
-#: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:551
+#: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
 msgstr "Zagon prek upravljalnika datotek ne odpre novega primerka"
 
@@ -3743,7 +3745,7 @@ msgstr ""
 "prav tako prevzemajo procesorsko moč. Bodite pozorni, da lahko v posebnih "
 "primerih (napake) VLC zasiči procesor in s tem povzroči neodzivnost sistema."
 
-#: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:554
+#: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
 msgstr "Novi predmeti se dodajo na trenutni seznam predvajanja"
 
@@ -3799,7 +3801,7 @@ msgstr "Vrednost predpomnjenja za kamere in mikrofone (v milisekundah)."
 
 #: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
 #: modules/gui/qt/dialogs/firstrun.cpp:95
-#: modules/gui/qt/ui/sprefs_interface.h:564
+#: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
 msgstr "Omogoči dostop do omrežja metapodatov"
 
@@ -3964,7 +3966,7 @@ msgstr ""
 "Zbirka predstavnih datotek se samodejno shrani in se ponovno naloži ob "
 "ponovnem zagonu predvajalnika."
 
-#: src/libvlc-module.c:1192 modules/gui/qt/ui/sprefs_interface.h:552
+#: src/libvlc-module.c:1192 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Display playlist tree"
 msgstr "Prikaži zgradbo seznama predvajanja"
 
@@ -3981,7 +3983,7 @@ msgstr ""
 "Nastavitve predstavljajo splošna določila tipkovnih povezav imenovanih "
 "»hitre tipke«"
 
-#: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:103
+#: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Ignore"
 msgstr "Prezri"
 
@@ -4032,7 +4034,7 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
 #: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:501
 #: modules/gui/qt/components/controller.hpp:108
-#: modules/gui/qt/ui/sprefs_video.h:314
+#: modules/gui/qt/ui/sprefs_video.h:318
 msgid "Fullscreen"
 msgstr "Celozaslonski način"
 
@@ -4152,8 +4154,8 @@ msgstr "Izbor hitre tipke za prekinitev predvajanja."
 
 #: src/libvlc-module.c:1246 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:273
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:295
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:286
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:308
 #: modules/spu/marq.c:151 modules/spu/rss.c:198
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 #: modules/gui/qt/ui/video_effects.h:1279
@@ -5320,9 +5322,8 @@ msgstr "%.1f GiB"
 msgid "%.1f MiB"
 msgstr "%.1f MiB"
 
-#: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:148
-#: modules/gui/macosx/VLCPlaylistInfo.m:150
-#: modules/gui/macosx/VLCPlaylistInfo.m:160
+#: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:143
+#: modules/gui/macosx/VLCPlaylistInfo.m:145
 #, c-format
 msgid "%.1f KiB"
 msgstr "%.1f KiB"
@@ -5342,11 +5343,11 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Napaka med odpiranjem »%s« za zapisovanje"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2702
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:479
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:533
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:788
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:834
+#: modules/demux/avi/avi.c:2716
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:869
 #: modules/gui/macosx/VLCBookmarksWindowController.m:89
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:153
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:182
@@ -5364,8 +5365,8 @@ msgstr "Napaka med odpiranjem »%s« za zapisovanje"
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:739
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:807
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:861
 #: modules/gui/macosx/prefs.m:189
 #: modules/gui/qt/components/open_panels.cpp:1360
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
@@ -6120,7 +6121,7 @@ msgstr "Samodejna prilagoditev velikosti videa"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:429
 #: modules/gui/macosx/VLCMainMenu.m:430
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:180
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:193
 #: modules/video_filter/croppadd.c:87 modules/gui/qt/ui/video_effects.h:1239
 msgid "Crop"
 msgstr "Obrez"
@@ -6283,11 +6284,11 @@ msgstr "Blu-ray"
 msgid "Blu-ray Disc support (libbluray)"
 msgstr "Podpora diskom Blu-Ray (libbluray)"
 
-#: modules/access/bluray.c:715
+#: modules/access/bluray.c:717
 msgid "Path doesn't appear to be a Blu-ray"
 msgstr "Pot ni videti kot pot Blu-ray"
 
-#: modules/access/bluray.c:730
+#: modules/access/bluray.c:732
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
@@ -6295,33 +6296,33 @@ msgstr ""
 "Ta disk Blu-ray za odkodiranje AACS potrebuje knjižnico, ki ni nameščena na "
 "vašem sistemu."
 
-#: modules/access/bluray.c:736
+#: modules/access/bluray.c:738
 msgid "Blu-ray Disc is corrupted."
 msgstr "Disk Blu-ray je okvarjen."
 
-#: modules/access/bluray.c:738
+#: modules/access/bluray.c:740
 msgid "Missing AACS configuration file!"
 msgstr "Nastavitvena datoteka AACS manjka!"
 
-#: modules/access/bluray.c:740
+#: modules/access/bluray.c:742
 msgid "No valid processing key found in AACS config file."
 msgstr ""
 "V nastavitveni datoteki AACS ni bilo najden veljaven ključ za obdelavo."
 
-#: modules/access/bluray.c:742
+#: modules/access/bluray.c:744
 msgid "No valid host certificate found in AACS config file."
 msgstr ""
 "V nastavitveni datoteki AACS ni bilo najdeno veljavno gostiteljsko potrdilo."
 
-#: modules/access/bluray.c:744
+#: modules/access/bluray.c:746
 msgid "AACS Host certificate revoked."
 msgstr "Gostiteljsko potrdilo AACS je bilo preklicano."
 
-#: modules/access/bluray.c:746
+#: modules/access/bluray.c:748
 msgid "AACS MMC failed."
 msgstr "AACS MMC je spodletel."
 
-#: modules/access/bluray.c:756
+#: modules/access/bluray.c:758
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
@@ -6329,43 +6330,43 @@ msgstr ""
 "Ta disk Blu-ray za odkodiranje BD+ potrebuje knjižnico, ki ni nameščena na "
 "vašem sistemu."
 
-#: modules/access/bluray.c:759
+#: modules/access/bluray.c:761
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 "Vaša sistemska knjižnica za odkodiranje BD+ ne deluje. Ali manjka nastavitev?"
 
-#: modules/access/bluray.c:792
+#: modules/access/bluray.c:794
 #, fuzzy
 msgid "Java required"
 msgstr "Zahtevan je SDP"
 
-#: modules/access/bluray.c:793
+#: modules/access/bluray.c:795
 #, c-format
 msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
 
-#: modules/access/bluray.c:794
+#: modules/access/bluray.c:796
 msgid "Java was not found on your system."
 msgstr ""
 
-#: modules/access/bluray.c:817
+#: modules/access/bluray.c:819
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
 "Začenjanje predvajanja pogona Bluray je spodletelo. Poskusite predvajati "
 "vsebino brez omogočenih menijev."
 
-#: modules/access/bluray.c:845 modules/access/bluray.c:2279
-#: modules/access/bluray.c:2284
+#: modules/access/bluray.c:847 modules/access/bluray.c:2281
+#: modules/access/bluray.c:2286
 msgid "Blu-ray error"
 msgstr "Napaka na pogonu Blu-ray"
 
-#: modules/access/bluray.c:1667
+#: modules/access/bluray.c:1669
 msgid "Top Menu"
 msgstr "Vrhnji meni"
 
-#: modules/access/bluray.c:1670
+#: modules/access/bluray.c:1672
 msgid "First Play"
 msgstr "Prvo predvajanje"
 
@@ -7500,7 +7501,7 @@ msgid "File"
 msgstr "Datoteka"
 
 #: modules/access/fs.c:44 modules/demux/directory.c:93
-#: modules/gui/qt/ui/sprefs_video.h:329
+#: modules/gui/qt/ui/sprefs_video.h:331
 msgid "Directory"
 msgstr "Mapa"
 
@@ -7764,7 +7765,7 @@ msgstr "Število kanalov osnovnega zvokovnega pretoka"
 
 #: modules/access/imem.c:83 modules/access/v4l2/v4l2.c:65
 #: modules/demux/rawvid.c:47
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:247
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
 #: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
@@ -7834,7 +7835,7 @@ msgid "Address of the release callback function"
 msgstr "Naslov odzivne funkcije release"
 
 #: modules/access/imem.c:113
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:244
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:235
 #: modules/gui/qt/components/extended_panels.cpp:1296
 msgid "Size"
 msgstr "Velikost"
@@ -8395,33 +8396,27 @@ msgstr ""
 "Izboljšanje zajemanja z deljenjem zaslona na dele določene višine (16 je "
 "primerna vrednost, 0 pa nastavitev onemogoča)."
 
-#: modules/access/screen/screen.c:55 modules/access/screen/wayland.c:460
-#: modules/access/screen/xcb.c:47
+#: modules/access/screen/screen.c:55 modules/access/screen/xcb.c:47
 msgid "Region top row"
 msgstr "Zogrnja vrtica območja"
 
-#: modules/access/screen/screen.c:57 modules/access/screen/wayland.c:462
-#: modules/access/screen/xcb.c:49
+#: modules/access/screen/screen.c:57 modules/access/screen/xcb.c:49
 msgid "Ordinate of the capture region in pixels."
 msgstr "Ordinata območja zajema v slikovnih točkah."
 
-#: modules/access/screen/screen.c:59 modules/access/screen/wayland.c:456
-#: modules/access/screen/xcb.c:43
+#: modules/access/screen/screen.c:59 modules/access/screen/xcb.c:43
 msgid "Region left column"
 msgstr "Levi stolpec območja"
 
-#: modules/access/screen/screen.c:61 modules/access/screen/wayland.c:458
-#: modules/access/screen/xcb.c:45
+#: modules/access/screen/screen.c:61 modules/access/screen/xcb.c:45
 msgid "Abscissa of the capture region in pixels."
 msgstr "Abscisa območja zajema v slikovnih točkah."
 
-#: modules/access/screen/screen.c:63 modules/access/screen/wayland.c:464
-#: modules/access/screen/xcb.c:51
+#: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
 msgstr "Širina regije zajema"
 
-#: modules/access/screen/screen.c:65 modules/access/screen/wayland.c:468
-#: modules/access/screen/xcb.c:55
+#: modules/access/screen/screen.c:65 modules/access/screen/xcb.c:55
 msgid "Capture region height"
 msgstr "Višina regije zajema"
 
@@ -8464,8 +8459,8 @@ msgstr "Kazalo zaslona (1, 2, 3, ...). Nadomstno za ID zaslona."
 msgid "Screen Input"
 msgstr "Zaslonski dovod"
 
-#: modules/access/screen/screen.c:99 modules/access/screen/wayland.c:473
-#: modules/access/screen/xcb.c:70 modules/gui/macosx/VLCMainMenu.m:600
+#: modules/access/screen/screen.c:99 modules/access/screen/xcb.c:70
+#: modules/gui/macosx/VLCMainMenu.m:600
 #: modules/gui/macosx/VLCOpenWindowController.m:207
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
@@ -8474,23 +8469,18 @@ msgstr "Zaslonski dovod"
 msgid "Screen"
 msgstr "Prikaz na zaslonu"
 
-#: modules/access/screen/wayland.c:454 modules/access/screen/xcb.c:41
-#: modules/access/shm.c:44 modules/access/vnc.c:60
+#: modules/access/screen/xcb.c:41 modules/access/shm.c:44
+#: modules/access/vnc.c:60
 msgid "How many times the screen content should be refreshed per second."
 msgstr "Kako pogosto naj se vsako sekundo vsebina zaslona osveži."
 
-#: modules/access/screen/wayland.c:466 modules/access/screen/xcb.c:53
+#: modules/access/screen/xcb.c:53
 msgid "Pixel width of the capture region, or 0 for full width"
 msgstr "Širina regije zajema v pikslih ali 0 za celotno širino"
 
-#: modules/access/screen/wayland.c:470 modules/access/screen/xcb.c:57
+#: modules/access/screen/xcb.c:57
 msgid "Pixel height of the capture region, or 0 for full height"
 msgstr "Višina regije zajema v pikslih ali 0 za celotna višina"
-
-#: modules/access/screen/wayland.c:474
-#, fuzzy
-msgid "Screen capture (with Wayland)"
-msgstr "Zaslonsko zajemanje (z X11/XCB)"
 
 #: modules/access/screen/xcb.c:71
 msgid "Screen capture (with X11/XCB)"
@@ -8785,7 +8775,7 @@ msgid "Reset controls to defaults."
 msgstr "Ponastavi nadzorne tipke na privzeto."
 
 #: modules/access/v4l2/v4l2.c:84
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:192
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:205
 #: modules/gui/qt/ui/video_effects.h:1217
 msgid "Brightness"
 msgstr "Svetlost"
@@ -8803,7 +8793,7 @@ msgid "Automatically adjust the picture brightness."
 msgstr "Samodejno nastavi svetlost slike."
 
 #: modules/access/v4l2/v4l2.c:89
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:191
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:204
 #: modules/gui/qt/ui/video_effects.h:1219
 msgid "Contrast"
 msgstr "Kontrast"
@@ -8813,8 +8803,8 @@ msgid "Picture contrast or luma gain."
 msgstr "Kontrast slike ali ojačitev osvetljenosti"
 
 #: modules/access/v4l2/v4l2.c:91
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:194
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:240
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:207
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:253
 #: modules/gui/qt/ui/video_effects.h:1220
 #: modules/gui/qt/ui/video_effects.h:1252
 msgid "Saturation"
@@ -8825,7 +8815,7 @@ msgid "Picture saturation or chroma gain."
 msgstr "Nasičenost slike ali ojačanje barve."
 
 #: modules/access/v4l2/v4l2.c:93
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:190
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:203
 #: modules/gui/qt/ui/video_effects.h:1216
 msgid "Hue"
 msgstr "Odtenek"
@@ -8879,7 +8869,7 @@ msgid "Blue chroma balance."
 msgstr "Uravnoteženje modre barve"
 
 #: modules/access/v4l2/v4l2.c:111
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:195
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:208
 #: modules/gui/qt/ui/video_effects.h:1221
 msgid "Gamma"
 msgstr "Prilagoditev gama"
@@ -9008,7 +8998,7 @@ msgid "Black & white"
 msgstr "Črno belo"
 
 #: modules/access/v4l2/v4l2.c:164
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:242
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:255
 #: modules/video_filter/sepia.c:66 modules/gui/qt/ui/video_effects.h:1254
 msgid "Sepia"
 msgstr "Učinek sepia"
@@ -9762,7 +9752,7 @@ msgid "Dolby Surround decoder"
 msgstr "Odkodirnik za Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:53
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:255
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:246
 msgid ""
 "This effect gives you the feeling that you are standing in a room with a "
 "complete 7.1 speaker set when using only a headphone, providing a more "
@@ -9980,7 +9970,7 @@ msgid "Level of input signal"
 msgstr "Raven vhodnega sigbala"
 
 #: modules/audio_filter/compressor.c:155
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:233
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:224
 #: modules/gui/qt/components/extended_panels.cpp:1274
 msgid "RMS/peak"
 msgstr "Povprečje korena kvadrata/največja jakost"
@@ -10018,7 +10008,7 @@ msgid "Set the threshold level in dB."
 msgstr "Nastavi raven praga v dB (-30 ... 0)."
 
 #: modules/audio_filter/compressor.c:167
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:237
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:228
 #: modules/gui/qt/components/extended_panels.cpp:1278
 msgid "Ratio"
 msgstr "Razmerje"
@@ -10029,7 +10019,7 @@ msgid "Set the ratio (n:1)."
 msgstr "Nastavite razmerje (n:1) (1 ... 20)."
 
 #: modules/audio_filter/compressor.c:170
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
 msgid "Knee radius"
 msgstr "Polmer kolena"
 
@@ -10039,7 +10029,7 @@ msgid "Set the knee radius in dB."
 msgstr "Nastavite polmer kolena v dB (1 ... 10)."
 
 #: modules/audio_filter/compressor.c:173
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:239
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
 msgid "Makeup gain"
 msgstr "Naknadno ojačanje"
 
@@ -10048,7 +10038,7 @@ msgid "Set the makeup gain in dB (0 ... 24)."
 msgstr "Nastavite naknadno ojačanje v dB (0 ... 24)."
 
 #: modules/audio_filter/compressor.c:177
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:280
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:271
 #: modules/gui/qt/dialogs/extended.cpp:71
 msgid "Compressor"
 msgstr "Stiskalnik"
@@ -10104,7 +10094,7 @@ msgid "Two pass"
 msgstr "Dvakratno filtriranje"
 
 #: modules/audio_filter/equalizer.c:73
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:225
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 msgid "Filter the audio twice. This provides a more intense effect."
 msgstr "Dvakratno filtriranje zvoka. Moč učinka se s tem podvoji."
 
@@ -10113,7 +10103,7 @@ msgid "Global gain"
 msgstr "Celotna pridobitev"
 
 #: modules/audio_filter/equalizer.c:77
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:228
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:219
 msgid "Set the global gain in dB (-20 ... 20)."
 msgstr "Določilo celotne pridobitve v dB (-20 ... 20)."
 
@@ -10122,7 +10112,7 @@ msgid "Equalizer with 10 bands"
 msgstr "Uravnalnik z 10 trakovi"
 
 #: modules/audio_filter/equalizer.c:81
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:279
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:270
 #: modules/gui/qt/dialogs/extended.cpp:67 share/lua/http/index.html:219
 msgid "Equalizer"
 msgstr "Uravnalnik zvoka"
@@ -10216,12 +10206,12 @@ msgid "Gain control filter"
 msgstr "Filter za nadzor ojačanja"
 
 #: modules/audio_filter/karaoke.c:33 modules/demux/xiph_metadata.h:51
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:268
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:259
 msgid "Karaoke"
 msgstr "Karaoke"
 
 #: modules/audio_filter/karaoke.c:34
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:269
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:260
 msgid "Simple Karaoke filter"
 msgstr "Preprost filter Karaoke"
 
@@ -10244,7 +10234,7 @@ msgid "Maximal volume level"
 msgstr "Največja raven glasnosti"
 
 #: modules/audio_filter/normvol.c:72
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:254
 msgid ""
 "If the average power over the last N buffers is higher than this value, the "
 "volume will be normalized. This value is a positive floating point number. A "
@@ -10255,7 +10245,7 @@ msgstr ""
 "vejico. Vrednost med 0,5 in10 je videti smiselna."
 
 #: modules/audio_filter/normvol.c:78 modules/audio_filter/normvol.c:79
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:253
 msgid "Volume normalizer"
 msgstr "Izenačevalik glasnosti"
 
@@ -10395,12 +10385,12 @@ msgid "Audio pitch changer"
 msgstr "Odvodni zvokovni kanali"
 
 #: modules/audio_filter/scaletempo.c:55
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:271
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
 msgid "Audio tempo scaler synched with rate"
 msgstr "Prilagodi tempo zvoka pri usklajevanju s hitrostjo"
 
 #: modules/audio_filter/scaletempo.c:56
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:270
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:261
 msgid "Scaletempo"
 msgstr "Prilagodi tempo"
 
@@ -10442,7 +10432,7 @@ msgid "Room size"
 msgstr "Velikost prostora"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:55
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:245
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:236
 msgid "Defines the virtual surface of the room emulated by the filter."
 msgstr "Določa navidezno površino sobe, ki jo filter emulira."
 
@@ -10451,24 +10441,24 @@ msgid "Room width"
 msgstr "Širina prostora"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:59
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:248
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:239
 msgid "Width of the virtual room"
 msgstr "Širina navideznega prostora"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:61
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:249
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:240
 #: modules/gui/qt/components/extended_panels.cpp:1298
 msgid "Wet"
 msgstr "Mokro"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:64
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:250
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:241
 #: modules/gui/qt/components/extended_panels.cpp:1299
 msgid "Dry"
 msgstr "Suho"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:67
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:251
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:242
 #: modules/gui/qt/components/extended_panels.cpp:1300
 msgid "Damp"
 msgstr "Vlažno"
@@ -10478,13 +10468,13 @@ msgid "Audio Spatializer"
 msgstr "Prostornik zvoka"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:72
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:281
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:272
 #: modules/gui/qt/dialogs/extended.cpp:75
 msgid "Spatializer"
 msgstr "Prostornik"
 
 #: modules/audio_filter/stereo_widen.c:53
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:273
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:264
 msgid ""
 "This filter enhances the stereo effect by suppressing mono (signal common to "
 "both channels) and by delaying the signal of left into right and vice versa, "
@@ -10533,7 +10523,7 @@ msgid "Level of input signal of original channel."
 msgstr "Raven vhodnega signala izvirnega kanala."
 
 #: modules/audio_filter/stereo_widen.c:77
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:272
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
 msgid "Stereo Enhancer"
 msgstr "Izboljševalnik učinka stereo"
 
@@ -10646,11 +10636,11 @@ msgid ""
 "The selected audio output device is exclusively in use by another program."
 msgstr "Izbrano z ime zvokovne napraveo napravo uporablja nek drug program."
 
-#: modules/audio_output/coreaudio_common.c:445
+#: modules/audio_output/coreaudio_common.c:484
 msgid "Audio device is not configured"
 msgstr "Zvokovna naprava ni nastavljena"
 
-#: modules/audio_output/coreaudio_common.c:446
+#: modules/audio_output/coreaudio_common.c:485
 msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
@@ -10780,17 +10770,41 @@ msgstr "Omogočite to možnost, če ne želite, da vaš zvok prekine drugi zvok.
 msgid "K Audio Interface audio output"
 msgstr "Zvokovni odvod vmesnika K Audio"
 
-#: modules/audio_output/mmdevice.c:1274
+#: modules/audio_output/mmdevice.c:1293 modules/gui/qt/ui/sprefs_audio.h:419
+msgid "HDMI/SPDIF audio passthrough"
+msgstr ""
+
+#: modules/audio_output/mmdevice.c:1295
+msgid ""
+"Change this value if you have issue with HD codecs when using a HDMI "
+"receiver."
+msgstr ""
+
+#: modules/audio_output/mmdevice.c:1302
+#, fuzzy
+msgid "Disabled"
+msgstr "Onemogoči"
+
+#: modules/audio_output/mmdevice.c:1303
+msgid "Enabled (without HD codecs)"
+msgstr ""
+
+#: modules/audio_output/mmdevice.c:1304
+#, fuzzy
+msgid "Enabled"
+msgstr "Omogoči"
+
+#: modules/audio_output/mmdevice.c:1309
 #, fuzzy
 msgid "Windows Multimedia Device output"
 msgstr "Windows GDI izhod slike"
 
-#: modules/audio_output/mmdevice.c:1280
+#: modules/audio_output/mmdevice.c:1315
 #, fuzzy
 msgid "Output back-end"
 msgstr "Izhodna kartica"
 
-#: modules/audio_output/mmdevice.c:1280
+#: modules/audio_output/mmdevice.c:1315
 #, fuzzy
 msgid "Audio output back-end interface."
 msgstr "Odvodna zvokovna naprava"
@@ -10819,7 +10833,7 @@ msgstr "Programsko ojačanje"
 msgid "This linear gain will be applied in software."
 msgstr "To linearno ojačanje bo dodano programsko."
 
-#: modules/audio_output/wasapi.c:645
+#: modules/audio_output/wasapi.c:640
 msgid "Windows Audio Session API output"
 msgstr "Izhod API-ja Windows Audio Session"
 
@@ -10943,8 +10957,8 @@ msgstr "Koordinata X za izris podnapisa"
 msgid "ARIB subtitles decoder"
 msgstr "Odkodirnik podnapisov DVB"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1084
-#: modules/demux/mpeg/ts_psi.c:1091
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
+#: modules/demux/mpeg/ts_psi.c:1092
 #, fuzzy
 msgid "ARIB subtitles"
 msgstr "Podnapisi DVB"
@@ -11635,8 +11649,8 @@ msgstr "Točka na osi Y, kjer so kodirani podnapisi."
 msgid "DVB subtitles decoder"
 msgstr "Odkodirnik podnapisov DVB"
 
-#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:771
-#: modules/demux/mpeg/ts_psi.c:820
+#: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:772
+#: modules/demux/mpeg/ts_psi.c:821
 msgid "DVB subtitles"
 msgstr "Podnapisi DVB"
 
@@ -12104,20 +12118,20 @@ msgstr "Privzete vrednosti izrisovanja Tiger"
 msgid "Kate text subtitles packetizer"
 msgstr "Paketnik podnapisov Kate"
 
-#: modules/codec/libass.c:56
+#: modules/codec/libass.c:60
 msgid "Subtitles (advanced)"
 msgstr "Podnapisi (napredno)"
 
-#: modules/codec/libass.c:57
+#: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
 msgstr "Izris podnapisov s knjižnico libass"
 
-#: modules/codec/libass.c:245
+#: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
 msgid "Building font cache"
 msgstr "Izgradnja predpomnilnika pisav"
 
-#: modules/codec/libass.c:246
+#: modules/codec/libass.c:250
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
@@ -12893,8 +12907,8 @@ msgstr ""
 
 #: modules/codec/speex.c:59 modules/codec/speex.c:907
 #: modules/gui/macosx/VLCOpenWindowController.m:195
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:245
-#: modules/gui/qt/ui/sprefs_video.h:326 modules/gui/qt/ui/video_effects.h:1246
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:258
+#: modules/gui/qt/ui/sprefs_video.h:328 modules/gui/qt/ui/video_effects.h:1246
 msgid "Mode"
 msgstr "Način"
 
@@ -13440,7 +13454,7 @@ msgstr "Zvokovni odkodirnik Ulead DV"
 msgid "Use Hardware decoders only"
 msgstr "Strojno odkodiranje"
 
-#: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:325
+#: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
 msgstr "Razpletanje"
 
@@ -14422,7 +14436,7 @@ msgstr "Hitro"
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
 #: modules/gui/macosx/VLCSimplePrefsController.m:689
-#: modules/gui/qt/components/simple_preferences.cpp:645
+#: modules/gui/qt/components/simple_preferences.cpp:666
 #: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14562,15 +14576,15 @@ msgstr "Nadzorni vmesnik vodila D-Bus"
 #: modules/gui/macosx/VLCMainWindow.m:669
 #: modules/gui/macosx/VLCMainWindow.m:675
 #: modules/gui/macosx/VLCMainWindow.m:1276
-#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1035
-#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1234
-#: modules/gui/qt/main_interface.cpp:1238
-#: modules/gui/qt/main_interface.cpp:1277
-#: modules/gui/qt/main_interface.cpp:1279
-#: modules/gui/qt/main_interface.cpp:1388
-#: modules/gui/qt/main_interface.cpp:1405
-#: modules/gui/qt/main_interface.cpp:1413
-#: modules/gui/qt/main_interface.cpp:1436 modules/lua/libs/httpd.c:80
+#: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
+#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1264
+#: modules/gui/qt/main_interface.cpp:1268
+#: modules/gui/qt/main_interface.cpp:1307
+#: modules/gui/qt/main_interface.cpp:1309
+#: modules/gui/qt/main_interface.cpp:1418
+#: modules/gui/qt/main_interface.cpp:1435
+#: modules/gui/qt/main_interface.cpp:1443
+#: modules/gui/qt/main_interface.cpp:1466 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -14638,7 +14652,7 @@ msgstr "Vmesnik splošnih hitrih tipk"
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
 #: modules/gui/qt/components/preferences_widgets.cpp:1145
-#: modules/gui/qt/components/simple_preferences.cpp:232
+#: modules/gui/qt/components/simple_preferences.cpp:233
 msgid "Hotkeys"
 msgstr "Hitre tipke"
 
@@ -15308,25 +15322,6 @@ msgstr "| predvajanih medpomnilnikov   :    %5<PRIi64>"
 msgid "| buffers lost     :    %5<PRIi64>"
 msgstr "| izgubljenih medpomnilnikov: %5<PRIi64>"
 
-#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:845
-msgid "+-[Streaming]"
-msgstr "+-[Pretakanje]"
-
-#: modules/control/oldrc.c:1756 modules/gui/ncurses.c:847
-#, c-format
-msgid "| packets sent     :    %5<PRIi64>"
-msgstr "| poslanih paketov: %5<PRIi64>"
-
-#: modules/control/oldrc.c:1758 modules/gui/ncurses.c:848
-#, c-format
-msgid "| bytes sent       : %8.0f KiB"
-msgstr "| poslanih bajtov       : %8.0f KiB"
-
-#: modules/control/oldrc.c:1760 modules/gui/ncurses.c:850
-#, c-format
-msgid "| sending bitrate  :   %6.0f kb/s"
-msgstr "| bitna hitrost pošiljanja  :   %6.0f kb/s"
-
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
 msgstr ""
@@ -15441,7 +15436,7 @@ msgid "Avformat muxer"
 msgstr "Zvijalnik Avformat"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:109 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Zvijalnik"
 
@@ -15497,7 +15492,7 @@ msgstr "Popravi ob potrebi"
 msgid "AVI demuxer"
 msgstr "Odvijalnik AVI"
 
-#: modules/demux/avi/avi.c:820 modules/demux/mp4/mp4.c:1673
+#: modules/demux/avi/avi.c:825 modules/demux/mp4/mp4.c:1671
 #, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
@@ -15514,28 +15509,28 @@ msgstr ""
 "To opravilo je lahko pri velikih datotekah dolgotrajno.\n"
 "Kako želite nadaljevati?"
 
-#: modules/demux/avi/avi.c:828
+#: modules/demux/avi/avi.c:833
 msgid "Do not play"
 msgstr "Ne predvajaj"
 
-#: modules/demux/avi/avi.c:829
+#: modules/demux/avi/avi.c:834
 msgid "Build index then play"
 msgstr "Sestavi kazalo in predvajaj"
 
-#: modules/demux/avi/avi.c:830
+#: modules/demux/avi/avi.c:835
 msgid "Play as is"
 msgstr "Predvajaj kot je"
 
-#: modules/demux/avi/avi.c:831 modules/demux/mp4/mp4.c:1684
+#: modules/demux/avi/avi.c:836 modules/demux/mp4/mp4.c:1682
 #, fuzzy
 msgid "Broken or missing Index"
 msgstr "Okvarjeno ali manjkajoče kazalo AVI"
 
-#: modules/demux/avi/avi.c:2703
+#: modules/demux/avi/avi.c:2717
 msgid "Broken or missing AVI Index"
 msgstr "Okvarjeno ali manjkajoče kazalo AVI"
 
-#: modules/demux/avi/avi.c:2704
+#: modules/demux/avi/avi.c:2718
 msgid "Fixing AVI Index..."
 msgstr "Popravljanje AVI kazala ..."
 
@@ -15692,7 +15687,7 @@ msgstr "Kodeki poglavij"
 msgid "Use chapter codecs found in the segment."
 msgstr "Uporabi kodeke zapisane v poglavjih."
 
-#: modules/demux/mkv/mkv.cpp:64 modules/gui/qt/ui/sprefs_input.h:358
+#: modules/demux/mkv/mkv.cpp:64 modules/gui/qt/ui/sprefs_input.h:370
 msgid "Preload MKV files in the same directory"
 msgstr "Vnaprej naloži datoteke MKV iz iste mapi"
 
@@ -15982,12 +15977,12 @@ msgstr "Odvijalnik MP4"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1681
+#: modules/demux/mp4/mp4.c:1679
 #, fuzzy
 msgid "Do not seek"
 msgstr "Ne predvajaj"
 
-#: modules/demux/mp4/mp4.c:1682
+#: modules/demux/mp4/mp4.c:1680
 #, fuzzy
 msgid "Build index"
 msgstr "Sestavi kazalo in predvajaj"
@@ -16156,60 +16151,60 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "Odvijalnik MPEG Transport Stream"
 
-#: modules/demux/mpeg/ts_psi.c:421
+#: modules/demux/mpeg/ts_psi.c:422
 #, fuzzy
 msgid "Main audio"
 msgstr "Utišaj zvok."
 
-#: modules/demux/mpeg/ts_psi.c:422
+#: modules/demux/mpeg/ts_psi.c:423
 #, fuzzy
 msgid "Audio description for the visually impaired"
 msgstr "Za ta kodek opis ni na voljo."
 
-#: modules/demux/mpeg/ts_psi.c:423
+#: modules/demux/mpeg/ts_psi.c:424
 #, fuzzy
 msgid "Clean audio for the hearing impaired"
 msgstr "Teletekst podnapisi: slušno omejeni"
 
-#: modules/demux/mpeg/ts_psi.c:424
+#: modules/demux/mpeg/ts_psi.c:425
 #, fuzzy
 msgid "Spoken subtitles for the visually impaired"
 msgstr "DVB podnapisi: slušno omejeni"
 
-#: modules/demux/mpeg/ts_psi.c:606 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:455
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "Teletekst"
 
-#: modules/demux/mpeg/ts_psi.c:607
+#: modules/demux/mpeg/ts_psi.c:608
 msgid "Teletext subtitles"
 msgstr "Podnapisi Teletekst"
 
-#: modules/demux/mpeg/ts_psi.c:608
+#: modules/demux/mpeg/ts_psi.c:609
 msgid "Teletext: additional information"
 msgstr "Teletekst: več podrobnosti"
 
-#: modules/demux/mpeg/ts_psi.c:609
+#: modules/demux/mpeg/ts_psi.c:610
 msgid "Teletext: program schedule"
 msgstr "Teletekst: urnik programa"
 
-#: modules/demux/mpeg/ts_psi.c:610
+#: modules/demux/mpeg/ts_psi.c:611
 msgid "Teletext subtitles: hearing impaired"
 msgstr "Teletekst podnapisi: slušno omejeni"
 
-#: modules/demux/mpeg/ts_psi.c:827
+#: modules/demux/mpeg/ts_psi.c:828
 msgid "DVB subtitles: hearing impaired"
 msgstr "DVB podnapisi: slušno omejeni"
 
-#: modules/demux/mpeg/ts_psi.c:1328
+#: modules/demux/mpeg/ts_psi.c:1332
 msgid "clean effects"
 msgstr "počisti učinke"
 
-#: modules/demux/mpeg/ts_psi.c:1329
+#: modules/demux/mpeg/ts_psi.c:1333
 msgid "hearing impaired"
 msgstr "slušno omejeni"
 
-#: modules/demux/mpeg/ts_psi.c:1330
+#: modules/demux/mpeg/ts_psi.c:1334
 msgid "visual impaired commentary"
 msgstr "opombe za slepe in slabovidne"
 
@@ -16744,150 +16739,150 @@ msgstr "Odstrani"
 msgid "Skins"
 msgstr "Preobleke"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:224
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:215
 #: modules/gui/qt/ui/equalizer.h:134
 msgid "2 Pass"
 msgstr "2 prehoda"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:227
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:218
 #: modules/gui/qt/components/extended_panels.cpp:1111
 #: modules/gui/qt/ui/equalizer.h:136
 msgid "Preamp"
 msgstr "Predokrepitev"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:222
 msgid "Enable dynamic range compressor"
 msgstr "Omogoči stiskalnik dinamičnega območja"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:232
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:243
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:234
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:49
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:209
 #: modules/gui/qt/dialogs/gototime.cpp:66
 msgid "Reset"
 msgstr "Ponastavi"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:234
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:225
 #: modules/gui/qt/components/extended_panels.cpp:1275
 msgid "Attack"
 msgstr "Vzpostavitev"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:235
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:226
 #: modules/gui/qt/components/extended_panels.cpp:1276
 msgid "Release"
 msgstr "Sprostitev"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:236
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:227
 #: modules/gui/qt/components/extended_panels.cpp:1277
 msgid "Threshold"
 msgstr "Prag"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:242
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:233
 msgid "Enable Spatializer"
 msgstr "Omogoči prostornik"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:254
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:245
 msgid "Headphone virtualization"
 msgstr "Učinek navideznosti slušalk"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:261
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:252
 msgid "Volume normalization"
 msgstr "Izenačevanje glasnosti"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:267
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:258
 msgid "Maximum level"
 msgstr "Največja izravnava"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:282
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:273
 msgid "Filter"
 msgstr "Filter"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:283
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:274
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:84
 #: modules/gui/macosx/VLCSimplePrefsController.m:260
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "Učinki zvoka"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:311
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:359
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:325
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:394
 msgid "Duplicate current profile..."
 msgstr "Podvoji trenutni profil ..."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:316
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:330
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1037
 msgid "Organize Profiles..."
 msgstr "Upravljanje profilov ..."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:477
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:737
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:509
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:790
 msgid "Duplicate current profile for a new profile"
 msgstr "Podvoji trenutni profil v nov profil"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:478
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:510
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:474
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:738
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:791
 msgid "Enter a name for the new profile:"
 msgstr "Vnesite ime za nov profil:"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:480
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:789
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:512
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:740
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
 #: modules/gui/qt/ui/vlm.h:301
 msgid "Save"
 msgstr "Shrani"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:499
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:761
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:532
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:814
 msgid "Please enter a unique name for the new profile."
 msgstr "Ime za nov profil mora biti enoznačno."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:500
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:762
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:533
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:815
 msgid "Multiple profiles with the same name are not allowed."
 msgstr "Več profilov z istem imenom ni dovoljenih."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:530
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:831
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:804
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:566
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:866
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:858
 msgid "Remove a preset"
 msgstr "Odstrani prednastavitev"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:531
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:832
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:805
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:567
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:867
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:859
 msgid "Select the preset you would like to remove:"
 msgstr "Izberite prednastavitev, ki jo želite odstraniti:"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:532
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:833
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:568
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:868
 #: modules/gui/macosx/VLCBookmarksWindowController.m:81
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:338
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:806
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:860
 #: modules/gui/qt/ui/open_file.h:154
 msgid "Remove"
 msgstr "Odstrani"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:610
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:645
 msgid "Add new Preset..."
 msgstr "Dodaj novo prednastavitev ..."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:615
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:650
 msgid "Organize Presets..."
 msgstr "Upravljaj prednastavitve ..."
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:786
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:821
 msgid "Save current selection as new preset"
 msgstr "Shrani trenutni izbor kot novo prednastavitev"
 
-#: modules/gui/macosx/VLCAudioEffectsWindowController.m:787
+#: modules/gui/macosx/VLCAudioEffectsWindowController.m:822
 msgid "Enter a name for the new preset:"
 msgstr "Novo imeza prednastavitev:"
 
@@ -16929,7 +16924,7 @@ msgstr "Čas"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:194
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:363
-#: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:359
+#: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:342
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1359
@@ -17056,11 +17051,11 @@ msgstr "Izberite mesto izhoda"
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
 #: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:425
+#: modules/gui/qt/components/simple_preferences.cpp:440
 #: modules/gui/qt/components/sout/sout_widgets.cpp:132
 #: modules/gui/qt/ui/open.h:282 modules/gui/qt/ui/open_disk.h:307
-#: modules/gui/qt/ui/open_file.h:147 modules/gui/qt/ui/sprefs_audio.h:433
-#: modules/gui/qt/ui/sprefs_input.h:356 modules/gui/qt/ui/sprefs_video.h:330
+#: modules/gui/qt/ui/open_file.h:147 modules/gui/qt/ui/sprefs_audio.h:417
+#: modules/gui/qt/ui/sprefs_input.h:368 modules/gui/qt/ui/sprefs_video.h:332
 msgid "Browse..."
 msgstr "Prebrskaj ..."
 
@@ -17268,7 +17263,7 @@ msgstr "Zahtevan je izvoz SDP, toda ni naveden URL."
 #: modules/gui/macosx/VLCSimplePrefsController.m:683
 #: modules/gui/macosx/VLCSimplePrefsController.m:711
 #: modules/gui/macosx/VLCSimplePrefsController.m:1244
-#: modules/gui/qt/components/simple_preferences.cpp:642
+#: modules/gui/qt/components/simple_preferences.cpp:663
 msgid "Custom"
 msgstr "Po meri"
 
@@ -17314,7 +17309,7 @@ msgstr "Zapusti celozaslonski način"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
-#: modules/gui/qt/dialogs/toolbar.cpp:468 modules/gui/qt/ui/sprefs_audio.h:427
+#: modules/gui/qt/dialogs/toolbar.cpp:468 modules/gui/qt/ui/sprefs_audio.h:411
 msgid "Volume"
 msgstr "Glasnost"
 
@@ -17644,15 +17639,15 @@ msgstr "Daljinski upravljalnik Apple in tipke za predstavnost"
 msgid "Video output"
 msgstr "Video izhod"
 
-#: modules/gui/macosx/VLCMain+OldPrefs.m:101
+#: modules/gui/macosx/VLCMain+OldPrefs.m:113
 msgid "Remove old preferences?"
 msgstr "Ali naj se počistijo stare možnosti?"
 
-#: modules/gui/macosx/VLCMain+OldPrefs.m:102
+#: modules/gui/macosx/VLCMain+OldPrefs.m:114
 msgid "We just found an older version of VLC's preferences files."
 msgstr "Zaznana je starejša različica nastavitvenih datotek predvajalnika VLC."
 
-#: modules/gui/macosx/VLCMain+OldPrefs.m:103
+#: modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Move To Trash and Relaunch VLC"
 msgstr "Premakni v smeti in ponovno zaženi VLC"
 
@@ -17853,6 +17848,7 @@ msgstr "Lebdeče v ospredju"
 
 #: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
 #: modules/gui/macosx/VLCSimplePrefsController.m:357
+#: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "Slikovna celozaslonska naprava"
 
@@ -18155,7 +18151,7 @@ msgstr "Disk"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
 #: modules/gui/macosx/VLCSimplePrefsController.m:290
-#: modules/gui/qt/ui/sprefs_input.h:359
+#: modules/gui/qt/ui/sprefs_input.h:371
 msgid "Network"
 msgstr "Omrežje"
 
@@ -18217,7 +18213,7 @@ msgid "Enable DVD menus"
 msgstr "Omogoči menije DVD"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:113
+#: modules/stream_out/chromecast/cast.cpp:114
 msgid "IP Address"
 msgstr "Naslov IP"
 
@@ -18455,7 +18451,7 @@ msgid "Read at media"
 msgstr "Preberi pri predstavni datoteki"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:87
-#: modules/gui/qt/components/info_panels.cpp:579
+#: modules/gui/qt/components/info_panels.cpp:578
 msgid "Input bitrate"
 msgstr "Dovodna bitna hitrost"
 
@@ -18468,7 +18464,7 @@ msgid "Stream bitrate"
 msgstr "Bitna hitrost pretoka"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:92
-#: modules/gui/macosx/VLCPlaylistInfo.m:102
+#: modules/gui/macosx/VLCPlaylistInfo.m:97
 msgid "Decoded blocks"
 msgstr "Odkodirani bloki"
 
@@ -18480,35 +18476,19 @@ msgstr "Prikazane sličice"
 msgid "Lost frames"
 msgstr "Izgubljene sličice"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:96
-msgid "Streaming"
-msgstr "Pretakanje"
-
-#: modules/gui/macosx/VLCPlaylistInfo.m:97
-msgid "Sent packets"
-msgstr "Poslani paketi"
-
 #: modules/gui/macosx/VLCPlaylistInfo.m:98
-msgid "Sent bytes"
-msgstr "Poslani biti"
-
-#: modules/gui/macosx/VLCPlaylistInfo.m:99
-msgid "Send rate"
-msgstr "Hitrost pošiljanja"
-
-#: modules/gui/macosx/VLCPlaylistInfo.m:103
 msgid "Played buffers"
 msgstr "Predvajani medpomnilniki"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:104
+#: modules/gui/macosx/VLCPlaylistInfo.m:99
 msgid "Lost buffers"
 msgstr "Izgubljeni medpomnilniki"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:357
+#: modules/gui/macosx/VLCPlaylistInfo.m:340
 msgid "Error while saving meta"
 msgstr "Prišlo je do napake med shranjevanjem metapodatkov"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:358
+#: modules/gui/macosx/VLCPlaylistInfo.m:341
 msgid "VLC was unable to save the meta data."
 msgstr "Ni mogoče shraniti metapodatkov."
 
@@ -18540,7 +18520,7 @@ msgid "Disable renderer discovery"
 msgstr "Onemogoči ohranjevalnik zaslona"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
-#: modules/gui/qt/ui/sprefs_interface.h:545
+#: modules/gui/qt/ui/sprefs_interface.h:554
 msgid "Continue playback?"
 msgstr "Pokaži okno za potrditev nadaljevanja predvajanja"
 
@@ -18565,27 +18545,27 @@ msgid "Playback of \"%@\" will continue at %@"
 msgstr "Predvajanje »%@« se bo nadaljevalo od %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:220
-#: modules/gui/qt/components/simple_preferences.cpp:222
-#: modules/gui/qt/components/simple_preferences.cpp:669
+#: modules/gui/qt/components/simple_preferences.cpp:223
+#: modules/gui/qt/components/simple_preferences.cpp:690
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "Nastavitve vmesnika"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:222
-#: modules/gui/qt/components/simple_preferences.cpp:224
-#: modules/gui/qt/components/simple_preferences.cpp:400
+#: modules/gui/qt/components/simple_preferences.cpp:225
+#: modules/gui/qt/components/simple_preferences.cpp:415
 msgid "Audio Settings"
 msgstr "Nastavitve zvoka"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:224
-#: modules/gui/qt/components/simple_preferences.cpp:226
-#: modules/gui/qt/components/simple_preferences.cpp:354
+#: modules/gui/qt/components/simple_preferences.cpp:227
+#: modules/gui/qt/components/simple_preferences.cpp:355
 msgid "Video Settings"
 msgstr "Nastavitve slike"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:226
-#: modules/gui/qt/components/simple_preferences.cpp:228
-#: modules/gui/qt/components/simple_preferences.cpp:810
+#: modules/gui/qt/components/simple_preferences.cpp:229
+#: modules/gui/qt/components/simple_preferences.cpp:831
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Nastavitve za podnapise in zaslonski prikaz"
 
@@ -18614,7 +18594,7 @@ msgid "Keep audio level between sessions"
 msgstr "Ohrani zvokovno raven med sejami"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:269
-#: modules/gui/qt/ui/sprefs_audio.h:429
+#: modules/gui/qt/ui/sprefs_audio.h:413
 msgid "Always reset audio start level to:"
 msgstr "Vedno ponastavi glasnost zvoka na:"
 
@@ -18641,7 +18621,7 @@ msgid "Shortcut"
 msgstr "Bližnjica"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
-#: modules/gui/qt/ui/sprefs_input.h:355
+#: modules/gui/qt/ui/sprefs_input.h:367
 msgid "Record directory or filename"
 msgstr "Mapa snemanja ali ime datoteke"
 
@@ -18723,7 +18703,7 @@ msgstr ""
 "Omogoči obvestila Growl (ob spremembi predmeta na seznamu za predvajanje)"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:320
-#: modules/gui/qt/ui/sprefs_interface.h:555
+#: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Privacy / Network Interaction"
 msgstr "Krajevna / omrežna vzajemnost"
 
@@ -18791,7 +18771,7 @@ msgid "Outline thickness"
 msgstr "Debelina orisa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:347
-#: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:313
+#: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:315
 msgid "Display"
 msgstr "Zaslon"
 
@@ -18814,7 +18794,7 @@ msgid "Black screens in Fullscreen mode"
 msgstr "Črno celozaslonsko ozadje"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:359
-#: modules/gui/qt/ui/sprefs_video.h:328
+#: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Video snapshots"
 msgstr "Slikovni zajem"
 
@@ -18824,17 +18804,17 @@ msgid "Folder"
 msgstr "Mapa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
-#: modules/gui/qt/ui/sprefs_video.h:334
+#: modules/gui/qt/ui/sprefs_video.h:336
 msgid "Format"
 msgstr "Zapis"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:363
-#: modules/gui/qt/ui/sprefs_video.h:331
+#: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Prefix"
 msgstr "Predpona"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
-#: modules/gui/qt/ui/sprefs_video.h:333
+#: modules/gui/qt/ui/sprefs_video.h:335
 msgid "Sequential numbering"
 msgstr "Uporabi zaporedno oštevilčenje"
 
@@ -19069,24 +19049,24 @@ msgstr ""
 " glede na njihovo vsebino in to vrednost.\n"
 "Nastavite 0 za onemogočanje."
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:175
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:188
 #: modules/gui/qt/dialogs/extended.cpp:108
 msgid "Video Effects"
 msgstr "Slikovni učinki"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:179
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:192
 msgid "Basic"
 msgstr "Osnovno"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:181
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:194
 #: modules/gui/qt/ui/video_effects.h:1267
 msgid "Geometry"
 msgstr "Geometrija"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:182
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:238
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:256
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:259
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:195
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:251
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:269
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
 #: modules/spu/marq.c:115 modules/spu/rss.c:152
 #: modules/video_filter/colorthres.c:55 modules/gui/qt/ui/video_effects.h:1241
 #: modules/gui/qt/ui/video_effects.h:1247
@@ -19094,240 +19074,240 @@ msgstr "Geometrija"
 msgid "Color"
 msgstr "Barva"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:189
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:202
 msgid "Image Adjust"
 msgstr "Prilagajanje slike"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:193
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
 #: modules/gui/qt/ui/video_effects.h:1218
 msgid "Brightness Threshold"
 msgstr "Prag svetlosti"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:197
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:210
 #: modules/video_filter/sharpen.c:69 modules/gui/qt/ui/video_effects.h:1222
 msgid "Sharpen"
 msgstr "Izostritev"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:198
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:211
 #: modules/gui/qt/ui/video_effects.h:1223
 #: modules/gui/qt/ui/video_effects.h:1296
 msgid "Sigma"
 msgstr "Sigma"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:212
 #: modules/gui/qt/ui/video_effects.h:1224
 msgid "Banding removal"
 msgstr "Odstranjevanje barvnih pasov"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:200
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:213
 #: modules/video_filter/gradfun.c:50 modules/gui/qt/ui/video_effects.h:1225
 msgid "Radius"
 msgstr "Polmer"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:201
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:214
 #: modules/gui/qt/ui/video_effects.h:1226
 msgid "Film Grain"
 msgstr "Zrnatost posnetka"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:202
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:215
 #: modules/video_filter/grain.c:53 modules/gui/qt/ui/video_effects.h:1227
 msgid "Variance"
 msgstr "Varianca"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:207
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:220
 #: modules/gui/qt/ui/video_effects.h:1235
 msgid "Synchronize top and bottom"
 msgstr "Uskladi zgoraj in spodaj"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:208
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:221
 #: modules/gui/qt/ui/video_effects.h:1236
 msgid "Synchronize left and right"
 msgstr "Uskladi levo in desno"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:210
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:223
 #: modules/gui/qt/ui/video_effects.h:1261
 msgid "Transform"
 msgstr "Preoblikovanje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:212
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:225
 #: modules/video_filter/transform.c:52
 msgid "Rotate by 90 degrees"
 msgstr "Obrni za 90 stopinj"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:215
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:228
 #: modules/video_filter/transform.c:53
 msgid "Rotate by 180 degrees"
 msgstr "Obrni za 180 stopinj"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:218
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:231
 #: modules/video_filter/transform.c:53
 msgid "Rotate by 270 degrees"
 msgstr "Obrni za 270 stopinj"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:221
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:234
 #: modules/video_filter/transform.c:54
 msgid "Flip horizontally"
 msgstr "Zrcali vodoravno"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:224
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:237
 #: modules/video_filter/transform.c:54
 msgid "Flip vertically"
 msgstr "Zrcali navpično"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:227
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:240
 msgid "Magnification/Zoom"
 msgstr "Povečevanje/Približevanje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:228
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:241
 #: modules/gui/qt/ui/video_effects.h:1264
 msgid "Puzzle game"
 msgstr "Zaslonska sestavljanka"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:229
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:234
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:242
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:247
 #: share/lua/http/dialogs/mosaic_window.html:96
 #: modules/gui/qt/ui/video_effects.h:1259
 #: modules/gui/qt/ui/video_effects.h:1265
 msgid "Rows"
 msgstr "Vrstice"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:230
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:235
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:243
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:248
 #: share/lua/http/dialogs/mosaic_window.html:114
 #: modules/gui/qt/ui/video_effects.h:1260
 #: modules/gui/qt/ui/video_effects.h:1266
 msgid "Columns"
 msgstr "Stolpci"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:231
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:244
 #: modules/video_splitter/clone.c:57 modules/gui/qt/ui/video_effects.h:1306
 msgid "Clone"
 msgstr "Podvajanje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:232
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:245
 #: modules/video_splitter/clone.c:39 modules/gui/qt/ui/video_effects.h:1307
 msgid "Number of clones"
 msgstr "Število podvajanj"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:233
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:246
 #: modules/gui/qt/ui/video_effects.h:1258
 msgid "Wall"
 msgstr "Razdelitev slike na zidake"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:237
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:250
 #: modules/video_filter/colorthres.c:71 modules/gui/qt/ui/video_effects.h:1249
 msgid "Color threshold"
 msgstr "Barvni prag"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:241
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:254
 #: modules/gui/qt/ui/video_effects.h:1253
 msgid "Similarity"
 msgstr "Podobnost"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:243
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:256
 #: modules/gui/qt/ui/video_effects.h:1255
 msgid "Intensity"
 msgstr "Intenzivnost"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:244
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:247
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:257
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:260
 #: modules/video_filter/gradient.c:76 modules/video_filter/gradient.c:82
 #: modules/gui/qt/ui/video_effects.h:1245
 msgid "Gradient"
 msgstr "Prelivanje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:250
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:263
 #: modules/video_filter/gradient.c:76
 msgid "Edge"
 msgstr "Robljenje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:253
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:266
 #: modules/video_filter/gradient.c:76
 msgid "Hough"
 msgstr "Zastavljanje"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:257
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:270
 #: modules/gui/qt/ui/video_effects.h:1248
 msgid "Cartoon"
 msgstr "Risanka"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:258
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:271
 #: modules/gui/qt/ui/video_effects.h:1240
 msgid "Color extraction"
 msgstr "Izločanje barv"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:261
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:274
 msgid "Invert colors"
 msgstr "Obračanje barv"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:262
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:275
 #: modules/video_filter/posterize.c:69 modules/gui/qt/ui/video_effects.h:1244
 msgid "Posterize"
 msgstr "Posterizacija"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:263
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:276
 #: modules/video_filter/posterize.c:61
 msgid "Posterize level"
 msgstr "Raven posterizacije"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:264
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:277
 #: modules/video_filter/motionblur.c:60 modules/gui/qt/ui/video_effects.h:1297
 msgid "Motion blur"
 msgstr "Megljenje gibanja"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:265
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:278
 #: modules/gui/qt/ui/video_effects.h:1298
 msgid "Factor"
 msgstr "Faktor"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:266
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:279
 #: modules/video_filter/motiondetect.c:49
 msgid "Motion Detect"
 msgstr "Zaznavanje gibanja"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:267
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:280
 #: modules/gui/qt/ui/video_effects.h:1293
 msgid "Water effect"
 msgstr "Vodni učinek"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:269
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:282
 #: modules/meta_engine/ID3Genres.h:100 modules/video_filter/psychedelic.c:55
 #: modules/gui/qt/ui/video_effects.h:1291
 msgid "Psychedelic"
 msgstr "Psihedelično"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:270
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:283
 #: modules/video_filter/anaglyph.c:72
 msgid "Anaglyph"
 msgstr "Stereoskop"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:271
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:284
 #: modules/gui/qt/ui/video_effects.h:1278
 msgid "Add text"
 msgstr "Dodajanje besedila"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:272
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:285
 #: modules/logger/file.c:193 modules/spu/marq.c:88
 #: modules/gui/qt/ui/video_effects.h:1280
 msgid "Text"
 msgstr "Besedilo"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:293
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:306
 #: modules/gui/qt/ui/video_effects.h:1268
 msgid "Add logo"
 msgstr "Dodaj logotip"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:294
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:307
 #: modules/gui/qt/ui/video_effects.h:1269
 msgid "Logo"
 msgstr "Logotip"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:315
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:328
 #: modules/spu/mosaic.c:87 modules/stream_out/mosaic_bridge.c:124
 msgid "Transparency"
 msgstr "Prozornost"
 
-#: modules/gui/macosx/VLCVideoEffectsWindowController.m:364
+#: modules/gui/macosx/VLCVideoEffectsWindowController.m:399
 msgid "Organize profiles..."
 msgstr "Uredi profile ..."
 
@@ -19396,261 +19376,261 @@ msgstr "  [%s]"
 msgid "      %s: %s"
 msgstr "      %s: %s"
 
-#: modules/gui/ncurses.c:868
+#: modules/gui/ncurses.c:859
 msgid "[Display]"
 msgstr "[Prikaz]"
 
-#: modules/gui/ncurses.c:870
+#: modules/gui/ncurses.c:861
 msgid " h,H                    Show/Hide help box"
 msgstr " h,H                    skrije/prikaže okno pomoči"
 
-#: modules/gui/ncurses.c:871
+#: modules/gui/ncurses.c:862
 msgid " i                      Show/Hide info box"
 msgstr " i                      skrije/prikaže okno podrobnosti"
 
-#: modules/gui/ncurses.c:872
+#: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
 msgstr " M Skrij/Prikaži polje metapodatkov"
 
-#: modules/gui/ncurses.c:873
+#: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
 msgstr " L                      skrije/prikaže okno sporočil"
 
-#: modules/gui/ncurses.c:874
+#: modules/gui/ncurses.c:865
 msgid " P                      Show/Hide playlist box"
 msgstr " P                      skrije/prikaže okno seznama predvajanja"
 
-#: modules/gui/ncurses.c:875
+#: modules/gui/ncurses.c:866
 msgid " B                      Show/Hide filebrowser"
 msgstr " B                      skrije/prikaže brskalnik datotek"
 
-#: modules/gui/ncurses.c:876
+#: modules/gui/ncurses.c:867
 msgid " x                      Show/Hide objects box"
 msgstr " x                      skrije/prikaže okno predmetov"
 
-#: modules/gui/ncurses.c:877
+#: modules/gui/ncurses.c:868
 msgid " S                      Show/Hide statistics box"
 msgstr " S                      skrije/prikaže okno statistike"
 
-#: modules/gui/ncurses.c:878
+#: modules/gui/ncurses.c:869
 msgid " Esc                    Close Add/Search entry"
 msgstr " Esc                    zapre vnos dodaj/poišči"
 
-#: modules/gui/ncurses.c:879
+#: modules/gui/ncurses.c:870
 msgid " Ctrl-l                 Refresh the screen"
 msgstr " Ctrl-l                 osveži zaslon"
 
-#: modules/gui/ncurses.c:883
+#: modules/gui/ncurses.c:874
 msgid "[Global]"
 msgstr "[Splošno]"
 
-#: modules/gui/ncurses.c:885
+#: modules/gui/ncurses.c:876
 msgid " q, Q, Esc              Quit"
 msgstr " q, Q, Esc              konča program"
 
-#: modules/gui/ncurses.c:886
+#: modules/gui/ncurses.c:877
 msgid " s                      Stop"
 msgstr " q, Q, Esc              zaustavi predvajanje"
 
-#: modules/gui/ncurses.c:887
+#: modules/gui/ncurses.c:878
 msgid " <space>                Pause/Play"
 msgstr " <preslednica>       premor/predvajanje posnetka"
 
-#: modules/gui/ncurses.c:888
+#: modules/gui/ncurses.c:879
 msgid " f                      Toggle Fullscreen"
 msgstr " f                      preklopi celozaslonski način"
 
-#: modules/gui/ncurses.c:889
+#: modules/gui/ncurses.c:880
 msgid " c                      Cycle through audio tracks"
 msgstr "c Preklop kroženja zvočnih sledi"
 
-#: modules/gui/ncurses.c:890
+#: modules/gui/ncurses.c:881
 msgid " v                      Cycle through subtitles tracks"
 msgstr "v Preklop kroženja sledi podnapisov"
 
-#: modules/gui/ncurses.c:891
+#: modules/gui/ncurses.c:882
 msgid " b                      Cycle through video tracks"
 msgstr "b Preklop kroženja slikovnih sledi"
 
-#: modules/gui/ncurses.c:892
+#: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
 msgstr " n, p                   naslednji/predhodni predmet seznama"
 
-#: modules/gui/ncurses.c:893
+#: modules/gui/ncurses.c:884
 msgid " [, ]                   Next/Previous title"
 msgstr " [, ]                   naslednji/predhodni naslov"
 
-#: modules/gui/ncurses.c:894
+#: modules/gui/ncurses.c:885
 msgid " <, >                   Next/Previous chapter"
 msgstr " <, >                   naslednje/predhodno poglavje"
 
 #. xgettext: You can use ← and → characters
-#: modules/gui/ncurses.c:896
+#: modules/gui/ncurses.c:887
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
 msgstr " <levo>,<desno>     Iskanje -/+ 1%%"
 
-#: modules/gui/ncurses.c:897
+#: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
 msgstr " a, z                   poveča ali zmanjša glasnost"
 
-#: modules/gui/ncurses.c:898
+#: modules/gui/ncurses.c:889
 msgid " m                      Mute"
 msgstr "m Utišaj"
 
 #. xgettext: You can use ↑ and ↓ characters
-#: modules/gui/ncurses.c:900
+#: modules/gui/ncurses.c:891
 msgid " <up>,<down>            Navigate through the box line by line"
 msgstr " <gor>,<dol>              premikanje po oknu vrstico po vrstico"
 
 #. xgettext: You can use ⇞ and ⇟ characters
-#: modules/gui/ncurses.c:902
+#: modules/gui/ncurses.c:893
 msgid " <pageup>,<pagedown>    Navigate through the box page by page"
 msgstr " <stran gor>,<stran dol>    premikanje po oknu stran po stran"
 
 #. xgettext: You can use ↖ and ↘ characters
-#: modules/gui/ncurses.c:904
+#: modules/gui/ncurses.c:895
 msgid " <start>,<end>          Navigate to start/end of box"
 msgstr " <↖>,<↘>                skok na začetek ali konec"
 
-#: modules/gui/ncurses.c:908
+#: modules/gui/ncurses.c:899
 msgid "[Playlist]"
 msgstr "[Seznam predvajanja]"
 
-#: modules/gui/ncurses.c:910
+#: modules/gui/ncurses.c:901
 msgid " r                      Toggle Random playing"
 msgstr " r                      preklop naključnega predvajanja"
 
-#: modules/gui/ncurses.c:911
+#: modules/gui/ncurses.c:902
 msgid " l                      Toggle Loop Playlist"
 msgstr " l                      preklop kroženja seznama predvajanja"
 
-#: modules/gui/ncurses.c:912
+#: modules/gui/ncurses.c:903
 msgid " R                      Toggle Repeat item"
 msgstr " R                      preklop ponavljanje predvajanja predmeta"
 
-#: modules/gui/ncurses.c:913
+#: modules/gui/ncurses.c:904
 msgid " o                      Order Playlist by title"
 msgstr " o                      razvrščanje seznama predvajanja po naslovu"
 
-#: modules/gui/ncurses.c:914
+#: modules/gui/ncurses.c:905
 msgid " O                      Reverse order Playlist by title"
 msgstr ""
 " O                      obrnjena razvrstitev seznama predvajanja po naslovu"
 
-#: modules/gui/ncurses.c:915
+#: modules/gui/ncurses.c:906
 msgid " g                      Go to the current playing item"
 msgstr " g                      skok na trenutno predvajan predmet"
 
-#: modules/gui/ncurses.c:916
+#: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
 msgstr " /                      iskanje predmeta"
 
-#: modules/gui/ncurses.c:917
+#: modules/gui/ncurses.c:908
 msgid " ;                      Look for the next item"
 msgstr "; Poišči naslednji predmet"
 
-#: modules/gui/ncurses.c:918
+#: modules/gui/ncurses.c:909
 msgid " A                      Add an entry"
 msgstr " A                      dodajanje vnosa"
 
 #. xgettext: You can use ⌫ character to translate <backspace>
-#: modules/gui/ncurses.c:920
+#: modules/gui/ncurses.c:911
 msgid " D, <backspace>, <del>  Delete an entry"
 msgstr " D, <⌫>, <brisalka>       Izbris predmeta"
 
-#: modules/gui/ncurses.c:921
+#: modules/gui/ncurses.c:912
 msgid " e                      Eject (if stopped)"
 msgstr " e                      izvrzi (če je ustavljeno)"
 
-#: modules/gui/ncurses.c:925
+#: modules/gui/ncurses.c:916
 msgid "[Filebrowser]"
 msgstr "[Brskanje datotek]"
 
-#: modules/gui/ncurses.c:927
+#: modules/gui/ncurses.c:918
 msgid " <enter>                Add the selected file to the playlist"
 msgstr " <vnosnica>           dodajanje izbrane datoteke na seznam predvajanja"
 
-#: modules/gui/ncurses.c:928
+#: modules/gui/ncurses.c:919
 msgid " <space>                Add the selected directory to the playlist"
 msgstr " <preslednica>       dodajanje izbrane mape na seznam predvajanja"
 
-#: modules/gui/ncurses.c:929
+#: modules/gui/ncurses.c:920
 msgid " .                      Show/Hide hidden files"
 msgstr " .                      skrij/pokaži skrite datoteke"
 
-#: modules/gui/ncurses.c:933
+#: modules/gui/ncurses.c:924
 msgid "[Player]"
 msgstr "[Predvajalnik]"
 
 #. xgettext: You can use ↑ and ↓ characters
-#: modules/gui/ncurses.c:936
+#: modules/gui/ncurses.c:927
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
 msgstr " <↑>,<↓>                 iskanje +/-5%%"
 
-#: modules/gui/ncurses.c:1055
+#: modules/gui/ncurses.c:1046
 #, fuzzy
 msgid "[Repeat]"
 msgstr "[Ponovi]"
 
-#: modules/gui/ncurses.c:1056
+#: modules/gui/ncurses.c:1047
 #, fuzzy
 msgid "[Random]"
 msgstr "[Naključno]"
 
-#: modules/gui/ncurses.c:1057
+#: modules/gui/ncurses.c:1048
 msgid "[Loop]"
 msgstr "[Kroženje]"
 
-#: modules/gui/ncurses.c:1066
+#: modules/gui/ncurses.c:1057
 #, c-format
 msgid " Source   : %s"
 msgstr "Vir            : %s"
 
-#: modules/gui/ncurses.c:1099
+#: modules/gui/ncurses.c:1090
 #, c-format
 msgid " Position : %s/%s"
 msgstr " Položaj    : %s/%s"
 
-#: modules/gui/ncurses.c:1104
+#: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
 msgstr "Glasnost : nemo"
 
-#: modules/gui/ncurses.c:1105
+#: modules/gui/ncurses.c:1096
 #, c-format
 msgid " Volume   : %3ld%%"
 msgstr " Glasnost : %3ld%%"
 
-#: modules/gui/ncurses.c:1105
+#: modules/gui/ncurses.c:1096
 msgid " Volume   : ----"
 msgstr " Glasnost : ----"
 
-#: modules/gui/ncurses.c:1111
+#: modules/gui/ncurses.c:1102
 #, c-format
 msgid " Title    : %<PRId64>/%d"
 msgstr " Naslov     : %<PRId64>/%d"
 
-#: modules/gui/ncurses.c:1117
+#: modules/gui/ncurses.c:1108
 #, c-format
 msgid " Chapter  : %<PRId64>/%d"
 msgstr " Poglavje  : %<PRId64>/%d"
 
-#: modules/gui/ncurses.c:1122
+#: modules/gui/ncurses.c:1113
 #, fuzzy
 msgid " Source: <no current item>"
 msgstr " Vir: <ni navedenega predmeta>"
 
-#: modules/gui/ncurses.c:1124
+#: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
 msgstr "[h za pomoč]"
 
-#: modules/gui/ncurses.c:1145
+#: modules/gui/ncurses.c:1136
 #, c-format
 msgid "Open: %s"
 msgstr "Odpri: %s"
 
-#: modules/gui/ncurses.c:1147
+#: modules/gui/ncurses.c:1138
 #, c-format
 msgid "Find: %s"
 msgstr "Najdi: %s"
@@ -20045,85 +20025,68 @@ msgstr "Statistika trenutne predstavne datoteke ali pretoka"
 msgid "Input/Read"
 msgstr "Vhod/Prebrano"
 
-#: modules/gui/qt/components/info_panels.cpp:575
-msgid "Output/Written/Sent"
-msgstr "Izhod/Zapisano/Poslano"
-
-#: modules/gui/qt/components/info_panels.cpp:577
+#: modules/gui/qt/components/info_panels.cpp:576
 msgid "Media data size"
 msgstr "Podatkovna velikost predstavne datoteke"
 
-#: modules/gui/qt/components/info_panels.cpp:583
+#: modules/gui/qt/components/info_panels.cpp:582
 msgid "Demuxed data size"
 msgstr "Velikost odvitih podatkov"
 
-#: modules/gui/qt/components/info_panels.cpp:584
+#: modules/gui/qt/components/info_panels.cpp:583
 msgid "Content bitrate"
 msgstr "Bitna hitrost vsebine"
 
-#: modules/gui/qt/components/info_panels.cpp:586
+#: modules/gui/qt/components/info_panels.cpp:585
 msgid "Discarded (corrupted)"
 msgstr "Zavrženo (okvarjeno)"
 
-#: modules/gui/qt/components/info_panels.cpp:588
+#: modules/gui/qt/components/info_panels.cpp:587
 msgid "Dropped (discontinued)"
 msgstr "Izpuščeno (opuščeno)"
 
-#: modules/gui/qt/components/info_panels.cpp:591
-#: modules/gui/qt/components/info_panels.cpp:604
+#: modules/gui/qt/components/info_panels.cpp:590
+#: modules/gui/qt/components/info_panels.cpp:597
 msgid "Decoded"
 msgstr "Odkodirano"
 
-#: modules/gui/qt/components/info_panels.cpp:592
-#: modules/gui/qt/components/info_panels.cpp:605
+#: modules/gui/qt/components/info_panels.cpp:591
+#: modules/gui/qt/components/info_panels.cpp:598
 msgid "blocks"
 msgstr "bloki"
 
-#: modules/gui/qt/components/info_panels.cpp:593
+#: modules/gui/qt/components/info_panels.cpp:592
 msgid "Displayed"
 msgstr "Prikazano"
 
-#: modules/gui/qt/components/info_panels.cpp:594
-#: modules/gui/qt/components/info_panels.cpp:596
+#: modules/gui/qt/components/info_panels.cpp:593
+#: modules/gui/qt/components/info_panels.cpp:595
 msgid "frames"
 msgstr "sličice"
 
-#: modules/gui/qt/components/info_panels.cpp:595
-#: modules/gui/qt/components/info_panels.cpp:608
+#: modules/gui/qt/components/info_panels.cpp:594
+#: modules/gui/qt/components/info_panels.cpp:601
 msgid "Lost"
 msgstr "Izgubljeno"
 
-#: modules/gui/qt/components/info_panels.cpp:598
 #: modules/gui/qt/components/info_panels.cpp:599
-msgid "Sent"
-msgstr "Poslano"
-
-#: modules/gui/qt/components/info_panels.cpp:598
-msgid "packets"
-msgstr "paketi"
-
-#: modules/gui/qt/components/info_panels.cpp:601
-msgid "Upstream rate"
-msgstr "Hitrost povratnega pretoka"
-
-#: modules/gui/qt/components/info_panels.cpp:606
 msgid "Played"
 msgstr "Predvajano"
 
-#: modules/gui/qt/components/info_panels.cpp:607
-#: modules/gui/qt/components/info_panels.cpp:608
+#: modules/gui/qt/components/info_panels.cpp:600
+#: modules/gui/qt/components/info_panels.cpp:601
 msgid "buffers"
 msgstr "medpomnilniki"
 
-#: modules/gui/qt/components/info_panels.cpp:630
+#: modules/gui/qt/components/info_panels.cpp:622
 msgid "Last 60 seconds"
 msgstr "Zadnjih 60 sekund"
 
-#: modules/gui/qt/components/info_panels.cpp:631
+#: modules/gui/qt/components/info_panels.cpp:623
 msgid "Overall"
 msgstr "Skupno"
 
-#: modules/gui/qt/components/interface_widgets.cpp:605
+#: modules/gui/qt/components/interface_widgets.cpp:608
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -20131,46 +20094,46 @@ msgstr ""
 "Trenutna hitrost predvajanja: %1\n"
 "S klikom je vrednost mogoče spreminjati."
 
-#: modules/gui/qt/components/interface_widgets.cpp:678
+#: modules/gui/qt/components/interface_widgets.cpp:681
 msgid "Revert to normal play speed"
 msgstr "Povrni na običajno hitrost predvajanja"
 
-#: modules/gui/qt/components/interface_widgets.cpp:784
+#: modules/gui/qt/components/interface_widgets.cpp:787
 msgid "Download cover art"
 msgstr "Prejmi naslovnice"
 
-#: modules/gui/qt/components/interface_widgets.cpp:788
+#: modules/gui/qt/components/interface_widgets.cpp:791
 msgid "Add cover art from file"
 msgstr "Dodaj naslovnico iz datoteke"
 
-#: modules/gui/qt/components/interface_widgets.cpp:854
+#: modules/gui/qt/components/interface_widgets.cpp:857
 msgid "Choose Cover Art"
 msgstr "Izberite naslovnico"
 
-#: modules/gui/qt/components/interface_widgets.cpp:855
+#: modules/gui/qt/components/interface_widgets.cpp:858
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
 msgstr "Slikovne datoteke (*.gif *.jpg *.jpeg *.png)"
 
-#: modules/gui/qt/components/interface_widgets.cpp:879
+#: modules/gui/qt/components/interface_widgets.cpp:882
 #: modules/gui/qt/dialogs/toolbar.cpp:564
 msgid "Elapsed time"
 msgstr "Pretečeni čas"
 
-#: modules/gui/qt/components/interface_widgets.cpp:883
+#: modules/gui/qt/components/interface_widgets.cpp:886
 #: modules/gui/qt/dialogs/toolbar.cpp:568
 msgid "Total/Remaining time"
 msgstr "Skupni/Preostali čas"
 
-#: modules/gui/qt/components/interface_widgets.cpp:885
+#: modules/gui/qt/components/interface_widgets.cpp:888
 msgid "Click to toggle between total and remaining time"
 msgstr "Kliknite za preklop med možnostima prikaza časa"
 
-#: modules/gui/qt/components/interface_widgets.cpp:891
+#: modules/gui/qt/components/interface_widgets.cpp:894
 msgid "Click to toggle between elapsed and remaining time"
 msgstr ""
 "S klikom se preklopi prikaz pretečenega in preostalega trajanja predvajanja."
 
-#: modules/gui/qt/components/interface_widgets.cpp:893
+#: modules/gui/qt/components/interface_widgets.cpp:896
 msgid "Double click to jump to a chosen time position"
 msgstr "Z dvojnim klikom je mogoče skočiti na želeni čas posnetka."
 
@@ -20192,7 +20155,7 @@ msgid "File names:"
 msgstr "Imena datotek:"
 
 #: modules/gui/qt/components/open_panels.cpp:162
-#: modules/gui/qt/ui/sprefs_interface.h:558
+#: modules/gui/qt/ui/sprefs_interface.h:561
 msgid "Filter:"
 msgstr "Filter:"
 
@@ -20470,21 +20433,21 @@ msgstr "Tipka ali kombinacija:"
 msgid "Key: "
 msgstr "Tipka: "
 
-#: modules/gui/qt/components/simple_preferences.cpp:230
-#: modules/gui/qt/components/simple_preferences.cpp:571
+#: modules/gui/qt/components/simple_preferences.cpp:231
+#: modules/gui/qt/components/simple_preferences.cpp:591
 msgid "Input & Codecs Settings"
 msgstr "Nastavitve dovoda in kodekov"
 
-#: modules/gui/qt/components/simple_preferences.cpp:232
-#: modules/gui/qt/components/simple_preferences.cpp:854
+#: modules/gui/qt/components/simple_preferences.cpp:233
+#: modules/gui/qt/components/simple_preferences.cpp:875
 msgid "Configure Hotkeys"
 msgstr "Nastavitev vročih tipk"
 
-#: modules/gui/qt/components/simple_preferences.cpp:408
+#: modules/gui/qt/components/simple_preferences.cpp:423
 msgid "Device:"
 msgstr "Naprava:"
 
-#: modules/gui/qt/components/simple_preferences.cpp:576
+#: modules/gui/qt/components/simple_preferences.cpp:596
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -20496,58 +20459,58 @@ msgstr ""
 "Določiti je mogoče enoznačno vrednost,\n"
 "ali pa jo določiti v naprednih nastavitvah."
 
-#: modules/gui/qt/components/simple_preferences.cpp:643
+#: modules/gui/qt/components/simple_preferences.cpp:664
 msgid "Lowest latency"
 msgstr "Najnižja zakasnitev"
 
-#: modules/gui/qt/components/simple_preferences.cpp:644
+#: modules/gui/qt/components/simple_preferences.cpp:665
 msgid "Low latency"
 msgstr "Nizka zakasnitev"
 
-#: modules/gui/qt/components/simple_preferences.cpp:646
+#: modules/gui/qt/components/simple_preferences.cpp:667
 msgid "High latency"
 msgstr "Visoka zakasnitev"
 
-#: modules/gui/qt/components/simple_preferences.cpp:647
+#: modules/gui/qt/components/simple_preferences.cpp:668
 msgid "Higher latency"
 msgstr "Višja zakasnitev"
 
-#: modules/gui/qt/components/simple_preferences.cpp:695
+#: modules/gui/qt/components/simple_preferences.cpp:716
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "Vmesnik predvajalnika podpira preobleke, ki objavljene na spletišču"
 
-#: modules/gui/qt/components/simple_preferences.cpp:697
+#: modules/gui/qt/components/simple_preferences.cpp:718
 msgid "VLC skins website"
 msgstr "VLC Skins"
 
-#: modules/gui/qt/components/simple_preferences.cpp:721
+#: modules/gui/qt/components/simple_preferences.cpp:742
 msgid "System's default"
 msgstr "Sistemsko privzeto"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1239
+#: modules/gui/qt/components/simple_preferences.cpp:1265
 msgid "File associations"
 msgstr "Datotečne vezi"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1248
+#: modules/gui/qt/components/simple_preferences.cpp:1274
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "Zvokovne datoteke"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1249
+#: modules/gui/qt/components/simple_preferences.cpp:1275
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "Video datoteke"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1250
+#: modules/gui/qt/components/simple_preferences.cpp:1276
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "Datoteke seznamov predvajanja"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1315
+#: modules/gui/qt/components/simple_preferences.cpp:1341
 msgid "&Apply"
 msgstr "&Uporabi"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1316
+#: modules/gui/qt/components/simple_preferences.cpp:1342
 #: modules/gui/qt/dialogs/convert.cpp:133
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60
@@ -20731,7 +20694,7 @@ msgstr "Ni izbrane datoteke"
 msgid "Destination"
 msgstr "Cilj"
 
-#: modules/gui/qt/dialogs/convert.cpp:68 modules/gui/qt/ui/sprefs_audio.h:432
+#: modules/gui/qt/dialogs/convert.cpp:68 modules/gui/qt/ui/sprefs_audio.h:416
 msgid "Destination file:"
 msgstr "Ciljna datoteka:"
 
@@ -21150,7 +21113,7 @@ msgstr "Različica"
 msgid "Website"
 msgstr "Spletišče"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:354
+#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Datoteke"
 
@@ -21398,7 +21361,7 @@ msgstr "Ponovi:"
 msgid "Repeat delay:"
 msgstr "Zamik ponovitve:"
 
-#: modules/gui/qt/dialogs/vlm.cpp:112 modules/gui/qt/ui/sprefs_interface.h:556
+#: modules/gui/qt/dialogs/vlm.cpp:112 modules/gui/qt/ui/sprefs_interface.h:558
 msgid " days"
 msgstr " dni"
 
@@ -21489,20 +21452,20 @@ msgstr "Prazno"
 msgid "Deactivate"
 msgstr "Pokaži"
 
-#: modules/gui/qt/main_interface.cpp:371
+#: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
 msgstr "Ali želite nadaljevati s predvajanjem na mestu, kjer ste končali?"
 
-#: modules/gui/qt/main_interface.cpp:377
+#: modules/gui/qt/main_interface.cpp:382
 #, fuzzy
 msgid "&Continue"
 msgstr "Nadaljuj"
 
-#: modules/gui/qt/main_interface.cpp:1389
+#: modules/gui/qt/main_interface.cpp:1419
 msgid "Control menu for the player"
 msgstr "Nadzorni meni za predvajalnik"
 
-#: modules/gui/qt/main_interface.cpp:1433
+#: modules/gui/qt/main_interface.cpp:1463
 msgid "Paused"
 msgstr "V premoru"
 
@@ -22267,7 +22230,7 @@ msgstr "Barva slike (0-10)"
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Nastavitev barve slike med 0.01 in 10. Privzeta vrednost je 1."
 
-#: modules/hw/d3d11/d3d11_filters.c:613
+#: modules/hw/d3d11/d3d11_filters.c:620
 #, fuzzy
 msgid "Direct3D11 filter"
 msgstr "DirectX video pospeševanje (DXVA) 2.0"
@@ -25495,55 +25458,55 @@ msgstr "Privzeto: 90sec"
 msgid "Chromaprint stream output"
 msgstr "Premoščanje pretakanja odvoda"
 
-#: modules/stream_out/chromecast/cast.cpp:103
+#: modules/stream_out/chromecast/cast.cpp:104
 #, fuzzy
 msgid "HTTP port"
 msgstr "SFTP vrata"
 
-#: modules/stream_out/chromecast/cast.cpp:104
+#: modules/stream_out/chromecast/cast.cpp:105
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:107
+#: modules/stream_out/chromecast/cast.cpp:108
 msgid "The Chromecast receiver can receive video."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:109
+#: modules/stream_out/chromecast/cast.cpp:110
 #, fuzzy
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr ""
 "Modul omogoča odvod prekodiranega pretoka v omrežje prek strežnika IceCast."
 
-#: modules/stream_out/chromecast/cast.cpp:110
+#: modules/stream_out/chromecast/cast.cpp:111
 msgid "MIME content type"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:111
+#: modules/stream_out/chromecast/cast.cpp:112
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:114
+#: modules/stream_out/chromecast/cast.cpp:115
 #, fuzzy
 msgid "IP Address of the Chromecast."
 msgstr "Naslov računalnika za pretakanje."
 
-#: modules/stream_out/chromecast/cast.cpp:115
+#: modules/stream_out/chromecast/cast.cpp:116
 #, fuzzy
 msgid "Chromecast port"
 msgstr "Oblika barv"
 
-#: modules/stream_out/chromecast/cast.cpp:116
+#: modules/stream_out/chromecast/cast.cpp:117
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:120
+#: modules/stream_out/chromecast/cast.cpp:121
 #, fuzzy
 msgid "Chromecast"
 msgstr "Barva"
 
-#: modules/stream_out/chromecast/cast.cpp:121
+#: modules/stream_out/chromecast/cast.cpp:122
 #, fuzzy
 msgid "Chromecast stream output"
 msgstr "Premoščanje pretakanja odvoda"
@@ -28136,7 +28099,7 @@ msgstr "GLX"
 msgid "GLX extension for OpenGL"
 msgstr "Razširitev GLX za OpenGL"
 
-#: modules/video_output/kva.c:50 modules/gui/qt/ui/sprefs_video.h:322
+#: modules/video_output/kva.c:50 modules/gui/qt/ui/sprefs_video.h:324
 msgid "Enable a workaround for T23"
 msgstr "Omogoči zaobidenje za T23"
 
@@ -28148,7 +28111,7 @@ msgstr ""
 "Omogočite to možnost, če so prikazane poševne črte, kadar je velikost okna "
 "enaka ali manjša, kot velikost video posnetka."
 
-#: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:323
+#: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:325
 msgid "Video mode"
 msgstr "Način slike"
 
@@ -28281,7 +28244,7 @@ msgid "Direct3D11 video output"
 msgstr "Direct3D izhod slike"
 
 #: modules/video_output/win32/directdraw.c:65
-#: modules/gui/qt/ui/sprefs_video.h:318
+#: modules/gui/qt/ui/sprefs_video.h:321
 msgid "Use hardware YUV->RGB conversions"
 msgstr "Uporabi strojno pretvarjanje YUV->RGB"
 
@@ -29162,7 +29125,7 @@ msgid "Play List"
 msgstr "Seznam predvajanja"
 
 #: share/lua/http/dialogs/create_stream.html:156
-#: modules/gui/qt/ui/sprefs_audio.h:430
+#: modules/gui/qt/ui/sprefs_audio.h:414
 msgid "Output"
 msgstr "Odvod"
 
@@ -29363,11 +29326,11 @@ msgid "Dialog"
 msgstr "Pogovorno okno"
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
-#: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:425
-#: modules/gui/qt/ui/sprefs_input.h:345
-#: modules/gui/qt/ui/sprefs_interface.h:528
+#: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:409
+#: modules/gui/qt/ui/sprefs_input.h:356
+#: modules/gui/qt/ui/sprefs_interface.h:529
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
-#: modules/gui/qt/ui/sprefs_video.h:311 modules/gui/qt/ui/streampanel.h:167
+#: modules/gui/qt/ui/sprefs_video.h:313 modules/gui/qt/ui/streampanel.h:167
 msgid "Form"
 msgstr "Oblika"
 
@@ -29739,171 +29702,159 @@ msgstr "Pretoči vse osnovne pretoke"
 msgid "Generated stream output string"
 msgstr "Ustvarjen niz izhoda pretoka"
 
-#: modules/gui/qt/ui/sprefs_audio.h:428
+#: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
 msgstr " %"
 
-#: modules/gui/qt/ui/sprefs_audio.h:431
+#: modules/gui/qt/ui/sprefs_audio.h:415
 msgid "Output module:"
 msgstr "Modul odvoda:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:434
+#: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Use S/PDIF when available"
 msgstr "Po potrebi uporabi S/PDIF"
 
-#: modules/gui/qt/ui/sprefs_audio.h:435
+#: modules/gui/qt/ui/sprefs_audio.h:420
 msgid "Effects"
 msgstr "Učinki"
 
-#: modules/gui/qt/ui/sprefs_audio.h:436
+#: modules/gui/qt/ui/sprefs_audio.h:421
 msgid "Visualization:"
 msgstr "Predočenje:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:437
+#: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Enable Time-Stretching audio"
 msgstr "Omogoči časovno raztegovanje zvoka"
 
-#: modules/gui/qt/ui/sprefs_audio.h:438
-msgid "Dolby Surround:"
-msgstr "Dolby Surround:"
-
-#: modules/gui/qt/ui/sprefs_audio.h:439
+#: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
 msgstr "Raven ponovnega predvajanja:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:440
-msgid "Headphone surround effect"
-msgstr "Učinek slušalk"
-
-#: modules/gui/qt/ui/sprefs_audio.h:441
+#: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
 msgstr "Ustali glasnost na:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:442
+#: modules/gui/qt/ui/sprefs_audio.h:425
 msgid "Tracks"
 msgstr "Sledi"
 
-#: modules/gui/qt/ui/sprefs_audio.h:443
+#: modules/gui/qt/ui/sprefs_audio.h:426
 msgid "Preferred audio language:"
 msgstr "Prednostni jezik zvoka:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:444
+#: modules/gui/qt/ui/sprefs_audio.h:427
 msgid "Password:"
 msgstr "Geslo:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:445
+#: modules/gui/qt/ui/sprefs_audio.h:428
 msgid "Username:"
 msgstr "Uporabniško ime:"
 
-#: modules/gui/qt/ui/sprefs_audio.h:446
+#: modules/gui/qt/ui/sprefs_audio.h:429
 msgid "Submit played tracks stats to Last.fm"
 msgstr "Pošilji statistiko predvajanja na last.fm"
 
-#: modules/gui/qt/ui/sprefs_input.h:346
+#: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Codecs"
 msgstr "Kodeki"
 
-#: modules/gui/qt/ui/sprefs_input.h:347
+#: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
 msgstr "Izbira profila in ravni x264"
 
-#: modules/gui/qt/ui/sprefs_input.h:348
-msgid "x264 preset and tuning selection"
-msgstr "Izbira nastavitev in uglaševanja x264"
-
-#: modules/gui/qt/ui/sprefs_input.h:349
+#: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Hardware-accelerated decoding"
 msgstr "Strojno pospešeno odkodiranje"
 
-#: modules/gui/qt/ui/sprefs_input.h:350
-msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Izpusti filter kroženja pri H.264"
-
-#: modules/gui/qt/ui/sprefs_input.h:351
+#: modules/gui/qt/ui/sprefs_input.h:360 modules/gui/qt/ui/sprefs_input.h:362
 msgid "Video quality post-processing level"
 msgstr "Raven kakovosti slike poopravilnega filtra"
 
-#: modules/gui/qt/ui/sprefs_input.h:352
+#: modules/gui/qt/ui/sprefs_input.h:361
+msgid "Skip H.264 in-loop deblocking filter"
+msgstr "Izpusti filter kroženja pri H.264"
+
+#: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
 msgstr "Optični pogon"
 
-#: modules/gui/qt/ui/sprefs_input.h:353
+#: modules/gui/qt/ui/sprefs_input.h:365
 msgid "Default optical device"
 msgstr "Privzeta optična naprava"
 
-#: modules/gui/qt/ui/sprefs_input.h:357
+#: modules/gui/qt/ui/sprefs_input.h:369
 msgid "Damaged or incomplete AVI file"
 msgstr "Odziv na okvarjeno kazalo datoteke AVI"
 
-#: modules/gui/qt/ui/sprefs_input.h:360
+#: modules/gui/qt/ui/sprefs_input.h:372
 msgid "HTTP proxy URL"
 msgstr "Naslov URL posredovalnega strežnika HTTP"
 
-#: modules/gui/qt/ui/sprefs_input.h:361
+#: modules/gui/qt/ui/sprefs_input.h:373
 msgid "HTTP (default)"
 msgstr "HTTP (privzeto)"
 
-#: modules/gui/qt/ui/sprefs_input.h:362
+#: modules/gui/qt/ui/sprefs_input.h:374
 msgid "RTP over RTSP (TCP)"
 msgstr "RTP prek RTSP (TCP)"
 
-#: modules/gui/qt/ui/sprefs_input.h:363
+#: modules/gui/qt/ui/sprefs_input.h:375
 msgid "Live555 stream transport"
 msgstr "Prenos pretoka Live555"
 
-#: modules/gui/qt/ui/sprefs_input.h:364
+#: modules/gui/qt/ui/sprefs_input.h:376
 msgid "Default caching policy"
 msgstr "Privzeta pravila predpomnjenja"
 
-#: modules/gui/qt/ui/sprefs_interface.h:530
+#: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
 msgstr "Jezik menija:"
 
-#: modules/gui/qt/ui/sprefs_interface.h:531
+#: modules/gui/qt/ui/sprefs_interface.h:532
 msgid "Look and feel"
 msgstr "Videz in občutek"
 
-#: modules/gui/qt/ui/sprefs_interface.h:532
+#: modules/gui/qt/ui/sprefs_interface.h:533
 msgid "Use custom skin"
 msgstr "Uporabi preobleko po meri"
 
-#: modules/gui/qt/ui/sprefs_interface.h:534
+#: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "This is VLC's default interface, with a native look and feel."
 msgstr "Privzet vmesnik predvajalnika z lastnim videzom."
 
-#: modules/gui/qt/ui/sprefs_interface.h:536
+#: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Use native style"
 msgstr "Uporabi lastni videz"
 
-#: modules/gui/qt/ui/sprefs_interface.h:537
+#: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Resize interface to video size"
 msgstr "Prilagodi velikost vmesnika na velikost posnetka"
 
-#: modules/gui/qt/ui/sprefs_interface.h:538
+#: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Show controls in full screen mode"
 msgstr "V celozaslonskem načinu pokaži nadzorne tipke"
 
-#: modules/gui/qt/ui/sprefs_interface.h:539
+#: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Pause playback when minimized"
 msgstr "Ob skrčenju ustavi predvajanje"
 
-#: modules/gui/qt/ui/sprefs_interface.h:540
+#: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Show media change popup:"
 msgstr "Prikaži pojavno okno spremembe predstavnosti:"
 
-#: modules/gui/qt/ui/sprefs_interface.h:541
+#: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Start in minimal view mode"
 msgstr "Zaženi predvajalnik s poenostavljenim vmesnikom"
 
-#: modules/gui/qt/ui/sprefs_interface.h:542
+#: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Force window style:"
 msgstr "Vsili oblikovni slog okna predvajalnika:"
 
-#: modules/gui/qt/ui/sprefs_interface.h:543
+#: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Integrate video in interface"
 msgstr "Vpni sliko videa v vmesnik"
 
-#: modules/gui/qt/ui/sprefs_interface.h:544
+#: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Show systray icon"
 msgstr "Pokaži ikono v sistemski vrstici"
 
@@ -29922,39 +29873,39 @@ msgstr "Datoteka preobleke:"
 msgid "Playlist and Instances"
 msgstr "Seznam predvajanja in zagon"
 
-#: modules/gui/qt/ui/sprefs_interface.h:550
-msgid "Allow only one instance"
-msgstr "Dovoli le en sočasen zagon programa"
-
-#: modules/gui/qt/ui/sprefs_interface.h:553
+#: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
 msgstr "Vsili premor na zadnji sličici posnetka"
 
+#: modules/gui/qt/ui/sprefs_interface.h:555
+msgid "Allow only one instance"
+msgstr "Dovoli le en sočasen zagon programa"
+
 #: modules/gui/qt/ui/sprefs_interface.h:557
+msgid "Activate updates notifier"
+msgstr "Omogoči obvestila o posodobitvah"
+
+#: modules/gui/qt/ui/sprefs_interface.h:559
 msgid "Every "
 msgstr "Vsak"
 
 #: modules/gui/qt/ui/sprefs_interface.h:560
-msgid "Separate words by | (without space)"
-msgstr "Loči besede z znakom | (brez preslednice)"
-
-#: modules/gui/qt/ui/sprefs_interface.h:562
 msgid "Save recently played items"
 msgstr "Beleži nedavno predvajane predmete"
 
 #: modules/gui/qt/ui/sprefs_interface.h:563
-msgid "Activate updates notifier"
-msgstr "Omogoči obvestila o posodobitvah"
+msgid "Separate words by | (without space)"
+msgstr "Loči besede z znakom | (brez preslednice)"
 
-#: modules/gui/qt/ui/sprefs_interface.h:565
+#: modules/gui/qt/ui/sprefs_interface.h:566
 msgid "Operating System Integration"
 msgstr "Povezljivost z operacijskim sistemom"
 
-#: modules/gui/qt/ui/sprefs_interface.h:566
+#: modules/gui/qt/ui/sprefs_interface.h:567
 msgid "File extensions association"
 msgstr "Povezava datotečnih končnic"
 
-#: modules/gui/qt/ui/sprefs_interface.h:567
+#: modules/gui/qt/ui/sprefs_interface.h:568
 msgid "Set up associations..."
 msgstr "Nastavi vezi ..."
 
@@ -30002,32 +29953,28 @@ msgstr " točk"
 msgid "Add a background"
 msgstr "Dodaj ozadje"
 
-#: modules/gui/qt/ui/sprefs_video.h:315
+#: modules/gui/qt/ui/sprefs_video.h:316
 #, fuzzy
 msgid "O&utput"
 msgstr "Odvod"
 
-#: modules/gui/qt/ui/sprefs_video.h:316
-msgid "Accelerated video output (Overlay)"
-msgstr "Pospešen izhod slike (prekrivanje)"
-
-#: modules/gui/qt/ui/sprefs_video.h:319
+#: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
 msgstr "DirectX"
 
-#: modules/gui/qt/ui/sprefs_video.h:320
-msgid "Display device"
-msgstr "Prikaži napravo"
+#: modules/gui/qt/ui/sprefs_video.h:322
+msgid "Accelerated video output (Overlay)"
+msgstr "Pospešen izhod slike (prekrivanje)"
 
-#: modules/gui/qt/ui/sprefs_video.h:321
+#: modules/gui/qt/ui/sprefs_video.h:323
 msgid "KVA"
 msgstr "KVA"
 
-#: modules/gui/qt/ui/sprefs_video.h:327
+#: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
 msgstr "Vsiljeno razmerje velikosti"
 
-#: modules/gui/qt/ui/sprefs_video.h:332
+#: modules/gui/qt/ui/sprefs_video.h:334
 msgid "vlc-snap"
 msgstr "vlc-snap"
 
@@ -30228,6 +30175,58 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Seznam upravljalnika predstavnih datotek"
+
+#, fuzzy
+#~ msgid "Screen capture (with Wayland)"
+#~ msgstr "Zaslonsko zajemanje (z X11/XCB)"
+
+#~ msgid "+-[Streaming]"
+#~ msgstr "+-[Pretakanje]"
+
+#~ msgid "| packets sent     :    %5<PRIi64>"
+#~ msgstr "| poslanih paketov: %5<PRIi64>"
+
+#~ msgid "| bytes sent       : %8.0f KiB"
+#~ msgstr "| poslanih bajtov       : %8.0f KiB"
+
+#~ msgid "| sending bitrate  :   %6.0f kb/s"
+#~ msgstr "| bitna hitrost pošiljanja  :   %6.0f kb/s"
+
+#~ msgid "Streaming"
+#~ msgstr "Pretakanje"
+
+#~ msgid "Sent packets"
+#~ msgstr "Poslani paketi"
+
+#~ msgid "Sent bytes"
+#~ msgstr "Poslani biti"
+
+#~ msgid "Send rate"
+#~ msgstr "Hitrost pošiljanja"
+
+#~ msgid "Output/Written/Sent"
+#~ msgstr "Izhod/Zapisano/Poslano"
+
+#~ msgid "Sent"
+#~ msgstr "Poslano"
+
+#~ msgid "packets"
+#~ msgstr "paketi"
+
+#~ msgid "Upstream rate"
+#~ msgstr "Hitrost povratnega pretoka"
+
+#~ msgid "Dolby Surround:"
+#~ msgstr "Dolby Surround:"
+
+#~ msgid "Headphone surround effect"
+#~ msgstr "Učinek slušalk"
+
+#~ msgid "x264 preset and tuning selection"
+#~ msgstr "Izbira nastavitev in uglaševanja x264"
+
+#~ msgid "Display device"
+#~ msgstr "Prikaži napravo"
 
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
@@ -39536,10 +39535,6 @@ msgstr "Seznam upravljalnika predstavnih datotek"
 #, fuzzy
 #~ msgid "%i items in the playlist"
 #~ msgstr "Naslednja predstavna datoteka na seznamu"
-
-#, fuzzy
-#~ msgid "Enabled"
-#~ msgstr "Omogoči"
 
 #, fuzzy
 #~ msgid "Position:"
