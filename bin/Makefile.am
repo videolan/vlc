@@ -40,6 +40,7 @@ libbreakpad_wrapper_la_CXXFLAGS = $(AM_CXXFLAGS) $(BREAKPAD_CFLAGS) -DBREAKPAD_U
 if HAVE_BREAKPAD
 noinst_LTLIBRARIES = libbreakpad_wrapper.la
 vlc_LDADD += libbreakpad_wrapper.la -lstdc++ -lwininet
+vlc_DEPENDENCIES += libbreakpad_wrapper.la
 vlc_CPPFLAGS += -DHAVE_BREAKPAD
 endif
 endif
