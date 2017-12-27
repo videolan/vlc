@@ -625,7 +625,7 @@ static int16_t dat12tos16( uint_fast16_t y )
 
 static void DAT12Decode( void *outp, const uint8_t *in, unsigned samples )
 {
-    int32_t *out = outp;
+    int16_t *out = outp;
 
     while( samples >= 2 )
     {
