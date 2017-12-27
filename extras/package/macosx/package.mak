@@ -92,6 +92,15 @@ package-macosx-zip: VLC.app
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 
+package-macosx-release:
+	rm -f "$(top_builddir)/vlc-$(VERSION)-release.zip"
+	mkdir -p $(top_builddir)/vlc-$(VERSION)-release
+	cp -R $(top_builddir)/VLC.app $(top_builddir)/vlc-$(VERSION)-release/
+	cp $(srcdir)/extras/package/macosx/dmg/* $(top_builddir)/vlc-$(VERSION)-release/
+	cp "$(srcdir)/extras/package/macosx/codesign.sh" $(top_builddir)/vlc-$(VERSION)-release/
+	zip -r -y -9 $(top_builddir)/vlc-$(VERSION)-release.zip $(top_builddir)/vlc-$(VERSION)-release
+	rm -rf "$(top_builddir)/vlc-$(VERSION)-release"
+
 package-translations:
 	mkdir -p "$(srcdir)/vlc-translations-$(VERSION)"
 	for i in `cat "$(top_srcdir)/po/LINGUAS"`; do \
@@ -111,7 +120,7 @@ package-translations:
 	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
-.PHONY: package-macosx package-macosx-zip package-translations pseudo-bundle
+.PHONY: package-macosx package-macosx-zip package-macosx-release package-translations pseudo-bundle
 
 ###############################################################################
 # Mac OS X project
