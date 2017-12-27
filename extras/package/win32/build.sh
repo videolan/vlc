@@ -95,7 +95,10 @@ cd ../../
 info "Building contribs"
 export USE_FFMPEG=1
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
-../bootstrap --host=$TRIPLET
+if [ ! -z "$BREAKPAD" ]; then
+     CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
+fi
+../bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" != "yes" ]; then
@@ -116,10 +119,7 @@ export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
 export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
 echo $PATH
 
-if [ ! -z "$BREAKPAD" ]; then
-     CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
-fi
-./bootstrap $CONTRIBFLAGS
+./bootstrap
 
 info "Configuring VLC"
 mkdir $SHORTARCH || true
