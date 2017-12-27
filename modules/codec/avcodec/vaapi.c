@@ -103,11 +103,14 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
         count = 5;
         break;
     case AV_CODEC_ID_VP9:
-        if (fmt->i_profile == FF_PROFILE_VP9_0)
+        if (ctx->profile == FF_PROFILE_VP9_0)
             i_profile = VAProfileVP9Profile0;
 #if VA_CHECK_VERSION( 0, 39, 0 )
-        else if (fmt->i_profile == FF_PROFILE_VP9_2)
+        else if (ctx->profile == FF_PROFILE_VP9_2)
+        {
             i_profile = VAProfileVP9Profile2;
+            i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
+        }
 #endif
         else
             return VLC_EGENERIC;
