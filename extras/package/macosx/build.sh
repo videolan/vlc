@@ -19,6 +19,10 @@ VLCBUILDDIR=""
 CORE_COUNT=`getconf NPROCESSORS_ONLN 2>&1`
 let JOBS=$CORE_COUNT+1
 
+if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
+    OSX_KERNELVERSION="$VLC_FORCE_KERNELVERSION"
+fi
+
 usage()
 {
 cat << EOF
@@ -33,9 +37,11 @@ OPTIONS:
    -r            Rebuild everything (tools, contribs, vlc)
    -c            Recompile contribs from sources
    -p            Build packages for all artifacts
+   -i <n|u>      Create an installable package (n: nightly, u: unsigned stripped release archive)
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $ARCH)
    -C            Use the specified VLC build dir
+   -b <url>      Enable breakpad support and send crash reports to this URL
 EOF
 
 }
@@ -50,7 +56,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrcpk:a:j:C:" OPTION
+while getopts "hvrcpi:k:a:j:C:b:" OPTION
 do
      case $OPTION in
          h)
@@ -70,6 +76,9 @@ do
          p)
              PACKAGE="yes"
          ;;
+         i)
+             PACKAGETYPE=$OPTARG
+         ;;
          a)
              ARCH=$OPTARG
          ;;
@@ -81,6 +90,9 @@ do
          ;;
          C)
              VLCBUILDDIR=$OPTARG
+         ;;
+         b)
+             BREAKPAD=$OPTARG
          ;;
      esac
 done
@@ -232,6 +244,11 @@ fi
 # vlc/configure
 #
 
+CONFIGFLAGS=""
+if [ ! -z "$BREAKPAD" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
+fi
+
 if [ "${vlcroot}/configure" -nt Makefile ]; then
 
   ${vlcroot}/extras/package/macosx/configure.sh \
@@ -239,6 +256,7 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
       --host=$TRIPLET \
       --with-macosx-version-min=$MINIMAL_OSX_VERSION \
       --with-macosx-sdk=$SDKROOT \
+      $CONFIGFLAGS \
       $VLC_CONFIGURE_ARGS > $out
 fi
 
@@ -259,7 +277,21 @@ info "Preparing VLC.app"
 make VLC.app
 
 
-if [ "$PACKAGE" = "yes" ]; then
+if [ "$PACKAGETYPE" = "u" ]; then
+    info "Copying app with debug symbols into VLC-debug.app and stripping"
+    rm -rf VLC-debug.app
+    cp -R VLC.app VLC-debug.app
+
+    find VLC.app/ -name "*.dylib" -exec strip -u -r {} \;
+    find VLC.app/ -type f -name "VLC" -exec strip -u -r {} \;
+    find VLC.app/ -type f -name "Sparkle" -exec strip -u -r {} \;
+    find VLC.app/ -type f -name "Growl" -exec strip -u -r {} \;
+    find VLC.app/ -type f -name "Breakpad" -exec strip -u -r {} \;
+
+    info "Building VLC release archive"
+    make package-macosx-release
+    shasum -a 512 vlc-*-release.zip
+elif [ "$PACKAGETYPE" = "n" -o "$PACKAGE" = "yes" ]; then
     info "Building VLC dmg package"
     make package-macosx
 fi
