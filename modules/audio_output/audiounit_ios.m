@@ -90,7 +90,14 @@ struct aout_sys_t
     bool      b_paused;
     bool      b_preferred_channels_set;
     enum au_dev au_dev;
+
+    /* sw gain */
+    float               soft_gain;
+    bool                soft_mute;
 };
+
+/* Soft volume helper */
+#include "audio_output/volume.h"
 
 enum port_type
 {
@@ -492,6 +499,9 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
+
+    aout_SoftVolumeStart( p_aout );
+
     msg_Dbg(p_aout, "analog AudioUnit output successfully opened for %4.4s %s",
             (const char *)&fmt->i_format, aout_FormatPrintChannels(fmt));
     return VLC_SUCCESS;
@@ -573,6 +583,8 @@ Open(vlc_object_t *obj)
     aout->start = Start;
     aout->stop = Stop;
     aout->device_select = DeviceSelect;
+
+    aout_SoftVolumeInit( aout );
 
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
