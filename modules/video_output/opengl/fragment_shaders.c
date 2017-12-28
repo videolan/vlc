@@ -608,7 +608,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         struct pl_shader *sh = tc->pl_sh;
         pl_shader_color_map(sh, &pl_color_map_default_params,
                 pl_color_space_from_video_format(&tc->fmt),
-                pl_color_space_unknown, false);
+                pl_color_space_unknown, NULL, false);
 
         const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
 
