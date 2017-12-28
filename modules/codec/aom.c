@@ -454,6 +454,11 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         {
             int keyframe = pkt->data.frame.flags & AOM_FRAME_IS_KEY;
             block_t *p_block = block_Alloc(pkt->data.frame.sz);
+            if (unlikely(p_block == NULL)) {
+                block_ChainRelease(p_out);
+                p_out = NULL;
+                break;
+            }
 
             /* FIXME: do this in-place */
             memcpy(p_block->p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
