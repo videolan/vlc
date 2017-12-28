@@ -83,11 +83,6 @@ static void Destroy( vlc_object_t * );
 #define FAMILY_LONGTEXT N_("Font family for the font you want to use")
 #define FONT_LONGTEXT N_("Font file for the font you want to use")
 
-#define FONTSIZE_TEXT N_("Font size in pixels")
-#define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
-    "that will be rendered on the video. " \
-    "If set to something different than 0 this option will override the " \
-    "relative font size." )
 #define OPACITY_TEXT N_("Text opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of the " \
     "text that will be rendered on the video. 0 = transparent, " \
@@ -97,10 +92,7 @@ static void Destroy( vlc_object_t * );
     "the video. This must be an hexadecimal (like HTML colors). The first two "\
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
-#define FONTSIZER_TEXT N_("Relative font size")
-#define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
-    "fonts that will be rendered on the video. If absolute font size is set, "\
-    "relative size will be overridden." )
+
 #define BOLD_TEXT N_("Force bold")
 
 #define BG_OPACITY_TEXT N_("Background opacity")
@@ -166,16 +158,6 @@ vlc_module_begin ()
     add_loadfile( "freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE, MONOSPACE_FONT_TEXT, FONT_LONGTEXT, false )
 #endif
 
-    add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
-                 FONTSIZE_LONGTEXT, true )
-        change_integer_range( 0, 4096)
-        change_safe()
-
-    add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
-                 FONTSIZER_LONGTEXT, false )
-        change_integer_list( pi_sizes, ppsz_sizes_text )
-        change_safe()
-
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
@@ -228,6 +210,8 @@ vlc_module_begin ()
                           SHADOW_DISTANCE_TEXT, NULL, false )
         change_safe()
 
+    add_obsolete_integer( "freetype-fontsize" );
+    add_obsolete_integer( "freetype-rel-fontsize" );
     add_obsolete_integer( "freetype-effect" );
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
@@ -992,11 +976,6 @@ static void FillDefaultStyles( filter_t *p_filter )
     p_sys->p_default_style->i_font_size = 0;
     p_sys->p_default_style->i_style_flags |= STYLE_SHADOW;
     p_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
-
-    p_sys->p_forced_style->i_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
-    p_sys->p_forced_style->f_font_relsize = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
-    if( p_sys->p_forced_style->f_font_relsize )
-        p_sys->p_forced_style->f_font_relsize = 100.0 / p_sys->p_forced_style->f_font_relsize;
 
     if( var_InheritBool( p_filter, "freetype-bold" ) )
     {
