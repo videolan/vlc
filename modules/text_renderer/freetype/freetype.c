@@ -996,7 +996,7 @@ static void FillDefaultStyles( filter_t *p_filter )
     p_sys->p_forced_style->i_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->p_forced_style->f_font_relsize = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
     if( p_sys->p_forced_style->f_font_relsize )
-        p_sys->p_forced_style->f_font_relsize = 1.0 / p_sys->p_forced_style->f_font_relsize;
+        p_sys->p_forced_style->f_font_relsize = 100.0 / p_sys->p_forced_style->f_font_relsize;
 
     if( var_InheritBool( p_filter, "freetype-bold" ) )
     {
