@@ -72,7 +72,7 @@ ifdef HAVE_CROSS_COMPILE
 	cd $<; $(MAKE) install_qmake install_mkspecs
 	cd $</src/tools; \
 	for i in bootstrap uic rcc moc; \
-		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ && $(MAKE) install); \
+		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ LIB="$(HOST)-ar -rc" && $(MAKE) install); \
 	done
 endif
 	touch $@
