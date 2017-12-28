@@ -19,3 +19,23 @@
  #define DYN_NCRYPT
  
  #ifdef __MINGW32__
+--- gnutls/lib/system/keys-win.c.old	2017-12-28 11:04:45.599954683 +0100
++++ gnutls/lib/system/keys-win.c	2017-12-28 11:07:37.999947957 +0100
+@@ -624,6 +624,9 @@
+  -*/
+ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
++#else
+ 	uint8_t id[MAX_WID_SIZE];
+ 	HCERTSTORE store = NULL;
+ 	size_t id_size;
+@@ -873,6 +876,7 @@
+ 
+ 	CertCloseStore(store, 0);
+ 	return ret;
++#endif
+ }
+ 
+ int _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
