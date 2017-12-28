@@ -9,3 +9,14 @@
  	if (ncrypt_lib == NULL) {
  		return gnutls_assert_val(GNUTLS_E_CRYPTO_INIT_FAILED);
  	}
+--- gnutls/lib/system.c.old	2017-12-28 15:24:07.479820602 +0100
++++ gnutls/lib/system.c	2017-12-28 15:25:33.587817242 +0100
+@@ -50,7 +50,7 @@
+ #if defined(_WIN32) && defined(NEED_CERT_ENUM_CRLS)
+ 	/* used in system/certs.c */
+ 	HMODULE crypto;
+-	crypto = LoadLibraryA("Crypt32.dll");
++	crypto = LoadLibrary(TEXT("Crypt32.dll"));
+ 
+ 	if (crypto == NULL)
+ 		return GNUTLS_E_CRYPTO_INIT_FAILED;
