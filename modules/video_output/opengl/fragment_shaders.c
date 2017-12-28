@@ -606,9 +606,20 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 #ifdef HAVE_LIBPLACEBO
     if (tc->pl_sh) {
         struct pl_shader *sh = tc->pl_sh;
-        pl_shader_color_map(sh, &pl_color_map_default_params,
+        struct pl_color_map_params color_params = pl_color_map_default_params;
+        color_params.intent = var_InheritInteger(tc->gl, "rendering-intent");
+        color_params.tone_mapping_algo = var_InheritInteger(tc->gl, "tone-mapping");
+        color_params.tone_mapping_param = var_InheritFloat(tc->gl, "tone-mapping-param");
+        color_params.tone_mapping_desaturate = var_InheritFloat(tc->gl, "tone-mapping-desat");
+        color_params.gamut_warning = var_InheritBool(tc->gl, "tone-mapping-warn");
+
+        struct pl_color_space dst_space = pl_color_space_unknown;
+        dst_space.primaries = var_InheritInteger(tc->gl, "target-prim");
+        dst_space.transfer = var_InheritInteger(tc->gl, "target-trc");
+
+        pl_shader_color_map(sh, &color_params,
                 pl_color_space_from_video_format(&tc->fmt),
-                pl_color_space_unknown, NULL, false);
+                dst_space, NULL, false);
 
         const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
 
