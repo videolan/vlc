@@ -76,7 +76,7 @@ endif
 .gcrypt: gcrypt
 	# Reconfiguring this requires a git repo to be available, to
 	# successfully produce a nonempty mym4_revision_dec.
-	git init && git config --local user.email "cone@example.com" && git config --local user.name "Cony Cone" && \
+	cd $< && git init && git config --local user.email "cone@example.com" && git config --local user.name "Cony Cone" && \
 		git commit --allow-empty -m "dummy commit"
 	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" ./configure $(HOSTCONF) $(GCRYPT_CONF)
