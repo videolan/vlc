@@ -23,6 +23,6 @@ mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(MOVE)
 
 .mfx: mfx
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CXXFLAGS="-std=c++98 -O2"
 	cd $< && $(MAKE) install
 	touch $@
