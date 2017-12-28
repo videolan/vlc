@@ -4134,7 +4134,7 @@ AC_ARG_ENABLE(libplacebo,
       [disable libplacebo support (default auto)])])
 
 AS_IF([test "$enable_libplacebo" != "no"], [
-  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.1], [
+  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.2], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
   ], [
     AS_IF([test -n "${enable_libplacebo}"], [
