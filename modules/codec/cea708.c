@@ -163,10 +163,10 @@ void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, mtime_t i_start, const uint8_
 #define CEA708_WINDOW_MAX_ROWS          15
 
 #define CEA708_ROW_HEIGHT_STANDARD     (CEA708_SAFE_AREA_REL / \
-                                        CEA708_SCREEN_ROWS)
+                                        CEA708_WINDOW_MAX_ROWS)
 #define CEA708_FONT_TO_LINE_HEIGHT_RATIO 1.06
 
-#define CEA708_FONTRELSIZE_STANDARD    (CEA708_ROW_HEIGHT_STANDARD / \
+#define CEA708_FONTRELSIZE_STANDARD    (100.0 * CEA708_ROW_HEIGHT_STANDARD / \
                                         CEA708_FONT_TO_LINE_HEIGHT_RATIO)
 #define CEA708_FONTRELSIZE_SMALL       (CEA708_FONTRELSIZE_STANDARD * 0.7)
 #define CEA708_FONTRELSIZE_LARGE       (CEA708_FONTRELSIZE_STANDARD * 1.3)
