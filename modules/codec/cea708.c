@@ -1299,13 +1299,17 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
     {
         case CEA708_C1_CLW:
             REQUIRE_ARGS_AND_POP_COMMAND(1);
-            Debug(printf("[CLW]"));
-            if( p_cea708->p_cw->b_defined )
-            {
-                CEA708_Window_ClearText( p_cea708->p_cw );
-                if( p_cea708->p_cw->b_visible )
-                    i_ret |= CEA708_STATUS_OUTPUT;
-            }
+            Debug(printf("[CLW"));
+            for( i = 0, v = cea708_input_buffer_get( ib ); v; v = v >> 1, i++ )
+                if( v & 1 )
+                {
+                    if( p_cea708->window[i].b_defined &&
+                        p_cea708->window[i].b_visible )
+                        i_ret |= CEA708_STATUS_OUTPUT;
+                    CEA708_Window_ClearText( &p_cea708->window[i] );
+                    Debug(printf("%d", i));
+                }
+            Debug(printf("]"));
             break;
         case CEA708_C1_DSW:
             REQUIRE_ARGS_AND_POP_COMMAND(1);
