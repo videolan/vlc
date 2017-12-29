@@ -3255,14 +3255,15 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            }
            info_category_AddInfo( p_cat, _("Projection"), "%s", _(psz_loc_name) );
 
-           info_category_AddInfo( p_cat, _("Yaw"), "%.2f",
-                                  fmt->video.pose.yaw );
-           info_category_AddInfo( p_cat, _("Pitch"), "%.2f",
-                                  fmt->video.pose.pitch );
-           info_category_AddInfo( p_cat, _("Roll"), "%.2f",
-                                  fmt->video.pose.roll );
-           info_category_AddInfo( p_cat, _("Field of view"), "%.2f",
-                                  fmt->video.pose.fov );
+           info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Yaw"),
+                                  "%.2f", fmt->video.pose.yaw );
+           info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Pitch"),
+                                  "%.2f", fmt->video.pose.pitch );
+           info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Roll"),
+                                  "%.2f", fmt->video.pose.roll );
+           info_category_AddInfo( p_cat,
+                                  vlc_pgettext("ViewPoint", "Field of view"),
+                                  "%.2f", fmt->video.pose.fov );
        }
        if ( fmt->video.mastering.max_luminance )
        {
