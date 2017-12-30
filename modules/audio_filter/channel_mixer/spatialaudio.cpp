@@ -371,6 +371,7 @@ static int OpenBinauralizer(vlc_object_t *p_this)
     p_sys->binauralizer.Reset();
 
     outfmt->i_format = infmt->i_format = VLC_CODEC_FL32;
+    outfmt->i_rate = infmt->i_rate;
     outfmt->i_physical_channels = AOUT_CHANS_STEREO;
     aout_FormatPrepare(infmt);
     aout_FormatPrepare(outfmt);
