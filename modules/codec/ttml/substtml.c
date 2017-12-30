@@ -450,14 +450,24 @@ static void ComputeTTMLStyles( ttml_context_t *p_ctx, const vlc_dictionary_t *p_
      * Default value conversion must also not depend on attribute presence */
     text_style_t *p_text_style = p_ttml_style->font_style;
     ttml_length_t len = p_ttml_style->font_size;
-    len = ttml_rebase_length( p_ctx->i_cell_resolution_v, len, p_ctx->root_extent_v );
+
+    /* font size is pixels, cells or, % of cell */
+    if( len.unit == TTML_UNIT_PERCENT )
+    {
+        len.i_value /= 100.0;
+        len.unit = TTML_UNIT_CELL;
+    }
+
+    /* font size is now pixels or cells */
+    /* if cell (and indirectly cell %), rebase as line height depending on resolution */
     if( len.unit == TTML_UNIT_CELL )
-        p_text_style->f_font_relsize = 100.0 * len.i_value /
-                    (p_ctx->i_cell_resolution_v * TTML_LINE_TO_HEIGHT_RATIO);
-    else if( len.unit == TTML_UNIT_PERCENT )
-        p_text_style->f_font_relsize = len.i_value /
-                    (p_ctx->i_cell_resolution_v * TTML_LINE_TO_HEIGHT_RATIO);
-    else if( len.unit == TTML_UNIT_PIXELS )
+        len = ttml_rebase_length( p_ctx->i_cell_resolution_v, len, p_ctx->root_extent_v );
+
+    /* font size is root_extent height % or pixels */
+    if( len.unit == TTML_UNIT_PERCENT )
+        p_text_style->f_font_relsize = len.i_value / TTML_LINE_TO_HEIGHT_RATIO;
+    else
+    if( len.unit == TTML_UNIT_PIXELS )
         p_text_style->i_font_size = len.i_value;
 }
 
