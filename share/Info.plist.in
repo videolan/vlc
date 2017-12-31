@@ -1395,7 +1395,7 @@
 	<key>BreakpadRequestComments</key>
 	<string>1</string>
 	<key>BreakpadURL</key>
-	<string>@BREAKPAD_URL@/crashreports</string>
+	<string>@BREAKPAD_URL@/reports</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
