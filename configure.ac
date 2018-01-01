@@ -290,6 +290,7 @@ case "${host_os}" in
     LDFLAGS="${LDFLAGS} -Zomf -Zbin-files -Zargs-wild -Zhigh-mem"
     AC_LIBOBJ([freeaddrinfo])
     AC_LIBOBJ([gai_strerror])
+    AC_CHECK_FUNCS([if_nametoindex])
     ;;
   *nacl*)
     SYS=nacl

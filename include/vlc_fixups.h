@@ -602,6 +602,10 @@ static const struct in6_addr in6addr_any =
 # ifndef EPROTO
 #  define EPROTO (ELAST + 1)
 # endif
+
+# ifndef HAVE_IF_NAMETOINDEX
+#  define if_nametoindex(name)  atoi(name)
+# endif
 #endif
 
 /* math.h */
