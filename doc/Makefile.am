@@ -83,7 +83,7 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2016 changelogs doc
+.PHONY: ChangeLog-2017 changelogs doc
 
 changelogs: $(CHANGELOGS)
 
