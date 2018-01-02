@@ -532,6 +532,9 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
             b_l0_handled = true;
         }
 
+        if ( !b_seekable )
+            break;
+
         EbmlElement* p_l0_prev = p_l0;
 
         if (p_l0->IsFiniteSize() )
