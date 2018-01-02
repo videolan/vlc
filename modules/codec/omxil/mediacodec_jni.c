@@ -34,11 +34,12 @@
 #include <OMX_Core.h>
 #include <OMX_Component.h>
 #include "omxil_utils.h"
+#include "../../packetizer/hevc_nal.h"
 
 #include "mediacodec.h"
 
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile, bool *p_adaptive);
+                         int profile, bool *p_adaptive);
 
 #define THREAD_NAME "mediacodec_jni"
 
@@ -310,7 +311,7 @@ struct mc_api_sys
  * MediaCodec_GetName
  *****************************************************************************/
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile, bool *p_adaptive)
+                         int profile, bool *p_adaptive)
 {
     JNIEnv *env;
     int num_codecs;
@@ -395,7 +396,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                 /* The mime type is matching for this component. We
                    now check if the capabilities of the codec is
                    matching the video format. */
-                if (h264_profile)
+                if (profile > 0)
                 {
                     /* This decoder doesn't expose its profiles and is high
                      * profile capable */
@@ -407,9 +408,24 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                         jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
 
                         int omx_profile = (*env)->GetIntField(env, profile_level, jfields.profile_field);
-                        size_t codec_profile = convert_omx_to_profile_idc(omx_profile);
                         (*env)->DeleteLocalRef(env, profile_level);
-                        if (codec_profile != h264_profile)
+
+                        int codec_profile = 0;
+                        if (strcmp(psz_mime, "video/avc") == 0)
+                            codec_profile = convert_omx_to_profile_idc(omx_profile);
+                        else if (strcmp(psz_mime, "video/hevc") == 0)
+                        {
+                            switch (omx_profile)
+                            {
+                                case 0x1: /* OMX_VIDEO_HEVCProfileMain */
+                                    codec_profile = HEVC_PROFILE_MAIN;
+                                    break;
+                                case 0x2: /* OMX_VIDEO_HEVCProfileMain10 */
+                                    codec_profile = HEVC_PROFILE_MAIN_10;
+                                    break;
+                            }
+                        }
+                        if (codec_profile != profile)
                             continue;
                         /* Some encoders set the level too high, thus we ignore it for the moment.
                            We could try to guess the actual profile based on the resolution. */
@@ -961,12 +977,12 @@ static void Clean(mc_api *api)
 /*****************************************************************************
  * Configure
  *****************************************************************************/
-static int Configure(mc_api *api, size_t i_h264_profile)
+static int Configure(mc_api *api, int i_profile)
 {
     free(api->psz_name);
     bool b_adaptive;
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_h264_profile, &b_adaptive);
+                                       i_profile, &b_adaptive);
     if (!api->psz_name)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,

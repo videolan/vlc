@@ -125,7 +125,7 @@ struct mc_api
     bool b_direct_rendering;
 
     void (*clean)(mc_api *);
-    int (*configure)(mc_api *, size_t i_h264_profile);
+    int (*configure)(mc_api *, int i_profile);
     int (*start)(mc_api *, union mc_api_args *p_args);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
