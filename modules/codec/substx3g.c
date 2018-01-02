@@ -244,8 +244,10 @@ static bool SegmentSplit( tx3g_segment_t *p_prev, tx3g_segment_t **pp_segment,
     else
         p_segment_middle->p_next3g = p_next3g;
 
-    text_style_Delete( p_segment_middle->s->style );
-    p_segment_middle->s->style = text_style_Duplicate( p_styles );
+    if( p_segment_middle->s->style )
+        text_style_Merge( p_segment_middle->s->style, p_styles, true );
+    else
+        p_segment_middle->s->style = text_style_Duplicate( p_styles );
 
     return true;
 }
