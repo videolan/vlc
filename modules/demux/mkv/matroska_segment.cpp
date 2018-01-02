@@ -620,7 +620,8 @@ bool matroska_segment_c::Preload( )
         }
         else if( MKV_CHECKED_PTR_DECL ( kc_ptr, KaxCluster, el ) )
         {
-            if( var_InheritBool( &sys.demuxer, "mkv-preload-clusters" ) )
+            if( sys.b_seekable &&
+                var_InheritBool( &sys.demuxer, "mkv-preload-clusters" ) )
             {
                 PreloadClusters        ( kc_ptr->GetElementPosition() );
                 es.I_O().setFilePointer( kc_ptr->GetElementPosition() );
