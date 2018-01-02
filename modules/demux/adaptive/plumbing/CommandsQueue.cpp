@@ -355,7 +355,11 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
         output.pop_front();
 
         if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND )
-            lastdts = command->getTime();
+        {
+            mtime_t dts = command->getTime();
+            if( dts != VLC_TS_INVALID )
+                lastdts = dts;
+        }
 
         command->Execute( out );
         delete command;
