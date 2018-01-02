@@ -342,9 +342,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     tx3g_segment_t *p_segment3g = tx3g_segment_New( psz_subtitle );
     p_segment3g->i_size = str8len( psz_subtitle );
-    if ( p_dec->fmt_in.subs.p_style )
-        p_segment3g->s->style = text_style_Duplicate( p_dec->fmt_in.subs.p_style );
-
     free( psz_subtitle );
 
     if ( !p_segment3g->s->psz_text )
@@ -385,42 +382,23 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                 uint16_t i_start = __MIN( GetWBE(p_buf), i_psz_bytelength - 1 );
                 uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_bytelength - 1 );
 
-                text_style_t style;
-                memset( &style, 0, sizeof(text_style_t) );
-                style.i_style_flags = ConvertFlags( p_buf[6] );
-                style.i_font_size = p_buf[7];
-                style.i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
-                style.i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
-                style.i_features = STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
-                ApplySegmentStyle( &p_segment3g, i_start, i_end, &style );
-
-                if ( i_nbrecords == 1 )
+                text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
+                if( p_style )
                 {
-                    if ( p_buf[6] )
-                    {
-                        if( (p_spu_sys->p_default_style->i_style_flags = ConvertFlags( p_buf[6] )) )
-                            p_spu_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
-                    }
-                    p_spu_sys->p_default_style->i_font_size = p_buf[7];
-                    p_spu_sys->p_default_style->i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> ARGB
-                    p_spu_sys->p_default_style->i_font_alpha = (GetDWBE(p_buf+8) & 0xFF) << 24;
-                    p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA);
+                    if( (p_style->i_style_flags = ConvertFlags( p_buf[6] )) )
+                        p_style->i_features |= STYLE_HAS_FLAGS;
+                    p_style->i_font_size = p_buf[7];
+                    p_style->i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
+                    p_style->i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
+                    p_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
+                    ApplySegmentStyle( &p_segment3g, i_start, i_end, p_style );
+                    text_style_Delete( p_style );
                 }
 
                 p_buf += 12;
             }
         }   break;
 
-        case VLC_FOURCC('d','r','p','o'):
-            if ( (size_t)(p_buf - p_block->p_buffer) < 4 ) break;
-            p_spu_sys->p_default_style->i_shadow_width = __MAX( GetWBE(p_buf), GetWBE(p_buf+2) );
-            break;
-
-        case VLC_FOURCC('d','r','p','t'):
-            if ( (size_t)(p_buf - p_block->p_buffer) < 2 ) break;
-            p_spu_sys->p_default_style->i_shadow_alpha = GetWBE(p_buf);
-            p_spu_sys->p_default_style->i_features |= STYLE_HAS_SHADOW_ALPHA;
-            break;
 
         default:
             break;
@@ -436,7 +414,9 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
 
-    FontSizeConvert( p_dec->fmt_in.subs.p_style,  p_spu_sys->p_default_style );
+    if( p_dec->fmt_in.subs.p_style )
+        text_style_Merge( p_spu_sys->p_default_style, p_dec->fmt_in.subs.p_style, true );
+    FontSizeConvert( p_dec->fmt_in.subs.p_style, p_spu_sys->p_default_style );
 
     /* Unwrap */
     text_segment_t *p_text_segments = p_segment3g->s;
