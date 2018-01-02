@@ -1,92 +1,15 @@
-From 91ec35bff6d1b45d79a81566b03b399c87784d85 Mon Sep 17 00:00:00 2001
+From 158a429154af39896a7c6edcd0d07e83b2a4368e Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Mon, 13 Nov 2017 15:00:04 +0100
-Subject: [PATCH 2/2] build: fix win32 build
+Subject: [PATCH 2/3] build: fix win32 build
 
- - Remove pthread (disable TA_MEMORY_DEBUGGING and always init/deinit).
-
- - Remove msvcr100.dll dependency. This dell  is not avaible on old Windows
-   versions. Don't set locale on Windows, this doesn't seem to have any
-   consequences with VLC on windows (tested with US/FR locales).
+Remove msvcr100.dll dependency. This dll  is not avaible on old Windows
+versions. Don't set locale on Windows, this doesn't seem to have any
+consequences with VLC on windows (tested with US/FR locales).
 ---
- Makefile                      |  9 ++++++++-
- src/context.c                 | 12 ++++++++++++
  src/osdep/printf_useloc_win.c | 18 ++++++------------
- src/ta/ta.c                   |  4 ++++
- 4 files changed, 30 insertions(+), 13 deletions(-)
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 13f661b..0d29744 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,6 +1,13 @@
- SRCS := colorspace.c common.c context.c dispatch.c filters.c ra.c shaders.c \
- 	shaders/colorspace.c shaders/sampling.c spirv.c bstr/bstr.c siphash.c \
--	ta/ta.c ta/ta_utils.c ta/talloc.c osdep/printf_useloc_posix.c
-+	ta/ta.c ta/ta_utils.c ta/talloc.c
-+
-+ifdef HAVE_WIN32
-+SRCS += osdep/printf_useloc_win.c
-+else
-+SRCS += osdep/printf_useloc_posix.c
-+lpthread_libs = $(shell $(LD) -lpthread && echo "-lpthread" || echo "")
-+endif
- 
- OBJS = $(patsubst %.c, $(OBJDIR)src/%.o, $(SRCS))
- 
-diff --git a/src/context.c b/src/context.c
-index a325fb8..312e9d7 100644
---- a/src/context.c
-+++ b/src/context.c
-@@ -17,13 +17,17 @@
- 
- #include <stdio.h>
- #include <locale.h>
-+#ifndef _WIN32
- #include <pthread.h>
-+#endif
- 
- #include "common.h"
- #include "context.h"
- 
-+#ifndef _WIN32
- static pthread_mutex_t pl_ctx_mutex = PTHREAD_MUTEX_INITIALIZER;
- static int pl_ctx_refcount;
-+#endif
- 
- static void global_init(void)
- {
-@@ -59,11 +63,15 @@ struct pl_context *pl_context_create(int api_ver,
-         abort();
-     }
- 
-+#ifdef _WIN32
-+    global_init();
-+#else
-     // Do global initialization only when refcount is 0
-     pthread_mutex_lock(&pl_ctx_mutex);
-     if (pl_ctx_refcount++ == 0)
-         global_init();
-     pthread_mutex_unlock(&pl_ctx_mutex);
-+#endif
- 
-     struct pl_context *ctx = talloc_zero(NULL, struct pl_context);
-     ctx->params = *PL_DEF(params, &pl_context_default_params);
-@@ -77,10 +85,14 @@ void pl_context_destroy(struct pl_context **ctx)
-     TA_FREEP(ctx);
- 
-     // Do global uninitialization only when refcount reaches 0
-+#ifdef _WIN32
-+    global_uninit();
-+#else
-     pthread_mutex_lock(&pl_ctx_mutex);
-     if (--pl_ctx_refcount == 0)
-         global_uninit();
-     pthread_mutex_unlock(&pl_ctx_mutex);
-+#endif
- }
- 
- static FILE *default_stream(void *stream, enum pl_log_level level)
 diff --git a/src/osdep/printf_useloc_win.c b/src/osdep/printf_useloc_win.c
 index 0c4c3be..fc56f90 100644
 --- a/src/osdep/printf_useloc_win.c
@@ -141,21 +64,6 @@ index 0c4c3be..fc56f90 100644
  }
  
  #define WRAP(fn, ...)                               \
-diff --git a/src/ta/ta.c b/src/ta/ta.c
-index c6f8116..dec9cb7 100644
---- a/src/ta/ta.c
-+++ b/src/ta/ta.c
-@@ -29,6 +29,10 @@
- #define TA_MEMORY_DEBUGGING
- #endif
- 
-+#ifdef _WIN32
-+#undef TA_MEMORY_DEBUGGING
-+#endif
-+
- struct ta_header {
-     size_t size;                // size of the user allocation
-     struct ta_header *prev;     // ring list containing siblings
 -- 
 2.11.0
 

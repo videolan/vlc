@@ -1,25 +1,34 @@
-From 2f3ec424ca2dcfdd1abe5f1774c35aea1c9b0088 Mon Sep 17 00:00:00 2001
+From 3899884d6c15251255b8217ae19f78a8f5d0a08c Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Mon, 30 Oct 2017 14:32:03 +0100
-Subject: [PATCH 1/2] build: use a Makefile
+Subject: [PATCH 1/3] build: use a Makefile
 
 Only needed for VLC 3.0
 ---
- Makefile     | 38 ++++++++++++++++++++++++++++++++++++++
+ Makefile     | 45 +++++++++++++++++++++++++++++++++++++++++++++
  src/config.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+)
+ 2 files changed, 86 insertions(+)
  create mode 100644 Makefile
  create mode 100644 src/config.h
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..13f661b
+index 0000000..4c431cf
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,38 @@
-+SRCS := colorspace.c common.c context.c dispatch.c filters.c ra.c shaders.c \
+@@ -0,0 +1,45 @@
++SRCS := colorspace.c common.c context.c dither.c dispatch.c filters.c ra.c renderer.c shaders.c \
 +	shaders/colorspace.c shaders/sampling.c spirv.c bstr/bstr.c siphash.c \
-+	ta/ta.c ta/ta_utils.c ta/talloc.c osdep/printf_useloc_posix.c
++	ta/ta.c ta/ta_utils.c ta/talloc.c
++
++ifdef HAVE_WIN32
++SRCS += osdep/printf_useloc_win.c
++CFLAGS += -DPTW32_STATIC_LIB
++lpthread_libs = -lpthreadGC2 -lws2_32
++else
++SRCS += osdep/printf_useloc_posix.c
++lpthread_libs = $(shell $(LD) -lpthread && echo "-lpthread" || echo "")
++endif
 +
 +OBJS = $(patsubst %.c, $(OBJDIR)src/%.o, $(SRCS))
 +
@@ -32,8 +41,6 @@ index 0000000..13f661b
 +
 +all: $(targets)
 +
-+lpthread_libs = $(shell $(LD) -lpthread && echo "-lpthread" || echo "")
-+
 +install: $(targets)
 +	rm -rf $(PREFIX)/include/libplacebo
 +	mkdir -p $(PREFIX)/lib/pkgconfig/ $(PREFIX)/include/libplacebo
@@ -42,7 +49,7 @@ index 0000000..13f661b
 +	cp libplacebo.a $(PREFIX)/lib/
 +	@echo "Name: libplacebo" > $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Description: Reusable library for GPU-accelerated video/image rendering" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
-+	@echo "Version: 0.1.2" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
++	@echo "Version: 0.2.0" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Libs: -L$(PREFIX)/lib -lplacebo $(lpthread_libs)" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +	@echo "Cflags: -I$(PREFIX)/include" >> $(PREFIX)/lib/pkgconfig/libplacebo.pc
 +
@@ -57,7 +64,7 @@ index 0000000..13f661b
 +	rm -f $(targets)
 diff --git a/src/config.h b/src/config.h
 new file mode 100644
-index 0000000..d49992f
+index 0000000..85aac82
 --- /dev/null
 +++ b/src/config.h
 @@ -0,0 +1,41 @@
@@ -86,13 +93,13 @@ index 0000000..d49992f
 +
 +// Increased any time the API changes. (Note: Does not reset when PL_MAJOR_VER
 +// is increased)
-+#define PL_API_VER 1
++#define PL_API_VER 2
 +
 +// Increased any time a fix is made to a given API version.
 +#define PL_FIX_VER 0
 +
 +// Friendly name (`git describe`) for the overall version of the library
-+#define PL_VERSION "v0.1.0"
++#define PL_VERSION "v0.2.0"
 +
 +// Feature tests. These aren't described in further detail, but may be useful
 +// for programmers wanting to programmatically check for feature support
