@@ -94,6 +94,10 @@ do
          b)
              BREAKPAD=$OPTARG
          ;;
+         *)
+             usage
+             exit 1
+         ;;
      esac
 done
 shift $(($OPTIND - 1))
