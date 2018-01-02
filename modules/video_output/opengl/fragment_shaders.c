@@ -96,13 +96,10 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
 
 static int
 tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
-                 vlc_fourcc_t chroma, video_color_space_t yuv_space,
+                 vlc_fourcc_t chroma, const vlc_chroma_description_t *desc,
+                 video_color_space_t yuv_space,
                  bool *swap_uv, const char *swizzle_per_tex[])
 {
-    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
-    if (desc == NULL)
-        return VLC_EGENERIC;
-
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
@@ -560,11 +557,15 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     bool yuv_swap_uv = false;
     int ret;
 
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
+    if (desc == NULL)
+        return VLC_EGENERIC;
+
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(tc);
 
     if (is_yuv)
-        ret = tc_yuv_base_init(tc, tex_target, chroma, yuv_space,
+        ret = tc_yuv_base_init(tc, tex_target, chroma, desc, yuv_space,
                                &yuv_swap_uv, swizzle_per_tex);
     else
         ret = tc_rgb_base_init(tc, tex_target, chroma);
