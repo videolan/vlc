@@ -178,6 +178,11 @@ static int Control(stream_t *stream, int query, va_list args)
         *va_arg( args, const block_t ** ) = sys->p_tags;
         return VLC_SUCCESS;
     }
+    else if(query == STREAM_GET_SIZE)
+    {
+        *va_arg(args, uint64_t *) = stream_Size(stream->s) - sys->header_skip;
+        return VLC_SUCCESS;
+    }
 
     return vlc_stream_vaControl(stream->s, query, args);
 }
