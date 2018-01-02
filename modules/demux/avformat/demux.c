@@ -908,7 +908,7 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
 
     p_sys->i_pcr = i_time;
     for( unsigned i = 0; i < p_sys->ic->nb_streams; i++ )
-        p_sys->tracks[i].i_pcr = i_time;
+        p_sys->tracks[i].i_pcr = VLC_TS_INVALID;
 
     if( i_time > VLC_TS_INVALID )
     {
