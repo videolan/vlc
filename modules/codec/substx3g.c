@@ -318,6 +318,12 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     /* Read our raw string and create the styled segment for HTML */
     uint16_t i_psz_bytelength = GetWBE( p_buf );
+    if( p_block->i_buffer < i_psz_bytelength + 2U )
+    {
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
+    }
+
     const uint8_t *p_pszstart = p_block->p_buffer + sizeof(uint16_t);
     char *psz_subtitle;
     if ( i_psz_bytelength > 2 &&
