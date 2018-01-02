@@ -513,64 +513,13 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                                 var_InheritBool( &demuxer, "mkv-use-dummy" ) );
             p_segment1->ep = ep;
             p_segment1->segment = (KaxSegment*)p_l0;
+            p_segment1->Preload();
 
-            while ((p_l1 = ep->Get()))
-            {
-                if (MKV_IS_ID(p_l1, KaxInfo))
-                {
-                    // find the families of this segment
-                    KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
-                    b_keep_segment = b_initial;
-                    if( unlikely( p_info->IsFiniteSize() && p_info->GetSize() >= SIZE_MAX ) )
-                    {
-                        msg_Err( p_demux, "KaxInfo too big aborting" );
-                        break;
-                    }
-                    try
-                    {
-                        p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
-                    }
-                    catch (...)
-                    {
-                        msg_Err( p_demux, "KaxInfo found but corrupted");
-                        break;
-                    }
-                    for( size_t i = 0; i < p_info->ListSize(); i++ )
-                    {
-                        EbmlElement *l = (*p_info)[i];
+            b_keep_segment = (FindSegment( *p_segment1->p_segment_uid ) == NULL);
 
-                        if( MKV_IS_ID( l, KaxSegmentUID ) )
-                        {
-                            KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
-                            b_keep_segment = (FindSegment( *p_uid ) == NULL);
-                            delete p_segment1->p_segment_uid;
-                            p_segment1->p_segment_uid = new KaxSegmentUID(*p_uid);
-                            if ( !b_keep_segment )
-                                break; // this segment is already known
-                        }
-                        else if( MKV_IS_ID( l, KaxPrevUID ) )
-                        {
-                            p_segment1->p_prev_segment_uid = new KaxPrevUID( *static_cast<KaxPrevUID*>(l) );
-                            p_segment1->b_ref_external_segments = true;
-                        }
-                        else if( MKV_IS_ID( l, KaxNextUID ) )
-                        {
-                            p_segment1->p_next_segment_uid = new KaxNextUID( *static_cast<KaxNextUID*>(l) );
-                            p_segment1->b_ref_external_segments = true;
-                        }
-                        else if( MKV_IS_ID( l, KaxSegmentFamily ) )
-                        {
-                            KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
-                            p_segment1->families.push_back( p_fam );
-                        }
-                    }
-                    if( b_keep_segment || !p_segment1->p_segment_uid )
-                        opened_segments.push_back( p_segment1 );
-                    break;
-                }
-            }
             if ( b_keep_segment || !p_segment1->p_segment_uid )
             {
+                opened_segments.push_back( p_segment1 );
                 b_keep_stream = true;
                 p_stream1->segments.push_back( p_segment1 );
             }
