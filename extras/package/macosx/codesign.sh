@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2012-2017 VLC authors and VideoLAN
 # Copyright (C) 2012-2014 Felix Paul Kühne <fkuehne at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify it
@@ -16,6 +17,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
 set -e
+# set -o xtrace
 
 info()
 {
@@ -34,13 +36,12 @@ Sign VLC.app in the current directory
 OPTIONS:
    -h            Show this help
    -i            Identity to use
-   -t            Entitlements file to use
-   -g            Enable additional magic
+   -g            Use gatekeeper mode (additional magic)
 EOF
 
 }
 
-while getopts "hi:t:g" OPTION
+while getopts "hi:g" OPTION
 do
      case $OPTION in
          h)
@@ -49,9 +50,6 @@ do
          ;;
          i)
              IDENTITY=$OPTARG
-         ;;
-         t)
-             OPTIONS="--entitlements $OPTARG"
          ;;
          g)
              GK="yes"
@@ -74,106 +72,92 @@ sign()
         IDENTIFIER="${filename%.*}"
     fi
 
-    info "Signing file $1 with identifier $IDENTIFIER"
+    # info "Signing file $1 with identifier $IDENTIFIER"
 
-    FIRSTPARTOF_REQUIREMENT="=designated => anchor apple generic  and identifier \""
-    SECONDPARTOF_REQUIREMENT="\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))"
+    if [ -z "$GK" ]; then
+        codesign --force --verbose -s "$IDENTITY" --prefix "org.videolan." "$1"
+    else
+        REQUIREMENT="=designated => anchor apple generic  and identifier \"$IDENTIFIER\" "
+        REQUIREMENT+="and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or "
+        REQUIREMENT+="( certificate 1[field.1.2.840.113635.100.6.2.6] exists and "
+        REQUIREMENT+="certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and "
+        REQUIREMENT+="certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))"
 
-    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none "$1"
+        codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$REQUIREMENT" --timestamp=none "$1"
+    fi
 }
 
 
-if test -z "$GK"
-then
+info "Cleaning frameworks"
+find VLC.app/Contents/Frameworks -type f -name ".DS_Store" -exec rm '{}' \;
+find VLC.app/Contents/Frameworks -type f -name "*.textile" -exec rm '{}' \;
+find VLC.app/Contents/Frameworks -type f -name "*.txt" -exec rm '{}' \;
 
-    info "Signing frameworks"
-    find VLC.app/Contents/Frameworks/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+info "Signing frameworks"
 
-    info "Signing the modules"
-    find VLC.app/Contents/MacOS/plugins/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+sign "VLC.app/Contents/Frameworks/Growl.framework/Versions/A" "com.growl.growlframework"
 
-    info "Signing the libraries"
-    find VLC.app/Contents/MacOS/lib/* -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app" "org.sparkle-project.Sparkle.Autoupdate"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A" "org.sparkle-project.Sparkle"
 
-    info "Signing the lua stuff"
-    find VLC.app/Contents/MacOS/share/lua/* -name *luac -type f -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app" "com.Breakpad.crash_report_sender"
+sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A" "com.googlecode.google-breakpad"
 
-    find VLC.app/Contents/MacOS/include -type f -name *.h -exec codesign --force -s "$IDENTITY" $OPTIONS '{}' \;
+info "Signing the framework headers"
+for i in $(find VLC.app/Contents/Frameworks -type f -name "*.h" -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    info "Signing the executable"
-    codesign --force -s "$IDENTITY" $OPTIONS VLC.app/Contents/MacOS/VLC
+info "Signing the framework strings"
+for i in $(find VLC.app/Contents/Frameworks -type f -name "*.strings" -exec echo {} \;)
+do
+    sign "$i"
+done
 
-else
-    info "Cleaning frameworks"
-    find VLC.app/Contents/Frameworks -type f -name ".DS_Store" -exec rm '{}' \;
-    find VLC.app/Contents/Frameworks -type f -name "*.textile" -exec rm '{}' \;
-    find VLC.app/Contents/Frameworks -type f -name "*.txt" -exec rm '{}' \;
+info "Signing the framework plist files"
+for i in $(find VLC.app/Contents/Frameworks -type f -name "*.plist" -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    info "Signing frameworks"
+info "Signing the framework nib files"
+for i in $(find VLC.app/Contents/Frameworks -type f -name "*.nib" -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    sign "VLC.app/Contents/Frameworks/Growl.framework/Versions/A" "com.growl.growlframework"
+info "Signing the headers"
+for i in $(find VLC.app/Contents/MacOS/include -type f -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
-    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app" "org.sparkle-project.Sparkle.Autoupdate"
-    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A" "org.sparkle-project.Sparkle"
+info "Signing the modules"
 
-    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app" "com.Breakpad.crash_report_sender"
-    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A" "com.googlecode.google-breakpad"
+for i in $(find VLC.app/Contents/MacOS/plugins -type f -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    info "Signing the framework headers"
-    for i in `find VLC.app/Contents/Frameworks/* -type f -name "*.h" -exec echo {} \;`
-    do
-        sign "$i"
-    done
+info "Signing the libraries"
 
-    info "Signing the framework strings"
-    for i in `find VLC.app/Contents/Frameworks/* -type f -name "*.strings" -exec echo {} \;`
-    do
-        sign "$i"
-    done
+for i in $(find VLC.app/Contents/MacOS/lib -type f -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    info "Signing the framework plist files"
-    for i in `find VLC.app/Contents/Frameworks/* -type f -name "*.plist" -exec echo {} \;`
-    do
-        sign "$i"
-    done
+info "Signing share"
 
-    info "Signing the framework nib files"
-    for i in `find VLC.app/Contents/Frameworks/* -type f -name "*.nib" -exec echo {} \;`
-    do
-        sign "$i"
-    done
+for i in $(find VLC.app/Contents/MacOS/share -type f -exec echo {} \;)
+do
+    sign "$i"
+done
 
-    info "Signing the headers"
-    for i in `find VLC.app/Contents/MacOS/include/* -type f -exec echo {} \;`
-    do
-        sign "$i"
-    done
+info "Signing the executable"
+sign "VLC.app" "org.videolan.vlc"
 
-    info "Signing the modules"
-
-    for i in `find VLC.app/Contents/MacOS/plugins/* -type f -exec echo {} \;`
-    do
-        sign "$i"
-    done
-
-    info "Signing the libraries"
-
-    for i in `find VLC.app/Contents/MacOS/lib/* -type f -exec echo {} \;`
-    do
-        sign "$i"
-    done
-
-    info "Signing share"
-
-    for i in `find VLC.app/Contents/MacOS/share/* -type f -exec echo {} \;`
-    do
-        sign "$i"
-    done
-
-    info "Signing the executable"
-    sign "VLC.app" "org.videolan.vlc"
-fi
 
 info "all items signed, validating..."
 
