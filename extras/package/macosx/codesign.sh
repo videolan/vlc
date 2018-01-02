@@ -54,6 +54,10 @@ do
          g)
              GK="yes"
          ;;
+         *)
+             usage
+             exit 1
+         ;;
      esac
 done
 shift $(($OPTIND - 1))
