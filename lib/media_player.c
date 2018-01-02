@@ -1581,20 +1581,31 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
     seekpoint_t **p_seekpoint = NULL;
 
     /* fetch data */
-    int ret = input_Control(p_input_thread, INPUT_GET_SEEKPOINTS, &p_seekpoint, &i_chapters_of_title);
-    vlc_object_release( p_input_thread );
+    int ci_chapter_count = i_chapters_of_title;
 
+    int ret = input_Control(p_input_thread, INPUT_GET_SEEKPOINTS, &p_seekpoint, &ci_chapter_count);
     if( ret != VLC_SUCCESS)
     {
+        vlc_object_release( p_input_thread );
         return -1;
     }
 
-    if (i_chapters_of_title == 0 || p_seekpoint == NULL)
+    if (ci_chapter_count == 0 || p_seekpoint == NULL)
     {
+        vlc_object_release( p_input_thread );
         return 0;
     }
 
-    const int ci_chapter_count = (const int)i_chapters_of_title;
+    input_title_t *p_title;
+    ret = input_Control( p_input_thread, INPUT_GET_TITLE_INFO, &p_title,
+                         &i_chapters_of_title );
+    vlc_object_release( p_input_thread );
+    if( ret != VLC_SUCCESS )
+    {
+        goto error;
+    }
+    int64_t i_title_duration = p_title->i_length / 1000;
+    vlc_input_title_Delete( p_title );
 
     *pp_chapters = calloc( ci_chapter_count, sizeof(**pp_chapters) );
     if( !*pp_chapters )
@@ -1603,7 +1614,7 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
     }
 
     /* fill array */
-    for( int i = 0; i < ci_chapter_count; i++)
+    for( int i = 0; i < ci_chapter_count; ++i )
     {
         libvlc_chapter_description_t *p_chapter = malloc( sizeof(*p_chapter) );
         if( unlikely(p_chapter == NULL) )
@@ -1614,13 +1625,17 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
 
         p_chapter->i_time_offset = p_seekpoint[i]->i_time_offset / 1000;
 
-        if( i > 0 )
+        if( i < ci_chapter_count - 1 )
         {
-            p_chapter->i_duration = p_chapter->i_time_offset - (*pp_chapters)[i-1]->i_time_offset;
+            p_chapter->i_duration = p_seekpoint[i + 1]->i_time_offset / 1000 -
+                                    p_chapter->i_time_offset;
         }
         else
         {
-            p_chapter->i_duration = p_chapter->i_time_offset;
+            if ( i_title_duration )
+                p_chapter->i_duration = i_title_duration - p_chapter->i_time_offset;
+            else
+                p_chapter->i_duration = 0;
         }
 
         if( p_seekpoint[i]->psz_name )
