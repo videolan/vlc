@@ -1,0 +1,66 @@
+From e8f45790dbf39ac39ac81ef47bde84fd92282ae2 Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.xyz>
+Date: Tue, 26 Dec 2017 04:14:53 +0100
+Subject: [PATCH 3/3] 2.0 fixup
+
+Include the following commits:
+
+- shaders: fix typo in comment
+- dither: minor fixes
+- shaders: fix typo in gamut warning shader
+---
+ src/dither.c                                | 3 ++-
+ src/include/libplacebo/shaders/colorspace.h | 2 +-
+ src/shaders/colorspace.c                    | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/dither.c b/src/dither.c
+index 4a08e5c..e2b54ae 100644
+--- a/src/dither.c
++++ b/src/dither.c
+@@ -34,6 +34,7 @@
+ void pl_generate_bayer_matrix(float *data, int size)
+ {
+     pl_assert(size >= 0);
++
+     // Start with a single entry of 0
+     data[0] = 0;
+ 
+@@ -73,7 +74,7 @@ struct ctx {
+ 
+ static void makegauss(struct ctx *k, unsigned int sizeb)
+ {
+-    assert(sizeb >= 1 && sizeb <= MAX_SIZEB);
++    pl_assert(sizeb >= 1 && sizeb <= MAX_SIZEB);
+ 
+     k->sizeb = sizeb;
+     k->size = 1 << k->sizeb;
+diff --git a/src/include/libplacebo/shaders/colorspace.h b/src/include/libplacebo/shaders/colorspace.h
+index fb80bea..82bfc69 100644
+--- a/src/include/libplacebo/shaders/colorspace.h
++++ b/src/include/libplacebo/shaders/colorspace.h
+@@ -159,7 +159,7 @@ enum pl_dither_method {
+     // Dither with blue noise. Very high quality, but requires the use of a
+     // LUT. Warning: Computing a blue noise texture with a large size can be
+     // very slow, however this only needs to be performed once. Even so, using
+-    // this with a `lut_size` greater than 8 is generally ill-advised. This is
++    // this with a `lut_size` greater than 6 is generally ill-advised. This is
+     // the preferred/default dither method.
+     PL_DITHER_BLUE_NOISE,
+ 
+diff --git a/src/shaders/colorspace.c b/src/shaders/colorspace.c
+index b85e1b2..6d467f5 100644
+--- a/src/shaders/colorspace.c
++++ b/src/shaders/colorspace.c
+@@ -749,7 +749,7 @@ void pl_shader_color_map(struct pl_shader *sh,
+     if (params->gamut_warning) {
+         GLSL("if (any(greaterThan(color.rgb, vec3(1.01))) ||\n"
+              "    any(lessThan(color.rgb, vec3(-0.01))))\n"
+-             "    color.rgb = vec3(1.0) - color.rgb;) // invert\n");
++             "    color.rgb = vec3(1.0) - color.rgb; // invert\n");
+     }
+ 
+     if (src.light != dst.light)
+-- 
+2.11.0
+
