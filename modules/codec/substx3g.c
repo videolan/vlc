@@ -369,7 +369,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
     mp4_box_iterator_t it;
-    mp4_box_iterator_Init( &it, p_block->p_buffer, p_block->i_buffer );
+    mp4_box_iterator_Init( &it, p_buf,
+                           p_block->i_buffer - (p_buf - p_block->p_buffer) );
     /* Parse our styles */
     while( mp4_box_iterator_Next( &it ) )
     {
