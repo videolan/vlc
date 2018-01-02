@@ -1002,10 +1002,7 @@ void matroska_segment_c::EnsureDuration()
 
     i_duration = -1;
 
-    bool b_seekable;
-
-    if( vlc_stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable ) ||
-        !b_seekable )
+    if( !sys.b_fastseekable )
     {
         msg_Warn( &sys.demuxer, "could not look for the segment duration" );
         return;

@@ -351,6 +351,8 @@ public:
 
     /* current data */
     demux_t                 & demuxer;
+    bool                    b_seekable;
+    bool                    b_fastseekable;
 
     mtime_t                 i_pts;
     mtime_t                 i_pcr;

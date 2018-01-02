@@ -86,12 +86,10 @@ static inline char * ToUTF8( const UTFstring &u )
 void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 {
     EbmlElement *l;
-    bool b_seekable;
 
     i_seekhead_count++;
 
-    vlc_stream_Control( sys.demuxer.s, STREAM_CAN_SEEK, &b_seekable );
-    if( !b_seekable )
+    if( !sys.b_seekable )
         return;
 
     EbmlParser eparser ( &es, seekhead, &sys.demuxer,
