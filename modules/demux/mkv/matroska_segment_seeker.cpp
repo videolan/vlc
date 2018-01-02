@@ -290,6 +290,9 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
         Seekpoint const& start = seekpoints.first;
         Seekpoint const& end   = seekpoints.second;
 
+        if (start.fpos == std::numeric_limits<fptr_t>::max() )
+            return tracks_seekpoint_t();
+
         index_range( ms, Range( start.fpos, end.fpos ), needle_pts );
 
         {
