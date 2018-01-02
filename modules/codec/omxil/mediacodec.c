@@ -522,7 +522,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
     int i_ret;
-    size_t i_h264_profile = 0;
+    int i_profile = p_dec->fmt_in.i_profile;
     const char *mime = NULL;
 
     /* Video or Audio if "mediacodec-audio" bool is true */
@@ -543,8 +543,24 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             return VLC_EGENERIC;
 
         switch (p_dec->fmt_in.i_codec) {
-        case VLC_CODEC_HEVC: mime = "video/hevc"; break;
-        case VLC_CODEC_H264: mime = "video/avc"; break;
+        case VLC_CODEC_HEVC:
+            if (i_profile == -1)
+            {
+                uint8_t i_hevc_profile;
+                if (hevc_get_profile_level(&p_dec->fmt_in, &i_hevc_profile, NULL, NULL))
+                    i_profile = i_hevc_profile;
+            }
+            mime = "video/hevc";
+            break;
+        case VLC_CODEC_H264:
+            if (i_profile == -1)
+            {
+                uint8_t i_h264_profile;
+                if (h264_get_profile_level(&p_dec->fmt_in, &i_h264_profile, NULL, NULL))
+                    i_profile = i_h264_profile;
+            }
+            mime = "video/avc";
+            break;
         case VLC_CODEC_H263: mime = "video/3gpp"; break;
         case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
         case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
@@ -599,26 +615,19 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_sys->api.i_cat = p_dec->fmt_in.i_cat;
     p_sys->api.psz_mime = mime;
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-    {
-        uint8_t i_profile;
-        if (h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL))
-            i_h264_profile = i_profile;
-    }
-
     if (pf_init(&p_sys->api) != 0)
     {
         free(p_sys);
         return VLC_EGENERIC;
     }
-    if (p_sys->api.configure(&p_sys->api, i_h264_profile) != 0)
+    if (p_sys->api.configure(&p_sys->api, i_profile) != 0)
     {
         /* If the device can't handle video/wvc1,
          * it can probably handle video/x-ms-wmv */
         if (!strcmp(mime, "video/wvc1") && p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
         {
             p_sys->api.psz_mime = "video/x-ms-wmv";
-            if (p_sys->api.configure(&p_sys->api, i_h264_profile) != 0)
+            if (p_sys->api.configure(&p_sys->api, i_profile) != 0)
             {
                 p_sys->api.clean(&p_sys->api);
                 free(p_sys);
