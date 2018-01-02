@@ -120,7 +120,6 @@ struct filter_sys_t
 
     std::vector<float> inputSamples;
     mtime_t i_inputPTS;
-    unsigned i_rate;
     unsigned i_order;
 
     float** inBuf;
@@ -186,7 +185,7 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
     else
         p_out_buf->i_pts = p_sys->i_inputPTS;
     p_out_buf->i_dts = p_out_buf->i_pts;
-    p_out_buf->i_length = p_out_buf->i_nb_samples * INT64_C(1000000) / p_sys->i_rate;
+    p_out_buf->i_length = p_out_buf->i_nb_samples * INT64_C(1000000) / p_filter->fmt_in.audio.i_rate;
 
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (float *)p_sys->inputSamples.data();
@@ -315,7 +314,6 @@ static int OpenBinauralizer(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     p_sys->mode = filter_sys_t::BINAURALIZER;
-    p_sys->i_rate = p_filter->fmt_in.audio.i_rate;
     p_sys->i_inputNb = p_filter->fmt_in.audio.i_channels;
     p_sys->i_outputNb = 2;
 
@@ -360,7 +358,7 @@ static int OpenBinauralizer(vlc_object_t *p_this)
     msg_Dbg(p_filter, "Using the HRTF file: %s", HRTFPath.c_str());
 
     unsigned i_tailLength = 0;
-    if (!p_sys->binauralizer.Configure(p_sys->i_rate, AMB_BLOCK_TIME_LEN,
+    if (!p_sys->binauralizer.Configure(p_filter->fmt_in.audio.i_rate, AMB_BLOCK_TIME_LEN,
                                        p_sys->speakers, infmt->i_channels, i_tailLength,
                                        HRTFPath))
     {
@@ -406,7 +404,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->f_phi = 0.f;
     p_sys->f_roll = 0.f;
     p_sys->f_zoom = 0.f;
-    p_sys->i_rate = p_filter->fmt_in.audio.i_rate;
     p_sys->i_inputNb = p_filter->fmt_in.audio.i_channels;
     p_sys->i_outputNb = p_filter->fmt_out.audio.i_channels;
 
@@ -440,7 +437,7 @@ static int Open(vlc_object_t *p_this)
         msg_Dbg(p_filter, "Using the HRTF file: %s", HRTFPath.c_str());
 
         if (!p_sys->binauralDecoder.Configure(p_sys->i_order, true,
-                p_sys->i_rate, AMB_BLOCK_TIME_LEN, i_tailLength,
+                p_filter->fmt_in.audio.i_rate, AMB_BLOCK_TIME_LEN, i_tailLength,
                 HRTFPath))
         {
             msg_Err(p_filter, "Error creating the binaural decoder.");
