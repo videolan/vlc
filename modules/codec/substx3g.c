@@ -339,11 +339,9 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
     else
     {
-        psz_subtitle = malloc( i_psz_bytelength + 1 );
+        psz_subtitle = strndup( (const char*) p_pszstart, i_psz_bytelength );
         if ( !psz_subtitle )
             return VLCDEC_SUCCESS;
-        memcpy( psz_subtitle, p_pszstart, i_psz_bytelength );
-        psz_subtitle[ i_psz_bytelength ] = '\0';
     }
     p_buf += i_psz_bytelength + sizeof(uint16_t);
 
