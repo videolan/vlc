@@ -198,7 +198,11 @@ info "Validating autoupdate app"
 codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app
 
 info "Validating complete bundle"
-codesign --verify --deep --verbose=4 VLC.app
+codesign --verify --deep --strict --verbose=4 VLC.app
+
+if [ ! -z "$GK" ]; then
+    spctl -a -t exec -vv VLC.app
+fi
 
 
 info "Validation complete"
