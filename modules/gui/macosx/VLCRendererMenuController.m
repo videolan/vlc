@@ -169,22 +169,15 @@
         return;
 
     if (item) {
-        [item setSoutForPlaylist:playlist];
-        [item setDemuxFilterForPlaylist:playlist];
+        [item setRendererForPlaylist:playlist];
     } else {
-        [self unsetSoutForPlaylist:playlist];
-        [self unsetDemuxFilterForPlaylist:playlist];
+        [self unsetRendererForPlaylist:playlist];
     }
 }
 
-- (void)unsetSoutForPlaylist:(playlist_t*)playlist
+- (void)unsetRendererForPlaylist:(playlist_t*)playlist
 {
-    var_SetString(playlist, "sout", "");
-}
-
-- (void)unsetDemuxFilterForPlaylist:(playlist_t*)playlist
-{
-    var_SetString(playlist, "demux-filter", "");
+    playlist_SetRenderer(playlist, NULL);
 }
 
 #pragma mark VLCRendererDiscovery delegate methods

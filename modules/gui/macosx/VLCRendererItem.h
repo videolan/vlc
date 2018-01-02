@@ -64,29 +64,11 @@
 - (int)capabilityFlags;
 
 /**
- Checks if the Item’s sout string is equivalent to the given
- sout string. If output is YES, it's checked if it's an
- output sout as well.
+ Sets the renderer represented by this \c VLCRendererItem as active
+ for the given playlist.
 
- \param sout    The sout c string to compare with
- \param output  Indicates wether to check if sout is an output
-
- \return YES if souts match the given sout and output, NO otherwise
+ \param playlist The playlist for which to set the renderer
  */
-- (bool)isSoutEqualTo:(const char*)sout asOutput:(bool)output;
-
-/**
- Sets the passed playlist’s sout to the sout of the \c VLCRendererItem.
-
- \param playlist The playlist for which to set the sout
- */
-- (void)setSoutForPlaylist:(playlist_t*)playlist;
-
-/**
- Sets the passed playlist’s demux filter to the demux filter of the \c VLCRendererItem.
-
- \param playlist The playlist for which to set the demux filter
- */
-- (void)setDemuxFilterForPlaylist:(playlist_t*)playlist;
+- (void)setRendererForPlaylist:(playlist_t*)playlist;
 
 @end

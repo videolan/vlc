@@ -68,39 +68,9 @@
     return vlc_renderer_item_flags(_rendererItem);
 }
 
-- (bool)isSoutEqualTo:(const char*)sout asOutput:(bool)output
+- (void)setRendererForPlaylist:(playlist_t*)playlist
 {
-    NSString *temp_sout;
-    NSString *prefix;
-    NSString *self_sout;
-
-    prefix = (output) ? @"#" : @"";
-    self_sout = [prefix stringByAppendingString:toNSStr(vlc_renderer_item_sout(_rendererItem))];
-    temp_sout = toNSStr(sout);
-
-    return [temp_sout isEqualToString:self_sout];
-}
-
-- (void)setSoutForPlaylist:(playlist_t*)playlist
-{
-    NSString *sout;
-    const char *item_sout = vlc_renderer_item_sout(_rendererItem);
-
-    if (!playlist || !item_sout)
-        return;
-
-    sout = [[NSString alloc] initWithFormat:@"#%s", item_sout];
-    var_SetString(playlist , "sout", sout.UTF8String);
-}
-
-- (void)setDemuxFilterForPlaylist:(playlist_t*)playlist
-{
-    const char *item_demux_filter = vlc_renderer_item_demux_filter(_rendererItem);
-
-    if (!playlist || !item_demux_filter)
-        return;
-
-    var_SetString(playlist, "demux-filter", item_demux_filter);
+    playlist_SetRenderer(playlist, _rendererItem);
 }
 
 - (BOOL)isEqual:(id)object
