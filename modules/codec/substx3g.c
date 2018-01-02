@@ -29,6 +29,7 @@
 #include <vlc_charset.h>
 
 #include "substext.h"
+#include "../demux/mp4/minibox.h"
 
 /*****************************************************************************
  * Module descriptor.
@@ -370,41 +371,43 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
+    mp4_box_iterator_t it;
+    mp4_box_iterator_Init( &it, p_buf,
+                           p_block->i_buffer - (p_buf - p_block->p_buffer) );
     /* Parse our styles */
-    while( (size_t)(p_buf - p_block->p_buffer) + 8 < p_block->i_buffer )
+    while( mp4_box_iterator_Next( &it ) )
     {
-        uint32_t i_atomsize = GetDWBE( p_buf );
-        vlc_fourcc_t i_atomtype = VLC_FOURCC(p_buf[4],p_buf[5],p_buf[6],p_buf[7]);
-        p_buf += 8;
-        switch( i_atomtype )
+        switch( it.i_type )
         {
 
         case VLC_FOURCC('s','t','y','l'):
         {
-            if ( (size_t)(p_buf - p_block->p_buffer) < 14 ) break;
-            uint16_t i_nbrecords = GetWBE(p_buf);
+            if( it.i_payload < 14 )
+                break;
+
+            uint16_t i_nbrecords = GetWBE(it.p_payload);
             uint16_t i_cur_record = 0;
-            p_buf += 2;
-            while( i_cur_record++ < i_nbrecords )
+
+            it.p_payload += 2; it.i_payload -= 2;
+            while( i_cur_record++ < i_nbrecords && it.i_payload >= 12 )
             {
-                if ( (size_t)(p_buf - p_block->p_buffer) < 12 ) break;
-                uint16_t i_start = __MIN( GetWBE(p_buf), i_psz_bytelength - 1 );
-                uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_bytelength - 1 );
+                uint16_t i_start = __MIN( GetWBE(it.p_payload), i_psz_bytelength - 1 );
+                uint16_t i_end =  __MIN( GetWBE(it.p_payload + 2), i_psz_bytelength - 1 );
 
                 text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
                 if( p_style )
                 {
-                    if( (p_style->i_style_flags = ConvertFlags( p_buf[6] )) )
+                    if( (p_style->i_style_flags = ConvertFlags( it.p_payload[6] )) )
                         p_style->i_features |= STYLE_HAS_FLAGS;
-                    p_style->i_font_size = p_buf[7];
-                    p_style->i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
-                    p_style->i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
+                    p_style->i_font_size = it.p_payload[7];
+                    p_style->i_font_color = GetDWBE(&it.p_payload[8]) >> 8;// RGBA -> RGB
+                    p_style->i_font_alpha = GetDWBE(&it.p_payload[8]) & 0xFF;
                     p_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
                     ApplySegmentStyle( &p_segment3g, i_start, i_end, p_style );
                     text_style_Delete( p_style );
                 }
 
-                p_buf += 12;
+                it.p_payload += 12; it.i_payload -= 12;
             }
         }   break;
 
@@ -413,7 +416,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             break;
 
         }
-        p_buf += i_atomsize;
     }
 
     p_spu->i_start    = p_block->i_pts;
