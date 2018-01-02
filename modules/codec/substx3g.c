@@ -281,20 +281,20 @@ static void ApplySegmentStyle( tx3g_segment_t **pp_segment, const uint16_t i_abs
 
 /* Do relative size conversion using default style size (from stsd),
    as the line should always be 5%. Apply to each segment specific text size */
-static void FontSizeConvert( const text_style_t *p_default_style, text_style_t *p_style )
+static void FontSizeConvert( const text_style_t *p_reference, text_style_t *p_style )
 {
     if( unlikely(!p_style) )
     {
         return;
     }
-    else if( unlikely(!p_default_style) || p_default_style->i_font_size == 0 )
+    else if( unlikely(!p_reference) || p_reference->i_font_size == 0 )
     {
         p_style->i_font_size = 0;
         p_style->f_font_relsize = 5.0;
     }
     else
     {
-        p_style->f_font_relsize = 5.0 * (float) p_style->i_font_size / p_default_style->i_font_size;
+        p_style->f_font_relsize = 5.0 * (float) p_style->i_font_size / p_reference->i_font_size;
         p_style->i_font_size = 0;
     }
 }
