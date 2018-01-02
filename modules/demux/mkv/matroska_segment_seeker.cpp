@@ -475,6 +475,10 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
             ms.cluster->InitTimecode( static_cast<uint64>( *p_tc ), ms.i_timescale );
             break;
         }
+        else if( MKV_CHECKED_PTR_DECL( p_tc, EbmlCrc32, el ) )
+        {
+            p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA ); /* avoid a skip that may fail */
+        }
     }
 
     /* TODO: add error handling; what if we never get a KaxCluster and/or KaxClusterTimecode? */
