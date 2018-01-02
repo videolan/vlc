@@ -628,21 +628,8 @@ bool matroska_segment_c::Preload( )
             }
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
-            if( !ParseCluster( kc_ptr ) )
-                break;
 
             cluster = kc_ptr;
-            IndexAppendCluster( cluster );
-
-            // add first cluster as trusted seekpoint for all tracks
-            for( tracks_map_t::const_iterator it = tracks.begin();
-                 it != tracks.end(); ++it )
-            {
-                _seeker.add_seekpoint( it->first,
-                    SegmentSeeker::Seekpoint( cluster->GetElementPosition(), 0 ) );
-            }
-
-            ep->Down();
             /* stop pre-parsing the stream */
             break;
         }
