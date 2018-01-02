@@ -354,7 +354,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         }
     }
 
-    if(rate.size)
+    if(rate.size && rate.time)
     {
         connManager->updateDownloadRate(sourceid, rate.size, rate.time);
     }
