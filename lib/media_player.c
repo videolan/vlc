@@ -1599,7 +1599,7 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
     *pp_chapters = calloc( ci_chapter_count, sizeof(**pp_chapters) );
     if( !*pp_chapters )
     {
-        return -1;
+        goto error;
     }
 
     /* fill array */
@@ -1608,8 +1608,7 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
         libvlc_chapter_description_t *p_chapter = malloc( sizeof(*p_chapter) );
         if( unlikely(p_chapter == NULL) )
         {
-            libvlc_chapter_descriptions_release( *pp_chapters, ci_chapter_count );
-            return -1;
+            goto error;
         }
         (*pp_chapters)[i] = p_chapter;
 
@@ -1633,9 +1632,19 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
             p_chapter->psz_name = NULL;
         }
         vlc_seekpoint_Delete( p_seekpoint[i] );
+        p_seekpoint[i] = NULL;
     }
 
+    free( p_seekpoint );
     return ci_chapter_count;
+
+error:
+    if( *pp_chapters )
+        libvlc_chapter_descriptions_release( *pp_chapters, ci_chapter_count );
+    for ( int i = 0; i < ci_chapter_count; ++i )
+        vlc_seekpoint_Delete( p_seekpoint[i] );
+    free( p_seekpoint );
+    return -1;
 }
 
 void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapters,
