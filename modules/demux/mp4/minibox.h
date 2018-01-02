@@ -50,6 +50,7 @@ static bool mp4_box_iterator_Next( mp4_box_iterator_t *p_it )
             p_it->i_buffer -= i_size;
             return true;
         }
+        else break;
     }
     return false;
 }
