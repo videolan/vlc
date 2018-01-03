@@ -52,7 +52,7 @@ vlc_module_begin()
     set_capability("vout display", 275)
     add_shortcut("glwin32", "opengl")
     set_callbacks(Open, Close)
-    add_glconv()
+    add_glopts()
 vlc_module_end()
 
 /*****************************************************************************

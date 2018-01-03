@@ -82,7 +82,7 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 
     add_shortcut("vout_ios2", "vout_ios")
-    add_glconv()
+    add_glopts()
 vlc_module_end ()
 
 @interface VLCOpenGLES2VideoView : UIView {
