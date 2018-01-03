@@ -1,0 +1,42 @@
+From 32b56287cc9d07dfbbc2ee21b70a8fbe1f2d9f2f Mon Sep 17 00:00:00 2001
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date: Sat, 30 Dec 2017 19:57:08 +0100
+Subject: [PATCH] x509/verify: when verifying against a self signed certificate ignore issuer
+
+That is, ignore issuer when checking the issuer's parameters strength. That
+resolves the issue of marking self-signed certificates as with insecure
+parameters during verification.
+
+Resolves #347
+
+Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+---
+ lib/x509/verify.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/lib/x509/verify.c b/lib/x509/verify.c
+index 26b1ab3..a59e637 100644
+--- a/lib/x509/verify.c
++++ b/lib/x509/verify.c
+@@ -431,11 +431,13 @@ unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned 
+ 			_gnutls_debug_log(#level": certificate's security level is unacceptable\n"); \
+ 			return gnutls_assert_val(0); \
+ 		} \
+-		sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
+-		if (sp < level) { \
+-			_gnutls_cert_log("issuer", issuer); \
+-			_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
+-			return gnutls_assert_val(0); \
++		if (issuer) { \
++			sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
++			if (sp < level) { \
++				_gnutls_cert_log("issuer", issuer); \
++				_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
++				return gnutls_assert_val(0); \
++			} \
+ 		} \
+ 		break;
+ 
+--
+libgit2 0.26.0
+
