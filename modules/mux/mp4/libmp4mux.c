@@ -1011,34 +1011,39 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     return vide;
 }
 
-static bo_t *GetTextBox(void)
+static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
-    bo_t *text = box_new("text");
-    if(!text)
-        return NULL;
+    if(p_track->fmt.i_codec == VLC_CODEC_SUBT)
+    {
+        bo_t *text = box_new("text");
+        if(!text)
+            return NULL;
 
-    for (int i = 0; i < 6; i++)
-        bo_add_8(text, 0);        // reserved;
-    bo_add_16be(text, 1);         // data-reference-index
+        for (int i = 0; i < 6; i++)
+            bo_add_8(text, 0);        // reserved;
+        bo_add_16be(text, 1);         // data-reference-index
 
-    bo_add_32be(text, 0);         // display flags
-    bo_add_32be(text, 0);         // justification
-    for (int i = 0; i < 3; i++)
-        bo_add_16be(text, 0);     // back ground color
+        bo_add_32be(text, 0);         // display flags
+        bo_add_32be(text, 0);         // justification
+        for (int i = 0; i < 3; i++)
+            bo_add_16be(text, 0);     // back ground color
 
-    bo_add_16be(text, 0);         // box text
-    bo_add_16be(text, 0);         // box text
-    bo_add_16be(text, 0);         // box text
-    bo_add_16be(text, 0);         // box text
+        bo_add_16be(text, 0);         // box text
+        bo_add_16be(text, 0);         // box text
+        bo_add_16be(text, 0);         // box text
+        bo_add_16be(text, 0);         // box text
 
-    bo_add_64be(text, 0);         // reserved
-    for (int i = 0; i < 3; i++)
-        bo_add_16be(text, 0xff);  // foreground color
+        bo_add_64be(text, 0);         // reserved
+        for (int i = 0; i < 3; i++)
+            bo_add_16be(text, 0xff);  // foreground color
 
-    bo_add_8 (text, 9);
-    bo_add_mem(text, 9, (uint8_t*)"Helvetica");
+        bo_add_8 (text, 9);
+        bo_add_mem(text, 9, (uint8_t*)"Helvetica");
 
-    return text;
+        return text;
+    }
+
+    return NULL;
 }
 
 static int64_t GetScaledEntryDuration( const mp4mux_entry_t *p_entry, uint32_t i_timescale,
@@ -1067,7 +1072,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     else if (p_track->fmt.i_cat == VIDEO_ES)
         box_gather(stsd, GetVideBox(p_obj, p_track, b_mov));
     else if (p_track->fmt.i_cat == SPU_ES)
-        box_gather(stsd, GetTextBox());
+        box_gather(stsd, GetTextBox(p_obj, p_track, b_mov));
 
     /* chunk offset table */
     bo_t *stco;
@@ -1529,7 +1534,10 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         else if (p_stream->fmt.i_cat == VIDEO_ES)
             bo_add_fourcc(hdlr, "vide");
         else if (p_stream->fmt.i_cat == SPU_ES)
-            bo_add_fourcc(hdlr, "text");
+        {
+            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT)
+                bo_add_fourcc(hdlr, "text");
+        }
 
         bo_add_32be(hdlr, 0);         // reserved
         bo_add_32be(hdlr, 0);         // reserved
@@ -1579,22 +1587,25 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
                 box_gather(minf, vmhd);
             }
         } else if (p_stream->fmt.i_cat == SPU_ES) {
-            bo_t *gmin = box_full_new("gmin", 0, 1);
-            if(gmin)
+            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT)
             {
-                bo_add_16be(gmin, 0);     // graphicsmode
-                for (int i = 0; i < 3; i++)
-                    bo_add_16be(gmin, 0); // opcolor
-                bo_add_16be(gmin, 0);     // balance
-                bo_add_16be(gmin, 0);     // reserved
-
-                bo_t *gmhd = box_new("gmhd");
-                if(gmhd)
+                bo_t *gmin = box_full_new("gmin", 0, 1);
+                if(gmin)
                 {
-                    box_gather(gmhd, gmin);
-                    box_gather(minf, gmhd);
+                    bo_add_16be(gmin, 0);     // graphicsmode
+                    for (int i = 0; i < 3; i++)
+                        bo_add_16be(gmin, 0); // opcolor
+                    bo_add_16be(gmin, 0);     // balance
+                    bo_add_16be(gmin, 0);     // reserved
+
+                    bo_t *gmhd = box_new("gmhd");
+                    if(gmhd)
+                    {
+                        box_gather(gmhd, gmin);
+                        box_gather(minf, gmhd);
+                    }
+                    else bo_free(gmin);
                 }
-                else bo_free(gmin);
             }
         }
 

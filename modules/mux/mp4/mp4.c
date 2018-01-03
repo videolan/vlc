@@ -683,14 +683,14 @@ static int Mux(sout_mux_t *p_mux)
             }
         }
 
-        if (p_stream->mux.fmt.i_cat == SPU_ES && p_stream->mux.i_entry_count > 0)
+        if (p_stream->mux.fmt.i_cat == SPU_ES &&
+            p_stream->mux.i_entry_count > 0 &&
+            p_stream->mux.entry[p_stream->mux.i_entry_count-1].i_length == 0)
         {
              /* length of previous spu, stored in spu clearer */
             int64_t i_length = dts_fb_pts( p_data ) - p_stream->i_last_dts;
             if(i_length < 0)
                 i_length = 0;
-            assert( p_stream->mux.entry[p_stream->mux.i_entry_count-1].i_length == 0 );
-            assert( p_stream->mux.entry[p_stream->mux.i_entry_count-1].i_size == 3 );
             /* Fix entry */
             p_stream->mux.entry[p_stream->mux.i_entry_count-1].i_length = i_length;
             p_stream->mux.i_read_duration += i_length;
@@ -728,22 +728,29 @@ static int Mux(sout_mux_t *p_mux)
         /* Add SPU clearing tag (duration tb fixed on next SPU or stream end )*/
         if (p_stream->mux.fmt.i_cat == SPU_ES)
         {
-            block_t *p_empty = block_Alloc(3);
-            if (p_empty)
+            block_t *p_empty = NULL;
+            if(p_stream->mux.fmt.i_codec == VLC_CODEC_SUBT)
             {
-                /* point to start of our empty */
-                p_stream->i_last_dts += e->i_length;
+                p_empty = block_Alloc(3);
+                if (p_empty)
+                {
+                    /* point to start of our empty */
+                    p_stream->i_last_dts += e->i_length;
 
-                /* Write a " " */
-                p_empty->p_buffer[0] = 0;
-                p_empty->p_buffer[1] = 1;
-                p_empty->p_buffer[2] = ' ';
+                    /* Write a " " */
+                    p_empty->p_buffer[0] = 0;
+                    p_empty->p_buffer[1] = 1;
+                    p_empty->p_buffer[2] = ' ';
+                }
+            }
 
+            if(p_empty)
+            {
                 /* Append a idx entry */
                 /* XXX: No need to grow the entry here */
                 mp4mux_entry_t *e_empty = &p_stream->mux.entry[p_stream->mux.i_entry_count++];
                 e_empty->i_pos    = p_sys->i_pos;
-                e_empty->i_size   = 3;
+                e_empty->i_size   = p_empty->i_buffer;
                 e_empty->i_pts_dts= 0;
                 e_empty->i_length = 0; /* will add dts diff later*/
                 e_empty->i_flags  = 0;
