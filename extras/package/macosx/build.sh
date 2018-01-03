@@ -177,6 +177,7 @@ spushd "${vlcroot}/extras/tools"
 ./bootstrap > $out
 if [ "$REBUILD" = "yes" ]; then
     make clean
+    ./bootstrap > $out
 fi
 make > $out
 spopd
