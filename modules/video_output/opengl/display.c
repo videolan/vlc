@@ -68,7 +68,7 @@ vlc_module_begin ()
     add_module ("gl", "opengl", NULL,
                 GL_TEXT, PROVIDER_LONGTEXT, true)
 #endif
-    add_glconv ()
+    add_glopts ()
 vlc_module_end ()
 
 struct vout_display_sys_t

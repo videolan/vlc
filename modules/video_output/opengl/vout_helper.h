@@ -61,7 +61,8 @@
 #define GLCONV_TEXT N_("Open GL/GLES hardware converter")
 #define GLCONV_LONGTEXT N_( \
     "Force a \"glconv\" module.")
-#define add_glconv() add_module ("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT, true)
+#define add_glopts() \
+    add_module ("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT, true)
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
     VLC_CODEC_RGBA,
