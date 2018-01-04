@@ -621,7 +621,37 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                 pl_color_space_from_video_format(&tc->fmt),
                 dst_space, NULL, false);
 
+        struct pl_shader_obj *dither_state = NULL;
+        int method = var_InheritInteger(tc->gl, "dither-algo");
+        if (method >= 0) {
+
+            unsigned out_bits = 0;
+            int override = var_InheritInteger(tc->gl, "dither-depth");
+            if (override > 0)
+                out_bits = override;
+            else
+            {
+                GLint fb_depth = 0;
+#if !defined(USE_OPENGL_ES2)
+                /* fetch framebuffer depth (we are already bound to the default one). */
+                if (tc->vt->GetFramebufferAttachmentParameteriv != NULL)
+                    tc->vt->GetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK_LEFT,
+                                                                GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
+                                                                &fb_depth);
+#endif
+                if (fb_depth <= 0)
+                    fb_depth = 8;
+                out_bits = fb_depth;
+            }
+
+            pl_shader_dither(sh, out_bits, &dither_state, &(struct pl_dither_params) {
+                .method   = method,
+                .lut_size = 4, // avoid too large values, since this gets embedded
+            });
+        }
+
         const struct pl_shader_res *res = tc->pl_sh_res = pl_shader_finalize(sh);
+        pl_shader_obj_destroy(&dither_state);
 
         FREENULL(tc->uloc.pl_vars);
         tc->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
