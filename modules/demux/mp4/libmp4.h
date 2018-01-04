@@ -941,8 +941,8 @@ typedef struct MP4_Box_data_elst_s
 
     uint32_t i_entry_count;
 
-    uint64_t *i_segment_duration;
-    int64_t  *i_media_time;
+    uint64_t *i_segment_duration; /* movie timescale */
+    int64_t  *i_media_time; /* media(track) timescale */
     uint16_t *i_media_rate_integer;
     uint16_t *i_media_rate_fraction;
 
