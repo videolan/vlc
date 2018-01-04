@@ -317,6 +317,8 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
         }
     }
 
+    i_dts = MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
+
     /* now handle elst */
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
     {
@@ -327,16 +329,16 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
               elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
             elst->i_media_time[p_track->i_elst] > 0 )
         {
-            i_dts -= elst->i_media_time[p_track->i_elst];
+            i_dts -= MP4_rescale( elst->i_media_time[p_track->i_elst], p_track->i_timescale, CLOCK_FREQ );
         }
 
         /* add i_elst_time */
-        i_dts += MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, p_track->i_timescale );
+        i_dts += MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, CLOCK_FREQ );
 
         if( i_dts < 0 ) i_dts = 0;
     }
 
-    return MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
+    return i_dts;
 }
 
 static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
