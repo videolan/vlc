@@ -823,6 +823,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(BufferData);
     GET_PROC_ADDR(DeleteBuffers);
 
+    GET_PROC_ADDR_OPTIONAL(GetFramebufferAttachmentParameteriv);
+
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
     GET_PROC_ADDR_OPTIONAL(MapBufferRange);
