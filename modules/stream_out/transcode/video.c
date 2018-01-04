@@ -691,7 +691,7 @@ void transcode_video_close( sout_stream_t *p_stream,
     if( id->p_encoder->p_module )
     {
         module_unneed( id->p_encoder, id->p_encoder->p_module );
-        id->p_decoder->p_module = NULL;
+        id->p_encoder->p_module = NULL;
     }
 
     /* Close filters */
