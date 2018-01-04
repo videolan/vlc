@@ -102,6 +102,7 @@ typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLs
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
 #   define PFNGLBUFFERSUBDATAPROC            typeof(glBufferSubData)*
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
+#   define PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC typeof(glGetFramebufferAttachmentParameteriv)*
 #if defined(__APPLE__)
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
@@ -199,6 +200,9 @@ typedef struct {
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
+
+    /* Framebuffers commands */
+    PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC GetFramebufferAttachmentParameteriv;
 
     /* Commands used for PBO and/or Persistent mapping */
     PFNGLBUFFERSUBDATAPROC          BufferSubData; /* can be NULL */
