@@ -63,6 +63,35 @@ struct demux_sys_t
         }
         if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
             canSeek = false;
+
+        input_title_t** pp_titles;
+        int i_nb_titles, i_title_offset, i_chapter_offset;
+        if( demux_Control( demux->p_next, DEMUX_GET_TITLE_INFO, &pp_titles,
+                          &i_nb_titles, &i_title_offset,
+                          &i_chapter_offset ) == VLC_SUCCESS )
+        {
+            int64_t i_longest_duration = 0;
+            int i_longest_title = 0;
+            for( int i = 0 ; i < i_nb_titles; ++i )
+            {
+                if( pp_titles[i]->i_length > i_longest_duration )
+                {
+                    i_longest_duration = pp_titles[i]->i_length;
+                    i_longest_title = i;
+                }
+                vlc_input_title_Delete( pp_titles[i] );
+            }
+            free( pp_titles );
+            int i_current_title;
+            if ( demux_Control( p_demux->p_next, DEMUX_GET_TITLE,
+                                &i_current_title ) == VLC_SUCCESS &&
+                 i_current_title != i_longest_title )
+            {
+                demux_Control( p_demux->p_next, DEMUX_SET_TITLE,
+                               i_longest_title );
+                p_demux->info.i_update = p_demux->p_next->info.i_update;
+            }
+        }
     }
 
     ~demux_sys_t()
