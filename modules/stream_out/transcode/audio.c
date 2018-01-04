@@ -354,11 +354,14 @@ end:
     /* Drain encoder */
     if( unlikely( !b_error && in == NULL ) )
     {
-        block_t *p_block;
-        do {
-           p_block = id->p_encoder->pf_encode_audio(id->p_encoder, NULL );
-           block_ChainAppend( out, p_block );
-        } while( p_block );
+        if( id->p_encoder->p_module )
+        {
+            block_t *p_block;
+            do {
+               p_block = id->p_encoder->pf_encode_audio(id->p_encoder, NULL );
+               block_ChainAppend( out, p_block );
+            } while( p_block );
+        }
     }
 
     return b_error ? VLC_EGENERIC : VLC_SUCCESS;
