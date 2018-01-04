@@ -178,6 +178,26 @@ static const char * const tone_text[] = {
 #define TONEMAP_WARN_TEXT "Highlight clipped pixels"
 #define TONEMAP_WARN_LONGTEXT "Debugging tool to indicate which pixels were clipped as part of the tone mapping process."
 
+#define DITHER_TEXT "Dithering algorithm"
+#define DITHER_LONGTEXT "The algorithm to use when dithering to a lower bit depth (degrades performance on some platforms)."
+
+static const int dither_values[] = {
+    -1, // no dithering
+    PL_DITHER_BLUE_NOISE,
+    PL_DITHER_WHITE_NOISE,
+    PL_DITHER_ORDERED_LUT,
+};
+
+static const char * const dither_text[] = {
+    "Disabled",
+    "Blue noise",
+    "White noise",
+    "Bayer matrix (ordered dither)",
+};
+
+#define DEPTH_TEXT N_("Dither depth override (0 = framebuffer depth)")
+#define DEPTH_LONGTEXT N_("Overrides the detected framebuffer depth. Useful to dither to lower bit depths than otherwise required.")
+
 #define add_glopts_placebo() \
     set_section("Colorspace conversion", NULL) \
     add_integer("rendering-intent", pl_color_map_default_params.intent, \
@@ -195,7 +215,11 @@ static const char * const tone_text[] = {
               TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true) \
     add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
               TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false) \
-    add_bool("tone-mapping-warn", false, TONEMAP_WARN_TEXT, TONEMAP_WARN_LONGTEXT, false)
+    add_bool("tone-mapping-warn", false, TONEMAP_WARN_TEXT, TONEMAP_WARN_LONGTEXT, false) \
+    set_section("Dithering", NULL) \
+    add_integer("dither-algo", -1, DITHER_TEXT, DITHER_LONGTEXT, false) \
+            change_integer_list(dither_values, dither_text) \
+    add_integer_with_range("dither-depth", 0, 0, 16, DEPTH_TEXT, DEPTH_LONGTEXT, false)
 #else
 #define add_glopts_placebo()
 #endif
