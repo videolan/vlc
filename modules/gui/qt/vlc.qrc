@@ -6,6 +6,7 @@
         <file alias="vlc48.png">../../../share/icons/48x48/vlc.png</file>
         <file alias="vlc128-xmas.png">../../../share/icons/128x128/vlc-xmas.png</file>
         <file alias="vlc48-xmas.png">../../../share/icons/48x48/vlc-xmas.png</file>
+        <file alias="vlc128-kb.png">../../../share/icons/128x128/vlc-kb.png</file>
     </qresource>
     <qresource prefix="/menu">
         <file alias="help.svg">pixmaps/menus/help_16px.svg</file>

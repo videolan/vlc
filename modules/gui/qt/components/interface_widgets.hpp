@@ -112,11 +112,13 @@ private:
 protected:
     void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
     void showEvent( QShowEvent * e ) Q_DECL_OVERRIDE;
+    void updateDefaultArt( const QString& );
     static const int MARGIN = 5;
     QString defaultArt;
 public slots:
     void toggle(){ isVisible() ? hide() : show(); }
     void updateArt( const QString& );
+    void titleUpdated( const QString& );
 };
 
 class EasterEggBackgroundWidget : public BackgroundWidget
