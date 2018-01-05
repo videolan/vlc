@@ -3020,8 +3020,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         {
             if (update.subs.psz_encoding == NULL)
                 update.subs.psz_encoding = es->fmt.subs.psz_encoding;
-            if (update.subs.p_style == NULL)
-                update.subs.p_style = es->fmt.subs.p_style;
         }
         if (update.i_extra_languages == 0)
         {

@@ -506,12 +506,6 @@ int es_format_Copy(es_format_t *restrict dst, const es_format_t *src)
             if (unlikely(dst->subs.psz_encoding == NULL))
                 ret = VLC_ENOMEM;
         }
-        if (src->subs.p_style != NULL)
-        {
-            dst->subs.p_style = text_style_Duplicate(src->subs.p_style);
-            if (unlikely(dst->subs.p_style == NULL))
-                ret = VLC_ENOMEM;
-        }
     }
 
     if (src->i_extra_languages > 0)
@@ -549,12 +543,7 @@ void es_format_Clean(es_format_t *fmt)
     if (fmt->i_cat == VIDEO_ES)
         video_format_Clean( &fmt->video );
     if (fmt->i_cat == SPU_ES)
-    {
         free(fmt->subs.psz_encoding);
-
-        if (fmt->subs.p_style != NULL)
-            text_style_Delete(fmt->subs.p_style);
-    }
 
     for (unsigned i = 0; i < fmt->i_extra_languages; i++)
     {

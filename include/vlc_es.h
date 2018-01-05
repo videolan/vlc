@@ -26,7 +26,6 @@
 
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
-#include <vlc_text_style.h>
 #include <vlc_viewpoint.h>
 
 /**
@@ -544,8 +543,6 @@ struct subs_format_t
         /* Reorder depth of transport video, -1 for no reordering */
         int i_reorder_depth;
     } cc;
-
-    text_style_t *p_style; /* Default styles to use */
 };
 
 #define SPU_PALETTE_DEFINED  0xbeefbeef
