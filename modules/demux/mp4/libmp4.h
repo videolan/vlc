@@ -742,26 +742,9 @@ typedef struct
 
     uint16_t i_data_reference_index;
 
-    uint32_t i_display_flags;   // TextDescription and Tx3gDescription
+    uint8_t *p_data;
+    size_t   i_data;
 
-    int8_t i_justification_horizontal; // left(0), centered(1), right(-1)
-    int8_t i_justification_vertical;   // top(0), centered(1), bottom(-1)
-
-    uint16_t i_background_color[4];
-
-    uint16_t i_text_box_top;
-    uint16_t i_text_box_left;
-    uint16_t i_text_box_bottom;
-    uint16_t i_text_box_right;
-
-    uint32_t i_reserved3;
-
-    uint16_t i_font_id;
-    uint8_t  i_font_face;
-    uint8_t  i_font_size;
-    uint32_t i_font_color; //RGBA
-
-    // TODO to complete
 } MP4_Box_data_sample_text_t;
 
 typedef struct
