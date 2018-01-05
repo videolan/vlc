@@ -406,15 +406,18 @@ static int Open( vlc_object_t * p_this )
         p_demux->pf_demux = Demux_Seekable;
         p_sys->i_read_increment = READ_LENGTH;
     }
-    else if( p_sys->b_seekable && !p_sys->b_interleaved )
+    else if( p_sys->b_seekable )
     {
         p_demux->pf_demux = Demux_Seekable;
         p_sys->i_read_increment = READ_LENGTH_NONINTERLEAVED;
-        msg_Warn( p_demux, "Non seekable non interleaved content over slow seekable, "
-                           "expect bad performance" );
+        if( !p_sys->b_interleaved )
+            msg_Warn( p_demux, "Non interleaved content over slow seekable, "
+                               "expect bad performance" );
     }
     else
     {
+        msg_Warn( p_demux, "Non seekable content " );
+
         p_demux->pf_demux = Demux_UnSeekable;
         p_sys->i_read_increment = READ_LENGTH_NONINTERLEAVED;
          /* non seekable and non interleaved case ? well... */
