@@ -1,6 +1,6 @@
 # GNU Multiple Precision Arithmetic
 
-GMP_VERSION := 6.0.0
+GMP_VERSION := 6.1.2
 GMP_URL := https://gmplib.org/download/gmp-$(GMP_VERSION)/gmp-$(GMP_VERSION).tar.bz2
 
 GMP_CONF :=
@@ -21,8 +21,6 @@ $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 
 gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
-	$(APPLY) $(SRC)/gmp/thumb.patch
-	$(APPLY) $(SRC)/gmp/clang.patch
 	$(APPLY) $(SRC)/gmp/ppc64.patch
 	$(MOVE)
 
