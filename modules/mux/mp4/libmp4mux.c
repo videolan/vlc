@@ -1013,32 +1013,44 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
 static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
-    if(p_track->fmt.i_codec == VLC_CODEC_SUBT)
+    VLC_UNUSED(p_obj);
+    if(p_track->fmt.i_codec == VLC_CODEC_SPU ||
+       p_track->fmt.i_codec == VLC_CODEC_TX3G)
     {
-        bo_t *text = box_new("text");
+        bo_t *text = (!b_mov || p_track->fmt.i_codec == VLC_CODEC_TX3G) ?
+                     box_new("tx3g") : box_new("text");
         if(!text)
             return NULL;
 
-        for (int i = 0; i < 6; i++)
-            bo_add_8(text, 0);        // reserved;
-        bo_add_16be(text, 1);         // data-reference-index
+        if(p_track->fmt.i_codec == VLC_CODEC_TX3G &&
+           p_track->fmt.i_extra >= 32)
+        {
+            /* Copy the original sample description format */
+            bo_add_mem(text, p_track->fmt.i_extra, p_track->fmt.p_extra);
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+                bo_add_8(text, 0);        // reserved;
+            bo_add_16be(text, 1);         // data-reference-index
 
-        bo_add_32be(text, 0);         // display flags
-        bo_add_32be(text, 0);         // justification
-        for (int i = 0; i < 3; i++)
-            bo_add_16be(text, 0);     // back ground color
+            bo_add_32be(text, 0);         // display flags
+            bo_add_32be(text, 0);         // justification
+            for (int i = 0; i < 3; i++)
+                bo_add_16be(text, 0);     // back ground color
 
-        bo_add_16be(text, 0);         // box text
-        bo_add_16be(text, 0);         // box text
-        bo_add_16be(text, 0);         // box text
-        bo_add_16be(text, 0);         // box text
+            bo_add_16be(text, 0);         // box text
+            bo_add_16be(text, 0);         // box text
+            bo_add_16be(text, 0);         // box text
+            bo_add_16be(text, 0);         // box text
 
-        bo_add_64be(text, 0);         // reserved
-        for (int i = 0; i < 3; i++)
-            bo_add_16be(text, 0xff);  // foreground color
+            bo_add_64be(text, 0);         // reserved
+            for (int i = 0; i < 3; i++)
+                bo_add_16be(text, 0xff);  // foreground color
 
-        bo_add_8 (text, 9);
-        bo_add_mem(text, 9, (uint8_t*)"Helvetica");
+            bo_add_8 (text, 9);
+            bo_add_mem(text, 9, (uint8_t*)"Helvetica");
+        }
 
         return text;
     }
@@ -1535,8 +1547,13 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
             bo_add_fourcc(hdlr, "vide");
         else if (p_stream->fmt.i_cat == SPU_ES)
         {
+            /* text/tx3g 3GPP */
+            /* sbtl/tx3g Apple subs */
+            /* text/text Apple text */
             if(p_stream->fmt.i_codec == VLC_CODEC_SUBT)
                 bo_add_fourcc(hdlr, "text");
+            else if(p_stream->fmt.i_codec == VLC_CODEC_TX3G)
+                bo_add_fourcc(hdlr, (b_mov) ? "sbtl" : "text");
         }
 
         bo_add_32be(hdlr, 0);         // reserved
@@ -1587,7 +1604,9 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
                 box_gather(minf, vmhd);
             }
         } else if (p_stream->fmt.i_cat == SPU_ES) {
-            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT)
+            if(b_mov &&
+               (p_stream->fmt.i_codec == VLC_CODEC_SUBT||
+                p_stream->fmt.i_codec == VLC_CODEC_TX3G))
             {
                 bo_t *gmin = box_full_new("gmin", 0, 1);
                 if(gmin)
@@ -1768,6 +1787,8 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
     case VLC_CODEC_SUBT:
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
+        break;
+    case VLC_CODEC_TX3G:
         break;
     default:
         return false;
