@@ -237,13 +237,18 @@ InitJNIFields (vlc_object_t *p_obj, JNIEnv *env)
         }
         *(jclass*)((uint8_t*)&jfields + classes[i].offset) =
             (jclass) (*env)->NewGlobalRef(env, clazz);
+        (*env)->DeleteLocalRef(env, clazz);
     }
 
-    jclass last_class;
+    jclass last_class = NULL;
     for (int i = 0; members[i].name; i++)
     {
         if (i == 0 || strcmp(members[i].class, members[i - 1].class))
+        {
+            if (last_class != NULL)
+                (*env)->DeleteLocalRef(env, last_class);
             last_class = (*env)->FindClass(env, members[i].class);
+        }
 
         if (CHECK_EXCEPTION())
         {
@@ -273,6 +278,8 @@ InitJNIFields (vlc_object_t *p_obj, JNIEnv *env)
                 goto end;
         }
     }
+    if (last_class != NULL)
+        (*env)->DeleteLocalRef(env, last_class);
     /* getInputBuffers and getOutputBuffers are deprecated if API >= 21
      * use getInputBuffer and getOutputBuffer instead. */
     if (jfields.get_input_buffer && jfields.get_output_buffer)
