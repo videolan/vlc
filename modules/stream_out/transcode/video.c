@@ -184,10 +184,6 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
     /* Open decoder
      * Initialization of decoder structures
      */
-    id->p_decoder->fmt_out = id->p_decoder->fmt_in;
-    id->p_decoder->fmt_out.i_extra = 0;
-    id->p_decoder->fmt_out.p_extra = NULL;
-    id->p_decoder->fmt_out.psz_language = NULL;
     id->p_decoder->pf_decode = NULL;
     id->p_decoder->pf_queue_video = decoder_queue_video;
     id->p_decoder->p_queue_ctx = id;
