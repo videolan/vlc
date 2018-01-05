@@ -179,6 +179,7 @@ static bo_t *BuildMoov(sout_mux_t *p_mux);
 static block_t *ConvertSUBT(block_t *);
 static bool CreateCurrentEdit(mp4_stream_t *, mtime_t, bool);
 static void DebugEdits(sout_mux_t *, const mp4_stream_t *);
+static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream);
 
 /*****************************************************************************
  * Open:
@@ -482,10 +483,13 @@ static void DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     mp4_stream_t *p_stream = (mp4_stream_t*)p_input->p_sys;
 
-    if(!p_sys->b_fragmented &&
-        CreateCurrentEdit(p_stream, p_sys->i_start_dts, false))
+    if(!p_sys->b_fragmented)
     {
-        DebugEdits(p_mux, p_stream);
+        while(block_FifoCount(p_input->p_fifo) > 0 &&
+              MuxStream(p_mux, p_input, p_stream) == VLC_SUCCESS) {};
+
+        if(CreateCurrentEdit(p_stream, p_sys->i_start_dts, false))
+            DebugEdits(p_mux, p_stream);
     }
 
     msg_Dbg(p_mux, "removing input");
