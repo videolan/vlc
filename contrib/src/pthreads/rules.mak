@@ -19,6 +19,8 @@ pthreads: pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz .sum-pthreads
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/pthreads/winrt.patch
 endif
+	$(APPLY) $(SRC)/pthreads/implib.patch
+	$(APPLY) $(SRC)/pthreads/remove-inline.patch
 	$(MOVE)
 
 ifdef HAVE_CROSS_COMPILE
