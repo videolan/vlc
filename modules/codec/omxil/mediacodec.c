@@ -441,8 +441,7 @@ static int UpdateVout(decoder_t *p_dec)
     {
         assert(p_dec->fmt_out.i_codec == VLC_CODEC_ANDROID_OPAQUE);
         p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
-        video_format_ApplyRotation(&p_dec->fmt_out.video,
-                                   &p_dec->fmt_out.video);
+        video_format_TransformTo(&p_dec->fmt_out.video, ORIENT_NORMAL);
     }
 
     if (decoder_UpdateVideoFormat(p_dec) != 0)
