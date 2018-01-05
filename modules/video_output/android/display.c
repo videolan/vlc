@@ -479,7 +479,7 @@ error:
     }
     p_window->b_use_priv = false;
     if (p_window->i_angle != 0)
-        video_format_ApplyRotation(&p_window->fmt, &p_window->fmt);
+        video_format_TransformTo(&p_window->fmt, ORIENT_NORMAL);
     return -1;
 }
 
@@ -729,7 +729,7 @@ static int OpenCommon(vout_display_t *vd)
 
     /* use software rotation if we don't use private anw */
     if (!sys->p_window->b_opaque && !sys->p_window->b_use_priv)
-        video_format_ApplyRotation(&vd->fmt, &vd->fmt);
+        video_format_TransformTo(&vd->fmt, ORIENT_NORMAL);
 
     msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" :
             (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
