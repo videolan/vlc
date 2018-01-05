@@ -498,7 +498,14 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 es_fmt.subs.dvb.i_id = GetWBE( cp->extradata ) |
                                       (GetWBE( cp->extradata + 2 ) << 16);
             }
-
+            else if( cp->codec_id == AV_CODEC_ID_MOV_TEXT )
+            {
+                if( cp->extradata_size && (es_fmt.p_extra = malloc(cp->extradata_size)) )
+                {
+                    memcpy( es_fmt.p_extra, cp->extradata, cp->extradata_size );
+                    es_fmt.i_extra = cp->extradata_size;
+                }
+            }
             psz_type = "subtitle";
             break;
 
