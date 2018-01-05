@@ -516,6 +516,10 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
             continue;
 
         char const* path = archive_entry_pathname( entry );
+
+        if( unlikely( !path ) )
+            break;
+
         char*       mrl  = vlc_stream_extractor_CreateMRL( p_directory, path );
 
         if( unlikely( !mrl ) )
