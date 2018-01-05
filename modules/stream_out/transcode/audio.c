@@ -164,13 +164,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
      */
 
     /* Initialization of decoder structures */
-
-    /* No need to clean the fmt_out, it was freshly initialized by
-     * es_format_Init in Add() */
-    es_format_Copy( &id->p_decoder->fmt_out, &id->p_decoder->fmt_in );
-    free( id->p_decoder->fmt_out.p_extra );
-    id->p_decoder->fmt_out.i_extra = 0;
-    id->p_decoder->fmt_out.p_extra = NULL;
     id->p_decoder->pf_decode = NULL;
     id->p_decoder->pf_queue_audio = decoder_queue_audio;
     id->p_decoder->p_queue_ctx = id;
