@@ -6,6 +6,7 @@ PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
 
 ifdef HAVE_WIN32
 LIBPLACEBO_WIN32 = HAVE_WIN32=1
+DEPS_libplacebo += pthreads $(DEPS_pthreads)
 endif
 
 PKGS += libplacebo
