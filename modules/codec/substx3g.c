@@ -35,6 +35,7 @@
  * Module descriptor.
  *****************************************************************************/
 static int Open ( vlc_object_t * );
+static void Close ( vlc_object_t * );
 static int Decode( decoder_t *, block_t * );
 
 vlc_module_begin ()
@@ -43,34 +44,12 @@ vlc_module_begin ()
     set_capability( "spu decoder", 100 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    set_callbacks( Open, NULL )
+    set_callbacks( Open, Close )
 vlc_module_end ()
 
 /****************************************************************************
  * Local structs
  ****************************************************************************/
-
-/*****************************************************************************
- * Open: probe the decoder and return score
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    decoder_t     *p_dec = (decoder_t *) p_this;
-
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_TX3G )
-        return VLC_EGENERIC;
-
-    p_dec->pf_decode = Decode;
-
-    p_dec->fmt_out.i_codec = 0;
-    if( p_dec->fmt_out.subs.p_style )
-    {
-        p_dec->fmt_out.subs.p_style->i_font_size = 0;
-        p_dec->fmt_out.subs.p_style->f_font_relsize = 5.0;
-    }
-
-    return VLC_SUCCESS;
-}
 
 /*****************************************************************************
  * Local:
@@ -366,7 +345,9 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         free( p_segment3g );
         return VLCDEC_SUCCESS;
     }
+
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    const text_style_t *p_root_style = (text_style_t *) p_dec->p_sys;
 
     mp4_box_iterator_t it;
     mp4_box_iterator_Init( &it, p_buf,
@@ -422,16 +403,15 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
 
-    if( p_dec->fmt_in.subs.p_style )
-        text_style_Merge( p_spu_sys->p_default_style, p_dec->fmt_in.subs.p_style, true );
-    FontSizeConvert( p_dec->fmt_in.subs.p_style, p_spu_sys->p_default_style );
+    text_style_Merge( p_spu_sys->p_default_style, p_root_style, true );
+    FontSizeConvert( p_root_style, p_spu_sys->p_default_style );
 
     /* Unwrap */
     text_segment_t *p_text_segments = p_segment3g->s;
     text_segment_t *p_cur = p_text_segments;
     while( p_segment3g )
     {
-        FontSizeConvert( p_dec->fmt_in.subs.p_style, p_segment3g->s->style );
+        FontSizeConvert( p_root_style, p_segment3g->s->style );
 
         tx3g_segment_t * p_old = p_segment3g;
         p_segment3g = p_segment3g->p_next3g;
@@ -447,4 +427,69 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     decoder_QueueSub( p_dec, p_spu );
     return VLCDEC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Extradata Parsing
+ *****************************************************************************/
+static void ParseExtradata( decoder_t *p_dec )
+{
+    text_style_t *p_style = (text_style_t *) p_dec->p_sys;
+    const uint8_t *p_extra = p_dec->fmt_in.p_extra;
+
+    if( p_dec->fmt_in.i_extra < 32 )
+        return;
+
+    /* DF @0 */
+    /* Just @4 */
+
+    /* BGColor @6 */
+    p_style->i_background_color = GetDWBE(&p_extra[6]) >> 8;
+    p_style->i_background_alpha = p_extra[9];
+    p_style->i_features |= STYLE_HAS_BACKGROUND_COLOR|STYLE_HAS_BACKGROUND_ALPHA;
+
+    /* BoxRecord @10 */
+
+    /* StyleRecord @18 */
+    p_style->i_style_flags = ConvertFlags( p_extra[24] );
+    if( p_style->i_style_flags )
+        p_style->i_features |= STYLE_HAS_FLAGS;
+    p_style->i_font_size = p_extra[25];
+    p_style->i_font_color = GetDWBE(&p_extra[26]) >> 8;// RGBA -> RGB
+    p_style->i_font_alpha = p_extra[29];
+    p_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
+
+    /* FontTableBox @30 */
+}
+
+/*****************************************************************************
+ * Close: clean decoder
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    decoder_t     *p_dec = (decoder_t *) p_this;
+    text_style_Delete( (text_style_t *) p_dec->p_sys );
+}
+
+/*****************************************************************************
+ * Open: probe the decoder and return score
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    decoder_t     *p_dec = (decoder_t *) p_this;
+
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TX3G )
+        return VLC_EGENERIC;
+
+    p_dec->pf_decode = Decode;
+
+    p_dec->p_sys = (decoder_sys_t *) text_style_Create( STYLE_NO_DEFAULTS );
+    if( !p_dec->p_sys )
+        return VLC_ENOMEM;
+
+    ParseExtradata( p_dec );
+
+    p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
+
+    return VLC_SUCCESS;
 }
