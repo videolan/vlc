@@ -1,6 +1,7 @@
 # Breton translation
-# Copyright (C) 2017 VideoLAN
-# This file is distributed under the same license as the vlc package.
+# Copyright (C) 2018 VideoLAN
+# This file is distributed under the same license as the VLC package.
+
 #
 # Translators:
 # Denis ARNAUD <denisarnuad@hotmail.com>, 2012,2015
@@ -9,13 +10,12 @@
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
-"Language-Team: Breton (http://www.transifex.com/yaron/vlc-trans/language/"
-"br/)\n"
+"Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2017\n"
+"Language-Team: Breton (https://www.transifex.com/yaron/teams/16553/br/)\n"
 "Language: br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,8 +81,8 @@ msgstr "Arventennoù evit reoliadur ketal VLC"
 msgid "Hotkeys settings"
 msgstr "Arventennoù ar berradennoù"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -191,9 +191,8 @@ msgstr ""
 "dindan skeudennoù\""
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Siloù"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -661,9 +660,8 @@ msgid "Spectrum"
 msgstr "Spektr"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Metr gwell"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -679,9 +677,8 @@ msgid "Stereo audio mode"
 msgstr "Mod aodio stereo"
 
 #: src/audio_output/output.c:421
-#, fuzzy
 msgid "Original"
-msgstr "ID Orin"
+msgstr ""
 
 #: src/audio_output/output.c:427 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -739,7 +736,8 @@ msgstr ""
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Emgefre"
@@ -835,14 +833,12 @@ msgstr ""
 "\n"
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr "(diouer aotreet)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr "(diouer diweredekaet)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -989,9 +985,9 @@ msgid "Yes"
 msgstr "Ya"
 
 #: src/input/es_out.c:2132
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Leadelloù serret %u"
+msgstr ""
 
 #: src/input/es_out.c:2134
 #, c-format
@@ -1019,8 +1015,8 @@ msgstr "Yezh"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskrivadur"
 
@@ -1078,9 +1074,8 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3133
-#, fuzzy
 msgid "Video resolution"
-msgstr "Skrammañ an diarunusted"
+msgstr ""
 
 #: src/input/es_out.c:3138
 msgid "Buffer dimensions"
@@ -1105,42 +1100,36 @@ msgid "Top left"
 msgstr ""
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Left top"
-msgstr "Kleiz"
+msgstr ""
 
 #: src/input/es_out.c:3165
 msgid "Right bottom"
 msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Top right"
-msgstr "Copyright"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom left"
-msgstr "Traoñ"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom right"
-msgstr "Traoñ"
+msgstr ""
 
 #: src/input/es_out.c:3167
 msgid "Left bottom"
 msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Right top"
-msgstr "Dehou"
+msgstr ""
 
 #: src/input/es_out.c:3169
-#, fuzzy
 msgid "Orientation"
-msgstr "Reteradur ar melezour"
+msgstr ""
 
 #: src/input/es_out.c:3175 src/input/es_out.c:3193 src/input/es_out.c:3211
 #: src/input/es_out.c:3225 src/playlist/tree.c:67
@@ -1149,19 +1138,16 @@ msgid "Undefined"
 msgstr ""
 
 #: src/input/es_out.c:3177
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 linenn / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3179
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 linenn / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3187
-#, fuzzy
 msgid "Color primaries"
-msgstr "Kemennadennoù al liv"
+msgstr ""
 
 #: src/input/es_out.c:3194 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1173,14 +1159,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3205
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Tuginañ al livioù"
+msgstr ""
 
 #: src/input/es_out.c:3218
-#, fuzzy
 msgid "Color space"
-msgstr "Kemennadennoù al liv"
+msgstr ""
 
 #: src/input/es_out.c:3218
 #, c-format
@@ -1203,29 +1187,24 @@ msgid "Center"
 msgstr "Kreizañ"
 
 #: src/input/es_out.c:3228
-#, fuzzy
 msgid "Top Left"
-msgstr "Kleiz"
+msgstr ""
 
 #: src/input/es_out.c:3229
-#, fuzzy
 msgid "Top Center"
-msgstr "Kreizañ"
+msgstr ""
 
 #: src/input/es_out.c:3230
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Traoñ"
+msgstr ""
 
 #: src/input/es_out.c:3231
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Kreizañ"
+msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Chroma location"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: src/input/es_out.c:3244
 msgid "Rectangular"
@@ -1240,9 +1219,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3256
-#, fuzzy
 msgid "Projection"
-msgstr "projectM"
+msgstr ""
 
 #: src/input/es_out.c:3258
 msgid "Yaw"
@@ -1281,9 +1259,8 @@ msgid "Primary B"
 msgstr ""
 
 #: src/input/es_out.c:3303
-#, fuzzy
 msgid "White point"
-msgstr "Gwenn"
+msgstr ""
 
 #: src/input/es_out.c:3318 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1300,11 +1277,12 @@ msgstr ""
 "Dic’houest eo VLC da zigeriñ ar MRL '%s'. Gwiriañ ar marilh konter evit "
 "munudoù."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1398,14 +1376,12 @@ msgid "Actors"
 msgstr "Aktrourien"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Arzour"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Niverenn al loabr"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1446,14 +1422,12 @@ msgid "Previous title"
 msgstr "Titl kent"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Titl da-heul"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Lec'hiadur an destenn"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1605,13 +1579,10 @@ msgid "Color messages"
 msgstr "Kemennadennoù al liv"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Kaset en deus  gweredekaat livañ ar c’hemenadennoù-mañ d'ar penel ho "
-"ezhommoù diwezhañ skor liv Linux evit an dra-mañ da labourat."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1655,9 +1626,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Restroù media"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1675,33 +1645,28 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Ma Sonioù"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "C'hoari"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Loupenn/Zoumañ"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Kelaouenn"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
@@ -1780,7 +1745,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2079,9 +2045,8 @@ msgid "Always place the video window on top of other windows."
 msgstr ""
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Gweredakaat an enbonegañ hep koll"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2565,15 +2530,15 @@ msgstr "Loabr aodio"
 
 #: src/libvlc-module.c:584
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr ""
+msgstr "Niver ar froud eus ar roudenn aodio d'ober ganti (eus 0 da n)."
 
 #: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
-msgstr ""
+msgstr "Roudenn istitl"
 
 #: src/libvlc-module.c:589
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr ""
+msgstr "Niver ar froud eus ar roudenn istitl d'ober ganti (eus 0 da n)."
 
 #: src/libvlc-module.c:592 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2612,15 +2577,15 @@ msgstr "ID al loabr aodio"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the audio track to use."
-msgstr ""
+msgstr "ID froud ar roudenn aodio d'ober ganti."
 
 #: src/libvlc-module.c:612
 msgid "Subtitle track ID"
-msgstr ""
+msgstr "ID ar roudenn istitl"
 
 #: src/libvlc-module.c:614
 msgid "Stream ID of the subtitle track to use."
-msgstr ""
+msgstr "ID froud ar roudenn istitl d'ober ganti."
 
 #: src/libvlc-module.c:616
 msgid "Preferred Closed Captions decoder"
@@ -2743,9 +2708,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:675
-#, fuzzy
 msgid "Record directory"
-msgstr "Teuliad mammenn"
+msgstr ""
 
 #: src/libvlc-module.c:677
 msgid "Directory where the records will be stored"
@@ -2814,9 +2778,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:714
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Enboneger an istitloù DVB"
+msgstr ""
 
 #: src/libvlc-module.c:715
 msgid "Changes the subtitles size where possible"
@@ -2964,9 +2927,8 @@ msgid "TCP connection timeout"
 msgstr "Re hir an dale evit ar c'hennask TCP"
 
 #: src/libvlc-module.c:805
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "Re hir an dale evit ar c'hennask TCP"
+msgstr ""
 
 #: src/libvlc-module.c:807
 msgid "HTTP server address"
@@ -3307,19 +3269,16 @@ msgid "Stream filter module"
 msgstr "Mollad silañ al lanv"
 
 #: src/libvlc-module.c:1003
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "Siloù video a zo arveret da skrammañ al lanv video."
+msgstr ""
 
 #: src/libvlc-module.c:1005
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Mollad silañ al lanv"
+msgstr ""
 
 #: src/libvlc-module.c:1007
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "Siloù video a zo arveret da skrammañ al lanv video."
+msgstr ""
 
 #: src/libvlc-module.c:1009
 msgid "Demux module"
@@ -3479,9 +3438,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "Hizivadennoù al lenner mediaoù VLC"
+msgstr ""
 
 #: src/libvlc-module.c:1099
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3504,9 +3462,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1116
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Re hir an dale evit ar c'hennask TCP"
+msgstr ""
 
 #: src/libvlc-module.c:1118
 msgid "Maximum time allowed to preparse an item, in milliseconds"
@@ -3551,9 +3508,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1141
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Sil video"
+msgstr ""
 
 #: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
@@ -3618,9 +3574,8 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr ""
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Start paused"
-msgstr "      %s: %s"
+msgstr ""
 
 #: src/libvlc-module.c:1176
 msgid "Pause each item in the playlist on the first frame."
@@ -3673,14 +3628,12 @@ msgid "Ignore"
 msgstr "Leuskel a-gostez"
 
 #: src/libvlc-module.c:1208
-#, fuzzy
 msgid "Volume control"
-msgstr "Izelaat ar son"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: src/libvlc-module.c:1209
 msgid "Position control reversed"
@@ -4088,19 +4041,16 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
 #: src/libvlc-module.c:1319
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Ezvoneger istitloù Teletext"
+msgstr ""
 
 #: src/libvlc-module.c:1320
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Enboneger an istitloù DVB"
+msgstr ""
 
 #: src/libvlc-module.c:1321
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Arverañ ar restr is titloù"
+msgstr ""
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to change subtitles text scaling"
@@ -4313,27 +4263,27 @@ msgstr ""
 
 #: src/libvlc-module.c:1383
 msgid "Cycle audio track"
-msgstr ""
+msgstr "Dibunañ ar roudoù aodio"
 
 #: src/libvlc-module.c:1384
 msgid "Cycle through the available audio tracks(languages)."
-msgstr ""
+msgstr "Dibunañ dre ar roudoù aodio hegerz (yezhoù)."
 
 #: src/libvlc-module.c:1385
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "Dibunañ ar roudoù istitl en urzh eilpennet"
 
 #: src/libvlc-module.c:1386
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "Dibunañ dre ar roudoù istitl hegerz en urzh eilpennet."
 
 #: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
-msgstr ""
+msgstr "Dibunañ ar roudoù istitl"
 
 #: src/libvlc-module.c:1388
 msgid "Cycle through the available subtitle tracks."
-msgstr ""
+msgstr "Dibunañ dre ar roudoù istitl hegerz."
 
 #: src/libvlc-module.c:1389
 msgid "Toggle subtitles"
@@ -4341,7 +4291,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1390
 msgid "Toggle subtitle track visibility."
-msgstr ""
+msgstr "Gwintañ gwelusted ar roudenn istitl."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle next program Service ID"
@@ -4714,7 +4664,8 @@ msgid "Browser Stop"
 msgstr "Ergerzher Ehan"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5072,13 +5023,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr ""
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"Gant berzh eo bet pellgarget an handelv nevez. Fellout a ra deoc'h serriñ "
-"VLC ha staliañ anezhi diouzhtu ?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -5849,19 +5797,16 @@ msgid "Attachment input"
 msgstr ""
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "Enrollañ an aodio"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Mollad an ec'hankad aodio"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Trobarzhell enankad ebet bet kavet"
+msgstr ""
 
 #: modules/access/avcapture.m:287
 msgid ""
@@ -6025,23 +5970,20 @@ msgid "CDDB Server port to use."
 msgstr ""
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Roll an anankoù"
+msgstr ""
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
 msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "Enank an arc'had TCP"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6052,9 +5994,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "Kerzhlevr d'ur restr"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6150,9 +6091,8 @@ msgid "Composite"
 msgstr ""
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-video"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6431,23 +6371,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Kinklañ ar prenestr"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
 msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "Enankad SMB"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Molladoù an dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -6505,7 +6442,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -6895,18 +6833,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "Diuzañ un drobarzhell"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "roll an diuzadenn"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -6917,9 +6853,8 @@ msgid "Use NIT for scanning services"
 msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -6933,9 +6868,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "roll an diuzadenn"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7027,9 +6961,8 @@ msgid "Directory"
 msgstr "Teuliad"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "Molladoù arbennik"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7082,14 +7015,13 @@ msgid "Account that will be used for the connection."
 msgstr ""
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "Dilesa RTSP"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "Roit un anv kennaskañ talvoudek hag ur ger-tremen."
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7160,14 +7092,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "Enankad HTTP"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP (S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7194,9 +7124,8 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Anv an arveriad"
+msgstr ""
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7275,7 +7204,8 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Ledander"
@@ -7356,14 +7286,12 @@ msgid "Memory input"
 msgstr "Enankad ar memor"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Dilemel an hini diuzet"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Enankad ar memor"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7614,19 +7542,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Enankad ebet"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Sac'het eo an estez"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7674,9 +7599,8 @@ msgid "QuickTime Sound Capture"
 msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Trobarzhell enankad ebet bet kavet"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
 msgid ""
@@ -7685,9 +7609,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Trobarzhell enankad ebet bet kavet"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -7830,9 +7753,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Diuzañ ul lanv"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8072,9 +7994,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr ""
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "Dilesa RTSP"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8085,14 +8006,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:288 modules/access_output/srt.c:311
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:289
-#, fuzzy
 msgid "SRT input"
-msgstr "Enankad SFTP"
+msgstr ""
 
 #: modules/access/srt.c:294 modules/access_output/srt.c:317
 msgid "SRT chunk size (bytes)"
@@ -8200,7 +8119,8 @@ msgstr "Trobarzhell ar skimgomz"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr ""
 
@@ -8753,9 +8673,8 @@ msgid "Keep existing file"
 msgstr ""
 
 #: modules/access_output/file.c:316
-#, fuzzy
 msgid "Overwrite"
-msgstr "Flastrañ ar bajenn"
+msgstr ""
 
 #: modules/access_output/file.c:317
 msgid ""
@@ -8780,9 +8699,8 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr ""
 
 #: modules/access_output/file.c:381
-#, fuzzy
 msgid "Format time and date"
-msgstr "Anv ar mentrezh"
+msgstr ""
 
 #: modules/access_output/file.c:382
 msgid "Perform ISO C time and date formatting on the file path"
@@ -8797,14 +8715,12 @@ msgid "Open the file with synchronous writing."
 msgstr ""
 
 #: modules/access_output/file.c:388
-#, fuzzy
 msgid "File stream output"
-msgstr "Skrammañ ec'hankad al lanv"
+msgstr ""
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Siloù video a zo arveret da skrammañ al lanv video."
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -8820,9 +8736,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8830,9 +8745,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:67
-#, fuzzy
 msgid "HTTP stream output"
-msgstr "Ec'hankad al lanv UDP"
+msgstr ""
 
 #: modules/access_output/livehttp.c:67
 msgid "Segment length"
@@ -8852,9 +8766,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/livehttp.c:74
-#, fuzzy
 msgid "Number of segments"
-msgstr "Niver a bannoù"
+msgstr ""
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
@@ -8869,14 +8782,12 @@ msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 msgstr ""
 
 #: modules/access_output/livehttp.c:80
-#, fuzzy
 msgid "Index file"
-msgstr "Moger skeudennoù"
+msgstr ""
 
 #: modules/access_output/livehttp.c:81
-#, fuzzy
 msgid "Path to the index file to create"
-msgstr "Treug d'ar c'hroc'hen da vezañ implijet."
+msgstr ""
 
 #: modules/access_output/livehttp.c:83
 msgid "Full URL to put in index file"
@@ -8887,9 +8798,8 @@ msgid "Full URL to put in index file. Use #'s to represent segment number"
 msgstr ""
 
 #: modules/access_output/livehttp.c:87
-#, fuzzy
 msgid "Delete segments"
-msgstr "Dilemel an holl sinedoù"
+msgstr ""
 
 #: modules/access_output/livehttp.c:88
 msgid "Delete segments when they are no longer needed"
@@ -8900,9 +8810,8 @@ msgid "Use muxers rate control mechanism"
 msgstr ""
 
 #: modules/access_output/livehttp.c:92
-#, fuzzy
 msgid "AES key URI to place in playlist"
-msgstr "Klask er roll-lenn"
+msgstr ""
 
 #: modules/access_output/livehttp.c:94
 msgid "AES key file"
@@ -8932,18 +8841,16 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Niver a renkoù"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
 msgstr ""
 
 #: modules/access_output/livehttp.c:109
-#, fuzzy
 msgid "HTTP Live streaming output"
-msgstr "Ec'hankad al lanv UDP"
+msgstr ""
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
@@ -8987,9 +8894,8 @@ msgid "Genre of the content."
 msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Deskrivadur"
+msgstr ""
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
@@ -9004,9 +8910,8 @@ msgid "Samplerate information of the transcoded stream."
 msgstr ""
 
 #: modules/access_output/shout.c:98
-#, fuzzy
 msgid "Number of channels"
-msgstr "Niver a bannoù"
+msgstr ""
 
 #: modules/access_output/shout.c:99
 msgid "Number of channels information of the transcoded stream."
@@ -9021,9 +8926,8 @@ msgid "Ogg Vorbis Quality information of the transcoded stream."
 msgstr ""
 
 #: modules/access_output/shout.c:104
-#, fuzzy
 msgid "Stream public"
-msgstr "Ec'hankad al lanvioù"
+msgstr ""
 
 #: modules/access_output/shout.c:105
 msgid ""
@@ -9037,9 +8941,8 @@ msgid "IceCAST output"
 msgstr "Ec'hankad IceCAST"
 
 #: modules/access_output/srt.c:312
-#, fuzzy
 msgid "SRT stream output"
-msgstr "Ec'hankad al lanv UDP"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9052,9 +8955,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/udp.c:67
-#, fuzzy
 msgid "Group packets"
-msgstr "pakadoù"
+msgstr ""
 
 #: modules/access_output/udp.c:68
 msgid ""
@@ -9285,9 +9187,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:76
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Skrammer"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9402,9 +9303,8 @@ msgid "Ratio"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Kenfeur an  neuze : %s"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9691,9 +9591,8 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Perzhded an enbonegañ"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
@@ -9751,9 +9650,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Sanelloù aodio"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
@@ -9993,9 +9891,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:484
-#, fuzzy
 msgid "Audio device is not configured"
-msgstr "Anv an trobarzhell aodio"
+msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:485
 msgid ""
@@ -10125,33 +10022,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
-#, fuzzy
 msgid "Disabled"
-msgstr "Diweredekaat"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1304
-#, fuzzy
 msgid "Enabled"
-msgstr "Gweredekaat"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1309
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "Ec'hankad ar restr aodio"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Output back-end"
-msgstr "Trobarzhell ec'hankad"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Sac'het eo an ec'hakad aodio"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10238,9 +10130,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr ""
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10251,9 +10142,8 @@ msgid "Raw audio encoder"
 msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "ouzhpennañ d'ar restr"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
@@ -10284,15 +10174,13 @@ msgid "Use Core Text renderer in the subtitle."
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "Ezvonegeran istitloù DVB"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "Istitloù DVB"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10697,9 +10585,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "Ec'hankad video Direct3D"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -10743,14 +10630,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:354
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "Ezvoneger video PNG"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "Ezvoneger ar skeudenn SDL"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -10805,19 +10690,16 @@ msgid "Enforce a keyframe interval between 1 and 1000."
 msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Paketer video H.264"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11369,19 +11251,16 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "Ezvoneger aodio MPEG "
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Paketer video H.264"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
@@ -11623,9 +11502,8 @@ msgid "Pseudo raw video packetizer"
 msgstr ""
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Enboneger video Theora"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -11999,9 +11877,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr ""
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "ezvoneger"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12012,9 +11889,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "ezvoneger"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12418,18 +12294,16 @@ msgid "Specify the height to decode the image too"
 msgstr ""
 
 #: modules/codec/svg.c:54
-#, fuzzy
 msgid "Scale factor"
-msgstr "Diuzañ un teuliad"
+msgstr ""
 
 #: modules/codec/svg.c:55
 msgid "Scale factor to apply to image"
 msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12470,9 +12344,8 @@ msgid "Teletext subtitles decoder"
 msgstr "Ezvoneger istitloù Teletext"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "Ezvonegeran istitloù DVB"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -12497,23 +12370,20 @@ msgid "Theora video encoder"
 msgstr "Enboneger video Theora"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "ezvoneger"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "Ezvoneger istitloù EBU STL"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "Displezher TTA"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12558,9 +12428,8 @@ msgid "Ulead DV audio decoder"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:80
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Ezvoneger gant ar periant"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
@@ -12573,9 +12442,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "Ezvoneger video CDG"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12612,9 +12480,8 @@ msgid "Vorbis audio encoder"
 msgstr "Enboneger aodio Vorbis"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Mod didrouz"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -12629,24 +12496,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Enboneger video Theora"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "ezvoneger"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "Ezvoneger istitloù EBU STL"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "Merdeer an istitloù EBU STL"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13361,9 +13224,8 @@ msgid "Default preset setting used"
 msgstr ""
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Dibarzhioù kempleshoc'h"
+msgstr ""
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
@@ -13439,9 +13301,8 @@ msgid "frame alternation"
 msgstr ""
 
 #: modules/codec/x264.c:445
-#, fuzzy
 msgid "2D"
-msgstr "F2"
+msgstr ""
 
 #: modules/codec/x264.c:449
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -13739,9 +13600,9 @@ msgid "Subtitle position %d px"
 msgstr ""
 
 #: modules/control/hotkeys.c:1355
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Enboneger an istitloù DVB"
+msgstr ""
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -13806,9 +13667,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "chommlec'h an dafariad HTTP"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -14115,10 +13975,12 @@ msgstr ""
 #: modules/control/oldrc.c:816
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr ""
+"Aroudenniñ a ran [X] . . . . . . . . . . . lakaat/kemer ar roudenn aodio"
 
 #: modules/control/oldrc.c:817
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr ""
+"Vroudenniñ a ran [X] . . . . . . . . . . . lakaat/kemer ar roudenn video"
 
 #: modules/control/oldrc.c:818
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
@@ -14139,6 +14001,7 @@ msgstr ""
 #: modules/control/oldrc.c:822
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
 msgstr ""
+"Sroudenniñ a ran [X] . . . . . . . . . . . lakaat/kemer ar roudenn istitl"
 
 #: modules/control/oldrc.c:823
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
@@ -14257,9 +14120,8 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Ketal Ncurses"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
 msgid "Maximum device width"
@@ -14290,9 +14152,8 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Gweredekaat"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
@@ -14488,9 +14349,8 @@ msgid "Dirac video demuxer"
 msgstr "Displezher video Dirac"
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "Enankad DirectShow"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
@@ -14618,9 +14478,8 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Siloù al lanvioù"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -14706,14 +14565,12 @@ msgid "Writer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:69
-#, fuzzy
 msgid "Composer"
-msgstr "Kempuner : %s\n"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:70
-#, fuzzy
 msgid "Producer"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
 #: modules/gui/qt/components/controller.hpp:112
@@ -14722,37 +14579,32 @@ msgid "Information"
 msgstr "Kelaouenn"
 
 #: modules/demux/mp4/meta.c:72
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Dilezel"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:73
 msgid "Requirements"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:74
-#, fuzzy
 msgid "Original Format"
-msgstr "ID Orin"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:75
-#, fuzzy
 msgid "Display Source As"
-msgstr "Skrammañ an arventennoù"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:76
-#, fuzzy
 msgid "Host Computer"
-msgstr "Ma urzhiataer"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:77
 msgid "Performers"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:78
-#, fuzzy
 msgid "Original Performer"
-msgstr "ID Orin"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
@@ -14772,52 +14624,44 @@ msgid "Lyrics"
 msgstr "Komzoù"
 
 #: modules/demux/mp4/meta.c:83
-#, fuzzy
 msgid "Record Company"
-msgstr "Echu eo an enrollañ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:84
 msgid "Model"
 msgstr "Patrom"
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
-#, fuzzy
 msgid "Grouping"
-msgstr "Strollad"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:88
-#, fuzzy
 msgid "Sub-Title"
-msgstr "Istitl"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:89
 msgid "Arranger"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:90
-#, fuzzy
 msgid "Art Director"
-msgstr "Teuliad"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:91
-#, fuzzy
 msgid "Copyright Acknowledgement"
-msgstr "Metaroadennoù ar Copyright"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:92
-#, fuzzy
 msgid "Conductor"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:93
-#, fuzzy
 msgid "Song Description"
-msgstr "Deskrivadur"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
@@ -14844,18 +14688,16 @@ msgid "Executive Producer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Oc'h enbonegañ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "Niver ar sanel"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -14866,18 +14708,16 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Skarzhañ"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "Son an aodio"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr ""
+msgstr "Na ober van eus ar roudoù nann-aodio evit restroù aodio iTunes"
 
 #: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
@@ -14888,9 +14728,8 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1679
-#, fuzzy
 msgid "Do not seek"
-msgstr "Ne lenn ket"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1680
 msgid "Build index"
@@ -15040,14 +14879,12 @@ msgid "MPEG Transport Stream demuxer"
 msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Aodio mud"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "Displegadur ebet evit ar c'hodisk-man"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
 msgid "Clean audio for the hearing impaired"
@@ -15255,9 +15092,8 @@ msgid "Load"
 msgstr "Kargañ"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Peurvec'hiañ"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15367,7 +15203,7 @@ msgstr ""
 
 #: modules/demux/subtitle.c:60
 msgid "Override the default track description."
-msgstr ""
+msgstr "Erlec'hiañ deskrivadur dre ziouer ar roudenn."
 
 #: modules/demux/subtitle.c:72
 msgid "Text subtitle parser"
@@ -15580,7 +15416,8 @@ msgid "Name"
 msgstr "Anv"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Aozer"
@@ -15833,32 +15670,27 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Media Araok"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Afell al lenn"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Lenn"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Titl kent"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Mont d'an eur"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -15959,7 +15791,7 @@ msgstr "Bonez aodio"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:161
 #: modules/gui/qt/ui/profiles.h:727
 msgid "Keep original video track"
-msgstr ""
+msgstr "Mirout ar roudenn video orin"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:749
@@ -15981,7 +15813,7 @@ msgstr "Skeulaat"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:172
 #: modules/gui/qt/ui/profiles.h:753
 msgid "Keep original audio track"
-msgstr ""
+msgstr "Mirout ar roudenn aodio orin"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:179
 #: modules/gui/qt/ui/profiles.h:764
@@ -16157,9 +15989,8 @@ msgid "Volume"
 msgstr "Son"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Son an aodio"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -16595,7 +16426,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainMenu.m:386
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
-msgstr ""
+msgstr "Sinkroneladur ar roudenn"
 
 #: modules/gui/macosx/VLCMainMenu.m:392
 #: modules/gui/qt/components/controller.hpp:110
@@ -16895,18 +16726,17 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "Son d'an traoñ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Efedoù aodio"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -16927,18 +16757,16 @@ msgid "Open"
 msgstr "Digeriñ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Ec'hankad al lanvioù"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Arventennoù..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Dibab an enankad"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -16961,9 +16789,8 @@ msgstr "Dibab ur restr"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Diuzañ ur restr"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17089,9 +16916,8 @@ msgid "Setup subtitle playback details"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Arverañ ar restr is titloù"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -17174,7 +17000,7 @@ msgstr "Enrollañ ar restr"
 
 #: modules/gui/macosx/VLCPlaylist.m:106
 msgid "Track Number"
-msgstr ""
+msgstr "Niver ar roudenn"
 
 #: modules/gui/macosx/VLCPlaylist.m:109
 #: modules/gui/qt/components/playlist/sorting.h:61
@@ -17191,9 +17017,8 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
-#, fuzzy
 msgid "Expand All"
-msgstr "Adober an Holl"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:233
 msgid "Collapse All"
@@ -17269,29 +17094,25 @@ msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
-#, fuzzy
 msgid "Renderer discovery off"
-msgstr "Dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:75
 #: modules/gui/macosx/VLCRendererMenuController.m:145
-#, fuzzy
 msgid "Enable renderer discovery"
-msgstr "Dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:77
 msgid "No renderer"
 msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:134
-#, fuzzy
 msgid "Renderer discovery on"
-msgstr "Dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:135
-#, fuzzy
 msgid "Disable renderer discovery"
-msgstr "Diweredekaat "
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
@@ -17442,9 +17263,8 @@ msgid "Note that these are system-wide settings."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
-#, fuzzy
 msgid "General settings"
-msgstr "Arventennoù aodio hollek"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
@@ -17463,9 +17283,8 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Fazi en ur lenn"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Enable notifications on playlist item change"
@@ -17481,14 +17300,12 @@ msgid "Automatically check for updates"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Etrefas"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Ketal gwiskadus"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -17549,14 +17366,12 @@ msgid "Show video within the main window"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:353
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Skrammad a-bezh"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:354
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Skrammad a-bezh"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Black screens in Fullscreen mode"
@@ -17682,39 +17497,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Lenn/Paouez"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Prenestr pennañ..."
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "Deskrivadur an URL"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "O lenn bremañ"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Diuzañ un teuliad"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Digeriñ ul &lec'hiadur diouzh ar golver"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -17725,14 +17534,15 @@ msgid "sec."
 msgstr ""
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Aodio/Video"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:51
 #: modules/gui/qt/components/extended_panels.cpp:1395
 msgid "Audio track synchronization:"
-msgstr ""
+msgstr "Sinkroneladur ar roudenn aodio:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:52
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:56
@@ -17751,7 +17561,7 @@ msgstr "Istitloù/Video"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:55
 #: modules/gui/qt/components/extended_panels.cpp:1407
 msgid "Subtitle track synchronization:"
-msgstr ""
+msgstr "Sinkroneladur ar roudenn istitloù:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
@@ -18185,15 +17995,15 @@ msgstr ""
 
 #: modules/gui/ncurses.c:880
 msgid " c                      Cycle through audio tracks"
-msgstr ""
+msgstr " c                      Dibunañ e-mesk ar roudoù aodio"
 
 #: modules/gui/ncurses.c:881
 msgid " v                      Cycle through subtitles tracks"
-msgstr ""
+msgstr " v                      Dibunañ e-mesk ar roudoù istitloù"
 
 #: modules/gui/ncurses.c:882
 msgid " b                      Cycle through video tracks"
-msgstr ""
+msgstr " b                     Dibunañ e-mesk ar roudoù video"
 
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
@@ -18312,14 +18122,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr ""
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "Adlenn"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "Dargouezhek"
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -18359,9 +18167,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr " Chabistr  : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr " Mammenn : <elfenn ebet>"
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -18398,9 +18205,8 @@ msgid "Teletext Activation"
 msgstr ""
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Treuswelusted"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -18557,15 +18363,13 @@ msgid "Aspect Ratio"
 msgstr ""
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "Skoazell hegerz ebet"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:362
 #: modules/gui/qt/components/extended_panels.cpp:373
-#, fuzzy
 msgid "Image Files"
-msgstr "Moger skeudennoù"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:364 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -18699,9 +18503,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1333
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "Kengeidañ an tevetegezh VLC"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1367
 msgid "(Hastened)"
@@ -19363,10 +19166,11 @@ msgid "Extract"
 msgstr "Eztennañ"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19378,14 +19182,14 @@ msgstr "&Serriñ"
 msgid "Bytes"
 msgstr ""
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Amdreiñ"
 
 #: modules/gui/qt/dialogs/convert.cpp:58
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Teul ebet bet diuzet"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:65 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19400,18 +19204,16 @@ msgid "Browse"
 msgstr "Meerdeiñ"
 
 #: modules/gui/qt/dialogs/convert.cpp:86
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "Teul ebet bet diuzet"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:88
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:91
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "ouzhpennañ d'ar restr"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
@@ -19463,9 +19265,8 @@ msgid "Adjustments and Effects"
 msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Mod stereo"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19481,9 +19282,8 @@ msgid "&Save"
 msgstr "En&rollañ"
 
 #: modules/gui/qt/dialogs/external.cpp:219
-#, fuzzy
 msgid "Store the Password"
-msgstr "Ger-tremen"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19785,7 +19585,8 @@ msgstr "Handelv"
 msgid "Website"
 msgstr "Lec'hienn web"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Restroù"
 
@@ -20107,14 +19908,12 @@ msgstr "An holl restroù"
 #: modules/gui/qt/extensions_manager.cpp:181
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
-#, fuzzy
 msgid "Empty"
-msgstr "- Goullo -"
+msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Gweredekaat"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
@@ -20153,9 +19952,8 @@ msgid "Subti&tle"
 msgstr "Is&titl"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1076
-#, fuzzy
 msgid "Tool&s"
-msgstr "Benveg"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1083
 msgid "V&iew"
@@ -20219,7 +20017,7 @@ msgstr "&Efedoù ha siloù"
 
 #: modules/gui/qt/menus.cpp:416
 msgid "&Track Synchronization"
-msgstr ""
+msgstr "Sinkroneladur ar &roudenn"
 
 #: modules/gui/qt/menus.cpp:435
 msgid "Plu&gins and extensions"
@@ -20250,9 +20048,8 @@ msgid "Docked Playlist"
 msgstr "Roll-lenn enkorfet"
 
 #: modules/gui/qt/menus.cpp:499
-#, fuzzy
 msgid "Always on &top"
-msgstr "Skrammañ an diarunusted"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
@@ -20283,9 +20080,8 @@ msgid "&Increase Volume"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:597
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Izelaat ar son"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:600
 msgid "&Mute"
@@ -20313,7 +20109,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:653
 msgid "Sub &Track"
-msgstr ""
+msgstr "&Roudenn stitloù"
 
 #: modules/gui/qt/menus.cpp:678
 msgid "Video &Track"
@@ -20493,13 +20289,15 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:105
 msgid "Show notification popup on track change"
-msgstr ""
+msgstr "Diskouez ar c'hemenn kemperzhel pa cheñch roudenn"
 
 #: modules/gui/qt/qt.cpp:107
 msgid ""
 "Show a notification popup with the artist and track name when the current "
 "playlist item changes, when VLC is minimized or hidden."
 msgstr ""
+"Diskouez ur c'hemenn kemperzhel gant an an arzour hag ar roudenn pa cheñch "
+"an elfenn red, pa vez pe bihanaet pe kuzhet VLC."
 
 #: modules/gui/qt/qt.cpp:110
 msgid "Windows opacity between 0.1 and 1"
@@ -20559,9 +20357,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Tuginaén livioù ar skeudenn"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -20604,9 +20401,8 @@ msgid "Load extensions on startup"
 msgstr "Kargañ an askouezhioù e-pad al loc'hañ"
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Kargañ an askouezhioù e-pad al loc'hañ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -20643,9 +20439,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Arventennoù ar c'hetal pennañ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -20678,10 +20473,9 @@ msgid "debug"
 msgstr "diveugañ"
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "Skarzhañ"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
@@ -20692,14 +20486,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "Restroù Kroc'hen |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "Restroù Roll-lenn|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "|All Files |*"
-msgstr "An holl restroù"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:216
 msgid "Open playlist"
@@ -20710,9 +20502,8 @@ msgid "Save playlist"
 msgstr "Enrollañ ar roll-lenn"
 
 #: modules/gui/skins2/src/dialogs.cpp:224
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "Roll lenn XSPF|*.xspf|restr M3U|*.m3u|roll lenn HTML|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:484
 msgid "Skin to use"
@@ -20775,9 +20566,8 @@ msgid "Select skin"
 msgstr "Diuzañ ur c'hroc'hen"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Digeriñ ar c'hrogen..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20840,14 +20630,12 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:620
-#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Ec'hankad video Direct3D"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:429
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "Ec'hankad video Direct3D"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -20877,9 +20665,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "Digenweañ"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -20908,9 +20695,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Digenweañ ar video"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -20927,14 +20713,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Sil video"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1188
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Sil video"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21005,27 +20789,24 @@ msgid "Secrets are stored on a file without any encryption"
 msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Dilemel an hini diuzet"
+msgstr ""
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
 msgstr ""
 
 #: modules/keystore/keychain.m:40
-#, fuzzy
 msgid "No"
-msgstr "&Ket"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:46
-#, fuzzy
 msgid "System default"
-msgstr "Spletad bonegoù ar reizhiad"
+msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
@@ -21089,9 +20870,8 @@ msgid "Secrets are stored via KWallet"
 msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Dilemel an hini diuzet"
+msgstr ""
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
@@ -21106,9 +20886,8 @@ msgid "Secrets are stored via libsecret"
 msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Ouzhpennañ ul logo"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -21123,28 +20902,24 @@ msgid "Turn off all messages on the console."
 msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Penel"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Penel"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Muioc'h a ditouroù"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "diveugañ"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -21155,19 +20930,16 @@ msgid "Log all VLC messages to a text file."
 msgstr ""
 
 #: modules/logger/file.c:208
-#, fuzzy
 msgid "Log filename"
-msgstr "Anvioù ar restroù logo"
+msgstr ""
 
 #: modules/logger/file.c:209
-#, fuzzy
 msgid "Specify the log filename."
-msgstr "Diuzañ ur restr"
+msgstr ""
 
 #: modules/logger/file.c:211
-#, fuzzy
 msgid "Log format"
-msgstr "Mentrezh ar skeudenn"
+msgstr ""
 
 #: modules/logger/file.c:212
 msgid "Specify the logging format."
@@ -21188,9 +20960,8 @@ msgid "Logger"
 msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Restr/Teuliad"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -21209,9 +20980,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Maskl an diveugañ"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -21234,9 +21004,8 @@ msgid "System logging facility."
 msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "Kerzhlevr da syslog"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -21468,7 +21237,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:57
 msgid "Soundtrack"
-msgstr ""
+msgstr "Roudenn ar son"
 
 #: modules/meta_engine/ID3Genres.h:58
 msgid "Euro-Techno"
@@ -22012,9 +21781,8 @@ msgid "acoustid"
 msgstr ""
 
 #: modules/misc/fingerprinter.c:74
-#, fuzzy
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr "Trobarzhell enankad ebet bet kavet"
+msgstr ""
 
 #: modules/misc/gnutls.c:477
 msgid ""
@@ -22081,9 +21849,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:753
-#, fuzzy
 msgid "Trust directory"
-msgstr "Teuliad mammenn"
+msgstr ""
 
 #: modules/misc/gnutls.c:755
 msgid ""
@@ -22130,9 +21897,8 @@ msgid "Playing some media."
 msgstr ""
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "Diweredekaat "
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -22587,9 +22353,8 @@ msgid "WAV muxer"
 msgstr "Liesplezher WAV"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "Enlugellad rebuziñ Libnotify"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -22689,7 +22454,8 @@ msgstr "Video MPEG"
 msgid "VC-1 packetizer"
 msgstr "Paketer VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -22732,14 +22498,12 @@ msgstr "Ma skeudennoù"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:620
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Dizoleiñ ar servijoù"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -22886,28 +22650,24 @@ msgid "Unknown type"
 msgstr "Rizh dianav"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Sanelloù aodio"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Skarzhañ ar roll"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Dafariad CDDB"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "Personelaat"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -23619,9 +23379,8 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Siloù al lanvioù"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -23648,24 +23407,20 @@ msgid "gzip decompression"
 msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "Lanv"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "Sil an amdrodur RV32"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Siloù al lanvioù"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "skurzerioù"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -23795,24 +23550,20 @@ msgid "Bridge in"
 msgstr ""
 
 #: modules/stream_out/chromaprint.c:57
-#, fuzzy
 msgid "Duration of the fingerprinting"
-msgstr "Arventennoù an aodio"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Lanv dre ziouer"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Eilañ ec'hankad al lanv"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:104
-#, fuzzy
 msgid "HTTP port"
-msgstr "Porzh SFTP"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid ""
@@ -23841,37 +23592,32 @@ msgid "IP Address of the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:116
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Porzhun arval"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:117
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:121
-#, fuzzy
 msgid "Chromecast"
-msgstr "Lec'hiadur"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "Eilañ ec'hankad al lanv"
+msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:328
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Displezher Avformat"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "Eilañ ec'hankad al lanv"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -24689,9 +24435,8 @@ msgid "Shadow distance"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Lec'hiadur an destenn"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -24867,9 +24612,8 @@ msgid "YUVP converter"
 msgstr "Amdroer YUVP"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Gamma ar skeudenn (0-10)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
@@ -25177,9 +24921,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:768
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Dilemel sil ar videoioù"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -25351,14 +25094,12 @@ msgid "Deinterlacing video filter"
 msgstr ""
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Dilemel sil ar videoioù"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Diuzañ ur restr"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -25401,14 +25142,12 @@ msgid "Extract RGB component video filter"
 msgstr ""
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Tuginañ sil ar video"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "Amdroer YUVP"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -25592,9 +25331,8 @@ msgid "Direction"
 msgstr ""
 
 #: modules/video_filter/mirror.c:72
-#, fuzzy
 msgid "Direction of the mirroring."
-msgstr "Arventennoù an aodio"
+msgstr ""
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -26071,9 +25809,8 @@ msgid "ASCII-art video output"
 msgstr ""
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Serriñ ar prenestr"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -26171,18 +25908,16 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Mollad an ec'hankad video"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Mollad an ec'hankad aodio"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Options"
@@ -26389,18 +26124,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "Ec'hankad video Direct3D"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "Ec'hankad video Direct3D"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -26471,9 +26204,8 @@ msgid "Wallpaper"
 msgstr ""
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "Ec'hankad video OpenGL"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -26484,9 +26216,8 @@ msgid "GPU affinity"
 msgstr ""
 
 #: modules/video_output/win32/wgl.c:46
-#, fuzzy
 msgid "WGL extension for OpenGL"
-msgstr "Askouezh OpenGL"
+msgstr ""
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -26537,9 +26268,8 @@ msgstr "Memor ar video"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "Skrammañ X11"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -26561,9 +26291,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Ec'hankad ar memo video"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -26955,14 +26684,12 @@ msgid "The height of the visualization window, in pixels."
 msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Spektr"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "Skrammadennoù a-vremañ"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -27338,7 +27065,7 @@ msgstr ""
 
 #: share/lua/http/index.html:218
 msgid "Track Synchronisation"
-msgstr ""
+msgstr "Sinkroneladur ar roudenn"
 
 #: share/lua/http/index.html:220
 msgid "VLM Batch Commands"
@@ -27476,9 +27203,8 @@ msgid "Start Time"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Amzer ehan"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27663,7 +27389,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
 msgid "Features"
-msgstr ""
+msgstr "Arc'hweladurioù"
 
 #: modules/gui/qt/ui/profiles.h:719
 msgid "Streamable"
@@ -27833,7 +27559,7 @@ msgstr "Anv an arveriad :"
 
 #: modules/gui/qt/ui/sprefs_audio.h:429
 msgid "Submit played tracks stats to Last.fm"
-msgstr ""
+msgstr "Kas ar stadegoù lenn roudoù da Last.fm"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Codecs"
@@ -27940,9 +27666,8 @@ msgid "Show systray icon"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ketal Ncurses"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28033,9 +27758,8 @@ msgid "Add a background"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Ec'hankad"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28255,40 +27979,11 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Screen capture (with Wayland)"
-#~ msgstr "Tapañ ur skrammad"
-
-#~ msgid "Streaming"
-#~ msgstr "Lanv"
-
 #~ msgid "Output/Written/Sent"
 #~ msgstr "Ec'hankad/skrivet/kaset"
 
 #~ msgid "Sent"
 #~ msgstr "Kaset"
-
-#~ msgid "packets"
-#~ msgstr "pakadoù"
-
-#~ msgid "Display device"
-#~ msgstr "Trobarzhell skrammañ"
-
-#, fuzzy
-#~ msgid "Capture region heigh"
-#~ msgstr "Trobarzhell enrollañ"
-
-#, fuzzy
-#~ msgid "High quality"
-#~ msgstr "Perzhded an enbonegañ"
-
-#, fuzzy
-#~ msgid "Very high quality"
-#~ msgstr "Perzhded an enbonegañ"
-
-#, fuzzy
-#~ msgid "Disable lua"
-#~ msgstr "Diweredekaat"
 
 #~ msgid "VLC can't recognize the input's format"
 #~ msgstr "N'hall ket VLC anavezout furmad an degasadenn"
@@ -28299,84 +27994,23 @@ msgstr ""
 #~ "N'hall ket furmad ar '%s' bezañ dinoet. Teurel ur sell ouzh ar marilh "
 #~ "konter evit munudoù."
 
-#~ msgid "Navigation"
-#~ msgstr "Merdeadur"
-
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Lazhañ an holl gemenadennoù diwall ha kelaouiñ."
 
 #~ msgid "Downloading ..."
 #~ msgstr "O pellgargañ..."
 
-#~ msgid ""
-#~ "%s\n"
-#~ "Downloading... %s/%s - %.1f%% done"
-#~ msgstr ""
-#~ "%s\n"
-#~ "O pellgargañ... %s/%s - %.1f%% graet"
-
 #~ msgid "BD"
 #~ msgstr "BD"
-
-#~ msgid "Configure"
-#~ msgstr "Kefluniañ"
-
-#~ msgid "EyeTV input"
-#~ msgstr "Enankad EyeTV"
-
-#~ msgid "FTP user name"
-#~ msgstr "Anv an arveriad FTP"
-
-#~ msgid "FTP password"
-#~ msgstr "Ger-tremen FTP"
-
-#~ msgid "GnomeVFS input"
-#~ msgstr "Enankad GnomeVFS"
-
-#~ msgid "RTSP user name"
-#~ msgstr "Anv an arveriad RTSP"
-
-#~ msgid "RTSP password"
-#~ msgstr "Ger-tremen RTSP"
 
 #~ msgid "No Input device found"
 #~ msgstr "Trobarzhell enankad ebet bet kavet"
 
-#~ msgid "SMB user name"
-#~ msgstr "Anv an arveriad SMB"
-
-#~ msgid "SMB password"
-#~ msgstr "Ger-tremen SMB"
-
-#~ msgid "LID"
-#~ msgstr "LID"
-
-#~ msgid "VCD Format"
-#~ msgstr "Mentrezh VCD"
-
 #~ msgid "Vol #"
 #~ msgstr "Son #"
 
-#~ msgid "Volume Set"
-#~ msgstr "Arventenniñ an dregern"
-
-#~ msgid "System Id"
-#~ msgstr "Naoudi linenn an dealfoù : %s"
-
-#~ msgid "Audio Channels"
-#~ msgstr "Sanelloù aodio"
-
 #~ msgid "type"
 #~ msgstr "rizh"
-
-#~ msgid "end"
-#~ msgstr "dibenn"
-
-#~ msgid "play list"
-#~ msgstr "Roll-lenn"
-
-#~ msgid "unknown type"
-#~ msgstr "Rizh dianav"
 
 #~ msgid "List ID"
 #~ msgstr "Naoudi ar roll"
@@ -28390,128 +28024,29 @@ msgstr ""
 #~ msgid "Use playback control?"
 #~ msgstr "Skramm X da implij"
 
-#~ msgid "Zip files filter"
-#~ msgstr "Sil restroù koazhet"
-
-#~ msgid "OpenSLES audio output"
-#~ msgstr "Ec'hankad an aodio OpenSLES"
-
-#~ msgid "OpenSLES"
-#~ msgstr "OpenSLES"
-
-#~ msgid "\"%s\" is no video encoder."
-#~ msgstr "N'eo ket un enboneger video \"%s\"."
-
-#~ msgid "\"%s\" is no audio encoder."
-#~ msgstr "N'eo ket un enboneger aodio \"%s\"."
-
 #~ msgid "DTS parser"
 #~ msgstr "Merdeer DTS"
 
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Ezvoneger al levraoueg QuickTime"
 
-#~ msgid "Google Video"
-#~ msgstr "Video Google"
-
-#~ msgid "ZPL playlist import"
-#~ msgstr "Enporzhiañ rolloù-lenn ZPL"
-
-#~ msgid "Invalid selection"
-#~ msgstr "Diuzad didalvoudek"
-
 #~ msgid "Send"
 #~ msgstr "Kas"
-
-#~ msgid "No device is selected"
-#~ msgstr "Trobarzhell ebet bet diuzet"
-
-#~ msgid "Current channel:"
-#~ msgstr "Sanell vremanel :"
-
-#~ msgid "Previous Channel"
-#~ msgstr "Sanell gent"
-
-#~ msgid "Next Channel"
-#~ msgstr "Sanell war-lerc'h"
 
 #~ msgid "Download Plugin"
 #~ msgstr "Pellakargañ an enlugellad"
 
-#~ msgid "S-Video input"
-#~ msgstr "Enankad S-Video"
-
 #~ msgid "H264 is a new video codec (useable with MPEG TS and MP4)"
 #~ msgstr "H264 a zo un bonez nevez (da vezañ arveret gant MPEG TS ha MP4)"
-
-#~ msgid "MPEG 1 Format"
-#~ msgstr "Mentrezh MPEG 1"
-
-#~ msgid "Transcode/Save to file"
-#~ msgstr "Treuzvonegañ/Enrollañ en ur restr"
 
 #~ msgid "From"
 #~ msgstr "Diouzh"
 
-#~ msgid "To"
-#~ msgstr "Da"
-
-#~ msgid "Transcode audio"
-#~ msgstr "Treuzvonegañ an aodio"
-
-#~ msgid "Transcode video"
-#~ msgstr "Treuzvonegañ ar video"
-
-#~ msgid "Additional transcode options"
-#~ msgstr "Dibarzhioù treuzvonegañ ouzhpenn"
-
-#~ msgid "Save file to"
-#~ msgstr "Enrollañ ar restr evel"
-
-#~ msgid "No input selected"
-#~ msgstr "Enankad  ebet bet diuzet"
-
-#~ msgid "Select the directory to save to"
-#~ msgstr "Diuzañ an teuliad e vez enrollet ennañ"
-
-#~ msgid "No folder selected"
-#~ msgstr "Teuliad ebet bet diuzet"
-
-#~ msgid "Finish"
-#~ msgstr "Echuiñ"
-
 #~ msgid "%i items"
 #~ msgstr "%i ergorenn"
 
-#~ msgid "yes"
-#~ msgstr "ya"
-
-#~ msgid "no"
-#~ msgstr "ket"
-
-#~ msgid "Current visualization"
-#~ msgstr "Skrammadennoù a-vremañ"
-
-#~ msgid "Local drives"
-#~ msgstr "Lennerioù lec'hel"
-
-#~ msgid "Page"
-#~ msgstr "Pajenn"
-
-#~ msgid "Password file"
-#~ msgstr "Restr ar ger-tremen"
-
 #~ msgid "RAOP"
 #~ msgstr "RAOP"
-
-#~ msgid "OSD menu"
-#~ msgstr "Lañser OSD"
-
-#~ msgid "Device type"
-#~ msgstr "Rizh an trobarzhell"
-
-#~ msgid "AtmoWin Software"
-#~ msgstr "Meziant AtmoWin"
 
 #~ msgid "DMX"
 #~ msgstr "DMX"
@@ -28522,44 +28057,14 @@ msgstr ""
 #~ msgid "Serial Port/Device"
 #~ msgstr "Porzh a-steud/Trobarzhell"
 
-#~ msgid "No Filtering"
-#~ msgstr "Sil ebet"
-
 #~ msgid "Percent"
 #~ msgstr "dregantad"
-
-#~ msgid "disabled"
-#~ msgstr "diweredekaet"
 
 #~ msgid "Filename of AtmoWin*.exe"
 #~ msgstr "Anv ar restr eus AtmoWin*.exe"
 
 #~ msgid "AtmoLight Filter"
 #~ msgstr "Sil AtmoLight"
-
-#~ msgid "DMX options"
-#~ msgstr "Dibarzhioù DMX"
-
-#~ msgid "MoMoLight options"
-#~ msgstr "Dibarzhioù MoMolight"
-
-#~ msgid "OpenGL ES extension"
-#~ msgstr "Askouezh OpenGL ES"
-
-#~ msgid "OpenGL ES"
-#~ msgstr "OpenGL ES"
-
-#~ msgid "Direct2D video output"
-#~ msgstr "Ec'hankad video Direct2D"
-
-#~ msgid "SDL chroma format"
-#~ msgstr "Mentrezh chroma SDL"
-
-#~ msgid "OpenGL GLX video output (XCB)"
-#~ msgstr "Ec'hankad video OpenGL GLX (XCB)"
-
-#~ msgid "Brightness (%)"
-#~ msgstr "Lintr (%)"
 
 #~ msgid "FLV"
 #~ msgstr "FLV"
@@ -28904,6 +28409,302 @@ msgstr ""
 #~ msgstr "Evezh"
 
 #, fuzzy
+#~ msgid "Low Pass Ffilter"
+#~ msgstr "Restr ar ger-tremen"
+
+#, fuzzy
+#~ msgid "1 item"
+#~ msgstr "%i ergorenn"
+
+#, fuzzy
+#~ msgid "Direct3D Desktop mode"
+#~ msgstr "Ec'hankad video Direct3D"
+
+#, fuzzy
+#~ msgid "Screen capture (with Wayland)"
+#~ msgstr "Tapañ ur skrammad"
+
+#, fuzzy
+#~ msgid "Streaming"
+#~ msgstr "Lanv"
+
+#, fuzzy
+#~ msgid "packets"
+#~ msgstr "paketer"
+
+#, fuzzy
+#~ msgid "Display device"
+#~ msgstr "Trobarzhell kantennoù"
+
+#, fuzzy
+#~ msgid "Capture region heigh"
+#~ msgstr "Trobarzhell enrollañ"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Perzhded an enbonegañ"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Perzhded an enbonegañ"
+
+#, fuzzy
+#~ msgid "Disable lua"
+#~ msgstr "Diweredekaat"
+
+#, fuzzy
+#~ msgid "Navigation"
+#~ msgstr "Peurvec'hiañ"
+
+#, fuzzy
+#~ msgid ""
+#~ "%s\n"
+#~ "Downloading... %s/%s - %.1f%% done"
+#~ msgstr ""
+#~ "%s\n"
+#~ "O pellgargañ... %s/%s %.1f%% graet"
+
+#, fuzzy
+#~ msgid "Configure"
+#~ msgstr "Kefluniañ ar berradennoù"
+
+#, fuzzy
+#~ msgid "EyeTV input"
+#~ msgstr "Enankad FTP"
+
+#, fuzzy
+#~ msgid "FTP user name"
+#~ msgstr "Anv an arveriad SOCKS"
+
+#, fuzzy
+#~ msgid "FTP password"
+#~ msgstr "Ger-tremen"
+
+#, fuzzy
+#~ msgid "GnomeVFS input"
+#~ msgstr "Enankad ebet"
+
+#, fuzzy
+#~ msgid "RTSP user name"
+#~ msgstr "Anv an arveriad SOCKS"
+
+#, fuzzy
+#~ msgid "RTSP password"
+#~ msgstr "Ger-tremen"
+
+#, fuzzy
+#~ msgid "SMB user name"
+#~ msgstr "Anv an arveriad SOCKS"
+
+#, fuzzy
+#~ msgid "SMB password"
+#~ msgstr "Ger-tremen SOCKS"
+
+#, fuzzy
+#~ msgid "LID"
+#~ msgstr "ID"
+
+#, fuzzy
+#~ msgid "VCD Format"
+#~ msgstr "Mentrezh"
+
+#, fuzzy
+#~ msgid "Volume Set"
+#~ msgstr "Ampled ebet"
+
+#, fuzzy
+#~ msgid "System Id"
+#~ msgstr "Spletad bonegoù ar reizhiad"
+
+#, fuzzy
+#~ msgid "Audio Channels"
+#~ msgstr "Sanelloù aodio"
+
+#, fuzzy
+#~ msgid "end"
+#~ msgstr "Kemmeskañ"
+
+#, fuzzy
+#~ msgid "play list"
+#~ msgstr "Roll-lenn"
+
+#, fuzzy
+#~ msgid "unknown type"
+#~ msgstr "Rizh dianav"
+
+#, fuzzy
+#~ msgid "Zip files filter"
+#~ msgstr "Sil video"
+
+#, fuzzy
+#~ msgid "OpenSLES audio output"
+#~ msgstr "Ec'hankad an aodio ALSA"
+
+#, fuzzy
+#~ msgid "OpenSLES"
+#~ msgstr "OpenGL ES2"
+
+#, fuzzy
+#~ msgid "\"%s\" is no video encoder."
+#~ msgstr "Enboneger video Theora"
+
+#, fuzzy
+#~ msgid "\"%s\" is no audio encoder."
+#~ msgstr "Enboneger aodio Vorbis"
+
+#, fuzzy
+#~ msgid "Google Video"
+#~ msgstr "Video MPEG"
+
+#, fuzzy
+#~ msgid "ZPL playlist import"
+#~ msgstr "Enporzhiañ rolloù-lenn WPL"
+
+#, fuzzy
+#~ msgid "Invalid selection"
+#~ msgstr "Diuzañ un drobarzhell"
+
+#, fuzzy
+#~ msgid "No device is selected"
+#~ msgstr "Dilemel an hini diuzet"
+
+#, fuzzy
+#~ msgid "Current channel:"
+#~ msgstr "Sanelloù : "
+
+#, fuzzy
+#~ msgid "Previous Channel"
+#~ msgstr "Chabistr kent"
+
+#, fuzzy
+#~ msgid "Next Channel"
+#~ msgstr "Sanneloù"
+
+#, fuzzy
+#~ msgid "S-Video input"
+#~ msgstr "Enankad video"
+
+#, fuzzy
+#~ msgid "MPEG 1 Format"
+#~ msgstr "Mentrezh"
+
+#, fuzzy
+#~ msgid "Transcode/Save to file"
+#~ msgstr "Dilemel sil ar videoioù"
+
+#, fuzzy
+#~ msgid "To"
+#~ msgstr "Krec'h"
+
+#, fuzzy
+#~ msgid "Transcode audio"
+#~ msgstr "Treuzvonegañ"
+
+#, fuzzy
+#~ msgid "Transcode video"
+#~ msgstr "Treuzvonegañ"
+
+#, fuzzy
+#~ msgid "Additional transcode options"
+#~ msgstr "Dibarzhioù ar treuzvonegañ"
+
+#, fuzzy
+#~ msgid "Save file to"
+#~ msgstr "Enrollañ ar restr"
+
+#, fuzzy
+#~ msgid "No input selected"
+#~ msgstr "Enankad ebet"
+
+#, fuzzy
+#~ msgid "Select the directory to save to"
+#~ msgstr "Diuzañ un teuliad"
+
+#, fuzzy
+#~ msgid "No folder selected"
+#~ msgstr "Dilemel an hini diuzet"
+
+#, fuzzy
+#~ msgid "Finish"
+#~ msgstr "Finneg"
+
+#, fuzzy
+#~ msgid "yes"
+#~ msgstr "Ya"
+
+#, fuzzy
+#~ msgid "no"
+#~ msgstr "Mono"
+
+#, fuzzy
+#~ msgid "Current visualization"
+#~ msgstr "Skrammadennoù an aodio"
+
+#, fuzzy
+#~ msgid "Local drives"
+#~ msgstr "Trobarzhell lenner kantennoù"
+
+#, fuzzy
+#~ msgid "Page"
+#~ msgstr "E barr ar Bajenn"
+
+#, fuzzy
+#~ msgid "Password file"
+#~ msgstr "Ger-tremen"
+
+#, fuzzy
+#~ msgid "OSD menu"
+#~ msgstr "Lañserioù an DVD"
+
+#, fuzzy
+#~ msgid "Device type"
+#~ msgstr "Anv an drobarzhell"
+
+#, fuzzy
+#~ msgid "AtmoWin Software"
+#~ msgstr "Meziant"
+
+#, fuzzy
+#~ msgid "No Filtering"
+#~ msgstr "Sil"
+
+#, fuzzy
+#~ msgid "disabled"
+#~ msgstr "Diweredekaat"
+
+#, fuzzy
+#~ msgid "DMX options"
+#~ msgstr "Dibarzhioù"
+
+#, fuzzy
+#~ msgid "MoMoLight options"
+#~ msgstr "Dibarzhioù ar c'hefluniad"
+
+#, fuzzy
+#~ msgid "OpenGL ES extension"
+#~ msgstr "Askouezh OpenGL ES 2"
+
+#, fuzzy
+#~ msgid "OpenGL ES"
+#~ msgstr "OpenGL ES2"
+
+#, fuzzy
+#~ msgid "Direct2D video output"
+#~ msgstr "Ec'hankad aodio DirectX"
+
+#, fuzzy
+#~ msgid "SDL chroma format"
+#~ msgstr "Mentrezh ezvoneget"
+
+#, fuzzy
+#~ msgid "OpenGL GLX video output (XCB)"
+#~ msgstr "Ec'hankad video OpenGL"
+
+#, fuzzy
+#~ msgid "Brightness (%)"
+#~ msgstr "Lintr"
+
+#, fuzzy
 #~ msgid "MKV"
 #~ msgstr "KVA"
 
@@ -28921,7 +28722,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Subtitle track added"
-#~ msgstr "Loabr an istitloù : %s "
+#~ msgstr "Roudenn istitl"
 
 #, fuzzy
 #~ msgid "Media in Zip"
@@ -28997,7 +28798,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "CPU features"
-#~ msgstr "Pakañ"
+#~ msgstr "Arc'hweladurioù"
 
 #, fuzzy
 #~ msgid "Chroma modules settings"
@@ -29069,7 +28870,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Subtitles track ID"
-#~ msgstr "Loabr an istitl"
+#~ msgstr "ID ar roudenn istitl"
 
 #, fuzzy
 #~ msgid "Show interface"
@@ -29117,11 +28918,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "SFTP user name"
-#~ msgstr "Anv an arveriad FTP"
+#~ msgstr "Anv an arveriad SOCKS"
 
 #, fuzzy
 #~ msgid "SFTP password"
-#~ msgstr "Ger-tremen FTP"
+#~ msgstr "Ger-tremen"
 
 #, fuzzy
 #~ msgid "Video4Linux2"
@@ -29157,7 +28958,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "RealVideo library decoder"
-#~ msgstr "Ezvoneger al levraoueg QuickTime"
+#~ msgstr "Enboneger ar video"
 
 #, fuzzy
 #~ msgid "normal"
@@ -29341,7 +29142,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&Navigation"
-#~ msgstr "Merdeadur"
+#~ msgstr "Skrammadennoù"
 
 #, fuzzy
 #~ msgid "Hide VLC media player in taskbar"
@@ -29405,7 +29206,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "MUX Options"
-#~ msgstr "Dibarzhioù DMX"
+#~ msgstr "Dibarzhioù"
 
 #, fuzzy
 #~ msgid "Video Scale"
@@ -29462,10 +29263,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "RTSP host address"
 #~ msgstr "Chomlec'h an dafariad RTSP"
-
-#, fuzzy
-#~ msgid "Low Pass Ffilter"
-#~ msgstr "Restr ar ger-tremen"
 
 #, fuzzy
 #~ msgid "Duration in second"
@@ -29569,7 +29366,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Zoom playlist"
-#~ msgstr "Roll-lenn"
+#~ msgstr "Roll-lenn M3U"
 
 #, fuzzy
 #~ msgid "key"
@@ -29585,7 +29382,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "HTTP password"
-#~ msgstr "Ger-tremen FTP"
+#~ msgstr "Ger-tremen ar proksi HTTP"
 
 #, fuzzy
 #~ msgid "Certificate file"
@@ -29645,15 +29442,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "Trobarzhell ebet bet diuzet"
+#~ msgstr "Anv an drobarzhell video"
 
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
 #~ msgstr "Ouzhpennañ d'ar roll-lenn"
-
-#, fuzzy
-#~ msgid "1 item"
-#~ msgstr "%i ergorenn"
 
 #, fuzzy
 #~ msgid "Empty Folder"
@@ -29714,10 +29507,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "&Streaming..."
 #~ msgstr "&Lanv..."
-
-#, fuzzy
-#~ msgid "Direct3D Desktop mode"
-#~ msgstr "Ec'hankad video Direct3D"
 
 #, fuzzy
 #~ msgid "Manage &bookmarks"
