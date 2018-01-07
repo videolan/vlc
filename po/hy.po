@@ -1,5 +1,5 @@
 # Armenian translation
-# Copyright (C) 2017 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,13 +7,12 @@
 # Վահե Գրիգորյան <vahe@keemail.me>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2017-09-20 03:43+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Armenian (http://www.transifex.com/yaron/vlc-trans/language/"
-"hy/)\n"
+"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"Language-Team: Armenian (https://www.transifex.com/yaron/teams/16553/hy/)\n"
 "Language: hy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,8 +71,8 @@ msgstr ""
 msgid "Hotkeys settings"
 msgstr "Կոճակների կարգավորումներ"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -180,9 +179,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Բաժանիչ"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -594,9 +592,8 @@ msgid "Spectrum"
 msgstr "Սպեկտր"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Vu Չափիչ"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -612,9 +609,8 @@ msgid "Stereo audio mode"
 msgstr ""
 
 #: src/audio_output/output.c:421
-#, fuzzy
 msgid "Original"
-msgstr "1:1 Օրիգինալ"
+msgstr ""
 
 #: src/audio_output/output.c:427 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -672,7 +668,8 @@ msgstr "Ականջակալներ"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Ավտոմատ"
@@ -735,14 +732,12 @@ msgid ""
 msgstr ""
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr " (լռությամբ թույլտրված)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr " (լռությամբ չթույլտրված)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -908,8 +903,8 @@ msgstr "Լեզու"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Նկարագրություն"
 
@@ -967,9 +962,8 @@ msgid "%.2f dB"
 msgstr "%.2f դբ"
 
 #: src/input/es_out.c:3133
-#, fuzzy
 msgid "Video resolution"
-msgstr "Թույլատվություն"
+msgstr ""
 
 #: src/input/es_out.c:3138
 msgid "Buffer dimensions"
@@ -990,49 +984,40 @@ msgid "Decoded format"
 msgstr ""
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Top left"
-msgstr "ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Left top"
-msgstr "Ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Right bottom"
-msgstr "Ներքեւի"
+msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Top right"
-msgstr "Հեղինակային իրավունք"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom left"
-msgstr "Ներքեւի-Ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom right"
-msgstr "Ներքեւի-Աջ"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Left bottom"
-msgstr "Ներքեւի"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Right top"
-msgstr "Աջ"
+msgstr ""
 
 #: src/input/es_out.c:3169
-#, fuzzy
 msgid "Orientation"
-msgstr "Հայելու դիրք"
+msgstr ""
 
 #: src/input/es_out.c:3175 src/input/es_out.c:3193 src/input/es_out.c:3211
 #: src/input/es_out.c:3225 src/playlist/tree.c:67
@@ -1049,9 +1034,8 @@ msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr ""
 
 #: src/input/es_out.c:3187
-#, fuzzy
 msgid "Color primaries"
-msgstr "Գունավորել հաղորդագրությունները"
+msgstr ""
 
 #: src/input/es_out.c:3194 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1063,14 +1047,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3205
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Գունաբաժանում"
+msgstr ""
 
 #: src/input/es_out.c:3218
-#, fuzzy
 msgid "Color space"
-msgstr "Գունավորել հաղորդագրությունները"
+msgstr ""
 
 #: src/input/es_out.c:3218
 #, c-format
@@ -1093,48 +1075,40 @@ msgid "Center"
 msgstr "Կենտրոն"
 
 #: src/input/es_out.c:3228
-#, fuzzy
 msgid "Top Left"
-msgstr "Վերևի-Ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3229
-#, fuzzy
 msgid "Top Center"
-msgstr "Կենտրոն"
+msgstr ""
 
 #: src/input/es_out.c:3230
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Ներքեւի-Ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3231
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Ներքեւի-Ձախ"
+msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Chroma location"
-msgstr "Սկավառակի ընտրություն"
+msgstr ""
 
 #: src/input/es_out.c:3244
-#, fuzzy
 msgid "Rectangular"
-msgstr "ուղղանկյուն Գծային փուլ`"
+msgstr ""
 
 #: src/input/es_out.c:3247
 msgid "Equirectangular"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Cubemap"
-msgstr "Cube"
+msgstr ""
 
 #: src/input/es_out.c:3256
-#, fuzzy
 msgid "Projection"
-msgstr "Ուղղություն"
+msgstr ""
 
 #: src/input/es_out.c:3258
 msgid "Yaw"
@@ -1153,14 +1127,12 @@ msgid "Field of view"
 msgstr ""
 
 #: src/input/es_out.c:3269
-#, fuzzy
 msgid "Max. luminance"
-msgstr "Կապույտի բալանս"
+msgstr ""
 
 #: src/input/es_out.c:3274
-#, fuzzy
 msgid "Min. luminance"
-msgstr "Կապույտի բալանս"
+msgstr ""
 
 #: src/input/es_out.c:3282
 msgid "Primary R"
@@ -1175,9 +1147,8 @@ msgid "Primary B"
 msgstr ""
 
 #: src/input/es_out.c:3303
-#, fuzzy
 msgid "White point"
-msgstr "Սպիտակ"
+msgstr ""
 
 #: src/input/es_out.c:3318 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1192,11 +1163,12 @@ msgstr "Ձեր գրածը չի կարող բացվել"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1290,14 +1262,12 @@ msgid "Actors"
 msgstr ""
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Արտիստ"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Հերթական համար"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1338,14 +1308,12 @@ msgid "Previous title"
 msgstr "Նախորդ վերնագիր"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Մենյուների առավելագույն սպասում"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Մենյուների առավելագույն սպասում"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1528,9 +1496,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Մեդիա Ֆայլեր"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1548,38 +1515,32 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Musical"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Hasce"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "Game"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Ուժեղացում"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Հասցե"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Դիրք"
+msgstr ""
 
 #: src/libvlc-module.c:144
-#, fuzzy
 msgid "Accessibility"
-msgstr "Միանալու մոդուլներ"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1654,7 +1615,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1953,9 +1915,8 @@ msgid "Always place the video window on top of other windows."
 msgstr ""
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Պաստառ"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2619,9 +2580,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:675
-#, fuzzy
 msgid "Record directory"
-msgstr "Աղբյուր պանակ"
+msgstr ""
 
 #: src/libvlc-module.c:677
 msgid "Directory where the records will be stored"
@@ -2690,9 +2650,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:714
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Վիդեո ձգման գործակից"
+msgstr ""
 
 #: src/libvlc-module.c:715
 msgid "Changes the subtitles size where possible"
@@ -2842,9 +2801,8 @@ msgid "TCP connection timeout"
 msgstr ""
 
 #: src/libvlc-module.c:805
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "Փոխել հիմնական քեշացման արժեքը (in միլիվարկյաններով)"
+msgstr ""
 
 #: src/libvlc-module.c:807
 msgid "HTTP server address"
@@ -3190,9 +3148,8 @@ msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
 
 #: src/libvlc-module.c:1005
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Վիդեո զտիչ մոդուլ"
+msgstr ""
 
 #: src/libvlc-module.c:1007
 msgid "Demux filters are used to modify/control the stream that is being read."
@@ -3356,9 +3313,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC-ի թարմացումները"
+msgstr ""
 
 #: src/libvlc-module.c:1099
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3371,9 +3327,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1111
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "Ավտոմատ ստուգել թարմացումները"
+msgstr ""
 
 #: src/libvlc-module.c:1113
 msgid ""
@@ -3382,9 +3337,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1116
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Մենյուների առավելագույն սպասում"
+msgstr ""
 
 #: src/libvlc-module.c:1118
 msgid "Maximum time allowed to preparse an item, in milliseconds"
@@ -3429,9 +3383,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1141
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Ցույց տալ մանրամսները"
+msgstr ""
 
 #: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
@@ -3496,9 +3449,8 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr ""
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Start paused"
-msgstr "Սկսելու Ժամանակ"
+msgstr ""
 
 #: src/libvlc-module.c:1176
 msgid "Pause each item in the playlist on the first frame."
@@ -3551,19 +3503,16 @@ msgid "Ignore"
 msgstr "Անտեսել"
 
 #: src/libvlc-module.c:1208
-#, fuzzy
 msgid "Volume control"
-msgstr "Ձայնի վերահսկում"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control"
-msgstr "Դիրքի Վերահսկում"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control reversed"
-msgstr "Դիրքի Վերահսկում"
+msgstr ""
 
 #: src/libvlc-module.c:1212
 msgid "Mouse wheel vertical axis control"
@@ -3967,19 +3916,16 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
 #: src/libvlc-module.c:1319
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Տելետեքստ ենթագրերով"
+msgstr ""
 
 #: src/libvlc-module.c:1320
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Տելետեքստ ենթագրերով"
+msgstr ""
 
 #: src/libvlc-module.c:1321
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Օգտագործել ենթագրերով ֆայլ"
+msgstr ""
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to change subtitles text scaling"
@@ -4199,14 +4145,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "Հերթով անցնել առկա ձայնի գծերով (լեզուներով)."
 
 #: src/libvlc-module.c:1385
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "Հերթով անցնել ենթագրերի գծերով"
+msgstr ""
 
 #: src/libvlc-module.c:1386
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Հերթով անցնել առկա ենթագրերի գծերով"
+msgstr ""
 
 #: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
@@ -4217,14 +4161,12 @@ msgid "Cycle through the available subtitle tracks."
 msgstr "Հերթով անցնել առկա ենթագրերի գծերով"
 
 #: src/libvlc-module.c:1389
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "Տելետեքստ ենթագրերով"
+msgstr ""
 
 #: src/libvlc-module.c:1390
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "Հերթով անցնել ենթագրերի գծերով"
+msgstr ""
 
 #: src/libvlc-module.c:1391
 msgid "Cycle next program Service ID"
@@ -4597,7 +4539,8 @@ msgid "Browser Stop"
 msgstr ""
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5729,18 +5672,16 @@ msgid "Attachment input"
 msgstr "Կցված մուտք"
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "Ձայնի գրանցում"
+msgstr ""
 
 #: modules/access/avcapture.m:58
 msgid "AVFoundation video capture module."
 msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Մուտքային սարք չի հայտնաբերվել"
+msgstr ""
 
 #: modules/access/avcapture.m:287
 msgid ""
@@ -5904,19 +5845,16 @@ msgid "CDDB Server port to use."
 msgstr "CDDB Սերվերի պորտ, օգտվելու համար"
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Մուտքային հոսք"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr "ստորակետով առանձնացված ցանկ ակտիվ պատուհանների, Նախնականը բոլոր"
+msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "Hasce"
+msgstr ""
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
@@ -5931,9 +5869,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "CRL ֆայլը"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6029,9 +5966,8 @@ msgid "Composite"
 msgstr ""
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "Վիդեո"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6107,13 +6043,10 @@ msgid "Audio device name"
 msgstr "Ձայնային սարքի անունը"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"Չափը the վիդեո that will be displayed by the DirectShow ներդրված ծրագիր. If "
-"you don’t specify anything the լռությամբ size for your device will be used."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:792
@@ -6313,9 +6246,8 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Պատուհանի արտաքին դեսք"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6326,9 +6258,8 @@ msgid "libdsm SMB input"
 msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Ծառայությունների հայտնաբերման մոդուլներ"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -6386,7 +6317,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -6526,9 +6458,8 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "Հոսքի զտիչներ"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -6777,32 +6708,28 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "Սկզբնական դիրք"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "ընտրության ցուցակ"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
 msgstr ""
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid "Use NIT for scanning services"
-msgstr "Օգտագործվում է վիճակագրության համար "
+msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -6816,9 +6743,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "ընտրության ցուցակ"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -6847,9 +6773,8 @@ msgid "DVDnav Input"
 msgstr ""
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "Nuv դեմուլտիպլեքսոր"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -6931,11 +6856,10 @@ msgstr "Մականուն"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7043,14 +6967,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "HTTP մուտք"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP: (S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7061,9 +6983,8 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "Քայլ առաջ"
+msgstr ""
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
@@ -7078,9 +6999,8 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Ոգտագործող անուն"
+msgstr ""
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7159,7 +7079,8 @@ msgstr "Ձայնային տարրական հոսքի Կանալների քանա
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Լայնություն"
@@ -7240,14 +7161,12 @@ msgid "Memory input"
 msgstr ""
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Հեռացնել Ընտրվածը"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Գրանցել հոսքի ելքը"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7498,19 +7417,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr " Կադր/վ"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Մուտք չկա"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Ֆայլի ընթերցումը ձախողվեց"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7550,18 +7466,16 @@ msgid "PulseAudio input"
 msgstr ""
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "Շրջափակում"
+msgstr ""
 
 #: modules/access/qtsound.m:60
 msgid "QuickTime Sound Capture"
 msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Մուտքային սարք չի հայտնաբերվել"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
 msgid ""
@@ -7570,9 +7484,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Մուտքային սարք չի հայտնաբերվել"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -7715,9 +7628,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Ընտրել հոսք"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -7969,14 +7881,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:288 modules/access_output/srt.c:311
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:289
-#, fuzzy
 msgid "SRT input"
-msgstr "FTP մուտք"
+msgstr ""
 
 #: modules/access/srt.c:294 modules/access_output/srt.c:317
 msgid "SRT chunk size (bytes)"
@@ -8007,9 +7917,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr ""
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "UDP առավելագույն սպասում (մվրկ-ով)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8085,14 +7994,14 @@ msgstr "Ռադիո սարք"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Հաճախություն"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "Տյուների հաճախականությունը Հց կամ կՀց (տես debug ելքը)"
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8615,9 +8524,8 @@ msgid "VNC client access"
 msgstr ""
 
 #: modules/access/wasapi.c:485
-#, fuzzy
 msgid "Loopback mode"
-msgstr "Կրկնման հապաղում՝"
+msgstr ""
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
@@ -8636,9 +8544,8 @@ msgid "Dummy stream output"
 msgstr ""
 
 #: modules/access_output/file.c:315
-#, fuzzy
 msgid "Keep existing file"
-msgstr "Ավելացնել գոյություն ունեցող ֆայլին"
+msgstr ""
 
 #: modules/access_output/file.c:316
 msgid "Overwrite"
@@ -8651,16 +8558,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/file.c:375
-#, fuzzy
 msgid "Overwrite existing file"
-msgstr "Ավելացնել գոյություն ունեցող ֆայլին"
+msgstr ""
 
 #: modules/access_output/file.c:377
-#, fuzzy
 msgid "If the file already exists, it will be overwritten."
 msgstr ""
-"Եթե ֆայլը գոյություն ունի, եւ այս տարբերակը ընտրված են, որ գոյություն "
-"ունեցող ֆայլը չի ունի."
 
 #: modules/access_output/file.c:378
 msgid "Append to file"
@@ -8671,32 +8574,28 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr "Ավելացնել ֆայլին, եթե գոյություն ունի, ոչ թե փոխարինել այն"
 
 #: modules/access_output/file.c:381
-#, fuzzy
 msgid "Format time and date"
-msgstr "Ֆորմատավորած Ենթագրեր"
+msgstr ""
 
 #: modules/access_output/file.c:382
 msgid "Perform ISO C time and date formatting on the file path"
 msgstr ""
 
 #: modules/access_output/file.c:384
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Համաժամացում"
+msgstr ""
 
 #: modules/access_output/file.c:385
 msgid "Open the file with synchronous writing."
 msgstr ""
 
 #: modules/access_output/file.c:388
-#, fuzzy
 msgid "File stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Ոգտագործող անուն, որ կպահանջվի Հոսք մուտք գործելու համար"
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -8712,9 +8611,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8722,14 +8620,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:67
-#, fuzzy
 msgid "HTTP stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/access_output/livehttp.c:67
-#, fuzzy
 msgid "Segment length"
-msgstr "Շատ առաջ տալու չափ"
+msgstr ""
 
 #: modules/access_output/livehttp.c:68
 msgid "Length of TS stream segments"
@@ -8745,9 +8641,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/livehttp.c:74
-#, fuzzy
 msgid "Number of segments"
-msgstr "Կրկնօրինակների քանակ"
+msgstr ""
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
@@ -8762,9 +8657,8 @@ msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 msgstr ""
 
 #: modules/access_output/livehttp.c:80
-#, fuzzy
 msgid "Index file"
-msgstr "Պատկերի լայնությունը"
+msgstr ""
 
 #: modules/access_output/livehttp.c:81
 msgid "Path to the index file to create"
@@ -8779,9 +8673,8 @@ msgid "Full URL to put in index file. Use #'s to represent segment number"
 msgstr ""
 
 #: modules/access_output/livehttp.c:87
-#, fuzzy
 msgid "Delete segments"
-msgstr "Ջնջել բոլոր էջանիշները"
+msgstr ""
 
 #: modules/access_output/livehttp.c:88
 msgid "Delete segments when they are no longer needed"
@@ -8792,9 +8685,8 @@ msgid "Use muxers rate control mechanism"
 msgstr ""
 
 #: modules/access_output/livehttp.c:92
-#, fuzzy
 msgid "AES key URI to place in playlist"
-msgstr "Որոնել երգացանկում"
+msgstr ""
 
 #: modules/access_output/livehttp.c:94
 msgid "AES key file"
@@ -8824,23 +8716,20 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Կրկնօրինակների քանակ"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
 msgstr ""
 
 #: modules/access_output/livehttp.c:109
-#, fuzzy
 msgid "HTTP Live streaming output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/access_output/livehttp.c:110
-#, fuzzy
 msgid "LiveHTTP"
-msgstr "Կենդանի"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:380
@@ -8853,18 +8742,16 @@ msgid "Name to give to this stream/channel on the shoutcast/icecast server."
 msgstr ""
 
 #: modules/access_output/shout.c:68
-#, fuzzy
 msgid "Stream description"
-msgstr "Նկարագրություն"
+msgstr ""
 
 #: modules/access_output/shout.c:69
 msgid "Description of the stream content or information about your channel."
 msgstr ""
 
 #: modules/access_output/shout.c:72
-#, fuzzy
 msgid "Stream MP3"
-msgstr "Հոսք"
+msgstr ""
 
 #: modules/access_output/shout.c:73
 msgid ""
@@ -8874,56 +8761,48 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/shout.c:82
-#, fuzzy
 msgid "Genre description"
-msgstr "Նկարագրություն"
+msgstr ""
 
 #: modules/access_output/shout.c:83
 msgid "Genre of the content."
 msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Նկարագրություն"
+msgstr ""
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
 msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "Վերցնել ձայնային հոսքի մեջ ստերեո."
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "Վերցնել ձայնային հոսքի մեջ ստերեո."
+msgstr ""
 
 #: modules/access_output/shout.c:98
-#, fuzzy
 msgid "Number of channels"
-msgstr "Կրկնօրինակների քանակ"
+msgstr ""
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "Վերցնել ձայնային հոսքի մեջ ստերեո."
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr ""
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Վերցնել ձայնային հոսքի մեջ ստերեո."
+msgstr ""
 
 #: modules/access_output/shout.c:104
-#, fuzzy
 msgid "Stream public"
-msgstr "Ելքի Հոսք"
+msgstr ""
 
 #: modules/access_output/shout.c:105
 msgid ""
@@ -8933,32 +8812,26 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/shout.c:111
-#, fuzzy
 msgid "IceCAST output"
-msgstr "Կառավարել ելքը"
+msgstr ""
 
 #: modules/access_output/srt.c:312
-#, fuzzy
 msgid "SRT stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
 msgstr ""
 
 #: modules/access_output/udp.c:64
-#, fuzzy
 msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Լռությամբ քեշացման արժեքը համար PVR հոսանքներին. Այս արժեքը պետք է սահմանված "
-"միլիվարկյաններով\"."
 
 #: modules/access_output/udp.c:67
-#, fuzzy
 msgid "Group packets"
-msgstr "փաթեթներ"
+msgstr ""
 
 #: modules/access_output/udp.c:68
 msgid ""
@@ -9189,9 +9062,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:76
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Վիզուալիզացարար"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9280,18 +9152,16 @@ msgid "Attack time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr "Փոխել հիմնական քեշացման արժեքը (in միլիվարկյաններով)"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "Փոխել հիմնական քեշացման արժեքը (in միլիվարկյաններով)"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9308,9 +9178,8 @@ msgid "Ratio"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Չափերի հարաբերությունը՝ %s"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9345,9 +9214,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr ""
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "Ձայնային զտիչ համար այլանդակ resampling"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -9598,9 +9466,8 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Կոդավորման որակ"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
@@ -9654,14 +9521,12 @@ msgid "Nearest-neighbor audio resampler"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:52
-#, fuzzy
 msgid "Pitch Shifter"
-msgstr "Qt ինտերֆեյս"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Ձայնային կանալներ"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
@@ -9901,9 +9766,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:484
-#, fuzzy
 msgid "Audio device is not configured"
-msgstr "Ձայնային սարքի անունը"
+msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:485
 msgid ""
@@ -10033,32 +9897,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
-#, fuzzy
 msgid "Disabled"
-msgstr "Անջատել"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1304
-#, fuzzy
 msgid "Enabled"
-msgstr "Միացնել"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1309
 msgid "Windows Multimedia Device output"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Output back-end"
-msgstr "Ելքային մոդուլներ"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Ձայնի ելքը պահված ձայնը`"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10145,9 +10005,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "AES3/SMPTE 302M աուդիո փաթեթավորիչ"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10158,9 +10017,8 @@ msgid "Raw audio encoder"
 msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "Ավելացնել ֆայլի"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
@@ -10179,30 +10037,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "Օգտագործել ենթագրերով ֆայլ"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "Win32 տառատեսակի մշակում"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "Օգտագործել ենթագրերով ֆայլ"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "DVD ենթագրերի ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "DVD ենթագրեր"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10607,9 +10460,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "XVideo extension վիդեո ելք"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -10653,14 +10505,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:354
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -10707,28 +10557,24 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "Մենյու թարմացման ժամանակ"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
 msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "H.264 վիդեո փաթեթավորիչ"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11280,19 +11126,16 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "MPEG աուդիո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "H.264 վիդեո փաթեթավորիչ"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
@@ -11534,9 +11377,8 @@ msgid "Pseudo raw video packetizer"
 msgstr ""
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -11910,9 +11752,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr ""
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "Վիճակագրություն: Ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -11923,9 +11764,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "Վիճակագրություն: Ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12334,14 +12174,12 @@ msgid "Scale factor"
 msgstr "Ձգման գործակից"
 
 #: modules/codec/svg.c:55
-#, fuzzy
 msgid "Scale factor to apply to image"
-msgstr "Ձգման գործակից վերափոխման ժամանակ օգտագործելու համար (օրինակ` 0.25)"
+msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12382,9 +12220,8 @@ msgid "Teletext subtitles decoder"
 msgstr ""
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "DVD ենթագրերի ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -12409,23 +12246,20 @@ msgid "Theora video encoder"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "դեկոդեր"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "DVD ենթագրերի ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "TTA դեմուլտիպլեքսոր"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12470,9 +12304,8 @@ msgid "Ulead DV audio decoder"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:80
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Օգտագործել սառքային մակարդակի YUV-> RGB փոխակերպում"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
@@ -12485,9 +12318,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "CDG վիդեո ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12524,9 +12356,8 @@ msgid "Vorbis audio encoder"
 msgstr "Vorbis աուդիո կոդավորիչ"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Հանդարտ ռեժիմ"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -12541,24 +12372,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Վիդեո կոդավորիչ"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "դեկոդեր"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "DVD ենթագրերի ապակոդավորիչ"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "DVD ենթագրերի փաթեթավորիչ"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -12645,11 +12472,10 @@ msgid "Adaptive B-frame decision"
 msgstr ""
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
-msgstr "Number of threads"
+msgstr ""
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -13274,9 +13100,8 @@ msgid "Default preset setting used"
 msgstr ""
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Ընդլայնված Ընտարնքներ"
+msgstr ""
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
@@ -13380,9 +13205,8 @@ msgid "Teletext page"
 msgstr ""
 
 #: modules/codec/zvbi.c:62
-#, fuzzy
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr "Բացել նշված Տելետեքստ էջը: Լռությամբ էջը 100 է`"
+msgstr ""
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -13652,9 +13476,9 @@ msgid "Subtitle position %d px"
 msgstr ""
 
 #: modules/control/hotkeys.c:1355
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Ենթագրի ընթանում:%s"
+msgstr ""
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -13715,9 +13539,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "VNC համակարգիչ կամ IP-հասցե."
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -14166,19 +13989,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Գլխավոր ինտերֆեյսներ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "Առավելագույն մակարդակ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "Առավելագույն մակարդակ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -14201,23 +14021,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "Թողունակության շերտ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "Թողունակության շերտ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -14228,9 +14045,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -14402,14 +14218,12 @@ msgid "Dirac video demuxer"
 msgstr ""
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "DirectShow մուտք"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "Հստակեցման վիդեո զտիչ"
+msgstr ""
 
 #: modules/demux/flac.c:50
 msgid "FLAC demuxer"
@@ -14533,9 +14347,8 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Ստեղծել Պանակ"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -14621,14 +14434,12 @@ msgid "Writer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:69
-#, fuzzy
 msgid "Composer"
-msgstr "Կոմպիլյատոր` %s \n"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:70
-#, fuzzy
 msgid "Producer"
-msgstr "Դիրք"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
 #: modules/gui/qt/components/controller.hpp:112
@@ -14637,23 +14448,20 @@ msgid "Information"
 msgstr "Տեղեկություն"
 
 #: modules/demux/mp4/meta.c:72
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Դեն նետել"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:73
 msgid "Requirements"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:74
-#, fuzzy
 msgid "Original Format"
-msgstr "1:1 Օրիգինալ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:75
-#, fuzzy
 msgid "Display Source As"
-msgstr "Ցուցադրված կադրեր"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:76
 msgid "Host Computer"
@@ -14664,9 +14472,8 @@ msgid "Performers"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:78
-#, fuzzy
 msgid "Original Performer"
-msgstr "Օրիգինալ Չափ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
@@ -14677,9 +14484,8 @@ msgid "Warning"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:81
-#, fuzzy
 msgid "Software"
-msgstr "Մեղմ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
 #: modules/demux/xiph_metadata.h:64
@@ -14687,53 +14493,44 @@ msgid "Lyrics"
 msgstr "Բառերը"
 
 #: modules/demux/mp4/meta.c:83
-#, fuzzy
 msgid "Record Company"
-msgstr "Գրանցումն ավարտված է"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:84
-#, fuzzy
 msgid "Model"
-msgstr "Ռեժիմ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Դիրք"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
-#, fuzzy
 msgid "Grouping"
-msgstr "Խումբ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:88
-#, fuzzy
 msgid "Sub-Title"
-msgstr "Ենթագիր"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:89
 msgid "Arranger"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:90
-#, fuzzy
 msgid "Art Director"
-msgstr "Ստեղծել Պանակ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:91
-#, fuzzy
 msgid "Copyright Acknowledgement"
-msgstr "Հեղինակային իրավունքի մետատվյալները"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:92
-#, fuzzy
 msgid "Conductor"
-msgstr "Դիրք"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:93
-#, fuzzy
 msgid "Song Description"
-msgstr "Նկարագրություն"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
@@ -14760,9 +14557,8 @@ msgid "Executive Producer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Կոդավորում"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
@@ -14781,9 +14577,8 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Մաքրել"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
 msgid "M4A audio only"
@@ -14802,9 +14597,8 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1679
-#, fuzzy
 msgid "Do not seek"
-msgstr "Արագ որոնում"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1680
 msgid "Build index"
@@ -14954,18 +14748,16 @@ msgid "MPEG Transport Stream demuxer"
 msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Կոդավորել աուդիոն"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
 msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "լսողության խնդիրներ ունեցողներ"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
@@ -15172,9 +14964,8 @@ msgid "Load"
 msgstr "Բեռնել"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Հագեցում"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15453,16 +15244,14 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
-#, fuzzy
 msgid "Interfaces"
-msgstr "Ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
-#, fuzzy
 msgid "Art and meta fetchers"
-msgstr "Lua Meta Fetcher"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:112
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
@@ -15499,7 +15288,8 @@ msgid "Name"
 msgstr "Անուն"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Հեղինակ"
@@ -15742,9 +15532,8 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "Քայլ ետ"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -15755,32 +15544,27 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Քայլ առաջ"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Ընթացքի վերահսկողության"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Ընթացք"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Նախորդ վերնագիր"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Գնալ ժամանակի պահի"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -15838,9 +15622,8 @@ msgid "Setup Streaming..."
 msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "Հոսքավորման մեթոդը"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16062,18 +15845,16 @@ msgid "Play/Pause the current media"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "Շարժման բացահայտման վիդեո զտիչ"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "Սովորական պատուհան"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16082,9 +15863,8 @@ msgid "Volume"
 msgstr "Ձայնի բարձրություն"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Ճշգրտել պատկերը"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -16498,9 +16278,8 @@ msgid "Select All"
 msgstr "Ընտրել բոլորը"
 
 #: modules/gui/macosx/VLCMainMenu.m:363
-#, fuzzy
 msgid "Find"
-msgstr "Փնտրել՝ %s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:365
 msgid "View"
@@ -16821,18 +16600,17 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "Ձայնը իջացնել"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Ձայնային էֆֆեկտներ`"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -16853,18 +16631,16 @@ msgid "Open"
 msgstr "Բացել"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Ելքի Հոսք"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Կարգավորումներ..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Ընտրեք մուտք"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -16887,9 +16663,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Ընտրել ֆայլ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -16995,14 +16770,12 @@ msgid "Subscreen top"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "Ենթաէկրանի լայնությունը"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "Ենթաէկրանի բարձրություն"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -17013,14 +16786,12 @@ msgid "Add Subtitle File:"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "Ենթագրի հապաղումը %i մվ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Օգտագործել ենթագրերով ֆայլ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -17120,9 +16891,8 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
-#, fuzzy
 msgid "Expand All"
-msgstr "Բացել հանգույց"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:233
 msgid "Collapse All"
@@ -17198,25 +16968,21 @@ msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
-#, fuzzy
 msgid "Renderer discovery off"
-msgstr "Ծառայությունների հայտնաբերում"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:75
 #: modules/gui/macosx/VLCRendererMenuController.m:145
-#, fuzzy
 msgid "Enable renderer discovery"
-msgstr "Ծառայությունների հայտնաբերում"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:77
-#, fuzzy
 msgid "No renderer"
-msgstr "Win32 տառատեսակի մշակում"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:134
-#, fuzzy
 msgid "Renderer discovery on"
-msgstr "Ծառայությունների հայտնաբերում"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:135
 msgid "Disable renderer discovery"
@@ -17371,9 +17137,8 @@ msgid "Note that these are system-wide settings."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
-#, fuzzy
 msgid "General settings"
-msgstr "Ընդհանուր ձայնային կարգավորումներ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
@@ -17392,9 +17157,8 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Ընթացքի ձախողում"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Enable notifications on playlist item change"
@@ -17410,14 +17174,12 @@ msgid "Automatically check for updates"
 msgstr "Ավտոմատ ստուգել թարմացումները"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Qt ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Սկինավորվող Ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -17478,14 +17240,12 @@ msgid "Show video within the main window"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:353
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Ողջ էկրանով"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:354
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Դուրս ողջ էկրանից"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Black screens in Fullscreen mode"
@@ -17540,24 +17300,20 @@ msgid "No check was performed yet."
 msgstr "Ոչ մի ստուգում էր կատարվել դեռ"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:685
-#, fuzzy
 msgid "Lowest Latency"
-msgstr "Ամենափոքր ուշացում"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:687
-#, fuzzy
 msgid "Low Latency"
-msgstr "Փոքր ուշացում"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:691
-#, fuzzy
 msgid "Higher Latency"
-msgstr "Ավելի մեծ ուշացում"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Highest Latency"
-msgstr "Ավելի մեծ ուշացում"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -17615,39 +17371,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Միացնել / Ընդմիջել"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Փակել պատուհանը"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "URL նկարագրություն"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "Ընթացիկ"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Ընտրել Պանակ"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Բացել կրկնապատկված հասցեն"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -17658,7 +17408,8 @@ msgid "sec."
 msgstr "վրկ."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Աուդիո/Վիդեո"
 
@@ -18245,14 +17996,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr ""
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[Կրկնել]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[Պատահական]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -18292,9 +18041,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr ""
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr "Կրկնել ընթացիկը"
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -18331,9 +18079,8 @@ msgid "Teletext Activation"
 msgstr ""
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Թափանցիկություն"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -18492,15 +18239,13 @@ msgid "Aspect Ratio"
 msgstr ""
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "Օգնություն չկա"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:362
 #: modules/gui/qt/components/extended_panels.cpp:373
-#, fuzzy
 msgid "Image Files"
-msgstr "Պատկերի լայնությունը"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:364 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19008,11 +18753,10 @@ msgid "Select File"
 msgstr "Ընտրել ֆայլը"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
-msgstr "Ընտրեք գործողություն նրա հետ կապված կոճակը փոխելու համար`"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -19303,10 +19047,11 @@ msgid "Extract"
 msgstr "Քաղել"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19318,14 +19063,14 @@ msgstr "&Փակել"
 msgid "Bytes"
 msgstr "Բայթեր"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Փոխել ֆորմատը "
 
 #: modules/gui/qt/dialogs/convert.cpp:58
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Ոչ մի ֆայլ ընտրված չէ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:65 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19340,18 +19085,16 @@ msgid "Browse"
 msgstr "Հայտնաբերել"
 
 #: modules/gui/qt/dialogs/convert.cpp:86
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "Ոչ մի ֆայլ ընտրված չէ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:88
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:91
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Ավելացնել ֆայլի"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
@@ -19403,9 +19146,8 @@ msgid "Adjustments and Effects"
 msgstr "Շտկումներ և Էֆֆեկտներ"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Ստերեո ռեժիմ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19421,9 +19163,8 @@ msgid "&Save"
 msgstr "&Պահել"
 
 #: modules/gui/qt/dialogs/external.cpp:219
-#, fuzzy
 msgid "Store the Password"
-msgstr "Գաղտնաբառ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19540,9 +19281,8 @@ msgid "Save log file as..."
 msgstr "Պահել լոգ ֆայլը որպես ..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Տեքստեր / Լոգեր (*.log *.txt);; Բոլորը (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -19726,7 +19466,8 @@ msgstr "Տարբերակ"
 msgid "Website"
 msgstr "Կայք"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Ֆայլեր"
 
@@ -20052,18 +19793,16 @@ msgid "Empty"
 msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Ակտիվացնել"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:382
-#, fuzzy
 msgid "&Continue"
-msgstr "Շարունակել"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:1419
 msgid "Control menu for the player"
@@ -20094,9 +19833,8 @@ msgid "Subti&tle"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1076
-#, fuzzy
 msgid "Tool&s"
-msgstr "Գործիք"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1083
 msgid "V&iew"
@@ -20191,9 +19929,8 @@ msgid "Docked Playlist"
 msgstr "Ներդրված երգացանկ"
 
 #: modules/gui/qt/menus.cpp:499
-#, fuzzy
 msgid "Always on &top"
-msgstr "Միշտ երևացող"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
@@ -20224,9 +19961,8 @@ msgid "&Increase Volume"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:597
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Իջացնել Ձայնը"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:600
 msgid "&Mute"
@@ -20389,9 +20125,8 @@ msgid "&Renderer"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:1640
-#, fuzzy
 msgid "<Local>"
-msgstr "Վոկալ"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1653
 msgid "Scan"
@@ -20502,9 +20237,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Inverts գույները պատկերը`"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -20547,9 +20281,8 @@ msgid "Load extensions on startup"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Ավտոմատ փրկել ծավալների մասին ելքը`"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -20586,9 +20319,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Ինֆրակարմիր Հեռակառավարման ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -20621,10 +20353,9 @@ msgid "debug"
 msgstr ""
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "Մաքրել"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
@@ -20635,14 +20366,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "Սկինի ֆայլեր | *. vlt, *. wsz, *. xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "Երգացանկի Ֆայլեր |"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "|All Files |*"
-msgstr "Բոլոր Ֆայլերը"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:216
 msgid "Open playlist"
@@ -20653,9 +20382,8 @@ msgid "Save playlist"
 msgstr "Պահել երգացանկը"
 
 #: modules/gui/skins2/src/dialogs.cpp:224
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF երգացանկ|*.xspf|M3U ֆայլ|*.m3u |HTML երգացանկ|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:484
 msgid "Skin to use"
@@ -20718,9 +20446,8 @@ msgid "Select skin"
 msgstr "Ընտրել սկին"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Բացել սկին..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20783,14 +20510,12 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:620
-#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "XVideo extension վիդեո ելք"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:429
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "YUV վիդեո ելք"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -20820,9 +20545,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "&Deinterlace"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -20851,9 +20575,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Հերթով անցնել deinterlace ռեժիմներով"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -20870,14 +20593,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Վիդեո զտիչ"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1188
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "XVideo extension վիդեո ելք"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -20944,33 +20665,28 @@ msgid "File keystore (plaintext)"
 msgstr ""
 
 #: modules/keystore/file.c:55
-#, fuzzy
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Օգտագործել shared հիշողությունը"
+msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Հեռացնել Ընտրվածը"
+msgstr ""
 
 #: modules/keystore/file.c:66
-#, fuzzy
 msgid "Secrets are stored encrypted on a file"
-msgstr "Օգտագործել shared հիշողությունը"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
-#, fuzzy
 msgid "No"
-msgstr "Ոչ մի"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:46
-#, fuzzy
 msgid "System default"
-msgstr "Համակարգի հիմնական"
+msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
@@ -20985,9 +20701,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:51
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "Միշտ երևացող"
+msgstr ""
 
 #: modules/keystore/keychain.m:52
 msgid "When unlocked"
@@ -20998,9 +20713,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:56
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "Վերևն ու ներքևը նույնը վերցնել"
+msgstr ""
 
 #: modules/keystore/keychain.m:57
 msgid ""
@@ -21032,33 +20746,28 @@ msgid "KWallet keystore"
 msgstr ""
 
 #: modules/keystore/kwallet.c:49
-#, fuzzy
 msgid "Secrets are stored via KWallet"
-msgstr "Օգտագործել shared հիշողությունը"
+msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Հեռացնել Ընտրվածը"
+msgstr ""
 
 #: modules/keystore/memory.c:42
-#, fuzzy
 msgid "Secrets are stored in memory"
-msgstr "Օգտագործել shared հիշողությունը"
+msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
 msgstr ""
 
 #: modules/keystore/secret.c:40
-#, fuzzy
 msgid "Secrets are stored via libsecret"
-msgstr "Օգտագործել shared հիշողությունը"
+msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Ավելացնել տարբերանշան"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -21073,51 +20782,44 @@ msgid "Turn off all messages on the console."
 msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Կոնսոլ"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Կոնսոլ"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Ավել Տվյալներ"
+msgstr ""
 
 #: modules/logger/file.c:203
 msgid "Debug"
 msgstr ""
 
 #: modules/logger/file.c:205
-#, fuzzy
 msgid "Log to file"
-msgstr "Գնալ Ժամանակի պահի"
+msgstr ""
 
 #: modules/logger/file.c:206
 msgid "Log all VLC messages to a text file."
 msgstr ""
 
 #: modules/logger/file.c:208
-#, fuzzy
 msgid "Log filename"
-msgstr "Ֆայլի անուն"
+msgstr ""
 
 #: modules/logger/file.c:209
-#, fuzzy
 msgid "Specify the log filename."
-msgstr "Ընտրել ֆայլը"
+msgstr ""
 
 #: modules/logger/file.c:211
-#, fuzzy
 msgid "Log format"
-msgstr "Պատկերի ֆորմատ"
+msgstr ""
 
 #: modules/logger/file.c:212
 msgid "Specify the logging format."
@@ -21138,9 +20840,8 @@ msgid "Logger"
 msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Ֆայլ/Պանակ"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -21159,9 +20860,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Գունավորել հաղորդագրությունները"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -21176,9 +20876,8 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "Թույլ է տրվում - թույլատրված"
+msgstr ""
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
@@ -21897,9 +21596,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "Վիդեոյի վերափոխման զտիչ"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -22021,9 +21719,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:748
-#, fuzzy
 msgid "Use system trust database"
-msgstr "Ցանկալի շրջանակ տոկոսադրույքը համար գերում."
+msgstr ""
 
 #: modules/misc/gnutls.c:750
 msgid ""
@@ -22032,9 +21729,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:753
-#, fuzzy
 msgid "Trust directory"
-msgstr "Աղբյուր պանակ"
+msgstr ""
 
 #: modules/misc/gnutls.c:755
 msgid ""
@@ -22081,14 +21777,12 @@ msgid "Playing some media."
 msgstr "Կատարվում է ինչ-որ ֆայլ"
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "XDG-Էկրանապահ"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
-#, fuzzy
 msgid "D-Bus screen saver inhibition"
-msgstr "XDG էկրանապահիչի զսպելը"
+msgstr ""
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -22539,9 +22233,8 @@ msgid "WAV muxer"
 msgstr "WAV մուլտիպլեքսոր"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "գոռալ UDP ծանուցումը Ներդրված ծրագիր"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -22552,9 +22245,8 @@ msgid "Now playing"
 msgstr "Ընթացիկ"
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "Շրջանցել գովազդ"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -22577,9 +22269,8 @@ msgid "A/52 audio packetizer"
 msgstr "A/52 աուդիո փաթեթավորիչ"
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "փաթեթավորիչ"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -22643,27 +22334,24 @@ msgstr "MPEG Վիդեո"
 msgid "VC-1 packetizer"
 msgstr "VC-1 փաթեթավորիչ"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:370
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -22690,14 +22378,12 @@ msgstr "Իմ նկարները"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:620
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Bonjour ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -22844,28 +22530,24 @@ msgid "Unknown type"
 msgstr "Անհայտ տիպ"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Ձայնային կանալներ"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Թարմացնել"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Ծառայություններ"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "Սեփական "
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -22934,9 +22616,8 @@ msgid ""
 msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
-#, fuzzy
 msgid "Bar width in pixel"
-msgstr "Թողունակության շերտ"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
@@ -23115,9 +22796,8 @@ msgid "Font size, pixels"
 msgstr "Տառատեսակի չափը, պիքսելներով"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
-msgstr "Տառատեսակի չափը, պիքսելներով: Լռությամբ -1 (օգտագործման լռությամբը)."
+msgstr ""
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -23579,9 +23259,8 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Հոսքի զտիչներ"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -23608,24 +23287,20 @@ msgid "gzip decompression"
 msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "Հոսք"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "Վիդեո ձգման զտիչ"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Հոսքի զտիչներ"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "Ինքնաթափներ բուֆերի չափը`"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -23640,9 +23315,8 @@ msgid "Prefetch background read size (bytes)"
 msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "Զտիչի շեմը"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -23756,24 +23430,20 @@ msgid "Bridge in"
 msgstr ""
 
 #: modules/stream_out/chromaprint.c:57
-#, fuzzy
 msgid "Duration of the fingerprinting"
-msgstr "Հայելացման ուղղություն"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Հիմնական հոսք"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:104
-#, fuzzy
 msgid "HTTP port"
-msgstr "HTTP պրոքսի"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid ""
@@ -23798,42 +23468,36 @@ msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:115
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "Համակարգչի հասցեն, որին պետք է հոսք ուղարկել:"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:116
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Սկավառակի ընտրություն"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:117
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:121
-#, fuzzy
 msgid "Chromecast"
-msgstr "Սկավառակի ընտրություն"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:328
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Սկավառակի ընտրություն"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "UDP հոսքի ելք"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -24651,9 +24315,8 @@ msgid "Shadow distance"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Տեքստի դիրքը"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -24678,14 +24341,12 @@ msgid "Thick"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "Ձախ դիմացից"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "Գնալ ձախ"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -24831,14 +24492,12 @@ msgid "YUVP converter"
 msgstr ""
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Պատկերի երանգ (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "Ընտրել հստակեցման ուժգնությունը 0-ից 2: Նախնականը 0.05 է:"
+msgstr ""
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -25142,9 +24801,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:768
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Հստակեցման վիդեո զտիչ"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -25316,14 +24974,12 @@ msgid "Deinterlacing video filter"
 msgstr ""
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Շարժման բացահայտման վիդեո զտիչ"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Ֆայլի ընտրություն"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -25366,14 +25022,12 @@ msgid "Extract RGB component video filter"
 msgstr ""
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Հստակեցման վիդեո զտիչ"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "Փոխել ֆորմատը "
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -25557,9 +25211,8 @@ msgid "Direction"
 msgstr "Ուղղություն"
 
 #: modules/video_filter/mirror.c:72
-#, fuzzy
 msgid "Direction of the mirroring."
-msgstr "Հայելացման ուղղություն"
+msgstr ""
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -26038,9 +25691,8 @@ msgid "ASCII-art video output"
 msgstr "ASCII Արվեստի վիդեո ելք"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Փակել պատուհանը"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -26069,9 +25721,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "Խճանկարային պատկերի թափանցիկություն"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -26139,18 +25790,16 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Վիդեո ելքի մոդուլը"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Վիդեո ելքի մոդուլը"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Options"
@@ -26357,18 +26006,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "YUV վիդեո ելք"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "YUV վիդեո ելք"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -26439,9 +26086,8 @@ msgid "Wallpaper"
 msgstr "Պաստառ"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "OpenGL Վիդեո ելք"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -26504,9 +26150,8 @@ msgstr "Վիդեո հիշողություն"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "X11 display"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -26528,9 +26173,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Ողջ էկրանով վիդեո ելք"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -26632,11 +26276,8 @@ msgid "Chroma used"
 msgstr ""
 
 #: modules/video_output/yuv.c:46
-#, fuzzy
 msgid "Force use of a specific chroma for output."
 msgstr ""
-"սահմանել օգտագործման կոնկրետ chroma տողը. Լռությամբ է Y420 (հատուկ N770/N8xx "
-"սարք)."
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
@@ -26925,14 +26566,12 @@ msgid "The height of the visualization window, in pixels."
 msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Սպեկտր"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "Ձայնային Վիզուալիզացիա"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -27078,11 +26717,8 @@ msgid "Show 80 bands instead of 20"
 msgstr ""
 
 #: modules/visualization/visual/visual.c:72
-#, fuzzy
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
 msgstr ""
-"Ավելի խմբերի համար սպեկտրի անալիզատոր: 80 եթե թույլ է տրվում - թույլատրված "
-"ուրիշ 20."
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -27173,9 +26809,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "float մասին Վերեւ"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -27450,9 +27085,8 @@ msgid "Start Time"
 msgstr "Սկսելու Ժամանակ"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Գնալ Ժամանակի պահի"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27479,9 +27113,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Փոխել սկսելու ժամանակը"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27580,9 +27213,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV մուլտիպլեքսոր"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27593,9 +27225,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -27606,9 +27237,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27623,9 +27253,8 @@ msgid "Webm"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1 ֆորմատ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27656,9 +27285,8 @@ msgid "Menus"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Կադրերի արագութուն"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -27673,9 +27301,8 @@ msgid "Custom options"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Որակի մակարդակ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27698,14 +27325,12 @@ msgid "px"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Դիսկրետացման հաճախություն"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Անձնագիրի անունը Բացակայում է"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27928,11 +27553,8 @@ msgstr ""
 "համակարգի վահանակում"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"Դուք օգտագործում եք Qt4 Ինտերֆեյսը: \n"
-" \n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28023,9 +27645,8 @@ msgid "Add a background"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Ելք"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28245,60 +27866,14 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
-#, fuzzy
-#~ msgid "Screen capture (with Wayland)"
-#~ msgstr "Էկրանի նկարում"
-
-#~ msgid "Streaming"
-#~ msgstr "Հոսք"
-
 #~ msgid "Sent packets"
 #~ msgstr "Ուղարկված փաթեթներ"
-
-#~ msgid "Sent bytes"
-#~ msgstr "Ուղարկված բայթեր"
-
-#~ msgid "Send rate"
-#~ msgstr "Ողղարկման արագություն"
 
 #~ msgid "Sent"
 #~ msgstr "Ուղարկված"
 
-#~ msgid "packets"
-#~ msgstr "փաթեթներ"
-
-#~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround՝"
-
 #~ msgid "Headphone surround effect"
 #~ msgstr "Ականջակալների տարածական էֆֆեկտ"
-
-#~ msgid "Display device"
-#~ msgstr "Ցուցադրող սարք"
-
-#, fuzzy
-#~ msgid "Capture region heigh"
-#~ msgstr "Գրանցման ռեժիմ"
-
-#, fuzzy
-#~ msgid "High quality"
-#~ msgstr "Կոդավորման որակ"
-
-#, fuzzy
-#~ msgid "Very high quality"
-#~ msgstr "Կոդավորման որակ"
-
-#, fuzzy
-#~ msgid "YouTube Start Time"
-#~ msgstr "Սկսելու Ժամանակ"
-
-#, fuzzy
-#~ msgid "iTunes Account ID"
-#~ msgstr "Տյուների երկրի կոդը"
-
-#, fuzzy
-#~ msgid "Disable lua"
-#~ msgstr "Անջատել"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Անջատեք բոլոր զգուշացումները եւ հաղորդագրությունները"
@@ -28312,18 +27887,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "BD"
 #~ msgstr "BD"
 
-#~ msgid "Configure"
-#~ msgstr " Կարգավորել"
-
-#~ msgid "FTP user name"
-#~ msgstr "FTP Օգտագործողի անունը"
-
-#~ msgid "FTP password"
-#~ msgstr "FTP գաղտնաբառը"
-
-#~ msgid "Your password was rejected."
-#~ msgstr "Ձեր գաղտնաբառը մերժվել է."
-
 #~ msgid "Subscreen top left corner"
 #~ msgstr "Ենթաէկրանի վերեւի ձախ անկյուն"
 
@@ -28333,60 +27896,18 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "Left coordinate of the subscreen top left corner."
 #~ msgstr "Ենթաէկրանի վերեւի ձախ անկյունի Ձախ կորդինատ"
 
-#~ msgid "LID"
-#~ msgstr "LID"
-
-#~ msgid "VCD Format"
-#~ msgstr "VCD Ֆորմատ"
-
-#~ msgid "Volume Set"
-#~ msgstr "Ձայնը Սահմանել"
-
-#~ msgid "Audio Channels"
-#~ msgstr "Ձայնային կանալներ"
-
 #~ msgid "type"
 #~ msgstr "տեսակ"
 
-#~ msgid "end"
-#~ msgstr "վերջ"
-
-#~ msgid "play list"
-#~ msgstr "երգա ցանկ"
-
-#~ msgid "extended selection list"
-#~ msgstr "ընդլայնված ընտրության պանակ"
-
-#~ msgid "unknown type"
-#~ msgstr "անհայտ տեսակ"
-
-#~ msgid "Use playback control?"
-#~ msgstr "Օգտագործե՞լ ընթացքի վերահսկողություն"
-
 #~ msgid "A/52 parser"
 #~ msgstr "A/52 պարսեր"
-
-#~ msgid "Visualize motion vectors"
-#~ msgstr "Ցուցադրել շարժման վեկտորները"
 
 #, fuzzy
 #~ msgid "QuickTime library decoder"
 #~ msgstr "QuickTime գրադարանի ապակոդավորիչ"
 
-#~ msgid "Google Video"
-#~ msgstr "Google Վիդեո"
-
-#~ msgid "VLC media player Help"
-#~ msgstr "VLC մեդիա նվագարկչի Օգնություն"
-
-#~ msgid "Invalid selection"
-#~ msgstr "Սխալ ընտրություն"
-
 #~ msgid "Two bookmarks have to be selected."
 #~ msgstr "Պետք է ընտրել երկու էջանիշ"
-
-#~ msgid "No input found"
-#~ msgstr "Մուտք չի հայտնաբերվել"
 
 #~ msgid "Send"
 #~ msgstr "Ուղարկել"
@@ -28400,15 +27921,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "ReadMe / FAQ..."
 #~ msgstr "ReadMe / ՀՏՀ ..."
 
-#~ msgid "Current channel:"
-#~ msgstr "Ընթացիկ կանալը՝"
-
-#~ msgid "Previous Channel"
-#~ msgstr "Նախորդ կանալ"
-
-#~ msgid "Next Channel"
-#~ msgstr "Հաջորդ կանալ"
-
 #~ msgid "Retrieving Channel Info..."
 #~ msgstr "Ստացվում են կանալի տվյալները..."
 
@@ -28419,12 +27931,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ "VLCն չի կարող միանալ EyeTV-ին. \n"
 #~ "Համոզվեք, որ տեղադրել եք VLCի EyeTV ներդրված ծրագիր."
 
-#~ msgid "Composite input"
-#~ msgstr "Խառը մուտք"
-
-#~ msgid "S-Video input"
-#~ msgstr "S-Video մուտք"
-
 #~ msgid "Download Cover Art"
 #~ msgstr "Քաշել դիսկի նկարը"
 
@@ -28433,9 +27939,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #~ msgid "Sort Node by Author"
 #~ msgstr "Տեսակավորել հանգույցը ըստ հեղինակի"
-
-#~ msgid "Meta-information"
-#~ msgstr "Մետատվյալներ"
 
 #~ msgid ""
 #~ "DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
@@ -28446,20 +27949,8 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "Uncompressed audio samples (useable with WAV)"
 #~ msgstr "Չսեղմված աուդիո նմուշներ (կիրառելի WAVի հետ)"
 
-#~ msgid "MPEG 1 Format"
-#~ msgstr "MPEG 1 ֆորմատ"
-
-#~ msgid "Stream to network"
-#~ msgstr "Հոսք դեպի ցանց"
-
 #~ msgid "Transcode/Save to file"
 #~ msgstr "Վերակոդավորել / Պահել ֆայլում"
-
-#~ msgid "Streaming method"
-#~ msgstr "Հոսքավորման մեթոդը"
-
-#~ msgid "UDP Unicast"
-#~ msgstr "UDP Unicast"
 
 #~ msgid "UDP Multicast"
 #~ msgstr "UDP Multicast"
@@ -28467,56 +27958,17 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "Time-To-Live (TTL)"
 #~ msgstr "Time-To-Live (TTL)"
 
-#~ msgid "Local playback"
-#~ msgstr "Աշխատացնել տեղում"
-
 #~ msgid "Summary"
 #~ msgstr "Ամփոփում"
 
-#~ msgid "Save file to"
-#~ msgstr "Պահել ֆայլը`"
-
-#~ msgid "No input selected"
-#~ msgstr "Ոչ մի մուտք ընտրված չէ"
-
-#~ msgid "No valid destination"
-#~ msgstr "Ոչ վավեր ուղղություն"
-
-#~ msgid "Select the directory to save to"
-#~ msgstr "Ընտրեք պանակ պահպանելու համար"
-
-#~ msgid "No folder selected"
-#~ msgstr "Ոչ մի պանակ ընտրված չէ"
-
-#~ msgid "Finish"
-#~ msgstr "Ավարտ"
-
 #~ msgid "%i items"
 #~ msgstr "%i տարր"
-
-#~ msgid "yes"
-#~ msgstr "այո"
-
-#~ msgid "no"
-#~ msgstr "ոչ"
-
-#~ msgid "A->B Loop"
-#~ msgstr "A-> B Ցիկլ"
 
 #~ msgid "Page"
 #~ msgstr "Էջ"
 
 #~ msgid "RAOP"
 #~ msgstr "RAOP"
-
-#~ msgid "Name for the font you want to use"
-#~ msgstr "Տառատեսակի անունը, որը ուզում եք օգտագործել"
-
-#~ msgid "Filename for the font you want to use"
-#~ msgstr "Ֆայլի անուն որի տառատեսակը ուզում եք օգտագործել"
-
-#~ msgid "Device type"
-#~ msgstr "Սարքի տեսակ"
 
 #~ msgid "DMX"
 #~ msgstr "DMX"
@@ -28530,14 +27982,8 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "DMX address for each channel"
 #~ msgstr "DMX հասցեն համար յուրաքանչյուր կանալի համար`"
 
-#~ msgid "Count of channels"
-#~ msgstr "Կանալների քանակը"
-
 #~ msgid "Zones on left / right side"
 #~ msgstr "Գոտիներ ձախից/աջից"
-
-#~ msgid "White Blue"
-#~ msgstr "Բաց Կապույտ"
 
 #~ msgid "Edge weightning"
 #~ msgstr "Եզրերի հաստացում"
@@ -28551,20 +27997,11 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "Filter Smoothness"
 #~ msgstr "Զտիչի հարթություն"
 
-#~ msgid "No Filtering"
-#~ msgstr "Առանց զտման"
-
 #~ msgid "Combined"
 #~ msgstr "Համադրված"
 
 #~ msgid "Percent"
 #~ msgstr "Տոկոս"
-
-#~ msgid "Frame delay (ms)"
-#~ msgstr "Կադրերի հապաղում (մվ)"
-
-#~ msgid "disabled"
-#~ msgstr "անջատված"
 
 #~ msgid "Zone 3:left"
 #~ msgstr "Գոտի 3՝ձախ "
@@ -28599,17 +28036,8 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgid "AtmoLight"
 #~ msgstr "AtmoLight"
 
-#~ msgid "DMX options"
-#~ msgstr "DMX ընտրանքներ"
-
 #~ msgid "Zone Layout for the build-in Atmo"
 #~ msgstr "Գոտու Դասավորությունը նեռկառուցված Atmo-ի համար"
-
-#~ msgid "Brightness (%)"
-#~ msgstr "Պայծառություն (%)"
-
-#~ msgid "Filter threshold (%)"
-#~ msgstr "Զտիչի շեմը (%-ով)"
 
 #, fuzzy
 #~ msgid "Choose your preferred video output and configure it here."
@@ -33187,6 +32615,406 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ "Allows you to modify the user name that will be used for the connection."
 
 #, fuzzy
+#~ msgid "Tuner id (see debug output)."
+#~ msgstr "Տյուների հաճախականությունը Հց կամ կՀց (տես debug ելքը)"
+
+#, fuzzy
+#~ msgid "X coordinate of the rendered image"
+#~ msgstr "Ենթաէկրանի վերեւի ձախ անկյունի Վերևի կորդինատ"
+
+#, fuzzy
+#~ msgid "Y coordinate of the rendered image"
+#~ msgstr "Ենթաէկրանի վերեւի ձախ անկյունի Վերևի կորդինատ"
+
+#, fuzzy
+#~ msgid "Subscreen width:"
+#~ msgstr "Ենթաէկրանի լայնությունը"
+
+#, fuzzy
+#~ msgid "Filename of the SQLite database"
+#~ msgstr "Ֆայլի անուն որի տառատեսակը ուզում եք օգտագործել"
+
+#, fuzzy
+#~ msgid "Edge Weightning"
+#~ msgstr "Եզրերի հաստացում"
+
+#, fuzzy
+#~ msgid "Filter Smoothness (in %)"
+#~ msgstr "Զտիչի հարթություն (%-ով)"
+
+#, fuzzy
+#~ msgid "IPv6 will be used by default for all connections."
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+
+#, fuzzy
+#~ msgid "IPv4 will be used by default for all connections."
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+
+#, fuzzy
+#~ msgid "Invalid polarization"
+#~ msgstr "Սխալ ընտրություն"
+
+#, fuzzy
+#~ msgid "RTP de-jitter buffer length (msec)"
+#~ msgstr "Զտիչի երկարություն (մվ)"
+
+#, fuzzy
+#~ msgid "1 item"
+#~ msgstr "%i տարր"
+
+#, fuzzy
+#~ msgid ""
+#~ "Allows you to modify the password that will be used for the connection."
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+
+#, fuzzy
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for authenticating "
+#~ "the connection."
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+
+#, fuzzy
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-2 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MPEG4, OGG "
+#~ "and RAW)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
+#~ "RAW ֆորմատների հետ)"
+
+#, fuzzy
+#~ msgid "DVD audio format"
+#~ msgstr "VCD Ֆորմատ"
+
+#, fuzzy
+#~ msgid "MPEG Audio Layer 3"
+#~ msgstr "MPEG աուդիո ապակոդավորիչ"
+
+#, fuzzy
+#~ msgid "RTP Multicast"
+#~ msgstr "UDP Multicast"
+
+#, fuzzy
+#~ msgid "RTP Unicast"
+#~ msgstr "UDP Unicast"
+
+#, fuzzy
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Ընտրեք պանակ պահպանելու համար"
+
+#, fuzzy
+#~ msgid "Transcode audio (if available)"
+#~ msgstr "Վերակոդավորել / Պահել ֆայլում"
+
+#, fuzzy
+#~ msgid "UDP/RTP Multicast"
+#~ msgstr "UDP Multicast"
+
+#, fuzzy
+#~ msgid "multicast"
+#~ msgstr "UDP Multicast"
+
+#, fuzzy
+#~ msgid "summary"
+#~ msgstr "Ամփոփում"
+
+#, fuzzy
+#~ msgid "type : "
+#~ msgstr "տեսակ"
+
+#, fuzzy
+#~ msgid "unicast"
+#~ msgstr "UDP Unicast"
+
+#, fuzzy
+#~ msgid "Screen capture (with Wayland)"
+#~ msgstr "Էկրանի նկարում"
+
+#, fuzzy
+#~ msgid "Streaming"
+#~ msgstr "Հոսք"
+
+#, fuzzy
+#~ msgid "Sent bytes"
+#~ msgstr "%s բայթ"
+
+#, fuzzy
+#~ msgid "Send rate"
+#~ msgstr "Դիսկրետացման հաճախություն"
+
+#, fuzzy
+#~ msgid "packets"
+#~ msgstr "փաթեթավորիչ"
+
+#, fuzzy
+#~ msgid "Dolby Surround:"
+#~ msgstr "Dolby Surround"
+
+#, fuzzy
+#~ msgid "Display device"
+#~ msgstr "Սկավառակի սարք"
+
+#, fuzzy
+#~ msgid "Capture region heigh"
+#~ msgstr "Նկարող &Սարք"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Կոդավորման որակ"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Կոդավորման որակ"
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Սկսելու Ժամանակ"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Տյուների երկրի կոդը"
+
+#, fuzzy
+#~ msgid "Disable lua"
+#~ msgstr "Անջատել"
+
+#, fuzzy
+#~ msgid "Configure"
+#~ msgstr "Կարգավորել Կոճակները"
+
+#, fuzzy
+#~ msgid "FTP user name"
+#~ msgstr "SOCKS օգտանուն"
+
+#, fuzzy
+#~ msgid "FTP password"
+#~ msgstr "Գաղտնաբառ"
+
+#, fuzzy
+#~ msgid "Your password was rejected."
+#~ msgstr "Ձեր հաշիվը մերժվել է."
+
+#, fuzzy
+#~ msgid "LID"
+#~ msgstr "ID"
+
+#, fuzzy
+#~ msgid "VCD Format"
+#~ msgstr "Ֆորմատ"
+
+#, fuzzy
+#~ msgid "Volume Set"
+#~ msgstr "Ձայնի բարձրություն"
+
+#, fuzzy
+#~ msgid "Audio Channels"
+#~ msgstr "Ձայնային կանալներ"
+
+#, fuzzy
+#~ msgid "end"
+#~ msgstr "Խառնել"
+
+#, fuzzy
+#~ msgid "play list"
+#~ msgstr "Երգացանկ"
+
+#, fuzzy
+#~ msgid "extended selection list"
+#~ msgstr "Ցուց տալ ընլայնված կարգավորումներ"
+
+#, fuzzy
+#~ msgid "unknown type"
+#~ msgstr "Անհայտ տիպ"
+
+#, fuzzy
+#~ msgid "Use playback control?"
+#~ msgstr "Ընթացքի վերահսկողության"
+
+#, fuzzy
+#~ msgid "Visualize motion vectors"
+#~ msgstr "Վիզուալիզացիայի ընտրում"
+
+#, fuzzy
+#~ msgid "Google Video"
+#~ msgstr "MPEG Վիդեո"
+
+#, fuzzy
+#~ msgid "VLC media player Help"
+#~ msgstr "VLC մեդիա նվագարկչի Օգնություն ..."
+
+#, fuzzy
+#~ msgid "Invalid selection"
+#~ msgstr "Սարքի ընտրություն"
+
+#, fuzzy
+#~ msgid "No input found"
+#~ msgstr "Մուտք չկա"
+
+#, fuzzy
+#~ msgid "Current channel:"
+#~ msgstr "Կանալներ՝"
+
+#, fuzzy
+#~ msgid "Previous Channel"
+#~ msgstr "Նախորդ բաժին"
+
+#, fuzzy
+#~ msgid "Next Channel"
+#~ msgstr "Կանալներ"
+
+#, fuzzy
+#~ msgid "Composite input"
+#~ msgstr "Վիդեո մուտք"
+
+#, fuzzy
+#~ msgid "S-Video input"
+#~ msgstr "Վիդեո մուտք"
+
+#, fuzzy
+#~ msgid "Meta-information"
+#~ msgstr "Ֆայլի Տեղեկություններ"
+
+#, fuzzy
+#~ msgid "MPEG 1 Format"
+#~ msgstr "Ֆորմատ"
+
+#, fuzzy
+#~ msgid "Stream to network"
+#~ msgstr "Հոսքի զտիչներ"
+
+#, fuzzy
+#~ msgid "Streaming method"
+#~ msgstr "Դիրքորոշման մեթոդը"
+
+#, fuzzy
+#~ msgid "UDP Unicast"
+#~ msgstr "UDP մուտք"
+
+#, fuzzy
+#~ msgid "Local playback"
+#~ msgstr "Կանգնեցնել"
+
+#, fuzzy
+#~ msgid "Save file to"
+#~ msgstr "Պահել Ֆայլը"
+
+#, fuzzy
+#~ msgid "No input selected"
+#~ msgstr "Մուտք չկա"
+
+#, fuzzy
+#~ msgid "No valid destination"
+#~ msgstr "Նոր ուղղություն"
+
+#, fuzzy
+#~ msgid "Select the directory to save to"
+#~ msgstr "Ընտրել պանակ"
+
+#, fuzzy
+#~ msgid "No folder selected"
+#~ msgstr "Հեռացնել Ընտրվածը"
+
+#, fuzzy
+#~ msgid "Finish"
+#~ msgstr "Ֆիններեն"
+
+#, fuzzy
+#~ msgid "yes"
+#~ msgstr "Բայթեր"
+
+#, fuzzy
+#~ msgid "no"
+#~ msgstr "Մոնո"
+
+#, fuzzy
+#~ msgid "A->B Loop"
+#~ msgstr "Ցիկլ"
+
+#, fuzzy
+#~ msgid "Name for the font you want to use"
+#~ msgstr "Ցանկալի տառատեսակի ընտանիքը"
+
+#, fuzzy
+#~ msgid "Filename for the font you want to use"
+#~ msgstr "Ցանկալի տառատեսակի ընտանիքը"
+
+#, fuzzy
+#~ msgid "Device type"
+#~ msgstr "Սարքի անունը"
+
+#, fuzzy
+#~ msgid "Count of channels"
+#~ msgstr "Ձայնային կանալներ"
+
+#, fuzzy
+#~ msgid "White Blue"
+#~ msgstr "Սպիտակի մակարդակ Կապույտի համար"
+
+#, fuzzy
+#~ msgid "No Filtering"
+#~ msgstr "Զտիչներ"
+
+#, fuzzy
+#~ msgid "Frame delay (ms)"
+#~ msgstr "Շրջափակման հապաղում (մվ)"
+
+#, fuzzy
+#~ msgid "disabled"
+#~ msgstr "Անջատել"
+
+#, fuzzy
+#~ msgid "DMX options"
+#~ msgstr "Ընտրանքներ"
+
+#, fuzzy
+#~ msgid "Brightness (%)"
+#~ msgstr "Պայծառություն"
+
+#, fuzzy
+#~ msgid "Filter threshold (%)"
+#~ msgstr "Գույնը շեմը"
+
+#, fuzzy
 #~ msgid ""
 #~ "These are general settings for video/audio/subtitle encoding modules."
 #~ msgstr "Ձայնի ելքի մոդուլների ընդհանուր ղեկավարում"
@@ -33345,7 +33173,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Clone the image"
-#~ msgstr "Խառնել պատկերը"
+#~ msgstr "Նկարների հոսք"
 
 #, fuzzy
 #~ msgid "Magnification"
@@ -33453,19 +33281,15 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "SFTP user name"
-#~ msgstr "FTP Օգտագործողի անունը"
+#~ msgstr "SOCKS օգտանուն"
 
 #, fuzzy
 #~ msgid "SFTP password"
-#~ msgstr "FTP գաղտնաբառը"
+#~ msgstr "Գաղտնաբառ"
 
 #, fuzzy
 #~ msgid "Tuner id"
 #~ msgstr "Տյուներ"
-
-#, fuzzy
-#~ msgid "Tuner id (see debug output)."
-#~ msgstr "Տյուների հաճախականությունը Հց կամ կՀց (տես debug ելքը)"
 
 #, fuzzy
 #~ msgid "Video4Linux2"
@@ -33530,14 +33354,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Խճանկարային պատկերի թափանցիկություն"
 
 #, fuzzy
-#~ msgid "X coordinate of the rendered image"
-#~ msgstr "Ենթաէկրանի վերեւի ձախ անկյունի Վերևի կորդինատ"
-
-#, fuzzy
-#~ msgid "Y coordinate of the rendered image"
-#~ msgstr "Ենթաէկրանի վերեւի ձախ անկյունի Վերևի կորդինատ"
-
-#, fuzzy
 #~ msgid "Display on overlay framebuffer"
 #~ msgstr "Ցուցադրված կադրեր"
 
@@ -33554,12 +33370,8 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Կադր վարկյանում"
 
 #, fuzzy
-#~ msgid "Subscreen width:"
-#~ msgstr "Ենթաէկրանի լայնությունը"
-
-#, fuzzy
 #~ msgid "Subscreen height:"
-#~ msgstr "Ենթաէկրանի բարձրություն"
+#~ msgstr "Եզրի բարձրություն"
 
 #, fuzzy
 #~ msgid "Image width:"
@@ -33702,10 +33514,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Ֆրանսերեն"
 
 #, fuzzy
-#~ msgid "Filename of the SQLite database"
-#~ msgstr "Ֆայլի անուն որի տառատեսակը ուզում եք օգտագործել"
-
-#, fuzzy
 #~ msgid "Ignored extensions in the media library"
 #~ msgstr "Անտեսել ընդլայնումները"
 
@@ -33766,14 +33574,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Լեզու"
 
 #, fuzzy
-#~ msgid "Edge Weightning"
-#~ msgstr "Եզրերի հաստացում"
-
-#, fuzzy
-#~ msgid "Filter Smoothness (in %)"
-#~ msgstr "Զտիչի հարթություն (%-ով)"
-
-#, fuzzy
 #~ msgid "Automatic cropping"
 #~ msgstr "Ավտոմատ"
 
@@ -33799,7 +33599,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Luminance threshold "
-#~ msgstr "Զտիչի շեմը"
+#~ msgstr "Պայծառության շեմ"
 
 #, fuzzy
 #~ msgid "Crop video filter"
@@ -33855,7 +33655,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "MUX Options"
-#~ msgstr "DMX ընտրանքներ"
+#~ msgstr "Ընտրանքներ"
 
 #, fuzzy
 #~ msgid "Output Destination"
@@ -34051,7 +33851,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Zoom playlist"
-#~ msgstr "երգա ցանկ"
+#~ msgstr "Բացել երգացանկ"
 
 #, fuzzy
 #~ msgid "key"
@@ -34072,14 +33872,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #, fuzzy
 #~ msgid "UDP port"
 #~ msgstr "CDDB պորտ"
-
-#, fuzzy
-#~ msgid "IPv6 will be used by default for all connections."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
-
-#, fuzzy
-#~ msgid "IPv4 will be used by default for all connections."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
 
 #, fuzzy
 #~ msgid "Media dump access filter trigger."
@@ -34107,15 +33899,11 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "HTTP password"
-#~ msgstr "FTP գաղտնաբառը"
+#~ msgstr "Գաղտնաբառ"
 
 #, fuzzy
 #~ msgid "Input syntax is deprecated"
 #~ msgstr "Մուտքը փոխվել է"
-
-#, fuzzy
-#~ msgid "Invalid polarization"
-#~ msgstr "Սխալ ընտրություն"
 
 #, fuzzy
 #~ msgid "Fake"
@@ -34127,11 +33915,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "User agent that will be used for the connection."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
-
-#, fuzzy
-#~ msgid "RTP de-jitter buffer length (msec)"
-#~ msgstr "Զտիչի երկարություն (մվ)"
+#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի SOCKS պրոքսիի հետ կապի համար "
 
 #, fuzzy
 #~ msgid "Audio Channel"
@@ -34297,7 +34081,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "Մուտքային սարք չի հայտնաբերվել"
+#~ msgstr "Վիդեո սարքի անունը"
 
 #, fuzzy
 #~ msgid "Screen Capture Input"
@@ -34314,10 +34098,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
 #~ msgstr "Ավելացնել երգացանկում"
-
-#, fuzzy
-#~ msgid "1 item"
-#~ msgstr "%i տարր"
 
 #, fuzzy
 #~ msgid "Empty Folder"
@@ -34549,23 +34329,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid ""
-#~ "Allows you to modify the password that will be used for the connection."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
-
-#, fuzzy
-#~ msgid ""
-#~ "Allows you to modify the user name that will be used for authenticating "
-#~ "the connection."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
-
-#, fuzzy
-#~ msgid ""
-#~ "Allows you to modify the user name that will be used for the connection "
-#~ "(Basic authentication only)."
-#~ msgstr "Ոգտագործող անուն, որ կօգտագործվի կապի համար "
-
-#, fuzzy
-#~ msgid ""
 #~ "Allows you to specify a URL with additional information on the stream."
 #~ msgstr "Թույլ է տալիս ներմուծել \"վերնագիր\" մետատվյալը մուտքի համար."
 
@@ -34637,52 +34400,9 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid ""
-#~ "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
-
-#, fuzzy
-#~ msgid ""
-#~ "MPEG-2 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
-
-#, fuzzy
-#~ msgid ""
-#~ "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MPEG4, OGG "
-#~ "and RAW)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
-
-#, fuzzy
-#~ msgid ""
 #~ "Preamp\n"
 #~ "12.0dB"
 #~ msgstr "Նախաուժեղացում"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "DVD ձայնային ֆորմատ (օգտագործվում MPEG PS, MPEG TS, MPEG1, ASF, OGG եւ "
-#~ "RAW ֆորմատների հետ)"
 
 #, fuzzy
 #~ msgid ""
@@ -34769,7 +34489,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "&View items"
-#~ msgstr "%i տարր"
+#~ msgstr "&Տեսք"
 
 #, fuzzy
 #~ msgid "(Experimental) XCB video output"
@@ -35074,7 +34794,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Choose title"
-#~ msgstr "Ընտրեք մուտք"
+#~ msgstr "Ընտրեք"
 
 #, fuzzy
 #~ msgid "Cinepak video decoder"
@@ -35121,10 +34841,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Ջնջել"
 
 #, fuzzy
-#~ msgid "DVD audio format"
-#~ msgstr "VCD Ֆորմատ"
-
-#, fuzzy
 #~ msgid "DVD device to use"
 #~ msgstr "DVD սարք"
 
@@ -35162,7 +34878,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Disc type"
-#~ msgstr "Սարքի տեսակ"
+#~ msgstr "Սկավառակ"
 
 #, fuzzy
 #~ msgid "Disk Device"
@@ -35170,7 +34886,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Display Device"
-#~ msgstr "Ցուցադրող սարք"
+#~ msgstr "Սկավառակի սարք"
 
 #, fuzzy
 #~ msgid "Distortion"
@@ -35317,16 +35033,12 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Անուն:Գաղտնաբառ"
 
 #, fuzzy
-#~ msgid "MPEG Audio Layer 3"
-#~ msgstr "MPEG աուդիո ապակոդավորիչ"
-
-#, fuzzy
 #~ msgid "MPEG I/II hw video decoder (using libmpeg2)"
 #~ msgstr "AAC աուդիո ապակոդավորիչ (օգտագործելով libfaad2)"
 
 #, fuzzy
 #~ msgid "MPEG audio / MP3 demuxer"
-#~ msgstr "MPEG աուդիո ապակոդավորիչ"
+#~ msgstr "MPEG-PS դեմուլտիպլեքսոր"
 
 #, fuzzy
 #~ msgid "MPEG-2 Video codec"
@@ -35338,7 +35050,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "MPEG-4 audio demuxer"
-#~ msgstr "MPEG աուդիո ապակոդավորիչ"
+#~ msgstr "MPEG-I/II վիդեո դեմուլտիպլեքսոր"
 
 #, fuzzy
 #~ msgid "MPEG-4 video demuxer"
@@ -35593,20 +35305,12 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Բացել Ֆայլ..."
 
 #, fuzzy
-#~ msgid "RTP Multicast"
-#~ msgstr "UDP Multicast"
-
-#, fuzzy
-#~ msgid "RTP Unicast"
-#~ msgstr "UDP Unicast"
-
-#, fuzzy
 #~ msgid "RTSP"
 #~ msgstr "RTSP VoD"
 
 #, fuzzy
 #~ msgid "Random dithering"
-#~ msgstr "Առանց զտման"
+#~ msgstr "Պատահականը Միացնել"
 
 #, fuzzy
 #~ msgid "Random off"
@@ -35699,16 +35403,12 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Ընտրված պորտեր՝"
 
 #, fuzzy
-#~ msgid "Select the protocol for the URL."
-#~ msgstr "Ընտրեք պանակ պահպանելու համար"
-
-#, fuzzy
 #~ msgid "Session descriptipn"
-#~ msgstr "URL նկարագրություն"
+#~ msgstr "Նկարագրություն"
 
 #, fuzzy
 #~ msgid "Set"
-#~ msgstr "Ուղարկված"
+#~ msgstr "Խոնավ"
 
 #, fuzzy
 #~ msgid "Shoutcast radio listings"
@@ -35744,11 +35444,11 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Sorted by Album"
-#~ msgstr "Տեսակավորել հանգույցը ըստ հեղինակի"
+#~ msgstr "Տեսակավորել ըստ"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
-#~ msgstr "Տեսակավորել հանգույցը ըստ հեղինակի"
+#~ msgstr "Տեսակավորել ըստ"
 
 #, fuzzy
 #~ msgid "Spatialization"
@@ -35796,7 +35496,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Subscreen height."
-#~ msgstr "Ենթաէկրանի բարձրություն"
+#~ msgstr "Եզրի բարձրություն"
 
 #, fuzzy
 #~ msgid "Subtitle aspect-ratio correction"
@@ -35867,10 +35567,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Հերթական համար"
 
 #, fuzzy
-#~ msgid "Transcode audio (if available)"
-#~ msgstr "Վերակոդավորել / Պահել ֆայլում"
-
-#, fuzzy
 #~ msgid "Transcode options"
 #~ msgstr "Ընդլայնված ընտարնքներ..."
 
@@ -35881,10 +35577,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #, fuzzy
 #~ msgid "Transrate"
 #~ msgstr "Թափանցիկ"
-
-#, fuzzy
-#~ msgid "UDP/RTP Multicast"
-#~ msgstr "UDP Multicast"
 
 #, fuzzy
 #~ msgid "Unable to find playlist"
@@ -36000,7 +35692,7 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 
 #, fuzzy
 #~ msgid "Xinerama option"
-#~ msgstr "DMX ընտրանքներ"
+#~ msgstr "Տեղեկություն"
 
 #, fuzzy
 #~ msgid "You must choose a file to save to"
@@ -36079,10 +35771,6 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Վիդեոյի չափ"
 
 #, fuzzy
-#~ msgid "multicast"
-#~ msgstr "UDP Multicast"
-
-#, fuzzy
 #~ msgid "no artist"
 #~ msgstr "Արտիստ"
 
@@ -36103,24 +35791,12 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #~ msgstr "Ելքի Հոսք"
 
 #, fuzzy
-#~ msgid "summary"
-#~ msgstr "Ամփոփում"
-
-#, fuzzy
 #~ msgid "textFormat"
 #~ msgstr "Ֆորմատ"
 
 #, fuzzy
 #~ msgid "title"
 #~ msgstr "Վերնագիր"
-
-#, fuzzy
-#~ msgid "type : "
-#~ msgstr "տեսակ"
-
-#, fuzzy
-#~ msgid "unicast"
-#~ msgstr "UDP Unicast"
 
 #, fuzzy
 #~ msgid "video-filter-event"
