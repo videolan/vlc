@@ -181,8 +181,8 @@ typedef enum video_orientation_t
     ORIENT_BOTTOM_LEFT, /**< Flipped vertically */
     ORIENT_BOTTOM_RIGHT, /**< Rotated 180 degrees */
     ORIENT_LEFT_TOP, /**< Transposed */
-    ORIENT_LEFT_BOTTOM, /**< Rotated 90 degrees clockwise */
-    ORIENT_RIGHT_TOP, /**< Rotated 90 degrees anti-clockwise */
+    ORIENT_LEFT_BOTTOM, /**< Rotated 90 degrees anti-clockwise */
+    ORIENT_RIGHT_TOP, /**< Rotated 90 degrees clockwise */
     ORIENT_RIGHT_BOTTOM, /**< Anti-transposed */
 
     ORIENT_NORMAL      = ORIENT_TOP_LEFT,
