@@ -86,7 +86,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 
     subpicture_region_t *p_region;
     block_t *p_block;
-    size_t len;
+    size_t len = 0;
 
     if( p_spu == NULL )
         return NULL;
@@ -99,9 +99,30 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
         return NULL;
 
     /* This should already be UTF-8 encoded, so not much effort... */
-    len = strlen( p_region->p_text->psz_text );
-    p_block = block_Alloc( len );
-    memcpy( p_block->p_buffer, p_region->p_text->psz_text, len );
+    for( const text_segment_t *p_segment = p_region->p_text;
+                               p_segment; p_segment = p_segment->p_next )
+    {
+        if( p_segment->psz_text == NULL )
+            continue;
+        len += strlen( p_segment->psz_text );
+    }
+
+    p_block = block_Alloc( len + 1 );
+    if( !p_block )
+        return NULL;
+
+    p_block->i_buffer = 0;
+    for( const text_segment_t *p_segment = p_region->p_text;
+                               p_segment; p_segment = p_segment->p_next )
+    {
+        if( p_segment->psz_text == NULL )
+            continue;
+        len = strlen( p_segment->psz_text );
+        memcpy( &p_block->p_buffer[p_block->i_buffer],
+                p_segment->psz_text, len );
+        p_block->i_buffer += len;
+    }
+    p_block->p_buffer[p_block->i_buffer] = 0;
 
     p_block->i_pts = p_block->i_dts = p_spu->i_start;
     if( !p_spu->b_ephemer && ( p_spu->i_stop > p_spu->i_start ) )
