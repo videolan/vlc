@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17C88" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -164,7 +164,6 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="105" y="903" width="580" height="620"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
-            <value key="maxSize" type="size" width="580" height="1400"/>
             <view key="contentView" id="2266">
                 <rect key="frame" x="0.0" y="0.0" width="580" height="620"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -180,10 +179,10 @@
                                 </view>
                             </subviews>
                             <constraints>
-                                <constraint firstAttribute="bottom" secondItem="HOX-DS-Fgr" secondAttribute="bottom" priority="50" id="K7G-L9-E1u"/>
-                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="leading" secondItem="ecH-Hh-jJF" secondAttribute="leading" id="SGZ-aS-bLe"/>
-                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="top" secondItem="ecH-Hh-jJF" secondAttribute="top" id="d18-94-8pD"/>
-                                <constraint firstAttribute="trailing" secondItem="HOX-DS-Fgr" secondAttribute="trailing" id="nkd-2f-qUW"/>
+                                <constraint firstAttribute="bottom" secondItem="HOX-DS-Fgr" secondAttribute="bottom" priority="5" id="7ew-2Y-7ct"/>
+                                <constraint firstAttribute="trailing" secondItem="HOX-DS-Fgr" secondAttribute="trailing" id="8GE-iX-VYW"/>
+                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="top" secondItem="ecH-Hh-jJF" secondAttribute="top" id="Chc-4R-C0j"/>
+                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="leading" secondItem="ecH-Hh-jJF" secondAttribute="leading" id="Cr6-OY-NmH"/>
                             </constraints>
                             <color key="backgroundColor" name="controlHighlightColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
@@ -194,8 +193,8 @@
                             <rect key="frame" x="-100" y="-100" width="568" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="5eR-1v-88a">
-                            <rect key="frame" x="553" y="1" width="16" height="298"/>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.5" horizontal="NO" id="5eR-1v-88a">
+                            <rect key="frame" x="563" y="1" width="16" height="573"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -1963,7 +1962,7 @@ Gw
                     <rect key="frame" x="20" y="60" width="530" height="311"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="310"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="287"/>
@@ -2086,7 +2085,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2800">
-                        <rect key="frame" x="151" y="76" width="138" height="18"/>
+                        <rect key="frame" x="152" y="76" width="137" height="18"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="${PRESSED_KEYS}" usesSingleLineMode="YES" id="3530">
                             <font key="font" metaFont="systemBold" size="14"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>

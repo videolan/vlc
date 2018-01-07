@@ -186,6 +186,13 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
     /* setup useful stuff */
     _hotkeysNonUseableKeys = [NSArray arrayWithObjects:@"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", @"Command-Shift-f", nil];
+
+    // Workaround for Mac OS X Lion, which does not apply the same constraints when set in IB
+    NSView *clipView = _contentView.superview;
+
+    NSDictionary *views = @{ @"view": _contentView };
+    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[view]|" options:0 metrics:nil views:views];
+    [clipView addConstraints:constraints];
 }
 
 #define CreateToolbarItem(name, desc, img, sel) \
@@ -1060,9 +1067,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [_contentView addSubview:categoryView];
 
     NSDictionary *views = @{ @"view": categoryView };
-    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[view]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:views];
+    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[view]|" options:0 metrics:nil views:views];
     [_contentView addConstraints:constraints];
-    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:views];
+    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:views];
     [_contentView addConstraints:constraints];
 
     [_scrollView layoutSubtreeIfNeeded];
