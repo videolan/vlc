@@ -1,5 +1,5 @@
 # Dutch translation
-# Copyright (C) 2017 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,13 +9,12 @@
 # Thomas De Rocker, 2008-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 2.2.7\n"
+"Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2017-12-26 23:46+0100\n"
 "Last-Translator: Thomas De Rocker <thomasderocker@outlook.com>, 2017\n"
-"Language-Team: Dutch (https://www.transifex.com/yaron/vlc-trans/language/"
-"nl/)\n"
+"Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,8 +79,8 @@ msgstr "Instellingen voor VLC's bedieningsinterfaces"
 msgid "Hotkeys settings"
 msgstr "Sneltoetsen"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -736,7 +735,8 @@ msgstr "Koptelefoon"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatisch"
@@ -1014,8 +1014,8 @@ msgstr "Taal"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beschrijving"
 
@@ -1274,11 +1274,12 @@ msgstr "Uw invoer kan niet geopend worden"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC kon de MRL '%s' niet openen. Controleer het logboek voor details."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1767,7 +1768,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5023,7 +5025,8 @@ msgid "Browser Stop"
 msgstr "Browser stoppen"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6882,7 +6885,8 @@ msgstr ""
 "Tv-kanalen worden gegroepeerd op transponder (multiplex) bij een gegeven "
 "frequentie. Dit is vereist om de ontvanger af te stemmen."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulatie / Constellatie"
 
@@ -7699,7 +7703,8 @@ msgstr "Aantal kanalen van een elementaire audiostream"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Breedte"
@@ -8683,7 +8688,8 @@ msgstr "Radio-apparaat"
 msgid "Radio tuner device node."
 msgstr "Radiotuner-aparaatnode."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Frequentie"
 
@@ -10699,29 +10705,28 @@ msgid "K Audio Interface audio output"
 msgstr "K Audio interface audio-uitvoer"
 
 #: modules/audio_output/mmdevice.c:1293 modules/gui/qt/ui/sprefs_audio.h:419
-#, fuzzy
 msgid "HDMI/SPDIF audio passthrough"
-msgstr "S/PDIF pass-through-decoder"
+msgstr "HDMI/SPDIF-audiodoorvoer"
 
 #: modules/audio_output/mmdevice.c:1295
 msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
+"Wijzig deze waarde als u problemen heeft met hd-codecs bij gebruik van een "
+"hdmi-ontvanger"
 
 #: modules/audio_output/mmdevice.c:1302
-#, fuzzy
 msgid "Disabled"
-msgstr "Uitschakelen"
+msgstr "Uitgeschakeld"
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
-msgstr ""
+msgstr "Ingeschakeld (zonder hd-codecs)"
 
 #: modules/audio_output/mmdevice.c:1304
-#, fuzzy
 msgid "Enabled"
-msgstr "Inschakelen"
+msgstr "Ingeschakeld"
 
 #: modules/audio_output/mmdevice.c:1309
 msgid "Windows Multimedia Device output"
@@ -16605,7 +16610,8 @@ msgid "Name"
 msgstr "Naam"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Auteur"
@@ -18813,7 +18819,8 @@ msgid "sec."
 msgstr "seconden"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -20493,10 +20500,11 @@ msgid "Extract"
 msgstr "Extract"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20508,7 +20516,8 @@ msgstr "&Sluiten"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Converteren"
 
@@ -20932,7 +20941,8 @@ msgstr "Versie"
 msgid "Website"
 msgstr "Website"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Bestanden"
 
@@ -23964,7 +23974,8 @@ msgstr "MPEG video"
 msgid "VC-1 packetizer"
 msgstr "VC-1 packetizer"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf-netwerkdiensten"
 
@@ -29892,53 +29903,68 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Mediabeheerlijst"
 
-#~ msgid "Screen capture (with Wayland)"
-#~ msgstr "Schermopname (met Wayland)"
-
-#~ msgid "+-[Streaming]"
-#~ msgstr "+-[Streamen]"
-
-#~ msgid "| packets sent     :    %5<PRIi64>"
-#~ msgstr "| pakketten verzonden     :    %5<PRIi64>"
-
-#~ msgid "| bytes sent       : %8.0f KiB"
-#~ msgstr "| bytes verzonden       : %8.0f KiB"
-
-#~ msgid "| sending bitrate  :   %6.0f kb/s"
-#~ msgstr "| verzend-bitrate  :   %6.0f kb/s"
-
-#~ msgid "Streaming"
-#~ msgstr "Streamen"
-
-#~ msgid "Sent packets"
-#~ msgstr "Verstuurde paketten"
-
-#~ msgid "Sent bytes"
-#~ msgstr "Verstuurde bytes"
-
-#~ msgid "Send rate"
-#~ msgstr "Verzendsnelheid"
-
 #~ msgid "Output/Written/Sent"
 #~ msgstr "Uitvoer/geschreven/verzonden"
 
 #~ msgid "Sent"
 #~ msgstr "Verzonden"
 
+#, fuzzy
+#~ msgid "Screen capture (with Wayland)"
+#~ msgstr "Schermopname (met X11/XCB)"
+
+#, fuzzy
+#~ msgid "+-[Streaming]"
+#~ msgstr "+-[Binnenkomend]"
+
+#, fuzzy
+#~ msgid "| packets sent     :    %5<PRIi64>"
+#~ msgstr "| beelden verloren           :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "| bytes sent       : %8.0f KiB"
+#~ msgstr "| invoer bytes gelezen : %8.0f KiB"
+
+#, fuzzy
+#~ msgid "| sending bitrate  :   %6.0f kb/s"
+#~ msgstr "| invoerbitrate    :   %6.0f kb/s"
+
+#, fuzzy
+#~ msgid "Streaming"
+#~ msgstr "Stream"
+
+#, fuzzy
+#~ msgid "Sent packets"
+#~ msgstr "Groepeer pakketten"
+
+#, fuzzy
+#~ msgid "Sent bytes"
+#~ msgstr "%s bytes"
+
+#, fuzzy
+#~ msgid "Send rate"
+#~ msgstr "Samplerate"
+
+#, fuzzy
 #~ msgid "packets"
-#~ msgstr "paketten"
+#~ msgstr "packetizer"
 
+#, fuzzy
 #~ msgid "Upstream rate"
-#~ msgstr "Uitgaande bitrate"
+#~ msgstr "Stream-bitrate"
 
+#, fuzzy
 #~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround:"
+#~ msgstr "Dolby Surround"
 
+#, fuzzy
 #~ msgid "Headphone surround effect"
-#~ msgstr "Koptelefoon surround-effect"
+#~ msgstr "Koptelefoon-effect"
 
+#, fuzzy
 #~ msgid "x264 preset and tuning selection"
-#~ msgstr "x264 preset- en afstemmingselectie"
+#~ msgstr "x264 profiel- en niveauselectie"
 
+#, fuzzy
 #~ msgid "Display device"
-#~ msgstr "Weergaveapparaat"
+#~ msgstr "Schijfapparaat"
