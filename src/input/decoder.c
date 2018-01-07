@@ -892,7 +892,8 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             if( DecoderPlaySout( p_dec, p_sout_block ) == VLC_EGENERIC )
             {
-                msg_Err( p_dec, "cannot continue streaming due to errors" );
+                msg_Err( p_dec, "cannot continue streaming due to errors with codec %4.4s",
+                                (char *)&p_owner->fmt.i_codec );
 
                 p_owner->error = true;
 
