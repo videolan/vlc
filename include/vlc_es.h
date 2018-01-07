@@ -206,7 +206,7 @@ typedef enum video_orientation_t
 #define ORIENT_HFLIP(orient) ((orient) ^ 1)
 /** Applies vertical flip to an orientation */
 #define ORIENT_VFLIP(orient) ((orient) ^ 2)
-/** Applies horizontal flip to an orientation */
+/** Applies 180 degree rotation to an orientation */
 #define ORIENT_ROTATE_180(orient) ((orient) ^ 3)
 
 typedef enum video_transform_t
