@@ -1,5 +1,5 @@
 # Serbian translation
-# Copyright (C) 2017 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -13,13 +13,12 @@
 # Serbian linux distribution cp6Linux
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Предраг Љубеновић <predragljubenovic@gmail.com>\n"
-"Language-Team: Serbian (http://www.transifex.com/yaron/vlc-trans/language/"
-"sr/)\n"
+"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"Language-Team: Serbian (https://www.transifex.com/yaron/teams/16553/sr/)\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,8 +82,8 @@ msgstr "Поставке управљачких интерфејса VLC-а"
 msgid "Hotkeys settings"
 msgstr "Поставке тастерских пречица"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -191,9 +190,8 @@ msgid ""
 msgstr "Поставке екранског менија, текстуалних и сликовних титлова"
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Разделник"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -647,9 +645,8 @@ msgid "Spectrum"
 msgstr "Спектар"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Мерач јачине звука"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -665,9 +662,8 @@ msgid "Stereo audio mode"
 msgstr "Стерео режим рада"
 
 #: src/audio_output/output.c:421
-#, fuzzy
 msgid "Original"
-msgstr "Изворни ID"
+msgstr ""
 
 #: src/audio_output/output.c:427 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -725,7 +721,8 @@ msgstr "Слушалице"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Аутоматско"
@@ -788,14 +785,12 @@ msgid ""
 msgstr ""
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr " (подразумевано омогућено)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr " (подразумевано онемогућено)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -939,9 +934,9 @@ msgid "Yes"
 msgstr "Да"
 
 #: src/input/es_out.c:2132
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Помоћни натписи %u"
+msgstr ""
 
 #: src/input/es_out.c:2134
 #, c-format
@@ -969,8 +964,8 @@ msgstr "Језик"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Опис"
 
@@ -1028,9 +1023,8 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3133
-#, fuzzy
 msgid "Video resolution"
-msgstr "Жељена видео-резолуција"
+msgstr ""
 
 #: src/input/es_out.c:3138
 msgid "Buffer dimensions"
@@ -1051,49 +1045,40 @@ msgid "Decoded format"
 msgstr "Декодирани формат"
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Top left"
-msgstr "Лево"
+msgstr ""
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Left top"
-msgstr "Лево"
+msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Right bottom"
-msgstr "Дно"
+msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Top right"
-msgstr "Ауторска право"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom left"
-msgstr "Доле лево"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom right"
-msgstr "Доле десно"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Left bottom"
-msgstr "Дно"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Right top"
-msgstr "Десно"
+msgstr ""
 
 #: src/input/es_out.c:3169
-#, fuzzy
 msgid "Orientation"
-msgstr "Одрериште"
+msgstr ""
 
 #: src/input/es_out.c:3175 src/input/es_out.c:3193 src/input/es_out.c:3211
 #: src/input/es_out.c:3225 src/playlist/tree.c:67
@@ -1102,19 +1087,16 @@ msgid "Undefined"
 msgstr "Недефинисано"
 
 #: src/input/es_out.c:3177
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 линија / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3179
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 линија / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3187
-#, fuzzy
 msgid "Color primaries"
-msgstr "Обојене поруке"
+msgstr ""
 
 #: src/input/es_out.c:3194 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1126,14 +1108,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3205
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Обртање боје"
+msgstr ""
 
 #: src/input/es_out.c:3218
-#, fuzzy
 msgid "Color space"
-msgstr "Обојене поруке"
+msgstr ""
 
 #: src/input/es_out.c:3218
 #, c-format
@@ -1141,9 +1121,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3220
-#, fuzzy
 msgid "Full"
-msgstr "Пун бас"
+msgstr ""
 
 #: src/input/es_out.c:3227 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1157,29 +1136,24 @@ msgid "Center"
 msgstr "Центар"
 
 #: src/input/es_out.c:3228
-#, fuzzy
 msgid "Top Left"
-msgstr "Горе лево"
+msgstr ""
 
 #: src/input/es_out.c:3229
-#, fuzzy
 msgid "Top Center"
-msgstr "Центар"
+msgstr ""
 
 #: src/input/es_out.c:3230
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Доле лево"
+msgstr ""
 
 #: src/input/es_out.c:3231
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Доле лево"
+msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Chroma location"
-msgstr "Појачање обојености"
+msgstr ""
 
 #: src/input/es_out.c:3244
 msgid "Rectangular"
@@ -1190,14 +1164,12 @@ msgid "Equirectangular"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Cubemap"
-msgstr "Коцка"
+msgstr ""
 
 #: src/input/es_out.c:3256
-#, fuzzy
 msgid "Projection"
-msgstr "Заштита од одсецања"
+msgstr ""
 
 #: src/input/es_out.c:3258
 msgid "Yaw"
@@ -1216,14 +1188,12 @@ msgid "Field of view"
 msgstr ""
 
 #: src/input/es_out.c:3269
-#, fuzzy
 msgid "Max. luminance"
-msgstr "Денс"
+msgstr ""
 
 #: src/input/es_out.c:3274
-#, fuzzy
 msgid "Min. luminance"
-msgstr "Денс"
+msgstr ""
 
 #: src/input/es_out.c:3282
 msgid "Primary R"
@@ -1238,9 +1208,8 @@ msgid "Primary B"
 msgstr ""
 
 #: src/input/es_out.c:3303
-#, fuzzy
 msgid "White point"
-msgstr "Бела"
+msgstr ""
 
 #: src/input/es_out.c:3318 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1256,11 +1225,12 @@ msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "VLC не може да отвори MRL „%s“. Погледајте дневник за више информација."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1354,14 +1324,12 @@ msgid "Actors"
 msgstr "Глумци"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Извођач"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Број записа"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1402,14 +1370,12 @@ msgid "Previous title"
 msgstr "Претходни наслов"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Дужина трајања"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Дужина трајања"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1561,13 +1527,10 @@ msgid "Color messages"
 msgstr "Обојене поруке"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Ово омогућава бојење порука које се шаљу у конзолу. Терминалу је потребна "
-"Линуксова подршка за боје како би бојење радило."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1619,9 +1582,8 @@ msgstr ""
 "аутоматски одабере најбољи метод који је доступан."
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Време – медији"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1641,38 +1603,32 @@ msgstr ""
 "одиграти, те ће се очувати процесорска моћ."
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Музикална"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Локација"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "Игрица"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Појачање"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Одрериште"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Продуцент"
+msgstr ""
 
 #: src/libvlc-module.c:144
-#, fuzzy
 msgid "Accessibility"
-msgstr "Приступни модул"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1723,13 +1679,10 @@ msgstr ""
 "Овим бирате који ћете прикључак користити за поновно узимање узорака звука."
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"Ово подешава који ће се аудио излазни канали користити када је то могуће "
-"(нпр. ако ваш хардвер то подржава као и аудио ток који се репродукује)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1759,7 +1712,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2083,9 +2037,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "Увек прилажи видео прозор изнад других прозора."
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Укључи мод позадине"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2681,9 +2634,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "ID тока титл траке који се користи."
 
 #: src/libvlc-module.c:616
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "Листа жељених декодера"
+msgstr ""
 
 #: src/libvlc-module.c:620
 msgid "Preferred video resolution"
@@ -2809,14 +2761,12 @@ msgstr ""
 "time=optional-time-offset,bytes=optional-byte-offset},{...}\""
 
 #: src/libvlc-module.c:675
-#, fuzzy
 msgid "Record directory"
-msgstr "Изворни дирекотријум"
+msgstr ""
 
 #: src/libvlc-module.c:677
-#, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "Директоријум или име датотеке за складиштење снимака"
+msgstr ""
 
 #: src/libvlc-module.c:679
 msgid "Prefer native stream recording"
@@ -2893,14 +2843,12 @@ msgstr ""
 "Испробајте неколико позиција."
 
 #: src/libvlc-module.c:714
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Енкодирање текстуалних титлова"
+msgstr ""
 
 #: src/libvlc-module.c:715
-#, fuzzy
 msgid "Changes the subtitles size where possible"
-msgstr "Одабери титл"
+msgstr ""
 
 #: src/libvlc-module.c:717
 msgid "Enable sub-pictures"
@@ -3065,9 +3013,8 @@ msgid "TCP connection timeout"
 msgstr "Време чекања на TCP везу"
 
 #: src/libvlc-module.c:805
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "Подразумевано време чекања на TCP везу (у милисекундама)."
+msgstr ""
 
 #: src/libvlc-module.c:807
 msgid "HTTP server address"
@@ -3460,19 +3407,16 @@ msgid "Stream filter module"
 msgstr "Модул филтера за ток"
 
 #: src/libvlc-module.c:1003
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "Видео-филтери се користе за обраду видео-записа."
+msgstr ""
 
 #: src/libvlc-module.c:1005
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Модул филтера за ток"
+msgstr ""
 
 #: src/libvlc-module.c:1007
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "Видео-филтери се користе за обраду видео-записа."
+msgstr ""
 
 #: src/libvlc-module.c:1009
 msgid "Demux module"
@@ -3562,16 +3506,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1052
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "Листа жељених паковаоца"
+msgstr ""
 
 #: src/libvlc-module.c:1054
-#, fuzzy
 msgid "List of keystores that VLC will use in priority."
 msgstr ""
-"Ово вам омогућава да одаберете списак приоритетних енкодера које ће VLC "
-"користити."
 
 #: src/libvlc-module.c:1056
 msgid "Locally collect statistics"
@@ -3661,9 +3601,8 @@ msgstr ""
 "пуштање и настави са пуштањем тренутне ставке."
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC медија плејер надоградња"
+msgstr ""
 
 #: src/libvlc-module.c:1099
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3678,28 +3617,22 @@ msgstr ""
 "промене у дијалогу прозора листе за пуштање."
 
 #: src/libvlc-module.c:1111
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "Аутоматски припреми фајлове за анализу"
+msgstr ""
 
 #: src/libvlc-module.c:1113
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"Аутоматски припреми фајлове додане у листу за пуштање за анализу (због "
-"поновног узимања мета података)."
 
 #: src/libvlc-module.c:1116
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Дужина трајања"
+msgstr ""
 
 #: src/libvlc-module.c:1118
-#, fuzzy
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr "Вредност кеширања за фотоапарате и микрофоне (у милисекундама)."
+msgstr ""
 
 #: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3744,9 +3677,8 @@ msgstr ""
 "листе за пуштање. Употребите листу екстензија одвојених зарезом."
 
 #: src/libvlc-module.c:1141
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Прикажи детаље"
+msgstr ""
 
 #: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
@@ -3814,16 +3746,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr ""
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Start paused"
-msgstr "Време почетка"
+msgstr ""
 
 #: src/libvlc-module.c:1176
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
 msgstr ""
-"Уврсти ставке у листу за пуштање када се ради у режиму рада једног примерка "
-"програма"
 
 #: src/libvlc-module.c:1178
 msgid "Auto start"
@@ -3876,14 +3804,12 @@ msgid "Ignore"
 msgstr "Игнориши"
 
 #: src/libvlc-module.c:1208
-#, fuzzy
 msgid "Volume control"
-msgstr "Контрола звука"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control"
-msgstr "Позиција"
+msgstr ""
 
 #: src/libvlc-module.c:1209
 msgid "Position control reversed"
@@ -4165,44 +4091,40 @@ msgid "Navigate up"
 msgstr "Управљање ка горе"
 
 #: src/libvlc-module.c:1290
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr "Изаберите тастер за померање селектора на горе у DVD менијима."
+msgstr ""
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
 msgstr "Управљање ка доле"
 
 #: src/libvlc-module.c:1292
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr "Изаберите тастер за померање селектора на доле у DVD менијима."
+msgstr ""
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
 msgstr "Управљање ка лево"
 
 #: src/libvlc-module.c:1294
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr "Изаберите тастер за померање селектора на лево у DVD менијима."
+msgstr ""
 
 #: src/libvlc-module.c:1295
 msgid "Navigate right"
 msgstr "Управљање ка десно"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr "Изаберите тастер за померање селектора на десно у DVD менијима."
+msgstr ""
 
 #: src/libvlc-module.c:1297
 msgid "Activate"
@@ -4296,24 +4218,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "Изаберите тастер за смањивање кашњења титла."
 
 #: src/libvlc-module.c:1319
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Телетекст титл декодер"
+msgstr ""
 
 #: src/libvlc-module.c:1320
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Одабери титл"
+msgstr ""
 
 #: src/libvlc-module.c:1321
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Одабери титл"
+msgstr ""
 
 #: src/libvlc-module.c:1322
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "Изаберите тастер за померање титла нагоре."
+msgstr ""
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4529,14 +4447,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "Циклично прођи кроз доступне аудио траке (језике)"
 
 #: src/libvlc-module.c:1385
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "Циклус титла траке"
+msgstr ""
 
 #: src/libvlc-module.c:1386
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Прођи циклично кроз доступне титл траке."
+msgstr ""
 
 #: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
@@ -4547,14 +4463,12 @@ msgid "Cycle through the available subtitle tracks."
 msgstr "Прођи циклично кроз доступне титл траке."
 
 #: src/libvlc-module.c:1389
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "Телетекст титлови"
+msgstr ""
 
 #: src/libvlc-module.c:1390
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "Циклус титла траке"
+msgstr ""
 
 #: src/libvlc-module.c:1391
 msgid "Cycle next program Service ID"
@@ -4927,7 +4841,8 @@ msgid "Browser Stop"
 msgstr "Заустави – прегледач"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5287,13 +5202,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr "Преузета датотека \"%s\" је оштећена. Те је обрисана."
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"Нова верзија је успешно преузета. Да ли желиш да затвориш VLC и да га "
-"инсталираш сада?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6068,14 +5980,12 @@ msgid "AVFoundation Video Capture"
 msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Модул звучног излаза"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Име видео уређаја"
+msgstr ""
 
 #: modules/access/avcapture.m:287
 msgid ""
@@ -6173,9 +6083,8 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 
 #: modules/access/bluray.c:794
-#, fuzzy
 msgid "Java required"
-msgstr "Обавезан је SDP"
+msgstr ""
 
 #: modules/access/bluray.c:795
 #, c-format
@@ -6240,24 +6149,20 @@ msgid "CDDB Server port to use."
 msgstr "CDDB порт сервера који се користи."
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Списак уноса"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr "Списак активних прозора, одвојеих зарезом, подразумевано све"
+msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "Локација"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "TCP командни улаз"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6268,9 +6173,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "M3U фајл"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6368,9 +6272,8 @@ msgid "Composite"
 msgstr "Сложено"
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-видео"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6448,13 +6351,10 @@ msgid "Audio device name"
 msgstr "Име аудио уређаја"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"Име видео уређаја који ће употребљавати DirectShow додатак. Ако не одредите "
-"ниједан, користиће се подразумевани уређај."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:792
@@ -6658,23 +6558,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Украаси прозора"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
 msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "SMB улаз"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Модули за откривање сервиса"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -6732,7 +6629,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -6872,9 +6770,8 @@ msgid "Layer C time interleaving"
 msgstr ""
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "Филтери тока"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -7131,9 +7028,8 @@ msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "одабрана листа"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -7144,9 +7040,8 @@ msgid "Use NIT for scanning services"
 msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -7160,9 +7055,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "одабрана листа"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7193,9 +7087,8 @@ msgid "DVDnav Input"
 msgstr "DVDnav Улаз"
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "Nuv демултиплексер"
+msgstr ""
 
 #: modules/access/dvdnav.c:294 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -7257,9 +7150,8 @@ msgid "Directory"
 msgstr "Директоријум"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "Специјални модули"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7278,11 +7170,10 @@ msgstr "Корисничко име"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "Корисничко име које ће се користити за повезивање."
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7299,11 +7190,10 @@ msgstr "Шифра"
 
 #: modules/access/ftp.c:72 modules/access/rdp.c:69 modules/access/sftp.c:59
 #: modules/access/smb_common.h:25
-#, fuzzy
 msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
-msgstr "Лозинка која ће се користити за повезивање."
+msgstr ""
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7314,14 +7204,13 @@ msgid "Account that will be used for the connection."
 msgstr "Налог који ће се користити за повезивање."
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "SFTP провера идентитета"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "Унесите исправно корисничко име и лозинку за подручје %s."
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7393,14 +7282,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Унесите исправно корисничко име и лозинку за подручје %s."
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "HTTP улаз"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7411,14 +7298,12 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "Корак унапред"
+msgstr ""
 
 #: modules/access/http/access.c:301
-#, fuzzy
 msgid "Forward cookies across HTTP redirections."
-msgstr "Проследите колачиће преко HTTP преусмерења."
+msgstr ""
 
 #: modules/access/http/access.c:302
 msgid "Referrer"
@@ -7429,9 +7314,8 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Кориснички агент"
+msgstr ""
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7510,7 +7394,8 @@ msgstr "Број канала основног звучног тока"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Ширина"
@@ -7591,14 +7476,12 @@ msgid "Memory input"
 msgstr "Улаз меморије"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Уклони изабрано"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Псеудо излазни ток"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7851,19 +7734,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Нема улаза"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Сесија није успела"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7904,18 +7784,16 @@ msgid "PulseAudio input"
 msgstr "PulseAudio улаз"
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "Окружење"
+msgstr ""
 
 #: modules/access/qtsound.m:60
 msgid "QuickTime Sound Capture"
 msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Није пронађен улаз"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
 msgid ""
@@ -7924,9 +7802,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Није пронађен улаз"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8069,9 +7946,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Изаберите ток"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8313,9 +8189,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr "Домен/Радна група која ће се користити за повезивање."
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "SFTP провера идентитета"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8326,14 +8201,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:288 modules/access_output/srt.c:311
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:289
-#, fuzzy
 msgid "SRT input"
-msgstr "SFTP улаз"
+msgstr ""
 
 #: modules/access/srt.c:294 modules/access_output/srt.c:317
 msgid "SRT chunk size (bytes)"
@@ -8344,9 +8217,8 @@ msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
 
 #: modules/access/srt.c:297 modules/access_output/srt.c:320
-#, fuzzy
 msgid "SRT latency (ms)"
-msgstr "DTS кашњење (ms)"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8365,9 +8237,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr ""
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "SAP прекид (секунде)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8443,14 +8314,14 @@ msgstr "Радио уређај"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Фреквенција"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "ID тјунера (погледајте дневник отклањања грешака)."
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8973,14 +8844,12 @@ msgid "VNC client access"
 msgstr ""
 
 #: modules/access/wasapi.c:485
-#, fuzzy
 msgid "Loopback mode"
-msgstr "Понављај једно"
+msgstr ""
 
 #: modules/access/wasapi.c:486
-#, fuzzy
 msgid "Record an audio rendering endpoint."
-msgstr "Омогући/Онемогући аудио рендеровање"
+msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -8999,9 +8868,8 @@ msgid "Keep existing file"
 msgstr "Задржи постојећу датотеку"
 
 #: modules/access_output/file.c:316
-#, fuzzy
 msgid "Overwrite"
-msgstr "Пређи преко странице"
+msgstr ""
 
 #: modules/access_output/file.c:317
 msgid ""
@@ -9010,9 +8878,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/file.c:375
-#, fuzzy
 msgid "Overwrite existing file"
-msgstr "Задржи постојећу датотеку"
+msgstr ""
 
 #: modules/access_output/file.c:377
 msgid "If the file already exists, it will be overwritten."
@@ -9035,9 +8902,8 @@ msgid "Perform ISO C time and date formatting on the file path"
 msgstr ""
 
 #: modules/access_output/file.c:384
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Синхронизација"
+msgstr ""
 
 #: modules/access_output/file.c:385
 msgid "Open the file with synchronous writing."
@@ -9048,9 +8914,8 @@ msgid "File stream output"
 msgstr "Излаз тока фајла"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Корисничко име које ће бити захтевано за приступ току."
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9066,9 +8931,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -9097,9 +8961,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/livehttp.c:74
-#, fuzzy
 msgid "Number of segments"
-msgstr "Број колона"
+msgstr ""
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
@@ -9126,9 +8989,8 @@ msgid "Full URL to put in index file"
 msgstr "Пуна адреса која ће се ставити у индексну датотеку"
 
 #: modules/access_output/livehttp.c:84
-#, fuzzy
 msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "Пуна адреса која ће се ставити у индексну датотеку"
+msgstr ""
 
 #: modules/access_output/livehttp.c:87
 msgid "Delete segments"
@@ -9143,14 +9005,12 @@ msgid "Use muxers rate control mechanism"
 msgstr ""
 
 #: modules/access_output/livehttp.c:92
-#, fuzzy
 msgid "AES key URI to place in playlist"
-msgstr "Претражи у Листи за пуштање"
+msgstr ""
 
 #: modules/access_output/livehttp.c:94
-#, fuzzy
 msgid "AES key file"
-msgstr "Направи нови профил"
+msgstr ""
 
 #: modules/access_output/livehttp.c:95
 msgid "File containing the 16 bytes encryption key"
@@ -9176,9 +9036,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Број редова"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -9226,51 +9085,44 @@ msgid "Genre description"
 msgstr "Опис жанра"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "Жанр садржаја."
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Опис"
+msgstr ""
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
 msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "Циљана брзина транскодованог видео тока."
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "Циљана брзина транскодованог видео тока."
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "Број канала"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "Број аудио канала у транскодованим токовима."
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Квалитет Ogg Vorbis-а"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Циљана брзина транскодованог видео тока."
+msgstr ""
 
 #: modules/access_output/shout.c:104
-#, fuzzy
 msgid "Stream public"
-msgstr "Излаз тока"
+msgstr ""
 
 #: modules/access_output/shout.c:105
 msgid ""
@@ -9284,9 +9136,8 @@ msgid "IceCAST output"
 msgstr "IceCAST излаз"
 
 #: modules/access_output/srt.c:312
-#, fuzzy
 msgid "SRT stream output"
-msgstr "RTP излаз тока"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9545,9 +9396,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:76
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Визуализација"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9636,18 +9486,16 @@ msgid "Attack time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr "Подразумевано време чекања на TCP везу (у милисекундама)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "Подразумевано време чекања на TCP везу (у милисекундама)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9664,9 +9512,8 @@ msgid "Ratio"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Однос пропорције: %s"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9674,9 +9521,8 @@ msgid "Knee radius"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:171
-#, fuzzy
 msgid "Set the knee radius in dB."
-msgstr "Поставите пораст нивоа у dB (0 … 24)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9702,9 +9548,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "Аудио филтер за PCM формат конверзију"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "Аудио филтер за A/52->S/PDIF енкапсулацију"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -9958,14 +9803,12 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Квалитет исцртавања"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "Модул за поновно узимање узорака звука"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10019,9 +9862,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Аудио канали"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
@@ -10261,9 +10103,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:484
-#, fuzzy
 msgid "Audio device is not configured"
-msgstr "Име аудио уређаја"
+msgstr ""
 
 #: modules/audio_output/coreaudio_common.c:485
 msgid ""
@@ -10394,33 +10235,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
-#, fuzzy
 msgid "Disabled"
-msgstr "Онемогући"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1304
-#, fuzzy
 msgid "Enabled"
-msgstr "Укључи"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1309
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "Прозорски GDI видео излаз"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Output back-end"
-msgstr "Излазни уређај"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Праг излазног аудио нивоа"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10514,9 +10350,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr ""
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10527,9 +10362,8 @@ msgid "Raw audio encoder"
 msgstr "Неуобличени аудио енкодер"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "Додај у фајл"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
@@ -10548,30 +10382,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "X координата направљеног титла"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "Рендерер текста"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "X координата направљеног титла"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "DVB декодер титлова"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "DVB титлови"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -11057,14 +10886,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:354
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -11111,28 +10938,24 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "Интервал кључног фрејма:"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
 msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Theora видео паковалац"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "Theora видео енкодер"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11424,14 +11247,11 @@ msgid "Formatted Subtitles"
 msgstr "Форматирани Титлови"
 
 #: modules/codec/kate.c:192
-#, fuzzy
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Неки титл формати дозвољавају форматирање текста. VLC делимично имплементира "
-"ово, али можете да изаберете да онемогућите сва форматирања."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11694,29 +11514,24 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "MPEG аудио декодер"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Theora видео паковалац"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "Директно рендеровање"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "Директно рендеровање"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -11950,9 +11765,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "Псеудо неуобличени видео паковалац"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Theora видео енкодер"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12326,9 +12140,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr ""
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "G.711 декодер"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12339,9 +12152,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "G.711 декодер"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12743,23 +12555,20 @@ msgid "Image height"
 msgstr "Висина слике"
 
 #: modules/codec/svg.c:53
-#, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "Одредите модул расплитања за коришћење."
+msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
 msgstr "Фактор размере"
 
 #: modules/codec/svg.c:55
-#, fuzzy
 msgid "Scale factor to apply to image"
-msgstr "Фактор размене за примену на видео у току транскодовања (пример: 0.25)"
+msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "PNG видео декодер"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12806,9 +12615,8 @@ msgid "Teletext subtitles decoder"
 msgstr "Телетекст титл декодер"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "Декодер текстуалних титлова "
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -12835,23 +12643,20 @@ msgid "Theora video encoder"
 msgstr "Theora видео енкодер"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "декодер"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "EBU STL декодер титлова"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "TTA демултиплексер"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12898,9 +12703,8 @@ msgid "Ulead DV audio decoder"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:80
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Хардверско декодирање"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
@@ -12913,9 +12717,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "Theora видео декодер"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12955,9 +12758,8 @@ msgid "Vorbis audio encoder"
 msgstr "Vorbis аудио енкодер"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Тихи режим рада"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -12972,24 +12774,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Theora видео енкодер"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "декодер"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "EBU STL декодер титлова"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "Анализатор текстуалних титлова"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13000,14 +12798,11 @@ msgid "Maximum GOP size"
 msgstr "Максимална GOP величина"
 
 #: modules/codec/x264.c:72
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames. Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"Подешава максимални интервал између IDR-оквира.Веће вредности чувају битове, "
-"и на тај начин побољшава дату брзину на рачун прецизности тражења."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13094,13 +12889,10 @@ msgid "Adaptive B-frame decision"
 msgstr "Адаптивна одлука B-оквира"
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"Приморај одређени број узастопних B-оквира да се користе, осим вероватно пре "
-"I-оквира."
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -13433,7 +13225,6 @@ msgid "Partitions to consider"
 msgstr "Партиције за разматрање"
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -13443,13 +13234,6 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"Партиције за разматрање у режиму анализе: \n"
-" - ништа  : \n"
-" - брзо  : i4x4\n"
-" - нормално: i4x4,p8x8,(i8x8)\n"
-" - споро  : i4x4,p8x8,(i8x8),b8x8\n"
-" - све   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
-"(p4x4 захтева p8x8. i8x8 захтева 8x8dct)."
 
 #: modules/codec/x264.c:282
 msgid "Direct MV prediction mode"
@@ -13460,16 +13244,12 @@ msgid "Direct prediction size"
 msgstr "Величина директног предвиђања"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"Директна величина предикције:  -  0: 4x4\n"
-" -  1: 8x8\n"
-" - -1: најмања могућа према нивоу\n"
 
 #: modules/codec/x264.c:291
 msgid "Weighted prediction for B-frames"
@@ -13496,7 +13276,6 @@ msgid "Integer pixel motion estimation method"
 msgstr ""
 
 #: modules/codec/x264.c:301
-#, fuzzy
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -13505,11 +13284,6 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
-"Изаберите алгоритам процене кретања:  - dia: претрага дијаманта, радијус 1 "
-"(брзо)\n"
-" - hex: хексагонална претрага, радијус 2\n"
-" - umh: неједнака мулти-хексагонална претрага (боље али спорије)\n"
-" - esa: исцпрна претрага (преспоро, само за тестирање)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -13607,7 +13381,6 @@ msgid "Trellis RD quantization"
 msgstr "RD квантизација решетке"
 
 #: modules/codec/x264.c:352
-#, fuzzy
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -13615,11 +13388,6 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
-"RD квантизација решетке: \n"
-" - 0: онемогућено\n"
-" - 1: омогућено само на финалном енкодирању MB-а\n"
-" - 2: омогућено за све одлуке начина рада\n"
-"Ово захтева CABAC."
 
 #: modules/codec/x264.c:358
 msgid "Early SKIP detection on P-frames"
@@ -13634,13 +13402,10 @@ msgid "Coefficient thresholding on P-frames"
 msgstr "Коефицијент прага на P-оквирима"
 
 #: modules/codec/x264.c:362
-#, fuzzy
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"Коефицијент прага на P-оквирима.Уклоните dct блокове који садрже само мали "
-"коефицијент."
 
 #: modules/codec/x264.c:365
 msgid "Use Psy-optimizations"
@@ -13782,9 +13547,8 @@ msgid "Default preset setting used"
 msgstr ""
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Напредне опције"
+msgstr ""
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
@@ -13860,9 +13624,8 @@ msgid "frame alternation"
 msgstr ""
 
 #: modules/codec/x264.c:445
-#, fuzzy
 msgid "2D"
-msgstr "F2"
+msgstr ""
 
 #: modules/codec/x264.c:449
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -13912,9 +13675,8 @@ msgid "Output teletext subtitles as text instead of as RGBA."
 msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "Ниво Одјека"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -14161,9 +13923,9 @@ msgid "Subtitle position %d px"
 msgstr "Позиција титла %d px"
 
 #: modules/control/hotkeys.c:1355
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Енкодирање текстуалних титлова"
+msgstr ""
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -14224,9 +13986,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "Адреса HTTP сервера"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -14689,19 +14450,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Windows Service интерфејс"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "Маскимална ширина видеа"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "Максимална висина видеа"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -14712,9 +14470,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "Алтернатива"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -14725,23 +14482,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Медитација"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "Проток (MHz)"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "Ширина видеа"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -14752,9 +14506,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "Медитација"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -14928,14 +14681,12 @@ msgid "Dirac video demuxer"
 msgstr ""
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "DirectShow улаз"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "Зрнасти видео филтер"
+msgstr ""
 
 #: modules/demux/flac.c:50
 msgid "FLAC demuxer"
@@ -15062,9 +14813,8 @@ msgstr ""
 "Прочитај и одбаци непознате EBML елементе (није добро за покварене фајлове)."
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Изабери директоријум"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -15084,10 +14834,8 @@ msgid "Reverberation level (from 0 to 100, default value is 0)."
 msgstr "Ниво одјека (од 0 до 100, подразумевана вредност је 0)."
 
 #: modules/demux/mod.c:59
-#, fuzzy
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
 msgstr ""
-"Кашњење одјека, у милисекундама (ms). Вредности су обично од 40 до 200ms."
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -15156,9 +14904,8 @@ msgid "Composer"
 msgstr "Композитор"
 
 #: modules/demux/mp4/meta.c:70
-#, fuzzy
 msgid "Producer"
-msgstr "Продуцент"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
 #: modules/gui/qt/components/controller.hpp:112
@@ -15167,38 +14914,32 @@ msgid "Information"
 msgstr "Информација"
 
 #: modules/demux/mp4/meta.c:72
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Одбаци"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:73
-#, fuzzy
 msgid "Requirements"
-msgstr "Сегменти"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:74
-#, fuzzy
 msgid "Original Format"
-msgstr "Изворни ID"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:75
-#, fuzzy
 msgid "Display Source As"
-msgstr "Подешавање приказа"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:76
-#, fuzzy
 msgid "Host Computer"
-msgstr "Компјутер"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:77
 msgid "Performers"
 msgstr "Извођачи"
 
 #: modules/demux/mp4/meta.c:78
-#, fuzzy
 msgid "Original Performer"
-msgstr "Извођачи"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
@@ -15209,9 +14950,8 @@ msgid "Warning"
 msgstr "Упозорење"
 
 #: modules/demux/mp4/meta.c:81
-#, fuzzy
 msgid "Software"
-msgstr "Мекано"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
 #: modules/demux/xiph_metadata.h:64
@@ -15219,54 +14959,44 @@ msgid "Lyrics"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:83
-#, fuzzy
 msgid "Record Company"
-msgstr "Изворни дирекотријум"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:84
-#, fuzzy
 msgid "Model"
-msgstr "Режим рада"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Продуцент"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
-#, fuzzy
 msgid "Grouping"
-msgstr "Група"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:88
-#, fuzzy
 msgid "Sub-Title"
-msgstr "Титл"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:89
-#, fuzzy
 msgid "Arranger"
-msgstr "Рендерер текста"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:90
-#, fuzzy
 msgid "Art Director"
-msgstr "Режисер"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:91
-#, fuzzy
 msgid "Copyright Acknowledgement"
-msgstr "Право умножавања мета података"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:92
-#, fuzzy
 msgid "Conductor"
-msgstr "Продуцент"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:93
-#, fuzzy
 msgid "Song Description"
-msgstr "Опис"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
@@ -15293,18 +15023,16 @@ msgid "Executive Producer"
 msgstr "Извршни продуцент"
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Енкодирање"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "Број медија каталога (MCN)"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15315,14 +15043,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Обриши"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "Кашњење звука"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -15337,9 +15063,8 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1679
-#, fuzzy
 msgid "Do not seek"
-msgstr "Не демултиплексирај"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1680
 msgid "Build index"
@@ -15454,13 +15179,10 @@ msgid "Packet size in bytes to decrypt"
 msgstr "Величина пакета у бајтовима за декриптовање"
 
 #: modules/demux/mpeg/ts.c:100
-#, fuzzy
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
-"Одредите величину TS пакета за дешифровање. Рутине дешифровања одузимају TS-"
-"заглавља од вредности пре дешифровања. "
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
@@ -15501,19 +15223,16 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG Transport Stream демултиплексер"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Искључите зук."
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "За овај кодек немамо опис."
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "са слушним потешкоћама"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
@@ -15719,9 +15438,8 @@ msgid "Load"
 msgstr "Учитај"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Засићење"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16012,9 +15730,8 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
-#, fuzzy
 msgid "Interfaces"
-msgstr "Интерфејс"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -16057,7 +15774,8 @@ msgid "Name"
 msgstr "Име"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Аутор"
@@ -16302,9 +16020,8 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "Корак уназад"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -16315,32 +16032,27 @@ msgstr "Напред"
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Корак унапред"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Контрола преслушавања"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Преслушавање"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Претходни наслов"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Иди на време"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -16398,9 +16110,8 @@ msgid "Setup Streaming..."
 msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "Метод Пуштања Тока"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16622,18 +16333,16 @@ msgid "Play/Pause the current media"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "Видео филтер откривања померања"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "Искључи приказ преко целог екрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16642,9 +16351,8 @@ msgid "Volume"
 msgstr "Јачина звука"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Јачина звука"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -17064,9 +16772,8 @@ msgid "Select All"
 msgstr "Изабери Све"
 
 #: modules/gui/macosx/VLCMainMenu.m:363
-#, fuzzy
 msgid "Find"
-msgstr "Пронађи: %s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:365
 msgid "View"
@@ -17387,18 +17094,17 @@ msgstr "Промешај"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr " Јачина звука: %3ld%%"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Аудио ефекти"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17419,18 +17125,16 @@ msgid "Open"
 msgstr "Отвори"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Излаз тока"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Подешавања..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Изаберите улаз"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17453,9 +17157,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Изаберите фајл"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17561,14 +17264,12 @@ msgid "Subscreen top"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "Дужина подекрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "Висина подекрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -17579,14 +17280,12 @@ msgid "Add Subtitle File:"
 msgstr "Додај титл:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "Кашњење титла %i ms"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Одабери титл"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -17686,14 +17385,12 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
-#, fuzzy
 msgid "Expand All"
-msgstr "Прошири"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:233
-#, fuzzy
 msgid "Collapse All"
-msgstr "Скупи"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -17765,30 +17462,25 @@ msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
-#, fuzzy
 msgid "Renderer discovery off"
-msgstr "Откривање сервиса"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:75
 #: modules/gui/macosx/VLCRendererMenuController.m:145
-#, fuzzy
 msgid "Enable renderer discovery"
-msgstr "Омогући одјек"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:77
-#, fuzzy
 msgid "No renderer"
-msgstr "Рендерер текста"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:134
-#, fuzzy
 msgid "Renderer discovery on"
-msgstr "Откривање сервиса"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:135
-#, fuzzy
 msgid "Disable renderer discovery"
-msgstr "Онемогући чувара екрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
@@ -17802,9 +17494,8 @@ msgid "Continue"
 msgstr "Настави"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "Увек настави"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -17940,9 +17631,8 @@ msgid "Note that these are system-wide settings."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
-#, fuzzy
 msgid "General settings"
-msgstr "Опште поставке звука"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
@@ -17961,9 +17651,8 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Немогућност репродукције"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Enable notifications on playlist item change"
@@ -17979,14 +17668,12 @@ msgid "Automatically check for updates"
 msgstr "Аутоматски провери за надоградње"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Qt интерфејс"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Интерфејс са Маском"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -18047,14 +17734,12 @@ msgid "Show video within the main window"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:353
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Пун екран"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:354
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Покрени видео у режиму пуног екрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Black screens in Fullscreen mode"
@@ -18109,9 +17794,8 @@ msgid "No check was performed yet."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:685
-#, fuzzy
 msgid "Lowest Latency"
-msgstr "Најнижи"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:687
 msgid "Low Latency"
@@ -18122,9 +17806,8 @@ msgid "Higher Latency"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Highest Latency"
-msgstr "Највиши"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:813
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -18182,39 +17865,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Репродукуј/Паузирај"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Затвори Прозор"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "Опис адресе"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "Репродукује се"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Изабери фасциклу"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Отвори &локацију из клипборда"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -18225,7 +17902,8 @@ msgid "sec."
 msgstr "сек."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Аудио/Видео"
 
@@ -18814,14 +18492,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr ""
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "Понови"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[Насумице] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -18861,9 +18537,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr " Поглавље: %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr "Понови тренутну ставку"
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -18901,9 +18576,8 @@ msgid "Teletext Activation"
 msgstr ""
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Провидност"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -19062,15 +18736,13 @@ msgid "Aspect Ratio"
 msgstr "Размера"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "Најбоље могуће"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:362
 #: modules/gui/qt/components/extended_panels.cpp:373
-#, fuzzy
 msgid "Image Files"
-msgstr "Зид за слике"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:364 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19204,9 +18876,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1333
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "Подеси VLC приоритет"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1367
 msgid "(Hastened)"
@@ -19873,10 +19544,11 @@ msgid "Extract"
 msgstr "Извези"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19888,14 +19560,14 @@ msgstr "&Затвори"
 msgid "Bytes"
 msgstr "Бајтови"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Конвертуј"
 
 #: modules/gui/qt/dialogs/convert.cpp:58
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Није изабран фајл"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:65 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19910,18 +19582,16 @@ msgid "Browse"
 msgstr "Претражи"
 
 #: modules/gui/qt/dialogs/convert.cpp:86
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "&Отвори више датотека..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:88
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:91
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Додај у фајл"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
@@ -19973,9 +19643,8 @@ msgid "Adjustments and Effects"
 msgstr "Ефекти и филтери"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Стерео режим рада"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19991,9 +19660,8 @@ msgid "&Save"
 msgstr "&Сачувај"
 
 #: modules/gui/qt/dialogs/external.cpp:219
-#, fuzzy
 msgid "Store the Password"
-msgstr "Шифра"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -20295,7 +19963,8 @@ msgstr "Верзија"
 msgid "Website"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Фајлови"
 
@@ -20621,18 +20290,16 @@ msgid "Empty"
 msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Активирај"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:382
-#, fuzzy
 msgid "&Continue"
-msgstr "Настави"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:1419
 msgid "Control menu for the player"
@@ -20663,9 +20330,8 @@ msgid "Subti&tle"
 msgstr "Ти&тл"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1076
-#, fuzzy
 msgid "Tool&s"
-msgstr "А&латке"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1083
 msgid "V&iew"
@@ -20760,9 +20426,8 @@ msgid "Docked Playlist"
 msgstr "Закачена листа за пуштање"
 
 #: modules/gui/qt/menus.cpp:499
-#, fuzzy
 msgid "Always on &top"
-msgstr "Увек на врху"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
@@ -20793,9 +20458,8 @@ msgid "&Increase Volume"
 msgstr "&Појачај звук"
 
 #: modules/gui/qt/menus.cpp:597
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Утишај звук"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:600
 msgid "&Mute"
@@ -20954,14 +20618,12 @@ msgid "&Clear"
 msgstr "&Очисти"
 
 #: modules/gui/qt/menus.cpp:1636
-#, fuzzy
 msgid "&Renderer"
-msgstr "Рендерер текста"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1640
-#, fuzzy
 msgid "<Local>"
-msgstr "Вокал"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1653
 msgid "Scan"
@@ -21071,9 +20733,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Инвертује боје слике"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -21116,9 +20777,8 @@ msgid "Load extensions on startup"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Аутоматско појачање видео-сигнала."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -21155,9 +20815,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Поставке главног интерфејса"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -21190,10 +20849,9 @@ msgid "debug"
 msgstr ""
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "Обриши"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
@@ -21204,14 +20862,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "Датотеке маске |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "Датотеке за пуштање|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "|All Files |*"
-msgstr "Сви фајлови"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:216
 msgid "Open playlist"
@@ -21222,11 +20878,8 @@ msgid "Save playlist"
 msgstr "Сачувај листу за пуштање"
 
 #: modules/gui/skins2/src/dialogs.cpp:224
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
-"Све Листе за пуштање|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF "
-"playlist|*.xspf"
 
 #: modules/gui/skins2/src/skin_main.cpp:484
 msgid "Skin to use"
@@ -21293,9 +20946,8 @@ msgid "Select skin"
 msgstr "Изабери маску"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Отвори маску..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -21358,14 +21010,12 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Подесите гаму слиике, између 0.01 и 10. Подразумевано је 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
-#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "DirectX аудио излаз"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:429
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "DirectX аудио излаз"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -21395,9 +21045,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "Расплитање"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -21426,9 +21075,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Приморај испреплетан метод"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -21445,14 +21093,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Видео филтер"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1188
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Видео филтер"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21515,38 +21161,32 @@ msgid "VDPAU sharpen video filter"
 msgstr ""
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "Листа жељених паковаоца"
+msgstr ""
 
 #: modules/keystore/file.c:55
-#, fuzzy
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Користи дељену меморију"
+msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Уклони изабрано"
+msgstr ""
 
 #: modules/keystore/file.c:66
-#, fuzzy
 msgid "Secrets are stored encrypted on a file"
-msgstr "Користи дељену меморију"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
-#, fuzzy
 msgid "No"
-msgstr "&Не"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:46
-#, fuzzy
 msgid "System default"
-msgstr "Системски подразумеване вредности"
+msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
@@ -21561,9 +21201,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:51
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "Увек на врху"
+msgstr ""
 
 #: modules/keystore/keychain.m:52
 msgid "When unlocked"
@@ -21574,9 +21213,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:56
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "Синхронизација"
+msgstr ""
 
 #: modules/keystore/keychain.m:57
 msgid ""
@@ -21608,33 +21246,28 @@ msgid "KWallet keystore"
 msgstr ""
 
 #: modules/keystore/kwallet.c:49
-#, fuzzy
 msgid "Secrets are stored via KWallet"
-msgstr "Користи дељену меморију"
+msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Уклони изабрано"
+msgstr ""
 
 #: modules/keystore/memory.c:42
-#, fuzzy
 msgid "Secrets are stored in memory"
-msgstr "Користи дељену меморију"
+msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
 msgstr ""
 
 #: modules/keystore/secret.c:40
-#, fuzzy
 msgid "Secrets are stored via libsecret"
-msgstr "Користи дељену меморију"
+msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Додај лого"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -21645,33 +21278,28 @@ msgid "Be quiet"
 msgstr "Будите мирни"
 
 #: modules/logger/console.c:115
-#, fuzzy
 msgid "Turn off all messages on the console."
-msgstr "Сачувај све поруке VLC у текстуалном фајлу."
+msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Конзола"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Конзола"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Више Информација"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "Маска за дебаговање"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -21694,14 +21322,12 @@ msgid "Log format"
 msgstr "Формат Дневника"
 
 #: modules/logger/file.c:212
-#, fuzzy
 msgid "Specify the logging format."
-msgstr "Одредите име фајла Дневника."
+msgstr ""
 
 #: modules/logger/file.c:214
-#, fuzzy
 msgid "Verbosity"
-msgstr "Детаљност (0, 1, 2)"
+msgstr ""
 
 #: modules/logger/file.c:215
 msgid ""
@@ -21714,9 +21340,8 @@ msgid "Logger"
 msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Формат Фајла:"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -21735,9 +21360,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Маска за дебаговање"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -21752,9 +21376,8 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "Ниво квалитета"
+msgstr ""
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
@@ -22465,9 +22088,8 @@ msgid "Synthpop"
 msgstr ""
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "Максимална локална брзина битова"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -22478,9 +22100,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "Видео филтер трансформације"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -22612,9 +22233,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:753
-#, fuzzy
 msgid "Trust directory"
-msgstr "Директоријум снимања за каснији преглед"
+msgstr ""
 
 #: modules/misc/gnutls.c:755
 msgid ""
@@ -22661,9 +22281,8 @@ msgid "Playing some media."
 msgstr ""
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "Онемогући чувара екрана"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -22983,13 +22602,10 @@ msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
 msgstr "SDT Дескриптори (захтева --sout-ts-es-id-pid)"
 
 #: modules/mux/mpeg/ts.c:125
-#, fuzzy
 msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"Дефинише дескриптор сваког SDT-а. Ово захтева да буде омогућена опција  "
-"\"Set PID to ID of ES\"."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23149,9 +22765,8 @@ msgid "WAV muxer"
 msgstr "WAV мултиплексер"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "Growl Додатак за Обавештења"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23162,18 +22777,16 @@ msgid "Now playing"
 msgstr ""
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "Прескочи огласе"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr "Дужина трајања (ms)"
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "Дужина трајања приказа обавештења"
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -23188,9 +22801,8 @@ msgid "A/52 audio packetizer"
 msgstr "A/52 аудио паковалац"
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "Копирај паковалац"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23254,27 +22866,24 @@ msgstr ""
 msgid "VC-1 packetizer"
 msgstr ""
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:370
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23301,14 +22910,12 @@ msgstr "Фотографије"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:620
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Bonjour сервиси"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -23460,28 +23067,24 @@ msgid "Unknown type"
 msgstr "непознато"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Аудио канали"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Ажурирај"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Сервиси"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "Прилагоди:"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -23562,9 +23165,8 @@ msgid "Bar Height in pixel"
 msgstr ""
 
 #: modules/spu/audiobargraph_v.c:59
-#, fuzzy
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr "Висина у пикселима границе између минијатура."
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -23733,24 +23335,18 @@ msgid ""
 msgstr ""
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"Непрозирност (супротно од прозирности) текста који преклапа. 0=прозирно, "
-"255=потпуно непрозирно"
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
 msgstr "Величина фонта у пикселима"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
-"Величина фонта у пикселима. Подразумевано је -1 (користи подразумевану "
-"величину фонта)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -23910,15 +23506,11 @@ msgid "Elements order"
 msgstr "Редослед елемената"
 
 #: modules/spu/mosaic.c:144
-#, fuzzy
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
-"Можете да приморате редослед елемента на мозаику. Морате да дате листу "
-"ID(ова) слика одвојених зарезом.Ови ID-еви се додељују у \"mosaic-bridge\" "
-"модулу."
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24237,9 +23829,8 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Филтери тока"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -24250,9 +23841,8 @@ msgid "Block stream cache"
 msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "Прикажи ток локално"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24267,24 +23857,20 @@ msgid "gzip decompression"
 msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "Излаз HTTP емитовања уживо"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "RV32 филтер конверзије"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Филтери тока"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "Величине скокова"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -24299,9 +23885,8 @@ msgid "Prefetch background read size (bytes)"
 msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "Праг"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -24424,19 +24009,16 @@ msgid "Duration of the fingerprinting"
 msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Подразумевани ток"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Мост излазни ток"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:104
-#, fuzzy
 msgid "HTTP port"
-msgstr "SFTP порт"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid ""
@@ -24461,42 +24043,36 @@ msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:115
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "Адреса компјутера за пуштање тока."
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:116
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Порт клијента"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:117
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:121
-#, fuzzy
 msgid "Chromecast"
-msgstr "Хрома"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "Мост излазни ток"
+msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:328
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Порт клијента"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "Дуплирај излаз тока"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25213,9 +24789,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "Позиција подслике"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -25236,13 +24811,10 @@ msgid "Overlays/Subtitles"
 msgstr "Преклопи/Титлови"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
-#, fuzzy
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"Сачекај док се твој фонт кеш не обнови.\n"
-"Ово би требало да потраје мање од минут."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -25275,13 +24847,10 @@ msgid "Text opacity"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"Непровидност (инверзно од провидности) текста који ће бити рендерован на "
-"видеу. 0 = провидно, 255 = тотално непровидно."
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -25340,9 +24909,8 @@ msgid "Shadow distance"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Позиција текста"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -25373,9 +24941,8 @@ msgid "Left to right"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "Управљање ка лево"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -25522,14 +25089,12 @@ msgid "YUVP converter"
 msgstr ""
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Нијанса слике (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "Подесите нијансу слике, између 0 и 360. Подразумевано је 0."
+msgstr ""
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -25841,9 +25406,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:768
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Зрнасти видео филтер"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26015,14 +25579,12 @@ msgid "Deinterlacing video filter"
 msgstr "Видео филтер расплитања"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Видео филтер откривања померања"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Одабир уређаја"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -26065,14 +25627,12 @@ msgid "Extract RGB component video filter"
 msgstr ""
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Видео филтер преокретања"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "Конвертуј"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -26744,9 +26304,8 @@ msgid "ASCII-art video output"
 msgstr "ASCII-art видео излаз"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Затвори Прозор"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -26844,24 +26403,20 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Модул видео излаза"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
-#, fuzzy
 msgid "DeckLink Video Options"
-msgstr "Поставке видео-записа"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Модул звучног излаза"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
-#, fuzzy
 msgid "DeckLink Audio Options"
-msgstr "Поставке видео-записа"
+msgstr ""
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27022,9 +26577,8 @@ msgid "Open GL/GLES hardware converter"
 msgstr ""
 
 #: modules/video_output/opengl/vout_helper.h:63
-#, fuzzy
 msgid "Force a \"glconv\" module."
-msgstr "Модул излаза"
+msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:70
 msgid "The desktop mode allows you to display the video on the desktop."
@@ -27065,18 +26619,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "DirectX аудио излаз"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "DirectX аудио излаз"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -27156,9 +26708,8 @@ msgid "Wallpaper"
 msgstr "Тапета"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "OpenGL видео излаз"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -27224,9 +26775,8 @@ msgstr ""
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "X11 приказ"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -27248,9 +26798,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Излаз видеа сивих тонова"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -27636,19 +27185,16 @@ msgid "Image wall"
 msgstr "Зид за слике"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "Ширина прозора видео-ефеката у пикселима."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "Висина прозора видео-ефеката у пикселима."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Спектар"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
 msgid "3D OpenGL spectrum visualization"
@@ -27891,9 +27437,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "Плутај на Врху"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -28168,9 +27713,8 @@ msgid "Start Time"
 msgstr "Време почетка"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Време заустављања"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28197,9 +27741,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Промени приказано име сервиса."
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28298,9 +27841,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV мултиплексержж"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -28311,9 +27853,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -28324,9 +27865,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -28341,9 +27881,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1 Формат"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28374,9 +27913,8 @@ msgid "Menus"
 msgstr "Мени"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Брзина кадрова"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -28391,9 +27929,8 @@ msgid "Custom options"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Ниво квалитета"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28416,14 +27953,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Брзина узорковања"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Име профила"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -28640,11 +28175,8 @@ msgid "Show systray icon"
 msgstr "Икона у системској касети"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"Користите Qt4 интерфејс.\n"
-"\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28735,9 +28267,8 @@ msgid "Add a background"
 msgstr "Додај позадину"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Излаз"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28961,59 +28492,11 @@ msgstr ""
 #~ msgid "Screen capture (with Wayland)"
 #~ msgstr "Улазни Екран"
 
-#~ msgid "Streaming"
-#~ msgstr "Емитовање"
-
-#~ msgid "Sent packets"
-#~ msgstr "Послати пакети"
-
 #~ msgid "Sent bytes"
 #~ msgstr "Послати бајтови"
 
-#~ msgid "Send rate"
-#~ msgstr "Брзина слања"
-
-#~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround"
-
-#~ msgid "Headphone surround effect"
-#~ msgstr "Ефекат Слушалица"
-
-#~ msgid "Display device"
-#~ msgstr "Уређај за приказ"
-
-#, fuzzy
-#~ msgid "Capture region heigh"
-#~ msgstr "Мод снимања"
-
-#~ msgid "Always &on Top"
-#~ msgstr "Увек &на врху"
-
-#, fuzzy
-#~ msgid "High quality"
-#~ msgstr "Квалитет енкодирања"
-
-#, fuzzy
-#~ msgid "Very high quality"
-#~ msgstr "Квалитет исцртавања"
-
-#, fuzzy
-#~ msgid "YouTube Start Time"
-#~ msgstr "Време почетка"
-
-#, fuzzy
-#~ msgid "iTunes Account ID"
-#~ msgstr "Језички кôд тјунера"
-
-#, fuzzy
-#~ msgid "Disable lua"
-#~ msgstr "Онемогући"
-
 #~ msgid "Both"
 #~ msgstr "Оба"
-
-#~ msgid "Display resolution"
-#~ msgstr "Резолуција приказа"
 
 #~ msgid "VLC can't recognize the input's format"
 #~ msgstr "VLC не може да препозна формат улаза"
@@ -29023,9 +28506,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Формат „%s“ не може бити откривен. Погледајте евиденцију за више "
 #~ "информација."
-
-#~ msgid "Navigation"
-#~ msgstr "Навигација"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Искључи сва упозорења и поруке са информацијама."
@@ -29037,75 +28517,14 @@ msgstr ""
 #~ "S/PDIF се може користити као подразумевано ако ваш хардвер то подржава "
 #~ "као и аудио ток који се репродукује"
 
-#~ msgid "HTTP/TLS Certificate Authority"
-#~ msgstr "Ауторитет за издавање HTTP/TLS сертификата"
-
-#~ msgid "HTTP/TLS Certificate Revocation List"
-#~ msgstr "Списак опозваних HTTP/TLS сертификата"
-
-#~ msgid "Log all VLC messages to syslog (UNIX systems)."
-#~ msgstr "Пријави све VLC поруке у syslog (UNIX системи)."
-
 #~ msgid "%ld B"
 #~ msgstr "%ld B"
 
 #~ msgid "Downloading ..."
 #~ msgstr "Преузимање ..."
 
-#~ msgid ""
-#~ "%s\n"
-#~ "Downloading... %s/%s - %.1f%% done"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Преузимам… %s/%s – завршено %.1f%%"
-
 #~ msgid "BD"
 #~ msgstr "BD"
-
-#~ msgid "Configure"
-#~ msgstr "Подеси"
-
-#~ msgid "FTP user name"
-#~ msgstr "FTP корисничко име"
-
-#~ msgid "FTP password"
-#~ msgstr "FTP лозинка"
-
-#~ msgid "Your password was rejected."
-#~ msgstr "Лозинка је одбијена."
-
-#~ msgid "Your connection attempt to the server was rejected."
-#~ msgstr "Повезивање са сервером је одбијено."
-
-#~ msgid "GnomeVFS input"
-#~ msgstr "GnomeVFS улаз"
-
-#~ msgid "Forward Cookies"
-#~ msgstr "Проследи колачиће"
-
-#~ msgid "RTSP user name"
-#~ msgstr "RTSP корисничко име"
-
-#~ msgid "RTSP password"
-#~ msgstr "RTSP лозинка"
-
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "VLC није могао да отвори датотеку \"%s\": %s"
-
-#~ msgid "SMB user name"
-#~ msgstr "SMB корисничко име"
-
-#~ msgid "SMB password"
-#~ msgstr "SMB лозинка"
-
-#~ msgid "Segment"
-#~ msgstr "Сегмент"
-
-#~ msgid "LID"
-#~ msgstr "LID"
-
-#~ msgid "VCD Format"
-#~ msgstr "VCD Формат"
 
 #~ msgid "Preparer"
 #~ msgstr "Припремалац"
@@ -29115,18 +28534,6 @@ msgstr ""
 
 #~ msgid "Vol max #"
 #~ msgstr "Максимална јачина звука #"
-
-#~ msgid "Volume Set"
-#~ msgstr "Подеси јачину Звука"
-
-#~ msgid "System Id"
-#~ msgstr "Id Система"
-
-#~ msgid "Entries"
-#~ msgstr "Уноси"
-
-#~ msgid "Audio Channels"
-#~ msgstr "Звучни канали"
 
 #~ msgid "First Entry Point"
 #~ msgstr "Прва Тачка Уноса"
@@ -29139,21 +28546,6 @@ msgstr ""
 
 #~ msgid "type"
 #~ msgstr "тип"
-
-#~ msgid "end"
-#~ msgstr "крај"
-
-#~ msgid "play list"
-#~ msgstr "листа за пуштање"
-
-#~ msgid "extended selection list"
-#~ msgstr "проширена одбрана листа"
-
-#~ msgid "unknown type"
-#~ msgstr "непознати тип"
-
-#~ msgid "List ID"
-#~ msgstr "ID Листе"
 
 #~ msgid "(Super) Video CD"
 #~ msgstr "(Супер) Видео CD"
@@ -29171,9 +28563,6 @@ msgstr ""
 #~ msgid "Number of CD blocks to get in a single read."
 #~ msgstr "Број CD блокова који се добију у једном читању."
 
-#~ msgid "Use playback control?"
-#~ msgstr "Желите ли да користите контролу преслушавања?"
-
 #~ msgid ""
 #~ "If VCD is authored with playback control, use it. Otherwise we play by "
 #~ "tracks."
@@ -29189,9 +28578,6 @@ msgstr ""
 #~ "an entry."
 #~ msgstr ""
 #~ "Ако је постављено, дужина дела за претрагу је трака пре него дужина уноса."
-
-#~ msgid "Show extended VCD info?"
-#~ msgstr "Желите ли да прикажете проширену VCD информацију?"
 
 #~ msgid ""
 #~ "Show the maximum amount of information under Stream and Media Info. Shows "
@@ -29212,14 +28598,8 @@ msgstr ""
 #~ msgid "Enable the internal upmixing algorithm (not recommended)."
 #~ msgstr "Омогући алгоритам унутрашњег надмиксовања (није препоручено)."
 
-#~ msgid "Audio filter for DTS->S/PDIF encapsulation"
-#~ msgstr "Аудио филтер за DTS->S/PDIF енкапсулацију"
-
 #~ msgid "A/52 parser"
 #~ msgstr "A/52 анализатор"
-
-#~ msgid "Visualize motion vectors"
-#~ msgstr "Визеуелизуј векторе кретања"
 
 #~ msgid ""
 #~ "You can overlay the motion vectors (arrows showing how the images move) "
@@ -29246,23 +28626,8 @@ msgstr ""
 #~ msgid "QuickTime library decoder"
 #~ msgstr "QuickTime библиотека декодера"
 
-#~ msgid "Desired frame rate for the H264 stream."
-#~ msgstr "Жељена брзина оквира за H264 ток."
-
-#~ msgid "Google Video"
-#~ msgstr "Google видео"
-
-#~ msgid "VLC media player Help"
-#~ msgstr "VLC медија плејер помоћ"
-
-#~ msgid "Invalid selection"
-#~ msgstr "Неисправна селекција"
-
 #~ msgid "Two bookmarks have to be selected."
 #~ msgstr "Два маркера треба да буду изабрана."
-
-#~ msgid "The stream must be playing or paused for bookmarks to work."
-#~ msgstr "Ток мора да се преслушава или паузира да би маркери радили."
 
 #~ msgid "Send"
 #~ msgstr "Пошаљи"
@@ -29276,35 +28641,17 @@ msgstr ""
 #~ msgid "Streaming/Exporting Wizard..."
 #~ msgstr "Мађионичар за Пуштање Тока/Извоз"
 
-#~ msgid "Next Channel"
-#~ msgstr "Следећи канал"
-
 #~ msgid "Download Plugin"
 #~ msgstr "Преузми додатак"
 
-#~ msgid "Click to select a subtitle file."
-#~ msgstr "Кликни да изабереш титл."
-
 #~ msgid "Streaming/Saving:"
 #~ msgstr "Пуштање Тока/Чување:"
-
-#~ msgid "Expand Node"
-#~ msgstr "Прошири Чвор"
-
-#~ msgid "Download Cover Art"
-#~ msgstr "Преузми омот"
 
 #~ msgid "Sort Node by Name"
 #~ msgstr "Сортирај Чворове по Имену"
 
 #~ msgid "Sort Node by Author"
 #~ msgstr "Сортирај Чворове по Аутору"
-
-#~ msgid "Meta-information"
-#~ msgstr "Мета подаци"
-
-#~ msgid "Show Fullscreen Controller"
-#~ msgstr "Прикажи контролер пуног екрана"
 
 #~ msgid ""
 #~ "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -29417,15 +28764,6 @@ msgstr ""
 #~ msgid "Uncompressed audio samples (useable with WAV)"
 #~ msgstr "Некомпресовани аудио узорци (употребљиво са WAV форматом)"
 
-#~ msgid "MPEG Program Stream"
-#~ msgstr "MPEG Програмски Ток"
-
-#~ msgid "MPEG Transport Stream"
-#~ msgstr "MPEG Ток Транспорта"
-
-#~ msgid "MPEG 1 Format"
-#~ msgstr "MPEG 1 Формат"
-
 #~ msgid ""
 #~ "Enter the local addresses you want to listen requests on. Do not enter "
 #~ "anything if you want to listen on all the network interfaces. This is "
@@ -29468,9 +28806,6 @@ msgstr ""
 #~ "Microsoft софтвера. Приметите да је само мали део MMS протокола подржан "
 #~ "(MMS уграђен у HTTP)."
 
-#~ msgid "Enter the address of the computer to stream to."
-#~ msgstr "Унесите адресу компјутера на који се пушта ток."
-
 #~ msgid "Use this to stream to a single computer."
 #~ msgstr "Употребите овај ток за један компјутер."
 
@@ -29509,9 +28844,6 @@ msgstr ""
 #~ "мрежи. Ово је најефикасниј метод за пуштање тока на неколико компјутераm, "
 #~ "али не ради преко Интернета. RTP заглавља ће бити додата на ток"
 
-#~ msgid "Streaming/Transcoding Wizard"
-#~ msgstr "Мађионичар за Пуштање Тока/Транскодовање"
-
 #~ msgid "More Info"
 #~ msgstr "Више Информација"
 
@@ -29524,20 +28856,11 @@ msgstr ""
 #~ "тока и транскодовања. Дијалози Отвори и 'Saving/Streaming' дају приступ "
 #~ "већем броју карактеристика."
 
-#~ msgid "Stream to network"
-#~ msgstr "Ток ка мрежи"
-
 #~ msgid "Transcode/Save to file"
 #~ msgstr "Транскодовање(Чување у фајл"
 
 #~ msgid "Choose here your input stream."
 #~ msgstr "Изаберите овде Ваш улазни ток."
-
-#~ msgid "Existing playlist item"
-#~ msgstr "Постојећа ставка листе за пуштање"
-
-#~ msgid "Partial Extract"
-#~ msgstr "Делимично Извожење"
 
 #~ msgid ""
 #~ "This can be used to read only a part of the stream. It must be possible "
@@ -29552,15 +28875,6 @@ msgstr ""
 #~ msgid "From"
 #~ msgstr "Од"
 
-#~ msgid "To"
-#~ msgstr "До"
-
-#~ msgid "Streaming method"
-#~ msgstr "Метод Пуштања Тока"
-
-#~ msgid "UDP Unicast"
-#~ msgstr "UDP Уникаст (једноструко емитовање)"
-
 #~ msgid "UDP Multicast"
 #~ msgstr "UDP Мултикаст (вишеструко емитовање)"
 
@@ -29572,50 +28886,14 @@ msgstr ""
 #~ "траке. Ако желите да промените формат садржаоца, идите на следећу "
 #~ "страницу."
 
-#~ msgid "Transcode audio"
-#~ msgstr "Аудио транскодовање"
-
-#~ msgid "Transcode video"
-#~ msgstr "Видео транскодовање"
-
-#~ msgid "Encapsulation format"
-#~ msgstr "Формат енкапсулације"
-
-#~ msgid "Additional streaming options"
-#~ msgstr "Додатне опције пуштања тока"
-
 #~ msgid "In this page, a few additional streaming parameters can be set."
 #~ msgstr ""
 #~ "На овој страници, могу бити подешени додатни параметри за пуштање тока."
-
-#~ msgid "Local playback"
-#~ msgstr "Локално преслушавање"
-
-#~ msgid "Additional transcode options"
-#~ msgstr "Додатне опције транскодовања"
 
 #~ msgid "In this page, a few additional transcoding parameters can be set."
 #~ msgstr ""
 #~ "На овој страници, можете подесити пар додатних параметара за "
 #~ "транскодовање."
-
-#~ msgid "Summary"
-#~ msgstr "Резиме"
-
-#~ msgid "Encap. format"
-#~ msgstr "Енкапсулација формат"
-
-#~ msgid "Input stream"
-#~ msgstr "Улазни ток"
-
-#~ msgid "Save file to"
-#~ msgstr "Сачувајте фајл на"
-
-#~ msgid "Include subtitles"
-#~ msgstr "Укључи титлове"
-
-#~ msgid "No input selected"
-#~ msgstr "Није изабран улаз"
 
 #~ msgid ""
 #~ "No new stream or valid playlist item has been selected.\n"
@@ -29625,9 +28903,6 @@ msgstr ""
 #~ "Није изабран нови ток или важећа листа за пуштање.\n"
 #~ "\n"
 #~ "Изаберите нешто пре преласка на следећу страну."
-
-#~ msgid "No valid destination"
-#~ msgstr "Неисправно одредиште"
 
 #~ msgid ""
 #~ "A valid destination has to be selected Enter either a Unicast-IP or a "
@@ -29641,15 +28916,6 @@ msgstr ""
 #~ "\n"
 #~ "Ако не знате шта ово значи, погледајте VLC Стримовање КАКОДА и помоћни "
 #~ "текст у овом прозору."
-
-#~ msgid "Select the directory to save to"
-#~ msgstr "Изаберите директоријум за чување"
-
-#~ msgid "No folder selected"
-#~ msgstr "Ниједна фасцикла није одабрана"
-
-#~ msgid "A directory where to save the files has to be selected."
-#~ msgstr "Директоријум за чување фајлова је изабран."
 
 #~ msgid ""
 #~ "Enter either a valid path or use the \"Choose...\" button to select a "
@@ -29668,17 +28934,8 @@ msgstr ""
 #~ "Или унесите валидну путању или користите \"Choose\" опцију да изаберете "
 #~ "локацију."
 
-#~ msgid "Finish"
-#~ msgstr "Завршетак"
-
 #~ msgid "%i items"
 #~ msgstr "%i ставки"
-
-#~ msgid "yes"
-#~ msgstr "да"
-
-#~ msgid "no"
-#~ msgstr "не"
 
 #~ msgid "yes: %@ @ %@ kb/s"
 #~ msgstr "да: %@ @ %@ kb/s"
@@ -29720,38 +28977,17 @@ msgstr ""
 #~ msgid "T&ools"
 #~ msgstr "А&латке"
 
-#~ msgid "&Decrease Volume"
-#~ msgstr "&Утишај звук"
-
-#~ msgid "&Save To Playlist"
-#~ msgstr "Сачувај у листу за пуштање"
-
-#~ msgid "Specify an identifier integer for this elementary stream to change"
-#~ msgstr "Изаберите идентификатор основног тока који желите да промените"
-
 #~ msgid "RAOP"
 #~ msgstr "RAOP"
-
-#~ msgid "OSD menu"
-#~ msgstr "OSD мени"
 
 #~ msgid "Filename for the font you want to use"
 #~ msgstr "Име фајла за фонт који желите да користитњ"
 
-#~ msgid "Win32 font renderer"
-#~ msgstr "Win32 рендерер фонта"
-
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "DirectFB видео излаз http://www.directfb.org/"
 
-#~ msgid "OpenGL ES"
-#~ msgstr "OpenGL ES"
-
 #~ msgid "Simple DirectMedia Layer video output"
 #~ msgstr "Једноставан DirectMedia Layer видео излаз"
-
-#~ msgid "Brightness (%)"
-#~ msgstr "Осветљење (%)"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32586,6 +31822,638 @@ msgstr ""
 #~ msgstr "MKV"
 
 #, fuzzy
+#~ msgid "HTTP interace Certificates Revocation List file."
+#~ msgstr "Списак опозваних HTTP/TLS сертификата"
+
+#, fuzzy
+#~ msgid "last config"
+#~ msgstr "Увек настави"
+
+#, fuzzy
+#~ msgid "CAPMT System ID"
+#~ msgstr "Id Система"
+
+#, fuzzy
+#~ msgid "yes: from %@ to %@ secs"
+#~ msgstr "да: %@ @ %@ kb/s"
+
+#, fuzzy
+#~ msgid "1 item"
+#~ msgstr "%i ставки"
+
+#, fuzzy
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Изаберите директоријум за чување"
+
+#, fuzzy
+#~ msgid "Format to use in playlist \"title\" field when no CDDB"
+#~ msgstr "Формат за употребу у пољу\"наслов\" листе за пуштање."
+
+#, fuzzy
+#~ msgid "Format to use in playlist \"title\" field when using CDDB"
+#~ msgstr "Формат за употребу у пољу\"наслов\" листе за пуштање."
+
+#, fuzzy
+#~ msgid "UDP/RTP Multicast"
+#~ msgstr "UDP Мултикаст (вишеструко емитовање)"
+
+#, fuzzy
+#~ msgid "Additional &Sources"
+#~ msgstr "Додатне опције транскодовања"
+
+#, fuzzy
+#~ msgid "Bonjour"
+#~ msgstr "Bonjour сервиси"
+
+#, fuzzy
+#~ msgid "Seam Carving"
+#~ msgstr "Пуштање Тока/Чување:"
+
+#, fuzzy
+#~ msgid "VLC - Controller"
+#~ msgstr "Контрола звука"
+
+#, fuzzy
+#~ msgid "Preparse"
+#~ msgstr "Припремалац"
+
+#, fuzzy
+#~ msgid "Use this to stream on a network."
+#~ msgstr "Употребите овај ток за један компјутер."
+
+#, fuzzy
+#~ msgid ""
+#~ "This wizard only contains a small subset of VLC's streaming and "
+#~ "transcoding capabilities. Use the Open and Stream Output dialogs to "
+#~ "access all of them."
+#~ msgstr ""
+#~ "Овај маџионичар даје приступ малом подскупу VLC-ових могућности пуштања "
+#~ "тока и транскодовања. Дијалози Отвори и 'Saving/Streaming' дају приступ "
+#~ "већем броју карактеристика."
+
+#, fuzzy
+#~ msgid "Use this to stream on a network"
+#~ msgstr "Употребите овај ток за један компјутер."
+
+#, fuzzy
+#~ msgid ""
+#~ "Use this to read only a part of the stream. To use, enter the starting "
+#~ "and ending times (in seconds).\n"
+#~ "\n"
+#~ "Note: You must be able to control the incoming stream (for example, a "
+#~ "file or a disc, but not a RTP/UDP network stream).\n"
+#~ msgstr ""
+#~ "Ово може да се користи за читање само дела тока. Мора бити могуће "
+#~ "контролисање долазећег тока (на пример, диск или фајл, али не UDP мрежни "
+#~ "ток.) Почетна и завршна времена могу бити дата у секундама."
+
+#, fuzzy
+#~ msgid ""
+#~ "Changes the compression format of the audio or video tracks. To change "
+#~ "only the container format, proceed to the next page."
+#~ msgstr ""
+#~ "Ова страница Вам дозвољава да промените формат компресије аудио или видео "
+#~ "траке. Ако желите да промените формат садржаоца, идите на следећу "
+#~ "страницу."
+
+#, fuzzy
+#~ msgid ""
+#~ "Select the target video codec. Choose a codec to display more information "
+#~ "about it."
+#~ msgstr "Изаберите ваш видео кодек. Кликните на неки за више информација."
+
+#, fuzzy
+#~ msgid ""
+#~ "Select the target audio codec. Choose a codec to display more information "
+#~ "about it."
+#~ msgstr "Изаберите ваш аудио кодек. Кликните на неки за више информација."
+
+#, fuzzy
+#~ msgid "Defines a few additional parameters for the transcoding."
+#~ msgstr ""
+#~ "На овој страници, могу бити подешени додатни параметри за пуштање тока."
+
+#, fuzzy
+#~ msgid ""
+#~ "When streaming using RTP, you can announce your streams using the SAP/SDP "
+#~ "announcing protocol. This way, the clients won't have to type in the "
+#~ "multicast address, it will appear in their playlist if they enable the "
+#~ "SAP extra interface.\n"
+#~ "If you want to give a name to your stream, enter it here. Otherwise, a "
+#~ "default name will be used."
+#~ msgstr ""
+#~ "Када пуштате ток коришћењем UDP-а, токови могу бити најављени коришћењем "
+#~ "SAP/SDP протокола најава. На овај начин, клијенти неће морати да уносе "
+#~ "мултикаст адресу, појавиће се у њиховим Листама за пуштање ако омогуће "
+#~ "екстра SAP интерфејс.\n"
+#~ "Ако желите да дате име току, унесите га овде, у супротном, користиће се "
+#~ "подразумевано име."
+
+#, fuzzy
+#~ msgid "Transcode audio (if available)"
+#~ msgstr "Аудио транскодовање"
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
+#~ msgstr ""
+#~ "MPEG-1 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, OGG и RAW "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-2 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
+#~ msgstr ""
+#~ "MPEG-2 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, OGG и RAW "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid ""
+#~ "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MPEG4, OGG "
+#~ "and RAW)"
+#~ msgstr ""
+#~ "MPEG-4 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, ASF, MP4, OGG "
+#~ "и RAW форматима)"
+
+#, fuzzy
+#~ msgid "H264 is a new video codec (useable with MPEG TS and MPEG4)"
+#~ msgstr "H264 је нови видео кодек (употребљив са MPEG TS и MP4 форматима)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid ""
+#~ "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
+#~ msgstr ""
+#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
+#~ msgstr ""
+#~ "Theora је бесплатан кодек опште употребе (употребљив са MPEG TS и OGG "
+#~ "форматима)"
+
+#, fuzzy
+#~ msgid "RTP Unicast"
+#~ msgstr "UDP Уникаст (једноструко емитовање)"
+
+#, fuzzy
+#~ msgid "Stream to a single computer."
+#~ msgstr "Употребите овај ток за један компјутер."
+
+#, fuzzy
+#~ msgid "RTP Multicast"
+#~ msgstr "UDP Мултикаст (вишеструко емитовање)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Stream to a dynamic group of computers on a multicast-enabled network. "
+#~ "This is the most efficient method to stream to several computers, but it "
+#~ "does not work over the Internet."
+#~ msgstr ""
+#~ "Користите овај ток ка динамичкој групи компјутера на мултикаст-омогућеној "
+#~ "мрежи. Ово је најефикасниј метод за пуштање тока на неколико компјутераm, "
+#~ "али не ради преко Интернета."
+
+#, fuzzy
+#~ msgid ""
+#~ "Enter the multicast address to stream to. This must be an IP address "
+#~ "between 224.0.0.0 an 239.255.255.255. For private use, enter an address "
+#~ "beginning with 239.255."
+#~ msgstr ""
+#~ "Унесите мултикаст адресу на коју ће се пуштати ток у овом пољу . Ово мора "
+#~ "да буде IP адреса измеђи 224.0.0.0 и 239.255.255.255. За приватну "
+#~ "употребу, унесите адресу која почиње са 239.255."
+
+#, fuzzy
+#~ msgid ""
+#~ "Stream to several computers. This method is less efficient, as the server "
+#~ "needs to send the stream several times."
+#~ msgstr ""
+#~ "Користите ово да пуштате ток на више компјутера. Овај метод није "
+#~ "најефикаснији, пошто сервер мора да шаље ток неколико пута, али је "
+#~ "генерално најкомпатибилнији"
+
+#, fuzzy
+#~ msgid ""
+#~ "Enter the local addresses you want to listen to. Do not enter anything if "
+#~ "you want to listen to all adresses or if you don't understand. This is "
+#~ "generally the best thing to do. Other computers can then access the "
+#~ "stream at http://yourip:8080 by default."
+#~ msgstr ""
+#~ "Унесите локалну адреса са које желите да слушате захтеве. Немој да "
+#~ "уносите ниђта ако желите да слушате све мрежне интерфејсе. Ово је "
+#~ "уопштено најбоље. Други компјутери могу да приступе  току преко http://"
+#~ "yourip:8080 која је подразумевана."
+
+#, fuzzy
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "Припремалац"
+
+#, fuzzy
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "Подеси јачину Звука"
+
+#, fuzzy
+#~ msgid "Streaming"
+#~ msgstr "Ток"
+
+#, fuzzy
+#~ msgid "Sent packets"
+#~ msgstr "Групиши пакете"
+
+#, fuzzy
+#~ msgid "Send rate"
+#~ msgstr "Брзина узорковања"
+
+#, fuzzy
+#~ msgid "Dolby Surround:"
+#~ msgstr "Dolby Surround"
+
+#, fuzzy
+#~ msgid "Headphone surround effect"
+#~ msgstr "Ефекат Слушалица"
+
+#, fuzzy
+#~ msgid "Display device"
+#~ msgstr "Уређај за репродукцију"
+
+#, fuzzy
+#~ msgid "Capture region heigh"
+#~ msgstr "Величина фрагмента за захватање"
+
+#, fuzzy
+#~ msgid "Always &on Top"
+#~ msgstr "Увек на врху"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Квалитет енкодирања"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Квалитет исцртавања"
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Време почетка"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Језички кôд тјунера"
+
+#, fuzzy
+#~ msgid "Disable lua"
+#~ msgstr "Онемогући"
+
+#, fuzzy
+#~ msgid "Display resolution"
+#~ msgstr "Подешавање приказа"
+
+#, fuzzy
+#~ msgid "Navigation"
+#~ msgstr "Управљање ка доле"
+
+#, fuzzy
+#~ msgid "HTTP/TLS Certificate Authority"
+#~ msgstr "Сертификат HTTP/TLS сервера"
+
+#, fuzzy
+#~ msgid "HTTP/TLS Certificate Revocation List"
+#~ msgstr "Сертификат HTTP/TLS сервера"
+
+#, fuzzy
+#~ msgid "Log all VLC messages to syslog (UNIX systems)."
+#~ msgstr "Сачувај све поруке VLC у текстуалном фајлу."
+
+#, fuzzy
+#~ msgid ""
+#~ "%s\n"
+#~ "Downloading... %s/%s - %.1f%% done"
+#~ msgstr ""
+#~ "%s\n"
+#~ "Преузимам… %s/%s – завршено %.1f%%"
+
+#, fuzzy
+#~ msgid "Configure"
+#~ msgstr "Подешавање пречица"
+
+#, fuzzy
+#~ msgid "FTP user name"
+#~ msgstr "SOCKS корисничко име"
+
+#, fuzzy
+#~ msgid "FTP password"
+#~ msgstr "Шифра"
+
+#, fuzzy
+#~ msgid "Your password was rejected."
+#~ msgstr "Налог је одбијен."
+
+#, fuzzy
+#~ msgid "Your connection attempt to the server was rejected."
+#~ msgstr "Налог је одбијен."
+
+#, fuzzy
+#~ msgid "GnomeVFS input"
+#~ msgstr "Нема улаза"
+
+#, fuzzy
+#~ msgid "Forward Cookies"
+#~ msgstr "Напред"
+
+#, fuzzy
+#~ msgid "RTSP user name"
+#~ msgstr "SOCKS корисничко име"
+
+#, fuzzy
+#~ msgid "RTSP password"
+#~ msgstr "Шифра"
+
+#, fuzzy
+#~ msgid "VLC could not open the file \"%s\": %s"
+#~ msgstr "VLC не може да отвори датотеку \"%s\" (%s)."
+
+#, fuzzy
+#~ msgid "SMB user name"
+#~ msgstr "SOCKS корисничко име"
+
+#, fuzzy
+#~ msgid "SMB password"
+#~ msgstr "SOCKS шифра"
+
+#, fuzzy
+#~ msgid "Segment"
+#~ msgstr "Дужина исечка"
+
+#, fuzzy
+#~ msgid "LID"
+#~ msgstr "ID"
+
+#, fuzzy
+#~ msgid "VCD Format"
+#~ msgstr "Формат"
+
+#, fuzzy
+#~ msgid "Volume Set"
+#~ msgstr "Искључи звук"
+
+#, fuzzy
+#~ msgid "System Id"
+#~ msgstr "Системски подразумеване вредности"
+
+#, fuzzy
+#~ msgid "Entries"
+#~ msgstr "Унос"
+
+#, fuzzy
+#~ msgid "Audio Channels"
+#~ msgstr "Аудио канали"
+
+#, fuzzy
+#~ msgid "end"
+#~ msgstr "Уклапање"
+
+#, fuzzy
+#~ msgid "play list"
+#~ msgstr "Списак нумера"
+
+#, fuzzy
+#~ msgid "extended selection list"
+#~ msgstr "Прикажи напредне опције"
+
+#, fuzzy
+#~ msgid "unknown type"
+#~ msgstr "непознато"
+
+#, fuzzy
+#~ msgid "List ID"
+#~ msgstr "Листа"
+
+#, fuzzy
+#~ msgid "Use playback control?"
+#~ msgstr "Контрола преслушавања"
+
+#, fuzzy
+#~ msgid "Show extended VCD info?"
+#~ msgstr "Прикажи напредне опције"
+
+#, fuzzy
+#~ msgid "Audio filter for DTS->S/PDIF encapsulation"
+#~ msgstr "Аудио филтер за PCM формат конверзију"
+
+#, fuzzy
+#~ msgid "Visualize motion vectors"
+#~ msgstr "Визуелизација"
+
+#, fuzzy
+#~ msgid "Desired frame rate for the H264 stream."
+#~ msgstr "Жељена брзина фрејмова за захватање."
+
+#, fuzzy
+#~ msgid "Google Video"
+#~ msgstr "Увећај видео"
+
+#, fuzzy
+#~ msgid "VLC media player Help"
+#~ msgstr "VLC медија плејер помоћ..."
+
+#, fuzzy
+#~ msgid "Invalid selection"
+#~ msgstr "Неисправна комбинација"
+
+#, fuzzy
+#~ msgid "The stream must be playing or paused for bookmarks to work."
+#~ msgstr ""
+#~ "Није пронађен улаз. Ток мора да се репродукује или паузира да би маркери "
+#~ "радили."
+
+#, fuzzy
+#~ msgid "Next Channel"
+#~ msgstr "Канали"
+
+#, fuzzy
+#~ msgid "Click to select a subtitle file."
+#~ msgstr "Одабери титл"
+
+#, fuzzy
+#~ msgid "Expand Node"
+#~ msgstr "Прошири"
+
+#, fuzzy
+#~ msgid "Download Cover Art"
+#~ msgstr "Преузми омот"
+
+#, fuzzy
+#~ msgid "Meta-information"
+#~ msgstr "Информације датотеке"
+
+#, fuzzy
+#~ msgid "Show Fullscreen Controller"
+#~ msgstr "Прикажи контролер пуног екрана"
+
+#, fuzzy
+#~ msgid "MPEG Program Stream"
+#~ msgstr "MPEG Transport Stream демултиплексер"
+
+#, fuzzy
+#~ msgid "MPEG Transport Stream"
+#~ msgstr "MPEG Transport Stream демултиплексер"
+
+#, fuzzy
+#~ msgid "MPEG 1 Format"
+#~ msgstr "Формат"
+
+#, fuzzy
+#~ msgid "Enter the address of the computer to stream to."
+#~ msgstr "Постави кодек основног тока"
+
+#, fuzzy
+#~ msgid "Streaming/Transcoding Wizard"
+#~ msgstr "Емитовање/транскодирање није успело"
+
+#, fuzzy
+#~ msgid "Stream to network"
+#~ msgstr "Филтери тока"
+
+#, fuzzy
+#~ msgid "Existing playlist item"
+#~ msgstr "Прикажи стабло списка за репродуковање"
+
+#, fuzzy
+#~ msgid "Partial Extract"
+#~ msgstr "Извези"
+
+#, fuzzy
+#~ msgid "To"
+#~ msgstr "Врх"
+
+#, fuzzy
+#~ msgid "Streaming method"
+#~ msgstr "Режим рада расплитања за ток"
+
+#, fuzzy
+#~ msgid "UDP Unicast"
+#~ msgstr "UDP улаз"
+
+#, fuzzy
+#~ msgid "Transcode audio"
+#~ msgstr "Транскодовање"
+
+#, fuzzy
+#~ msgid "Transcode video"
+#~ msgstr "Транскодовање"
+
+#, fuzzy
+#~ msgid "Encapsulation format"
+#~ msgstr "Метод Енкапсулације"
+
+#, fuzzy
+#~ msgid "Additional streaming options"
+#~ msgstr "Опис излаза тока"
+
+#, fuzzy
+#~ msgid "Local playback"
+#~ msgstr "Прекини репродукцију"
+
+#, fuzzy
+#~ msgid "Additional transcode options"
+#~ msgstr "Опције транскодовања"
+
+#, fuzzy
+#~ msgid "Summary"
+#~ msgstr "Резиме Подкаста"
+
+#, fuzzy
+#~ msgid "Encap. format"
+#~ msgstr "Формат слике"
+
+#, fuzzy
+#~ msgid "Input stream"
+#~ msgstr "S-излазни ток"
+
+#, fuzzy
+#~ msgid "Save file to"
+#~ msgstr "Сачувај Фајл"
+
+#, fuzzy
+#~ msgid "Include subtitles"
+#~ msgstr "Омогући титлове"
+
+#, fuzzy
+#~ msgid "No input selected"
+#~ msgstr "Нема улаза"
+
+#, fuzzy
+#~ msgid "No valid destination"
+#~ msgstr "Неисправна комбинација"
+
+#, fuzzy
+#~ msgid "Select the directory to save to"
+#~ msgstr "Изаберите директоријум"
+
+#, fuzzy
+#~ msgid "No folder selected"
+#~ msgstr "Уклони изабрано"
+
+#, fuzzy
+#~ msgid "A directory where to save the files has to be selected."
+#~ msgstr "Директоријум где ће се чувати слике."
+
+#, fuzzy
+#~ msgid "Finish"
+#~ msgstr "фински"
+
+#, fuzzy
+#~ msgid "yes"
+#~ msgstr "Бајтови"
+
+#, fuzzy
+#~ msgid "no"
+#~ msgstr "Моно"
+
+#, fuzzy
+#~ msgid "&Decrease Volume"
+#~ msgstr "Утишај звук"
+
+#, fuzzy
+#~ msgid "&Save To Playlist"
+#~ msgstr "Сачувај листу за пуштање"
+
+#, fuzzy
+#~ msgid "Specify an identifier integer for this elementary stream to change"
+#~ msgstr "Наведите идентификатор за овај основни ток"
+
+#, fuzzy
+#~ msgid "OSD menu"
+#~ msgstr "DVD менији"
+
+#, fuzzy
+#~ msgid "Win32 font renderer"
+#~ msgstr "Freetype2 рендерер фонта"
+
+#, fuzzy
+#~ msgid "OpenGL ES"
+#~ msgstr "OpenGL"
+
+#, fuzzy
+#~ msgid "Brightness (%)"
+#~ msgstr "Осветљеност"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allowing only one running instance of VLC can sometimes be useful, for "
 #~ "example if you associated VLC with some media types and you don't want a "
@@ -32598,10 +32466,6 @@ msgstr ""
 #~ "фајлова и не желите да се отвара нови примерак VLC-а сваки пут када два "
 #~ "пута кликнете на фајл у претраживачу. Ова опција Вам дозвољава да пустите "
 #~ "или додате фајл у већ покренутом примерку програма."
-
-#, fuzzy
-#~ msgid "HTTP interace Certificates Revocation List file."
-#~ msgstr "Списак опозваних HTTP/TLS сертификата"
 
 #, fuzzy
 #~ msgid "Check TLS/SSL server hostname in certificate"
@@ -32637,17 +32501,14 @@ msgstr ""
 #~ msgstr "HTML листа за пуштање"
 
 #, fuzzy
-#~ msgid "last config"
-#~ msgstr "Увек настави"
-
-#, fuzzy
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr ""
 #~ "Уврсти ставке у листу за пуштање када се ради у режиму рада једног "
 #~ "примерка програма"
 
+#, fuzzy
 #~ msgid "Subtitle track added"
-#~ msgstr "Додат превод"
+#~ msgstr "Запис титла"
 
 #, fuzzy
 #~ msgid "Display XOSD output at the bottom of the screen instead of the top."
@@ -32997,11 +32858,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "SFTP user name"
-#~ msgstr "FTP корисничко име"
+#~ msgstr "SOCKS корисничко име"
 
 #, fuzzy
 #~ msgid "SFTP password"
-#~ msgstr "FTP лозинка"
+#~ msgstr "Шифра"
 
 #, fuzzy
 #~ msgid "Tuner id"
@@ -33094,10 +32955,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Silent mode"
 #~ msgstr "Тихи режим рада"
-
-#, fuzzy
-#~ msgid "CAPMT System ID"
-#~ msgstr "Id Система"
 
 #, fuzzy
 #~ msgid "Filename of dump"
@@ -33267,7 +33124,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&Tools"
-#~ msgstr "А&латке"
+#~ msgstr "Алат"
 
 #, fuzzy
 #~ msgid "&Open (advanced)..."
@@ -33275,7 +33132,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Audio &Channels"
-#~ msgstr "Звучни канали"
+#~ msgstr "Аудио канали"
 
 #, fuzzy
 #~ msgid "&Subtitles Track"
@@ -33283,7 +33140,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&Navigation"
-#~ msgstr "Навигација"
+#~ msgstr "Управљање ка доле"
 
 #, fuzzy
 #~ msgid "Hide VLC media player in taskbar"
@@ -33506,10 +33363,6 @@ msgstr ""
 #~ msgstr "Композитор"
 
 #, fuzzy
-#~ msgid "yes: from %@ to %@ secs"
-#~ msgstr "да: %@ @ %@ kb/s"
-
-#, fuzzy
 #~ msgid "Previous/Backward"
 #~ msgstr "Претходно поглавље"
 
@@ -33559,7 +33412,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Display on &Desktop"
-#~ msgstr "Резолуција приказа"
+#~ msgstr "Увек на врху"
 
 #, fuzzy
 #~ msgid "Video standard (Default, SECAM_D, PAL_B, NTSC_M, etc...)."
@@ -33651,7 +33504,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Zoom playlist"
-#~ msgstr "листа за пуштање"
+#~ msgstr "HTML листа за пуштање"
 
 #, fuzzy
 #~ msgid "key"
@@ -33679,11 +33532,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "IPv6 will be used by default for all connections."
-#~ msgstr "Лозинка која ће се користити за повезивање."
+#~ msgstr "Налог који ће се користити за повезивање."
 
 #, fuzzy
 #~ msgid "IPv4 will be used by default for all connections."
-#~ msgstr "Лозинка која ће се користити за повезивање."
+#~ msgstr "Налог који ће се користити за повезивање."
 
 #, fuzzy
 #~ msgid "Enable CPU MMX support"
@@ -33782,7 +33635,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "HTTP password"
-#~ msgstr "FTP лозинка"
+#~ msgstr "Лозинка за HTTP посредника"
 
 #, fuzzy
 #~ msgid "Certificate file"
@@ -33861,7 +33714,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "User agent that will be used for the connection."
-#~ msgstr "Корисничко име које ће се користити за повезивање."
+#~ msgstr "Налог који ће се користити за повезивање."
 
 #, fuzzy
 #~ msgid "Max number of redirection"
@@ -33977,7 +33830,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Audio Channel"
-#~ msgstr "Звучни канали"
+#~ msgstr "Аудио канали"
 
 #, fuzzy
 #~ msgid "Brightness of the video input."
@@ -34050,7 +33903,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Simple DirectMedia Layer audio output"
-#~ msgstr "Једноставан DirectMedia Layer видео излаз"
+#~ msgstr "DirectX аудио излаз"
 
 #, fuzzy
 #~ msgid "Reload image file"
@@ -34190,7 +34043,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "Није изабран фајл"
+#~ msgstr "Име видео уређаја"
 
 #, fuzzy
 #~ msgid "No items in the playlist"
@@ -34199,10 +34052,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
 #~ msgstr "Додај на списак нумера"
-
-#, fuzzy
-#~ msgid "1 item"
-#~ msgstr "%i ставки"
 
 #, fuzzy
 #~ msgid "Empty Folder"
@@ -34358,7 +34207,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Growl UDP Notification Plugin"
-#~ msgstr "Growl Додатак за Обавештења"
+#~ msgstr "LibNotify Додатак за Обавештења"
 
 #, fuzzy
 #~ msgid "Use SAP cache"
@@ -34430,7 +34279,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Enter the URL of the network stream here."
-#~ msgstr "Унесите адресу компјутера на који се пушта ток."
+#~ msgstr "Постави ID основног тока"
 
 #, fuzzy
 #~ msgid "Default port (server mode)"
@@ -34484,10 +34333,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "SDL video driver name"
 #~ msgstr "Име видео уређаја"
-
-#, fuzzy
-#~ msgid "Select the protocol for the URL."
-#~ msgstr "Изаберите директоријум за чување"
 
 #, fuzzy
 #~ msgid "Other codecs"
@@ -34558,20 +34403,12 @@ msgstr ""
 #~ msgstr "Вредност кеширања за локалне датотеке (у милисекундама)."
 
 #, fuzzy
-#~ msgid "Format to use in playlist \"title\" field when no CDDB"
-#~ msgstr "Формат за употребу у пољу\"наслов\" листе за пуштање."
-
-#, fuzzy
 #~ msgid "Use CD audio controls and output?"
 #~ msgstr "укључи ток аудио излаза"
 
 #, fuzzy
 #~ msgid "CDDB"
 #~ msgstr "CDDB порт"
-
-#, fuzzy
-#~ msgid "Format to use in playlist \"title\" field when using CDDB"
-#~ msgstr "Формат за употребу у пољу\"наслов\" листе за пуштање."
 
 #, fuzzy
 #~ msgid "CDDB server"
@@ -34637,12 +34474,12 @@ msgstr ""
 #~ msgid ""
 #~ "Allows you to modify the user name that will be used for authenticating "
 #~ "the connection."
-#~ msgstr "Корисничко име које ће се користити за повезивање."
+#~ msgstr "Налог који ће се користити за повезивање."
 
 #, fuzzy
 #~ msgid ""
 #~ "Allows you to modify the password that will be used for the connection."
-#~ msgstr "Лозинка која ће се користити за повезивање."
+#~ msgstr "Налог који ће се користити за повезивање."
 
 #, fuzzy
 #~ msgid "MPEG-4 video demuxer"
@@ -34674,7 +34511,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "VLC media player: Open Subtitle File"
-#~ msgstr "VLC медија плејер помоћ"
+#~ msgstr "VLC медија плејер надоградња"
 
 #, fuzzy
 #~ msgid "Select None"
@@ -34698,7 +34535,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Stay On Top"
-#~ msgstr "Увек &на врху"
+#~ msgstr "Плутај на Врху"
 
 #, fuzzy
 #~ msgid "Take Screen Shot"
@@ -34726,11 +34563,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "unicast"
-#~ msgstr "UDP Уникаст (једноструко емитовање)"
+#~ msgstr "Шоуткаст"
 
 #, fuzzy
 #~ msgid "multicast"
-#~ msgstr "UDP Мултикаст (вишеструко емитовање)"
+#~ msgstr "Шоуткаст"
 
 #, fuzzy
 #~ msgid "Network: "
@@ -34953,7 +34790,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "summary"
-#~ msgstr "Резиме"
+#~ msgstr "Резиме Подкаста"
 
 #, fuzzy
 #~ msgid "video-filter-event"
@@ -35057,10 +34894,6 @@ msgstr ""
 #~ msgstr "Ново Доба"
 
 #, fuzzy
-#~ msgid "UDP/RTP Multicast"
-#~ msgstr "UDP Мултикаст (вишеструко емитовање)"
-
-#, fuzzy
 #~ msgid "Use a sub&amp;titles file"
 #~ msgstr "Користи фа&јл титла"
 
@@ -35099,10 +34932,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "&Load Playlist File..."
 #~ msgstr "&Сачувај списак нумера…"
-
-#, fuzzy
-#~ msgid "Additional &Sources"
-#~ msgstr "Додатне опције транскодовања"
 
 #, fuzzy
 #~ msgid "American English"
@@ -35235,11 +35064,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "MPEG-4 audio demuxer"
-#~ msgstr "MPEG аудио декодер"
+#~ msgstr "MPEG-I/II видео демултиплексер"
 
 #, fuzzy
 #~ msgid "MPEG audio / MP3 demuxer"
-#~ msgstr "MPEG аудио декодер"
+#~ msgstr "MPEG-PS демултиплексер"
 
 #, fuzzy
 #~ msgid "16:9 subtitles"
@@ -35306,10 +35135,6 @@ msgstr ""
 #~ msgstr "Излазни фајл"
 
 #, fuzzy
-#~ msgid "Bonjour"
-#~ msgstr "Bonjour сервиси"
-
-#, fuzzy
 #~ msgid "Image video output"
 #~ msgstr "OpenGL видео излаз"
 
@@ -35350,14 +35175,6 @@ msgstr ""
 #~ msgstr "Аудио CD - аудио запис %02i"
 
 #, fuzzy
-#~ msgid "Seam Carving"
-#~ msgstr "Пуштање Тока/Чување:"
-
-#, fuzzy
-#~ msgid "VLC - Controller"
-#~ msgstr "Контрола звука"
-
-#, fuzzy
 #~ msgid "Extended settings"
 #~ msgstr "Прикажи напредне опције"
 
@@ -35395,7 +35212,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Subscreen height."
-#~ msgstr "Висина подекрана"
+#~ msgstr "Висина оквира"
 
 #, fuzzy
 #~ msgid "%i items in the playlist"
@@ -35435,11 +35252,11 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Display Device"
-#~ msgstr "Уређај за приказ"
+#~ msgstr "Прикажи ИД"
 
 #, fuzzy
 #~ msgid "Enable Wallpaper Mode"
-#~ msgstr "Укључи мод позадине"
+#~ msgstr "Омогући режим мегабаса"
 
 #, fuzzy
 #~ msgid "use Pause Color"
@@ -35499,7 +35316,9 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "The stream must be playing or paused for bookmarks to work"
-#~ msgstr "Ток мора да се преслушава или паузира да би маркери радили."
+#~ msgstr ""
+#~ "Није пронађен улаз. Ток мора да се репродукује или паузира да би маркери "
+#~ "радили."
 
 #, fuzzy
 #~ msgid ""
@@ -35596,11 +35415,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "&View items"
-#~ msgstr "%i ставки"
-
-#, fuzzy
-#~ msgid "Preparse"
-#~ msgstr "Припремалац"
+#~ msgstr "&Преглед"
 
 #, fuzzy
 #~ msgid "%i items in playlist"
@@ -35651,88 +35466,12 @@ msgstr ""
 #~ msgstr "Ово Вам дозвољава да одредите основни порт за RTP пуштање тока."
 
 #, fuzzy
-#~ msgid "Use this to stream on a network."
-#~ msgstr "Употребите овај ток за један компјутер."
-
-#, fuzzy
-#~ msgid ""
-#~ "This wizard only contains a small subset of VLC's streaming and "
-#~ "transcoding capabilities. Use the Open and Stream Output dialogs to "
-#~ "access all of them."
-#~ msgstr ""
-#~ "Овај маџионичар даје приступ малом подскупу VLC-ових могућности пуштања "
-#~ "тока и транскодовања. Дијалози Отвори и 'Saving/Streaming' дају приступ "
-#~ "већем броју карактеристика."
-
-#, fuzzy
-#~ msgid "Use this to stream on a network"
-#~ msgstr "Употребите овај ток за један компјутер."
-
-#, fuzzy
 #~ msgid "Unable to find playlist"
 #~ msgstr "Очисти листу за пуштање"
 
 #, fuzzy
-#~ msgid ""
-#~ "Use this to read only a part of the stream. To use, enter the starting "
-#~ "and ending times (in seconds).\n"
-#~ "\n"
-#~ "Note: You must be able to control the incoming stream (for example, a "
-#~ "file or a disc, but not a RTP/UDP network stream).\n"
-#~ msgstr ""
-#~ "Ово може да се користи за читање само дела тока. Мора бити могуће "
-#~ "контролисање долазећег тока (на пример, диск или фајл, али не UDP мрежни "
-#~ "ток.) Почетна и завршна времена могу бити дата у секундама."
-
-#, fuzzy
-#~ msgid ""
-#~ "Changes the compression format of the audio or video tracks. To change "
-#~ "only the container format, proceed to the next page."
-#~ msgstr ""
-#~ "Ова страница Вам дозвољава да промените формат компресије аудио или видео "
-#~ "траке. Ако желите да промените формат садржаоца, идите на следећу "
-#~ "страницу."
-
-#, fuzzy
-#~ msgid ""
-#~ "Select the target video codec. Choose a codec to display more information "
-#~ "about it."
-#~ msgstr "Изаберите ваш видео кодек. Кликните на неки за више информација."
-
-#, fuzzy
-#~ msgid ""
-#~ "Select the target audio codec. Choose a codec to display more information "
-#~ "about it."
-#~ msgstr "Изаберите ваш аудио кодек. Кликните на неки за више информација."
-
-#, fuzzy
 #~ msgid "Determines how the input stream will be sent."
 #~ msgstr "Одређује колико ће постојати делова спектра."
-
-#, fuzzy
-#~ msgid "Defines a few additional parameters for the transcoding."
-#~ msgstr ""
-#~ "На овој страници, могу бити подешени додатни параметри за пуштање тока."
-
-#, fuzzy
-#~ msgid ""
-#~ "When streaming using RTP, you can announce your streams using the SAP/SDP "
-#~ "announcing protocol. This way, the clients won't have to type in the "
-#~ "multicast address, it will appear in their playlist if they enable the "
-#~ "SAP extra interface.\n"
-#~ "If you want to give a name to your stream, enter it here. Otherwise, a "
-#~ "default name will be used."
-#~ msgstr ""
-#~ "Када пуштате ток коришћењем UDP-а, токови могу бити најављени коришћењем "
-#~ "SAP/SDP протокола најава. На овај начин, клијенти неће морати да уносе "
-#~ "мултикаст адресу, појавиће се у њиховим Листама за пуштање ако омогуће "
-#~ "екстра SAP интерфејс.\n"
-#~ "Ако желите да дате име току, унесите га овде, у супротном, користиће се "
-#~ "подразумевано име."
-
-#, fuzzy
-#~ msgid "Transcode audio (if available)"
-#~ msgstr "Аудио транскодовање"
 
 #, fuzzy
 #~ msgid "Image inversion"
@@ -35806,7 +35545,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Previous playlist item"
-#~ msgstr "Постојећа ставка листе за пуштање"
+#~ msgstr "Претходни наслов"
 
 #, fuzzy
 #~ msgid "Play slower"
@@ -35839,112 +35578,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Media &Info..."
 #~ msgstr "Информациjе о медију..."
-
-#, fuzzy
-#~ msgid ""
-#~ "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-#~ msgstr ""
-#~ "MPEG-1 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, OGG и RAW "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid ""
-#~ "MPEG-2 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-#~ msgstr ""
-#~ "MPEG-2 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, OGG и RAW "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid ""
-#~ "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MPEG4, OGG "
-#~ "and RAW)"
-#~ msgstr ""
-#~ "MPEG-4 Видео кодек (употребљив са MPEG PS, MPEG TS, MPEG1, ASF, MP4, OGG "
-#~ "и RAW форматима)"
-
-#, fuzzy
-#~ msgid "H264 is a new video codec (useable with MPEG TS and MPEG4)"
-#~ msgstr "H264 је нови видео кодек (употребљив са MPEG TS и MP4 форматима)"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid ""
-#~ "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
-#~ msgstr ""
-#~ "WMV (Windows Media Video) 1 (употребљив са MPEG TS, MPEG1, ASF и OGG "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
-#~ msgstr ""
-#~ "Theora је бесплатан кодек опште употребе (употребљив са MPEG TS и OGG "
-#~ "форматима)"
-
-#, fuzzy
-#~ msgid "RTP Unicast"
-#~ msgstr "UDP Уникаст (једноструко емитовање)"
-
-#, fuzzy
-#~ msgid "Stream to a single computer."
-#~ msgstr "Употребите овај ток за један компјутер."
-
-#, fuzzy
-#~ msgid "RTP Multicast"
-#~ msgstr "UDP Мултикаст (вишеструко емитовање)"
-
-#, fuzzy
-#~ msgid ""
-#~ "Stream to a dynamic group of computers on a multicast-enabled network. "
-#~ "This is the most efficient method to stream to several computers, but it "
-#~ "does not work over the Internet."
-#~ msgstr ""
-#~ "Користите овај ток ка динамичкој групи компјутера на мултикаст-омогућеној "
-#~ "мрежи. Ово је најефикасниј метод за пуштање тока на неколико компјутераm, "
-#~ "али не ради преко Интернета."
-
-#, fuzzy
-#~ msgid ""
-#~ "Enter the multicast address to stream to. This must be an IP address "
-#~ "between 224.0.0.0 an 239.255.255.255. For private use, enter an address "
-#~ "beginning with 239.255."
-#~ msgstr ""
-#~ "Унесите мултикаст адресу на коју ће се пуштати ток у овом пољу . Ово мора "
-#~ "да буде IP адреса измеђи 224.0.0.0 и 239.255.255.255. За приватну "
-#~ "употребу, унесите адресу која почиње са 239.255."
-
-#, fuzzy
-#~ msgid ""
-#~ "Stream to several computers. This method is less efficient, as the server "
-#~ "needs to send the stream several times."
-#~ msgstr ""
-#~ "Користите ово да пуштате ток на више компјутера. Овај метод није "
-#~ "најефикаснији, пошто сервер мора да шаље ток неколико пута, али је "
-#~ "генерално најкомпатибилнији"
-
-#, fuzzy
-#~ msgid ""
-#~ "Enter the local addresses you want to listen to. Do not enter anything if "
-#~ "you want to listen to all adresses or if you don't understand. This is "
-#~ "generally the best thing to do. Other computers can then access the "
-#~ "stream at http://yourip:8080 by default."
-#~ msgstr ""
-#~ "Унесите локалну адреса са које желите да слушате захтеве. Немој да "
-#~ "уносите ниђта ако желите да слушате све мрежне интерфејсе. Ово је "
-#~ "уопштено најбоље. Други компјутери могу да приступе  току преко http://"
-#~ "yourip:8080 која је подразумевана."
 
 #, fuzzy
 #~ msgid "Bookmarks dialog"
@@ -36011,16 +35644,8 @@ msgstr ""
 #~ msgstr "Апликација"
 
 #, fuzzy
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "Припремалац"
-
-#, fuzzy
 #~ msgid "ISO-9660 Publisher"
 #~ msgstr "Издавач"
-
-#, fuzzy
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "Подеси јачину Звука"
 
 #, fuzzy
 #~ msgid "print help for the advanced options"
@@ -36124,15 +35749,15 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
-#~ msgstr "Сортирај Чворове по Аутору"
+#~ msgstr "Сортирај по"
 
 #, fuzzy
 #~ msgid "Sorted by Album"
-#~ msgstr "Сортирај Чворове по Аутору"
+#~ msgstr "Сортирај по"
 
 #, fuzzy
 #~ msgid "Growl password"
-#~ msgstr "FTP лозинка"
+#~ msgstr "Лозинка за HTTP посредника"
 
 #, fuzzy
 #~ msgid "(no title)"
