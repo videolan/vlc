@@ -1,5 +1,5 @@
 # Indonesian translation
-# Copyright (C) 2015 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -10,13 +10,12 @@
 # zk <zamani.karmana@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2017-12-27 11:00+0100\n"
 "PO-Revision-Date: 2015-12-04 10:01+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
-"Language-Team: Indonesian (http://www.transifex.com/yaron/vlc-trans/language/"
-"id/)\n"
+"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"Language-Team: Indonesian (https://www.transifex.com/yaron/teams/16553/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,8 +79,8 @@ msgstr "Pengaturan untuk antarmuka pengendali VLC"
 msgid "Hotkeys settings"
 msgstr "Pengaturan Tombol Pintas Cepat"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -189,9 +188,8 @@ msgstr ""
 "Pengaturan yang berkaitan dengan OSD, terjemahan dan \"lapisan subgambar\"."
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Filter"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -658,9 +656,8 @@ msgid "Spectrum"
 msgstr "Spektrum"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Meteran Vu"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -676,9 +673,8 @@ msgid "Stereo audio mode"
 msgstr "Mode audio stereo"
 
 #: src/audio_output/output.c:421
-#, fuzzy
 msgid "Original"
-msgstr "ID Asli"
+msgstr ""
 
 #: src/audio_output/output.c:427 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -736,7 +732,8 @@ msgstr "Headphones"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Otomatis"
@@ -832,14 +829,12 @@ msgstr ""
 "  vlc://quit                     Butir spesial untuk keluar dari VLC\n"
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr " (aktif secara bawaan)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr " (nonaktif secara bawaan)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -983,9 +978,9 @@ msgid "Yes"
 msgstr "Ya"
 
 #: src/input/es_out.c:2132
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Teks tindih %u"
+msgstr ""
 
 #: src/input/es_out.c:2134
 #, c-format
@@ -1013,8 +1008,8 @@ msgstr "Bahasa"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskripsi"
 
@@ -1072,14 +1067,12 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3133
-#, fuzzy
 msgid "Video resolution"
-msgstr "Resolusi video yang dikehendaki"
+msgstr ""
 
 #: src/input/es_out.c:3138
-#, fuzzy
 msgid "Buffer dimensions"
-msgstr "Ukuran buffer dalam detik"
+msgstr ""
 
 #: src/input/es_out.c:3148 src/input/es_out.c:3151 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1096,48 +1089,40 @@ msgid "Decoded format"
 msgstr "Format terawakode"
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Top left"
-msgstr "Kiri belakang"
+msgstr ""
 
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Left top"
-msgstr "Depan kiri"
+msgstr ""
 
 #: src/input/es_out.c:3165
 msgid "Right bottom"
 msgstr ""
 
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Top right"
-msgstr "Hakcipta"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom left"
-msgstr "Kiri-Bawah"
+msgstr ""
 
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom right"
-msgstr "Kanan-Bawah"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Left bottom"
-msgstr "Zona 2:bawah"
+msgstr ""
 
 #: src/input/es_out.c:3167
-#, fuzzy
 msgid "Right top"
-msgstr "Kanan"
+msgstr ""
 
 #: src/input/es_out.c:3169
-#, fuzzy
 msgid "Orientation"
-msgstr "Orientasi pencerminan"
+msgstr ""
 
 #: src/input/es_out.c:3175 src/input/es_out.c:3193 src/input/es_out.c:3211
 #: src/input/es_out.c:3225 src/playlist/tree.c:67
@@ -1146,19 +1131,16 @@ msgid "Undefined"
 msgstr "Tidak ditentukan"
 
 #: src/input/es_out.c:3177
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 baris / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3179
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 baris / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3187
-#, fuzzy
 msgid "Color primaries"
-msgstr "Pesan berwarna"
+msgstr ""
 
 #: src/input/es_out.c:3194 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1170,14 +1152,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3205
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Ekstraksi warna"
+msgstr ""
 
 #: src/input/es_out.c:3218
-#, fuzzy
 msgid "Color space"
-msgstr "Skema warna"
+msgstr ""
 
 #: src/input/es_out.c:3218
 #, c-format
@@ -1185,9 +1165,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3220
-#, fuzzy
 msgid "Full"
-msgstr "Bass penuh"
+msgstr ""
 
 #: src/input/es_out.c:3227 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1201,29 +1180,24 @@ msgid "Center"
 msgstr "Tengah"
 
 #: src/input/es_out.c:3228
-#, fuzzy
 msgid "Top Left"
-msgstr "Kiri-Atas"
+msgstr ""
 
 #: src/input/es_out.c:3229
-#, fuzzy
 msgid "Top Center"
-msgstr "Tengah"
+msgstr ""
 
 #: src/input/es_out.c:3230
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Kiri-Bawah"
+msgstr ""
 
 #: src/input/es_out.c:3231
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Kiri-Bawah"
+msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Chroma location"
-msgstr "Format kroma"
+msgstr ""
 
 #: src/input/es_out.c:3244
 msgid "Rectangular"
@@ -1238,9 +1212,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3256
-#, fuzzy
 msgid "Projection"
-msgstr "Arah"
+msgstr ""
 
 #: src/input/es_out.c:3258
 msgid "Yaw"
@@ -1267,24 +1240,20 @@ msgid "Min. luminance"
 msgstr ""
 
 #: src/input/es_out.c:3282
-#, fuzzy
 msgid "Primary R"
-msgstr "Bahasa utama"
+msgstr ""
 
 #: src/input/es_out.c:3289
-#, fuzzy
 msgid "Primary G"
-msgstr "Bahasa utama"
+msgstr ""
 
 #: src/input/es_out.c:3296
-#, fuzzy
 msgid "Primary B"
-msgstr "Bahasa utama"
+msgstr ""
 
 #: src/input/es_out.c:3303
-#, fuzzy
 msgid "White point"
-msgstr "Putih"
+msgstr ""
 
 #: src/input/es_out.c:3318 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1299,11 +1268,12 @@ msgstr "Masukan anda tidak dapat dibuka"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC tidak dapat membuka MRL '%s'. Periksa catatan log untuk perincian."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1397,14 +1367,12 @@ msgid "Actors"
 msgstr "Actor"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Artis"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Nomor trek"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1445,14 +1413,12 @@ msgid "Previous title"
 msgstr "Judul sebelumnya"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Timeout"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Timeout"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1604,13 +1570,10 @@ msgid "Color messages"
 msgstr "Pesan berwarna"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Ini mengaktifkan pewarnaan pesan yang dikirim ke konsol. Terminal anda "
-"memerlukan dukungan warna Linux untuk melakukannya."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1662,9 +1625,8 @@ msgstr ""
 "adalah dengan secara otomatis memilih metode terbaik yang ada."
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Sudut pada Media"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1684,38 +1646,32 @@ msgstr ""
 "audio tidak akan berjalan, sehingga akan menghemat sedikit tenaga pemrosesan."
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Musical"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Lokasi"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "Game"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Penguatan"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Destinasi"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Produk"
+msgstr ""
 
 #: src/libvlc-module.c:144
-#, fuzzy
 msgid "Accessibility"
-msgstr "Keluaran Akses"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1763,14 +1719,10 @@ msgid "This selects which plugin to use for audio resampling."
 msgstr ""
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"Ini akan menetapkan mode kanal keluaran audio yang akan digunakan secara "
-"baku jika dimungkinkan (mis. jika perangkat keras anda mendukungnya begitu "
-"juga dengan strim audio yang diputar)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1801,7 +1753,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2125,9 +2078,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "Selalu tempatkan window video di atas window lain."
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Hidupkan mode wallpaper"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2729,9 +2681,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "ID Stream trek subtitle yang digunakan."
 
 #: src/libvlc-module.c:616
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "Daftar dekoder yang dikehendaki"
+msgstr ""
 
 #: src/libvlc-module.c:620
 msgid "Preferred video resolution"
@@ -2862,14 +2813,12 @@ msgstr ""
 "offset},{...}\""
 
 #: src/libvlc-module.c:675
-#, fuzzy
 msgid "Record directory"
-msgstr "Direktori sumber"
+msgstr ""
 
 #: src/libvlc-module.c:677
-#, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "Direktori atau nama file di mana rekaman akan disimpan"
+msgstr ""
 
 #: src/libvlc-module.c:679
 msgid "Prefer native stream recording"
@@ -2945,9 +2894,8 @@ msgstr ""
 "alih-alih di atas film. Coba beberapa posisi."
 
 #: src/libvlc-module.c:714
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Enkoding teks subtitle"
+msgstr ""
 
 #: src/libvlc-module.c:715
 msgid "Changes the subtitles size where possible"
@@ -3118,9 +3066,8 @@ msgid "TCP connection timeout"
 msgstr "Timeout koneksi TCP"
 
 #: src/libvlc-module.c:805
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "Default timeout koneksi TCP (dalam milidetik)."
+msgstr ""
 
 #: src/libvlc-module.c:807
 msgid "HTTP server address"
@@ -3502,19 +3449,16 @@ msgid "Stream filter module"
 msgstr "Modul filter stream"
 
 #: src/libvlc-module.c:1003
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "Filter stream digunakan untuk mengubah stream yang sedang dibaca."
+msgstr ""
 
 #: src/libvlc-module.c:1005
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Modul filter stream"
+msgstr ""
 
 #: src/libvlc-module.c:1007
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "Filter stream digunakan untuk mengubah stream yang sedang dibaca."
+msgstr ""
 
 #: src/libvlc-module.c:1009
 msgid "Demux module"
@@ -3606,16 +3550,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1052
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "Daftar packetizer yang dikehendaki"
+msgstr ""
 
 #: src/libvlc-module.c:1054
-#, fuzzy
 msgid "List of keystores that VLC will use in priority."
 msgstr ""
-"Ini akan mengizinkan Anda memilih daftar enkoder yang akan digunakan VLC "
-"dalam urutan prioritas."
 
 #: src/libvlc-module.c:1056
 msgid "Locally collect statistics"
@@ -3707,9 +3647,8 @@ msgstr ""
 "dan tetap putar item saat ini."
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC media player update"
+msgstr ""
 
 #: src/libvlc-module.c:1099
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3724,28 +3663,22 @@ msgstr ""
 "ditindih pada kotak dialog playlist."
 
 #: src/libvlc-module.c:1111
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "Preparse file secara otomatis"
+msgstr ""
 
 #: src/libvlc-module.c:1113
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"Preparse file yang ditambahkan pada playlist (untuk mendapatkan beberapa "
-"metadata) secara otomatis."
 
 #: src/libvlc-module.c:1116
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Timeout"
+msgstr ""
 
 #: src/libvlc-module.c:1118
-#, fuzzy
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr "Nilai caching untuk kamera dan mikropon, dalam milidetik."
+msgstr ""
 
 #: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3795,9 +3728,8 @@ msgstr ""
 "instans. Gunakan daftar ekstensi dipisah-koma."
 
 #: src/libvlc-module.c:1141
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Filter rotasi video"
+msgstr ""
 
 #: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
@@ -3862,14 +3794,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr ""
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Start paused"
-msgstr "Waktu mulai"
+msgstr ""
 
 #: src/libvlc-module.c:1176
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr "Bariskan item kepada playlist apabila berada pada mode satu instans"
+msgstr ""
 
 #: src/libvlc-module.c:1178
 msgid "Auto start"
@@ -3923,19 +3853,16 @@ msgid "Ignore"
 msgstr "Abaikan"
 
 #: src/libvlc-module.c:1208
-#, fuzzy
 msgid "Volume control"
-msgstr "Kontrol Volume"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control"
-msgstr "Kontrol Posisi"
+msgstr ""
 
 #: src/libvlc-module.c:1209
-#, fuzzy
 msgid "Position control reversed"
-msgstr "Kontrol Posisi"
+msgstr ""
 
 #: src/libvlc-module.c:1212
 msgid "Mouse wheel vertical axis control"
@@ -4216,44 +4143,40 @@ msgid "Navigate up"
 msgstr "Arahkan ke atas"
 
 #: src/libvlc-module.c:1290
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr "Pilih kunci untuk memindahkan pemilih ke atas dalam menu DVD."
+msgstr ""
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
 msgstr "Arahkan ke bawah"
 
 #: src/libvlc-module.c:1292
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr "Pilih kunci untuk memindahkan pemilih ke bawah dalam menu DVD."
+msgstr ""
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
 msgstr "Arahkan ke kiri"
 
 #: src/libvlc-module.c:1294
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr "Pilih kunci untuk memindahkan pemilih ke kiri dalam menu DVD."
+msgstr ""
 
 #: src/libvlc-module.c:1295
 msgid "Navigate right"
 msgstr "Arahkan ke kanan"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr "Pilih kunci untuk memindahkan pemilih ke kanan dalam menu DVD."
+msgstr ""
 
 #: src/libvlc-module.c:1297
 msgid "Activate"
@@ -4347,24 +4270,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "Pilih kunci untuk menaikkan penundaan subtitle."
 
 #: src/libvlc-module.c:1319
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Dekoder subtitle teleteks"
+msgstr ""
 
 #: src/libvlc-module.c:1320
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Hidupkan subtitle"
+msgstr ""
 
 #: src/libvlc-module.c:1321
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Hidupkan subtitle"
+msgstr ""
 
 #: src/libvlc-module.c:1322
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "Pilih kunci untuk memindahkan subtitle lebih tinggi."
+msgstr ""
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4584,14 +4503,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "Putar sesuai trek (bahasa) audio yang ada."
 
 #: src/libvlc-module.c:1385
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "Putar trek subtitle"
+msgstr ""
 
 #: src/libvlc-module.c:1386
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Putar sesuai trek subtitle yang ada."
+msgstr ""
 
 #: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
@@ -4988,7 +4905,8 @@ msgid "Browser Stop"
 msgstr "Berhenti pada Peramban"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5351,13 +5269,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr "File \"%s\" yang diunduh terkorupsi. Sehingga, file tersebut dihapus."
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"Versi baru berhasil diunduh. Apakah Anda ingin menutup VLC dan menginstalasi "
-"versi baru tersebut?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6128,28 +6043,22 @@ msgid "Attachment input"
 msgstr "Masukan lampiran"
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "Penangkap audio"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Modul keluaran audio"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Tidak ada perangkat input yang ditemukan"
+msgstr ""
 
 #: modules/access/avcapture.m:287
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
-"Mac Anda kelihatannya tidak dilengkapi dengan perangkat input yang cocok. "
-"Harap cek konektor dan driver Anda."
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6248,9 +6157,8 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr "Pustaka dekoding BD+ Anda tidak berfungsi. Konfigurasi hilang?"
 
 #: modules/access/bluray.c:794
-#, fuzzy
 msgid "Java required"
-msgstr "Dibutuhkan SDP"
+msgstr ""
 
 #: modules/access/bluray.c:795
 #, c-format
@@ -6315,24 +6223,20 @@ msgid "CDDB Server port to use."
 msgstr "Port server CDDB yang digunakan."
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Daftar input"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr "Daftar terpisah koma dari window aktif, default ke semua"
+msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "Lokasi"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "Input perintah TCP"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6343,9 +6247,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "Input Kamera Digital IIDC (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "Log ke file"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6441,9 +6344,8 @@ msgid "Composite"
 msgstr "Komposit"
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-Video"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6521,13 +6423,10 @@ msgid "Audio device name"
 msgstr "Nama perangkat audio"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"Nama perangkat audio yang akan digunakan oleh plugin DirectShow. Jika Anda "
-"tidak menentukan apapun, perangkat default akan digunakan."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:792
@@ -6683,13 +6582,10 @@ msgid "AM Tuner mode"
 msgstr "Mode penala AM"
 
 #: modules/access/dshow/dshow.cpp:194
-#, fuzzy
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"Mode penala AM. Dapat berupa salah satu dari Default (0), TV (1), AM Radio "
-"(2), FM Radio (3) atau DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6754,23 +6650,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "Perangkat penangkap \"%s\" tidak mendukung parameter dibutuhkan."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Dekorasi window"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
 msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "Input SMB"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Modul penemuan servis"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -6836,7 +6729,8 @@ msgstr ""
 "Kanal TV dikelompokkan oleh transponder (alias multiplex) pada frekuensi "
 "tertentu. Ini dibutuhkan untuk menyetel penerima."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulasi / Konstelasi"
 
@@ -7229,18 +7123,16 @@ msgstr ""
 "fitur ini jika menghadapi kesulitan."
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "Ketinggian Satelit"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "Pemindaian DVB"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -7251,9 +7143,8 @@ msgid "Use NIT for scanning services"
 msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -7267,9 +7158,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "Pemindaian DVB"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7365,9 +7255,8 @@ msgid "Directory"
 msgstr "Direktori"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "Modul khusus"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7386,11 +7275,10 @@ msgstr "Username"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "Nama pengguna yang akan digunakan untuk koneksi."
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7407,13 +7295,10 @@ msgstr "Password"
 
 #: modules/access/ftp.c:72 modules/access/rdp.c:69 modules/access/sftp.c:59
 #: modules/access/smb_common.h:25
-#, fuzzy
 msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
-"Tentukan nama pengguna untuk koneksi tersebut, jika tidak ada nama pengguna "
-"atau password yang ditentukan dalam url."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7424,14 +7309,13 @@ msgid "Account that will be used for the connection."
 msgstr "Akun yang akan digunakan untuk koneksi."
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "Otentifikasi SFTP"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "Masukkan nama login dan password yang sah untuk koneksi sftp ke %s."
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7507,14 +7391,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Masukkan nama login dan password yang sah untuk %s."
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "Input HTTP"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7541,9 +7423,8 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Agen pengguna HTTP"
+msgstr ""
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7622,7 +7503,8 @@ msgstr "Jumlah kanal dari stream antara audio"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Lebar"
@@ -7703,14 +7585,12 @@ msgid "Memory input"
 msgstr "Input memori"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Buang Pemilihan"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Output stream dummy"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7976,19 +7856,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Tidak ada input"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Koneksi RTSP gagal"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8028,32 +7905,26 @@ msgid "PulseAudio input"
 msgstr "Input PulseAudio"
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "Surround"
+msgstr ""
 
 #: modules/access/qtsound.m:60
 msgid "QuickTime Sound Capture"
 msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Tidak ada perangkat input yang ditemukan"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
-"Mac Anda kelihatannya tidak dilengkapi dengan perangkat input yang cocok. "
-"Harap cek konektor dan driver Anda."
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Tidak ada perangkat input yang ditemukan"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8203,9 +8074,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Pilih stream"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8449,9 +8319,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr "Domain/Workgroup yang akan digunakan untuk koneksi."
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "Pengesahan RTSP"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8462,14 +8331,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:288 modules/access_output/srt.c:311
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:289
-#, fuzzy
 msgid "SRT input"
-msgstr "Input SFTP"
+msgstr ""
 
 #: modules/access/srt.c:294 modules/access_output/srt.c:317
 msgid "SRT chunk size (bytes)"
@@ -8480,9 +8347,8 @@ msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
 
 #: modules/access/srt.c:297 modules/access_output/srt.c:320
-#, fuzzy
 msgid "SRT latency (ms)"
-msgstr "Penundaan DTS (milidetik)"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8501,9 +8367,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr ""
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "Timeout sumber RTP (detik)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8542,17 +8407,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "Standar video (Default, SECAM, PAL, atau NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
-#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
 "I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"Paksa perangkat video Video4Linux2 untuk menggunakan format kroma tertentu "
-"(misal I420 atau I422 untuk gambar raw, MJPG untuk input terkompresi M-JPEG) "
-"(Daftar lengkap: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, "
-"I422, I420, I411, I410, MJPG)"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8584,7 +8444,8 @@ msgstr "Perangkat radio"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Frekuensi"
 
@@ -9073,18 +8934,16 @@ msgid "X.509 Client certificate"
 msgstr "Sertifikat klien X.509"
 
 #: modules/access/vnc.c:53
-#, fuzzy
 msgid "Certificate for client authentication"
-msgstr "Sertifikat untuk otentifikasi klien"
+msgstr ""
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
 msgstr "Kunci privat klien X.509"
 
 #: modules/access/vnc.c:55
-#, fuzzy
 msgid "Private key for authentication by certificate"
-msgstr "Kunci privat untuk otentifikasi sesuai sertifikat"
+msgstr ""
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9119,9 +8978,8 @@ msgid "Loopback mode"
 msgstr ""
 
 #: modules/access/wasapi.c:486
-#, fuzzy
 msgid "Record an audio rendering endpoint."
-msgstr "Hidup/matikan rendering audio."
+msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -9176,9 +9034,8 @@ msgid "Perform ISO C time and date formatting on the file path"
 msgstr "Lakukan permformatan waktu dan tanggal ISO C pada path file"
 
 #: modules/access_output/file.c:384
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Sinkronisasi"
+msgstr ""
 
 #: modules/access_output/file.c:385
 msgid "Open the file with synchronous writing."
@@ -9189,9 +9046,8 @@ msgid "File stream output"
 msgstr "Output stream file"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Username yang akan diminta untuk mengakses stream."
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9208,9 +9064,8 @@ msgstr ""
 "MIME yang dikembalikan oleh server (deteksi otomatis jika tidak ditentukan)."
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -9271,9 +9126,8 @@ msgid "Full URL to put in index file"
 msgstr "URL lengkap untuk diletakkan pada file indeks"
 
 #: modules/access_output/livehttp.c:84
-#, fuzzy
 msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr "URL lengkap untuk diletakkan pada file indeks"
+msgstr ""
 
 #: modules/access_output/livehttp.c:87
 msgid "Delete segments"
@@ -9319,14 +9173,12 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr "Bangkitkan IV dibandingkan menggunakan nomor segmen sebagai IV"
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Jumlah segmen"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
-#, fuzzy
 msgid "The number of the first segment generated"
-msgstr "Jumlah waktu yang digunakan untuk melakukan blend"
+msgstr ""
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
@@ -9374,47 +9226,40 @@ msgid "Genre description"
 msgstr "Deskripsi Genre"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "Genre dari konten."
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Deskripsi"
+msgstr ""
 
 #: modules/access_output/shout.c:86
-#, fuzzy
 msgid "URL with information about the stream or your channel."
-msgstr "URL dengan informasi tentang stream atau kanal Anda. "
+msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "Informasi kadar bit dari stream tertranskodekan. "
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "Informasi kadar pensampelan dari stream tertranskodekan. "
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "Jumlah kanal"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "Jumlah informasi kanal dari stream tertranskodekan."
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Kualitas Ogg Vorbis"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Informasi Kualitas Ogg Vorbis pada stream tertranskodekan. "
+msgstr ""
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9435,9 +9280,8 @@ msgid "IceCAST output"
 msgstr "Output IceCAST"
 
 #: modules/access_output/srt.c:312
-#, fuzzy
 msgid "SRT stream output"
-msgstr "Output stream RTP"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9706,9 +9550,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:76
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Penvisual"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9797,27 +9640,24 @@ msgid "Attack time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr "Default timeout koneksi TCP (dalam milidetik)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr "Waktu rilis"
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "Default timeout koneksi TCP (dalam milidetik)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
 msgstr "Level batasan"
 
 #: modules/audio_filter/compressor.c:165
-#, fuzzy
 msgid "Set the threshold level in dB."
-msgstr "Tetapkan level batasan dalam dB (-30 ... 0)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:228
@@ -9826,9 +9666,8 @@ msgid "Ratio"
 msgstr "Rasio"
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Tetapkan rasio (n:1) (1 ... 20)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9863,9 +9702,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "Filter audio untuk konversi format PCM"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "Filter audio untuk enkapsulasi A/52->S/PDIF"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10126,14 +9964,12 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Kualitas rendering"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "Kadar persampelan"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10187,9 +10023,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Kanal output audio"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
@@ -10506,9 +10341,8 @@ msgid "Output file"
 msgstr "File Output"
 
 #: modules/audio_output/file.c:109
-#, fuzzy
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr "File di mana sampel audio akan dituliskan. (\"-\" untuk stdout"
+msgstr ""
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10539,9 +10373,8 @@ msgstr ""
 "dengan ekspresi reguler yang diperhatikan untuk koneksi."
 
 #: modules/audio_output/jack.c:94
-#, fuzzy
 msgid "JACK client name"
-msgstr "Akses klien VNC"
+msgstr ""
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10580,33 +10413,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
-#, fuzzy
 msgid "Disabled"
-msgstr "Nonaktif"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1304
-#, fuzzy
 msgid "Enabled"
-msgstr "Hidupkan"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1309
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "Output video GDI Windows"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Output back-end"
-msgstr "Kartu output"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1315
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Perangkat output audio"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10701,9 +10529,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "Packetizer audio AES3/SMPTE 302M"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "Dekoder video CDG"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10714,14 +10541,12 @@ msgid "Raw audio encoder"
 msgstr "Enkoder audio Raw"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "Font suara"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
-#, fuzzy
 msgid "SoundFont file to use for software synthesis."
-msgstr "File font suara dibutuhkan untuk sintesis perangkat lunak."
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:57
 msgid "AudioToolbox MIDI synthesizer"
@@ -10736,30 +10561,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "Koordinat X subtitle ter-render"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "Perender font CoreText"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "Koordinat X subtitle ter-render"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "Dekoder subtitle DVB"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "Subtitle DVB"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -11226,9 +11046,8 @@ msgstr ""
 "yang menghidupkan fitur libfdk-aac"
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "Akselerasi Video DirectX (DXVA) 2.0"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11272,14 +11091,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:354
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "Dekoder video PNG"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "Dekoder Gambar XWD"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
@@ -11322,34 +11139,28 @@ msgid "Encoding quality"
 msgstr "Kualitas enkoding"
 
 #: modules/codec/daala.c:111
-#, fuzzy
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr "Tentukan kualitas antara 0 (rendah) dan 10 (tinggi)."
+msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "Interval kunci"
+msgstr ""
 
 #: modules/codec/daala.c:114
-#, fuzzy
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr "Tentukan kualitas antara 0 (rendah) dan 10 (tinggi)."
+msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "Dekoder video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Packetizer video Theora"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "Dekoder video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11473,9 +11284,8 @@ msgid "Encoder Profile"
 msgstr "Profil Enkoder"
 
 #: modules/codec/fdkaac.c:68
-#, fuzzy
 msgid "Encoder Algorithm to use."
-msgstr "Algoritma Enkoder yang digunakan"
+msgstr ""
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
@@ -11499,13 +11309,10 @@ msgid "Enable afterburner library"
 msgstr "Hidupkan pustaka afterburner"
 
 #: modules/codec/fdkaac.c:77
-#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
-"Pustaka ini akan memproduksi audio dengan kualitas lebih tinggi dengan "
-"mengambil daya CPU lebih besar (default dihidupkan)"
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
@@ -11646,15 +11453,11 @@ msgid "Formatted Subtitles"
 msgstr "Subtitle Terformat"
 
 #: modules/codec/kate.c:192
-#, fuzzy
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Stream Kate mengizinkan pemformatan teks. VLC menerapkan hal ini sebagian, "
-"tetapi Anda dapat memilih untuk mematikan semua pemformatan. Perlu dicatat "
-"bahwa hal ini tidak berefek ketika perenderan melalui Tiger dihidupkan."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11931,29 +11734,24 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "Dekoder audio MPEG"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "Dekoder video CDG"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Packetizer video Theora"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "Per-renderan langsung"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "Per-renderan langsung"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12190,9 +11988,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "Packetizer video raw pseudo"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Enkoder video Theora"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12571,9 +12368,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr "Enkoder video Dirac menggunakan pustaka libschroedinger"
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "Dekoder G.711"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12584,9 +12380,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "Dekoder G.711"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12993,24 +12788,20 @@ msgid "Image height"
 msgstr "Tinggi gambar"
 
 #: modules/codec/svg.c:53
-#, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "Tentukan modul deinterlace yang digunakan."
+msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
 msgstr "Faktor skala"
 
 #: modules/codec/svg.c:55
-#, fuzzy
 msgid "Scale factor to apply to image"
 msgstr ""
-"Faktor skala untuk diterapkan pada video selama mentranskode (cth: 0.25)"
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "Dekoder video CDG"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13051,9 +12842,8 @@ msgid "Teletext subtitles decoder"
 msgstr "Dekoder subtitle teleteks"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "Dekoder teks subtitle"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -13080,23 +12870,20 @@ msgid "Theora video encoder"
 msgstr "Enkoder video Theora"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "dekoder"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "Dekoder subtitle EBU STL"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "Demuxer TTA"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13144,9 +12931,8 @@ msgid "Ulead DV audio decoder"
 msgstr "Dekoder audio Ulead DV"
 
 #: modules/codec/videotoolbox.m:80
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Pendekodean dengan perangkat keras"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:81 modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
@@ -13159,9 +12945,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "Dekoder video Theora"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13202,9 +12987,8 @@ msgid "Vorbis audio encoder"
 msgstr "Enkoder audio Vorbis"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Mode senyap"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13219,24 +13003,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Enkoder video Theora"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "dekoder"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "Dekoder subtitle EBU STL"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "Parser subtitle EBU STL"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13247,16 +13027,11 @@ msgid "Maximum GOP size"
 msgstr "Ukuran GOP maksimum"
 
 #: modules/codec/x264.c:72
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames. Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"Tentukan interval maksimal antara bingkai-IDR. Nilai lebih besar menghemat "
-"bit, sehingga akan meningkatkan kualitas untuk kadar bit yang diberikan "
-"dengan mengorbankan tingkat presisi pencarian. Gunakan -1 untuk tak "
-"terhingga."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13344,13 +13119,10 @@ msgid "Adaptive B-frame decision"
 msgstr "Keputusan adaptif Bingkai-B"
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"Paksa nomor tertentu bingkai-B berurutan yang digunakan, kecuali kemungkinan "
-"sebelum sebuah bingkai-I. Range antara 0 hingga 2."
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -13701,7 +13473,6 @@ msgid "Partitions to consider"
 msgstr "Penyekat yang dipertimbangkan"
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -13711,13 +13482,6 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"Penyekat yang dipertimbangkan dalam mode analisis: \n"
-" - tidak ada : \n"
-" - cepat : i4x4\n"
-" - normal: i4x4,p8x8,(i8x8)\n"
-" - lambat: i4x4,p8x8,(i8x8),b8x8\n"
-" - semua : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
-"(p4x4 membutuhkan p8x8. i8x8 membutuhkan 8x8dct)."
 
 #: modules/codec/x264.c:282
 msgid "Direct MV prediction mode"
@@ -13728,16 +13492,12 @@ msgid "Direct prediction size"
 msgstr "Ukuran prediksi langsung"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"Ukuran prediksi langsung:  -  0: 4x4\n"
-" -  1: 8x8\n"
-" - -1: sekecil mungkin berdasar level\n"
 
 #: modules/codec/x264.c:291
 msgid "Weighted prediction for B-frames"
@@ -13764,7 +13524,6 @@ msgid "Integer pixel motion estimation method"
 msgstr "Metode jangkaan gerak piksel integer"
 
 #: modules/codec/x264.c:301
-#, fuzzy
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -13773,13 +13532,6 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
-"Pilih algoritma estimasi gerakan: - dia: pencarian berbentuk intan, radius 1 "
-"(cepat)\n"
-" - hex: pencarian berbentuk hexagonal, radius 2\n"
-" - umh: pencarian multi-hexagon tidak rata (lebih baik tetapi lebih lambat)\n"
-" - esa: pencarian menyeluruh (sangat lambat, terutama untuk testing)\n"
-" - tesa: pencarian sangat menyeluruh (sangat lambat, terutama untuk "
-"testing)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -13885,7 +13637,6 @@ msgid "Trellis RD quantization"
 msgstr "Pengkuantitasan RD Trellis"
 
 #: modules/codec/x264.c:352
-#, fuzzy
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -13893,11 +13644,6 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
-"Pengkuantitasan Trellis RD: \n"
-" - 0: dimatikan\n"
-" - 1: dihidupkan hanya pada mengenkode akhir dari sebuah MB\n"
-" - 2: dihidupkan pada semua keputusan mode\n"
-"Ini membutuhkan CABAC."
 
 #: modules/codec/x264.c:358
 msgid "Early SKIP detection on P-frames"
@@ -13912,13 +13658,10 @@ msgid "Coefficient thresholding on P-frames"
 msgstr "Koefisien tresholding pada bingkai-P"
 
 #: modules/codec/x264.c:362
-#, fuzzy
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"Koefisien tresholding pada bingkai-P. Menghapus blok dct yang hanya "
-"mengandung koefisien tunggal kecil."
 
 #: modules/codec/x264.c:365
 msgid "Use Psy-optimizations"
@@ -14058,14 +13801,12 @@ msgid "Default preset setting used"
 msgstr ""
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Pilihan lanjutan x264."
+msgstr ""
 
 #: modules/codec/x264.c:422
-#, fuzzy
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr "Pilihan lanjutan x264, dalam bentuk {opsi1=nilai1,opsi2=val2} ."
+msgstr ""
 
 #: modules/codec/x264.c:427
 msgid "dia"
@@ -14187,14 +13928,12 @@ msgid "Teletext text subtitles"
 msgstr ""
 
 #: modules/codec/zvbi.c:76
-#, fuzzy
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr "Keluarkan subtitle teleteks dalam bentuk teks bukan dalam bentuk RGBA"
+msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "Level gema"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -14445,9 +14184,9 @@ msgid "Subtitle position %d px"
 msgstr "Posisi subtitle %d px"
 
 #: modules/control/hotkeys.c:1355
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Enkoding teks subtitle"
+msgstr ""
 
 #: modules/control/hotkeys.c:1511
 #, c-format
@@ -14516,9 +14255,8 @@ msgstr ""
 "untuk sinkronisasi terhadap klien yang mendengar"
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "Alamat ip master server"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -14983,19 +14721,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Antarmuka Servis Windows"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "Lebar video maksimum."
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "Tinggi video maksimum"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -15006,9 +14741,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "Alternative Rock"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -15019,9 +14753,8 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
@@ -15032,9 +14765,8 @@ msgid "Bandwidth Adaptive"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "Lebar video"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -15045,9 +14777,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -15169,9 +14900,8 @@ msgid "Play as is"
 msgstr "Tayangkan apa adanya"
 
 #: modules/demux/avi/avi.c:836 modules/demux/mp4/mp4.c:1682
-#, fuzzy
 msgid "Broken or missing Index"
-msgstr "Indeks AVI rusak atau hilang"
+msgstr ""
 
 #: modules/demux/avi/avi.c:2717
 msgid "Broken or missing AVI Index"
@@ -15222,14 +14952,12 @@ msgid "Dirac video demuxer"
 msgstr "Demuxer video Dirac"
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "Input DirectShow"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "Filter adegan video"
+msgstr ""
 
 #: modules/demux/flac.c:50
 msgid "FLAC demuxer"
@@ -15363,9 +15091,8 @@ msgstr ""
 "rusak)."
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Buat Direktori"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -15385,10 +15112,8 @@ msgid "Reverberation level (from 0 to 100, default value is 0)."
 msgstr "Level gema (dari 0 hingga 100, nilai default adalah 0)."
 
 #: modules/demux/mod.c:59
-#, fuzzy
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
 msgstr ""
-"Penundaan gema, dalam milidetik. Nilai biasa dari 40 hingga 200 milidetik."
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -15469,14 +15194,12 @@ msgid "Information"
 msgstr "Informasi"
 
 #: modules/demux/mp4/meta.c:72
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Singkirkan"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:73
-#, fuzzy
 msgid "Requirements"
-msgstr "Segmen"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:74
 msgid "Original Format"
@@ -15491,19 +15214,16 @@ msgid "Host Computer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:77
-#, fuzzy
 msgid "Performers"
-msgstr "Pilihan kinerja"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:78
-#, fuzzy
 msgid "Original Performer"
-msgstr "Format Asli"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:79
-#, fuzzy
 msgid "Providers Source Content"
-msgstr "Relatif pada isi sumber"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
 msgid "Warning"
@@ -15527,9 +15247,8 @@ msgid "Model"
 msgstr "Model"
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Produk"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
@@ -15548,9 +15267,8 @@ msgid "Art Director"
 msgstr "Direktur Seni"
 
 #: modules/demux/mp4/meta.c:91
-#, fuzzy
 msgid "Copyright Acknowledgement"
-msgstr "Metadata hak cipta"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:92
 msgid "Conductor"
@@ -15581,23 +15299,20 @@ msgid "Thanks"
 msgstr "Terima kasih"
 
 #: modules/demux/mp4/meta.c:100
-#, fuzzy
 msgid "Executive Producer"
-msgstr "Produser"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Parameter mengenkode"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "Nomor Katalog Media (MCN)"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15608,14 +15323,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Kosongkan"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "Penundaan Audio"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -15630,9 +15343,8 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1679
-#, fuzzy
 msgid "Do not seek"
-msgstr "Jangan tayangkan"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1680
 msgid "Build index"
@@ -15748,13 +15460,10 @@ msgid "Packet size in bytes to decrypt"
 msgstr "Ukuran paket dalam byte untuk didekripsikan"
 
 #: modules/demux/mpeg/ts.c:100
-#, fuzzy
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
-"Tentukan ukuran paket TS untuk didekripsikan. Rutin pendekripsian "
-"mengurangkan header-TS dari nilai sebelum didekripsikan."
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
@@ -15783,9 +15492,8 @@ msgid "Use the stream PCR as a reference."
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
-#, fuzzy
 msgid "Digital TV Standard"
-msgstr "Televisi dan Radio Digital"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:123
 msgid ""
@@ -15798,24 +15506,20 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "Demuxer Stream Pengangkut MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Bisukan audio"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "Tidak ada deskripsi untuk kodek ini"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "Teleteks subtitle: pendengaran terganggu"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
-#, fuzzy
 msgid "Spoken subtitles for the visually impaired"
-msgstr "DVB subtitle: pendengaran terganggu"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:455
 #: modules/gui/qt/dialogs/toolbar.cpp:532
@@ -16017,9 +15721,8 @@ msgid "Load"
 msgstr "Muat"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Kepekatan"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16053,13 +15756,10 @@ msgid "Forces the audio language"
 msgstr "Paksa bahasa audio"
 
 #: modules/demux/rawaud.c:54
-#, fuzzy
 msgid ""
 "Forces the audio language for the output mux. Three letter ISO639 code. "
 "Default is 'eng'."
 msgstr ""
-"Paksa bahasa audio untuk mux output. Kode tiga huruf ISO639. Default adalah "
-"'eng'."
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16352,7 +16052,8 @@ msgid "Name"
 msgstr "Nama"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Pengarang"
@@ -16598,9 +16299,8 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "Undur Langkah"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -16611,32 +16311,27 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Maju Langkah"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Kontrol playback"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Playback"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Judul sebelumnya"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Pergi ke waktu"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -16919,18 +16614,16 @@ msgid "Play/Pause the current media"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "Filter rotasi video"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "Tinggalkan Layar penuh"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16939,9 +16632,8 @@ msgid "Volume"
 msgstr "Volume"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Volume audio"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -17370,9 +17062,8 @@ msgid "Select All"
 msgstr "Pilih Semua"
 
 #: modules/gui/macosx/VLCMainMenu.m:363
-#, fuzzy
 msgid "Find"
-msgstr "Cari: %s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:365
 msgid "View"
@@ -17693,18 +17384,17 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "Volume %ld%%"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr "Volume Penuh"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Efek Audio"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17725,18 +17415,16 @@ msgid "Open"
 msgstr "Buka"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Keluaran strim"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Setting..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Pilih input"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17759,9 +17447,8 @@ msgstr "Pilih file"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Pilih file"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17867,14 +17554,12 @@ msgid "Subscreen top"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "Lebar sublayar"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "Tinggi sublayar"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -17885,14 +17570,12 @@ msgid "Add Subtitle File:"
 msgstr "Tambah File Subtitle:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "Packetizer teks subtitile Kate"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Pilih file subtitle"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -17992,14 +17675,12 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:232
-#, fuzzy
 msgid "Expand All"
-msgstr "Kembangkan"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:233
-#, fuzzy
 msgid "Collapse All"
-msgstr "Lipat"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18071,30 +17752,25 @@ msgstr "VLC gagal menyimpan meta data."
 
 #: modules/gui/macosx/VLCRendererMenuController.m:72
 #: modules/gui/macosx/VLCRendererMenuController.m:144
-#, fuzzy
 msgid "Renderer discovery off"
-msgstr "Penemuan Layanan"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:75
 #: modules/gui/macosx/VLCRendererMenuController.m:145
-#, fuzzy
 msgid "Enable renderer discovery"
-msgstr "Hidupkan gema"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:77
-#, fuzzy
 msgid "No renderer"
-msgstr "Perender teks"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:134
-#, fuzzy
 msgid "Renderer discovery on"
-msgstr "Penemuan Layanan"
+msgstr ""
 
 #: modules/gui/macosx/VLCRendererMenuController.m:135
-#, fuzzy
 msgid "Disable renderer discovery"
-msgstr "Matikan screensaver"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
@@ -18245,9 +17921,8 @@ msgid "Note that these are system-wide settings."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
-#, fuzzy
 msgid "General settings"
-msgstr "Pengaturan audio umum"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
@@ -18266,14 +17941,12 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Kegagalan playback"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
-#, fuzzy
 msgid "Enable notifications on playlist item change"
-msgstr "Tampilkan popup notifikasi pada perubahan trek"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:320
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -18285,14 +17958,12 @@ msgid "Automatically check for updates"
 msgstr "Memeriksa update secara otomatis"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Antarmuka Qt"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Skinnable Interface"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -18353,14 +18024,12 @@ msgid "Show video within the main window"
 msgstr "Tampilkan video dalam window utama"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:353
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Layar Penuh"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:354
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Jalankan video dalam mode layar penuh"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Black screens in Fullscreen mode"
@@ -18488,39 +18157,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr "Kombinasi ini telah dipergunakan oleh \"%@\"."
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Tayang/Jeda"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Window Utama..."
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "Deskripsi URL"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "Sekarang Diputar"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Pilih Folder"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Buka &Lokasi dari clipboard"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -18531,7 +18194,8 @@ msgid "sec."
 msgstr "detik."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -19120,14 +18784,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr ""
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[Pengulangan]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[Acak] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -19167,9 +18829,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr ""
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr "Sumber: <tidak ada item saat ini>"
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19206,9 +18867,8 @@ msgid "Teletext Activation"
 msgstr "Aktivasi Teleteks"
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Transparansi"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -19374,9 +19034,8 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:362
 #: modules/gui/qt/components/extended_panels.cpp:373
-#, fuzzy
 msgid "Image Files"
-msgstr "Image wall"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:364 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19510,9 +19169,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1333
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "Menyesuaikan prioritas VLC"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1367
 msgid "(Hastened)"
@@ -19890,13 +19548,10 @@ msgid "Select File"
 msgstr "Pilih File"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
-"Pilih atau klik ganda aksi untuk mengubah hotkey terasosiasi. Gunakan tombol "
-"delete untuk menghapus hotkey"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20197,10 +19852,11 @@ msgid "Extract"
 msgstr "Ekstrak"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20212,14 +19868,14 @@ msgstr "&Tutup"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Konversi"
 
 #: modules/gui/qt/dialogs/convert.cpp:58
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Tidak ada file yang dipilih"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:65 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20234,18 +19890,16 @@ msgid "Browse"
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:86
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "Buka Beberapa File..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:88
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:91
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Tambahkan pada file"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
@@ -20297,9 +19951,8 @@ msgid "Adjustments and Effects"
 msgstr "Penyesuaian dan Efek"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Mode stereo"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20315,9 +19968,8 @@ msgid "&Save"
 msgstr "&Simpan"
 
 #: modules/gui/qt/dialogs/external.cpp:219
-#, fuzzy
 msgid "Store the Password"
-msgstr "Password RDP"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -20434,9 +20086,8 @@ msgid "Save log file as..."
 msgstr "Simpan file log sebagai..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Teks / Catatan (*.log *.txt);; Semua (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -20622,7 +20273,8 @@ msgstr "Versi"
 msgid "Website"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "File"
 
@@ -20953,9 +20605,8 @@ msgid "Empty"
 msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Aktifkan"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
@@ -20994,9 +20645,8 @@ msgid "Subti&tle"
 msgstr "Subti&tle"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1076
-#, fuzzy
 msgid "Tool&s"
-msgstr "Alat"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1083
 msgid "V&iew"
@@ -21091,9 +20741,8 @@ msgid "Docked Playlist"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:499
-#, fuzzy
 msgid "Always on &top"
-msgstr "Selalu di atas"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
@@ -21124,9 +20773,8 @@ msgid "&Increase Volume"
 msgstr "Na&ikkan Volume"
 
 #: modules/gui/qt/menus.cpp:597
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Turunkan Volume"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:600
 msgid "&Mute"
@@ -21285,14 +20933,12 @@ msgid "&Clear"
 msgstr "Kosongkan"
 
 #: modules/gui/qt/menus.cpp:1636
-#, fuzzy
 msgid "&Renderer"
-msgstr "Perender teks"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1640
-#, fuzzy
 msgid "<Local>"
-msgstr "Vocal"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1653
 msgid "Scan"
@@ -21325,9 +20971,8 @@ msgid "Start VLC with only a systray icon"
 msgstr "Mulai VLC hanya dengan sebuah icon systray"
 
 #: modules/gui/qt/qt.cpp:92
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar."
-msgstr "VLC akan dimulai dengan sebuah icon pada taskbar Anda"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -21409,27 +21054,20 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Tentukan warna dari slider volume"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
-#, fuzzy
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
 "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255'"
 msgstr ""
-"Tentukan warna dari slider volume\n"
-"Dengan memasukkan 12 angka dipisahkan tanda \";\"\n"
-"Default adalah '255;255;255;20;226;20;255;176;15;235;30;20'\n"
-"Alternatif yang lain '30;30;50;40;40;100;50;50;160;150;150;255' "
 
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "Pilihan mode memulai dan tampilan"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -21465,9 +21103,8 @@ msgid "Load extensions on startup"
 msgstr "Muat ekstensi ketika memulai"
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Muat secara otomatis modul ekstensi pada permulaan"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -21484,9 +21121,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "Warna default dari latar belakang"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
@@ -21505,9 +21141,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Pengaturan untuk antarmuka utama"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -21540,10 +21175,9 @@ msgid "debug"
 msgstr ""
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "Kosongkan"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:206
 msgid "Open a skin file"
@@ -21554,14 +21188,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "File skin |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "File Playlist|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:215
-#, fuzzy
 msgid "|All Files |*"
-msgstr "Semua File"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:216
 msgid "Open playlist"
@@ -21572,9 +21204,8 @@ msgid "Save playlist"
 msgstr "Simpan playlist"
 
 #: modules/gui/skins2/src/dialogs.cpp:224
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "Playlist XSPF|*.xspf|File M3U|*.m3u|Playlist HTML|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:484
 msgid "Skin to use"
@@ -21645,9 +21276,8 @@ msgid "Select skin"
 msgstr "Pilih skin"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Buka skin ..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -21712,14 +21342,12 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Tetapkan gamma gambar, antara 0.01 dan 10. Default 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
-#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Akselerasi Video DirectX (DXVA) 2.0"
+msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:429
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "Output video Direct3D"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -21749,9 +21377,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "Deinterlace"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -21780,9 +21407,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Paksa metode menyisip"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -21799,14 +21425,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1187
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Filter video"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1188
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Output video Akselerasi K Video"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21869,38 +21493,32 @@ msgid "VDPAU sharpen video filter"
 msgstr ""
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "Daftar packetizer yang dikehendaki"
+msgstr ""
 
 #: modules/keystore/file.c:55
-#, fuzzy
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Gunakan memori bersama"
+msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Buang Pemilihan"
+msgstr ""
 
 #: modules/keystore/file.c:66
-#, fuzzy
 msgid "Secrets are stored encrypted on a file"
-msgstr "Gunakan memori bersama"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
-#, fuzzy
 msgid "No"
-msgstr "Tidak"
+msgstr ""
 
 #: modules/keystore/keychain.m:40
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:46
-#, fuzzy
 msgid "System default"
-msgstr "Kembali ke Nilai Default"
+msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
@@ -21915,9 +21533,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:51
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "Selalu di atas"
+msgstr ""
 
 #: modules/keystore/keychain.m:52
 msgid "When unlocked"
@@ -21928,9 +21545,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:56
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "Sinkronkan atas dan bawah"
+msgstr ""
 
 #: modules/keystore/keychain.m:57
 msgid ""
@@ -21962,33 +21578,28 @@ msgid "KWallet keystore"
 msgstr ""
 
 #: modules/keystore/kwallet.c:49
-#, fuzzy
 msgid "Secrets are stored via KWallet"
-msgstr "Gunakan memori bersama"
+msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Buang Pemilihan"
+msgstr ""
 
 #: modules/keystore/memory.c:42
-#, fuzzy
 msgid "Secrets are stored in memory"
-msgstr "Gunakan memori bersama"
+msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
 msgstr ""
 
 #: modules/keystore/secret.c:40
-#, fuzzy
 msgid "Secrets are stored via libsecret"
-msgstr "Gunakan memori bersama"
+msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Tambah logo"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -21999,33 +21610,28 @@ msgid "Be quiet"
 msgstr "Diamkan"
 
 #: modules/logger/console.c:115
-#, fuzzy
 msgid "Turn off all messages on the console."
-msgstr "Log semua pesan VLC pada file teks."
+msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Konsol"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Konsol"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Info Tambahan"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "Debug mask"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -22056,23 +21662,18 @@ msgid "Verbosity"
 msgstr "Tingkat Verbositas"
 
 #: modules/logger/file.c:215
-#, fuzzy
 msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
-"Pilih verbositas yang digunakan untuk log atau -1 untuk menggunakan "
-"verbositas yang sama yang diberikan oleh --verbose."
 
 #: modules/logger/file.c:219
-#, fuzzy
 msgid "Logger"
-msgstr "Pencatatan"
+msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Pencatatan dalam file"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -22091,9 +21692,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Debug mask"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -22108,19 +21708,16 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "Kapabilitas"
+msgstr ""
 
 #: modules/logger/syslog.c:148
-#, fuzzy
 msgid "System logging facility."
-msgstr "Fasilitas Syslog"
+msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "Log ke syslog"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -22826,9 +22423,8 @@ msgid "Synthpop"
 msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "Kadar bit lokal maksimum"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -22839,9 +22435,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "Filter transformasi video"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -22906,9 +22501,8 @@ msgstr ""
 "Kunjungi http://www.last.fm/join/ untuk mendapatkan akun."
 
 #: modules/misc/fingerprinter.c:73
-#, fuzzy
 msgid "acoustid"
-msgstr "Acoustic"
+msgstr ""
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
@@ -22969,9 +22563,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:748
-#, fuzzy
 msgid "Use system trust database"
-msgstr "Kadar bingkai ditangkap yang diinginkan."
+msgstr ""
 
 #: modules/misc/gnutls.c:750
 msgid ""
@@ -22980,9 +22573,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:753
-#, fuzzy
 msgid "Trust directory"
-msgstr "Direktori peralihan waktu"
+msgstr ""
 
 #: modules/misc/gnutls.c:755
 msgid ""
@@ -23029,9 +22621,8 @@ msgid "Playing some media."
 msgstr ""
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "Matikan screensaver"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -23353,13 +22944,10 @@ msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
 msgstr "SDT Descriptors (membutuhkan --sout-ts-es-id-pid)"
 
 #: modules/mux/mpeg/ts.c:125
-#, fuzzy
 msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"Tentukan deskriptor untuk setiap SDT. Ini membutuhkan \"Tentukan PID pada ID "
-"dari ES\" dihidupkan."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23524,9 +23112,8 @@ msgid "WAV muxer"
 msgstr "Muxer WAV"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "Plugin Pemberitahuan Growl"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23537,18 +23124,16 @@ msgid "Now playing"
 msgstr ""
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "Lewati iklan"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr "Timeout (milidetik)"
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "Berapa lama pemberitahuan akan ditampilkan"
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -23631,27 +23216,24 @@ msgstr "Video MPEG"
 msgid "VC-1 packetizer"
 msgstr "Packetizer VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:370
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23678,14 +23260,12 @@ msgstr "My Pictures"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:620
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Servis Bonjour"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -23840,23 +23420,20 @@ msgid "Unknown type"
 msgstr "Tipe tidak diketahui"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Kanal audio"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Hapus Daftar"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Servis"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
@@ -23933,23 +23510,20 @@ msgstr ""
 "juga dapat menggunakan kombinasi nilai ini, cth 6=atas-kanan)."
 
 #: modules/spu/audiobargraph_v.c:56
-#, fuzzy
 msgid "Bar width in pixel"
-msgstr "Lebar tangkapan video dalam piksel"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
 msgstr ""
 
 #: modules/spu/audiobargraph_v.c:58
-#, fuzzy
 msgid "Bar Height in pixel"
-msgstr "Tinggi tangkapan video dalam piksel"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:59
-#, fuzzy
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr "Tinggi dalam piksel untuk sempadan di antara miniatur."
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24000,9 +23574,8 @@ msgid "Logo animation # of loops"
 msgstr "Jumlah perulangan dari animasi logo"
 
 #: modules/spu/logo.c:54
-#, fuzzy
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
-msgstr "Jumlah perulangan untuk animasi logo. -1 = terus menerus, 0 = matikan"
+msgstr ""
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -24118,23 +23691,18 @@ msgid ""
 msgstr ""
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"Keburaman (kebalikan dari transparansi) pada teks terlapis. 0 = transparan, "
-"255 = buram sepenuhnya."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
 msgstr "Ukuran font, piksel"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
-"Ukuran font, dalam piksel. Default adalah -1 (gunakan default ukuran font)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24273,13 +23841,10 @@ msgid "Number of columns"
 msgstr "Jumlah kolom"
 
 #: modules/spu/mosaic.c:131
-#, fuzzy
 msgid ""
 "Number of image columns in the mosaic (only used if positioning method is "
 "set to \"fixed\")."
 msgstr ""
-"Jumlah kolom gambar dalam mosaik (hanya digunakan jika metode pemosisian "
-"ditentukan ke \"tetap\")."
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24302,15 +23867,11 @@ msgid "Elements order"
 msgstr "Susunan elemen"
 
 #: modules/spu/mosaic.c:144
-#, fuzzy
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
-"Anda dapat menentukan urutan elemen-elemen mosaik. Anda harus memberikan "
-"daftar ID dari tiap gambar dipisah koma. ID ini diberikan dalam modul "
-"\"jembatan-mosaik\"."
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24385,10 +23946,8 @@ msgid "VNC poll interval"
 msgstr "VNC poll interval"
 
 #: modules/spu/remoteosd.c:85
-#, fuzzy
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
-"Dalam interval ini update dari VNC dimintakan, default setiap 300 milidetik."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24650,9 +24209,8 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Filter strim"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -24663,9 +24221,8 @@ msgid "Block stream cache"
 msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "Tampilkan stream secara lokal"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24680,29 +24237,24 @@ msgid "gzip decompression"
 msgstr "Dekompresi gzip"
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "+-[Streaming]"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "Dekompresi LZMA"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Filter strim"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "Ukuran buffer bingkai RTSP"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
-#, fuzzy
 msgid "Prefetch buffer size (KiB)"
-msgstr "Ukuran buffer bingkai RTSP"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
@@ -24713,9 +24265,8 @@ msgid "Prefetch background read size (bytes)"
 msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "Ambang filter"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -24840,19 +24391,16 @@ msgid "Duration of the fingerprinting"
 msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Strim baku"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Jembatan output stream"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:104
-#, fuzzy
 msgid "HTTP port"
-msgstr "Port SFTP"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid ""
@@ -24877,42 +24425,36 @@ msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:115
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "Alamat komputer untuk stream padanya."
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:116
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Format kroma"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:117
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:121
-#, fuzzy
 msgid "Chromecast"
-msgstr "Kroma"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "Jembatan output stream"
+msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:328
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Demuxer Avformat"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "Duplikasikan output stream"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25664,9 +25206,8 @@ msgstr ""
 "VIDEO."
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "Ukuran tekstur"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -25687,13 +25228,10 @@ msgid "Overlays/Subtitles"
 msgstr "Overlays/Subtitles"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
-#, fuzzy
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"Harap tunggu cache font dibangun ulang.\n"
-"Ini seharusnya berlangsung kurang dari satu menit."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -25726,13 +25264,10 @@ msgid "Text opacity"
 msgstr "Keburaman teks"
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"Keburaman (kebalikan dari transparansi) pada teks yang akan dirender pada "
-"video. 0 = transparan, 255 = buram sepenuhnya."
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -25789,9 +25324,8 @@ msgid "Shadow distance"
 msgstr "Jarak bayangan"
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Posisi teks"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -25818,14 +25352,12 @@ msgid "Thick"
 msgstr "Tebal"
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "Kiri ke kanan/Atas ke bawah"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "Kanan ke kiri/Bawah ke atas"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -25971,14 +25503,12 @@ msgid "YUVP converter"
 msgstr "Pengkonversi YUVP"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Hue gambar (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "Tetapkan hue gambar, antara 0 dan 360. Default 0."
+msgstr ""
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26294,9 +25824,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:768
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Filter penajaman video"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26472,14 +26001,12 @@ msgid "Deinterlacing video filter"
 msgstr "Filter video deinterlace"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Filter video deteksi pergerakan"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Pilihan Perangkat"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -26523,14 +26050,12 @@ msgid "Extract RGB component video filter"
 msgstr "Filter pengekstraksi komponen RGB"
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Filter adegan video"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "Pengkonversi YUVP"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -26702,12 +26227,9 @@ msgid "Mirror orientation"
 msgstr "Orientasi pencerminan"
 
 #: modules/video_filter/mirror.c:65
-#, fuzzy
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
-"Menentukan orientasi dari pencerminan.      Dapat berupa vertikal atau "
-"horizontal"
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -26790,9 +26312,8 @@ msgid "Use input chroma unaltered"
 msgstr "Gunakan input kroma tanpa perubahan"
 
 #: modules/video_filter/opencv_wrapper.c:62
-#, fuzzy
 msgid "I420 - first plane is grayscale"
-msgstr "I420 - plane pertama adalah greyscale"
+msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
@@ -26835,12 +26356,10 @@ msgid "Scale factor (0.1-2.0)"
 msgstr "Faktor skala (0.1-2.0)"
 
 #: modules/video_filter/opencv_wrapper.c:82
-#, fuzzy
 msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
-"Amoun yang menskala gambar sebelum mengirimnya ke filter OpenCV internal"
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27221,9 +26740,8 @@ msgid "ASCII-art video output"
 msgstr "output video ASCII-art"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Tutup Window"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -27252,9 +26770,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "Transparansi dari gambar mosaik."
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -27318,29 +26835,24 @@ msgid "Output module to write to Blackmagic SDI card"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:236
-#, fuzzy
 msgid "DeckLink General Options"
-msgstr "Opsi Video Decklink"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Modul output video Decklink"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
-#, fuzzy
 msgid "DeckLink Video Options"
-msgstr "Opsi Video Decklink"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Modul output audio Decklink"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
-#, fuzzy
 msgid "DeckLink Audio Options"
-msgstr "Opsi Audio Decklink"
+msgstr ""
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27548,20 +27060,16 @@ msgstr ""
 "Output video yang direkomendasikan untuk Windows Vista dan versi selanjutnya"
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "Output video Direct3D"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
-#, fuzzy
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
-"Output video yang direkomendasikan untuk Windows Vista dan versi selanjutnya"
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "Output video Direct3D"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -27649,9 +27157,8 @@ msgid "Wallpaper"
 msgstr "Wallpaper"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "Output video OpenGL"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -27662,9 +27169,8 @@ msgid "GPU affinity"
 msgstr ""
 
 #: modules/video_output/win32/wgl.c:46
-#, fuzzy
 msgid "WGL extension for OpenGL"
-msgstr "Ekstensi EGL untuk OpenGL"
+msgstr ""
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -27719,9 +27225,8 @@ msgstr "Memori video"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "Tampilan X11"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -27743,9 +27248,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Output video skala kelabu"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -27848,24 +27352,18 @@ msgid "Chroma used"
 msgstr "Kroma yang digunakan"
 
 #: modules/video_output/yuv.c:46
-#, fuzzy
 msgid "Force use of a specific chroma for output."
-msgstr "Paksa penggunaan kroma spesifik untuk output. Default adalah I420."
+msgstr ""
 
 #: modules/video_output/yuv.c:48
-#, fuzzy
 msgid "Add a YUV4MPEG2 header"
-msgstr "Tambah WAVE header"
+msgstr ""
 
 #: modules/video_output/yuv.c:49
-#, fuzzy
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
-"Header YUV4MPEG2 adalah kompatibel dengan output video yuv mplayer dan "
-"membutuhkan YV12/I420 fourcc. Secara default vlc menuliskan fourcc dari "
-"bingkai gambar ke dalam tujuan output."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -28144,24 +27642,20 @@ msgid "Image wall"
 msgstr "Image wall"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "Lebar window video, dalam piksel."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "Tinggi window video, dalam piksel."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Spektrum"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "Visualisasi saat ini"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28405,9 +27899,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "Apung di Atas"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -28682,9 +28175,8 @@ msgid "Start Time"
 msgstr "Waktu mulai"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Waktu henti"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28711,9 +28203,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Ganti waktu permulaan untuk media"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28812,9 +28303,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -28825,9 +28315,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -28838,9 +28327,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -28855,9 +28343,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28888,9 +28375,8 @@ msgid "Menus"
 msgstr "Menu"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Kadar Bingkai"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -28905,9 +28391,8 @@ msgid "Custom options"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Kualitas"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28930,14 +28415,12 @@ msgid "px"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Laju sampel"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Nama Profil"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29157,11 +28640,8 @@ msgid "Show systray icon"
 msgstr "Tampilkan icon systray"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"Anda sedang menggunakan antarmuka Qt4.\n"
-"\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29252,9 +28732,8 @@ msgid "Add a background"
 msgstr "Tambahkan latar belakang"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Output"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -29474,41 +28953,11 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Daftar Media Manager"
 
-#~ msgid "+-[Streaming]"
-#~ msgstr "+-[Streaming]"
-
 #~ msgid "| packets sent     :    %5<PRIi64>"
 #~ msgstr "| paket terkirim   :    %5<PRIi64>"
 
-#~ msgid "| bytes sent       : %8.0f KiB"
-#~ msgstr "| byte terkirim    : %8.0f kB"
-
-#~ msgid "Streaming"
-#~ msgstr "Streaming"
-
-#~ msgid "Sent packets"
-#~ msgstr "Paket terkirim"
-
-#~ msgid "Sent bytes"
-#~ msgstr "Byte terkirim"
-
-#~ msgid "Send rate"
-#~ msgstr "Tingkat pengiriman"
-
 #~ msgid "Sent"
 #~ msgstr "Terkirim"
-
-#~ msgid "packets"
-#~ msgstr "paket"
-
-#~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround:"
-
-#~ msgid "Headphone surround effect"
-#~ msgstr "Efek surround headphone"
-
-#~ msgid "Display device"
-#~ msgstr "Perangkat tampilan"
 
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
@@ -29516,36 +28965,6 @@ msgstr "Daftar Media Manager"
 
 #~ msgid "Sound fonts"
 #~ msgstr "Font suara"
-
-#, fuzzy
-#~ msgid "Capture region heigh"
-#~ msgstr "Tinggi tangkapan video"
-
-#~ msgid "Always &on Top"
-#~ msgstr "Selalu di Atas"
-
-#, fuzzy
-#~ msgid "High quality"
-#~ msgstr "Kualitas gambar"
-
-#, fuzzy
-#~ msgid "Very high quality"
-#~ msgstr "Kualitas rendering"
-
-#, fuzzy
-#~ msgid "YouTube Start Time"
-#~ msgstr "Waktu mulai"
-
-#, fuzzy
-#~ msgid "iTunes Account ID"
-#~ msgstr "Kode negara penala"
-
-#, fuzzy
-#~ msgid "Disable lua"
-#~ msgstr "Nonaktif"
-
-#~ msgid "Display resolution"
-#~ msgstr "Resolusi tampilan"
 
 #~ msgid "VLC can't recognize the input's format"
 #~ msgstr "VLC tidak bisa mengenali format masukan"
@@ -29555,9 +28974,6 @@ msgstr "Daftar Media Manager"
 #~ msgstr ""
 #~ "Format '%s' tidak dapat dideteksi. Silakan lihat catatan log untuk "
 #~ "perincian."
-
-#~ msgid "Navigation"
-#~ msgstr "Navigasi"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Matikan segala peringatan dan pesan informasi."
@@ -29569,123 +28985,20 @@ msgstr "Daftar Media Manager"
 #~ "S/PDIF dapat digunakan secara baku apabila perangkat keras anda "
 #~ "mendukungnya begitu juga dengan strim audio yang diputar."
 
-#~ msgid "HTTP/TLS Certificate Revocation List"
-#~ msgstr "Daftar Penarikan Sertifikat HTTP/TLS"
-
-#~ msgid "Log all VLC messages to syslog (UNIX systems)."
-#~ msgstr "Log semua pesan VLC kepada syslog (sistem UNIX)."
-
-#~ msgid ""
-#~ "Allowing only one running instance of VLC can sometimes be useful, for "
-#~ "example if you associated VLC with some media types and you don't want a "
-#~ "new instance of VLC to be opened each time you open a file in your file "
-#~ "manager. This option will allow you to play the file with the already "
-#~ "running instance or enqueue it. This option requires the D-Bus session "
-#~ "daemon to be active and the running instance of VLC to use D-Bus control "
-#~ "interface."
-#~ msgstr ""
-#~ "Mengizinkan hanya ada satu instans VLC yang dijalankan kadangkala sangat "
-#~ "berguna, sebagai contoh jika Anda mengaitkan VLC dengan beberapa jenis "
-#~ "media dan Anda tidak menginginkan sebuah instans baru VLC dibuka setiap "
-#~ "kali Anda membuka sebuah file dalam file manajer Anda. Pilihan ini "
-#~ "mengizinkan Anda memutar file dengan instans yang sudah berjalan atau "
-#~ "memasukkannya dalam antrian. Pilihan ini membutuhkan sesi daemon D-Bus "
-#~ "yang aktif dan instans VLC yang telah berjalan untuk menggunakan "
-#~ "antarmuka kontrol D-Bus."
-
 #~ msgid "%ld B"
 #~ msgstr "%ld B"
 
 #~ msgid "Downloading ..."
 #~ msgstr "Mengunduh ..."
 
-#~ msgid ""
-#~ "%s\n"
-#~ "Downloading... %s/%s - %.1f%% done"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Mengunduh... %s/%s - %.1f%% selesai"
-
 #~ msgid "BD"
 #~ msgstr "BD"
-
-#~ msgid "Blu-ray Disc Input"
-#~ msgstr "Input Disk Blue-Ray"
-
-#~ msgid "Configure"
-#~ msgstr "Konfigurasikan"
-
-#~ msgid "Channel number"
-#~ msgstr "Nomor kanal"
-
-#~ msgid "EyeTV input"
-#~ msgstr "Input EyeTV"
-
-#~ msgid "Do not sort the items."
-#~ msgstr "Jangan urutkan item."
-
-#~ msgid "FTP user name"
-#~ msgstr "Nama pengguna FTP"
-
-#~ msgid "FTP password"
-#~ msgstr "Password FTP"
-
-#~ msgid "Password that will be used for the connection."
-#~ msgstr "Password yang akan digunakan untuk koneksi."
-
-#~ msgid "Your password was rejected."
-#~ msgstr "Password Anda ditolak."
-
-#~ msgid "Your connection attempt to the server was rejected."
-#~ msgstr "Percobaan koneksi ke server ditolak."
-
-#~ msgid "GnomeVFS input"
-#~ msgstr "Input GnomeVFS"
-
-#~ msgid "HTTP referer value"
-#~ msgstr "Nilai referer HTTP"
-
-#~ msgid "RTSP user name"
-#~ msgstr "Nama pengguna RTSP"
-
-#~ msgid "RTSP password"
-#~ msgstr "Password RTSP"
-
-#~ msgid "Video Capture width"
-#~ msgstr "Lebar tangkapan video"
 
 #~ msgid "RDP auth username"
 #~ msgstr "Nama pengguna RDP"
 
-#~ msgid "RDP Password"
-#~ msgstr "Password RDP"
-
-#~ msgid "Subscreen top left corner"
-#~ msgstr "Sudut kiri atas sublayar"
-
-#~ msgid "Top coordinate of the subscreen top left corner."
-#~ msgstr "Koordinat atas pada sudut kiri atas sublayar."
-
-#~ msgid "Left coordinate of the subscreen top left corner."
-#~ msgstr "Koordinat kiri pada sudut kiri atas sublayar."
-
 #~ msgid "Size of the request for reading access"
 #~ msgstr "Ukuran dari permintaan untuk akses pembacaan"
-
-#~ msgid "SMB user name"
-#~ msgstr "Nama pengguna SMB"
-
-#~ msgid "SMB password"
-#~ msgstr "Password SMB"
-
-#~ msgid "Segment"
-#~ msgstr "Segmen"
-
-#~ msgid "LID"
-#~ msgstr "LID"
-
-#~ msgid "VCD Format"
-#~ msgstr "Format VCD"
 
 #~ msgid "Preparer"
 #~ msgstr "Penyedia"
@@ -29695,18 +29008,6 @@ msgstr "Daftar Media Manager"
 
 #~ msgid "Vol max #"
 #~ msgstr "# Vol maks"
-
-#~ msgid "Volume Set"
-#~ msgstr "Set Volume"
-
-#~ msgid "System Id"
-#~ msgstr "ID Sistem"
-
-#~ msgid "Entries"
-#~ msgstr "Masukan"
-
-#~ msgid "Audio Channels"
-#~ msgstr "Kanal Audio"
 
 #~ msgid "First Entry Point"
 #~ msgstr "Titik Masukan Pertama"
@@ -29720,24 +29021,6 @@ msgstr "Daftar Media Manager"
 #~ msgid "type"
 #~ msgstr "jenis"
 
-#~ msgid "end"
-#~ msgstr "akhir"
-
-#~ msgid "play list"
-#~ msgstr "play list"
-
-#~ msgid "extended selection list"
-#~ msgstr "daftar pilihan tambahan"
-
-#~ msgid "selection list"
-#~ msgstr "daftar pilihan"
-
-#~ msgid "unknown type"
-#~ msgstr "Jenis tidak diketahui"
-
-#~ msgid "List ID"
-#~ msgstr "Daftar ID"
-
 #~ msgid "(Super) Video CD"
 #~ msgstr "CD Video (Super)"
 
@@ -29747,14 +29030,8 @@ msgstr "Daftar Media Manager"
 #~ msgid "vcdx://[device-or-file][@{P,S,T}num]"
 #~ msgstr "vcdx://[perangkat-atau-file][@{P,S,T}nomor]"
 
-#~ msgid "If nonzero, this gives additional debug information."
-#~ msgstr "Jika bukan nol, ini memberi informasi debug tambahan."
-
 #~ msgid "Number of CD blocks to get in a single read."
 #~ msgstr "Jumlah blok CD untuk dimasukkan dalam pembacaan tunggal."
-
-#~ msgid "Use playback control?"
-#~ msgstr "Gunakan kontrol playback?"
 
 #~ msgid ""
 #~ "If VCD is authored with playback control, use it. Otherwise we play by "
@@ -29772,9 +29049,6 @@ msgstr "Daftar Media Manager"
 #~ msgstr ""
 #~ "Jika ditentukan, panjang bar pencarian adalah trek bukan panjang masukan."
 
-#~ msgid "Show extended VCD info?"
-#~ msgstr "Tampilkan informasi tambahan dari VCD?"
-
 #~ msgid ""
 #~ "Show the maximum amount of information under Stream and Media Info. Shows "
 #~ "for example playback control navigation."
@@ -29788,14 +29062,8 @@ msgstr "Daftar Media Manager"
 #~ msgid "Format to use in the playlist's \"title\" field."
 #~ msgstr "Format yang digunakan dalam isian \"judul\" dalam playlist."
 
-#~ msgid "Zip files filter"
-#~ msgstr "Filter file Zip"
-
 #~ msgid "Zip access"
 #~ msgstr "Akses Zip"
-
-#~ msgid "Audio filter for simple channel mixing using NEON assembly"
-#~ msgstr "Filter audio untuk mencampur kanal sederhana menggunakan NEON"
 
 #~ msgid "Enable internal upmixing"
 #~ msgstr "Hidupkan upmixing internal"
@@ -29803,26 +29071,8 @@ msgstr "Daftar Media Manager"
 #~ msgid "Enable the internal upmixing algorithm (not recommended)."
 #~ msgstr "Hidupkan algoritma upmixing internal (tidak disarankan)."
 
-#~ msgid "Audio filter for DTS->S/PDIF encapsulation"
-#~ msgstr "Filter audio untuk enkapsulasi DTS->S/PDIF"
-
-#~ msgid "Android AudioTrack audio output"
-#~ msgstr "Output audio Android AudioTrack"
-
-#~ msgid "AudioUnit output for iOS"
-#~ msgstr "Output AudioUnit untuk iOS"
-
-#~ msgid "OpenSLES audio output"
-#~ msgstr "Output audio OpenSLES"
-
-#~ msgid "OpenSLES"
-#~ msgstr "OpenSLES"
-
 #~ msgid "A/52 parser"
 #~ msgstr "Parser A/52"
-
-#~ msgid "Visualize motion vectors"
-#~ msgstr "Menvisualisasikan vektor bergerak"
 
 #~ msgid ""
 #~ "You can overlay the motion vectors (arrows showing how the images move) "
@@ -29840,15 +29090,6 @@ msgstr "Daftar Media Manager"
 #~ "4 - memvisualisasikan ke belakang vektor bergerak dari bingkai B\n"
 #~ "Untuk memvisualisasikan semua vektor, nilai seharusnya adalah 7."
 
-#~ msgid "VDA output pixel format"
-#~ msgstr "Format piksel output VDA"
-
-#~ msgid "\"%s\" is no video encoder."
-#~ msgstr "\"%s\" tidak memiliki enkoder video."
-
-#~ msgid "\"%s\" is no audio encoder."
-#~ msgstr "\"%s\" tidak memiliki enkoder audio."
-
 #~ msgid "420YpCbCr8Planar"
 #~ msgstr "420YpCbCr8Planar"
 
@@ -29858,58 +29099,17 @@ msgstr "Daftar Media Manager"
 #~ msgid "DTS parser"
 #~ msgstr "Parser DTS"
 
-#~ msgid "Video decoder using Android MediaCodec"
-#~ msgstr "Dekoder video menggunakan MediaCodec Android"
-
 #~ msgid "QuickTime library decoder"
 #~ msgstr "Dekoder pustaka QuickTime"
-
-#~ msgid "Desired frame rate for the H264 stream."
-#~ msgstr "Kadar bingkai diinginkan untuk stream H264."
-
-#~ msgid "Google Video"
-#~ msgstr "Video Google"
-
-#~ msgid "Google Video Playlist importer"
-#~ msgstr "Pengimpor Playlist Video Google"
-
-#~ msgid "ZPL playlist import"
-#~ msgstr "Impor playlist ZPL"
-
-#~ msgid "Compiled by %s with %@"
-#~ msgstr "Dikompilasi oleh %s dengan %@"
-
-#~ msgid "VLC media player Help"
-#~ msgstr "Bantuan VLC media player"
-
-#~ msgid "Invalid selection"
-#~ msgstr "Pilihan Tidak Sah"
 
 #~ msgid "Two bookmarks have to be selected."
 #~ msgstr "Dua tanda buku harus dipilih."
 
-#~ msgid "No input found"
-#~ msgstr "Tidak ada input ditemukan"
-
-#~ msgid "The stream must be playing or paused for bookmarks to work."
-#~ msgstr ""
-#~ "Stream harus ditayangkan atau dihentikan seketika agar tanda buku "
-#~ "berfungsi."
-
 #~ msgid "Send"
 #~ msgstr "Kirim"
 
-#~ msgid "Click to enable fullscreen video playback."
-#~ msgstr "Klik untuk menghidupkan playback video layar penuh."
-
-#~ msgid "Click to stop playback."
-#~ msgstr "Klik untuk menghentikan playback."
-
 #~ msgid "Click to play the audio at maximum volume."
 #~ msgstr "Klik untuk memainkan audio pada volume maksimum."
-
-#~ msgid "User name"
-#~ msgstr "Nama pengguna"
 
 #~ msgid ""
 #~ "Don't display dialogs that don't require user action (Critical and error "
@@ -29923,18 +29123,6 @@ msgstr "Daftar Media Manager"
 
 #~ msgid "Streaming/Exporting Wizard..."
 #~ msgstr "Tuntunan Menstream/Mengekspor..."
-
-#~ msgid "No device is selected"
-#~ msgstr "Tidak ada perangkat yang dipilih"
-
-#~ msgid "Current channel:"
-#~ msgstr "Kanal saat ini:"
-
-#~ msgid "Previous Channel"
-#~ msgstr "Kanal Sebelumnya"
-
-#~ msgid "Next Channel"
-#~ msgstr "Kanal Berikutnya"
 
 #~ msgid "EyeTV is not launched"
 #~ msgstr "EyeTV tidak dijalankan"
@@ -29952,38 +29140,11 @@ msgstr "Daftar Media Manager"
 #~ msgid "Download Plugin"
 #~ msgstr "Unduh Plugin"
 
-#~ msgid "Click to select a subtitle file."
-#~ msgstr "Klik untuk memilih file subtitle."
-
-#~ msgid "Composite input"
-#~ msgstr "Input komposit"
-
-#~ msgid "S-Video input"
-#~ msgstr "S-Video input"
-
-#~ msgid "Streaming/Saving:"
-#~ msgstr "Streaming/Menyimpan:"
-
-#~ msgid "Expand Node"
-#~ msgstr "Kembangkan Node"
-
-#~ msgid "Download Cover Art"
-#~ msgstr "Unduh Cover Art"
-
 #~ msgid "Sort Node by Name"
 #~ msgstr "Urutkan Node berdasar Nama"
 
 #~ msgid "Sort Node by Author"
 #~ msgstr "Urutkan Node berdasar Pengarang"
-
-#~ msgid "Meta-information"
-#~ msgstr "Informasi-meta"
-
-#~ msgid "Hardware Acceleration"
-#~ msgstr "Akselerasi Perangkat Keras"
-
-#~ msgid "Show Fullscreen Controller"
-#~ msgstr "Tampilkan Kontroler Layar Penuh"
 
 #~ msgid ""
 #~ "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -30098,9 +29259,6 @@ msgstr "Daftar Media Manager"
 #~ msgid "Uncompressed audio samples (useable with WAV)"
 #~ msgstr "Sampel audio tidak terkompresi (dapat digunakan dengan WAV)"
 
-#~ msgid "MPEG 1 Format"
-#~ msgstr "Format MPEG 1"
-
 #~ msgid ""
 #~ "Enter the local addresses you want to listen requests on. Do not enter "
 #~ "anything if you want to listen on all the network interfaces. This is "
@@ -30131,9 +29289,6 @@ msgstr "Daftar Media Manager"
 #~ "apapun jika Anda ingin mendengarkan pada semua antarmuka jaringan. Ini "
 #~ "biasanya adalah hal terbaik yang dilakukan. Komputer lain kemudian dapat "
 #~ "mengakses stream pada mms://ip-anda:8080 secara default."
-
-#~ msgid "Enter the address of the computer to stream to."
-#~ msgstr "Masukkan alamat komputer untuk stream kepadanya."
 
 #~ msgid "Use this to stream to a single computer."
 #~ msgstr "Gunakan ini untuk stream ke sebuah komputer tunggal."
@@ -30174,9 +29329,6 @@ msgstr "Daftar Media Manager"
 #~ "komputer, tetapi tidak akan berfungsi pada Internet. RTP header akan "
 #~ "ditambahkan ke stream"
 
-#~ msgid "Streaming/Transcoding Wizard"
-#~ msgstr "Tuntunan Streaming/Transkoding"
-
 #~ msgid ""
 #~ "This wizard allows configuring simple streaming or transcoding setups."
 #~ msgstr ""
@@ -30192,21 +29344,6 @@ msgstr "Daftar Media Manager"
 #~ "transkode VLC. Dialog Buka dan 'Simpan/Streaming' akan memberi akses "
 #~ "kepada lebih banyak fitur."
 
-#~ msgid "Stream to network"
-#~ msgstr "Stream ke jaringan"
-
-#~ msgid "Transcode/Save to file"
-#~ msgstr "Transkode/simpan ke file"
-
-#~ msgid "Choose here your input stream."
-#~ msgstr "Pilih stream input Anda di sini."
-
-#~ msgid "Existing playlist item"
-#~ msgstr "Item playlist yang ada"
-
-#~ msgid "Partial Extract"
-#~ msgstr "Ekstrak Sebagian"
-
 #~ msgid ""
 #~ "This can be used to read only a part of the stream. It must be possible "
 #~ "to control the incoming stream (for example, a file or a disc, but not an "
@@ -30221,22 +29358,10 @@ msgstr "Daftar Media Manager"
 #~ msgid "From"
 #~ msgstr "Dari"
 
-#~ msgid "To"
-#~ msgstr "Ke"
-
 #~ msgid "This page allows selecting how the input stream will be sent."
 #~ msgstr ""
 #~ "Laman ini mengizinkan untuk memilih bagaimana stream input akan "
 #~ "dikirimkan."
-
-#~ msgid "Streaming method"
-#~ msgstr "Metode stream"
-
-#~ msgid "UDP Unicast"
-#~ msgstr "UDP Unicast"
-
-#~ msgid "UDP Multicast"
-#~ msgstr "UDP Multicast"
 
 #~ msgid ""
 #~ "This page allows changing the compression format of the audio or video "
@@ -30244,12 +29369,6 @@ msgstr "Daftar Media Manager"
 #~ msgstr ""
 #~ "Laman ini mengizinkan untuk mengubah format kompresi trek audio atau "
 #~ "video. Jika hanya mengubah format wadah, teruskan kepada laman berikutnya."
-
-#~ msgid "Transcode audio"
-#~ msgstr "Audio transkode"
-
-#~ msgid "Transcode video"
-#~ msgstr "Video transkode"
 
 #~ msgid ""
 #~ "Enabling this allows transcoding the audio track if one is present in the "
@@ -30265,9 +29384,6 @@ msgstr "Daftar Media Manager"
 #~ "Menghidupkan ini akan mengizinkan untuk mentranskodekan trek video jika "
 #~ "terdapat dalam stream."
 
-#~ msgid "Encapsulation format"
-#~ msgstr "Format enkapsulasi"
-
 #~ msgid ""
 #~ "This page allows selecting how the stream will be encapsulated. Depending "
 #~ "on previously chosen settings all formats won't be available."
@@ -30275,9 +29391,6 @@ msgstr "Daftar Media Manager"
 #~ "Laman ini mengizinkan untuk memilih bagaimana stream akan dienkapsulasi. "
 #~ "Bergantung pada setting yang dipilih sebelumnya tidak semua format "
 #~ "tersedia."
-
-#~ msgid "Additional streaming options"
-#~ msgstr "Pilihan menstream tambahan"
 
 #~ msgid "In this page, a few additional streaming parameters can be set."
 #~ msgstr ""
@@ -30287,22 +29400,10 @@ msgstr "Daftar Media Manager"
 #~ msgid "Time-To-Live (TTL)"
 #~ msgstr "Time-To-Live (TTL)"
 
-#~ msgid "Local playback"
-#~ msgstr "Playback lokal"
-
-#~ msgid "Add Subtitles to transcoded video"
-#~ msgstr "Tambahkan subtitle ke video tertranskodekan"
-
-#~ msgid "Additional transcode options"
-#~ msgstr "Pilihan transkode tambahan"
-
 #~ msgid "In this page, a few additional transcoding parameters can be set."
 #~ msgstr ""
 #~ "Pada laman ini, beberapa parameter tambahan untuk pentranskodean dapat "
 #~ "ditentukan."
-
-#~ msgid "Select the file to save to"
-#~ msgstr "Pilih file untuk menyimpan"
 
 #~ msgid ""
 #~ "Adds available subtitles directly to the video. These cannot be disabled "
@@ -30318,21 +29419,6 @@ msgstr "Daftar Media Manager"
 #~ "Laman ini mendaftar semua setting. Klik \"Selesai\" untuk memulai "
 #~ "menstream atau mentranskodekan."
 
-#~ msgid "Summary"
-#~ msgstr "Ringkasan"
-
-#~ msgid "Encap. format"
-#~ msgstr "Format enkapsulasi"
-
-#~ msgid "Input stream"
-#~ msgstr "Stream input"
-
-#~ msgid "Save file to"
-#~ msgstr "Simpan file ke"
-
-#~ msgid "No input selected"
-#~ msgstr "Tidak ada input yang dipilih"
-
 #~ msgid ""
 #~ "No new stream or valid playlist item has been selected.\n"
 #~ "\n"
@@ -30341,9 +29427,6 @@ msgstr "Daftar Media Manager"
 #~ "Tidak ada stream baru atau item playlist valid yang telah dipilih.\n"
 #~ "\n"
 #~ "Pilih satu sebelum pergi ke laman berikutnya."
-
-#~ msgid "No valid destination"
-#~ msgstr "Tidak ada destinasi sah"
 
 #~ msgid ""
 #~ "A valid destination has to be selected Enter either a Unicast-IP or a "
@@ -30369,15 +29452,6 @@ msgstr "Daftar Media Manager"
 #~ "\n"
 #~ "Perbaiki pilihan Anda dan coba lagi."
 
-#~ msgid "Select the directory to save to"
-#~ msgstr "Pilih direktori untuk penyimpanan"
-
-#~ msgid "No folder selected"
-#~ msgstr "Tidak ada folder yang dipilih"
-
-#~ msgid "A directory where to save the files has to be selected."
-#~ msgstr "Direktori di mana untuk menyimpan file harus dipilih."
-
 #~ msgid ""
 #~ "Enter either a valid path or use the \"Choose...\" button to select a "
 #~ "location."
@@ -30400,12 +29474,6 @@ msgstr "Daftar Media Manager"
 #~ msgid "%i items"
 #~ msgstr "%i item"
 
-#~ msgid "yes"
-#~ msgstr "ya"
-
-#~ msgid "no"
-#~ msgstr "tidak"
-
 #~ msgid "yes: from %@ to %@"
 #~ msgstr "ya: dari %@ ke %@"
 
@@ -30427,16 +29495,6 @@ msgstr "Daftar Media Manager"
 #~ "Perhatikan bahwa VLC tidak berapa sesuai untuk transkoding file ke file. "
 #~ "Fitur transkoding hanya sangat berguna untuk menghemat stream jaringan, "
 #~ "sebagai contoh."
-
-#~ msgid "Select your audio codec. Click one to get more information."
-#~ msgstr ""
-#~ "Pilih kodek audio Anda. Pilih salah satu untuk memperoleh informasi "
-#~ "lanjutan."
-
-#~ msgid "Select your video codec. Click one to get more information."
-#~ msgstr ""
-#~ "Pilih kodek video Anda. Pilih salah satu untuk memperoleh informasi "
-#~ "lanjutan."
 
 #~ msgid ""
 #~ "This allows defining the TTL (Time-To-Live) of the stream. This parameter "
@@ -30477,44 +29535,17 @@ msgstr "Daftar Media Manager"
 #~ "Perhatikan bahwa ini memerlukan daya CPU yang lebih besar dibandingkan "
 #~ "trankoding atau streaming sederhana."
 
-#~ msgid "A->B Loop"
-#~ msgstr "Perulangan A->B"
-
-#~ msgid "&Write changes to config"
-#~ msgstr "Tulis perubahan ke file konfigurasi"
-
 #~ msgid "T&ools"
 #~ msgstr "Peralatan"
 
-#~ msgid "&Decrease Volume"
-#~ msgstr "Turunkan Volume"
-
-#~ msgid "Local drives"
-#~ msgstr "Drive lokal"
-
-#~ msgid "Preferred Width"
-#~ msgstr "Lebar yang dikehendaki"
-
-#~ msgid "Preferred Height"
-#~ msgstr "Tinggi yang dikehendaki"
-
 #~ msgid "Buffer Size (Seconds)"
 #~ msgstr "Ukuran Buffer (Detik)"
-
-#~ msgid "Specify an identifier integer for this elementary stream to change"
-#~ msgstr "Tentukan satu angka pengenal bagi stream antara ini untuk diubah"
-
-#~ msgid "Row"
-#~ msgstr "Baris"
 
 #~ msgid "Lang From Telx"
 #~ msgstr "Bahasa Dari Telx"
 
 #~ msgid "Dynamic language setting from teletext"
 #~ msgstr "Setting bahasa dinamis dari teleteks"
-
-#~ msgid "Hostname or IP address of target device"
-#~ msgstr "Hostname atau alamat IP dari perangkat tujuan"
 
 #~ msgid ""
 #~ "Output volume for analog output: 0 for silence, 1..255 from almost silent "
@@ -30526,9 +29557,6 @@ msgstr "Daftar Media Manager"
 #~ msgid "Password for target device."
 #~ msgstr "Password untuk perangkat tujuan."
 
-#~ msgid "Password file"
-#~ msgstr "File password"
-
 #~ msgid "Read password for target device from file."
 #~ msgstr "Baca password untuk perangkat tujuan dari file."
 
@@ -30538,41 +29566,10 @@ msgstr "Daftar Media Manager"
 #~ msgid "Remote Audio Output Protocol stream output"
 #~ msgstr "Output stream Remote Audio Output Protocol"
 
-#~ msgid "Session phone number"
-#~ msgstr "Nomor telepon sesi"
-
-#~ msgid ""
-#~ "This allows you to give a contact telephone number for the stream, that "
-#~ "will be announced in the SDP (Session Descriptor)."
-#~ msgstr ""
-#~ "Ini mengizinkan Anda memberikan nomor telepon kontak untuk stream, yang "
-#~ "akan diumumkan dalam SDP (Session Descriptor)."
-
-#~ msgid "OSD menu"
-#~ msgstr "Menu OSD"
-
 #~ msgid ""
 #~ "Stream the On Screen Display menu (using the osdmenu subpicture module)."
 #~ msgstr ""
 #~ "Stream menu Tampilan Di Atas Layar (menggunakan modul subgambar osdmenu)."
-
-#~ msgid "Name for the font you want to use"
-#~ msgstr "Nama font yang ingin Anda gunakan"
-
-#~ msgid "Text renderer for Mac"
-#~ msgstr "Perender teks untuk Mac"
-
-#~ msgid "Filename for the font you want to use"
-#~ msgstr "Nama file untuk font yang ingin Anda gunakan"
-
-#~ msgid "Win32 font renderer"
-#~ msgstr "Perender font Win32"
-
-#~ msgid "Device type"
-#~ msgstr "Tipe perangkat"
-
-#~ msgid "Classic AtmoLight"
-#~ msgstr "AtmoLight Klasik"
 
 #~ msgid "Quattro AtmoLight"
 #~ msgstr "AtmoLight Quattro"
@@ -30582,9 +29579,6 @@ msgstr "Daftar Media Manager"
 
 #~ msgid "MoMoLight"
 #~ msgstr "MoMoLight"
-
-#~ msgid "Count of AtmoLight channels"
-#~ msgstr "Jumlah kanal AtmoLight"
 
 #~ msgid "How many AtmoLight channels, should be emulated with that DMX device"
 #~ msgstr ""
@@ -30601,23 +29595,14 @@ msgstr "Daftar Media Manager"
 #~ "Tentukan di sini alamat dasar DMX untuk setiap kanal. Gunakan , atau ; "
 #~ "untuk memisahkan nilai"
 
-#~ msgid "Count of channels"
-#~ msgstr "Jumlah kanal"
-
 #~ msgid "Depending on your MoMoLight hardware choose 3 or 4 channels"
 #~ msgstr "Pilih 3 atau 4 kanal tergantung perangkat keras MoMoLight Anda"
 
 #~ msgid "Save Debug Frames"
 #~ msgstr "Simpan Bingkai Debug"
 
-#~ msgid "Extracted Image Width"
-#~ msgstr "Lebar gambar terekstrak"
-
 #~ msgid "The width of the mini image for further processing (64 is default)"
 #~ msgstr "Lebar gambar mini untuk pemrosesan lebih lanjut (64 adalah default)"
-
-#~ msgid "Extracted Image Height"
-#~ msgstr "Tinggi gambar terekstrak"
 
 #~ msgid "The height of the mini image for further processing (48 is default)"
 #~ msgstr ""
@@ -30626,9 +29611,6 @@ msgstr "Daftar Media Manager"
 #~ msgid "Mark analyzed pixels"
 #~ msgstr "Tandai piksel yang teranalisis"
 
-#~ msgid "Color when paused"
-#~ msgstr "Warna ketika berhenti sementara"
-
 #~ msgid ""
 #~ "Set the color to show if the user pauses the video. (Have light to get "
 #~ "another beer?)"
@@ -30636,23 +29618,8 @@ msgstr "Daftar Media Manager"
 #~ "Tetapkan warna yang akan ditampilkan ketika pengguna menghentikan video "
 #~ "sementara."
 
-#~ msgid "Number of zones on top"
-#~ msgstr "Jumlah zona pada bagian atas"
-
-#~ msgid "Number of zones on the top of the screen"
-#~ msgstr "Jumlah zona pada bagian atas layar"
-
-#~ msgid "Number of zones on bottom"
-#~ msgstr "Jumlah zona pada bagian bawah"
-
-#~ msgid "Number of zones on the bottom of the screen"
-#~ msgstr "Jumlah zona pada bagian bawah layar"
-
 #~ msgid "Serial Port/Device"
 #~ msgstr "Port/Perangkat Serial"
-
-#~ msgid "Darkness limit"
-#~ msgstr "Batasan Kegelapan"
 
 #~ msgid "Filter length (ms)"
 #~ msgstr "Panjang filter (milidetik)"
@@ -30660,41 +29627,8 @@ msgstr "Daftar Media Manager"
 #~ msgid "Filter smoothness (%)"
 #~ msgstr "Ambang kehalusan (%)"
 
-#~ msgid "No Filtering"
-#~ msgstr "Tanpa Filtering"
-
-#~ msgid "Percent"
-#~ msgstr "Persen"
-
-#~ msgid "Frame delay (ms)"
-#~ msgstr "Penundaan frame (mdetik)"
-
-#~ msgid "Channel 0: summary"
-#~ msgstr "Kanal 0: ringkasan"
-
-#~ msgid "Channel 1: left"
-#~ msgstr "Kanal 1: kiri"
-
-#~ msgid "Channel 2: right"
-#~ msgstr "Kanal 2: kanan"
-
-#~ msgid "Channel 3: top"
-#~ msgstr "Kanal 3: atas"
-
-#~ msgid "Channel 4: bottom"
-#~ msgstr "Kanal 4: bawah"
-
-#~ msgid "disabled"
-#~ msgstr "dimatikan"
-
 #~ msgid "Zone 4:summary"
 #~ msgstr "Zona 4:ringkasan"
-
-#~ msgid "Zone 3:left"
-#~ msgstr "Zona 3: kiri"
-
-#~ msgid "Zone 1:right"
-#~ msgstr "Zona 1:kanan"
 
 #~ msgid "Zone 0:top"
 #~ msgstr "Zona 0:atas"
@@ -30719,17 +29653,11 @@ msgstr "Daftar Media Manager"
 #~ msgstr ""
 #~ "Menentukan gambar kecil dengan 64x48 piksel, berisi gradasi skala kelabu"
 
-#~ msgid "Filename of AtmoWin*.exe"
-#~ msgstr "Nama file dari AtmoWin*.exe"
-
 #~ msgid "AtmoLight Filter"
 #~ msgstr "Filter AtmoLight"
 
 #~ msgid "AtmoLight"
 #~ msgstr "AtmoLight"
-
-#~ msgid "Choose Devicetype and Connection"
-#~ msgstr "Pilih Tipe Perangkat dan Koneksi"
 
 #~ msgid "Illuminate the room with this color on pause"
 #~ msgstr "Terangi ruangan dengan warna ini ketika berhenti sementara"
@@ -30740,66 +29668,14 @@ msgstr "Daftar Media Manager"
 #~ msgid "Change gradients"
 #~ msgstr "Ubah gradasi"
 
-#~ msgid "Force use of a specific chroma for output. Default is RGB32."
-#~ msgstr "Paksa penggunaan kroma spesifik untuk output. Default adalah RGB32."
-
-#~ msgid "Android Surface video output"
-#~ msgstr "Output video Android Surface"
-
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "Output video DirectFB http://www.directfb.org/"
-
-#~ msgid "OpenGL ES extension"
-#~ msgstr "Ekstensi OpenGL ES"
-
-#~ msgid "OpenGL ES"
-#~ msgstr "OpenGL ES"
-
-#~ msgid "OpenGL for Embedded Systems video output"
-#~ msgstr "OpenGL untuk output video Sistem Terbenam"
-
-#~ msgid "OpenGL video output (experimental)"
-#~ msgstr "Output video OpenGL (eksperimen)"
-
-#~ msgid "iOS OpenGL video output"
-#~ msgstr "Output video iOS OpenGL"
-
-#~ msgid "Video output for Windows 7/Windows Vista with Platform update"
-#~ msgstr "Output video untuk Windows 7/Windows Vista dengan Platform update"
-
-#~ msgid "Direct2D video output"
-#~ msgstr "Output video Direct2D"
-
-#~ msgid "SDL chroma format"
-#~ msgstr "Format kroma SDL"
-
-#~ msgid ""
-#~ "Force the SDL renderer to use a specific chroma format instead of trying "
-#~ "to improve performances by using the most efficient one."
-#~ msgstr ""
-#~ "Paksa renderer SDL menggunakan format kroma tertentu daripada mencoba "
-#~ "menaikkan kinerja dengan menggunakan kroma yang paling efisien."
-
-#~ msgid "Simple DirectMedia Layer video output"
-#~ msgstr "Output video Lapisan DirectMedia Sederhana"
-
-#~ msgid "OpenGL GLX video output (XCB)"
-#~ msgstr "Output video OpenGL GLX (XCB)"
 
 #~ msgid "YUV4MPEG2 header (default disabled)"
 #~ msgstr "Header YUV4MPEG2 (default dimatikan)"
 
-#~ msgid "Brightness (%)"
-#~ msgstr "Kecerahan (%)"
-
 #~ msgid "Mark analyzed Pixels"
 #~ msgstr "Tandai Pixel teranalisis"
-
-#~ msgid "Filter threshold (%)"
-#~ msgstr "Ambang filter (%)"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
 
 #~ msgid "FLV"
 #~ msgstr "FLV"
@@ -32863,6 +31739,867 @@ msgstr "Daftar Media Manager"
 #~ msgstr "Kebijakan pengunduhan album art"
 
 #, fuzzy
+#~ msgid "FFmpeg access"
+#~ msgstr "Akses Zip"
+
+#, fuzzy
+#~ msgid "Display OSD menu on top of video output"
+#~ msgstr "Output video iOS OpenGL"
+
+#, fuzzy
+#~ msgid "CAPMT System ID"
+#~ msgstr "ID Sistem"
+
+#, fuzzy
+#~ msgid "      packets sent     :    %5i"
+#~ msgstr "| paket terkirim   :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "Filename of the SQLite database"
+#~ msgstr "Nama file untuk font yang ingin Anda gunakan"
+
+#, fuzzy
+#~ msgid "Password for the database"
+#~ msgstr "Password untuk perangkat tujuan."
+
+#, fuzzy
+#~ msgid "yes: from %@ to %@ secs"
+#~ msgstr "ya: dari %@ ke %@"
+
+#, fuzzy
+#~ msgid "1 item"
+#~ msgstr "%i item"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force use of a specific chroma for output. Default is Y420 (specific to "
+#~ "N770/N8xx hardware)."
+#~ msgstr "Paksa penggunaan kroma spesifik untuk output. Default adalah I420."
+
+#, fuzzy
+#~ msgid "Format to use in playlist \"title\" field when no CDDB"
+#~ msgstr "Format yang digunakan dalam isian \"judul\" dalam playlist."
+
+#, fuzzy
+#~ msgid "Format to use in playlist \"title\" field when using CDDB"
+#~ msgstr "Format yang digunakan dalam isian \"judul\" dalam playlist."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame."
+#~ msgstr ""
+#~ "Paksa nomor tertentu bingkai-B berurutan yang digunakan, kecuali "
+#~ "kemungkinan sebelum sebuah bingkai-I. Range antara 0 hingga 2."
+
+#, fuzzy
+#~ msgid ""
+#~ "Selects the motion estimation algorithm:  - dia: diamond search, radius 1 "
+#~ "(fast)\n"
+#~ " - hex: hexagonal search, radius 2\n"
+#~ " - umh: uneven multi-hexagon search (better but slower)\n"
+#~ " - esa: exhaustive search (extremely slow, primarily for testing)\n"
+#~ msgstr ""
+#~ "Pilih algoritma estimasi gerakan: - dia: pencarian berbentuk intan, "
+#~ "radius 1 (cepat)\n"
+#~ " - hex: pencarian berbentuk hexagonal, radius 2\n"
+#~ " - umh: pencarian multi-hexagon tidak rata (lebih baik tetapi lebih "
+#~ "lambat)\n"
+#~ " - esa: pencarian menyeluruh (sangat lambat, terutama untuk testing)\n"
+#~ " - tesa: pencarian sangat menyeluruh (sangat lambat, terutama untuk "
+#~ "testing)\n"
+
+#, fuzzy
+#~ msgid "MJPEG:"
+#~ msgstr "MJPEG"
+
+#, fuzzy
+#~ msgid "Time To Live (TTL):"
+#~ msgstr "Time-To-Live (TTL)"
+
+#, fuzzy
+#~ msgid "+-[Streaming]"
+#~ msgstr "Stream"
+
+#, fuzzy
+#~ msgid "| bytes sent       : %8.0f KiB"
+#~ msgstr "| byte input terbaca : %8.0f KiB"
+
+#, fuzzy
+#~ msgid "Streaming"
+#~ msgstr "Stream"
+
+#, fuzzy
+#~ msgid "Sent packets"
+#~ msgstr "Grup paket"
+
+#, fuzzy
+#~ msgid "Sent bytes"
+#~ msgstr "%s bit"
+
+#, fuzzy
+#~ msgid "Send rate"
+#~ msgstr "Laju sampel"
+
+#, fuzzy
+#~ msgid "packets"
+#~ msgstr "packetizer"
+
+#, fuzzy
+#~ msgid "Dolby Surround:"
+#~ msgstr "Dolby Surround"
+
+#, fuzzy
+#~ msgid "Headphone surround effect"
+#~ msgstr "Efek headphone"
+
+#, fuzzy
+#~ msgid "Display device"
+#~ msgstr "Perangkat disk"
+
+#, fuzzy
+#~ msgid "Capture region heigh"
+#~ msgstr "Ukuran fragmen tangkapan"
+
+#, fuzzy
+#~ msgid "Always &on Top"
+#~ msgstr "Selalu di atas"
+
+#, fuzzy
+#~ msgid "High quality"
+#~ msgstr "Kualitas gambar"
+
+#, fuzzy
+#~ msgid "Very high quality"
+#~ msgstr "Kualitas rendering"
+
+#, fuzzy
+#~ msgid "YouTube Start Time"
+#~ msgstr "Waktu mulai"
+
+#, fuzzy
+#~ msgid "iTunes Account ID"
+#~ msgstr "Kode negara penala"
+
+#, fuzzy
+#~ msgid "Disable lua"
+#~ msgstr "Nonaktif"
+
+#, fuzzy
+#~ msgid "Display resolution"
+#~ msgstr "Setting Tampilan"
+
+#, fuzzy
+#~ msgid "Navigation"
+#~ msgstr "Arahkan ke bawah"
+
+#, fuzzy
+#~ msgid "HTTP/TLS Certificate Revocation List"
+#~ msgstr "Daftar Penarikan Sertifikat X.509"
+
+#, fuzzy
+#~ msgid "Log all VLC messages to syslog (UNIX systems)."
+#~ msgstr "Log semua pesan VLC pada file teks."
+
+#, fuzzy
+#~ msgid ""
+#~ "Allowing only one running instance of VLC can sometimes be useful, for "
+#~ "example if you associated VLC with some media types and you don't want a "
+#~ "new instance of VLC to be opened each time you open a file in your file "
+#~ "manager. This option will allow you to play the file with the already "
+#~ "running instance or enqueue it. This option requires the D-Bus session "
+#~ "daemon to be active and the running instance of VLC to use D-Bus control "
+#~ "interface."
+#~ msgstr ""
+#~ "Mengizinkan hanya ada satu instans VLC yang dijalankan kadangkala sangat "
+#~ "berguna, sebagai contoh jika Anda mengaitkan VLC dengan beberapa jenis "
+#~ "media dan Anda tidak menginginkan sebuah instans baru VLC dibuka setiap "
+#~ "kali Anda membuka sebuah file dalam file manajer Anda. Pilihan ini "
+#~ "mengizinkan Anda memutar file dengan instans yang sudah berjalan atau "
+#~ "memasukkannya dalam antrian."
+
+#, fuzzy
+#~ msgid ""
+#~ "%s\n"
+#~ "Downloading... %s/%s - %.1f%% done"
+#~ msgstr ""
+#~ "%s\n"
+#~ "Mengunduh... %s/%s %.1f%% selesai"
+
+#, fuzzy
+#~ msgid "Blu-ray Disc Input"
+#~ msgstr "Disk Blue-Ray terkorupsi."
+
+#, fuzzy
+#~ msgid "Configure"
+#~ msgstr "Konfigurasi Hotkey"
+
+#, fuzzy
+#~ msgid "Channel number"
+#~ msgstr "Nama Kanal"
+
+#, fuzzy
+#~ msgid "EyeTV input"
+#~ msgstr "Input FTP"
+
+#, fuzzy
+#~ msgid "Do not sort the items."
+#~ msgstr "Font yang digunakan untuk judul"
+
+#, fuzzy
+#~ msgid "FTP user name"
+#~ msgstr "Nama pengguna SOCKS"
+
+#, fuzzy
+#~ msgid "FTP password"
+#~ msgstr "Password"
+
+#, fuzzy
+#~ msgid "Password that will be used for the connection."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
+
+#, fuzzy
+#~ msgid "Your password was rejected."
+#~ msgstr "Akun Anda ditolak."
+
+#, fuzzy
+#~ msgid "Your connection attempt to the server was rejected."
+#~ msgstr "Koneksi VLC ke server yang ditentukan ditolak."
+
+#, fuzzy
+#~ msgid "GnomeVFS input"
+#~ msgstr "Tidak ada input"
+
+#, fuzzy
+#~ msgid "HTTP referer value"
+#~ msgstr "Alamat server HTTP"
+
+#, fuzzy
+#~ msgid "RTSP user name"
+#~ msgstr "Nama pengguna SOCKS"
+
+#, fuzzy
+#~ msgid "RTSP password"
+#~ msgstr "Password"
+
+#, fuzzy
+#~ msgid "Video Capture width"
+#~ msgstr "Lebar snapshot video"
+
+#, fuzzy
+#~ msgid "RDP Password"
+#~ msgstr "Password"
+
+#, fuzzy
+#~ msgid "Subscreen top left corner"
+#~ msgstr "Toleransi Bluescreen U"
+
+#, fuzzy
+#~ msgid "Top coordinate of the subscreen top left corner."
+#~ msgstr "Koordinat X pada sudut kiri atas mosaik."
+
+#, fuzzy
+#~ msgid "Left coordinate of the subscreen top left corner."
+#~ msgstr "Koordinat X pada sudut kiri atas mosaik."
+
+#, fuzzy
+#~ msgid "SMB user name"
+#~ msgstr "Nama pengguna SOCKS"
+
+#, fuzzy
+#~ msgid "SMB password"
+#~ msgstr "Password SOCKS"
+
+#, fuzzy
+#~ msgid "Segment"
+#~ msgstr "Panjang segmen"
+
+#, fuzzy
+#~ msgid "LID"
+#~ msgstr "ID"
+
+#, fuzzy
+#~ msgid "VCD Format"
+#~ msgstr "Format"
+
+#, fuzzy
+#~ msgid "Volume Set"
+#~ msgstr "Volume Senyap"
+
+#, fuzzy
+#~ msgid "System Id"
+#~ msgstr "Kodeset Sistem"
+
+#, fuzzy
+#~ msgid "Entries"
+#~ msgstr "Masukan"
+
+#, fuzzy
+#~ msgid "Audio Channels"
+#~ msgstr "Kanal audio"
+
+#, fuzzy
+#~ msgid "end"
+#~ msgstr "Blend"
+
+#, fuzzy
+#~ msgid "play list"
+#~ msgstr "Daftar Putar"
+
+#, fuzzy
+#~ msgid "extended selection list"
+#~ msgstr "Tampilkan setting tambahan"
+
+#, fuzzy
+#~ msgid "selection list"
+#~ msgstr "Pilihan Disk"
+
+#, fuzzy
+#~ msgid "unknown type"
+#~ msgstr "Tipe tidak diketahui"
+
+#, fuzzy
+#~ msgid "List ID"
+#~ msgstr "Daftar"
+
+#, fuzzy
+#~ msgid "If nonzero, this gives additional debug information."
+#~ msgstr "Teleteks: informasi tambahan"
+
+#, fuzzy
+#~ msgid "Use playback control?"
+#~ msgstr "Kontrol playback"
+
+#, fuzzy
+#~ msgid "Show extended VCD info?"
+#~ msgstr "Tampilkan opsi tambahan"
+
+#, fuzzy
+#~ msgid "Zip files filter"
+#~ msgstr "Lewati filter loop"
+
+#, fuzzy
+#~ msgid "Audio filter for simple channel mixing using NEON assembly"
+#~ msgstr "Filter audio untuk mencampur kanal sederhana"
+
+#, fuzzy
+#~ msgid "Audio filter for DTS->S/PDIF encapsulation"
+#~ msgstr "Filter audio untuk konversi format PCM"
+
+#, fuzzy
+#~ msgid "Android AudioTrack audio output"
+#~ msgstr "Output audio Pulseaudio"
+
+#, fuzzy
+#~ msgid "AudioUnit output for iOS"
+#~ msgstr "Output AudioUnit HAL"
+
+#, fuzzy
+#~ msgid "OpenSLES audio output"
+#~ msgstr "Output audio ALSA"
+
+#, fuzzy
+#~ msgid "OpenSLES"
+#~ msgstr "OpenGL ES2"
+
+#, fuzzy
+#~ msgid "Visualize motion vectors"
+#~ msgstr "Pemilih visualisasi"
+
+#, fuzzy
+#~ msgid "VDA output pixel format"
+#~ msgstr "Format Output"
+
+#, fuzzy
+#~ msgid "\"%s\" is no video encoder."
+#~ msgstr "Enkoder video Theora"
+
+#, fuzzy
+#~ msgid "\"%s\" is no audio encoder."
+#~ msgstr "Enkoder audio Vorbis"
+
+#, fuzzy
+#~ msgid "Video decoder using Android MediaCodec"
+#~ msgstr "Dekoder video Dirac menggunakan pustaka libschroedinger"
+
+#, fuzzy
+#~ msgid "Desired frame rate for the H264 stream."
+#~ msgstr "Kadar bingkai yang diinginkan untuk stream VC-1."
+
+#, fuzzy
+#~ msgid "Google Video"
+#~ msgstr "Video MPEG"
+
+#, fuzzy
+#~ msgid "Google Video Playlist importer"
+#~ msgstr "Impor playlist DVB"
+
+#, fuzzy
+#~ msgid "ZPL playlist import"
+#~ msgstr "Impor playlist WPL"
+
+#, fuzzy
+#~ msgid "Compiled by %s with %@"
+#~ msgstr "Dikompilasi oleh %s pada %s (%s)\n"
+
+#, fuzzy
+#~ msgid "VLC media player Help"
+#~ msgstr "Bantuan VLC Media Player..."
+
+#, fuzzy
+#~ msgid "Invalid selection"
+#~ msgstr "Kombinasi tidak sah"
+
+#, fuzzy
+#~ msgid "No input found"
+#~ msgstr "Tidak ada input"
+
+#, fuzzy
+#~ msgid "The stream must be playing or paused for bookmarks to work."
+#~ msgstr ""
+#~ "Tidak ada input yang ditemukan. Stream harus dimainkan atau dihentikan "
+#~ "seketika agar tanda buku berfungsi."
+
+#, fuzzy
+#~ msgid "Click to enable fullscreen video playback."
+#~ msgstr "Matikan screensaver selama pemutaran video."
+
+#, fuzzy
+#~ msgid "Click to stop playback."
+#~ msgstr "Pilih hotkey untuk hentikan playback."
+
+#, fuzzy
+#~ msgid "User name"
+#~ msgstr "Username"
+
+#, fuzzy
+#~ msgid "No device is selected"
+#~ msgstr "Tidak ada perangkat video atau audio yang dipilih."
+
+#, fuzzy
+#~ msgid "Current channel:"
+#~ msgstr "Kanal:"
+
+#, fuzzy
+#~ msgid "Previous Channel"
+#~ msgstr "Babak sebelumnya"
+
+#, fuzzy
+#~ msgid "Next Channel"
+#~ msgstr "Kanal"
+
+#, fuzzy
+#~ msgid "Click to select a subtitle file."
+#~ msgstr "Pilih file subtitle"
+
+#, fuzzy
+#~ msgid "Composite input"
+#~ msgstr "Komposit"
+
+#, fuzzy
+#~ msgid "S-Video input"
+#~ msgstr "Input video"
+
+#, fuzzy
+#~ msgid "Streaming/Saving:"
+#~ msgstr "Destinasi Stream"
+
+#, fuzzy
+#~ msgid "Expand Node"
+#~ msgstr "Kembangkan"
+
+#, fuzzy
+#~ msgid "Download Cover Art"
+#~ msgstr "Unduh cover art"
+
+#, fuzzy
+#~ msgid "Meta-information"
+#~ msgstr "Informasi Media"
+
+#, fuzzy
+#~ msgid "Hardware Acceleration"
+#~ msgstr "Percepatan pendekodean dengan perangkat keras"
+
+#, fuzzy
+#~ msgid "Show Fullscreen Controller"
+#~ msgstr "Tampilkan kontroler layar penuh"
+
+#, fuzzy
+#~ msgid "MPEG 1 Format"
+#~ msgstr "Format"
+
+#, fuzzy
+#~ msgid "Enter the address of the computer to stream to."
+#~ msgstr "Tentukan kodek dari stream antara"
+
+#, fuzzy
+#~ msgid "Streaming/Transcoding Wizard"
+#~ msgstr "Strim / Transkod gagal"
+
+#, fuzzy
+#~ msgid "Stream to network"
+#~ msgstr "Filter strim"
+
+#, fuzzy
+#~ msgid "Transcode/Save to file"
+#~ msgstr "Filter penghapus video"
+
+#, fuzzy
+#~ msgid "Choose here your input stream."
+#~ msgstr "Pilih folder untuk menyimpan snapshot video Anda."
+
+#, fuzzy
+#~ msgid "Existing playlist item"
+#~ msgstr "Tampilkan percabangan playlist"
+
+#, fuzzy
+#~ msgid "Partial Extract"
+#~ msgstr "Ekstrak"
+
+#, fuzzy
+#~ msgid "To"
+#~ msgstr "Atas"
+
+#, fuzzy
+#~ msgid "Streaming method"
+#~ msgstr "Mode deinterlace stream"
+
+#, fuzzy
+#~ msgid "UDP Unicast"
+#~ msgstr "Unicast"
+
+#, fuzzy
+#~ msgid "UDP Multicast"
+#~ msgstr "Multicast"
+
+#, fuzzy
+#~ msgid "Transcode audio"
+#~ msgstr "Transkode"
+
+#, fuzzy
+#~ msgid "Transcode video"
+#~ msgstr "Transkode"
+
+#, fuzzy
+#~ msgid "Encapsulation format"
+#~ msgstr "Enkapsulasi"
+
+#, fuzzy
+#~ msgid "Additional streaming options"
+#~ msgstr "Deskripsi output stream"
+
+#, fuzzy
+#~ msgid "Local playback"
+#~ msgstr "Hentikan playback"
+
+#, fuzzy
+#~ msgid "Add Subtitles to transcoded video"
+#~ msgstr "Lapiskan subtitle di atas video"
+
+#, fuzzy
+#~ msgid "Additional transcode options"
+#~ msgstr "Pilihan transkode"
+
+#, fuzzy
+#~ msgid "Select the file to save to"
+#~ msgstr "Pilih file"
+
+#, fuzzy
+#~ msgid "Summary"
+#~ msgstr "Ringkasan Podcast"
+
+#, fuzzy
+#~ msgid "Encap. format"
+#~ msgstr "Format gambar"
+
+#, fuzzy
+#~ msgid "Input stream"
+#~ msgstr "Strim sout"
+
+#, fuzzy
+#~ msgid "Save file to"
+#~ msgstr "Simpan File"
+
+#, fuzzy
+#~ msgid "No input selected"
+#~ msgstr "Tidak ada input"
+
+#, fuzzy
+#~ msgid "No valid destination"
+#~ msgstr "Destinasi baru"
+
+#, fuzzy
+#~ msgid "Select the directory to save to"
+#~ msgstr "Pilih direktori"
+
+#, fuzzy
+#~ msgid "No folder selected"
+#~ msgstr "Buang Pemilihan"
+
+#, fuzzy
+#~ msgid "A directory where to save the files has to be selected."
+#~ msgstr "Direktori di mana snapshot video akan disimpan."
+
+#, fuzzy
+#~ msgid "yes"
+#~ msgstr "Byte"
+
+#, fuzzy
+#~ msgid "no"
+#~ msgstr "Mono"
+
+#, fuzzy
+#~ msgid "Select your audio codec. Click one to get more information."
+#~ msgstr "Klik dua kali untuk mendapat informasi media"
+
+#, fuzzy
+#~ msgid "Select your video codec. Click one to get more information."
+#~ msgstr "Klik dua kali untuk mendapat informasi media"
+
+#, fuzzy
+#~ msgid "A->B Loop"
+#~ msgstr "Perulangan A->B"
+
+#, fuzzy
+#~ msgid "&Write changes to config"
+#~ msgstr "Tulis proses id ke file"
+
+#, fuzzy
+#~ msgid "&Decrease Volume"
+#~ msgstr "Turunkan Volume"
+
+#, fuzzy
+#~ msgid "Local drives"
+#~ msgstr "Drive optik"
+
+#, fuzzy
+#~ msgid "Preferred Width"
+#~ msgstr "Resolusi video yang dikehendaki"
+
+#, fuzzy
+#~ msgid "Preferred Height"
+#~ msgstr "Daftar dekoder yang dikehendaki"
+
+#, fuzzy
+#~ msgid "Specify an identifier integer for this elementary stream to change"
+#~ msgstr "Tentukan satu angka pengenal untuk stream antara ini"
+
+#, fuzzy
+#~ msgid "Row"
+#~ msgstr "Baris"
+
+#, fuzzy
+#~ msgid "Hostname or IP address of target device"
+#~ msgstr "Nama host VNC atau alamat IP."
+
+#, fuzzy
+#~ msgid "Password file"
+#~ msgstr "Password"
+
+#, fuzzy
+#~ msgid "Session phone number"
+#~ msgstr "Nama sesi"
+
+#, fuzzy
+#~ msgid ""
+#~ "This allows you to give a contact telephone number for the stream, that "
+#~ "will be announced in the SDP (Session Descriptor)."
+#~ msgstr ""
+#~ "Ini akan mengizinkan Anda memberi alamat email kontak untuk stream, yang "
+#~ "akan diumumkan dalam SDP (Session Descriptor)."
+
+#, fuzzy
+#~ msgid "OSD menu"
+#~ msgstr "Menu DVD"
+
+#, fuzzy
+#~ msgid "Name for the font you want to use"
+#~ msgstr "Font family dari font yang ingin Anda gunakan"
+
+#, fuzzy
+#~ msgid "Text renderer for Mac"
+#~ msgstr "Perender teks"
+
+#, fuzzy
+#~ msgid "Filename for the font you want to use"
+#~ msgstr "Nama file untuk font yang ingin Anda gunakan"
+
+#, fuzzy
+#~ msgid "Win32 font renderer"
+#~ msgstr "Perender font dummy"
+
+#, fuzzy
+#~ msgid "Device type"
+#~ msgstr "Nama perangkat"
+
+#, fuzzy
+#~ msgid "Classic AtmoLight"
+#~ msgstr "Classic Rock"
+
+#, fuzzy
+#~ msgid "Count of AtmoLight channels"
+#~ msgstr "Jumlah kanal output"
+
+#, fuzzy
+#~ msgid "Count of channels"
+#~ msgstr "Jumlah kanal"
+
+#, fuzzy
+#~ msgid "Extracted Image Width"
+#~ msgstr "Lebar gambar"
+
+#, fuzzy
+#~ msgid "Extracted Image Height"
+#~ msgstr "Tinggi gambar"
+
+#, fuzzy
+#~ msgid "Color when paused"
+#~ msgstr "Ambang warna"
+
+#, fuzzy
+#~ msgid "Number of zones on top"
+#~ msgstr "Jumlah klon"
+
+#, fuzzy
+#~ msgid "Number of zones on the top of the screen"
+#~ msgstr "Jumlah piksel yang dipotong dari puncak gambar"
+
+#, fuzzy
+#~ msgid "Number of zones on bottom"
+#~ msgstr "Jumlah klon"
+
+#, fuzzy
+#~ msgid "Number of zones on the bottom of the screen"
+#~ msgstr "Jumlah piksel yang dipotong dari dasar gambar"
+
+#, fuzzy
+#~ msgid "Darkness limit"
+#~ msgstr "Menyembunyi gelap"
+
+#, fuzzy
+#~ msgid "No Filtering"
+#~ msgstr "Tanpa pre-filtering"
+
+#, fuzzy
+#~ msgid "Percent"
+#~ msgstr "Tengah belakang"
+
+#, fuzzy
+#~ msgid "Frame delay (ms)"
+#~ msgstr "Penundaan DTS (milidetik)"
+
+#, fuzzy
+#~ msgid "Channel 0: summary"
+#~ msgstr "Kanal"
+
+#, fuzzy
+#~ msgid "Channel 1: left"
+#~ msgstr "Nama Kanal"
+
+#, fuzzy
+#~ msgid "Channel 2: right"
+#~ msgstr "Kanal:"
+
+#, fuzzy
+#~ msgid "Channel 3: top"
+#~ msgstr "Kanal:"
+
+#, fuzzy
+#~ msgid "Channel 4: bottom"
+#~ msgstr "Jumlah kanal"
+
+#, fuzzy
+#~ msgid "disabled"
+#~ msgstr "Nonaktif"
+
+#, fuzzy
+#~ msgid "Zone 3:left"
+#~ msgstr "Kiri belakang"
+
+#, fuzzy
+#~ msgid "Zone 1:right"
+#~ msgstr "Kanan belakang"
+
+#, fuzzy
+#~ msgid "Filename of AtmoWin*.exe"
+#~ msgstr "Prefiks nama file"
+
+#, fuzzy
+#~ msgid "Choose Devicetype and Connection"
+#~ msgstr "Pilih Destinasi"
+
+#, fuzzy
+#~ msgid "Force use of a specific chroma for output. Default is RGB32."
+#~ msgstr "Paksa penggunaan muxer avformat tertentu."
+
+#, fuzzy
+#~ msgid "Android Surface video output"
+#~ msgstr "Output video skala kelabu"
+
+#, fuzzy
+#~ msgid "OpenGL ES extension"
+#~ msgstr "Ekstensi OpenGL ES 2"
+
+#, fuzzy
+#~ msgid "OpenGL ES"
+#~ msgstr "OpenGL ES2"
+
+#, fuzzy
+#~ msgid "OpenGL for Embedded Systems video output"
+#~ msgstr "OpenGL untuk output video Sistem Terbenam 2"
+
+#, fuzzy
+#~ msgid "OpenGL video output (experimental)"
+#~ msgstr "Output video OpenGL"
+
+#, fuzzy
+#~ msgid "iOS OpenGL video output"
+#~ msgstr "Output video OpenGL"
+
+#, fuzzy
+#~ msgid "Video output for Windows 7/Windows Vista with Platform update"
+#~ msgstr ""
+#~ "Output video yang direkomendasikan untuk Windows Vista dan versi "
+#~ "selanjutnya"
+
+#, fuzzy
+#~ msgid "Direct2D video output"
+#~ msgstr "Output audio DirectX"
+
+#, fuzzy
+#~ msgid "SDL chroma format"
+#~ msgstr "Format kroma"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the SDL renderer to use a specific chroma format instead of trying "
+#~ "to improve performances by using the most efficient one."
+#~ msgstr ""
+#~ "Paksa output video dummy untuk membuat gambar menggunakan format chroma "
+#~ "spesifik dibandingkan mencoba meningkatkan performansi dengan menggunakan "
+#~ "yang paling efisien."
+
+#, fuzzy
+#~ msgid "Simple DirectMedia Layer video output"
+#~ msgstr "Output video DirectX (DirectDraw)"
+
+#, fuzzy
+#~ msgid "OpenGL GLX video output (XCB)"
+#~ msgstr "Output video OpenGL"
+
+#, fuzzy
+#~ msgid "Brightness (%)"
+#~ msgstr "Kecerahan"
+
+#, fuzzy
+#~ msgid "Filter threshold (%)"
+#~ msgstr "Ambang warna"
+
+#, fuzzy
+#~ msgid "MKV"
+#~ msgstr "KVA"
+
+#, fuzzy
 #~ msgid "---  DVD Menu"
 #~ msgstr "Menu DVD"
 
@@ -32918,10 +32655,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Load Media Library"
 #~ msgstr "Pustaka Media"
-
-#, fuzzy
-#~ msgid "FFmpeg access"
-#~ msgstr "Akses Zip"
 
 #, fuzzy
 #~ msgid "VLC could not open the file \"%s\". (%m)"
@@ -33014,7 +32747,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Automatically retrieve media infos"
-#~ msgstr "Preparse file secara otomatis"
+#~ msgstr "Memeriksa update secara otomatis"
 
 #, fuzzy
 #~ msgid "Get more extensions from"
@@ -33042,7 +32775,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Output video iOS OpenGL"
+#~ msgstr "Output video OpenGL"
 
 #, fuzzy
 #~ msgid "Add a subtitle file"
@@ -33190,10 +32923,6 @@ msgstr "Daftar Media Manager"
 #~ msgstr "Turunkan faktor skala"
 
 #, fuzzy
-#~ msgid "Display OSD menu on top of video output"
-#~ msgstr "Output video iOS OpenGL"
-
-#, fuzzy
 #~ msgid "Do not display OSD menu on video output"
 #~ msgstr "Jangan tampilkan video apapun"
 
@@ -33287,11 +33016,11 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "SFTP user name"
-#~ msgstr "Nama pengguna FTP"
+#~ msgstr "Nama pengguna SOCKS"
 
 #, fuzzy
 #~ msgid "SFTP password"
-#~ msgstr "Password FTP"
+#~ msgstr "Password"
 
 #, fuzzy
 #~ msgid "Backlight compensation."
@@ -33339,7 +33068,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "RealVideo library decoder"
-#~ msgstr "Dekoder pustaka QuickTime"
+#~ msgstr "Video encoder"
 
 #, fuzzy
 #~ msgid "Direct MV prediction mode."
@@ -33370,10 +33099,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Silent mode"
 #~ msgstr "Mode senyap"
-
-#, fuzzy
-#~ msgid "CAPMT System ID"
-#~ msgstr "ID Sistem"
 
 #, fuzzy
 #~ msgid "Filename of dump"
@@ -33430,7 +33155,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Automatically save the volume on exit"
-#~ msgstr "Muat secara otomatis modul ekstensi pada permulaan"
+#~ msgstr "Menyesuaikan kecerahan gambar secara otomatis."
 
 #, fuzzy
 #~ msgid "Frames per Second:"
@@ -33521,12 +33246,8 @@ msgstr "Daftar Media Manager"
 #~ msgstr "+-[Pendekodean Audio]"
 
 #, fuzzy
-#~ msgid "      packets sent     :    %5i"
-#~ msgstr "| paket terkirim   :    %5<PRIi64>"
-
-#, fuzzy
 #~ msgid "      bytes sent       : %8.0f KiB"
-#~ msgstr "| byte terkirim    : %8.0f kB"
+#~ msgstr "| byte input terbaca : %8.0f KiB"
 
 #, fuzzy
 #~ msgid "Show playlist"
@@ -33598,7 +33319,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Audio &Channels"
-#~ msgstr "Kanal Audio"
+#~ msgstr "Kanal audio"
 
 #, fuzzy
 #~ msgid "&Subtitles Track"
@@ -33606,7 +33327,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "&Navigation"
-#~ msgstr "Navigasi"
+#~ msgstr "Arahkan ke bawah"
 
 #, fuzzy
 #~ msgid "Advanced options"
@@ -33617,20 +33338,12 @@ msgstr "Daftar Media Manager"
 #~ msgstr "Tampilkan opsi tingkat lanjut"
 
 #, fuzzy
-#~ msgid "Filename of the SQLite database"
-#~ msgstr "Nama file untuk font yang ingin Anda gunakan"
-
-#, fuzzy
 #~ msgid "Ignored extensions in the media library"
 #~ msgstr "Ekstensi yang diabaikan"
 
 #, fuzzy
 #~ msgid "Subdirectory recursive scanning"
 #~ msgstr "Tingkah laku subdirektori"
-
-#, fuzzy
-#~ msgid "Password for the database"
-#~ msgstr "Password untuk perangkat tujuan."
 
 #, fuzzy
 #~ msgid "Port for the database"
@@ -33726,7 +33439,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Darkness Limit"
-#~ msgstr "Batasan Kegelapan"
+#~ msgstr "Menyembunyi gelap"
 
 #, fuzzy
 #~ msgid "Automatic cropping"
@@ -33893,7 +33606,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Low Pass Ffilter"
-#~ msgstr "File password"
+#~ msgstr "Filter video logo"
 
 #, fuzzy
 #~ msgid ""
@@ -33910,10 +33623,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Override parametters"
 #~ msgstr "Tindih parameter"
-
-#, fuzzy
-#~ msgid "yes: from %@ to %@ secs"
-#~ msgstr "ya: dari %@ ke %@"
 
 #, fuzzy
 #~ msgid "Previous/Backward"
@@ -33969,7 +33678,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Display on &Desktop"
-#~ msgstr "Resolusi tampilan"
+#~ msgstr "Selalu di atas"
 
 #, fuzzy
 #~ msgid "Elasped time"
@@ -34073,7 +33782,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Zoom playlist"
-#~ msgstr "play list"
+#~ msgstr "Playlist M3U"
 
 #, fuzzy
 #~ msgid "key"
@@ -34117,11 +33826,11 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "IPv6 will be used by default for all connections."
-#~ msgstr "Password yang akan digunakan untuk koneksi."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
 
 #, fuzzy
 #~ msgid "IPv4 will be used by default for all connections."
-#~ msgstr "Password yang akan digunakan untuk koneksi."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
 
 #, fuzzy
 #~ msgid "Enable CPU MMX support"
@@ -34232,7 +33941,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "HTTP password"
-#~ msgstr "Password FTP"
+#~ msgstr "Password HTTP proxy"
 
 #, fuzzy
 #~ msgid "Root CA file"
@@ -34291,7 +34000,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "User agent that will be used for the connection."
-#~ msgstr "Nama pengguna yang akan digunakan untuk koneksi."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
 
 #, fuzzy
 #~ msgid ""
@@ -34400,7 +34109,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Audio Channel"
-#~ msgstr "Kanal Audio"
+#~ msgstr "Kanal audio"
 
 #, fuzzy
 #~ msgid "Brightness of the video input."
@@ -34469,11 +34178,11 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "UNIX OSS audio output"
-#~ msgstr "Output audio OpenSLES"
+#~ msgstr "Output audio ALSA"
 
 #, fuzzy
 #~ msgid "Simple DirectMedia Layer audio output"
-#~ msgstr "Output video Lapisan DirectMedia Sederhana"
+#~ msgstr "Output audio DirectX"
 
 #, fuzzy
 #~ msgid "Reload image file"
@@ -34524,7 +34233,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "HTTP interace Certificates Revocation List file."
-#~ msgstr "Daftar Penarikan Sertifikat HTTP/TLS"
+#~ msgstr "Daftar Penarikan Sertifikat X.509"
 
 #, fuzzy
 #~ msgid "HTTP remote control interface"
@@ -34580,7 +34289,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Inverts the colors of the image"
-#~ msgstr "Tentukan warna dari slider volume"
+#~ msgstr "Plih satu warna dalam video"
 
 #, fuzzy
 #~ msgid "Audio Filter"
@@ -34612,7 +34321,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "Tidak ada perangkat yang dipilih"
+#~ msgstr "Nama perangkat video"
 
 #, fuzzy
 #~ msgid "Open VIDEO_TS Directory"
@@ -34621,10 +34330,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Add Folder to Playlist"
 #~ msgstr "Tambah ke Daftar Putar"
-
-#, fuzzy
-#~ msgid "1 item"
-#~ msgstr "%i item"
 
 #, fuzzy
 #~ msgid "Empty Folder"
@@ -34764,7 +34469,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Growl UDP Notification Plugin"
-#~ msgstr "Plugin Pemberitahuan Growl"
+#~ msgstr "Plugin Pemberitahuan LibNotify"
 
 #, fuzzy
 #~ msgid "Simple XML Parser"
@@ -34787,12 +34492,6 @@ msgstr "Daftar Media Manager"
 #~ msgstr ""
 #~ "Perangkat buffer-bingkai yang digunakan untuk rendering (biasanya /dev/"
 #~ "fb0)."
-
-#, fuzzy
-#~ msgid ""
-#~ "Force use of a specific chroma for output. Default is Y420 (specific to "
-#~ "N770/N8xx hardware)."
-#~ msgstr "Paksa penggunaan kroma spesifik untuk output. Default adalah I420."
 
 #, fuzzy
 #~ msgid "OMAP framebuffer"
@@ -34856,7 +34555,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Enter the URL of the network stream here."
-#~ msgstr "Masukkan alamat komputer untuk stream kepadanya."
+#~ msgstr "Tentukan ID dari stream antara"
 
 #, fuzzy
 #~ msgid "Default port (server mode)"
@@ -34908,7 +34607,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Set"
-#~ msgstr "Terkirim"
+#~ msgstr "Basah"
 
 #, fuzzy
 #~ msgid "SDL video driver name"
@@ -34999,20 +34698,12 @@ msgstr "Daftar Media Manager"
 #~ msgstr "Nilai caching untuk file lokal, dalam milidetik."
 
 #, fuzzy
-#~ msgid "Format to use in playlist \"title\" field when no CDDB"
-#~ msgstr "Format yang digunakan dalam isian \"judul\" dalam playlist."
-
-#, fuzzy
 #~ msgid "Use CD audio controls and output?"
 #~ msgstr "Hidupkan output stream audio"
 
 #, fuzzy
 #~ msgid "CDDB"
 #~ msgstr "Port CDDB"
-
-#, fuzzy
-#~ msgid "Format to use in playlist \"title\" field when using CDDB"
-#~ msgstr "Format yang digunakan dalam isian \"judul\" dalam playlist."
 
 #, fuzzy
 #~ msgid "CDDB server"
@@ -35057,31 +34748,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Tarkin decoder"
 #~ msgstr "Statistik dekoder"
-
-#, fuzzy
-#~ msgid ""
-#~ "Force the specified number of consecutive B-frames to be used, except "
-#~ "possibly before an I-frame."
-#~ msgstr ""
-#~ "Paksa nomor tertentu bingkai-B berurutan yang digunakan, kecuali "
-#~ "kemungkinan sebelum sebuah bingkai-I. Range antara 0 hingga 2."
-
-#, fuzzy
-#~ msgid ""
-#~ "Selects the motion estimation algorithm:  - dia: diamond search, radius 1 "
-#~ "(fast)\n"
-#~ " - hex: hexagonal search, radius 2\n"
-#~ " - umh: uneven multi-hexagon search (better but slower)\n"
-#~ " - esa: exhaustive search (extremely slow, primarily for testing)\n"
-#~ msgstr ""
-#~ "Pilih algoritma estimasi gerakan: - dia: pencarian berbentuk intan, "
-#~ "radius 1 (cepat)\n"
-#~ " - hex: pencarian berbentuk hexagonal, radius 2\n"
-#~ " - umh: pencarian multi-hexagon tidak rata (lebih baik tetapi lebih "
-#~ "lambat)\n"
-#~ " - esa: pencarian menyeluruh (sangat lambat, terutama untuk testing)\n"
-#~ " - tesa: pencarian sangat menyeluruh (sangat lambat, terutama untuk "
-#~ "testing)\n"
 
 #, fuzzy
 #~ msgid ""
@@ -35135,12 +34801,12 @@ msgstr "Daftar Media Manager"
 #~ msgid ""
 #~ "Allows you to modify the user name that will be used for authenticating "
 #~ "the connection."
-#~ msgstr "Nama pengguna yang akan digunakan untuk koneksi."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
 
 #, fuzzy
 #~ msgid ""
 #~ "Allows you to modify the password that will be used for the connection."
-#~ msgstr "Password yang akan digunakan untuk koneksi."
+#~ msgstr "Akun yang akan digunakan untuk koneksi."
 
 #, fuzzy
 #~ msgid "MPEG-4 video demuxer"
@@ -35172,7 +34838,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "VLC media player: Open Subtitle File"
-#~ msgstr "Bantuan VLC media player"
+#~ msgstr "VLC media player update"
 
 #, fuzzy
 #~ msgid "Select None"
@@ -35200,11 +34866,11 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Stay On Top"
-#~ msgstr "Selalu di Atas"
+#~ msgstr "Apung di Atas"
 
 #, fuzzy
 #~ msgid "Download now"
-#~ msgstr "Unduh Plugin"
+#~ msgstr "Unduh cover art"
 
 #, fuzzy
 #~ msgid "Autoplay selected file"
@@ -35280,15 +34946,11 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Quality:"
-#~ msgstr "Kualitas"
+#~ msgstr "Kualitas VBR"
 
 #, fuzzy
 #~ msgid "Tuner:"
 #~ msgstr "Penala"
-
-#, fuzzy
-#~ msgid "MJPEG:"
-#~ msgstr "MJPEG"
 
 #, fuzzy
 #~ msgid "Decimation:"
@@ -35309,10 +34971,6 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Deinterlace:"
 #~ msgstr "Deinterlace"
-
-#, fuzzy
-#~ msgid "Time To Live (TTL):"
-#~ msgstr "Time-To-Live (TTL)"
 
 #, fuzzy
 #~ msgid "kbits/s"
@@ -35399,7 +35057,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "Compiled by "
-#~ msgstr "Dikompilasi oleh %s dengan %@"
+#~ msgstr "Pengompilasi: %s\n"
 
 #, fuzzy
 #~ msgid "Open:"
@@ -35447,7 +35105,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "summary"
-#~ msgstr "Ringkasan"
+#~ msgstr "Ringkasan Podcast"
 
 #, fuzzy
 #~ msgid "video-filter-event"
@@ -35467,7 +35125,7 @@ msgstr "Daftar Media Manager"
 
 #, fuzzy
 #~ msgid "DirectX video output"
-#~ msgstr "Output video Direct2D"
+#~ msgstr "Output audio DirectX"
 
 #, fuzzy
 #~ msgid "QT Embedded display"
@@ -35486,8 +35144,9 @@ msgstr "Daftar Media Manager"
 #~ "Force the XVideo renderer to use a specific chroma format instead of "
 #~ "trying to improve performances by using the most efficient one."
 #~ msgstr ""
-#~ "Paksa renderer SDL menggunakan format kroma tertentu daripada mencoba "
-#~ "menaikkan kinerja dengan menggunakan kroma yang paling efisien."
+#~ "Paksa output video dummy untuk membuat gambar menggunakan format chroma "
+#~ "spesifik dibandingkan mencoba meningkatkan performansi dengan menggunakan "
+#~ "yang paling efisien."
 
 #, fuzzy
 #~ msgid "X11 display name"
