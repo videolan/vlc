@@ -208,7 +208,7 @@ struct  basic_filter_data
         vlc_atomic_float        drv_value;
         VAProcFilterValueRange  drv_range;
         struct range const *    p_vlc_range;
-        char *                  psz_name;
+        const char *            psz_name;
     } sigma;
 
     VAProcFilterType    filter_type;
@@ -743,7 +743,8 @@ OpenBasicFilter_InitFilterParams(filter_t * filter, void * p_data,
 }
 
 static int
-OpenBasicFilter(vlc_object_t * obj)
+OpenBasicFilter(vlc_object_t * obj, VAProcFilterType filter_type,
+                const char *psz_sigma_name, struct range const *p_vlc_range)
 {
     VAProcPipelineCaps                  pipeline_caps;
     filter_t *const                     filter = (filter_t *)obj;
@@ -752,24 +753,9 @@ OpenBasicFilter(vlc_object_t * obj)
     if (!p_data)
         return VLC_ENOMEM;
 
-    p_data->sigma.psz_name =
-        calloc(strlen(filter->psz_name) + strlen("-sigma") + 1, sizeof(char));
-    if (!p_data->sigma.psz_name)
-        goto error;
-
-    strcpy(p_data->sigma.psz_name, filter->psz_name);
-    strcat(p_data->sigma.psz_name, "-sigma");
-
-    if (!strcmp(filter->psz_name, "denoise"))
-    {
-        p_data->filter_type = VAProcFilterNoiseReduction;
-        p_data->sigma.p_vlc_range = &vlc_denoise_sigma_range;
-    }
-    else if (!strcmp(filter->psz_name, "sharpen"))
-    {
-        p_data->filter_type = VAProcFilterSharpening;
-        p_data->sigma.p_vlc_range = &vlc_sharpen_sigma_range;
-    }
+    p_data->filter_type = filter_type;
+    p_data->sigma.psz_name = psz_sigma_name;
+    p_data->sigma.p_vlc_range = p_vlc_range;
 
     var_Create(obj, p_data->sigma.psz_name,
                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
@@ -786,10 +772,22 @@ OpenBasicFilter(vlc_object_t * obj)
 
 error:
     var_Destroy(obj, p_data->sigma.psz_name);
-    if (p_data->sigma.psz_name)
-        free(p_data->sigma.psz_name);
     free(p_data);
     return VLC_EGENERIC;
+}
+
+static int
+OpenDenoiseFilter(vlc_object_t * obj)
+{
+    return OpenBasicFilter(obj, VAProcFilterNoiseReduction, "denoise-sigma",
+                           &vlc_denoise_sigma_range);
+}
+
+static int
+OpenSharpenFilter(vlc_object_t * obj)
+{
+    return OpenBasicFilter(obj, VAProcFilterSharpening, "sharpen-sigma",
+                           &vlc_sharpen_sigma_range);
 }
 
 static void
@@ -801,7 +799,6 @@ CloseBasicFilter(vlc_object_t * obj)
 
     var_DelCallback(obj, p_data->sigma.psz_name, FilterCallback, p_data);
     var_Destroy(obj, p_data->sigma.psz_name);
-    free(p_data->sigma.psz_name);
     free(p_data);
     Close(filter, filter_sys);
 }
@@ -1199,13 +1196,17 @@ vlc_module_begin()
     add_shortcut("deinterlace")
 
     add_submodule()
-    set_callbacks(OpenBasicFilter, CloseBasicFilter)
+    set_callbacks(OpenDenoiseFilter, CloseBasicFilter)
     add_float_with_range("denoise-sigma", 1.f, .0f, .0f,
                          "Denoise strength (0-2)",
                          "Set the Denoise strength, between 0 and 2. "
                             "Defaults to 1.",
                          false)
-    add_shortcut("denoise", "sharpen")
+    add_shortcut("denoise")
+
+    add_submodule()
+    set_callbacks(OpenSharpenFilter, CloseBasicFilter)
+    add_shortcut("sharpen")
 
     add_submodule()
     set_capability("video converter", 10)
