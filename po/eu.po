@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-27 11:00+0100\n"
+"POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2016-04-04 16:53+0000\n"
 "Last-Translator: julen <julenx@gmail.com>, 2017\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
@@ -44,7 +44,7 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "Hautatu \"Aukera aurreratuak\" aukera guztiak ikusteko."
 
 #: include/vlc_config_cat.h:38
-#: modules/gui/macosx/VLCSimplePrefsController.m:220
+#: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
 #: modules/gui/qt/menus.cpp:1090
 msgid "Interface"
@@ -75,16 +75,16 @@ msgid "Settings for VLC's control interfaces"
 msgstr "VLCren kontrol-interfazeetarako ezarpenak"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
-#: modules/gui/macosx/VLCSimplePrefsController.m:230
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
 msgid "Hotkeys settings"
 msgstr "Laster-teklen ezarpenak"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
-#: src/libvlc-module.c:1486 modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
+#: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
-#: modules/gui/macosx/VLCSimplePrefsController.m:222
+#: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/info_panels.cpp:572
 #: modules/gui/qt/components/simple_preferences.cpp:225
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
@@ -149,12 +149,12 @@ msgstr "Askotariko audio-ezarpenak eta moduluak."
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
-#: modules/gui/macosx/VLCSimplePrefsController.m:224
-#: modules/gui/macosx/VLCSimplePrefsController.m:367
+#: modules/gui/macosx/VLCSimplePrefsController.m:231
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:107 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -749,8 +749,7 @@ msgstr "Aurikularrak"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137
-#: modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatikoa"
@@ -925,47 +924,47 @@ msgstr "Errore ezezaguna"
 msgid "Bookmark %i"
 msgstr "Laster-marka %i"
 
-#: src/input/decoder.c:1881
+#: src/input/decoder.c:1882
 msgid "No description for this codec"
 msgstr "Deskribapenik ez kodek honetarako"
 
-#: src/input/decoder.c:1883
+#: src/input/decoder.c:1884
 msgid "Codec not supported"
 msgstr "Kodek ez-onartua"
 
-#: src/input/decoder.c:1884
+#: src/input/decoder.c:1885
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
 msgstr "VLC-k ezingo luke \"%4.4s\" (%s) formatua deskodetu"
 
-#: src/input/decoder.c:1888
+#: src/input/decoder.c:1889
 msgid "Unidentified codec"
 msgstr "Identifikatu gabeko kodeka"
 
-#: src/input/decoder.c:1889
+#: src/input/decoder.c:1890
 msgid "VLC could not identify the audio or video codec"
 msgstr "VLC-k ezin izan du audio edo bideo kodeka identifikatu"
 
-#: src/input/decoder.c:1900
+#: src/input/decoder.c:1901
 msgid "packetizer"
 msgstr "paketatzailea"
 
-#: src/input/decoder.c:1900
+#: src/input/decoder.c:1901
 msgid "decoder"
 msgstr "deskodetzailea"
 
-#: src/input/decoder.c:1908 src/input/decoder.c:2189
-#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:885
+#: src/input/decoder.c:1909 src/input/decoder.c:2190
+#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:882
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "Transmisio jarraituak / Transkodeketak huts egin du"
 
-#: src/input/decoder.c:1909
+#: src/input/decoder.c:1910
 #, c-format
 msgid "VLC could not open the %s module."
 msgstr "VLCk ezin izan du %s deskodetzailea ireki."
 
-#: src/input/decoder.c:2190
+#: src/input/decoder.c:2191
 msgid "VLC could not open the decoder module."
 msgstr "VLCk ezin izan du %s deskodetzailea ireki."
 
@@ -1023,19 +1022,19 @@ msgstr "Kodeka"
 
 #: src/input/es_out.c:3076 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
-#: modules/gui/macosx/VLCSimplePrefsController.m:304
+#: modules/gui/macosx/VLCSimplePrefsController.m:311
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "Hizkuntza"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112
-#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskribapena"
 
-#: src/input/es_out.c:3085 src/input/es_out.c:3129 src/input/es_out.c:3318
+#: src/input/es_out.c:3085 src/input/es_out.c:3129 src/input/es_out.c:3319
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
@@ -1238,46 +1237,54 @@ msgid "Projection"
 msgstr "Proiekzioa"
 
 #: src/input/es_out.c:3258
+#, fuzzy
+msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Yaw"
 
-#: src/input/es_out.c:3260 modules/video_output/vmem.c:48
+#: src/input/es_out.c:3260
+#, fuzzy
+msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "Tonua"
 
 #: src/input/es_out.c:3262
+#, fuzzy
+msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "Biribilkia"
 
-#: src/input/es_out.c:3264
+#: src/input/es_out.c:3265
+#, fuzzy
+msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Ikusmen-eremua"
 
-#: src/input/es_out.c:3269
+#: src/input/es_out.c:3270
 msgid "Max. luminance"
 msgstr "Luminantzia maximoa"
 
-#: src/input/es_out.c:3274
+#: src/input/es_out.c:3275
 msgid "Min. luminance"
 msgstr "Luminantzia minimoa"
 
-#: src/input/es_out.c:3282
+#: src/input/es_out.c:3283
 msgid "Primary R"
 msgstr "G nagusia"
 
-#: src/input/es_out.c:3289
+#: src/input/es_out.c:3290
 msgid "Primary G"
 msgstr "B nagusia"
 
-#: src/input/es_out.c:3296
+#: src/input/es_out.c:3297
 msgid "Primary B"
 msgstr "U nagusia"
 
-#: src/input/es_out.c:3303
+#: src/input/es_out.c:3304
 msgid "White point"
 msgstr "Puntu zuria"
 
-#: src/input/es_out.c:3318 modules/access/imem.c:64
+#: src/input/es_out.c:3319 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "Azpititulua"
 
@@ -1290,12 +1297,11 @@ msgstr "Zure sarrera ezin da ireki"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLCk ezin du ireki '%s' MRLa. Begiratu egunkaria xehetasunak jakiteko."
 
-#: src/input/meta.c:55 src/input/var.c:170
-#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
+#: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107
-#: modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1658,7 +1664,7 @@ msgid "Media (player) role for operating system policy."
 msgstr ""
 "Multimedia-erreproduzigailuaren funtzioa sistema eragilearen politikarako."
 
-#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:261
+#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:268
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Enable audio"
 msgstr "Gaitu audioa"
@@ -1768,7 +1774,7 @@ msgstr ""
 "Audio-irteerak S/PDIF euskarria adostu ezin duenean erabili behar da aukera "
 "hau."
 
-#: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:259
+#: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:266
 msgid "Force detection of Dolby Surround"
 msgstr "Dolby Surround-en detekzioa behartzea"
 
@@ -1787,8 +1793,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120
-#: modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1922,7 +1927,7 @@ msgstr ""
 "Hau da VLCk erabiltzen duen bideo-irteerako metodoa. Erabilgarri dagoen "
 "metodo onena automatikoki aukeratzea da portaera lehenetsia."
 
-#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:346
+#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:314
 msgid "Enable video"
 msgstr "Gaitu bideoa"
@@ -2173,7 +2178,7 @@ msgstr ""
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:433
 #: modules/gui/macosx/VLCMainMenu.m:434
-#: modules/gui/macosx/VLCSimplePrefsController.m:365
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/dialogs/convert.cpp:119 modules/hw/vdpau/chroma.c:884
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
@@ -2182,7 +2187,7 @@ msgstr "Bereizi gurutzelarkatuak"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:436
-#: modules/gui/macosx/VLCSimplePrefsController.m:366
+#: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
 msgstr "Gurutzelarkatuak bereizteko modua"
@@ -2239,7 +2244,7 @@ msgstr ""
 "Energia kudeatzeko daemon-a desaktibatu egiten du erreprodukzio baten "
 "dirauen artean, ordenagailua geldirik egoteagatik eseki ez dadin."
 
-#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:351
+#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "Window decorations"
 msgstr "Leiho-dekorazioak"
@@ -2441,7 +2446,7 @@ msgstr ""
 "karratuak dauzkate (1:1). 16:9 pantaila bat badaukazu, baliteke horren ordez "
 "4:3 ezarri behar izatea proportzioak gordetzeko."
 
-#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:294
+#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
 msgstr "Saltatu markoak"
 
@@ -2595,7 +2600,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
 #: modules/gui/macosx/VLCMainMenu.m:592
-#: modules/gui/macosx/VLCSimplePrefsController.m:649
+#: modules/gui/macosx/VLCSimplePrefsController.m:656
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
 #: modules/gui/macosx/prefs_widgets.m:1217
@@ -2995,7 +3000,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "Azpiirudien prozesatzea erabat desgaitu dezakezu."
 
 #: src/libvlc-module.c:721 src/libvlc-module.c:1668 src/text/iso-639_def.h:145
-#: modules/gui/macosx/VLCSimplePrefsController.m:338
+#: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
 msgstr "Pantailako bistaratzea"
@@ -3831,7 +3836,7 @@ msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
 "Elementu bat aurrez analizatzeko baimendutako denbora maximoa, milisegundotan"
 
-#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
+#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
@@ -4934,7 +4939,7 @@ msgstr "Gainjartzeak"
 msgid "Track settings"
 msgstr "Pista-ezarpenak"
 
-#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:309
+#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "Playback control"
 msgstr "Erreprodukzioaren kontrola"
 
@@ -5097,8 +5102,7 @@ msgid "Browser Stop"
 msgstr "Nabigatzailea gelditu"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231
-#: modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5372,7 +5376,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Huts egin du \"%s\" idazteko irekitzean"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2716
+#: modules/demux/avi/avi.c:2719
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
@@ -5389,10 +5393,10 @@ msgstr "Huts egin du \"%s\" idazteko irekitzean"
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:274
-#: modules/gui/macosx/VLCSimplePrefsController.m:300
-#: modules/gui/macosx/VLCSimplePrefsController.m:371
-#: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCSimplePrefsController.m:281
+#: modules/gui/macosx/VLCSimplePrefsController.m:307
+#: modules/gui/macosx/VLCSimplePrefsController.m:378
+#: modules/gui/macosx/VLCSimplePrefsController.m:820
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:861
@@ -5401,6 +5405,7 @@ msgstr "Huts egin du \"%s\" idazteko irekitzean"
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
+#: modules/stream_out/chromecast/cast.cpp:305
 msgid "Cancel"
 msgstr "Utzi"
 
@@ -6958,8 +6963,7 @@ msgstr ""
 "Telebista-kateak satelite-errepikagailuaren arabera taldekatzen dira "
 "maiztasun jakin batean. Hori beharrezkoa da hargailua sintonizatzeko."
 
-#: modules/access/dtv/access.c:61
-#: modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulazioa / Konstelazioa"
 
@@ -7538,7 +7542,7 @@ msgstr "Sartu gailuak eta hodiak direktorioak zerrendatzean"
 #: modules/access/smb_common.h:21 modules/access/vnc.c:46
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
-#: modules/gui/macosx/VLCSimplePrefsController.m:266
+#: modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
@@ -7558,8 +7562,8 @@ msgstr ""
 #: modules/access/smb_common.h:24 modules/access/vnc.c:47
 #: modules/access_output/http.c:55
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:265
-#: modules/gui/macosx/VLCSimplePrefsController.m:327
+#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
@@ -7784,8 +7788,7 @@ msgstr "Audioaren oinarrizko transmisio jarraituaren kanal kopurua"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42
-#: share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Zabalera"
@@ -8493,7 +8496,7 @@ msgstr "Pantaila-sarrera"
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
 #: modules/gui/macosx/VLCOpenWindowController.m:1096
-#: modules/gui/macosx/VLCSimplePrefsController.m:654
+#: modules/gui/macosx/VLCSimplePrefsController.m:661
 msgid "Screen"
 msgstr "Pantaila"
 
@@ -8776,8 +8779,7 @@ msgstr "Irrati-gailua"
 msgid "Radio tuner device node."
 msgstr "Irrati sintonizadorearen nodoa."
 
-#: modules/access/v4l2/v4l2.c:75
-#: modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Maiztasuna"
 
@@ -11158,7 +11160,7 @@ msgid "Internal libavcodec codec name"
 msgstr "Barneko libavcodec kodek izena"
 
 #: modules/codec/avcodec/avcodec.h:108
-#: modules/gui/macosx/VLCSimplePrefsController.m:292
+#: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "Saltatu begizta-iragazkia H.264 deskodeketarako"
 
@@ -11475,32 +11477,32 @@ msgstr ""
 "Hau ez da VLC multimedia-erreproduzigailuaren errorea.\n"
 "Ez jarri harremanetan VideoLAN proiektuarekin arazo hau konpontzeko.\n"
 
-#: modules/codec/avcodec/encoder.c:872
+#: modules/codec/avcodec/encoder.c:869
 msgid "unknown"
 msgstr "ezezaguna"
 
-#: modules/codec/avcodec/encoder.c:872
+#: modules/codec/avcodec/encoder.c:869
 msgid "video"
 msgstr "bideoa"
 
-#: modules/codec/avcodec/encoder.c:873
+#: modules/codec/avcodec/encoder.c:870
 msgid "audio"
 msgstr "audioa"
 
-#: modules/codec/avcodec/encoder.c:873
+#: modules/codec/avcodec/encoder.c:870
 msgid "subpicture"
 msgstr "azpiirudia"
 
-#: modules/codec/avcodec/encoder.c:886
+#: modules/codec/avcodec/encoder.c:883
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "VLC-k ezin izan du %4.4s %s kodetzailea ireki."
 
-#: modules/codec/avcodec/vaapi.c:349
+#: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
 msgstr "VA-API via DRM bideo-dekodetzailea"
 
-#: modules/codec/avcodec/vaapi.c:354
+#: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
 msgstr "VA-API bideo-deskodetzailea"
 
@@ -11509,7 +11511,7 @@ msgid "BPG image decoder"
 msgstr "BPG irudi-deskodetzailea"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
-#: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
+#: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
 #: modules/spu/rss.c:144 modules/gui/qt/ui/video_effects.h:1276
 msgid "Opacity"
 msgstr "Opakutasuna"
@@ -14455,7 +14457,7 @@ msgstr "Azkarra"
 
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
-#: modules/gui/macosx/VLCSimplePrefsController.m:689
+#: modules/gui/macosx/VLCSimplePrefsController.m:696
 #: modules/gui/qt/components/simple_preferences.cpp:666
 #: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
@@ -14594,14 +14596,14 @@ msgstr "D-Bus kontroleko interfazea"
 #: modules/gui/macosx/VLCMainWindow.m:675
 #: modules/gui/macosx/VLCMainWindow.m:1276
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1264
-#: modules/gui/qt/main_interface.cpp:1268
-#: modules/gui/qt/main_interface.cpp:1307
-#: modules/gui/qt/main_interface.cpp:1309
-#: modules/gui/qt/main_interface.cpp:1418
-#: modules/gui/qt/main_interface.cpp:1435
-#: modules/gui/qt/main_interface.cpp:1443
-#: modules/gui/qt/main_interface.cpp:1466 modules/lua/libs/httpd.c:80
+#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1265
+#: modules/gui/qt/main_interface.cpp:1269
+#: modules/gui/qt/main_interface.cpp:1308
+#: modules/gui/qt/main_interface.cpp:1310
+#: modules/gui/qt/main_interface.cpp:1419
+#: modules/gui/qt/main_interface.cpp:1436
+#: modules/gui/qt/main_interface.cpp:1444
+#: modules/gui/qt/main_interface.cpp:1467 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -14668,7 +14670,7 @@ msgid "Global Hotkeys interface"
 msgstr "Laster-tekla orokorren interfazea"
 
 #: modules/control/hotkeys.c:100
-#: modules/gui/macosx/VLCSimplePrefsController.m:230
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
 #: modules/gui/qt/components/preferences_widgets.cpp:1145
 #: modules/gui/qt/components/simple_preferences.cpp:233
 msgid "Hotkeys"
@@ -15466,7 +15468,7 @@ msgid "Avformat muxer"
 msgstr "Avformat multiplexadorea"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:109 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:110 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Multiplexadorea"
 
@@ -15522,7 +15524,7 @@ msgstr "Beharrezkoa denean konpondu"
 msgid "AVI demuxer"
 msgstr "AVI demultiplexadorea"
 
-#: modules/demux/avi/avi.c:825 modules/demux/mp4/mp4.c:1671
+#: modules/demux/avi/avi.c:828 modules/demux/mp4/mp4.c:1673
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15538,27 +15540,27 @@ msgstr ""
 "Urrats honek luze jo dezake fitxategia handia bada.\n"
 "Zer egin nahi duzu?"
 
-#: modules/demux/avi/avi.c:833
+#: modules/demux/avi/avi.c:836
 msgid "Do not play"
 msgstr "Ez erreproduzitu"
 
-#: modules/demux/avi/avi.c:834
+#: modules/demux/avi/avi.c:837
 msgid "Build index then play"
 msgstr "Eraiki indizea eta gero erreproduzitu"
 
-#: modules/demux/avi/avi.c:835
+#: modules/demux/avi/avi.c:838
 msgid "Play as is"
 msgstr "Erreproduzitu dagoen bezala"
 
-#: modules/demux/avi/avi.c:836 modules/demux/mp4/mp4.c:1682
+#: modules/demux/avi/avi.c:839 modules/demux/mp4/mp4.c:1684
 msgid "Broken or missing Index"
 msgstr "Hondatutako edo galdutako indizea"
 
-#: modules/demux/avi/avi.c:2717
+#: modules/demux/avi/avi.c:2720
 msgid "Broken or missing AVI Index"
 msgstr "Hondatutako edo galdutako AVI indizea"
 
-#: modules/demux/avi/avi.c:2718
+#: modules/demux/avi/avi.c:2721
 msgid "Fixing AVI Index..."
 msgstr "AVI indizea konpontzen..."
 
@@ -16000,11 +16002,11 @@ msgstr "MP4 transmisio jarraituen demultiplexadorea"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1679
+#: modules/demux/mp4/mp4.c:1681
 msgid "Do not seek"
 msgstr "Ez bilatu"
 
-#: modules/demux/mp4/mp4.c:1680
+#: modules/demux/mp4/mp4.c:1682
 msgid "Build index"
 msgstr "Eraiki indizea"
 
@@ -16747,8 +16749,7 @@ msgid "Name"
 msgstr "Izena"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108
-#: modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Egilea"
@@ -16824,7 +16825,7 @@ msgstr "Iragazia"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:274
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:84
-#: modules/gui/macosx/VLCSimplePrefsController.m:260
+#: modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "Audio-efektuak"
@@ -16855,8 +16856,8 @@ msgstr "Sartu izen bat profil berriarentzat:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/VLCSimplePrefsController.m:299
-#: modules/gui/macosx/VLCSimplePrefsController.m:373
+#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
@@ -16922,7 +16923,7 @@ msgid "Add"
 msgstr "Gehitu"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:276
+#: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:300
 msgid "Clear"
 msgstr "Garbitu"
@@ -16950,9 +16951,10 @@ msgstr "Denbora"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:363
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:342
-#: modules/gui/macosx/VLCSimplePrefsController.m:275
+#: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1359
+#: modules/stream_out/chromecast/cast.cpp:305
 msgid "OK"
 msgstr "Ados"
 
@@ -17067,8 +17069,8 @@ msgstr "Aukeratu irteera-kokaleku bat"
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
 #: modules/gui/macosx/VLCOutput.m:67
-#: modules/gui/macosx/VLCSimplePrefsController.m:283
-#: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:440
@@ -17281,9 +17283,9 @@ msgid "A SDP export is requested, but no URL is provided."
 msgstr "SDP esportazio bat eskatu da, baina ez da URL-rik eman."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1035
-#: modules/gui/macosx/VLCSimplePrefsController.m:683
-#: modules/gui/macosx/VLCSimplePrefsController.m:711
-#: modules/gui/macosx/VLCSimplePrefsController.m:1244
+#: modules/gui/macosx/VLCSimplePrefsController.m:690
+#: modules/gui/macosx/VLCSimplePrefsController.m:718
+#: modules/gui/macosx/VLCSimplePrefsController.m:1251
 #: modules/gui/qt/components/simple_preferences.cpp:663
 msgid "Custom"
 msgstr "Pertsonalizatua"
@@ -17404,7 +17406,7 @@ msgstr ""
 "hori hemen desgaitu daiteke."
 
 #: modules/gui/macosx/macosx.m:76
-#: modules/gui/macosx/VLCSimplePrefsController.m:311
+#: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Control playback with the Apple Remote"
 msgstr "Kontrolatu erreprodukzioa Apple-ren urruneko kontrolarekin"
 
@@ -17415,7 +17417,7 @@ msgstr ""
 "kontrolarekin."
 
 #: modules/gui/macosx/macosx.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:313
+#: modules/gui/macosx/VLCSimplePrefsController.m:320
 msgid "Control system volume with the Apple Remote"
 msgstr "Kontrolatu sistemaren bolumena Apple-ren urruneko kontrolarekin"
 
@@ -17429,7 +17431,7 @@ msgstr ""
 "aukera dezakezu horren ordez."
 
 #: modules/gui/macosx/macosx.m:82
-#: modules/gui/macosx/VLCSimplePrefsController.m:314
+#: modules/gui/macosx/VLCSimplePrefsController.m:321
 msgid "Display VLC status menu icon"
 msgstr "Bistaratu VLC egoeraren menu-ikonoa"
 
@@ -17457,7 +17459,7 @@ msgstr ""
 "desgaitu dezakezu."
 
 #: modules/gui/macosx/macosx.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:312
+#: modules/gui/macosx/VLCSimplePrefsController.m:319
 msgid "Control playback with media keys"
 msgstr "Kontrolatu erreprodukzioa multimedia-teklekin"
 
@@ -17482,7 +17484,7 @@ msgstr ""
 "du. Bestela, interfazearen estilo grisa erabiliko da."
 
 #: modules/gui/macosx/macosx.m:95
-#: modules/gui/macosx/VLCSimplePrefsController.m:356
+#: modules/gui/macosx/VLCSimplePrefsController.m:363
 msgid "Use the native fullscreen mode"
 msgstr "Erabili jatorrizko pantaila-osoko modua"
 
@@ -17514,7 +17516,7 @@ msgstr ""
 "da."
 
 #: modules/gui/macosx/macosx.m:104
-#: modules/gui/macosx/VLCSimplePrefsController.m:349 modules/gui/qt/qt.cpp:178
+#: modules/gui/macosx/VLCSimplePrefsController.m:356 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
 msgstr "Pausarazi bideo-erreprodukzioa ikonotzean"
 
@@ -17591,7 +17593,7 @@ msgstr ""
 "nagusian."
 
 #: modules/gui/macosx/macosx.m:128
-#: modules/gui/macosx/VLCSimplePrefsController.m:318
+#: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control external music players"
 msgstr "Kontrolatu kanpoko musika-erreproduzigailuak"
 
@@ -17725,7 +17727,7 @@ msgid "Hide Others"
 msgstr "Ezkutatu besteak"
 
 #: modules/gui/macosx/VLCMainMenu.m:342
-#: modules/gui/macosx/VLCSimplePrefsController.m:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:377
 msgid "Show All"
 msgstr "Erakutsi dena"
 
@@ -17869,12 +17871,12 @@ msgid "Fit to Screen"
 msgstr "Doitu pantailari"
 
 #: modules/gui/macosx/VLCMainMenu.m:423
-#: modules/gui/macosx/VLCSimplePrefsController.m:350
+#: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
 msgstr "Flotatu goian"
 
 #: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
-#: modules/gui/macosx/VLCSimplePrefsController.m:357
+#: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "Pantaila osoko bideo-gailua"
@@ -18170,7 +18172,7 @@ msgid "Disc"
 msgstr "Diskoa"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
-#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:297
 #: modules/gui/qt/ui/sprefs_input.h:371
 msgid "Network"
 msgstr "Sarea"
@@ -18199,7 +18201,7 @@ msgstr "Erreproduzitu beste multimedia-fitxategi bat sinkronizatuta"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:347
-#: modules/gui/macosx/VLCSimplePrefsController.m:332
+#: modules/gui/macosx/VLCSimplePrefsController.m:339
 #: modules/gui/qt/ui/sprefs_interface.h:548
 msgid "Choose..."
 msgstr "Aukeratu..."
@@ -18231,7 +18233,7 @@ msgid "Enable DVD menus"
 msgstr "Gaitu DVD menuak"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:114
+#: modules/stream_out/chromecast/cast.cpp:117
 msgid "IP Address"
 msgstr "IP helbidea"
 
@@ -18342,7 +18344,7 @@ msgid "Subtitle encoding"
 msgstr "Azpitituluaren kodeketa"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:359
-#: modules/gui/macosx/VLCSimplePrefsController.m:334
+#: modules/gui/macosx/VLCSimplePrefsController.m:341
 #: modules/gui/qt/ui/sprefs_subtitles.h:300
 msgid "Font size"
 msgstr "Letra-tamaina"
@@ -18530,7 +18532,7 @@ msgid "Continue playback?"
 msgstr "Erreproduzitzen jarraitu?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/macosx/VLCSimplePrefsController.m:821
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
 msgstr "Jarraitu"
@@ -18548,105 +18550,105 @@ msgstr "Berrabiarazi erreprodukzioa"
 msgid "Playback of \"%@\" will continue at %@"
 msgstr "\"%@\"(r)en erreprodukzioak  %@-n jarraituko du"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:220
+#: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
 #: modules/gui/qt/components/simple_preferences.cpp:690
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "Interfazearen ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:222
+#: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/simple_preferences.cpp:225
 #: modules/gui/qt/components/simple_preferences.cpp:415
 msgid "Audio Settings"
 msgstr "Audio-ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:224
+#: modules/gui/macosx/VLCSimplePrefsController.m:231
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/components/simple_preferences.cpp:355
 msgid "Video Settings"
 msgstr "Bideo-ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:226
+#: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:229
 #: modules/gui/qt/components/simple_preferences.cpp:831
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Azpitituluen eta pantailako bistaratzearen ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:228
+#: modules/gui/macosx/VLCSimplePrefsController.m:235
 msgid "Input & Codec Settings"
 msgstr "Sarrera eta kodeken ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:262
+#: modules/gui/macosx/VLCSimplePrefsController.m:269
 msgid "General Audio"
 msgstr "Audio orokorra"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:263
+#: modules/gui/macosx/VLCSimplePrefsController.m:270
 msgid "Preferred Audio language"
 msgstr "Hobetsitako audio-hizkuntza"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:264
+#: modules/gui/macosx/VLCSimplePrefsController.m:271
 msgid "Enable Last.fm submissions"
 msgstr "Gaitu Last.fm bidalketak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:267
+#: modules/gui/macosx/VLCSimplePrefsController.m:274
 msgid "Visualization"
 msgstr "Bisualizazioa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:268
+#: modules/gui/macosx/VLCSimplePrefsController.m:275
 msgid "Keep audio level between sessions"
 msgstr "Mantendu audio-maila saio batetik bestera"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:269
+#: modules/gui/macosx/VLCSimplePrefsController.m:276
 #: modules/gui/qt/ui/sprefs_audio.h:413
 msgid "Always reset audio start level to:"
 msgstr "Beti berrezarri audioaren hasierako maila hau:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:279
 #: modules/gui/qt/dialogs/vlm.cpp:493
 msgid "Change"
 msgstr "Aldatu"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:273
+#: modules/gui/macosx/VLCSimplePrefsController.m:280
 msgid "Change Hotkey"
 msgstr "Aldatu laster-tekla"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:277
+#: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Select an action to change the associated hotkey:"
 msgstr "Hautatu ekintza bat asoziatutako laster-tekla aldatzeko:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:278
+#: modules/gui/macosx/VLCSimplePrefsController.m:285
 #: modules/gui/qt/components/preferences_widgets.cpp:1150
 msgid "Action"
 msgstr "Ekintza"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:279
+#: modules/gui/macosx/VLCSimplePrefsController.m:286
 msgid "Shortcut"
 msgstr "Lasterbidea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:282
+#: modules/gui/macosx/VLCSimplePrefsController.m:289
 #: modules/gui/qt/ui/sprefs_input.h:367
 msgid "Record directory or filename"
 msgstr "Grabazioen direktorioa edo fitxategi-izena"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:284
+#: modules/gui/macosx/VLCSimplePrefsController.m:291
 msgid "Directory or filename where the records will be stored"
 msgstr "Grabazioak gordeko diren direktorioa edo fitxategi-izena"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:292
 msgid "Repair AVI Files"
 msgstr "Konpondu AVI fitxategiak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:286
+#: modules/gui/macosx/VLCSimplePrefsController.m:293
 msgid "Default Caching Level"
 msgstr "Cache-maila lehenetsia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:287
+#: modules/gui/macosx/VLCSimplePrefsController.m:294
 #: modules/gui/qt/ui/open.h:266
 msgid "Caching"
 msgstr "Cachea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:288
+#: modules/gui/macosx/VLCSimplePrefsController.m:295
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
@@ -18654,213 +18656,213 @@ msgstr ""
 "Erabili hobespen guztiak atzipen-modulu bakoitzerako cache-balio "
 "pertsonalizatuak konfiguratzeko."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:289
+#: modules/gui/macosx/VLCSimplePrefsController.m:296
 msgid "Codecs / Muxers"
 msgstr "Kodekak / Multiplexadoreak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:291
+#: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Post-Processing Quality"
 msgstr "Prozesatu ondorengo kalitatea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:293
+#: modules/gui/macosx/VLCSimplePrefsController.m:300
 msgid "Edit default application settings for network protocols"
 msgstr "Editatu aplikazio lehenetsiaren ezarpenak sare-protokoloetarako"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:297
+#: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Open network streams using the following protocols"
 msgstr "Ireki transmisio jarraituko sarea hurrengo protokoloak erabilita"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:298
+#: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Note that these are system-wide settings."
 msgstr "kontuan izan hauek sistema osoaren ezarpenak direla"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "General settings"
 msgstr "Ezarpen orokorrak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:305
+#: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
 msgstr "Interfazearen estiloa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Dark"
 msgstr "Iluna"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:307
+#: modules/gui/macosx/VLCSimplePrefsController.m:314
 msgid "Bright"
 msgstr "Argia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:310
+#: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Continue playback"
 msgstr "Jarraitu erreprodukzioa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:316
+#: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Playback behaviour"
 msgstr "Erreprodukzioaren portaera"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:317
+#: modules/gui/macosx/VLCSimplePrefsController.m:324
 msgid "Enable notifications on playlist item change"
 msgstr "Gaitu jakinarazpenak erreprodukzio-zerrendaren elementuak aldatzean"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Privacy / Network Interaction"
 msgstr "Pribatutasuna / Sarea interakzioa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:322
+#: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Automatically check for updates"
 msgstr "Automatikoki begiratu eguneratzerik badagoen"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:325
+#: modules/gui/macosx/VLCSimplePrefsController.m:332
 msgid "HTTP web interface"
 msgstr "HTTP web interfazea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:326
+#: modules/gui/macosx/VLCSimplePrefsController.m:333
 msgid "Enable HTTP web interface"
 msgstr "Gaitu HTTP web interfazea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:330
+#: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
 msgstr "Kodeketa lehenetsia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:331
+#: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Display Settings"
 msgstr "Bistaratu ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:333
+#: modules/gui/macosx/VLCSimplePrefsController.m:340
 #: modules/gui/qt/ui/sprefs_subtitles.h:301
 msgid "Font color"
 msgstr "Letra-kolorea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:335 modules/spu/marq.c:157
+#: modules/gui/macosx/VLCSimplePrefsController.m:342 modules/spu/marq.c:157
 #: modules/spu/rss.c:204 modules/text_renderer/freetype/freetype.c:80
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Font"
 msgstr "Letra-tipoa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:336
+#: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Subtitle languages"
 msgstr "Azpitituluen hizkuntzak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:337
+#: modules/gui/macosx/VLCSimplePrefsController.m:344
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Preferred subtitle language"
 msgstr "Azpitituluen hizkuntza hobetsia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:339
+#: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "Enable OSD"
 msgstr "Gaitu OSD"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:341
+#: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
 msgstr "Behartu lodia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:342
+#: modules/gui/macosx/VLCSimplePrefsController.m:349
 #: modules/text_renderer/freetype/freetype.c:110
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 msgid "Outline color"
 msgstr "Ingeradaren kolorea"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:343
+#: modules/gui/macosx/VLCSimplePrefsController.m:350
 #: modules/text_renderer/freetype/freetype.c:111
 #: modules/gui/qt/ui/sprefs_subtitles.h:302
 msgid "Outline thickness"
 msgstr "Ingeradaren loditasuna"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:347
+#: modules/gui/macosx/VLCSimplePrefsController.m:354
 #: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:315
 msgid "Display"
 msgstr "Bistaratu"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:348
+#: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Show video within the main window"
 msgstr "Erakutsi bideoa leiho nagusiaren barruan"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:353
+#: modules/gui/macosx/VLCSimplePrefsController.m:360
 msgid "Fullscreen settings"
 msgstr "Pantaila osoaren ezarpenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:354
+#: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Start in fullscreen"
 msgstr "Hasi pantaila osoan"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:355
+#: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
 msgstr "Pantaila beltzak pantaila osoaren moduan"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:359
+#: modules/gui/macosx/VLCSimplePrefsController.m:366
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Video snapshots"
 msgstr "Bideoaren argazkiak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:361
+#: modules/gui/macosx/VLCSimplePrefsController.m:368
 #: modules/meta_engine/folder.c:69
 msgid "Folder"
 msgstr "Karpeta"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:362
+#: modules/gui/macosx/VLCSimplePrefsController.m:369
 #: modules/gui/qt/ui/sprefs_video.h:336
 msgid "Format"
 msgstr "Formatua"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:363
+#: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Prefix"
 msgstr "Aurrizkia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:364
+#: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/qt/ui/sprefs_video.h:335
 msgid "Sequential numbering"
 msgstr "Zenbakitze sekuentziala"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
 msgstr "Berrezarri guztia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/VLCSimplePrefsController.m:381
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
 msgstr "Hobespenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:547
+#: modules/gui/macosx/VLCSimplePrefsController.m:554
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
 "Multimedia-fitxategiak ezin dira berrekin azken multimedia-elementuak "
 "mantentzea desgaituta dagoelako."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:567
+#: modules/gui/macosx/VLCSimplePrefsController.m:574
 msgid "Last check on: %@"
 msgstr "Azkenekoz noiz begiratu zen: %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:569
+#: modules/gui/macosx/VLCSimplePrefsController.m:576
 msgid "No check was performed yet."
 msgstr "Oraindik ez da begiratu."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:685
+#: modules/gui/macosx/VLCSimplePrefsController.m:692
 msgid "Lowest Latency"
 msgstr "Latentzia txikiena"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:687
+#: modules/gui/macosx/VLCSimplePrefsController.m:694
 msgid "Low Latency"
 msgstr "Latentzia txikia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:691
+#: modules/gui/macosx/VLCSimplePrefsController.m:698
 msgid "Higher Latency"
 msgstr "Latentzia handiagoa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:693
+#: modules/gui/macosx/VLCSimplePrefsController.m:700
 msgid "Highest Latency"
 msgstr "Latentzia handiena"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCSimplePrefsController.m:820
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
 msgstr "Berrezarri hobespenak"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:816
+#: modules/gui/macosx/VLCSimplePrefsController.m:823
 msgid ""
 "This will reset VLC media player's preferences.\n"
 "\n"
@@ -18883,26 +18885,26 @@ msgstr ""
 "\n"
 "Ziur zaude jarraitu nahi duzula?"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1086
+#: modules/gui/macosx/VLCSimplePrefsController.m:1093
 msgid ""
 "This setting cannot be changed because the native fullscreen mode is enabled."
 msgstr ""
 "Ezarpen hau ezin da aldatu jatorrizko pantaila-osoko modua gaituta dagoelako."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1155
+#: modules/gui/macosx/VLCSimplePrefsController.m:1162
 msgid "Choose the folder to save your video snapshots to."
 msgstr "Aukeratu zer karpetatan gorde behar diren bideoaren argazkiak."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1157
-#: modules/gui/macosx/VLCSimplePrefsController.m:1256
+#: modules/gui/macosx/VLCSimplePrefsController.m:1164
+#: modules/gui/macosx/VLCSimplePrefsController.m:1263
 msgid "Choose"
 msgstr "Aukeratu"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1254
+#: modules/gui/macosx/VLCSimplePrefsController.m:1261
 msgid "Choose the directory or filename where the records will be stored."
 msgstr "Aukeratu grabazioak gordeko diren direktorioa edo fitxategi-izena."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1371
+#: modules/gui/macosx/VLCSimplePrefsController.m:1378
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -18910,16 +18912,16 @@ msgstr ""
 "Sakatu honentzako laster-tekla berria:\n"
 "\"%@\""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1444
+#: modules/gui/macosx/VLCSimplePrefsController.m:1451
 msgid "Invalid combination"
 msgstr "Konbinazio okerra"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1445
+#: modules/gui/macosx/VLCSimplePrefsController.m:1452
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "Zoritxarrez, tekla horiek ezin dira laster-tekla gisa esleitu."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1455
-#: modules/gui/macosx/VLCSimplePrefsController.m:1459
+#: modules/gui/macosx/VLCSimplePrefsController.m:1462
+#: modules/gui/macosx/VLCSimplePrefsController.m:1466
 msgid "This combination is already taken by \"%@\"."
 msgstr "Tekla-konbinazio hori jada honentzat hartuta dago: \"%@\"."
 
@@ -18961,8 +18963,7 @@ msgid "sec."
 msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391
-#: modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audioa/Bideoa"
 
@@ -20664,11 +20665,10 @@ msgid "Extract"
 msgstr "Erauzi"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84
-#: modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20680,8 +20680,7 @@ msgstr "&Itxi"
 msgid "Bytes"
 msgstr "Byteak"
 
-#: modules/gui/qt/dialogs/convert.cpp:45
-#: modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Bihurtu"
 
@@ -21114,8 +21113,7 @@ msgstr "Bertsioa"
 msgid "Website"
 msgstr "Webgunea"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533
-#: modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Fitxategiak"
 
@@ -21462,11 +21460,11 @@ msgstr "Erreprodukzioak utzitako lekuan jarraitzea nahi duzu?"
 msgid "&Continue"
 msgstr "&Jarraitu"
 
-#: modules/gui/qt/main_interface.cpp:1419
+#: modules/gui/qt/main_interface.cpp:1420
 msgid "Control menu for the player"
 msgstr "Erreproduzigailuaren kontroleko menua"
 
-#: modules/gui/qt/main_interface.cpp:1463
+#: modules/gui/qt/main_interface.cpp:1464
 msgid "Paused"
 msgstr "Pausarazita"
 
@@ -24162,8 +24160,7 @@ msgstr "MPEG bideoa"
 msgid "VC-1 packetizer"
 msgstr "VC-1 paketatzailea"
 
-#: modules/services_discovery/avahi.c:52
-#: modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf sareko zerbitzuak"
 
@@ -25262,7 +25259,7 @@ msgstr "Aurre-eskuratu aurrera saltatzeko atalasea (byteak)"
 msgid "Internal stream record"
 msgstr "Barruko transmisio jarraituaren erregistroa"
 
-#: modules/stream_filter/skiptags.c:235
+#: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
 msgstr "APE/ID3 etiketak saltatzeko iragazkia"
 
@@ -25399,11 +25396,11 @@ msgstr "Lehenetsia: 90 seg"
 msgid "Chromaprint stream output"
 msgstr "Chromaprint transmisio jarraituaren irteera"
 
-#: modules/stream_out/chromecast/cast.cpp:104
+#: modules/stream_out/chromecast/cast.cpp:105
 msgid "HTTP port"
 msgstr "HTTP ataka"
 
-#: modules/stream_out/chromecast/cast.cpp:105
+#: modules/stream_out/chromecast/cast.cpp:106
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
@@ -25411,46 +25408,67 @@ msgstr ""
 "Zerbitzari lokalaren HTTP ataka ezartzen du, Chromecast gailura "
 "multimediaren transmisio jarraitua egiteko."
 
-#: modules/stream_out/chromecast/cast.cpp:108
+#: modules/stream_out/chromecast/cast.cpp:109
 msgid "The Chromecast receiver can receive video."
 msgstr "Chromecast hargailuak bideoa har dezake."
 
-#: modules/stream_out/chromecast/cast.cpp:110
+#: modules/stream_out/chromecast/cast.cpp:111
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr ""
 "Chromecast gailura transmisio jarraitua egiteko erabiliko den "
 "multiplexadorea ezartzen du."
 
-#: modules/stream_out/chromecast/cast.cpp:111
+#: modules/stream_out/chromecast/cast.cpp:112
 msgid "MIME content type"
 msgstr "MIME eduki-mota"
 
-#: modules/stream_out/chromecast/cast.cpp:112
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 "Chromecast gailura bidaliko den multimediaren MIME eduki-mota ezartzen du."
 
+#: modules/stream_out/chromecast/cast.cpp:114
+#: modules/stream_out/chromecast/cast.cpp:306
+#, fuzzy
+msgid "Performance warning"
+msgstr "Errendimendu-aukerak"
+
 #: modules/stream_out/chromecast/cast.cpp:115
+msgid "Display a performance warning when transcoding"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
 msgstr "Chromecast gailuaren IP helbidea."
 
-#: modules/stream_out/chromecast/cast.cpp:116
+#: modules/stream_out/chromecast/cast.cpp:119
 msgid "Chromecast port"
 msgstr "Chromecast ataka"
 
-#: modules/stream_out/chromecast/cast.cpp:117
+#: modules/stream_out/chromecast/cast.cpp:120
 msgid "The port used to talk to the Chromecast."
 msgstr "Chromecast gailuari hitz egiteko erabiliko den ataka."
 
-#: modules/stream_out/chromecast/cast.cpp:121
+#: modules/stream_out/chromecast/cast.cpp:124
 msgid "Chromecast"
 msgstr "Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:125
 msgid "Chromecast stream output"
 msgstr "Chromecast transmisio jarraituaren irteera"
 
-#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#: modules/stream_out/chromecast/cast.cpp:305
+#, fuzzy
+msgid "Ok, Don't warn me again"
+msgstr "Ez galdetu berriro"
+
+#: modules/stream_out/chromecast/cast.cpp:307
+msgid ""
+"Casting this video requires conversion. This conversion can use all the "
+"available power and could quickly drain your battery."
+msgstr ""
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
 msgstr "Chromecast demultiplexadorearen bilgarria"
 
@@ -28137,14 +28155,6 @@ msgstr "EGL"
 msgid "EGL extension for OpenGL"
 msgstr "OpenGLrako EGL hedapena"
 
-#: modules/video_output/opengl/vout_helper.h:61
-msgid "Open GL/GLES hardware converter"
-msgstr "Open GL/GLES hardware bidezko bihurgailua"
-
-#: modules/video_output/opengl/vout_helper.h:63
-msgid "Force a \"glconv\" module."
-msgstr "Behartu \"glconv\" modulua."
-
 #: modules/video_output/win32/direct3d9.c:70
 msgid "The desktop mode allows you to display the video on the desktop."
 msgstr ""
@@ -28327,6 +28337,10 @@ msgstr "Bideo-memoriaren bufferraren zabalera."
 #: modules/video_output/vmem.c:46
 msgid "Video memory buffer height."
 msgstr "Bideo-memoriaren bufferraren altuera."
+
+#: modules/video_output/vmem.c:48
+msgid "Pitch"
+msgstr "Tonua"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
@@ -30109,6 +30123,12 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
+
+#~ msgid "Open GL/GLES hardware converter"
+#~ msgstr "Open GL/GLES hardware bidezko bihurgailua"
+
+#~ msgid "Force a \"glconv\" module."
+#~ msgstr "Behartu \"glconv\" modulua."
 
 #~ msgid "Output/Written/Sent"
 #~ msgstr "Irteera/Idatzia/Bidalia"
@@ -33790,9 +33810,6 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #~ msgstr ""
 #~ "Zure helbide elektroniko lehenetsia bakarrik bidaliko da, bestelako "
 #~ "informaziorik gabe."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Ez galdetu berriro"
 
 #~ msgid "Couldn't find any trace of a previous crash."
 #~ msgstr "Ezin izan da aurreko kraskadura baten arrastorik aurkitu."

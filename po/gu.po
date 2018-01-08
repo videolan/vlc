@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2017-12-27 11:00+0100\n"
+"POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2015-12-04 10:01+0000\n"
 "Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
 "Language-Team: Gujarati (India) (http://www.transifex.com/yaron/vlc-trans/"
@@ -42,7 +42,7 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "બધા વિકલ્પોને જોવા માટે \"ઉન્નત વિકલ્પો\" ને પસંદ કરો."
 
 #: include/vlc_config_cat.h:38
-#: modules/gui/macosx/VLCSimplePrefsController.m:220
+#: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
 #: modules/gui/qt/menus.cpp:1090
 msgid "Interface"
@@ -73,7 +73,7 @@ msgid "Settings for VLC's control interfaces"
 msgstr "VLC નાં નિયંત્રણ ઇન્ટરફેસો માટે સુયોજનો"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
-#: modules/gui/macosx/VLCSimplePrefsController.m:230
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
 msgid "Hotkeys settings"
 msgstr "હોટકી સુયોજનો"
 
@@ -82,7 +82,7 @@ msgstr "હોટકી સુયોજનો"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
-#: modules/gui/macosx/VLCSimplePrefsController.m:222
+#: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/info_panels.cpp:572
 #: modules/gui/qt/components/simple_preferences.cpp:225
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
@@ -146,12 +146,12 @@ msgstr "વિવિધ જાતનાં ઓડિયો સુયોજનો
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
-#: modules/gui/macosx/VLCSimplePrefsController.m:224
-#: modules/gui/macosx/VLCSimplePrefsController.m:367
+#: modules/gui/macosx/VLCSimplePrefsController.m:231
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:107 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:108 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -894,47 +894,47 @@ msgstr "અજ્ઞાત ભૂલ"
 msgid "Bookmark %i"
 msgstr "બુકમાર્ક %i"
 
-#: src/input/decoder.c:1881
+#: src/input/decoder.c:1882
 msgid "No description for this codec"
 msgstr "આ કોડેક માટે વર્ણન નથી"
 
-#: src/input/decoder.c:1883
+#: src/input/decoder.c:1884
 msgid "Codec not supported"
 msgstr "કોડેક આધારભૂત નથી"
 
-#: src/input/decoder.c:1884
+#: src/input/decoder.c:1885
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
 msgstr "VLC એ બંધારણ \"%4.4s\" (%s) ડિકોડ કરી શક્યા નહિં"
 
-#: src/input/decoder.c:1888
+#: src/input/decoder.c:1889
 msgid "Unidentified codec"
 msgstr "બિનઓળખાયેલ કોડેક"
 
-#: src/input/decoder.c:1889
+#: src/input/decoder.c:1890
 msgid "VLC could not identify the audio or video codec"
 msgstr "VLC એ ઓડિયો અથવા વિડિઓ કોડેકને ઓળખી શક્યા નહિં"
 
-#: src/input/decoder.c:1900
+#: src/input/decoder.c:1901
 msgid "packetizer"
 msgstr "પેકેટસાઇઝર"
 
-#: src/input/decoder.c:1900
+#: src/input/decoder.c:1901
 msgid "decoder"
 msgstr "ડિકોડર"
 
-#: src/input/decoder.c:1908 src/input/decoder.c:2189
-#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:885
+#: src/input/decoder.c:1909 src/input/decoder.c:2190
+#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:882
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "સ્ટ્રીમીંગ / ટ્રાન્સકોડીંગ નિષ્ફળ"
 
-#: src/input/decoder.c:1909
+#: src/input/decoder.c:1910
 #, c-format
 msgid "VLC could not open the %s module."
 msgstr "VLC %s મોડ્યુલને ખોલી શક્યા નહિં."
 
-#: src/input/decoder.c:2190
+#: src/input/decoder.c:2191
 msgid "VLC could not open the decoder module."
 msgstr "VLC ડિકોડર મોડ્યુલને ખોલી શક્યા નહિં."
 
@@ -992,7 +992,7 @@ msgstr "કોડેક"
 
 #: src/input/es_out.c:3076 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
-#: modules/gui/macosx/VLCSimplePrefsController.m:304
+#: modules/gui/macosx/VLCSimplePrefsController.m:311
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "ભાષા"
@@ -1004,7 +1004,7 @@ msgstr "ભાષા"
 msgid "Description"
 msgstr "વર્ણન"
 
-#: src/input/es_out.c:3085 src/input/es_out.c:3129 src/input/es_out.c:3318
+#: src/input/es_out.c:3085 src/input/es_out.c:3129 src/input/es_out.c:3319
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
@@ -1230,50 +1230,55 @@ msgid "Projection"
 msgstr "દિશા"
 
 #: src/input/es_out.c:3258
+msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr ""
 
-#: src/input/es_out.c:3260 modules/video_output/vmem.c:48
+#: src/input/es_out.c:3260
+#, fuzzy
+msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "પીચ"
 
 #: src/input/es_out.c:3262
+msgctxt "ViewPoint"
 msgid "Roll"
 msgstr ""
 
-#: src/input/es_out.c:3264
+#: src/input/es_out.c:3265
+msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr ""
 
-#: src/input/es_out.c:3269
+#: src/input/es_out.c:3270
 msgid "Max. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3274
+#: src/input/es_out.c:3275
 msgid "Min. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3282
+#: src/input/es_out.c:3283
 #, fuzzy
 msgid "Primary R"
 msgstr "મુખ્ય ભાષા"
 
-#: src/input/es_out.c:3289
+#: src/input/es_out.c:3290
 #, fuzzy
 msgid "Primary G"
 msgstr "મુખ્ય ભાષા"
 
-#: src/input/es_out.c:3296
+#: src/input/es_out.c:3297
 #, fuzzy
 msgid "Primary B"
 msgstr "મુખ્ય ભાષા"
 
-#: src/input/es_out.c:3303
+#: src/input/es_out.c:3304
 #, fuzzy
 msgid "White point"
 msgstr "કયૂ પોઇન્ટ"
 
-#: src/input/es_out.c:3318 modules/access/imem.c:64
+#: src/input/es_out.c:3319 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "ઉપશીર્ષક"
 
@@ -1651,7 +1656,7 @@ msgstr "મીડિયા ખૂણો"
 msgid "Media (player) role for operating system policy."
 msgstr ""
 
-#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:261
+#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:268
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Enable audio"
 msgstr "ઓડિયોને સક્રિય કરો"
@@ -1762,7 +1767,7 @@ msgid ""
 "support."
 msgstr ""
 
-#: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:259
+#: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:266
 msgid "Force detection of Dolby Surround"
 msgstr "ડોલ્બી સરાઉન્ડનાં શોધને દબાણ કરો"
 
@@ -1907,7 +1912,7 @@ msgstr ""
 "આ VLC દ્દારા વાપરેલ વિડિઓ આઉટપુટ પદ્દતિ છે. મૂળભૂત વર્ણતૂક એ સારામાં સારી ઉપલબ્ધ પદ્દતિને "
 "આપમેળે પસંદ કરવાની છે."
 
-#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:346
+#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:314
 msgid "Enable video"
 msgstr "વિડિઓને સક્રિય કરો"
@@ -2144,7 +2149,7 @@ msgstr "n મિલિસેકંડ પછી માઉસ કર્સર અ
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:433
 #: modules/gui/macosx/VLCMainMenu.m:434
-#: modules/gui/macosx/VLCSimplePrefsController.m:365
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/dialogs/convert.cpp:119 modules/hw/vdpau/chroma.c:884
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
@@ -2153,7 +2158,7 @@ msgstr "અમિશ્રિત"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:436
-#: modules/gui/macosx/VLCSimplePrefsController.m:366
+#: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
 msgstr "અમિશ્રિત સ્થિતિ"
@@ -2208,7 +2213,7 @@ msgstr ""
 "કોઇપણ પ્લેબેક દરમ્યાન પાવર સંચાલન ડિમનને રોકે છે, નિષ્ક્રિય હોવાને કારણે કમ્પ્યૂટર સ્થગિત થતુ "
 "અટકાવવા માટે."
 
-#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:351
+#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "Window decorations"
 msgstr "વિન્ડો સજાવટ"
@@ -2402,7 +2407,7 @@ msgstr ""
 "આ મૉનિટરનો આસ્પેકટ રેશીઓ થોપે છે. મોટા ભાગના મૉનિટરોમાં ચોરસ પીક્સલ (1:1) હોય છે. જો "
 "તમારી પાસે 16:9 નો પડદો હોય તો તમારે પ્રમાણ જાળવી રાખવા આને 4:3 માં બદલવું પડશે."
 
-#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:294
+#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
 msgstr "માળખુ છોડો"
 
@@ -2551,7 +2556,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
 #: modules/gui/macosx/VLCMainMenu.m:592
-#: modules/gui/macosx/VLCSimplePrefsController.m:649
+#: modules/gui/macosx/VLCSimplePrefsController.m:656
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
 #: modules/gui/macosx/prefs_widgets.m:1217
@@ -2932,7 +2937,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "તમે ઉપ-ચિત્ર પ્રક્રિયાને સંપૂર્ણપણે નિષ્ક્રિય કરી શકો છો."
 
 #: src/libvlc-module.c:721 src/libvlc-module.c:1668 src/text/iso-639_def.h:145
-#: modules/gui/macosx/VLCSimplePrefsController.m:338
+#: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
 msgstr "સ્ક્રીન દર્શાવ પર"
@@ -3716,7 +3721,7 @@ msgstr "RTSP સત્ર સમયસમાપ્તિ (s)"
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr "કૅમેરા અને માઇક્રોફોન માટે કેશીંગ કિંમત, મિલિસેકંડમાં."
 
-#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:321
+#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
@@ -4795,7 +4800,7 @@ msgstr "ઓવરલે"
 msgid "Track settings"
 msgstr "ટ્રેક સુયોજનો"
 
-#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:309
+#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "Playback control"
 msgstr "પ્લેબેક નિયંત્રણ"
 
@@ -5227,7 +5232,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "લખવા માટે \"%s\" ને ખોલવાનું નિષ્ફળ"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2716
+#: modules/demux/avi/avi.c:2719
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
@@ -5244,10 +5249,10 @@ msgstr "લખવા માટે \"%s\" ને ખોલવાનું નિ�
 #: modules/gui/macosx/VLCMainWindow.m:211
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:274
-#: modules/gui/macosx/VLCSimplePrefsController.m:300
-#: modules/gui/macosx/VLCSimplePrefsController.m:371
-#: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCSimplePrefsController.m:281
+#: modules/gui/macosx/VLCSimplePrefsController.m:307
+#: modules/gui/macosx/VLCSimplePrefsController.m:378
+#: modules/gui/macosx/VLCSimplePrefsController.m:820
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:861
@@ -5256,6 +5261,7 @@ msgstr "લખવા માટે \"%s\" ને ખોલવાનું નિ�
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
+#: modules/stream_out/chromecast/cast.cpp:305
 msgid "Cancel"
 msgstr "રદ કરો"
 
@@ -7362,7 +7368,7 @@ msgstr ""
 #: modules/access/smb_common.h:21 modules/access/vnc.c:46
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
-#: modules/gui/macosx/VLCSimplePrefsController.m:266
+#: modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
@@ -7381,8 +7387,8 @@ msgstr "વપરાશકર્તા નામ કે જે જોડાણ �
 #: modules/access/smb_common.h:24 modules/access/vnc.c:47
 #: modules/access_output/http.c:55
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:265
-#: modules/gui/macosx/VLCSimplePrefsController.m:327
+#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
@@ -8308,7 +8314,7 @@ msgstr "સ્ક્રીન ઇનપુટ"
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
 #: modules/gui/macosx/VLCOpenWindowController.m:1096
-#: modules/gui/macosx/VLCSimplePrefsController.m:654
+#: modules/gui/macosx/VLCSimplePrefsController.m:661
 msgid "Screen"
 msgstr "સ્ક્રીન"
 
@@ -10946,7 +10952,7 @@ msgid "Internal libavcodec codec name"
 msgstr "આંતરિક libavcodec કોડેક નામ"
 
 #: modules/codec/avcodec/avcodec.h:108
-#: modules/gui/macosx/VLCSimplePrefsController.m:292
+#: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "H.264 ડિકોડીંગ માટે લુપ ફિલ્ટરને છોડો"
 
@@ -11248,32 +11254,32 @@ msgstr ""
 "આ VLC મીડિયા પ્લેયરની અંદર ભૂલ નથી.\n"
 "આ સમસ્યા વિષે VideoLAN પ્રોજેક્ટનો સંપર્ક કરો નહિ.\n"
 
-#: modules/codec/avcodec/encoder.c:872
+#: modules/codec/avcodec/encoder.c:869
 msgid "unknown"
 msgstr "અજ્ઞાત"
 
-#: modules/codec/avcodec/encoder.c:872
+#: modules/codec/avcodec/encoder.c:869
 msgid "video"
 msgstr "વિડિઓ"
 
-#: modules/codec/avcodec/encoder.c:873
+#: modules/codec/avcodec/encoder.c:870
 msgid "audio"
 msgstr "ઓડિયો"
 
-#: modules/codec/avcodec/encoder.c:873
+#: modules/codec/avcodec/encoder.c:870
 msgid "subpicture"
 msgstr "ઉપચિત્ર"
 
-#: modules/codec/avcodec/encoder.c:886
+#: modules/codec/avcodec/encoder.c:883
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "VLC એ %4.4s %s એનકોડરને ખોલી શક્યા નહિં."
 
-#: modules/codec/avcodec/vaapi.c:349
+#: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
 msgstr "DRM મારફતે VA-API વિડિઓ ડિકોડર"
 
-#: modules/codec/avcodec/vaapi.c:354
+#: modules/codec/avcodec/vaapi.c:357
 #, fuzzy
 msgid "VA-API video decoder"
 msgstr "X11 મારફતે VA-API વિડિઓ ડિકોડર"
@@ -11284,7 +11290,7 @@ msgid "BPG image decoder"
 msgstr "JPEG છબી ડિકોડર"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
-#: modules/gui/macosx/VLCSimplePrefsController.m:340 modules/spu/marq.c:108
+#: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
 #: modules/spu/rss.c:144 modules/gui/qt/ui/video_effects.h:1276
 msgid "Opacity"
 msgstr "પારદર્શકતા"
@@ -14151,7 +14157,7 @@ msgstr "ઝડપી"
 
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
-#: modules/gui/macosx/VLCSimplePrefsController.m:689
+#: modules/gui/macosx/VLCSimplePrefsController.m:696
 #: modules/gui/qt/components/simple_preferences.cpp:666
 #: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
@@ -14291,14 +14297,14 @@ msgstr "D-Bus નિયંત્રણ ઇન્ટરફેસ"
 #: modules/gui/macosx/VLCMainWindow.m:675
 #: modules/gui/macosx/VLCMainWindow.m:1276
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1264
-#: modules/gui/qt/main_interface.cpp:1268
-#: modules/gui/qt/main_interface.cpp:1307
-#: modules/gui/qt/main_interface.cpp:1309
-#: modules/gui/qt/main_interface.cpp:1418
-#: modules/gui/qt/main_interface.cpp:1435
-#: modules/gui/qt/main_interface.cpp:1443
-#: modules/gui/qt/main_interface.cpp:1466 modules/lua/libs/httpd.c:80
+#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1265
+#: modules/gui/qt/main_interface.cpp:1269
+#: modules/gui/qt/main_interface.cpp:1308
+#: modules/gui/qt/main_interface.cpp:1310
+#: modules/gui/qt/main_interface.cpp:1419
+#: modules/gui/qt/main_interface.cpp:1436
+#: modules/gui/qt/main_interface.cpp:1444
+#: modules/gui/qt/main_interface.cpp:1467 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -14364,7 +14370,7 @@ msgid "Global Hotkeys interface"
 msgstr "વૈશ્ર્વિક હોટકી ઇન્ટરફેસ"
 
 #: modules/control/hotkeys.c:100
-#: modules/gui/macosx/VLCSimplePrefsController.m:230
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
 #: modules/gui/qt/components/preferences_widgets.cpp:1145
 #: modules/gui/qt/components/simple_preferences.cpp:233
 msgid "Hotkeys"
@@ -15144,7 +15150,7 @@ msgid "Avformat muxer"
 msgstr "Avformat મક્સર"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:109 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:110 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "મક્સર"
 
@@ -15200,7 +15206,7 @@ msgstr "સુધારો જ્યારે જરૂરી હોય"
 msgid "AVI demuxer"
 msgstr "AVI ડિમક્સર"
 
-#: modules/demux/avi/avi.c:825 modules/demux/mp4/mp4.c:1671
+#: modules/demux/avi/avi.c:828 modules/demux/mp4/mp4.c:1673
 #, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
@@ -15216,28 +15222,28 @@ msgstr ""
 "આ પગલું વિશાળ ફાઈલ માટે લાંબો સમય લગાડી શકે છે.\n"
 "તમારે શું કરવાની ઈચ્છા છે?"
 
-#: modules/demux/avi/avi.c:833
+#: modules/demux/avi/avi.c:836
 msgid "Do not play"
 msgstr "વગાડો નહિં"
 
-#: modules/demux/avi/avi.c:834
+#: modules/demux/avi/avi.c:837
 msgid "Build index then play"
 msgstr "અનુક્રમણિકાને બનાવો પછી વગાડો"
 
-#: modules/demux/avi/avi.c:835
+#: modules/demux/avi/avi.c:838
 msgid "Play as is"
 msgstr "આ રીતે વગાડો"
 
-#: modules/demux/avi/avi.c:836 modules/demux/mp4/mp4.c:1682
+#: modules/demux/avi/avi.c:839 modules/demux/mp4/mp4.c:1684
 #, fuzzy
 msgid "Broken or missing Index"
 msgstr "તુટેલ અથવા ગુમ થયેલ AVI અનુક્રમણિકા"
 
-#: modules/demux/avi/avi.c:2717
+#: modules/demux/avi/avi.c:2720
 msgid "Broken or missing AVI Index"
 msgstr "તુટેલ અથવા ગુમ થયેલ AVI અનુક્રમણિકા"
 
-#: modules/demux/avi/avi.c:2718
+#: modules/demux/avi/avi.c:2721
 msgid "Fixing AVI Index..."
 msgstr "AVI અનુક્રમણિકાને સુધારી રહ્યા છે..."
 
@@ -15679,12 +15685,12 @@ msgstr "MP4 સ્ટ્રીમ ડિમક્સર"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:1679
+#: modules/demux/mp4/mp4.c:1681
 #, fuzzy
 msgid "Do not seek"
 msgstr "વગાડો નહિં"
 
-#: modules/demux/mp4/mp4.c:1680
+#: modules/demux/mp4/mp4.c:1682
 #, fuzzy
 msgid "Build index"
 msgstr "અનુક્રમણિકાને બનાવો પછી વગાડો"
@@ -16488,7 +16494,7 @@ msgstr "ફિલ્ટર"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:274
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:84
-#: modules/gui/macosx/VLCSimplePrefsController.m:260
+#: modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "ઓડિયો અસરો"
@@ -16519,8 +16525,8 @@ msgstr "નવી રૂપરેખા માટે નામને દાખ�
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
 #: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
-#: modules/gui/macosx/VLCSimplePrefsController.m:299
-#: modules/gui/macosx/VLCSimplePrefsController.m:373
+#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:443
@@ -16586,7 +16592,7 @@ msgid "Add"
 msgstr "ઉમેરો"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:276
+#: modules/gui/macosx/VLCSimplePrefsController.m:283
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:300
 msgid "Clear"
 msgstr "સાફ કરો"
@@ -16614,9 +16620,10 @@ msgstr "સમય"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:363
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:342
-#: modules/gui/macosx/VLCSimplePrefsController.m:275
+#: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1359
+#: modules/stream_out/chromecast/cast.cpp:305
 msgid "OK"
 msgstr "બરાબર"
 
@@ -16734,8 +16741,8 @@ msgstr "આઉટપુટ સ્થાનને પસંદ કરો"
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:350
 #: modules/gui/macosx/VLCOutput.m:67
-#: modules/gui/macosx/VLCSimplePrefsController.m:283
-#: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:440
@@ -16946,9 +16953,9 @@ msgid "A SDP export is requested, but no URL is provided."
 msgstr "A SDP નિકાસ સૂચિત થયેલ છે, પરંતુ URL પૂરી પાડેલ નથી."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1035
-#: modules/gui/macosx/VLCSimplePrefsController.m:683
-#: modules/gui/macosx/VLCSimplePrefsController.m:711
-#: modules/gui/macosx/VLCSimplePrefsController.m:1244
+#: modules/gui/macosx/VLCSimplePrefsController.m:690
+#: modules/gui/macosx/VLCSimplePrefsController.m:718
+#: modules/gui/macosx/VLCSimplePrefsController.m:1251
 #: modules/gui/qt/components/simple_preferences.cpp:663
 msgid "Custom"
 msgstr "વૈવિધ્ય"
@@ -17068,7 +17075,7 @@ msgstr ""
 "મૂળભૂત રીતે, VLC એ છેલ્લા 10 વસ્તુઓની યાદી રાખે છે. આ લક્ષણ અહિંયા નિષ્ક્રિય કરી શકાય છે."
 
 #: modules/gui/macosx/macosx.m:76
-#: modules/gui/macosx/VLCSimplePrefsController.m:311
+#: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Control playback with the Apple Remote"
 msgstr "એપલ દૂરસ્થ સાથે પ્લેબેકને નિયંત્રિત કરો"
 
@@ -17077,7 +17084,7 @@ msgid "By default, VLC can be remotely controlled with the Apple Remote."
 msgstr "મૂળભૂત રીતે, VLC એ એપલ દૂરસ્થ સાથે દૂરસ્થ રીતે નિયંત્રિત કરી શકાય છે."
 
 #: modules/gui/macosx/macosx.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:313
+#: modules/gui/macosx/VLCSimplePrefsController.m:320
 msgid "Control system volume with the Apple Remote"
 msgstr "એપલ દૂરસ્થ સાથે સિસ્ટમ અવાજને નિયંત્રિત કરો"
 
@@ -17090,7 +17097,7 @@ msgstr ""
 "વૈશ્વિક સિસ્ટમ અવાજને નિયંત્રણ કરવા પસંદ કરી શકે છે."
 
 #: modules/gui/macosx/macosx.m:82
-#: modules/gui/macosx/VLCSimplePrefsController.m:314
+#: modules/gui/macosx/VLCSimplePrefsController.m:321
 msgid "Display VLC status menu icon"
 msgstr ""
 
@@ -17116,7 +17123,7 @@ msgstr ""
 "છે. તમે આ વિકલ્પ સાથેની વર્તણુકને નિષ્ક્રિય કરી શકે છે."
 
 #: modules/gui/macosx/macosx.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:312
+#: modules/gui/macosx/VLCSimplePrefsController.m:319
 msgid "Control playback with media keys"
 msgstr "મીડિયા કી સાથે પ્લેબેકને નિયંત્રિત કરો"
 
@@ -17140,7 +17147,7 @@ msgstr ""
 "ઇન્ટરફેસ શૈલીને વાપરેલ છે."
 
 #: modules/gui/macosx/macosx.m:95
-#: modules/gui/macosx/VLCSimplePrefsController.m:356
+#: modules/gui/macosx/VLCSimplePrefsController.m:363
 msgid "Use the native fullscreen mode"
 msgstr "મૂળ સંપૂર્ણસ્ક્રીન સ્થિતિને વાપરો"
 
@@ -17170,7 +17177,7 @@ msgstr ""
 " મૂળભૂત રીતે, ઈન્ટરફેસ એ મૂળ વિડિઓ માપનું માપ બદલે છે."
 
 #: modules/gui/macosx/macosx.m:104
-#: modules/gui/macosx/VLCSimplePrefsController.m:349 modules/gui/qt/qt.cpp:178
+#: modules/gui/macosx/VLCSimplePrefsController.m:356 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
 msgstr "વિડિઓને અટકાવો જ્યારે ન્યૂનત્તમ કરેલ હોય"
 
@@ -17238,7 +17245,7 @@ msgid "Shows a sidebar in the main window listing media sources."
 msgstr "મુખ્ય વિન્ડોની યાદીકરણ મીડિયા સ્ત્રોતમાં બાજુપટ્ટીને બતાવે છે."
 
 #: modules/gui/macosx/macosx.m:128
-#: modules/gui/macosx/VLCSimplePrefsController.m:318
+#: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control external music players"
 msgstr "બહારનાં સંગીત પ્લેયરને નિયંત્રિત કરો"
 
@@ -17370,7 +17377,7 @@ msgid "Hide Others"
 msgstr "બીજાઓને છુપાડો"
 
 #: modules/gui/macosx/VLCMainMenu.m:342
-#: modules/gui/macosx/VLCSimplePrefsController.m:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:377
 msgid "Show All"
 msgstr "બધાને બતાવો"
 
@@ -17515,12 +17522,12 @@ msgid "Fit to Screen"
 msgstr "સ્ક્રીનમાં બંધબેસાડો"
 
 #: modules/gui/macosx/VLCMainMenu.m:423
-#: modules/gui/macosx/VLCSimplePrefsController.m:350
+#: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
 msgstr "ટોચ પર તરો"
 
 #: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
-#: modules/gui/macosx/VLCSimplePrefsController.m:357
+#: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "સંપૂર્ણસ્ક્રીન વિડિઓ ઉપકરણ"
@@ -17820,7 +17827,7 @@ msgid "Disc"
 msgstr "ડિસ્ક"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
-#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:297
 #: modules/gui/qt/ui/sprefs_input.h:371
 msgid "Network"
 msgstr "નેટવર્ક"
@@ -17850,7 +17857,7 @@ msgstr "સુમેળ રીતે બીજી મીડિયાને વ�
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:347
-#: modules/gui/macosx/VLCSimplePrefsController.m:332
+#: modules/gui/macosx/VLCSimplePrefsController.m:339
 #: modules/gui/qt/ui/sprefs_interface.h:548
 msgid "Choose..."
 msgstr "પસંદ કરો..."
@@ -17882,7 +17889,7 @@ msgid "Enable DVD menus"
 msgstr "DVD મેનુને સક્રિય કરો"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:114
+#: modules/stream_out/chromecast/cast.cpp:117
 msgid "IP Address"
 msgstr "IP સરનામું"
 
@@ -17995,7 +18002,7 @@ msgid "Subtitle encoding"
 msgstr "ઉપશીર્ષક એનકોડીંગ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:359
-#: modules/gui/macosx/VLCSimplePrefsController.m:334
+#: modules/gui/macosx/VLCSimplePrefsController.m:341
 #: modules/gui/qt/ui/sprefs_subtitles.h:300
 msgid "Font size"
 msgstr "ફોન્ટ માપ"
@@ -18191,7 +18198,7 @@ msgid "Continue playback?"
 msgstr "શું પ્લેબેકને ચાલુ રાખવુ છે?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:814
+#: modules/gui/macosx/VLCSimplePrefsController.m:821
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
 msgstr "ચાલુ રાખો"
@@ -18210,323 +18217,323 @@ msgstr "શું પ્લેબેકને ફરી શરૂ કરવુ �
 msgid "Playback of \"%@\" will continue at %@"
 msgstr "\"%@\" નું પ્લેબેક એ %@ પર ચાલુ રહેશે"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:220
+#: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
 #: modules/gui/qt/components/simple_preferences.cpp:690
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "ઇન્ટરફેસ સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:222
+#: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/simple_preferences.cpp:225
 #: modules/gui/qt/components/simple_preferences.cpp:415
 msgid "Audio Settings"
 msgstr "ઓડિયો સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:224
+#: modules/gui/macosx/VLCSimplePrefsController.m:231
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/components/simple_preferences.cpp:355
 msgid "Video Settings"
 msgstr "વિડિઓ સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:226
+#: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:229
 #: modules/gui/qt/components/simple_preferences.cpp:831
 msgid "Subtitle & On Screen Display Settings"
 msgstr "ઉપશીર્ષક અને ઓન સ્ક્રીન દર્શાવ સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:228
+#: modules/gui/macosx/VLCSimplePrefsController.m:235
 msgid "Input & Codec Settings"
 msgstr "ઇનપુટ અને કોડેક સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:262
+#: modules/gui/macosx/VLCSimplePrefsController.m:269
 msgid "General Audio"
 msgstr "સામાન્ય ઓડિયો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:263
+#: modules/gui/macosx/VLCSimplePrefsController.m:270
 msgid "Preferred Audio language"
 msgstr "પસંદ થયેલ ઓડિયો ભાષા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:264
+#: modules/gui/macosx/VLCSimplePrefsController.m:271
 msgid "Enable Last.fm submissions"
 msgstr "Last.fm સબમીશનને સક્રિય કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:267
+#: modules/gui/macosx/VLCSimplePrefsController.m:274
 msgid "Visualization"
 msgstr "કલ્પના"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:268
+#: modules/gui/macosx/VLCSimplePrefsController.m:275
 msgid "Keep audio level between sessions"
 msgstr "સત્રો વચ્ચે ઓડિયો સ્તરને રાખો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:269
+#: modules/gui/macosx/VLCSimplePrefsController.m:276
 #: modules/gui/qt/ui/sprefs_audio.h:413
 msgid "Always reset audio start level to:"
 msgstr "તેમાં હમેંશા ઓડિયો શરૂઆતી સ્તરને ફરી સુયોજિત કરો:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:279
 #: modules/gui/qt/dialogs/vlm.cpp:493
 msgid "Change"
 msgstr "બદલો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:273
+#: modules/gui/macosx/VLCSimplePrefsController.m:280
 msgid "Change Hotkey"
 msgstr "હોટકી બદલો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:277
+#: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Select an action to change the associated hotkey:"
 msgstr "સંકળાયેલ હોટકીને બદલવા માટે ક્રિયાને પસંદ કરો:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:278
+#: modules/gui/macosx/VLCSimplePrefsController.m:285
 #: modules/gui/qt/components/preferences_widgets.cpp:1150
 msgid "Action"
 msgstr "ક્રિયા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:279
+#: modules/gui/macosx/VLCSimplePrefsController.m:286
 msgid "Shortcut"
 msgstr "ટૂંકાણ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:282
+#: modules/gui/macosx/VLCSimplePrefsController.m:289
 #: modules/gui/qt/ui/sprefs_input.h:367
 msgid "Record directory or filename"
 msgstr "ડિરેક્ટરી અથવા ફાઇલનામનો અહેવાલ લો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:284
+#: modules/gui/macosx/VLCSimplePrefsController.m:291
 msgid "Directory or filename where the records will be stored"
 msgstr "ડિરેક્ટરી અથવા ફાઇલનામ જ્યાં અહેવાલો સંગ્રહેલ હશે"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:292
 msgid "Repair AVI Files"
 msgstr "FilesAVI ફાઇલોને સુધારો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:286
+#: modules/gui/macosx/VLCSimplePrefsController.m:293
 msgid "Default Caching Level"
 msgstr "મૂળભૂત કેશીંગ સ્તર"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:287
+#: modules/gui/macosx/VLCSimplePrefsController.m:294
 #: modules/gui/qt/ui/open.h:266
 msgid "Caching"
 msgstr "કેશીંગ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:288
+#: modules/gui/macosx/VLCSimplePrefsController.m:295
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
 msgstr ""
 "દરેક પ્રવેશ મોડ્યુલસ માટે વૈવિધ્ય કેશીંગ કિંમતને રૂપરેખાંકિત કરવા માટે સંપૂર્ણ પસંદગીઓ વાપરો."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:289
+#: modules/gui/macosx/VLCSimplePrefsController.m:296
 msgid "Codecs / Muxers"
 msgstr "કોડેક / મક્સર"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:291
+#: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Post-Processing Quality"
 msgstr "પછીની પ્રક્રિયાની ગુણવત્તા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:293
+#: modules/gui/macosx/VLCSimplePrefsController.m:300
 msgid "Edit default application settings for network protocols"
 msgstr "નેટવર્ક પ્રોટોકોલ માટે મૂળભૂત કાર્યક્રમ સુયોજનોમાં ફેરફાર કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:297
+#: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Open network streams using the following protocols"
 msgstr "નીચેનાં પ્રોટોકોલની મદદથી નેટવર્ક સ્ટ્રીમને ખોલો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:298
+#: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Note that these are system-wide settings."
 msgstr "નોંધો કે આ સિસ્ટમ-વ્યાપક સુયોજનો છે."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:310
 #, fuzzy
 msgid "General settings"
 msgstr "સામાન્ય ઓડિયો સુયોજનો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:305
+#: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
 msgstr "ઇન્ટરફેસ શૈલી"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Dark"
 msgstr "ઘટ્ટ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:307
+#: modules/gui/macosx/VLCSimplePrefsController.m:314
 msgid "Bright"
 msgstr "તેજસ્વી"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:310
+#: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Continue playback"
 msgstr "સતત ચાલતુ પ્લેબેક"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:316
+#: modules/gui/macosx/VLCSimplePrefsController.m:323
 #, fuzzy
 msgid "Playback behaviour"
 msgstr "પ્લેબેક નિષ્ફળ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:317
+#: modules/gui/macosx/VLCSimplePrefsController.m:324
 #, fuzzy
 msgid "Enable notifications on playlist item change"
 msgstr "Growl સૂચનાઓને સક્રિય કરો (વગાડવા માટેની યાદી વસ્તુ બદલાવ પર)"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
 msgid "Privacy / Network Interaction"
 msgstr "ખાનગી  / નેટવર્ક ક્રિયાપ્રતિક્રિયા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:322
+#: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Automatically check for updates"
 msgstr "સુધારા માટે આપમેળે ચકાસો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:325
+#: modules/gui/macosx/VLCSimplePrefsController.m:332
 #, fuzzy
 msgid "HTTP web interface"
 msgstr "Qt ઇન્ટરફેસ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:326
+#: modules/gui/macosx/VLCSimplePrefsController.m:333
 #, fuzzy
 msgid "Enable HTTP web interface"
 msgstr "આવરણ કરી શકાય તેવું ઇન્ટરફેસ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:330
+#: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
 msgstr "મૂળભૂત એનકોડીંગ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:331
+#: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Display Settings"
 msgstr "સુયોજનો દર્શાવો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:333
+#: modules/gui/macosx/VLCSimplePrefsController.m:340
 #: modules/gui/qt/ui/sprefs_subtitles.h:301
 msgid "Font color"
 msgstr "ફોન્ટ રંગ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:335 modules/spu/marq.c:157
+#: modules/gui/macosx/VLCSimplePrefsController.m:342 modules/spu/marq.c:157
 #: modules/spu/rss.c:204 modules/text_renderer/freetype/freetype.c:80
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Font"
 msgstr "ફોન્ટ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:336
+#: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Subtitle languages"
 msgstr "ઉપશીર્ષક ભાષા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:337
+#: modules/gui/macosx/VLCSimplePrefsController.m:344
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Preferred subtitle language"
 msgstr "પસંદ થયેલ ઉપશીર્ષક ભાષા"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:339
+#: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "Enable OSD"
 msgstr "OSD ને સક્રિય કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:341
+#: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
 msgstr "ઘટ્ટ કરવા દબાણ કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:342
+#: modules/gui/macosx/VLCSimplePrefsController.m:349
 #: modules/text_renderer/freetype/freetype.c:110
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 msgid "Outline color"
 msgstr "બાહ્ય કિનારી રંગ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:343
+#: modules/gui/macosx/VLCSimplePrefsController.m:350
 #: modules/text_renderer/freetype/freetype.c:111
 #: modules/gui/qt/ui/sprefs_subtitles.h:302
 msgid "Outline thickness"
 msgstr "બાહ્ય કિનારીની જાડાઇ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:347
+#: modules/gui/macosx/VLCSimplePrefsController.m:354
 #: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:315
 msgid "Display"
 msgstr "દર્શાવ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:348
+#: modules/gui/macosx/VLCSimplePrefsController.m:355
 msgid "Show video within the main window"
 msgstr "મુખ્ય વિન્ડોમાં વિડિઓને બતાવો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:353
+#: modules/gui/macosx/VLCSimplePrefsController.m:360
 #, fuzzy
 msgid "Fullscreen settings"
 msgstr "સંપૂર્ણસ્ક્રીન"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:354
+#: modules/gui/macosx/VLCSimplePrefsController.m:361
 #, fuzzy
 msgid "Start in fullscreen"
 msgstr "સંપૂર્ણસ્ક્રીન સ્થિતિમાં વિડિઓને શરૂ કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:355
+#: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
 msgstr "સંપૂર્ણસ્ક્રીન સ્થિતિમાં કાળી સ્ક્રીન"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:359
+#: modules/gui/macosx/VLCSimplePrefsController.m:366
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Video snapshots"
 msgstr "વિડિઓ સ્નેપશોટ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:361
+#: modules/gui/macosx/VLCSimplePrefsController.m:368
 #: modules/meta_engine/folder.c:69
 msgid "Folder"
 msgstr "ફોલ્ડર"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:362
+#: modules/gui/macosx/VLCSimplePrefsController.m:369
 #: modules/gui/qt/ui/sprefs_video.h:336
 msgid "Format"
 msgstr "બંધારણ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:363
+#: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Prefix"
 msgstr "ઉપસર્ગ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:364
+#: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/qt/ui/sprefs_video.h:335
 msgid "Sequential numbering"
 msgstr "ક્રમાંકિત નંબર"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
 msgstr "બધુ પુન:સુયોજિત કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/VLCSimplePrefsController.m:381
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
 msgstr "પસંદગીઓ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:547
+#: modules/gui/macosx/VLCSimplePrefsController.m:554
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:567
+#: modules/gui/macosx/VLCSimplePrefsController.m:574
 msgid "Last check on: %@"
 msgstr "છેલ્લી ચકાસણી પર: %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:569
+#: modules/gui/macosx/VLCSimplePrefsController.m:576
 msgid "No check was performed yet."
 msgstr "કોઈ તપાસ હજી કરવામાં આવી નથી."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:685
+#: modules/gui/macosx/VLCSimplePrefsController.m:692
 msgid "Lowest Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:687
+#: modules/gui/macosx/VLCSimplePrefsController.m:694
 msgid "Low Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:691
+#: modules/gui/macosx/VLCSimplePrefsController.m:698
 msgid "Higher Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:693
+#: modules/gui/macosx/VLCSimplePrefsController.m:700
 msgid "Highest Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:813
+#: modules/gui/macosx/VLCSimplePrefsController.m:820
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
 msgstr "પસંદગીઓને પુન:સુયોજિત કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:816
+#: modules/gui/macosx/VLCSimplePrefsController.m:823
 msgid ""
 "This will reset VLC media player's preferences.\n"
 "\n"
@@ -18547,25 +18554,25 @@ msgstr ""
 "\n"
 "શું તમે ખરેખર ચાલુ રાખવા માંગો છો?"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1086
+#: modules/gui/macosx/VLCSimplePrefsController.m:1093
 msgid ""
 "This setting cannot be changed because the native fullscreen mode is enabled."
 msgstr "આ સુયોજનોને બદલી શકાતા નથી કારણ કે મૂળ સંપૂર્ણસ્ક્રીન સ્થિતિ સક્રિય થયેલ છે."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1155
+#: modules/gui/macosx/VLCSimplePrefsController.m:1162
 msgid "Choose the folder to save your video snapshots to."
 msgstr "તેમાં તમારા વિડિઓ સ્નેપશોટને સંગ્રહવા માટે ફોલ્ડરને પસંદ કરો."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1157
-#: modules/gui/macosx/VLCSimplePrefsController.m:1256
+#: modules/gui/macosx/VLCSimplePrefsController.m:1164
+#: modules/gui/macosx/VLCSimplePrefsController.m:1263
 msgid "Choose"
 msgstr "પસંદ કરો"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1254
+#: modules/gui/macosx/VLCSimplePrefsController.m:1261
 msgid "Choose the directory or filename where the records will be stored."
 msgstr "ડિરેક્ટરી અથવા ફાઇલનામને પસંદ કરો જ્યાં અહેવાલોને સંગ્રહેલ હશે."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1371
+#: modules/gui/macosx/VLCSimplePrefsController.m:1378
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -18573,16 +18580,16 @@ msgstr ""
 "તેની માટે નવી કીને દબાવો\n"
 "\"%@\""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1444
+#: modules/gui/macosx/VLCSimplePrefsController.m:1451
 msgid "Invalid combination"
 msgstr "અયોગ્ય સંયોજન"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1445
+#: modules/gui/macosx/VLCSimplePrefsController.m:1452
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "દુ:ખની વાત એ છે કે, આ કી એ હોટકી ટૂંકાણો તરીકે સોંપી શકાતી નથી."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1455
-#: modules/gui/macosx/VLCSimplePrefsController.m:1459
+#: modules/gui/macosx/VLCSimplePrefsController.m:1462
+#: modules/gui/macosx/VLCSimplePrefsController.m:1466
 msgid "This combination is already taken by \"%@\"."
 msgstr "આ સંયોજન પહેલેથી \"%@\" દ્દારા લીધેલ છે."
 
@@ -21093,11 +21100,11 @@ msgstr "જ્યાંથી છોડી દીધું હતું ત્�
 msgid "&Continue"
 msgstr "ચાલુ રાખો (&C)"
 
-#: modules/gui/qt/main_interface.cpp:1419
+#: modules/gui/qt/main_interface.cpp:1420
 msgid "Control menu for the player"
 msgstr "પ્લેયર માટે નિયંત્રણ મેનુ"
 
-#: modules/gui/qt/main_interface.cpp:1463
+#: modules/gui/qt/main_interface.cpp:1464
 msgid "Paused"
 msgstr "અટકાવાયેલ"
 
@@ -24888,7 +24895,7 @@ msgstr ""
 msgid "Internal stream record"
 msgstr "આંતરિક સ્ટ્રીમ અહેવાલ"
 
-#: modules/stream_filter/skiptags.c:235
+#: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
 msgstr ""
 
@@ -25022,59 +25029,80 @@ msgstr "મૂળભૂત સ્ટ્રીમ"
 msgid "Chromaprint stream output"
 msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
 
-#: modules/stream_out/chromecast/cast.cpp:104
+#: modules/stream_out/chromecast/cast.cpp:105
 #, fuzzy
 msgid "HTTP port"
 msgstr "SFTP પોર્ટ"
 
-#: modules/stream_out/chromecast/cast.cpp:105
+#: modules/stream_out/chromecast/cast.cpp:106
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:108
+#: modules/stream_out/chromecast/cast.cpp:109
 msgid "The Chromecast receiver can receive video."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:110
+#: modules/stream_out/chromecast/cast.cpp:111
 #, fuzzy
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr "આ મોડ્યુલ Icecast સર્વરમાં ટ્રાન્સકોડ થયેલ સ્ટ્રીમનું આઉટપુટ લે છે."
 
-#: modules/stream_out/chromecast/cast.cpp:111
+#: modules/stream_out/chromecast/cast.cpp:112
 msgid "MIME content type"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:112
+#: modules/stream_out/chromecast/cast.cpp:113
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
+#: modules/stream_out/chromecast/cast.cpp:114
+#: modules/stream_out/chromecast/cast.cpp:306
+#, fuzzy
+msgid "Performance warning"
+msgstr "પ્રભાવ વિકલ્પો"
+
 #: modules/stream_out/chromecast/cast.cpp:115
+msgid "Display a performance warning when transcoding"
+msgstr ""
+
+#: modules/stream_out/chromecast/cast.cpp:118
 #, fuzzy
 msgid "IP Address of the Chromecast."
 msgstr "તેમાં સ્ટ્રીમ કરવા માટે કમ્પ્યૂટરનું સરનામું."
 
-#: modules/stream_out/chromecast/cast.cpp:116
+#: modules/stream_out/chromecast/cast.cpp:119
 #, fuzzy
 msgid "Chromecast port"
 msgstr "ક્રોમા બંધારણ"
 
-#: modules/stream_out/chromecast/cast.cpp:117
+#: modules/stream_out/chromecast/cast.cpp:120
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:121
+#: modules/stream_out/chromecast/cast.cpp:124
 #, fuzzy
 msgid "Chromecast"
 msgstr "ક્રોમા"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:125
 #, fuzzy
 msgid "Chromecast stream output"
 msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
 
-#: modules/stream_out/chromecast/chromecast_demux.cpp:328
+#: modules/stream_out/chromecast/cast.cpp:305
+#, fuzzy
+msgid "Ok, Don't warn me again"
+msgstr "સોફ્ટવેર ગેઇન"
+
+#: modules/stream_out/chromecast/cast.cpp:307
+msgid ""
+"Casting this video requires conversion. This conversion can use all the "
+"available power and could quickly drain your battery."
+msgstr ""
+
+#: modules/stream_out/chromecast/chromecast_demux.cpp:366
 #, fuzzy
 msgid "Chromecast demux wrapper"
 msgstr "Avformat ડિમક્સર"
@@ -27694,14 +27722,6 @@ msgstr "EGL"
 msgid "EGL extension for OpenGL"
 msgstr "OpenGL માટે EGL એક્સટેન્શન"
 
-#: modules/video_output/opengl/vout_helper.h:61
-msgid "Open GL/GLES hardware converter"
-msgstr ""
-
-#: modules/video_output/opengl/vout_helper.h:63
-msgid "Force a \"glconv\" module."
-msgstr ""
-
 #: modules/video_output/win32/direct3d9.c:70
 msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "ડેસ્કટોપ પર વિડિઓને દર્શાવવા માટે ડેસ્કટોપ સ્થિતિ તમને પરવાનગી આપે છે."
@@ -27881,6 +27901,10 @@ msgstr "વિડિઓ મેમરી બફર પહોળાઇ."
 #: modules/video_output/vmem.c:46
 msgid "Video memory buffer height."
 msgstr "વિડિઓ મેમરી બફર ઊંચાઇ."
+
+#: modules/video_output/vmem.c:48
+msgid "Pitch"
+msgstr "પીચ"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
