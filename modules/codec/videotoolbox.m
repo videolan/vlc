@@ -128,6 +128,7 @@ struct frame_info_t
     int i_foc;
     bool b_forced;
     bool b_flush;
+    bool b_keyframe;
     bool b_field;
     bool b_progressive;
     bool b_top_field_first;
@@ -282,6 +283,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 h264_compute_poc(p_sps, &slice, &p_sys->h264_pocctx,
                                  &p_info->i_poc, &p_info->i_foc, &bFOC);
 
+                p_info->b_keyframe = slice.type == H264_SLICE_TYPE_I;
                 p_info->b_flush = (slice.type == H264_SLICE_TYPE_I) || slice.has_mmco5;
                 p_info->b_field = slice.i_field_pic_flag;
                 p_info->b_progressive = !p_sps->mb_adaptive_frame_field_flag &&
@@ -596,6 +598,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
             if(!p_sli)
                 return false;
 
+            p_info->b_keyframe = i_nal_type >= HEVC_NAL_BLA_W_LP;
+
             hevc_sequence_parameter_set_t *p_sps;
             hevc_picture_parameter_set_t *p_pps;
             hevc_video_parameter_set_t *p_vps;
@@ -842,6 +846,7 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
         p_info->i_num_ts = 2;
         p_info->b_progressive = true;
         p_info->b_field = false;
+        p_info->b_keyframe = true;
     }
 
     p_info->i_length = p_block->i_length;
@@ -1859,6 +1864,12 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             free(p_info);
             goto skip;
         }
+    }
+
+    if (!p_sys->b_vt_feed && !p_info->b_keyframe)
+    {
+        free(p_info);
+        goto skip;
     }
 
     CMSampleBufferRef sampleBuffer =
