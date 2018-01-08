@@ -2770,7 +2770,7 @@ static int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static int MP4_FreeBox_sample_text( MP4_Box_t *p_box )
+static void MP4_FreeBox_sample_text( MP4_Box_t *p_box )
 {
     free( p_box->data.p_sample_text->p_data );
 }
