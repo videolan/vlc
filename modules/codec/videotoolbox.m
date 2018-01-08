@@ -1205,8 +1205,6 @@ static int StartVideoToolbox(decoder_t *p_dec)
     p_sys->b_enable_temporal_processing = status == noErr &&
         CFDictionaryContainsKey(supportedProps,
                                 kVTDecompressionProperty_DeinterlaceMode_Temporal);
-    if (!p_sys->b_handle_deint)
-        msg_Warn(p_dec, "VT decoder doesn't handle deinterlacing");
 
     if (status == noErr)
         CFRelease(supportedProps);
