@@ -234,7 +234,7 @@
     _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
 
     if (_darkInterface) {
-        styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
+        styleMask = NSBorderlessWindowMask | NSResizableWindowMask | NSMiniaturizableWindowMask;
     }
 
     self = [super initWithContentRect:contentRect styleMask:styleMask
