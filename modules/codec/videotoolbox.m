@@ -102,7 +102,6 @@ enum vtsession_status
 {
     VTSESSION_STATUS_OK,
     VTSESSION_STATUS_RESTART,
-    VTSESSION_STATUS_RESTART_DECAGAIN,
     VTSESSION_STATUS_ABORT,
 };
 
@@ -1714,8 +1713,6 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                 break;
             case -8969 /* codecBadDataErr */:
             case kVTVideoDecoderBadDataErr:
-                *p_vtsession_status = VTSESSION_STATUS_RESTART_DECAGAIN;
-                break;
             case kVTInvalidSessionErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
@@ -1891,22 +1888,9 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
     else
     {
-        if (vtsession_status == VTSESSION_STATUS_RESTART
-         || vtsession_status == VTSESSION_STATUS_RESTART_DECAGAIN)
+        if (vtsession_status == VTSESSION_STATUS_RESTART)
         {
             int ret = RestartVideoToolbox(p_dec, true);
-            if (ret == VLC_SUCCESS
-             && vtsession_status == VTSESSION_STATUS_RESTART_DECAGAIN)
-            {
-                /* Duplicate p_info since it is or will be freed by the
-                 * Decoder Callback */
-                p_info = CreateReorderInfo(p_dec, p_block);
-                if (likely(p_info))
-                    status = VTDecompressionSessionDecodeFrame(p_sys->session,
-                                    sampleBuffer, decoderFlags, p_info, &flagOut);
-                if (status != 0)
-                    ret = VLC_EGENERIC;
-            }
             if (ret != VLC_SUCCESS) /* restart failed, abort */
                 vtsession_status = VTSESSION_STATUS_ABORT;
         }
@@ -2051,10 +2035,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     enum vtsession_status vtsession_status;
     if (HandleVTStatus(p_dec, status, &vtsession_status) != VLC_SUCCESS)
     {
-        /* Can't decode again from here */
-        if (vtsession_status == VTSESSION_STATUS_RESTART_DECAGAIN)
-            vtsession_status = VTSESSION_STATUS_RESTART;
-
         if (p_sys->vtsession_status != VTSESSION_STATUS_ABORT)
             p_sys->vtsession_status = vtsession_status;
         goto end;
