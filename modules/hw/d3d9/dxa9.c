@@ -242,7 +242,7 @@ static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t 
 
 static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     picture_sys_t *p_sys = dst->p_sys;
 
     D3DSURFACE_DESC texDesc;
@@ -433,7 +433,7 @@ done:
 void D3D9CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     CopyCleanCache( &p_sys->cache );
     D3D9_Destroy( &p_sys->hd3d );
     free( p_sys );
@@ -443,7 +443,7 @@ void D3D9CloseConverter( vlc_object_t *obj )
 void D3D9CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging);
     D3D9_FilterReleaseInstance(&p_sys->d3d_dev);

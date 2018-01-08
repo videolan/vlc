@@ -84,7 +84,7 @@ static int SetupProcessor(filter_t *p_filter, ID3D11Device *d3ddevice,
                           ID3D11DeviceContext *d3dctx,
                           DXGI_FORMAT srcFormat, DXGI_FORMAT dstFormat)
 {
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
     ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
@@ -188,7 +188,7 @@ static HRESULT can_map(filter_sys_t *sys, ID3D11DeviceContext *context)
 
 static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
 {
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
 
     if (sys->staging)
@@ -269,7 +269,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
@@ -410,7 +410,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
@@ -586,7 +586,7 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
 
 static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
-    filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *sys = p_filter->p_sys;
     picture_sys_t *p_sys = dst->p_sys;
     if (unlikely(p_sys==NULL))
     {
@@ -805,7 +805,7 @@ done:
 void D3D11CloseConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
 #if CAN_PROCESSOR
     if (p_sys->d3dviddev)
         ID3D11VideoDevice_Release(p_sys->d3dviddev);
@@ -827,7 +827,7 @@ void D3D11CloseConverter( vlc_object_t *obj )
 void D3D11CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging_pic);
     D3D11_Destroy(&p_sys->hd3d);
