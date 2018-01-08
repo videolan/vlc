@@ -301,6 +301,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
 
     /* There is one ip for several srvs, fetch them */
     const char *psz_ip = NULL;
+    struct srv *p_srv = NULL;
     i_nb_srv = 0;
     for( const struct rr_entry *p_entry = p_entries;
          p_entry != NULL; p_entry = p_entry->next )
@@ -312,7 +313,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
                 if( !strrcmp( p_entry->name, protocols[i].psz_service_name ) &&
                     protocols[i].b_renderer == b_renderer )
                 {
-                    struct srv *p_srv = &p_srvs[i_nb_srv];
+                    p_srv = &p_srvs[i_nb_srv];
 
                     p_srv->psz_device_name =
                         strndup( p_entry->name, strlen( p_entry->name )
@@ -333,6 +334,19 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
         {
             psz_ip = p_entry->data.AAAA.addr_str;
             *p_ipv6 = true;
+        }
+        else if( p_entry->type == RR_TXT && p_srv != NULL )
+        {
+            for ( struct rr_data_txt *p_txt = p_entry->data.TXT;
+                  p_txt != NULL ; p_txt = p_txt->next )
+            {
+                if( !strcmp( p_srv->psz_protocol, "chromecast" ) &&
+                        !strncmp( "fn=", p_txt->txt, 3 ) )
+                {
+                    free( p_srv->psz_device_name );
+                    p_srv->psz_device_name = strdup( p_txt->txt + 3 );
+                }
+            }
         }
     }
     if( psz_ip == NULL || i_nb_srv == 0 )
