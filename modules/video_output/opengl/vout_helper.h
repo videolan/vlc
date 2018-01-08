@@ -195,8 +195,8 @@ static const char * const dither_text[] = {
     "Bayer matrix (ordered dither)",
 };
 
-#define DEPTH_TEXT N_("Dither depth override (0 = framebuffer depth)")
-#define DEPTH_LONGTEXT N_("Overrides the detected framebuffer depth. Useful to dither to lower bit depths than otherwise required.")
+#define DEPTH_TEXT "Dither depth override (0 = framebuffer depth)"
+#define DEPTH_LONGTEXT "Overrides the detected framebuffer depth. Useful to dither to lower bit depths than otherwise required."
 
 #define add_glopts_placebo() \
     set_section("Colorspace conversion", NULL) \
@@ -224,9 +224,8 @@ static const char * const dither_text[] = {
 #define add_glopts_placebo()
 #endif
 
-#define GLCONV_TEXT N_("Open GL/GLES hardware converter")
-#define GLCONV_LONGTEXT N_( \
-    "Force a \"glconv\" module.")
+#define GLCONV_TEXT "Open GL/GLES hardware converter"
+#define GLCONV_LONGTEXT "Force a \"glconv\" module."
 
 #define add_glopts() \
     add_module ("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT, true) \
