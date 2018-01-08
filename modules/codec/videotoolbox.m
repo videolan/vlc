@@ -1262,18 +1262,6 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
     p_sys->b_vt_feed = false;
 }
 
-static int RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    msg_Dbg(p_dec, "Restarting decoder session");
-
-    if (p_sys->session != nil)
-        StopVideoToolbox(p_dec, b_reset_format);
-
-    return StartVideoToolbox(p_dec);
-}
-
 #pragma mark - module open and close
 
 
@@ -1793,18 +1781,20 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
     {
         msg_Warn(p_dec, "restarting vt session (dec callback failed)");
-
         vlc_mutex_unlock(&p_sys->lock);
-        int ret = RestartVideoToolbox(p_dec, true);
-        vlc_mutex_lock(&p_sys->lock);
 
-        p_sys->vtsession_status = ret == VLC_SUCCESS ? VTSESSION_STATUS_OK
-                                                     : VTSESSION_STATUS_ABORT;
+        /* Session will be started by Late Start code block */
+        StopVideoToolbox(p_dec, true);
+
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->vtsession_status = VTSESSION_STATUS_OK;
     }
 
     if (p_sys->vtsession_status == VTSESSION_STATUS_ABORT)
     {
         vlc_mutex_unlock(&p_sys->lock);
+
+        msg_Err(p_dec, "decoder failure, Abort.");
         /* Add an empty variable so that videotoolbox won't be loaded again for
          * this ES */
         var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID);
@@ -1899,22 +1889,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
     else
     {
-        if (vtsession_status == VTSESSION_STATUS_RESTART)
-        {
-            int ret = RestartVideoToolbox(p_dec, true);
-            if (ret != VLC_SUCCESS) /* restart failed, abort */
-                vtsession_status = VTSESSION_STATUS_ABORT;
-        }
         vlc_mutex_lock(&p_sys->lock);
-        if (vtsession_status == VTSESSION_STATUS_ABORT)
-        {
-            msg_Err(p_dec, "decoder failure, Abort.");
-            /* The decoder module will be reloaded next time since we already
-             * modified the input block */
-            p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
-        }
-        else /* reset status set by the decoder callback during restart */
-            p_sys->vtsession_status = VTSESSION_STATUS_OK;
+        p_sys->vtsession_status = vtsession_status;
+        /* In case of abort, the decoder module will be reloaded next time
+         * since we already modified the input block */
         vlc_mutex_unlock(&p_sys->lock);
     }
     CFRelease(sampleBuffer);
