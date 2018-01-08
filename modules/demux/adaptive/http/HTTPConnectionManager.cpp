@@ -109,10 +109,9 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
 
 void HTTPConnectionManager::closeAllConnections      ()
 {
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
     releaseAllConnections();
     vlc_delete_all(this->connectionPool);
-    vlc_mutex_unlock(&lock);
 }
 
 void HTTPConnectionManager::releaseAllConnections()
@@ -145,7 +144,7 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
             return nullptr;
     }
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
     AbstractConnection *conn = reuseConnection(params);
     if(!conn)
     {
@@ -154,7 +153,6 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
 
         if(!conn)
         {
-            vlc_mutex_unlock(&lock);
             return nullptr;
         }
 
@@ -162,13 +160,11 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
 
         if (!conn->prepare(params))
         {
-            vlc_mutex_unlock(&lock);
             return nullptr;
         }
     }
 
     conn->setUsed(true);
-    vlc_mutex_unlock(&lock);
     return conn;
 }
 

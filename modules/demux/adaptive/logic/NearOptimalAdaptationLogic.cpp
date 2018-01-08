@@ -193,7 +193,7 @@ unsigned NearOptimalAdaptationLogic::getMaxCurrentBw() const
 void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
                                                     vlc_tick_t time, vlc_tick_t)
 {
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
     std::map<ID, NearOptimalContext>::iterator it = streams.find(id);
     if(it != streams.end())
     {
@@ -201,7 +201,6 @@ void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
         ctx.last_download_rate = ctx.average.push(CLOCK_FREQ * dlsize * 8 / time);
     }
     currentBps = getMaxCurrentBw();
-    vlc_mutex_unlock(&lock);
 }
 
 void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
@@ -212,13 +211,12 @@ void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
         {
             const RepresentationSwitchEvent &event =
                     static_cast<const RepresentationSwitchEvent &>(ev);
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             if(event.prev)
                 usedBps -= event.prev->getBandwidth();
             if(event.next)
                 usedBps += event.next->getBandwidth();
                  BwDebug(msg_Info(p_obj, "New total bandwidth usage %zu kBps", (usedBps / 8000)));
-            vlc_mutex_unlock(&lock);
         }
         break;
 
@@ -227,7 +225,7 @@ void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             const BufferingStateUpdatedEvent &event =
                     static_cast<const BufferingStateUpdatedEvent &>(ev);
             const ID &id = *event.id;
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             if(event.enabled)
             {
                 if(streams.find(id) == streams.end())
@@ -242,7 +240,6 @@ void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
                 if(it != streams.end())
                     streams.erase(it);
             }
-            vlc_mutex_unlock(&lock);
             BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive", id.str().c_str(),
                          (event.enabled) ? "" : "in"));
         }
@@ -253,11 +250,10 @@ void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             const BufferingLevelChangedEvent &event =
                     static_cast<const BufferingLevelChangedEvent &>(ev);
             const ID &id = *event.id;
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             NearOptimalContext &ctx = streams[id];
             ctx.buffering_level = event.current;
             ctx.buffering_target = event.target;
-            vlc_mutex_unlock(&lock);
         }
         break;
 

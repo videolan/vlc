@@ -69,7 +69,7 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
     RepresentationSelector selector(maxwidth, maxheight);
     BaseRepresentation *rep;
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
 
     std::map<ID, PredictiveStats>::iterator it = streams.find(adaptSet->getID());
     if(it == streams.end())
@@ -145,22 +145,19 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
         stats.segments_count++;
     }
 
-    vlc_mutex_unlock(&lock);
-
     return rep;
 }
 
 void PredictiveAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
                                                    vlc_tick_t time, vlc_tick_t)
 {
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
     std::map<ID, PredictiveStats>::iterator it = streams.find(id);
     if(it != streams.end())
     {
         PredictiveStats &stats = (*it).second;
         stats.last_download_rate = stats.average.push(CLOCK_FREQ * dlsize * 8 / time);
     }
-    vlc_mutex_unlock(&lock);
 }
 
 unsigned PredictiveAdaptationLogic::getAvailableBw(unsigned i_bw, const BaseRepresentation *curRep) const
@@ -183,14 +180,13 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
         {
             const RepresentationSwitchEvent &event =
                     static_cast<const RepresentationSwitchEvent &>(ev);
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             if(event.prev)
                 usedBps -= event.prev->getBandwidth();
             if(event.next)
                 usedBps += event.next->getBandwidth();
 
             BwDebug(msg_Info(p_obj, "New total bandwidth usage %zu KiB/s", (usedBps / 8000)));
-            vlc_mutex_unlock(&lock);
         }
         break;
 
@@ -199,7 +195,7 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             const BufferingStateUpdatedEvent &event =
                     static_cast<const BufferingStateUpdatedEvent &>(ev);
             const ID &id = *event.id;
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             if(event.enabled)
             {
                 if(streams.find(id) == streams.end())
@@ -214,7 +210,6 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
                 if(it != streams.end())
                     streams.erase(it);
             }
-            vlc_mutex_unlock(&lock);
             BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive", id.str().c_str(),
                              (event.enabled) ? "" : "in"));
         }
@@ -225,11 +220,10 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             const BufferingLevelChangedEvent &event =
                     static_cast<const BufferingLevelChangedEvent &>(ev);
             const ID &id = *event.id;
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             PredictiveStats &stats = streams[id];
             stats.buffering_level = event.current;
             stats.buffering_target = event.target;
-            vlc_mutex_unlock(&lock);
         }
         break;
 
@@ -238,10 +232,9 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             const SegmentChangedEvent &event =
                     static_cast<const SegmentChangedEvent &>(ev);
             const ID &id = *event.id;
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             PredictiveStats &stats = streams[id];
             stats.last_duration = event.duration;
-            vlc_mutex_unlock(&lock);
         }
         break;
 

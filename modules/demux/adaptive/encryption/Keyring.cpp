@@ -46,7 +46,7 @@ KeyringKey Keyring::getKey(SharedResources *resources, const std::string &uri)
 {
     KeyringKey key;
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_locker locker(&lock);
     std::map<std::string, KeyringKey>::iterator it = keys.find(uri);
     if(it == keys.end())
     {
@@ -80,7 +80,6 @@ KeyringKey Keyring::getKey(SharedResources *resources, const std::string &uri)
         }
         key = (*it).second;
     }
-    vlc_mutex_unlock(&lock);
 
     return key;
 }
