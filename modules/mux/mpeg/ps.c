@@ -103,6 +103,7 @@ typedef struct ps_stream_s
 
     /* Language is iso639-2T */
     uint8_t lang[3];
+    int64_t i_dts;
 
 } ps_stream_t;
 
@@ -270,6 +271,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( unlikely(p_input->p_sys == NULL) )
         return VLC_ENOMEM;
     p_stream->i_stream_type = 0x81;
+    p_stream->i_dts = -1;
 
     /* Init this new stream */
     switch( p_input->p_fmt->i_codec )
@@ -468,28 +470,43 @@ static int Mux( sout_mux_t *p_mux )
         p_stream = (ps_stream_t*)p_input->p_sys;
         p_ps     = NULL;
 
+        p_stream->i_dts = i_dts;
+
         /* Write regulary PackHeader */
         if( p_sys->i_pes_count % 30 == 0)
         {
-            /* Update the instant bitrate every second or so */
-            if( p_sys->i_instant_size &&
-                i_dts - p_sys->i_instant_dts > 1000000 )
+            int64_t i_mindts = INT64_MAX;
+            for( size_t i=0; i<p_mux->i_nb_inputs; i++ )
             {
-                int64_t i_instant_bitrate = p_sys->i_instant_size * 8000000 /
-                    ( i_dts - p_sys->i_instant_dts );
-
-                p_sys->i_instant_bitrate += i_instant_bitrate;
-                p_sys->i_instant_bitrate /= 2;
-
-                p_sys->i_instant_size = 0;
-                p_sys->i_instant_dts = i_dts;
-            }
-            else if( !p_sys->i_instant_size )
-            {
-                p_sys->i_instant_dts = i_dts;
+                ps_stream_t *p_s = (ps_stream_t*)p_input->p_sys;
+                if( p_input->p_fmt->i_cat == SPU_ES && p_mux->i_nb_inputs > 1 )
+                    continue;
+                if( p_s->i_dts >= 0 && i_mindts > p_s->i_dts )
+                    i_mindts = p_s->i_dts;
             }
 
-            MuxWritePackHeader( p_mux, &p_ps, i_dts );
+            if( i_mindts > p_sys->i_instant_dts )
+            {
+                /* Update the instant bitrate every second or so */
+                if( p_sys->i_instant_size &&
+                    i_dts - p_sys->i_instant_dts > 1000000 )
+                {
+                    int64_t i_instant_bitrate = p_sys->i_instant_size * 8000000 /
+                            ( i_dts - p_sys->i_instant_dts );
+
+                    p_sys->i_instant_bitrate += i_instant_bitrate;
+                    p_sys->i_instant_bitrate /= 2;
+
+                    p_sys->i_instant_size = 0;
+                    p_sys->i_instant_dts = i_dts;
+                }
+                else if( !p_sys->i_instant_size )
+                {
+                    p_sys->i_instant_dts = i_dts;
+                }
+
+                MuxWritePackHeader( p_mux, &p_ps, i_dts );
+            }
         }
 
         /* Write regulary SystemHeader */
