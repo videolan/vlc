@@ -1079,7 +1079,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             p_sys->b_default_selection = false;
         }
-        else
+        else if( !p_sys->b_default_selection )
         {
             ARRAY_RESET( p_sys->programs );
             p_sys->seltype = PROGRAM_AUTO_DEFAULT;
