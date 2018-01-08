@@ -50,6 +50,6 @@ endif
 
 .libxml2: libxml2
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="-DLIBXML_STATIC" $(XMLCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) -DLIBXML_STATIC" $(XMLCONF)
 	cd $< && $(MAKE) install
 	touch $@
