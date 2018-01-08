@@ -215,10 +215,13 @@ static void Close( vlc_object_t * p_this )
     msg_Info( p_mux, "Close" );
 
     p_end = block_Alloc( 4 );
-    p_end->p_buffer[0] = 0x00; p_end->p_buffer[1] = 0x00;
-    p_end->p_buffer[2] = 0x01; p_end->p_buffer[3] = 0xb9;
+    if( p_end )
+    {
+        p_end->p_buffer[0] = 0x00; p_end->p_buffer[1] = 0x00;
+        p_end->p_buffer[2] = 0x01; p_end->p_buffer[3] = 0xb9;
 
-    sout_AccessOutWrite( p_mux->p_access, p_end );
+        sout_AccessOutWrite( p_mux->p_access, p_end );
+    }
 
     free( p_sys );
 }
@@ -578,6 +581,8 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
     i_scr = (i_dts - p_sys->i_dts_delay) * 9 / 100;
 
     p_hdr = block_Alloc( 18 );
+    if( !p_hdr )
+        return;
     p_hdr->i_pts = p_hdr->i_dts = i_dts;
     bits_initwrite( &bits, 14, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01ba );
@@ -652,6 +657,8 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
         ( i_nb_private > 0 ? i_nb_private - 1 : 0 );
 
     p_hdr = block_Alloc(  12 + i_nb_stream * 3 );
+    if( !p_hdr )
+        return;
     p_hdr->i_dts = p_hdr->i_pts = i_dts;
 
     /* The spec specifies that the reported rate_bound must be upper limit */
@@ -742,6 +749,8 @@ static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
     i_psm_size += i_es_map_size;
 
     p_hdr = block_Alloc( i_psm_size );
+    if( !p_hdr )
+        return;
     p_hdr->i_dts = p_hdr->i_pts = i_dts;
 
     memset( p_hdr->p_buffer, 0, p_hdr->i_buffer );
