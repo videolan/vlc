@@ -1645,7 +1645,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                           enum vtsession_status * p_vtsession_status)
 {
 #define VTERRCASE(x) \
-    case x: msg_Err(p_dec, "vt session error: '" #x "'"); break;
+    case x: msg_Warn(p_dec, "vt session error: '" #x "'"); break;
 
     switch (status)
     {
@@ -1682,11 +1682,11 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
         VTERRCASE(kVTCouldNotFindTemporalFilterErr)
         VTERRCASE(kVTPixelTransferNotPermittedErr)
         case -12219:
-            msg_Err(p_dec, "vt session error: "
-                    "'kVTColorCorrectionImageRotationFailedErr'");
+            msg_Warn(p_dec, "vt session error: "
+                     "'kVTColorCorrectionImageRotationFailedErr'");
             break;
         default:
-            msg_Err(p_dec, "unknown vt session error (%i)", (int)status);
+            msg_Warn(p_dec, "unknown vt session error (%i)", (int)status);
     }
 #undef VTERRCASE
 
