@@ -90,4 +90,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_s
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
 
+HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
+                                  ID3D11RenderTargetView *output[D3D11_MAX_SHADER_VIEW]);
+
 #endif /* VLC_D3D11_SHADERS_H */

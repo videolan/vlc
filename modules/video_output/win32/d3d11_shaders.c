@@ -514,3 +514,26 @@ float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
             return DEFAULT_BRIGHTNESS;
     }
 }
+
+HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *texture,
+                                   const d3d_format_t *cfg, ID3D11RenderTargetView *output[D3D11_MAX_SHADER_VIEW] )
+{
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    {
+        if (cfg->resourceFormat[i])
+        {
+            renderTargetViewDesc.Format = cfg->resourceFormat[i];
+            HRESULT hr = ID3D11Device_CreateRenderTargetView(d3d_dev->d3ddevice, texture,
+                                                             &renderTargetViewDesc, &output[i]);
+            if (FAILED(hr))
+            {
+                return hr;
+            }
+        }
+    }
+    return S_OK;
+}
