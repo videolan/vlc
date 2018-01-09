@@ -71,6 +71,7 @@ hxxx_helper_clean(struct hxxx_helper *hh)
                          h264_release_sps(hnal->h264_sps));
             RELEASE_NALS(hh->h264.pps_list, H264_PPS_ID_MAX,
                          h264_release_pps(hnal->h264_pps));
+            memset(&hh->h264, 0, sizeof(hh->h264));
             break;
         case VLC_CODEC_HEVC:
             RELEASE_NALS(hh->hevc.vps_list, HEVC_VPS_ID_MAX,
@@ -79,6 +80,7 @@ hxxx_helper_clean(struct hxxx_helper *hh)
                          hevc_rbsp_release_sps(hnal->hevc_sps));
             RELEASE_NALS(hh->hevc.pps_list, HEVC_PPS_ID_MAX,
                          hevc_rbsp_release_pps(hnal->hevc_pps));
+            memset(&hh->hevc, 0, sizeof(hh->hevc));
             break;
         default:
             vlc_assert_unreachable();
