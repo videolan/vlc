@@ -711,6 +711,7 @@ mtime_t intf_sys_t::getPlaybackTimestamp() const
     {
     case Playing:
         return ( mdate() - m_time_playback_started ) + m_ts_local_start;
+#ifdef CHROMECAST_VERBOSE
     case Ready:
         msg_Dbg(m_module, "receiver idle using buffering time %" PRId64, m_ts_local_start);
         break;
@@ -720,6 +721,7 @@ mtime_t intf_sys_t::getPlaybackTimestamp() const
     case Paused:
         msg_Dbg(m_module, "receiver paused using buffering time %" PRId64, m_ts_local_start);
         break;
+#endif
     default:
         break;
     }

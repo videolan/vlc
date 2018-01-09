@@ -61,6 +61,8 @@ static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cas
 
 #define PACKET_MAX_LEN 10 * 1024
 
+//#define CHROMECAST_VERBOSE
+
 // Media player Chromecast app id
 #define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
