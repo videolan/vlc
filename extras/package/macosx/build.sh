@@ -285,13 +285,15 @@ make VLC.app
 if [ "$PACKAGETYPE" = "u" ]; then
     info "Copying app with debug symbols into VLC-debug.app and stripping"
     rm -rf VLC-debug.app
-    cp -R VLC.app VLC-debug.app
+    cp -Rp VLC.app VLC-debug.app
 
     find VLC.app/ -name "*.dylib" -exec strip -u -r {} \;
     find VLC.app/ -type f -name "VLC" -exec strip -u -r {} \;
     find VLC.app/ -type f -name "Sparkle" -exec strip -u -r {} \;
     find VLC.app/ -type f -name "Growl" -exec strip -u -r {} \;
     find VLC.app/ -type f -name "Breakpad" -exec strip -u -r {} \;
+
+    bin/vlc-cache-gen VLC.app/Contents/MacOS/plugins
 
     info "Building VLC release archive"
     make package-macosx-release
