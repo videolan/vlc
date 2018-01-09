@@ -70,7 +70,7 @@ static const char* globPixelShaderDefault = "\
   struct PS_INPUT\n\
   {\n\
     float4 Position   : SV_POSITION;\n\
-    float4 Texture    : TEXCOORD0;\n\
+    float3 Texture    : TEXCOORD0;\n\
   };\n\
   \n\
   /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
@@ -108,7 +108,7 @@ static const char* globPixelShaderDefault = "\
       %s;\n\
   }\n\
   \n\
-  inline float4 sampleTexture(SamplerState samplerState, float4 coords) {\n\
+  inline float4 sampleTexture(SamplerState samplerState, float3 coords) {\n\
       float4 sample;\n\
       %s /* sampling routine in sample */\n\
       return sample;\n\
