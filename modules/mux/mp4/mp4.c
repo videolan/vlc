@@ -729,6 +729,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     {
         block_t *p_empty = NULL;
         if(p_stream->mux.fmt.i_codec == VLC_CODEC_SUBT||
+           p_stream->mux.fmt.i_codec == VLC_CODEC_QTXT||
            p_stream->mux.fmt.i_codec == VLC_CODEC_TX3G)
         {
             p_empty = block_Alloc(3);

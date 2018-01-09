@@ -33,6 +33,7 @@
 #include <vlc_es.h>
 #include <vlc_iso_lang.h>
 #include <vlc_bits.h>
+#include <vlc_text_style.h>
 #include <assert.h>
 #include <time.h>
 
@@ -1014,16 +1015,13 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
     VLC_UNUSED(p_obj);
-    if(p_track->fmt.i_codec == VLC_CODEC_SPU ||
-       p_track->fmt.i_codec == VLC_CODEC_TX3G)
+    if(p_track->fmt.i_codec == VLC_CODEC_QTXT)
     {
-        bo_t *text = (!b_mov || p_track->fmt.i_codec == VLC_CODEC_TX3G) ?
-                     box_new("tx3g") : box_new("text");
+        bo_t *text = box_new("text");
         if(!text)
             return NULL;
 
-        if(p_track->fmt.i_codec == VLC_CODEC_TX3G &&
-           p_track->fmt.i_extra >= 32)
+        if(p_track->fmt.i_extra >= 44)
         {
             /* Copy the original sample description format */
             bo_add_mem(text, p_track->fmt.i_extra, p_track->fmt.p_extra);
@@ -1037,22 +1035,82 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             bo_add_32be(text, 0);         // display flags
             bo_add_32be(text, 0);         // justification
             for (int i = 0; i < 3; i++)
-                bo_add_16be(text, 0);     // back ground color
+                bo_add_16be(text, 0);     // background color
 
-            bo_add_16be(text, 0);         // box text
-            bo_add_16be(text, 0);         // box text
-            bo_add_16be(text, 0);         // box text
-            bo_add_16be(text, 0);         // box text
-
+            bo_add_64be(text, 0);         // box text
             bo_add_64be(text, 0);         // reserved
+
+            bo_add_16be(text, 0);         // font-number
+            bo_add_16be(text, 0);         // font-face
+            bo_add_8(text, 0);            // reserved
+            bo_add_16be(text, 0);         // reserved
+
             for (int i = 0; i < 3; i++)
                 bo_add_16be(text, 0xff);  // foreground color
 
-            bo_add_8 (text, 9);
-            bo_add_mem(text, 9, (uint8_t*)"Helvetica");
+            bo_add_8(text, 5);
+            bo_add_mem(text, 5,  (void*)"Serif");
+        }
+        return text;
+    }
+    else if(p_track->fmt.i_codec == VLC_CODEC_SPU ||
+            p_track->fmt.i_codec == VLC_CODEC_TX3G)
+    {
+        bo_t *tx3g = box_new("tx3g");
+        if(!tx3g)
+            return NULL;
+
+        if(p_track->fmt.i_codec == VLC_CODEC_TX3G &&
+           p_track->fmt.i_extra >= 32)
+        {
+            /* Copy the original sample description format */
+            bo_add_mem(tx3g, p_track->fmt.i_extra, p_track->fmt.p_extra);
+        }
+        else /* Build TTXT(tx3g) sample desc */
+        {
+            /* Sample Entry Header */
+            for (int i = 0; i < 6; i++)
+                bo_add_8(tx3g, 0);        // reserved;
+            bo_add_16be(tx3g, 1);         // data-reference-index
+
+            /* tx3g sample description */
+            bo_add_32be(tx3g, 0);         // display flags
+            bo_add_16be(tx3g, 0);         // justification
+
+            bo_add_32be(tx3g, 0);         // background color
+
+            /* BoxRecord */
+            bo_add_64be(tx3g, 0);
+
+            /* StyleRecord*/
+            bo_add_16be(tx3g, 0);         // startChar
+            bo_add_16be(tx3g, 0);         // endChar
+            bo_add_16be(tx3g, 0);         // default font ID
+            bo_add_8(tx3g, 0);            // face style flags
+            bo_add_8(tx3g, STYLE_DEFAULT_FONT_SIZE);  // font size
+            bo_add_32be(tx3g, 0xFFFFFFFFU);// foreground color
+
+            /* FontTableBox */
+            bo_t *ftab = box_new("ftab");
+            if(ftab)
+            {
+                bo_add_16be(ftab, b_mov ? 2 : 3); // Entry Count
+                /* Font Record */
+                bo_add_8(ftab, 5);
+                bo_add_mem(ftab, 5,  (void*)"Serif");
+                bo_add_8(ftab, 10);
+                bo_add_mem(ftab, 10, (void*) (b_mov ? "Sans-Serif" : "Sans-serif"));
+                if(!b_mov) /* qt only allows "Serif" and "Sans-Serif" */
+                {
+                    bo_add_8(ftab, 9);
+                    bo_add_mem(ftab, 9,  (void*)"Monospace");
+                }
+
+                box_gather(tx3g, ftab);
+            }
         }
 
-        return text;
+        return tx3g;
     }
 
     return NULL;
@@ -1549,8 +1607,9 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         {
             /* text/tx3g 3GPP */
             /* sbtl/tx3g Apple subs */
-            /* text/text Apple text */
-            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT)
+            /* text/text Apple textmedia */
+            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT||
+               p_stream->fmt.i_codec == VLC_CODEC_QTXT)
                 bo_add_fourcc(hdlr, "text");
             else if(p_stream->fmt.i_codec == VLC_CODEC_TX3G)
                 bo_add_fourcc(hdlr, (b_mov) ? "sbtl" : "text");
@@ -1606,7 +1665,8 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         } else if (p_stream->fmt.i_cat == SPU_ES) {
             if(b_mov &&
                (p_stream->fmt.i_codec == VLC_CODEC_SUBT||
-                p_stream->fmt.i_codec == VLC_CODEC_TX3G))
+                p_stream->fmt.i_codec == VLC_CODEC_TX3G||
+                p_stream->fmt.i_codec == VLC_CODEC_QTXT))
             {
                 bo_t *gmin = box_full_new("gmin", 0, 1);
                 if(gmin)
@@ -1788,6 +1848,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
         break;
+    case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
         break;
     default:
