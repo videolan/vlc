@@ -370,19 +370,23 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             while( i_cur_record++ < i_nbrecords && it.i_payload >= 12 )
             {
                 uint16_t i_start = __MIN( GetWBE(it.p_payload), i_psz_bytelength - 1 );
-                uint16_t i_end =  __MIN( GetWBE(it.p_payload + 2), i_psz_bytelength - 1 );
-
-                text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
-                if( p_style )
+                uint16_t i_end =  GetWBE(it.p_payload + 2); /* index is past last char */
+                if( i_start < i_end )
                 {
-                    if( (p_style->i_style_flags = ConvertFlags( it.p_payload[6] )) )
-                        p_style->i_features |= STYLE_HAS_FLAGS;
-                    p_style->i_font_size = it.p_payload[7];
-                    p_style->i_font_color = GetDWBE(&it.p_payload[8]) >> 8;// RGBA -> RGB
-                    p_style->i_font_alpha = GetDWBE(&it.p_payload[8]) & 0xFF;
-                    p_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
-                    ApplySegmentStyle( &p_segment3g, i_start, i_end, p_style );
-                    text_style_Delete( p_style );
+                    i_end = VLC_CLIP( i_end - 1, i_start, i_psz_bytelength - 1 );
+
+                    text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
+                    if( p_style )
+                    {
+                        if( (p_style->i_style_flags = ConvertFlags( it.p_payload[6] )) )
+                            p_style->i_features |= STYLE_HAS_FLAGS;
+                        p_style->i_font_size = it.p_payload[7];
+                        p_style->i_font_color = GetDWBE(&it.p_payload[8]) >> 8;// RGBA -> RGB
+                        p_style->i_font_alpha = GetDWBE(&it.p_payload[8]) & 0xFF;
+                        p_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
+                        ApplySegmentStyle( &p_segment3g, i_start, i_end, p_style );
+                        text_style_Delete( p_style );
+                    }
                 }
 
                 it.p_payload += 12; it.i_payload -= 12;
