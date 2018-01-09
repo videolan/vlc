@@ -353,6 +353,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     mp4_box_iterator_Init( &it, p_buf,
                            p_block->i_buffer - (p_buf - p_block->p_buffer) );
     /* Parse our styles */
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_QTXT )
     while( mp4_box_iterator_Next( &it ) )
     {
         switch( it.i_type )
@@ -436,7 +437,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 /*****************************************************************************
  * Extradata Parsing
  *****************************************************************************/
-static void ParseExtradata( decoder_t *p_dec )
+static void ParseExtradataTx3g( decoder_t *p_dec )
 {
     text_style_t *p_style = (text_style_t *) p_dec->p_sys;
     const uint8_t *p_extra = p_dec->fmt_in.p_extra;
@@ -466,6 +467,41 @@ static void ParseExtradata( decoder_t *p_dec )
     /* FontTableBox @30 */
 }
 
+static void ParseExtradataTextMedia( decoder_t *p_dec )
+{
+    text_style_t *p_style = (text_style_t *) p_dec->p_sys;
+    const uint8_t *p_extra = p_dec->fmt_in.p_extra;
+
+    if( p_dec->fmt_in.i_extra < 44 )
+        return;
+
+    /* DF @0 */
+    /* Just @4 */
+
+    /* BGColor @8, read top of 16 bits */
+    p_style->i_background_color = (p_extra[8]  << 16) |
+                                  (p_extra[10] <<  8) |
+                                   p_extra[12];
+    p_style->i_features |= STYLE_HAS_BACKGROUND_COLOR;
+
+    /* BoxRecord @14 */
+    /* Reserved 64 @22 */
+    /* Font # @30 */
+
+    /* Font Face @32 */
+    p_style->i_style_flags = ConvertFlags( GetWBE(&p_extra[32]) );
+    if( p_style->i_style_flags )
+        p_style->i_features |= STYLE_HAS_FLAGS;
+    /* Reserved 8 @34 */
+    /* Reserved 16 @35 */
+    /* FGColor @37 */
+    p_style->i_font_color = (p_extra[37] << 16) |
+                            (p_extra[39] <<  8) |
+                             p_extra[41];
+    p_style->i_features |= STYLE_HAS_FONT_COLOR;
+
+    /* FontName Pascal (8 + string) @43 */
+}
 /*****************************************************************************
  * Close: clean decoder
  *****************************************************************************/
@@ -482,7 +518,8 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_TX3G )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TX3G &&
+        p_dec->fmt_in.i_codec != VLC_CODEC_QTXT )
         return VLC_EGENERIC;
 
     p_dec->pf_decode = Decode;
@@ -491,7 +528,10 @@ static int Open( vlc_object_t *p_this )
     if( !p_dec->p_sys )
         return VLC_ENOMEM;
 
-    ParseExtradata( p_dec );
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_TX3G )
+        ParseExtradataTx3g( p_dec );
+    else
+        ParseExtradataTextMedia( p_dec );
 
     p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
