@@ -147,9 +147,9 @@ static void SegmentDoSplit( tx3g_segment_t *p_segment, uint16_t i_start, uint16_
         p_segment_left->i_size = str8len( p_segment_left->s->psz_text );
     }
 
-    char* psz_text = str8indup( p_segment->s->psz_text, i_start, i_end - i_start + 1 );
-    p_segment_middle = tx3g_segment_New( psz_text );
-    free( psz_text );
+    char* psz_midtext = str8indup( p_segment->s->psz_text, i_start, i_end - i_start + 1 );
+    p_segment_middle = tx3g_segment_New( psz_midtext );
+    free( psz_midtext );
     if ( !p_segment_middle ) goto error;
     p_segment_middle->s->style = text_style_Duplicate( p_segment->s->style );
     p_segment_middle->i_size = str8len( p_segment_middle->s->psz_text );
