@@ -3,18 +3,18 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2018
 # Michał Ryszard Balicki <balicki93@gmail.com>, 2015
 # Grzegorz Pruchniakowski <gootector@o2.pl>, 2013-2017
 # Daniel Krawczyk <daniekonepl@gmail.com>, 2014
 # Marcin Szymański <cysioland@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
-"PO-Revision-Date: 2017-12-11 20:10+0100\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-01-08 22:35+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1224,25 +1224,21 @@ msgid "Projection"
 msgstr "Projekcja"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Odchylenie"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Wysokość"
+msgstr "Pochylenie"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "Przechylenie"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Pole widzenia"
@@ -4225,7 +4221,7 @@ msgid ""
 "(pitch)."
 msgstr ""
 "Wybierz klawisz dla nawigacji selektora w górę w menu DVD/Przenieś punkt "
-"widzenia w górę (wysokość)."
+"widzenia w górę (pochylenie)."
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
@@ -4237,7 +4233,7 @@ msgid ""
 "down (pitch)."
 msgstr ""
 "Wybierz klawisz dla nawigacji selektora w dół w menu DVD/Przenieś punkt "
-"widzenia w dół (wysokość)."
+"widzenia w dół (pochylenie)."
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
@@ -25131,13 +25127,12 @@ msgstr "Ustawia typ treści MIME dla multimediów wysłanych do Chromecasta."
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Opcje wydajności"
+msgstr "Ostrzeżenie wydajności"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Wyświetl ostrzeżenie o wydajności podczas transkodowania"
 
 #: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
@@ -25160,15 +25155,16 @@ msgid "Chromecast stream output"
 msgstr "Wyjście strumienia Chromecasta"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Nie pytaj ponownie"
+msgstr "Nie ostrzegaj mnie ponownie"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Transmisja tego filmu wymaga konwersji. Ta konwersja może zużyć całą "
+"dostępną energię i szybciej wyczerpać baterię."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
@@ -28006,11 +28002,11 @@ msgstr "Wysokość bufora pamięci wideo."
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
-msgstr "Wysokość"
+msgstr "Poziom"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
-msgstr "Rozmiar buforu pamięci tonacji w bajtach."
+msgstr "Poziom bufora pamięci wideo w bajtach."
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
