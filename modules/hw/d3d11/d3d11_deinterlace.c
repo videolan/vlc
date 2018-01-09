@@ -546,6 +546,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     return VLC_SUCCESS;
 error:
+    if (sys->processorOutput)
+        ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
     if (sys->outTexture)
         ID3D11Texture2D_Release(sys->outTexture);
     if (sys->videoProcessor)
