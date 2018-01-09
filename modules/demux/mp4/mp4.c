@@ -126,6 +126,7 @@ struct demux_sys_t
 #define DEMUX_TRACK_MAX_PRELOAD (CLOCK_FREQ * 15) /* maximum preloading, to deal with interleaving */
 
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)
+#define VLC_DEMUXER_FATAL (VLC_DEMUXER_EGENERIC - 2)
 
 const uint32_t rgi_pict_atoms[2] = { ATOM_PICT, ATOM_pict };
 const char *psz_meta_roots[] = { "/moov/udta/meta/ilst",
@@ -4292,7 +4293,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
         {
             if( p_block )
                 block_Release( p_block );
-            return VLC_DEMUXER_EOF;
+            return VLC_DEMUXER_FATAL;
         }
 
 #if 0
@@ -4394,6 +4395,8 @@ static int DemuxMoof( demux_t *p_demux )
 
             if( i_ret == VLC_DEMUXER_SUCCESS )
                 i_status = VLC_DEMUXER_SUCCESS;
+            else if( i_ret == VLC_DEMUXER_FATAL )
+                i_status = VLC_DEMUXER_EOF;
         }
 
         if( i_status != VLC_DEMUXER_SUCCESS || !tk )
