@@ -68,7 +68,7 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
     assert(quad->resourceCount <= D3D11_MAX_SHADER_VIEW);
     ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
 
-    ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport);
+    ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport[0]);
 
     ID3D11DeviceContext_DrawIndexed(d3d_dev->d3dcontext, quad->indexCount, 0, 0);
 }
@@ -779,8 +779,11 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     if (!D3D11_UpdateQuadPosition(o, d3d_dev, quad, output, orientation))
         goto error;
 
-    quad->cropViewport.MinDepth = 0.0f;
-    quad->cropViewport.MaxDepth = 1.0f;
+    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    {
+        quad->cropViewport[i].MinDepth = 0.0f;
+        quad->cropViewport[i].MaxDepth = 1.0f;
+    }
     quad->d3dvertexShader = d3dvertexShader;
     quad->pVertexLayout   = pVertexLayout;
     quad->resourceCount = DxgiResourceCount(quad->formatInfo);
@@ -794,8 +797,8 @@ error:
 
 void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect)
 {
-    quad->cropViewport.TopLeftX = rect->left;
-    quad->cropViewport.TopLeftY = rect->top;
-    quad->cropViewport.Width    = rect->right  - rect->left;
-    quad->cropViewport.Height   = rect->bottom - rect->top;
+    quad->cropViewport[0].TopLeftX = rect->left;
+    quad->cropViewport[0].TopLeftY = rect->top;
+    quad->cropViewport[0].Width    = rect->right  - rect->left;
+    quad->cropViewport[0].Height   = rect->bottom - rect->top;
 }

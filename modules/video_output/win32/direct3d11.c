@@ -1396,7 +1396,9 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     SetQuadVSProjection(vd, &sys->picQuad, &vd->cfg->viewpoint);
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "picQuad position (%.02f,%.02f) %.02fx%.02f", sys->picQuad.cropViewport.TopLeftX, sys->picQuad.cropViewport.TopLeftY, sys->picQuad.cropViewport.Width, sys->picQuad.cropViewport.Height );
+    msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
+             sys->picQuad.cropViewport[0].TopLeftX, sys->picQuad.cropViewport[0].TopLeftY,
+             sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
 #endif
 }
 

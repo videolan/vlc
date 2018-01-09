@@ -45,7 +45,7 @@ typedef struct
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader;
     ID3D11InputLayout         *pVertexLayout;
-    D3D11_VIEWPORT            cropViewport;
+    D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
     unsigned int              i_width;
     unsigned int              i_height;
     video_projection_mode_t   projection;
