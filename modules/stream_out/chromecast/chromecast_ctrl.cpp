@@ -381,7 +381,8 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
                 break;
             // else: fall through and warn
         default:
-            msg_Warn( m_module, "Unexpected RECEIVER_STATUS with state %d", m_state );
+            msg_Warn( m_module, "Unexpected RECEIVER_STATUS with state %s",
+                      StateToStr( m_state ) );
             break;
         }
     }
