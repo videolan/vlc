@@ -1218,7 +1218,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
     return VLC_SUCCESS;
 }
 
-static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
+static void StopVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1244,15 +1244,11 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
             p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_visible_height = 64;
             (void) decoder_UpdateVideoFormat(p_dec);
             p_dec->fmt_out.video = orig;
-            b_reset_format = true;
         }
 #endif
 
-        if (b_reset_format)
-        {
-            p_sys->b_format_propagated = false;
-            p_dec->fmt_out.i_codec = 0;
-        }
+        p_sys->b_format_propagated = false;
+        p_dec->fmt_out.i_codec = 0;
     }
 
     if (p_sys->videoFormatDescription != nil) {
@@ -1403,7 +1399,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    StopVideoToolbox(p_dec, true);
+    StopVideoToolbox(p_dec);
 
     if(p_sys->pf_codec_clean)
         p_sys->pf_codec_clean(p_dec);
@@ -1784,7 +1780,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         vlc_mutex_unlock(&p_sys->lock);
 
         /* Session will be started by Late Start code block */
-        StopVideoToolbox(p_dec, true);
+        StopVideoToolbox(p_dec);
 
         vlc_mutex_lock(&p_sys->lock);
         p_sys->vtsession_status = VTSESSION_STATUS_OK;
@@ -1834,7 +1830,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             msg_Dbg(p_dec, "parameters sets changed: draining decoder");
             Drain(p_dec, false);
             msg_Dbg(p_dec, "parameters sets changed: restarting decoder");
-            StopVideoToolbox(p_dec, true);
+            StopVideoToolbox(p_dec);
         }
 
         if(!p_sys->session)
