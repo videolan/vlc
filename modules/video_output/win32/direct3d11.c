@@ -102,7 +102,7 @@ struct vout_display_sys_t
 
     picture_sys_t            stagingSys;
 
-    ID3D11RenderTargetView   *d3drenderTargetView;
+    ID3D11RenderTargetView   *d3drenderTargetView[D3D11_MAX_SHADER_VIEW];
     ID3D11DepthStencilView   *d3ddepthStencilView;
 
     ID3D11InputLayout         *pVertexLayout;
@@ -486,9 +486,9 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     uint32_t i_height = RECTHeight(rect);
     D3D11_TEXTURE2D_DESC dsc = { 0 };
 
-    if (sys->d3drenderTargetView) {
+    if (sys->d3drenderTargetView[0]) {
         ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource(sys->d3drenderTargetView, &res);
+        ID3D11RenderTargetView_GetResource(sys->d3drenderTargetView[0], &res);
         if (res)
         {
             ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
@@ -499,9 +499,12 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     if (dsc.Width == i_width && dsc.Height == i_height)
         return S_OK; /* nothing changed */
 
-    if (sys->d3drenderTargetView) {
-        ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
-        sys->d3drenderTargetView = NULL;
+    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
+    {
+        if (sys->d3drenderTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
+            sys->d3drenderTargetView[i] = NULL;
+        }
     }
     if (sys->d3ddepthStencilView) {
         ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
@@ -522,12 +525,15 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
        return hr;
     }
 
-    hr = ID3D11Device_CreateRenderTargetView(sys->d3d_dev.d3ddevice, (ID3D11Resource *)pBackBuffer, NULL, &sys->d3drenderTargetView);
+    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
+                                    sys->display.pixelFormat, sys->d3drenderTargetView );
     ID3D11Texture2D_Release(pBackBuffer);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
         return hr;
     }
+
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->d3drenderTargetView );
 
     D3D11_TEXTURE2D_DESC deptTexDesc;
     memset(&deptTexDesc, 0,sizeof(deptTexDesc));
@@ -904,6 +910,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         sys->d3dregions      = subpicture_regions;
     }
 
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->d3drenderTargetView );
+
     if (picture->format.mastering.max_luminance)
     {
         D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
@@ -926,9 +934,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
         }
     }
-
-    FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    ID3D11DeviceContext_ClearRenderTargetView(sys->d3d_dev.d3dcontext, sys->d3drenderTargetView, blackRGBA);
 
     /* no ID3D11Device operations should come here */
 
@@ -1679,10 +1684,12 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
         ID3D11VertexShader_Release(sys->projectionVSShader);
         sys->projectionVSShader = NULL;
     }
-    if (sys->d3drenderTargetView)
+    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
     {
-        ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
-        sys->d3drenderTargetView = NULL;
+        if (sys->d3drenderTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
+            sys->d3drenderTargetView[i] = NULL;
+        }
     }
     if (sys->d3ddepthStencilView)
     {
