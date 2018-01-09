@@ -530,6 +530,7 @@
 #define VLC_CODEC_USF       VLC_FOURCC('u','s','f',' ')
 #define VLC_CODEC_OGT       VLC_FOURCC('o','g','t',' ')
 #define VLC_CODEC_CVD       VLC_FOURCC('c','v','d',' ')
+#define VLC_CODEC_QTXT      VLC_FOURCC('q','t','x','t')
 #define VLC_CODEC_TX3G      VLC_FOURCC('t','x','3','g')
 #define VLC_CODEC_ARIB_A    VLC_FOURCC('a','r','b','a')
 #define VLC_CODEC_ARIB_C    VLC_FOURCC('a','r','b','c')

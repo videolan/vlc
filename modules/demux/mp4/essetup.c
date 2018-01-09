@@ -1272,7 +1272,10 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             if(!p_text)
                 return 0;
 
-            p_track->fmt.i_codec = VLC_CODEC_TX3G;
+            if( p_sample->i_type == VLC_FOURCC( 't', 'e', 'x', 't' ) )
+                p_track->fmt.i_codec = VLC_CODEC_QTXT;
+            else
+                p_track->fmt.i_codec = VLC_CODEC_TX3G;
 
             if( GetDWBE(p_text->p_data) & 0xC0000000 )
             {
