@@ -1719,11 +1719,8 @@ static void RequestFlush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* There is no Flush in VT api, ask to restart VT from next DecodeBlock if
-     * we already feed some input blocks (it's better to not restart here in
-     * order to avoid useless restart just before a close). */
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_vt_flush = p_sys->b_vt_feed;
+    p_sys->b_vt_flush = true;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1737,7 +1734,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     DrainDPBLocked(p_dec, flush);
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (p_sys->session)
+    if (p_sys->session && p_sys->b_vt_feed)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
