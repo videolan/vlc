@@ -13,18 +13,18 @@
 # Martin Böh <martin-boeh@outlook.com>, 2013
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006
 # Michael <inactive+banescar@transifex.com>, 2013
-# Michał Trzebiatowski <michtrz@gmail.com>, 2010-2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2010-2018
 # Philipp Weissenbacher <philippweissenbacher _at_ aon.at>, 2004
 # thillux, 2013
 # Thomas Graf <tgr at reeler.org>, 2002
 # Tobias Bannert <tobannert@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
-"PO-Revision-Date: 2017-11-15 18:51+0100\n"
-"Last-Translator: ePirat <epirat07@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-01-08 23:07+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -1233,25 +1233,21 @@ msgid "Projection"
 msgstr "Projektion"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "Gier"
+msgstr "Gierwinkel"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Nick"
+msgstr "Nickwinkel"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "Roll"
+msgstr "Rollwinkel"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Sichtfeld"
@@ -4294,7 +4290,7 @@ msgid ""
 "(pitch)."
 msgstr ""
 "Wählen Sie den Hotkey, um die Auswahl in DVD-Menüs nach oben zu bewegen/den "
-"Blickpunkt nach oben zu bewegen (Pitch)."
+"Blickpunkt nach oben zu bewegen (Nickwinkel)."
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
@@ -4306,7 +4302,7 @@ msgid ""
 "down (pitch)."
 msgstr ""
 "Wählen Sie den Hotkey, um die Auswahl in DVD-Menüs nach unten zu bewegen/den "
-"Blickpunkt nach unten zu bewegen (Pitch)."
+"Blickpunkt nach unten zu bewegen (Nickwinkel)."
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
@@ -4318,7 +4314,7 @@ msgid ""
 "left (yaw)."
 msgstr ""
 "Wählen Sie den Hotkey, um die Auswahl in DVD-Menüs nach links zu bewegen/den "
-"Blickpunkt nach links zu bewegen (Yaw)."
+"Blickpunkt nach links zu bewegen (Gierwinkel)."
 
 #: src/libvlc-module.c:1295
 msgid "Navigate right"
@@ -4330,7 +4326,7 @@ msgid ""
 "right (yaw)."
 msgstr ""
 "Wählen Sie den Hotkey, um die Auswahl in DVD-Menüs nach rechts zu bewegen/"
-"den Blickpunkt nach rechts zu bewegen (Yaw)."
+"den Blickpunkt nach rechts zu bewegen (Gierwinkel)."
 
 #: src/libvlc-module.c:1297
 msgid "Activate"
@@ -25345,13 +25341,12 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Performanceoptionen"
+msgstr "Leistungswarnung"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Eine Leistungswarnung beim Transkodieren anzeigen"
 
 #: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
@@ -25374,15 +25369,16 @@ msgid "Chromecast stream output"
 msgstr "Chromecast-Streamausgabe"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Softwareverstärker"
+msgstr "Ok, mich nicht mehr warnen"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Vor dem Senden, muss das Video umgewandelt werden. Diese Umwandlung konnte "
+"die gesamte verfügbare Energie verbrauchen und den Akku schneller entleeren."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
@@ -28249,11 +28245,11 @@ msgstr "Videospeicher Pufferhöhe."
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
-msgstr "Nick"
+msgstr "Abstand"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
-msgstr "Video-Speicherpuffer Pitch in Bytes"
+msgstr "Videospeicher-Pufferabstand in Bytes."
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
