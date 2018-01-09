@@ -779,6 +779,8 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     if (!D3D11_UpdateQuadPosition(o, d3d_dev, quad, output, orientation))
         goto error;
 
+    quad->cropViewport.MinDepth = 0.0f;
+    quad->cropViewport.MaxDepth = 1.0f;
     quad->d3dvertexShader = d3dvertexShader;
     quad->pVertexLayout   = pVertexLayout;
     quad->resourceCount = DxgiResourceCount(quad->formatInfo);
@@ -788,4 +790,12 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 error:
     D3D11_ReleaseQuad(quad);
     return VLC_EGENERIC;
+}
+
+void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect)
+{
+    quad->cropViewport.TopLeftX = rect->left;
+    quad->cropViewport.TopLeftY = rect->top;
+    quad->cropViewport.Width    = rect->right  - rect->left;
+    quad->cropViewport.Height   = rect->bottom - rect->top;
 }
