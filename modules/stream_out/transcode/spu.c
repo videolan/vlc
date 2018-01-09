@@ -176,6 +176,20 @@ int transcode_spu_process( sout_stream_t *p_stream,
         {
             block_t *p_block;
 
+            es_format_t fmt;
+            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_TEXT );
+
+            fmt.video.i_sar_num =
+            fmt.video.i_visible_width =
+            fmt.video.i_width = p_sys->i_spu_width;
+
+            fmt.video.i_sar_den =
+            fmt.video.i_visible_height =
+            fmt.video.i_height = p_sys->i_spu_height;
+
+            subpicture_Update( p_subpic, &fmt.video, &fmt.video, p_subpic->i_start );
+            es_format_Clean( &fmt );
+
             p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
             subpicture_Delete( p_subpic );
             if( p_block )

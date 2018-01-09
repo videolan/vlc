@@ -364,6 +364,12 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
             id->p_encoder->fmt_in.video.i_sar_den;
     }
 
+    if( p_fmt_out )
+    {
+        p_stream->p_sys->i_spu_width = p_fmt_out->video.i_visible_width;
+        p_stream->p_sys->i_spu_height = p_fmt_out->video.i_visible_height;
+    }
+
     /* Keep colorspace etc info along */
     id->p_encoder->fmt_in.video.space     = id->p_decoder->fmt_out.video.space;
     id->p_encoder->fmt_in.video.transfer  = id->p_decoder->fmt_out.video.transfer;

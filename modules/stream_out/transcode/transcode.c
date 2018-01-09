@@ -409,6 +409,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->b_soverlay = var_GetBool( p_stream, SOUT_CFG_PREFIX "soverlay" );
+    /* Set default size for TEXT spu non overlay conversion / updater */
+    p_sys->i_spu_width = (p_sys->i_width) ? p_sys->i_width : 1280;
+    p_sys->i_spu_height = (p_sys->i_height) ? p_sys->i_height : 720;
 
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
     if( psz_string && *psz_string )

@@ -61,6 +61,8 @@ struct sout_stream_sys_t
     config_chain_t  *p_spu_cfg;
     spu_t           *p_spu;
     filter_t        *p_spu_blend;
+    unsigned int     i_spu_width; /* render width */
+    unsigned int     i_spu_height;
 
     /* Sync */
     bool            b_master_sync;
