@@ -93,4 +93,7 @@ float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
                                   ID3D11RenderTargetView *output[D3D11_MAX_SHADER_VIEW]);
 
+void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
+                              ID3D11RenderTargetView *targets[D3D11_MAX_SHADER_VIEW]);
+
 #endif /* VLC_D3D11_SHADERS_H */
