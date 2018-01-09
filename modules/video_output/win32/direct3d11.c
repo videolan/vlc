@@ -103,7 +103,6 @@ struct vout_display_sys_t
     picture_sys_t            stagingSys;
 
     ID3D11RenderTargetView   *d3drenderTargetView[D3D11_MAX_SHADER_VIEW];
-    ID3D11DepthStencilView   *d3ddepthStencilView;
 
     ID3D11InputLayout         *pVertexLayout;
     ID3D11VertexShader        *flatVSShader;
@@ -475,7 +474,6 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
-    ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
     RECT rect;
 #if VLC_WINSTORE_APP
@@ -506,10 +504,6 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
             sys->d3drenderTargetView[i] = NULL;
         }
     }
-    if (sys->d3ddepthStencilView) {
-        ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
-        sys->d3ddepthStencilView = NULL;
-    }
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
     hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
@@ -534,41 +528,6 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     }
 
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->d3drenderTargetView );
-
-    D3D11_TEXTURE2D_DESC deptTexDesc;
-    memset(&deptTexDesc, 0,sizeof(deptTexDesc));
-    deptTexDesc.ArraySize = 1;
-    deptTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    deptTexDesc.CPUAccessFlags = 0;
-    deptTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    deptTexDesc.Width = i_width;
-    deptTexDesc.Height = i_height;
-    deptTexDesc.MipLevels = 1;
-    deptTexDesc.MiscFlags = 0;
-    deptTexDesc.SampleDesc.Count = 1;
-    deptTexDesc.SampleDesc.Quality = 0;
-    deptTexDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    hr = ID3D11Device_CreateTexture2D(sys->d3d_dev.d3ddevice, &deptTexDesc, NULL, &pDepthStencil);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the depth stencil texture. (hr=0x%lX)", hr);
-       return hr;
-    }
-
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc;
-    memset(&depthViewDesc, 0, sizeof(depthViewDesc));
-
-    depthViewDesc.Format = deptTexDesc.Format;
-    depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    depthViewDesc.Texture2D.MipSlice = 0;
-
-    hr = ID3D11Device_CreateDepthStencilView(sys->d3d_dev.d3ddevice, (ID3D11Resource *)pDepthStencil, &depthViewDesc, &sys->d3ddepthStencilView);
-    ID3D11Texture2D_Release(pDepthStencil);
-
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the depth stencil view. (hr=0x%lX)", hr);
-       return hr;
-    }
 
     return S_OK;
 }
@@ -934,10 +893,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
         }
     }
-
-    /* no ID3D11Device operations should come here */
-
-    ID3D11DeviceContext_ClearDepthStencilView(sys->d3d_dev.d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     /* Render the quad */
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
@@ -1686,11 +1641,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
             ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
             sys->d3drenderTargetView[i] = NULL;
         }
-    }
-    if (sys->d3ddepthStencilView)
-    {
-        ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
-        sys->d3ddepthStencilView = NULL;
     }
     if (sys->pSPUPixelShader)
     {
