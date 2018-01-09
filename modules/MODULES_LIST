@@ -394,7 +394,7 @@ $Id$
  * stream_out_transcode: audio & video transcoder
  * subsdec: a codec to output textual subtitles
  * subsdelay: subtitles delay filter
- * substx3g: tx3g styled subtitles decoder
+ * substx3g: tx3g styled subtitles encoder and decoder
  * subsusf: a demuxer for USF subtitles
  * subtitle: a demuxer for subtitle files
  * svcdsub: SVCD subtitles decoder

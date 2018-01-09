@@ -34,9 +34,13 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static int Open ( vlc_object_t * );
-static void Close ( vlc_object_t * );
+static int OpenDecoder ( vlc_object_t * );
+static void CloseDecoder ( vlc_object_t * );
 static int Decode( decoder_t *, block_t * );
+#ifdef ENABLE_SOUT
+static int OpenEncoder ( vlc_object_t * );
+static block_t * Encode( encoder_t *, subpicture_t * );
+#endif
 
 vlc_module_begin ()
     set_description( N_("tx3g subtitles decoder") )
@@ -44,7 +48,14 @@ vlc_module_begin ()
     set_capability( "spu decoder", 100 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    set_callbacks( Open, Close )
+    set_callbacks( OpenDecoder, CloseDecoder )
+#ifdef ENABLE_SOUT
+    add_submodule ()
+        set_description( N_("tx3g subtitles encoder") )
+        set_shortname( N_("tx3g subtitles encoder") )
+        set_capability( "encoder", 101 )
+        set_callbacks( OpenEncoder, NULL )
+#endif
 vlc_module_end ()
 
 /****************************************************************************
@@ -59,7 +70,7 @@ vlc_module_end ()
 #define FONT_FACE_ITALIC    0x2
 #define FONT_FACE_UNDERLINE 0x4
 
-static int ConvertFlags( int i_atomflags )
+static int ConvertToVLCFlags( int i_atomflags )
 {
     int i_vlcstyles_flags = 0;
     if ( i_atomflags & FONT_FACE_BOLD )
@@ -379,7 +390,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                     text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
                     if( p_style )
                     {
-                        if( (p_style->i_style_flags = ConvertFlags( it.p_payload[6] )) )
+                        if( (p_style->i_style_flags = ConvertToVLCFlags( it.p_payload[6] )) )
                             p_style->i_features |= STYLE_HAS_FLAGS;
                         p_style->i_font_size = it.p_payload[7];
                         p_style->i_font_color = GetDWBE(&it.p_payload[8]) >> 8;// RGBA -> RGB
@@ -456,7 +467,7 @@ static void ParseExtradataTx3g( decoder_t *p_dec )
     /* BoxRecord @10 */
 
     /* StyleRecord @18 */
-    p_style->i_style_flags = ConvertFlags( p_extra[24] );
+    p_style->i_style_flags = ConvertToVLCFlags( p_extra[24] );
     if( p_style->i_style_flags )
         p_style->i_features |= STYLE_HAS_FLAGS;
     p_style->i_font_size = p_extra[25];
@@ -489,7 +500,7 @@ static void ParseExtradataTextMedia( decoder_t *p_dec )
     /* Font # @30 */
 
     /* Font Face @32 */
-    p_style->i_style_flags = ConvertFlags( GetWBE(&p_extra[32]) );
+    p_style->i_style_flags = ConvertToVLCFlags( GetWBE(&p_extra[32]) );
     if( p_style->i_style_flags )
         p_style->i_features |= STYLE_HAS_FLAGS;
     /* Reserved 8 @34 */
@@ -503,18 +514,15 @@ static void ParseExtradataTextMedia( decoder_t *p_dec )
     /* FontName Pascal (8 + string) @43 */
 }
 /*****************************************************************************
- * Close: clean decoder
+ * Decoder entry/exit points
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
     text_style_Delete( (text_style_t *) p_dec->p_sys );
 }
 
-/*****************************************************************************
- * Open: probe the decoder and return score
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
 
@@ -537,3 +545,175 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Encoder entry/exit
+ *****************************************************************************/
+#ifdef ENABLE_SOUT
+static void FillExtradataTx3g( void **pp_extra, int *pi_extra )
+{
+    size_t i_extra = 32 + 37;
+    uint8_t *p_extra = calloc( 1, i_extra );
+    if( p_extra )
+    {
+        SetDWBE( &p_extra[6],  0x000000FFU ); /* bgcolor */
+        p_extra[25] = STYLE_DEFAULT_FONT_SIZE;
+        SetDWBE( &p_extra[26], 0xFFFFFFFFU ); /* fgcolor */
+
+        /* FontTableBox */
+        SetDWBE(&p_extra[32], 8 + 2 + 6 + 11 + 10);
+        memcpy(&p_extra[36], "ftab", 4);
+
+        SetWBE(&p_extra[40], 3); /* entry count */
+        /* Font Record 0 */
+        p_extra[41] = 5;
+        memcpy(&p_extra[42], "Serif", 5);
+        /* Font Record 1 */
+        p_extra[47] = 10;
+        memcpy(&p_extra[48], "Sans-serif", 10);
+        /* Font Record 2 */
+        p_extra[58] = 9;
+        memcpy(&p_extra[59], "Monospace", 9);
+
+        *pp_extra = p_extra;
+        *pi_extra = i_extra;
+    }
+}
+
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_TX3G )
+        return VLC_EGENERIC;
+
+    p_enc->fmt_in.i_codec = VLC_CODEC_TEXT;
+
+    p_enc->p_sys = NULL;
+
+    p_enc->pf_encode_sub = Encode;
+    p_enc->fmt_out.i_cat = SPU_ES;
+
+    if( !p_enc->fmt_out.i_extra )
+        FillExtradataTx3g( &p_enc->fmt_out.p_extra, &p_enc->fmt_out.i_extra );
+
+    return VLC_SUCCESS;
+}
+
+static int ConvertFromVLCFlags( const text_style_t *p_style )
+{
+    int i_atomflags = 0;
+    if( p_style->i_features & STYLE_HAS_FLAGS )
+    {
+        if ( p_style->i_style_flags & STYLE_BOLD )
+            i_atomflags |= FONT_FACE_BOLD;
+        if ( p_style->i_style_flags & STYLE_ITALIC )
+            i_atomflags |= FONT_FACE_ITALIC;
+        if ( p_style->i_style_flags & STYLE_UNDERLINE )
+            i_atomflags |= FONT_FACE_UNDERLINE;
+    }
+    return i_atomflags;
+}
+
+static uint32_t ConvertFromVLCColor( const text_style_t *p_style )
+{
+    uint32_t rgba = 0;
+    if( p_style->i_features & STYLE_HAS_FONT_COLOR )
+        rgba = ((uint32_t)p_style->i_font_color) << 8;
+    else
+        rgba = 0xFFFFFF00U;
+    if( p_style->i_features & STYLE_HAS_FONT_ALPHA )
+        rgba |= p_style->i_font_alpha;
+    else
+        rgba |= 0xFF;
+    return rgba;
+}
+
+static bool NeedStyling( const text_segment_t *p_segment )
+{
+    const text_style_t *p_style = p_segment->style;
+    if( !p_style )
+        return false;
+
+    if( p_style->i_features & STYLE_HAS_FLAGS )
+    {
+        if( p_style->i_style_flags & (STYLE_BOLD|STYLE_ITALIC|STYLE_UNDERLINE) )
+            return true;
+    }
+
+    if( p_style->i_features & (STYLE_HAS_FONT_COLOR|STYLE_HAS_FONT_ALPHA) )
+        return true;
+
+    return false;
+}
+
+static block_t *GetStylBlock( const text_segment_t *p_segment, size_t i_styles )
+{
+    size_t i_start = 0;
+    block_t *p_styl = block_Alloc( 10 + 12 * i_styles );
+    if( p_styl )
+    {
+        SetDWBE( p_styl->p_buffer, p_styl->i_buffer );
+        memcpy( &p_styl->p_buffer[4], "styl", 4 );
+        SetWBE( &p_styl->p_buffer[8], i_styles );
+        p_styl->i_buffer = 10;
+        for( ; p_segment; p_segment = p_segment->p_next )
+        {
+            size_t i_len = str8len( p_segment->psz_text );
+            if( NeedStyling( p_segment ) )
+            {
+                uint8_t *p = &p_styl->p_buffer[p_styl->i_buffer];
+                SetWBE( &p[0], i_start );
+                SetWBE( &p[2], i_start + i_len );
+                SetWBE( &p[4], 0 );
+                p[6] = ConvertFromVLCFlags( p_segment->style );
+                p[7] = STYLE_DEFAULT_FONT_SIZE;
+                SetDWBE(&p[8], ConvertFromVLCColor( p_segment->style ) );
+                p_styl->i_buffer += 12;
+            }
+            i_start += i_len;
+        }
+    }
+    return p_styl;
+}
+
+static block_t * Encode( encoder_t *p_enc, subpicture_t *p_spu )
+{
+    VLC_UNUSED(p_enc);
+    const text_segment_t *p_segments = (p_spu->p_region)
+                                     ? p_spu->p_region->p_text
+                                     : NULL;
+    size_t i_len = 0;
+    size_t i_styles = 0;
+
+    for(const text_segment_t  *p_segment = p_segments;
+                               p_segment; p_segment = p_segment->p_next )
+    {
+        if( p_segment->style )
+            i_styles++;
+        i_len += strlen( p_segment->psz_text );
+    }
+
+    block_t *p_block = block_Alloc( i_len + 2 );
+    if( p_block )
+    {
+        SetWBE(p_block->p_buffer, i_len);
+        p_block->i_buffer = 2;
+        for(const text_segment_t  *p_segment = p_segments;
+                                   p_segment; p_segment = p_segment->p_next )
+        {
+            size_t i_seglen = strlen(p_segment->psz_text);
+            memcpy(&p_block->p_buffer[p_block->i_buffer],
+                    p_segment->psz_text, i_seglen);
+            p_block->i_buffer += i_seglen;
+        }
+        p_block->i_dts = p_block->i_pts = p_spu->i_start;
+        p_block->i_length = p_spu->i_stop - p_spu->i_start;
+
+        if( i_styles > 0 )
+            p_block->p_next = GetStylBlock( p_segments, i_styles );
+    }
+
+    return block_ChainGather( p_block );
+}
+#endif
