@@ -113,6 +113,7 @@ struct decoder_sys_t
         {
             void *p_surface, *p_jsurface;
             unsigned i_angle;
+            unsigned i_input_width, i_input_height;
             unsigned int i_stride, i_slice_height;
             int i_pixel_format;
             struct hxxx_helper hh;
@@ -247,19 +248,19 @@ static int CSDDup(decoder_t *p_dec, const void *p_buf, size_t i_buf)
 
 static void HXXXInitSize(decoder_t *p_dec, bool *p_size_changed)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    struct hxxx_helper *hh = &p_sys->video.hh;
-    unsigned i_w, i_h, i_vw, i_vh;
-    hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
-
     if (p_size_changed)
-        *p_size_changed = (i_w != p_dec->fmt_out.video.i_width
-                        || i_h != p_dec->fmt_out.video.i_height);
+    {
+        decoder_sys_t *p_sys = p_dec->p_sys;
+        struct hxxx_helper *hh = &p_sys->video.hh;
+        unsigned i_w, i_h, i_vw, i_vh;
+        hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh);
 
-    p_dec->fmt_out.video.i_visible_width =
-    p_dec->fmt_out.video.i_width = i_w;
-    p_dec->fmt_out.video.i_visible_height =
-    p_dec->fmt_out.video.i_height = i_h;
+        *p_size_changed = (i_w != p_sys->video.i_input_width
+                        || i_h != p_sys->video.i_input_height);
+        p_sys->video.i_input_width = i_w;
+        p_sys->video.i_input_height = i_h;
+        /* fmt_out video size will be updated by mediacodec output callback */
+    }
 }
 
 /* Fill the p_sys->p_csd struct with H264 Parameter Sets */
@@ -696,7 +697,9 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 p_sys->video.i_angle = 0;
 
             p_dec->fmt_out.video = p_dec->fmt_in.video;
+            p_sys->video.i_input_width =
             p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+            p_sys->video.i_input_height =
             p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
             if (UpdateVout(p_dec) != VLC_SUCCESS)
