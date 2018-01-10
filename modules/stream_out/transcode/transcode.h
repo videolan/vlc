@@ -79,7 +79,6 @@ struct sout_stream_id_sys_t
 
     /* Decoder */
     decoder_t       *p_decoder;
-    video_format_t video_dec_out; /* only rw from pf_vout_format_update() */
 
     struct
     {
@@ -108,6 +107,7 @@ struct sout_stream_id_sys_t
              filter_chain_t  *p_f_chain; /**< Video filters */
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
              video_format_t  fmt_input_video;
+             video_format_t  video_dec_out; /* only rw from pf_vout_format_update() */
          };
          struct
          {
