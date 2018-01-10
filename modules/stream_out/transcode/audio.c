@@ -200,12 +200,27 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
 
     vlc_mutex_lock(&id->fifo.lock);
+    /* The decoder fmt_out can be uninitialized here (since it can initialized
+     * asynchronously). Fix audio_dec_out with default values in that case.
+     * This should be enough to initialize the encoder for the first time (it
+     * will be reloaded when all informations from the decoder are available).
+     * */
     id->audio_dec_out = id->p_decoder->fmt_out.audio;
     id->audio_dec_out.i_format = id->p_decoder->fmt_out.i_codec;
+    if (id->audio_dec_out.i_format == 0)
+        id->audio_dec_out.i_format = VLC_CODEC_FL32;
     if (id->audio_dec_out.i_rate == 0)
+    {
         id->audio_dec_out.i_rate = id->p_decoder->fmt_in.audio.i_rate;
+        if (id->audio_dec_out.i_rate == 0)
+            id->audio_dec_out.i_rate = 48000;
+    }
     if (id->audio_dec_out.i_physical_channels == 0)
+    {
         id->audio_dec_out.i_physical_channels = id->p_decoder->fmt_in.audio.i_physical_channels;
+        if (id->audio_dec_out.i_physical_channels == 0)
+            id->audio_dec_out.i_physical_channels = AOUT_CHANS_STEREO;
+    }
     aout_FormatPrepare( &id->audio_dec_out );
 
     /*
