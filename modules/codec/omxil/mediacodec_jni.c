@@ -427,7 +427,8 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                                 case 0x1: /* OMX_VIDEO_HEVCProfileMain */
                                     codec_profile = HEVC_PROFILE_MAIN;
                                     break;
-                                case 0x2: /* OMX_VIDEO_HEVCProfileMain10 */
+                                case 0x2:    /* OMX_VIDEO_HEVCProfileMain10 */
+                                case 0x1000: /* OMX_VIDEO_HEVCProfileMain10HDR10 */
                                     codec_profile = HEVC_PROFILE_MAIN_10;
                                     break;
                             }
