@@ -49,6 +49,7 @@ struct sout_stream_sys_t
         , b_supports_video(has_video)
         , i_port(port)
         , es_changed( true )
+        , transcode_attempt_idx( 0 )
     {
         assert(p_intf != NULL);
     }
@@ -60,7 +61,8 @@ struct sout_stream_sys_t
     }
 
     bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
-    bool canDecodeAudio( vlc_fourcc_t i_codec ) const;
+    bool canDecodeAudio( vlc_fourcc_t i_codec,
+                         const audio_format_t* p_fmt ) const;
     bool startSoutChain(sout_stream_t* p_stream);
 
     sout_stream_t     *p_out;
@@ -76,15 +78,19 @@ struct sout_stream_sys_t
 
     bool                               es_changed;
     std::vector<sout_stream_id_sys_t*> streams;
+    bool                               stream_started;
+    unsigned int                       transcode_attempt_idx;
 
 private:
     bool UpdateOutput( sout_stream_t * );
+    vlc_fourcc_t transcodeAudioFourCC(const audio_format_t* p_fmt );
+
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 
-static const vlc_fourcc_t DEFAULT_TRANSCODE_AUDIO = VLC_CODEC_MP4A;
 static const vlc_fourcc_t DEFAULT_TRANSCODE_VIDEO = VLC_CODEC_H264;
+static const unsigned int MAX_TRANSCODE_PASS = 3;
 static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1}}}";
 
 
@@ -199,26 +205,55 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         sout_StreamChainDelete( p_sys->p_out, NULL );
         p_sys->p_out = NULL;
         p_sys->sout = "";
+        p_sys->stream_started = false;
+        p_sys->transcode_attempt_idx = 0;
     }
 }
 
+/**
+ * Transcode steps:
+ * 0: Accept HEVC/VP9 & all supported audio formats
+ * 1: Transcode to h264 & accept all supported audio formats if the video codec
+ *    was HEVC/VP9
+ * 2: Transcode to H264 & MP3
+ *
+ * Additionally:
+ * - Disallow multichannel AAC
+ *
+ * Supported formats: https://developers.google.com/cast/docs/media
+ */
 
 bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
 {
+    if ( transcode_attempt_idx == MAX_TRANSCODE_PASS - 1 )
+        return false;
+    if ( i_codec == VLC_CODEC_HEVC || i_codec == VLC_CODEC_VP9 )
+        return transcode_attempt_idx == 0;
     return i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_VP8;
 }
 
-bool sout_stream_sys_t::canDecodeAudio( vlc_fourcc_t i_codec ) const
+bool sout_stream_sys_t::canDecodeAudio( vlc_fourcc_t i_codec,
+                                        const audio_format_t* p_fmt ) const
 {
-    return i_codec == VLC_CODEC_VORBIS ||
-        i_codec == VLC_CODEC_MP4A ||
-        i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
-        i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
-        i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
-        i_codec == VLC_CODEC_OPUS ||
-        i_codec == VLC_CODEC_MP3 ||
-        i_codec == VLC_CODEC_A52 ||
-        i_codec == VLC_CODEC_EAC3;
+    if ( transcode_attempt_idx == MAX_TRANSCODE_PASS - 1 )
+        return false;
+    if ( i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
+            i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
+            i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
+            i_codec == VLC_CODEC_MP4A )
+    {
+        return p_fmt->i_channels <= 2;
+    }
+    return i_codec == VLC_CODEC_VORBIS || i_codec == VLC_CODEC_OPUS ||
+           i_codec == VLC_CODEC_A52 || i_codec == VLC_CODEC_EAC3 ||
+           i_codec == VLC_CODEC_MP3;
+}
+
+vlc_fourcc_t sout_stream_sys_t::transcodeAudioFourCC( const audio_format_t* p_fmt )
+{
+    if ( p_fmt->i_channels > 2 )
+        return VLC_CODEC_S16L;
+    return VLC_CODEC_MP3;
 }
 
 bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
@@ -269,21 +304,25 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 
     bool canRemux = true;
     vlc_fourcc_t i_codec_video = 0, i_codec_audio = 0;
+    const es_format_t *p_original_audio = NULL;
+    const es_format_t *p_original_video = NULL;
 
     for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); ++it)
     {
         const es_format_t *p_es = &(*it)->fmt;
-        if (p_es->i_cat == AUDIO_ES)
+        if (p_es->i_cat == AUDIO_ES && p_original_audio == NULL)
         {
-            if (!canDecodeAudio( p_es->i_codec ))
+            if ( !canDecodeAudio( p_es->i_codec, &p_es->audio ) )
             {
                 msg_Dbg( p_stream, "can't remux audio track %d codec %4.4s", p_es->i_id, (const char*)&p_es->i_codec );
                 canRemux = false;
             }
             else if (i_codec_audio == 0)
                 i_codec_audio = p_es->i_codec;
+            p_original_audio = p_es;
         }
-        else if (b_supports_video && p_es->i_cat == VIDEO_ES)
+        else if (b_supports_video && p_es->i_cat == VIDEO_ES &&
+                 p_original_video == NULL )
         {
             if (!canDecodeVideo( p_es->i_codec ))
             {
@@ -292,7 +331,17 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             }
             else if (i_codec_video == 0)
                 i_codec_video = p_es->i_codec;
+            p_original_video = p_es;
         }
+    }
+
+    if ( transcode_attempt_idx == 1 && p_original_video != NULL &&
+         ( p_original_video->i_codec != VLC_CODEC_HEVC &&
+           p_original_video->i_codec != VLC_CODEC_VP9 ) )
+    {
+        msg_Dbg( p_stream, "Video format wasn't HEVC/VP9; skipping 2nd step and"
+                 " transcoding to h264/mp3" );
+        transcode_attempt_idx++;
     }
 
     std::stringstream ssout;
@@ -315,9 +364,9 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         /* TODO: provide audio samplerate and channels */
         ssout << "transcode{";
         char s_fourcc[5];
-        if ( i_codec_audio == 0 )
+        if ( i_codec_audio == 0 && p_original_audio )
         {
-            i_codec_audio = DEFAULT_TRANSCODE_AUDIO;
+            i_codec_audio = transcodeAudioFourCC( &p_original_audio->audio );
             msg_Dbg( p_stream, "Converting audio to %.4s", (const char*)&i_codec_audio );
             ssout << "acodec=";
             vlc_fourcc_to_char( i_codec_audio, s_fourcc );
@@ -356,6 +405,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     {
         /* tell the chromecast to load the content */
         p_intf->setHasInput( mime );
+        stream_started = false;
     }
     else
     {
@@ -398,6 +448,34 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     {
         block_Release( p_buffer );
         return VLC_EGENERIC;
+    }
+    /**
+     * Check if the chromecast refused to handle the current configuration.
+     * Once the State switched to started, we know it has been accepted and don't
+     * need to monitor state changes anymore.
+     */
+    if ( p_sys->stream_started == false )
+    {
+        States s = p_sys->p_intf->state();
+        if ( s == LoadFailed && p_sys->es_changed == false )
+        {
+            if ( p_sys->transcode_attempt_idx > MAX_TRANSCODE_PASS - 1 )
+            {
+                msg_Err( p_stream, "All attempts failed. Giving up." );
+                block_Release( p_buffer );
+                return VLC_EGENERIC;
+            }
+            p_sys->transcode_attempt_idx++;
+            p_sys->es_changed = true;
+            msg_Dbg( p_stream, "Load failed detected. Switching to next "
+                     "configuration index: %u", p_sys->transcode_attempt_idx );
+        }
+        else if ( s == Playing || s == Paused )
+        {
+            msg_Dbg( p_stream, "Playback started: Current configuration (%u) "
+                     "accepted", p_sys->transcode_attempt_idx );
+            p_sys->stream_started = true;
+        }
     }
 
     return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
