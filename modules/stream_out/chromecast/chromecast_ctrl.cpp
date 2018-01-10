@@ -58,6 +58,8 @@ static const char* StateToStr( States s )
         return "Lauching";
     case Ready:
         return "Ready";
+    case LoadFailed:
+        return "LoadFailed";
     case Loading:
         return "Loading";
     case Buffering:
@@ -381,8 +383,12 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
                 break;
             // else: fall through and warn
         default:
-            msg_Warn( m_module, "Unexpected RECEIVER_STATUS with state %s",
+            msg_Warn( m_module, "Unexpected RECEIVER_STATUS with state %s. "
+                      "Checking media status",
                       StateToStr( m_state ) );
+            // This is likely because the chromecast refused the playback, but
+            // let's check by explicitely probing the media status
+            m_communication.msgPlayerGetStatus( m_appTransportId );
             break;
         }
     }
@@ -420,14 +426,26 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
 
         vlc_mutex_locker locker( &m_lock );
 
-        if (newPlayerState == "IDLE")
+        if (newPlayerState == "IDLE" || newPlayerState.empty() == true )
         {
-            if ( m_state != Ready )
+            /* Idle state is expected when the media receiver application is
+             * started. In case the state is still Buffering, it denotes an error.
+             * In most case, we'd receive a RECEIVER_STATUS message, which causes
+             * use to ask for the MEDIA_STATUS before assuming an error occured.
+             * If the chromecast silently gave up on playing our stream, we also
+             * might have an empty status array.
+             * If the media load indeed failed, we need to try another
+             * transcode/remux configuration, or give up.
+             */
+            if ( m_state != Ready && m_state != LoadFailed )
             {
                 // The playback stopped
                 m_mediaSessionId = "";
                 m_time_playback_started = VLC_TS_INVALID;
-                setState( Ready );
+                if ( m_state == Buffering )
+                    setState( LoadFailed );
+                else
+                    setState( Ready );
             }
         }
         else
@@ -491,7 +509,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                     setState( Loading );
                 }
             }
-            else if (!newPlayerState.empty())
+            else
                 msg_Warn( m_module, "Unknown Chromecast MEDIA_STATUS state %s", newPlayerState.c_str());
         }
     }
@@ -499,11 +517,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
     {
         msg_Err( m_module, "Media load failed");
         vlc_mutex_locker locker(&m_lock);
-        /* close the app to restart it */
-        if ( m_state == Launching )
-            m_communication.msgReceiverClose(m_appTransportId);
-        else
-            m_communication.msgReceiverGetStatus();
+        setState( LoadFailed );
     }
     else if (type == "LOAD_CANCELLED")
     {
@@ -620,6 +634,12 @@ void intf_sys_t::requestPlayerStop()
     if ( m_mediaSessionId.empty() == true )
         return;
     queueMessage( Stop );
+}
+
+States intf_sys_t::state() const
+{
+    vlc_mutex_locker locker( &m_lock );
+    return m_state;
 }
 
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
