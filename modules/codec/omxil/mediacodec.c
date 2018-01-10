@@ -643,11 +643,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     p_dec->p_sys = p_sys;
 
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
-    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
-    p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
-
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
     vlc_cond_init(&p_sys->dec_cond);
@@ -700,6 +695,10 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             else
                 p_sys->video.i_angle = 0;
 
+            p_dec->fmt_out.video = p_dec->fmt_in.video;
+            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
+
             if (UpdateVout(p_dec) != VLC_SUCCESS)
             {
                 msg_Err(p_dec, "Opaque Vout request failed");
@@ -720,6 +719,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             msg_Warn(p_dec, "codec need a valid channel count");
             goto bailout;
         }
+
+        p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     }
 
     /* Try first to configure CSD */
