@@ -21,6 +21,7 @@ ifdef HAVE_WINSTORE
 endif
 	$(APPLY) $(SRC)/pthreads/implib.patch
 	$(APPLY) $(SRC)/pthreads/remove-inline.patch
+	$(APPLY) $(SRC)/pthreads/x86-inline-asm.patch
 	$(MOVE)
 
 ifdef HAVE_CROSS_COMPILE

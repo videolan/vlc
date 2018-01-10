@@ -1,0 +1,12 @@
+diff -u pthreads-orig/implement.h pthreads/implement.h
+--- pthreads-orig/implement.h	2012-03-18 07:11:43.000000000 +0200
++++ pthreads/implement.h	2018-01-10 14:53:53.596756881 +0200
+@@ -746,7 +746,7 @@
+  *
+  * The above aren't available in Mingw32 as of gcc 4.5.2 so define our own.
+  */
+-#if defined(__GNUC__)
++#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+ # if defined(_WIN64)
+ # define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand)    \
+     ({                                                                     \
