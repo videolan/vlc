@@ -806,4 +806,13 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect)
     quad->cropViewport[0].TopLeftY = rect->top;
     quad->cropViewport[0].Width    = rect->right  - rect->left;
     quad->cropViewport[0].Height   = rect->bottom - rect->top;
+
+    if ( quad->formatInfo->formatTexture == DXGI_FORMAT_NV12 ||
+         quad->formatInfo->formatTexture == DXGI_FORMAT_P010 )
+    {
+        quad->cropViewport[1].TopLeftX = rect->left / 2;
+        quad->cropViewport[1].TopLeftY = rect->top / 2;
+        quad->cropViewport[1].Width    = (rect->right  - rect->left) / 2;
+        quad->cropViewport[1].Height   = (rect->bottom - rect->top) / 2;
+    }
 }
