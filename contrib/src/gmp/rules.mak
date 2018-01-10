@@ -28,6 +28,7 @@ $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
 	$(APPLY) $(SRC)/gmp/ppc64.patch
+	$(APPLY) $(SRC)/gmp/win-arm64.patch
 	$(MOVE)
 
 # GMP requires either GPLv2 or LGPLv3
@@ -35,6 +36,7 @@ gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 ifndef GPL
 	$(REQUIRE_GNUV3)
 endif
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GMP_CONF)
 	cd $< && $(MAKE) install
 	touch $@
