@@ -157,7 +157,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                                 sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    audio_sample_format_t fmt_last;
 
     /*
      * Open decoder
@@ -179,13 +178,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* decoders don't set audio.i_format, but audio filters use it */
     id->p_decoder->fmt_out.audio.i_format = id->p_decoder->fmt_out.i_codec;
     aout_FormatPrepare( &id->p_decoder->fmt_out.audio );
-    fmt_last = id->p_decoder->fmt_out.audio;
-    /* Fix AAC SBR changing number of channels and sampling rate */
-    if( !(id->p_decoder->fmt_in.i_codec == VLC_CODEC_MP4A &&
-        fmt_last.i_rate != id->p_encoder->fmt_in.audio.i_rate &&
-        fmt_last.i_channels != id->p_encoder->fmt_in.audio.i_channels) )
-        fmt_last.i_rate = id->p_decoder->fmt_in.audio.i_rate;
-
     /*
      * Open encoder
      */
@@ -193,7 +185,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         return VLC_EGENERIC;
 
     if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
-                                                      &fmt_last ) != VLC_SUCCESS ) )
+                        &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
