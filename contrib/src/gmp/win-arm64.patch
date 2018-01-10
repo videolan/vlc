@@ -1,0 +1,55 @@
+From 7b969bbb2e3a0ec9a173a7ddf276b2a03e14452b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Mon, 19 Mar 2018 23:46:02 +0200
+Subject: [PATCH] Add support for building for windows on aarch64
+
+Just as on windows/x86_64, "long" still is 32 bit; tweak the
+arm/aarch64 ABI check to test sizeof(void*) instead of sizeof(long),
+and use long long for mp_limb_t for mingw targets.
+---
+ acinclude.m4 | 4 ++--
+ configure.ac | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 2ea5f5a..6eb7343 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -907,8 +907,8 @@ dnl  a workaround for a HP compiler bug.
+ 
+ AC_DEFUN([GMP_C_TEST_SIZEOF],
+ [echo "configure: testlist $2" >&AC_FD_CC
+-[gmp_sizeof_type=`echo "$2" | sed 's/sizeof-\([a-z]*\).*/\1/'`]
+-[gmp_sizeof_want=`echo "$2" | sed 's/sizeof-[a-z]*-\([0-9]*\).*/\1/'`]
++[gmp_sizeof_type=`echo "$2" | sed 's/sizeof-\([a-z\*]*\).*/\1/'`]
++[gmp_sizeof_want=`echo "$2" | sed 's/sizeof-[a-z\*]*-\([0-9]*\).*/\1/'`]
+ AC_MSG_CHECKING([compiler $1 has sizeof($gmp_sizeof_type)==$gmp_sizeof_want])
+ cat >conftest.c <<EOF
+ [int
+diff --git a/configure.ac b/configure.ac
+index e42599b..071fff0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -602,8 +602,8 @@ case $host in
+     CALLING_CONVENTIONS_OBJS='arm32call.lo arm32check.lo'
+     CALLING_CONVENTIONS_OBJS_64=""
+     cclist_64="gcc cc"
+-    any_32_testlist="sizeof-long-4"
+-    any_64_testlist="sizeof-long-8"
++    any_32_testlist="sizeof-void*-4"
++    any_64_testlist="sizeof-void*-8"
+ 
+     # This is needed for clang, which is not content with flags like -mfpu=neon
+     # alone.
+@@ -612,6 +612,8 @@ case $host in
+         gcc_cflags_fpmode="-mfloat-abi=softfp" ;;
+       *-*-*eabihf)
+         gcc_cflags_fpmode="-mfloat-abi=hard" ;;
++      *-*-mingw*)
++        limb_64=longlong ;;
+     esac
+ 
+     # FIXME: We make mandatory compiler options optional here.  We should
+-- 
+2.7.4
+
