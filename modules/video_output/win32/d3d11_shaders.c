@@ -195,12 +195,50 @@ bool IsRGBShader(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_YUY2;
 }
 
+static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
+                                   d3d11_device_t *d3d_dev,
+                                   const char *psz_sampler,
+                                   const char *psz_src_transform, const char *psz_display_transform,
+                                   const char *psz_tone_mapping,
+                                   const char *psz_adjust_range, ID3D11PixelShader **output)
+{
+    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
+                          strlen(psz_src_transform) + strlen(psz_display_transform) +
+                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
+    if (!shader)
+    {
+        msg_Err(o, "no room for the Pixel Shader");
+        return E_OUTOFMEMORY;
+    }
+    sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
+            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
+#ifndef NDEBUG
+    msg_Dbg(o,"psz_src_transform %s", psz_src_transform);
+    msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
+    msg_Dbg(o,"psz_display_transform %s", psz_display_transform);
+    msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
+    msg_Dbg(o,"psz_sampler %s", psz_sampler);
+#endif
+
+    ID3DBlob *pPSBlob = D3D11_CompileShader(o, hd3d, d3d_dev, shader, true);
+    free(shader);
+    if (!pPSBlob)
+        return E_INVALIDARG;
+
+    HRESULT hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
+                                                (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
+                                                ID3D10Blob_GetBufferSize(pPSBlob), NULL, output);
+
+    ID3D10Blob_Release(pPSBlob);
+    return hr;
+}
+
 #undef D3D11_CompilePixelShader
 HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
                                  d3d11_device_t *d3d_dev,
                                  const d3d_format_t *format, const display_info_t *display,
                                  video_transfer_func_t transfer, bool src_full_range,
-                                 ID3D11PixelShader **output)
+                                 ID3D11PixelShader *output[D3D11_MAX_SHADER_VIEW])
 {
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler;
@@ -420,38 +458,12 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         }
     }
 
-    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
-                          strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
-    if (!shader)
-    {
-        msg_Err(o, "no room for the Pixel Shader");
-        free(psz_range);
-        return E_OUTOFMEMORY;
-    }
-    sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
-#ifndef NDEBUG
-    if (!IsRGBShader(format)) {
-        msg_Dbg(o,"psz_src_transform %s", psz_src_transform);
-        msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
-        msg_Dbg(o,"psz_display_transform %s", psz_display_transform);
-        msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
-        msg_Dbg(o,"psz_sampler %s", psz_sampler);
-    }
-#endif
+    HRESULT hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
+                                     psz_sampler, psz_src_transform,
+                                     psz_display_transform, psz_tone_mapping,
+                                     psz_adjust_range, &output[0]);
     free(psz_range);
 
-    ID3DBlob *pPSBlob = D3D11_CompileShader(o, hd3d, d3d_dev, shader, true);
-    free(shader);
-    if (!pPSBlob)
-        return E_INVALIDARG;
-
-    HRESULT hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                                (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
-                                                ID3D10Blob_GetBufferSize(pPSBlob), NULL, output);
-
-    ID3D10Blob_Release(pPSBlob);
     return hr;
 }
 

@@ -114,7 +114,7 @@ struct vout_display_sys_t
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
-    ID3D11PixelShader        *pSPUPixelShader;
+    ID3D11PixelShader        *pSPUPixelShader[D3D11_MAX_SHADER_VIEW];
     const d3d_format_t       *d3dregion_format;
     int                      d3dregion_count;
     picture_t                **d3dregions;
@@ -1387,7 +1387,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                  sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->b_color_range_full, &sys->picQuad.d3dpixelShader);
+                                  sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->b_color_range_full,
+                                  sys->picQuad.d3dpixelShader);
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
@@ -1509,13 +1510,17 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (sys->d3dregion_format != NULL)
     {
         hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                      sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
+                                      sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true,
+                                      sys->pSPUPixelShader);
         if (FAILED(hr))
         {
-            if (sys->picQuad.d3dpixelShader)
+            for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
             {
-                ID3D11PixelShader_Release(sys->picQuad.d3dpixelShader);
-                sys->picQuad.d3dpixelShader = NULL;
+                if (sys->picQuad.d3dpixelShader[i])
+                {
+                    ID3D11PixelShader_Release(sys->picQuad.d3dpixelShader[i]);
+                    sys->picQuad.d3dpixelShader[i] = NULL;
+                }
             }
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
@@ -1641,11 +1646,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
             ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
             sys->d3drenderTargetView[i] = NULL;
         }
-    }
-    if (sys->pSPUPixelShader)
-    {
-        ID3D11PixelShader_Release(sys->pSPUPixelShader);
-        sys->pSPUPixelShader = NULL;
+        if (sys->pSPUPixelShader[i])
+        {
+            ID3D11PixelShader_Release(sys->pSPUPixelShader[i]);
+            sys->pSPUPixelShader[i] = NULL;
+        }
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
@@ -1756,7 +1761,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
-            d3dquad->d3dpixelShader = sys->pSPUPixelShader;
             picture_resource_t picres = {
                 .p_sys      = (picture_sys_t *) d3dquad,
                 .pf_destroy = DestroyPictureQuad,
@@ -1769,6 +1773,15 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad_picture = (*region)[i];
+            for (size_t j=0; j<D3D11_MAX_SHADER_VIEW; j++)
+            {
+                /* TODO use something more accurate if we have different formats */
+                if (sys->pSPUPixelShader[j])
+                {
+                    d3dquad->d3dpixelShader[j] = sys->pSPUPixelShader[j];
+                    ID3D11PixelShader_AddRef(d3dquad->d3dpixelShader[j]);
+                }
+            }
         } else {
             D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, (d3d_quad_t *) quad_picture->p_sys, &output, ORIENT_NORMAL);
         }

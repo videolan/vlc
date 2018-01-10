@@ -43,7 +43,7 @@ typedef struct
     ID3D11Buffer              *pVertexShaderConstants;
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
-    ID3D11PixelShader         *d3dpixelShader;
+    ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
     ID3D11InputLayout         *pVertexLayout;
     D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
     unsigned int              i_width;

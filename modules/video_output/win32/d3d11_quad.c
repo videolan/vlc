@@ -64,11 +64,12 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
     assert(quad->resourceCount <= D3D11_MAX_SHADER_VIEW);
     ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
 
-    ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader, NULL, 0);
     for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
         if (!d3drenderTargetView[i])
             break;
+
+        ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader[0], NULL, 0);
 
         ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport[i]);
 
@@ -163,10 +164,13 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexShaderConstants);
         quad->pVertexShaderConstants = NULL;
     }
-    if (quad->d3dpixelShader)
+    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
-        ID3D11PixelShader_Release(quad->d3dpixelShader);
-        quad->d3dpixelShader = NULL;
+        if (quad->d3dpixelShader[i])
+        {
+            ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
+            quad->d3dpixelShader[i] = NULL;
+        }
     }
     ReleasePictureSys(&quad->picSys);
 }
