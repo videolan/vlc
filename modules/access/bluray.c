@@ -2097,7 +2097,10 @@ static void streamFlush( demux_sys_t *p_sys )
         0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
         0x47, 0x50, 0x11, 0x30,                /* TP header */
         (192 - (4 + 5) - sizeof(seq_end_pes)), /* adaptation field length */
-        0x80,                                  /* adaptation field: discontinuity indicator */
+        0x82,                                  /* af: discontinuity indicator + priv data */
+        0x0E,                                  /* priv data size */
+         'V',  'L',  'C',  '_',
+         'S',  'T',  'I',  'L',  'L',  'F',  'R',  'A',  'M',  'E',
     };
 
     memset(p_block->p_buffer, 0, 192);
