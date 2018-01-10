@@ -61,7 +61,7 @@ struct sout_stream_sys_t
     }
 
     bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
-    bool canDecodeAudio( vlc_fourcc_t i_codec,
+    bool canDecodeAudio( sout_stream_t* p_stream, vlc_fourcc_t i_codec,
                          const audio_format_t* p_fmt ) const;
     bool startSoutChain(sout_stream_t* p_stream);
 
@@ -83,7 +83,7 @@ struct sout_stream_sys_t
 
 private:
     bool UpdateOutput( sout_stream_t * );
-    vlc_fourcc_t transcodeAudioFourCC(const audio_format_t* p_fmt );
+    vlc_fourcc_t transcodeAudioFourCC( const audio_format_t* p_fmt );
 
 };
 
@@ -119,6 +119,8 @@ static const char *const ppsz_sout_options[] = {
 #define MIME_LONGTEXT N_("This sets the media MIME content type sent to the Chromecast.")
 #define PERF_TEXT N_( "Performance warning" )
 #define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
+#define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
+#define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®" )
 
 #define IP_ADDR_TEXT N_("IP Address")
 #define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
@@ -142,6 +144,7 @@ vlc_module_begin ()
     add_string(SOUT_CFG_PREFIX "mux", DEFAULT_MUXER, MUX_TEXT, MUX_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mime", "video/x-matroska", MIME_TEXT, MIME_LONGTEXT, false)
     add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
+    add_bool(SOUT_CFG_PREFIX "audio-passthrough", true, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
 
 
 vlc_module_end ()
@@ -218,6 +221,9 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
  * 2: Transcode to H264 & MP3
  *
  * Additionally:
+ * - Allow (E)AC3 passthrough depending on the audio-passthrough
+ *   config value, except for the final step, where we just give up and transcode
+ *   everything.
  * - Disallow multichannel AAC
  *
  * Supported formats: https://developers.google.com/cast/docs/media
@@ -232,11 +238,16 @@ bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
     return i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_VP8;
 }
 
-bool sout_stream_sys_t::canDecodeAudio( vlc_fourcc_t i_codec,
+bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
+                                        vlc_fourcc_t i_codec,
                                         const audio_format_t* p_fmt ) const
 {
     if ( transcode_attempt_idx == MAX_TRANSCODE_PASS - 1 )
         return false;
+    if ( i_codec == VLC_CODEC_A52 || i_codec == VLC_CODEC_EAC3 )
+    {
+        return var_InheritBool( p_stream, SOUT_CFG_PREFIX "audio-passthrough" );
+    }
     if ( i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
             i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
             i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
@@ -245,7 +256,6 @@ bool sout_stream_sys_t::canDecodeAudio( vlc_fourcc_t i_codec,
         return p_fmt->i_channels <= 2;
     }
     return i_codec == VLC_CODEC_VORBIS || i_codec == VLC_CODEC_OPUS ||
-           i_codec == VLC_CODEC_A52 || i_codec == VLC_CODEC_EAC3 ||
            i_codec == VLC_CODEC_MP3;
 }
 
@@ -312,7 +322,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         const es_format_t *p_es = &(*it)->fmt;
         if (p_es->i_cat == AUDIO_ES && p_original_audio == NULL)
         {
-            if ( !canDecodeAudio( p_es->i_codec, &p_es->audio ) )
+            if ( !canDecodeAudio( p_stream, p_es->i_codec, &p_es->audio ) )
             {
                 msg_Dbg( p_stream, "can't remux audio track %d codec %4.4s", p_es->i_id, (const char*)&p_es->i_codec );
                 canRemux = false;
