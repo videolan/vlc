@@ -266,6 +266,27 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                      sample.z = 0.0;\
                      sample.a = 1;";
             break;
+        case DXGI_FORMAT_UNKNOWN:
+            switch (format->fourcc)
+            {
+            case VLC_CODEC_YUVA:
+                /* Y */
+                psz_sampler[0] =
+                        "sample.x = shaderTexture[0].Sample(samplerState, coords).x;\
+                         sample.y = 0.0;\
+                         sample.z = 0.0;\
+                         sample.a = shaderTexture[3].Sample(samplerState, coords).x;";
+                /* UV */
+                psz_sampler[1] =
+                        "sample.x = shaderTexture[1].Sample(samplerState, coords).x;\
+                         sample.y = shaderTexture[2].Sample(samplerState, coords).x;\
+                         sample.z = 0.0;\
+                         sample.a = shaderTexture[3].Sample(samplerState, coords).x;";
+                break;
+            default:
+                vlc_assert_unreachable();
+            }
+            break;
         default:
             vlc_assert_unreachable();
         }
@@ -304,18 +325,32 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     "sample = shaderTexture[0].Sample(samplerState, coords);";
             break;
         case DXGI_FORMAT_UNKNOWN:
-            if (format->fourcc == VLC_CODEC_I420_10L)
+            switch (format->fourcc)
+            {
+            case VLC_CODEC_I420_10L:
                 psz_sampler[0] =
                        "sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\
                         sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\
                         sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\
                         sample.a  = 1;";
-            else
+                break;
+            case VLC_CODEC_I420:
                 psz_sampler[0] =
                        "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
                         sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
                         sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
                         sample.a  = 1;";
+                break;
+            case VLC_CODEC_YUVA:
+                psz_sampler[0] =
+                       "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
+                        sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
+                        sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
+                        sample.a  = shaderTexture[3].Sample(samplerState, coords).x;";
+                break;
+            default:
+                vlc_assert_unreachable();
+            }
             break;
         default:
             vlc_assert_unreachable();
