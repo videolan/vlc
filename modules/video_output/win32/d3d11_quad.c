@@ -811,12 +811,38 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect)
     quad->cropViewport[0].Width    = rect->right  - rect->left;
     quad->cropViewport[0].Height   = rect->bottom - rect->top;
 
-    if ( quad->formatInfo->formatTexture == DXGI_FORMAT_NV12 ||
-         quad->formatInfo->formatTexture == DXGI_FORMAT_P010 )
+    switch ( quad->formatInfo->formatTexture )
     {
+    case DXGI_FORMAT_NV12:
+    case DXGI_FORMAT_P010:
         quad->cropViewport[1].TopLeftX = rect->left / 2;
         quad->cropViewport[1].TopLeftY = rect->top / 2;
         quad->cropViewport[1].Width    = (rect->right  - rect->left) / 2;
         quad->cropViewport[1].Height   = (rect->bottom - rect->top) / 2;
+        break;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+        break; /* packed format */
+    case DXGI_FORMAT_UNKNOWN:
+        switch ( quad->formatInfo->fourcc )
+        {
+        case VLC_CODEC_YUVA:
+            quad->cropViewport[1] = quad->cropViewport[2] =
+            quad->cropViewport[3] = quad->cropViewport[0];
+            break;
+        case VLC_CODEC_I420:
+            quad->cropViewport[1].TopLeftX = quad->cropViewport[0].TopLeftX / 2;
+            quad->cropViewport[1].TopLeftY = quad->cropViewport[0].TopLeftY / 2;
+            quad->cropViewport[1].Width    = quad->cropViewport[0].Width / 2;
+            quad->cropViewport[1].Height   = quad->cropViewport[0].Height / 2;
+            quad->cropViewport[2] = quad->cropViewport[1];
+            break;
+        }
+        break;
+    default:
+        vlc_assert_unreachable();
     }
 }
