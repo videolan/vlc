@@ -29,6 +29,8 @@
 #include "os_graphics.hpp"
 #include "os_window.hpp"
 #include "../events/evt_key.hpp"
+#include "../events/evt_motion.hpp"
+#include "../events/evt_mouse.hpp"
 
 #include <vlc_actions.h>
 
@@ -115,3 +117,29 @@ void VoutWindow::processEvent( EvtKey &rEvtKey )
         getIntf()->p_sys->p_dialogs->sendKey( rEvtKey.getModKey() );
 }
 
+
+void VoutWindow::processEvent( EvtMotion &rEvtMotion )
+{
+    int x = rEvtMotion.getXPos() - m_pParentWindow->getLeft() - getLeft();
+    int y = rEvtMotion.getYPos() - m_pParentWindow->getTop() - getTop();
+    vout_window_ReportMouseMoved( m_pWnd, x, y );
+}
+
+
+void VoutWindow::processEvent( EvtMouse &rEvtMouse )
+{
+    int button = -1;
+    if( rEvtMouse.getButton() == EvtMouse::kLeft )
+        button = 0;
+    else if( rEvtMouse.getButton() == EvtMouse::kMiddle )
+        button = 1;
+    else if( rEvtMouse.getButton() == EvtMouse::kRight )
+        button = 2;
+
+    if( rEvtMouse.getAction() == EvtMouse::kDown )
+        vout_window_ReportMousePressed( m_pWnd, button );
+    else if( rEvtMouse.getAction() == EvtMouse::kUp )
+        vout_window_ReportMouseReleased( m_pWnd, button );
+    else if( rEvtMouse.getAction() == EvtMouse::kDblClick )
+        vout_window_ReportMouseDoubleClick( m_pWnd, button );
+}
