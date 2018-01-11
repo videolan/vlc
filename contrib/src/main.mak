@@ -466,6 +466,7 @@ ifndef WITH_OPTIMIZATION
 else
 	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
 endif
+	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
 ifdef HAVE_WIN32
 ifdef HAVE_WINDOWSPHONE
 	echo "set(CMAKE_SYSTEM_NAME WindowsPhone)" >> $@
