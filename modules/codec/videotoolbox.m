@@ -140,6 +140,7 @@ struct frame_info_t
 #pragma mark - decoder structure
 
 #define H264_MAX_DPB 16
+#define VT_MAX_SEI_COUNT 16
 
 struct decoder_sys_t
 {
@@ -250,7 +251,12 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                        p_sys->hh.i_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
-    const uint8_t *p_sei_nal = NULL; size_t i_sei_nal = 0;
+    struct
+    {
+        const uint8_t *p_nal;
+        size_t i_nal;
+    } sei_array[VT_MAX_SEI_COUNT];
+    size_t i_sei_count = 0;
     while(hxxx_iterate_next(&itctx, &p_nal, &i_nal))
     {
         if(i_nal < 2)
@@ -293,8 +299,9 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 sei.p_sps = p_sps;
                 sei.i_pic_struct = UINT8_MAX;
 
-                if(p_sei_nal)
-                    HxxxParseSEI(p_sei_nal, i_sei_nal, 1, ParseH264SEI, &sei);
+                for(size_t i=0; i<i_sei_count; i++)
+                    HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal, 1,
+                                 ParseH264SEI, &sei);
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
@@ -316,8 +323,11 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
         }
         else if(i_nal_type == H264_NAL_SEI)
         {
-            p_sei_nal = p_nal;
-            i_sei_nal = i_nal;
+            if(i_sei_count < VT_MAX_SEI_COUNT)
+            {
+                sei_array[i_sei_count].p_nal = p_nal;
+                sei_array[i_sei_count++].i_nal = i_nal;
+            }
         }
     }
 
@@ -584,7 +594,13 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                        p_sys->hh.i_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
-    const uint8_t *p_sei_nal = NULL; size_t i_sei_nal = 0;
+    struct
+    {
+        const uint8_t *p_nal;
+        size_t i_nal;
+    } sei_array[VT_MAX_SEI_COUNT];
+    size_t i_sei_count = 0;
+
     while(hxxx_iterate_next(&itctx, &p_nal, &i_nal))
     {
         if(i_nal < 2 || hevc_getNALLayer(p_nal) > 0)
@@ -620,8 +636,9 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 const int POC = hevc_compute_picture_order_count(p_sps, p_sli,
                                                                  &p_sys->hevc_pocctx);
 
-                if(p_sei_nal)
-                    HxxxParseSEI(p_sei_nal, i_sei_nal, 1, ParseHEVCSEI, &sei);
+                for(size_t i=0; i<i_sei_count; i++)
+                    HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal,
+                                 1, ParseHEVCSEI, &sei);
 
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
@@ -648,8 +665,11 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
         }
         else if(i_nal_type == HEVC_NAL_PREF_SEI)
         {
-            p_sei_nal = p_nal;
-            i_sei_nal = i_nal;
+            if(i_sei_count < VT_MAX_SEI_COUNT)
+            {
+                sei_array[i_sei_count].p_nal = p_nal;
+                sei_array[i_sei_count++].i_nal = i_nal;
+            }
         }
     }
 
