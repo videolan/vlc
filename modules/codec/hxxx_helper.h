@@ -41,6 +41,8 @@ struct hxxx_helper_nal
     };
 };
 
+#define HXXX_HELPER_SEI_COUNT 16
+
 struct hxxx_helper
 {
     vlc_object_t *p_obj; /* for logs */
@@ -61,11 +63,14 @@ struct hxxx_helper
             struct hxxx_helper_nal sps_list[HEVC_SPS_ID_MAX + 1];
             struct hxxx_helper_nal pps_list[HEVC_PPS_ID_MAX + 1];
             struct hxxx_helper_nal vps_list[HEVC_VPS_ID_MAX + 1];
+            struct hxxx_helper_nal sei_list[HXXX_HELPER_SEI_COUNT];
             uint8_t i_current_sps;
             uint8_t i_current_vps;
             uint8_t i_sps_count;
             uint8_t i_pps_count;
             uint8_t i_vps_count;
+            uint8_t i_sei_count;
+            uint8_t i_previous_nal_type;
         } hevc;
     };
 
