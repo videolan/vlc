@@ -118,6 +118,9 @@ public:
     /// set fullscreen mode (vout window provider)
     void setFullscreenWnd( vout_window_t* pWnd, bool b_fullscreen );
 
+    /// hide mouse (vout window provider)
+    void hideMouseWnd( vout_window_t* pWnd, bool hide );
+
     // Register Video Controls (when building theme)
     void registerCtrlVideo( CtrlVideo* p_CtrlVideo );
 

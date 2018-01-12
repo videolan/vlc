@@ -297,6 +297,17 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
 }
 
 
+void VoutManager::hideMouseWnd( vout_window_t *pWnd, bool hide )
+{
+    msg_Dbg( pWnd, "hide mouse (%i) received from vout thread", hide );
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    if( hide )
+        pOsFactory->changeCursor( OSFactory::kNoCursor );
+    else
+        pOsFactory->changeCursor( OSFactory::kDefaultArrow );
+}
+
+
 void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg )
 {
     (void)arg;

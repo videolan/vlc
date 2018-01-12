@@ -51,7 +51,8 @@ public:
         kResizeNS,
         kResizeWE,
         kResizeNWSE,
-        kResizeNESW
+        kResizeNESW,
+        kNoCursor,
     };
 
     /**
