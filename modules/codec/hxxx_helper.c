@@ -88,8 +88,8 @@ hxxx_helper_clean(struct hxxx_helper *hh)
 }
 
 #define HELPER_FOREACH_NAL(it, p_nal_list, i_nal_count, i_nal_max) \
-    for (size_t ii = 0, i_nal_nb = 0; i < i_nal_max && i_nal_count > i_nal_nb; ++ii) \
-        if (p_nal_list[ii].b != NULL && (it = &p_nal_list[ii]) && ++i_nal_nb)
+    for (size_t ii = 0, i_nal_found = 0; ii < i_nal_max && i_nal_count > i_nal_found; ++ii) \
+        if (p_nal_list[ii].b != NULL && (it = &p_nal_list[ii]) && ++i_nal_found)
 
 static int
 helper_dup_buf(struct hxxx_helper_nal *p_nal,
@@ -703,26 +703,22 @@ block_t *
 h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 {
     const struct hxxx_helper_nal *p_nal;
-    size_t i = 0;
     const uint8_t *pp_sps_bufs[hh->h264.i_sps_count];
     size_t p_sps_sizes[hh->h264.i_sps_count];
     HELPER_FOREACH_NAL(p_nal, hh->h264.sps_list, hh->h264.i_sps_count,
                        H264_SPS_ID_MAX+1)
     {
-        pp_sps_bufs[i] = p_nal->b->p_buffer;
-        p_sps_sizes[i] = p_nal->b->i_buffer;
-        ++i;
+        pp_sps_bufs[i_nal_found - 1] = p_nal->b->p_buffer;
+        p_sps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
 
-    i = 0;
     const uint8_t *pp_pps_bufs[hh->h264.i_pps_count];
     size_t p_pps_sizes[hh->h264.i_pps_count];
     HELPER_FOREACH_NAL(p_nal, hh->h264.pps_list, hh->h264.i_pps_count,
                        H264_PPS_ID_MAX+1)
     {
-        pp_pps_bufs[i] = p_nal->b->p_buffer;
-        p_pps_sizes[i] = p_nal->b->i_buffer;
-        ++i;
+        pp_pps_bufs[i_nal_found - 1] = p_nal->b->p_buffer;
+        p_pps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
     return h264_NAL_to_avcC(4, pp_sps_bufs, p_sps_sizes, hh->h264.i_sps_count,
                             pp_pps_bufs, p_pps_sizes, hh->h264.i_pps_count);
@@ -733,14 +729,12 @@ hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
 {
     struct hevc_dcr_params params = {};
     const struct hxxx_helper_nal *p_nal;
-    size_t i = 0;
 
     HELPER_FOREACH_NAL(p_nal, hh->hevc.vps_list, hh->hevc.i_vps_count,
                        HEVC_VPS_ID_MAX+1)
     {
         params.p_vps[params.i_vps_count] = p_nal->b->p_buffer;
         params.rgi_vps[params.i_vps_count++] = p_nal->b->i_buffer;
-        ++i;
     }
 
     HELPER_FOREACH_NAL(p_nal, hh->hevc.sps_list, hh->hevc.i_sps_count,
@@ -748,7 +742,6 @@ hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
     {
         params.p_sps[params.i_sps_count] = p_nal->b->p_buffer;
         params.rgi_sps[params.i_sps_count++] = p_nal->b->i_buffer;
-        ++i;
     }
 
     HELPER_FOREACH_NAL(p_nal, hh->hevc.pps_list, hh->hevc.i_pps_count,
@@ -756,7 +749,6 @@ hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
     {
         params.p_pps[params.i_pps_count] = p_nal->b->p_buffer;
         params.rgi_pps[params.i_pps_count++] = p_nal->b->i_buffer;
-        ++i;
     }
 
     size_t i_dcr;
