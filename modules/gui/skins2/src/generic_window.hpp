@@ -114,6 +114,9 @@ public:
     /// windows handle
     vlc_wnd_type getOSHandle() const;
 
+    /// window type
+    WindowType_t getType() { return m_type; }
+
     /// reparent
     void setParent( GenericWindow* pParent,
                     int x = 0, int y = 0, int w = -1, int h = -1 );
@@ -157,6 +160,7 @@ protected:
     virtual void onUpdate( Subject<VarBool> &rVariable , void*);
 
 private:
+    WindowType_t m_type;
     /// Window position and size
     int m_left, m_top, m_width, m_height;
     /// OS specific implementation

@@ -32,8 +32,8 @@
 GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
                               bool dragDrop, bool playOnDrop,
                               GenericWindow *pParent, WindowType_t type ):
-    SkinObject( pIntf ), m_left( left ), m_top( top ), m_width( 0 ),
-    m_height( 0 ), m_pVarVisible( NULL )
+    SkinObject( pIntf ), m_type( type ), m_left( left ), m_top( top ),
+    m_width( 0 ), m_height( 0 ), m_pVarVisible( NULL )
 {
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );

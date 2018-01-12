@@ -45,7 +45,8 @@
 #include <vlc_xlib.h>
 
 X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),
-    m_pDisplay( NULL ), m_pTimerLoop( NULL ), m_dirSep( "/" )
+    m_pDisplay( NULL ), m_pTimerLoop( NULL ), m_dirSep( "/" ),
+    mPointerWindow( None ), mVoutWindow( None ), mEmptyCursor( None )
 {
     // see init()
 }
@@ -53,6 +54,8 @@ X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),
 
 X11Factory::~X11Factory()
 {
+    if( mEmptyCursor != None )
+        XFreeCursor( m_pDisplay->getDisplay(), mEmptyCursor );
     delete m_pTimerLoop;
     delete m_pDisplay;
 }
@@ -106,6 +109,9 @@ bool X11Factory::init()
                                 info[i].x_org, info[i].y_org );
         XFree( info );
     }
+
+    // init cursors
+    initCursors();
 
     return true;
 }
@@ -370,4 +376,50 @@ void X11Factory::rmDir( const std::string &rPath )
     rmdir( rPath.c_str() );
 }
 
+
+void X11Factory::changeCursor( CursorType_t type ) const
+{
+    Cursor cursor = mCursors[type];
+    Window win = (type == OSFactory::kNoCursor) ? mVoutWindow : mPointerWindow;
+
+    if( win != None )
+        XDefineCursor( m_pDisplay->getDisplay(), win, cursor );
+}
+
+void X11Factory::initCursors( )
+{
+    Display *display = m_pDisplay->getDisplay();
+    static const struct {
+        CursorType_t type;
+	const char *name;
+    } cursors[] = {
+        { kDefaultArrow, "left_ptr" },
+	{ kResizeNWSE, "bottom_right_corner" },
+	{ kResizeNS, "bottom_side" },
+	{ kResizeWE, "right_side" },
+	{ kResizeNESW, "bottom_left_corner" },
+    };
+    // retrieve cursors from default theme
+    for( unsigned i = 0; i < sizeof(cursors) / sizeof(cursors[0]); i++ )
+	mCursors[cursors[i].type] =
+            XcursorLibraryLoadCursor( display, cursors[i].name );
+
+    // build an additional empty cursor
+    XColor color;
+    const char data[] = { 0 };
+    Window root = DefaultRootWindow( display );
+    Pixmap pix = XCreateBitmapFromData( display, root, data, 1, 1 );
+    mEmptyCursor = XCreatePixmapCursor( display, pix, pix, &color, &color, 0, 0 );
+    XFreePixmap( display, pix );
+    mCursors[kNoCursor] = mEmptyCursor;
+}
+
+
+void X11Factory::setPointerWindow( Window win )
+{
+    GenericWindow *pWin = m_windowMap[win];
+    if( pWin->getType() == GenericWindow::VoutWindow )
+        mVoutWindow = win;
+    mPointerWindow = win;
+}
 #endif

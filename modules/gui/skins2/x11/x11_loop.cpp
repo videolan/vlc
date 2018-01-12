@@ -161,7 +161,7 @@ inline int X11Loop::X11ModToMod( unsigned state )
 void X11Loop::handleX11Event()
 {
     XEvent event;
-    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    X11Factory *pFactory = (X11Factory*)OSFactory::instance( getIntf() );
 
     // Look for the next event in the queue
     XNextEvent( XDISPLAY, &event );
@@ -186,8 +186,7 @@ void X11Loop::handleX11Event()
     }
 
     // Find the window to which the event is sent
-    GenericWindow *pWin =
-        ((X11Factory*)pOsFactory)->m_windowMap[event.xany.window];
+    GenericWindow *pWin = pFactory->m_windowMap[event.xany.window];
 
     if( !pWin )
     {
@@ -223,7 +222,8 @@ void X11Loop::handleX11Event()
             // Don't trust the position in the event, it is
             // out of date. Get the actual current position instead
             int x, y;
-            pOsFactory->getMousePos( x, y );
+            pFactory->getMousePos( x, y );
+            pFactory->setPointerWindow( event.xany.window );
             EvtMotion evt( getIntf(), x, y );
             pWin->processEvent( evt );
             break;
@@ -256,7 +256,7 @@ void X11Loop::handleX11Event()
             {
                 mtime_t time = mdate();
                 int x, y;
-                pOsFactory->getMousePos( x, y );
+                pFactory->getMousePos( x, y );
                 if( time - m_lastClickTime < m_dblClickDelay &&
                     x == m_lastClickPosX && y == m_lastClickPosY )
                 {
@@ -343,8 +343,7 @@ void X11Loop::handleX11Event()
             std::string type = XGetAtomName( XDISPLAY, event.xclient.message_type );
 
             // Find the DnD object for this window
-            X11DragDrop *pDnd =
-                ((X11Factory*)pOsFactory)->m_dndMap[event.xany.window];
+            X11DragDrop *pDnd = pFactory->m_dndMap[event.xany.window];
             if( !pDnd )
             {
                 msg_Err( getIntf(), "no associated D&D object" );

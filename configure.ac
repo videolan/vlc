@@ -3750,9 +3750,10 @@ AS_IF([test "${enable_skins2}" != "no"], [
   ], [
     PKG_CHECK_MODULES([XPM], [xpm],, [have_skins_deps="no"])
     PKG_CHECK_MODULES([XINERAMA], [xinerama],, [have_skins_deps="no"])
+    PKG_CHECK_MODULES([XCURSOR], [xcursor],, [have_skins_x11_deps="no"])
     PKG_CHECK_MODULES([XEXT], [xext],, [have_skins_deps="no"])
     VLC_ADD_CPPFLAGS([skins2],[${X_CFLAGS} ${XEXT_CFLAGS} ${XPM_CFLAGS} -DX11_SKINS])
-    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} -lX11])
+    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} ${XCURSOR_LIBS} -lX11])
   ])
 
   dnl we need freetype
