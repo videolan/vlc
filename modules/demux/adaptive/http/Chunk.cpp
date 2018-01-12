@@ -197,7 +197,8 @@ block_t * HTTPChunkSource::read(size_t readsize)
         consumed += p_block->i_buffer;
         if((size_t)ret < readsize)
             eof = true;
-        connManager->updateDownloadRate(sourceid, p_block->i_buffer, time);
+        if(ret && time)
+            connManager->updateDownloadRate(sourceid, p_block->i_buffer, time);
     }
 
     return p_block;
