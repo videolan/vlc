@@ -1402,7 +1402,8 @@ uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
     HEVC_DCR_ADD_SIZES(p_params->i_vps_count, p_params->rgi_vps);
     HEVC_DCR_ADD_SIZES(p_params->i_sps_count, p_params->rgi_sps);
     HEVC_DCR_ADD_SIZES(p_params->i_pps_count, p_params->rgi_pps);
-    HEVC_DCR_ADD_SIZES(p_params->i_sei_count, p_params->rgi_sei);
+    HEVC_DCR_ADD_SIZES(p_params->i_seipref_count, p_params->rgi_seipref);
+    HEVC_DCR_ADD_SIZES(p_params->i_seisuff_count, p_params->rgi_seisuff);
 
     uint8_t *p_data = malloc( i_total_size );
     if( p_data == NULL )
@@ -1430,7 +1431,8 @@ uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
               (i_nal_length_size - 1) );
     /* total number of arrays */
     *p++ = !!p_params->i_vps_count + !!p_params->i_sps_count +
-           !!p_params->i_pps_count + !!p_params->i_sei_count;
+           !!p_params->i_pps_count + !!p_params->i_seipref_count +
+           !!p_params->i_seisuff_count;
 
     /* Write NAL arrays */
     HEVC_DCR_ADD_NALS(HEVC_NAL_VPS, p_params->i_vps_count,
@@ -1439,8 +1441,10 @@ uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
                       p_params->p_sps, p_params->rgi_sps);
     HEVC_DCR_ADD_NALS(HEVC_NAL_PPS, p_params->i_pps_count,
                       p_params->p_pps, p_params->rgi_pps);
-    HEVC_DCR_ADD_NALS(HEVC_NAL_PREF_SEI, p_params->i_sei_count,
-                      p_params->p_sei, p_params->rgi_sei);
+    HEVC_DCR_ADD_NALS(HEVC_NAL_PREF_SEI, p_params->i_seipref_count,
+                      p_params->p_seipref, p_params->rgi_seipref);
+    HEVC_DCR_ADD_NALS(HEVC_NAL_SUFF_SEI, p_params->i_seisuff_count,
+                      p_params->p_seisuff, p_params->rgi_seisuff);
 
     return p_data;
 }

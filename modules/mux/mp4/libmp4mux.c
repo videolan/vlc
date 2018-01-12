@@ -622,13 +622,22 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
                 }
                 break;
             case HEVC_NAL_PREF_SEI:
-                if(params.i_sei_count != HEVC_DCR_SEI_COUNT)
+                if(params.i_seipref_count != HEVC_DCR_SEI_COUNT)
                 {
-                    params.p_sei[params.i_sei_count] = p_nal;
-                    params.rgi_sei[params.i_sei_count] = i_nal;
-                    params.i_sei_count++;
+                    params.p_seipref[params.i_seipref_count] = p_nal;
+                    params.rgi_seipref[params.i_seipref_count] = i_nal;
+                    params.i_seipref_count++;
                 }
                 break;
+            case HEVC_NAL_SUFF_SEI:
+                if(params.i_seisuff_count != HEVC_DCR_SEI_COUNT)
+                {
+                    params.p_seisuff[params.i_seisuff_count] = p_nal;
+                    params.rgi_seisuff[params.i_seisuff_count] = i_nal;
+                    params.i_seisuff_count++;
+                }
+                break;
+
             default:
                 break;
         }
