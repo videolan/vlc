@@ -60,6 +60,23 @@ hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
         } \
     }
 
+static void
+helper_clear_sei(struct hxxx_helper *hh)
+{
+    if (hh->i_codec != VLC_CODEC_HEVC)
+        return;
+
+    for (uint8_t i=0; i<hh->hevc.i_sei_count; i++)
+    {
+        if(hh->hevc.sei_list[i].b)
+        {
+            block_Release(hh->hevc.sei_list[i].b);
+            hh->hevc.sei_list[i].b = NULL;
+        }
+    }
+    hh->hevc.i_sei_count = 0;
+}
+
 void
 hxxx_helper_clean(struct hxxx_helper *hh)
 {
@@ -80,6 +97,7 @@ hxxx_helper_clean(struct hxxx_helper *hh)
                          hevc_rbsp_release_sps(hnal->hevc_sps));
             RELEASE_NALS(hh->hevc.pps_list, HEVC_PPS_ID_MAX,
                          hevc_rbsp_release_pps(hnal->hevc_pps));
+            helper_clear_sei(hh);
             memset(&hh->hevc, 0, sizeof(hh->hevc));
             break;
         default:
@@ -136,6 +154,21 @@ helper_nal_length_valid(struct hxxx_helper *hh)
 {
     return hh->i_nal_length_size == 1 || hh->i_nal_length_size == 2
         || hh->i_nal_length_size == 4;
+}
+
+static void
+helper_load_sei(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal)
+{
+    if(hh->i_codec != VLC_CODEC_HEVC)
+        return;
+
+    if(hh->hevc.i_sei_count == HXXX_HELPER_SEI_COUNT)
+        return;
+
+    struct hxxx_helper_nal *hnal = &hh->hevc.sei_list[hh->hevc.i_sei_count];
+    if (helper_dup_buf(hnal, p_nal, i_nal))
+        return;
+    hh->hevc.i_sei_count++;
 }
 
 #define LOAD_xPS(list, count, id, max, xpstype, xpsdecode, xpsrelease) \
@@ -237,6 +270,17 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
     return VLC_SUCCESS;
 }
 
+static void
+helper_check_sei_au(struct hxxx_helper *hh, uint8_t i_nal_type)
+{
+    if ((i_nal_type <= HEVC_NAL_IRAP_VCL23 &&
+         hh->hevc.i_previous_nal_type != HEVC_NAL_PREF_SEI) ||
+        (i_nal_type == HEVC_NAL_PREF_SEI &&
+         hh->hevc.i_previous_nal_type != HEVC_NAL_PREF_SEI))
+        helper_clear_sei(hh);
+    hh->hevc.i_previous_nal_type = i_nal_type;
+}
+
 static int
 hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf,
                       uint8_t i_nal_length_size, bool *p_config_changed)
@@ -254,6 +298,10 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
             continue;
 
         const uint8_t i_nal_type = hevc_getNALType(p_nal);
+
+        /* we need to clear sei not belonging to this access unit */
+        helper_check_sei_au(hh, i_nal_type);
+
         if (i_nal_type == HEVC_NAL_VPS)
         {
             uint8_t i_id;
@@ -324,6 +372,11 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                 }
             }
             break; /* No need to parse further NAL */
+        }
+        else if(i_nal_type == HEVC_NAL_PREF_SEI||
+                i_nal_type == HEVC_NAL_SUFF_SEI)
+        {
+            helper_load_sei(hh, p_nal, i_nal);
         }
     }
     return VLC_SUCCESS;
@@ -749,6 +802,21 @@ hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
     {
         params.p_pps[params.i_pps_count] = p_nal->b->p_buffer;
         params.rgi_pps[params.i_pps_count++] = p_nal->b->i_buffer;
+    }
+
+    HELPER_FOREACH_NAL(p_nal, hh->hevc.sei_list, hh->hevc.i_sei_count,
+                       HEVC_DCR_SEI_COUNT)
+    {
+        if (hevc_getNALType(p_nal->b->p_buffer) == HEVC_NAL_PREF_SEI)
+        {
+            params.p_seipref[params.i_seipref_count] = p_nal->b->p_buffer;
+            params.rgi_seipref[params.i_seipref_count++] = p_nal->b->i_buffer;
+        }
+        else
+        {
+            params.p_seisuff[params.i_seisuff_count] = p_nal->b->p_buffer;
+            params.rgi_seisuff[params.i_seisuff_count++] = p_nal->b->i_buffer;
+        }
     }
 
     size_t i_dcr;
