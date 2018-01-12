@@ -996,7 +996,7 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    CFMutableDictionaryRef decoderConfiguration = cfdict_create(2);
+    CFMutableDictionaryRef decoderConfiguration = cfdict_create(0);
     if (decoderConfiguration == NULL)
         return nil;
 
@@ -1124,7 +1124,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
         return VLC_EGENERIC;
 
     /* destination pixel buffer attributes */
-    CFMutableDictionaryRef destinationPixelBufferAttributes = cfdict_create(2);
+    CFMutableDictionaryRef destinationPixelBufferAttributes = cfdict_create(0);
     if(destinationPixelBufferAttributes == nil)
         return VLC_EGENERIC;
 
