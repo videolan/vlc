@@ -71,6 +71,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     fileLine = new QLineEdit;
     fileLine->setMinimumWidth( 300 );
     fileLine->setFocus( Qt::ActiveWindowFocusReason );
+    fileLine->setReadOnly(true);
     destLabel->setBuddy( fileLine );
     // You can set a specific name for only one file.
     if(singleFileSelected)
@@ -154,11 +155,11 @@ void ConvertDialog::fileBrowse()
 {
     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
-    QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
+    QUrl fileName = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
         p_intf->p_sys->filepath,
         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
             .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
-    fileLine->setText( toNativeSeparators( fileName ) );
+    fileLine->setText( fileName.toEncoded() );
     setDestinationFileExtension();
 }
 
@@ -198,7 +199,7 @@ void ConvertDialog::close()
             // Only one file, use the destination provided
             if(singleFileSelected)
             {
-                newFileName = fileLine->text();
+                newFileName = QUrl(fileLine->text()).toLocalFile();
             }
 
             // Multiple, use the convention.
@@ -209,7 +210,7 @@ void ConvertDialog::close()
                 newFileName = incomingMRLs->at(i);
 
                 // Remove the file:// from the front of our MRL
-                newFileName = newFileName.remove(0,7);
+                newFileName = QUrl(newFileName).toLocalFile();
 
                 // Remote the existing extention (if any)
                 int extentionPos = newFileName.lastIndexOf('.');
