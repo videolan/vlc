@@ -3750,7 +3750,7 @@ AS_IF([test "${enable_skins2}" != "no"], [
   ], [
     PKG_CHECK_MODULES([XPM], [xpm],, [have_skins_deps="no"])
     PKG_CHECK_MODULES([XINERAMA], [xinerama],, [have_skins_deps="no"])
-    PKG_CHECK_MODULES([XCURSOR], [xcursor],, [have_skins_x11_deps="no"])
+    PKG_CHECK_MODULES([XCURSOR], [xcursor],, [have_skins_deps="no"])
     PKG_CHECK_MODULES([XEXT], [xext],, [have_skins_deps="no"])
     VLC_ADD_CPPFLAGS([skins2],[${X_CFLAGS} ${XEXT_CFLAGS} ${XPM_CFLAGS} -DX11_SKINS])
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} ${XCURSOR_LIBS} -lX11])
@@ -3765,7 +3765,7 @@ AS_IF([test "${enable_skins2}" != "no"], [
     AS_IF([test "x${enable_skins2}" = "x"], [
       AC_MSG_WARN([Skins2 interface disabled due to missing dependencies.])
     ], [
-      AC_MSG_ERROR([Skins2 interface requires FreeType, libxpm, libxext and libxinerama])
+      AC_MSG_ERROR([Skins2 interface requires FreeType, libxcursor, libxpm, libxext and libxinerama])
     ])
     enable_skins2="no"
   ], [
