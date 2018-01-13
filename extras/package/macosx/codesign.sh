@@ -67,6 +67,18 @@ if [ "x$1" != "x" ]; then
     exit 1
 fi
 
+VLCCACHEGEN=""
+if [ -e "./bin/vlc-cache-gen" ]; then
+    VLCCACHEGEN="./bin/vlc-cache-gen"
+fi
+if [ -e "./vlc-cache-gen" ]; then
+    VLCCACHEGEN="./vlc-cache-gen"
+fi
+
+if [ -z "$VLCCACHEGEN" ]; then
+info "WARN: Cannot find vlc-cache-gen, cache will be corrupt after signing"
+fi
+
 # Call with $1 = file or folder, $2 = identifier (if empty, file name is used)
 sign()
 {
@@ -140,10 +152,16 @@ done
 
 info "Signing the modules"
 
-for i in $(find VLC.app/Contents/MacOS/plugins -type f -exec echo {} \;)
+for i in $(find VLC.app/Contents/MacOS/plugins -type f -name "*.dylib" -exec echo {} \;)
 do
     sign "$i"
 done
+
+if [ ! -z "$VLCCACHEGEN" ]; then
+    $VLCCACHEGEN VLC.app/Contents/MacOS/plugins
+fi
+
+sign "VLC.app/Contents/MacOS/plugins/plugins.dat"
 
 info "Signing the libraries"
 
