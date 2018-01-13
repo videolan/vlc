@@ -85,7 +85,7 @@ sign()
     IDENTIFIER="$2"
     if [ -z "$IDENTIFIER" ]; then
         filename=$(basename "$1")
-        IDENTIFIER="${filename%.*}"
+        IDENTIFIER="org.videolan.${filename%.*}"
     fi
 
     # info "Signing file $1 with identifier $IDENTIFIER"
