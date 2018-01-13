@@ -117,8 +117,10 @@ sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupd
 sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app" "org.sparkle-project.Sparkle.Autoupdate"
 sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A" "org.sparkle-project.Sparkle"
 
-sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app" "com.Breakpad.crash_report_sender"
-sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A" "com.googlecode.google-breakpad"
+if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app" "com.Breakpad.crash_report_sender"
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A" "com.googlecode.google-breakpad"
+fi
 
 info "Signing the framework headers"
 for i in $(find VLC.app/Contents/Frameworks -type f -name "*.h" -exec echo {} \;)
@@ -184,7 +186,10 @@ sign "VLC.app" "org.videolan.vlc"
 info "all items signed, validating..."
 
 info "Validating frameworks"
-codesign --verify -vv VLC.app/Contents/Frameworks/Breakpad.framework
+if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
+    codesign --verify -vv VLC.app/Contents/Frameworks/Breakpad.framework
+fi
+
 codesign --verify -vv VLC.app/Contents/Frameworks/Growl.framework
 codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework
 
