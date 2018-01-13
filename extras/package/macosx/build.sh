@@ -287,11 +287,11 @@ if [ "$PACKAGETYPE" = "u" ]; then
     rm -rf VLC-debug.app
     cp -Rp VLC.app VLC-debug.app
 
-    find VLC.app/ -name "*.dylib" -exec strip -u -r {} \;
-    find VLC.app/ -type f -name "VLC" -exec strip -u -r {} \;
-    find VLC.app/ -type f -name "Sparkle" -exec strip -u -r {} \;
-    find VLC.app/ -type f -name "Growl" -exec strip -u -r {} \;
-    find VLC.app/ -type f -name "Breakpad" -exec strip -u -r {} \;
+    find VLC.app/ -name "*.dylib" -exec strip -x {} \;
+    find VLC.app/ -type f -name "VLC" -exec strip -x {} \;
+    find VLC.app/ -type f -name "Sparkle" -exec strip -x {} \;
+    find VLC.app/ -type f -name "Growl" -exec strip -x {} \;
+    find VLC.app/ -type f -name "Breakpad" -exec strip -x {} \;
 
     bin/vlc-cache-gen VLC.app/Contents/MacOS/plugins
 
