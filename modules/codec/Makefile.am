@@ -350,9 +350,6 @@ libvideotoolbox_plugin_la_SOURCES = \
 	packetizer/h264_slice.c packetizer/h264_slice.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
-if HAVE_OSX
-libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -mmacosx-version-min=10.8
-endif
 if HAVE_IOS
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -miphoneos-version-min=8.0
 endif

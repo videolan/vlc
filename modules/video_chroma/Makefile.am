@@ -118,9 +118,6 @@ chroma_LTLIBRARIES += \
 endif
 
 libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.c
-if HAVE_OSX
-libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.8
-endif
 if HAVE_IOS
 libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -miphoneos-version-min=8.0
 endif
