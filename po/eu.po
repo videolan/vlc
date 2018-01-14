@@ -11,7 +11,7 @@
 # LEIRE LÓPEZ GOIBURU <leirerentzat@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2016-04-04 16:53+0000\n"
@@ -79,8 +79,8 @@ msgstr "VLCren kontrol-interfazeetarako ezarpenak"
 msgid "Hotkeys settings"
 msgstr "Laster-teklen ezarpenak"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -749,7 +749,8 @@ msgstr "Aurikularrak"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatikoa"
@@ -1029,8 +1030,8 @@ msgstr "Hizkuntza"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskribapena"
 
@@ -1237,25 +1238,21 @@ msgid "Projection"
 msgstr "Proiekzioa"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Yaw"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Tonua"
+msgstr "Pitch"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "Biribilkia"
+msgstr "Roll"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Ikusmen-eremua"
@@ -1297,11 +1294,12 @@ msgstr "Zure sarrera ezin da ireki"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLCk ezin du ireki '%s' MRLa. Begiratu egunkaria xehetasunak jakiteko."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1793,7 +1791,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5102,7 +5101,8 @@ msgid "Browser Stop"
 msgstr "Nabigatzailea gelditu"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6963,7 +6963,8 @@ msgstr ""
 "Telebista-kateak satelite-errepikagailuaren arabera taldekatzen dira "
 "maiztasun jakin batean. Hori beharrezkoa da hargailua sintonizatzeko."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulazioa / Konstelazioa"
 
@@ -7788,7 +7789,8 @@ msgstr "Audioaren oinarrizko transmisio jarraituaren kanal kopurua"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Zabalera"
@@ -8779,7 +8781,8 @@ msgstr "Irrati-gailua"
 msgid "Radio tuner device node."
 msgstr "Irrati sintonizadorearen nodoa."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Maiztasuna"
 
@@ -16749,7 +16752,8 @@ msgid "Name"
 msgstr "Izena"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Egilea"
@@ -18963,7 +18967,8 @@ msgid "sec."
 msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audioa/Bideoa"
 
@@ -20665,10 +20670,11 @@ msgid "Extract"
 msgstr "Erauzi"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20680,7 +20686,8 @@ msgstr "&Itxi"
 msgid "Bytes"
 msgstr "Byteak"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Bihurtu"
 
@@ -21113,7 +21120,8 @@ msgstr "Bertsioa"
 msgid "Website"
 msgstr "Webgunea"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Fitxategiak"
 
@@ -24160,7 +24168,8 @@ msgstr "MPEG bideoa"
 msgid "VC-1 packetizer"
 msgstr "VC-1 paketatzailea"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf sareko zerbitzuak"
 
@@ -25429,13 +25438,12 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Errendimendu-aukerak"
+msgstr "Errendimendu-abisua"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Bistaratu errendimendu-abisua transkodetzerakoan"
 
 #: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
@@ -25458,15 +25466,16 @@ msgid "Chromecast stream output"
 msgstr "Chromecast transmisio jarraituaren irteera"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Ez galdetu berriro"
+msgstr "Ados, ez abisatu berriro"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Bideo hau igortzeak bihurketa egitea eskatzen du. Honek erabilgarri dagoen "
+"energia guztia erabili eta bateria azkar agor lezake."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
