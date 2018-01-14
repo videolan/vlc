@@ -30,7 +30,7 @@
 # Decode
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2017-11-01 07:26+0000\n"
@@ -99,8 +99,8 @@ msgstr "Indstillinger til VLCs kontrolgrænseflader"
 msgid "Hotkeys settings"
 msgstr "Indstillinger for genvejstaster"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -749,7 +749,8 @@ msgstr "Høretelefoner"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatisk"
@@ -1026,8 +1027,8 @@ msgstr "Sprog"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beskrivelse"
 
@@ -1239,10 +1240,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Pitch"
+msgstr ""
 
 #: src/input/es_out.c:3262
 msgctxt "ViewPoint"
@@ -1291,11 +1291,12 @@ msgstr "Input kan ikke åbnes"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC kan ikke åbne MRL '%s'. Tjek loggen for detaljer."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1778,7 +1779,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4989,7 +4991,8 @@ msgid "Browser Stop"
 msgstr "Browser - stop"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6838,7 +6841,8 @@ msgstr ""
 "TV-kanaler grupperes efter transponder (også kendt som multipleks) på en "
 "given frekvens. Dette er påkrævet for at finjustere modtageren."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulation / konstellation"
 
@@ -7642,7 +7646,8 @@ msgstr "Antal kanaler på et lyd elementary stream"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Bredde"
@@ -8609,7 +8614,8 @@ msgstr "Radioenhed"
 msgid "Radio tuner device node."
 msgstr "Enhedsnode for radiotuner."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Frekvens"
 
@@ -16376,7 +16382,8 @@ msgid "Name"
 msgstr "Navn"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Forfatter"
@@ -18563,7 +18570,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Lyd/video"
 
@@ -20235,10 +20243,11 @@ msgid "Extract"
 msgstr "Udtræk"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20250,7 +20259,8 @@ msgstr "&Luk"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Konvertér"
 
@@ -20677,7 +20687,8 @@ msgstr "Version"
 msgid "Website"
 msgstr "Hjemmeside"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Filer"
 
@@ -23673,7 +23684,8 @@ msgstr "MPEG-video"
 msgid "VC-1 packetizer"
 msgstr "VC-1 packetizer"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -24882,7 +24894,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid "HTTP port"
-msgstr ""
+msgstr "HTTP-port"
 
 #: modules/stream_out/chromecast/cast.cpp:106
 msgid ""
@@ -24908,9 +24920,8 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Ydelsesindstillinger"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
@@ -24937,9 +24948,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Softwareforstærkning"
+msgstr "OK, advar mig ikke igen"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
@@ -25852,7 +25862,7 @@ msgstr "Skygge afstand"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "Tekstretning"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -27296,7 +27306,7 @@ msgstr "ASCII-art video output"
 
 #: modules/video_output/android/window.c:50
 msgid "Android Window"
-msgstr ""
+msgstr "Android-vindue"
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -27818,7 +27828,7 @@ msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
-msgstr ""
+msgstr "XDG-skal"
 
 #: modules/video_output/wayland/xdg-shell.c:381
 msgid "XDG shell surface"
@@ -27927,7 +27937,7 @@ msgstr ""
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
-msgstr ""
+msgstr "Tilføj en YUV4MPEG2-header"
 
 #: modules/video_output/yuv.c:49
 msgid ""
@@ -29005,7 +29015,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
 msgid "Profile &Name"
-msgstr ""
+msgstr "&Profilnavn"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29317,7 +29327,7 @@ msgstr "Tilføj baggrund"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "O&utput"
-msgstr ""
+msgstr "&Output"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
