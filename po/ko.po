@@ -12,7 +12,7 @@
 # Seongki Shin <skshin@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2017-09-20 03:42+0000\n"
@@ -80,8 +80,8 @@ msgstr "VLC 제어 인터페이스 설정"
 msgid "Hotkeys settings"
 msgstr "단축키 설정"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -725,7 +725,8 @@ msgstr "헤드폰"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "자동"
@@ -996,8 +997,8 @@ msgstr "언어"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "설명"
 
@@ -1204,25 +1205,21 @@ msgid "Projection"
 msgstr "투영법"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Yaw (Y축 회전)"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "Pitch (X축 회전)"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "Roll (Z축 회전)"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "시야"
@@ -1264,11 +1261,12 @@ msgstr "입력을 열 수 없습니다"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC에서 '%s' MRL을 열 수 없습니다. 자세한 내용은 로그를 확인하세요."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1749,7 +1747,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4895,7 +4894,8 @@ msgid "Browser Stop"
 msgstr "브라우저 정지"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6729,7 +6729,8 @@ msgstr ""
 "TV 채널은 주어진 주파수상에서 트랜스폰터 (멀티플렉스라고 알려진) 에 의해 그룹"
 "화됩니다. 이것은 수신기를 조정하기 위해 필요합니다."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "변조 / 성상도"
 
@@ -7529,7 +7530,8 @@ msgstr "오디오 엘러멘터리 스트림의 채널 수"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "너비"
@@ -8488,7 +8490,8 @@ msgstr "라디오 장치"
 msgid "Radio tuner device node."
 msgstr "라디오 튜너 장치 노드"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "주파수"
 
@@ -16171,10 +16174,10 @@ msgid ""
 msgstr ""
 "<p>VLC 미디어 재생기는 <a href=\"http://www.videolan.org/\"><span style=\" "
 "text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> 커뮤니티</p>"
-"의 자발적인 참여자들이 만든 무료 오픈 소스 미디어 재생기, 인코더, 그리고 스트"
-"리머입니다. <p>VLC는 자체적인 내장 코덱을 사용하고, 당연히 여러 유명한 플랫"
-"폼 상에서 동작합니다. 그리고 거의 모든 파일, CD, DVD, 네트웍 스트림, 캡처 카"
-"드와 다른 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"http://www."
+"의 자발적인 참여자들이 만든 무료 오픈 소스 미디어 재생기, 인코딩 및 스트리밍 "
+"도구입니다. <p>VLC는 자체적인 내장 코덱을 사용하며, 기본적으로 모든 유명한 플"
+"랫폼에서 동작합니다. 그리고 거의 모든 파일, CD, DVD, 네트워크 스트림, 캡처 카"
+"드와 기타 미디어 형식을 읽을 수 있습니다!</p><p><a href=\"http://www."
 "videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
 "#0057ae;\">참여하세요!</span></a>"
 
@@ -16239,7 +16242,8 @@ msgid "Name"
 msgstr "이름"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "작성자"
@@ -18419,7 +18423,8 @@ msgid "sec."
 msgstr "초"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "오디오/비디오"
 
@@ -20088,10 +20093,11 @@ msgid "Extract"
 msgstr "RGB 추출"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20103,7 +20109,8 @@ msgstr "닫기(&C)"
 msgid "Bytes"
 msgstr "바이트"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "변환"
 
@@ -20525,7 +20532,8 @@ msgstr "버전"
 msgid "Website"
 msgstr "웹사이트"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "파일"
 
@@ -23526,7 +23534,8 @@ msgstr "MPEG 비디오"
 msgid "VC-1 packetizer"
 msgstr "VC-1 패킷타이저"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf 네트워크 서비스"
 
@@ -24740,13 +24749,12 @@ msgstr "이것은 크롬캐스트에 전송되는 미디어 MIMI 컨텐츠 형�
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "성능 옵션"
+msgstr "성능 경고"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "트랜스코딩시 성능 경고 표시하기"
 
 #: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
@@ -24769,15 +24777,16 @@ msgid "Chromecast stream output"
 msgstr "크롬캐스트 스트림 출력"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "다시 묻지 않기"
+msgstr "네, 다시 경고하지 마세요"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"이 비디오를 전송하려면 변환이 필요합니다. 이 변환은 사용 가능한 모든 전원을 "
+"사용할 수 있으며 배터리를 빨리 소모할 수 있습니다."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
