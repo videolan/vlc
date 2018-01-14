@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17C88" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17C205" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -1436,8 +1436,8 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3162">
-                                <rect key="frame" x="62" y="24" width="410" height="11"/>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3162" customClass="VLCWrappableTextField">
+                                <rect key="frame" x="15" y="24" width="504" height="11"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Use the complete preferences to configure custom caching values for each access module." id="3515">
                                     <font key="font" metaFont="miniSystem"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1446,14 +1446,14 @@ Gw
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="3162" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="17" id="2z7-Hd-etu"/>
+                            <constraint firstItem="3162" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="17" id="2z7-Hd-etu"/>
                             <constraint firstItem="2574" firstAttribute="top" secondItem="deK-kX-Lvr" secondAttribute="top" constant="12" id="4so-vT-r4H"/>
                             <constraint firstAttribute="bottom" secondItem="3162" secondAttribute="bottom" constant="24" id="DHM-6v-unL"/>
                             <constraint firstItem="3162" firstAttribute="centerX" secondItem="deK-kX-Lvr" secondAttribute="centerX" id="Huj-Q0-fSB"/>
                             <constraint firstItem="2580" firstAttribute="leading" secondItem="2574" secondAttribute="trailing" constant="17" id="MpM-4o-ZxL"/>
                             <constraint firstAttribute="trailing" secondItem="2580" secondAttribute="trailing" constant="17" id="N4J-65-EWZ"/>
                             <constraint firstItem="2574" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="16" id="YS7-i8-eoQ"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3162" secondAttribute="trailing" constant="17" id="cZZ-fq-ISG"/>
+                            <constraint firstAttribute="trailing" secondItem="3162" secondAttribute="trailing" constant="17" id="cZZ-fq-ISG"/>
                             <constraint firstItem="3162" firstAttribute="top" secondItem="2580" secondAttribute="bottom" constant="5" id="ltx-8x-IZC"/>
                             <constraint firstItem="2574" firstAttribute="centerY" secondItem="2580" secondAttribute="centerY" id="yq3-Ir-bxc"/>
                         </constraints>
@@ -2074,8 +2074,8 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="440" height="170"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2679">
-                        <rect key="frame" x="159" y="102" width="122" height="34"/>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2679">
+                        <rect key="frame" x="98" y="102" width="244" height="34"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="3527">
                             <font key="font" metaFont="system"/>
                             <string key="title">Press new keys for
@@ -2092,7 +2092,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2803">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2803">
                         <rect key="frame" x="112" y="54" width="217" height="14"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="This combination is already taken by %s" usesSingleLineMode="YES" id="3531">
                             <font key="font" metaFont="smallSystem"/>
@@ -2122,10 +2122,17 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="2679" firstAttribute="leading" secondItem="2678" secondAttribute="leading" constant="100" id="3nd-rp-ZnD"/>
+                    <constraint firstItem="2679" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="top" constant="17" id="55x-0r-0qV"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2800" secondAttribute="trailing" constant="17" id="6e5-ip-qeH"/>
                     <constraint firstItem="2803" firstAttribute="top" secondItem="2800" secondAttribute="bottom" constant="8" id="7lB-JR-wGe"/>
+                    <constraint firstAttribute="trailing" secondItem="2679" secondAttribute="trailing" constant="100" id="COG-xA-ijE"/>
                     <constraint firstAttribute="bottom" secondItem="2791" secondAttribute="bottom" constant="19" id="Hid-Pb-8rm"/>
                     <constraint firstAttribute="trailing" secondItem="2791" secondAttribute="trailing" constant="20" id="QIF-0S-zPw"/>
+                    <constraint firstItem="2803" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="Ril-RK-86t"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2803" secondAttribute="trailing" constant="17" id="TOI-Bo-QnU"/>
                     <constraint firstItem="2800" firstAttribute="top" secondItem="2679" secondAttribute="bottom" constant="8" id="aBX-2J-mHL"/>
+                    <constraint firstItem="2800" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="fgc-9A-80d"/>
                     <constraint firstItem="2800" firstAttribute="centerX" secondItem="2803" secondAttribute="centerX" id="hod-8D-J9c"/>
                     <constraint firstItem="2792" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2803" secondAttribute="bottom" constant="14" id="iIs-KU-NWi"/>
                     <constraint firstItem="2791" firstAttribute="leading" secondItem="2792" secondAttribute="trailing" constant="12" id="kML-hM-juB"/>
@@ -2203,9 +2210,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="5Kf-UL-t5A"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3795">
                         <rect key="frame" x="47" y="154" width="28" height="17"/>
@@ -2228,9 +2232,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="8DS-2C-ipM"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3798">
                         <rect key="frame" x="40" y="128" width="35" height="17"/>
@@ -2253,9 +2254,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="gvj-gc-PEC"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3806">
                         <rect key="frame" x="34" y="102" width="41" height="17"/>
@@ -2278,9 +2276,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="AVJ-ty-acQ"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3814">
                         <rect key="frame" x="283" y="154" width="37" height="17"/>
@@ -2303,9 +2298,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="gg6-lu-VFC"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3822">
                         <rect key="frame" x="46" y="76" width="29" height="17"/>
@@ -2328,9 +2320,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="1BP-8O-2rm"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3830">
                         <rect key="frame" x="284" y="128" width="36" height="17"/>
@@ -2353,9 +2342,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="nut-Yk-T3c"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3838">
                         <rect key="frame" x="288" y="102" width="32" height="17"/>
@@ -2378,9 +2364,6 @@ Gw
                                 </items>
                             </menu>
                         </popUpButtonCell>
-                        <connections>
-                            <action selector="urlHandlerAction:" target="-2" id="pxo-qS-haU"/>
-                        </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3846">
                         <rect key="frame" x="288" y="76" width="32" height="17"/>
@@ -2400,8 +2383,10 @@ Gw
                     <constraint firstItem="3829" firstAttribute="top" secondItem="3813" secondAttribute="bottom" constant="5" id="34h-Wl-av2"/>
                     <constraint firstItem="3822" firstAttribute="centerY" secondItem="3821" secondAttribute="centerY" id="6ij-VA-qKV"/>
                     <constraint firstItem="3821" firstAttribute="top" secondItem="3805" secondAttribute="bottom" constant="5" id="7wb-Ol-KSn"/>
+                    <constraint firstItem="3747" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3746" secondAttribute="leading" constant="19" id="BMp-6f-JI6"/>
                     <constraint firstItem="3797" firstAttribute="width" secondItem="3789" secondAttribute="width" id="COF-no-8BN"/>
                     <constraint firstItem="3797" firstAttribute="top" secondItem="3789" secondAttribute="bottom" constant="5" id="FB2-0s-gxn"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3749" secondAttribute="trailing" constant="19" id="FPE-Tx-eWB"/>
                     <constraint firstAttribute="trailing" secondItem="3813" secondAttribute="trailing" constant="36" id="GHF-bW-2zd"/>
                     <constraint firstItem="3845" firstAttribute="top" secondItem="3837" secondAttribute="bottom" constant="5" id="GgT-Er-RqV"/>
                     <constraint firstItem="3829" firstAttribute="width" secondItem="3837" secondAttribute="width" id="IoH-HM-0FE"/>
@@ -2426,9 +2411,11 @@ Gw
                     <constraint firstItem="3797" firstAttribute="leading" secondItem="3805" secondAttribute="leading" id="bh8-nz-NoW"/>
                     <constraint firstItem="3829" firstAttribute="leading" secondItem="3830" secondAttribute="trailing" constant="6" id="c38-xu-2bF"/>
                     <constraint firstItem="3837" firstAttribute="width" secondItem="3845" secondAttribute="width" id="d2F-oE-TpT"/>
+                    <constraint firstItem="3749" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3746" secondAttribute="leading" constant="19" id="dvs-PD-9sG"/>
                     <constraint firstItem="3767" firstAttribute="leading" secondItem="3769" secondAttribute="trailing" constant="7" id="jAP-t7-dJt"/>
                     <constraint firstItem="3837" firstAttribute="leading" secondItem="3838" secondAttribute="trailing" constant="6" id="jmn-74-TTM"/>
                     <constraint firstItem="3806" firstAttribute="centerY" secondItem="3805" secondAttribute="centerY" id="kqy-Ej-ddv"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3747" secondAttribute="trailing" constant="19" id="lLU-2q-m1L"/>
                     <constraint firstItem="3813" firstAttribute="top" secondItem="3789" secondAttribute="top" id="lse-mV-5Fg"/>
                     <constraint firstItem="3806" firstAttribute="leading" secondItem="3746" secondAttribute="leading" constant="36" id="oJR-0V-ZeB"/>
                     <constraint firstItem="3789" firstAttribute="leading" secondItem="3797" secondAttribute="leading" id="rsj-uf-AxA"/>
