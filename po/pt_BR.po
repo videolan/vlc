@@ -7,7 +7,7 @@
 # ssdoria <ssdoria@gmail.com>, 2008-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2016-01-22 02:26+0000\n"
@@ -76,8 +76,8 @@ msgstr "Configurações para as interfaces de controle do VLC"
 msgid "Hotkeys settings"
 msgstr "Configurações de atalhos"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -732,7 +732,8 @@ msgstr "Fones de ouvido"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automático"
@@ -1008,8 +1009,8 @@ msgstr "Idioma"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Descrição"
 
@@ -1216,28 +1217,24 @@ msgid "Projection"
 msgstr "Projeção"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Guinada"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Variação"
+msgstr "Inclinação"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "Rolagem"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "Ângulo de visão"
+msgstr "Campo de visão"
 
 #: src/input/es_out.c:3270
 msgid "Max. luminance"
@@ -1278,11 +1275,12 @@ msgstr ""
 "O VLC não é capaz de abrir o MRL '%s'. Verifique o registro de erros para "
 "maiores detalhes."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1769,7 +1767,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5010,7 +5009,8 @@ msgid "Browser Stop"
 msgstr "Parar no Navegador"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6876,7 +6876,8 @@ msgstr ""
 "Os canais de TV são agrupados pelo transponder (i.e., combinador) em uma "
 "dada frequência. Necessário para sintonizar o receptor."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulação / Constelação"
 
@@ -7693,7 +7694,8 @@ msgstr "Contagem de canais de um fluxo de áudio primário"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Largura"
@@ -8673,7 +8675,8 @@ msgstr "Dispositivo de rádio"
 msgid "Radio tuner device node."
 msgstr "Dispositivo de sintonia de rádio."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Freqüência"
 
@@ -16600,7 +16603,8 @@ msgid "Name"
 msgstr "Nome"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autor"
@@ -18808,7 +18812,8 @@ msgid "sec."
 msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Áudio/Vídeo"
 
@@ -20486,10 +20491,11 @@ msgid "Extract"
 msgstr "Extração"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20501,7 +20507,8 @@ msgstr "Fe&char"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Converter"
 
@@ -20929,7 +20936,8 @@ msgstr "Versão"
 msgid "Website"
 msgstr "Página da Web"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Arquivos"
 
@@ -21876,7 +21884,7 @@ msgstr "Arquivos de Lista de Reprodução I"
 
 #: modules/gui/skins2/src/dialogs.cpp:215
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Todos os Arquivos |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:216
 msgid "Open playlist"
@@ -21889,6 +21897,8 @@ msgstr "Salvar lista de reprodução"
 #: modules/gui/skins2/src/dialogs.cpp:224
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
+"Lista de reprodução XSPF |*.xspf|Arquivo M3U |*.m3u|Lista de reprodução HTML "
+"|*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:484
 msgid "Skin to use"
@@ -21959,7 +21969,7 @@ msgstr "Selecionar capa"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "Abrir capa..."
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -22025,11 +22035,11 @@ msgstr "Configura o gamma da imagem, entre 0.01 e 10. O padrão é 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
 msgid "Direct3D11 filter"
-msgstr ""
+msgstr "Filtro Direct3D11"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
-msgstr ""
+msgstr "Filtro de ajuste Direct3D9"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -22055,20 +22065,22 @@ msgstr "Extensão de decodificador baseado em MMAL para Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr ""
+msgstr "Usar QPUs para desentrelaçamento HD avançado."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"Usa os QPUs para permitir maior qualidade de desentrelaçamento de conteúdo "
+"HD."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
-msgstr ""
+msgstr "Desentrelaçamento MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr ""
+msgstr "Complemento de filtro de desentrelaçamento baseado em MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22084,11 +22096,11 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr ""
+msgstr "Tela branca abaixo do vídeo."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
-msgstr ""
+msgstr "Exibe uma tela branca abaixo do vídeo. Aumenta a carga no VideoCore."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -22096,13 +22108,15 @@ msgstr "Ajusta a taxa de atualização do HDMI para o vídeo."
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
-msgstr ""
+msgstr "Impõe o modo de vídeo entrelaçado."
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
+"Impõe à saída HDMI um modo de vídeo entrelaçado para conteúdos de vídeo "
+"entrelaçados."
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
@@ -22114,11 +22128,11 @@ msgstr "Complemento de saída de vídeo baseado em MMAL para Raspberry Pi"
 
 #: modules/hw/vaapi/filters.c:1187
 msgid "VAAPI filters"
-msgstr ""
+msgstr "Filtros VAAPI"
 
 #: modules/hw/vaapi/filters.c:1188
 msgid "Video Accelerated API filters"
-msgstr ""
+msgstr "Filtros de API Acelerados para Vídeo"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -22182,19 +22196,19 @@ msgstr "Filtro de nitidez de vídeo VDPAU"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
-msgstr ""
+msgstr "Arquivo repositório de chaves (texto puro)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr ""
+msgstr "Senhas são armazenadas em um arquivo sem criptografia"
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
-msgstr ""
+msgstr "Repositório de chaves criptografado"
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr ""
+msgstr "Senhas são armazenadas criptografadas em um arquivo"
 
 #: modules/keystore/keychain.m:40
 msgid "No"
@@ -22202,7 +22216,7 @@ msgstr "Não"
 
 #: modules/keystore/keychain.m:40
 msgid "Any"
-msgstr ""
+msgstr "Qualquer"
 
 #: modules/keystore/keychain.m:46
 msgid "System default"
@@ -22210,88 +22224,93 @@ msgstr "Padrão do sistema"
 
 #: modules/keystore/keychain.m:47
 msgid "After first unlock"
-msgstr ""
+msgstr "Após o primeiro desbloqueio"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock, on this device only"
-msgstr ""
+msgstr "Após o primeiro desbloqueio, neste dispositivo apenas"
 
 #: modules/keystore/keychain.m:50
 msgid "When passcode set, on this device only"
-msgstr ""
+msgstr "Quando a senha for definida, neste dispositivo apenas"
 
 #: modules/keystore/keychain.m:51
 msgid "Always, on this device only"
-msgstr ""
+msgstr "Sempre, neste dispositivo apenas"
 
 #: modules/keystore/keychain.m:52
 msgid "When unlocked"
-msgstr ""
+msgstr "Quando desbloqueado"
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked, on this device only"
-msgstr ""
+msgstr "Quando desbloqueado, neste dispositivo apenas"
 
 #: modules/keystore/keychain.m:56
 msgid "Synchronize stored items"
-msgstr ""
+msgstr "Sincronizar os itens armazenados"
 
 #: modules/keystore/keychain.m:57
 msgid ""
 "Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
+"Sincroniza itens armazenados via Keychain do iCloud, se habilitado no "
+"domínio."
 
 #: modules/keystore/keychain.m:59
 msgid "Accessibility type for all future passwords saved to the Keychain"
 msgstr ""
+"Tipo de acessibilidade para todas as senhas futuramente salvas no "
+"repositório de chaves"
 
 #: modules/keystore/keychain.m:61
 msgid "Keychain access group"
-msgstr ""
+msgstr "Grupo de acesso do Keychain"
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group as defined by the app entitlements."
 msgstr ""
+"Grupo de acesso do Keychain, como definido pelas permissões dos aplicativos."
 
 #: modules/keystore/keychain.m:108
 msgid "Keychain keystore"
-msgstr ""
+msgstr "Repositório de chaves Keychain"
 
 #: modules/keystore/keychain.m:109
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr ""
+msgstr "Repositório de chaves para iOS, Mac OS X e tvOS"
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
-msgstr ""
+msgstr "Repositório de chaves KWallet"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
-msgstr ""
+msgstr "Senhas são armazenadas via KWallet"
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
-msgstr ""
+msgstr "Repositório de chaves em memória"
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
-msgstr ""
+msgstr "Senhas são armazenadas em memória"
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
-msgstr ""
+msgstr "Repositório de chaves libsecret"
 
 #: modules/keystore/secret.c:40
 msgid "Secrets are stored via libsecret"
-msgstr ""
+msgstr "Senhas são armazenadas via libsecret"
 
 #: modules/logger/android.c:85
 msgid "Android log"
-msgstr ""
+msgstr "Registro do Android"
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
-msgstr ""
+msgstr "Registro do Android usando logcat"
 
 #: modules/logger/console.c:114
 msgid "Be quiet"
@@ -22299,15 +22318,15 @@ msgstr "Silencioso"
 
 #: modules/logger/console.c:115
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Desativar todas as mensagens na console."
 
 #: modules/logger/console.c:118
 msgid "Console log"
-msgstr ""
+msgstr "Registro da console"
 
 #: modules/logger/console.c:119
 msgid "Console logger"
-msgstr ""
+msgstr "Registrador da console"
 
 #: modules/logger/file.c:193
 msgid "HTML"
@@ -22315,7 +22334,7 @@ msgstr "HTML"
 
 #: modules/logger/file.c:203
 msgid "Info"
-msgstr ""
+msgstr "Informações"
 
 #: modules/logger/file.c:203
 msgid "Debug"
@@ -22354,62 +22373,64 @@ msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
+"Seleciona o detalhamento do registro ou o padrão a ser usado dado por --"
+"verbose."
 
 #: modules/logger/file.c:219
 msgid "Logger"
-msgstr ""
+msgstr "Registrador"
 
 #: modules/logger/file.c:220
 msgid "File logger"
-msgstr ""
+msgstr "Registrador em arquivo"
 
 #: modules/logger/journal.c:77
 msgid "Journal"
-msgstr ""
+msgstr "Journal"
 
 #: modules/logger/journal.c:78
 msgid "SystemD journal logger"
-msgstr ""
+msgstr "Registrador Journal do SystemD"
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
-msgstr ""
+msgstr "Registro do sistema (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
-msgstr ""
+msgstr "Emite mensagens de registro através do sistema de registro POSIX."
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
-msgstr ""
+msgstr "Mensagens de depuração"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
-msgstr ""
+msgstr "Inclui mensagens de depuração no registro do sistema."
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
-msgstr ""
+msgstr "Identidade"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Identidade do processo no registro do sistema."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
-msgstr ""
+msgstr "Infraestrutura"
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Infraestrutura de registro do sistema."
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
-msgstr ""
+msgstr "syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Registrador do sistema (syslog)"
 
 #: modules/lua/extension.c:1185
 msgid "Extension not responding!"
@@ -23119,31 +23140,31 @@ msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "Armazenamento local de complementos"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "Instalador do armazenamento local de complementos"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
-msgstr ""
+msgstr "Enumerador do armazenamento local de complementos"
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
-msgstr ""
+msgstr "Localizador dos complementos da videolan.org"
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
-msgstr ""
+msgstr "Localizador dos complementos de addons.videolan.org"
 
 #: modules/misc/addons/vorepository.c:70
 msgid "Videolan.org's single archive addons finder"
-msgstr ""
+msgstr "Localizador de complementos de arquivo único da Videolan.org."
 
 #: modules/misc/addons/vorepository.c:72
 msgid "single .vlp archive addons finder"
-msgstr ""
+msgstr "Localizador de complementos de arquivo único .vlp"
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -23183,7 +23204,7 @@ msgstr ""
 
 #: modules/misc/audioscrobbler.c:714
 msgid "Last.fm username not set"
-msgstr ""
+msgstr "O nome do usuário do Last.fm não está definido"
 
 #: modules/misc/audioscrobbler.c:715
 msgid ""
@@ -23197,17 +23218,20 @@ msgstr ""
 
 #: modules/misc/fingerprinter.c:73
 msgid "acoustid"
-msgstr ""
+msgstr "acoustid"
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr ""
+msgstr "Criador de impressão digital de trilhas (baseado em Acoustid)"
 
 #: modules/misc/gnutls.c:477
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Entretanto o certificado de segurança apresentado pelo servidor é "
+"desconhecido e pode não ter sido autenticado por uma Autoridade "
+"Certificadora confiável."
 
 #: modules/misc/gnutls.c:483
 msgid ""
@@ -23215,6 +23239,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Entretanto o certificado de segurança apresentado pelo servidor mudou desde "
+"a última visita e pode não ter sido autenticado por uma Autoridade "
+"Certificadora confiável."
 
 #: modules/misc/gnutls.c:494 modules/misc/gnutls.c:515
 #: modules/misc/securetransport.c:338
@@ -23239,6 +23266,11 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
+"Você tentou contactar %s. %s\n"
+"Este problema pode ter se originado de uma tentativa de quebrarem sua "
+"segurança, comprometer sua privacidade, ou um erro de configuração.\n"
+"\n"
+"Se estiver em dúvida, cancele agora.\n"
 
 #: modules/misc/gnutls.c:515
 msgid "Accept 24 hours"
@@ -23263,23 +23295,27 @@ msgstr ""
 
 #: modules/misc/gnutls.c:748
 msgid "Use system trust database"
-msgstr ""
+msgstr "Usar o banco de dados de confiança do sistema"
 
 #: modules/misc/gnutls.c:750
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr ""
+"Confia os certificados raiz das autoridades certificadoras armazenados no "
+"banco de dados de confiança para autenticar sessões TLS."
 
 #: modules/misc/gnutls.c:753
 msgid "Trust directory"
-msgstr ""
+msgstr "Pasta de confiança"
 
 #: modules/misc/gnutls.c:755
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr ""
+"Confia os certificados raiz das autoridades certificadoras armazenados nessa "
+"pasta específica para autenticar sessões TLS."
 
 #: modules/misc/gnutls.c:758
 msgid "TLS cipher priorities"
@@ -23324,11 +23360,11 @@ msgstr "Reproduzindo mídia."
 
 #: modules/misc/inhibit/dbus.c:232
 msgid "D-Bus screensaver"
-msgstr ""
+msgstr "Proteção de tela do D-Bus"
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
-msgstr ""
+msgstr "Inibição da proteção de tela do D-Bus"
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -23550,7 +23586,7 @@ msgstr "Misturador MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Descombinador para MP4 fragmentado e transmissível"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23665,6 +23701,8 @@ msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
+"Define os descritores de cada SDT. Requer \"Definir PID para ID do ES\" para "
+"ser habilitado."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23837,7 +23875,7 @@ msgstr "Misturador de WAV"
 
 #: modules/notify/osx_notifications.m:126
 msgid "OS X Notification Plugin"
-msgstr ""
+msgstr "Complemento de Notificação do OS X"
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23849,7 +23887,7 @@ msgstr "Reproduzindo agora"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
-msgstr ""
+msgstr "Pular"
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -23857,7 +23895,7 @@ msgstr "Tempo Limite (ms)"
 
 #: modules/notify/notify.c:56
 msgid "How long the notification will be displayed."
-msgstr ""
+msgstr "Por quanto tempo a notificação será exibida."
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -23873,7 +23911,7 @@ msgstr "Empacotador de áudio A/52"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "Empacotador avparser"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23940,23 +23978,24 @@ msgstr "Vídeo MPEG"
 msgid "VC-1 packetizer"
 msgstr "Empacotador VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr ""
+msgstr "Serviço de rede Zeroconf"
 
 #: modules/services_discovery/avahi.c:56
 msgid "Zeroconf services"
-msgstr ""
+msgstr "Serviço Zeroconf"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:370
 msgid "Bonjour Network Discovery"
-msgstr ""
+msgstr "Descoberta de Rede Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "Descoberta de Exibidor Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23984,11 +24023,11 @@ msgstr "Minhas Imagens"
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:620
 msgid "mDNS Network Discovery"
-msgstr ""
+msgstr "Descoberta de Rede mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "Descoberta de Exibidor mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24145,23 +24184,23 @@ msgstr "Tipo desconhecido"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
-msgstr ""
+msgstr "Lista de canais SAT>IP"
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
-msgstr ""
+msgstr "Lista de URL de canais personalizados SAT>IP"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
-msgstr ""
+msgstr "Lista Principal"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Server List"
-msgstr ""
+msgstr "Lista do Servidor"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
-msgstr ""
+msgstr "Lista Personalizada"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24236,19 +24275,19 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
 msgid "Bar width in pixel"
-msgstr ""
+msgstr "Altura da barra em pixels"
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
-msgstr ""
+msgstr "Altura em pixels de cada Gráfico de barras a ser exibido."
 
 #: modules/spu/audiobargraph_v.c:58
 msgid "Bar Height in pixel"
-msgstr ""
+msgstr "Largura da Barra em pixels"
 
 #: modules/spu/audiobargraph_v.c:59
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr ""
+msgstr "Largura em pixels do Gráfico de Barra a ser exibido."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24301,6 +24340,7 @@ msgstr "Número de exibições da animação do logotipo"
 #: modules/spu/logo.c:54
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
 msgstr ""
+"Número de exibições da animação do logotipo. -1 = contínuo, 0 = desabilitado"
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -24427,6 +24467,8 @@ msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
+"Opacidade (inverso de transparência) do texto sobreposto. 0 = transparente, "
+"255 = totamente opaco."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
@@ -24435,6 +24477,7 @@ msgstr "Tamanho da fonte, em pixels"
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
+"Tamanho da fonte, em pixels. O padrão é 0 (usar fonte em tamanho padrão)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24578,6 +24621,8 @@ msgid ""
 "Number of image columns in the mosaic (only used if positioning method is "
 "set to \"fixed\")."
 msgstr ""
+"Número de colunas de imagem no mosaico (somente usado se o método de "
+"posicionamento for definido para \"fixo\")."
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24607,6 +24652,9 @@ msgid ""
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
+"É possível garantir a ordem dos elementos no mosaico. Você deve preencher "
+"uma lista de IDs de figuras, separada por vírgulas. Esses IDs são associados "
+"no módulo \"ponte do mosaico\"."
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24683,6 +24731,8 @@ msgstr "Intervalo de poll do VNC"
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
+"Neste intervalo, será solicitada uma atualização do VNC. O padrão é a cada "
+"300ms."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24948,27 +24998,27 @@ msgstr "Correção de sobreposição"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr ""
+msgstr "Pasta de fluxos baseados em libarchive"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr ""
+msgstr "Extrator de fluxos baseados em libarchive"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
-msgstr ""
+msgstr "Filtro de fluxo ADF"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
-msgstr ""
+msgstr "Módulo de Câmera ARIB STD-B25"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr ""
+msgstr "Memória do fluxo de blocos"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr ""
+msgstr "Memória do fluxo em bytes"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24984,23 +25034,23 @@ msgstr "Descompressão gzip"
 
 #: modules/stream_filter/hds/hds.c:208
 msgid "HTTP Dynamic Streaming"
-msgstr ""
+msgstr "Fluxo Dinâmico HTTP"
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
-msgstr ""
+msgstr "Filtro de descompressão Zlib"
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
-msgstr ""
+msgstr "Filtro de pré recepção de fluxo"
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
-msgstr ""
+msgstr "Tamanho da memória"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
-msgstr ""
+msgstr "Tamanho da memória de pré aquisição (KiB)"
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
@@ -25009,14 +25059,15 @@ msgstr "Tamanho de leitura"
 #: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
 msgstr ""
+"Tamanho da memória de pré aquisição de leitura em segundo plano (bytes)"
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
-msgstr ""
+msgstr "Limiar de busca"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
-msgstr ""
+msgstr "Limiar (em bytes) da pré busca"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
@@ -25024,7 +25075,7 @@ msgstr "Gravação de fluxo interno"
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
-msgstr ""
+msgstr "Filtro de omissão de marcadores APE/ID3"
 
 #: modules/stream_out/autodel.c:46
 msgid "Autodel"
@@ -25099,6 +25150,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
+"Se habilitada, a ponte descartará todas as entradas de fluxo primário, "
+"exceto se não receber dados de outra ponte de conexão. Pode ser usado para "
+"configurar um controlador de fluxo quando a fonte real falhar. Fonte e "
+"controlador de fluxos devem ter o mesmo formato."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25141,55 +25196,57 @@ msgstr "Ponte de entrada"
 
 #: modules/stream_out/chromaprint.c:57
 msgid "Duration of the fingerprinting"
-msgstr ""
+msgstr "Duração da impressão digital"
 
 #: modules/stream_out/chromaprint.c:58
 msgid "Default: 90sec"
-msgstr ""
+msgstr "Padrão: 90 s"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
-msgstr ""
+msgstr "Saída de fluxo Chromaprint"
 
 #: modules/stream_out/chromecast/cast.cpp:105
 msgid "HTTP port"
-msgstr ""
+msgstr "Porta HTTP"
 
 #: modules/stream_out/chromecast/cast.cpp:106
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
+"Define a porta HTTP do servidor local a ser usado para criar fluxo da mídia "
+"para o Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:109
 msgid "The Chromecast receiver can receive video."
-msgstr ""
+msgstr "O receptor Chromecast pode receber vídeo."
 
 #: modules/stream_out/chromecast/cast.cpp:111
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr ""
+"Define o tipo de combinador a ser usado para enviar fluxo ao Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:112
 msgid "MIME content type"
-msgstr ""
+msgstr "Tipo de conteúdo MIME"
 
 #: modules/stream_out/chromecast/cast.cpp:113
 msgid "This sets the media MIME content type sent to the Chromecast."
-msgstr ""
+msgstr "Define o tipo de conteúdo MIME da mídia enviado ao Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Opções de desempenho"
+msgstr "Aviso de desempenho"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Exibe um aviso de desempenho quando transcodificando"
 
 #: modules/stream_out/chromecast/cast.cpp:118
 msgid "IP Address of the Chromecast."
-msgstr ""
+msgstr "Endereço IP do Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:119
 msgid "Chromecast port"
@@ -25197,7 +25254,7 @@ msgstr "Porta do Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:120
 msgid "The port used to talk to the Chromecast."
-msgstr ""
+msgstr "A porta usada para se comunicar com o Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:124
 msgid "Chromecast"
@@ -25208,15 +25265,16 @@ msgid "Chromecast stream output"
 msgstr "Saída de fluxo do Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Não me perguntar novamente"
+msgstr "Sim. Não me avisar novamente"
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Para juntar esse vídeo é necessário conversão. A conversão pode usar todo o "
+"poder de processamento e rapidamente drenar a sua bateria."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:366
 msgid "Chromecast demux wrapper"
@@ -25782,23 +25840,28 @@ msgstr ""
 
 #: modules/stream_out/standard.c:51
 msgid "Address to bind to (helper setting for dst)"
-msgstr ""
+msgstr "Endereço de ligação (configuração do auxiliar do dst)"
 
 #: modules/stream_out/standard.c:53
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
+"endereço:porta de ligação para o VLC aguardar auxiliares de conexão de "
+"fluxos de entrada para dst. dst=ligação+'/'+caminho. O parâmetro dst "
+"sobrepõe este."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr ""
+msgstr "Nome de arquivo para o fluxo (configuração do auxiliar para o dst)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
+"Nome de arquivo para a configuração do auxiliar para dst. dst=ligação"
+"+'/'+caminho. Os parametros dst sobrepõem este"
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -25972,6 +26035,10 @@ msgid ""
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
+"Permite adicionar sobreposições (também conhecidas como \"sub telas\") no "
+"fluxo de vídeo transcodificado. As sub telas produzidas pelos filtros serão "
+"sobrepostas diretamente ao vídeo. Você pode especificar uma lista de módulos "
+"de sub tela separados por dois-pontos."
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -25994,13 +26061,15 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
-msgstr ""
+msgstr "Tamanho da memória intermediária de Imagens"
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
 "Defines how many pictures we allow to be in pool between decoder/encoder "
 "threads when threads > 0"
 msgstr ""
+"Define quantas imagens serão permitidas a estar na memória intermediária "
+"entre os threads codificador/decodificador, quando threads > 0"
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
@@ -26019,6 +26088,8 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
+"Por favor, aguarde enquanto o cache de fontes é reorganizado.\n"
+"Isto não vai demorar."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -26054,6 +26125,8 @@ msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
+"A opacidade (inverso de translucidez) do texto que será desenhado na tela. 0 "
+"= transparente, 255 = totalmente opaco."
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -26113,11 +26186,11 @@ msgstr "Distância da sombra"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "Direção do texto"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
-msgstr ""
+msgstr "Direção base do parágrafo para o algoritmo bidirecional Unicode."
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
@@ -26141,11 +26214,11 @@ msgstr "Cheio"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Left to right"
-msgstr ""
+msgstr "Esquerda para a direita"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Right to left"
-msgstr ""
+msgstr "Direita para a esquerda"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -26157,11 +26230,11 @@ msgstr "Gerador de fonte Freetype2"
 
 #: modules/text_renderer/nsspeechsynthesizer.m:47
 msgid "Speech synthesis for Mac OS X"
-msgstr ""
+msgstr "Sintetização de fala do Mac OS X"
 
 #: modules/text_renderer/sapi.cpp:55
 msgid "Speech synthesis for Windows"
-msgstr ""
+msgstr "Sintetização de fala do Windows"
 
 #: modules/text_renderer/svg.c:70
 msgid "SVG template file"
@@ -26188,11 +26261,11 @@ msgstr "Conversões de "
 
 #: modules/video_chroma/i420_10_p010.c:131
 msgid "YUV 10-bits planar to semiplanar 10-bits conversions"
-msgstr ""
+msgstr "Conversões de YUV em 10 bits para semiplanar em 10 bits"
 
 #: modules/video_chroma/i420_nv12.c:163
 msgid "YUV planar to semiplanar conversions"
-msgstr ""
+msgstr "Conversões YUV de planar para semiplanar"
 
 #: modules/video_chroma/i420_rgb.c:79
 msgid "SSE2 I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
@@ -26292,11 +26365,11 @@ msgstr "Conversor YUVP"
 
 #: modules/video_filter/adjust.c:67
 msgid "Image hue (-180..180)"
-msgstr ""
+msgstr "Tonalidade de cor da imagem (-180..180)"
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr ""
+msgstr "Configura a tonalidade da imagem, entre -180 e 180. O padrão é 0."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26613,16 +26686,17 @@ msgstr "Filtro de vídeo canvas"
 
 #: modules/video_filter/ci_filters.m:760
 msgid "Use a specific Core Image Filter"
-msgstr ""
+msgstr "Usar um Filtro de Imagem Interno específico"
 
 #: modules/video_filter/ci_filters.m:762
 msgid ""
 "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 msgstr ""
+"Exemplo: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 
 #: modules/video_filter/ci_filters.m:768
 msgid "Mac OS X hardware video filters"
-msgstr ""
+msgstr "Filtros de vídeo por dispositivo do Mac OS X"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26817,15 +26891,15 @@ msgstr "Desentrelaçamento de vídeo"
 
 #: modules/video_filter/edgedetection.c:39
 msgid "Edge detection video filter"
-msgstr ""
+msgstr "Filtro de vídeo de detecção de canto"
 
 #: modules/video_filter/edgedetection.c:40
 msgid "Edge detection"
-msgstr ""
+msgstr "Detecção de canto"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
-msgstr ""
+msgstr "Detecta cantos no quadro e os destaca em branco."
 
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
@@ -26867,11 +26941,11 @@ msgstr "Filtro de vídeo de extração RGB"
 
 #: modules/video_filter/fps.c:45
 msgid "FPS conversion video filter"
-msgstr ""
+msgstr "Filtro de conversão de vídeo FPS"
 
 #: modules/video_filter/fps.c:46
 msgid "FPS Converter"
-msgstr ""
+msgstr "Conversor de FPS"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -27047,6 +27121,7 @@ msgstr "Orientação do espelhamento"
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
+"Define a orientação do espelho em partição. Pode ser vertical ou horizontal."
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -27062,7 +27137,7 @@ msgstr "Direção"
 
 #: modules/video_filter/mirror.c:72
 msgid "Direction of the mirroring."
-msgstr ""
+msgstr "Direção do espelhamento."
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -27130,7 +27205,7 @@ msgstr "Usar formato cromático de entrada inalterado"
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "I420 - first plane is grayscale"
-msgstr ""
+msgstr "I420 - o primeiro plano está em escala de cinza"
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
@@ -27177,6 +27252,8 @@ msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
+"Quantidade de mudança na escala da figura antes de enviá-la ao filtro "
+"interno OpenCV"
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27594,23 +27671,23 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:73
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Valor do Formato Ativo do Descritor"
 
 #: modules/video_output/decklink.cpp:76
 msgid "Aspect Ratio of the source picture."
-msgstr ""
+msgstr "Proporção da imagem."
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Linha do Descritor Ativo de Formato"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
-msgstr ""
+msgstr "Linha do VBI para a qual sairá o Descritor Ativo de Formato."
 
 #: modules/video_output/decklink.cpp:81
 msgid "Picture to display on input signal loss"
-msgstr ""
+msgstr "Imagem a ser exibida em caso de perda de sinal"
 
 #: modules/video_output/decklink.cpp:84
 msgid "Output card"
@@ -27667,27 +27744,27 @@ msgstr "Saída Decklink"
 
 #: modules/video_output/decklink.cpp:235
 msgid "Output module to write to Blackmagic SDI card"
-msgstr ""
+msgstr "Módulo de saída para escrever na placa SDI Blackmagic"
 
 #: modules/video_output/decklink.cpp:236
 msgid "DeckLink General Options"
-msgstr ""
+msgstr "Opções Gerais do DeckLink"
 
 #: modules/video_output/decklink.cpp:241
 msgid "DeckLink Video Output module"
-msgstr ""
+msgstr "Módulo de Saída de Vídeo Decklink"
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Options"
-msgstr ""
+msgstr "Opções de Vídeo do DeckLink"
 
 #: modules/video_output/decklink.cpp:269
 msgid "DeckLink Audio Output module"
-msgstr ""
+msgstr "Módulo de Saída de Áudio DeckLink"
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Options"
-msgstr ""
+msgstr "Opções de Áudio do DeckLink"
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27748,7 +27825,7 @@ msgstr "A memória de quadros usa aceleração por hardware."
 
 #: modules/video_output/fb.c:71
 msgid "Disable for double buffering in software."
-msgstr ""
+msgstr "Desabilite para memória dupla em software."
 
 #: modules/video_output/fb.c:73
 msgid "Image format (default RGB)"
@@ -27896,15 +27973,15 @@ msgstr "Saída de vídeo recomendada para o Windows Vista e versões posteriores
 
 #: modules/video_output/win32/direct3d9.c:91
 msgid "Direct3D9 video output"
-msgstr ""
+msgstr "Saída de vídeo Direct3D9"
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr ""
+msgstr "Saída de vídeo recomendada para o Windows 8 e versões posteriores"
 
 #: modules/video_output/win32/direct3d11.c:78
 msgid "Direct3D11 video output"
-msgstr ""
+msgstr "Saída de vídeo Direct3D11"
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -27992,7 +28069,7 @@ msgstr "Papel de parede"
 
 #: modules/video_output/win32/glwin32.c:51
 msgid "OpenGL video output for Windows"
-msgstr ""
+msgstr "Saída de vídeo OpenGL para Windows"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -28004,7 +28081,7 @@ msgstr "Afinidade de GPU"
 
 #: modules/video_output/win32/wgl.c:46
 msgid "WGL extension for OpenGL"
-msgstr ""
+msgstr "Extensão WGL para OpenGL"
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -28065,7 +28142,7 @@ msgstr "Memória de vídeo"
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
 msgid "Wayland display"
-msgstr ""
+msgstr "Tela Wayland"
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -28073,30 +28150,32 @@ msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
 msgstr ""
+"O vídeo será exibido nesta tela Wayland. Se um valor não for preenchido, o "
+"valor padrão de tela será usado."
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
-msgstr ""
+msgstr "Interface WL"
 
 #: modules/video_output/wayland/shell.c:412
 msgid "Wayland shell surface"
-msgstr ""
+msgstr "Camada de interface do Wayland"
 
 #: modules/video_output/wayland/shm.c:508
 msgid "WL SHM"
-msgstr ""
+msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr ""
+msgstr "Saída de vídeo de memória compartilhada do Wayland"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
-msgstr ""
+msgstr "Interface XDG"
 
 #: modules/video_output/wayland/xdg-shell.c:381
 msgid "XDG shell surface"
-msgstr ""
+msgstr "Camada de interface do XDG"
 
 #. xgettext: This is a plain ASCII spelling of "VLC media player"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -28197,17 +28276,19 @@ msgstr "Formato cromático usado"
 
 #: modules/video_output/yuv.c:46
 msgid "Force use of a specific chroma for output."
-msgstr ""
+msgstr "Impõe o uso de um formato cromático específico para a saída."
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
-msgstr ""
+msgstr "Adicionar um cabeçalho YUV4MPEG2"
 
 #: modules/video_output/yuv.c:49
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
+"O cabeçalho YUV4MPEG2 é compatível com a saída de vídeo yuv do mplayer e "
+"requer o YV12/I420 fourcc."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -28498,11 +28579,11 @@ msgstr "Parede de imagens"
 
 #: modules/visualization/glspectrum.c:56
 msgid "The width of the visualization window, in pixels."
-msgstr ""
+msgstr "A largura da janela de visualização, em pixels."
 
 #: modules/visualization/glspectrum.c:59
 msgid "The height of the visualization window, in pixels."
-msgstr ""
+msgstr "A altura da janela de visualização, em pixels."
 
 #: modules/visualization/glspectrum.c:62
 msgid "glSpectrum"
@@ -28510,7 +28591,7 @@ msgstr "glSpectrum"
 
 #: modules/visualization/glspectrum.c:63
 msgid "3D OpenGL spectrum visualization"
-msgstr ""
+msgstr "Visualização do espectro com 3D OpenGL"
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28657,6 +28738,8 @@ msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
+"O parâmetro alfa da janela Kaiser. Aumentando o alfa, aumenta a largura do "
+"lobo principal e diminui a amplitude do lobo lateral."
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
@@ -28752,19 +28835,19 @@ msgstr "Analizador de espectro"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Hann"
-msgstr ""
+msgstr "Hann"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Flat Top"
-msgstr ""
+msgstr "Teto Plano"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
-msgstr ""
+msgstr "Blackman-Harris"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Kaiser"
-msgstr ""
+msgstr "Kaiser"
 
 #: modules/visualization/vsxu.cpp:59 modules/visualization/vsxu.cpp:60
 msgid "vsxu"
@@ -29046,7 +29129,7 @@ msgstr "Momento de Início"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Stop Time"
-msgstr ""
+msgstr "Momento de Parada"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -29074,7 +29157,7 @@ msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
 msgid "Change the stop time for the media"
-msgstr ""
+msgstr "Modificar o momento de parada para a mídia"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -30799,9 +30882,6 @@ msgstr "Lista do Gerenciador de Mídias"
 #~ "Nome da porta serial onde o controlador AtmoLight está atrelada.\n"
 #~ "No Windows, geralmente algo como COM1 ou COM2. No Linux /dev/ttyS01 f.e."
 
-#~ msgid "Edge weightning"
-#~ msgstr "Ponderação pelos Cantos"
-
 #~ msgid ""
 #~ "Increasing this value will result in color more depending on the border "
 #~ "of the frame."
@@ -30938,9 +31018,6 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #~ msgid "Change gradients"
 #~ msgstr "Modificaar gradientes"
-
-#~ msgid "Bar width in pixel (default : 10)"
-#~ msgstr "Largura da barra em pixels (padrão : 10)"
 
 #~ msgid "Android MediaCodec direct rendering video output"
 #~ msgstr "Saída de vídeo de renderização direta do Android MediaCodec"
@@ -32757,9 +32834,6 @@ msgstr "Lista do Gerenciador de Mídias"
 #~ "Tamanho do cache para captura de imagens (número de imagens a serem "
 #~ "mantidas)."
 
-#~ msgid "ID of the video output X window"
-#~ msgstr "ID da saída de vídeo X Window"
-
 #~ msgid ""
 #~ "VLC can embed its video output in an existing X11 window. This is the X "
 #~ "identifier of that window (0 means none)."
@@ -33840,10 +33914,6 @@ msgstr "Lista do Gerenciador de Mídias"
 #~ msgstr "Senha para o dispositivo alvo."
 
 #, fuzzy
-#~ msgid "Edge Weightning"
-#~ msgstr "Ponderação pelos Cantos"
-
-#, fuzzy
 #~ msgid "yes: from %@ to %@ secs"
 #~ msgstr "sim: de %@ a %@"
 
@@ -33854,12 +33924,6 @@ msgstr "Lista do Gerenciador de Mídias"
 #, fuzzy
 #~ msgid "1 item"
 #~ msgstr "%i itens"
-
-#, fuzzy
-#~ msgid ""
-#~ "Force use of a specific chroma for output. Default is Y420 (specific to "
-#~ "N770/N8xx hardware)."
-#~ msgstr "Impõe o uso de um formato cromático específico. O padrão é o I420."
 
 #, fuzzy
 #~ msgid "Format to use in playlist \"title\" field when no CDDB"
@@ -33880,6 +33944,28 @@ msgstr "Lista do Gerenciador de Mídias"
 #, fuzzy
 #~ msgid "Use built-in AtmoLight"
 #~ msgstr "AtmoLight Clássico"
+
+#, fuzzy
+#~ msgid "Edge weightning"
+#~ msgstr "Detecção de canto"
+
+#, fuzzy
+#~ msgid "Bar width in pixel (default : 10)"
+#~ msgstr "Altura da barra em pixels"
+
+#, fuzzy
+#~ msgid "ID of the video output X window"
+#~ msgstr "Saída de vídeo OpenGL para Windows"
+
+#, fuzzy
+#~ msgid "Edge Weightning"
+#~ msgstr "Detecção de canto"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force use of a specific chroma for output. Default is Y420 (specific to "
+#~ "N770/N8xx hardware)."
+#~ msgstr "Impõe o uso de um formato cromático específico para a saída."
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
@@ -34855,7 +34941,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "Force use of a specific chroma for output. Default is RGB32."
-#~ msgstr "Impõe o uso de um combinador avformat específico."
+#~ msgstr "Impõe o uso de um formato cromático específico para a saída."
 
 #, fuzzy
 #~ msgid "Android Surface video output"
@@ -34888,7 +34974,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "Direct2D video output"
-#~ msgstr "Saída de áudio do DirectX"
+#~ msgstr "Saída de vídeo Direct3D9"
 
 #, fuzzy
 #~ msgid "SDL chroma format"
@@ -35174,7 +35260,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Saída de vídeo OpenGL do Mac OS X"
+#~ msgstr "Saída de vídeo OpenGL para Windows"
 
 #, fuzzy
 #~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
@@ -35250,7 +35336,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "Search Filter"
-#~ msgstr "Filtros de fluxo"
+#~ msgstr "Filtro de pré recepção de fluxo"
 
 #, fuzzy
 #~ msgid "Image clone"
@@ -36362,7 +36448,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "Instante da Mídia"
+#~ msgstr "Momento de Parada"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
@@ -37428,7 +37514,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "Growl UDP Notification Plugin"
-#~ msgstr "Complemento de Notificação LibNotify"
+#~ msgstr "Complemento de Notificação do OS X"
 
 #, fuzzy
 #~ msgid "Simple XML Parser"
@@ -38210,7 +38296,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "DirectX video output"
-#~ msgstr "Saída de áudio do DirectX"
+#~ msgstr "Saída de vídeo Direct3D9"
 
 #, fuzzy
 #~ msgid "QT Embedded display"
@@ -38307,7 +38393,7 @@ msgstr "Lista do Gerenciador de Mídias"
 
 #, fuzzy
 #~ msgid "VIDEO_TS directory"
-#~ msgstr "Pasta"
+#~ msgstr "Pasta de confiança"
 
 #, fuzzy
 #~ msgid "Video On Demand"
