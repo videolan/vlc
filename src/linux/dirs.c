@@ -24,31 +24,15 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 #include <linux/limits.h>
 
 #include <vlc_common.h>
 #include "libvlc.h"
 #include "config/configuration.h"
 
-char *config_GetLibDir (void)
+static char *config_GetLibDirRaw(void)
 {
-    static struct
-    {
-        vlc_mutex_t lock;
-        char path[PATH_MAX];
-    } cache = {
-        VLC_STATIC_MUTEX, "",
-    };
-
-    /* Reading and parsing /proc/self/maps is slow, so cache the value since
-     * it's guaranteed not to change during the life-time of the process. */
-    vlc_mutex_lock(&cache.lock);
-    if (cache.path[0] != '\0')
-    {
-        char *ret = strdup(cache.path);
-        vlc_mutex_unlock(&cache.lock);
-        return ret;
-    }
     char *path = NULL;
 
     /* Find the path to libvlc (i.e. ourselves) */
@@ -92,10 +76,27 @@ char *config_GetLibDir (void)
 error:
     if (path == NULL)
         path = strdup(PKGLIBDIR);
-    if (likely(path != NULL && sizeof(cache.path) > strlen(path)))
-        strcpy(cache.path, path);
-    vlc_mutex_unlock(&cache.lock);
     return path;
+}
+
+static char cached_path[PATH_MAX] = PKGLIBDIR;
+
+static void config_GetLibDirOnce(void)
+{
+    char *path = config_GetLibDirRaw();
+    if (likely(path != NULL && sizeof (cached_path) > strlen(path)))
+        strcpy(cached_path, path);
+    free(path);
+}
+
+char *config_GetLibDir(void)
+{
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+
+    /* Reading and parsing /proc/self/maps is slow, so cache the value since
+     * it's guaranteed not to change during the life-time of the process. */
+    pthread_once(&once, config_GetLibDirOnce);
+    return strdup(cached_path);
 }
 
 char *config_GetDataDir (void)
