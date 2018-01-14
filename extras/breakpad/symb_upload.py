@@ -168,8 +168,6 @@ class LocalDirOutputStore(OutputStore):
     def __init__(self, rootdir: str):
         super().__init__()
         self.rootdir = rootdir
-        if not os.path.exists(basepath):
-            raise RuntimeError("root path '{}' does not exists".format(basepath))
 
     def store(self, dump: typing.io, meta):
         basepath = os.path.join(self.rootdir, meta["debug_file"], meta["debug_identifier"])
