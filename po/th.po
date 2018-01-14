@@ -11,7 +11,7 @@
 # Theppitak Karoonboonyanan <thep@linux.thai.net>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2017-09-20 03:42+0000\n"
@@ -79,8 +79,8 @@ msgstr "ค่าตั้งของส่วนติดต่อควบค
 msgid "Hotkeys settings"
 msgstr "ค่าตั้งปุ่มลัด"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -717,7 +717,8 @@ msgstr "หูฟัง"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "อัตโนมัติ"
@@ -988,8 +989,8 @@ msgstr "ภาษา"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "รายละเอียด"
 
@@ -1196,25 +1197,21 @@ msgid "Projection"
 msgstr "การฉายภาพ"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "มุมส่าย (Yaw)"
+msgstr "มุมส่ายหน้า (Yaw)"
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Pitch"
+msgstr "มุมก้ม/เงย (Pitch)"
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "มุมเอียงหน้า (Roll)"
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "ขอบเขตภาพ (FOV)"
@@ -1256,11 +1253,12 @@ msgstr "ไม่สามารถเปิดข้อมูลเข้าข
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC ไม่สามารถเปิด MRL '%s' โปรดตรวจสอบรายละเอียดที่ปูม"
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1734,7 +1732,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2405,7 +2404,7 @@ msgid ""
 "channel."
 msgstr ""
 "ตัวเลือกเหล่านี้จะช่วยให้คุณสามารถปรับเปลี่ยนพฤติกรรมของส่วนอ่านข้อมูลเข้า เช่น อุปกรณ์ดีวีดีหรือซีดี "
-"ค่าตั้งอินเทอร์เฟซเครือข่าย หรือช่องบทบรรยาย"
+"ค่าตั้งช่องเชื่อมต่อเครือข่าย หรือช่องบทบรรยาย"
 
 #: src/libvlc-module.c:505
 msgid "File caching (ms)"
@@ -2441,43 +2440,51 @@ msgstr "ค่าการทำแคชสำหรับทรัพยาก
 
 #: src/libvlc-module.c:521
 msgid "Clock reference average counter"
-msgstr ""
+msgstr "ค่าเฉลี่ยตัวนับสัญญาณนาฬิกาอ้างอิง"
 
 #: src/libvlc-module.c:523
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
 msgstr ""
+"เมื่อใช้เครื่องอัดวีดิทัศน์ดิจิทัล (หรือแหล่งที่มีความไม่สม่ำเสมอสูง) เป็นข้อมูลขาเข้า คุณควรตั้งค่านี้เป็น "
+"10000"
 
 #: src/libvlc-module.c:526
 msgid "Clock synchronisation"
-msgstr "การปรับเทียบเวลาของนาฬิกาให้ตรงกัน"
+msgstr "ปรับพ้องสัญญาณนาฬิกา"
 
 #: src/libvlc-module.c:528
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
+"คุณสามารถปิดใช้การปรับพ้องสัญญาณนาฬิกาของวีดิทัศน์ขาเข้าสำหรับแหล่งสดได้ "
+"คุณควรเลือกตัวเลือกนี้ถ้าพบการกระตุกของภาพขณะเล่นกระแสผ่านเครือข่าย"
 
 #: src/libvlc-module.c:532
 msgid "Clock jitter"
-msgstr ""
+msgstr "บีบเวลาสัญญาณภาพไหว"
 
 #: src/libvlc-module.c:534
 msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr ""
+"ค่านี้กำหนดความหน่วงสูงสุดของสัญญาณเข้าที่ทำให้ภาพไหวที่อัลกอริทึมพ้องจังหวะจะพยายามชดเชยให้ "
+"(เป็นมิลลิวินาที)"
 
 #: src/libvlc-module.c:537
 msgid "Network synchronisation"
-msgstr "การรับประสานข้อมูลจากเครือข่าย"
+msgstr "พ้องจังหวะข้อมูลเครือข่าย"
 
 #: src/libvlc-module.c:538
 msgid ""
 "This allows you to remotely synchronise clocks for server and client. The "
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
+"ตัวเลือกนี้ช่วยให้คุณสามารถปรับความพ้องจังหวะสัญญาณนาฬิกาของแม่ข่ายกับลูกข่ายจากระยะไกลได้ "
+"ค่าตั้งโดยละเอียดมีอยู่ในหัวข้อ ขั้นสูง / การพ้องจังหวะเครือข่าย"
 
 #: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -2509,13 +2516,13 @@ msgstr "เปิดใช้"
 
 #: src/libvlc-module.c:546
 msgid "MTU of the network interface"
-msgstr ""
+msgstr "MTU ของช่องเชื่อมต่อเครือข่าย"
 
 #: src/libvlc-module.c:548
 msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
-msgstr ""
+msgstr "นี่คือขนาดสูงสุดของแพ็กเก็ตในชั้นแอปพลิเคชันที่สามารถส่งผ่านเครือข่ายได้ (เป็นไบต์)"
 
 #: src/libvlc-module.c:553 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
@@ -2527,30 +2534,38 @@ msgid ""
 "multicast packets sent by the stream output (-1 = use operating system built-"
 "in default)."
 msgstr ""
+"นี่คือขีดจำกัดจำนวน hop (เรียกอีกอย่างว่า \"Time-To-Live\" หรือ TTL) "
+"ของแพ็กเก็ตสัญญาณหมู่ที่ส่งโดยกระแสขาออก (-1 = ใช้ค่าที่กำหนดโดยระบบปฏิบัติการเป็นค่าปริยาย)"
 
 #: src/libvlc-module.c:559
 msgid "Multicast output interface"
-msgstr "ส่วนติดต่อส่งสัญญาณหมู่"
+msgstr "ช่องเชื่อมต่อส่งสัญญาณหมู่"
 
 #: src/libvlc-module.c:561
 msgid "Default multicast interface. This overrides the routing table."
-msgstr ""
+msgstr "ช่องเชื่อมต่อที่ใช้ส่งสัญญาณหมู่โดยปริยาย ค่านี้จะกำหนดทับค่าตารางเส้นทางเครือข่าย"
 
 #: src/libvlc-module.c:563
 msgid "DiffServ Code Point"
-msgstr ""
+msgstr "DiffServ Code Point"
 
 #: src/libvlc-module.c:564
 msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
 msgstr ""
+"Differentiated Services Code Point สำหรับกระแส UDP ขาออก (หรือ Type Of Service "
+"สำหรับ IPv4, หรือ Traffic Class สำหรับ IPv6) ค่านี้ใช้สำหรับจัดการ Quality of Service "
+"ของเครือข่าย"
 
 #: src/libvlc-module.c:570
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
+"เลือกรายการที่จะรับชมโดยระบุ Service ID ของรายการ "
+"คุณควรใช้ตัวเลือกนี้ก็ต่อเมื่อคุณต้องการอ่านข้อมูลกระแสที่ส่งรายการหลายรายการเท่านั้น (เช่น กระแส "
+"DVB)"
 
 #: src/libvlc-module.c:576
 msgid ""
@@ -2558,6 +2573,9 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
+"เลือกรายการต่างๆ ที่จะรับชมโดยระบุรายชื่อ Service ID (SID) ของรายการ คั่นด้วยจุลภาค "
+"คุณควรใช้ตัวเลือกนี้ก็ต่อเมื่อคุณต้องการอ่านข้อมูลกระแสที่ส่งรายการหลายรายการเท่านั้น (เช่น กระแส "
+"DVB)"
 
 #: src/libvlc-module.c:582 modules/gui/qt/ui/open_disk.h:312
 msgid "Audio track"
@@ -2565,7 +2583,7 @@ msgstr "ร่องเสียงที่"
 
 #: src/libvlc-module.c:584
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr "หมายเลขกระแสของร่องเสียง ที่จะใช้ (จาก 0 ถึง n)"
+msgstr "หมายเลขกระแสของร่องเสียงที่จะใช้ (จาก 0 ถึง n)"
 
 #: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
@@ -2573,7 +2591,7 @@ msgstr "ร่องบทบรรยาย"
 
 #: src/libvlc-module.c:589
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr "หมายเลขกระแสของร่องบทบรรยาย ที่จะใช้ (จาก 0 ถึง n)"
+msgstr "หมายเลขกระแสของร่องบทบรรยายที่จะใช้ (จาก 0 ถึง n)"
 
 #: src/libvlc-module.c:592 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2585,8 +2603,8 @@ msgid ""
 "letter country code, you may use 'none' to avoid a fallback to another "
 "language)."
 msgstr ""
-"ภาษาของร่องเสียงที่คุณต้องการใช้ (ใส่รหัสภาษาโดยใช้เครื่องหมายจุลภาคแบ่ง \" , \" "
-"เพื่อใช้แยกแยะกับตัวหลัง ซึ่งท่านอาจจะเพิ่มขึ้นมาเผื่อไว้เพื่อกันพลาด)"
+"ภาษาของร่องเสียงที่คุณต้องการใช้ (ใช้รหัสภาษาแบบสองหรือสามตัวอักษร คั่นด้วยจุลภาค คุณอาจใช้ค่า "
+"'none' เพื่อป้องกันการถอยไปใช้ภาษาอื่นได้)"
 
 #: src/libvlc-module.c:597
 msgid "Subtitle language"
@@ -2597,8 +2615,8 @@ msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"ภาษาของร่องบทบรรยายที่คุณต้องการใช้ (ใส่รหัสภาษาโดยใช้เครื่องหมายจุลภาคแบ่ง \" , \" "
-"เพื่อใช้แยกแยะกับตัวหลัง ซึ่งท่านอาจจะเพิ่มขึ้นมาเผื่อไว้เพื่อกันพลาด)"
+"ภาษาของร่องบทบรรยายที่คุณต้องการใช้ (ใช้รหัสภาษาแบบสองหรือสามตัวอักษร คั่นด้วยจุลภาค "
+"คุณอาจใช้ค่า 'any' เพื่อใช้เป็นตัวเลือกสำรองได้)"
 
 #: src/libvlc-module.c:602
 msgid "Menu language"
@@ -2609,6 +2627,8 @@ msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"ภาษาของเมนูที่คุณต้องการใช้กับดีวีดี/บลูเรย์ (ใช้รหัสภาษาแบบสองหรือสามตัวอักษร คั่นด้วยจุลภาค "
+"คุณอาจใช้ค่า 'any' เพื่อใช้เป็นตัวเลือกสำรองได้)"
 
 #: src/libvlc-module.c:608
 msgid "Audio track ID"
@@ -2616,7 +2636,7 @@ msgstr "ID ร่องเสียง"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the audio track to use."
-msgstr "ID กระแสของร่องเสียง ที่จะใช้"
+msgstr "ID กระแสของร่องเสียงที่จะใช้"
 
 #: src/libvlc-module.c:612
 msgid "Subtitle track ID"
@@ -2624,11 +2644,11 @@ msgstr "ID ร่องบทบรรยาย"
 
 #: src/libvlc-module.c:614
 msgid "Stream ID of the subtitle track to use."
-msgstr "ID กระของร่องบทบรรยายที่จะใช้"
+msgstr "ID กระแสของร่องบทบรรยายที่จะใช้"
 
 #: src/libvlc-module.c:616
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "ตัวอ่านบทบรรยายปกติปิดที่เลือกใช้"
 
 #: src/libvlc-module.c:620
 msgid "Preferred video resolution"
@@ -2641,6 +2661,9 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
+"เมื่อวีดิทัศน์มีหลายฟอร์แมตให้ใช้ ให้ VLC เลือกฟอร์แมตที่ให้ความละเอียดใกล้เคียง (แต่ไม่เกิน) "
+"ค่านี้มากที่สุด ในหน่วยจำนวนเส้น คุณควรใช้ตัวเลือกนี้ถ้าพลังประมวลผลของ CPU "
+"ของคุณหรือแบนด์วิดท์ของเครือข่ายมีไม่มากพอที่จะเล่นความละเอียดสูงกว่านี้ได้"
 
 #: src/libvlc-module.c:628
 msgid "Best available"
@@ -2656,7 +2679,7 @@ msgstr "HD (720p)"
 
 #: src/libvlc-module.c:629
 msgid "Standard Definition (576 or 480 lines)"
-msgstr "ความละเอียกมาตรฐาน (576 หรือ 480 เส้น)"
+msgstr "ความละเอียดมาตรฐาน (576 หรือ 480 เส้น)"
 
 #: src/libvlc-module.c:630
 msgid "Low Definition (360 lines)"
@@ -2668,11 +2691,11 @@ msgstr "ความละเอียดต่ำมาก (240 เส้น)"
 
 #: src/libvlc-module.c:634
 msgid "Input repetitions"
-msgstr ""
+msgstr "จำนวนรอบการเล่นซ้ำ"
 
 #: src/libvlc-module.c:636
 msgid "Number of time the same input will be repeated"
-msgstr ""
+msgstr "จำนวนรอบที่จะเล่นข้อมูลขาเข้าเดิมซ้ำๆ"
 
 #: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
@@ -2680,7 +2703,7 @@ msgstr "เวลาเริ่ม"
 
 #: src/libvlc-module.c:640
 msgid "The stream will start at this position (in seconds)."
-msgstr "กระแสจะเริ่มที่เวลานี้ (วินาที)"
+msgstr "กระแสจะเริ่มเล่นที่เวลานี้ (เป็นวินาที)"
 
 #: src/libvlc-module.c:642 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
@@ -2688,23 +2711,23 @@ msgstr "เวลาหยุด"
 
 #: src/libvlc-module.c:644
 msgid "The stream will stop at this position (in seconds)."
-msgstr "กระแสจะหยุดลงที่เวลานี้ (วินาที)"
+msgstr "กระแสจะหยุดลงที่เวลานี้ (เป็นวินาที)"
 
 #: src/libvlc-module.c:646
 msgid "Run time"
-msgstr "เวลาที่ใช้"
+msgstr "เวลาที่เล่น"
 
 #: src/libvlc-module.c:648
 msgid "The stream will run this duration (in seconds)."
-msgstr "กระแสะจะเดินในช่วงเวลานี้ (วินาที)"
+msgstr "กระแสจะเล่นเป็นเวลาเท่านี้ (เป็นวินาที)"
 
 #: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
-msgstr "การไล่ดูแบบเร็ว"
+msgstr "เลื่อนดูแบบเร็ว"
 
 #: src/libvlc-module.c:652
 msgid "Favor speed over precision while seeking"
-msgstr "ให้ความสำคัญกับความเร็วมากกว่าความแม่นยำระหว่างการไล่ดู"
+msgstr "ในการเลื่อนดู ให้ความสำคัญกับความเร็วมากกว่าความแม่นยำ"
 
 #: src/libvlc-module.c:654
 msgid "Playback speed"
@@ -2716,17 +2739,17 @@ msgstr "ค่านี้กำหนดความเร็วในการ
 
 #: src/libvlc-module.c:658
 msgid "Input list"
-msgstr "รายการส่วนนำเข้า"
+msgstr "รายชื่อสื่อขาเข้า"
 
 #: src/libvlc-module.c:660
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
-msgstr ""
+msgstr "คุณสามารถกำหนดรายชื่อที่คั่นด้วยจุลภาคของสื่อขาเข้าที่จะเพิ่มเป้นเนื้อหาท้ายสื่อปกติ"
 
 #: src/libvlc-module.c:663
 msgid "Input slave (experimental)"
-msgstr ""
+msgstr "ลูกข่ายขาเข้า (ขั้นทดลอง)"
 
 #: src/libvlc-module.c:665
 msgid ""
@@ -2734,10 +2757,12 @@ msgid ""
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
+"ค่านี้จะช่วยให้คุณสามารถเล่นสื่อจากหลายแหล่งพร้อมๆ กันได้ ความสามารถนี้ยังอยู่ในขั้นทดลองเท่านั้น "
+"ยังไม่รองรับทุกฟอร์แมต คุณสามารถกำหนดรายชื่อแหล่งขาเข้าโดยใช้ '#' คั่นระหว่างรายการ"
 
 #: src/libvlc-module.c:669
 msgid "Bookmarks list for a stream"
-msgstr ""
+msgstr "รายชื่อที่คั่นสำหรับกระแส"
 
 #: src/libvlc-module.c:671
 msgid ""
@@ -2745,46 +2770,48 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"คุณสามารถกำหนดรายชื่อของที่คั่นสำหรับกระแสหนึ่งๆ ได้ในรูป \"{name=ชื่อที่คั่น,"
+"time=เวลาเริ่มเล่น(ถ้ามี),bytes=ไบต์เริ่มเล่น(ถ้ามี)},{...}\""
 
 #: src/libvlc-module.c:675
 msgid "Record directory"
-msgstr ""
+msgstr "ไดเรกทอรีเก็บสื่อที่อัด"
 
 #: src/libvlc-module.c:677
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "ไดเรกทอรีที่จะเก็บสื่อที่อัด"
 
 #: src/libvlc-module.c:679
 msgid "Prefer native stream recording"
-msgstr ""
+msgstr "เลือกใช้การอัดด้วยกระแสเนื้อในของอุปกรณ์"
 
 #: src/libvlc-module.c:681
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
-msgstr ""
+msgstr "จะอัดกระแสขาเข้าโดยตรงแทนที่จะใช้มอดูลกระแสขาออกถ้าเป็นไปได้"
 
 #: src/libvlc-module.c:684
 msgid "Timeshift directory"
-msgstr ""
+msgstr "ไดเรกทอรีเก็บแฟ้มกระโดดข้ามเวลา"
 
 #: src/libvlc-module.c:686
 msgid "Directory used to store the timeshift temporary files."
-msgstr ""
+msgstr "ไดเรกทอรีที่จะใช้เก็บแฟ้มชั่วคราวต่างๆ ที่เกี่ยวกับการกระโดดข้ามเวลา"
 
 #: src/libvlc-module.c:688
 msgid "Timeshift granularity"
-msgstr ""
+msgstr "ความละเอียดของการกระโดดข้ามเวลา"
 
 #: src/libvlc-module.c:690
 msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
-msgstr ""
+msgstr "ค่านี้คือขนาดสูงสุดเป็นไบต์ของแฟ้มชั่วคราวต่างๆ ที่จะใช้เก็บกระแสที่มีการกระโดดข้ามเวลา"
 
 #: src/libvlc-module.c:693
 msgid "Change title according to current media"
-msgstr ""
+msgstr "เปลี่ยนหัวเรื่องตามสื่อที่เล่น"
 
 #: src/libvlc-module.c:694
 msgid ""
@@ -2793,10 +2820,13 @@ msgid ""
 "Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z: \"Now playing"
 "\" (Fall back on Title - Artist)"
 msgstr ""
+"ตัวเลือกนี้ช่วยให้คุณสามารถกำหนดหัวเรื่องตามสื่อที่กำลังเล่นได้<br>$a: ศิลปิน<br>$b: อัลบัม<br>"
+"$c: ลิขสิทธิ์<br>$t: ชื่อเรื่อง<br>$g: ประเภท<br>$n: เลขร่อง<br>$p: \"กำลังเล่น\"<br>"
+"$A: วันที่<br>$D: ความยาว<br>$Z: \"กำลังเล่น\" (ชื่อเรื่อง - ศิลปิน)"
 
 #: src/libvlc-module.c:699
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "ปิดใช้ปลั๊กอิน lua ทั้งหมด"
 
 #: src/libvlc-module.c:703
 msgid ""
@@ -4705,7 +4735,8 @@ msgid "Browser Stop"
 msgstr "ปุ่มหยุดการเรียก (Browser Stop)"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6483,7 +6514,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -7246,7 +7278,8 @@ msgstr "จำนวนช่องของกระแสมูลฐานเ
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "ความกว้าง"
@@ -8160,7 +8193,8 @@ msgstr "อุปกรณ์เล่นวิทยุ"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "ความถี่"
 
@@ -13731,11 +13765,11 @@ msgstr "ระยะเวลา (วินาที) จนกระทั่�
 
 #: modules/control/netsync.c:70
 msgid "Network Sync"
-msgstr "รับประสานเครือข่าย"
+msgstr "การพ้องจังหวะเครือข่าย"
 
 #: modules/control/netsync.c:71
 msgid "Network synchronization"
-msgstr "การรับประสานข้อมูลจากเครือข่าย"
+msgstr "การพ้องจังหวะข้อมูลจากเครือข่าย"
 
 #: modules/control/ntservice.c:45
 msgid "Install Windows Service"
@@ -15462,7 +15496,8 @@ msgid "Name"
 msgstr "ชื่อ"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "ผู้สร้าง"
@@ -17589,7 +17624,8 @@ msgid "sec."
 msgstr "วินาที"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "เสียง/วีดิทัศน์"
 
@@ -19229,10 +19265,11 @@ msgid "Extract"
 msgstr ""
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19244,7 +19281,8 @@ msgstr "&ป&ิด"
 msgid "Bytes"
 msgstr "ไบต์"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "แปลง"
 
@@ -19648,7 +19686,8 @@ msgstr "รุ่น"
 msgid "Website"
 msgstr "เว็บไซต์"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "แฟ้ม"
 
@@ -22530,7 +22569,8 @@ msgstr "วีดิทัศน์ MPEG"
 msgid "VC-1 packetizer"
 msgstr "ตัวทำแพกเกจ VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -23664,9 +23704,8 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "แสดงข้อผิดพลาดและคำเตือน"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
@@ -23693,9 +23732,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "ไม่ต้องถามอีก"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
@@ -26327,19 +26365,19 @@ msgstr "ส่วนแสดงวีดิทัศน์เชิงสถิ
 
 #: modules/video_output/vmem.c:43
 msgid "Video memory buffer width."
-msgstr "ความกว้างบัฟเฟอร์ความจำวีดิทัศน์"
+msgstr "ความกว้างภาพของบัฟเฟอร์หน่วยความจำวีดิทัศน์"
 
 #: modules/video_output/vmem.c:46
 msgid "Video memory buffer height."
-msgstr "ความสูงบัฟเฟอร์ความจำวีดิทัศน์"
+msgstr "ความสูงภาพของบัฟเฟอร์หน่วยความจำวีดิทัศน์"
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
-msgstr "Pitch"
+msgstr "ความยาวเส้นภาพ"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
-msgstr "ระดับเสียงบัฟเฟอร์ความจำวีดิทัศน์เป็นไบต์"
+msgstr "ความยาวเส้นภาพของบัฟเฟอร์หน่วยความจำวีดิทัศน์เป็นไบต์"
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
