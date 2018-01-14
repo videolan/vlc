@@ -197,36 +197,39 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
-int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
+static char **vlclua_dir_list_append( char **restrict list, char *basedir,
+                                      const char *luadirname )
 {
-#define MAX_DIR_LIST_SIZE 5
-    *pppsz_dir_list = malloc(MAX_DIR_LIST_SIZE*sizeof(char *));
-    if (!*pppsz_dir_list)
+    if (unlikely(basedir == NULL))
+        return list;
+
+    if (likely(asprintf(list, "%s"DIR_SEP"lua"DIR_SEP"%s",
+                        basedir, luadirname) != -1))
+        list++;
+
+    free(basedir);
+    return list;
+}
+
+int vlclua_dir_list(const char *luadirname, char ***restrict listp)
+{
+    char **list = malloc(4 * sizeof(char *));
+    if (unlikely(list == NULL))
         return VLC_EGENERIC;
-    char **ppsz_dir_list = *pppsz_dir_list;
 
-    int i = 0;
-    char *datadir = config_GetUserDir( VLC_DATA_DIR );
+    *listp = list;
 
-    if( likely(datadir != NULL)
-     && likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
-                         datadir, luadirname ) != -1) )
-        i++;
-    free( datadir );
+    /* Lua scripts in user-specific data directory */
+    list = vlclua_dir_list_append(list, config_GetUserDir(VLC_DATA_DIR),
+                                  luadirname);
 
-    char *psz_datapath = config_GetDataDir();
-    if( likely(psz_datapath != NULL) )
-    {
-        if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
-                              psz_datapath, luadirname ) != -1) )
-            i++;
-        free( psz_datapath );
-    }
+    /* Tokenized Lua scripts in architecture-specific data directory */
+    list = vlclua_dir_list_append(list, config_GetLibDir(), luadirname);
 
-    ppsz_dir_list[i] = NULL;
+    /* Source Lua Scripts in architecture-independent data directory */
+    list = vlclua_dir_list_append(list, config_GetDataDir(), luadirname);
 
-    assert( i < MAX_DIR_LIST_SIZE);
-
+    *list = NULL;
     return VLC_SUCCESS;
 }
 
