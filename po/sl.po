@@ -12,7 +12,7 @@
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc5\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-08 16:15+0100\n"
 "PO-Revision-Date: 2017-10-08 10:16+0000\n"
@@ -83,8 +83,8 @@ msgstr "Nastavitve vmesnikov upravljanja predvajalnika VLC"
 msgid "Hotkeys settings"
 msgstr "Nastavitve hitrih tipk"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3085 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3085
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -670,7 +670,7 @@ msgstr "Zvokovni filtri"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr "Ponovno predvajanje"
+msgstr "Glasnost sledi"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCMainMenu.m:411
@@ -737,7 +737,8 @@ msgstr "Slušalke"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:970
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Samodejno"
@@ -1020,8 +1021,8 @@ msgstr "Jezik"
 
 #: src/input/es_out.c:3079 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Opis"
 
@@ -1067,11 +1068,11 @@ msgstr "%u kb/s"
 
 #: src/input/es_out.c:3120
 msgid "Track replay gain"
-msgstr "Pridobitev zaznane glasnosti sledi"
+msgstr "Zaznana glasnost sledi"
 
 #: src/input/es_out.c:3122
 msgid "Album replay gain"
-msgstr "Pridobitev zaznane glasnosti albuma"
+msgstr "Zaznana glasnosti albuma"
 
 #: src/input/es_out.c:3123
 #, c-format
@@ -1228,25 +1229,21 @@ msgid "Projection"
 msgstr "Projekcija"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "Yaw"
+msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Uglasitev"
+msgstr ""
 
 #: src/input/es_out.c:3262
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "Roll"
+msgstr ""
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Polje pogleda"
@@ -1289,11 +1286,12 @@ msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "Ni mogoče odpreti MRL »%s«. Podrobnosti so zabeležene v dnevniški datoteki."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:503
 #: modules/gui/qt/components/open_panels.cpp:517
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1699,11 +1697,11 @@ msgstr "Preizkus"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr "Ojačitev zvoka"
+msgstr "Glasnost zvoka"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr "Linearna ojačitev bo uveljavljena na odvodu zvoka."
+msgstr "Linearna uskladitev glasnosti bo uveljavljena na odvodu zvoka."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
@@ -1778,7 +1776,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1821,11 +1820,11 @@ msgstr "Možnost doda module predočenja (spektralna analiza ...)."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr "Način ponovnega predvajanja"
+msgstr "Način usklajevanja glasnosti"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr "Izbor načina ponovnega predvajanja"
+msgstr "Izbor načina usklajevanja glasnosti"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
@@ -1836,16 +1835,18 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
-"Možnost dovoljuje določitev privzete ciljne ravni (89 dB) za pretok "
-"podrobnosti ponovnega predvajanja."
+"Možnost dovoljuje določitev privzete ciljne ravni (89 dB) za pretok, pri "
+"katerem so opredeljene podrobnosti usklajevanja glasnosti."
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr "Privzeto ponovno predvajanje"
+msgstr "Privzeta vrednost zaznane glasnosti"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr "Uporabljen pritok za pretoke brez podrobnosti ponovnega predvajanja"
+msgstr ""
+"Možnost določa uskladitev glasnosti za pretok, pri katerem podrobnosti o "
+"usklajevanju ni mogoče najti."
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -2523,7 +2524,7 @@ msgid ""
 "to 10000."
 msgstr ""
 "Ob uporabi dovoda PVR (ali zelo neenakomernega vira) nastavite vrednost na "
-"10000."
+"10 000."
 
 #: src/libvlc-module.c:526
 msgid "Clock synchronisation"
@@ -2592,7 +2593,7 @@ msgstr "Omogoči"
 
 #: src/libvlc-module.c:546
 msgid "MTU of the network interface"
-msgstr "MTU za omrežni vmesnik"
+msgstr "Vrednost MTU za omrežni vmesnik"
 
 #: src/libvlc-module.c:548
 msgid ""
@@ -2618,12 +2619,12 @@ msgstr ""
 
 #: src/libvlc-module.c:559
 msgid "Multicast output interface"
-msgstr "Vmesnik skupinskega pošiljanja izhoda"
+msgstr "Vmesnik skupinskega pošiljanja odvoda"
 
 #: src/libvlc-module.c:561
 msgid "Default multicast interface. This overrides the routing table."
 msgstr ""
-"Privzeti vmesnik skupinskega pošiljanja. Nastavitev prepiše usmerjevalno "
+"Privzeti vmesnik za skupinsko pošiljanje. Nastavitev prepiše usmerjevalno "
 "razpredelnico."
 
 #: src/libvlc-module.c:563
@@ -3087,16 +3088,16 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Privzeti pogon DVD ali datoteka, ki naj se uporabi. Pogon mora biti določen "
-"s črko in dvopičjem (primer: D:)"
+"Privzeti pogon DVD ali datoteka, ki naj se uporabi. Pogon mora biti v okolju "
+"Windows določen s črko in dvopičjem (primer: D:)"
 
 #: src/libvlc-module.c:775
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Privzeti pogon VCD ali datoteka, ki naj se uporabi. Pogon mora biti določen "
-"s črko in dvopičjem (primer: D:)"
+"Privzeti pogon VCD ali datoteka, ki naj se uporabi. Pogon mora biti v okolju "
+"Windows določen s črko in dvopičjem (primer: D:)"
 
 #: src/libvlc-module.c:778 modules/access/cdda.c:704
 msgid ""
@@ -3169,8 +3170,9 @@ msgid ""
 "is 80. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"Strežnik HTTP bo poslušal na teh vratih TCP. Standardno število vrat HTTP je "
-"80. Vendar pa operacijski sistem omejuje dodelitev števil vrat pod 1025."
+"Strežnik HTTP bo spremljal dogajanje na vratih TCP. Standardna številka vrat "
+"HTTP je 80, sicer pa operacijski sistem omejuje dodelitev števil vrat pod "
+"1025."
 
 #: src/libvlc-module.c:828
 msgid "HTTPS server port"
@@ -3182,8 +3184,9 @@ msgid ""
 "number is 443. However allocation of port numbers below 1025 is usually "
 "restricted by the operating system."
 msgstr ""
-"Strežnik HTTPS bo poslušal na teh vratih TCP. Standardno število vrat HTTPS "
-"je 443. Vendar pa operacijski sistem omejuje dodelitev števil vrat pod 1025."
+"Strežnik HTTPS bo spremljal dogajanje na vratih TCP. Standardna številka "
+"vrat HTTPS je 443, sicer pa operacijski sistem omejuje dodelitev števil vrat "
+"pod 1025."
 
 #: src/libvlc-module.c:835
 msgid "RTSP server port"
@@ -3195,8 +3198,9 @@ msgid ""
 "is 554. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"Strežnik RTSP bo poslušal na teh vratih TCP. Standardno število vrat HTTP je "
-"554. Vendar pa operacijski sistem omejuje dodelitev števil vrat pod 1025."
+"Strežnik RTSP bo spremljal dogajanje na vratih TCP. Standardna številk avrat "
+"RTSP je 554, sicer pa operacijski sistem omejuje dodelitev števil vrat pod "
+"1025."
 
 #: src/libvlc-module.c:842
 msgid "HTTP/TLS server certificate"
@@ -3207,8 +3211,8 @@ msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
 msgstr ""
-"To datoteko potrdila X.509 (oblika PEM) uporablja TLS strežnika. Na OS X se "
-"niz uporablja kot oznako za iskanje potrdila v verigi ključev."
+"To datoteko potrdila X.509 (oblika PEM) uporablja strežnik za protokol TLS. "
+"Na OS X se niz uporablja kot oznako za iskanje potrdila v verigi ključev."
 
 #: src/libvlc-module.c:847
 msgid "HTTP/TLS server private key"
@@ -3217,7 +3221,7 @@ msgstr "Zasebni ključ strežnika HTTP/TLS"
 #: src/libvlc-module.c:849
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr ""
-"Ta datoteka zasebnega ključa (zapis PEM) se uporablja za strežniško stran "
+"Ta datoteka zasebnega ključa (zapis PEM) se uporablja za strežniški protokol "
 "TLS."
 
 #: src/libvlc-module.c:851
@@ -3586,8 +3590,8 @@ msgid ""
 "VLC instances."
 msgstr ""
 "Možnost doda odmik (pozitiven ali negativen) prednosti predvajalnika VLC. "
-"Nastavitev lahko uporabite pri nastavljanju prednostnega izvajanja med "
-"drugimi programi ali med vmesniki predvajalnika."
+"Nastavitev lahko uporabite pri nastavljanju prednosi izvajanja pred drugimi "
+"programi oziroma pred drugimi primerki programa VLC."
 
 #: src/libvlc-module.c:1036
 msgid ""
@@ -5012,7 +5016,8 @@ msgid "Browser Stop"
 msgstr "Ustavi brskalnik"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6874,7 +6879,8 @@ msgstr ""
 "TV kanali so združeni po transponderju (zvijalniku) na dani frekvenci. To je "
 "zahtevano za uglaševanje sprejemnika."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:966
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:966
 msgid "Modulation / Constellation"
 msgstr "Modulacija / Konstelacija"
 
@@ -7685,7 +7691,8 @@ msgstr "Število kanalov osnovnega zvokovnega pretoka"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Širina"
@@ -8652,7 +8659,8 @@ msgstr "Radijska naprava"
 msgid "Radio tuner device node."
 msgstr "Vozlišče naprave za radijski sprejem."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1073
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1073
 msgid "Frequency"
 msgstr "Frekvenca"
 
@@ -8702,7 +8710,7 @@ msgstr "Kontrast"
 
 #: modules/access/v4l2/v4l2.c:90
 msgid "Picture contrast or luma gain."
-msgstr "Kontrast slike ali ojačitev osvetljenosti"
+msgstr "Kontrast slike ali uskladitev osvetljenosti"
 
 #: modules/access/v4l2/v4l2.c:91
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:207
@@ -8714,7 +8722,7 @@ msgstr "Nasičenost"
 
 #: modules/access/v4l2/v4l2.c:92
 msgid "Picture saturation or chroma gain."
-msgstr "Nasičenost slike ali ojačanje barve."
+msgstr "Nasičenost slike ali uskladitev barve."
 
 #: modules/access/v4l2/v4l2.c:93
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:203
@@ -8782,7 +8790,7 @@ msgstr "Prilagoditev osvetljenosti slike gama"
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
-msgstr "Samodejno ojačanje"
+msgstr "Samodejno usklajevanje videa"
 
 #: modules/access/v4l2/v4l2.c:116
 msgid "Automatically set the video gain."
@@ -8790,11 +8798,11 @@ msgstr "Samodejno nastavi ojačanje videa."
 
 #: modules/access/v4l2/v4l2.c:117 modules/audio_filter/gain.c:62
 msgid "Gain"
-msgstr "Okrepitev"
+msgstr "Usklajevanje glasnosti"
 
 #: modules/access/v4l2/v4l2.c:119
 msgid "Picture gain."
-msgstr "Ojačanje slike."
+msgstr "Usklajevanje kontrasta slike."
 
 #: modules/access/v4l2/v4l2.c:120
 msgid "Sharpness"
@@ -8806,19 +8814,19 @@ msgstr "Nastavitev filtra ostrine."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
-msgstr "Ojačanje barve"
+msgstr "Usklajevanje barve"
 
 #: modules/access/v4l2/v4l2.c:123
 msgid "Chroma gain control."
-msgstr "Nadzor ojačanja barve"
+msgstr "Nadzor usklajevanja barve"
 
 #: modules/access/v4l2/v4l2.c:124
 msgid "Automatic chroma gain"
-msgstr "Samodejno ojačanje barve"
+msgstr "Samodejno usklajevanje barve"
 
 #: modules/access/v4l2/v4l2.c:126
 msgid "Automatically control the chroma gain."
-msgstr "Samodejni nadzor ojačanja barve."
+msgstr "Samodejni nadzor nad usklajevanjem barve."
 
 #: modules/access/v4l2/v4l2.c:127
 msgid "Power line frequency"
@@ -9011,11 +9019,11 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "525 lines / 60 Hz"
-msgstr "525 črt / 60 Hz"
+msgstr "525 vrstic / 60 Hz"
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "625 lines / 50 Hz"
-msgstr "625 črt / 50 Hz"
+msgstr "625 vrstic / 50 Hz"
 
 #: modules/access/v4l2/v4l2.c:255
 msgid "PAL N Argentina"
@@ -9059,7 +9067,7 @@ msgstr "Dovod slike"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr "Uglaševalo"
+msgstr "Uglaševalnik"
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
@@ -9798,7 +9806,7 @@ msgstr "Zakasnitev"
 
 #: modules/audio_filter/chorus_flanger.c:76
 msgid "Add a delay effect to the sound"
-msgstr "Doda zvoku učinek zakasnitve"
+msgstr "Doda zvoku učinek zakasnitve."
 
 #: modules/audio_filter/chorus_flanger.c:80
 #: modules/audio_filter/stereo_widen.c:57
@@ -9834,7 +9842,7 @@ msgstr "Hitrost zamika globine obsipavanja v ms na sekundo predvajanja"
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1317
 msgid "Feedback gain"
-msgstr "Povratno ojačanje"
+msgstr "Povratno usklajevanje"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
@@ -10083,7 +10091,7 @@ msgstr "Povečaj ali zmanjšaj ojačanje (privzeto je 1.0)"
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
-msgstr "Filter za nadzor ojačanja"
+msgstr "Filter za nadzor usklajevanja glasnosti"
 
 #: modules/audio_filter/karaoke.c:33 modules/demux/xiph_metadata.h:51
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:259
@@ -10139,7 +10147,7 @@ msgstr "Nizka frekvenca (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "Low freq gain (dB)"
-msgstr "Nizka frekvenčna pridobitev (dB)"
+msgstr "Nizka frekvenčna uskladitev (dB)"
 
 #: modules/audio_filter/param_eq.c:61
 msgid "High freq (Hz)"
@@ -10147,7 +10155,7 @@ msgstr "Visoka frekvenca (Hz)"
 
 #: modules/audio_filter/param_eq.c:63
 msgid "High freq gain (dB)"
-msgstr "Visoka frekvenčna pridobitev (dB)"
+msgstr "Visoka frekvenčna uskladitev (dB)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 (Hz)"
@@ -10155,7 +10163,7 @@ msgstr "Frekvenca 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:66
 msgid "Freq 1 gain (dB)"
-msgstr "Frekvenčna pridobitev 1 (dB)"
+msgstr "Frekvenčna uskladitev 1 (dB)"
 
 #: modules/audio_filter/param_eq.c:68
 msgid "Freq 1 Q"
@@ -10167,7 +10175,7 @@ msgstr "Frekvenca 2 (Hz)"
 
 #: modules/audio_filter/param_eq.c:71
 msgid "Freq 2 gain (dB)"
-msgstr "Frekvenčna pridobitev 2 (dB)"
+msgstr "Frekvenčna uskladitev 2 (dB)"
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 2 Q"
@@ -10179,7 +10187,7 @@ msgstr "Frekvenca 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (dB)"
-msgstr "Frekvenčna pridobitev 3 (dB)"
+msgstr "Frekvenčna uskladitev 3 (dB)"
 
 #: modules/audio_filter/param_eq.c:78
 msgid "Freq 3 Q"
@@ -10276,7 +10284,7 @@ msgstr "Dolžina koraka"
 
 #: modules/audio_filter/scaletempo.c:67
 msgid "Length in milliseconds to output each stride"
-msgstr "Dolžina v milisekundah za odvod posameznega koraka"
+msgstr "Dolžina za odvod posameznega koraka v milisekundah"
 
 #: modules/audio_filter/scaletempo.c:69
 msgid "Overlap Length"
@@ -10284,7 +10292,7 @@ msgstr "Dolžina prekrivanja"
 
 #: modules/audio_filter/scaletempo.c:69
 msgid "Percentage of stride to overlap"
-msgstr "Odstotek koraka prekrivanja"
+msgstr "Odstotek koraka za prekrivanje"
 
 #: modules/audio_filter/scaletempo.c:71
 msgid "Search Length"
@@ -10292,7 +10300,7 @@ msgstr "Preišči dolžino"
 
 #: modules/audio_filter/scaletempo.c:71
 msgid "Length in milliseconds to search for best overlap position"
-msgstr "Dolžina v milisekundah pri iskanju najboljšega mesta prekrivanja."
+msgstr "Dolžina za iskanje najboljšega mesta prekrivanja v milisekundah."
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch Shift"
@@ -10309,7 +10317,7 @@ msgstr "Velikost prostora"
 #: modules/audio_filter/spatializer/spatializer.cpp:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:236
 msgid "Defines the virtual surface of the room emulated by the filter."
-msgstr "Določa navidezno površino sobe, ki jo filter emulira."
+msgstr "Določa velikost navideznega prostora, ki ga filter posnema."
 
 #: modules/audio_filter/spatializer/spatializer.cpp:58
 msgid "Room width"
@@ -10355,13 +10363,13 @@ msgid ""
 "both channels) and by delaying the signal of left into right and vice versa, "
 "thereby widening the stereo effect."
 msgstr ""
-"Ta filter izboljša stereo učinek z dušenjem mono signala (signal, ki je "
-"skupen obema kanaloma) in zakasnitvijo signala levega kanala proti desnemu "
-"in obratno in s tem razširi stereo učinek."
+"Filter omogoča izboljšavo učinka stereo zvoka z dušenjem mono signala "
+"(signal, ki je skupen obema kanaloma) in z zakasnjenem signala levega kanala "
+"napram desnemu in obratno, s čimer razširi stereo učinek."
 
 #: modules/audio_filter/stereo_widen.c:58
 msgid "Time in ms of the delay of left signal into right and vice versa."
-msgstr "Čas zakasnitve signala levega kanala proti desnemu in obratno."
+msgstr "Čas zakasnitve signala levega kanala napram desnemu in obratno."
 
 #: modules/audio_filter/stereo_widen.c:61
 msgid ""
@@ -10369,9 +10377,9 @@ msgid ""
 "delay effect of left signal in right output and vice versa which gives "
 "widening effect."
 msgstr ""
-"Količina ojačitve zakasnjenega signala levega kanala proti desnemu in "
-"obratno. Naredi učinek zakasnitve signala levega kanala v desnem izhodu in "
-"obratno, kar naredi učinek širjenja."
+"Količina ojačitve zakasnjenega signala levega kanala napram desnemu in "
+"obratno. Prilagoditev ustvari učinek zakasnitve signala levega kanala na "
+"desnem izhodu in obratno, to pa vpliva na občutek prostornosti zvoka."
 
 #: modules/audio_filter/stereo_widen.c:64
 #: modules/gui/qt/components/extended_panels.cpp:1318
@@ -10697,11 +10705,11 @@ msgstr "Zvokovni odvod OpenBSD sndio"
 
 #: modules/audio_output/volume.h:30
 msgid "Software gain"
-msgstr "Programsko ojačanje"
+msgstr "Programsko usklajevanje"
 
 #: modules/audio_output/volume.h:31
 msgid "This linear gain will be applied in software."
-msgstr "To linearno ojačanje bo dodano programsko."
+msgstr "Vrednost linearne uskladitve zvoka bo dodana programsko."
 
 #: modules/audio_output/wasapi.c:640
 msgid "Windows Audio Session API output"
@@ -12735,7 +12743,7 @@ msgstr "Točkovni kodirnik zvoka MP3"
 
 #: modules/codec/spdif.c:36
 msgid "S/PDIF pass-through decoder"
-msgstr ""
+msgstr "Odkodirnik prehoda S/PDIF"
 
 #: modules/codec/speex.c:59 modules/codec/speex.c:907
 #: modules/gui/macosx/VLCOpenWindowController.m:195
@@ -16505,7 +16513,8 @@ msgid "Name"
 msgstr "Ime"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Avtor"
@@ -18707,7 +18716,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Zvok / Video"
 
@@ -20391,10 +20401,11 @@ msgid "Extract"
 msgstr "Pretvori"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20406,7 +20417,8 @@ msgstr "&Zapri"
 msgid "Bytes"
 msgstr "Bajti"
 
-#: modules/gui/qt/dialogs/convert.cpp:45 modules/gui/qt/dialogs/convert.cpp:102
+#: modules/gui/qt/dialogs/convert.cpp:45
+#: modules/gui/qt/dialogs/convert.cpp:102
 msgid "Convert"
 msgstr "Pretvori"
 
@@ -20832,7 +20844,8 @@ msgstr "Različica"
 msgid "Website"
 msgstr "Spletišče"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Datoteke"
 
@@ -23024,15 +23037,15 @@ msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "krajevna shramba razširitev"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "Namestilnik krajevne shrambe razširitev"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
-msgstr ""
+msgstr "Seznam krajevne shrambe razširitev"
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
@@ -23837,7 +23850,8 @@ msgstr "Video MPEG"
 msgid "VC-1 packetizer"
 msgstr "Paketnik VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Omrežne storitve Zeroconf"
 
@@ -25088,9 +25102,8 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:114
 #: modules/stream_out/chromecast/cast.cpp:306
-#, fuzzy
 msgid "Performance warning"
-msgstr "Možnosti zmogljivosti"
+msgstr "Opozorilo delovanja"
 
 #: modules/stream_out/chromecast/cast.cpp:115
 msgid "Display a performance warning when transcoding"
@@ -25117,9 +25130,8 @@ msgid "Chromecast stream output"
 msgstr "Odvod pretoka Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:305
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Ne vprašaj več"
+msgstr "V redu, tega sporočila ne pokaži več."
 
 #: modules/stream_out/chromecast/cast.cpp:307
 msgid ""
@@ -28009,7 +28021,7 @@ msgstr "Lupina XDG"
 
 #: modules/video_output/wayland/xdg-shell.c:381
 msgid "XDG shell surface"
-msgstr ""
+msgstr "Lupina XDG"
 
 #. xgettext: This is a plain ASCII spelling of "VLC media player"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -37034,7 +37046,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Automatic cropping"
-#~ msgstr "Samodejno ojačanje barve"
+#~ msgstr "Samodejno usklajevanje barve"
 
 #, fuzzy
 #~ msgid "Automatically detect black borders and crop them."
@@ -37410,14 +37422,14 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "IPv4 multicast output interface address"
-#~ msgstr "Vmesnik skupinskega pošiljanja izhoda"
+#~ msgstr "Vmesnik skupinskega pošiljanja odvoda"
 
 #, fuzzy
 #~ msgid ""
 #~ "IPv4 address for the default multicast interface. This overrides the "
 #~ "routing table."
 #~ msgstr ""
-#~ "Privzeti vmesnik skupinskega pošiljanja. Nastavitev prepiše usmerjevalno "
+#~ "Privzeti vmesnik za skupinsko pošiljanje. Nastavitev prepiše usmerjevalno "
 #~ "razpredelnico."
 
 #, fuzzy
@@ -37779,7 +37791,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Auto gain"
-#~ msgstr "Ojačitev zvoka"
+#~ msgstr "Glasnost zvoka"
 
 #, fuzzy
 #~ msgid "Horizontal centering"
@@ -38781,7 +38793,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Tuner:"
-#~ msgstr "Uglaševalo"
+#~ msgstr "Uglaševalnik"
 
 #, fuzzy
 #~ msgid "Decimation:"
@@ -38889,7 +38901,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Select play mode"
-#~ msgstr "Izbor načina ponovnega predvajanja"
+#~ msgstr "Izbor načina usklajevanja glasnosti"
 
 #, fuzzy
 #~ msgid "Alignment:"
