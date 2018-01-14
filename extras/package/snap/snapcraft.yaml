@@ -27,6 +27,8 @@ apps:
       - removable-media
       - screen-inhibit-control
       - x11
+      - desktop
+      - desktop-legacy
     slots:
       - mpris
 
