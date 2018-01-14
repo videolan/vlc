@@ -179,6 +179,11 @@ do
     sign "$i"
 done
 
+for i in $(find VLC.app/Contents/MacOS/lua -type f -exec echo {} \;)
+do
+    sign "$i"
+done
+
 info "Signing the executable"
 sign "VLC.app" "org.videolan.vlc"
 
