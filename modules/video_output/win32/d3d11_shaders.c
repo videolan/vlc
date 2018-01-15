@@ -108,6 +108,10 @@ static const char* globPixelShaderDefault = "\
       %s;\n\
   }\n\
   \n\
+  inline float3 reorderPlanes(float3 rgb) {\n\
+      %s;\n\
+  }\n\
+  \n\
   inline float4 sampleTexture(SamplerState samplerState, float3 coords) {\n\
       float4 sample;\n\
       %s /* sampling routine in sample */\n\
@@ -129,6 +133,7 @@ static const char* globPixelShaderDefault = "\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
     rgb = adjustRange(rgb);\n\
+    rgb = reorderPlanes(rgb);\n\
     return float4(rgb, saturate(opacity));\n\
   }\n\
 ";
@@ -200,24 +205,26 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
                                    const char *psz_sampler,
                                    const char *psz_src_transform, const char *psz_display_transform,
                                    const char *psz_tone_mapping,
-                                   const char *psz_adjust_range, ID3D11PixelShader **output)
+                                   const char *psz_adjust_range, const char *psz_move_planes,
+                                   ID3D11PixelShader **output)
 {
     char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
                           strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
+                          strlen(psz_tone_mapping) + strlen(psz_adjust_range) + strlen(psz_move_planes));
     if (!shader)
     {
         msg_Err(o, "no room for the Pixel Shader");
         return E_OUTOFMEMORY;
     }
     sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
+            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_move_planes, psz_sampler);
 #ifndef NDEBUG
     msg_Dbg(o,"psz_src_transform %s", psz_src_transform);
     msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
     msg_Dbg(o,"psz_display_transform %s", psz_display_transform);
     msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
     msg_Dbg(o,"psz_sampler %s", psz_sampler);
+    msg_Dbg(o,"psz_move_planes %s", psz_move_planes);
 #endif
 
     ID3DBlob *pPSBlob = D3D11_CompileShader(o, hd3d, d3d_dev, shader, true);
@@ -246,6 +253,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     const char *psz_display_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
+    const char *psz_move_planes[2]    = {DEFAULT_NOOP, DEFAULT_NOOP};
     char *psz_range = NULL;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
@@ -521,12 +529,12 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     HRESULT hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                      psz_sampler[0], psz_src_transform,
                                      psz_display_transform, psz_tone_mapping,
-                                     psz_adjust_range, &output[0]);
+                                     psz_adjust_range, psz_move_planes[0], &output[0]);
     if (!FAILED(hr) && psz_sampler[1])
         hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                  psz_sampler[1], psz_src_transform,
                                  psz_display_transform, psz_tone_mapping,
-                                 psz_adjust_range, &output[1]);
+                                 psz_adjust_range, psz_move_planes[1], &output[1]);
     free(psz_range);
 
     return hr;
