@@ -163,7 +163,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
         return;
     }
     // We should now be in the ready state, and therefor have a valid transportId
-    assert( m_state == Ready && m_appTransportId.empty() == false );
+    assert( m_appTransportId.empty() == false );
     // we cannot start a new load when the last one is still processing
     m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_title, m_artwork, mime_type );
     setState( Loading );
@@ -654,7 +654,7 @@ void intf_sys_t::setPauseState(bool paused)
 
 void intf_sys_t::waitAppStarted()
 {
-    while ( m_state != Ready && m_state != Dead )
+    while ( m_state == Connected || m_state == Launching )
     {
         if ( m_state == Connected )
         {
