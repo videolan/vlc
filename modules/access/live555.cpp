@@ -781,6 +781,12 @@ static int SessionsSetup( demux_t *p_demux )
             continue;
         }
 
+        if( p_sys->rtsp && i_client_port != -1 )
+        {
+            sub->setClientPortNum( i_client_port );
+            i_client_port += 2;
+        }
+
         if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
             bInit = sub->initiate( 0 );
         else
@@ -811,13 +817,6 @@ static int SessionsSetup( demux_t *p_demux )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-
-                if( i_client_port != -1 )
-                {
-                    sub->setClientPortNum( i_client_port );
-                    i_client_port += 2;
-                }
-
                 p_sys->rtsp->sendSetupCommand( *sub, default_live555_callback, False,
                                                toBool( b_rtsp_tcp ),
                                                toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
