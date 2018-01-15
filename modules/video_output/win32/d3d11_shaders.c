@@ -274,6 +274,20 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                      sample.z = 0.0;\
                      sample.a = 1;";
             break;
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+            /* Y */
+            psz_sampler[0] =
+                    "sample = shaderTexture[0].Sample(samplerState, coords);\n";
+            psz_move_planes[0] = "return rgb";
+            /* UV */
+            psz_sampler[1] =
+                    "sample = shaderTexture[0].Sample(samplerState, coords);\n";
+            psz_move_planes[1] =
+                    "rgb.x = rgb.y;\n"
+                    "rgb.y = rgb.z;\n"
+                    "rgb.z = 0;\n"
+                    "return rgb";
+            break;
         case DXGI_FORMAT_UNKNOWN:
             switch (format->fourcc)
             {

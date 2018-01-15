@@ -705,6 +705,14 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
+
+    static const FLOAT COLORSPACE_FULL_RGBA_TO_BT601_YUV[4*4] = {
+        0.299000f,  0.587000f,  0.114000f, 0.f,
+       -0.168736f, -0.331264f,  0.500000f, 0.f,
+        0.500000f, -0.418688f, -0.081312f, 0.f,
+              0.f,        0.f,        0.f, 1.f,
+    };
+
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.709_conversion, in studio range */
     static const FLOAT COLORSPACE_BT709_YUV_TO_FULL_RGBA[4*4] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
@@ -725,31 +733,46 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
 
     const FLOAT *ppColorspace;
-    if (RGB_shader)
-        ppColorspace = IDENTITY_4X4;
-    else {
-        switch (fmt->space){
-            case COLOR_SPACE_BT709:
-                ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
-                break;
-            case COLOR_SPACE_BT2020:
-                ppColorspace = COLORSPACE_BT2020_YUV_TO_FULL_RGBA;
-                break;
-            case COLOR_SPACE_BT601:
-                ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
-                break;
-            default:
-            case COLOR_SPACE_UNDEF:
-                if( fmt->i_height > 576 )
-                    ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
-                else
-                    ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
-                break;
+    if (!IsRGBShader(displayFormat->pixelFormat))
+    {
+        if (!RGB_shader)
+            ppColorspace = IDENTITY_4X4;
+        else
+        {
+            ppColorspace = COLORSPACE_FULL_RGBA_TO_BT601_YUV;
+            colorspace.WhitePoint[0*4 + 3] = itu_black_level;
+            colorspace.WhitePoint[1*4 + 3] = itu_achromacy;
+            colorspace.WhitePoint[2*4 + 3] = itu_achromacy;
         }
-        /* all matrices work in studio range and output in full range */
-        colorspace.WhitePoint[0*4 + 3] = -itu_black_level;
-        colorspace.WhitePoint[1*4 + 3] = -itu_achromacy;
-        colorspace.WhitePoint[2*4 + 3] = -itu_achromacy;
+    }
+    else
+    {
+        if (RGB_shader)
+            ppColorspace = IDENTITY_4X4;
+        else {
+            switch (fmt->space){
+                case COLOR_SPACE_BT709:
+                    ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
+                    break;
+                case COLOR_SPACE_BT2020:
+                    ppColorspace = COLORSPACE_BT2020_YUV_TO_FULL_RGBA;
+                    break;
+                case COLOR_SPACE_BT601:
+                    ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
+                    break;
+                default:
+                case COLOR_SPACE_UNDEF:
+                    if( fmt->i_height > 576 )
+                        ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
+                    else
+                        ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
+                    break;
+            }
+            /* all matrices work in studio range and output in full range */
+            colorspace.WhitePoint[0*4 + 3] = -itu_black_level;
+            colorspace.WhitePoint[1*4 + 3] = -itu_achromacy;
+            colorspace.WhitePoint[2*4 + 3] = -itu_achromacy;
+        }
     }
 
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
