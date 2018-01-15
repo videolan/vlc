@@ -1459,26 +1459,16 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
     spuBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-    spuBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    spuBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    spuBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-
-    spuBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    spuBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-    spuBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-
     spuBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    /* output colors */
+    spuBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    spuBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; /* keep source intact */
+    spuBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA; /* RGB colors + inverse alpha (255 is full opaque) */
+    /* output alpha  */
+    spuBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    spuBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE; /* keep source intact */
+    spuBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO; /* discard */
 
-    spuBlendDesc.RenderTarget[1].BlendEnable = TRUE;
-    spuBlendDesc.RenderTarget[1].SrcBlend = D3D11_BLEND_ONE;
-    spuBlendDesc.RenderTarget[1].DestBlend = D3D11_BLEND_ZERO;
-    spuBlendDesc.RenderTarget[1].BlendOp = D3D11_BLEND_OP_ADD;
-
-    spuBlendDesc.RenderTarget[1].SrcBlendAlpha = D3D11_BLEND_ONE;
-    spuBlendDesc.RenderTarget[1].DestBlendAlpha = D3D11_BLEND_ZERO;
-    spuBlendDesc.RenderTarget[1].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-
-    spuBlendDesc.RenderTarget[1].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     hr = ID3D11Device_CreateBlendState(sys->d3d_dev.d3ddevice, &spuBlendDesc, &pSpuBlendState);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create SPU blend state. (hr=0x%lX)", hr);
