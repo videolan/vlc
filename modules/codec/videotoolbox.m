@@ -78,8 +78,6 @@ static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
-#define VT_TEMPO_DEINTERLACE N_("Deinterlacing")
-#define VT_TEMPO_DEINTERLACE_LONG N_("If interlaced content is detected, temporal deinterlacing is enabled at the expense of a pipeline delay.")
 #define VT_FORCE_CVPX_CHROMA "Force the VT decoder CVPX chroma"
 #define VT_FORCE_CVPX_CHROMA_LONG "Values can be 'BGRA', 'y420', '420f', '420v', '2vuy'. \
     By Default, the best chroma is choosen by the VT decoder."
@@ -91,7 +89,7 @@ set_description(N_("VideoToolbox video decoder"))
 set_capability("video decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
-add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
+add_obsolete_bool("videotoolbox-temporal-deinterlacing")
 add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
 add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
 vlc_module_end()
@@ -173,8 +171,6 @@ struct decoder_sys_t
     uint8_t                     i_pic_reorder_max;
     bool                        b_invalid_pic_reorder_max;
     bool                        b_poc_based_reorder;
-    bool                        b_enable_temporal_processing;
-    bool                        b_handle_deint;
 
     bool                        b_format_propagated;
 
@@ -1229,21 +1225,6 @@ static int StartVideoToolbox(decoder_t *p_dec)
     if (HandleVTStatus(p_dec, status, NULL) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
-    /* Check if the current session supports deinterlacing and temporal
-     * processing */
-    CFDictionaryRef supportedProps = NULL;
-    status = VTSessionCopySupportedPropertyDictionary(p_sys->session,
-                                                      &supportedProps);
-    p_sys->b_handle_deint = status == noErr &&
-        CFDictionaryContainsKey(supportedProps,
-                                kVTDecompressionPropertyKey_FieldMode);
-    p_sys->b_enable_temporal_processing = status == noErr &&
-        CFDictionaryContainsKey(supportedProps,
-                                kVTDecompressionProperty_DeinterlaceMode_Temporal);
-
-    if (status == noErr)
-        CFRelease(supportedProps);
-
     PtsInit(p_dec);
 
     return VLC_SUCCESS;
@@ -1326,8 +1307,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = nil;
     p_sys->i_pic_reorder_max = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
-    p_sys->b_enable_temporal_processing =
-        var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1902,9 +1881,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     VTDecodeInfoFlags flagOut;
     VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
-    if (p_sys->b_enable_temporal_processing
-     && (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK))
-        decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
 
     OSStatus status =
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
@@ -2139,7 +2115,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
         p_pic->date = pts.value;
         p_pic->b_force = p_info->b_forced;
-        p_pic->b_progressive = p_sys->b_handle_deint || p_info->b_progressive;
+        p_pic->b_progressive = p_info->b_progressive;
         if(!p_pic->b_progressive)
         {
             p_pic->i_nb_fields = p_info->i_num_ts;
