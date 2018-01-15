@@ -1346,7 +1346,7 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest_clipped );
+    D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest_clipped, sys->display.pixelFormat );
 
     SetQuadVSProjection(vd, &sys->picQuad, &vd->cfg->viewpoint);
 
@@ -1807,7 +1807,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         spuViewport.right  = sys->sys.rect_dest.left + (FLOAT) (r->i_x + r->fmt.i_visible_width)  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
         spuViewport.bottom = sys->sys.rect_dest.top  + (FLOAT) (r->i_y + r->fmt.i_visible_height) * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
 
-        D3D11_UpdateViewport( quad, &spuViewport );
+        D3D11_UpdateViewport( quad, &spuViewport, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, &sys->d3d_dev, quad, r->i_alpha / 255.0f );
     }

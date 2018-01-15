@@ -82,7 +82,7 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d_quad_t *,
                                const RECT *output, video_orientation_t );
 #define D3D11_UpdateQuadPosition(a,b,c,d,e)  D3D11_UpdateQuadPosition(VLC_OBJECT(a),b,c,d,e)
 
-void D3D11_UpdateViewport(d3d_quad_t *, const RECT *);
+void D3D11_UpdateViewport(d3d_quad_t *, const RECT *, const d3d_format_t *display);
 
 void D3D11_UpdateQuadOpacity(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float opacity);
 #define D3D11_UpdateQuadOpacity(a,b,c,d)  D3D11_UpdateQuadOpacity(VLC_OBJECT(a),b,c,d)

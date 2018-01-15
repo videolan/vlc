@@ -804,7 +804,7 @@ error:
     return VLC_EGENERIC;
 }
 
-void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect)
+void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t *display)
 {
     quad->cropViewport[0].TopLeftX = rect->left;
     quad->cropViewport[0].TopLeftY = rect->top;
