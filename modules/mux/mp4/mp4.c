@@ -356,8 +356,7 @@ cleanup:
         mp4mux_trackinfo_Clear(&p_stream->mux);
         free(p_stream);
     }
-    if (p_sys->i_nb_streams)
-        free(p_sys->pp_streams);
+    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
     free(p_sys);
 }
 
@@ -1336,7 +1335,11 @@ static void CleanupFrag(sout_mux_sys_t *p_sys)
             p_stream->towrite.p_first = p_next;
         }
         free(p_stream->p_indexentries);
+
+        mp4mux_trackinfo_Clear(&p_stream->mux);
+        free(p_stream);
     }
+    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
     free(p_sys);
 }
 
