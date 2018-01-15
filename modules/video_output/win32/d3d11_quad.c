@@ -685,21 +685,21 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
     /* matrices for studio range */
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT601_YUV_TO_FULL_RGBA[4*4] = {
         1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
         1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.709_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT709_YUV_TO_FULL_RGBA[4*4] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
         1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
         1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.2020_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT2020_YUV_TO_FULL_RGBA[4*4] = {
         1.164383561643836f,  0.000000000000f,  1.678674107143f, 0.f,
         1.164383561643836f, -0.127007098661f, -0.440987687946f, 0.f,
         1.164383561643836f,  2.141772321429f,  0.000000000000f, 0.f,
@@ -716,20 +716,20 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     else {
         switch (fmt->space){
             case COLOR_SPACE_BT709:
-                ppColorspace = COLORSPACE_BT709_TO_FULL;
+                ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT2020:
-                ppColorspace = COLORSPACE_BT2020_TO_FULL;
+                ppColorspace = COLORSPACE_BT2020_YUV_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT601:
-                ppColorspace = COLORSPACE_BT601_TO_FULL;
+                ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
                 break;
             default:
             case COLOR_SPACE_UNDEF:
                 if( fmt->i_height > 576 )
-                    ppColorspace = COLORSPACE_BT709_TO_FULL;
+                    ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
                 else
-                    ppColorspace = COLORSPACE_BT601_TO_FULL;
+                    ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
                 break;
         }
         /* all matrices work in studio range and output in full range */
