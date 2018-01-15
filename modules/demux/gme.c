@@ -333,6 +333,15 @@ static int Control (demux_t *demux, int query, va_list args)
         case DEMUX_GET_TITLE:
             *va_arg(args, int *) = sys->track_id;
             return VLC_SUCCESS;
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( demux->s, 0, -1, 0, 1, query, args );
+
+        default:
+            return VLC_EGENERIC;
     }
 
     return VLC_EGENERIC;

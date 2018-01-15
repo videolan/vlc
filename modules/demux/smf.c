@@ -524,6 +524,13 @@ static int Control (demux_t *demux, int i_query, va_list args)
             break;
         case DEMUX_SET_TIME:
             return Seek (demux, va_arg (args, int64_t));
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( demux->s, 0, -1, 0, 1, i_query, args );
+
         default:
             return VLC_EGENERIC;
     }

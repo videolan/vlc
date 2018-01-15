@@ -1046,6 +1046,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
             return vlc_stream_Control( p_demux->s, STREAM_GET_META, args );
 
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( p_demux->s, p_sys->i_data_offset,
+                                          p_sys->i_data_size, 0, 1, i_query, args );
+
         default:
             return VLC_EGENERIC;
     }

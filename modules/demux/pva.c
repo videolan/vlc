@@ -346,6 +346,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf = (double)1000000.0 / (double)p_sys->i_pcr_inc;
             return VLC_SUCCESS;
 #endif
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+
         case DEMUX_SET_TIME:
         default:
             return VLC_EGENERIC;

@@ -459,6 +459,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             b = va_arg( args, int ); /* precise? */
             msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
             return Seek( p_demux, i64, -1, NULL, b );
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+
         default:
             return VLC_EGENERIC;
     }

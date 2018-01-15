@@ -283,8 +283,17 @@ static int Control(demux_t *demux, int query, va_list args)
     case DEMUX_GET_META:
     case DEMUX_HAS_UNSUPPORTED_META:
     case DEMUX_GET_ATTACHMENTS:
+        return VLC_EGENERIC;
+
+    case DEMUX_CAN_PAUSE:
+    case DEMUX_SET_PAUSE_STATE:
+    case DEMUX_CAN_CONTROL_PACE:
+    case DEMUX_GET_PTS_DELAY:
+        return demux_vaControlHelper( demux->s, 0, -1, 0, 1, query, args );
+
     default:
         return VLC_EGENERIC;
+
     }
 }
 

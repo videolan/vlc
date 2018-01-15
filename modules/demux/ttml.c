@@ -277,6 +277,11 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             break;
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+            return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:

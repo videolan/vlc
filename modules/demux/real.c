@@ -390,7 +390,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
 
-            /* read stream size maybe failed in rtsp streaming, 
+            /* read stream size maybe failed in rtsp streaming,
                so use duration to determin the position at first  */
             if( p_sys->i_our_duration > 0 )
             {
@@ -457,7 +457,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
- 
+
             if( p_sys->i_our_duration <= 0 )
             {
                 *pi64 = 0;
@@ -484,6 +484,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 vlc_meta_SetDescription( p_meta, p_sys->psz_description );
             return VLC_SUCCESS;
         }
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+            return demux_vaControlHelper( p_demux->s, p_sys->i_data_offset,
+                                          p_sys->i_data_size, 0, 1, i_query, args );
 
         case DEMUX_GET_FPS:
         default:
@@ -1252,7 +1259,7 @@ static void HeaderINDX( demux_t *p_demux )
         }
 
         real_index_t *p_idx = &p_sys->p_index[i];
-        
+
         p_idx->i_time_offset = GetDWBE( &p_entry[2] );
         p_idx->i_file_offset = GetDWBE( &p_entry[6] );
         p_idx->i_frame_index = GetDWBE( &p_entry[10] );
