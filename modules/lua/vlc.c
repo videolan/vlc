@@ -223,11 +223,16 @@ int vlclua_dir_list(const char *luadirname, char ***restrict listp)
     list = vlclua_dir_list_append(list, config_GetUserDir(VLC_DATA_DIR),
                                   luadirname);
 
+    char *libdir = config_GetLibDir();
+    char *datadir = config_GetDataDir();
+    bool both = strcmp(libdir, datadir);
+
     /* Tokenized Lua scripts in architecture-specific data directory */
-    list = vlclua_dir_list_append(list, config_GetLibDir(), luadirname);
+    list = vlclua_dir_list_append(list, libdir, luadirname);
 
     /* Source Lua Scripts in architecture-independent data directory */
-    list = vlclua_dir_list_append(list, config_GetDataDir(), luadirname);
+    if (both)
+        list = vlclua_dir_list_append(list, datadir, luadirname);
 
     *list = NULL;
     return VLC_SUCCESS;
