@@ -706,11 +706,14 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         break;
 
         case ATOM_WMV3:
+            p_track->p_asf = MP4_BoxGet( p_sample, "ASF " );
+            /* fallsthrough */
+        case ATOM_H264:
+        case VLC_FOURCC('W','V','C','1'):
         {
             MP4_Box_t *p_strf = MP4_BoxGet(  p_sample, "strf", 0 );
             if ( p_strf && BOXDATA(p_strf) )
             {
-                p_track->fmt.i_codec = VLC_CODEC_WMV3;
                 p_track->fmt.video.i_width = BOXDATA(p_strf)->bmiHeader.biWidth;
                 p_track->fmt.video.i_visible_width = p_track->fmt.video.i_width;
                 p_track->fmt.video.i_height = BOXDATA(p_strf)->bmiHeader.biHeight;
@@ -723,7 +726,6 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     memcpy( p_track->fmt.p_extra, BOXDATA(p_strf)->p_extra,
                             p_track->fmt.i_extra );
                 }
-                p_track->p_asf = MP4_BoxGet( p_sample, "ASF " );
             }
             break;
         }

@@ -4542,6 +4542,9 @@ static const struct
     { ATOM_yv12,    MP4_ReadBox_sample_vide,  0 },
     { ATOM_yuv2,    MP4_ReadBox_sample_vide,  0 },
 
+    { ATOM_strf,    MP4_ReadBox_strf,         ATOM_WVC1 }, /* MS smooth */
+    { ATOM_strf,    MP4_ReadBox_strf,         ATOM_H264 }, /* MS smooth */
+
     { ATOM_strf,    MP4_ReadBox_strf,         ATOM_WMV3 }, /* flip4mac */
     { ATOM_ASF ,    MP4_ReadBox_ASF,          ATOM_WMV3 }, /* flip4mac */
     { ATOM_ASF ,    MP4_ReadBox_ASF,          ATOM_wave }, /* flip4mac */
