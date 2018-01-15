@@ -195,7 +195,10 @@ struct pic_holder
     vlc_mutex_t lock;
     vlc_cond_t  wait;
     uint8_t     nb_out;
+    uint8_t     pic_reorder_max;
 };
+
+static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t);
 
 #pragma mark - start & stop
 
@@ -282,6 +285,8 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     h264_get_dpb_values(p_sps, &i_reorder, &dummy);
                     vlc_mutex_lock(&p_sys->lock);
                     p_sys->i_pic_reorder_max = i_reorder;
+                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                                                  p_sys->i_pic_reorder_max);
                     vlc_mutex_unlock(&p_sys->lock);
                 }
 
@@ -630,6 +635,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 {
                     vlc_mutex_lock(&p_sys->lock);
                     p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
+                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                                                  p_sys->i_pic_reorder_max);
                     vlc_mutex_unlock(&p_sys->lock);
                 }
 
@@ -894,6 +901,8 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
+                pic_holder_update_reorder_max(p_sys->pic_holder,
+                                              p_sys->i_pic_reorder_max);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -903,6 +912,8 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
+                pic_holder_update_reorder_max(p_sys->pic_holder,
+                                              p_sys->i_pic_reorder_max);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -1344,6 +1355,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     vlc_cond_init(&p_sys->pic_holder->wait);
     p_sys->pic_holder->nb_out = 0;
     p_sys->pic_holder->closed = false;
+    pic_holder_update_reorder_max(p_sys->pic_holder, p_sys->i_pic_reorder_max);
 
     vlc_mutex_init(&p_sys->lock);
 
@@ -2006,16 +2018,25 @@ static void pic_holder_on_cvpx_released(void *data)
     }
 }
 
-static void pic_holder_wait(struct pic_holder *pic_holder, uint8_t pic_reorder_max)
+static void
+pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder_max)
+{
+    vlc_mutex_lock(&pic_holder->lock);
+
+    pic_holder->pic_reorder_max = pic_reorder_max;
+    vlc_cond_signal(&pic_holder->wait);
+
+    vlc_mutex_unlock(&pic_holder->lock);
+}
+
+static void pic_holder_wait(struct pic_holder *pic_holder)
 {
     static const uint8_t reserved_picture = 2;
 
-    if (pic_reorder_max == 0)
-        pic_reorder_max = 1;
-
     vlc_mutex_lock(&pic_holder->lock);
 
-    while (pic_holder->nb_out >= pic_reorder_max + reserved_picture)
+    while (pic_holder->pic_reorder_max != 0
+        && pic_holder->nb_out >= pic_holder->pic_reorder_max + reserved_picture)
         vlc_cond_wait(&pic_holder->wait, &pic_holder->lock);
     pic_holder->nb_out++;
 
@@ -2083,8 +2104,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         /* Unlock the mutex because decoder_NewPicture() is blocking. Indeed,
          * it can wait indefinitely when the input is paused. */
 
-        uint8_t i_pic_reorder_max = p_sys->i_pic_reorder_max;
-
         vlc_mutex_unlock(&p_sys->lock);
 
         picture_t *p_pic = decoder_NewPicture(p_dec);
@@ -2106,7 +2125,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
          * FIXME: A proper way to fix this issue is to allow decoder modules to
          * specify the dpb and having the vout re-allocating output frames when
          * this number changes. */
-        pic_holder_wait(p_sys->pic_holder, i_pic_reorder_max);
+        pic_holder_wait(p_sys->pic_holder);
 
         vlc_mutex_lock(&p_sys->lock);
 
