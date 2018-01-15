@@ -825,7 +825,15 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_B5G6R5_UNORM:
     case DXGI_FORMAT_R10G10B10A2_UNORM:
-        break; /* packed format */
+        if ( display->formatTexture == DXGI_FORMAT_NV12 ||
+             display->formatTexture == DXGI_FORMAT_P010 )
+        {
+            quad->cropViewport[1].TopLeftX = rect->left / 2;
+            quad->cropViewport[1].TopLeftY = rect->top / 2;
+            quad->cropViewport[1].Width    = (rect->right  - rect->left) / 2;
+            quad->cropViewport[1].Height   = (rect->bottom - rect->top) / 2;
+        }
+        break;
     case DXGI_FORMAT_UNKNOWN:
         switch ( quad->formatInfo->fourcc )
         {
