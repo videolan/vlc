@@ -225,13 +225,13 @@ int vlclua_dir_list(const char *luadirname, char ***restrict listp)
 
     char *libdir = config_GetLibDir();
     char *datadir = config_GetDataDir();
-    bool both = strcmp(libdir, datadir);
+    bool both = libdir != NULL && datadir != NULL && strcmp(libdir, datadir);
 
     /* Tokenized Lua scripts in architecture-specific data directory */
     list = vlclua_dir_list_append(list, libdir, luadirname);
 
     /* Source Lua Scripts in architecture-independent data directory */
-    if (both)
+    if (both || libdir == NULL)
         list = vlclua_dir_list_append(list, datadir, luadirname);
 
     *list = NULL;
