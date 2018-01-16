@@ -129,11 +129,13 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
         return NULL;
     }
 
-    /* Copy pixels to the CVPX backed picture */
-    picture_CopyPixels(mapped_dst, src);
+    /* Copy pixels to the CVPX backed picture. Don't use picture_CopyPixels()
+     * since we want to handle the context ourself. */
+    for( int i = 0; i < src->i_planes ; i++ )
+        plane_CopyPixels( mapped_dst->p+i, src->p+i );
 
     /* Attach the CVPX to a new opaque picture */
-    cvpxpic_attach(dst, (void *)mapped_dst->p_sys);
+    cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst));
 
     /* Unlock and unmap the dst picture */
     picture_Release(mapped_dst);
