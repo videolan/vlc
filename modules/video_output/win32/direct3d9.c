@@ -429,6 +429,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
         picture_sys_t *picsys = malloc(sizeof(*picsys));
         if (unlikely(picsys == NULL))
             goto error;
+        memset(picsys, 0, sizeof(*picsys));
 
         HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3d9_dev->dev,
                                                           fmt->i_width,

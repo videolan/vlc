@@ -177,12 +177,12 @@ static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
     }
 }
 
-static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *);
+static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *, IDirectXVideoDecoder *);
 
 static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
 {
     struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->picsys.surface);
+    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->picsys.surface, src_ctx->picsys.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = src_ctx->va_surface;
@@ -190,7 +190,7 @@ static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t 
     return &pic_ctx->s;
 }
 
-static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
+static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDirectXVideoDecoder *decoder)
 {
     struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
@@ -198,6 +198,7 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
     pic_ctx->s.destroy = d3d9_pic_context_destroy;
     pic_ctx->s.copy    = d3d9_pic_context_copy;
     pic_ctx->picsys.surface = surface;
+    pic_ctx->picsys.decoder = decoder;
     AcquirePictureSys(&pic_ctx->picsys);
     return pic_ctx;
 }
@@ -205,7 +206,7 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
 static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index)
 {
     directx_sys_t *dx_sys = &va->sys->dx_sys;
-    struct va_pic_context *pic_ctx = CreatePicContext(dx_sys->hw_surface[surface_index]);
+    struct va_pic_context *pic_ctx = CreatePicContext(dx_sys->hw_surface[surface_index], dx_sys->decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     /* all the resources are acquired during surfaces init, and a second time in
