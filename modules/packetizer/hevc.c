@@ -463,6 +463,59 @@ static bool XPSReady(decoder_sys_t *p_sys)
     return false;
 }
 
+static void AppendAsAnnexB(const block_t *p_block,
+                           uint8_t **pp_dst, size_t *pi_dst)
+{
+    if(SIZE_MAX - p_block->i_buffer < *pi_dst ||
+       SIZE_MAX - 4 < *pi_dst + p_block->i_buffer)
+        return;
+
+    size_t i_realloc = p_block->i_buffer + 4 + *pi_dst;
+    uint8_t *p_realloc = realloc(*pp_dst, i_realloc);
+    if(p_realloc)
+    {
+        memcpy(&p_realloc[*pi_dst], annexb_startcode4, 4);
+        memcpy(&p_realloc[*pi_dst + 4], p_block->p_buffer, p_block->i_buffer);
+        *pi_dst = i_realloc;
+        *pp_dst = p_realloc;
+    }
+}
+
+#define APPENDIF(idmax, set, rg, b) \
+    for(size_t i=0; i<=idmax; i++)\
+    {\
+        if(((set != rg[i].p_decoded) == !b) && rg[i].p_nal)\
+        {\
+            AppendAsAnnexB(rg[i].p_nal, &p_data, &i_data);\
+            break;\
+        }\
+    }
+
+static void SetsToAnnexB(decoder_sys_t *p_sys,
+                         const hevc_picture_parameter_set_t *p_pps,
+                         const hevc_sequence_parameter_set_t *p_sps,
+                         const hevc_video_parameter_set_t *p_vps,
+                         uint8_t **pp_out, int *pi_out)
+{
+    uint8_t *p_data = NULL;
+    size_t i_data = 0;
+
+    APPENDIF(HEVC_VPS_ID_MAX, p_vps, p_sys->rg_vps, true);
+    APPENDIF(HEVC_VPS_ID_MAX, p_vps, p_sys->rg_vps, false);
+    APPENDIF(HEVC_SPS_ID_MAX, p_sps, p_sys->rg_sps, true);
+    APPENDIF(HEVC_SPS_ID_MAX, p_sps, p_sys->rg_sps, false);
+    APPENDIF(HEVC_PPS_ID_MAX, p_pps, p_sys->rg_pps, true);
+    APPENDIF(HEVC_PPS_ID_MAX, p_pps, p_sys->rg_pps, false);
+
+    /* because we copy to i_extra :/ */
+    if(i_data <= INT_MAX)
+    {
+        *pp_out = p_data;
+        *pi_out = i_data;
+    }
+    else free(p_data);
+}
+
 static void ActivateSets(decoder_t *p_dec,
                          const hevc_picture_parameter_set_t *p_pps,
                          const hevc_sequence_parameter_set_t *p_sps,
@@ -519,6 +572,10 @@ static void ActivateSets(decoder_t *p_dec,
                 p_dec->fmt_out.i_level = i_level;
             }
         }
+
+        if(p_dec->fmt_out.i_extra == 0 && p_vps && p_pps)
+            SetsToAnnexB(p_sys, p_pps, p_sps, p_vps,
+                         (uint8_t **)&p_dec->fmt_out.p_extra, &p_dec->fmt_out.i_extra);
     }
 }
 
