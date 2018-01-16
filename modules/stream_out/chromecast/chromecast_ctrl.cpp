@@ -674,7 +674,8 @@ void intf_sys_t::setPauseState(bool paused)
 
 void intf_sys_t::waitAppStarted()
 {
-    while ( m_state == Connected || m_state == Launching )
+    while ( m_state == Connected || m_state == Launching ||
+            m_state == Authenticating || m_state == Connecting )
     {
         if ( m_state == Connected )
         {
