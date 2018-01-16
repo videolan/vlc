@@ -670,15 +670,9 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
 
-    if ( !rendererMenu )
-        rendererMenu = RendererMenu( p_intf );
-
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
-
-        current->addSeparator();
-        current->addMenu( rendererMenu );
 
         current->addSeparator();
         /* Surface modifiers */
@@ -732,6 +726,13 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     action->setData( "bookmark" );
 
     menu->addSeparator();
+
+    if ( !rendererMenu )
+        rendererMenu = RendererMenu( p_intf );
+
+    menu->addMenu( rendererMenu );
+    menu->addSeparator();
+
 
     PopupMenuControlEntries( menu, p_intf );
 
