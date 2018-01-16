@@ -298,6 +298,31 @@ struct demux_sys_t
             p_renderer = NULL;
             m_startTime = VLC_TS_INVALID;
             return VLC_SUCCESS;
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_CONTROL_PACE:
+        {
+            int ret;
+            va_list ap;
+
+            va_copy( ap, args );
+            ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
+            if( ret == VLC_SUCCESS )
+                *va_arg( ap, bool* ) = false;
+            va_end( ap );
+            return VLC_SUCCESS;
+        }
+        case DEMUX_GET_PTS_DELAY:
+        {
+            int ret;
+            va_list ap;
+
+            va_copy( ap, args );
+            ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
+            if( ret == VLC_SUCCESS )
+                *va_arg( ap, int64_t* ) = 0;
+            va_end( ap );
+            return VLC_SUCCESS;
+        }
         }
 
         return demux_vaControl( p_demux_filter->p_next, i_query, args );
