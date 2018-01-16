@@ -861,9 +861,14 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
         switch ( quad->formatInfo->fourcc )
         {
         case VLC_CODEC_YUVA:
-            quad->cropViewport[1] = quad->cropViewport[2] =
-            quad->cropViewport[3] = quad->cropViewport[0];
-            break;
+            if ( display->formatTexture != DXGI_FORMAT_NV12 &&
+                 display->formatTexture != DXGI_FORMAT_P010 )
+            {
+                quad->cropViewport[1] = quad->cropViewport[2] =
+                quad->cropViewport[3] = quad->cropViewport[0];
+                break;
+            }
+            /* fallthrough */
         case VLC_CODEC_I420:
             quad->cropViewport[1].TopLeftX = quad->cropViewport[0].TopLeftX / 2;
             quad->cropViewport[1].TopLeftY = quad->cropViewport[0].TopLeftY / 2;
