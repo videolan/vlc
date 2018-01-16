@@ -230,7 +230,6 @@ static int Open(vlc_object_t *p_obj)
 
     if(!p_manager)
     {
-        msg_Warn(p_obj, "unsupported adaptive streaming");
         delete authStorage;
         return VLC_EGENERIC;
     }
