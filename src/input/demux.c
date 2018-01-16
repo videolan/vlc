@@ -303,65 +303,8 @@ void demux_Delete( demux_t *p_demux )
 #define static_control_match(foo) \
     static_assert((unsigned) DEMUX_##foo == STREAM_##foo, "Mismatch")
 
-static int demux_ControlInternal( demux_t *demux, int query, ... )
-{
-    int ret;
-    va_list ap;
-
-    va_start( ap, query );
-    ret = demux->pf_control( demux, query, ap );
-    va_end( ap );
-    return ret;
-}
-
 int demux_vaControl( demux_t *demux, int query, va_list args )
 {
-    if( demux->s != NULL )
-        switch( query )
-        {
-            /* Legacy fallback for missing getters in synchronous demuxers */
-            case DEMUX_CAN_PAUSE:
-            case DEMUX_CAN_CONTROL_PACE:
-            case DEMUX_GET_PTS_DELAY:
-            {
-                int ret;
-                va_list ap;
-
-                va_copy( ap, args );
-                ret = demux->pf_control( demux, query, args );
-                if( ret != VLC_SUCCESS )
-                    ret = vlc_stream_vaControl( demux->s, query, ap );
-                va_end( ap );
-                return ret;
-            }
-
-            /* Some demuxers need to control pause directly (e.g. adaptive),
-             * but many legacy demuxers do not understand pause at all.
-             * If DEMUX_CAN_PAUSE is not implemented, bypass the demuxer and
-             * byte stream. If DEMUX_CAN_PAUSE is implemented and pause is
-             * supported, pause the demuxer normally. Else, something went very
-             * wrong.
-             *
-             * Note that this requires asynchronous/threaded demuxers to
-             * always return VLC_SUCCESS for DEMUX_CAN_PAUSE, so that they are
-             * never bypassed. Otherwise, we would reenter demux->s callbacks
-             * and break thread safety. At the time of writing, asynchronous or
-             * threaded *non-access* demuxers do not exist and are not fully
-             * supported by the input thread, so this is theoretical. */
-            case DEMUX_SET_PAUSE_STATE:
-            {
-                bool can_pause;
-
-                if( demux_ControlInternal( demux, DEMUX_CAN_PAUSE,
-                                           &can_pause ) )
-                    return vlc_stream_vaControl( demux->s, query, args );
-
-                /* The caller shall not pause if pause is unsupported. */
-                assert( can_pause );
-                break;
-            }
-        }
-
     return demux->pf_control( demux, query, args );
 }
 
