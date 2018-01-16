@@ -465,7 +465,7 @@ static void DxDestroyVideoService(vlc_va_t *va)
     {
         HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(va->sys->devmng, va->sys->device);
         if (FAILED(hr))
-            msg_Warn(va, "Failed to release device handle %x. (hr=0x%lX)", va->sys->device, hr);
+            msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", va->sys->device, hr);
     }
     if (dx_sys->d3ddec)
         IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
