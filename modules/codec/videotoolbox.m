@@ -1773,14 +1773,35 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     vlc_mutex_lock(&p_sys->lock);
 
-#if TARGET_OS_IPHONE
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK)
     {
+#if TARGET_OS_IPHONE
         msg_Warn(p_dec, "VT decoder doesn't handle deinterlacing on iOS, "
                  "aborting...");
         p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
-    }
+#else
+        if (p_sys->i_forced_cvpx_format == 0)
+        {
+            /* In case of interlaced content, force VT to output I420 since our
+             * SW deinterlacer handle this chroma natively. This avoids having
+             * 2 extra conversions (CVPX->I420 then I420->CVPX). */
+
+            p_sys->i_forced_cvpx_format = kCVPixelFormatType_420YpCbCr8Planar;
+            msg_Warn(p_dec, "Interlaced content: forcing VT to output I420");
+            if (p_sys->session != nil && p_sys->vtsession_status == VTSESSION_STATUS_OK)
+            {
+                msg_Warn(p_dec, "restarting vt session (color changed)");
+                vlc_mutex_unlock(&p_sys->lock);
+
+                /* Drain before stopping */
+                Drain(p_dec, false);
+                StopVideoToolbox(p_dec);
+
+                vlc_mutex_lock(&p_sys->lock);
+            }
+        }
 #endif
+    }
 
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
     {
