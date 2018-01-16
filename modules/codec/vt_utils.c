@@ -46,9 +46,10 @@ struct cvpxpic_ctx
 {
     picture_context_t s;
     CVPixelBufferRef cvpx;
+    unsigned nb_fields;
 
     atomic_uint ref_count;
-    void (*on_released_cb)(void *);
+    void (*on_released_cb)(CVPixelBufferRef, void *, unsigned);
     void *on_released_data;
 };
 
@@ -61,7 +62,7 @@ cvpxpic_destroy_cb(picture_context_t *opaque)
     {
         CFRelease(ctx->cvpx);
         if (ctx->on_released_cb)
-            ctx->on_released_cb(ctx->on_released_data);
+            ctx->on_released_cb(ctx->cvpx, ctx->on_released_data, ctx->nb_fields);
         free(opaque);
     }
 }
@@ -77,7 +78,8 @@ cvpxpic_copy_cb(struct picture_context_t *opaque)
 static int
 cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
                       void (*pf_destroy)(picture_context_t *),
-                      void (*on_released_cb)(void *), void *on_released_data)
+                      void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
+                      void *on_released_data)
 {
     struct cvpxpic_ctx *ctx = malloc(sizeof(struct cvpxpic_ctx));
     if (ctx == NULL)
@@ -88,6 +90,7 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
     ctx->s.destroy = pf_destroy;
     ctx->s.copy = cvpxpic_copy_cb;
     ctx->cvpx = CVPixelBufferRetain(cvpx);
+    ctx->nb_fields = p_pic->i_nb_fields;
     atomic_init(&ctx->ref_count, 1);
 
     ctx->on_released_cb = on_released_cb;
@@ -105,7 +108,7 @@ cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx)
 }
 
 int cvpxpic_attach_with_cb(picture_t *p_pic, CVPixelBufferRef cvpx,
-                           void (*on_released_cb)(void *),
+                           void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
                            void *on_released_data)
 {
     return cvpxpic_attach_common(p_pic, cvpx, cvpxpic_destroy_cb, on_released_cb,

@@ -1976,7 +1976,8 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     return 0;
 }
 
-static void pic_holder_on_cvpx_released(void *data)
+static void
+pic_holder_on_cvpx_released(CVPixelBufferRef cvpx, void *data, unsigned nb_fields)
 {
     struct pic_holder *pic_holder = data;
 
