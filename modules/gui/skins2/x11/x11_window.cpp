@@ -148,7 +148,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
         // Register the window as a drop target
         Atom xdndAtom = XInternAtom( XDISPLAY, "XdndAware", False );
-        char xdndVersion = 4;
+        char xdndVersion = 5;
         XChangeProperty( XDISPLAY, m_wnd, xdndAtom, XA_ATOM, 32,
                          PropModeReplace, (unsigned char *)&xdndVersion, 1 );
 
