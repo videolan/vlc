@@ -36,6 +36,7 @@
 #include <vlc_vout.h>
 #include <vlc_aout.h>
 #include <vlc_actions.h>
+#include <vlc_http.h>
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_set_state()
@@ -724,6 +725,15 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
+    /* Initialize the shared HTTP cookie jar */
+    vlc_value_t cookies;
+    cookies.p_address = vlc_http_cookies_new();
+    if ( likely(cookies.p_address) )
+    {
+        var_Create(mp, "http-cookies", VLC_VAR_ADDRESS);
+        var_SetChecked(mp, "http-cookies", VLC_VAR_ADDRESS, cookies);
+    }
+
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
@@ -817,6 +827,13 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
+
+    vlc_http_cookie_jar_t *cookies = var_GetAddress( p_mi, "http-cookies" );
+    if ( cookies )
+    {
+        var_Destroy( p_mi, "http-cookies" );
+        vlc_http_cookies_destroy( cookies );
+    }
 
     libvlc_instance_t *instance = p_mi->p_libvlc_instance;
     vlc_object_release( p_mi );
