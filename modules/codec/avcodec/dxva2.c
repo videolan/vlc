@@ -685,6 +685,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
 
     /* Create the decoder */
     IDirectXVideoDecoder *decoder;
+    /* adds a reference on each decoder surface */
     if (FAILED(IDirectXVideoDecoderService_CreateVideoDecoder(sys->d3ddec,
                                                               &sys->input,
                                                               &dsc,
@@ -710,6 +711,7 @@ static void DxDestroyVideoDecoder(vlc_va_t *va)
     directx_sys_t *dx_sys = &va->sys->dx_sys;
     if (dx_sys->decoder)
     {
+        /* releases a reference on each decoder surface */
         IDirectXVideoDecoder_Release(dx_sys->decoder);
         dx_sys->decoder = NULL;
         for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
