@@ -190,8 +190,8 @@ struct pic_holder
     bool        closed;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
-    uint8_t     nb_out;
-    uint8_t     pic_reorder_max;
+    uint8_t     nb_field_out;
+    uint8_t     field_reorder_max;
 };
 
 static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t);
@@ -1332,7 +1332,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     vlc_mutex_init(&p_sys->pic_holder->lock);
     vlc_cond_init(&p_sys->pic_holder->wait);
-    p_sys->pic_holder->nb_out = 0;
+    p_sys->pic_holder->nb_field_out = 0;
     p_sys->pic_holder->closed = false;
     pic_holder_update_reorder_max(p_sys->pic_holder, p_sys->i_pic_reorder_max);
 
@@ -1418,7 +1418,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     vlc_mutex_destroy(&p_sys->lock);
 
     vlc_mutex_lock(&p_sys->pic_holder->lock);
-    if (p_sys->pic_holder->nb_out == 0)
+    if (p_sys->pic_holder->nb_field_out == 0)
     {
         vlc_mutex_unlock(&p_sys->pic_holder->lock);
         pic_holder_clean(p_sys->pic_holder);
@@ -1982,8 +1982,9 @@ pic_holder_on_cvpx_released(CVPixelBufferRef cvpx, void *data, unsigned nb_field
     struct pic_holder *pic_holder = data;
 
     vlc_mutex_lock(&pic_holder->lock);
-    pic_holder->nb_out--;
-    if (pic_holder->nb_out == 0 && pic_holder->closed)
+    assert((int) pic_holder->nb_field_out - nb_fields >= 0);
+    pic_holder->nb_field_out -= nb_fields;
+    if (pic_holder->nb_field_out == 0 && pic_holder->closed)
     {
         vlc_mutex_unlock(&pic_holder->lock);
         pic_holder_clean(pic_holder);
@@ -2000,22 +2001,23 @@ pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder
 {
     vlc_mutex_lock(&pic_holder->lock);
 
-    pic_holder->pic_reorder_max = pic_reorder_max;
+    pic_holder->field_reorder_max = pic_reorder_max * 2;
     vlc_cond_signal(&pic_holder->wait);
 
     vlc_mutex_unlock(&pic_holder->lock);
 }
 
-static void pic_holder_wait(struct pic_holder *pic_holder)
+static void pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
 {
-    static const uint8_t reserved_picture = 2;
+    static const uint8_t reserved_fields = 4;
 
     vlc_mutex_lock(&pic_holder->lock);
 
-    while (pic_holder->pic_reorder_max != 0
-        && pic_holder->nb_out >= pic_holder->pic_reorder_max + reserved_picture)
+
+    while (pic_holder->field_reorder_max != 0
+        && pic_holder->nb_field_out >= pic_holder->field_reorder_max + reserved_fields)
         vlc_cond_wait(&pic_holder->wait, &pic_holder->lock);
-    pic_holder->nb_out++;
+    pic_holder->nb_field_out += pic->i_nb_fields;
 
     vlc_mutex_unlock(&pic_holder->lock);
 }
@@ -2084,9 +2086,24 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         vlc_mutex_unlock(&p_sys->lock);
 
         picture_t *p_pic = decoder_NewPicture(p_dec);
+        if (!p_pic)
+        {
+            vlc_mutex_lock(&p_sys->lock);
+            goto end;
+        }
 
-        if (!p_pic
-         || cvpxpic_attach_with_cb(p_pic, imageBuffer, pic_holder_on_cvpx_released,
+        p_info->p_picture = p_pic;
+
+        p_pic->date = pts.value;
+        p_pic->b_force = p_info->b_forced;
+        p_pic->b_progressive = p_info->b_progressive;
+        if(!p_pic->b_progressive)
+        {
+            p_pic->i_nb_fields = p_info->i_num_ts;
+            p_pic->b_top_field_first = p_info->b_top_field_first;
+        }
+
+        if (cvpxpic_attach_with_cb(p_pic, imageBuffer, pic_holder_on_cvpx_released,
                                    p_sys->pic_holder) != VLC_SUCCESS)
         {
             vlc_mutex_lock(&p_sys->lock);
@@ -2102,7 +2119,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
          * FIXME: A proper way to fix this issue is to allow decoder modules to
          * specify the dpb and having the vout re-allocating output frames when
          * this number changes. */
-        pic_holder_wait(p_sys->pic_holder);
+        pic_holder_wait(p_sys->pic_holder, p_pic);
 
         vlc_mutex_lock(&p_sys->lock);
 
@@ -2110,17 +2127,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         {
             picture_Release(p_pic);
             goto end;
-        }
-
-        p_info->p_picture = p_pic;
-
-        p_pic->date = pts.value;
-        p_pic->b_force = p_info->b_forced;
-        p_pic->b_progressive = p_info->b_progressive;
-        if(!p_pic->b_progressive)
-        {
-            p_pic->i_nb_fields = p_info->i_num_ts;
-            p_pic->b_top_field_first = p_info->b_top_field_first;
         }
 
         OnDecodedFrame( p_dec, p_info );
