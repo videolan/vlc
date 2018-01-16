@@ -493,7 +493,8 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
 static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
                                            VTDecompressionSessionRef session)
 {
-    const struct hxxx_helper *hh = &p_dec->p_sys->hh;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    const struct hxxx_helper *hh = &p_sys->hh;
 
     unsigned w, h, vw, vh;
     int sarn, sard;
@@ -513,7 +514,7 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
         CMFormatDescriptionRef newvideoFormatDesc;
         /* create new video format description */
         OSStatus status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
-                                                         kCMVideoCodecType_H264,
+                                                         p_sys->codec,
                                                          vw, vh,
                                                          decoderConfiguration,
                                                          &newvideoFormatDesc);
@@ -679,14 +680,6 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
     return false;
 }
 
-static bool VideoToolboxNeedsToRestartHEVC(decoder_t *p_dec,
-                                           VTDecompressionSessionRef session)
-{
-    VLC_UNUSED(p_dec);
-    VLC_UNUSED(session);
-    return false;
-}
-
 static CFMutableDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -731,6 +724,7 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
 
 #define ConfigureVoutHEVC ConfigureVoutH264
 #define ProcessBlockHEVC ProcessBlockH264
+#define VideoToolboxNeedsToRestartHEVC VideoToolboxNeedsToRestartH264
 
 static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
 {
