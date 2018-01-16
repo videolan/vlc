@@ -38,6 +38,7 @@
 #ifdef ENABLE_SOUT
 # include <aom/aomcx.h>
 # include <aom/aom_image.h>
+# define SOUT_CFG_PREFIX "sout-aom-"
 #endif
 
 /****************************************************************************
@@ -64,10 +65,12 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
 #ifdef ENABLE_SOUT
     add_submodule()
-    set_shortname("aom")
-    set_capability("encoder", 60)
-    set_description(N_("AOM video encoder"))
-    set_callbacks(OpenEncoder, CloseEncoder)
+        set_shortname("aom")
+        set_capability("encoder", 60)
+        set_description(N_("AOM video encoder"))
+        set_callbacks(OpenEncoder, CloseEncoder)
+        add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL, true )
+            change_integer_range( 0, 3 )
 #endif
 vlc_module_end ()
 
@@ -362,23 +365,30 @@ static int OpenEncoder(vlc_object_t *p_this)
     enccfg.g_h = p_enc->fmt_in.video.i_visible_height;
 
     int enc_flags;
-    switch (p_enc->fmt_in.i_codec) {
-        case VLC_CODEC_I420_10L:
-            enc_flags = AOM_CODEC_USE_HIGHBITDEPTH;
-            /* Profile 1: 10-bit and 12-bit color only, with 4:2:0 sampling. */
-            enccfg.g_profile = 2;
-            enccfg.g_bit_depth = 10;
-            break;
-        case VLC_CODEC_I420:
+    int i_profile = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "profile" );
+    switch( i_profile )
+    {
+        case 0:
+            p_enc->fmt_in.i_codec = VLC_CODEC_I420;
             enc_flags = 0;
             /* Profile 0: 8-bit 4:2:0 only. */
             enccfg.g_profile = 0;
             enccfg.g_bit_depth = 8;
             break;
+
+        case 2:
+            p_enc->fmt_in.i_codec = VLC_CODEC_I420_10L;
+            enc_flags = AOM_CODEC_USE_HIGHBITDEPTH;
+            /* Profile 2: 10-bit and 12-bit color only, with 4:2:0 sampling. */
+            enccfg.g_profile = 2;
+            enccfg.g_bit_depth = 10;
+            break;
+
+        case 1:
+        case 3:
         default:
-            msg_Err(p_this, "Unsupported input format %s",
-                    vlc_fourcc_GetDescription(VIDEO_ES, p_enc->fmt_in.i_codec));
-            free(p_sys);
+            msg_Err( p_enc, "Unsupported profile %d", i_profile );
+            free( p_sys );
             return VLC_EGENERIC;
     }
 
