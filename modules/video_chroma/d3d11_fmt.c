@@ -305,7 +305,7 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 }
 #endif
 
-int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId, const struct wdmm_version *min_ver)
+int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId, const struct wddm_version *min_ver)
 {
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3ddev);
     if (!pAdapter)

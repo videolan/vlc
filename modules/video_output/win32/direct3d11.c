@@ -1973,7 +1973,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     (void) vd;
     return false;
 #else
-    struct wdmm_version WDDM = {
+    struct wddm_version WDDM = {
         .wddm         = 22,
         .d3d_features = 19,
         .revision     = 162,

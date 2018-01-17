@@ -29,6 +29,12 @@
 
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
+/* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
+struct wddm_version
+{
+    int wddm, d3d_features, revision, build;
+};
+
 typedef struct
 {
     ID3D11Device             *d3ddevice;       /* D3D device */
@@ -97,17 +103,11 @@ int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
 
 void D3D11_Destroy(d3d11_handle_t *);
 
-/* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
-struct wdmm_version
-{
-    int wddm, d3d_features, revision, build;
-};
-
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId,
-                            const struct wdmm_version *min_ver);
+                            const struct wddm_version *min_ver);
 
 static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
                                         DXGI_FORMAT format, UINT supportFlags)
