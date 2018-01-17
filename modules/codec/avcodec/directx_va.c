@@ -312,6 +312,9 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
     case AV_CODEC_ID_H264:
         surface_count += 16;
         break;
+    case AV_CODEC_ID_VP9:
+        surface_count += 4;
+        break;
     default:
         surface_count += 2;
     }
