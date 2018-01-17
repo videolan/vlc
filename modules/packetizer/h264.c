@@ -246,16 +246,14 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
 
             if( p_spsblock && p_ppsblock )
             {
-                size_t i_alloc = p_ppsblock->i_buffer + p_spsblock->i_buffer + 8;
+                size_t i_alloc = p_ppsblock->i_buffer + p_spsblock->i_buffer;
                 p_dec->fmt_out.p_extra = malloc( i_alloc );
                 if( p_dec->fmt_out.p_extra )
                 {
                     uint8_t*p_buf = p_dec->fmt_out.p_extra;
                     p_dec->fmt_out.i_extra = i_alloc;
-                    memcpy( &p_buf[0], annexb_startcode4, 4 );
-                    memcpy( &p_buf[4], p_spsblock->p_buffer, p_spsblock->i_buffer );
-                    memcpy( &p_buf[4 + p_spsblock->i_buffer], annexb_startcode4, 4 );
-                    memcpy( &p_buf[8 + p_spsblock->i_buffer], p_ppsblock->p_buffer,
+                    memcpy( &p_buf[0], p_spsblock->p_buffer, p_spsblock->i_buffer );
+                    memcpy( &p_buf[p_spsblock->i_buffer], p_ppsblock->p_buffer,
                             p_ppsblock->i_buffer );
                 }
             }

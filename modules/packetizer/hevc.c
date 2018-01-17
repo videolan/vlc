@@ -430,12 +430,6 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
         }
 
         *pp_nal = block_Duplicate((block_t *)p_nalb);
-        if(*pp_nal)
-        {
-            size_t off = p_nalb->i_buffer - i_buffer;
-            (*pp_nal)->p_buffer += off;
-            (*pp_nal)->i_buffer -= off;
-        }
 
         return true;
     }
@@ -466,16 +460,14 @@ static bool XPSReady(decoder_sys_t *p_sys)
 static void AppendAsAnnexB(const block_t *p_block,
                            uint8_t **pp_dst, size_t *pi_dst)
 {
-    if(SIZE_MAX - p_block->i_buffer < *pi_dst ||
-       SIZE_MAX - 4 < *pi_dst + p_block->i_buffer)
+    if(SIZE_MAX - p_block->i_buffer < *pi_dst )
         return;
 
-    size_t i_realloc = p_block->i_buffer + 4 + *pi_dst;
+    size_t i_realloc = p_block->i_buffer + *pi_dst;
     uint8_t *p_realloc = realloc(*pp_dst, i_realloc);
     if(p_realloc)
     {
-        memcpy(&p_realloc[*pi_dst], annexb_startcode4, 4);
-        memcpy(&p_realloc[*pi_dst + 4], p_block->p_buffer, p_block->i_buffer);
+        memcpy(&p_realloc[*pi_dst], p_block->p_buffer, p_block->i_buffer);
         *pi_dst = i_realloc;
         *pp_dst = p_realloc;
     }
