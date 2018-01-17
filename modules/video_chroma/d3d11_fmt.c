@@ -162,7 +162,8 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 }
 #endif
 
-static void GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+#undef D3D11_GetDriverVersion
+void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
 #if VLC_WINSTORE_APP
@@ -291,7 +292,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
     if (SUCCEEDED(hr))
     {
         out->owner = true;
-        GetDriverVersion(obj, out);
+        D3D11_GetDriverVersion(obj, out);
     }
 
     return hr;
