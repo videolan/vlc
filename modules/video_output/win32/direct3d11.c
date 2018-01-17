@@ -1979,7 +1979,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
         .revision     = 162,
         .build        = 0,
     };
-    if (D3D11CheckDriverVersion(vd->sys->d3d_dev.d3ddevice, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
         return true;
 
     msg_Dbg(vd, "fallback to legacy shader mode for old AMD drivers");
