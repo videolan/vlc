@@ -146,6 +146,9 @@ static int Open( vlc_object_t *p_this)
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
+    const unsigned int i_out_frame_rate = p_filter->fmt_out.video.i_frame_rate;
+    const unsigned int i_out_frame_rate_base = p_filter->fmt_out.video.i_frame_rate_base;
+
     video_format_Clean( &p_filter->fmt_out.video );
     video_format_Copy( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
 
@@ -153,8 +156,8 @@ static int Open( vlc_object_t *p_this)
     if( var_InheritURational( p_filter, &p_filter->fmt_out.video.i_frame_rate,
                                         &p_filter->fmt_out.video.i_frame_rate_base, CFG_PREFIX "fps" ) )
     {
-        p_filter->fmt_out.video.i_frame_rate = p_filter->fmt_in.video.i_frame_rate;
-        p_filter->fmt_out.video.i_frame_rate_base = p_filter->fmt_in.video.i_frame_rate_base;
+        p_filter->fmt_out.video.i_frame_rate = i_out_frame_rate;
+        p_filter->fmt_out.video.i_frame_rate_base = i_out_frame_rate_base;
     }
 
     msg_Dbg( p_filter, "Converting fps from %d/%d -> %d/%d",
