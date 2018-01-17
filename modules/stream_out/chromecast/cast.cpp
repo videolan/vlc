@@ -50,6 +50,7 @@ struct sout_stream_sys_t
         , i_port(port)
         , es_changed( true )
         , transcode_attempt_idx( 0 )
+        , previous_state( Authenticating )
     {
         assert(p_intf != NULL);
     }
@@ -78,8 +79,8 @@ struct sout_stream_sys_t
 
     bool                               es_changed;
     std::vector<sout_stream_id_sys_t*> streams;
-    bool                               stream_started;
     unsigned int                       transcode_attempt_idx;
+    States                             previous_state;
 
 private:
     bool UpdateOutput( sout_stream_t * );
@@ -215,7 +216,6 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         sout_StreamChainDelete( p_sys->p_out, NULL );
         p_sys->p_out = NULL;
         p_sys->sout = "";
-        p_sys->stream_started = false;
         p_sys->transcode_attempt_idx = 0;
     }
 }
@@ -424,7 +424,6 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     {
         /* tell the chromecast to load the content */
         p_intf->setHasInput( mime );
-        stream_started = false;
     }
     else
     {
@@ -468,14 +467,9 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         block_Release( p_buffer );
         return VLC_EGENERIC;
     }
-    /**
-     * Check if the chromecast refused to handle the current configuration.
-     * Once the State switched to started, we know it has been accepted and don't
-     * need to monitor state changes anymore.
-     */
-    if ( p_sys->stream_started == false )
+    States s = p_sys->p_intf->state();
+    if ( p_sys->previous_state != s )
     {
-        States s = p_sys->p_intf->state();
         if ( s == LoadFailed && p_sys->es_changed == false )
         {
             if ( p_sys->transcode_attempt_idx > MAX_TRANSCODE_PASS - 1 )
@@ -493,8 +487,8 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         {
             msg_Dbg( p_stream, "Playback started: Current configuration (%u) "
                      "accepted", p_sys->transcode_attempt_idx );
-            p_sys->stream_started = true;
         }
+        p_sys->previous_state = s;
     }
 
     return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
