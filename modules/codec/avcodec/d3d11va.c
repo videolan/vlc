@@ -357,6 +357,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
             sys->d3d_dev.d3dcontext = p_sys->context;
             sys->d3d_dev.owner = false;
+            D3D11_GetDriverVersion(va, &sys->d3d_dev);
             sys->d3dvidctx = d3dvidctx;
 
             assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);

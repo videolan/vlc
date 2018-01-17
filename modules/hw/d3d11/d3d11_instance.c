@@ -83,6 +83,7 @@ void D3D11_FilterHoldInstance(filter_t *filter, d3d11_device_t *out, D3D11_TEXTU
     {
         ID3D11DeviceContext_AddRef(out->d3dcontext);
         ID3D11Device_AddRef(out->d3ddevice);
+        D3D11_GetDriverVersion(filter, out);
     }
 
     vlc_mutex_unlock(&inst_lock);

@@ -111,6 +111,8 @@ bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 int D3D11CheckDriverVersion(d3d11_device_t *, UINT vendorId,
                             const struct wddm_version *min_ver);
+void D3D11_GetDriverVersion(vlc_object_t *, d3d11_device_t *);
+#define D3D11_GetDriverVersion(a,b) D3D11_GetDriverVersion(VLC_OBJECT(a),b)
 
 static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
                                         DXGI_FORMAT format, UINT supportFlags)
