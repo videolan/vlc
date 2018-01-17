@@ -40,6 +40,9 @@ typedef struct
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     bool                     owner;
+#if !VLC_WINSTORE_APP
+    struct wddm_version      WDDM;
+#endif
 } d3d11_device_t;
 
 typedef struct
@@ -106,7 +109,7 @@ void D3D11_Destroy(d3d11_handle_t *);
 bool isXboxHardware(ID3D11Device *d3ddev);
 bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
-int D3D11CheckDriverVersion(ID3D11Device *d3ddev, UINT vendorId,
+int D3D11CheckDriverVersion(d3d11_device_t *, UINT vendorId,
                             const struct wddm_version *min_ver);
 
 static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,

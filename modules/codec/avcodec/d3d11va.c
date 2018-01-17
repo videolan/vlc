@@ -537,7 +537,7 @@ static bool CanUseIntelHEVC(vlc_va_t *va)
         .revision     = 15,
         .build        = 4836,
     };
-    if (D3D11CheckDriverVersion(sys->d3d_dev.d3ddevice, GPU_MANUFACTURER_INTEL, &WDMM) == VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(&sys->d3d_dev, GPU_MANUFACTURER_INTEL, &WDMM) == VLC_SUCCESS)
         return true;
 
     msg_Dbg(va, "HEVC not supported with these drivers");
