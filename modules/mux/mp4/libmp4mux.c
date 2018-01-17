@@ -1030,6 +1030,11 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!text)
             return NULL;
 
+        /* Sample Entry Header */
+        for (int i = 0; i < 6; i++)
+            bo_add_8(text, 0);        // reserved;
+        bo_add_16be(text, 1);         // data-reference-index
+
         if(p_track->fmt.i_extra >= 44)
         {
             /* Copy the original sample description format */
@@ -1069,6 +1074,11 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!tx3g)
             return NULL;
 
+        /* Sample Entry Header */
+        for (int i = 0; i < 6; i++)
+            bo_add_8(tx3g, 0);        // reserved;
+        bo_add_16be(tx3g, 1);         // data-reference-index
+
         if(p_track->fmt.i_codec == VLC_CODEC_TX3G &&
            p_track->fmt.i_extra >= 32)
         {
@@ -1077,11 +1087,6 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         }
         else /* Build TTXT(tx3g) sample desc */
         {
-            /* Sample Entry Header */
-            for (int i = 0; i < 6; i++)
-                bo_add_8(tx3g, 0);        // reserved;
-            bo_add_16be(tx3g, 1);         // data-reference-index
-
             /* tx3g sample description */
             bo_add_32be(tx3g, 0);         // display flags
             bo_add_16be(tx3g, 0);         // justification
