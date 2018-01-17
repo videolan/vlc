@@ -35,6 +35,7 @@
 
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_modules.h>
 
 #include <cassert>
 
@@ -84,9 +85,6 @@ struct sout_stream_sys_t
 
 private:
     bool UpdateOutput( sout_stream_t * );
-    vlc_fourcc_t transcodeAudioFourCC( sout_stream_t* p_stream,
-                                       const audio_format_t* p_fmt );
-
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -123,8 +121,6 @@ static const char *const ppsz_sout_options[] = {
 #define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
 #define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®" )
-#define MULTICHANNEL_PCM_TEXT N_( "Multichannel PCM" )
-#define MULTICHANNEL_PCM_LONGTEXT N_( "Use PCM for multichannel audio." )
 
 #define IP_ADDR_TEXT N_("IP Address")
 #define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
@@ -152,8 +148,6 @@ vlc_module_begin ()
     add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
         change_private()
     add_bool(SOUT_CFG_PREFIX "audio-passthrough", true, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
-    add_bool(SOUT_CFG_PREFIX "multichannel-pcm", true, MULTICHANNEL_PCM_TEXT, MULTICHANNEL_PCM_LONGTEXT, false );
-
 
 vlc_module_end ()
 
@@ -266,15 +260,6 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
            i_codec == VLC_CODEC_MP3;
 }
 
-vlc_fourcc_t sout_stream_sys_t::transcodeAudioFourCC( sout_stream_t *p_stream,
-                                                      const audio_format_t* p_fmt )
-{
-    if ( p_fmt->i_channels > 2 &&
-         var_InheritBool( p_stream, SOUT_CFG_PREFIX "multichannel-pcm" ) )
-        return VLC_CODEC_S16L;
-    return VLC_CODEC_MP3;
-}
-
 bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
 {
     if ( unlikely( p_out != NULL ) )
@@ -385,12 +370,18 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         char s_fourcc[5];
         if ( i_codec_audio == 0 && p_original_audio )
         {
-            i_codec_audio = transcodeAudioFourCC( p_stream, &p_original_audio->audio );
+            if ( p_original_audio->audio.i_channels > 2 && module_exists( "vorbis" ) )
+                i_codec_audio = VLC_CODEC_VORBIS;
+            else
+                i_codec_audio = VLC_CODEC_MP3;
+
             msg_Dbg( p_stream, "Converting audio to %.4s", (const char*)&i_codec_audio );
             ssout << "acodec=";
             vlc_fourcc_to_char( i_codec_audio, s_fourcc );
             s_fourcc[4] = '\0';
             ssout << s_fourcc << ',';
+            if( i_codec_audio == VLC_CODEC_VORBIS )
+                ssout << "aenc=vorbis{quality=6},";
         }
         if ( b_supports_video && i_codec_video == 0 )
         {
