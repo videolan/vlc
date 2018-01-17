@@ -332,15 +332,15 @@ static int spu_invscale_h(unsigned v, const spu_scale_t s)
  * A few area functions helpers
  */
 typedef struct {
-    unsigned x;
-    unsigned y;
-    unsigned width;
-    unsigned height;
+    int x;
+    int y;
+    int width;
+    int height;
 
     spu_scale_t scale;
 } spu_area_t;
 
-static spu_area_t spu_area_create(unsigned x, unsigned y, unsigned w, unsigned h, spu_scale_t s)
+static spu_area_t spu_area_create(int x, int y, int w, int h, spu_scale_t s)
 {
     spu_area_t a = { .x = x, .y = y, .width = w, .height = h, .scale = s };
     return a;
@@ -378,7 +378,7 @@ static bool spu_area_overlap(spu_area_t a, spu_area_t b)
     a = spu_area_scaled(a);
     b = spu_area_scaled(b);
 
-    return __MAX(a.x, b.x) < __MIN(a.x + a.width, b.x + b.width ) &&
+    return __MAX(a.x, b.x) < __MIN(a.x + a.width , b.x + b.width ) &&
            __MAX(a.y, b.y) < __MIN(a.y + a.height, b.y + b.height);
 }
 
@@ -432,21 +432,17 @@ static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
 {
     spu_area_t a = spu_area_scaled(*area);
 
-    if((a.x + a.width) > boundary->width)
-    {
-        if(boundary->width > a.width)
-            a.x = boundary->width - a.width;
-        else
-            a.x = 0;
-    }
+    const int i_error_x = (a.x + a.width) - boundary->width;
+    if (i_error_x > 0)
+        a.x -= i_error_x;
+    if (a.x < 0)
+        a.x = 0;
 
-    if((a.y + a.height) > boundary->height)
-    {
-        if(boundary->height > a.height)
-            a.y = boundary->height - a.height;
-        else
-            a.y = 0;
-    }
+    const int i_error_y = (a.y + a.height) - boundary->height;
+    if (i_error_y > 0)
+        a.y -= i_error_y;
+    if (a.y < 0)
+        a.y = 0;
 
     *area = spu_area_unscaled(a, area->scale);
 }
