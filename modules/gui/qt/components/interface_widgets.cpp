@@ -342,7 +342,14 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if( p_window != NULL )
     {
-        vout_window_ReportMouseMoved( p_window, event->x(), event->y() );
+        QPointF current_pos = event->localPos();
+
+#if HAS_QT56
+        current_pos *= devicePixelRatioF();
+#else
+        current_pos *= devicePixelRatio();
+#endif
+        vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
         event->accept();
     }
     else
