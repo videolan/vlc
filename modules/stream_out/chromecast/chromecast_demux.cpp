@@ -306,7 +306,7 @@ struct demux_sys_t
 
             va_copy( ap, args );
             ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
-            if( ret == VLC_SUCCESS )
+            if( ret != VLC_SUCCESS )
                 *va_arg( ap, bool* ) = false;
             va_end( ap );
             return VLC_SUCCESS;
@@ -318,7 +318,7 @@ struct demux_sys_t
 
             va_copy( ap, args );
             ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
-            if( ret == VLC_SUCCESS )
+            if( ret != VLC_SUCCESS )
                 *va_arg( ap, int64_t* ) = 0;
             va_end( ap );
             return VLC_SUCCESS;
