@@ -122,6 +122,35 @@ static const char *const ppsz_sout_options[] = {
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
 #define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®" )
 
+enum {
+    CONVERSION_QUALITY_HIGH = 0,
+    CONVERSION_QUALITY_MEDIUM = 1,
+    CONVERSION_QUALITY_LOW = 2,
+    CONVERSION_QUALITY_LOWCPU = 3,
+};
+
+#if defined (__ANDROID__) || defined (__arm__) || (defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
+# define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_LOW
+#else
+# define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_MEDIUM
+#endif
+
+static const int conversion_quality_list[] = {
+    CONVERSION_QUALITY_HIGH,
+    CONVERSION_QUALITY_MEDIUM,
+    CONVERSION_QUALITY_LOW,
+    CONVERSION_QUALITY_LOWCPU,
+};
+static const char *const conversion_quality_list_text[] = {
+    N_( "High (high quality and high bandwith)" ),
+    N_( "Medium (medium quality and medium bandwidth)" ),
+    N_( "Low (low quality and low bandwith)" ),
+    N_( "Low CPU (low quality but high bandwith)" ),
+};
+
+#define CONVERSION_QUALITY_TEXT N_( "Conversion quality" )
+#define CONVERSION_QUALITY_LONGTEXT N_( "Change this option to increase conversion speed or quality." )
+
 #define IP_ADDR_TEXT N_("IP Address")
 #define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
 #define PORT_TEXT N_("Chromecast port")
@@ -148,6 +177,9 @@ vlc_module_begin ()
     add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
         change_private()
     add_bool(SOUT_CFG_PREFIX "audio-passthrough", true, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
+    add_integer(SOUT_CFG_PREFIX "conversion-quality", CONVERSION_QUALITY_DEFAULT,
+                CONVERSION_QUALITY_TEXT, CONVERSION_QUALITY_LONGTEXT, false );
+        change_integer_list(conversion_quality_list, conversion_quality_list_text)
 
 vlc_module_end ()
 
@@ -365,12 +397,55 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             if ( res == 2 )
                 config_PutInt(p_stream, SOUT_CFG_PREFIX "show-perf-warning", 0 );
         }
+
+        static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";
+        static const char video_maxres_720p[] = "maxwidth=1280,maxheight=720";
+        static const char video_x264_preset_veryfast[] = "veryfast";
+        static const char video_x264_preset_ultrafast[] = "ultrafast";
+
+        const int i_quality = var_InheritInteger( p_stream, SOUT_CFG_PREFIX "conversion-quality" );
+        const char *psz_video_maxres;
+        const char *psz_video_x264_preset;
+        unsigned i_video_x264_crf_hd, i_video_x264_crf_720p;
+        bool b_audio_mp3;
+
+        switch ( i_quality )
+        {
+            case CONVERSION_QUALITY_HIGH:
+                psz_video_maxres = video_maxres_hd;
+                i_video_x264_crf_hd = i_video_x264_crf_720p = 21;
+                psz_video_x264_preset = video_x264_preset_veryfast;
+                b_audio_mp3 = false;
+                break;
+            case CONVERSION_QUALITY_MEDIUM:
+                psz_video_maxres = video_maxres_hd;
+                i_video_x264_crf_hd = 23;
+                i_video_x264_crf_720p = 21;
+                psz_video_x264_preset = video_x264_preset_veryfast;
+                b_audio_mp3 = false;
+                break;
+            case CONVERSION_QUALITY_LOW:
+                psz_video_maxres = video_maxres_720p;
+                i_video_x264_crf_hd = i_video_x264_crf_720p = 23;
+                psz_video_x264_preset = video_x264_preset_veryfast;
+                b_audio_mp3 = true;
+                break;
+            default:
+            case CONVERSION_QUALITY_LOWCPU:
+                psz_video_maxres = video_maxres_720p;
+                i_video_x264_crf_hd = i_video_x264_crf_720p = 23;
+                psz_video_x264_preset = video_x264_preset_ultrafast;
+                b_audio_mp3 = true;
+                break;
+        }
+
         /* TODO: provide audio samplerate and channels */
         ssout << "transcode{";
         char s_fourcc[5];
         if ( i_codec_audio == 0 && p_original_audio )
         {
-            if ( p_original_audio->audio.i_channels > 2 && module_exists( "vorbis" ) )
+            if ( !b_audio_mp3
+              && p_original_audio->audio.i_channels > 2 && module_exists( "vorbis" ) )
                 i_codec_audio = VLC_CODEC_VORBIS;
             else
                 i_codec_audio = VLC_CODEC_MP3;
@@ -387,11 +462,22 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         {
             i_codec_video = DEFAULT_TRANSCODE_VIDEO;
             msg_Dbg( p_stream, "Converting video to %.4s", (const char*)&i_codec_video );
-            /* TODO: provide maxwidth,maxheight */
             ssout << "vcodec=";
             vlc_fourcc_to_char( i_codec_video, s_fourcc );
             s_fourcc[4] = '\0';
-            ssout << s_fourcc;
+            ssout << s_fourcc << ',' << psz_video_maxres << ',';
+
+            const video_format_t *p_vid =
+                p_original_video ? &p_original_video->video : NULL;
+            const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
+            unsigned i_video_x264_crf = b_hdres ? i_video_x264_crf_hd : i_video_x264_crf_720p;
+
+            if( i_codec_video == VLC_CODEC_H264 )
+            {
+                if ( module_exists("x264") )
+                    ssout << "venc=x264{preset=" << psz_video_x264_preset
+                          << ",crf=" << i_video_x264_crf << "},";
+            }
         }
         ssout << "}:";
     }
