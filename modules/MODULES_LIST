@@ -466,6 +466,7 @@ $Id$
  * win_msg: Windows Messages module
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
+ * winhibit: Win32 screensaver inhibition
  * winstore: Windows Store App audio output
  * wl_shell: Wayland shell surface window provider
  * wl_shm: Wayland shared memory video output
