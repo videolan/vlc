@@ -188,10 +188,6 @@ static void *EventThread( void *p_this )
         return NULL;
     }
 
-    /* Prevent monitor from powering off */
-    if (var_GetBool(vd, "disable-screensaver"))
-        SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS );
-
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
     for( ;; )

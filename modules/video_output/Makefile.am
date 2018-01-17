@@ -334,6 +334,11 @@ if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
 endif
 
+libwinhibit_plugin_la_SOURCES = video_output/win32/inhibit.c
+if HAVE_WIN32_DESKTOP
+vout_LTLIBRARIES += libwinhibit_plugin.la
+endif
+
 libegl_win32_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_win32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WIN32=1
 libegl_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
