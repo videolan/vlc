@@ -918,8 +918,8 @@ bool transcode_video_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
              "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
              (char*)&p_fmt->i_codec, (char*)&p_sys->i_vcodec );
 
-    id->fifo.audio.first = NULL;
-    id->fifo.audio.last = &id->fifo.audio.first;
+    id->fifo.pic.first = NULL;
+    id->fifo.pic.last = &id->fifo.pic.first;
 
     /* Complete destination format */
     id->p_encoder->fmt_out.i_codec = p_sys->i_vcodec;
