@@ -274,7 +274,7 @@ block_t * ForgedInitSegment::buildMoovBox()
     mp4mux_trackinfo_t *p_tracks = &trackinfo;
     bo_t *box = NULL;
 
-    if(mp4mux_CanMux( NULL, &trackinfo.fmt ))
+    if(mp4mux_CanMux( NULL, &trackinfo.fmt, true, false ))
        box = mp4mux_GetMoovBox(NULL, &p_tracks, 1,
                                trackTimescale.ToTime(duration.Get()),
                                true, false, false, false);

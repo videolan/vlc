@@ -1816,8 +1816,10 @@ bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], s
     return box;
 }
 
-bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
+bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
+                   bool b_fragmented, bool b_mov)
 {
+    VLC_UNUSED(b_mov);
     switch(p_fmt->i_codec)
     {
     case VLC_CODEC_A52:
@@ -1856,10 +1858,10 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
     case VLC_CODEC_SUBT:
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
-        break;
+        return !b_fragmented;
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
-        break;
+        return !b_fragmented;
     default:
         return false;
     }
