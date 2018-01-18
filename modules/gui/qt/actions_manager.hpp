@@ -81,7 +81,8 @@ private:
                                            vlc_renderer_item_t * );
     static void renderer_event_item_removed( vlc_renderer_discovery_t *,
                                              vlc_renderer_item_t * );
-    static bool compareRenderers( const QVariant &m_obj, vlc_renderer_item_t* p_item );
+    static vlc_renderer_item_t* compareRenderers( const QVariant &m_obj,
+                                                  vlc_renderer_item_t* p_item );
 
 public slots:
     void toggleMuteAudio();
@@ -95,12 +96,18 @@ public slots:
     void RendererSelected( QAction * );
 
 protected slots:
+    void onRendererItemAdded( vlc_renderer_item_t* );
+    void onRendererItemRemoved( vlc_renderer_item_t* );
     void fullscreen();
     void snapshot();
     void playlist();
     void frame();
 
     virtual void doAction( int );
+
+signals:
+    void rendererItemAdded( vlc_renderer_item_t* );
+    void rendererItemRemoved( vlc_renderer_item_t* );
 };
 
 #endif

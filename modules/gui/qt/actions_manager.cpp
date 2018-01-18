@@ -40,7 +40,12 @@
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
-{ }
+{
+    CONNECT( this, rendererItemAdded( vlc_renderer_item_t* ),
+             this, onRendererItemAdded( vlc_renderer_item_t* ) );
+    CONNECT( this, rendererItemRemoved( vlc_renderer_item_t* ),
+             this, onRendererItemRemoved( vlc_renderer_item_t* ) );
+}
 
 ActionsManager::~ActionsManager()
 {
@@ -209,21 +214,22 @@ void ActionsManager::skipBackward()
         THEMIM->getIM()->jumpBwd();
 }
 
-bool ActionsManager::compareRenderers( const QVariant &obj, vlc_renderer_item_t* p_item )
+vlc_renderer_item_t* ActionsManager::compareRenderers( const QVariant &obj, vlc_renderer_item_t* p_item )
 {
     if (!obj.canConvert<QVariantHash>())
-        return false;
+        return NULL;
     QVariantHash qvh = obj.value<QVariantHash>();
     if (!qvh.contains( "sout" ))
-        return false;
+        return NULL;
     vlc_renderer_item_t* p_existing =
             reinterpret_cast<vlc_renderer_item_t*>( qvh["sout"].value<void*>() );
-    return !strcasecmp(vlc_renderer_item_sout( p_existing ),
-                    vlc_renderer_item_sout( p_item ) );
+    if ( !strcasecmp(vlc_renderer_item_sout( p_existing ),
+                    vlc_renderer_item_sout( p_item ) ) )
+        return p_existing;
+    return NULL;
 }
 
-void ActionsManager::renderer_event_item_added( vlc_renderer_discovery_t*,
-                                                vlc_renderer_item_t *p_item )
+void ActionsManager::onRendererItemAdded(vlc_renderer_item_t* p_item)
 {
     QAction *firstSeparator = NULL;
 
@@ -236,14 +242,16 @@ void ActionsManager::renderer_event_item_added( vlc_renderer_discovery_t*,
         }
         QVariant v = action->data();
         if (compareRenderers( action->data(), p_item ))
+        {
+            vlc_renderer_item_release( p_item );
             return; /* we already have this item */
+        }
     }
 
     QAction *action = new QAction( vlc_renderer_item_flags(p_item) & VLC_RENDERER_CAN_VIDEO ? QIcon( ":/sidebar/movie.svg" ) : QIcon( ":/sidebar/music.svg" ),
                                    vlc_renderer_item_name(p_item), VLCMenuBar::rendererMenu );
     action->setCheckable(true);
 
-    vlc_renderer_item_hold( p_item );
     QVariantHash data;
     data.insert( "sout", QVariant::fromValue( reinterpret_cast<void*>( p_item ) ) );
     action->setData( data );
@@ -254,21 +262,39 @@ void ActionsManager::renderer_event_item_added( vlc_renderer_discovery_t*,
     }
 }
 
-void ActionsManager::renderer_event_item_removed(
-    vlc_renderer_discovery_t *, vlc_renderer_item_t *p_item )
+void ActionsManager::onRendererItemRemoved( vlc_renderer_item_t* p_item )
 {
     foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
     {
         if (action->isSeparator())
             continue;
-        if (compareRenderers( action->data(), p_item ))
+        vlc_renderer_item_t *p_existing = compareRenderers( action->data(), p_item );
+        if (p_existing)
         {
             VLCMenuBar::rendererMenu->removeAction( action );
             VLCMenuBar::rendererGroup->removeAction( action );
-            vlc_renderer_item_release( p_item );
-            return;
+            vlc_renderer_item_release( p_existing );
+            break;
         }
     }
+    // Always release the item as we acquired it before emiting the signal
+    vlc_renderer_item_release( p_item );
+}
+
+void ActionsManager::renderer_event_item_added( vlc_renderer_discovery_t* p_rd,
+                                                vlc_renderer_item_t *p_item )
+{
+    ActionsManager *self = reinterpret_cast<ActionsManager*>( p_rd->owner.sys );
+    vlc_renderer_item_hold( p_item );
+    self->emit rendererItemAdded( p_item );
+}
+
+void ActionsManager::renderer_event_item_removed( vlc_renderer_discovery_t *p_rd,
+                                                  vlc_renderer_item_t *p_item )
+{
+    ActionsManager *self = reinterpret_cast<ActionsManager*>( p_rd->owner.sys );
+    vlc_renderer_item_hold( p_item );
+    self->emit rendererItemRemoved( p_item );
 }
 
 void ActionsManager::ScanRendererAction(bool checked)
@@ -296,7 +322,7 @@ void ActionsManager::ScanRendererAction(bool checked)
 
         struct vlc_renderer_discovery_owner owner =
         {
-            p_intf,
+            this,
             renderer_event_item_added,
             renderer_event_item_removed,
         };
