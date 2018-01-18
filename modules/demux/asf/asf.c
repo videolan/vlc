@@ -564,7 +564,7 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
     demux_sys_t *p_sys = p_demux->p_sys;
     asf_track_t *tk = p_sys->track[i_stream_number];
 
-    if ( tk->p_fmt->video.i_sar_num == i_ratio_x && tk->p_fmt->video.i_sar_den == i_ratio_y )
+    if ( !tk->p_fmt || (tk->p_fmt->video.i_sar_num == i_ratio_x && tk->p_fmt->video.i_sar_den == i_ratio_y ) )
         return;
 
     /* Only apply if origin pixel size >= 1x1, due to broken yacast */
