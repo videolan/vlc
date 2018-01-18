@@ -232,13 +232,13 @@ static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
         if( psz_align++ )
         {
             if( !strcmp( psz_align, "line-left" ) )
-                p_settings->linealign = WEBVTT_ALIGN_LEFT;
+                p_settings->positionalign = WEBVTT_ALIGN_LEFT;
             else if( !strcmp( psz_align, "line-right" ) )
-                p_settings->linealign = WEBVTT_ALIGN_RIGHT;
+                p_settings->positionalign = WEBVTT_ALIGN_RIGHT;
             else if( !strcmp( psz_align, "center" ) )
-                p_settings->linealign = WEBVTT_ALIGN_CENTER;
+                p_settings->positionalign = WEBVTT_ALIGN_CENTER;
             else
-                p_settings->linealign = WEBVTT_ALIGN_AUTO;
+                p_settings->positionalign = WEBVTT_ALIGN_AUTO;
         }
     }
     else if( !strcmp( psz_key, "size" ) )
