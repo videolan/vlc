@@ -257,7 +257,12 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
     picture_UpdatePlanes(sys->staging, d3drect.pBits, d3drect.Pitch);
 
     picture_Hold( src );
+
+    if (src->format.i_chroma == VLC_CODEC_I420)
+        plane_SwapUV( src->p );
     sys->filter->pf_video_filter(sys->filter, src);
+    if (src->format.i_chroma == VLC_CODEC_I420)
+        plane_SwapUV( src->p );
 
     IDirect3DSurface9_UnlockRect(sys->staging->p_sys->surface);
 
