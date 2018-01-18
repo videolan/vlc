@@ -1651,11 +1651,12 @@ QMenu *VLCMenuBar::RendererMenu(intf_thread_t *p_intf, QMenu *menu )
 
     submenu->addSeparator();
 
-    action = new QAction( qtr("Scan"), submenu );
-    action->setCheckable(true);
+    action = new QAction( qtr("Scanning..."), submenu );
+    action->setEnabled( false );
     submenu->addAction( action );
 
-    CONNECT( action, triggered(bool), ActionsManager::getInstance( p_intf ), ScanRendererAction( bool ) );
+    CONNECT( submenu, aboutToShow(), ActionsManager::getInstance( p_intf ), StartRendererScan() );
+    CONNECT( submenu, aboutToHide(), ActionsManager::getInstance( p_intf ), RendererMenuCountdown() );
     CONNECT( rendererGroup, triggered(QAction*), ActionsManager::getInstance( p_intf ), RendererSelected( QAction* ) );
 
     return submenu;

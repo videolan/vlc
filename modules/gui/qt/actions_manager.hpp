@@ -33,6 +33,7 @@
 #include <QVector>
 
 #include <QObject>
+#include <QTimer>
 class QAction;
 
 typedef enum actionType_e
@@ -76,6 +77,8 @@ private:
 
     intf_thread_t* const p_intf;
     QVector<vlc_renderer_discovery_t*> m_rds;
+    QTimer m_stop_scan_timer;
+    bool m_scanning;
 
     static void renderer_event_item_added( vlc_renderer_discovery_t *,
                                            vlc_renderer_item_t * );
@@ -92,7 +95,9 @@ public slots:
     void record();
     void skipForward();
     void skipBackward();
-    void ScanRendererAction( bool );
+    void StartRendererScan();
+    void RendererMenuCountdown();
+    void StopRendererScan();
     void RendererSelected( QAction * );
 
 protected slots:
