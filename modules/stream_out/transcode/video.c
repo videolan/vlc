@@ -826,12 +826,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             memcpy( &id->fmt_input_video, &p_pic->format, sizeof(video_format_t));
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
-            {
-                picture_Release( p_pic );
-                id->b_transcode = false;
-                b_error = true;
-                continue;
-            }
+                goto error;
         }
 
         /* Run the filter and output chains; first with the picture,
@@ -863,6 +858,12 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             p_pic = NULL;
         }
+        continue;
+error:
+        if( p_pic )
+            picture_Release( p_pic );
+        id->b_transcode = false;
+        b_error = true;
     } while( p_pics );
 
     if( p_sys->i_threads >= 1 )
