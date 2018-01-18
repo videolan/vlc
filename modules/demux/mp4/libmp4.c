@@ -1964,7 +1964,6 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 
 error:
-    MP4_FreeBox_avcC( p_box );
     MP4_READBOX_EXIT( 0 );
 }
 
