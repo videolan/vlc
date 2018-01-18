@@ -159,7 +159,7 @@ static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseVorbisComments( decoder_t * );
 
-static void ConfigureChannelOrder(uint8_t *, int, uint32_t, bool );
+static void ConfigureChannelOrder(uint8_t *, int, uint32_t );
 
 #ifdef HAVE_VORBIS_ENCODER
 static int OpenEncoder   ( vlc_object_t * );
@@ -442,7 +442,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
 
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
-            p_dec->fmt_out.audio.i_physical_channels, true);
+            p_dec->fmt_out.audio.i_physical_channels);
 
     return VLC_SUCCESS;
 }
@@ -672,7 +672,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
  *
  *****************************************************************************/
 static void ConfigureChannelOrder(uint8_t *pi_chan_table, int i_channels,
-                                  uint32_t i_channel_mask, bool b_decode)
+                                  uint32_t i_channel_mask)
 {
     const uint32_t *pi_channels_in;
     switch( i_channels )
@@ -700,12 +700,8 @@ static void ConfigureChannelOrder(uint8_t *pi_chan_table, int i_channels,
             return;
     }
 
-    if( b_decode )
-        aout_CheckChannelReorder( pi_channels_in, NULL,
-                                  i_channel_mask, pi_chan_table );
-    else
-        aout_CheckChannelReorder( NULL, pi_channels_in,
-                                  i_channel_mask, pi_chan_table );
+    aout_CheckChannelReorder( pi_channels_in, NULL,
+                              i_channel_mask, pi_chan_table );
 }
 
 /*****************************************************************************
@@ -881,7 +877,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_samples_delay = 0;
 
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
-            p_enc->fmt_in.audio.i_physical_channels, true);
+            p_enc->fmt_in.audio.i_physical_channels);
 
     return VLC_SUCCESS;
 }
