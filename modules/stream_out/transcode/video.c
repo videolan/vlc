@@ -369,8 +369,8 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 }
 
 /* Take care of the scaling and chroma conversions. */
-static void conversion_video_filter_append( sout_stream_id_sys_t *id,
-                                            picture_t *p_pic )
+static int conversion_video_filter_append( sout_stream_id_sys_t *id,
+                                           picture_t *p_pic )
 {
     const video_format_t *p_vid_out = video_output_format( id, p_pic );
 
@@ -381,9 +381,10 @@ static void conversion_video_filter_append( sout_stream_id_sys_t *id,
         es_format_t fmt_out;
         es_format_Init( &fmt_out, VIDEO_ES, p_vid_out->i_chroma );
         fmt_out.video = *p_vid_out;
-        filter_chain_AppendConverter( id->p_uf_chain ? id->p_uf_chain : id->p_f_chain,
-                                      &fmt_out, &id->p_encoder->fmt_in );
+        return filter_chain_AppendConverter( id->p_uf_chain ? id->p_uf_chain : id->p_f_chain,
+                                             &fmt_out, &id->p_encoder->fmt_in );
     }
+    return VLC_SUCCESS;
 }
 
 static void transcode_video_framerate_init( sout_stream_t *p_stream,
@@ -803,7 +804,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             transcode_video_encoder_init( p_stream, id, p_pic );
             transcode_video_filter_init( p_stream, id );
-            conversion_video_filter_append( id, p_pic );
+            if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
+                goto error;
             memcpy( &id->fmt_input_video, &p_pic->format, sizeof(video_format_t));
         }
 
@@ -818,7 +820,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             transcode_video_encoder_init( p_stream, id, p_pic );
             transcode_video_filter_init( p_stream, id );
-            conversion_video_filter_append( id, p_pic );
+            if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
+                goto error;
             memcpy( &id->fmt_input_video, &p_pic->format, sizeof(video_format_t));
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
