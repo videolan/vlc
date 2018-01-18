@@ -894,7 +894,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     block_t *p_block, *p_chain = NULL;
     float **buffer;
 
-    /* FIXME: flush buffers in here */
+    /* Packets are already flushed, see bellow. */
     if( unlikely( !p_aout_buf ) ) return NULL;
 
     mtime_t i_pts = p_aout_buf->i_pts -
