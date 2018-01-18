@@ -472,6 +472,15 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
             unsigned i_video_x264_crf = b_hdres ? i_video_x264_crf_hd : i_video_x264_crf_720p;
 
+            if( p_vid == NULL
+             || p_vid->i_frame_rate == 0 || p_vid->i_frame_rate_base == 0
+             || ( p_vid->i_frame_rate / p_vid->i_frame_rate_base ) > 30 )
+            {
+                /* Even force 24fps if the frame rate is unknown */
+                msg_Warn( p_stream, "lowering frame rate to 24fps" );
+                ssout << "fps=24,";
+            }
+
             if( i_codec_video == VLC_CODEC_H264 )
             {
                 if ( module_exists("x264") )
