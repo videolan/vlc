@@ -261,6 +261,11 @@ void ActionsManager::onRendererItemAdded(vlc_renderer_item_t* p_item)
         VLCMenuBar::rendererMenu->insertAction( firstSeparator, action );
         VLCMenuBar::rendererGroup->addAction(action);
     }
+    else
+    {
+        vlc_renderer_item_release( p_item );
+        delete action;
+    }
 }
 
 void ActionsManager::onRendererItemRemoved( vlc_renderer_item_t* p_item )
