@@ -242,7 +242,6 @@ void ActionsManager::onRendererItemAdded(vlc_renderer_item_t* p_item)
             firstSeparator = action;
             break;
         }
-        QVariant v = action->data();
         if (compareRenderers( action->data(), p_item ))
         {
             vlc_renderer_item_release( p_item );
