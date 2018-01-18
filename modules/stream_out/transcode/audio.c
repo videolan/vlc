@@ -307,6 +307,13 @@ int transcode_audio_process( sout_stream_t *p_stream,
             }
             date_Init( &id->next_input_pts, id->audio_dec_out.i_rate, 1 );
             date_Set( &id->next_input_pts, p_audio_buf->i_pts );
+
+            if (!id->id)
+            {
+                id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
+                if (!id->id)
+                    id->b_transcode = false;
+            }
         }
 
         /* Check if audio format has changed, and filters need reinit */
@@ -426,14 +433,7 @@ bool transcode_audio_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
     }
 
     /* Open output stream */
-    id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
     id->b_transcode = true;
-
-    if( !id->id )
-    {
-        transcode_audio_close( id );
-        return false;
-    }
 
     /* Reinit encoder again later on, when all information from decoders
      * is available. */
