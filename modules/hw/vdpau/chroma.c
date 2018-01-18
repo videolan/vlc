@@ -819,12 +819,29 @@ static picture_t *VideoExport_Filter(filter_t *filter, picture_t *src)
     return VideoExport(filter, src, dst);
 }
 
+static bool ChromaMatches(VdpChromaType vdp_type, vlc_fourcc_t vlc_chroma)
+{
+    switch (vlc_chroma)
+    {
+        case VLC_CODEC_VDPAU_VIDEO_420:
+            return vdp_type == VDP_CHROMA_TYPE_420;
+        case VLC_CODEC_VDPAU_VIDEO_422:
+            return vdp_type == VDP_CHROMA_TYPE_422;
+        case VLC_CODEC_VDPAU_VIDEO_444:
+            return vdp_type == VDP_CHROMA_TYPE_444;
+        default:
+            return false;
+    }
+}
+
 static int YCbCrOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+    VdpChromaType type;
+    VdpYCbCrFormat format;
+
+    if (!vlc_fourcc_to_vdp_ycc(filter->fmt_out.video.i_chroma, &type, &format)
+      || !ChromaMatches(type, filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
 
     if (filter->fmt_in.video.i_visible_width
@@ -840,13 +857,8 @@ static int YCbCrOpen(vlc_object_t *obj)
     filter_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
-    if (!vlc_fourcc_to_vdp_ycc(filter->fmt_out.video.i_chroma,
-                               &sys->chroma, &sys->format))
-    {
-        free(sys);
-        return VLC_EGENERIC;
-    }
+    sys->chroma = type;
+    sys->format = format;
 
     filter->pf_video_filter = VideoExport_Filter;
     filter->p_sys = sys;
