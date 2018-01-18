@@ -869,7 +869,16 @@ static int OpenEncoder( vlc_object_t *p_this )
         }
     }
 
+    assert(p_sys->vi.channels > 0 && (size_t) p_sys->vi.channels < ARRAY_SIZE(pi_channels_maps) );
+
+    p_enc->fmt_out.audio.i_channels = p_enc->fmt_in.audio.i_channels =
+        p_sys->vi.channels;
+
+    p_enc->fmt_out.audio.i_physical_channels =
+    p_enc->fmt_in.audio.i_physical_channels =
+        pi_channels_maps[p_sys->vi.channels];
     p_sys->i_channels = p_enc->fmt_in.audio.i_channels;
+
     p_sys->i_last_block_size = 0;
     p_sys->i_samples_delay = 0;
 
