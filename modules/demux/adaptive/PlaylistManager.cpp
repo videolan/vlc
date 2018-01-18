@@ -196,7 +196,7 @@ struct PrioritizedAbstractStream
     AbstractStream *st;
 };
 
-static bool streamCompare(PrioritizedAbstractStream a,  PrioritizedAbstractStream b)
+static bool streamCompare(const PrioritizedAbstractStream &a,  const PrioritizedAbstractStream &b)
 {
     if( a.status >= b.status ) /* Highest prio is higer value in enum */
     {
