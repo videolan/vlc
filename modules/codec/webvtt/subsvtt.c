@@ -1425,6 +1425,41 @@ static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
     return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
 }
 
+static void ChainCueSegments( const webvtt_dom_cue_t *p_cue, text_segment_t *p_new,
+                              text_segment_t **pp_append )
+{
+    if( p_new )
+    {
+        bool b_newline = *pp_append;
+
+        while( *pp_append )
+            pp_append = &((*pp_append)->p_next);
+
+        if( b_newline ) /* auto newlines */
+        {
+            *pp_append = text_segment_New( "\n" );
+            if( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+        }
+
+        if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT ) /* LTR */
+        {
+            *pp_append = text_segment_New( "\u2067" );
+            if( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+        }
+
+        *pp_append = p_new;
+
+        if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT )
+        {
+            *pp_append = text_segment_New( "\u2069" );
+            if( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+        }
+    }
+}
+
 static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue )
@@ -1442,34 +1477,7 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, mtime_t i_start
             continue;
 
         text_segment_t *p_new = ConvertCueToSegments( p_dec, p_vars, p_cue );
-        if( p_new )
-        {
-            while( *pp_append )
-                pp_append = &((*pp_append)->p_next);
-
-            if( p_segments ) /* auto newlines */
-            {
-                *pp_append = text_segment_New( "\n" );
-                if( *pp_append )
-                    pp_append = &((*pp_append)->p_next);
-            }
-
-            if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT ) /* LTR */
-            {
-                *pp_append = text_segment_New( "\u2067" );
-                if( *pp_append )
-                    pp_append = &((*pp_append)->p_next);
-            }
-
-            *pp_append = p_new;
-
-            if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT )
-            {
-                *pp_append = text_segment_New( "\u2069" );
-                if( *pp_append )
-                    pp_append = &((*pp_append)->p_next);
-            }
-        }
+        ChainCueSegments( p_cue, p_new, pp_append );
     }
     return p_segments;
 }
