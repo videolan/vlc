@@ -608,6 +608,10 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
 
     transcode_video_size_init( p_stream, id, p_vid_out );
     transcode_video_sar_init( p_stream, id, p_vid_out );
+
+    msg_Dbg( p_stream, "source chroma: %4.4s, destination %4.4s",
+             (const char *)&id->p_decoder->fmt_out.video.i_chroma,
+             (const char *)&id->p_encoder->fmt_in.video.i_chroma);
 }
 
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
