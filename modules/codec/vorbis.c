@@ -781,6 +781,11 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec  = VLC_CODEC_FL32;
     p_enc->fmt_out.i_codec = VLC_CODEC_VORBIS;
 
+    if( p_enc->fmt_in.audio.i_channels >= ARRAY_SIZE(pi_channels_maps) )
+    {
+        p_enc->fmt_in.audio.i_channels = ARRAY_SIZE(pi_channels_maps) - 1;
+        msg_Warn( p_enc, "lowering channel count to %u", p_enc->fmt_in.audio.i_channels );
+    }
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     i_quality = var_GetInteger( p_enc, ENC_CFG_PREFIX "quality" );
