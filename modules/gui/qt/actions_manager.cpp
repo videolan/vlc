@@ -40,17 +40,19 @@
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
+    , m_scanning( false )
 {
     CONNECT( this, rendererItemAdded( vlc_renderer_item_t* ),
              this, onRendererItemAdded( vlc_renderer_item_t* ) );
     CONNECT( this, rendererItemRemoved( vlc_renderer_item_t* ),
              this, onRendererItemRemoved( vlc_renderer_item_t* ) );
+    m_stop_scan_timer.setSingleShot( true );
+    CONNECT( &m_stop_scan_timer, timeout(), this, StopRendererScan() );
 }
 
 ActionsManager::~ActionsManager()
 {
-    foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
-        vlc_rd_release( p_rd );
+    StopRendererScan();
 }
 
 void ActionsManager::doAction( int id_action )
@@ -297,55 +299,60 @@ void ActionsManager::renderer_event_item_removed( vlc_renderer_discovery_t *p_rd
     self->emit rendererItemRemoved( p_item );
 }
 
-void ActionsManager::ScanRendererAction(bool checked)
+void ActionsManager::StartRendererScan()
 {
-    if (checked == !m_rds.empty())
-        return; /* nothing changed */
+    m_stop_scan_timer.stop();
+    if( m_scanning )
+        return;
 
-    if (checked)
+    /* SD subnodes */
+    char **ppsz_longnames;
+    char **ppsz_names;
+    if( vlc_rd_get_names( THEPL, &ppsz_names, &ppsz_longnames ) != VLC_SUCCESS )
+        return;
+
+    struct vlc_renderer_discovery_owner owner =
     {
-        /* reset the list of renderers */
-        foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
-        {
-            QVariant data = action->data();
-            if (!data.canConvert<QVariantHash>())
-                continue;
-            VLCMenuBar::rendererMenu->removeAction(action);
-            VLCMenuBar::rendererGroup->removeAction(action);
-        }
+        this,
+        renderer_event_item_added,
+        renderer_event_item_removed,
+    };
 
-        /* SD subnodes */
-        char **ppsz_longnames;
-        char **ppsz_names;
-        if( vlc_rd_get_names( THEPL, &ppsz_names, &ppsz_longnames ) != VLC_SUCCESS )
-            return;
-
-        struct vlc_renderer_discovery_owner owner =
-        {
-            this,
-            renderer_event_item_added,
-            renderer_event_item_removed,
-        };
-
-        char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-        for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
-        {
-            msg_Dbg( p_intf, "starting renderer discovery service %s", *ppsz_longname );
-            vlc_renderer_discovery_t* p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name, &owner );
-            if( p_rd != NULL )
-                m_rds.push_back( p_rd );
-            free( *ppsz_name );
-            free( *ppsz_longname );
-        }
-        free( ppsz_names );
-        free( ppsz_longnames );
-    }
-    else
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
-            vlc_rd_release( p_rd );
-        m_rds.clear();
+        msg_Dbg( p_intf, "starting renderer discovery service %s", *ppsz_longname );
+        vlc_renderer_discovery_t* p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name, &owner );
+        if( p_rd != NULL )
+            m_rds.push_back( p_rd );
+        free( *ppsz_name );
+        free( *ppsz_longname );
     }
+    free( ppsz_names );
+    free( ppsz_longnames );
+    m_scanning = true;
+}
+
+void ActionsManager::RendererMenuCountdown()
+{
+    m_stop_scan_timer.start( 20000 );
+}
+
+void ActionsManager::StopRendererScan()
+{
+    /* reset the list of renderers */
+    foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+    {
+        QVariant data = action->data();
+        if (!data.canConvert<QVariantHash>())
+            continue;
+        VLCMenuBar::rendererMenu->removeAction(action);
+        VLCMenuBar::rendererGroup->removeAction(action);
+    }
+    foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
+        vlc_rd_release( p_rd );
+    m_rds.clear();
+    m_scanning = false;
 }
 
 void ActionsManager::RendererSelected( QAction *selected )
