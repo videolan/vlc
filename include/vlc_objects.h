@@ -31,6 +31,7 @@
 /* Object flags */
 #define OBJECT_FLAGS_QUIET       0x0002
 #define OBJECT_FLAGS_NOINTERACT  0x0004
+#define OBJECT_FLAGS_INSECURE    0x1000 /* VLC 3.0 only, will be removed */
 
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)

@@ -445,6 +445,13 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
         gnutls_free (desc.data);
     }
 
+    if (status == (GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID) &&
+            (creds->obj.flags & OBJECT_FLAGS_INSECURE))
+    {
+        msg_Info( creds, "Accepting self-signed/untrusted CA certificate." );
+        return 0;
+    }
+
     status &= ~GNUTLS_CERT_INVALID; /* always set / catch-all error */
     status &= ~GNUTLS_CERT_SIGNER_NOT_FOUND; /* unknown CA */
     status &= ~GNUTLS_CERT_UNEXPECTED_OWNER; /* mismatched hostname */
