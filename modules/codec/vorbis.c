@@ -747,7 +747,6 @@ struct encoder_sys_t
 
     int i_last_block_size;
     int i_samples_delay;
-    unsigned int i_channels;
 
     /*
     ** Channel reordering
@@ -877,7 +876,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_out.audio.i_physical_channels =
     p_enc->fmt_in.audio.i_physical_channels =
         pi_channels_maps[p_sys->vi.channels];
-    p_sys->i_channels = p_enc->fmt_in.audio.i_channels;
 
     p_sys->i_last_block_size = 0;
     p_sys->i_samples_delay = 0;
@@ -912,12 +910,13 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     buffer = vorbis_analysis_buffer( &p_sys->vd, p_aout_buf->i_nb_samples );
 
     /* convert samples to float and uninterleave */
-    for( unsigned int i = 0; i < p_sys->i_channels; i++ )
+    const unsigned i_channels = p_enc->fmt_in.audio.i_channels;
+    for( unsigned int i = 0; i < i_channels; i++ )
     {
         for( unsigned int j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
         {
             buffer[i][j]= ((float *)p_aout_buf->p_buffer)
-                                    [j * p_sys->i_channels + p_sys->pi_chan_table[i]];
+                                    [j * i_channels + p_sys->pi_chan_table[i]];
         }
     }
 
