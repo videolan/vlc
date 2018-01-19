@@ -153,6 +153,7 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
         return;
     }
 
+    p_track->fmt.i_original_fourcc = 0; /* so we don't have MP4A as original fourcc */
     p_track->fmt.i_bitrate = p_decconfig->i_avg_bitrate;
 
     p_track->fmt.i_extra = p_decconfig->i_decoder_specific_info_len;
