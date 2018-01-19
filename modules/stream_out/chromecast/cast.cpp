@@ -236,6 +236,7 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
                     if (*out_it == id)
                     {
                         p_sys->out_streams.erase(out_it);
+                        p_sys->es_changed = true;
                         break;
                     }
                     out_it++;
@@ -245,7 +246,6 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
             es_format_Clean( &p_sys_id->fmt );
             free( p_sys_id );
             p_sys->streams.erase( it );
-            p_sys->es_changed = true;
             break;
         }
         it++;
