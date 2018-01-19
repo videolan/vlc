@@ -151,6 +151,23 @@ SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end
         tpoints.insert( tracks_seekpoint_t::value_type( it->first, sp ) );
     }
 
+    if (tpoints.empty())
+    {
+        // try a further pts
+        for( tracks_seekpoints_t::const_iterator it = _tracks_seekpoints.begin(); it != _tracks_seekpoints.end(); ++it )
+        {
+            if ( std::find( filter_tracks.begin(), filter_tracks.end(), it->first ) == filter_tracks.end() )
+                continue;
+
+            Seekpoint sp = get_first_seekpoint_around( end_pts, it->second );
+
+            if( sp.fpos < start_fpos )
+                continue;
+
+            tpoints.insert( tracks_seekpoint_t::value_type( it->first, sp ) );
+        }
+    }
+
     return tpoints;
 }
 
@@ -197,6 +214,10 @@ SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoint
     iterator const it_begin  = seekpoints.begin();
     iterator const it_end    = seekpoints.end();
     iterator const it_middle = greatest_lower_bound( it_begin, it_end, needle );
+
+    if ( it_middle != it_end && (*it_middle).pts > pts)
+        // found nothing low enough, use the first one
+        return seekpoint_pair_t( *it_begin, Seekpoint() );
 
     iterator it_before = it_middle;
     iterator it_after = it_middle == it_end ? it_middle : next_( it_middle ) ;
