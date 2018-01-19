@@ -216,7 +216,7 @@ void ActionsManager::skipBackward()
         THEMIM->getIM()->jumpBwd();
 }
 
-vlc_renderer_item_t* ActionsManager::compareRenderers( const QVariant &obj, vlc_renderer_item_t* p_item )
+vlc_renderer_item_t* ActionsManager::getMatchingRenderer( const QVariant &obj, vlc_renderer_item_t* p_item )
 {
     if (!obj.canConvert<QVariantHash>())
         return NULL;
@@ -242,7 +242,7 @@ void ActionsManager::onRendererItemAdded(vlc_renderer_item_t* p_item)
             firstSeparator = action;
             break;
         }
-        if (compareRenderers( action->data(), p_item ))
+        if (getMatchingRenderer( action->data(), p_item ))
         {
             vlc_renderer_item_release( p_item );
             return; /* we already have this item */
@@ -274,7 +274,7 @@ void ActionsManager::onRendererItemRemoved( vlc_renderer_item_t* p_item )
     {
         if (action->isSeparator())
             continue;
-        vlc_renderer_item_t *p_existing = compareRenderers( action->data(), p_item );
+        vlc_renderer_item_t *p_existing = getMatchingRenderer( action->data(), p_item );
         if (p_existing)
         {
             VLCMenuBar::rendererMenu->removeAction( action );

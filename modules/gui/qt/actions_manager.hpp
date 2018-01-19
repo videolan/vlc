@@ -84,8 +84,8 @@ private:
                                            vlc_renderer_item_t * );
     static void renderer_event_item_removed( vlc_renderer_discovery_t *,
                                              vlc_renderer_item_t * );
-    static vlc_renderer_item_t* compareRenderers( const QVariant &m_obj,
-                                                  vlc_renderer_item_t* p_item );
+    static vlc_renderer_item_t* getMatchingRenderer( const QVariant &m_obj,
+                                                     vlc_renderer_item_t* p_item );
 
 public slots:
     void toggleMuteAudio();
