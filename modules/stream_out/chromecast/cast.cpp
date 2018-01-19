@@ -80,6 +80,7 @@ struct sout_stream_sys_t
 
     bool                               es_changed;
     std::vector<sout_stream_id_sys_t*> streams;
+    std::vector<sout_stream_id_sys_t*> out_streams;
     unsigned int                       transcode_attempt_idx;
     States                             previous_state;
 
@@ -227,7 +228,19 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         if ( p_sys_id == id )
         {
             if ( p_sys_id->p_sub_id != NULL )
+            {
                 sout_StreamIdDel( p_sys->p_out, p_sys_id->p_sub_id );
+                for (std::vector<sout_stream_id_sys_t*>::iterator out_it = p_sys->out_streams.begin();
+                     out_it != p_sys->out_streams.end(); )
+                {
+                    if (*out_it == id)
+                    {
+                        p_sys->out_streams.erase(out_it);
+                        break;
+                    }
+                    out_it++;
+                }
+            }
 
             es_format_Clean( &p_sys_id->fmt );
             free( p_sys_id );
@@ -238,7 +251,7 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         it++;
     }
 
-    if ( p_sys->streams.empty() )
+    if ( p_sys->out_streams.empty() )
     {
         p_sys->p_intf->requestPlayerStop();
 
@@ -316,7 +329,8 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
     }
 
     /* check the streams we can actually add */
-    for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); )
+    for (std::vector<sout_stream_id_sys_t*>::iterator it = out_streams.begin();
+         it != out_streams.end(); )
     {
         sout_stream_id_sys_t *p_sys_id = *it;
         p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
@@ -324,13 +338,12 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
         {
             msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
             es_format_Clean( &p_sys_id->fmt );
-            free( p_sys_id );
-            it = streams.erase( it );
+            it = out_streams.erase( it );
         }
         else
             ++it;
     }
-    return streams.empty() == false;
+    return out_streams.empty() == false;
 }
 
 bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
@@ -346,6 +359,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     vlc_fourcc_t i_codec_video = 0, i_codec_audio = 0;
     const es_format_t *p_original_audio = NULL;
     const es_format_t *p_original_video = NULL;
+    out_streams.clear();
 
     for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); ++it)
     {
@@ -360,6 +374,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             else if (i_codec_audio == 0)
                 i_codec_audio = p_es->i_codec;
             p_original_audio = p_es;
+            out_streams.push_back(*it);
         }
         else if (b_supports_video)
         {
@@ -374,10 +389,14 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 else if (i_codec_video == 0)
                     i_codec_video = p_es->i_codec;
                 p_original_video = p_es;
+                out_streams.push_back(*it);
             }
             /* TODO: else handle ttml/webvtt */
         }
     }
+
+    if (out_streams.empty())
+        return true;
 
     std::stringstream ssout;
     if ( !canRemux )
