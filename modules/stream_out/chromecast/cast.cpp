@@ -220,19 +220,22 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    for (size_t i=0; i<p_sys->streams.size(); i++)
+    for (std::vector<sout_stream_id_sys_t*>::iterator it = p_sys->streams.begin();
+         it != p_sys->streams.end(); )
     {
-        if ( p_sys->streams[i] == id )
+        sout_stream_id_sys_t *p_sys_id = *it;
+        if ( p_sys_id == id )
         {
-            if ( p_sys->streams[i]->p_sub_id != NULL )
-                sout_StreamIdDel( p_sys->p_out, p_sys->streams[i]->p_sub_id );
+            if ( p_sys_id->p_sub_id != NULL )
+                sout_StreamIdDel( p_sys->p_out, p_sys_id->p_sub_id );
 
-            es_format_Clean( &p_sys->streams[i]->fmt );
-            free( p_sys->streams[i] );
-            p_sys->streams.erase( p_sys->streams.begin() +  i );
+            es_format_Clean( &p_sys_id->fmt );
+            free( p_sys_id );
+            p_sys->streams.erase( it );
             p_sys->es_changed = true;
             break;
         }
+        it++;
     }
 
     if ( p_sys->streams.empty() )
