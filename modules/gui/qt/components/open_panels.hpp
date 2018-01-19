@@ -129,6 +129,8 @@ protected:
     void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
 private:
     Ui::OpenFile ui;
+    QList<QUrl> urlList;
+    QUrl subUrl; //url for subtitle
     FileOpenBox *dialogBox;
     void BuildOldPanel();
 public slots:
