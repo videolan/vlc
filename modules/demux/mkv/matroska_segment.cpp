@@ -511,7 +511,7 @@ bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
             if( el == NULL )
                 break;
 
-            ClusterHandler::Dispatcher().send( el, ClusterHandler::Payload( payload ) );
+            ClusterHandler::Dispatcher().send( el, &payload );
         }
     }
 
@@ -1404,7 +1404,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 case 1:
                     {
                         EbmlTypeDispatcher const * dispatcher = dispatchers[i_level - 1];
-                        dispatcher->send( el, BlockGetHandler_l1::Payload( payload ) );
+                        dispatcher->send( el, &payload );
                     }
                     break;
 

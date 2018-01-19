@@ -94,9 +94,6 @@ namespace {
       typedef      PayloadType_ payload_t;                         \
       typedef     DispatchType_ dispatch_t;                        \
       typedef struct GroupName_ handler_t;                         \
-      static void* Payload (payload_t& data) {                     \
-          return static_cast<void*> (&data);                       \
-      }                                                            \
   };                                                               \
   struct GroupName_ : GroupName_ ## _base
 
