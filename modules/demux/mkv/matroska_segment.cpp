@@ -293,6 +293,8 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
         }
         E_CASE( KaxTagDefault, unused )
         {
+            VLC_UNUSED(unused);
+            VLC_UNUSED(vars);
         }
         E_CASE( KaxTagSimple, simple )
         {
@@ -964,8 +966,11 @@ void matroska_segment_c::ComputeTrackPriority()
             switch( it->second->fmt.i_cat )
             {
                 case VIDEO_ES: ++track_score;
+                /* fallthrough */
                 case AUDIO_ES: ++track_score;
+                /* fallthrough */
                 case   SPU_ES: ++track_score;
+                /* fallthrough */
                 default:
                   if( score < track_score )
                   {
@@ -1364,6 +1369,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             switch( i_level )
             {
                 case 2:
+                /* fallthrough */
                 case 3:
                     if( unlikely( !el->ValidateSize() || ( el->IsFiniteSize() && el->GetSize() >= SIZE_MAX ) ) )
                     {
@@ -1379,6 +1385,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
                         break;
                     }
+                    /* fallthrough */
                 case 1:
                     {
                         EbmlTypeDispatcher const * dispatcher = dispatchers[i_level - 1];
