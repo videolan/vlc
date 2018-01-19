@@ -68,6 +68,13 @@ static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
     return true;
 }
 
+static inline void plane_SwapUV(plane_t p[PICTURE_PLANE_MAX])
+{
+    uint8_t *buf = p[V_PLANE].p_pixels;
+    p[V_PLANE].p_pixels = p[U_PLANE].p_pixels;
+    p[U_PLANE].p_pixels = buf;
+}
+
 static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
