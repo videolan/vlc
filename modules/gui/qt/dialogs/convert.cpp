@@ -37,6 +37,9 @@
 #include <QFileDialog>
 #include <QCheckBox>
 
+#define urlToDisplayString(filestr) toNativeSeparators(QUrl(filestr).toDisplayString(\
+    QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ))
+
 ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
                               const QStringList& inputMRLs )
               : QVLCDialog( parent, _p_intf ),
@@ -155,11 +158,11 @@ void ConvertDialog::fileBrowse()
 {
     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
-    QUrl fileName = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
+    outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
         p_intf->p_sys->filepath,
         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
             .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
-    fileLine->setText( fileName.toEncoded() );
+    fileLine->setText( urlToDisplayString( outgoingMRL ) );
     setDestinationFileExtension();
 }
 
@@ -199,7 +202,7 @@ void ConvertDialog::close()
             // Only one file, use the destination provided
             if(singleFileSelected)
             {
-                newFileName = QUrl(fileLine->text()).toLocalFile();
+                newFileName = outgoingMRL.toLocalFile();
             }
 
             // Multiple, use the convention.
@@ -245,13 +248,14 @@ void ConvertDialog::close()
 
 void ConvertDialog::setDestinationFileExtension()
 {
-    if( !fileLine->text().isEmpty() && profile->isEnabled() )
+    if( !outgoingMRL.isEmpty() && profile->isEnabled() )
     {
-        QString newFileExtension = "." + profile->getMux();
-        if( fileLine->text().lastIndexOf( "." ) == -1 )
+        QString filepath = outgoingMRL.path(QUrl::FullyEncoded);
+        if( filepath.lastIndexOf( "." ) == -1 )
         {
-            QString newFileName = fileLine->text().append( newFileExtension );
-            fileLine->setText( toNativeSeparators( newFileName ) );
+            QString newFileExtension = "." + profile->getMux();
+            outgoingMRL.setPath(filepath + newFileExtension);
+            fileLine->setText( urlToDisplayString( outgoingMRL ) );
         }
     }
 }
