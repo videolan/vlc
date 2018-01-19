@@ -51,6 +51,7 @@ private:
 
     const QStringList *incomingMRLs;
     const bool singleFileSelected;
+    QUrl outgoingMRL;
     QStringList mrls;
 
 private slots:
