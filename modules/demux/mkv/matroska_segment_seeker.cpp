@@ -290,17 +290,17 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
         Seekpoint const& start = seekpoints.first;
         Seekpoint const& end   = seekpoints.second;
 
-        if (start.fpos == std::numeric_limits<fptr_t>::max() )
+        if ( start.fpos == std::numeric_limits<fptr_t>::max() )
             return tracks_seekpoint_t();
 
-        index_range( ms, Range( start.fpos, end.fpos ), needle_pts );
+        if ( end.fpos != std::numeric_limits<fptr_t>::max() )
+            // do not read the whole (infinite?) file to get seek indexes
+            index_range( ms, Range( start.fpos, end.fpos ), needle_pts );
 
-        {
-            tracks_seekpoint_t tpoints = find_greatest_seekpoints_in_range( start.fpos, target_pts, filter_tracks );
+        tracks_seekpoint_t tpoints = find_greatest_seekpoints_in_range( start.fpos, target_pts, filter_tracks );
 
-            if( contains_all_of_t() ( tpoints, priority_tracks ) )
-                return tpoints;
-        }
+        if( contains_all_of_t() ( tpoints, priority_tracks ) )
+            return tpoints;
 
         needle_pts = start.pts - 1;
     }
