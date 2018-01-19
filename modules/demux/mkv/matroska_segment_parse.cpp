@@ -599,8 +599,16 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoDisplayUnit, vdmode )
         {
             vars.track_video_info.i_display_unit = static_cast<uint8>( vdmode );
-            debug( vars, "Track Video Display Unit=%s",
-                vars.track_video_info.i_display_unit == 0 ? "pixels" : ( vars.track_video_info.i_display_unit == 1 ? "centimeters": "inches" ) );
+            const char *psz_unit;
+            switch (vars.track_video_info.i_display_unit)
+            {
+            case 0:  psz_unit = "pixels"; break;
+            case 1:  psz_unit = "centimeters"; break;
+            case 2:  psz_unit = "inches"; break;
+            case 3:  psz_unit = "dar"; break;
+            default: psz_unit = "unknown"; break;
+            }
+            debug( vars, "Track Video Display Unit=%s", psz_unit );
         }
         E_CASE( KaxVideoAspectRatio, ratio ) // UNUSED
         {
