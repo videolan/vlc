@@ -127,7 +127,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_io_stream, true );
+    p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_io_stream );
     if( p_stream == NULL )
     {
         msg_Err( p_demux, "cannot find KaxSegment or missing mandatory KaxInfo" );

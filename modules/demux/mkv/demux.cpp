@@ -449,7 +449,7 @@ demux_sys_t::~demux_sys_t()
 }
 
 
-matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial )
+matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream )
 {
     int i_upper_lvl = 0;
     EbmlElement *p_l0;
