@@ -695,24 +695,24 @@ static block_t * Encode( encoder_t *p_enc, subpicture_t *p_spu )
     }
 
     block_t *p_block = block_Alloc( i_len + 2 );
-    if( p_block )
-    {
-        SetWBE(p_block->p_buffer, i_len);
-        p_block->i_buffer = 2;
-        for(const text_segment_t  *p_segment = p_segments;
-                                   p_segment; p_segment = p_segment->p_next )
-        {
-            size_t i_seglen = strlen(p_segment->psz_text);
-            memcpy(&p_block->p_buffer[p_block->i_buffer],
-                    p_segment->psz_text, i_seglen);
-            p_block->i_buffer += i_seglen;
-        }
-        p_block->i_dts = p_block->i_pts = p_spu->i_start;
-        p_block->i_length = p_spu->i_stop - p_spu->i_start;
+    if( !p_block )
+        return NULL;
 
-        if( i_styles > 0 )
-            p_block->p_next = GetStylBlock( p_segments, i_styles );
+    SetWBE(p_block->p_buffer, i_len);
+    p_block->i_buffer = 2;
+    for(const text_segment_t  *p_segment = p_segments;
+                               p_segment; p_segment = p_segment->p_next )
+    {
+        size_t i_seglen = strlen(p_segment->psz_text);
+        memcpy(&p_block->p_buffer[p_block->i_buffer],
+                p_segment->psz_text, i_seglen);
+        p_block->i_buffer += i_seglen;
     }
+    p_block->i_dts = p_block->i_pts = p_spu->i_start;
+    p_block->i_length = p_spu->i_stop - p_spu->i_start;
+
+    if( i_styles > 0 )
+        p_block->p_next = GetStylBlock( p_segments, i_styles );
 
     return block_ChainGather( p_block );
 }
