@@ -452,7 +452,7 @@ demux_sys_t::~demux_sys_t()
 bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *p_stream1, bool b_initial )
 {
     int i_upper_lvl = 0;
-    EbmlElement *p_l0, *p_l1, *p_l2;
+    EbmlElement *p_l0;
     bool b_keep_stream = false, b_keep_segment = false;
 
     /* verify the EBML Header... it shouldn't be bigger than 1kB */
