@@ -2386,8 +2386,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         for( int i = 0; i < p_sys->i_es; i++ )
         {
-            EsDestroyDecoder( out, p_sys->es[i] );
-            EsCreateDecoder( out, p_sys->es[i] );
+            if( EsIsSelected( p_sys->es[i] ) )
+            {
+                EsDestroyDecoder( out, p_sys->es[i] );
+                EsCreateDecoder( out, p_sys->es[i] );
+            }
         }
         return VLC_SUCCESS;
     }
