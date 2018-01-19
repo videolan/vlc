@@ -558,7 +558,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             }
             p_sys->transcode_attempt_idx++;
             p_sys->es_changed = true;
-            msg_Dbg( p_stream, "Load failed detected. Switching to next "
+            msg_Warn( p_stream, "Load failed detected. Switching to next "
                      "configuration index: %u", p_sys->transcode_attempt_idx );
         }
         else if ( s == Playing || s == Paused )
