@@ -213,6 +213,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             return VLC_EGENERIC;
         }
     }
+    else if( fmt->i_codec == VLC_CODEC_MPGA && fmt->i_profile == 3 )
+    {
+        i_codec_id = AV_CODEC_ID_MP3;
+    }
 
     if( fmt->i_cat != VIDEO_ES && fmt->i_cat != AUDIO_ES)
     {
