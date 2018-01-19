@@ -409,7 +409,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
 
             vars.level += 1;
-            dispatcher.iterate( cencs.begin(), cencs.end(), Payload( vars ) );
+            dispatcher.iterate( cencs.begin(), cencs.end(), &vars );
             vars.level -= 1;
         }
         E_CASE( KaxContentEncoding, cenc )
@@ -417,7 +417,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             debug( vars, "Content Encoding" );
 
             vars.level += 1;
-            dispatcher.iterate( cenc.begin(), cenc.end(), Payload( vars ) );
+            dispatcher.iterate( cenc.begin(), cenc.end(), &vars );
             vars.level -= 1;
         }
         E_CASE( KaxContentEncodingOrder, encord )
@@ -440,7 +440,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             vars.tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
 
             vars.level += 1;
-            dispatcher.iterate( compr.begin(), compr.end(), Payload( vars ) );
+            dispatcher.iterate( compr.begin(), compr.end(), &vars );
             vars.level -= 1;
         }
         E_CASE( KaxContentCompAlgo, compalg )
@@ -476,7 +476,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
 
             vars.level += 1;
-            dispatcher.iterate (tkv.begin (), tkv.end (), Payload( vars ) );
+            dispatcher.iterate (tkv.begin (), tkv.end (), &vars );
             vars.level -= 1;
 
             unsigned int i_crop_top    = vars.track_video_info.i_crop_top;
@@ -514,7 +514,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             debug( vars, "Track Video Projection" ) ;
 
             vars.level += 1;
-            dispatcher.iterate (proj.begin (), proj.end (), Payload( vars ) );
+            dispatcher.iterate (proj.begin (), proj.end (), &vars );
             vars.level -= 1;
         }
         E_CASE( KaxVideoProjectionType, fint )
@@ -640,7 +640,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 msg_Err( vars.p_demuxer, "Video colors elements not allowed for this track" );
             } else {
             vars.level += 1;
-            dispatcher.iterate (colours.begin (), colours.end (), Payload( vars ) );
+            dispatcher.iterate (colours.begin (), colours.end (), &vars );
             vars.level -= 1;
             }
         }
@@ -745,7 +745,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 msg_Err( vars.p_demuxer, "Video metadata elements not allowed for this track" );
             } else {
             vars.level += 1;
-            dispatcher.iterate (mastering.begin (), mastering.end (), Payload( vars ) );
+            dispatcher.iterate (mastering.begin (), mastering.end (), &vars );
             vars.level -= 1;
             }
         }
@@ -806,7 +806,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 msg_Err( vars.p_demuxer, "Audio elements not allowed for this track" );
             } else {
             vars.level += 1;
-            dispatcher.iterate( tka.begin(), tka.end(), Payload( vars ));
+            dispatcher.iterate( tka.begin(), tka.end(), &vars );
             vars.level -= 1;
             }
         }
@@ -842,7 +842,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
     };
 
-    MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), MetaDataHandlers::Payload( metadata_payload ) );
+    MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), &metadata_payload );
 
     if( p_track->i_number == 0 )
     {
@@ -927,8 +927,7 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
         }
     };
 
-    TrackHandlers::Dispatcher().iterate(
-      tracks->begin(), tracks->end(), TrackHandlers::Payload( payload ) );
+    TrackHandlers::Dispatcher().iterate( tracks->begin(), tracks->end(), &payload );
 }
 
 /*****************************************************************************
@@ -1083,7 +1082,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 chapter_translation_c *p_translate = new chapter_translation_c();
 
                 TranslationHandler::Dispatcher().iterate(
-                    trans.begin(), trans.end(), TranslationHandler::Payload( p_translate )
+                    trans.begin(), trans.end(), &p_translate
                 );
 
                 vars.obj->translations.push_back( p_translate );
@@ -1103,7 +1102,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
     };
 
-    InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), InfoHandlers::Payload( captures ) );
+    InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), &captures );
 
     if( i_duration != -1 )
         i_duration = mtime_t( static_cast<double>( i_duration * i_timescale ) / 10e5 );
@@ -1184,7 +1183,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             debug( vars, "ChapterDisplay" );
 
             vars.level += 1;
-            dispatcher.iterate( chapter_display.begin(), chapter_display.end(), Payload( vars ) );
+            dispatcher.iterate( chapter_display.begin(), chapter_display.end(), &vars );
             vars.level -= 1;
         }
         E_CASE( KaxChapterString, name )
@@ -1257,7 +1256,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         }
     };
 
-    ChapterAtomHandlers::Dispatcher().iterate( ca->begin(), ca->end(), ChapterAtomHandlers::Payload( payload ) );
+    ChapterAtomHandlers::Dispatcher().iterate( ca->begin(), ca->end(), &payload );
 }
 
 /*****************************************************************************
@@ -1392,7 +1391,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                     msg_Dbg( vars.p_demuxer, "|   |   |   + Unknown (%s)", typeid(el).name() );
                 }
             };
-            KaxEditionHandler::Dispatcher().iterate( entry.begin(), entry.end(), KaxEditionHandler::Payload( data ) );
+            KaxEditionHandler::Dispatcher().iterate( entry.begin(), entry.end(), &data );
 
             data.obj->stored_editions.push_back( data.p_edition );
         }
@@ -1406,7 +1405,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         }
     };
 
-    KaxChapterHandler::Dispatcher().iterate( chapters->begin(), chapters->end(), KaxChapterHandler::Payload( *this ) );
+    KaxChapterHandler::Dispatcher().iterate( chapters->begin(), chapters->end(), this );
 }
 
 bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
@@ -2058,9 +2057,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     };
 
     try {
-        TrackCodecHandlers::Dispatcher().send( p_tk->codec.c_str(),
-          TrackCodecHandlers::Payload( captures )
-        );
+        TrackCodecHandlers::Dispatcher().send( p_tk->codec.c_str(), &captures );
     }
     catch (std::exception const& e)
     {
