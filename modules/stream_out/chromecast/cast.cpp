@@ -264,7 +264,7 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 
 bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
 {
-    if ( transcode_attempt_idx == MAX_TRANSCODE_PASS - 1 )
+    if ( transcode_attempt_idx != 0 )
         return false;
     if ( i_codec == VLC_CODEC_HEVC || i_codec == VLC_CODEC_VP9 )
         return transcode_attempt_idx == 0;
@@ -370,15 +370,6 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 i_codec_video = p_es->i_codec;
             p_original_video = p_es;
         }
-    }
-
-    if ( transcode_attempt_idx == 1 && p_original_video != NULL &&
-         ( p_original_video->i_codec != VLC_CODEC_HEVC &&
-           p_original_video->i_codec != VLC_CODEC_VP9 ) )
-    {
-        msg_Dbg( p_stream, "Video format wasn't HEVC/VP9; skipping 2nd step and"
-                 " transcoding to h264/mp3" );
-        transcode_attempt_idx++;
     }
 
     std::stringstream ssout;
