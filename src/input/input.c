@@ -1221,7 +1221,7 @@ static void InitPrograms( input_thread_t * p_input )
 
     /* Set up es_out */
     i_es_out_mode = ES_OUT_MODE_AUTO;
-    if( input_priv(p_input)->p_sout )
+    if( input_priv(p_input)->p_sout && !input_priv(p_input)->p_renderer )
     {
         char *prgms;
 
