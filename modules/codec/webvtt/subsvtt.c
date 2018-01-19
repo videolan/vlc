@@ -73,10 +73,16 @@ enum webvtt_align_e
 
 typedef struct
 {
+    float value;
+    bool b_auto;
+} webvtt_auto_value_t;
+
+typedef struct
+{
     char *psz_region;
     enum webvtt_align_e vertical;
     bool b_snap_to_lines;
-    float line;
+    webvtt_auto_value_t line;
     enum webvtt_align_e linealign;
     float position;
     enum webvtt_align_e positionalign;
@@ -212,8 +218,15 @@ static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
     else if( !strcmp( psz_key, "line" ) )
     {
         if( strchr( psz_value, '%' ) )
-            parse_percent( psz_value, &p_settings->line );
-        // else /* todo */
+        {
+            parse_percent( psz_value, &p_settings->line.value );
+            p_settings->b_snap_to_lines = false;
+        }
+        else
+            p_settings->line.value = us_strtof( psz_value, NULL );
+
+        /* else auto */
+
         const char *psz_align = strchr( psz_value, ',' );
         if( psz_align++ )
         {
@@ -300,7 +313,8 @@ static void webvtt_cue_settings_Init( webvtt_cue_settings_t *p_settings )
     p_settings->psz_region = NULL;
     p_settings->vertical = WEBVTT_ALIGN_AUTO;
     p_settings->b_snap_to_lines = true;
-    p_settings->line = -1;
+    p_settings->line.b_auto = true;
+    p_settings->line.value = 1.0;
     p_settings->linealign = WEBVTT_ALIGN_START;
     p_settings->position = -1;
     p_settings->positionalign = WEBVTT_ALIGN_AUTO;
