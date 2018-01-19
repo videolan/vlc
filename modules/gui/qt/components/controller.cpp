@@ -877,12 +877,16 @@ void FullscreenControllerWidget::restoreFSC()
             return;
 
         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+        QWindow *wh = windowHandle();
+        if ( wh != Q_NULLPTR )
+        {
 #ifdef QT5_HAS_WAYLAND
-        if ( !b_hasWayland )
-            windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+            if ( !b_hasWayland )
+                wh->setScreen(QGuiApplication::screens()[targetScreen()]);
 #else
-        windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+            wh->setScreen(QGuiApplication::screens()[targetScreen()]);
 #endif
+        }
 
         if( currentRes == screenRes &&
             QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
