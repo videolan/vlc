@@ -358,17 +358,21 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 i_codec_audio = p_es->i_codec;
             p_original_audio = p_es;
         }
-        else if (b_supports_video && p_es->i_cat == VIDEO_ES &&
-                 p_original_video == NULL )
+        else if (b_supports_video)
         {
-            if (!canDecodeVideo( p_es->i_codec ))
+            if (p_es->i_cat == VIDEO_ES && p_original_video == NULL)
             {
-                msg_Dbg( p_stream, "can't remux video track %d codec %4.4s", p_es->i_id, (const char*)&p_es->i_codec );
-                canRemux = false;
+                if (!canDecodeVideo( p_es->i_codec ))
+                {
+                    msg_Dbg( p_stream, "can't remux video track %d codec %4.4s",
+                             p_es->i_id, (const char*)&p_es->i_codec );
+                    canRemux = false;
+                }
+                else if (i_codec_video == 0)
+                    i_codec_video = p_es->i_codec;
+                p_original_video = p_es;
             }
-            else if (i_codec_video == 0)
-                i_codec_video = p_es->i_codec;
-            p_original_video = p_es;
+            /* TODO: else handle ttml/webvtt */
         }
     }
 
