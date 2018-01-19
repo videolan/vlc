@@ -151,7 +151,7 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
                   "unknown objectProfileIndication(0x%x) (Track[ID 0x%x])",
                   p_decconfig->i_objectProfileIndication,
                   p_track->i_track_ID );
-        break;
+        return;
     }
 
     p_track->fmt.i_bitrate = p_decconfig->i_avg_bitrate;
