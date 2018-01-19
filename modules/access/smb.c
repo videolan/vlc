@@ -436,7 +436,6 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
                     i_ret = VLC_ENOMEM;
                     break;
                 }
-                free( psz_name );
                 // We need to concatenate the scheme before, as the window version
                 // of smb_get_uri generates a path (and the other call site needs
                 // a path). The path is already prefixed by "//" so we just need
@@ -444,6 +443,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
                 char* psz_uri;
                 if( asprintf( &psz_uri, "file:%s", psz_path ) < 0 )
                 {
+                    free( psz_name );
                     free( psz_path );
                     i_ret = VLC_ENOMEM;
                     break;
@@ -452,6 +452,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
 
                 i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL,
                                     psz_name, ITEM_TYPE_DIRECTORY, ITEM_NET );
+                free( psz_name );
                 free( psz_uri );
             }
         }
