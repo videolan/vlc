@@ -679,15 +679,15 @@ void DecodeODCommand( vlc_object_t *p_object, od_descriptors_t *p_ods,
         switch( i_tag )
         {
             case ODTag_ObjectDescrUpdate:
-                ObjectDescrUpdateCommandRead( p_object, p_ods, i_data, p_data );
+                ObjectDescrUpdateCommandRead( p_object, p_ods, i_length, p_data );
                 break;
             case ODTag_ObjectDescrRemove:
-                ObjectDescrRemoveCommandRead( p_object, p_ods, i_data, p_data );
+                ObjectDescrRemoveCommandRead( p_object, p_ods, i_length, p_data );
                 break;
             default:
                 break;
         }
         p_data += i_length;
-        i_data -= i_data;
+        i_data -= i_length;
     }
 }
