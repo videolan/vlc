@@ -86,7 +86,7 @@ typedef struct
     enum webvtt_align_e linealign;
     float position;
     enum webvtt_align_e positionalign;
-    float size;
+    webvtt_auto_value_t size;
     enum webvtt_align_e align;
 } webvtt_cue_settings_t;
 
@@ -203,6 +203,89 @@ static bool parse_percent_tuple( const char *psz, float *x, float *y )
     return false;
 }
 
+typedef struct
+{
+    float x,y,w,h;
+} webvtt_rect_t;
+
+static void webvtt_get_cueboxrect( const webvtt_cue_settings_t *p_settings,
+                                   webvtt_rect_t *p_rect )
+{
+    float extent;
+    float indent_anchor_position;
+    enum webvtt_align_e alignment_on_indent_anchor;
+
+    /* Position of top or left depending on writing direction */
+    float line_offset;
+    if( !p_settings->line.b_auto ) /* numerical */
+    {
+        if( p_settings->b_snap_to_lines ) /* line # */
+            line_offset = p_settings->line.value /
+                          (WEBVTT_REGION_LINES_COUNT * WEBVTT_LINE_TO_HEIGHT_RATIO);
+        else
+            line_offset = p_settings->line.value;
+    }
+    else line_offset = 1.0;
+
+    if( p_settings->position < 0 )
+    {
+        if( p_settings->align == WEBVTT_ALIGN_LEFT )
+            indent_anchor_position = 0;
+        else if( p_settings->align == WEBVTT_ALIGN_RIGHT )
+            indent_anchor_position = 1.0;
+        else
+            indent_anchor_position = 0.5; /* center */
+    }
+    else indent_anchor_position = p_settings->position;
+
+    if( p_settings->positionalign == WEBVTT_ALIGN_AUTO )
+    {
+        /* text align */
+        if( p_settings->align == WEBVTT_ALIGN_LEFT ||
+            p_settings->align == WEBVTT_ALIGN_RIGHT )
+            alignment_on_indent_anchor = p_settings->align;
+        else
+            alignment_on_indent_anchor = WEBVTT_ALIGN_CENTER;
+    }
+    else alignment_on_indent_anchor = p_settings->positionalign;
+
+    if( !p_settings->size.b_auto )
+        extent = p_settings->size.value;
+    else
+        extent = 0.0;
+
+    /* apply */
+
+    /* we need 100% or size for inner_align to work on writing direction */
+    if( p_settings->vertical == WEBVTT_ALIGN_AUTO ) /* Horizontal text */
+    {
+        p_rect->y = line_offset > 0 ? line_offset : 1.0 + line_offset;
+        p_rect->w = (extent) ? extent : 1.0;
+        if( indent_anchor_position > 0 &&
+            (alignment_on_indent_anchor == WEBVTT_ALIGN_LEFT ||
+             alignment_on_indent_anchor == WEBVTT_ALIGN_START) )
+        {
+            p_rect->x  = indent_anchor_position;
+            p_rect->w -= p_rect->x;
+        }
+    }
+    else /* Vertical text */
+    {
+        if( p_settings->vertical == WEBVTT_ALIGN_LEFT )
+            p_rect->x = line_offset > 0 ? 1.0 - line_offset : -line_offset;
+        else
+            p_rect->x = line_offset > 0 ? line_offset : 1.0 + line_offset;
+        p_rect->y = (extent) ? extent : 1.0;
+
+        if( indent_anchor_position > 0 &&
+            alignment_on_indent_anchor == WEBVTT_ALIGN_START )
+        {
+            p_rect->y  = indent_anchor_position;
+            p_rect->h -= p_rect->y;
+        }
+    }
+}
+
 static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
                                             const char *psz_key, const char *psz_value )
 {
@@ -217,6 +300,7 @@ static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
     }
     else if( !strcmp( psz_key, "line" ) )
     {
+        p_settings->line.b_auto = false;
         if( strchr( psz_value, '%' ) )
         {
             parse_percent( psz_value, &p_settings->line.value );
@@ -224,7 +308,6 @@ static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
         }
         else
             p_settings->line.value = us_strtof( psz_value, NULL );
-
         /* else auto */
 
         const char *psz_align = strchr( psz_value, ',' );
@@ -256,7 +339,8 @@ static void webvtt_cue_settings_ParseTuple( webvtt_cue_settings_t *p_settings,
     }
     else if( !strcmp( psz_key, "size" ) )
     {
-        parse_percent( psz_value, &p_settings->size );
+        parse_percent( psz_value, &p_settings->size.value );
+        p_settings->size.b_auto = false;
     }
     else if( !strcmp( psz_key, "region" ) )
     {
@@ -318,7 +402,8 @@ static void webvtt_cue_settings_Init( webvtt_cue_settings_t *p_settings )
     p_settings->linealign = WEBVTT_ALIGN_START;
     p_settings->position = -1;
     p_settings->positionalign = WEBVTT_ALIGN_AUTO;
-    p_settings->size = 1.0; /* 100% */
+    p_settings->size.value = 1.0; /* 100% */
+    p_settings->size.b_auto = true;
     p_settings->align = WEBVTT_ALIGN_CENTER;
 }
 
@@ -1650,21 +1735,45 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         v.i_top = 0.0;
         /* !Variables */
 
-        text_segment_t *p_segments = ConvertCuesToSegments( p_dec, i_start, i_stop, &v, p_rlcue );
-        if( p_segments )
+        for( const webvtt_dom_cue_t *p_cue = p_rlcue; p_cue;
+             p_cue = (const webvtt_dom_cue_t *) p_cue->p_next )
         {
+            if( p_cue->type != NODE_CUE )
+                continue;
+
+            if( p_cue->i_start > i_start || p_cue->i_stop <= i_start )
+                continue;
+
+            text_segment_t *p_segments = ConvertCueToSegments( p_dec, &v, p_cue );
+            if( !p_segments )
+                continue;
+
             CreateSpuOrNewUpdaterRegion( p_dec, &p_spu, &p_updtregion );
-            if( !p_spu || !p_updtregion )
+            if( !p_updtregion )
             {
                 text_segment_ChainDelete( p_segments );
+                continue;
+            }
+
+            if( p_cue->settings.line.b_auto )
+            {
+                p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
             }
             else
             {
-                p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
-                p_updtregion->inner_align = GetCueTextAlignment( p_rlcue );
-
-                p_updtregion->p_segments = p_segments;
+                webvtt_rect_t rect = { 0,0,0,0 };
+                webvtt_get_cueboxrect( &p_cue->settings, &rect );
+                p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
+                p_updtregion->origin.x = rect.x;
+                p_updtregion->origin.y = rect.y;
+                p_updtregion->extent.x = rect.w;
+                p_updtregion->extent.y = rect.h;
+                p_updtregion->flags |= (UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO|
+                                        UPDT_REGION_EXTENT_X_IS_RATIO|UPDT_REGION_EXTENT_Y_IS_RATIO);
             }
+
+            p_updtregion->inner_align = GetCueTextAlignment( p_cue );
+            p_updtregion->p_segments = p_segments;
         }
     }
 
@@ -1673,7 +1782,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         p_spu->i_start = i_start;
         p_spu->i_stop = i_stop;
         p_spu->b_ephemer  = true; /* !important */
-        p_spu->b_absolute = false;
+        p_spu->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
 
         subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
         p_spu_sys->p_default_style->f_font_relsize = WEBVTT_DEFAULT_LINE_HEIGHT_VH /
