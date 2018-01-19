@@ -61,9 +61,6 @@ static int video_update_format_decoder( decoder_t *p_dec )
         .sys = sys,
     };
 
-    if( !id->b_transcode )
-        return 0;
-
     if( id->p_encoder->fmt_in.i_codec == p_dec->fmt_out.i_codec ||
         video_format_IsSimilar( &id->video_dec_out,
                                 &p_dec->fmt_out.video ) )
@@ -434,7 +431,6 @@ static void transcode_video_framerate_init( sout_stream_t *p_stream,
         id->p_decoder->fmt_out.video.i_frame_rate_base,
         id->p_encoder->fmt_in.video.i_frame_rate,
         id->p_encoder->fmt_in.video.i_frame_rate_base );
-
 }
 
 static void transcode_video_size_init( sout_stream_t *p_stream,
@@ -782,7 +778,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         p_pics = p_pics->p_next;
         p_pic->p_next = NULL;
 
-        if( b_error )
+        if( id->b_error )
         {
             picture_Release( p_pic );
             continue;
@@ -868,8 +864,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 error:
         if( p_pic )
             picture_Release( p_pic );
-        id->b_transcode = false;
-        b_error = true;
+        id->b_error = true;
     } while( p_pics );
 
     if( p_sys->i_threads >= 1 )

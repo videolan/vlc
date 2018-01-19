@@ -586,6 +586,9 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 {
     block_t *p_out = NULL;
 
+    if( id->b_error )
+        goto error;
+
     if( !id->b_transcode )
     {
         if( id->id )

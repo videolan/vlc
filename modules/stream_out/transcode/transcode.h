@@ -75,6 +75,7 @@ struct aout_filters;
 struct sout_stream_id_sys_t
 {
     bool            b_transcode;
+    bool            b_error;
 
     /* id of the out stream */
     void *id;
