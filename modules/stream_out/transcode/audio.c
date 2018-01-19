@@ -285,7 +285,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_bufs = p_audio_bufs->p_next;
         p_audio_buf->p_next = NULL;
 
-        if( b_error )
+        if( id->b_error )
         {
             block_Release( p_audio_buf );
             continue;
@@ -312,7 +312,10 @@ int transcode_audio_process( sout_stream_t *p_stream,
             {
                 id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
                 if (!id->id)
-                    id->b_transcode = false;
+                {
+                    vlc_mutex_unlock(&id->fifo.lock);
+                    goto error;
+                }
             }
         }
 
@@ -365,10 +368,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf = aout_FiltersPlay( id->p_af_chain, p_audio_buf,
                                         INPUT_RATE_DEFAULT );
         if( !p_audio_buf )
-        {
-            b_error = true;
-            continue;
-        }
+            goto error;
 
         p_audio_buf->i_dts = p_audio_buf->i_pts;
 
@@ -378,8 +378,9 @@ int transcode_audio_process( sout_stream_t *p_stream,
         block_Release( p_audio_buf );
         continue;
 error:
-        block_Release( p_audio_buf );
-        b_error = true;
+        if( p_audio_buf )
+            block_Release( p_audio_buf );
+        id->b_error = true;
     } while( p_audio_bufs );
 
 end:
