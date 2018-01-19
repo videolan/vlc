@@ -69,7 +69,7 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
 
 void SoutInputBox::setMRL( const QString& mrl )
 {
-    QUrl uri = QUrl::fromEncoded( mrl.toLatin1() );
+    QUrl uri( mrl );
     QString type = uri.scheme();
 
     if( !uri.isValid() &&
@@ -91,7 +91,10 @@ void SoutInputBox::setMRL( const QString& mrl )
     }
     else
     {
-        sourceLine->setText( uri.toString() );
+        sourceLine->setText(
+            toNativeSeparators(uri.toDisplayString(
+                QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments
+            )));
         if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
         sourceValueLabel->setText( type );
     }
