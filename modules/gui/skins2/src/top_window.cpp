@@ -272,6 +272,7 @@ void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
             std::list<std::string>::const_iterator it = files.begin();
             for( bool first = true; it != files.end(); ++it, first = false )
             {
+                msg_Dbg( getIntf(),"Dropped item: %s", it->c_str() );
                 bool playOnDrop = m_playOnDrop && first;
                 CmdAddItem( getIntf(), it->c_str(), playOnDrop ).execute();
             }
