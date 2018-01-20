@@ -1121,7 +1121,10 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
-        vlc_assert_unreachable();
+    {
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
 
     if (LoadMFTLibrary(&p_sys->mf_handle))
     {
