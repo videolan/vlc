@@ -45,6 +45,7 @@ public:
     void dndPosition( ldata_t data );
     void dndLeave( ldata_t data );
     void dndDrop( ldata_t data );
+    void dndSelectionNotify( );
 
 private:
     /// X11 display

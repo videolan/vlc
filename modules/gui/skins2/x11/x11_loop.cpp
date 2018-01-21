@@ -360,6 +360,26 @@ void X11Loop::handleX11Event()
                 pDnd->dndDrop( event.xclient.data.l );
             break;
         }
+
+        case SelectionNotify:
+        {
+            // Check XConvertSelection completion
+            if( event.xselection.property == None )
+            {
+                msg_Err( getIntf(), "Convertion failed for Drag&Drop" );
+                return;
+            }
+
+            // Find the DnD object for this window
+            X11DragDrop *pDnd = pFactory->m_dndMap[event.xselection.requestor];
+            if( !pDnd )
+            {
+                msg_Err( getIntf(), "no associated D&D object" );
+                return;
+            }
+            pDnd->dndSelectionNotify( );
+        }
+
     }
 }
 
