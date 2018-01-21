@@ -1073,9 +1073,12 @@ static const float f_min_window_height = 307.;
         }
     } else {
         PL_LOCK;
-        playlist_item_t *pl_item = playlist_ChildSearchName(&p_playlist->root, [[item untranslatedTitle] UTF8String]);
-        if (pl_item != NULL)
+        const char *title = [[item title] UTF8String];
+        playlist_item_t *pl_item = playlist_ChildSearchName(&p_playlist->root, title);
+        if (pl_item)
             [[[[VLCMain sharedInstance] playlist] model] changeRootItem:pl_item];
+        else
+            msg_Err(getIntf(), "Could not find playlist entry with name %s", title);
 
         PL_UNLOCK;
     }
