@@ -464,15 +464,16 @@ void Win32Factory::changeCursor( CursorType_t type ) const
     LPCTSTR id;
     switch( type )
     {
-    default:
     case kDefaultArrow: id = IDC_ARROW;    break;
     case kResizeNWSE:   id = IDC_SIZENWSE; break;
     case kResizeNS:     id = IDC_SIZENS;   break;
     case kResizeWE:     id = IDC_SIZEWE;   break;
     case kResizeNESW:   id = IDC_SIZENESW; break;
+    case kNoCursor:
+    default: id = 0;
     }
 
-    HCURSOR hCurs = LoadCursor( NULL, id );
+    HCURSOR hCurs = (type == kNoCursor) ? NULL : LoadCursor( NULL, id );
     SetCursor( hCurs );
 }
 
