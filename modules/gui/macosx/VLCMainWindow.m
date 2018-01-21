@@ -322,19 +322,16 @@ static const float f_min_window_height = 307.;
                 [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
-                [[internetItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_DEVICES:
                 [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
-                [[devicesItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_LAN:
                 [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[lanItems lastObject] setSdtype: SD_CAT_LAN];
-                [[lanItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_MYCOMPUTER:
                 [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
@@ -346,7 +343,6 @@ static const float f_min_window_height = 307.;
                     [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-pictures")];
                 else
                     [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                [[mycompItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 break;
             default:

@@ -32,7 +32,6 @@
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *identifier;
-@property (nonatomic, copy) NSString *untranslatedTitle;
 @property (nonatomic, retain) NSImage *icon;
 @property NSInteger badgeValue;
 @property NSInteger sdtype;
