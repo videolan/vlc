@@ -96,6 +96,7 @@
 #define AOUT_VAR_CHAN_RIGHT         4
 #define AOUT_VAR_CHAN_DOLBYS        5
 #define AOUT_VAR_CHAN_HEADPHONES    6
+#define AOUT_VAR_CHAN_MONO          7
 
 /*****************************************************************************
  * Main audio output structures
