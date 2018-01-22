@@ -476,7 +476,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             if( i_codec_audio == VLC_CODEC_VORBIS )
                 ssout << "aenc=vorbis{quality=6},";
         }
-        if ( b_supports_video && i_codec_video == 0 )
+        if ( i_codec_video == 0 && p_original_video )
         {
             i_codec_video = DEFAULT_TRANSCODE_VIDEO;
             msg_Dbg( p_stream, "Converting video to %.4s", (const char*)&i_codec_video );
@@ -509,7 +509,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         ssout << "}:";
     }
     std::string mime;
-    if ( !b_supports_video && default_muxer == DEFAULT_MUXER )
+    if ( !p_original_video && default_muxer == DEFAULT_MUXER )
         mime = "audio/x-matroska";
     else if ( i_codec_audio == VLC_CODEC_VORBIS &&
               i_codec_video == VLC_CODEC_VP8 &&
