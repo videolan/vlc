@@ -21,6 +21,8 @@
 !define MEMENTO_REGISTRY_ROOT ${PRODUCT_UNINST_ROOT_KEY}
 !define MEMENTO_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 
+@HAVE_WIN64_TRUE@ !define VLC_64BIT_INSTALLER
+
 ManifestDPIAware true
 Unicode true
 
@@ -34,6 +36,9 @@ Var PreviousVersion
 Var PreviousVersionState
 Var PreviousInstallDir
 Var UninstallLog
+
+Var 32bitUninstaller
+Var 32bitPath
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
@@ -254,6 +259,28 @@ ${MementoSection} "$(Name_Section01)" SEC01
 
   DetailPrint "$(Detail_CheckProcesses)"
   Call CheckRunningProcesses
+
+  ; Remove 32 bit version first
+  !ifdef VLC_64BIT_INSTALLER
+  ${If} $32bitPath != ""
+    ; Run uninstaller
+    ClearErrors
+    ExecWait '"$32bitUninstaller" /S _?=$32bitPath'
+
+    ; If uninstall was not successfull, do not continue.
+    ; This happens for example if the user cancels the uninstaller.
+    ${If} ${Errors}
+      Goto skip_uninstall32_cleanup
+    ${EndIf}
+
+    ${If} ${FileExists} "$32bitUninstaller"
+      Delete "$32bitUninstaller"
+      RMDir "$32bitPath"
+    ${EndIf}
+  ${EndIf}
+  !endif
+
+skip_uninstall32_cleanup:
 
   ; Remove previous version first, if this is update
   ${If} $ReinstallType == "1"
@@ -574,6 +601,21 @@ WinTooOld:
 WinOk:
   ; /update argument
   Call ParseCommandline
+
+  ; See if a other bitness VLC version exists
+  !ifdef VLC_64BIT_INSTALLER
+    SetRegView 32
+
+    Call ReadPreviousVersion
+
+    ${If} $PreviousVersion != ""
+      ReadRegStr $32bitUninstaller ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
+      ReadRegStr $32bitPath ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation"
+      StrCpy $PreviousVersion ""
+    ${EndIf}
+
+    SetRegView lastused
+  !endif
 
   ; See if previous version exists
   Call ReadPreviousVersion
