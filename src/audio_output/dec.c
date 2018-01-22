@@ -45,28 +45,30 @@ int aout_DecNew( audio_output_t *p_aout,
                  const audio_replay_gain_t *p_replay_gain,
                  const aout_request_vout_t *p_request_vout )
 {
+    if( p_format->i_bitspersample > 0 )
+    {
+        /* Sanitize audio format, input need to have a valid physical channels
+         * layout or a valid number of channels. */
+        int i_map_channels = aout_FormatNbChannels( p_format );
+        if( ( i_map_channels == 0 && p_format->i_channels == 0 )
+           || i_map_channels > AOUT_CHAN_MAX || p_format->i_channels > INPUT_CHAN_MAX )
+        {
+            msg_Err( p_aout, "invalid audio channels count" );
+            return -1;
+        }
 
-    /* Sanitize audio format, input need to have a valid physical channels
-     * layout or a valid number of channels. */
-    int i_map_channels = aout_FormatNbChannels( p_format );
-    if( ( i_map_channels == 0 && p_format->i_channels == 0 )
-       || i_map_channels > AOUT_CHAN_MAX || p_format->i_channels > INPUT_CHAN_MAX )
-    {
-        msg_Err( p_aout, "invalid audio channels count" );
-        return -1;
-    }
-
-    if( p_format->i_rate > 352800 )
-    {
-        msg_Err( p_aout, "excessive audio sample frequency (%u)",
-                 p_format->i_rate );
-        return -1;
-    }
-    if( p_format->i_rate < 4000 )
-    {
-        msg_Err( p_aout, "too low audio sample frequency (%u)",
-                 p_format->i_rate );
-        return -1;
+        if( p_format->i_rate > 352800 )
+        {
+            msg_Err( p_aout, "excessive audio sample frequency (%u)",
+                     p_format->i_rate );
+            return -1;
+        }
+        if( p_format->i_rate < 4000 )
+        {
+            msg_Err( p_aout, "too low audio sample frequency (%u)",
+                     p_format->i_rate );
+            return -1;
+        }
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
