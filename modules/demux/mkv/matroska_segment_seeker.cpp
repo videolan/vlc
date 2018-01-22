@@ -271,16 +271,12 @@ SegmentSeeker::get_seekpoints_around( mtime_t target_pts, track_ids_t const& pri
 
             if( cluster.fpos > points.first.fpos )
             {
-                points.first.fpos = cluster.fpos;
-                points.first.pts  = cluster.pts;
+                points.first = Seekpoint( cluster.fpos, cluster.pts );
 
                 // do we need to update the max point? //
 
                 if( points.second.fpos < points.first.fpos )
-                {
-                    points.second.fpos = cluster.fpos + cluster.size;
-                    points.second.pts  = cluster.pts  + cluster.duration;
-                }
+                    points.second = Seekpoint( cluster.fpos + cluster.size, cluster.pts + cluster.duration );
             }
         }
     }
