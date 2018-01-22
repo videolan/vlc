@@ -69,23 +69,14 @@ class SegmentSeeker
                 : Seekpoint( std::numeric_limits<fptr_t>::max(), -1, DISABLED )
             { }
 
-            Seekpoint(const Seekpoint & sp)
-                : Seekpoint( sp.fpos, sp.pts, sp.trust_level )
-            { }
-
-            Seekpoint operator=( const Seekpoint & other ) const
-            {
-                return other;
-            }
-
             bool operator<( Seekpoint const& rhs ) const
             {
                 return pts < rhs.pts;
             }
 
-            const fptr_t fpos;
-            const mtime_t pts;
-            const TrustLevel trust_level;
+            fptr_t fpos;
+            mtime_t pts;
+            TrustLevel trust_level;
         };
 
         struct Cluster {
