@@ -2784,15 +2784,14 @@ static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_text->i_data_reference_index );
 
-    if( i_read < 32 )
-        MP4_READBOX_EXIT( 0 );
-
-    p_box->data.p_sample_text->p_data = malloc( i_read );
-    if( !p_box->data.p_sample_text->p_data )
-        MP4_READBOX_EXIT( 0 );
-
+    if( i_read )
+    {
+        p_box->data.p_sample_text->p_data = malloc( i_read );
+        if( !p_box->data.p_sample_text->p_data )
+            MP4_READBOX_EXIT( 0 );
+        memcpy( p_box->data.p_sample_text->p_data, p_peek, i_read );
+    }
     p_box->data.p_sample_text->i_data = i_read;
-    memcpy( p_box->data.p_sample_text->p_data, p_peek, i_read );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"text\" in stsd text" );
