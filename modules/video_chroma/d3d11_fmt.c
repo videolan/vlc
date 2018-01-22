@@ -165,10 +165,11 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 #undef D3D11_GetDriverVersion
 void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
-    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
 #if VLC_WINSTORE_APP
     return;
 #else
+    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
+
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
     if (!pAdapter)
         return;
