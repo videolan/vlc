@@ -1,0 +1,28 @@
+From b66ca475be967547af9a3784e720fbbacd381be6 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Mon, 22 Jan 2018 15:42:53 +0100
+Subject: [PATCH] Exit the max size loop when there's nothing left possible to
+ find
+
+DataStream.getFilePointer() is not correct in this context. It might force to
+exit too early.
+---
+ src/EbmlElement.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/EbmlElement.cpp b/src/EbmlElement.cpp
+index ac0be41..061074b 100644
+--- a/src/EbmlElement.cpp
++++ b/src/EbmlElement.cpp
+@@ -478,7 +478,7 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
+     ReadIndex = SizeIdx - 1;
+     memmove(&PossibleIdNSize[0], &PossibleIdNSize[1], ReadIndex);
+     UpperLevel = UpperLevel_original;
+-  } while ( MaxDataSize > DataStream.getFilePointer() - SizeIdx + PossibleID_Length );
++  } while ( MaxDataSize >= ReadSize );
+ 
+   return NULL;
+ }
+-- 
+2.10.1.windows.1
+
