@@ -154,6 +154,7 @@ EbmlElement *EbmlParser::Get( int n_call )
         return ret;
     }
 
+next:
     p_prev = m_el[mi_level];
     if( p_prev )
         p_prev->SkipData( *m_es, EBML_CONTEXT(p_prev) );
@@ -274,7 +275,8 @@ EbmlElement *EbmlParser::Get( int n_call )
             /* The element fits inside its upper element */
             msg_Warn( p_demux, "Dummy element found %" PRIu64 "... skipping it",
                       m_el[mi_level]->GetElementPosition() );
-            return Get( ++n_call );
+            n_call++;
+            goto next;
         }
         else
         {
