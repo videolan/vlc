@@ -204,6 +204,13 @@ EbmlElement *EbmlParser::Get( int n_call )
                      m_es->FindNextElement( e_context,
                                             i_ulev, i_max_read,
                                             (  mb_dummy | (mi_level > 1) ), 1 );
+
+    if( m_el[mi_level] == NULL )
+    {
+        if ( i_max_read != UINT64_MAX && !static_cast<vlc_stream_io_callback *>(&m_es->I_O())->IsEOF() )
+            i_ulev = 1; /* found nothing valid anymore at this level, go up */
+    }
+
     if( i_ulev > 0 )
     {
         if( p_prev )
