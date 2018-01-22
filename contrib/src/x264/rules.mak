@@ -41,10 +41,10 @@ X264CONF += --cross-prefix="$(HOST)-"
 ifdef HAVE_ANDROID
 # broken text relocations
 ifeq ($(ANDROID_ABI), x86)
-FFMPEGCONF +=  --disable-asm
+X264CONF += --disable-asm
 endif
 ifeq ($(ANDROID_ABI), x86_64)
-FFMPEGCONF +=  --disable-asm
+X264CONF += --disable-asm
 endif
 endif
 endif
