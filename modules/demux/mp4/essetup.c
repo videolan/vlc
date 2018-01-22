@@ -1009,6 +1009,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case ATOM_dtsh: /* DTS‐HD audio formats */
         case ATOM_dtsl: /* DTS‐HD Lossless formats */
         {
+            p_track->fmt.i_codec = VLC_CODEC_DTS;
             p_track->fmt.i_profile = PROFILE_DTS_HD;
             break;
         }
