@@ -2084,7 +2084,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_SUCCESS;
                 }
             }
-            return VLC_EGENERIC;
+            return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
         }
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_SET_GROUP:
