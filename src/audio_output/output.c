@@ -415,6 +415,13 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     if (!AOUT_FMT_LINEAR(fmt))
         return;
 
+    if (i_nb_input_channels > 1)
+    {
+        val.i_int = AOUT_VAR_CHAN_MONO;
+        txt.psz_string = _("Mono");
+        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    }
+
     if (i_nb_input_channels != 2)
     {
         val.i_int = AOUT_VAR_CHAN_UNSET;
@@ -486,6 +493,11 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
             break;
         case AOUT_VAR_CHAN_HEADPHONES:
             filters_cfg->headphones = true;
+            break;
+        case AOUT_VAR_CHAN_MONO:
+            /* Remix all channels into one */
+            for (size_t i = 0; i < AOUT_CHANIDX_MAX; ++ i)
+                filters_cfg->remap[i] = AOUT_CHANIDX_LEFT;
             break;
         default:
             if (i_nb_input_channels == 2
