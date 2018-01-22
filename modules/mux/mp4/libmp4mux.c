@@ -1126,6 +1126,22 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
         return tx3g;
     }
+    else if(p_track->fmt.i_codec == VLC_CODEC_WEBVTT)
+    {
+        bo_t *wvtt = box_new("wvtt");
+        if(!wvtt)
+            return NULL;
+
+        /* Sample Entry Header */
+        for (int i = 0; i < 6; i++)
+            bo_add_8(wvtt, 0);        // reserved;
+        bo_add_16be(wvtt, 1);         // data-reference-index
+
+        bo_t *ftab = box_new("vttc");
+        box_gather(wvtt, ftab);
+
+        return wvtt;
+    }
 
     return NULL;
 }
@@ -1622,11 +1638,10 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
             /* text/tx3g 3GPP */
             /* sbtl/tx3g Apple subs */
             /* text/text Apple textmedia */
-            if(p_stream->fmt.i_codec == VLC_CODEC_SUBT||
-               p_stream->fmt.i_codec == VLC_CODEC_QTXT)
-                bo_add_fourcc(hdlr, "text");
-            else if(p_stream->fmt.i_codec == VLC_CODEC_TX3G)
+            if(p_stream->fmt.i_codec == VLC_CODEC_TX3G)
                 bo_add_fourcc(hdlr, (b_mov) ? "sbtl" : "text");
+            else
+                bo_add_fourcc(hdlr, "text");
         }
 
         bo_add_32be(hdlr, 0);         // reserved
@@ -1866,6 +1881,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
         return !b_fragmented;
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
+    case VLC_CODEC_WEBVTT:
         return !b_fragmented;
     default:
         return false;

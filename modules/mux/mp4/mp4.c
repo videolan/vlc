@@ -735,15 +735,21 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             p_empty = block_Alloc(3);
             if(p_empty)
             {
-                /* point to start of our empty */
-                p_stream->i_last_dts += e->i_length;
-
                 /* Write a " " */
                 p_empty->p_buffer[0] = 0;
                 p_empty->p_buffer[1] = 1;
                 p_empty->p_buffer[2] = ' ';
             }
         }
+        else if(p_stream->mux.fmt.i_codec == VLC_CODEC_WEBVTT)
+        {
+            p_empty = block_Alloc(8);
+            if(p_empty)
+                memcpy(p_empty->p_buffer, "\x00\x00\x00\x08vtte", 8);
+        }
+
+        /* point to start of our empty */
+        p_stream->i_last_dts += e->i_length;
 
         if(p_empty)
         {
