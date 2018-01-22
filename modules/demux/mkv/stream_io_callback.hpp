@@ -42,6 +42,8 @@ class vlc_stream_io_callback: public IOCallback
             vlc_stream_Delete( s );
     }
 
+    bool IsEOF() const { return mb_eof; }
+
     virtual uint32   read            ( void *p_buffer, size_t i_size);
     virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning );
     virtual size_t   write           ( const void *p_buffer, size_t i_size);
