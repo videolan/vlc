@@ -746,6 +746,11 @@ void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
+    if ( !videoWidget )
+    {
+        videoWidget = new VideoWidget( p_intf, stackCentralW );
+        stackCentralW->addWidget( videoWidget );
+    }
     *res = videoWidget->request( p_wnd );
     if( *res ) /* The videoWidget is available */
     {
