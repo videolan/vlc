@@ -364,8 +364,9 @@ static CFMutableDictionaryRef GetDecoderExtradataH264(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFMutableDictionaryRef extradata = nil;
-    if(p_dec->fmt_in.i_extra) /* copy DecoderConfiguration */
+    if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
+        /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("avcC"),
                                         p_dec->fmt_in.p_extra,
                                         p_dec->fmt_in.i_extra);
@@ -685,8 +686,9 @@ static CFMutableDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFMutableDictionaryRef extradata = nil;
-    if(p_dec->fmt_in.i_extra) /* copy DecoderConfiguration */
+    if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
+        /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("hvcC"),
                                         p_dec->fmt_in.p_extra,
                                         p_dec->fmt_in.i_extra);
