@@ -370,7 +370,7 @@ static int aout_get_native_sample_rate(audio_output_t *aout)
     /* 3 for AudioManager.STREAM_MUSIC */
     int sample_rate = (*p_env)->CallStaticIntMethod(p_env, cls, method, 3);
     (*p_env)->DeleteLocalRef(p_env, cls);
-    fprintf(stderr, "aout_get_native_sample_rate: %d\n", sample_rate);
+    msg_Dbg(aout, "%s: %d", __func__, sample_rate);
     return sample_rate;
 }
 
