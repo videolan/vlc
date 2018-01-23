@@ -370,9 +370,11 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
-    if( var_InheritBool( p_intf, "qt-recentplay" ) )
+    if( !recentsMenu && var_InheritBool( p_intf, "qt-recentplay" ) )
+        recentsMenu = new QMenu( qtr( "Open &Recent Media" ) );
+
+    if( recentsMenu )
     {
-        recentsMenu = new QMenu( qtr( "Open &Recent Media" ), menu );
         updateRecents( p_intf );
         menu->addMenu( recentsMenu );
     }
