@@ -17,6 +17,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(APPLY) $(SRC)/ebml/ebml-maxread.patch
 	$(APPLY) $(SRC)/ebml/unknown-check.patch
 	$(APPLY) $(SRC)/ebml/max-size-loop.patch
+	$(APPLY) $(SRC)/ebml/ebml-end-boundary.patch
 	$(MOVE)
 
 # libebml requires exceptions
