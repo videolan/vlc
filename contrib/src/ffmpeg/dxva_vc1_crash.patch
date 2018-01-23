@@ -14,3 +14,19 @@
          pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
      else
          pp->wBackwardRefPictureIndex = 0xffff;
+--- ffmpeg/libavcodec/dxva2_mpeg2.c	2018-01-23 12:58:14.672161600 +0100
++++ ffmpeg/libavcodec/dxva2_mpeg2.c.ref	2018-01-23 12:56:45.439743300 +0100
+@@ -51,11 +51,11 @@ static void fill_picture_parameters(AVCo
+     memset(pp, 0, sizeof(*pp));
+     pp->wDecodedPictureIndex         = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
+     pp->wDeblockedPictureIndex       = 0;
+-    if (s->pict_type != AV_PICTURE_TYPE_I)
++    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_picture.f->data[0])
+         pp->wForwardRefPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
+     else
+         pp->wForwardRefPictureIndex  = 0xffff;
+-    if (s->pict_type == AV_PICTURE_TYPE_B)
++    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture.f->data[0])
+         pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
+     else
+         pp->wBackwardRefPictureIndex = 0xffff;
