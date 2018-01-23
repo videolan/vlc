@@ -137,9 +137,10 @@ const EbmlSemanticContext Context_KaxSegmentVLC = EbmlSemanticContext(KaxSegment
                                                                       GetEbmlNoGlobal_Context,
                                                                       KaxSegment_Context.GetMaster());
 
-EbmlElement *EbmlParser::Get( int n_call )
+EbmlElement *EbmlParser::Get()
 {
     int i_ulev = 0;
+    int n_call = 0;
     EbmlElement *p_prev = NULL;
 
     if( mi_user_level != mi_level )
@@ -209,7 +210,10 @@ next:
     if( m_el[mi_level] == NULL )
     {
         if ( i_max_read != UINT64_MAX && !static_cast<vlc_stream_io_callback *>(&m_es->I_O())->IsEOF() )
-            i_ulev = 1; /* found nothing valid anymore at this level, go up */
+        {
+            msg_Dbg(p_demux, "found nothing, go up");
+            i_ulev = 1;
+        }
     }
 
     if( i_ulev > 0 )
@@ -275,6 +279,17 @@ next:
             /* The element fits inside its upper element */
             msg_Warn( p_demux, "Dummy element found %" PRIu64 "... skipping it",
                       m_el[mi_level]->GetElementPosition() );
+            if( p_prev )
+            {
+                if( !mb_keep )
+                {
+                    if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
+                        static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix(); // !! WARNING : TODO !! this is undefined-behavior
+                    delete p_prev;
+                    p_prev = NULL;
+                }
+                mb_keep = false;
+            }
             n_call++;
             goto next;
         }
@@ -297,10 +312,18 @@ next:
                 return NULL;
             }
 
-            EbmlElement *unwanted_dummy = m_el[mi_level];
-            EbmlElement *upper_dummy = Get();
-            delete unwanted_dummy;
-            return upper_dummy;
+            if( p_prev )
+            {
+                if( !mb_keep )
+                {
+                    if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
+                        static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix(); // !! WARNING : TODO !! this is undefined-behavior
+                    delete p_prev;
+                    p_prev = NULL;
+                }
+                mb_keep = false;
+            }
+            goto next;
         }
     }
 
