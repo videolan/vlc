@@ -160,6 +160,11 @@ static inline bool bo_add_mem(bo_t *p_bo, size_t i_size, const void *p_mem)
     return true;
 }
 
+static inline size_t bo_size(const bo_t *p_bo)
+{
+    return (p_bo->b) ? p_bo->b->i_buffer : 0;
+}
+
 #define bo_add_fourcc(p_bo, fcc) bo_add_mem(p_bo, 4, fcc)
 
 #endif // VLC_BOXES_H
