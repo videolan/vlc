@@ -415,17 +415,18 @@ helper_process_avcC_h264(struct hxxx_helper *hh, const uint8_t *p_buf,
     return VLC_SUCCESS;
 }
 
+static bool
+hxxx_extra_isannexb(const void *p_extra, size_t i_extra)
+{
+    return i_extra == 0
+        || (i_extra > 4 && memcmp(p_extra, annexb_startcode4, 4) == 0);
+}
+
 static int
 h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                       size_t i_extra)
 {
-    if (i_extra == 0)
-    {
-        /* AnnexB case */
-        hh->i_nal_length_size = 4;
-        return VLC_SUCCESS;
-    }
-    else if (h264_isavcC(p_extra, i_extra))
+    if (h264_isavcC(p_extra, i_extra))
     {
         hh->i_nal_length_size = (((uint8_t*)p_extra)[4] & 0x03) + 1;
         if (!helper_nal_length_valid(hh))
@@ -446,7 +447,14 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 
         return helper_process_avcC_h264(hh, p_extra, i_extra);
     }
-    else /* Can't handle extra that is not avcC */
+    else if (hxxx_extra_isannexb(p_extra, i_extra))
+    {
+        hh->i_nal_length_size = 4;
+        bool unused;
+        return i_extra == 0 ? VLC_SUCCESS :
+               h264_helper_parse_nal(hh, p_extra, i_extra, 0, &unused);
+    }
+    else
         return VLC_EGENERIC;
 }
 
@@ -493,13 +501,7 @@ static int
 hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                       size_t i_extra)
 {
-    if (i_extra == 0)
-    {
-        /* AnnexB case */
-        hh->i_nal_length_size = 4;
-        return VLC_SUCCESS;
-    }
-    else if (hevc_ishvcC(p_extra, i_extra))
+    if (hevc_ishvcC(p_extra, i_extra))
     {
         hh->i_nal_length_size = hevc_getNALLengthSize(p_extra);
         if (!helper_nal_length_valid(hh))
@@ -508,7 +510,14 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 
         return helper_process_hvcC_hevc( hh, p_extra, i_extra );
     }
-    else /* Can't handle extra that is not hvcC */
+    else if (hxxx_extra_isannexb(p_extra, i_extra))
+    {
+        hh->i_nal_length_size = 4;
+        bool unused;
+        return i_extra == 0 ? VLC_SUCCESS :
+               hevc_helper_parse_nal(hh, p_extra, i_extra, 0, &unused);
+    }
+    else
         return VLC_EGENERIC;
 }
 
