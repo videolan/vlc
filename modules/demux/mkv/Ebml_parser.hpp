@@ -43,7 +43,7 @@ class EbmlParser
     void Up( void );
     void Down( void );
     void Reset( demux_t *p_demux );
-    EbmlElement *Get( int n_call = 0 );
+    EbmlElement *Get( void );
     void        Keep( void );
     void        Unkeep( void );
 
