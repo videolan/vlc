@@ -464,11 +464,6 @@ void matroska_segment_c::InformationCreate( )
  * Misc
  *****************************************************************************/
 
-void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
-{
-    _seeker.add_cluster( cluster );
-}
-
 bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
 {
     struct ClusterHandlerPayload
@@ -484,8 +479,7 @@ bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
 
         E_CASE( KaxCluster, kcluster )
         {
-            if( vars.obj->ParseCluster( &kcluster, false ) )
-                vars.obj->IndexAppendCluster( &kcluster );
+            vars.obj->ParseCluster( &kcluster, false );
         }
 
         E_CASE_DEFAULT( el )
@@ -1189,7 +1183,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         {
             ktimecode.ReadData( vars.obj->es.I_O(), SCOPE_ALL_DATA );
             vars.obj->cluster->InitTimecode( static_cast<uint64>( ktimecode ), vars.obj->i_timescale );
-            vars.obj->IndexAppendCluster( vars.obj->cluster );
+            vars.obj->_seeker.add_cluster( vars.obj->cluster );
             vars.b_cluster_timecode = true;
         }
         E_CASE( KaxClusterSilentTracks, ksilent )
