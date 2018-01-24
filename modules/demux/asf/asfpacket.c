@@ -480,6 +480,9 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
         pkt.length = i_data_packet_min;
     }
 
+    if( i_skip + 4 > i_data_packet_min )
+        goto loop_error_recovery;
+
     pkt.send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
@@ -494,6 +497,8 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     pkt.length_type = 0x02; //unused
     if( pkt.multiple )
     {
+        if( i_skip + 1 >= i_data_packet_min )
+            goto loop_error_recovery;
         i_payload_count = p_peek[i_skip] & 0x3f;
         pkt.length_type = ( p_peek[i_skip] >> 6 )&0x03;
         i_skip++;
