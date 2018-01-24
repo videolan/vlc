@@ -279,7 +279,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
             p_context->pf_render_ordered( p_filter, p_dst[1], p_pic,
                                           1, b_top_field_first );
         if ( p_dst[2] )
-            p_context->pf_render_ordered( p_filter, p_dst[1], p_pic,
+            p_context->pf_render_ordered( p_filter, p_dst[2], p_pic,
                                           2, !b_top_field_first );
     }
 
