@@ -349,6 +349,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         {
             i_sub_payload_data_length = pkt->p_peek[pkt->i_skip++];
             i_payload_data_length--;
+            if( i_sub_payload_data_length > i_payload_data_length )
+                goto skip;
         }
 
         SkipBytes( p_demux->s, pkt->i_skip );
