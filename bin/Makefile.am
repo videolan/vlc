@@ -130,9 +130,11 @@ endif
 MOSTLYCLEANFILES = $(noinst_DATA)
 
 if HAVE_OSX
+if BUILD_VLC
 install-data-local:
 	cd $(bindir); mv vlc-osx vlc
 
+endif
 endif
 
 .PHONY: ../modules/plugins.dat
