@@ -32,11 +32,15 @@ ifeq ($(TIZEN_ABI), x86)
 	cp $@/src/syscfg/lock-obj-pub.i686-pc-linux-gnu.h $@/src/syscfg/lock-obj-pub.linux-gnueabi.h
 endif
 endif
-ifdef HAVE_IOS
+ifdef HAVE_DARWIN_OS
 ifdef HAVE_ARMV7A
 	cp $@/src/syscfg/lock-obj-pub.arm-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
 else
+ifeq ($(ARCH),aarch64)
 	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+else
+	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
 endif
 endif
 
