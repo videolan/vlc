@@ -243,6 +243,9 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
 
     bool b_ignore_pts = (p_tkinfo->i_cat == VIDEO_ES); /* ignore PTS delta with video when not set by mux */
 
+    if( pkt->left - pkt->i_skip < i_replicated_data_length )
+        return -1;
+
     /* Non compressed */
     if( i_replicated_data_length > 7 ) // should be at least 8 bytes
     {
@@ -257,9 +260,6 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         if(i_extension_pts != -1)
             i_extension_pts -= *p_packetsys->pi_preroll;
         pkt->i_skip += i_replicated_data_length;
-
-        if( ! pkt->left || pkt->i_skip >= pkt->left )
-            return -1;
     }
     else if ( i_replicated_data_length == 0 )
     {
@@ -282,9 +282,15 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     {
         /* >1 && <8 Invalid replicated length ! */
         msg_Warn( p_demux, "Invalid replicated data length detected." );
+        if( pkt->length - pkt->i_skip < pkt->padding_length )
+            return -1;
+
         i_payload_data_length = pkt->length - pkt->padding_length - pkt->i_skip;
         goto skip;
     }
+
+    if( ! pkt->left || pkt->i_skip >= pkt->left )
+        return -1;
 
     bool b_preroll_done = ( pkt->send_time > (*p_packetsys->pi_preroll_start/1000 + *p_packetsys->pi_preroll) );
 
@@ -294,8 +300,13 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     if( pkt->multiple ) {
         if (GetValue2b(&i_temp_payload_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->length_type) < 0)
             return -1;
-    } else
+    }
+    else
+    {
+        if( pkt->length - pkt->i_skip < pkt->padding_length )
+            return -1;
         i_temp_payload_length = pkt->length - pkt->padding_length - pkt->i_skip;
+    }
 
     i_payload_data_length = i_temp_payload_length;
 
