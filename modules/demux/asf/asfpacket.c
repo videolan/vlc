@@ -72,24 +72,8 @@ static inline int GetValue2b(uint32_t *var, const uint8_t *p, unsigned int *skip
 
 static uint32_t SkipBytes( stream_t *s, uint32_t i_bytes )
 {
-    int i_read;
-    int i_to_read = __MIN(i_bytes, INT_MAX);
-    uint32_t i_bytes_read = 0;
-
-    while( i_bytes )
-    {
-        i_read = vlc_stream_Read( s, NULL, i_to_read );
-        i_bytes -= i_read;
-        i_bytes_read += i_read;
-        if ( i_read < i_to_read || i_bytes == 0 )
-        {
-            /* end of stream */
-            return i_bytes_read;
-        }
-        i_to_read = __MIN(i_bytes, INT_MAX);
-    }
-
-    return i_bytes_read;
+    ssize_t i_read = vlc_stream_Read( s, NULL, i_bytes );
+    return i_read > 0 ? (uint32_t) i_read : 0;
 }
 
 static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
@@ -390,8 +374,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         pkt->i_skip = 0;
         if( pkt->left > 0 )
         {
-            int i_return = vlc_stream_Peek( p_demux->s, &pkt->p_peek, __MIN(pkt->left, INT_MAX) );
-            if ( i_return <= 0 || (unsigned int) i_return < __MIN(pkt->left, INT_MAX) )
+            ssize_t i_return = vlc_stream_Peek( p_demux->s, &pkt->p_peek, pkt->left );
+            if ( i_return <= 0 || (size_t) i_return < pkt->left )
             {
             msg_Warn( p_demux, "cannot peek, EOF ?" );
             return -1;
@@ -419,8 +403,8 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     demux_t *p_demux = p_packetsys->p_demux;
 
     const uint8_t *p_peek;
-    int i_return = vlc_stream_Peek( p_demux->s, &p_peek,i_data_packet_min );
-    if( i_return <= 0 || ((unsigned int) i_return) < i_data_packet_min )
+    ssize_t i_return = vlc_stream_Peek( p_demux->s, &p_peek,i_data_packet_min );
+    if( i_return <= 0 || (size_t) i_return < i_data_packet_min )
     {
         msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
         return 0;
@@ -487,7 +471,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
     i_return = vlc_stream_Peek( p_demux->s, &p_peek, pkt.length );
-    if( i_return <= 0 || pkt.length == 0 || (unsigned int)i_return < pkt.length )
+    if( i_return <= 0 || pkt.length == 0 || (size_t)i_return < pkt.length )
     {
         msg_Warn( p_demux, "cannot peek, EOF ?" );
         return 0;
@@ -530,7 +514,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
                             pkt.padding_length - pkt.left );
 #endif
         i_return = vlc_stream_Read( p_demux->s, NULL, pkt.left );
-        if( i_return < 0 || (unsigned int) i_return < pkt.left )
+        if( i_return < 0 || (size_t) i_return < pkt.left )
         {
             msg_Err( p_demux, "cannot skip data, EOF ?" );
             return 0;
@@ -547,7 +531,7 @@ loop_error_recovery:
         return -1;
     }
     i_return = vlc_stream_Read( p_demux->s, NULL, i_data_packet_min );
-    if( i_return <= 0 || (unsigned int) i_return != i_data_packet_min )
+    if( i_return <= 0 || (size_t) i_return != i_data_packet_min )
     {
         msg_Warn( p_demux, "cannot skip data, EOF ?" );
         return 0;
