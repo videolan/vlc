@@ -725,7 +725,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     sout_AccessOutWrite(p_mux->p_access, p_data);
 
     /* Add SPU clearing tag (duration tb fixed on next SPU or stream end )*/
-    if (p_stream->mux.fmt.i_cat == SPU_ES )
+    if ( p_stream->mux.fmt.i_cat == SPU_ES && e->i_length > 0 )
     {
         block_t *p_empty = NULL;
         if(p_stream->mux.fmt.i_codec == VLC_CODEC_SUBT||
