@@ -328,7 +328,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         p_packetsys->pf_updatesendtime( p_packetsys, INT64_C(1000) * pkt->send_time );
 
     uint32_t i_subpayload_count = 0;
-    while (i_payload_data_length)
+    while (i_payload_data_length && pkt->i_skip < pkt->left )
     {
         uint32_t i_sub_payload_data_length = i_payload_data_length;
         if( i_replicated_data_length == 1 )
