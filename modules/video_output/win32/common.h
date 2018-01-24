@@ -62,9 +62,6 @@ typedef struct vout_display_sys_win32_t
     bool is_first_display;
     bool is_on_top;
 
-    /* screensaver system settings to be restored when vout is closed */
-    UINT i_spi_screensaveactive;
-
     /* Coordinates of src and dest images (used when blitting to display) */
     RECT         rect_src;
     RECT         rect_src_clipped;
