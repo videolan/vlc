@@ -390,7 +390,7 @@ public:
     bool PreloadLinked();
     void FreeUnused();
     bool PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date );
-    matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream );
+    bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
     void InitUi();

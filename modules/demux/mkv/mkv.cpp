@@ -96,8 +96,6 @@ static int Open( vlc_object_t * p_this )
     matroska_segment_c *p_segment;
     const uint8_t      *p_peek;
     std::string         s_path, s_filename;
-    vlc_stream_io_callback *p_io_callback;
-    EbmlStream         *p_io_stream;
     bool                b_need_preload = false;
 
     /* peek the begining */
@@ -116,29 +114,20 @@ static int Open( vlc_object_t * p_this )
     if ( vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable ) )
         p_sys->b_fastseekable = false;
 
-    p_io_callback = new vlc_stream_io_callback( p_demux->s, false );
-    p_io_stream = new (std::nothrow) EbmlStream( *p_io_callback );
-
-    if( p_io_stream == NULL )
+    p_stream = new matroska_stream_c( p_demux->s, false );
+    if ( unlikely(p_stream == NULL) )
     {
-        msg_Err( p_demux, "failed to create EbmlStream" );
-        delete p_io_callback;
+        msg_Err( p_demux, "failed to create matroska_stream_c" );
         delete p_sys;
-        return VLC_EGENERIC;
-    }
-
-    p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_io_stream );
-    if( p_stream == NULL )
-    {
-        msg_Err( p_demux, "cannot find KaxSegment or missing mandatory KaxInfo" );
-        delete p_io_stream;
-        delete p_io_callback;
-        goto error;
+        return VLC_ENOMEM;
     }
     p_sys->streams.push_back( p_stream );
 
-    p_stream->p_io_callback = p_io_callback;
-    p_stream->p_estream = p_io_stream;
+    if( !p_sys->AnalyseAllSegmentsFound( p_demux, p_stream ) )
+    {
+        msg_Err( p_demux, "cannot find KaxSegment or missing mandatory KaxInfo" );
+        goto error;
+    }
 
     for (size_t i=0; i<p_stream->segments.size(); i++)
     {
@@ -216,21 +205,15 @@ static int Open( vlc_object_t * p_this )
 
                             if ( file_ok )
                             {
-                                vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, true );
-                                EbmlStream *p_estream = new EbmlStream(*p_file_io);
+                                matroska_stream_c *p_stream = new matroska_stream_c( p_file_stream, true );
 
-                                p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_estream );
-
-                                if ( p_stream == NULL )
+                                if ( !p_sys->AnalyseAllSegmentsFound( p_demux, p_stream ) )
                                 {
                                     msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
-                                    delete p_estream;
-                                    delete p_file_io;
+                                    delete p_stream;
                                 }
                                 else
                                 {
-                                    p_stream->p_io_callback = p_file_io;
-                                    p_stream->p_estream = p_estream;
                                     p_sys->streams.push_back( p_stream );
                                 }
                             }
@@ -888,3 +871,8 @@ mkv_track_t::~mkv_track_t()
     delete p_compression_data;
     delete p_sys;
 }
+
+matroska_stream_c::matroska_stream_c( stream_t *s, bool owner )
+    :io_callback( new vlc_stream_io_callback( s, owner ) )
+    ,estream( EbmlStream( *io_callback ) )
+{}
