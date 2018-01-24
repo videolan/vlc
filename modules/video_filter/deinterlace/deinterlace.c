@@ -410,8 +410,8 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
             }
 
             msg_Dbg( p_filter, "using %s deinterlace method", mode );
-            p_filter->p_sys->context.settings = filter_mode[i].settings;
-            p_filter->p_sys->context.pf_render_ordered = filter_mode[i].pf_render_ordered;
+            p_sys->context.settings = filter_mode[i].settings;
+            p_sys->context.pf_render_ordered = filter_mode[i].pf_render_ordered;
             return;
         }
     }
