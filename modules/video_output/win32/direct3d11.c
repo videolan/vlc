@@ -108,6 +108,7 @@ typedef struct
     D3D11_VIEWPORT            cropViewport;
     unsigned int              i_width;
     unsigned int              i_height;
+    float                     f_luminance_scale;
 } d3d_quad_t;
 
 typedef enum video_color_axis {
@@ -188,7 +189,7 @@ typedef struct {
     FLOAT Opacity;
     FLOAT BoundaryX;
     FLOAT BoundaryY;
-    FLOAT padding;
+    FLOAT LuminanceScale;
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
@@ -309,7 +310,7 @@ static const char* globPixelShaderDefault = "\
     float Opacity;\
     float BoundaryX;\
     float BoundaryY;\
-    float padding;\
+    float LuminanceScale;\
   };\
   cbuffer PS_COLOR_TRANSFORM : register(b1)\
   {\
@@ -1039,6 +1040,26 @@ static void Manage(vout_display_t *vd)
     }
 }
 
+static void UpdateQuadLuminanceScale(vout_display_t *vd, d3d_quad_t *quad, float luminanceScale)
+{
+    vout_display_sys_t *sys = vd->sys;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+    if (quad->f_luminance_scale == luminanceScale)
+        return;
+
+    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (SUCCEEDED(hr)) {
+        PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
+        quad->f_luminance_scale = luminanceScale;
+        dst_data->LuminanceScale = quad->f_luminance_scale;
+        ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
+    }
+    else {
+        msg_Err(vd, "Failed to lock the picture shader constants (hr=0x%lX)", hr);
+    }
+}
+
 static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
 {
     UINT stride = sizeof(d3d_vertex_t);
@@ -1167,6 +1188,26 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         sys->d3dregions      = subpicture_regions;
     }
 
+    if (sys->dxgiswapChain4 && picture->format.mastering.max_luminance)
+    {
+        UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / sys->display.luminance_peak);
+
+        DXGI_HDR_METADATA_HDR10 hdr10 = {0};
+        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
+        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
+        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
+        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
+        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
+        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
+        hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
+        hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
+        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
+        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
+        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
+        IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+    }
+
     FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     ID3D11DeviceContext_ClearRenderTargetView(sys->d3d_dev.d3dcontext, sys->d3drenderTargetView, blackRGBA);
 
@@ -1201,24 +1242,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         ReleaseMutex( sys->context_lock );
     }
 #endif
-
-    if (sys->dxgiswapChain4 && picture->format.mastering.max_luminance)
-    {
-        DXGI_HDR_METADATA_HDR10 hdr10 = {0};
-        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
-        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
-        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
-        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
-        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
-        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
-        hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
-        hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
-        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
-        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
-        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
-        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-        IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
-    }
 
     ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
 }
@@ -1702,7 +1725,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_peak_luminance    = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
-    char *psz_luminance = NULL;
     char *psz_range = NULL;
 
     switch (format->formatTexture)
@@ -1740,27 +1762,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     }
 
     video_transfer_func_t src_transfer;
-    unsigned src_luminance_peak;
-    switch (transfer)
-    {
-        case TRANSFER_FUNC_SMPTE_ST2084:
-            /* that's the default PQ value if the metadata are not set */
-            src_luminance_peak = MAX_PQ_BRIGHTNESS;
-            break;
-        case TRANSFER_FUNC_HLG:
-            src_luminance_peak = 1000;
-            break;
-        case TRANSFER_FUNC_BT470_BG:
-        case TRANSFER_FUNC_BT470_M:
-        case TRANSFER_FUNC_BT709:
-        case TRANSFER_FUNC_SRGB:
-            src_luminance_peak = DEFAULT_BRIGHTNESS;
-            break;
-        default:
-            msg_Dbg(vd, "unhandled source transfer %d", transfer);
-            src_luminance_peak = DEFAULT_BRIGHTNESS;
-            break;
-    }
 
     if (transfer != sys->display.colorspace->transfer)
     {
@@ -1846,15 +1847,10 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         }
     }
 
-    if (src_luminance_peak != sys->display.luminance_peak)
-    {
-        psz_luminance = malloc(64);
-        if (likely(psz_luminance))
-        {
-            sprintf(psz_luminance, "return rgb * %f", (float)src_luminance_peak / (float)sys->display.luminance_peak);
-            psz_peak_luminance = psz_luminance;
-        }
-    }
+    if ( transfer == TRANSFER_FUNC_SMPTE_ST2084 &&
+         sys->display.colorspace->transfer != TRANSFER_FUNC_SMPTE_ST2084 )
+        /* the luminance may be dynamic */
+        psz_peak_luminance = "return rgb * LuminanceScale";
 
     int range_adjust = 0;
     if (sys->display.colorspace->b_full_range) {
@@ -1937,7 +1933,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
-        free(psz_luminance);
         free(psz_range);
         return E_OUTOFMEMORY;
     }
@@ -1952,7 +1947,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
     }
 #endif
-    free(psz_luminance);
     free(psz_range);
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
@@ -2524,6 +2518,29 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     HRESULT hr;
     const bool RGB_shader = IsRGBShader(cfg);
 
+    unsigned src_luminance_peak;
+    switch (fmt->transfer)
+    {
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            /* that's the default PQ value if the metadata are not set */
+            src_luminance_peak = MAX_PQ_BRIGHTNESS;
+            break;
+        case TRANSFER_FUNC_HLG:
+            src_luminance_peak = 1000;
+            break;
+        case TRANSFER_FUNC_BT470_BG:
+        case TRANSFER_FUNC_BT470_M:
+        case TRANSFER_FUNC_BT709:
+        case TRANSFER_FUNC_SRGB:
+            src_luminance_peak = DEFAULT_BRIGHTNESS;
+            break;
+        default:
+            msg_Dbg(vd, "unhandled source transfer %d", fmt->transfer);
+            src_luminance_peak = DEFAULT_BRIGHTNESS;
+            break;
+    }
+    quad->f_luminance_scale = (float)src_luminance_peak / (float)sys->display.luminance_peak;
+
     /* pixel shader constant buffer */
     PS_CONSTANT_BUFFER defaultConstants;
     defaultConstants.Opacity = 1.0;
@@ -2535,6 +2552,8 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         defaultConstants.BoundaryY = 1.0; /* let texture clamping happen */
     else
         defaultConstants.BoundaryY = (FLOAT) (fmt->i_visible_height - 1) / fmt->i_height;
+    defaultConstants.LuminanceScale = quad->f_luminance_scale;
+
     static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
     D3D11_BUFFER_DESC constantDesc = {
         .Usage = D3D11_USAGE_DYNAMIC,
@@ -2796,8 +2815,8 @@ static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float 
 
     HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (SUCCEEDED(hr)) {
-        FLOAT *dst_data = mappedResource.pData;
-        *dst_data = opacity;
+        PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
+        dst_data->Opacity = opacity;
         ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
     }
     else {
