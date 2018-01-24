@@ -524,7 +524,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
             msg_Warn( p_demux, "Read %"PRIu32" too much bytes in the packet",
                             pkt.padding_length - pkt.left );
 #endif
-        int i_return = vlc_stream_Read( p_demux->s, NULL, pkt.left );
+        i_return = vlc_stream_Read( p_demux->s, NULL, pkt.left );
         if( i_return < 0 || (unsigned int) i_return < pkt.left )
         {
             msg_Err( p_demux, "cannot skip data, EOF ?" );
