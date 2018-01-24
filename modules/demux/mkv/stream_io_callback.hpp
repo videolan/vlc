@@ -34,7 +34,7 @@ class vlc_stream_io_callback: public IOCallback
     bool           b_owner;
 
   public:
-    vlc_stream_io_callback( stream_t *, bool );
+    vlc_stream_io_callback( stream_t *, bool owner );
 
     virtual ~vlc_stream_io_callback()
     {
