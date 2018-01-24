@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
-set -x
 
 info()
 {
@@ -193,9 +192,16 @@ spopd
 #   enabled. (e.g. ffmpeg)
 # - This will fail the build if a partially available symbol is added later on
 #   in contribs and not mentioned in the list of symbols above.
-export CFLAGS="-Werror=partial-availability"
-export CXXFLAGS="-Werror=partial-availability"
-export OBJCFLAGS="-Werror=partial-availability"
+CFLAGS="-Werror=partial-availability "
+CXXFLAGS="-Werror=partial-availability "
+OBJCFLAGS="-Werror=partial-availability "
+
+CFLAGS+="-isysroot "$SDKROOT" -mmacosx-version-min="$MINIMAL_OSX_VERSION" -DMACOSX_DEPLOYMENT_TARGET="$MINIMAL_OSX_VERSION
+LDFLAGS+="-Wl,-syslibroot,"$SDKROOT" -mmacosx-version-min="$MINIMAL_OSX_VERSION" -isysroot "$SDKROOT" -DMACOSX_DEPLOYMENT_TARGET="$MINIMAL_OSX_VERSION
+
+export CFLAGS=${CFLAGS}
+export CXXFLAGS=${CXXFLAGS}
+export LDFLAGS=${LDFLAGS}
 
 info "Building contribs"
 spushd "${vlcroot}/contrib"
