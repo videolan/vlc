@@ -121,15 +121,15 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
 
 static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
                                     const asf_track_info_t *p_tkinfo,
-                                    const asf_packet_t *pkt,
-                                    uint32_t i_length, bool *b_keyframe,
+                                    const uint8_t *p_data, size_t i_data,
+                                    bool *b_keyframe,
                                     int64_t *pi_extension_pts )
 {
     demux_t *p_demux = p_packetsys->p_demux;
 
-    if ( !p_tkinfo || !p_tkinfo->p_esp || !p_tkinfo->p_esp->p_ext ) return;
-    const uint8_t *p_data = pkt->p_peek + pkt->i_skip + 8;
-    i_length -= 8;
+    if ( !p_tkinfo || !p_tkinfo->p_esp || !p_tkinfo->p_esp->p_ext )
+        return;
+
     uint16_t i_payload_extensions_size;
     asf_payload_extension_system_t *p_ext = NULL;
 
@@ -139,10 +139,10 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
         p_ext = &p_tkinfo->p_esp->p_ext[i];
         if ( p_ext->i_data_size == 0xFFFF ) /* Variable length extension data */
         {
-            if ( i_length < 2 ) return;
+            if ( i_data < 2 ) return;
             i_payload_extensions_size = GetWLE( p_data );
             p_data += 2;
-            i_length -= 2;
+            i_data -= 2;
             i_payload_extensions_size = 0;
         }
         else
@@ -150,7 +150,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
             i_payload_extensions_size = p_ext->i_data_size;
         }
 
-        if ( i_length < i_payload_extensions_size ) return;
+        if ( i_data < i_payload_extensions_size ) return;
 
         if ( guidcmp( &p_ext->i_extension_id, &mfasf_sampleextension_outputcleanpoint_guid ) )
         {
@@ -192,7 +192,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
             msg_Dbg( p_demux, "Unknown extension " GUID_FMT, GUID_PRINT( p_ext->i_extension_id ) );
         }
 #endif
-        i_length -= i_payload_extensions_size;
+        i_data -= i_payload_extensions_size;
         p_data += i_payload_extensions_size;
     }
 
@@ -253,8 +253,10 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         i_pkt_time = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
 
         /* Parsing extensions, See 7.3.1 */
-        ParsePayloadExtensions( p_packetsys, p_tkinfo, pkt,
-                                i_replicated_data_length, &b_packet_keyframe,
+        ParsePayloadExtensions( p_packetsys, p_tkinfo,
+                                &pkt->p_peek[pkt->i_skip + 8],
+                                i_replicated_data_length - 8,
+                                &b_packet_keyframe,
                                 &i_extension_pts );
         i_pkt_time -= *p_packetsys->pi_preroll;
         if(i_extension_pts != -1)
