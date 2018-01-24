@@ -66,6 +66,7 @@ VPX_OS := darwin9
 else
 VPX_OS := darwin10
 endif
+VPX_CROSS :=
 else ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 VPX_OS := darwin
