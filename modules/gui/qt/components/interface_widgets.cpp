@@ -438,13 +438,15 @@ void BackgroundWidget::updateDefaultArt( const QString& url )
 void BackgroundWidget::titleUpdated( const QString& title )
 {
     /* don't ask */
-    if( var_InheritBool( p_intf, "qt-icon-change" ) )
+    if( var_InheritBool( p_intf, "qt-icon-change" ) && !title.isEmpty() )
     {
         int i_pos = title.indexOf( "Ki" /* Bps */ "ll", 0, Qt::CaseInsensitive );
         if( i_pos != -1 &&
             i_pos + 5 == title.indexOf( "Bi" /* directional */ "ll",
                                        i_pos, Qt::CaseInsensitive ) )
                 updateDefaultArt( ":/logo/vlc128-kb.png" );
+        else
+                updateDefaultArt( ":/logo/vlc128.png" );
     }
 }
 
