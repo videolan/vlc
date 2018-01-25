@@ -1211,14 +1211,14 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE( KaxClusterSilentTracks, ksilent )
         {
-            vars.obj->ep->Down ();
+            vars.ep->Down ();
 
             VLC_UNUSED( ksilent );
         }
         E_CASE( KaxBlockGroup, kbgroup )
         {
             vars.obj->i_block_pos = kbgroup.GetElementPosition();
-            vars.obj->ep->Down ();
+            vars.ep->Down ();
         }
         E_CASE( KaxSimpleBlock, ksblock )
         {
@@ -1259,7 +1259,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     SegmentSeeker::Seekpoint( kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 ) );
             }
 
-            vars.obj->ep->Keep ();
+            vars.ep->Keep ();
         }
         E_CASE( KaxBlockDuration, kduration )
         {
