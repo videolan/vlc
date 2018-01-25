@@ -478,6 +478,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
      flags, quality);
     if (res != VPX_CODEC_OK) {
         VPX_ERR(p_enc, ctx, "Failed to encode frame");
+        vpx_img_free(&img);
         return NULL;
     }
 
