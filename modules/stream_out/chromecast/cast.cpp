@@ -860,6 +860,7 @@ static void Close(vlc_object_t *p_this)
 
     assert(p_sys->out_streams.empty() && p_sys->streams.empty());
     var_Destroy( p_stream->p_sout, SOUT_CFG_PREFIX "sys" );
+    var_Destroy( p_stream->p_sout, SOUT_CFG_PREFIX "sout-mux-caching" );
 
     delete p_sys;
 }
