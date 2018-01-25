@@ -584,6 +584,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             }
             p_sys->transcode_attempt_idx++;
             p_sys->es_changed = true;
+            p_sys->out_streams.clear();
             msg_Warn( p_stream, "Load failed detected. Switching to next "
                      "configuration index: %u", p_sys->transcode_attempt_idx );
         }
