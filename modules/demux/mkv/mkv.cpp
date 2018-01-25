@@ -859,3 +859,13 @@ matroska_stream_c::matroska_stream_c( stream_t *s, bool owner )
     :io_callback( new vlc_stream_io_callback( s, owner ) )
     ,estream( EbmlStream( *io_callback ) )
 {}
+
+bool matroska_stream_c::isUsed() const
+{
+    for( size_t j = 0; j < segments.size(); j++ )
+    {
+        if( segments[j]->b_preloaded )
+            return true;
+    }
+    return false;
+}
