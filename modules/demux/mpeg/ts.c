@@ -111,6 +111,10 @@ static void Close ( vlc_object_t * );
     "Seek and position based on a percent byte position, not a PCR generated " \
     "time position. If seeking doesn't work property, turn on this option." )
 
+#define CC_CHECK_TEXT       "Check packets continuity counter"
+#define CC_CHECK_LONGTEXT   "Detect discontinuities and drop packet duplicates. " \
+                            "(bluRay sources are known broken and have false positives). "
+
 #define PCR_TEXT N_("Trust in-stream PCR")
 #define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
 
@@ -148,6 +152,7 @@ vlc_module_begin ()
 
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT, true )
+    add_bool( "ts-cc-check", true, CC_CHECK_TEXT, CC_CHECK_LONGTEXT, true )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -483,6 +488,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_canseek = false;
     p_sys->b_canfastseek = false;
     p_sys->b_ignore_time_for_positions = var_InheritBool( p_demux, "ts-seek-percent" );
+    p_sys->b_cc_check = var_InheritBool( p_demux, "ts-cc-check" );
 
     p_sys->standard = TS_STANDARD_AUTO;
     char *psz_standard = var_InheritString( p_demux, "ts-standard" );
@@ -2483,7 +2489,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
         * diff == 0 and duplicate packet (playload != 0) <- should we
         *   test the content ?
      */
-    if( b_payload )
+    if( b_payload && p_sys->b_cc_check )
     {
         const int i_diff = ( i_cc - pid->i_cc )&0x0f;
         if( i_diff == 1 )
