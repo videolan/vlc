@@ -143,10 +143,10 @@ static const int conversion_quality_list[] = {
     CONVERSION_QUALITY_LOWCPU,
 };
 static const char *const conversion_quality_list_text[] = {
-    N_( "High (high quality and high bandwith)" ),
+    N_( "High (high quality and high bandwidth)" ),
     N_( "Medium (medium quality and medium bandwidth)" ),
-    N_( "Low (low quality and low bandwith)" ),
-    N_( "Low CPU (low quality but high bandwith)" ),
+    N_( "Low (low quality and low bandwidth)" ),
+    N_( "Low CPU (low quality but high bandwidth)" ),
 };
 
 #define CONVERSION_QUALITY_TEXT N_( "Conversion quality" )
