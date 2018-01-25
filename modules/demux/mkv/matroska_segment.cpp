@@ -58,7 +58,7 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,psz_date_utc(NULL)
     ,i_default_edition(0)
     ,sys(demuxer)
-    ,ep( EbmlParser(&estream, p_seg, &demuxer.demuxer, var_InheritBool( &demuxer.demuxer, "mkv-use-dummy" ) ))
+    ,ep( EbmlParser(&estream, p_seg, &demuxer.demuxer ))
     ,b_preloaded(false)
     ,b_ref_external_segments(false)
 {
@@ -100,7 +100,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
         return;
     }
 
-    EbmlParser eparser (&es, cues, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    EbmlParser eparser (&es, cues, &sys.demuxer );
     while( ( el = eparser.Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
@@ -266,7 +266,7 @@ static const struct {
 
 bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *tag, int target_type )
 {
-    EbmlParser eparser ( &es, tag, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    EbmlParser eparser ( &es, tag, &sys.demuxer );
     EbmlElement *el;
     size_t max_size = tag->GetSize();
     size_t size = 0;
@@ -348,7 +348,7 @@ done:
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
     /* Master elements */
-    EbmlParser eparser = EbmlParser( &es, tags, &sys.demuxer, true );
+    EbmlParser eparser = EbmlParser( &es, tags, &sys.demuxer );
     EbmlElement *el;
 
     while( ( el = eparser.Get() ) != NULL )
@@ -504,7 +504,7 @@ bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
 
         while (payload.stop_parsing == false)
         {
-            EbmlParser parser ( &es, segment, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+            EbmlParser parser ( &es, segment, &sys.demuxer );
             EbmlElement* el = parser.Get();
 
             if( el == NULL )
@@ -1029,8 +1029,7 @@ void matroska_segment_c::EnsureDuration()
 
     es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
 
-    EbmlParser eparser ( &es, segment, &sys.demuxer, var_InheritBool(
-          &sys.demuxer, "mkv-use-dummy" ) );
+    EbmlParser eparser ( &es, segment, &sys.demuxer );
 
     // locate the definitely last cluster in the stream
 
