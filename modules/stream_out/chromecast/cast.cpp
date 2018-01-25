@@ -565,8 +565,8 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    id = p_sys->GetSubId( p_stream, id );
-    if ( id == NULL )
+    sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id );
+    if ( next_id == NULL )
     {
         block_Release( p_buffer );
         return VLC_EGENERIC;
@@ -595,7 +595,10 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         p_sys->previous_state = s;
     }
 
-    return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
+    int ret = sout_StreamIdSend(p_sys->p_out, next_id, p_buffer);
+    if (ret != VLC_SUCCESS)
+        Del(p_stream, id);
+    return ret;
 }
 
 static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
