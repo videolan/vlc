@@ -546,7 +546,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         if (pfmt->i_format == VLC_CODEC_DTS && b_hdmi)
         {
             msg_Warn(s, "cannot negotiate DTS at 768khz IEC958 rate (HDMI), "
-                     "fallback to 48kHz (S/PDIF)");
+                     "fallback to 48kHz (S/PDIF) (error 0x%lx)", hr);
             IAudioClient_Release(sys->client);
             free(sys);
             var_SetBool(s->obj.parent, "dtshd", false);
