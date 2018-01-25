@@ -676,6 +676,11 @@ static int blurayOpen(vlc_object_t *object)
     vlc_mutex_init(&p_sys->bdj_overlay_lock);
     vlc_mutex_init(&p_sys->read_block_lock); /* used during bd_open_stream() */
 
+    /* request sub demuxers to skip continuity check as some split
+       file concatenation are just resetting counters... */
+    var_Create( p_demux, "ts-cc-check", VLC_VAR_BOOL );
+    var_SetBool( p_demux, "ts-cc-check", false );
+
     var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
 
     /* Open BluRay */
