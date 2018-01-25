@@ -282,7 +282,6 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
             if( unlikely( !el->ValidateSize() ) )
             {
                 msg_Err( &sys.demuxer, "Error %s too big ignoring the tag", typeid(*el).name() );
-                delete ep;
                 return false;
             }
             if( MKV_CHECKED_PTR_DECL ( ktn_ptr, KaxTagName, el ) )
