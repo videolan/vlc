@@ -33,12 +33,10 @@
 class EbmlParser
 {
   public:
-    EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux,
-                bool b_with_dummy );
+    EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux );
     ~EbmlParser( void );
 
     void reconstruct( EbmlStream*, EbmlElement*, demux_t*);
-    void reconstruct( EbmlStream*, EbmlElement*, demux_t*, bool b_with_dummy );
 
     void Up( void );
     void Down( void );

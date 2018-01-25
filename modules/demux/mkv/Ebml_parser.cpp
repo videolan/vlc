@@ -29,15 +29,14 @@
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
-EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux,
-                        bool b_with_dummy ) :
+EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux ) :
     p_demux( p_demux ),
     m_es( es ),
     mi_level( 1 ),
     m_got( NULL ),
     mi_user_level( 1 ),
     mb_keep( false ),
-    mb_dummy( b_with_dummy )
+    mb_dummy( var_InheritBool( p_demux, "mkv-use-dummy" ) )
 {
     memset( m_el, 0, sizeof( *m_el ) * M_EL_MAXSIZE);
     m_el[0] = el_start;
@@ -64,17 +63,9 @@ EbmlParser::~EbmlParser( void )
 
 void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_demux )
 {
-    this->reconstruct( es, el_start, p_demux, var_InheritBool( p_demux, "mkv-use-dummy" ) );
-}
-
-void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_demux,
-  bool b_with_dummy)
-{
     this->~EbmlParser();
 
-    new( static_cast<void*>( this ) ) EbmlParser(
-      es, el_start, p_demux, b_with_dummy
-    );
+    new( static_cast<void*>( this ) ) EbmlParser( es, el_start, p_demux );
 }
 
 void EbmlParser::Up( void )
