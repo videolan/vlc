@@ -134,7 +134,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Video quality post-processing level</string>
+         <string>x264 preset and tuning selection</string>
         </property>
         <property name="buddy">
          <cstring>tuneBox</cstring>
