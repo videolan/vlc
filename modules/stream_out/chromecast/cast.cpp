@@ -313,10 +313,10 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
 {
     if ( unlikely( p_out != NULL ) )
     {
-        for ( size_t i = 0; i < streams.size(); i++ )
+        for ( size_t i = 0; i < out_streams.size(); i++ )
         {
-            if ( streams[i]->p_sub_id != NULL )
-                sout_StreamIdDel( p_out, streams[i]->p_sub_id );
+            if ( out_streams[i]->p_sub_id != NULL )
+                sout_StreamIdDel( p_out, out_streams[i]->p_sub_id );
         }
         sout_StreamChainDelete( p_out, NULL );
     }
@@ -550,10 +550,10 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
     if ( UpdateOutput( p_stream ) == false )
         return NULL;
 
-    for (i = 0; i < streams.size(); ++i)
+    for (i = 0; i < out_streams.size(); ++i)
     {
-        if ( id == (sout_stream_id_sys_t*) streams[i] )
-            return streams[i]->p_sub_id;
+        if ( id == (sout_stream_id_sys_t*) out_streams[i] )
+            return out_streams[i]->p_sub_id;
     }
 
     msg_Err( p_stream, "unknown stream ID" );
