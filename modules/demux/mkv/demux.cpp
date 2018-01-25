@@ -505,13 +505,8 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
         if ( MKV_IS_ID( p_l0, KaxSegment) )
         {
-            EbmlParser  *ep;
-            matroska_segment_c *p_segment1 = new matroska_segment_c( *this, p_stream1->estream );
+            matroska_segment_c *p_segment1 = new matroska_segment_c( *this, p_stream1->estream, (KaxSegment*)p_l0 );
 
-            ep = new EbmlParser(&p_stream1->estream, p_l0, &demuxer,
-                                var_InheritBool( &demuxer, "mkv-use-dummy" ) );
-            p_segment1->ep = ep;
-            p_segment1->segment = (KaxSegment*)p_l0;
             p_segment1->Preload();
 
             b_keep_segment = (FindSegment( *p_segment1->p_segment_uid ) == NULL);
