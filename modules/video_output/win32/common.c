@@ -55,9 +55,6 @@ static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 #if !VLC_WINSTORE_APP
 static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
-static void DisableScreensaver(vout_display_t *);
-static void RestoreScreensaver(vout_display_t *);
-
 static bool GetRect(const vout_display_sys_t *sys, RECT *out)
 {
     return GetClientRect(sys->hwnd, out);
@@ -120,7 +117,6 @@ int CommonInit(vout_display_t *vd)
             vout_display_SendEventFullscreen(vd, false, false);
     }
 
-    DisableScreensaver (vd);
 #endif
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
@@ -350,8 +346,6 @@ void CommonClean(vout_display_t *vd)
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
-
-    RestoreScreensaver(vd);
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HRESULT (WINAPI  * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
@@ -605,34 +599,6 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
         }
     }
     return VLC_SUCCESS;
-}
-
-static void DisableScreensaver(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* disable screensaver by temporarily changing system settings */
-    sys->i_spi_screensaveactive = 0;
-    if (var_GetBool(vd, "disable-screensaver")) {
-        msg_Dbg(vd, "disabling screen saver");
-        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0,
-                             &sys->i_spi_screensaveactive, 0);
-
-        if (FALSE != sys->i_spi_screensaveactive) {
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, 0, NULL, 0);
-        }
-    }
-}
-
-static void RestoreScreensaver(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* restore screensaver system settings */
-    if (0 != sys->i_spi_screensaveactive) {
-        SystemParametersInfo(SPI_SETSCREENSAVEACTIVE,
-                             sys->i_spi_screensaveactive, NULL, 0);
-    }
 }
 
 #else
