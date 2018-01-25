@@ -1312,9 +1312,6 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         EbmlElement *el = NULL;
         int         i_level;
 
-        if ( ep == NULL )
-            return VLC_EGENERIC;
-
         if( pp_simpleblock != NULL || ((el = ep->Get()) == NULL && pp_block != NULL) )
         {
             /* Check blocks validity to protect againts broken files */
