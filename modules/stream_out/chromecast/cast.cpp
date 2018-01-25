@@ -92,7 +92,7 @@ private:
 
 static const vlc_fourcc_t DEFAULT_TRANSCODE_VIDEO = VLC_CODEC_H264;
 static const unsigned int MAX_TRANSCODE_PASS = 3;
-static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1}}}";
+static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1}}";
 
 
 /*****************************************************************************
