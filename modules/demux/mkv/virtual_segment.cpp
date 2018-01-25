@@ -61,9 +61,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         return NULL;
     }
 
-    /* Preload segment */
-    if ( !p_segment->b_preloaded )
-        p_segment->Preload();
+    p_segment->Preload();
 
     int64_t start = ( b_ordered )? usertime_offset : p_chap->i_start_time;
     int64_t tmp = usertime_offset;
@@ -150,9 +148,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
                 msg_Dbg( &main_segment.sys.demuxer, "Prev segment 0x%x found\n",
                          *(int32_t*)p_cur->p_prev_segment_uid->GetBuffer() );
 
-                /* Preload segment */
-                if ( !p_prev->b_preloaded )
-                    p_prev->Preload();
+                p_prev->Preload();
 
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_prev->stored_editions.size() > 0 )? ((chapter_item_c *)p_prev->stored_editions[0]) : NULL;
@@ -187,9 +183,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
                 msg_Dbg( &main_segment.sys.demuxer, "Next segment 0x%x found\n",
                          *(int32_t*) p_cur->p_next_segment_uid->GetBuffer() );
 
-                /* Preload segment */
-                if ( !p_next->b_preloaded )
-                    p_next->Preload();
+                p_next->Preload();
 
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_next->stored_editions.size() > 0 )?( (chapter_item_c *)p_next->stored_editions[0] ) : NULL;
