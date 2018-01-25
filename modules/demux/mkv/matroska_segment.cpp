@@ -32,8 +32,8 @@
 #include <new>
 #include <iterator>
 
-matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
-    :segment(NULL)
+matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream, KaxSegment *p_seg )
+    :segment(p_seg)
     ,es(estream)
     ,i_timescale(MKVD_TIMECODESCALE)
     ,i_duration(-1)
@@ -58,7 +58,7 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,psz_date_utc(NULL)
     ,i_default_edition(0)
     ,sys(demuxer)
-    ,ep(NULL)
+    ,ep( EbmlParser(&estream, p_seg, &demuxer.demuxer, var_InheritBool( &demuxer.demuxer, "mkv-use-dummy" ) ))
     ,b_preloaded(false)
     ,b_ref_external_segments(false)
 {
@@ -72,7 +72,6 @@ matroska_segment_c::~matroska_segment_c()
     free( psz_title );
     free( psz_date_utc );
 
-    delete ep;
     delete segment;
     delete p_segment_uid;
     delete p_prev_segment_uid;
@@ -275,7 +274,7 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
         demux_sys_t        & sys;
         SimpleTag          & out;
         int                target_type;
-    } payload = { this, ep, sys, *pout_simple, 50 };
+    } payload = { this, &ep, sys, *pout_simple, 50 };
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, SimpleTagHandler, SimpleTagHandlerPayload )
     {
         MKV_SWITCH_INIT();
@@ -356,7 +355,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
         EbmlParser         * const ep;
         demux_sys_t        & sys;
         int                target_type;
-    } payload = { this, ep, sys, 50 };
+    } payload = { this, &ep, sys, 50 };
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, KaxTagsHandler, TagsHandlerPayload )
     {
         MKV_SWITCH_INIT();
@@ -565,9 +564,9 @@ bool matroska_segment_c::Preload( )
 
     EbmlElement *el = NULL;
 
-    ep->Reset( &sys.demuxer );
+    ep.Reset( &sys.demuxer );
 
-    while( ( el = ep->Get() ) != NULL )
+    while( ( el = ep.Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxSeekHead ) )
         {
@@ -1149,7 +1148,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         bool                 b_cluster_timecode;
 
     } payload = {
-        this, ep, &sys.demuxer, pp_block, pp_simpleblock,
+        this, &ep, &sys.demuxer, pp_block, pp_simpleblock,
         *pi_duration, *pb_key_picture, *pb_discardable_picture, true
     };
 
@@ -1289,13 +1288,13 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         EbmlElement *el = NULL;
         int         i_level;
 
-        if( pp_simpleblock != NULL || ((el = ep->Get()) == NULL && pp_block != NULL) )
+        if( pp_simpleblock != NULL || ((el = ep.Get()) == NULL && pp_block != NULL) )
         {
             /* Check blocks validity to protect againts broken files */
             const mkv_track_t *p_track = FindTrackByBlock( pp_block , pp_simpleblock );
             if( p_track == NULL )
             {
-                ep->Unkeep();
+                ep.Unkeep();
                 pp_simpleblock = NULL;
                 pp_block = NULL;
                 continue;
@@ -1327,13 +1326,13 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             return VLC_SUCCESS;
         }
 
-        i_level = ep->GetLevel();
+        i_level = ep.GetLevel();
 
         if( el == NULL )
         {
             if( i_level > 1 )
             {
-                ep->Up();
+                ep.Up();
                 continue;
             }
             msg_Warn( &sys.demuxer, "EOF" );
@@ -1345,7 +1344,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
          * without index */
         if( i_level > 1 )
         {
-            if( cluster && !ep->IsTopPresent( cluster ) )
+            if( cluster && !ep.IsTopPresent( cluster ) )
             {
                 msg_Warn( &sys.demuxer, "Unexpected escape from current cluster" );
                 cluster = NULL;
@@ -1365,12 +1364,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     if( unlikely( !el->ValidateSize() || ( el->IsFiniteSize() && el->GetSize() >= SIZE_MAX ) ) )
                     {
                         msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
-                        ep->Up();
+                        ep.Up();
 
                         if ( i_level == 2 )
                             break;
 
-                        ep->Unkeep();
+                        ep.Unkeep();
                         pp_simpleblock = NULL;
                         pp_block = NULL;
 
@@ -1396,8 +1395,8 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         catch (...)
         {
             msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
-            ep->Up();
-            ep->Unkeep();
+            ep.Up();
+            ep.Unkeep();
             pp_simpleblock = NULL;
             pp_block = NULL;
         }
