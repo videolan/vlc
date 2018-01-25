@@ -328,8 +328,6 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 
     if ( p_sys->out_streams.empty() )
     {
-        p_sys->p_intf->requestPlayerStop();
-
         sout_StreamChainDelete( p_sys->p_out, NULL );
         p_sys->p_out = NULL;
         p_sys->sout = "";
@@ -474,7 +472,10 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     }
 
     if (out_streams.empty())
+    {
+        p_intf->requestPlayerStop();
         return true;
+    }
 
     std::stringstream ssout;
     if ( !canRemux )
