@@ -121,7 +121,7 @@ static const char *const ppsz_sout_options[] = {
 #define PERF_TEXT N_( "Performance warning" )
 #define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
-#define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®" )
+#define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®." )
 
 enum {
     CONVERSION_QUALITY_HIGH = 0,
