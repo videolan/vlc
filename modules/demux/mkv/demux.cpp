@@ -707,17 +707,8 @@ void demux_sys_t::FreeUnused()
     size_t i;
     for( i = 0; i < streams.size(); i++ )
     {
-        bool used = false;
         struct matroska_stream_c *p_s = streams[i];
-        for( size_t j = 0; j < p_s->segments.size(); j++ )
-        {
-            if( p_s->segments[j]->b_preloaded )
-            {
-                used = true;
-                break;
-            }
-        }
-        if( !used )
+        if( !p_s->isUsed() )
         {
             streams[i] = NULL;
             delete p_s;

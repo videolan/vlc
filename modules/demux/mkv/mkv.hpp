@@ -162,6 +162,8 @@ struct matroska_stream_c
         delete io_callback;
     }
 
+    bool isUsed() const;
+
     IOCallback         * io_callback;
     EbmlStream         estream;
 
