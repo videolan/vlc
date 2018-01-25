@@ -103,8 +103,8 @@ void box_gather (bo_t *box, bo_t *box2)
 {
     if(box2 && box2->b && box && box->b)
     {
-        box_fix(box2, box2->b->i_buffer);
-        size_t i_offset = box->b->i_buffer;
+        box_fix(box2, bo_size( box2 ));
+        size_t i_offset = bo_size( box );
         box->b = block_Realloc(box->b, 0, box->b->i_buffer + box2->b->i_buffer);
         if(likely(box->b))
             memcpy(&box->b->p_buffer[i_offset], box2->b->p_buffer, box2->b->i_buffer);
@@ -1362,7 +1362,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         box_gather(stbl, ctts);
     box_gather(stbl, stsc);
     box_gather(stbl, stsz);
-    p_track->i_stco_pos = stbl->b->i_buffer + 16;
+    p_track->i_stco_pos = bo_size(stbl) + 16;
     box_gather(stbl, stco);
 
     return stbl;
@@ -1736,19 +1736,19 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
             stbl = GetStblBox(p_obj, p_stream, b_mov, b_stco64);
 
         /* append stbl to minf */
-        p_stream->i_stco_pos += minf->b->i_buffer;
+        p_stream->i_stco_pos += bo_size(minf);
         box_gather(minf, stbl);
 
         /* append minf to mdia */
-        p_stream->i_stco_pos += mdia->b->i_buffer;
+        p_stream->i_stco_pos += bo_size(mdia);
         box_gather(mdia, minf);
 
         /* append mdia to trak */
-        p_stream->i_stco_pos += trak->b->i_buffer;
+        p_stream->i_stco_pos += bo_size(trak);
         box_gather(trak, mdia);
 
         /* append trak to moov */
-        p_stream->i_stco_pos += moov->b->i_buffer;
+        p_stream->i_stco_pos += bo_size(moov);
         box_gather(moov, trak);
     }
 
@@ -1798,7 +1798,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     }
 
     if(moov->b)
-        box_fix(moov, moov->b->i_buffer);
+        box_fix(moov, bo_size(moov));
     return moov;
 }
 
@@ -1816,7 +1816,7 @@ bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], s
             free(box);
             return NULL;
         }
-        box_fix(box, box->b->i_buffer);
+        box_fix(box, bo_size(box));
     }
     return box;
 }
