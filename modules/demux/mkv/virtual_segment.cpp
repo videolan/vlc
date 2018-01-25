@@ -27,7 +27,7 @@
 
 #include "demux.hpp"
 
-/* FIXME move this */
+/* FIXME move this, it's demux_sys_t::FindSegment */
 matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matroska_segment_c*> & segments )
 {
     for( size_t i = 0; i < segments.size(); i++ )
