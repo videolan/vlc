@@ -56,19 +56,19 @@ int aout_DecNew( audio_output_t *p_aout,
             msg_Err( p_aout, "invalid audio channels count" );
             return -1;
         }
+    }
 
-        if( p_format->i_rate > 352800 )
-        {
-            msg_Err( p_aout, "excessive audio sample frequency (%u)",
-                     p_format->i_rate );
-            return -1;
-        }
-        if( p_format->i_rate < 4000 )
-        {
-            msg_Err( p_aout, "too low audio sample frequency (%u)",
-                     p_format->i_rate );
-            return -1;
-        }
+    if( p_format->i_rate > 352800 )
+    {
+        msg_Err( p_aout, "excessive audio sample frequency (%u)",
+                 p_format->i_rate );
+        return -1;
+    }
+    if( p_format->i_rate < 4000 )
+    {
+        msg_Err( p_aout, "too low audio sample frequency (%u)",
+                 p_format->i_rate );
+        return -1;
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
