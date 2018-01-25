@@ -65,7 +65,7 @@ static void Destroy   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_description( N_("antiflicker video filter") )
+    set_description( N_("Antiflicker video filter") )
     set_shortname( N_( "antiflicker" ))
     set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
