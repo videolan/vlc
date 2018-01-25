@@ -704,22 +704,26 @@ bool demux_sys_t::PreloadLinked()
 
 void demux_sys_t::FreeUnused()
 {
-    size_t i;
-    for( i = 0; i < streams.size(); i++ )
+    for (std::vector<matroska_stream_c*>::reverse_iterator i = streams.rbegin();
+         i != streams.rend(); ++i)
     {
-        struct matroska_stream_c *p_s = streams[i];
+        matroska_stream_c *p_s = *i;
         if( !p_s->isUsed() )
         {
-            streams[i] = NULL;
+            std::advance(i, 1);
+            streams.erase( i.base() );
             delete p_s;
         }
     }
-    for( i = 0; i < opened_segments.size(); i++)
+    for (std::vector<matroska_segment_c*>::reverse_iterator i = opened_segments.rbegin();
+         i != opened_segments.rend(); ++i)
     {
-        if( !opened_segments[i]->b_preloaded )
+        matroska_segment_c *p_sg = *i;
+        if( !p_sg->b_preloaded )
         {
-            delete opened_segments[i];
-            opened_segments[i] = NULL;
+            std::advance(i, 1);
+            opened_segments.erase( i.base() );
+            delete p_sg;
         }
     }
 }
