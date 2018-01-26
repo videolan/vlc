@@ -436,7 +436,8 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     vlc_fourcc_t i_codec_video = 0, i_codec_audio = 0;
     const es_format_t *p_original_audio = NULL;
     const es_format_t *p_original_video = NULL;
-    out_streams.clear();
+    bool b_out_streams_changed = false;
+    std::vector<sout_stream_id_sys_t*> new_streams;
 
     for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); ++it)
     {
@@ -451,7 +452,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             else if (i_codec_audio == 0)
                 i_codec_audio = p_es->i_codec;
             p_original_audio = p_es;
-            out_streams.push_back(*it);
+            new_streams.push_back(*it);
         }
         else if (b_supports_video)
         {
@@ -466,17 +467,37 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 else if (i_codec_video == 0)
                     i_codec_video = p_es->i_codec;
                 p_original_video = p_es;
-                out_streams.push_back(*it);
+                new_streams.push_back(*it);
             }
+            else
+                continue;
             /* TODO: else handle ttml/webvtt */
         }
+        else
+            continue;
+
+        bool b_found = false;
+        for (std::vector<sout_stream_id_sys_t*>::iterator out_it = out_streams.begin();
+             out_it != out_streams.end() && !b_found; ++out_it)
+        {
+            if (*out_it == *it)
+                b_found = true;
+        }
+        if (!b_found)
+            b_out_streams_changed = true;
     }
 
-    if (out_streams.empty())
+    if (new_streams.empty())
     {
         p_intf->requestPlayerStop();
         return true;
     }
+
+    /* Don't restart sout and CC session if streams didn't change */
+    if (new_streams.size() == out_streams.size() && !b_out_streams_changed)
+        return true;
+
+    out_streams = new_streams;
 
     std::stringstream ssout;
     if ( !canRemux )
