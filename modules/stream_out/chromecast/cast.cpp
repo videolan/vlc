@@ -828,8 +828,11 @@ error:
 static void Close(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+    assert(p_sys->out_streams.empty() && p_sys->streams.empty());
     var_Destroy( p_stream->p_sout, SOUT_CFG_PREFIX "sys" );
-    delete p_stream->p_sys;
+
+    delete p_sys;
 }
 
