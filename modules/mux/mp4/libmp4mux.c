@@ -1142,6 +1142,19 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
         return wvtt;
     }
+    else if(p_track->fmt.i_codec == VLC_CODEC_TTML)
+    {
+        bo_t *stpp = box_new("stpp");
+        if(!stpp)
+            return NULL;
+
+        /* Sample Entry Header */
+        for (int i = 0; i < 6; i++)
+            bo_add_8(stpp, 0);        // reserved;
+        bo_add_16be(stpp, 1);         // data-reference-index
+
+        return stpp;
+    }
 
     return NULL;
 }
@@ -1640,6 +1653,8 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
             /* text/text Apple textmedia */
             if(p_stream->fmt.i_codec == VLC_CODEC_TX3G)
                 bo_add_fourcc(hdlr, (b_mov) ? "sbtl" : "text");
+            else if(p_stream->fmt.i_codec == VLC_CODEC_TTML)
+                bo_add_fourcc(hdlr, "sbtl");
             else
                 bo_add_fourcc(hdlr, "text");
         }
@@ -1839,7 +1854,6 @@ bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], s
 bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
                    vlc_fourcc_t i_brand, bool b_fragmented)
 {
-    VLC_UNUSED(i_brand);
     switch(p_fmt->i_codec)
     {
     case VLC_CODEC_A52:
@@ -1879,6 +1893,10 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
         return !b_fragmented;
+    case VLC_CODEC_TTML:
+        /* Special case with smooth headers where we need to force frag TTML */
+        /* TTML currently not supported in sout, until we can keep original timestamps */
+            return i_brand == VLC_FOURCC('s', 'm', 'o', 'o');
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
     case VLC_CODEC_WEBVTT:

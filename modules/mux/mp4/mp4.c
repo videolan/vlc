@@ -752,6 +752,12 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
                 p_empty->p_buffer[2] = ' ';
             }
         }
+        else if(p_stream->mux.fmt.i_codec == VLC_CODEC_TTML)
+        {
+            p_empty = block_Alloc(40);
+            if(p_empty)
+                memcpy(p_empty->p_buffer, "<tt><body><div><p></p></div></body></tt>", 40);
+        }
         else if(p_stream->mux.fmt.i_codec == VLC_CODEC_WEBVTT)
         {
             p_empty = block_Alloc(8);
