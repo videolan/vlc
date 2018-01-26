@@ -50,6 +50,8 @@ struct sout_stream_sys_t
         , b_supports_video(has_video)
         , i_port(port)
         , es_changed( true )
+        , cc_has_input( false)
+        , out_streams_added( 0 )
         , transcode_attempt_idx( 0 )
         , previous_state( Authenticating )
     {
