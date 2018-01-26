@@ -342,10 +342,16 @@ vlc_modules += {
     'sources' : files('subsusf.c')
 }
 
-# TTML decoder
+# TTML
+ttml_sources = files('ttml/substtml.c', 'ttml/ttml.c', 'ttml/genttml.c', '../demux/ttml.c')
+
+if get_option('stream_outputs')
+    ttml_sources += files('ttml/encttml.c')
+endif
+
 vlc_modules += {
     'name' : 'ttml',
-    'sources' : files('ttml/substtml.c', 'ttml/ttml.c', 'ttml/genttml.c', '../demux/ttml.c'),
+    'sources' : ttml_sources,
     'include_directories' : include_directories('.')
 }
 

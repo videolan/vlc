@@ -27,6 +27,8 @@ void tt_CloseDemux( vlc_object_t* p_demux );
 
 int  tt_OpenDecoder   ( vlc_object_t * );
 
+int  tt_OpenEncoder   ( vlc_object_t * );
+
 enum
 {
     TT_TIMINGS_UNSPEC = 0,

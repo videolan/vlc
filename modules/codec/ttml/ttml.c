@@ -55,7 +55,14 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_INPUT_DEMUX )
         set_callbacks( tt_OpenDemux, tt_CloseDemux )
         add_shortcut( "ttml" )
-
+#ifdef ENABLE_SOUT
+    add_submodule()
+        set_shortname( N_("TTML") )
+        set_description( N_("TTML encoder") )
+        set_capability( "spu encoder", 101 )
+        set_subcategory( SUBCAT_INPUT_SCODEC )
+        set_callbacks( tt_OpenEncoder, NULL )
+#endif
 vlc_module_end ()
 
 

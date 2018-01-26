@@ -226,6 +226,9 @@ libttml_plugin_la_SOURCES = codec/ttml/substtml.c \
                             codec/ttml/genttml.c \
                             codec/ttml/imageupdater.h \
                             codec/ttml/ttmlpes.h
+if ENABLE_SOUT
+libttml_plugin_la_SOURCES += codec/ttml/encttml.c
+endif
 codec_LTLIBRARIES += libttml_plugin.la
 
 libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
