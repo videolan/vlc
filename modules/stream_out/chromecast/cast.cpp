@@ -564,8 +564,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             s_fourcc[4] = '\0';
             ssout << s_fourcc << ',' << psz_video_maxres << ',';
 
-            const video_format_t *p_vid =
-                p_original_video ? &p_original_video->video : NULL;
+            const video_format_t *p_vid = &p_original_video->video;
             const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
             unsigned i_video_x264_crf = b_hdres ? i_video_x264_crf_hd : i_video_x264_crf_720p;
 
