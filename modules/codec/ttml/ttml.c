@@ -191,7 +191,7 @@ static void tt_node_ParentAddChild( tt_node_t* p_parent, tt_basenode_t *p_child 
     *pp_node = p_child;
 }
 
-static tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text )
+tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text )
 {
     tt_textnode_t *p_node = calloc( 1, sizeof( *p_node ) );
     if( !p_node )
