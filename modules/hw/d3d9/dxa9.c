@@ -121,7 +121,9 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         Copy420_SP_to_P(dst, plane, pitch,
                         __MIN(desc.Height, src->format.i_y_offset + src->format.i_visible_height),
                         p_copy_cache);
-        picture_SwapUV(dst);
+
+        if (dst->format.i_chroma != VLC_CODEC_I420)
+            picture_SwapUV(dst);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to YV12", desc.Format);
     }
