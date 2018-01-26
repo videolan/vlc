@@ -70,6 +70,8 @@ static const char* StateToStr( States s )
         return "Paused";
     case Seeking:
         return "Seeking";
+    case Stopping:
+        return "Stopping";
     case Dead:
         return "Dead";
     }
@@ -129,6 +131,7 @@ intf_sys_t::~intf_sys_t()
     case Playing:
     case Paused:
     case Seeking:
+    case Stopping:
         // Generate the close messages.
         m_communication.msgReceiverClose( m_appTransportId );
         /* fallthrough */
@@ -157,6 +160,10 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     msg_Dbg( m_module, "Loading content for session:%s", m_mediaSessionId.c_str() );
 
     this->m_mime = mime_type;
+
+    /* new input: clear message queue */
+    std::queue<QueueableMessages> empty;
+    std::swap(m_msgQueue, empty);
 
     waitAppStarted();
     if ( m_state == Dead )
@@ -242,6 +249,7 @@ void intf_sys_t::mainLoop()
             {
                 case Stop:
                     m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+                    setState( Stopping );
                     break;
                 case Seek:
                 {
@@ -675,7 +683,8 @@ void intf_sys_t::setPauseState(bool paused)
 void intf_sys_t::waitAppStarted()
 {
     while ( m_state == Connected || m_state == Launching ||
-            m_state == Authenticating || m_state == Connecting )
+            m_state == Authenticating || m_state == Connecting ||
+            m_state == Stopping )
     {
         if ( m_state == Connected )
         {
