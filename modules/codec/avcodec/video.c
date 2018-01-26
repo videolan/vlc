@@ -205,8 +205,21 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
                                  * __MAX(ctx->ticks_per_frame, 1);
     }
 
-    if( ctx->color_range == AVCOL_RANGE_JPEG )
+    /* FIXME we should only set the known values and let the core decide
+     * later of fallbacks, but we can't do that with a boolean */
+    switch ( ctx->color_range )
+    {
+    case AVCOL_RANGE_JPEG:
         fmt->b_color_range_full = true;
+        break;
+    case AVCOL_RANGE_UNSPECIFIED:
+        fmt->b_color_range_full = !vlc_fourcc_IsYUV( fmt->i_chroma );
+        break;
+    case AVCOL_RANGE_MPEG:
+    default:
+        fmt->b_color_range_full = false;
+        break;
+    }
 
     switch( ctx->colorspace )
     {
