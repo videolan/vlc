@@ -86,6 +86,7 @@ enum States
     Playing,
     Paused,
     Seeking,
+    Stopping,
     // Something went wrong and the connection is dead.
     Dead,
 };
