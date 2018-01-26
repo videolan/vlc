@@ -226,6 +226,7 @@ private:
     ChromecastCommunication m_communication;
     std::queue<QueueableMessages> m_msgQueue;
     States m_state;
+    bool m_eof;
 
     std::string m_artwork;
     std::string m_title;
