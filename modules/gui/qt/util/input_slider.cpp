@@ -201,14 +201,16 @@ void SeekSlider::setChapters( SeekPoints *chapters_ )
 void SeekSlider::setPosition( float pos, int64_t time, int length )
 {
     VLC_UNUSED(time);
-    if( pos == -1.0 )
+    if( pos == -1.0  || ! b_seekable )
     {
         setEnabled( false );
         mTimeTooltip->hide();
         isSliding = false;
+        setValue( 0 );
+        return;
     }
     else
-        setEnabled( b_seekable );
+        setEnabled( true );
 
     if( !isSliding )
     {
