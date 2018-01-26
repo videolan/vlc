@@ -556,6 +556,8 @@ static void FillExtradataTx3g( void **pp_extra, int *pi_extra )
     uint8_t *p_extra = calloc( 1, i_extra );
     if( p_extra )
     {
+        p_extra[4] = 0x01;/* 1  center, horizontal */
+        p_extra[5] = 0xFF;/* -1 bottom, vertical */
         SetDWBE( &p_extra[6],  0x000000FFU ); /* bgcolor */
         p_extra[25] = STYLE_DEFAULT_FONT_SIZE;
         SetDWBE( &p_extra[26], 0xFFFFFFFFU ); /* fgcolor */
