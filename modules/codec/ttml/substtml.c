@@ -729,7 +729,7 @@ static int ParseTTMLChunk( xml_reader_t *p_reader, tt_node_t **pp_rootnode )
                     *pp_rootnode != NULL )
                     return VLC_EGENERIC;
 
-                *pp_rootnode = tt_node_New( p_reader, NULL, psz_node_name );
+                *pp_rootnode = tt_node_NewRead( p_reader, NULL, psz_node_name );
                 if( !*pp_rootnode ||
                     tt_nodes_Read( p_reader, *pp_rootnode ) != VLC_SUCCESS )
                     return VLC_EGENERIC;

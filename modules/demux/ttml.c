@@ -177,7 +177,7 @@ static int ReadTTML( demux_t* p_demux )
                     p_sys->p_rootnode != NULL )
                     return VLC_EGENERIC;
 
-                p_sys->p_rootnode = tt_node_New( p_sys->p_reader, NULL, psz_node_name );
+                p_sys->p_rootnode = tt_node_NewRead( p_sys->p_reader, NULL, psz_node_name );
                 if( b_empty )
                     break;
                 if( !p_sys->p_rootnode ||

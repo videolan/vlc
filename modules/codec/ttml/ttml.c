@@ -204,7 +204,7 @@ static tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text
     return p_node;
 }
 
-tt_node_t * tt_node_New( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name )
+tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name )
 {
     tt_node_t *p_node = calloc( 1, sizeof( *p_node ) );
     if( !p_node )
@@ -224,6 +224,15 @@ tt_node_t * tt_node_New( xml_reader_t* reader, tt_node_t* p_parent, const char* 
     p_node->p_parent = p_parent;
     if( p_parent )
         tt_node_ParentAddChild( p_parent, (tt_basenode_t *) p_node );
+
+    return p_node;
+}
+
+tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name )
+{
+    tt_node_t *p_node = tt_node_New( p_parent, psz_node_name );
+    if( !p_node )
+        return NULL;
 
     const char* psz_value = NULL;
     for( const char* psz_key = xml_ReaderNextAttr( reader, &psz_value );
@@ -328,7 +337,7 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 
             case XML_READER_STARTELEM:
             {
-                tt_node_t *p_newnode = tt_node_New( p_reader, p_node, psz_node_name );
+                tt_node_t *p_newnode = tt_node_NewRead( p_reader, p_node, psz_node_name );
                 if( !p_newnode )
                     return VLC_EGENERIC;
                 if( !b_empty )
