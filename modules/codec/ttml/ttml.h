@@ -20,6 +20,7 @@
 
 #include <vlc_tick.h>
 #include <vlc_arrays.h>
+#include <vlc_memstream.h>
 
 int tt_OpenDemux( vlc_object_t* p_this );
 void tt_CloseDemux( vlc_object_t* p_demux );
@@ -168,3 +169,10 @@ static inline tt_time_t tt_time_Sub( tt_time_t t1, tt_time_t t2 )
     t1.base -= t2.base;
     return t1;
 }
+
+/* Encoding */
+
+char *tt_genTiming( tt_time_t t );
+void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node );
+void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t *p_basenode,
+                     const tt_time_t *playbacktime );

@@ -345,7 +345,7 @@ vlc_modules += {
 # TTML decoder
 vlc_modules += {
     'name' : 'ttml',
-    'sources' : files('ttml/substtml.c', 'ttml/ttml.c', '../demux/ttml.c'),
+    'sources' : files('ttml/substtml.c', 'ttml/ttml.c', 'ttml/genttml.c', '../demux/ttml.c'),
     'include_directories' : include_directories('.')
 }
 

@@ -31,6 +31,7 @@
 #include <vlc_text_style.h>
 #include <vlc_charset.h>
 #include <vlc_image.h>
+#include <vlc_memstream.h>
 
 #include <ctype.h>
 #include <assert.h>
