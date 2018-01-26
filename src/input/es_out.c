@@ -175,6 +175,9 @@ struct es_out_sys_t
 
     /* Used only to limit debugging output */
     int         i_prev_stream_level;
+
+    /* For positions updates */
+    double      f_prev_position;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
@@ -332,6 +335,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->b_buffering = true;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
+    p_sys->f_prev_position = -1;
 
     return out;
 }
@@ -2759,10 +2763,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         input_SendEventLength( p_sys->p_input, i_length );
 
-        if( !p_sys->b_buffering )
+        if( !p_sys->b_buffering && f_position != p_sys->f_prev_position )
         {
             mtime_t i_delay;
-
+            p_sys->f_prev_position = f_position;
             /* Fix for buffering delay */
             if( !input_priv(p_sys->p_input)->p_sout ||
                 !input_priv(p_sys->p_input)->b_out_pace_control )
