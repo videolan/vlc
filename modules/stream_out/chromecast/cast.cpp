@@ -50,7 +50,8 @@ struct sout_stream_sys_t
         , b_supports_video(has_video)
         , i_port(port)
         , es_changed( true )
-        , cc_has_input( false)
+        , cc_has_input( false )
+        , out_force_reload( false )
         , out_streams_added( 0 )
         , transcode_attempt_idx( 0 )
         , previous_state( Authenticating )
@@ -83,6 +84,7 @@ struct sout_stream_sys_t
 
     bool                               es_changed;
     bool                               cc_has_input;
+    bool                               out_force_reload;
     std::vector<sout_stream_id_sys_t*> streams;
     std::vector<sout_stream_id_sys_t*> out_streams;
     unsigned int                       out_streams_added;
@@ -294,7 +296,8 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
 }
 
 
-static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
+                        bool reset_config)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -313,7 +316,8 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
                     if (*out_it == id)
                     {
                         p_sys->out_streams.erase(out_it);
-                        p_sys->es_changed = true;
+                        p_sys->es_changed = reset_config;
+                        p_sys->out_force_reload = reset_config;
                         break;
                     }
                     out_it++;
@@ -336,6 +340,11 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         p_sys->sout = "";
         p_sys->transcode_attempt_idx = 0;
     }
+}
+
+static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+{
+    DelInternal(p_stream, id, true);
 }
 
 /**
@@ -478,7 +487,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         else
             continue;
 
-        bool b_found = false;
+        bool b_found = out_force_reload;
         for (std::vector<sout_stream_id_sys_t*>::iterator out_it = out_streams.begin();
              out_it != out_streams.end() && !b_found; ++out_it)
         {
@@ -496,9 +505,10 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     }
 
     /* Don't restart sout and CC session if streams didn't change */
-    if (new_streams.size() == out_streams.size() && !b_out_streams_changed)
+    if (!out_force_reload && new_streams.size() == out_streams.size() && !b_out_streams_changed)
         return true;
 
+    out_force_reload = false;
     out_streams = new_streams;
 
     std::stringstream ssout;
@@ -695,11 +705,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
     int ret = sout_StreamIdSend(p_sys->p_out, next_id, p_buffer);
     if (ret != VLC_SUCCESS)
-    {
-        bool was_es_changed = p_sys->es_changed;
-        Del(p_stream, id);
-        p_sys->es_changed = was_es_changed;
-    }
+        DelInternal(p_stream, id, false);
     return ret;
 }
 
