@@ -617,7 +617,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_description(N_("Direct3D11 filter"))
+    set_description(N_("Direct3D11 adjust filter"))
     set_capability("video filter", 0)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
@@ -644,6 +644,7 @@ vlc_module_begin()
         change_safe()
 
     add_submodule()
+    set_description(N_("Direct3D11 deinterlace filter"))
     set_callbacks( D3D11OpenDeinterlace, D3D11CloseDeinterlace )
     add_shortcut ("deinterlace")
 
