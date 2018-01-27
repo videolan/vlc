@@ -911,10 +911,11 @@ errmsg:
 
             if ( i_frequency == 6 )
             {
-                msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
+                msg_Warn( p_enc, "MPEG audio doesn't support frequency=%d",
                         fmt->audio.i_rate );
-                av_dict_free(&options);
-                goto error;
+                /* Fallback to 44100 hz */
+                p_context->sample_rate = p_enc->fmt_in.audio.i_rate =
+                p_enc->fmt_out.audio.i_rate = 44100;
             }
 
             for ( i = 1; i < 14; i++ )
