@@ -12,7 +12,7 @@
 # Seongki Shin <skshin@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc5\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-09-20 03:42+0000\n"
@@ -80,8 +80,8 @@ msgstr "VLC 제어 인터페이스 설정"
 msgid "Hotkeys settings"
 msgstr "단축키 설정"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -730,7 +730,8 @@ msgstr "헤드폰"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "자동"
@@ -1001,8 +1002,8 @@ msgstr "언어"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "설명"
 
@@ -1265,11 +1266,12 @@ msgstr "입력을 열 수 없습니다"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC에서 '%s' MRL을 열 수 없습니다. 자세한 내용은 로그를 확인하세요."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1750,7 +1752,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4896,7 +4899,8 @@ msgid "Browser Stop"
 msgstr "브라우저 정지"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6730,7 +6734,8 @@ msgstr ""
 "TV 채널은 주어진 주파수상에서 트랜스폰터 (멀티플렉스라고 알려진) 에 의해 그룹"
 "화됩니다. 이것은 수신기를 조정하기 위해 필요합니다."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "변조 / 성상도"
 
@@ -7530,7 +7535,8 @@ msgstr "오디오 엘러멘터리 스트림의 채널 수"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "너비"
@@ -8489,7 +8495,8 @@ msgstr "라디오 장치"
 msgid "Radio tuner device node."
 msgstr "라디오 튜너 장치 노드"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "주파수"
 
@@ -16224,7 +16231,8 @@ msgid "Name"
 msgstr "이름"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "작성자"
@@ -18404,7 +18412,8 @@ msgid "sec."
 msgstr "초"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "오디오/비디오"
 
@@ -20073,10 +20082,11 @@ msgid "Extract"
 msgstr "RGB 추출"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20088,7 +20098,8 @@ msgstr "닫기(&C)"
 msgid "Bytes"
 msgstr "바이트"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "변환"
 
@@ -20510,7 +20521,8 @@ msgstr "버전"
 msgid "Website"
 msgstr "웹사이트"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "파일"
 
@@ -21179,9 +21191,8 @@ msgid "<Local>"
 msgstr "<로컬>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "DVB 검색"
+msgstr "스캔 중..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21595,8 +21606,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "이미지 감마 설정, 0.01 과 10 사이. 기본 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Direct3D11 필터"
+msgstr "Direct3D9 조절 필터"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -23512,7 +23524,8 @@ msgstr "MPEG 비디오"
 msgid "VC-1 packetizer"
 msgstr "VC-1 패킷타이저"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf 네트워크 서비스"
 
@@ -24734,38 +24747,40 @@ msgid "Display a performance warning when transcoding"
 msgstr "트랜스코딩시 성능 경고 표시하기"
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "오디오 스트림 출력 사용"
+msgstr "오디오 패스쓰루 사용"
 
 #: modules/stream_out/chromecast/cast.cpp:124
+#, fuzzy
 msgid "Disable if your receiver does not support Dolby®"
-msgstr ""
+msgstr "리시버가 돌비를 지원하지 않으면 비활성화하세요."
 
 #: modules/stream_out/chromecast/cast.cpp:146
+#, fuzzy
 msgid "High (high quality and high bandwith)"
-msgstr ""
+msgstr "높음 (고품질 및 높은 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:147
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "중간 (중품질 및 중간 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:148
+#, fuzzy
 msgid "Low (low quality and low bandwith)"
-msgstr ""
+msgstr "낮음 (저품질 및 낮은 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:149
+#, fuzzy
 msgid "Low CPU (low quality but high bandwith)"
-msgstr ""
+msgstr "낮은 CPU (저품질이지만 높은 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "렌더링 품질"
+msgstr "변환 품질"
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
-msgstr ""
+msgstr "변환 속도나 품질을 높이려면 이 옵션을 변경하세요."
 
 #: modules/stream_out/chromecast/cast.cpp:156
 msgid "IP Address of the Chromecast."
@@ -33548,9 +33563,8 @@ msgstr "미디어 관리자 목록"
 #~ msgid "Headphone surround effect"
 #~ msgstr "헤드폰 효과"
 
-#, fuzzy
 #~ msgid "x264 preset and tuning selection"
-#~ msgstr "x264 프로파일과 단계 선택"
+#~ msgstr "x264 프리셋 및 튜닝 선택"
 
 #, fuzzy
 #~ msgid "Display device"
@@ -39410,7 +39424,7 @@ msgstr "미디어 관리자 목록"
 
 #, fuzzy
 #~ msgid "Connecting..."
-#~ msgstr "설정..."
+#~ msgstr "스캔 중..."
 
 #, fuzzy
 #~ msgid ""
