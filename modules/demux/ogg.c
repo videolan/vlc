@@ -920,8 +920,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 *pi_title_offset = 0;
                 *pi_seekpoint_offset = 0;
+                return VLC_SUCCESS;
             }
-            return VLC_SUCCESS;
+            return VLC_EGENERIC;
         }
         case DEMUX_SET_TITLE:
         {
