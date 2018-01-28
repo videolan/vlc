@@ -243,7 +243,6 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
-    p_demux->info.i_update = 0;
     priv->destroy = s ? demux_DestroyDemux : demux_DestroyAccessDemux;
 
     if( s != NULL )
@@ -493,11 +492,8 @@ unsigned demux_TestAndClearFlags( demux_t *p_demux, unsigned flags )
 {
     unsigned update = flags;
 
-    if ( demux_Control( p_demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update ) == VLC_SUCCESS )
-        return update;
-
-    update = p_demux->info.i_update & flags;
-    p_demux->info.i_update &= ~flags;
+    if (demux_Control( p_demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update))
+        return 0;
     return update;
 }
 

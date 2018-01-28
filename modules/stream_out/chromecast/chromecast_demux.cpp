@@ -97,7 +97,6 @@ struct demux_sys_t
                 {
                     demux_Control( p_demux->p_next, DEMUX_SET_TITLE,
                                    i_longest_title );
-                    p_demux->info.i_update = p_demux->p_next->info.i_update;
                 }
             }
         }

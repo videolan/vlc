@@ -219,11 +219,9 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
 static unsigned demux_test_and_clear_flags(demux_t *demux, unsigned flags)
 {
     unsigned update;
-    if (demux_Control(demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update) == VLC_SUCCESS)
-        return update;
-    unsigned ret = demux->info.i_update & flags;
-    demux->info.i_update &= ~flags;
-    return ret;
+    if (demux_Control(demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update))
+        return 0;
+    return update;
 }
 
 static void demux_get_title_list(demux_t *demux)

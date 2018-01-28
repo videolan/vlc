@@ -81,13 +81,6 @@ struct demux_t
     int (*pf_demux)  ( demux_t * );   /* demux one frame only */
     int (*pf_control)( demux_t *, int i_query, va_list args);
 
-    /* Demux has to maintain them uptodate
-     * when it is responsible of seekpoint/title */
-    struct
-    {
-        unsigned int i_update;  /* Demux sets them on change,
-                                   Input removes them once take into account*/
-    } info;
     void *p_sys;
 
     /* Weak link to parent input */
@@ -99,7 +92,7 @@ struct demux_t
 #define VLC_DEMUXER_EGENERIC -1
 #define VLC_DEMUXER_SUCCESS   1
 
-/* demux_t.info.i_update field */
+/* DEMUX_TEST_AND_CLEAR flags */
 #define INPUT_UPDATE_TITLE      0x0010
 #define INPUT_UPDATE_SEEKPOINT  0x0020
 #define INPUT_UPDATE_META       0x0040
@@ -206,9 +199,6 @@ enum demux_query_e
      *
      * The unsigned* argument is set with the flags needed to be checked,
      * on return it contains the values that were reset during the call
-     *
-     * This can can fail, in which case flags from demux_t.info.i_update
-     * are read/reset
      *
      * arg1= unsigned * */
     DEMUX_TEST_AND_CLEAR_FLAGS, /* arg1= unsigned*      can fail */
