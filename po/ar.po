@@ -24,11 +24,11 @@
 # محيي الدين <tx99h4@hotmail.com>, 2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"Last-Translator: وجدي أبو سلطان, 2017\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -93,8 +93,8 @@ msgstr "إعدادات لواجهات تحكم VLC"
 msgid "Hotkeys settings"
 msgstr "إعدادات مفاتيح الاختصارات"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -123,7 +123,7 @@ msgstr "المرشّحات"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "تُستخدم مرشّحات الصوت لمعالجة تدفقات الصو."
+msgstr "تُستخدم مرشّحات الصوت لمعالجة تدفقات الصوت."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
@@ -291,7 +291,7 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"تستخدم إعدادات إخراج الدفق عندما العمل كخادوم تدفق أو عند حفظ التدفقات "
+"تستخدم إعدادات إخراج الدفق عند العمل كخادوم تدفق أو عند حفظ التدفقات "
 "الواردة.\n"
 "تُضاعف الدفقات أولا ثم تُرسل عبر وحدة ”وصول الإخراج“ التي تستطيع إما حفظ "
 "المخرجات أو بثها (UDP،‏ HTTP،‏ RTP/RTSP).\n"
@@ -737,7 +737,8 @@ msgstr "سماعات الرأس"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "آلي"
@@ -1015,8 +1016,8 @@ msgstr "اللغة"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "الوصف"
 
@@ -1238,10 +1239,9 @@ msgid "Roll"
 msgstr ""
 
 #: src/input/es_out.c:3271
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "مجال الرؤية"
+msgstr ""
 
 #: src/input/es_out.c:3276
 msgid "Max. luminance"
@@ -1280,11 +1280,12 @@ msgstr "تعذر فتح الدخل"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ".فحص سجل للاطلاع على التفاصيل. '%s'  MRL غير قادر على فتح  VLC "
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1754,7 +1755,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4829,7 +4831,8 @@ msgid "Browser Stop"
 msgstr "ايقاف الاستعراض"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6615,7 +6618,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -7377,7 +7381,8 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "العرض"
@@ -8298,7 +8303,8 @@ msgstr "جهاز راديو"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "التردد"
 
@@ -15734,7 +15740,8 @@ msgid "Name"
 msgstr "الاسم"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "المؤلف"
@@ -17870,7 +17877,8 @@ msgid "sec."
 msgstr ".ثا"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "صوت/ڤديو"
 
@@ -19512,10 +19520,11 @@ msgid "Extract"
 msgstr "استخرج"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19527,7 +19536,8 @@ msgstr "أغ&لق"
 msgid "Bytes"
 msgstr "بايتات"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "حوّل"
 
@@ -19944,7 +19954,8 @@ msgstr "الإصدار"
 msgid "Website"
 msgstr "الموقع"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "ملفات "
 
@@ -20606,9 +20617,8 @@ msgid "<Local>"
 msgstr "<المحلي>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "دفّ&ق..."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20993,8 +21003,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ".مجموعة صورة غاما ، وبين 0.01 و 10. التقصير الى 1"
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr ""
+msgstr "مُرشّح الڤديو"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -22844,7 +22855,8 @@ msgstr ""
 msgid "VC-1 packetizer"
 msgstr "VC-1 باكيتيزير "
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -24017,18 +24029,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:121
 #: modules/stream_out/chromecast/cast.cpp:409
-#, fuzzy
 msgid "Performance warning"
-msgstr "خيارات الأداء"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "فعّل تدفق خرج السمعي"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:124
 msgid "Disable if your receiver does not support Dolby®"
@@ -24051,9 +24061,8 @@ msgid "Low CPU (low quality but high bandwith)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "جودة التصيير"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
@@ -36914,7 +36923,7 @@ msgstr "قائمة مدير الوسائط"
 
 #, fuzzy
 #~ msgid "Audio filters are used to postprocess the audio stream"
-#~ msgstr "تُستخدم مرشّحات الصوت لمعالجة تدفقات الصو."
+#~ msgstr "تُستخدم مرشّحات الصوت لمعالجة تدفقات الصوت."
 
 #, fuzzy
 #~ msgid "Miscellaneous audio settings and modules"
