@@ -7,7 +7,7 @@
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc5\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-11-16 03:02+0100\n"
@@ -26,7 +26,7 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"法律によって許められる範囲で、このプログラムにはいかなる保証もありません。\n"
+"法律によって認められる範囲で、このプログラムにはいかなる保証もありません。\n"
 "あなたは、GNU GPLの条項に基づいて再頒布することが可能です。\n"
 "詳細については、COPYINGというファイルに書かれていますので、参照してくださ"
 "い。\n"
@@ -76,8 +76,8 @@ msgstr "VLCの制御インターフェース設定"
 msgid "Hotkeys settings"
 msgstr "ホットキー設定"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -97,7 +97,7 @@ msgstr "オーディオ設定"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
-msgstr "オーディオの一般的な設定設定"
+msgstr "オーディオの一般的な設定"
 
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:81
 #: modules/gui/qt/ui/profiles.h:750 modules/gui/qt/ui/profiles.h:760
@@ -737,7 +737,8 @@ msgstr "ヘッドフォン"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "自動"
@@ -1010,8 +1011,8 @@ msgstr "言語"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "説明"
 
@@ -1274,11 +1275,12 @@ msgstr "入力を開くことができません"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLCはMRL '%s'を開けません。詳細はログを確認してください。"
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1764,7 +1766,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4932,7 +4935,8 @@ msgid "Browser Stop"
 msgstr "ブラウザ 停止"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6789,7 +6793,8 @@ msgstr ""
 "トランスポンダーによってTVチャンネルはあたえられた周波数でグループ化(マルチプ"
 "レクス)されます。これは受信機でチューンする必要があります。"
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "変調方式 / コンステレーション"
 
@@ -7596,7 +7601,8 @@ msgstr "オーディオの基本ストリームのチャンネル数"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "幅"
@@ -8567,7 +8573,8 @@ msgstr "ラジオデバイス"
 msgid "Radio tuner device node."
 msgstr "ラジオチューナーデバイスノード"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "周波数"
 
@@ -16378,7 +16385,8 @@ msgid "Name"
 msgstr "名前"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "作成者"
@@ -18572,7 +18580,8 @@ msgid "sec."
 msgstr "秒"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "オーディオ/ビデオ"
 
@@ -20257,10 +20266,11 @@ msgid "Extract"
 msgstr "抽出"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20272,7 +20282,8 @@ msgstr "閉じる (&C)"
 msgid "Bytes"
 msgstr "バイト"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "変換"
 
@@ -20698,7 +20709,8 @@ msgstr "バージョン"
 msgid "Website"
 msgstr "ウェブサイト"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "ファイル"
 
@@ -21367,9 +21379,8 @@ msgid "<Local>"
 msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "DVBを検索中"
+msgstr "検索中..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21788,8 +21799,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "画像のガンマを0.01～10の範囲で設定します。デフォルトは1です。"
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Direct3D11フィルター"
+msgstr "Direct3D9調整フィルター"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -23721,7 +23733,8 @@ msgstr "MPEGビデオ"
 msgid "VC-1 packetizer"
 msgstr "VC-1パケッタイザー"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconfネットワークサービス"
 
@@ -24958,38 +24971,40 @@ msgid "Display a performance warning when transcoding"
 msgstr "トランスコーディング時に性能に関する警告を表示する"
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "オーディオストリーム出力の有効化"
+msgstr "オーディオパススルーの有効化"
 
 #: modules/stream_out/chromecast/cast.cpp:124
+#, fuzzy
 msgid "Disable if your receiver does not support Dolby®"
-msgstr ""
+msgstr "受信機がDolby®をサポートしていない場合、無効化してください"
 
 #: modules/stream_out/chromecast/cast.cpp:146
+#, fuzzy
 msgid "High (high quality and high bandwith)"
-msgstr ""
+msgstr "高 (高品質、高帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:147
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "中間 (中間品質、中間帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:148
+#, fuzzy
 msgid "Low (low quality and low bandwith)"
-msgstr ""
+msgstr "低 (低品質、低帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:149
+#, fuzzy
 msgid "Low CPU (low quality but high bandwith)"
-msgstr ""
+msgstr "低CPU (低品質、高帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "レンダリング品質"
+msgstr "変換品質"
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
-msgstr ""
+msgstr "このオプションを変更すると速度または、品質を増加させます。"
 
 #: modules/stream_out/chromecast/cast.cpp:156
 msgid "IP Address of the Chromecast."
@@ -33067,9 +33082,8 @@ msgstr "メディアマネージャーリスト"
 #~ msgid "Headphone surround effect"
 #~ msgstr "ヘッドフォンのエフェクト"
 
-#, fuzzy
 #~ msgid "x264 preset and tuning selection"
-#~ msgstr "x264プロファイルとレベル設定"
+#~ msgstr "x264プリセットとチューニング設定"
 
 #, fuzzy
 #~ msgid "Display device"
@@ -35376,7 +35390,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "General Audio Settings"
-#~ msgstr "オーディオの一般的な設定設定"
+#~ msgstr "オーディオの一般的な設定"
 
 #, fuzzy
 #~ msgid "General Video Settings"
