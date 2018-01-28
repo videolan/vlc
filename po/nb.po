@@ -26,7 +26,7 @@
 # Yomawaru, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-09-23 19:54+0000\n"
@@ -97,8 +97,8 @@ msgstr "Innstillinger for kontrollgrensesnittene i VLC"
 msgid "Hotkeys settings"
 msgstr "Hurtigtaster"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -755,7 +755,8 @@ msgstr "Hodetelefoner"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatisk"
@@ -1030,8 +1031,8 @@ msgstr "Språk"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beskrivelse"
 
@@ -1243,10 +1244,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3266
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Tonefall"
+msgstr ""
 
 #: src/input/es_out.c:3268
 msgctxt "ViewPoint"
@@ -1254,10 +1254,9 @@ msgid "Roll"
 msgstr ""
 
 #: src/input/es_out.c:3271
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "Synsfelt"
+msgstr ""
 
 #: src/input/es_out.c:3276
 msgid "Max. luminance"
@@ -1296,11 +1295,12 @@ msgstr "Inndataene kan ikke åpnes"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC kan ikke åpne MRL-en «%s». Les loggen for mer informasjon."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1782,7 +1782,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4961,7 +4962,8 @@ msgid "Browser Stop"
 msgstr "Nettleser stopp"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6808,7 +6810,8 @@ msgstr ""
 "TV-kanaler er sortert sammen av senderen (i multiplekser) på en gitt "
 "frekvens. Dette er påkrevd for å stille inn mottakeren."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulering / Konstellasjon"
 
@@ -7418,7 +7421,7 @@ msgstr "Kontoen som skal brukes til tilkoblingen."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "FTP-autentisering"
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7610,7 +7613,8 @@ msgstr "Antall kanaler i en hovedlydstrøm"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Bredde"
@@ -8449,7 +8453,7 @@ msgstr "Domenet/Arbeidsgruppen som skal brukes til tilkoblingen."
 
 #: modules/access/smb_common.h:31
 msgid "SMB authentication required"
-msgstr ""
+msgstr "SMB-autentisering påkrevd"
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8575,7 +8579,8 @@ msgstr "Radioenhet"
 msgid "Radio tuner device node."
 msgstr "Radiomottakerenhets-modus."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvens"
 
@@ -11224,7 +11229,7 @@ msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:63
 msgid "Direct3D11 Video Acceleration"
-msgstr ""
+msgstr "Direct3D11 Videoakselerasjon"
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -16359,7 +16364,8 @@ msgid "Name"
 msgstr "Navn"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Av"
@@ -18547,7 +18553,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Lyd/video"
 
@@ -20219,10 +20226,11 @@ msgid "Extract"
 msgstr "Pakk ut"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20234,7 +20242,8 @@ msgstr "&Lukk"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Konvertere"
 
@@ -20660,7 +20669,8 @@ msgstr "Versjon"
 msgid "Website"
 msgstr "Nettsted"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Fil"
 
@@ -21330,9 +21340,8 @@ msgid "<Local>"
 msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "Skanner DVB"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21744,8 +21753,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Bestem bildegammaen, mellom 0,01 og 10. Standarden er 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Direct3D11-filter"
+msgstr "Direct3D11 Videoakselerasjon"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -23660,7 +23670,8 @@ msgstr "MPEG-video"
 msgid "VC-1 packetizer"
 msgstr "VC-1-innpakker"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -24900,18 +24911,16 @@ msgstr "Dette setter innholdstype for MIME-media sendt til Chromecast-en."
 
 #: modules/stream_out/chromecast/cast.cpp:121
 #: modules/stream_out/chromecast/cast.cpp:409
-#, fuzzy
 msgid "Performance warning"
-msgstr "Ytelsesvalg"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:122
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Skru på lydstrømutdata"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:124
 msgid "Disable if your receiver does not support Dolby®"
@@ -24934,9 +24943,8 @@ msgid "Low CPU (low quality but high bandwith)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Opptegningskvalitet"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
@@ -24963,9 +24971,8 @@ msgid "Chromecast stream output"
 msgstr "Chromecast-strømutdata"
 
 #: modules/stream_out/chromecast/cast.cpp:408
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Ikke spør igjen"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:410
 msgid ""
@@ -32414,10 +32421,6 @@ msgstr "Mediebehandlerliste"
 #, fuzzy
 #~ msgid "Headphone surround effect"
 #~ msgstr "Hodetelefoneffekt"
-
-#, fuzzy
-#~ msgid "x264 preset and tuning selection"
-#~ msgstr "Valg av x264-profil og nivå"
 
 #, fuzzy
 #~ msgid "Display device"
