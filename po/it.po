@@ -44,7 +44,7 @@
 # Vincenzo Reale <vinx.reale@gmail.com>, 2014-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc5\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-11-16 03:00+0100\n"
@@ -113,8 +113,8 @@ msgstr "Impostazioni delle interfacce di controllo di VLC"
 msgid "Hotkeys settings"
 msgstr "Impostazioni delle scorciatoie"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -778,7 +778,8 @@ msgstr "Cuffie"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatico"
@@ -1058,8 +1059,8 @@ msgstr "Lingua"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Descrizione"
 
@@ -1324,11 +1325,12 @@ msgstr ""
 "VLC non è in grado di aprire il MRL '%s'. Controlla il registro per i "
 "dettagli."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1819,7 +1821,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5091,7 +5094,8 @@ msgid "Browser Stop"
 msgstr "Browser Ferma"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6960,7 +6964,8 @@ msgstr ""
 "I canali TV sono raggruppati per transponder (noto anche come multiplex) in "
 "una frequenza data. Ciò è richiesto per sintonizzare il ricevitore."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulazione / Costellazione"
 
@@ -7706,6 +7711,9 @@ msgid ""
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
+"Sovrascrive il nome e la versione del programma forniti al server HTTP, lo "
+"\"User-Agent\" HTTP. Essi devono essere separati da uno slash, ad es. "
+"FooBar/1.2.3."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7777,7 +7785,8 @@ msgstr "Numero di canali di un flusso audio elementare"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Larghezza"
@@ -8767,7 +8776,8 @@ msgstr "Dispositivo radio"
 msgid "Radio tuner device node."
 msgstr "Nodo di dispositivo del sintonizzatore radio."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frequenza"
 
@@ -10815,7 +10825,7 @@ msgstr "Motore di uscita"
 
 #: modules/audio_output/mmdevice.c:1315
 msgid "Audio output back-end interface."
-msgstr ""
+msgstr "Interfaccia del motore di uscita audio."
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -11692,7 +11702,7 @@ msgstr "Profilo codificatore"
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
-msgstr ""
+msgstr "Algoritmo di codifica da utilizzare."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
@@ -16705,7 +16715,8 @@ msgid "Name"
 msgstr "Nome"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autore"
@@ -17506,6 +17517,9 @@ msgid ""
 "fullscreen. Automatic brightness adjustment should be disabled in System "
 "Preferences."
 msgstr ""
+"Spegni la retroilluminazione del MacBook durante la riproduzione a schermo "
+"intero di un video. La regolazione automatica della luminosità dovrebbe "
+"essere disabilitata in Preferenze di sistema. "
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:366
 msgid "Show Previous & Next Buttons"
@@ -18276,7 +18290,7 @@ msgstr "Aggiungi file dei sottotitoli:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
 msgid "Setup subtitle playback details"
-msgstr ""
+msgstr "Configura i dettagli di riproduzione dei sottotitoli"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 msgid "Select a subtitle file"
@@ -18882,7 +18896,7 @@ msgstr "Commuta Riproduci/Pausa"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr ""
+msgstr "Attiva la riproduzione in ordine casuale"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
@@ -18914,7 +18928,8 @@ msgid "sec."
 msgstr "sec."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -20290,6 +20305,8 @@ msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
+"Seleziona o fai un doppio clic su un'azione per cambiare la scorciatoia "
+"associata. Utilizza il tasto Canc per rimuovere le scorciatoie."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20592,10 +20609,11 @@ msgid "Extract"
 msgstr "Estrai"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20607,7 +20625,8 @@ msgstr "&Chiudi"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Converti"
 
@@ -20633,7 +20652,7 @@ msgstr "Diversi file selezionati."
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
-msgstr ""
+msgstr "I file saranno posizionati nella stessa cartella con lo stesso nome."
 
 #: modules/gui/qt/dialogs/convert.cpp:95
 msgid "Append '-converted' to filename"
@@ -21035,7 +21054,8 @@ msgstr "Versione"
 msgid "Website"
 msgstr "Sito web"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "File"
 
@@ -21705,9 +21725,8 @@ msgid "<Local>"
 msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "Scansione DVB"
+msgstr "Scansione in corso..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -22130,8 +22149,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Imposta la gamma dell'immagine, tra 0.01 e 10. Predefinita a 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr "Filtro Direct3D11"
+msgstr "Accelerazione video Direct3D11"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -22162,7 +22182,7 @@ msgstr "Plugin di decodifica basato su MMAL per Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr ""
+msgstr "Usa QPU per il deinterlacciamento HD avanzato."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
@@ -22464,6 +22484,8 @@ msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
+"Seleziona la verbosità dei log o lacia il valore predefinito per utilizzare "
+"la stessa verbosità data da --verbose."
 
 #: modules/logger/file.c:219
 msgid "Logger"
@@ -24059,7 +24081,8 @@ msgstr "MPEG Video"
 msgid "VC-1 packetizer"
 msgstr "Incapsulamento VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Servizi di rete Zeroconf"
 
@@ -25328,38 +25351,42 @@ msgid "Display a performance warning when transcoding"
 msgstr "Visualizza un avviso di prestazioni quando si transcodifica"
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Abilita trasmissione audio in uscita"
+msgstr "Abilita passthrough audio"
 
 #: modules/stream_out/chromecast/cast.cpp:124
+#, fuzzy
 msgid "Disable if your receiver does not support Dolby®"
-msgstr ""
+msgstr "Disabilitala se il tuo ricevitore non supporta Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:146
+#, fuzzy
 msgid "High (high quality and high bandwith)"
-msgstr ""
+msgstr "Alta (alta qualità e molta banda)"
 
 #: modules/stream_out/chromecast/cast.cpp:147
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "Media (qualità media e banda media)"
 
 #: modules/stream_out/chromecast/cast.cpp:148
+#, fuzzy
 msgid "Low (low quality and low bandwith)"
-msgstr ""
+msgstr "Bassa (qualità bassa e poca banda)"
 
 #: modules/stream_out/chromecast/cast.cpp:149
+#, fuzzy
 msgid "Low CPU (low quality but high bandwith)"
-msgstr ""
+msgstr "Bassa CPU (qualità bassa, ma molta banda)"
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Qualità della resa"
+msgstr "Qualità della conversione"
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
+"Modifica questa opzione per incrementare la velocità di conversione o la "
+"qualità."
 
 #: modules/stream_out/chromecast/cast.cpp:156
 msgid "IP Address of the Chromecast."
@@ -25390,6 +25417,9 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"La trasmissione di questo video richiede la conversione. Questa conversione "
+"può utilizzare tutta la potenza disponibile e scaricare rapidamente la "
+"batteria."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:391
 msgid "Chromecast demux wrapper"
@@ -25966,23 +25996,28 @@ msgstr ""
 
 #: modules/stream_out/standard.c:51
 msgid "Address to bind to (helper setting for dst)"
-msgstr ""
+msgstr "Indirizzo da associare (impostazioni helper per dst)"
 
 #: modules/stream_out/standard.c:53
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
+"indirizzo:porta per associare vlc alle all'ascolto dei flussi in entrata. Le "
+"impostazioni dell'helper per dst, dst=bind+'/'+percorso. dst-parameter "
+"ignora tutto ciò."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr ""
+msgstr "nome file del flusso (impostazioni helper per dst)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
+"Nome del file del flusso. L'impostazione dell'helper per dst, dst=bind"
+"+'/'+percorso. dst-parameter ignora tutto questo."
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -27250,6 +27285,8 @@ msgstr "Orientamento dello specchio"
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
+"Definisce l'orientamento della suddivisione a specchio. Può essere verticale "
+"o orizzontale."
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -27873,7 +27910,7 @@ msgstr "Uscita Decklink"
 
 #: modules/video_output/decklink.cpp:235
 msgid "Output module to write to Blackmagic SDI card"
-msgstr ""
+msgstr "Modulo di uscita per scrivere su scheda SDI Blackmagic"
 
 #: modules/video_output/decklink.cpp:236
 msgid "DeckLink General Options"
@@ -28290,7 +28327,7 @@ msgstr "Shell WL"
 
 #: modules/video_output/wayland/shell.c:412
 msgid "Wayland shell surface"
-msgstr ""
+msgstr "Superficie shell Wayland"
 
 #: modules/video_output/wayland/shm.c:508
 msgid "WL SHM"
@@ -28306,7 +28343,7 @@ msgstr "Shell XDG"
 
 #: modules/video_output/wayland/xdg-shell.c:381
 msgid "XDG shell surface"
-msgstr ""
+msgstr "Superficie shell XDG"
 
 #. xgettext: This is a plain ASCII spelling of "VLC media player"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -35808,9 +35845,8 @@ msgstr "Elenco gestore multimediale"
 #~ msgid "Headphone surround effect"
 #~ msgstr "Effetto cuffie"
 
-#, fuzzy
 #~ msgid "x264 preset and tuning selection"
-#~ msgstr "Profilo x264 e selezione del livello"
+#~ msgstr "Preimpostazione x264 e selezione del sintonizzatore"
 
 #, fuzzy
 #~ msgid "Display device"
@@ -42541,7 +42577,7 @@ msgstr "Elenco gestore multimediale"
 
 #, fuzzy
 #~ msgid "Connecting..."
-#~ msgstr "Impostazioni..."
+#~ msgstr "Scansione in corso..."
 
 #, fuzzy
 #~ msgid "Dummy video filter"
