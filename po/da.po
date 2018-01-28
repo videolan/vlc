@@ -30,7 +30,7 @@
 # Decode
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc5\n"
+"Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-25 10:20+0100\n"
 "PO-Revision-Date: 2017-11-01 07:26+0000\n"
@@ -99,8 +99,8 @@ msgstr "Indstillinger til VLCs kontrolgrænseflader"
 msgid "Hotkeys settings"
 msgstr "Indstillinger for genvejstaster"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -214,7 +214,7 @@ msgstr "Splittere"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr "Videosplittere separerer strømmen i flere videoer."
+msgstr "Videosplittere separerer streamen i flere videoer."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -234,7 +234,7 @@ msgid ""
 "to alter are HTTP proxy or caching settings."
 msgstr ""
 "Indstillinger vedrørende de forskellige tilgangsmetoder. De indstillinger du "
-"typisk har brug for at ændre, er HTTP-proxy eller mellemlager-indstillinger."
+"typisk har brug for at ændre, er HTTP-proxy eller caching-indstillinger."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
@@ -287,7 +287,7 @@ msgstr "Generelle indstillinger for input. Brug med forsigtighed..."
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1944
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr "Strømoutput"
+msgstr "Stream-output"
 
 #: include/vlc_config_cat.h:129
 msgid ""
@@ -299,17 +299,17 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"Indstillingerne for strømoutput anvendes, når VLC optræder som "
+"Indstillingerne for stream-output anvendes, når VLC optræder som "
 "streamingserver eller når streams skal gemmes.\n"
 "Streams bliver først sammenkoblet/muxet og derefter sendt igennem et "
-"\"outputtilgangsmodul\", der kan gemme strømmen som en fil eller streame den "
+"\"outputtilgangsmodul\", der kan gemme streamen som en fil eller streame den "
 "(UDP, HTTP, RTP/RTSP).\n"
-"Sout-streammoduler giver mulighed for avanceret efterbehandling af strømmen "
+"Sout-streammoduler giver mulighed for avanceret efterbehandling af stream'en "
 "(konvertering, duplikering osv.)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr "Generelle indstillinger for strømoutput"
+msgstr "Generelle indstillinger for stream-output"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
@@ -399,7 +399,7 @@ msgid ""
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
 "Indstillinger vedrørende opførslen for spillelisten (f.eks. "
-"afspilningstilstand) og moduler, der automatisk tilføjer elementer på "
+"afspilningstilstand) og moduler, der automatisk tilføjer emner på "
 "spillelisten (\"tjenesteopdagelsesmoduler\")."
 
 #: include/vlc_config_cat.h:178
@@ -415,8 +415,8 @@ msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
-"Tjenesteopdagelsesmoduler er funktioner, der automatisk tilføjer elementer "
-"på spillelisten."
+"Tjenesteopdagelsesmoduler er funktioner, der automatisk tilføjer emner på "
+"spillelisten."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1844
 #: modules/gui/qt/dialogs/extended.cpp:93
@@ -621,14 +621,14 @@ msgid ""
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
-"charset=utf-8\" /></head><body><h2>Velkommen til VLC media player hjælp</"
+"charset=utf-8\" /></head><body><h2>Velkommen til VLC medieafspiller-hjælp</"
 "h2><h3>Vejledning</h3><p>Du kan finde manualen til VLC på <a href=\"http://"
 "wiki.videolan.org\">VideoLAN's wiki-websted</a>.</p><p>Hvis du er ny bruger "
-"af VLC media player, så læs <br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Introduktion til VLC media player</em></"
-"a>.</p><p>Du kan finde oplysninger til at bruge medieafspilleren i <br>\"<a "
-"href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to play "
-"files with VLC media player</em></a>\".</p><p>Du kan finde nyttige "
+"af VLC medieafspiller, så læs <br><a href=\"http://wiki.videolan.org/"
+"Documentation:VLC_for_dummies\"><em>Introduktion til VLC medieafspiller</"
+"em></a>.</p><p>Du kan finde oplysninger til at bruge medieafspilleren i <br>"
+"\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to "
+"play files with VLC media player</em></a>\".</p><p>Du kan finde nyttige "
 "oplysninger til at gemme, konvertere, omkode, kode, muxe og streame i <a "
 "href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
 "Documentation</a>.</p><p>Kender du ikke betegnelserne, så kig i <a href="
@@ -643,7 +643,7 @@ msgstr ""
 "projektet ved at bruger tid på at hjælpe fællesskabet, designe skins, "
 "oversætte manualen, teste og programmere. Du kan også hjælpe ved at donere "
 "penge og materialer til os. Og så kan du selvfølgelig <b>udbrede kendskabet</"
-"b> til VLC media player.</p></body></html>"
+"b> til VLC medieafspiller.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -658,7 +658,7 @@ msgstr "Det højeste antal filtre (%u) blev nået."
 #: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
 #: modules/gui/macosx/VLCMainWindow.m:1002 modules/video_filter/postproc.c:235
 msgid "Disable"
-msgstr "Deaktivér"
+msgstr "Deaktiver"
 
 #: src/audio_output/output.c:266 modules/visualization/visual/visual.c:142
 msgid "Spectrometer"
@@ -754,7 +754,8 @@ msgstr "Høretelefoner"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:366
 msgid "Automatic"
 msgstr "Automatisk"
@@ -1031,8 +1032,8 @@ msgstr "Sprog"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beskrivelse"
 
@@ -1145,7 +1146,7 @@ msgstr "Højre top"
 
 #: src/input/es_out.c:3175
 msgid "Orientation"
-msgstr ""
+msgstr "Orientering"
 
 #: src/input/es_out.c:3181 src/input/es_out.c:3199 src/input/es_out.c:3217
 #: src/input/es_out.c:3231 src/playlist/tree.c:67
@@ -1295,11 +1296,12 @@ msgstr "Input kan ikke åbnes"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC kan ikke åbne MRL '%s'. Tjek loggen for detaljer."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1661,7 +1663,7 @@ msgstr ""
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:268
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Enable audio"
-msgstr "Aktivér lyd"
+msgstr "Aktiver lyd"
 
 #: src/libvlc-module.c:134
 msgid ""
@@ -1782,7 +1784,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:120
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1862,7 +1865,7 @@ msgstr "Beskyt mod afklipning af lyd"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr "Aktivér tidsudstrukket lyd"
+msgstr "Aktiver tidsudstrukket lyd"
 
 #: src/libvlc-module.c:232
 msgid ""
@@ -1916,7 +1919,7 @@ msgstr ""
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:314
 msgid "Enable video"
-msgstr "Aktivér video"
+msgstr "Aktiver video"
 
 #: src/libvlc-module.c:260
 msgid ""
@@ -2112,7 +2115,7 @@ msgstr "Placer altid videovinduet foran andre vinduer."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr "Aktivér skrivebordstapettilstand"
+msgstr "Aktiver skrivebordstapettilstand"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2202,11 +2205,11 @@ msgstr "Film NTSC (IVTC)"
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr "Deaktivér pauseskærm"
+msgstr "Deaktiver pauseskærm"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr "Deaktivér pauseskærm under afspilning af video."
+msgstr "Deaktiver pauseskærm under afspilning af video."
 
 #: src/libvlc-module.c:374
 msgid "Inhibit the power management daemon during playback"
@@ -2486,35 +2489,35 @@ msgstr ""
 
 #: src/libvlc-module.c:505
 msgid "File caching (ms)"
-msgstr "Mellemlagring af fil (ms)"
+msgstr "Caching af fil (ms)"
 
 #: src/libvlc-module.c:507
 msgid "Caching value for local files, in milliseconds."
-msgstr "Mellemlagringsværdi for filer i millisekunder."
+msgstr "Cachingsværdi for filer i millisekunder."
 
 #: src/libvlc-module.c:509
 msgid "Live capture caching (ms)"
-msgstr "Mellemlagring af live-optagelse (ms)"
+msgstr "Caching af live-optagelse (ms)"
 
 #: src/libvlc-module.c:511
 msgid "Caching value for cameras and microphones, in milliseconds."
-msgstr "Værdier til mellemlagring af kameraer og mikrofoner, i millisekunder."
+msgstr "Værdier til caching af kameraer og mikrofoner, i millisekunder."
 
 #: src/libvlc-module.c:513
 msgid "Disc caching (ms)"
-msgstr "Disk-mellemlagring (ms)"
+msgstr "Disk-caching (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for optical media, in milliseconds."
-msgstr "Mellemlagringsværdi af optisk medie, i millisekunder."
+msgstr "Cachingsværdi af optisk medie, i millisekunder."
 
 #: src/libvlc-module.c:517
 msgid "Network caching (ms)"
-msgstr "Mellemlagring af netværk (ms)"
+msgstr "Netværkscaching (ms)"
 
 #: src/libvlc-module.c:519
 msgid "Caching value for network resources, in milliseconds."
-msgstr "Mellemlagringsværdi af netværksressoucer, i millisekunder."
+msgstr "Cachingsværdi af netværksressoucer, i millisekunder."
 
 #: src/libvlc-module.c:521
 msgid "Clock reference average counter"
@@ -2538,7 +2541,7 @@ msgid ""
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
 "Du kan deaktivere synkroniseringen af input-uret for realtidskilder. Gør "
-"dette, hvis du oplever, at afspilningen af netværksstrømme hakker."
+"dette, hvis du oplever, at afspilningen af netværks-streams hakker."
 
 #: src/libvlc-module.c:532
 msgid "Clock jitter"
@@ -2590,7 +2593,7 @@ msgstr "Standard"
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
-msgstr "Aktivér"
+msgstr "Aktiver"
 
 #: src/libvlc-module.c:546
 msgid "MTU of the network interface"
@@ -2615,7 +2618,7 @@ msgid ""
 "in default)."
 msgstr ""
 "Her angives hop grænsen (også kendt som \"Time-To-Live\" eller TTL) for de "
-"multicast-pakker, der sendes af strømoutput (-1 = brug styresystemets "
+"multicast-pakker, der sendes af stream-output (-1 = brug styresystemets "
 "indbyggede standard)."
 
 #: src/libvlc-module.c:559
@@ -2793,7 +2796,7 @@ msgstr "Sluttidspunkt"
 
 #: src/libvlc-module.c:644
 msgid "The stream will stop at this position (in seconds)."
-msgstr "Strømmen vil stoppe ved denne position (i sekunder)."
+msgstr "Streamen vil stoppe ved denne position (i sekunder)."
 
 #: src/libvlc-module.c:646
 msgid "Run time"
@@ -2801,7 +2804,7 @@ msgstr "Afspilningstid"
 
 #: src/libvlc-module.c:648
 msgid "The stream will run this duration (in seconds)."
-msgstr "Strømmen vil afspille så længe (i sekunder)."
+msgstr "Streamen vil afspille så længe (i sekunder)."
 
 #: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
@@ -2809,7 +2812,7 @@ msgstr "Hurtig søgning"
 
 #: src/libvlc-module.c:652
 msgid "Favor speed over precision while seeking"
-msgstr "Prioritér hastighed over præcision ved søgning"
+msgstr "Prioriter hastighed over præcision ved søgning"
 
 #: src/libvlc-module.c:654
 msgid "Playback speed"
@@ -2876,8 +2879,8 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
-"Når muligt vil input-streamet blive optaget i stedet for at bruge "
-"strømoutputmodulet"
+"Når muligt vil input-streamet blive optaget i stedet for at bruge stream-"
+"outputmodulet"
 
 #: src/libvlc-module.c:684
 msgid "Timeshift directory"
@@ -2918,7 +2921,7 @@ msgstr ""
 
 #: src/libvlc-module.c:699
 msgid "Disable all lua plugins"
-msgstr "Deaktivér alle lua-plugins"
+msgstr "Deaktiver alle lua-plugins"
 
 #: src/libvlc-module.c:703
 msgid ""
@@ -2954,7 +2957,7 @@ msgstr ""
 
 #: src/libvlc-module.c:717
 msgid "Enable sub-pictures"
-msgstr "Aktivér undertekst-billeder"
+msgstr "Aktiver undertekst-billeder"
 
 #: src/libvlc-module.c:719
 msgid "You can completely disable the sub-picture processing."
@@ -3358,11 +3361,11 @@ msgid ""
 "subsystem."
 msgstr ""
 "Disse indstillinger giver mulighed for at angive globale "
-"standardindstillinger for strømoutput teksttekstsystemet."
+"standardindstillinger for stream-output-systemet."
 
 #: src/libvlc-module.c:923
 msgid "Default stream output chain"
-msgstr "Standard-strømoutputkæde"
+msgstr "Standard-stream-outputkæde"
 
 #: src/libvlc-module.c:925
 msgid ""
@@ -3376,7 +3379,7 @@ msgstr ""
 
 #: src/libvlc-module.c:929
 msgid "Enable streaming of all ES"
-msgstr "Aktivér streaming af alle ES"
+msgstr "Aktiver streaming af alle ES"
 
 #: src/libvlc-module.c:931
 msgid "Stream all elementary streams (video, audio and subtitles)"
@@ -3392,43 +3395,43 @@ msgstr "Afspil streamet lokalt mens den streames."
 
 #: src/libvlc-module.c:937
 msgid "Enable video stream output"
-msgstr "Aktivér videostrømoutput"
+msgstr "Aktiver videostream-output"
 
 #: src/libvlc-module.c:939
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Vælg om videostreamet skal omdirigeres til funktionen for strømoutput, når "
+"Vælg om videostreamen skal omdirigeres til funktionen for stream-output, når "
 "sidstnævnte er slået til."
 
 #: src/libvlc-module.c:942
 msgid "Enable audio stream output"
-msgstr "Aktivér lydstrømoutput"
+msgstr "Aktiver lydstream-output"
 
 #: src/libvlc-module.c:944
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Vælg om lyd-streamet skal omdirigeres til funktionen for strømoutput,, når "
+"Vælg om lyd-streamen skal omdirigeres til funktionen for stream-output, når "
 "sidstnævnte er slået til."
 
 #: src/libvlc-module.c:947
 msgid "Enable SPU stream output"
-msgstr "Aktivér SPU-strømoutput"
+msgstr "Aktiver SPU-stream-output"
 
 #: src/libvlc-module.c:949
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Vælg om SPU-streams skal omdirigeres til funktionen for strømoutput,, når "
+"Vælg om SPU-streams skal omdirigeres til funktionen for stream-output, når "
 "sidstnævnte er slået til."
 
 #: src/libvlc-module.c:952
 msgid "Keep stream output open"
-msgstr "Hold strømoutput åben"
+msgstr "Hold stream-output åben"
 
 #: src/libvlc-module.c:954
 msgid ""
@@ -3436,19 +3439,19 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
-"Her kan du bevare en unik strømoutput-instans over flere emner på en "
-"spilleliste (indsæt automatisk indsamler-strømoutput, hvis ikke angivet)"
+"Her kan du bevare en unik stream-output-instans over flere emner på en "
+"spilleliste (indsæt automatisk indsamler-stream-output, hvis ikke angivet)"
 
 #: src/libvlc-module.c:958
 msgid "Stream output muxer caching (ms)"
-msgstr "Muxercaching til strømoutput (ms)"
+msgstr "Muxercaching til stream-output (ms)"
 
 #: src/libvlc-module.c:960
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
 msgstr ""
-"Dette gør at du kan konfigurere startmellemlagringsværdien for output-stream-"
+"Dette gør at du kan konfigurere startcachingsværdien for output-stream-"
 "muxeren. Denne værdi skal være i millisekunder."
 
 #: src/libvlc-module.c:963
@@ -3532,7 +3535,7 @@ msgstr "Streamfiltermodul"
 
 #: src/libvlc-module.c:1003
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr ""
+msgstr "Stream-filtre bruges til at modificere en stream der læses"
 
 #: src/libvlc-module.c:1005
 msgid "Demux filter module"
@@ -3581,12 +3584,12 @@ msgid ""
 msgstr ""
 "Ved at bruge realtidsprioritering for VLC-processen, vil tildeling af CPU-"
 "tid være mere præcis og derfor give bedre ydelse, især ved streaming. Det "
-"kan dog låse din maskine eller gøre den meget langsom. Aktivér kun "
+"kan dog låse din maskine eller gøre den meget langsom. Aktiver kun "
 "indstillingen hvis du er bekendt med konsekvenserne."
 
 #: src/libvlc-module.c:1029
 msgid "Adjust VLC priority"
-msgstr "Justér VLC-prioritet"
+msgstr "Juster VLC-prioritet"
 
 #: src/libvlc-module.c:1031
 msgid ""
@@ -3615,12 +3618,12 @@ msgstr "Læser en VLM-opsætningsfil så snart at VLM er startet."
 
 #: src/libvlc-module.c:1043
 msgid "Use a plugins cache"
-msgstr "Brug mellemlager til plugins"
+msgstr "Brug caching til plugins"
 
 #: src/libvlc-module.c:1045
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr ""
-"Brug mellemlager til plugins. Det vil få VLC til at starte langt hurtigere."
+"Brug caching til plugins. Det vil få VLC til at starte langt hurtigere."
 
 #: src/libvlc-module.c:1047
 msgid "Scan for new plugins"
@@ -3715,7 +3718,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
-msgstr "Sæt elementer i kø i spillelisten ved én instans tilstanden"
+msgstr "Sæt emner i kø i spillelisten ved én-instans-tilstanden"
 
 #: src/libvlc-module.c:1095
 msgid ""
@@ -3723,7 +3726,7 @@ msgid ""
 "playing current item."
 msgstr ""
 "Når indstillingen \"Tillad kun én instans\" er valgt, bliver den nuværende "
-"afspilning ikke afbrudt, men det nye element sættes i kø på spillelisten."
+"afspilning ikke afbrudt, men det nye emne sættes i kø på spillelisten."
 
 #: src/libvlc-module.c:1098
 msgid "Expose media player via D-Bus"
@@ -3839,15 +3842,15 @@ msgstr "Gentag alle"
 
 #: src/libvlc-module.c:1156
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr "VLC afspiller elementerne i spillelisten uafbrudt."
+msgstr "VLC afspiller emnerne på spillelisten uafbrudt."
 
 #: src/libvlc-module.c:1158
 msgid "Repeat current item"
-msgstr "Gentag nuværende element"
+msgstr "Gentag nuværende emne"
 
 #: src/libvlc-module.c:1160
 msgid "VLC will keep playing the current playlist item."
-msgstr "VLC bliver ved med at afspille det nuværende spilleliste-element."
+msgstr "VLC bliver ved med at afspille det nuværende spilleliste-emne."
 
 #: src/libvlc-module.c:1162
 msgid "Play and stop"
@@ -3855,7 +3858,7 @@ msgstr "Afspil og stop"
 
 #: src/libvlc-module.c:1164
 msgid "Stop the playlist after each played playlist item."
-msgstr "Stop spillelisten efter hvert afspillet element på spillelisten."
+msgstr "Stop spillelisten efter hvert afspillet emne på spillelisten."
 
 #: src/libvlc-module.c:1166
 msgid "Play and exit"
@@ -3863,7 +3866,7 @@ msgstr "Afspil og afslut"
 
 #: src/libvlc-module.c:1168
 msgid "Exit if there are no more items in the playlist."
-msgstr "Afslut, når der ikke er flere elementer i spillelisten."
+msgstr "Afslut, når der ikke er flere emner på spillelisten."
 
 #: src/libvlc-module.c:1170
 msgid "Play and pause"
@@ -3871,11 +3874,11 @@ msgstr "Afspil og pause"
 
 #: src/libvlc-module.c:1172
 msgid "Pause each item in the playlist on the last frame."
-msgstr "Sæt hvert element på spillelisten på pause ved sidste billede."
+msgstr "Sæt hvert emne på spillelisten på pause ved sidste billede."
 
 #: src/libvlc-module.c:1174
 msgid "Start paused"
-msgstr ""
+msgstr "Start på pause"
 
 #: src/libvlc-module.c:1176
 msgid "Pause each item in the playlist on the first frame."
@@ -3921,7 +3924,7 @@ msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr ""
-"Spillelisten kan bruge et træ til at kategorisere visse elementer, ligesom "
+"Spillelisten kan bruge et træ til at kategorisere visse emner, ligesom "
 "indholdet af en mappe."
 
 #: src/libvlc-module.c:1203
@@ -3932,7 +3935,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Ignore"
-msgstr "Ignorér"
+msgstr "Ignorer"
 
 #: src/libvlc-module.c:1208
 msgid "Volume control"
@@ -4061,7 +4064,7 @@ msgstr "Næste"
 #: src/libvlc-module.c:1241
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
-"Vælg genvejstasten der skal bruges for at springe til næste element på "
+"Vælg genvejstasten der skal bruges for at springe til næste emne på "
 "spillelisten."
 
 #: src/libvlc-module.c:1242 modules/control/hotkeys.c:414
@@ -4076,7 +4079,7 @@ msgstr "Forrige"
 #: src/libvlc-module.c:1243
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
-"Vælg genvejstasten der skal bruges for at springe til forrige element på "
+"Vælg genvejstasten der skal bruges for at springe til forrige emne på "
 "spillelisten."
 
 #: src/libvlc-module.c:1244 modules/gui/macosx/VLCMainMenu.m:378
@@ -4223,7 +4226,7 @@ msgstr "Vælg genvejstasten der skal afslutte programmet."
 
 #: src/libvlc-module.c:1289
 msgid "Navigate up"
-msgstr "Navigér op"
+msgstr "Naviger op"
 
 #: src/libvlc-module.c:1290
 msgid ""
@@ -4233,7 +4236,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
-msgstr "Navigér ned"
+msgstr "Naviger ned"
 
 #: src/libvlc-module.c:1292
 msgid ""
@@ -4243,7 +4246,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
-msgstr "Navigér venstre"
+msgstr "Naviger venstre"
 
 #: src/libvlc-module.c:1294
 msgid ""
@@ -4253,7 +4256,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1295
 msgid "Navigate right"
-msgstr "Navigér højre"
+msgstr "Naviger højre"
 
 #: src/libvlc-module.c:1296
 msgid ""
@@ -4263,11 +4266,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1297
 msgid "Activate"
-msgstr "Aktivér"
+msgstr "Aktiver"
 
 #: src/libvlc-module.c:1298
 msgid "Select the key to activate selected item in DVD menus."
-msgstr "Vælg genvejstasten der skal aktivere valgte elementer i DVD-menuer."
+msgstr "Vælg genvejstasten der skal aktivere valgte emne i DVD-menuer."
 
 #: src/libvlc-module.c:1299 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
@@ -4330,11 +4333,11 @@ msgstr "Vælg genvejstasten der skal formindske lydstyrken."
 #: modules/gui/macosx/VLCMainMenu.m:500
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 msgid "Mute"
-msgstr "Mute"
+msgstr "Lydløs"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to mute audio."
-msgstr "Vælg genvejstasten der skal mute lyden."
+msgstr "Vælg genvejstasten der skal gøre lyden lydløs."
 
 #: src/libvlc-module.c:1315
 msgid "Subtitle delay up"
@@ -4390,7 +4393,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1327
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr "Synk. af undertekster / synkronisér tidsstempler for lyd og undertekst"
+msgstr "Synk. af undertekster / synkroniser tidsstempler for lyd og undertekst"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
@@ -4607,7 +4610,7 @@ msgstr "Gå til næste tilgængelige undertekstspor."
 
 #: src/libvlc-module.c:1389
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "Slå undertekster til/fra"
 
 #: src/libvlc-module.c:1390
 msgid "Toggle subtitle track visibility."
@@ -4656,7 +4659,7 @@ msgstr "Auto-skalering til/fra"
 
 #: src/libvlc-module.c:1400
 msgid "Activate or deactivate autoscaling."
-msgstr "Aktivér eller deaktivér automatisk skalering."
+msgstr "Aktiver eller deaktiver automatisk skalering."
 
 #: src/libvlc-module.c:1401
 msgid "Increase scale factor"
@@ -4672,7 +4675,7 @@ msgstr "Deinterlacing til/fra"
 
 #: src/libvlc-module.c:1406
 msgid "Activate or deactivate deinterlacing."
-msgstr "Aktivér eller deaktivér deinterlacing."
+msgstr "Aktiver eller deaktiver deinterlacing."
 
 #: src/libvlc-module.c:1407
 msgid "Cycle deinterlace modes"
@@ -4942,7 +4945,7 @@ msgstr "brug alternativ konfigurationsfil"
 
 #: src/libvlc-module.c:2761
 msgid "resets the current plugins cache"
-msgstr "nulstiller den nuværende mellemlager til plugins"
+msgstr "nulstiller den nuværende cache til plugins"
 
 #: src/libvlc-module.c:2763
 msgid "print version information"
@@ -4993,7 +4996,8 @@ msgid "Browser Stop"
 msgstr "Browser - stop"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5202,7 +5206,7 @@ msgstr "Lydstyrke ned"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr "Slå lyd fra"
+msgstr "Gør lydløs"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
 msgid "Volume Up"
@@ -5298,7 +5302,7 @@ msgstr "Kunne åbne \"%s\" i skrivetilstand"
 #: modules/gui/qt/dialogs/sout.cpp:92
 #: modules/stream_out/chromecast/cast.cpp:408
 msgid "Cancel"
-msgstr "Annullér"
+msgstr "Annuller"
 
 #: src/misc/update.c:598
 #, c-format
@@ -5362,14 +5366,16 @@ msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
+"Den nye version er downloadet. Ønsker du at afslutte VLC og installere den "
+"nu?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
-msgstr "Installér"
+msgstr "Installer"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
-msgstr "Opdatér VLC media player"
+msgstr "Opdater VLC medieafspiller"
 
 #: src/playlist/engine.c:237 src/playlist/loadsave.c:159 lib/media_list.c:237
 #: modules/gui/macosx/VLCMainWindow.m:298
@@ -6040,7 +6046,7 @@ msgstr "Zulu"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
-msgstr "Autoskalér video"
+msgstr "Autoskaler video"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:429
 #: modules/gui/macosx/VLCMainMenu.m:430
@@ -6842,7 +6848,8 @@ msgstr ""
 "TV-kanaler grupperes efter transponder (også kendt som multipleks) på en "
 "given frekvens. Dette er påkrævet for at finjustere modtageren."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulation / konstellation"
 
@@ -6990,7 +6997,7 @@ msgstr "Lag C-tidsfletning"
 
 #: modules/access/dtv/access.c:154
 msgid "Stream identifier"
-msgstr ""
+msgstr "Streamidentifikator"
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -7453,7 +7460,7 @@ msgstr "Brugerkontoen der skal bruges til forbindelsen."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "FTP-godkendelse"
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7646,7 +7653,8 @@ msgstr "Antal kanaler på et lyd elementary stream"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Bredde"
@@ -7720,7 +7728,7 @@ msgstr "Størrelse"
 
 #: modules/access/imem.c:115
 msgid "Size of stream in bytes"
-msgstr "Størrelse på strøm i byte"
+msgstr "Størrelse på stream i byte"
 
 #: modules/access/imem.c:118 modules/access/imem.c:119
 msgid "Memory input"
@@ -8238,11 +8246,11 @@ msgstr "Størrelse på UDP-modtagerbuffer (byte)"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr ""
+msgstr "Anmod om multicast-stream"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Anmod serveren om at sende streamen som multicast"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8268,7 +8276,7 @@ msgid ""
 "Optimize the capture by fragmenting the screen in chunks of predefined "
 "height (16 might be a good value, and 0 means disabled)."
 msgstr ""
-"Optimér optagelsen ved at dele skærmen op i dele med foruddefineret højde "
+"Optimer optagelsen ved at dele skærmen op i dele med foruddefineret højde "
 "(16 er en god værdi, og 0 betyder deaktiveret)."
 
 #: modules/access/screen/screen.c:55 modules/access/screen/xcb.c:47
@@ -8613,7 +8621,8 @@ msgstr "Radioenhed"
 msgid "Radio tuner device node."
 msgstr "Enhedsnode for radiotuner."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvens"
 
@@ -8843,7 +8852,7 @@ msgid ""
 "Enable the color killer, i.e. switch to black & white picture whenever the "
 "signal is weak."
 msgstr ""
-"Aktivér farvefjerner, dvs. skift altid til sort og hvid-billede når signalet "
+"Aktiver farvefjerner, dvs. skift altid til sort og hvid-billede når signalet "
 "er svagt."
 
 #: modules/access/v4l2/v4l2.c:156
@@ -8927,7 +8936,7 @@ msgstr "Diskantjustering af lydinputtet."
 
 #: modules/access/v4l2/v4l2.c:183
 msgid "Mute the audio."
-msgstr "Mute lyden."
+msgstr "Gør lydløs."
 
 #: modules/access/v4l2/v4l2.c:184
 msgid "Loudness mode"
@@ -9160,7 +9169,7 @@ msgstr ""
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
-msgstr "Dummy-strømoutput"
+msgstr "Dummy-stream-output"
 
 #: modules/access_output/file.c:315
 msgid "Keep existing file"
@@ -9212,7 +9221,7 @@ msgstr "Åbn filen med synkroniseret skrivning."
 
 #: modules/access_output/file.c:388
 msgid "File stream output"
-msgstr "Fil-strømoutput"
+msgstr "Fil-stream-output"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
@@ -9245,7 +9254,7 @@ msgstr ""
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
-msgstr "HTTP-strømoutput"
+msgstr "HTTP-stream-output"
 
 #: modules/access_output/livehttp.c:67
 msgid "Segment length"
@@ -9274,7 +9283,7 @@ msgstr "Antal af segmenter, der skal indgå i indeks"
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
-msgstr "Tillad mellemlager"
+msgstr "Tillad cache"
 
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
@@ -9342,7 +9351,7 @@ msgstr "Brug randomiseret IV til kryptering"
 #: modules/access_output/livehttp.c:103
 msgid "Generate IV instead using segment-number as IV"
 msgstr ""
-"Generér initialiseringsvektor i stedet ved at bruge segmentnummer som IV"
+"Generer initialiseringsvektor i stedet ved at bruge segmentnummer som IV"
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
@@ -9456,15 +9465,15 @@ msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
-msgstr "Mellemlagringsværdi (ms)"
+msgstr "Cachingsværdi (ms)"
 
 #: modules/access_output/udp.c:64
 msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal være "
-"i millisekunder."
+"Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+"millisekunder."
 
 #: modules/access_output/udp.c:67
 msgid "Group packets"
@@ -9482,7 +9491,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:75
 msgid "UDP stream output"
-msgstr "UDP-strømoutput"
+msgstr "UDP-stream-output"
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9926,7 +9935,7 @@ msgstr "To gennemløb"
 #: modules/audio_filter/equalizer.c:73
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 msgid "Filter the audio twice. This provides a more intense effect."
-msgstr "Filtrér lyden to gange. Dette giver en mere intens effekt."
+msgstr "Filtrer lyden to gange. Dette giver en mere intens effekt."
 
 #: modules/audio_filter/equalizer.c:76
 msgid "Global gain"
@@ -10592,7 +10601,7 @@ msgid ""
 "Enable this option if you want your audio not to be interrupted by the other "
 "audio."
 msgstr ""
-"Aktivér denne indstilling, hvis du vil undgå at din lyd bliver forstyrret af "
+"Aktiver denne indstilling, hvis du vil undgå at din lyd bliver forstyrret af "
 "andre lydkilder."
 
 #: modules/audio_output/kai.c:110
@@ -10611,15 +10620,15 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
 msgid "Disabled"
-msgstr ""
+msgstr "Slået fra"
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
-msgstr ""
+msgstr "Aktiveret (uden HD-codecs)"
 
 #: modules/audio_output/mmdevice.c:1304
 msgid "Enabled"
-msgstr ""
+msgstr "Aktiveret"
 
 #: modules/audio_output/mmdevice.c:1309
 msgid "Windows Multimedia Device output"
@@ -11014,7 +11023,7 @@ msgstr "Kodning med interlacing"
 
 #: modules/codec/avcodec/avcodec.h:136
 msgid "Enable dedicated algorithms for interlaced frames."
-msgstr "Aktivér dedikerede algoritmer for billeder med interlacing."
+msgstr "Aktiver dedikerede algoritmer for billeder med interlacing."
 
 #: modules/codec/avcodec/avcodec.h:139
 msgid "Interlaced motion estimation"
@@ -11023,7 +11032,7 @@ msgstr "Estimering af bevægelse med interlace"
 #: modules/codec/avcodec/avcodec.h:140
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
-"Aktivér estimeringsalgoritmer for bevægelse med interlace. Dette kræver mere "
+"Aktiver estimeringsalgoritmer for bevægelse med interlace. Dette kræver mere "
 "CPU."
 
 #: modules/codec/avcodec/avcodec.h:143
@@ -11032,7 +11041,7 @@ msgstr "Pre-motion estimering"
 
 #: modules/codec/avcodec/avcodec.h:144
 msgid "Enable the pre-motion estimation algorithm."
-msgstr "Aktivér pre-motion estimering algoritme."
+msgstr "Aktiver pre-motion estimering algoritme."
 
 #: modules/codec/avcodec/avcodec.h:147
 msgid "Rate control buffer size"
@@ -11076,7 +11085,7 @@ msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
-"Aktivér en simpel støjredukton-algoritme for at formindske kodningslængden "
+"Aktiver en simpel støjredukton-algoritme for at formindske kodningslængden "
 "og bithastigheden, på bekostning af billeder med lavere kvalitet."
 
 #: modules/codec/avcodec/avcodec.h:166
@@ -11140,7 +11149,7 @@ msgstr "Trellis-kvantisering"
 #: modules/codec/avcodec/avcodec.h:193
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
-"Aktivér trellis-kvantisering (rate-forvrængning for blok-koefficienter)."
+"Aktiver trellis-kvantisering (rate-forvrængning for blok-koefficienter)."
 
 #: modules/codec/avcodec/avcodec.h:196
 msgid "Fixed quantizer scale"
@@ -11268,7 +11277,7 @@ msgstr ""
 "Hvis du ikke ved, hvordan du skal ordne det, så bed om hjælp fra din "
 "distribution.\n"
 "\n"
-"Dette er ikke en fejl i VLC media player.\n"
+"Dette er ikke en fejl i VLC medieafspiller.\n"
 "Undlad at kontakte VideoLAN-projektet vedrørende dette problem.\n"
 
 #: modules/codec/avcodec/encoder.c:869
@@ -11496,7 +11505,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
-msgstr "Aktivér spektral båndreplikering"
+msgstr "Aktiver spektral båndreplikering"
 
 #: modules/codec/fdkaac.c:71
 msgid "This is an optional feature only for the AAC-ELD profile."
@@ -11513,7 +11522,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
-msgstr "Aktivér biblioteket afterburner"
+msgstr "Aktiver biblioteket afterburner"
 
 #: modules/codec/fdkaac.c:77
 msgid ""
@@ -11790,7 +11799,7 @@ msgid ""
 "only render static text and bitmap based streams."
 msgstr ""
 "Kate-streams kan optegnes via Tiger-biblioteket. Hvis du deaktiverer dette, "
-"så er det kun statisk tekst og bitmap-baserede strømme som bliver optegnet."
+"så er det kun statisk tekst og bitmap-baserede streams som bliver optegnet."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
@@ -11834,7 +11843,7 @@ msgid ""
 "font parameters (name, size, etc) to use. A blank name will let Tiger choose "
 "font parameters where appropriate."
 msgstr ""
-"Hvilke skrifttypebeskrivelser som skal anvendes, hvis Kate-strømmen ikke "
+"Hvilke skrifttypebeskrivelser som skal anvendes, hvis Kate-streamen ikke "
 "angiver hvilke specifikke parametre for skrifttype (navn, størrelse, osv.) "
 "som skal benyttes. En tomt navn vil lade Tiger vælge parametre for "
 "skrifttype, hvor det findes passende."
@@ -11925,19 +11934,19 @@ msgstr "Undertekster (avanceret)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Underteksttegnere som bruger libass"
+msgstr "Undertekstoptegnere som bruger libass"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
 msgid "Building font cache"
-msgstr "Bygger skrifttypemellemlager"
+msgstr "Bygger skrifttypecache"
 
 #: modules/codec/libass.c:250
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
 msgstr ""
-"Vent venligst mens dit skrifttypemellemlager bliver genopbygget.\n"
+"Vent venligst mens din skrifttypecache bliver genopbygget.\n"
 "Det bør tage mindre end et minut."
 
 #: modules/codec/libmpeg2.c:137
@@ -12018,7 +12027,7 @@ msgstr "PNG-video-koder"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
-msgstr "Aktivér software-tilstand"
+msgstr "Aktiver software-tilstand"
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -12381,7 +12390,7 @@ msgstr "Præfilter"
 
 #: modules/codec/schroedinger.c:135
 msgid "Enable adaptive prefiltering"
-msgstr "Aktivér adaptive prefiltering"
+msgstr "Aktiver adaptive prefiltering"
 
 #: modules/codec/schroedinger.c:147
 msgid "No pre-filtering"
@@ -12510,15 +12519,15 @@ msgstr "Også kendt som DWT-niveauer"
 
 #: modules/codec/schroedinger.c:250
 msgid "Enable multiple quantizers"
-msgstr "Aktivér flere kvantiseringer"
+msgstr "Aktiver flere kvantiseringer"
 
 #: modules/codec/schroedinger.c:251
 msgid "Enable multiple quantizers per subband (one per codeblock)"
-msgstr "Aktivér flere kvantiseringer pr. underbånd (én pr. kodeblok)"
+msgstr "Aktiver flere kvantiseringer pr. underbånd (én pr. kodeblok)"
 
 #: modules/codec/schroedinger.c:255
 msgid "Disable arithmetic coding"
-msgstr "Deaktivér aritmetisk kodning"
+msgstr "Deaktiver aritmetisk kodning"
 
 #: modules/codec/schroedinger.c:256
 msgid "Use variable length codes instead, useful for very high bitrates"
@@ -12576,7 +12585,7 @@ msgstr "fuld - én kodeblok pr. underbånd"
 
 #: modules/codec/schroedinger.c:306
 msgid "Enable hierarchical Motion Estimation"
-msgstr "Aktivér hierarchical Motion Estimation"
+msgstr "Aktiver hierarchical Motion Estimation"
 
 #: modules/codec/schroedinger.c:310
 msgid "Number of levels of downsampling"
@@ -12588,15 +12597,15 @@ msgstr "Antal downsampling niveauer i hierarkisk motion estimering tilstand"
 
 #: modules/codec/schroedinger.c:315
 msgid "Enable Global Motion Estimation"
-msgstr "Aktivér global motion estimering"
+msgstr "Aktiver global motion estimering"
 
 #: modules/codec/schroedinger.c:319
 msgid "Enable Phase Correlation Estimation"
-msgstr "Aktivér Phase Correlation Estimation"
+msgstr "Aktiver Phase Correlation Estimation"
 
 #: modules/codec/schroedinger.c:323
 msgid "Enable Scene Change Detection"
-msgstr "Aktivér registrering af scene ændring"
+msgstr "Aktiver registrering af sceneændring"
 
 #: modules/codec/schroedinger.c:327
 msgid "Force Profile"
@@ -12714,7 +12723,7 @@ msgid ""
 "Enable voice activity detection (VAD). It is automatically activated in VBR "
 "mode."
 msgstr ""
-"Aktivér voice activity detection (VAD). Aktiveres automatisk i VBR-tilstand."
+"Aktiver voice activity detection (VAD). Aktiveres automatisk i VBR-tilstand."
 
 #: modules/codec/speex.c:85
 msgid "Discontinuous Transmission"
@@ -12722,7 +12731,7 @@ msgstr "Discontinuous Transmission"
 
 #: modules/codec/speex.c:87
 msgid "Enable discontinuous transmission (DTX)."
-msgstr "Aktivér discontinuous transmission (DTX)."
+msgstr "Aktiver discontinuous transmission (DTX)."
 
 #: modules/codec/speex.c:91
 msgid "Narrow-band (8kHz)"
@@ -12754,7 +12763,7 @@ msgstr "Koder for Speex-lyd"
 
 #: modules/codec/spudec/spudec.c:45
 msgid "Disable DVD subtitle transparency"
-msgstr "Deaktivér gennemsigtige DVD-undertekster"
+msgstr "Deaktiver gennemsigtige DVD-undertekster"
 
 #: modules/codec/spudec/spudec.c:46
 msgid "Removes all transparency effects used in DVD subtitles."
@@ -13080,12 +13089,12 @@ msgstr ""
 
 #: modules/codec/telx.c:60
 msgid "Ignore subtitle flag"
-msgstr "Ignorér undertekstflag"
+msgstr "Ignorer undertekstflag"
 
 #: modules/codec/telx.c:61
 msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
 msgstr ""
-"Ignorér undertekstflaget. Prøv dette hvis dine undertekster ikke vises."
+"Ignorer undertekstflaget. Prøv dette hvis dine undertekster ikke vises."
 
 #: modules/codec/telx.c:64
 msgid "Workaround for France"
@@ -13256,7 +13265,7 @@ msgstr "WebM-videodekoder"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
-msgstr ""
+msgstr "Webm-videokoder"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
@@ -13330,7 +13339,7 @@ msgstr "brug åben GOP, brug også bluray-compat for bluray-kompatibilitet"
 
 #: modules/codec/x264.c:95
 msgid "Enable compatibility hacks for Blu-ray support"
-msgstr "Aktivér kompatibilitet hacks til Blu-ray understøttelse"
+msgstr "Aktiver kompatibilitets-hacks til Blu-ray-understøttelse"
 
 #: modules/codec/x264.c:96
 msgid ""
@@ -13338,7 +13347,7 @@ msgid ""
 "ray compatibility\n"
 "e.g. resolution, framerate, level"
 msgstr ""
-"Aktivér hacks til understøttelse af Blu-ray, det gælder ikke alle aspekter "
+"Aktiver hacks til understøttelse af Blu-ray, det gælder ikke alle aspekter "
 "af Blu-ray kompatibilitet\n"
 "f.eks. opløsning, billedhastighed, niveau"
 
@@ -13456,7 +13465,7 @@ msgstr "Skip loop filter"
 
 #: modules/codec/x264.c:150
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr "Deaktivér deblocking loop filter (formindsker kvaliteten)."
+msgstr "Deaktiver deblocking loop filter (formindsker kvaliteten)."
 
 #: modules/codec/x264.c:152
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
@@ -13518,7 +13527,7 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
-"Definér arrangering af billeder for stereoskopiske videoer:\n"
+"Definer arrangering af billeder for stereoskopiske videoer:\n"
 "0: skakbræt - pixels er skiftevis fra V og H\n"
 "1: skift efter kolonne - V og H fås med interlace efter kolonne\n"
 "2: skift efter række - V og H fås med interlace efter række\n"
@@ -13736,7 +13745,7 @@ msgstr "QP-kurvekomprimering. I Intervallet 0.0 (CBR) til 1.0 (QCP)."
 
 #: modules/codec/x264.c:263 modules/codec/x264.c:267
 msgid "Reduce fluctuations in QP"
-msgstr "Reducér udsving i QP"
+msgstr "Reducer udsving i QP"
 
 #: modules/codec/x264.c:264
 msgid ""
@@ -14278,7 +14287,7 @@ msgstr "D-Bus-kontrolgrænseflade"
 #: modules/video_output/wayland/xdg-shell.c:291
 #: modules/video_output/xcb/window.c:464
 msgid "VLC media player"
-msgstr "VLC media player"
+msgstr "VLC medieafspiller"
 
 #: modules/control/dummy.c:38 modules/control/oldrc.c:176
 msgid "Do not open a DOS command box interface"
@@ -14577,19 +14586,19 @@ msgstr "Netværkssynkronisering"
 
 #: modules/control/ntservice.c:45
 msgid "Install Windows Service"
-msgstr "Installér Windows service"
+msgstr "Installer Windows service"
 
 #: modules/control/ntservice.c:47
 msgid "Install the Service and exit."
-msgstr "Installér tjenesten og afslut."
+msgstr "Installer tjenesten og afslut."
 
 #: modules/control/ntservice.c:48
 msgid "Uninstall Windows Service"
-msgstr "Afinstallér Windows service"
+msgstr "Afinstaller Windows-tjeneste"
 
 #: modules/control/ntservice.c:50
 msgid "Uninstall the Service and exit."
-msgstr "Afinstallér tjenesten og afslut."
+msgstr "Afinstaller tjenesten og afslut."
 
 #: modules/control/ntservice.c:51
 msgid "Display name of the Service"
@@ -15156,15 +15165,15 @@ msgstr "Spørg om handling"
 
 #: modules/demux/avi/avi.c:67
 msgid "Always fix"
-msgstr "Reparér altid"
+msgstr "Reparer altid"
 
 #: modules/demux/avi/avi.c:68
 msgid "Never fix"
-msgstr "Reparér aldrig"
+msgstr "Reparer aldrig"
 
 #: modules/demux/avi/avi.c:69
 msgid "Fix when necessary"
-msgstr "Reparér når nødvendigt"
+msgstr "Reparer når nødvendigt"
 
 #: modules/demux/avi/avi.c:73
 msgid "AVI demuxer"
@@ -15394,11 +15403,11 @@ msgstr ""
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
-msgstr "Aktivér støjreduktionsalgoritme."
+msgstr "Aktiver støjreduktionsalgoritme."
 
 #: modules/demux/mod.c:56
 msgid "Enable reverberation"
-msgstr "Aktivér rumklang"
+msgstr "Aktiver rumklang"
 
 #: modules/demux/mod.c:57
 msgid "Reverberation level (from 0 to 100, default value is 0)."
@@ -15410,7 +15419,7 @@ msgstr ""
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
-msgstr "Aktivér megabass-tilstand"
+msgstr "Aktiver megabass-tilstand"
 
 #: modules/demux/mod.c:62
 msgid "Megabass mode level (from 0 to 100, default value is 0)."
@@ -15725,8 +15734,8 @@ msgid ""
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
-"Angiv det interne ID for hver elementære strøm, der håndteres af VLC, til "
-"samme værdi som PID'et i TS-strømmen, i stedet for 1, 2, 3, osv. Det kan "
+"Angiv det interne ID for hver elementære stream, der håndteres af VLC, til "
+"samme værdi som PID'et i TS-streamen, i stedet for 1, 2, 3, osv. Det kan "
 "være fornuftigt at foretage '#duplicate{..., select=\"es=<pid>\"}'."
 
 #: modules/demux/mpeg/ts.c:90 modules/mux/mpeg/ts.c:173
@@ -15771,7 +15780,7 @@ msgid ""
 "off this option when using stream output."
 msgstr ""
 "Adskil Tekst-TV/DVBS sider til selvstændige ES. Det kan være nyttigt at slå "
-"indstillingen fra når der anvendes strømoutput."
+"indstillingen fra når der anvendes streamoutput."
 
 #: modules/demux/mpeg/ts.c:111
 msgid ""
@@ -16261,7 +16270,7 @@ msgstr "Dias (billeder)"
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:330
 msgid "About VLC media player"
-msgstr "Om VLC media player"
+msgstr "Om VLC medieafspiller"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:102
 #: modules/gui/qt/dialogs/help.cpp:125
@@ -16282,7 +16291,7 @@ msgstr "Udviklere"
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
 msgstr ""
-"VLC media player og VideoLAN er varemærker tilhørende VideoLAN Association."
+"VLC medieafspiller og VideoLAN er varemærker tilhørende VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
 #: modules/gui/qt/dialogs/help.cpp:94
@@ -16296,12 +16305,12 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player er en fri og open source medieafspiller, koder og "
+"<p>VLC medieafspiller er en fri og open source medieafspiller, koder og "
 "streamer lavet af frivillige fra <a href=\"http://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a>-"
 "fællesskabet.</p><p>VLC bruger sine egne interne codecs, virker på stort set "
 "alle populære platforme og kan afspille næsten alle filer, CD'er, DVD'er, "
-"netværksstrømme og andre medieformater!</p><p><a href=\"http://www.videolan."
+"netværksstreams og andre medieformater!</p><p><a href=\"http://www.videolan."
 "org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Hjælp os og vær med!</span></a>"
 
@@ -16366,14 +16375,15 @@ msgid "Name"
 msgstr "Navn"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Forfatter"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
 msgid "Uninstall"
-msgstr "Afinstallér"
+msgstr "Afinstaller"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -16395,7 +16405,7 @@ msgstr "Forforstærkning"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:222
 msgid "Enable dynamic range compressor"
-msgstr "Aktivér kompressor for dynamisk interval"
+msgstr "Aktiver kompressor for dynamisk interval"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:234
@@ -16422,7 +16432,7 @@ msgstr "Grænse"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:233
 msgid "Enable Spatializer"
-msgstr "Aktivér spatializer"
+msgstr "Aktiver spatializer"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:245
 msgid "Headphone virtualization"
@@ -16455,12 +16465,12 @@ msgstr "Opret en kopi af den nuværende profil..."
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:330
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1037
 msgid "Organize Profiles..."
-msgstr "Organisér profiler..."
+msgstr "Organiser profiler..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:509
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:790
 msgid "Duplicate current profile for a new profile"
-msgstr "Duplikér den nuværende profil til en ny profil"
+msgstr "Dupliker den nuværende profil til en ny profil"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:510
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:474
@@ -16519,7 +16529,7 @@ msgstr "Tilføj en ny forudindstilling..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:650
 msgid "Organize Presets..."
-msgstr "Organisér forudindstillinger..."
+msgstr "Organiser forudindstillinger..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:821
 msgid "Save current selection as new preset"
@@ -16639,17 +16649,17 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
 msgid "Go to previous item"
-msgstr ""
+msgstr "Gå til forrige emne"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
-msgstr ""
+msgstr "Gå til næste emne"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
-msgstr "Konvertér og stream"
+msgstr "Konverter og stream"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:137
 msgid "Go!"
@@ -16658,7 +16668,7 @@ msgstr "Kør!"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:138
 #: modules/gui/macosx/VLCMainWindow.m:191
 msgid "Drop media here"
-msgstr "Slip medier her"
+msgstr "Træk og slip mediefiler her"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:139
 #: modules/gui/macosx/VLCMainWindow.m:193
@@ -16704,7 +16714,7 @@ msgstr "Indstil streaming..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 msgid "Select Streaming Method"
-msgstr ""
+msgstr "Vælg streamings-metode"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16833,7 +16843,7 @@ msgstr "RTSP Announcement"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:194
 #: modules/gui/macosx/VLCOutput.m:106 modules/gui/macosx/VLCOutput.m:507
 msgid "Export SDP as file"
-msgstr "Eksportér SDP som fil"
+msgstr "Eksporter SDP som fil"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:198
 #: modules/gui/macosx/VLCOutput.m:108
@@ -17011,15 +17021,15 @@ msgstr "Afspil nye punkter så snart de bliver tilføjet."
 
 #: modules/gui/macosx/macosx.m:72
 msgid "Keep Recent Items"
-msgstr "Behold seneste elementer"
+msgstr "Behold seneste emner"
 
 #: modules/gui/macosx/macosx.m:73
 msgid ""
 "By default, VLC keeps a list of the last 10 items. This feature can be "
 "disabled here."
 msgstr ""
-"Som standard, husker VLC en liste med de sidste 10 elementer. Denne egenskab "
-"kan slås fra her."
+"Som standard, husker VLC en liste med de sidste 10 emner. Denne egenskab kan "
+"slås fra her."
 
 #: modules/gui/macosx/macosx.m:76
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
@@ -17046,7 +17056,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:82
 #: modules/gui/macosx/VLCSimplePrefsController.m:321
 msgid "Display VLC status menu icon"
-msgstr ""
+msgstr "Vis VLC-menulinjeikon"
 
 #: modules/gui/macosx/macosx.m:83
 msgid ""
@@ -17056,7 +17066,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
-msgstr "Styr spilleliste-elementer med Apple-fjernbetjeningen"
+msgstr "Styr spilleliste-emner med Apple-fjernbetjeningen"
 
 #: modules/gui/macosx/macosx.m:86
 msgid ""
@@ -17152,7 +17162,7 @@ msgstr "Lås højde-bredde-forhold"
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr ""
+msgstr "Sluk tastaturbelysningen under afspilning i fuld skærm"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17368,7 +17378,7 @@ msgstr "Luk vindue"
 
 #: modules/gui/macosx/VLCMainMenu.m:353
 msgid "Convert / Stream..."
-msgstr "Konvertér/stream..."
+msgstr "Konverter/stream..."
 
 #: modules/gui/macosx/VLCMainMenu.m:354
 msgid "Save Playlist..."
@@ -17384,7 +17394,7 @@ msgstr "Klip"
 
 #: modules/gui/macosx/VLCMainMenu.m:359
 msgid "Copy"
-msgstr "Kopiér"
+msgstr "Kopier"
 
 #: modules/gui/macosx/VLCMainMenu.m:360
 msgid "Paste"
@@ -17527,7 +17537,7 @@ msgstr "Vindue"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
 msgid "Minimize"
-msgstr "Minimér"
+msgstr "Minimer"
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Player..."
@@ -17567,7 +17577,7 @@ msgstr "Fejl og advarsler..."
 
 #: modules/gui/macosx/VLCMainMenu.m:476
 msgid "Bring All to Front"
-msgstr "Bring alle til front"
+msgstr "Anbring alle forrest"
 
 #: modules/gui/macosx/VLCMainMenu.m:478 modules/gui/qt/dialogs/help.cpp:54
 #: modules/gui/qt/menus.cpp:950 modules/gui/qt/menus.cpp:1137
@@ -17576,7 +17586,7 @@ msgstr "Hjælp"
 
 #: modules/gui/macosx/VLCMainMenu.m:479
 msgid "VLC media player Help..."
-msgstr "VLC media player hjælp..."
+msgstr "VLC medieafspiller-hjælp..."
 
 #: modules/gui/macosx/VLCMainMenu.m:481
 msgid "Online Documentation..."
@@ -17631,7 +17641,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindow.m:204
 #: modules/gui/qt/components/playlist/selector.cpp:580
 msgid "Subscribe"
-msgstr "Abonnér"
+msgstr "Abonner"
 
 #: modules/gui/macosx/VLCMainWindow.m:199
 #: modules/gui/macosx/VLCMainWindow.m:210
@@ -17642,7 +17652,7 @@ msgstr "Afmeld abonnement"
 #: modules/gui/macosx/VLCMainWindow.m:202
 #: modules/gui/qt/components/playlist/selector.cpp:279
 msgid "Subscribe to a podcast"
-msgstr "Abonnér på en podcast"
+msgstr "Abonner på en podcast"
 
 #: modules/gui/macosx/VLCMainWindow.m:203
 #: modules/gui/qt/components/playlist/selector.cpp:581
@@ -17663,7 +17673,7 @@ msgstr "Søg efter albumbillede og metadata?"
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid "Enable Metadata Retrieval"
-msgstr "Aktivér overførsel af metadata"
+msgstr "Aktiver overførsel af metadata"
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid "No, Thanks"
@@ -17753,7 +17763,7 @@ msgstr "Åbn"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 msgid "Stream output:"
-msgstr ""
+msgstr "Stream-output:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -17785,7 +17795,7 @@ msgstr "Vælg en fil"
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
 msgid "Select a file for playback"
-msgstr ""
+msgstr "Vælg en fil til afspilning"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17820,11 +17830,11 @@ msgstr "Indsæt disk"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:173
 msgid "Disable DVD menus"
-msgstr "Deaktivér DVD-menuer"
+msgstr "Deaktiver DVD-menuer"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:176
 msgid "Enable DVD menus"
-msgstr "Aktivér DVD-menuer"
+msgstr "Aktiver DVD-menuer"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
 #: modules/stream_out/chromecast/cast.cpp:155
@@ -17837,7 +17847,7 @@ msgid ""
 "enter the URL in the field above. If you want to open a RTP or UDP stream, "
 "press the button below."
 msgstr ""
-"For at åbne et almindelig netværksstrøm (HTTP, RTSP, RTMP, MMS, FTP, osv.), "
+"For at åbne et almindelig netværksstream (HTTP, RTSP, RTMP, MMS, FTP, osv.), "
 "skal du bare skrive dens URL i feltet ovenfor. Hvis du vil åbne en RTP- "
 "eller UDP-stream, skal du trykke på knappen nedenfor."
 
@@ -17854,7 +17864,7 @@ msgstr ""
 "en multicast stream. I unicast tilstand bruger VLC automatisk din maskines "
 "IP.\n"
 "\n"
-"For at åbne et stream med en anden protokol skal du bare trykke på Annullér "
+"For at åbne et stream med en anden protokol skal du bare trykke på Annuller "
 "for at lukke dette ark."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
@@ -17921,7 +17931,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 msgid "Select a subtitle file"
-msgstr ""
+msgstr "Vælg en undertekstfil"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18131,7 +18141,7 @@ msgstr "Fortsæt"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr ""
+msgstr "Genoptag altid medieafspilning"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18181,7 +18191,7 @@ msgstr "Foretrukket sprog til lyd"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:271
 msgid "Enable Last.fm submissions"
-msgstr "Aktivér indberetning til Last.fm"
+msgstr "Aktiver indberetning til Last.fm"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 msgid "Visualization"
@@ -18229,11 +18239,11 @@ msgstr "Mappe eller filnavn hvor optagelser gemmes"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:292
 msgid "Repair AVI Files"
-msgstr "Reparér AVI-filer"
+msgstr "Reparer AVI-filer"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:293
 msgid "Default Caching Level"
-msgstr "Standard mellemlagerniveau"
+msgstr "Standard cachingniveau"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:294
 #: modules/gui/qt/ui/open.h:266
@@ -18262,7 +18272,7 @@ msgstr "Rediger standardindstillingerne for netværksprotokoller"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Open network streams using the following protocols"
-msgstr "Åbn netværksstrømme med følgende protokoller"
+msgstr "Åbn netværksstreams med følgende protokoller"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Note that these are system-wide settings."
@@ -18270,7 +18280,7 @@ msgstr "Bemærk at disse indstillinger er gældende for hele systemet."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "General settings"
-msgstr ""
+msgstr "Generelle indstillinger"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -18290,11 +18300,11 @@ msgstr "Genoptag afspilning"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Playback behaviour"
-msgstr ""
+msgstr "Afspilningsadfærd"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:324
 msgid "Enable notifications on playlist item change"
-msgstr ""
+msgstr "Aktiver meddelelser ved skift af emne på spilleliste"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -18307,11 +18317,11 @@ msgstr "Søg automatisk efter opdateringer"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
 msgid "HTTP web interface"
-msgstr ""
+msgstr "HTTP-webinterface"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
 msgid "Enable HTTP web interface"
-msgstr ""
+msgstr "Aktiver HTTP-webinterface"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -18343,7 +18353,7 @@ msgstr "Foretrukket undertekstsprog"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "Enable OSD"
-msgstr "Aktivér OSD"
+msgstr "Aktiver OSD"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/text_renderer/freetype/freetype.c:104
@@ -18377,7 +18387,7 @@ msgstr "Fuldskærmsindstillinger"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Start in fullscreen"
-msgstr ""
+msgstr "Start i fuld skærm"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -18464,7 +18474,7 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"VLC media player's indstillinger vil blive nulstillet.\n"
+"VLC medieafspillers indstillinger vil blive nulstillet.\n"
 "\n"
 "Bemærk at VLC genstarter under forløbet, så din nuværende spilleliste vil "
 "blive tømt og eventuel afspilning, streaming eller transcoding vil stoppe "
@@ -18517,32 +18527,32 @@ msgstr "Denne tastekombination er allerede brugt af \"%@\"."
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
 msgid "Toggle Play/Pause"
-msgstr ""
+msgstr "Afspil/pause"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr ""
+msgstr "Slå blandet afspilningrækkefølge til/fra"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
-msgstr ""
+msgstr "Vis hovedvinduet"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
 msgid "Path/URL Action"
-msgstr ""
+msgstr "Sti/URL-handling"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
 msgid "Nothing playing"
-msgstr ""
+msgstr "Intet afspilles"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
 msgid "Select File In Finder"
-msgstr ""
+msgstr "Vælg fil i Finder"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
 msgid "Copy URL to clipboard"
-msgstr ""
+msgstr "Kopier URL til udklipsholder"
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -18553,7 +18563,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Lyd/video"
 
@@ -18706,7 +18717,7 @@ msgstr "Synkroniser venstre og højre"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:223
 #: modules/gui/qt/ui/video_effects.h:1261
 msgid "Transform"
-msgstr "Transformér"
+msgstr "Transformer"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:225
 #: modules/video_filter/transform.c:52
@@ -18888,7 +18899,7 @@ msgstr "Gennemsigtighed"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:399
 msgid "Organize profiles..."
-msgstr "Organisér profiler..."
+msgstr "Organiser profiler..."
 
 #: modules/gui/macosx/misc.m:301
 msgid "B"
@@ -19056,7 +19067,7 @@ msgstr " a, z                   Højere/lavere"
 
 #: modules/gui/ncurses.c:889
 msgid " m                      Mute"
-msgstr " m                      Mute"
+msgstr " m                      Lydløs"
 
 #. xgettext: You can use ↑ and ↓ characters
 #: modules/gui/ncurses.c:891
@@ -19091,7 +19102,7 @@ msgstr " R                      Gentag punkt til/fra"
 
 #: modules/gui/ncurses.c:904
 msgid " o                      Order Playlist by title"
-msgstr " o                      Sortér spilleliste efter titel"
+msgstr " o                      Sorter spilleliste efter titel"
 
 #: modules/gui/ncurses.c:905
 msgid " O                      Reverse order Playlist by title"
@@ -19099,15 +19110,15 @@ msgstr " O                      Omvendte sortering af spilleliste efter titel"
 
 #: modules/gui/ncurses.c:906
 msgid " g                      Go to the current playing item"
-msgstr " g                      Gå til det element som afspilles nu"
+msgstr " g                      Gå til det emne som afspilles nu"
 
 #: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
-msgstr " /                      Kig efter et element"
+msgstr " /                      Kig efter et emne"
 
 #: modules/gui/ncurses.c:908
 msgid " ;                      Look for the next item"
-msgstr " ;                      Kig efter det næste element"
+msgstr " ;                      Kig efter det næste emne"
 
 #: modules/gui/ncurses.c:909
 msgid " A                      Add an entry"
@@ -19172,7 +19183,7 @@ msgstr " Placering : %s/%s"
 
 #: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
-msgstr " Lydstyrke   : Mute"
+msgstr " Lydstyrke   : Lydløs"
 
 #: modules/gui/ncurses.c:1096
 #, c-format
@@ -19366,7 +19377,7 @@ msgstr "Slå lyden til"
 #: modules/gui/qt/components/controller_widget.cpp:148
 msgctxt "Tooltip|Mute"
 msgid "Mute"
-msgstr "Mute"
+msgstr "Lydløs"
 
 #: modules/gui/qt/components/controller_widget.cpp:234
 msgid "Pause the playback"
@@ -19866,7 +19877,7 @@ msgstr "Indtast et nyt navn til mappen:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
-msgstr "Sortér efter"
+msgstr "Sorter efter"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:261
 msgid "Ascending"
@@ -19898,7 +19909,7 @@ msgid ""
 "Drop a file here or select a media source from the left."
 msgstr ""
 "Spillelisten er tom.\n"
-"Slip en fil her eller vælg en mediekilde til venstre."
+"Træk og slip en fil her eller vælg en mediekilde til venstre."
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:143
 msgid "Icons"
@@ -20077,7 +20088,7 @@ msgstr "&Anvend"
 #: modules/gui/qt/dialogs/preferences.cpp:97
 #: modules/gui/qt/dialogs/toolbar.cpp:198
 msgid "&Cancel"
-msgstr "Annu&llér"
+msgstr "Annu&ller"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:53
 msgid "Profile"
@@ -20225,10 +20236,11 @@ msgid "Extract"
 msgstr "Udtræk"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20240,9 +20252,10 @@ msgstr "&Luk"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
-msgstr "Konvertér"
+msgstr "Konverter"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
 msgid "Multiple files selected."
@@ -20300,7 +20313,7 @@ msgstr "Programguide"
 #: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
 #: modules/gui/qt/ui/about.h:290
 msgid "Update"
-msgstr "Opdatér"
+msgstr "Opdater"
 
 #: modules/gui/qt/dialogs/epg.cpp:161
 msgid " (%1+ rated)"
@@ -20361,9 +20374,9 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>For at beskytte dit privatliv, indsamler <i>VLC media player</i> <b>ikke</"
-"b> personlige data og videregiver dem heller ikke, selv i anonym form, til "
-"andre.</p>\n"
+"<p>For at beskytte dit privatliv, indsamler <i>VLC medieafspiller</i> "
+"<b>ikke</b> personlige data og videregiver dem heller ikke, selv i anonym "
+"form, til andre.</p>\n"
 "<p>Ikke desto mindre, er <i>VLC</i> i stand til automatisk at hente "
 "oplysninger om medierne i din spilleliste fra internet-baseret "
 "tredjepartstjenester. Det inkludere cover-billede, spornavne, kunstnernavne "
@@ -20412,7 +20425,7 @@ msgstr "&Nej"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:147
 msgid "VLC media player updates"
-msgstr "VLC media player opdateringer"
+msgstr "VLC medieafspiller-opdateringer"
 
 #: modules/gui/qt/dialogs/help.cpp:294
 msgid "A new version of VLC (%1.%2.%3%4) is available."
@@ -20420,7 +20433,7 @@ msgstr "Der findes en ny version af VLC (%1.%2.%3%4)."
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
-msgstr "Du har den seneste version af VLC media player."
+msgstr "Du har den seneste version af VLC medieafspiller."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
@@ -20533,11 +20546,11 @@ msgstr "&Stream"
 
 #: modules/gui/qt/dialogs/open.cpp:121
 msgid "C&onvert"
-msgstr "K&onvertér"
+msgstr "K&onverter"
 
 #: modules/gui/qt/dialogs/open.cpp:207
 msgid "C&onvert / Save"
-msgstr "K&onvertér / gem"
+msgstr "K&onverter / gem"
 
 #: modules/gui/qt/dialogs/openurl.cpp:47
 msgid "Open URL"
@@ -20615,7 +20628,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:393
 msgid "Retrieves extra info and art for playlist items"
-msgstr "Henter ekstra information og billede til elementer på spillelisten"
+msgstr "Henter ekstra information og billede til emne på spillelisten"
 
 #: modules/gui/qt/dialogs/plugins.cpp:396
 msgid ""
@@ -20651,11 +20664,11 @@ msgstr "%1 downloads"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
 msgid "&Uninstall"
-msgstr "&Afinstallér"
+msgstr "&Afinstaller"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
 msgid "&Install"
-msgstr "&Installér"
+msgstr "&Installer"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -20667,7 +20680,8 @@ msgstr "Version"
 msgid "Website"
 msgstr "Hjemmeside"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Filer"
 
@@ -20726,11 +20740,11 @@ msgstr "Fil med indstillinger kunne ikke blive gemt"
 #: modules/gui/qt/dialogs/preferences.cpp:337
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
-"Er du sikker på, at du vil nulstille dine VLC media player-indstillinger?"
+"Er du sikker på, at du vil nulstille dine VLC medieafspiller-indstillinger?"
 
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
-msgstr "Strømoutput"
+msgstr "Stream-output"
 
 #: modules/gui/qt/dialogs/sout.cpp:51
 msgid ""
@@ -20750,7 +20764,7 @@ msgid ""
 "This is automatically generated when you change the above settings,\n"
 "but you can change it manually."
 msgstr ""
-"Strømoutput-streng.\n"
+"Stream-output-streng.\n"
 "Genereres automatisk når du ændre indstillingerne ovenfor,\n"
 "men du kan ændre det manuelt."
 
@@ -20920,11 +20934,11 @@ msgstr " dage"
 
 #: modules/gui/qt/dialogs/vlm.cpp:131
 msgid "I&mport"
-msgstr "I&mportér"
+msgstr "I&mporter"
 
 #: modules/gui/qt/dialogs/vlm.cpp:134
 msgid "E&xport"
-msgstr "&Eksportér"
+msgstr "&Eksporter"
 
 #: modules/gui/qt/dialogs/vlm.cpp:265
 msgid "Save VLM configuration as..."
@@ -21002,7 +21016,7 @@ msgstr "Tom"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
-msgstr "Deaktivér"
+msgstr "Deaktiver"
 
 #: modules/gui/qt/main_interface.cpp:376
 msgid "Do you want to restart the playback where left off?"
@@ -21066,7 +21080,7 @@ msgstr "Åbn &disk..."
 
 #: modules/gui/qt/menus.cpp:365
 msgid "Open &Network Stream..."
-msgstr "Åbn &netværksstrøm..."
+msgstr "Åbn &netværksstream..."
 
 #: modules/gui/qt/menus.cpp:367 modules/gui/qt/menus.cpp:943
 msgid "Open &Capture Device..."
@@ -21082,7 +21096,7 @@ msgstr "Åbn s&eneste medier"
 
 #: modules/gui/qt/menus.cpp:387
 msgid "Conve&rt / Save..."
-msgstr "&Konvertér / gem..."
+msgstr "&Konverter / gem..."
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
@@ -21174,7 +21188,7 @@ msgstr "&Lavere"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
-msgstr "&Mute"
+msgstr "&Lydløs"
 
 #: modules/gui/qt/menus.cpp:618
 msgid "Audio &Device"
@@ -21254,7 +21268,7 @@ msgstr "&Program"
 
 #: modules/gui/qt/menus.cpp:724
 msgid "&Manage"
-msgstr "&Håndtér"
+msgstr "&Håndter"
 
 #: modules/gui/qt/menus.cpp:790
 msgid "Check for &Updates..."
@@ -21314,11 +21328,11 @@ msgstr "&Afspilning"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr "&Skjul VLC media player i proceslinje"
+msgstr "&Skjul VLC medieafspiller i proceslinje"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr "&Vis VLC media player"
+msgstr "&Vis VLC medieafspiller"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
@@ -21337,9 +21351,8 @@ msgid "<Local>"
 msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1656
-#, fuzzy
 msgid "Scanning..."
-msgstr "Skanner DVB"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21363,7 +21376,7 @@ msgid ""
 "basic actions."
 msgstr ""
 "Vis et ikon i proceslinjen, der giver dig grundlæggende kontrol med VLC "
-"media player."
+"medieafspiller."
 
 #: modules/gui/qt/qt.cpp:91
 msgid "Start VLC with only a systray icon"
@@ -21391,7 +21404,7 @@ msgid ""
 "playlist item changes, when VLC is minimized or hidden."
 msgstr ""
 "Vis en påmindelse-pop op med kunstneren og spornavnet når det nuværende "
-"spilleliste-element ændres, når VLC er minimeret eller skjult."
+"spilleliste-emne ændres, når VLC er minimeret eller skjult."
 
 #: modules/gui/qt/qt.cpp:110
 msgid "Windows opacity between 0.1 and 1"
@@ -21545,10 +21558,10 @@ msgid ""
 "unchecked, the volume buttons will change VLC's volume when VLC is selected "
 "and change the system volume when VLC is not selected."
 msgstr ""
-"Når denne indstilling er slået til, vil knapperne højere, lavere og mute på "
-"tastaturet altid ændre systemets lydstyrke. Når indstillingen er slået fra, "
-"vil lydstyrke-knapperne ændre VLCs lydstyrke når VLC er valgt, og systemets "
-"lydstyrke når VLC ikke er valgt."
+"Når denne indstilling er slået til, vil knapperne skru op, skru ned og "
+"lydløs på tastaturet altid ændre systemets lydstyrke. Når indstillingen er "
+"slået fra, vil lydstyrke-knapperne ændre VLCs lydstyrke når VLC er valgt, og "
+"systemets lydstyrke når VLC ikke er valgt."
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
@@ -21648,7 +21661,7 @@ msgstr "Vis VLC på proceslinjen"
 
 #: modules/gui/skins2/src/skin_main.cpp:503
 msgid "Enable transparency effects"
-msgstr "Aktivér gennemsigtige effekter"
+msgstr "Aktiver gennemsigtige effekter"
 
 #: modules/gui/skins2/src/skin_main.cpp:504
 msgid ""
@@ -21751,8 +21764,9 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Indstil billedgamma, mellem 0.01 og 10. Standard er 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:620
+#, fuzzy
 msgid "Direct3D11 filter"
-msgstr ""
+msgstr "Videofilter"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -21818,7 +21832,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
-msgstr "Justér HDMI opdateringshastighed til videoen."
+msgstr "Juster HDMI opdateringshastighed til videoen."
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
@@ -22918,7 +22932,7 @@ msgid ""
 "VLC.\n"
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
-"Angiv et brugernavn, eller deaktivér audioscrobbler-pluginet, og genstart "
+"Angiv et brugernavn, eller deaktiver audioscrobbler-pluginet, og genstart "
 "VLC.\n"
 "Besøg http://www.last.fm/join/ for at melde dig til og få en konto."
 
@@ -23023,7 +23037,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:770
 msgid "Performance (prioritize faster ciphers)"
-msgstr "Ydelse (prioritér hurtigere chifre)"
+msgstr "Ydelse (prioriter hurtigere cifre)"
 
 #: modules/misc/gnutls.c:772
 msgid "Secure 128-bits (exclude 256-bits ciphers)"
@@ -23031,11 +23045,11 @@ msgstr "Sikker 128-bit (udeluk chifre på 256-bit)"
 
 #: modules/misc/gnutls.c:773
 msgid "Secure 256-bits (prioritize 256-bits ciphers)"
-msgstr "Sikker 256-bit (prioritér chifre med 256-bit)"
+msgstr "Sikker 256-bit (prioriter cifre med 256-bit)"
 
 #: modules/misc/gnutls.c:774
 msgid "Export (include insecure ciphers)"
-msgstr "Eksportér (medtag usikre chifre)"
+msgstr "Eksporter (medtag usikre cifre)"
 
 #: modules/misc/gnutls.c:779
 msgid "GNU TLS transport layer security"
@@ -23229,7 +23243,7 @@ msgid ""
 "in bytes"
 msgstr ""
 "Forsøg ikke på at gætte ASF-bithastighed. Aktiveres dette, vil du have "
-"kontrol over hvordan Windows Media Player mellemlagre det streamede indhold. "
+"kontrol over hvordan Windows Media Player cacher det streamede indhold. "
 "Indstil til lyd+video-bithastighed i byte"
 
 #: modules/mux/asf.c:73
@@ -23299,7 +23313,7 @@ msgstr "PES maksimal størrelse"
 #: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
 msgstr ""
-"Angiv den højeste tilladte PES størrelse når MPEG PS strømmen produceres."
+"Angiv den højeste tilladte PES størrelse når MPEG PS-streamen produceres."
 
 #: modules/mux/mpeg/ps.c:64
 msgid "PS muxer"
@@ -23426,7 +23440,7 @@ msgid ""
 "bitrate between the two boundaries. This avoids having huge bitrate peaks, "
 "especially for reference frames."
 msgstr ""
-"Klip strømmen i stykker på den givne varighed, og sørg for en konstant "
+"Klip streamen i stykker på den givne varighed, og sørg for en konstant "
 "bithastighed mellem de afgrænsninger. Dette forhindrer store udsving i "
 "bithastigheden, særligt for referencebilleder."
 
@@ -23664,7 +23678,8 @@ msgstr "MPEG-video"
 msgid "VC-1 packetizer"
 msgstr "VC-1 packetizer"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -23786,8 +23801,8 @@ msgstr "SAP timeout (sekunder)"
 msgid ""
 "Delay after which SAP items get deleted if no new announcement is received."
 msgstr ""
-"Ventetid hvorefter SAP-elementer bliver slettet, hvis ingen nye "
-"annonceringer modtages."
+"Ventetid hvorefter SAP-emner bliver slettet, hvis ingen nye annonceringer "
+"modtages."
 
 #: modules/services_discovery/sap.c:90
 msgid "Try to parse the announce"
@@ -23816,7 +23831,7 @@ msgstr ""
 #: modules/services_discovery/sap.c:106 modules/services_discovery/sap.c:110
 #: modules/services_discovery/sap.c:304
 msgid "Network streams (SAP)"
-msgstr "Netværksstrømme (SAP)"
+msgstr "Netværksstreams (SAP)"
 
 #: modules/services_discovery/sap.c:109
 msgid "SAP"
@@ -24849,7 +24864,7 @@ msgstr "Bro"
 
 #: modules/stream_out/bridge.c:93
 msgid "Bridge stream output"
-msgstr "Bro strømoutput"
+msgstr "Sammenfør stream-output"
 
 #: modules/stream_out/bridge.c:95
 msgid "Bridge out"
@@ -24907,9 +24922,8 @@ msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:123
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Aktivér lydstrømoutput"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:124
 msgid "Disable if your receiver does not support Dolby®"
@@ -24932,9 +24946,8 @@ msgid "Low CPU (low quality but high bandwith)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:152
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Gengivelseskvalitet"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:153
 msgid "Change this option to increase conversion speed or quality."
@@ -25008,7 +25021,7 @@ msgstr "Gør en stream forsinket"
 
 #: modules/stream_out/description.c:54
 msgid "Description stream output"
-msgstr "Beskrivelse strømoutput"
+msgstr "Beskrivelse stream-output"
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
@@ -25028,11 +25041,11 @@ msgstr "Indfører en forsinkelse i visningen af streamet."
 
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
-msgstr "Vis strømoutput"
+msgstr "Vis stream-output"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
-msgstr "Duplikér strømoutput"
+msgstr "Duplikér stream-output"
 
 #: modules/stream_out/es.c:42 modules/stream_out/standard.c:42
 msgid "Output access method"
@@ -25108,17 +25121,17 @@ msgstr "Dette er den output URI der vil blive brugt til video."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
-msgstr "Elementary strømoutput"
+msgstr "Elementary stream-output"
 
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
 msgstr ""
-"Der er ikke noget passende strømoutput adgangsmodul for \"%s/%s://%s\"."
+"Der er ikke noget passende stream-output-adgangsmodul for \"%s/%s://%s\"."
 
 #: modules/stream_out/gather.c:45
 msgid "Gathering stream output"
-msgstr "Indsamler strømoutput"
+msgstr "Indsamler stream-output"
 
 #: modules/stream_out/mosaic_bridge.c:103
 msgid "Specify an identifier string for this subpicture"
@@ -25185,7 +25198,7 @@ msgstr "Mosaik-bro"
 
 #: modules/stream_out/mosaic_bridge.c:140
 msgid "Mosaic bridge stream output"
-msgstr "Strømoutput for Mosaik-bro"
+msgstr "Stream-output for Mosaik-bro"
 
 #: modules/stream_out/record.c:50
 msgid "Destination prefix"
@@ -25197,7 +25210,7 @@ msgstr "Præfiks til den automatisk genererede destinationsfil"
 
 #: modules/stream_out/record.c:57
 msgid "Record stream output"
-msgstr "Optag strømoutput"
+msgstr "Optag stream-output"
 
 #: modules/stream_out/rtp.c:78
 msgid "This is the output URL that will be used."
@@ -25380,7 +25393,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
-msgstr "RTP-strømoutput"
+msgstr "RTP-stream-output"
 
 #: modules/stream_out/rtp.c:245
 msgid "RTSP VoD server"
@@ -25505,7 +25518,7 @@ msgstr "Smem"
 
 #: modules/stream_out/smem.c:97
 msgid "Stream output to memory buffer"
-msgstr "Strømoutput til hukommelsesbuffer"
+msgstr "Stream-output til hukommelsesbuffer"
 
 #: modules/stream_out/stats.c:42
 msgid "Writes stats to file instead of stdout"
@@ -25562,7 +25575,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
-msgstr "Standard strømoutput"
+msgstr "Standard stream-output"
 
 #: modules/stream_out/transcode/transcode.c:45
 msgid "Video encoder"
@@ -25766,7 +25779,7 @@ msgstr "Transkod"
 
 #: modules/stream_out/transcode/transcode.c:147
 msgid "Transcode stream output"
-msgstr "Transkod strømoutput"
+msgstr "Transkod stream-output"
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
@@ -25777,7 +25790,7 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"Vent venligst mens dit skrifttypemellemlager bliver genopbygget.\n"
+"Vent venligst mens din skrifttypecache bliver genopbygget.\n"
 "Det bør tage mindre end nogle få minutter."
 
 #: modules/text_renderer/freetype/freetype.c:81
@@ -27855,7 +27868,7 @@ msgstr ""
 #: modules/video_output/xcb/window.c:433
 msgctxt "ASCII"
 msgid "VLC media player"
-msgstr "VLC media player"
+msgstr "VLC medieafspiller"
 
 #. xgettext: This is a plain ASCII spelling of "VLC"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -28615,7 +28628,7 @@ msgstr "Tid:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "VLC media player - webgrænseflade"
+msgstr "VLC medieafspiller-webbrugerflade"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -29088,7 +29101,7 @@ msgstr "Stream alle elementary streams"
 
 #: modules/gui/qt/ui/sout.h:219
 msgid "Generated stream output string"
-msgstr "Genereret strømoutput-streng"
+msgstr "Genereret stream-output-streng"
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -29192,7 +29205,7 @@ msgstr "Live555 stream transport"
 
 #: modules/gui/qt/ui/sprefs_input.h:376
 msgid "Default caching policy"
-msgstr "Standard mellemlagerpolitik"
+msgstr "Standard cachingpolitik"
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
@@ -32959,8 +32972,9 @@ msgstr "Mediehåndteringsliste"
 #~ msgid "VLC Debug Log (%s).rtf"
 #~ msgstr "VLC-fejlsøgningslog (%s).rtf"
 
+#, fuzzy
 #~ msgid "Select a matching identity"
-#~ msgstr "Vælg en matchende identitet"
+#~ msgstr "Vælg streamings-metode"
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
@@ -33015,10 +33029,6 @@ msgstr "Mediehåndteringsliste"
 #~ msgstr "Høretelefoneffekt"
 
 #, fuzzy
-#~ msgid "x264 preset and tuning selection"
-#~ msgstr "x264 profil og niveau"
-
-#, fuzzy
 #~ msgid "Display device"
 #~ msgstr "Disk-enhed"
 
@@ -33052,7 +33062,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Disable lua"
-#~ msgstr "Deaktivér"
+#~ msgstr "Deaktiver"
 
 #, fuzzy
 #~ msgid "Display resolution"
@@ -33060,7 +33070,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Navigation"
-#~ msgstr "Navigér ned"
+#~ msgstr "Naviger ned"
 
 #, fuzzy
 #~ msgid "HTTP/TLS Certificate Authority"
@@ -33242,7 +33252,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Volume Set"
-#~ msgstr "Slå lyd fra"
+#~ msgstr "Gør lydløs"
 
 #, fuzzy
 #~ msgid "System Id"
@@ -33370,7 +33380,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "VLC media player Help"
-#~ msgstr "VLC media player hjælp..."
+#~ msgstr "VLC medieafspiller-hjælp..."
 
 #, fuzzy
 #~ msgid "Invalid selection"
@@ -33392,7 +33402,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Click to enable fullscreen video playback."
-#~ msgstr "Deaktivér pauseskærm under afspilning af video."
+#~ msgstr "Deaktiver pauseskærm under afspilning af video."
 
 #, fuzzy
 #~ msgid "Click to stop playback."
@@ -33400,11 +33410,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Click to mute or unmute the audio."
-#~ msgstr "Vælg genvejstasten der skal mute lyden."
+#~ msgstr "Vælg genvejstasten der skal gøre lyden lydløs."
 
 #, fuzzy
 #~ msgid "Click to go to the next playlist item."
-#~ msgstr "VLC bliver ved med at afspille det nuværende spilleliste-element."
+#~ msgstr "VLC bliver ved med at afspille det nuværende spilleliste-emne."
 
 #, fuzzy
 #~ msgid "User name"
@@ -33412,7 +33422,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "VLC media playback"
-#~ msgstr "VLC media player"
+#~ msgstr "VLC medieafspiller"
 
 #, fuzzy
 #~ msgid "No device is selected"
@@ -33436,7 +33446,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Click to select a subtitle file."
-#~ msgstr "Vælg undertekstfilen"
+#~ msgstr "Vælg en undertekstfil"
 
 #, fuzzy
 #~ msgid "Composite input"
@@ -33528,7 +33538,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Streaming method"
-#~ msgstr "Streaming deinterlace tilstand"
+#~ msgstr "Vælg streamings-metode"
 
 #, fuzzy
 #~ msgid "UDP Unicast"
@@ -33552,7 +33562,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Additional streaming options"
-#~ msgstr "Beskrivelse strømoutput"
+#~ msgstr "Beskrivelse stream-output"
 
 #, fuzzy
 #~ msgid "Local playback"
@@ -33856,7 +33866,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Filter length (ms)"
-#~ msgstr "Mellemlagring af fil (ms)"
+#~ msgstr "Caching af fil (ms)"
 
 #, fuzzy
 #~ msgid "Output Color filter mode"
@@ -33896,7 +33906,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "disabled"
-#~ msgstr "Deaktivér"
+#~ msgstr "Slået fra"
 
 #, fuzzy
 #~ msgid "Zone 3:left"
@@ -34205,7 +34215,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable the strict rate control algorithm."
-#~ msgstr "Aktivér pre-motion estimering algoritme."
+#~ msgstr "Aktiver pre-motion estimering algoritme."
 
 #, fuzzy
 #~ msgid ""
@@ -34245,7 +34255,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable lossless coding"
-#~ msgstr "Aktivér megabass-tilstand"
+#~ msgstr "Aktiver megabass-tilstand"
 
 #, fuzzy
 #~ msgid "No CrashLog found"
@@ -34433,7 +34443,7 @@ msgstr "Mediehåndteringsliste"
 #~ "Hvis du ikke ved, hvordan du skal ordne det, så bed om hjælp fra din "
 #~ "distribution.\n"
 #~ "\n"
-#~ "Dette er ikke en fejl i VLC media player.\n"
+#~ "Dette er ikke en fejl i VLC medieafspiller.\n"
 #~ "Undlad at kontakte VideoLAN-projektet vedrørende dette problem.\n"
 
 #, fuzzy
@@ -34474,7 +34484,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "If enabled the interface will uninstall the Service and exit."
-#~ msgstr "Afinstallér tjenesten og afslut."
+#~ msgstr "Afinstaller tjenesten og afslut."
 
 #, fuzzy
 #~ msgid "Width of motion compensation blocks"
@@ -34494,7 +34504,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enqueue items to playlist when in one instance mode"
-#~ msgstr "Sæt elementer i kø i spillelisten ved én instans tilstanden"
+#~ msgstr "Sæt emner i kø i spillelisten ved én-instans-tilstanden"
 
 #, fuzzy
 #~ msgid "Normal/Repeat/Loop"
@@ -34530,15 +34540,15 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "Sæt elementer i kø i spillelisten ved én instans tilstanden"
+#~ msgstr "Sæt emner i kø i spillelisten ved én-instans-tilstanden"
 
 #, fuzzy
 #~ msgid "Live Update"
-#~ msgstr "Opdatér"
+#~ msgstr "Opdater"
 
 #, fuzzy
 #~ msgid "&Update"
-#~ msgstr "Opdatér"
+#~ msgstr "Opdater"
 
 #, fuzzy
 #~ msgid "Couldn't find pixmap file: %s"
@@ -34550,7 +34560,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "Sæt elementer i kø i spillelisten ved én instans tilstanden"
+#~ msgstr "Sæt emner i kø i spillelisten ved én-instans-tilstanden"
 
 #, fuzzy
 #~ msgid "Choose program (SID)"
@@ -34631,7 +34641,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable spatial partitioning"
-#~ msgstr "Aktivér spektral båndreplikering"
+#~ msgstr "Aktiver spektral båndreplikering"
 
 #, fuzzy
 #~ msgid "Jump to time"
@@ -34683,7 +34693,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Sort"
-#~ msgstr "Sortér efter"
+#~ msgstr "Sorter efter"
 
 #, fuzzy
 #~ msgid "VLC cannot use the device \"%s\", because its type is not supported."
@@ -34726,7 +34736,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Sort by &Title"
-#~ msgstr "Sortér efter"
+#~ msgstr "Sorter efter"
 
 #, fuzzy
 #~ msgid "Growl server"
@@ -34937,8 +34947,8 @@ msgstr "Mediehåndteringsliste"
 #~ "This allow you to configure the initial caching amount for stream output  "
 #~ "muxer. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Dette gør at du kan konfigurere startmellemlagringsværdien for output-"
-#~ "stream-muxeren. Denne værdi skal være i millisekunder."
+#~ "Dette gør at du kan konfigurere startcachingsværdien for output-stream-"
+#~ "muxeren. Denne værdi skal være i millisekunder."
 
 #, fuzzy
 #~ msgid "Memory copy module"
@@ -34988,7 +34998,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Select current widget"
-#~ msgstr "Gentag nuværende element"
+#~ msgstr "Gentag nuværende emne"
 
 #, fuzzy
 #~ msgid "CPU"
@@ -35036,7 +35046,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "RTMP stream output"
-#~ msgstr "RTP-strømoutput"
+#~ msgstr "RTP-stream-output"
 
 #, fuzzy
 #~ msgid "PVR video device"
@@ -35301,7 +35311,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable Audio"
-#~ msgstr "Aktivér lyd"
+#~ msgstr "Aktiver lyd"
 
 #, fuzzy
 #~ msgid "HTTP Proxy"
@@ -35317,7 +35327,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable Video"
-#~ msgstr "Aktivér video"
+#~ msgstr "Aktiver video"
 
 #, fuzzy
 #~ msgid "SAP Announce"
@@ -35337,7 +35347,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable spatializer"
-#~ msgstr "Aktivér spatializer"
+#~ msgstr "Aktiver spatializer"
 
 #, fuzzy
 #~ msgid "Radio device name"
@@ -35369,11 +35379,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "&Convert"
-#~ msgstr "Konvertér"
+#~ msgstr "Konverter"
 
 #, fuzzy
 #~ msgid "&Convert / Save"
-#~ msgstr "K&onvertér / gem"
+#~ msgstr "K&onverter / gem"
 
 #, fuzzy
 #~ msgid "Subtitles Files"
@@ -35389,15 +35399,15 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "&Navigation"
-#~ msgstr "Navigér ned"
+#~ msgstr "Naviger ned"
 
 #, fuzzy
 #~ msgid "Hide VLC media player in taskbar"
-#~ msgstr "&Skjul VLC media player i proceslinje"
+#~ msgstr "&Skjul VLC medieafspiller i proceslinje"
 
 #, fuzzy
 #~ msgid "Show VLC media player"
-#~ msgstr "&Vis VLC media player"
+#~ msgstr "&Vis VLC medieafspiller"
 
 #, fuzzy
 #~ msgid "Advanced options"
@@ -35665,7 +35675,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Create Stream"
-#~ msgstr "Konvertér og stream"
+#~ msgstr "Konverter og stream"
 
 #, fuzzy
 #~ msgid "Capture Screen"
@@ -35685,7 +35695,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Create New Stream"
-#~ msgstr "Konvertér og stream"
+#~ msgstr "Konverter og stream"
 
 #, fuzzy
 #~ msgid "Delete All Streams"
@@ -35782,26 +35792,26 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable CPU MMX support"
-#~ msgstr "Aktivér SPU-strømoutput"
+#~ msgstr "Aktiver SPU-stream-output"
 
 #, fuzzy
 #~ msgid "Enable CPU 3D Now! support"
-#~ msgstr "Aktivér SPU-strømoutput"
+#~ msgstr "Aktiver SPU-stream-output"
 
 #, fuzzy
 #~ msgid "Enable CPU SSE support"
-#~ msgstr "Aktivér SPU-strømoutput"
+#~ msgstr "Aktiver SPU-stream-output"
 
 #, fuzzy
 #~ msgid "Enable CPU AltiVec support"
-#~ msgstr "Aktivér SPU-strømoutput"
+#~ msgstr "Aktiver SPU-stream-output"
 
 #, fuzzy
 #~ msgid ""
 #~ "Select the key to go back (to the previous media item) in the browsing "
 #~ "history."
 #~ msgstr ""
-#~ "Vælg genvejstasten der skal bruges for at springe til forrige element på "
+#~ "Vælg genvejstasten der skal bruges for at springe til forrige emne på "
 #~ "spillelisten."
 
 #, fuzzy
@@ -35809,12 +35819,12 @@ msgstr "Mediehåndteringsliste"
 #~ "Select the key to go forward (to the next media item) in the browsing "
 #~ "history."
 #~ msgstr ""
-#~ "Vælg genvejstasten der skal bruges for at springe til næste element på "
+#~ "Vælg genvejstasten der skal bruges for at springe til næste emne på "
 #~ "spillelisten."
 
 #, fuzzy
 #~ msgid "Caching value in ms"
-#~ msgstr "Mellemlagringsværdi (ms)"
+#~ msgstr "Cachingsværdi (ms)"
 
 #, fuzzy
 #~ msgid ""
@@ -35825,8 +35835,8 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for DVB streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Transponder FEC"
@@ -35845,23 +35855,23 @@ msgstr "Mediehåndteringsliste"
 #~ "Default caching value for Audio CDs. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DirectShow streams. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for DV streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "HTTP password"
@@ -35890,8 +35900,8 @@ msgstr "Mediehåndteringsliste"
 #, fuzzy
 #~ msgid "Caching value for DVDs. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -35905,8 +35915,8 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for fake streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Fake"
@@ -35918,11 +35928,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Extra network caching value (ms)"
-#~ msgstr "Mellemlagring af netværk (ms)"
+#~ msgstr "Netværkscaching (ms)"
 
 #, fuzzy
 #~ msgid "Supplementary caching value for remote files, in milliseconds."
-#~ msgstr "Mellemlagringsværdi for filer i millisekunder."
+#~ msgstr "Cachingsværdi for filer i millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -35936,8 +35946,8 @@ msgstr "Mediehåndteringsliste"
 #~ "Caching value for GnomeVFS streams.This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -35954,8 +35964,8 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for imem streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Memory-mapped file input"
@@ -35965,29 +35975,29 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for MMS streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Caching value for files. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for OSS captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
 #~ "Default caching value for PVR streams. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -36008,8 +36018,8 @@ msgstr "Mediehåndteringsliste"
 #~ "Caching value for screen capture. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -36022,8 +36032,8 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for SMB streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -36036,15 +36046,15 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for UDP streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
 #~ "Caching value for V4L captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid ""
@@ -36098,14 +36108,14 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for V4L2 captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Caching value for VCDs. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "Dummy S/PDIF audio mixer"
@@ -36157,7 +36167,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable debug"
-#~ msgstr "Aktivér video"
+#~ msgstr "Aktiver video"
 
 #, fuzzy
 #~ msgid "Host address"
@@ -36217,7 +36227,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "General editing filters"
-#~ msgstr "Behold eksisterende fil"
+#~ msgstr "Generelle indstillinger"
 
 #, fuzzy
 #~ msgid "Distortion filters"
@@ -36297,7 +36307,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid " State    : Paused %s"
-#~ msgstr "      %s: %s"
+#~ msgstr "Start på pause"
 
 #, fuzzy
 #~ msgid " Help "
@@ -36461,15 +36471,15 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable peaks"
-#~ msgstr "Aktivér lyd"
+#~ msgstr "Aktiver lyd"
 
 #, fuzzy
 #~ msgid "Enable bands"
-#~ msgstr "Aktivér lyd"
+#~ msgstr "Aktiver lyd"
 
 #, fuzzy
 #~ msgid "Enable base"
-#~ msgstr "Aktivér megabass-tilstand"
+#~ msgstr "Aktiver megabass-tilstand"
 
 #, fuzzy
 #~ msgid "Font size:"
@@ -36581,7 +36591,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable FPU support"
-#~ msgstr "Aktivér SPU-strømoutput"
+#~ msgstr "Aktiver SPU-stream-output"
 
 #, fuzzy
 #~ msgid "save the current command line options in the config"
@@ -36600,8 +36610,8 @@ msgstr "Mediehåndteringsliste"
 #~ "Caching value for CDDA streams. This value should be set in millisecond "
 #~ "units."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "cddax://[device-or-file][@[T]track]"
@@ -36613,11 +36623,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Caching value in microseconds"
-#~ msgstr "Mellemlagringsværdi for filer i millisekunder."
+#~ msgstr "Cachingsværdi for filer i millisekunder."
 
 #, fuzzy
 #~ msgid "Use CD audio controls and output?"
-#~ msgstr "Aktivér lydstrømoutput"
+#~ msgstr "Aktiver lydstream-output"
 
 #, fuzzy
 #~ msgid "CDDB"
@@ -36641,7 +36651,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Standard filesystem directory input"
-#~ msgstr "Standard strømoutput"
+#~ msgstr "Standard stream-output"
 
 #, fuzzy
 #~ msgid "audio filter for simple channel mixing"
@@ -36704,7 +36714,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Use DVD Menus"
-#~ msgstr "Deaktivér DVD-menuer"
+#~ msgstr "Deaktiver DVD-menuer"
 
 #, fuzzy
 #~ msgid "BeOS standard API interface"
@@ -36732,11 +36742,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "VLC media player: Open Media Files"
-#~ msgstr "VLC media player opdateringer"
+#~ msgstr "VLC medieafspiller-opdateringer"
 
 #, fuzzy
 #~ msgid "VLC media player: Open Subtitle File"
-#~ msgstr "VLC media player opdateringer"
+#~ msgstr "VLC medieafspiller-opdateringer"
 
 #, fuzzy
 #~ msgid "Select None"
@@ -36748,7 +36758,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Sort by Path"
-#~ msgstr "Sortér efter"
+#~ msgstr "Sorter efter"
 
 #, fuzzy
 #~ msgid "Randomize"
@@ -36820,7 +36830,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "enable"
-#~ msgstr "Aktivér"
+#~ msgstr "Aktiver"
 
 #, fuzzy
 #~ msgid "Video:"
@@ -36928,7 +36938,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid " Cancel "
-#~ msgstr "Annullér"
+#~ msgstr "Annuller"
 
 #, fuzzy
 #~ msgid "Preference"
@@ -36944,7 +36954,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Show the current item"
-#~ msgstr "Gentag nuværende element"
+#~ msgstr "Gentag nuværende emne"
 
 #, fuzzy
 #~ msgid "Audio Port"
@@ -36968,7 +36978,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable last.fm submission"
-#~ msgstr "Aktivér indberetning til Last.fm"
+#~ msgstr "Aktiver indberetning til Last.fm"
 
 #, fuzzy
 #~ msgid "Disc Devices"
@@ -36984,7 +36994,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Repair AVI files"
-#~ msgstr "Reparér AVI-filer"
+#~ msgstr "Reparer AVI-filer"
 
 #, fuzzy
 #~ msgid ""
@@ -37136,7 +37146,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "MPEG2 video transrating stream output"
-#~ msgstr "Aktivér videostrømoutput"
+#~ msgstr "Aktiver videostream-output"
 
 #, fuzzy
 #~ msgid "Transrate"
@@ -37240,7 +37250,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Cancelled"
-#~ msgstr "Annullér"
+#~ msgstr "Annuller"
 
 #, fuzzy
 #~ msgid "Illegal Polarization"
@@ -37250,8 +37260,8 @@ msgstr "Mediehåndteringsliste"
 #~ msgid ""
 #~ "Caching value for DV streams. Thisvalue should be set in milliseconds."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "EyeTV access module"
@@ -37535,7 +37545,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable Wallpaper Mode"
-#~ msgstr "Aktivér skrivebordstapettilstand"
+#~ msgstr "Aktiver skrivebordstapettilstand"
 
 #, fuzzy
 #~ msgid "use Pause Color"
@@ -37619,7 +37629,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Change the default caching value (in milliseconds)"
-#~ msgstr "Mellemlagringsværdi for filer i millisekunder."
+#~ msgstr "Cachingsværdi for filer i millisekunder."
 
 #, fuzzy
 #~ msgid "Use an external subtitles file."
@@ -37707,7 +37717,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Stream output MRL"
-#~ msgstr "Strømoutput"
+#~ msgstr "Stream-output"
 
 #, fuzzy
 #~ msgid "Channel name"
@@ -37801,7 +37811,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Open &Network Stream...\tCtrl-N"
-#~ msgstr "Åbn &netværksstrøm..."
+#~ msgstr "Åbn &netværksstream..."
 
 #, fuzzy
 #~ msgid "Open C&apture Device...\tCtrl-A"
@@ -37937,7 +37947,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "About VLC media player..."
-#~ msgstr "Om VLC media player"
+#~ msgstr "Om VLC medieafspiller"
 
 #, fuzzy
 #~ msgid "France"
@@ -38001,7 +38011,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Manage"
-#~ msgstr "&Håndtér"
+#~ msgstr "&Håndter"
 
 #, fuzzy
 #~ msgid "Ctrl+X"
@@ -38208,11 +38218,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
-#~ msgstr "Sortér efter"
+#~ msgstr "Sorter efter"
 
 #, fuzzy
 #~ msgid "Sorted by Album"
-#~ msgstr "Sortér efter"
+#~ msgstr "Sorter efter"
 
 #, fuzzy
 #~ msgid "Playlist stress tests"
@@ -38274,7 +38284,7 @@ msgstr "Mediehåndteringsliste"
 #~ msgid "This option allows you to always open a default stream on start-up."
 #~ msgstr ""
 #~ "Disse indstillinger giver mulighed for at angive globale "
-#~ "standardindstillinger for strømoutput teksttekstsystemet."
+#~ "standardindstillinger for stream-output-systemet."
 
 #, fuzzy
 #~ msgid ""
@@ -38319,15 +38329,15 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Standard filesystem file input"
-#~ msgstr "Standard strømoutput"
+#~ msgstr "Standard stream-output"
 
 #, fuzzy
 #~ msgid ""
 #~ "Allows you to modify the default caching value for http streams. This "
 #~ "value should be set in millisecond units."
 #~ msgstr ""
-#~ "Standard mellemlagringsværdi for udgående UDP-streams. Denne værdi skal "
-#~ "være i millisekunder."
+#~ "Standard cachingsværdi for udgående UDP-streams. Denne værdi skal være i "
+#~ "millisekunder."
 
 #, fuzzy
 #~ msgid "DTS"
@@ -38419,7 +38429,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Enable CABAC"
-#~ msgstr "Aktivér"
+#~ msgstr "Aktiver"
 
 #, fuzzy
 #~ msgid "Properties"
@@ -38655,7 +38665,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "_Navigation"
-#~ msgstr "Navigér ned"
+#~ msgstr "Naviger ned"
 
 #, fuzzy
 #~ msgid "Toggle _Interface"
@@ -38663,11 +38673,11 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "stream output"
-#~ msgstr "Strømoutput"
+#~ msgstr "Stream-output"
 
 #, fuzzy
 #~ msgid "stream output (MRL)"
-#~ msgstr "Strømoutput"
+#~ msgstr "Stream-output"
 
 #, fuzzy
 #~ msgid "Path:"
@@ -38691,7 +38701,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Navigate through the stream"
-#~ msgstr "Navigér højre"
+#~ msgstr "Naviger højre"
 
 #, fuzzy
 #~ msgid "_Settings"
@@ -38739,7 +38749,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Use stream output"
-#~ msgstr "UDP-strømoutput"
+#~ msgstr "UDP-stream-output"
 
 #, fuzzy
 #~ msgid "s."
@@ -38751,7 +38761,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "_Invert"
-#~ msgstr "Konvertér"
+#~ msgstr "Konverter"
 
 #, fuzzy
 #~ msgid "_Select"
@@ -38795,7 +38805,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Opens a network stream"
-#~ msgstr "Åbn &netværksstrøm..."
+#~ msgstr "Åbn &netværksstream..."
 
 #, fuzzy
 #~ msgid "Opening file..."
@@ -38883,7 +38893,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "Empty if no stream output."
-#~ msgstr "Elementary strømoutput"
+#~ msgstr "Elementary stream-output"
 
 #, fuzzy
 #~ msgid "Loop playlist on end"
@@ -38939,7 +38949,7 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "enabled"
-#~ msgstr "Aktivér"
+#~ msgstr "Aktiveret"
 
 #, fuzzy
 #~ msgid "horizontalLayout_3"
@@ -38995,8 +39005,8 @@ msgstr "Mediehåndteringsliste"
 
 #, fuzzy
 #~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "VLC media player - webgrænseflade"
+#~ msgstr "VLC medieafspiller-webbrugerflade"
 
 #, fuzzy
 #~ msgid "Streaming Output"
-#~ msgstr "Strømoutput"
+#~ msgstr "Stream-output"
