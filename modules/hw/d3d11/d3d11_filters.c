@@ -598,4 +598,9 @@ vlc_module_begin()
 #endif /* VLC_WINSTORE_APP */
     add_shortcut ("d3d11")
 
+    add_submodule()
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_callbacks( D3D11OpenBlockDecoder, D3D11CloseBlockDecoder )
+    set_capability( "video decoder", 90 )
+
 vlc_module_end()

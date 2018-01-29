@@ -28,11 +28,21 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int  D3D11OpenDeinterlace(filter_t *);
 int  D3D11OpenConverter(filter_t *);
 int  D3D11OpenCPUConverter(filter_t *);
+int  D3D11OpenBlockDecoder(vlc_object_t *);
+void D3D11CloseBlockDecoder(vlc_object_t *);
 
 int  D3D11OpenDecoderDeviceW8(vlc_decoder_device *, vout_window_t *);
 int  D3D11OpenDecoderDeviceAny(vlc_decoder_device *, vout_window_t *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* VLC_D3D11_FILTERS_H */
