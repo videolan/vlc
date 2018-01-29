@@ -186,7 +186,7 @@ vlc_module_begin ()
     add_string(SOUT_CFG_PREFIX "mime", "video/x-matroska", MIME_TEXT, MIME_LONGTEXT, false)
     add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
         change_private()
-    add_bool(SOUT_CFG_PREFIX "audio-passthrough", true, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
+    add_bool(SOUT_CFG_PREFIX "audio-passthrough", false, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
     add_integer(SOUT_CFG_PREFIX "conversion-quality", CONVERSION_QUALITY_DEFAULT,
                 CONVERSION_QUALITY_TEXT, CONVERSION_QUALITY_LONGTEXT, false );
         change_integer_list(conversion_quality_list, conversion_quality_list_text)
