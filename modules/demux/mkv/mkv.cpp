@@ -413,7 +413,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             unsigned *restrict flags = va_arg( args, unsigned * );
             *flags &= p_sys->i_updates;
             p_sys->i_updates &= ~*flags;
-            break;
+            return VLC_SUCCESS;
         }
 
         case DEMUX_GET_TITLE:
