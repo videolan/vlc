@@ -400,7 +400,10 @@ webvtt_sources = files(
 )
 
 if get_option('stream_outputs')
-    webvtt_sources += files('webvtt/encvtt.c')
+    webvtt_sources += files(
+      'webvtt/encvtt.c',
+      '../mux/webvtt.c',
+    )
 endif
 
 # WebVTT CSS engine requires Flex and Bison

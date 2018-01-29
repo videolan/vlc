@@ -233,7 +233,8 @@ libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
                               demux/webvtt.c \
                               demux/mp4/minibox.h
 if ENABLE_SOUT
-libwebvtt_plugin_la_SOURCES += codec/webvtt/encvtt.c
+libwebvtt_plugin_la_SOURCES += codec/webvtt/encvtt.c \
+                               mux/webvtt.c
 endif
 codec_LTLIBRARIES += libwebvtt_plugin.la
 if ENABLE_CSS

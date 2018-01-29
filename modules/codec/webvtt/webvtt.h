@@ -31,6 +31,9 @@ void webvtt_CloseDemux    ( vlc_object_t * );
 
 #ifdef ENABLE_SOUT
 int  webvtt_OpenEncoder   ( vlc_object_t * );
+
+int  webvtt_OpenMuxer   ( vlc_object_t * );
+void webvtt_CloseMuxer  ( vlc_object_t * );
 #endif
 
 #define ATOM_iden VLC_FOURCC('i', 'd', 'e', 'n')
