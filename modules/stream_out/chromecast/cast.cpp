@@ -517,7 +517,8 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     std::stringstream ssout;
     if ( !canRemux )
     {
-        if ( var_InheritInteger( p_stream, SOUT_CFG_PREFIX "show-perf-warning" ) )
+        if ( i_codec_video == 0 && p_original_video
+          && var_InheritInteger( p_stream, SOUT_CFG_PREFIX "show-perf-warning" ) )
         {
             int res = vlc_dialog_wait_question( p_stream,
                           VLC_DIALOG_QUESTION_WARNING,
