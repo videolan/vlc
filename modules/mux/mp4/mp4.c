@@ -158,6 +158,9 @@ struct sout_mux_sys_t
     bool b_64_ext;
     bool b_fast_start;
 
+    /* global */
+    bool     b_header_sent;
+
     uint64_t i_mdat_pos;
     uint64_t i_pos;
     mtime_t  i_read_duration;
@@ -166,9 +169,9 @@ struct sout_mux_sys_t
     unsigned int   i_nb_streams;
     mp4_stream_t **pp_streams;
 
+
     /* mp4frag */
     bool           b_fragmented;
-    bool           b_header_sent;
     mtime_t        i_written_duration;
     uint32_t       i_mfhd_sequence;
 };
@@ -180,6 +183,47 @@ static block_t *ConvertSUBT(block_t *);
 static bool CreateCurrentEdit(mp4_stream_t *, mtime_t, bool);
 static void DebugEdits(sout_mux_t *, const mp4_stream_t *);
 
+static int WriteSlowStartHeader(sout_mux_t *p_mux)
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    bo_t *box;
+
+    if (!p_sys->b_mov) {
+        /* Now add ftyp header */
+        if(p_sys->b_3gp)
+        {
+            vlc_fourcc_t extra[] = {MAJOR_3gp4, MAJOR_avc1};
+            box = mp4mux_GetFtyp(MAJOR_3gp6, 0, extra, ARRAY_SIZE(extra));
+        }
+        else
+        {
+            vlc_fourcc_t extra[] = {MAJOR_mp41, MAJOR_avc1};
+            box = mp4mux_GetFtyp(MAJOR_isom, 0, extra, ARRAY_SIZE(extra));
+        }
+
+        if(!box)
+            return VLC_ENOMEM;
+
+        p_sys->i_pos += box->b->i_buffer;
+        p_sys->i_mdat_pos = p_sys->i_pos;
+        box_send(p_mux, box);
+    }
+
+    /* Now add mdat header */
+    box = box_new("mdat");
+    if(!box)
+        return VLC_ENOMEM;
+
+    bo_add_64be(box, 0); // enough to store an extended size
+
+    if(box->b)
+        p_sys->i_pos += box->b->i_buffer;
+
+    box_send(p_mux, box);
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -187,7 +231,6 @@ static int Open(vlc_object_t *p_this)
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys;
-    bo_t            *box;
 
     msg_Dbg(p_mux, "Mp4 muxer opened");
     config_ChainParse(p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg);
@@ -208,48 +251,11 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_read_duration   = 0;
     p_sys->i_start_dts = VLC_TS_INVALID;
     p_sys->b_fragmented = false;
-
-    if (!p_sys->b_mov) {
-        /* Now add ftyp header */
-        if(p_sys->b_3gp)
-        {
-            vlc_fourcc_t extra[] = {MAJOR_3gp4, MAJOR_avc1};
-            box = mp4mux_GetFtyp(MAJOR_3gp6, 0, extra, ARRAY_SIZE(extra));
-        }
-        else
-        {
-            vlc_fourcc_t extra[] = {MAJOR_mp41, MAJOR_avc1};
-            box = mp4mux_GetFtyp(MAJOR_isom, 0, extra, ARRAY_SIZE(extra));
-        }
-
-        if(!box)
-        {
-            free(p_sys);
-            return VLC_ENOMEM;
-        }
-
-        p_sys->i_pos += box->b->i_buffer;
-        p_sys->i_mdat_pos = p_sys->i_pos;
-        box_send(p_mux, box);
-    }
+    p_sys->b_header_sent = false;
 
     /* FIXME FIXME
      * Quicktime actually doesn't like the 64 bits extensions !!! */
     p_sys->b_64_ext = false;
-
-    /* Now add mdat header */
-    box = box_new("mdat");
-    if(!box)
-    {
-        free(p_sys);
-        return VLC_ENOMEM;
-    }
-    bo_add_64be  (box, 0); // enough to store an extended size
-
-    if(box->b)
-        p_sys->i_pos += box->b->i_buffer;
-
-    box_send(p_mux, box);
 
     return VLC_SUCCESS;
 }
@@ -585,6 +591,14 @@ static inline mtime_t dts_fb_pts( const block_t *p_data )
 static int Mux(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+
+    if(!p_sys->b_header_sent)
+    {
+        int i_ret = WriteSlowStartHeader(p_mux);
+        if(i_ret != VLC_SUCCESS)
+            return i_ret;
+        p_sys->b_header_sent = true;
+    }
 
     for (;;) {
         int i_stream = sout_MuxGetStream(p_mux, 2, NULL);
