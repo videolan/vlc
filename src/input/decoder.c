@@ -1930,6 +1930,22 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
     else
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
 
+#ifdef ENABLE_SOUT
+    /* Do not delay sout creation for SPU or DATA. */
+    if( p_sout && fmt->b_packetized &&
+        (fmt->i_cat != VIDEO_ES && fmt->i_cat != AUDIO_ES) )
+    {
+        decoder_owner_sys_t *p_owner = p_dec->p_owner;
+        p_owner->p_sout_input = sout_InputNew( p_owner->p_sout, fmt );
+        if( p_owner->p_sout_input == NULL )
+        {
+            msg_Err( p_dec, "cannot create sout input (%4.4s)",
+                     (char *)&fmt->i_codec );
+            p_owner->error = true;
+        }
+    }
+#endif
+
     /* Spawn the decoder thread */
     if( vlc_clone( &p_dec->p_owner->thread, DecoderThread, p_dec, i_priority ) )
     {
