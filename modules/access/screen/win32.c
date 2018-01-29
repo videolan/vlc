@@ -252,7 +252,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     }
 
     /* Build block */
-    if( !(p_block = malloc( sizeof( block_t ) + sizeof( struct block_sys_t ) )) )
+    if( !(p_block = malloc( sizeof( struct block_sys_t ) )) )
         goto error;
 
     /* Fill all fields */
