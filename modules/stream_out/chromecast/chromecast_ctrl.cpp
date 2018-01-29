@@ -455,7 +455,11 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                 if ( m_state == Buffering )
                     setState( LoadFailed );
                 else
+                {
+                    if (idleReason == "FINISHED")
+                        m_eof = true;
                     setState( Ready );
+                }
             }
         }
         else
@@ -480,7 +484,6 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                 {
                     /* TODO reset demux PCR ? */
                     m_time_playback_started = mdate();
-                    m_eof = false;
                     setState( Playing );
                 }
             }
@@ -493,8 +496,6 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                      * request more input) but this state is fetched only when
                      * the input has reached EOF. */
 
-                    if( m_state == Playing )
-                        m_eof = true;
                     m_time_playback_started = VLC_TS_INVALID;
                     setState( Buffering );
                 }
@@ -727,7 +728,7 @@ void intf_sys_t::waitSeekDone()
 bool intf_sys_t::isFinishedPlaying()
 {
     vlc_mutex_locker locker(&m_lock);
-    return m_state == Ready || m_state == LoadFailed || m_state == Dead || m_eof;
+    return m_state == LoadFailed || m_state == Dead || m_eof;
 }
 
 void intf_sys_t::setTitle(const char* psz_title)
