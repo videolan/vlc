@@ -735,7 +735,7 @@ static int Control(sout_stream_t *p_stream, int i_query, va_list args)
     {
         bool *b = va_arg( args, bool * );
         /* check if the Chromecast to be done playing */
-        *b = p_sys->p_intf == NULL || p_sys->p_intf->isFinishedPlaying();
+        *b = p_sys->p_intf->isFinishedPlaying();
         return VLC_SUCCESS;
     }
 
