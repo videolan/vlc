@@ -155,15 +155,17 @@ void module_stop (vlc_object_t *obj, const module_t *m)
         deactivate (obj);
 }
 
-static bool module_match_name (const module_t *m, const char *name)
+static bool module_match_name(const module_t *m, const char *name, size_t len)
 {
      /* Plugins with zero score must be matched explicitly. */
-     if (!strcasecmp ("any", name))
+     if (len == 3 && strncasecmp("any", name, len) == 0)
          return m->i_score > 0;
 
-     for (unsigned i = 0; i < m->i_shortcuts; i++)
-          if (!strcasecmp (m->pp_shortcuts[i], name))
+     for (size_t i = 0; i < m->i_shortcuts; i++)
+          if (strncasecmp(m->pp_shortcuts[i], name, len) == 0
+           && m->pp_shortcuts[i][len] == '\0')
               return true;
+
      return false;
 }
 
@@ -247,21 +249,11 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
     va_start(args, probe);
     while (*name)
     {
-        char buf[32];
+        const char *shortcut = name;
         size_t slen = strcspn (name, ",");
 
-        if (likely(slen < sizeof (buf)))
-        {
-            memcpy(buf, name, slen);
-            buf[slen] = '\0';
-        }
         name += slen;
         name += strspn (name, ",");
-        if (unlikely(slen >= sizeof (buf)))
-            continue;
-
-        const char *shortcut = buf;
-        assert (shortcut != NULL);
 
         if (!strcasecmp ("none", shortcut))
             goto done;
@@ -272,7 +264,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
             module_t *cand = mods[i];
             if (cand == NULL)
                 continue; // module failed in previous iteration
-            if (!module_match_name (cand, shortcut))
+            if (!module_match_name(cand, shortcut, slen))
                 continue;
             mods[i] = NULL; // only try each module once at most...
 
