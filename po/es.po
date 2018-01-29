@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-01-25 10:20+0100\n"
+"POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-09-23 19:54+0000\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2017\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
@@ -86,8 +86,8 @@ msgstr "Preferencias para interfaces de control de VLC"
 msgid "Hotkeys settings"
 msgstr "Preferencias de atajos de teclado"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
-#: src/libvlc-module.c:1486 modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
+#: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -160,7 +160,7 @@ msgstr "Preferencias de audio y módulos."
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:115 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:124 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -748,9 +748,8 @@ msgstr "Auriculares"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137
-#: modules/gui/qt/components/open_panels.cpp:974
-#: modules/gui/qt/components/simple_preferences.cpp:366
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automática"
 
@@ -1027,8 +1026,8 @@ msgstr "Idioma"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112
-#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Descripción"
 
@@ -1292,12 +1291,11 @@ msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "VLC es incapaz de abrir el MRL «%s». Vea el registro para más detalles."
 
-#: src/input/meta.c:55 src/input/var.c:170
-#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
+#: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107
-#: modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1787,8 +1785,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120
-#: modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5052,8 +5049,7 @@ msgid "Browser Stop"
 msgstr "Parar el Navegador"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231
-#: modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5356,7 +5352,7 @@ msgstr "Fallo al abrir «%s» para escribir"
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -6266,11 +6262,11 @@ msgstr "Blu-ray"
 msgid "Blu-ray Disc support (libbluray)"
 msgstr "Soporte de disco Blu-ray (libbluray)"
 
-#: modules/access/bluray.c:717
+#: modules/access/bluray.c:722
 msgid "Path doesn't appear to be a Blu-ray"
 msgstr "La ruta no parece ser un Blu-Ray"
 
-#: modules/access/bluray.c:732
+#: modules/access/bluray.c:737
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
@@ -6278,35 +6274,35 @@ msgstr ""
 "Este disco Blu-ray necesita una librería para decodificación AACS y su "
 "sistema no dispone de ello."
 
-#: modules/access/bluray.c:738
+#: modules/access/bluray.c:743
 msgid "Blu-ray Disc is corrupted."
 msgstr "El disco Blu-ray está corrupto."
 
-#: modules/access/bluray.c:740
+#: modules/access/bluray.c:745
 msgid "Missing AACS configuration file!"
 msgstr "No se encuentra archivo de configuración AACS"
 
-#: modules/access/bluray.c:742
+#: modules/access/bluray.c:747
 msgid "No valid processing key found in AACS config file."
 msgstr ""
 "No se ha encontrado una clave de procesamiento válida en el archivo de "
 "configuración AACS."
 
-#: modules/access/bluray.c:744
+#: modules/access/bluray.c:749
 msgid "No valid host certificate found in AACS config file."
 msgstr ""
 "No se ha encontrado un certificado válido en el archivo de configuración "
 "AACS."
 
-#: modules/access/bluray.c:746
+#: modules/access/bluray.c:751
 msgid "AACS Host certificate revoked."
 msgstr "Certificado de destino AACS revocado."
 
-#: modules/access/bluray.c:748
+#: modules/access/bluray.c:753
 msgid "AACS MMC failed."
 msgstr "AACS MMC ha fallado."
 
-#: modules/access/bluray.c:758
+#: modules/access/bluray.c:763
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
@@ -6314,17 +6310,17 @@ msgstr ""
 "Este disco Blu-ray necesita una librería para el decodificado BD+ y su "
 "sistema no la tiene."
 
-#: modules/access/bluray.c:761
+#: modules/access/bluray.c:766
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 "Su librería de decodificación del sistema BD+ no funciona. ¿Configuración "
 "inexistente?"
 
-#: modules/access/bluray.c:794
+#: modules/access/bluray.c:799
 msgid "Java required"
 msgstr "Java es requerido"
 
-#: modules/access/bluray.c:795
+#: modules/access/bluray.c:800
 #, c-format
 msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
@@ -6333,25 +6329,25 @@ msgstr ""
 "Este disco Blu-ray requiere Java para el soporte de menús %s\n"
 "El disco será reproducido sin menús."
 
-#: modules/access/bluray.c:796
+#: modules/access/bluray.c:801
 msgid "Java was not found on your system."
 msgstr "No se ha encontrado Java en su sistema."
 
-#: modules/access/bluray.c:819
+#: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
 "Fallo al iniciar la reproducción bluray. Inténtelo sin el soporte de menús."
 
-#: modules/access/bluray.c:847 modules/access/bluray.c:2284
-#: modules/access/bluray.c:2289
+#: modules/access/bluray.c:852 modules/access/bluray.c:2289
+#: modules/access/bluray.c:2294
 msgid "Blu-ray error"
 msgstr "Error de Blu-ray"
 
-#: modules/access/bluray.c:1669
+#: modules/access/bluray.c:1674
 msgid "Top Menu"
 msgstr "Menú superior"
 
-#: modules/access/bluray.c:1672
+#: modules/access/bluray.c:1677
 msgid "First Play"
 msgstr "Reproducir primero"
 
@@ -6928,8 +6924,7 @@ msgstr ""
 "Los canales de TV son agrupados por un transpondedor  (multiplexado) en una "
 "frecuencia dada. Esto se requiere para sintonizar el receptor."
 
-#: modules/access/dtv/access.c:61
-#: modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulación / Contelación"
 
@@ -7750,8 +7745,7 @@ msgstr "Número de canales de una emisión elemental de audio"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42
-#: share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Anchura"
@@ -8737,8 +8731,7 @@ msgstr "Dispositivo de radio"
 msgid "Radio tuner device node."
 msgstr "Nodo de dispositivo sintonizador de radio."
 
-#: modules/access/v4l2/v4l2.c:75
-#: modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frecuencia"
 
@@ -14373,7 +14366,7 @@ msgstr "Rápido"
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
 #: modules/gui/macosx/VLCSimplePrefsController.m:696
-#: modules/gui/qt/components/simple_preferences.cpp:666
+#: modules/gui/qt/components/simple_preferences.cpp:673
 #: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14511,14 +14504,14 @@ msgstr "Interfaz de control D-Bus"
 #: modules/gui/macosx/VLCMainWindow.m:671
 #: modules/gui/macosx/VLCMainWindow.m:1275
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1265
-#: modules/gui/qt/main_interface.cpp:1269
-#: modules/gui/qt/main_interface.cpp:1308
+#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1267
+#: modules/gui/qt/main_interface.cpp:1271
 #: modules/gui/qt/main_interface.cpp:1310
-#: modules/gui/qt/main_interface.cpp:1419
-#: modules/gui/qt/main_interface.cpp:1436
-#: modules/gui/qt/main_interface.cpp:1444
-#: modules/gui/qt/main_interface.cpp:1467 modules/lua/libs/httpd.c:80
+#: modules/gui/qt/main_interface.cpp:1312
+#: modules/gui/qt/main_interface.cpp:1421
+#: modules/gui/qt/main_interface.cpp:1438
+#: modules/gui/qt/main_interface.cpp:1446
+#: modules/gui/qt/main_interface.cpp:1469 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -15365,7 +15358,7 @@ msgid "Avformat muxer"
 msgstr "Muxor Avformat"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:117 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:126 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Muxor"
 
@@ -16048,19 +16041,19 @@ msgstr ""
 "tiempo de posición generado de PCR. Si la búsqueda no funciona própiamente, "
 "active esta opción."
 
-#: modules/demux/mpeg/ts.c:114
+#: modules/demux/mpeg/ts.c:118
 msgid "Trust in-stream PCR"
 msgstr "Trust in-stream PCR"
 
-#: modules/demux/mpeg/ts.c:115
+#: modules/demux/mpeg/ts.c:119
 msgid "Use the stream PCR as a reference."
 msgstr "Usar la emisión PCR como referencia."
 
-#: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
+#: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
 msgstr "TV digital estándar"
 
-#: modules/demux/mpeg/ts.c:123
+#: modules/demux/mpeg/ts.c:127
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
@@ -16068,7 +16061,7 @@ msgstr ""
 "Selecciona el modo de TV digital estándar. Esta característica afecta a la "
 "información EPG y subtítulos."
 
-#: modules/demux/mpeg/ts.c:127
+#: modules/demux/mpeg/ts.c:131
 msgid "MPEG Transport Stream demuxer"
 msgstr "Demuxor de emisión de transporte MPEG"
 
@@ -16637,8 +16630,7 @@ msgid "Name"
 msgstr "Nombre"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108
-#: modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autor"
@@ -16843,7 +16835,7 @@ msgstr "Hora"
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1363
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 msgid "OK"
 msgstr "Aceptar"
 
@@ -16962,7 +16954,7 @@ msgstr "Seleccione una ubicación de salida"
 #: modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:440
+#: modules/gui/qt/components/simple_preferences.cpp:447
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
 #: modules/gui/qt/ui/open.h:282 modules/gui/qt/ui/open_disk.h:307
 #: modules/gui/qt/ui/open_file.h:148 modules/gui/qt/ui/sprefs_audio.h:417
@@ -17176,7 +17168,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:690
 #: modules/gui/macosx/VLCSimplePrefsController.m:718
 #: modules/gui/macosx/VLCSimplePrefsController.m:1251
-#: modules/gui/qt/components/simple_preferences.cpp:663
+#: modules/gui/qt/components/simple_preferences.cpp:670
 msgid "Custom"
 msgstr "Personalizada"
 
@@ -18124,7 +18116,7 @@ msgid "Enable DVD menus"
 msgstr "Habilitar menús DVD"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:155
+#: modules/stream_out/chromecast/cast.cpp:164
 msgid "IP Address"
 msgstr "Dirección IP"
 
@@ -18443,14 +18435,14 @@ msgstr "La reproducción de «%@» continuará en %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
-#: modules/gui/qt/components/simple_preferences.cpp:690
+#: modules/gui/qt/components/simple_preferences.cpp:697
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "Preferencias de interfaz"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/simple_preferences.cpp:225
-#: modules/gui/qt/components/simple_preferences.cpp:415
+#: modules/gui/qt/components/simple_preferences.cpp:422
 msgid "Audio Settings"
 msgstr "Preferencias de audio"
 
@@ -18462,7 +18454,7 @@ msgstr "Preferencias de vídeo"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:229
-#: modules/gui/qt/components/simple_preferences.cpp:831
+#: modules/gui/qt/components/simple_preferences.cpp:838
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Preferencias de subtítulos y ajustes sobre pantalla"
 
@@ -18859,8 +18851,7 @@ msgid "sec."
 msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391
-#: modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Vídeo"
 
@@ -19964,7 +19955,7 @@ msgstr "Últimos 60 segundos"
 msgid "Overall"
 msgstr "Sobretodo"
 
-#: modules/gui/qt/components/interface_widgets.cpp:615
+#: modules/gui/qt/components/interface_widgets.cpp:639
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -19972,45 +19963,45 @@ msgstr ""
 "Velocidad de reproducción actual: %1\n"
 "Clic para ajustar"
 
-#: modules/gui/qt/components/interface_widgets.cpp:688
+#: modules/gui/qt/components/interface_widgets.cpp:712
 msgid "Revert to normal play speed"
 msgstr "Volver a velocidad normal de reproducción"
 
-#: modules/gui/qt/components/interface_widgets.cpp:794
+#: modules/gui/qt/components/interface_widgets.cpp:818
 msgid "Download cover art"
 msgstr "Descargar arte de carátula"
 
-#: modules/gui/qt/components/interface_widgets.cpp:798
+#: modules/gui/qt/components/interface_widgets.cpp:822
 msgid "Add cover art from file"
 msgstr "Añadir carátula desde archivo"
 
-#: modules/gui/qt/components/interface_widgets.cpp:864
+#: modules/gui/qt/components/interface_widgets.cpp:888
 msgid "Choose Cover Art"
 msgstr "Seleccionar carátula"
 
-#: modules/gui/qt/components/interface_widgets.cpp:865
+#: modules/gui/qt/components/interface_widgets.cpp:889
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
 msgstr "Archivos de imagen (*.gif *.jpg *.jpeg *.png)"
 
-#: modules/gui/qt/components/interface_widgets.cpp:889
+#: modules/gui/qt/components/interface_widgets.cpp:913
 #: modules/gui/qt/dialogs/toolbar.cpp:564
 msgid "Elapsed time"
 msgstr "Tiempo transcurrido"
 
-#: modules/gui/qt/components/interface_widgets.cpp:893
+#: modules/gui/qt/components/interface_widgets.cpp:917
 #: modules/gui/qt/dialogs/toolbar.cpp:568
 msgid "Total/Remaining time"
 msgstr "Total/Tiempo restante"
 
-#: modules/gui/qt/components/interface_widgets.cpp:895
+#: modules/gui/qt/components/interface_widgets.cpp:919
 msgid "Click to toggle between total and remaining time"
 msgstr "Clic para intercambiar entre tiempo total y restante"
 
-#: modules/gui/qt/components/interface_widgets.cpp:901
+#: modules/gui/qt/components/interface_widgets.cpp:925
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "Cambiar entre tiempo transcurrido y restante"
 
-#: modules/gui/qt/components/interface_widgets.cpp:903
+#: modules/gui/qt/components/interface_widgets.cpp:927
 msgid "Double click to jump to a chosen time position"
 msgstr "Doble clic para ir a la posición de tiempo seleccionada"
 
@@ -20309,20 +20300,20 @@ msgid "Key: "
 msgstr "Tecla: "
 
 #: modules/gui/qt/components/simple_preferences.cpp:231
-#: modules/gui/qt/components/simple_preferences.cpp:591
+#: modules/gui/qt/components/simple_preferences.cpp:598
 msgid "Input & Codecs Settings"
 msgstr "Preferencias de entrada y códecs"
 
 #: modules/gui/qt/components/simple_preferences.cpp:233
-#: modules/gui/qt/components/simple_preferences.cpp:875
+#: modules/gui/qt/components/simple_preferences.cpp:882
 msgid "Configure Hotkeys"
 msgstr "Configurar atajos de teclado"
 
-#: modules/gui/qt/components/simple_preferences.cpp:423
+#: modules/gui/qt/components/simple_preferences.cpp:430
 msgid "Device:"
 msgstr "Dispositivo:"
 
-#: modules/gui/qt/components/simple_preferences.cpp:596
+#: modules/gui/qt/components/simple_preferences.cpp:603
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -20334,59 +20325,59 @@ msgstr ""
 "Puede definir uno único o configurarlos \n"
 "individualmente en preferencias avanzadas."
 
-#: modules/gui/qt/components/simple_preferences.cpp:664
+#: modules/gui/qt/components/simple_preferences.cpp:671
 msgid "Lowest latency"
 msgstr "La menor latencia"
 
-#: modules/gui/qt/components/simple_preferences.cpp:665
+#: modules/gui/qt/components/simple_preferences.cpp:672
 msgid "Low latency"
 msgstr "Baja latencia"
 
-#: modules/gui/qt/components/simple_preferences.cpp:667
+#: modules/gui/qt/components/simple_preferences.cpp:674
 msgid "High latency"
 msgstr "Alta latencia"
 
-#: modules/gui/qt/components/simple_preferences.cpp:668
+#: modules/gui/qt/components/simple_preferences.cpp:675
 msgid "Higher latency"
 msgstr "La mayor latencia"
 
-#: modules/gui/qt/components/simple_preferences.cpp:716
+#: modules/gui/qt/components/simple_preferences.cpp:723
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr ""
 "Esta es la interfaz personalizable de VLC. Puede descargar otras pieles desde"
 
-#: modules/gui/qt/components/simple_preferences.cpp:718
+#: modules/gui/qt/components/simple_preferences.cpp:725
 msgid "VLC skins website"
 msgstr "sitio web de pieles VLC"
 
-#: modules/gui/qt/components/simple_preferences.cpp:742
+#: modules/gui/qt/components/simple_preferences.cpp:749
 msgid "System's default"
 msgstr "Predeterminado del sistema"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1265
+#: modules/gui/qt/components/simple_preferences.cpp:1283
 msgid "File associations"
 msgstr "Asociaciones de archivo"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1274
+#: modules/gui/qt/components/simple_preferences.cpp:1292
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "Archivos de audio"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1275
+#: modules/gui/qt/components/simple_preferences.cpp:1293
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "Archivos de vídeo"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1276
+#: modules/gui/qt/components/simple_preferences.cpp:1294
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "Listas de reproducción"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1341
+#: modules/gui/qt/components/simple_preferences.cpp:1359
 msgid "&Apply"
 msgstr "&Aplicar"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1342
+#: modules/gui/qt/components/simple_preferences.cpp:1360
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60
@@ -20542,11 +20533,10 @@ msgid "Extract"
 msgstr "Extraer"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84
-#: modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20558,8 +20548,7 @@ msgstr "&Cerrar"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:48
-#: modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Convertir"
 
@@ -20988,8 +20977,7 @@ msgstr "Versión"
 msgid "Website"
 msgstr "Sitio web"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533
-#: modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Archivos"
 
@@ -21325,19 +21313,19 @@ msgstr "Vacío"
 msgid "Deactivate"
 msgstr "Desactivar"
 
-#: modules/gui/qt/main_interface.cpp:376
+#: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
 msgstr "¿Desea reiniciar la reproducción donde la dejó?"
 
-#: modules/gui/qt/main_interface.cpp:382
+#: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
 msgstr "&Continuar"
 
-#: modules/gui/qt/main_interface.cpp:1420
+#: modules/gui/qt/main_interface.cpp:1422
 msgid "Control menu for the player"
 msgstr "Menú de control para el reproductor"
 
-#: modules/gui/qt/main_interface.cpp:1464
+#: modules/gui/qt/main_interface.cpp:1466
 msgid "Paused"
 msgstr "Pausado"
 
@@ -22086,11 +22074,6 @@ msgstr "Gamma de imagen (0-10)"
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Establecer la gamma de imagen, entre 0.01 y 10. Predeterminado a 1."
-
-#: modules/hw/d3d11/d3d11_filters.c:620
-#, fuzzy
-msgid "Direct3D11 filter"
-msgstr "Ajustar filtro Direct3D9"
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -24030,8 +24013,7 @@ msgstr "Vídeo MPEG"
 msgid "VC-1 packetizer"
 msgstr "Empaquetador VC-1"
 
-#: modules/services_discovery/avahi.c:52
-#: modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Servicios de red Zeroconf"
 
@@ -25250,11 +25232,11 @@ msgstr "Por defecto: 90 seg"
 msgid "Chromaprint stream output"
 msgstr "Salida de emisión Chromaprint"
 
-#: modules/stream_out/chromecast/cast.cpp:112
+#: modules/stream_out/chromecast/cast.cpp:121
 msgid "HTTP port"
 msgstr "Puerto HTTP"
 
-#: modules/stream_out/chromecast/cast.cpp:113
+#: modules/stream_out/chromecast/cast.cpp:122
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
@@ -25262,93 +25244,93 @@ msgstr ""
 "Esto establece el puerto HTTP del servidor local usado para emitir el medio "
 "a Chromecast."
 
-#: modules/stream_out/chromecast/cast.cpp:116
+#: modules/stream_out/chromecast/cast.cpp:125
 msgid "The Chromecast receiver can receive video."
 msgstr "El receptor Chromecast puede recibir vídeo."
 
-#: modules/stream_out/chromecast/cast.cpp:118
+#: modules/stream_out/chromecast/cast.cpp:127
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr "Esto establece el muxor usado para emitir al Chromecast."
 
-#: modules/stream_out/chromecast/cast.cpp:119
+#: modules/stream_out/chromecast/cast.cpp:128
 msgid "MIME content type"
 msgstr "Tipo de contenido MIME"
 
-#: modules/stream_out/chromecast/cast.cpp:120
+#: modules/stream_out/chromecast/cast.cpp:129
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 "Esto establece el tipo de contenido MIME del medio enviado a Chromecast."
 
-#: modules/stream_out/chromecast/cast.cpp:121
-#: modules/stream_out/chromecast/cast.cpp:409
+#: modules/stream_out/chromecast/cast.cpp:130
+#: modules/stream_out/chromecast/cast.cpp:525
 msgid "Performance warning"
 msgstr "Advertencia de rendimiento"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
 msgstr "Mostrar advertencia de rendimiento al recodificar"
 
-#: modules/stream_out/chromecast/cast.cpp:123
+#: modules/stream_out/chromecast/cast.cpp:132
 msgid "Enable Audio passthrough"
 msgstr "Habilitar audio «passthrough»"
 
-#: modules/stream_out/chromecast/cast.cpp:124
+#: modules/stream_out/chromecast/cast.cpp:133
 #, fuzzy
-msgid "Disable if your receiver does not support Dolby®"
+msgid "Disable if your receiver does not support Dolby®."
 msgstr "Deshabilitar si su receptor no soporta Dolby®"
 
-#: modules/stream_out/chromecast/cast.cpp:146
+#: modules/stream_out/chromecast/cast.cpp:155
 #, fuzzy
-msgid "High (high quality and high bandwith)"
+msgid "High (high quality and high bandwidth)"
 msgstr "Alta (calidad y ancho de banda alto)"
 
-#: modules/stream_out/chromecast/cast.cpp:147
+#: modules/stream_out/chromecast/cast.cpp:156
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Media (calidad y ancho de banda medio)"
 
-#: modules/stream_out/chromecast/cast.cpp:148
+#: modules/stream_out/chromecast/cast.cpp:157
 #, fuzzy
-msgid "Low (low quality and low bandwith)"
+msgid "Low (low quality and low bandwidth)"
 msgstr "Baja (calidad y ancho de banda bajo)"
 
-#: modules/stream_out/chromecast/cast.cpp:149
+#: modules/stream_out/chromecast/cast.cpp:158
 #, fuzzy
-msgid "Low CPU (low quality but high bandwith)"
+msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Bajo CPU (calidad baja pero acho de banda alto)"
 
-#: modules/stream_out/chromecast/cast.cpp:152
+#: modules/stream_out/chromecast/cast.cpp:161
 msgid "Conversion quality"
 msgstr "Calidad de conversión"
 
-#: modules/stream_out/chromecast/cast.cpp:153
+#: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
 msgstr "Cabiar esta opción incrementa la velocidad de coversión y calidad."
 
-#: modules/stream_out/chromecast/cast.cpp:156
+#: modules/stream_out/chromecast/cast.cpp:165
 msgid "IP Address of the Chromecast."
 msgstr "Dirección IP de Chromecast."
 
-#: modules/stream_out/chromecast/cast.cpp:157
+#: modules/stream_out/chromecast/cast.cpp:166
 msgid "Chromecast port"
 msgstr "Puerto Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:158
+#: modules/stream_out/chromecast/cast.cpp:167
 msgid "The port used to talk to the Chromecast."
 msgstr "El puerto usado para comunicarse con Chromecast."
 
-#: modules/stream_out/chromecast/cast.cpp:162
+#: modules/stream_out/chromecast/cast.cpp:171
 msgid "Chromecast"
 msgstr "Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:163
+#: modules/stream_out/chromecast/cast.cpp:172
 msgid "Chromecast stream output"
 msgstr "Salida de emisión de Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 msgid "Ok, Don't warn me again"
 msgstr "Si, no preguntar de nuevo"
 
-#: modules/stream_out/chromecast/cast.cpp:410
+#: modules/stream_out/chromecast/cast.cpp:526
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -29584,13 +29566,17 @@ msgstr "Selección de perfil y nivel x264"
 msgid "Hardware-accelerated decoding"
 msgstr "Decodificación acelerada por hardware"
 
-#: modules/gui/qt/ui/sprefs_input.h:360 modules/gui/qt/ui/sprefs_input.h:362
+#: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
 msgstr "Nivel de postprocesamiento de calidad de vídeo"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Omisión de filtro de desbloqueo en bucle H.264"
+
+#: modules/gui/qt/ui/sprefs_input.h:362
+msgid "x264 preset and tuning selection"
+msgstr "Selección de ajuste y afinado x264"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29995,6 +29981,10 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Lista del administrador multimedia"
+
+#, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Ajustar filtro Direct3D9"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
@@ -36043,9 +36033,6 @@ msgstr "Lista del administrador multimedia"
 #, fuzzy
 #~ msgid "Headphone surround effect"
 #~ msgstr "Efecto de auriculares"
-
-#~ msgid "x264 preset and tuning selection"
-#~ msgstr "Selección de ajuste y afinado x264"
 
 #, fuzzy
 #~ msgid "Display device"

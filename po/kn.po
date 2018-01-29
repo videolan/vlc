@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-rc3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-01-25 10:20+0100\n"
+"POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-10-06 11:13+0000\n"
 "Last-Translator: M T <michtrz@gmail.com>, 2017\n"
 "Language-Team: Kannada (https://www.transifex.com/yaron/teams/16553/kn/)\n"
@@ -158,7 +158,7 @@ msgstr "ನಾನಾ ಬಗೆಯ ಧ್ವನಿ ಸಿದ್ದತೆಗಳು
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:115 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:124 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -747,7 +747,7 @@ msgstr "ಹೆಡ್ಫೋನ್ ಗಳು"
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
-#: modules/gui/qt/components/simple_preferences.cpp:366
+#: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "ಸ್ವಯಂಚಾಲಿತ"
 
@@ -1772,7 +1772,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:120 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5271,7 +5271,7 @@ msgstr "\"% s \" ಅನ್ನು ಬರೆಯುವುದಕ್ಕೆ ತೆರ�
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 msgid "Cancel"
 msgstr "ರದ್ದುಗೊಳಿಸಿ"
 
@@ -6177,11 +6177,11 @@ msgstr "ಬ್ಲೂ ರೇ"
 msgid "Blu-ray Disc support (libbluray)"
 msgstr "ಬ್ಲೂ ರೇ ಡಿಸ್ಕ್ ಬೆಂಬಲ (libbluray)"
 
-#: modules/access/bluray.c:717
+#: modules/access/bluray.c:722
 msgid "Path doesn't appear to be a Blu-ray"
 msgstr "ದಾರಿ ಬ್ಲೂ ರೇ ಎಂದು ಕಾಣುತ್ತಿಲ್ಲ"
 
-#: modules/access/bluray.c:732
+#: modules/access/bluray.c:737
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
@@ -6189,31 +6189,31 @@ msgstr ""
 "ಈ ಬ್ಲೂ ರೇ ಡಿಸ್ಕ್ AACS ವಿಸಂಕೇತಿಸುವ ಗ್ರಂಥಾಲಯದ ಅಗತ್ಯವಿದೆ, ಮತ್ತು ನಿಮ್ಮ ವ್ಯವಸ್ಥೆ ಅದನ್ನು "
 "ಹೊಂದಿಲ್ಲ."
 
-#: modules/access/bluray.c:738
+#: modules/access/bluray.c:743
 msgid "Blu-ray Disc is corrupted."
 msgstr "ಬ್ಲೂ ರೇ ಡಿಸ್ಕ್ ದೋಷಪೂರಿತವಾಗಿದೆ."
 
-#: modules/access/bluray.c:740
+#: modules/access/bluray.c:745
 msgid "Missing AACS configuration file!"
 msgstr "AACS ಸಂರಚನಾ ಕಡತ ಕಾಣೆಯಾಗಿದೆ!"
 
-#: modules/access/bluray.c:742
+#: modules/access/bluray.c:747
 msgid "No valid processing key found in AACS config file."
 msgstr "AACS ಸಂರಚನಾ ಕಡತದಲ್ಲಿ ಯಾವುದೇ ಮಾನ್ಯವಾದ ಸಂಸ್ಕರಣಾ ಕೀಲಿ ಕಂಡುಬಂದಿಲ್ಲ."
 
-#: modules/access/bluray.c:744
+#: modules/access/bluray.c:749
 msgid "No valid host certificate found in AACS config file."
 msgstr "AACS ಸಂರಚನಾ ಕಡತದಲ್ಲಿ ಮಾನ್ಯವಾದ ಅತಿಥೇಯ ಪ್ರಮಾಣಪತ್ರ ಕಂಡುಬಂದಿಲ್ಲ."
 
-#: modules/access/bluray.c:746
+#: modules/access/bluray.c:751
 msgid "AACS Host certificate revoked."
 msgstr "AACS ಅತಿಥೇಯ ಪ್ರಮಾಣಪತ್ರವನ್ನು ಹಿಂಪಡೆಯಲಾಗಿದೆ."
 
-#: modules/access/bluray.c:748
+#: modules/access/bluray.c:753
 msgid "AACS MMC failed."
 msgstr "AACS MMC ವಿಫಲವಾಗಿದೆ."
 
-#: modules/access/bluray.c:758
+#: modules/access/bluray.c:763
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
@@ -6221,40 +6221,40 @@ msgstr ""
 "ಈ ಬ್ಲೂ ರೇ ಡಿಸ್ಕ್ BD+ ವಿಸಂಕೇತಿಸುವ ಗ್ರಂಥಾಲಯದ ಅಗತ್ಯವಿದೆ, ಮತ್ತು ನಿಮ್ಮ ವ್ಯವಸ್ಥೆ ಅದನ್ನು "
 "ಹೊಂದಿಲ್ಲ."
 
-#: modules/access/bluray.c:761
+#: modules/access/bluray.c:766
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 "ನಿಮ್ಮ ವ್ಯವಸ್ಥೆಯ-BD + ವಿಸಂಕೇತಿಸುವ ಗ್ರಂಥಾಲಯ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಸಂರಚನಾ ಕಾಣೆಯಾಗಿದೆಯೆ?"
 
-#: modules/access/bluray.c:794
+#: modules/access/bluray.c:799
 msgid "Java required"
 msgstr ""
 
-#: modules/access/bluray.c:795
+#: modules/access/bluray.c:800
 #, c-format
 msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
 
-#: modules/access/bluray.c:796
+#: modules/access/bluray.c:801
 msgid "Java was not found on your system."
 msgstr ""
 
-#: modules/access/bluray.c:819
+#: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr "ಬ್ಲೂ ರೇ ಹಿನ್ನೆಲೆ ಆರಂಭಿಸಲು ವಿಫಲವಾಗಿದೆ. ಮೆನು ಬೆಂಬಲವಿಲ್ಲದೆ ಪ್ರಯತ್ನಿಸಿ."
 
-#: modules/access/bluray.c:847 modules/access/bluray.c:2284
-#: modules/access/bluray.c:2289
+#: modules/access/bluray.c:852 modules/access/bluray.c:2289
+#: modules/access/bluray.c:2294
 msgid "Blu-ray error"
 msgstr "ಬ್ಲೂ ರೇ ದೋಷ"
 
-#: modules/access/bluray.c:1669
+#: modules/access/bluray.c:1674
 msgid "Top Menu"
 msgstr "ಮೇಲಿನ ಮೆನು"
 
-#: modules/access/bluray.c:1672
+#: modules/access/bluray.c:1677
 msgid "First Play"
 msgstr "ಮೊದಲ ಪ್ಲೇ"
 
@@ -14036,7 +14036,7 @@ msgstr "ವೇಗವಾಗಿ"
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
 #: modules/gui/macosx/VLCMainMenu.m:384
 #: modules/gui/macosx/VLCSimplePrefsController.m:696
-#: modules/gui/qt/components/simple_preferences.cpp:666
+#: modules/gui/qt/components/simple_preferences.cpp:673
 #: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14173,14 +14173,14 @@ msgstr "D-ಬಸ್ ನಿಯಂತ್ರಣ ಅಂತರ್ವರ್ತನ"
 #: modules/gui/macosx/VLCMainWindow.m:671
 #: modules/gui/macosx/VLCMainWindow.m:1275
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
-#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1265
-#: modules/gui/qt/main_interface.cpp:1269
-#: modules/gui/qt/main_interface.cpp:1308
+#: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1267
+#: modules/gui/qt/main_interface.cpp:1271
 #: modules/gui/qt/main_interface.cpp:1310
-#: modules/gui/qt/main_interface.cpp:1419
-#: modules/gui/qt/main_interface.cpp:1436
-#: modules/gui/qt/main_interface.cpp:1444
-#: modules/gui/qt/main_interface.cpp:1467 modules/lua/libs/httpd.c:80
+#: modules/gui/qt/main_interface.cpp:1312
+#: modules/gui/qt/main_interface.cpp:1421
+#: modules/gui/qt/main_interface.cpp:1438
+#: modules/gui/qt/main_interface.cpp:1446
+#: modules/gui/qt/main_interface.cpp:1469 modules/lua/libs/httpd.c:80
 #: modules/notify/osx_notifications.m:302
 #: modules/video_output/wayland/shell.c:348
 #: modules/video_output/wayland/xdg-shell.c:291
@@ -15018,7 +15018,7 @@ msgid "Avformat muxer"
 msgstr "Avformat muxer"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:117 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:126 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "ಮಕ್ಸರ್"
 
@@ -15684,25 +15684,25 @@ msgstr ""
 "Seek and position based on a percent byte position, not a PCR generated time "
 "position. If seeking doesn't work property, turn on this option."
 
-#: modules/demux/mpeg/ts.c:114
+#: modules/demux/mpeg/ts.c:118
 msgid "Trust in-stream PCR"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:115
+#: modules/demux/mpeg/ts.c:119
 msgid "Use the stream PCR as a reference."
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:122 modules/mux/mpeg/ts.c:100
+#: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:123
+#: modules/demux/mpeg/ts.c:127
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:127
+#: modules/demux/mpeg/ts.c:131
 msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG-ಸಾರಿಗೆ ಸ್ಟ್ರೀಮ್ ಡಿಮಕ್ಸರ್"
 
@@ -16467,7 +16467,7 @@ msgstr "ಸಮಯ"
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1363
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 msgid "OK"
 msgstr "ಸರಿ"
 
@@ -16585,7 +16585,7 @@ msgstr "ಉತ್ಪಾದನೆಯ ಸ್ಥಳವನ್ನು ಆಯ್ಕೆ�
 #: modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/gui/macosx/prefs_widgets.m:1121
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:440
+#: modules/gui/qt/components/simple_preferences.cpp:447
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
 #: modules/gui/qt/ui/open.h:282 modules/gui/qt/ui/open_disk.h:307
 #: modules/gui/qt/ui/open_file.h:148 modules/gui/qt/ui/sprefs_audio.h:417
@@ -16797,7 +16797,7 @@ msgstr "ಒಂದು SDP ಗಳು ರಫ್ತು ಮನವಿ ಇದೆ. ಆ�
 #: modules/gui/macosx/VLCSimplePrefsController.m:690
 #: modules/gui/macosx/VLCSimplePrefsController.m:718
 #: modules/gui/macosx/VLCSimplePrefsController.m:1251
-#: modules/gui/qt/components/simple_preferences.cpp:663
+#: modules/gui/qt/components/simple_preferences.cpp:670
 msgid "Custom"
 msgstr "ಪದ್ಧತಿ"
 
@@ -17714,7 +17714,7 @@ msgid "Enable DVD menus"
 msgstr "ಡಿವಿಡಿ ಮೆನುಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:155
+#: modules/stream_out/chromecast/cast.cpp:164
 msgid "IP Address"
 msgstr "IP ವಿಳಾಸ"
 
@@ -18031,14 +18031,14 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:227
 #: modules/gui/qt/components/simple_preferences.cpp:223
-#: modules/gui/qt/components/simple_preferences.cpp:690
+#: modules/gui/qt/components/simple_preferences.cpp:697
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "ಅಂತರ್ವರ್ತನ ಸಂಯೋಜನೆಗಳು"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/simple_preferences.cpp:225
-#: modules/gui/qt/components/simple_preferences.cpp:415
+#: modules/gui/qt/components/simple_preferences.cpp:422
 msgid "Audio Settings"
 msgstr "ಧ್ವನಿ ಸಂಯೋಜನೆಗಳು"
 
@@ -18050,7 +18050,7 @@ msgstr "ವೀಡಿಯೊ ಸಂಯೋಜನೆಗಳು"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:229
-#: modules/gui/qt/components/simple_preferences.cpp:831
+#: modules/gui/qt/components/simple_preferences.cpp:838
 msgid "Subtitle & On Screen Display Settings"
 msgstr "ಉಪಶೀರ್ಷಿಕೆ &amp; ತೆರೆಯ ಪ್ರದರ್ಶನ ಸಂಯೋಜನೆಗಳು"
 
@@ -19538,7 +19538,7 @@ msgstr "ಕೊನೆಯ 60 ಸೆಕೆಂಡುಗಳು"
 msgid "Overall"
 msgstr "ಸಮಗ್ರ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:615
+#: modules/gui/qt/components/interface_widgets.cpp:639
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -19546,45 +19546,45 @@ msgstr ""
 "ಪ್ರಸ್ತುತ ಪ್ಲೇಬ್ಯಾಕ್ ವೇಗ:%1\n"
 "ಸರಿಹೊಂದಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:688
+#: modules/gui/qt/components/interface_widgets.cpp:712
 msgid "Revert to normal play speed"
 msgstr "ಸಾಮಾನ್ಯ ಪ್ಲೇ ವೇಗಕ್ಕೆ ಹಿಂತಿರುಗಿಸಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:794
+#: modules/gui/qt/components/interface_widgets.cpp:818
 msgid "Download cover art"
 msgstr "ಮುಖಪುಟದ ಕಲೆಯನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:798
+#: modules/gui/qt/components/interface_widgets.cpp:822
 msgid "Add cover art from file"
 msgstr "ಕಡತದಿಂದ ಚ್ ಸೇರಿಸಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:864
+#: modules/gui/qt/components/interface_widgets.cpp:888
 msgid "Choose Cover Art"
 msgstr "ಮುಖಪುಟದ ಕಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:865
+#: modules/gui/qt/components/interface_widgets.cpp:889
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
 msgstr "ಚಿತ್ರಿಕಾ ಕಡತ (*.gif ,*.jpg,*.jpeg,*.png)"
 
-#: modules/gui/qt/components/interface_widgets.cpp:889
+#: modules/gui/qt/components/interface_widgets.cpp:913
 #: modules/gui/qt/dialogs/toolbar.cpp:564
 msgid "Elapsed time"
 msgstr "ಕಳೆದ ಸಮಯ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:893
+#: modules/gui/qt/components/interface_widgets.cpp:917
 #: modules/gui/qt/dialogs/toolbar.cpp:568
 msgid "Total/Remaining time"
 msgstr "ಒಟ್ಟು / ಉಳಿದಿರುವ ಸಮಯ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:895
+#: modules/gui/qt/components/interface_widgets.cpp:919
 msgid "Click to toggle between total and remaining time"
 msgstr "ಒಟ್ಟು ಮತ್ತು ಉಳಿದ ಸಮಯದಲ್ಲಿ ನಡುವೆ ಅದಲುಬದಲು ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:901
+#: modules/gui/qt/components/interface_widgets.cpp:925
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "ಕಳೆದ ಮತ್ತು ಉಳಿದ ಸಮಯದಲ್ಲಿ ನಡುವೆ ಅದಲುಬದಲು ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ"
 
-#: modules/gui/qt/components/interface_widgets.cpp:903
+#: modules/gui/qt/components/interface_widgets.cpp:927
 msgid "Double click to jump to a chosen time position"
 msgstr "ಒಂದು ಆಯ್ಕೆಯ ಸಮಯದ ಸ್ಥಾನಕ್ಕೆ ನೆಗೆಯುವುದಕ್ಕೆ ಡಬಲ್ ಕ್ಲಿಕ್ ಮಾಡಿ"
 
@@ -19881,20 +19881,20 @@ msgid "Key: "
 msgstr "ಕೀಲಿ:"
 
 #: modules/gui/qt/components/simple_preferences.cpp:231
-#: modules/gui/qt/components/simple_preferences.cpp:591
+#: modules/gui/qt/components/simple_preferences.cpp:598
 msgid "Input & Codecs Settings"
 msgstr "ಇನ್ಪುಟ್ &amp; ಸಂಕೇತಕದ ಸಂಯೋಜನೆಗಳು"
 
 #: modules/gui/qt/components/simple_preferences.cpp:233
-#: modules/gui/qt/components/simple_preferences.cpp:875
+#: modules/gui/qt/components/simple_preferences.cpp:882
 msgid "Configure Hotkeys"
 msgstr "ಶೀಘ್ರಕೀಲಿಗಳನ್ನು ಸಂರಚಿಸಿ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:423
+#: modules/gui/qt/components/simple_preferences.cpp:430
 msgid "Device:"
 msgstr "ಸಾಧನ:"
 
-#: modules/gui/qt/components/simple_preferences.cpp:596
+#: modules/gui/qt/components/simple_preferences.cpp:603
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -19906,58 +19906,58 @@ msgstr ""
 "You can define a unique one or configure them \n"
 "individually in the advanced preferences."
 
-#: modules/gui/qt/components/simple_preferences.cpp:664
+#: modules/gui/qt/components/simple_preferences.cpp:671
 msgid "Lowest latency"
 msgstr "ಕಡಿಮೆ ಸುಪ್ತತೆ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:665
+#: modules/gui/qt/components/simple_preferences.cpp:672
 msgid "Low latency"
 msgstr "ಕಡಿಮೆ ಸುಪ್ತತೆ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:667
+#: modules/gui/qt/components/simple_preferences.cpp:674
 msgid "High latency"
 msgstr "ಅಧಿಕ ಸುಪ್ತತೆ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:668
+#: modules/gui/qt/components/simple_preferences.cpp:675
 msgid "Higher latency"
 msgstr "ಹೆಚ್ಚಿನ ಸುಪ್ತತೆ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:716
+#: modules/gui/qt/components/simple_preferences.cpp:723
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "This is VLC's skinnable interface. You can download other skins at"
 
-#: modules/gui/qt/components/simple_preferences.cpp:718
+#: modules/gui/qt/components/simple_preferences.cpp:725
 msgid "VLC skins website"
 msgstr "VLC ಯ ಸ್ಕಿನ್ಗಳ ಜಾಲತಾಣ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:742
+#: modules/gui/qt/components/simple_preferences.cpp:749
 msgid "System's default"
 msgstr "ವ್ಯವಸ್ಥೆಯ ಪೂರ್ವನಿಯೋಜಿತ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1265
+#: modules/gui/qt/components/simple_preferences.cpp:1283
 msgid "File associations"
 msgstr "ಕಡತದ ಸಂಘಗಳು"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1274
+#: modules/gui/qt/components/simple_preferences.cpp:1292
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "ಧ್ವನಿ ಕಡತಗಳು"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1275
+#: modules/gui/qt/components/simple_preferences.cpp:1293
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "ವಿಡಿಯೋ ಕಡತಗಳು"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1276
+#: modules/gui/qt/components/simple_preferences.cpp:1294
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "ಪ್ಲೇಪಟ್ಟಿಯ ಕಡತಗಳು"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1341
+#: modules/gui/qt/components/simple_preferences.cpp:1359
 msgid "&Apply"
 msgstr "ಅನ್ವಯಿಸಿ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1342
+#: modules/gui/qt/components/simple_preferences.cpp:1360
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60
@@ -20866,19 +20866,19 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: modules/gui/qt/main_interface.cpp:376
+#: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
-#: modules/gui/qt/main_interface.cpp:382
+#: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
 msgstr ""
 
-#: modules/gui/qt/main_interface.cpp:1420
+#: modules/gui/qt/main_interface.cpp:1422
 msgid "Control menu for the player"
 msgstr "ಪ್ಲೇಯರ್ ಗೆ ನಿಯಂತ್ರಣ ಮೆನು"
 
-#: modules/gui/qt/main_interface.cpp:1464
+#: modules/gui/qt/main_interface.cpp:1466
 msgid "Paused"
 msgstr "ವಿರಾಮಗೊಳಿಸಲಾಗಿದೆ"
 
@@ -21609,10 +21609,6 @@ msgstr "ಚಿತ್ರ ಗಾಮಾ (0-10)"
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "ಚಿತ್ರದ ಗಾಮಾವನ್ನು 0.01 ಮತ್ತು 10 ರ ನಡುವೆ ಹೊಂದಿಸಿ.ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ 1."
-
-#: modules/hw/d3d11/d3d11_filters.c:620
-msgid "Direct3D11 filter"
-msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
@@ -24703,102 +24699,102 @@ msgstr ""
 msgid "Chromaprint stream output"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:112
+#: modules/stream_out/chromecast/cast.cpp:121
 msgid "HTTP port"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:113
+#: modules/stream_out/chromecast/cast.cpp:122
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:116
+#: modules/stream_out/chromecast/cast.cpp:125
 msgid "The Chromecast receiver can receive video."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:118
+#: modules/stream_out/chromecast/cast.cpp:127
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:119
+#: modules/stream_out/chromecast/cast.cpp:128
 msgid "MIME content type"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:120
+#: modules/stream_out/chromecast/cast.cpp:129
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:121
-#: modules/stream_out/chromecast/cast.cpp:409
+#: modules/stream_out/chromecast/cast.cpp:130
+#: modules/stream_out/chromecast/cast.cpp:525
 #, fuzzy
 msgid "Performance warning"
 msgstr "ಕಾರ್ಯಕ್ಷಮತೆಯ ಆಯ್ಕೆಗಳು"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:123
+#: modules/stream_out/chromecast/cast.cpp:132
 #, fuzzy
 msgid "Enable Audio passthrough"
 msgstr "ಧ್ವನಿಯ  ಸ್ಟ್ರೀಮ್ output ಅನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
 
-#: modules/stream_out/chromecast/cast.cpp:124
-msgid "Disable if your receiver does not support Dolby®"
+#: modules/stream_out/chromecast/cast.cpp:133
+msgid "Disable if your receiver does not support Dolby®."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:146
-msgid "High (high quality and high bandwith)"
+#: modules/stream_out/chromecast/cast.cpp:155
+msgid "High (high quality and high bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:147
+#: modules/stream_out/chromecast/cast.cpp:156
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:148
-msgid "Low (low quality and low bandwith)"
+#: modules/stream_out/chromecast/cast.cpp:157
+msgid "Low (low quality and low bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:149
-msgid "Low CPU (low quality but high bandwith)"
+#: modules/stream_out/chromecast/cast.cpp:158
+msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:152
+#: modules/stream_out/chromecast/cast.cpp:161
 #, fuzzy
 msgid "Conversion quality"
 msgstr "ಸಲ್ಲಿಸುವಿಕೆಯ ಗುಣಮಟ್ಟದ"
 
-#: modules/stream_out/chromecast/cast.cpp:153
+#: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:156
+#: modules/stream_out/chromecast/cast.cpp:165
 msgid "IP Address of the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:157
+#: modules/stream_out/chromecast/cast.cpp:166
 msgid "Chromecast port"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:158
+#: modules/stream_out/chromecast/cast.cpp:167
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:162
+#: modules/stream_out/chromecast/cast.cpp:171
 msgid "Chromecast"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:163
+#: modules/stream_out/chromecast/cast.cpp:172
 msgid "Chromecast stream output"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:408
+#: modules/stream_out/chromecast/cast.cpp:524
 #, fuzzy
 msgid "Ok, Don't warn me again"
 msgstr "ಇನ್ನೊಮ್ಮೆ ಕೇಳಬೇಡಿ"
 
-#: modules/stream_out/chromecast/cast.cpp:410
+#: modules/stream_out/chromecast/cast.cpp:526
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -28965,13 +28961,18 @@ msgstr "x264 ಸ್ವವಿವರ ಮತ್ತು ಮಟ್ಟದ ಆಯ್ಕ�
 msgid "Hardware-accelerated decoding"
 msgstr "ಯಂತ್ರಾಂಶದ ವೇಗೋತ್ಕರ್ಷಿತ ವಿಸಂಕೇತಿಕರಣ"
 
-#: modules/gui/qt/ui/sprefs_input.h:360 modules/gui/qt/ui/sprefs_input.h:362
+#: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
 msgstr "ವೀಡಿಯೋ ಗುಣಮಟ್ಟ ನಂತರದ ಪ್ರಕ್ರಿಯೆಯ ಮಟ್ಟ"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 ಇನ್ ಲೂಪ್ deblocking ಶೋಧಕವನ್ನು ಬಿಟ್ಟುಬಿಡಿ"
+
+#: modules/gui/qt/ui/sprefs_input.h:362
+#, fuzzy
+msgid "x264 preset and tuning selection"
+msgstr "x264 ಸ್ವವಿವರ ಮತ್ತು ಮಟ್ಟದ ಆಯ್ಕೆ"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -30764,10 +30765,6 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #, fuzzy
 #~ msgid "Headphone surround effect"
 #~ msgstr "ಹೆಡ್ ಪೋನ್ ಪರಿಣಾಮ"
-
-#, fuzzy
-#~ msgid "x264 preset and tuning selection"
-#~ msgstr "x264 ಸ್ವವಿವರ ಮತ್ತು ಮಟ್ಟದ ಆಯ್ಕೆ"
 
 #, fuzzy
 #~ msgid "Display device"
