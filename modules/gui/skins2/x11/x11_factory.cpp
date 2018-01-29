@@ -326,8 +326,32 @@ void X11Factory::getDefaultGeometry( int* p_width, int* p_height ) const
 
 SkinsRect X11Factory::getWorkArea() const
 {
-    // XXX
-    return SkinsRect( 0, 0, getScreenWidth(), getScreenHeight() );
+    // query Work Area if available from Window Manager
+    // otherwise, default to the whole screen
+    int x = 0, y = 0;
+    int w = getScreenWidth(), h = getScreenHeight();
+    if( m_pDisplay->m_net_workarea != None )
+    {
+        Atom ret;
+        int i_format;
+        unsigned long i_items, i_bytesafter;
+        long *values;
+        if( XGetWindowProperty( m_pDisplay->getDisplay(),
+                                DefaultRootWindow( m_pDisplay->getDisplay() ),
+                                m_pDisplay->m_net_workarea,
+                                0, 16384, False, XA_CARDINAL,
+                                &ret, &i_format, &i_items, &i_bytesafter,
+                                (unsigned char **)&values ) == Success )
+        {
+            x = values[0];
+            y = values[1];
+            w = values[2];
+            h = values[3];
+            XFree( values );
+        }
+    }
+    msg_Dbg( getIntf(),"WorkArea: %ix%i at +%i+%i", w, h, x, y );
+    return SkinsRect( x, y, w, h );
 }
 
 
@@ -391,17 +415,17 @@ void X11Factory::initCursors( )
     Display *display = m_pDisplay->getDisplay();
     static const struct {
         CursorType_t type;
-	const char *name;
+        const char *name;
     } cursors[] = {
         { kDefaultArrow, "left_ptr" },
-	{ kResizeNWSE, "bottom_right_corner" },
-	{ kResizeNS, "bottom_side" },
-	{ kResizeWE, "right_side" },
-	{ kResizeNESW, "bottom_left_corner" },
+        { kResizeNWSE, "bottom_right_corner" },
+        { kResizeNS, "bottom_side" },
+        { kResizeWE, "right_side" },
+        { kResizeNESW, "bottom_left_corner" },
     };
     // retrieve cursors from default theme
     for( unsigned i = 0; i < sizeof(cursors) / sizeof(cursors[0]); i++ )
-	mCursors[cursors[i].type] =
+        mCursors[cursors[i].type] =
             XcursorLibraryLoadCursor( display, cursors[i].name );
 
     // build an additional empty cursor
