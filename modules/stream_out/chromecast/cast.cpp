@@ -68,7 +68,8 @@ struct sout_stream_sys_t
     bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
     bool canDecodeAudio( sout_stream_t* p_stream, vlc_fourcc_t i_codec,
                          const audio_format_t* p_fmt ) const;
-    bool startSoutChain(sout_stream_t* p_stream);
+    bool startSoutChain(sout_stream_t* p_stream,
+                        const std::vector<sout_stream_id_sys_t*> &new_streams);
 
     sout_stream_t     *p_out;
     std::string        sout;
@@ -394,7 +395,8 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
            i_codec == VLC_CODEC_MP3;
 }
 
-bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
+bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
+                                       const std::vector<sout_stream_id_sys_t*> &new_streams)
 {
     if ( unlikely( p_out != NULL ) )
     {
@@ -409,10 +411,12 @@ bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     cc_has_input = false;
     out_streams_added = 0;
+    out_streams = new_streams;
 
     p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
     if (p_out == NULL) {
         msg_Dbg(p_stream, "could not create sout chain:%s", sout.c_str());
+        out_streams.clear();
         return false;
     }
 
@@ -509,7 +513,6 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         return true;
 
     out_force_reload = false;
-    out_streams = new_streams;
 
     std::stringstream ssout;
     if ( !canRemux )
@@ -636,7 +639,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 
     sout = ssout.str();
 
-    if ( !startSoutChain( p_stream ) )
+    if ( !startSoutChain( p_stream, new_streams ) )
     {
         p_intf->requestPlayerStop();
 
