@@ -749,7 +749,7 @@ static const struct
         VLC_CODEC_D3D9_OPAQUE,    VLC_CODEC_D3D11_OPAQUE },
                                                FAKE_FMT() },
     { { VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_D3D9_OPAQUE_10B,
-        VLC_CODEC_D3D11_OPAQUE_RGBA                       },
+        VLC_CODEC_D3D11_OPAQUE_RGBA, VLC_CODEC_D3D11_OPAQUE_BGRA },
                                                FAKE_FMT() },
 
     { { VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_UYVY,
