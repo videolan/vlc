@@ -55,7 +55,6 @@
 
 static int  Open   (vlc_object_t *);
 static void Close  (vlc_object_t *);
-static int  OpenFrag   (vlc_object_t *);
 static void CloseFrag  (vlc_object_t *);
 
 #define SOUT_CFG_PREFIX "sout-mp4-"
@@ -80,7 +79,7 @@ add_submodule ()
     set_shortname("MP4 Frag")
     add_shortcut("mp4frag", "mp4stream")
     set_capability("sout mux", 0)
-    set_callbacks(OpenFrag, CloseFrag)
+    set_callbacks(Open, CloseFrag)
 
 vlc_module_end ()
 
@@ -231,32 +230,37 @@ static int WriteSlowStartHeader(sout_mux_t *p_mux)
 static int Open(vlc_object_t *p_this)
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
-    sout_mux_sys_t  *p_sys;
+    sout_mux_sys_t  *p_sys = malloc(sizeof(sout_mux_sys_t));
+    if (!p_sys)
+        return VLC_ENOMEM;
 
     msg_Dbg(p_mux, "Mp4 muxer opened");
     config_ChainParse(p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg);
 
-    p_mux->pf_control   = Control;
-    p_mux->pf_addstream = AddStream;
-    p_mux->pf_delstream = DelStream;
-    p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys = malloc(sizeof(sout_mux_sys_t));
-    if (!p_sys)
-        return VLC_ENOMEM;
+    p_sys->b_mov        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "mov");
+    p_sys->b_3gp        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "3gp");
+    p_sys->b_fragmented = p_mux->psz_mux && (!strcmp(p_mux->psz_mux, "mp4frag") ||
+                                             !strcmp(p_mux->psz_mux, "mp4stream"));
+    /* FIXME FIXME
+     * Quicktime actually doesn't like the 64 bits extensions !!! */
+    p_sys->b_64_ext = false;
+
     p_sys->i_pos        = 0;
     p_sys->i_nb_streams = 0;
     p_sys->pp_streams   = NULL;
     p_sys->i_mdat_pos   = 0;
-    p_sys->b_mov        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "mov");
-    p_sys->b_3gp        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "3gp");
-    p_sys->i_read_duration   = 0;
-    p_sys->i_start_dts = VLC_TS_INVALID;
-    p_sys->b_fragmented = false;
     p_sys->b_header_sent = false;
 
-    /* FIXME FIXME
-     * Quicktime actually doesn't like the 64 bits extensions !!! */
-    p_sys->b_64_ext = false;
+    p_sys->i_read_duration   = 0;
+    p_sys->i_written_duration= 0;
+    p_sys->i_start_dts = VLC_TS_INVALID;
+    p_sys->i_mfhd_sequence = 1;
+
+    p_mux->p_sys        = p_sys;
+    p_mux->pf_control   = Control;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = p_sys->b_fragmented ? MuxFrag : Mux;
 
     return VLC_SUCCESS;
 }
@@ -1227,40 +1231,6 @@ static void FlushHeader(sout_mux_t *p_mux)
     p_sys->i_pos += bo_size(ftyp);
     box_send(p_mux, ftyp);
     p_sys->b_header_sent = true;
-}
-
-static int OpenFrag(vlc_object_t *p_this)
-{
-    sout_mux_t *p_mux = (sout_mux_t*) p_this;
-    sout_mux_sys_t *p_sys = malloc(sizeof(sout_mux_sys_t));
-    if (!p_sys)
-        return VLC_ENOMEM;
-
-    p_mux->p_sys = (sout_mux_sys_t *) p_sys;
-    p_mux->pf_control   = Control;
-    p_mux->pf_addstream = AddStream;
-    p_mux->pf_delstream = DelStream;
-    p_mux->pf_mux       = MuxFrag;
-
-    /* unused */
-    p_sys->b_mov        = false;
-    p_sys->b_3gp        = false;
-    p_sys->b_64_ext     = false;
-    /* !unused */
-
-    p_sys->i_pos        = 0;
-    p_sys->i_nb_streams = 0;
-    p_sys->pp_streams   = NULL;
-    p_sys->i_mdat_pos   = 0;
-    p_sys->i_read_duration   = 0;
-    p_sys->i_written_duration= 0;
-
-    p_sys->b_header_sent = false;
-    p_sys->b_fragmented  = true;
-    p_sys->i_start_dts = VLC_TS_INVALID;
-    p_sys->i_mfhd_sequence = 1;
-
-    return VLC_SUCCESS;
 }
 
 static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
