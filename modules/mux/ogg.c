@@ -287,13 +287,6 @@ static void Close( vlc_object_t * p_this )
         /* Close the current ogg stream */
         msg_Dbg( p_mux, "writing footers" );
 
-        for(int i = 0; i < p_mux->i_nb_inputs; i++ )
-        {
-            p_stream = (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys;
-            OggCreateStreamFooter( p_mux, p_stream );
-            free( p_stream->skeleton.p_index );
-        }
-
         /* Remove deleted logical streams */
         for(int i = 0; i < p_sys->i_del_streams; i++ )
         {
