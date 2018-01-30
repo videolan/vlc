@@ -182,6 +182,7 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     state->height = cfg->height;
     vlc_mutex_init(&state->lock);
 
+    char *modlist = var_InheritString(vout, "window");
     vout_window_owner_t owner = {
         .sys = state,
         .resized = vout_display_window_ResizeNotify,
@@ -190,7 +191,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     };
     vout_window_t *window;
 
-    window = vout_window_New((vlc_object_t *)vout, "$window", cfg, &owner);
+    window = vout_window_New((vlc_object_t *)vout, modlist, cfg, &owner);
+    free(modlist);
     if (window == NULL) {
         vlc_mutex_destroy(&state->lock);
         free(state);
