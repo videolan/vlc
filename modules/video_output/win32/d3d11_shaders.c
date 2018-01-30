@@ -245,7 +245,8 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                                  d3d11_device_t *d3d_dev,
                                  const d3d_format_t *format, const display_info_t *display,
                                  video_transfer_func_t transfer, bool src_full_range,
-                                 ID3D11PixelShader *output[D3D11_MAX_SHADER_VIEW])
+                                 ID3D11PixelShader *output[D3D11_MAX_SHADER_VIEW],
+                                 ID3D11SamplerState *d3dsampState[2])
 {
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler[2] = {NULL, NULL};
@@ -255,6 +256,34 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     const char *psz_adjust_range      = DEFAULT_NOOP;
     const char *psz_move_planes[2]    = {DEFAULT_NOOP, DEFAULT_NOOP};
     char *psz_range = NULL;
+
+    if (d3dsampState)
+    {
+        D3D11_SAMPLER_DESC sampDesc;
+        memset(&sampDesc, 0, sizeof(sampDesc));
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        sampDesc.MinLOD = 0;
+        sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+        HRESULT hr;
+        hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &d3dsampState[0]);
+        if (FAILED(hr)) {
+            msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+            return hr;
+        }
+
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &d3dsampState[1]);
+        if (FAILED(hr)) {
+            msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+            ID3D11SamplerState_Release(d3dsampState[0]);
+            return hr;
+        }
+    }
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )

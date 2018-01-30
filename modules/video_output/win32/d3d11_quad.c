@@ -59,6 +59,9 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
 
     ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, quad->d3dvertexShader, NULL, 0);
 
+    if (quad->d3dsampState[0])
+        ID3D11DeviceContext_PSSetSamplers(d3d_dev->d3dcontext, 0, 2, quad->d3dsampState);
+
     /* pixel shader */
     ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
     assert(quad->resourceCount <= D3D11_MAX_SHADER_VIEW);
@@ -170,6 +173,14 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         {
             ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
             quad->d3dpixelShader[i] = NULL;
+        }
+    }
+    for (size_t i=0; i<2; i++)
+    {
+        if (quad->d3dsampState[i])
+        {
+            ID3D11SamplerState_Release(quad->d3dsampState[i]);
+            quad->d3dsampState[i] = NULL;
         }
     }
     ReleasePictureSys(&quad->picSys);
