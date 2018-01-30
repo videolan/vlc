@@ -169,7 +169,7 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 
     /* *** add it to the stream chain */
     vlc_mutex_lock( &p_sout->lock );
-    p_input->id = p_sout->p_stream->pf_add( p_sout->p_stream, p_fmt );
+    p_input->id = sout_StreamIdAdd( p_sout->p_stream, p_fmt );
     vlc_mutex_unlock( &p_sout->lock );
 
     if( p_input->id == NULL )
@@ -194,7 +194,7 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
              (void *)p_input );
 
     vlc_mutex_lock( &p_sout->lock );
-    p_sout->p_stream->pf_del( p_sout->p_stream, p_input->id );
+    sout_StreamIdDel( p_sout->p_stream, p_input->id );
     vlc_mutex_unlock( &p_sout->lock );
 
     free( p_input );
@@ -233,8 +233,7 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
     int                 i_ret;
 
     vlc_mutex_lock( &p_sout->lock );
-    i_ret = p_sout->p_stream->pf_send( p_sout->p_stream,
-                                       p_input->id, p_buffer );
+    i_ret = sout_StreamIdSend( p_sout->p_stream, p_input->id, p_buffer );
     vlc_mutex_unlock( &p_sout->lock );
 
     return i_ret;
