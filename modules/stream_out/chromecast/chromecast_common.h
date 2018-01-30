@@ -49,8 +49,7 @@ typedef struct
 
     void (*pf_set_pause_state)(void*, bool paused);
 
-    void (*pf_set_title)(void*, const char *psz_title);
-    void (*pf_set_artwork)(void*, const char *psz_artwork);
+    void (*pf_set_meta)(void*, vlc_meta_t *p_meta);
 
 } chromecast_common;
 

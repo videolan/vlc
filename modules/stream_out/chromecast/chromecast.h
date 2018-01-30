@@ -109,8 +109,8 @@ public:
     void msgReceiverGetStatus();
     void msgReceiverClose(const std::string& destinationId);
     void msgAuth();
-    void msgPlayerLoad( const std::string& destinationId, unsigned int i_port, const std::string& title,
-                        const std::string& artwork, const std::string& mime );
+    void msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
+                        const std::string& mime, const vlc_meta_t *p_meta );
     void msgPlayerPlay( const std::string& destinationId, const std::string& mediaSessionId );
     void msgPlayerStop( const std::string& destinationId, const std::string& mediaSessionId );
     void msgPlayerPause( const std::string& destinationId, const std::string& mediaSessionId );
@@ -128,8 +128,8 @@ private:
                       const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
                       castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
     void pushMediaPlayerMessage( const std::string& destinationId, const std::stringstream & payload );
-    std::string GetMedia( unsigned int i_port, const std::string& title,
-                          const std::string& artwork, const std::string& mime );
+    std::string GetMedia( unsigned int i_port, const std::string& mime,
+                          const vlc_meta_t *p_meta );
 
 private:
     vlc_object_t* m_module;
@@ -172,9 +172,7 @@ private:
 
     void setPauseState(bool paused);
 
-    void setTitle( const char *psz_title );
-
-    void setArtwork( const char *psz_artwork );
+    void setMeta( vlc_meta_t *p_meta );
 
     mtime_t getPlaybackTimestamp() const;
 
@@ -207,8 +205,7 @@ private:
 
     static void set_pause_state(void*, bool paused);
 
-    static void set_title(void*, const char *psz_title);
-    static void set_artwork(void*, const char *psz_artwork);
+    static void set_meta(void*, vlc_meta_t *p_meta);
 
 
 private:
@@ -228,8 +225,7 @@ private:
     States m_state;
     bool m_eof;
 
-    std::string m_artwork;
-    std::string m_title;
+    vlc_meta_t *m_meta;
 
     vlc_interrupt_t *m_ctl_thread_interrupt;
 
