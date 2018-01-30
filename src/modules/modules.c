@@ -217,17 +217,8 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
                           const char *name, bool strict,
                           vlc_activate_t probe, ...)
 {
-    char *var = NULL;
-
     if (name == NULL || name[0] == '\0')
         name = "any";
-
-    /* Deal with variables */
-    if (name[0] == '$')
-    {
-        var = var_InheritString (obj, name + 1);
-        name = (var != NULL) ? var : "any";
-    }
 
     /* Find matching modules */
     module_t **mods;
@@ -305,7 +296,6 @@ done:
     va_end (args);
     obj->obj.force = b_force_backup;
     module_list_free (mods);
-    free (var);
 
     if (module != NULL)
     {
