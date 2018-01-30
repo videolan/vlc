@@ -713,11 +713,18 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)renewGState
 {
-    NSWindow *window = [self window];
+    // Comment take from Apple GLEssentials sample code:
+    // https://developer.apple.com/library/content/samplecode/GLEssentials
+    //
+    // OpenGL rendering is not synchronous with other rendering on the OSX.
+    // Therefore, call disableScreenUpdatesUntilFlush so the window server
+    // doesn't render non-OpenGL content in the window asynchronously from
+    // OpenGL content, which could cause flickering.  (non-OpenGL content
+    // includes the title bar and drawing done by the app with other APIs)
 
-    // Remove flashes with splitter view.
-    if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
-        [window disableScreenUpdatesUntilFlush];
+    // In macOS 10.13 and later, window updates are automatically batched
+    // together and this no longer needs to be called (effectively a no-op)
+    [[self window] disableScreenUpdatesUntilFlush];
 
     [super renewGState];
 }
