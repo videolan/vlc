@@ -36,6 +36,8 @@
 #include <cassert>
 #include <cerrno>
 
+#include <vlc_stream.h>
+
 #include "../../misc/webservices/json.h"
 
 /* deadline regarding pings sent from receiver */
@@ -81,7 +83,8 @@ static const char* StateToStr( States s )
 /*****************************************************************************
  * intf_sys_t: class definition
  *****************************************************************************/
-intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr, int device_port, vlc_interrupt_t *p_interrupt)
+intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr,
+                       int device_port, vlc_interrupt_t *p_interrupt, httpd_host_t *httpd_host)
  : m_module(p_this)
  , m_streaming_port(port)
  , m_communication( p_this, device_addr.c_str(), device_port )
@@ -89,6 +92,10 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_eof( false )
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
+ , m_httpd_host(httpd_host)
+ , m_httpd_file(NULL)
+ , m_art_url(NULL)
+ , m_art_stream(NULL)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
  , m_length( VLC_TS_INVALID )
@@ -96,6 +103,10 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 {
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
+
+    std::stringstream ss;
+    ss << "http://" << m_communication.getServerIp() << ":" << port;
+    m_art_http_ip = ss.str();
 
     m_common.p_opaque = this;
     m_common.pf_get_position     = get_position;
@@ -115,9 +126,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     // Start the Chromecast event thread.
     if (vlc_clone(&m_chromecastThread, ChromecastThread, this,
                   VLC_THREAD_PRIORITY_LOW))
-    {
-        msg_Err( m_module, "Could not start the Chromecast talking thread");
-    }
+        throw std::runtime_error( "error creating cc thread" );
 }
 
 intf_sys_t::~intf_sys_t()
@@ -151,8 +160,102 @@ intf_sys_t::~intf_sys_t()
 
     vlc_interrupt_destroy( m_ctl_thread_interrupt );
 
+    if (m_meta != NULL)
+        vlc_meta_Delete(m_meta);
+
+    if( m_httpd_file )
+        httpd_FileDelete( m_httpd_file );
+    if( m_art_stream )
+        vlc_stream_Delete( m_art_stream );
+
     vlc_cond_destroy(&m_stateChangedCond);
     vlc_mutex_destroy(&m_lock);
+}
+
+int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data )
+{
+    (void) psz_request;
+
+    if( vlc_stream_Seek( m_art_stream, 0 ) )
+        return VLC_EGENERIC;
+
+    uint64_t size;
+    if( vlc_stream_GetSize( m_art_stream, &size ) != VLC_SUCCESS
+     || size > INT64_C( 10000000 ) )
+        return VLC_EGENERIC;
+
+    *pp_data = (uint8_t *)malloc( size );
+    if( !*pp_data )
+        return VLC_EGENERIC;
+
+    *pi_data = size;
+    ssize_t read = vlc_stream_Read( m_art_stream, *pp_data, size );
+    if( read < 0 || (size_t)read != size )
+    {
+        free( *pp_data );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
+                          uint8_t *psz_request, uint8_t **pp_data, int *pi_data )
+{
+    (void) http_file;
+    intf_sys_t *p_sys = static_cast<intf_sys_t*>((void *)data);
+    return p_sys->httpd_file_fill( psz_request, pp_data, pi_data );
+}
+
+void intf_sys_t::prepareHttpArtwork()
+{
+    const char *psz_art = m_meta ? vlc_meta_Get( m_meta, vlc_meta_ArtworkURL ) : NULL;
+    /* Abort if there is no art or if the art is already served */
+    if( !psz_art || strncmp( psz_art, "http", 4) == 0
+     || ( m_art_url && strcmp( psz_art, m_art_url ) == 0 ) )
+        return;
+
+    if( m_httpd_file )
+    {
+        httpd_FileDelete( m_httpd_file );
+        m_httpd_file = NULL;
+    }
+    if( m_art_stream )
+    {
+        vlc_stream_Delete( m_art_stream );
+        m_art_stream = NULL;
+    }
+
+    m_art_stream = vlc_stream_NewURL( m_module, psz_art );
+    if( !m_art_stream )
+        return;
+
+    uint64_t size;
+    if( vlc_stream_GetSize( m_art_stream, &size ) != VLC_SUCCESS
+     || size > INT64_C( 10000000 ) )
+    {
+        msg_Warn( m_module, "art stream is too big or invalid" );
+        vlc_stream_Delete( m_art_stream );
+        return;
+    }
+
+    const char *psz_artmime = "application/octet-stream";
+    char *psz_streammime = stream_MimeType( m_art_stream );
+    if( psz_streammime )
+        psz_artmime = psz_streammime;
+
+    m_httpd_file = httpd_FileNew( m_httpd_host, "/art", psz_artmime, NULL, NULL,
+                                  httpd_file_fill_cb, (httpd_file_sys_t *) this );
+    free( psz_streammime );
+    if( !m_httpd_file )
+    {
+        vlc_stream_Delete( m_art_stream );
+        return;
+    }
+
+    std::stringstream ss;
+    ss << m_art_http_ip << "/art";
+    vlc_meta_Set( m_meta, vlc_meta_ArtworkURL, ss.str().c_str() );
 }
 
 void intf_sys_t::setHasInput( const std::string mime_type )
@@ -172,6 +275,9 @@ void intf_sys_t::setHasInput( const std::string mime_type )
         msg_Warn( m_module, "no Chromecast hook possible");
         return;
     }
+
+    prepareHttpArtwork();
+
     // We should now be in the ready state, and therefor have a valid transportId
     assert( m_appTransportId.empty() == false );
     // we cannot start a new load when the last one is still processing
@@ -650,6 +756,18 @@ bool intf_sys_t::handleMessages()
 void intf_sys_t::requestPlayerStop()
 {
     vlc_mutex_locker locker(&m_lock);
+
+    if( m_httpd_file )
+    {
+        httpd_FileDelete( m_httpd_file );
+        m_httpd_file = NULL;
+    }
+    if( m_art_stream )
+    {
+        vlc_stream_Delete( m_art_stream );
+        m_art_stream = NULL;
+    }
+
     if ( m_mediaSessionId.empty() == true )
         return;
     queueMessage( Stop );

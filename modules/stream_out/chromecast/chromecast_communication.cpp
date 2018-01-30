@@ -290,7 +290,7 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
             }
 
             if ( psz_artwork && !strncmp( psz_artwork, "http", 4 ) )
-                ss << ",\"images\":[\"" << psz_artwork << "\"]";
+                ss << ",\"images\":[{\"url\":\"" << psz_artwork << "\"}]";
 
             ss << "},";
         }

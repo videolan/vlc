@@ -1056,7 +1056,8 @@ static int Open(vlc_object_t *p_this)
 
     try
     {
-        p_intf = new intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port, p_interrupt );
+        p_intf = new intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port,
+                                 p_interrupt, httpd_host );
     }
     catch (const std::runtime_error& err )
     {

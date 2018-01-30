@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_tls.h>
 #include <vlc_interrupt.h>
+#include <vlc_httpd.h>
 
 #include <atomic>
 #include <sstream>
@@ -120,6 +121,11 @@ public:
     void msgPlayerSetVolume( const std::string& destinationId, const std::string& mediaSessionId,
                              float volume, bool mute);
     ssize_t receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout );
+
+    const std::string getServerIp()
+    {
+        return m_serverIp;
+    }
 private:
     int sendMessage(const castchannel::CastMessage &msg);
 
@@ -150,7 +156,8 @@ struct intf_sys_t
         Stop,
         Seek
     };
-    intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port, vlc_interrupt_t *);
+    intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr,
+               int device_port, vlc_interrupt_t *, httpd_host_t *);
     ~intf_sys_t();
 
     bool isFinishedPlaying();
@@ -161,6 +168,7 @@ struct intf_sys_t
     void requestPlayerStop();
     States state() const;
 
+    int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
 private:
     bool handleMessages();
 
@@ -207,6 +215,7 @@ private:
 
     static void set_meta(void*, vlc_meta_t *p_meta);
 
+    void prepareHttpArtwork();
 
 private:
     vlc_object_t  * const m_module;
@@ -228,6 +237,12 @@ private:
     vlc_meta_t *m_meta;
 
     vlc_interrupt_t *m_ctl_thread_interrupt;
+
+    httpd_host_t     *m_httpd_host;
+    httpd_file_t     *m_httpd_file;
+    std::string       m_art_http_ip;
+    char             *m_art_url;
+    stream_t         *m_art_stream;
 
     /* local date when playback started/resumed, used by monotone clock */
     mtime_t           m_time_playback_started;
