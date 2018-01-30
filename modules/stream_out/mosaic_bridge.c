@@ -307,7 +307,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
-        module_need( p_sys->p_decoder, "video decoder", "$codec", false );
+        module_need_var( p_sys->p_decoder, "video decoder", "codec" );
 
     if( !p_sys->p_decoder->p_module )
     {

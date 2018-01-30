@@ -194,7 +194,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->pf_aout_format_update = audio_update_format;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "audio decoder", "$codec", false );
+        module_need_var( id->p_decoder, "audio decoder", "codec" );
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio decoder" );

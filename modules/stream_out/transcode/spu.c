@@ -83,7 +83,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "spu decoder", "$codec", false );
+        module_need_var( id->p_decoder, "spu decoder", "codec" );
 
     if( !id->p_decoder->p_module )
     {

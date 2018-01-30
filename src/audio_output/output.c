@@ -241,7 +241,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     aout->device_select = NULL;
-    owner->module = module_need (aout, "audio output", "$aout", false);
+    owner->module = module_need_var(aout, "audio output", "aout");
     if (owner->module == NULL)
     {
         msg_Err (aout, "no suitable audio output module");

@@ -205,7 +205,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
 
     text->pf_get_attachments = spu_get_attachments;
 
-    text->p_module = module_need(text, "text renderer", "$text-renderer", false);
+    text->p_module = module_need_var(text, "text renderer", "text-renderer");
 
     /* Create a few variables used for enhanced text rendering */
     var_Create(text, "spu-elapsed",   VLC_VAR_INTEGER);

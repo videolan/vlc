@@ -654,7 +654,7 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
         if (desc->plane_count == 0)
         {
             /* Opaque chroma: load a module to handle it */
-            tc->p_module = module_need(tc, "glconv", "$glconv", true);
+            tc->p_module = module_need_var(tc, "glconv", "glconv");
         }
 
         if (tc->p_module != NULL)
