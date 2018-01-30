@@ -59,14 +59,16 @@ int vout_OpenWrapper(vout_thread_t *vout,
     /* */
     const mtime_t double_click_timeout = 300000;
     const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
+    char *modlist = var_InheritString(vout, "vout");
 
-    if (splitter_name) {
-        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, "$vout", splitter_name,
+    if (splitter_name)
+        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, modlist, splitter_name,
                                            double_click_timeout, hide_timeout);
-    } else {
-        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, "$vout",
+    else
+        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, modlist,
                                           double_click_timeout, hide_timeout);
-    }
+    free(modlist);
+
     if (!sys->display.vd) {
         free(sys->display.title);
         return VLC_EGENERIC;
