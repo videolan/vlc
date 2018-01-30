@@ -246,6 +246,11 @@ static inline void sout_StreamFlush( sout_stream_t *s,
         s->pf_flush( s, id );
 }
 
+static inline int sout_StreamControlVa( sout_stream_t *s, int i_query, va_list args )
+{
+    return s->pf_control ? s->pf_control( s, i_query, args ) : VLC_EGENERIC;
+}
+
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
 {
     va_list args;
@@ -255,7 +260,7 @@ static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
     if ( !s->pf_control )
         i_result = VLC_EGENERIC;
     else
-        i_result = s->pf_control( s, i_query, args );
+        i_result = sout_StreamControlVa( s, i_query, args );
     va_end( args );
     return i_result;
 }
