@@ -1856,37 +1856,31 @@ static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
 
 static mtime_t AVI_GetPTS( avi_track_t *tk )
 {
-    if( tk->i_samplesize )
+    /* Lookup samples index */
+    if( tk->i_samplesize && tk->idx.i_size )
     {
         int64_t i_count = 0;
+        unsigned int idx = tk->i_idxposc;
 
         /* we need a valid entry we will emulate one */
-        if( tk->i_idxposc == tk->idx.i_size )
+        if( idx >= tk->idx.i_size )
         {
-            if( tk->i_idxposc )
-            {
-                /* use the last entry */
-                i_count = tk->idx.p_entry[tk->idx.i_size - 1].i_lengthtotal
-                            + tk->idx.p_entry[tk->idx.i_size - 1].i_length;
-            }
+            /* use the last entry */
+            idx = tk->idx.i_size - 1;
+            i_count = tk->idx.p_entry[idx].i_lengthtotal
+                    + tk->idx.p_entry[idx].i_length;
         }
         else
         {
-            i_count = tk->idx.p_entry[tk->i_idxposc].i_lengthtotal;
+            i_count = tk->idx.p_entry[idx].i_lengthtotal;
         }
         return AVI_GetDPTS( tk, i_count + tk->i_idxposb );
     }
+
+    if( tk->fmt.i_cat == AUDIO_ES )
+        return AVI_GetDPTS( tk, tk->i_blockno );
     else
-    {
-        if( tk->fmt.i_cat == AUDIO_ES )
-        {
-            return AVI_GetDPTS( tk, tk->i_blockno );
-        }
-        else
-        {
-            return AVI_GetDPTS( tk, tk->i_idxposc );
-        }
-    }
+        return AVI_GetDPTS( tk, tk->i_idxposc );
 }
 
 static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
