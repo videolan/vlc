@@ -275,6 +275,8 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                      sample.a = 1;";
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
+        case DXGI_FORMAT_B8G8R8A8_UNORM:
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
             /* Y */
             psz_sampler[0] =
                     "sample = shaderTexture[0].Sample(samplerState, coords);\n";
