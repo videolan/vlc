@@ -251,9 +251,7 @@ static void ProxyFlush(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 
 static int ProxyControl(sout_stream_t *p_stream, int i_query, va_list args)
 {
-    if (!p_stream->p_next->pf_control)
-        return VLC_EGENERIC;
-    return p_stream->p_next->pf_control(p_stream->p_next, i_query, args);
+    return sout_StreamControlVa( p_stream->p_next, i_query, args );
 }
 
 static int ProxyOpen(vlc_object_t *p_this)
