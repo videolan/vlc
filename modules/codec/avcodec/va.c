@@ -121,8 +121,11 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     if (unlikely(va == NULL))
         return NULL;
 
-    va->module = vlc_module_load(va, "hw decoder", "$avcodec-hw", true,
+    char *modlist = var_InheritString(obj, "avcodec-hw");
+
+    va->module = vlc_module_load(va, "hw decoder", modlist, true,
                                  vlc_va_Start, va, avctx, pix_fmt, fmt, p_sys);
+    free(modlist);
     if (va->module == NULL)
     {
         vlc_object_release(va);
