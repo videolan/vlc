@@ -136,11 +136,11 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
     {
         msg_Dbg( p_stream, "delaying ID %d by %"PRId64,
                  p_sys->i_id, p_sys->i_delay );
-        p_sys->id = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
+        p_sys->id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
         return p_sys->id;
     }
 
-    return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
+    return sout_StreamIdAdd( p_stream->p_next, p_fmt );
 }
 
 static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
@@ -150,7 +150,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     if ( id == p_sys->id )
         p_sys->id = NULL;
 
-    p_stream->p_next->pf_del( p_stream->p_next, id );
+    sout_StreamIdDel( p_stream->p_next, id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
@@ -171,5 +171,5 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         }
     }
 
-    return p_stream->p_next->pf_send( p_stream->p_next, id, p_buffer );
+    return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
