@@ -1113,11 +1113,13 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     EnterCriticalSection(&sys->lock);
     for (;;)
     {
+        char *modlist = var_InheritString(aout, "mmdevice-backend");
         HRESULT hr;
         s->owner.device = sys->dev;
 
-        sys->module = vlc_module_load(s, "aout stream", "$mmdevice-backend",
+        sys->module = vlc_module_load(s, "aout stream", modlist,
                                       false, aout_stream_Start, s, fmt, &hr);
+        free(modlist);
 
         int ret = -1;
         if (hr == AUDCLNT_E_ALREADY_INITIALIZED)
