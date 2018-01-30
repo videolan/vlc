@@ -740,7 +740,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         else
         {
             ppColorspace = COLORSPACE_FULL_RGBA_TO_BT601_YUV;
-            colorspace.WhitePoint[0*4 + 3] = itu_black_level;
+            colorspace.WhitePoint[0*4 + 3] = -itu_black_level;
             colorspace.WhitePoint[1*4 + 3] = itu_achromacy;
             colorspace.WhitePoint[2*4 + 3] = itu_achromacy;
         }
