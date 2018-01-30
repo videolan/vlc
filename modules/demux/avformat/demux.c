@@ -403,7 +403,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 es_fmt.i_original_fourcc = VLC_FOURCC('L','A','T','M');
                 es_fmt.b_packetized = false;
             }
-            else if(cp->codec_id == AV_CODEC_ID_AAC &&
+            else if(cp->codec_id == AV_CODEC_ID_AAC && p_sys->fmt->long_name &&
                     strstr(p_sys->fmt->long_name, "raw ADTS AAC"))
             {
                 es_fmt.i_original_fourcc = VLC_FOURCC('A','D','T','S');
