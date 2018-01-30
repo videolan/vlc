@@ -128,7 +128,9 @@ static int Open(vlc_object_t *object)
     if (!surface)
         goto error;
 
-    sys->gl = vlc_gl_Create (surface, VLC_OPENGL, "$gl");
+    char *modlist = var_InheritString(surface, "gl");
+    sys->gl = vlc_gl_Create (surface, VLC_OPENGL, modlist);
+    free(modlist);
     if (!sys->gl)
     {
         vlc_object_release(surface);
