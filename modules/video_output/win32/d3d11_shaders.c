@@ -277,6 +277,8 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
         case DXGI_FORMAT_B8G8R8X8_UNORM:
+        case DXGI_FORMAT_R10G10B10A2_UNORM:
+        case DXGI_FORMAT_B5G6R5_UNORM:
             /* Y */
             psz_sampler[0] =
                     "sample = shaderTexture[0].Sample(samplerState, coords);\n";
@@ -659,6 +661,7 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
     case DXGI_FORMAT_B8G8R8A8_UNORM:
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackRGBA);
         break;
     case DXGI_FORMAT_YUY2:
@@ -666,9 +669,6 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
         break;
     case DXGI_FORMAT_AYUV:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackVUYA);
-        break;
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackRGBA);
         break;
     default:
         vlc_assert_unreachable();
