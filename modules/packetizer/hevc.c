@@ -375,6 +375,19 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
             return false;
     }
 
+    /* Check if we really need to re-decode/replace */
+    if(*pp_nal)
+    {
+        const uint8_t *p_stored = (*pp_nal)->p_buffer;
+        size_t i_stored = (*pp_nal)->i_buffer;
+        hxxx_strip_AnnexB_startcode(&p_stored, &i_stored);
+        const uint8_t *p_new = p_nalb->p_buffer;
+        size_t i_new = p_nalb->i_buffer;
+        hxxx_strip_AnnexB_startcode(&p_new, &i_new);
+        if(i_stored == i_new && !memcmp(p_stored, p_new, i_new))
+            return true;
+    }
+
     /* Free associated decoded version */
     if(*pp_decoded)
     {
