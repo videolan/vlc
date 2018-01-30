@@ -366,14 +366,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             {
-
-                id o_window = [sys->glView window];
-                if (!o_window) {
-                    return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
-                }
-
-                NSSize windowMinSize = [o_window minSize];
-
                 const vout_display_cfg_t *cfg;
 
                 if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
