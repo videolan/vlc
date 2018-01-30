@@ -60,6 +60,7 @@ struct sout_stream_sys_t
         , es_changed( true )
         , cc_has_input( false )
         , out_force_reload( false )
+        , drained( false )
         , out_streams_added( 0 )
         , transcode_attempt_idx( 0 )
         , previous_state( Authenticating )
@@ -108,6 +109,7 @@ struct sout_stream_sys_t
     bool                               es_changed;
     bool                               cc_has_input;
     bool                               out_force_reload;
+    bool                               drained;
     std::vector<sout_stream_id_sys_t*> streams;
     std::vector<sout_stream_id_sys_t*> out_streams;
     unsigned int                       out_streams_added;
@@ -534,6 +536,7 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         p_sys->clearAccessOut();
         p_sys->sout = "";
         p_sys->transcode_attempt_idx = 0;
+        p_sys->drained = false;
     }
 }
 
@@ -890,7 +893,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     States s = p_sys->p_intf->state();
     if ( p_sys->previous_state != s )
     {
-        if ( s == LoadFailed && p_sys->es_changed == false )
+        if ( !p_sys->drained && s == LoadFailed && p_sys->es_changed == false )
         {
             if ( p_sys->transcode_attempt_idx > MAX_TRANSCODE_PASS - 1 )
             {
@@ -915,6 +918,9 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     int ret = sout_StreamIdSend(p_sys->p_out, next_id, p_buffer);
     if (ret != VLC_SUCCESS)
         DelInternal(p_stream, id, false);
+
+    p_sys->drained = false;
+
     return ret;
 }
 
@@ -922,8 +928,18 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+    if( p_sys->out_streams.empty() && p_sys->drained )
+    {
+        /* Worst case scenario that won't happen often: we terminated
+         * everything since we were draining but the user requested a seek.
+         * Change the es_changed value in order to re-create everything again.
+         * */
+
+        p_sys->es_changed = true;
+    }
+
     id = p_sys->GetSubId( p_stream, id );
-    if ( id == NULL )
+    if ( id == NULL || p_sys->drained )
         return;
 
     /* a seek on the Chromecast flushes its buffers */
@@ -939,6 +955,17 @@ static int Control(sout_stream_t *p_stream, int i_query, va_list args)
     if (i_query == SOUT_STREAM_EMPTY)
     {
         bool *b = va_arg( args, bool * );
+
+        /* Close the whole sout chain. This will drain every streams, and send
+         * the last data to the chromecast-http sout_access. This sout_access
+         * won't close the http connection but will send an EOF in order to let
+         * the CC download the last remaining data. */
+        if( !p_sys->drained )
+        {
+            p_sys->stopSoutChain( p_stream );
+            p_sys->drained = true;
+        }
+
         /* check if the Chromecast to be done playing */
         *b = p_sys->p_intf->isFinishedPlaying();
         return VLC_SUCCESS;
