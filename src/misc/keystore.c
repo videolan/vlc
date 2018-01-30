@@ -58,7 +58,12 @@ vlc_keystore *
 vlc_keystore_create(vlc_object_t *p_parent)
 {
     assert(p_parent);
-    return keystore_create(p_parent, "$keystore");
+
+    char *modlist = var_InheritString(p_parent, "keystore");
+    vlc_keystore *p_keystore = keystore_create(p_parent, modlist);
+
+    free(modlist);
+    return p_keystore;
 }
 
 void
