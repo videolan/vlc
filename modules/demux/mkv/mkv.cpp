@@ -570,15 +570,16 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             msg_Warn( p_demux, "Cannot read frame (too long or no frame)" );
             break;
         }
+        size_t extra_data = track.fmt.i_codec == VLC_CODEC_PRORES ? 8 : 0;
 
         if( track.i_compression_type == MATROSKA_COMPRESSION_HEADER &&
             track.p_compression_data != NULL &&
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
-            p_block = MemToBlock( data->Buffer(), data->Size(), track.p_compression_data->GetSize() );
+            p_block = MemToBlock( data->Buffer(), data->Size(), track.p_compression_data->GetSize() + extra_data );
         else if( unlikely( track.fmt.i_codec == VLC_CODEC_WAVPACK ) )
             p_block = packetize_wavpack( track, data->Buffer(), data->Size() );
         else
-            p_block = MemToBlock( data->Buffer(), data->Size(), 0 );
+            p_block = MemToBlock( data->Buffer(), data->Size(), extra_data );
 
         if( p_block == NULL )
         {
@@ -600,6 +601,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         {
             memcpy( p_block->p_buffer, track.p_compression_data->GetBuffer(), track.p_compression_data->GetSize() );
         }
+        if ( track.fmt.i_codec == VLC_CODEC_PRORES )
+            memcpy( p_block->p_buffer + 4, "icpf", 4 );
 
         if ( b_key_picture )
             p_block->i_flags |= BLOCK_FLAG_TYPE_I;
