@@ -2419,7 +2419,8 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         unsigned h, m, s, f;
         char c;
-        if( sscanf( psz_line, "%u:%u:%u%[:;]%u ", &h, &m, &s, &c, &f ) != 5 )
+        if( sscanf( psz_line, "%u:%u:%u%c%u ", &h, &m, &s, &c, &f ) != 5 ||
+                ( c != ':' && c != ';' ) )
             continue;
 
         /* convert everything to seconds */
