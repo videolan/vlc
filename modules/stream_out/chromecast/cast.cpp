@@ -70,6 +70,7 @@ struct sout_stream_sys_t
                          const audio_format_t* p_fmt ) const;
     bool startSoutChain(sout_stream_t* p_stream,
                         const std::vector<sout_stream_id_sys_t*> &new_streams);
+    void stopSoutChain(sout_stream_t* p_stream);
 
     sout_stream_t     *p_out;
     std::string        sout;
@@ -334,8 +335,7 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     if ( p_sys->out_streams.empty() )
     {
         p_sys->p_intf->requestPlayerStop();
-        sout_StreamChainDelete( p_sys->p_out, NULL );
-        p_sys->p_out = NULL;
+        p_sys->stopSoutChain(p_stream);
         p_sys->sout = "";
         p_sys->transcode_attempt_idx = 0;
     }
@@ -393,18 +393,30 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
            i_codec == VLC_CODEC_MP3;
 }
 
-bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
-                                       const std::vector<sout_stream_id_sys_t*> &new_streams)
+void sout_stream_sys_t::stopSoutChain(sout_stream_t *p_stream)
 {
+    (void) p_stream;
+
     if ( unlikely( p_out != NULL ) )
     {
         for ( size_t i = 0; i < out_streams.size(); i++ )
         {
             if ( out_streams[i]->p_sub_id != NULL )
+            {
                 sout_StreamIdDel( p_out, out_streams[i]->p_sub_id );
+                out_streams[i]->p_sub_id = NULL;
+            }
         }
+        out_streams.clear();
         sout_StreamChainDelete( p_out, NULL );
+        p_out = NULL;
     }
+}
+
+bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
+                                       const std::vector<sout_stream_id_sys_t*> &new_streams)
+{
+    stopSoutChain( p_stream );
 
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     cc_has_input = false;
