@@ -151,7 +151,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *p_es,
     p_es->i_last = p_buffer->i_dts;
     if ( !p_es->id && !p_es->b_error )
     {
-        p_es->id = p_stream->p_next->pf_add( p_stream->p_next, &p_es->fmt );
+        p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt );
         if ( p_es->id == NULL )
         {
             p_es->b_error = true;
@@ -161,7 +161,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *p_es,
     }
 
     if ( !p_es->b_error )
-        p_stream->p_next->pf_send( p_stream->p_next, p_es->id, p_buffer );
+        sout_StreamIdSend( p_stream->p_next, p_es->id, p_buffer );
     else
         block_ChainRelease( p_buffer );
 
@@ -172,7 +172,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *p_es,
                    || p_sys->pp_es[i]->fmt.i_cat == AUDIO_ES)
               && p_sys->pp_es[i]->i_last < i_current )
         {
-            p_stream->p_next->pf_del( p_stream->p_next, p_sys->pp_es[i]->id );
+            sout_StreamIdDel( p_stream->p_next, p_sys->pp_es[i]->id );
             p_sys->pp_es[i]->id = NULL;
         }
     }
