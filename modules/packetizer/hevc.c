@@ -345,6 +345,7 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     void **pp_decoded;
+    void **pp_active;
     block_t **pp_nal;
 
     switch(i_nal_type)
@@ -354,18 +355,21 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 return false;
             pp_decoded = &p_sys->rg_vps[i_id].p_decoded;
             pp_nal = &p_sys->rg_vps[i_id].p_nal;
+            pp_active = (void**)&p_sys->p_active_vps;
             break;
         case HEVC_NAL_SPS:
             if(i_id > HEVC_SPS_ID_MAX)
                 return false;
             pp_decoded = &p_sys->rg_sps[i_id].p_decoded;
             pp_nal = &p_sys->rg_sps[i_id].p_nal;
+            pp_active = (void**)&p_sys->p_active_sps;
             break;
         case HEVC_NAL_PPS:
             if(i_id > HEVC_PPS_ID_MAX)
                 return false;
             pp_decoded = &p_sys->rg_pps[i_id].p_decoded;
             pp_nal = &p_sys->rg_pps[i_id].p_nal;
+            pp_active = (void**)&p_sys->p_active_pps;
             break;
         default:
             return false;
@@ -386,8 +390,13 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 hevc_rbsp_release_pps(*pp_decoded);
                 break;
         }
+        if(*pp_active == *pp_decoded)
+            *pp_active = NULL;
+        else
+            pp_active = NULL; /* don't change pointer */
         *pp_decoded = NULL;
     }
+    else pp_active = NULL;
 
     /* Free raw stored version */
     if(*pp_nal)
@@ -428,6 +437,9 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 }
                 break;
         }
+
+        if(*pp_decoded && pp_active) /* restore active by id */
+            *pp_active = *pp_decoded;
 
         *pp_nal = block_Duplicate((block_t *)p_nalb);
 
