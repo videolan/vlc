@@ -224,11 +224,11 @@ static sout_stream_id_sys_t * AddLang( sout_stream_t *p_stream, const es_format_
 
 static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    p_stream->p_next->pf_del( p_stream->p_next, id );
+    sout_StreamIdDel( p_stream->p_next, id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
-    return p_stream->p_next->pf_send( p_stream->p_next, id, p_buffer );
+    return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
