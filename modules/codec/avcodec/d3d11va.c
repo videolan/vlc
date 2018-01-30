@@ -369,9 +369,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             D3D11_TEXTURE2D_DESC dstDesc;
             ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
             sys->render = dstDesc.Format;
-            va->sys->textureWidth = dstDesc.Width;
-            va->sys->textureHeight = dstDesc.Height;
-            va->sys->totalTextureSlices = dstDesc.ArraySize;
+            if (dstDesc.BindFlags & D3D11_BIND_DECODER)
+            {
+                va->sys->textureWidth = dstDesc.Width;
+                va->sys->textureHeight = dstDesc.Height;
+                va->sys->totalTextureSlices = dstDesc.ArraySize;
+            }
         }
     }
 
@@ -649,7 +652,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         }
 
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
-        if ( sys->render == processorInput[idx] )
+        if ( sys->render == processorInput[idx] && sys->totalTextureSlices > 4)
         {
             if (CanUseVoutPool(&sys->d3d_dev, sys->totalTextureSlices))
                 dx_sys->can_extern_pool = true;
