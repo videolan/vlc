@@ -87,6 +87,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
  , m_eof( false )
+ , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
@@ -105,8 +106,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_common.pf_request_seek     = request_seek;
     m_common.pf_wait_seek_done   = wait_seek_done;
     m_common.pf_set_pause_state  = set_pause_state;
-    m_common.pf_set_artwork      = set_artwork;
-    m_common.pf_set_title        = set_title;
+    m_common.pf_set_meta         = set_meta;
 
     assert( var_Type( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -175,7 +175,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     // We should now be in the ready state, and therefor have a valid transportId
     assert( m_appTransportId.empty() == false );
     // we cannot start a new load when the last one is still processing
-    m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_title, m_artwork, mime_type );
+    m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, mime_type, m_meta );
     setState( Loading );
     m_eof = false;
 }
@@ -673,7 +673,7 @@ void intf_sys_t::requestPlayerSeek(mtime_t pos)
 
 void intf_sys_t::setPauseState(bool paused)
 {
-    msg_Dbg( m_module, "%s state for %s", paused ? "paused" : "playing", m_title.c_str() );
+    msg_Dbg( m_module, "%s state", paused ? "paused" : "playing" );
     vlc_mutex_locker locker( &m_lock );
     if ( !paused )
     {
@@ -731,20 +731,12 @@ bool intf_sys_t::isFinishedPlaying()
     return m_state == LoadFailed || m_state == Dead || m_eof;
 }
 
-void intf_sys_t::setTitle(const char* psz_title)
+void intf_sys_t::setMeta(vlc_meta_t *p_meta)
 {
-    if ( psz_title )
-        m_title = psz_title;
-    else
-        m_title = "";
-}
-
-void intf_sys_t::setArtwork(const char* psz_artwork)
-{
-    if ( psz_artwork )
-        m_artwork = psz_artwork;
-    else
-        m_artwork = "";
+    vlc_mutex_locker locker(&m_lock);
+    if (m_meta != NULL)
+        vlc_meta_Delete(m_meta);
+    m_meta = p_meta;
 }
 
 mtime_t intf_sys_t::getPlaybackTimestamp() const
@@ -847,14 +839,8 @@ void intf_sys_t::set_pause_state(void *pt, bool paused)
     p_this->setPauseState( paused );
 }
 
-void intf_sys_t::set_title(void *pt, const char *psz_title)
+void intf_sys_t::set_meta(void *pt, vlc_meta_t *p_meta)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->setTitle( psz_title );
-}
-
-void intf_sys_t::set_artwork(void *pt, const char *psz_artwork)
-{
-    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->setArtwork( psz_artwork );
+    p_this->setMeta( p_meta );
 }

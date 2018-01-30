@@ -50,16 +50,36 @@ struct demux_sys_t
         vlc_meta_t *p_meta = vlc_meta_New();
         if( likely(p_meta != NULL) )
         {
-            if (demux_Control( demux->p_next, DEMUX_GET_META, p_meta) == VLC_SUCCESS)
+            input_item_t *p_item = demux->p_next->p_input ?
+                                   input_GetItem( demux->p_next->p_input ) : NULL;
+            if( p_item )
             {
-                const char *meta = vlc_meta_Get( p_meta, vlc_meta_Title );
-                if ( meta != NULL )
-                    p_renderer->pf_set_title( p_renderer->p_opaque, meta );
-                meta = vlc_meta_Get( p_meta, vlc_meta_ArtworkURL );
-                if ( meta != NULL )
-                    p_renderer->pf_set_artwork( p_renderer->p_opaque, meta );
+                /* Favor Meta from the input item of the input_thread since
+                 * it's pre-processed by the meta fetcher */
+                for( int i = 0; i < VLC_META_TYPE_COUNT; ++i )
+                {
+                    char *psz_meta = input_item_GetMeta( p_item, (vlc_meta_type_t)i );
+                    if( psz_meta )
+                    {
+                        vlc_meta_Set( p_meta, (vlc_meta_type_t)i, psz_meta );
+                        free( psz_meta );
+                    }
+                }
+                if( vlc_meta_Get( p_meta, vlc_meta_Title ) == NULL )
+                {
+                    char *psz_meta = input_item_GetName( p_item );
+                    if( psz_meta )
+                    {
+                        vlc_meta_Set( p_meta, vlc_meta_Title, psz_meta );
+                        free( psz_meta );
+                    }
+                }
+                p_renderer->pf_set_meta( p_renderer->p_opaque, p_meta );
             }
-            vlc_meta_Delete(p_meta);
+            else if (demux_Control( demux->p_next, DEMUX_GET_META, p_meta) == VLC_SUCCESS)
+                p_renderer->pf_set_meta( p_renderer->p_opaque, p_meta );
+            else
+                vlc_meta_Delete( p_meta );
         }
         if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
             canSeek = false;
@@ -105,10 +125,7 @@ struct demux_sys_t
     ~demux_sys_t()
     {
         if( p_renderer )
-        {
-            p_renderer->pf_set_title( p_renderer->p_opaque, NULL );
-            p_renderer->pf_set_artwork( p_renderer->p_opaque, NULL );
-        }
+            p_renderer->pf_set_meta( p_renderer->p_opaque, NULL );
     }
 
     void setPauseState(bool paused)
