@@ -1,2 +1,2 @@
 This file is outdated.
-Please refer to http://developers.videolan.org/i18n/vlc-howto.html
+Please refer to https://www.videolan.org/developers/i18n/
