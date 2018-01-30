@@ -217,7 +217,10 @@ void SoutDialog::updateMRL()
 
     mrl = smrl.getMrl();
 
-    if( ui.soutAll->isChecked() ) mrl.append( " :sout-all" );
+    if( ui.soutAll->isChecked() )
+        mrl.append( " :sout-all" );
+    else
+        mrl.append( " :no-sout-all" );
 
     mrl.append( " :sout-keep" );
 
