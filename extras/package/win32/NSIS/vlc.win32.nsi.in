@@ -201,6 +201,8 @@ RequestExecutionLevel admin
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SlovenianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Afrikaans"
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "AfrikaansExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "Albanian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "AlbanianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
 
 ; Missing upstream translations:
 ;
