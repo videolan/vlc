@@ -133,6 +133,7 @@ intf_sys_t::~intf_sys_t()
 {
     var_Destroy( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME );
 
+    vlc_mutex_lock(&m_lock);
     switch ( m_state )
     {
     case Ready:
@@ -153,6 +154,7 @@ intf_sys_t::~intf_sys_t()
     default:
         break;
     }
+    vlc_mutex_unlock(&m_lock);
 
     vlc_interrupt_kill( m_ctl_thread_interrupt );
 
