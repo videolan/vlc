@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "VLC-, Mozilla- ja Mozilla Firefox-liitännäin
 ${LangFileString} Desc_Section04 "VLC ActiveX-liitännäinen"
 ${LangFileString} Desc_Section05 "DVD- ja CD-toiston rekisteröinti"
 ${LangFileString} Desc_Section06 "Asettaa VLC-mediatoistimen oletusohjelmaksi valitulle tiedostotyypille"
-${LangFileString} Desc_Section07 "Lisää asiayhteysvalikkoon kohteet (\'Toista VLC:n kanssa\' ja \'Lisää VLC:n soittolistaan\')"
+${LangFileString} Desc_Section07 "Lisää asiayhteysvalikkoon kohteet ('Toista VLC:n kanssa' ja 'Lisää VLC:n soittolistaan')"
 ${LangFileString} Desc_Section08 "Poistaa vanhat VLC-mediatoistimen asetukset ja välimuistitiedostot edellisistä asennuksista"
 ${LangFileString} Name_Section91 "Poista asennus"
 ${LangFileString} Name_Section92 "Tyhjää asetukset ja välimuisti"

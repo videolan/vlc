@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "VLC 모질라, 모질라 파이어폭스 플�
 ${LangFileString} Desc_Section04 "VLC 액티브엑스 플러그인"
 ${LangFileString} Desc_Section05 "DVD / CD 재생 등록"
 ${LangFileString} Desc_Section06 "지정한 파일 형식에 대해 VLC 미디어 재생기를 기본 프로그램으로 설정합니다"
-${LangFileString} Desc_Section07 "컨텍스트 메뉴 항목 추가하기 (\'VLC로 재생하기\', \'VLC 재생목록에 추가하기\')"
+${LangFileString} Desc_Section07 "컨텍스트 메뉴 항목 추가하기 ('VLC로 재생하기', 'VLC 재생목록에 추가하기')"
 ${LangFileString} Desc_Section08 "이전에 설치된 VLC 미디어 플레이어의 환경설정과 남은 캐쉬 파일을 완전히 삭제합니다"
 ${LangFileString} Name_Section91 "제거하기"
 ${LangFileString} Name_Section92 "환경설정과 캐쉬 제거하기"

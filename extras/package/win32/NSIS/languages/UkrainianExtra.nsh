@@ -1,5 +1,5 @@
 !insertmacro LANGFILE_EXT Ukrainian
-${LangFileString} Name_Section01 "Медіапрогравач (обов\'язковий)"
+${LangFileString} Name_Section01 "Медіапрогравач (обов'язковий)"
 ${LangFileString} Name_Section02a "Ярлик у меню „Пуск“"
 ${LangFileString} Name_Section02b "Ярлик на робочому столі"
 ${LangFileString} Name_Section34 "Веб-модуль"
@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "Модуль VLC для Mozilla та Mozilla F
 ${LangFileString} Desc_Section04 "Модуль VLC ActiveX"
 ${LangFileString} Desc_Section05 "Реєстрація відтворення DVD та CD"
 ${LangFileString} Desc_Section06 "Установлює медіапрогравач VLC як типову програму для вказаного типу файлів"
-${LangFileString} Desc_Section07 "Додати елементи контекстного меню (\'Відтворити з VLC\' and \'Додати до списку відтворення VLC\')"
+${LangFileString} Desc_Section07 "Додати елементи контекстного меню ('Відтворити з VLC' and 'Додати до списку відтворення VLC')"
 ${LangFileString} Desc_Section08 "Вилучає налаштування медіапрогравача VLC та файли кешу, які залишилися від попередніх інсталяцій"
 ${LangFileString} Name_Section91 "Видалити"
 ${LangFileString} Name_Section92 "Вилучити налаштування і кеш"
