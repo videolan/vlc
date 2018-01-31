@@ -84,6 +84,7 @@ struct sout_stream_sys_t
     bool startSoutChain(sout_stream_t* p_stream,
                         const std::vector<sout_stream_id_sys_t*> &new_streams);
     void stopSoutChain(sout_stream_t* p_stream);
+    int  handleChromecastState(sout_stream_t* p_stream);
     void clearAccessOutUnlocked();
     void clearAccessOut();
 
@@ -623,6 +624,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     stopSoutChain( p_stream );
 
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
+    previous_state = Authenticating;
     cc_has_input = false;
     out_streams = new_streams;
 
@@ -883,6 +885,41 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
     return NULL;
 }
 
+int sout_stream_sys_t::handleChromecastState(sout_stream_t* p_stream)
+{
+    States s = p_intf->state();
+    if (cc_has_input && previous_state != s)
+    {
+        if (!drained && s == LoadFailed && es_changed == false)
+        {
+            if (transcode_attempt_idx > MAX_TRANSCODE_PASS - 1)
+            {
+                msg_Err(p_stream, "All attempts failed. Giving up.");
+                return VLC_EGENERIC;
+            }
+            transcode_attempt_idx++;
+            es_changed = true;
+            stopSoutChain(p_stream);
+            msg_Warn(p_stream, "Load failed detected. Switching to next "
+                     "configuration index: %u", transcode_attempt_idx);
+            return VLC_ETIMEOUT;
+        }
+        else if (s == Playing || s == Paused)
+        {
+            msg_Dbg( p_stream, "Playback started: Current configuration (%u) "
+                     "accepted", transcode_attempt_idx );
+        }
+        else if (s == Connected)
+        {
+            msg_Warn(p_stream, "chromecast exited, aborting...\n");
+            stopSoutChain(p_stream);
+            return VLC_EGENERIC;
+        }
+        previous_state = s;
+    }
+    return VLC_SUCCESS;
+}
+
 static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 block_t *p_buffer)
 {
@@ -894,32 +931,23 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         block_Release( p_buffer );
         return VLC_EGENERIC;
     }
-    States s = p_sys->p_intf->state();
-    if ( p_sys->previous_state != s )
+
+    int ret = p_sys->handleChromecastState(p_stream);
+    switch (ret)
     {
-        if ( !p_sys->drained && s == LoadFailed && p_sys->es_changed == false )
-        {
-            if ( p_sys->transcode_attempt_idx > MAX_TRANSCODE_PASS - 1 )
-            {
-                msg_Err( p_stream, "All attempts failed. Giving up." );
-                block_Release( p_buffer );
-                return VLC_EGENERIC;
-            }
-            p_sys->transcode_attempt_idx++;
-            p_sys->es_changed = true;
-            p_sys->out_streams.clear();
-            msg_Warn( p_stream, "Load failed detected. Switching to next "
-                     "configuration index: %u", p_sys->transcode_attempt_idx );
-        }
-        else if ( s == Playing || s == Paused )
-        {
-            msg_Dbg( p_stream, "Playback started: Current configuration (%u) "
-                     "accepted", p_sys->transcode_attempt_idx );
-        }
-        p_sys->previous_state = s;
+        case VLC_SUCCESS:
+            break;
+        case VLC_ETIMEOUT:
+            next_id = p_sys->GetSubId( p_stream, id );
+            if (next_id != NULL)
+                break;
+            /* fallthrough */
+        default:
+            block_Release( p_buffer );
+            return VLC_EGENERIC;
     }
 
-    int ret = sout_StreamIdSend(p_sys->p_out, next_id, p_buffer);
+    ret = sout_StreamIdSend(p_sys->p_out, next_id, p_buffer);
     if (ret != VLC_SUCCESS)
         DelInternal(p_stream, id, false);
 
@@ -971,7 +999,8 @@ static int Control(sout_stream_t *p_stream, int i_query, va_list args)
         }
 
         /* check if the Chromecast to be done playing */
-        *b = p_sys->p_intf->isFinishedPlaying();
+        *b = p_sys->p_intf->isFinishedPlaying()
+          || p_sys->handleChromecastState(p_stream) != VLC_SUCCESS;
         return VLC_SUCCESS;
     }
 
