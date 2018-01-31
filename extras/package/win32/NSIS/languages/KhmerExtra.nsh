@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "VLC Mozilla និង​កម្មវិធ�
 ${LangFileString} Desc_Section04 "កម្មវិធី​ជំនួយ VLC ActiveX"
 ${LangFileString} Desc_Section05 "ការ​ចុះ​ឈ្មោះ​ការ​ចាក់​ឡើង​វិញ​ឌីវីឌី និង​ស៊ីឌី"
 ${LangFileString} Desc_Section06 "កំណត់​កម្មវិធី​ចាក់​មេឌៀ VLC ជា​កម្មវិធី​លំនាំដើម​សម្រាប់​ប្រភេទ​ឯកសារ​ដែល​បាន​បញ្ជាក់"
-${LangFileString} Desc_Section07 "បន្ថែម​ធាតុ​ម៉ឺនុយ​​បរិបទ ('ចាក់​ជាមួយ VLC' និង 'បន្ថែម​ទៅ​បញ្ជី​ចាក់​របស់ VLC')"
+${LangFileString} Desc_Section07 "បន្ថែម​ធាតុ​ម៉ឺនុយ​​បរិបទ (\'ចាក់​ជាមួយ VLC\' និង \'បន្ថែម​ទៅ​បញ្ជី​ចាក់​របស់ VLC\')"
 ${LangFileString} Desc_Section08 "លុប​ចំណូលចិត្ត​កម្មវិធី​ចាក់​មេឌៀ VLC និង​ឯកសារ​ឃ្លាំង​​ពី​ការ​ដំឡើង​មុន"
 ${LangFileString} Name_Section91 "លុប"
 ${LangFileString} Name_Section92 "លុប​ចំណូល​ចិត្ត និង​ឃ្លាំង"
