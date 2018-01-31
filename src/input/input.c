@@ -817,15 +817,20 @@ static int InitSout( input_thread_t * p_input )
         return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
-    char *psz = NULL;
+    char *psz = var_GetNonEmptyString( p_input, "sout" );
     if( priv->p_renderer )
     {
+        /* Keep sout if it comes from a renderer and if the user didn't touch
+         * the sout config */
+        bool keep_sout = psz == NULL;
+        free(psz);
+
         const char *psz_renderer_sout = vlc_renderer_item_sout( priv->p_renderer );
         if( asprintf( &psz, "#%s", psz_renderer_sout ) < 0 )
             return VLC_ENOMEM;
+        if( keep_sout )
+            var_SetBool( p_input, "sout-keep", true );
     }
-    if( !psz )
-        psz = var_GetNonEmptyString( p_input, "sout" );
     if( psz && strncasecmp( priv->p_item->psz_uri, "vlc:", 4 ) )
     {
         priv->p_sout  = input_resource_RequestSout( priv->p_resource, NULL, psz );
