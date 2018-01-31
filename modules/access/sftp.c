@@ -253,7 +253,6 @@ static int Open( vlc_object_t* p_this )
     if( vlc_UrlParseFixup( &url, p_access->psz_url ) != 0 )
     {
         vlc_UrlClean( &url );
-        free( p_sys );
         return VLC_EGENERIC;
     }
     vlc_credential_init( &credential, &url );
