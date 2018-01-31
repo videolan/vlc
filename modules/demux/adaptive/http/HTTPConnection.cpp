@@ -139,8 +139,13 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
     msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
                        range.isValid() ? range.getStartByte() : 0);
 
+    std::string querypath;
     if(!proxyparams.getHostname().empty())
+    {
         msg_Dbg(p_object, "Using proxy %s", proxyparams.getUrl().c_str());
+        querypath = params.getUrl();
+    }
+    else querypath = path;
 
     if(!connected() && ( params.getHostname().empty() || !connect() ))
         return VLC_EGENERIC;
@@ -149,7 +154,7 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
     if(range.isValid() && range.getEndByte() > 0)
         contentLength = range.getEndByte() - range.getStartByte() + 1;
 
-    std::string header = buildRequestHeader(path);
+    std::string header = buildRequestHeader(querypath);
     if(connectionClose)
         header.append("Connection: close\r\n");
     header.append("\r\n");
