@@ -1,61 +1,57 @@
 !insertmacro LANGFILE_EXT Serbian
-${LangFileString} Name_Section01 "Медиа Плејер (обавезан)"
-${LangFileString} Name_Section02a "Старт мени пречица"
+${LangFileString} Name_Section01 "Медијски плејер (обавезно)"
+${LangFileString} Name_Section02a "Пречица у менију „Старт“"
 ${LangFileString} Name_Section02b "Пречица на радној површини"
-${LangFileString} Name_Section03 "Мозила додатак"
-${LangFileString} Name_Section04 "Activex додатак"
+${LangFileString} Name_Section34 "Веб додаци"
+${LangFileString} Name_Section03 "Додатак за Firefox"
+${LangFileString} Name_Section04 "ActiveX додатак"
 ${LangFileString} Name_Section05 "Репродукција дискова"
-${LangFileString} Name_Section06 "Одабир врсте фајлова за репродукцију"
-${LangFileString} Name_SectionGroupAudio "Аудио фајлови"
-${LangFileString} Name_SectionGroupVideo "Видео фајлови"
-${LangFileString} Name_SectionGroupOther "Остало"
+${LangFileString} Name_Section06 "Повезаности датотека"
+${LangFileString} Name_SectionGroupAudio "Аудио-записи"
+${LangFileString} Name_SectionGroupVideo "Видео-записи"
+${LangFileString} Name_SectionGroupOther "Друго"
 ${LangFileString} Name_Section07 "Контекстуални менији"
-${LangFileString} Name_Section08 "Обриши подешавања и кеш"
-
-${LangFileString} Desc_Section01 \
-    "Медија плејер"
-${LangFileString} Desc_Section02a \
-    "Додавање иконе на твој старт мени за лакши приступ"
-${LangFileString} Desc_Section02b \
-    "Додавање иконе на твојој радној површини за лакши приступ"
-${LangFileString} Desc_Section03 \
-    "VLC Мозила и Мозила Фајерфокс додатак"
-${LangFileString} Desc_Section04 \
-    "VLC ActiveX додатак"
-${LangFileString} Desc_Section05 \
-    "DVD и CD регистрација репродукције"
-${LangFileString} Desc_Section06 \
-    "Подешавање VLC медиа плејере као главне апликације за изабране врсте фајлова"
-${LangFileString} Desc_Section07 \
-    "Додавање ставки у контекстном менију ('Репродукуј са VLC' and 'Додај у VLC-ову листу за пуштање')"
-${LangFileString} Desc_Section08 \
-    "Брисање подешавања и кеш фајлова VLC медиа плејера остали из претходних инсталација"
-
-${LangFileString} Name_Section91 "Уклони"
-${LangFileString} Name_Section92 "Обриши подешавање и кеш"
-
-${LangFileString} Desc_Section91 \
-"Уклони VLC медиа плејер и све његове компоненте"
-${LangFileString} Desc_Section92 \
-"Брише подешавања и кеш фајлове VLC медиа плејера"
-
+${LangFileString} Name_Section08 "Обриши поставке и кеш"
+${LangFileString} Desc_Section01 "Сâм медијски плејер"
+${LangFileString} Desc_Section02a "Додаје иконе за брз приступ у мени „Старт“"
+${LangFileString} Desc_Section02b "Додаје икону за брз приступ на радну површину"
+${LangFileString} Desc_Section03 "Додатак за Firefox"
+${LangFileString} Desc_Section04 "ActiveX додатак"
+${LangFileString} Desc_Section05 "Регистровање DVD и CD репродукције"
+${LangFileString} Desc_Section06 "Поставља VLC Media Player као подразумевани програм за наведени тип датотека"
+${LangFileString} Desc_Section07 "Додаје ставке у контекстуални мени („Репродукуј помоћу VLC-а“ и „Додај у плејлисту VLC-а“)"
+${LangFileString} Desc_Section08 "Брише датотеке са поставкама и кешом VLC Media Player-а које су остале од претходних инсталација"
+${LangFileString} Name_Section91 "Деинсталирај"
+${LangFileString} Name_Section92 "Обриши поставке и кеш"
+${LangFileString} Desc_Section91 "Деинсталирај VLC Media Player и све његове компоненте"
+${LangFileString} Desc_Section92 "Брише датотеке са поставкама и кешом VLC Media Player-а"
 ${LangFileString} ShellAssociation_Play "Репродукуј"
-${LangFileString} ContextMenuEntry_PlayWith "Репродукуј са VLC медиа плејером"
-${LangFileString} ContextMenuEntry_AddToPlaylist "Додај у VLC медиа плејер-ову листу за пуштање"
-
-${LangFileString} Link_VisitWebsite "Посети VideoLAN VLC медиа плејер интернет презентацију"
-
+${LangFileString} ContextMenuEntry_PlayWith "Репродукуј помоћу VLC Media Player-а"
+${LangFileString} ContextMenuEntry_AddToPlaylist "Додај у плејлисту VLC Media Player-а"
+${LangFileString} Link_VisitWebsite "Посети сајт VLC Media Player-а"
 ${LangFileString} Name_InstTypeRecommended "Препоручено"
-${LangFileString} Name_InstTypeMinimum "Минимум"
-${LangFileString} Name_InstTypeFull "Све"
-
-${LangFileString} Action_OnArrivalDVD "Пушај DVD филмове"
-${LangFileString} Action_OnArrivalAudioCD "Пуштај аудио цд-ове"
-${LangFileString} Action_OnArrivalVCDMovie "Пуштај VCD филмове"
-${LangFileString} Action_OnArrivalSVCDMovie "Пуштај SVCD филмове"
-${LangFileString} Action_OnArrivalVideoFiles "Пуштај видео фајлове"
-${LangFileString} Action_OnArrivalMusicFiles "Пуштај аудио фајлове"
-${LangFileString} Action_OnArrivalDVDAudio "Пуштај аудио DVD"
-
-${LangFileString} License_NextText "Сада си упознат(а) са својим правима. Кликни на Next за наставак."
-
+${LangFileString} Name_InstTypeMinimum "Минимална"
+${LangFileString} Name_InstTypeFull "Пуна"
+${LangFileString} Action_OnArrivalDVD "Репродукуј DVD филм"
+${LangFileString} Action_OnArrivalAudioCD "Репродукуј аудио CD"
+${LangFileString} Action_OnArrivalVCDMovie "Репродукуј VCD филм"
+${LangFileString} Action_OnArrivalSVCDMovie "Репродукуј SVCD филм"
+${LangFileString} Action_OnArrivalVideoFiles "Репродукуј видео-записе"
+${LangFileString} Action_OnArrivalMusicFiles "Репродукуј аудио-записе"
+${LangFileString} Action_OnArrivalDVDAudio "Репродукуј аудио DVD"
+${LangFileString} License_NextText "Сада сте свесни својих права. Кликните на „У реду“ да бисте наставили."
+${LangFileString} Detail_CheckProcesses "Проверавам процесе…"
+${LangFileString} MessageBox_VLCRunning "Изгледа да је VLC покренут. Сада ће бити затворен."
+${LangFileString} MessageBox_VLCUnableToClose "Инсталациони програм не може да затвори VLC. Учините то ручно."
+${LangFileString} MessageBox_InstallAborted "Инсталација је прекинута!"
+${LangFileString} Reinstall_Headline "Већ је инсталиран"
+${LangFileString} Reinstall_HeadlineInstall "Изаберите како желите да инсталирате VLC."
+${LangFileString} Reinstall_HeadlineMaintenance "Изаберите опцију одржавања коју желите да извршите."
+${LangFileString} Reinstall_MessageOlder "На вашем систему је инсталирана старија верзија VLC-а. Изаберите жељену радњу и кликните на „Следеће“ да бисте наставили."
+${LangFileString} Reinstall_MessageNewer "Инсталирана је новија верзија VLC-а. Не препоручујемо вам да се враћате на старију верзију. Изаберите жељену радњу и кликните на „Следеће“ да бисте наставили."
+${LangFileString} Reinstall_MessageSame "VLC ${VERSION} је већ инсталиран. Изаберите жељену радњу и кликните на „Следеће“ да бисте наставили."
+${LangFileString} Reinstall_OptionUpgrade "Надогради VLC помоћу претходних поставки (препоручује се)"
+${LangFileString} Reinstall_OptionDowngrade "Уназади VLC помоћу претходних поставки (препоручује се)"
+${LangFileString} Reinstall_OptionComponents "Додај, уклони или поново инсталирај компоненте"
+${LangFileString} Reinstall_OptionAdvanced "Промени поставке (напредно)"
+${LangFileString} Reinstall_OptionUninstall "Деинсталирај VLC"
