@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "תוסף VLC עבור Mozilla ו־Firefox מב
 ${LangFileString} Desc_Section04 "תוסף ה־ActiveX של VLC"
 ${LangFileString} Desc_Section05 "רישום בתור נגן לתקליטורי מסוג CD ו־DVD"
 ${LangFileString} Desc_Section06 "הגדרת נגן המדיה כיישום בררת המחדל לטיפול בסוג הקובץ האמור"
-${LangFileString} Desc_Section07 "הוספת פריטים לתפריט ההקשר ('נגינה עם VLC' ו־'הוספה לרשימת ההשמעה של VLC')"
+${LangFileString} Desc_Section07 "הוספת פריטים לתפריט ההקשר (\'נגינה עם VLC\' ו־\'הוספה לרשימת ההשמעה של VLC\')"
 ${LangFileString} Desc_Section08 "מחיקת ההעדפות וקובצי המטמון של נגן המדיה VLC שנשארו מהתקנות קודמות"
 ${LangFileString} Name_Section91 "הסרה"
 ${LangFileString} Name_Section92 "מחיקת ההעדפות והמטמון"
