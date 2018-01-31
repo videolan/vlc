@@ -80,10 +80,16 @@ void D3D11_FilterHoldInstance(filter_t *filter, d3d11_device_t *out, D3D11_TEXTU
             instances++;
 
         memset(dstDesc, 0, sizeof(*dstDesc));
-        if (filter->fmt_in.video.i_chroma == VLC_CODEC_D3D11_OPAQUE_10B)
-            dstDesc->Format = DXGI_FORMAT_P010;
-        else
-            dstDesc->Format = DXGI_FORMAT_NV12;
+        dstDesc->Format = DxgiFourccFormat( filter->fmt_in.video.i_chroma );
+        if (dstDesc->Format == DXGI_FORMAT_UNKNOWN)
+            switch (filter->fmt_in.video.i_chroma)
+            {
+            case VLC_CODEC_D3D11_OPAQUE:      dstDesc->Format = DXGI_FORMAT_NV12; break;
+            case VLC_CODEC_D3D11_OPAQUE_10B:  dstDesc->Format = DXGI_FORMAT_P010; break;
+            case VLC_CODEC_D3D11_OPAQUE_BGRA: dstDesc->Format = DXGI_FORMAT_B8G8R8A8_UNORM; break;
+            case VLC_CODEC_D3D11_OPAQUE_RGBA: dstDesc->Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
+            default: break;
+            }
         dstDesc->Width  = filter->fmt_out.video.i_width;
         dstDesc->Height = filter->fmt_out.video.i_height;
     }
