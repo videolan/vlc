@@ -2037,6 +2037,7 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
             msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
                       "consumed quickly enough), resetting fifo!" );
             block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
+            p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
     else
