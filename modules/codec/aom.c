@@ -174,7 +174,7 @@ static int Decode(decoder_t *dec, block_t *block)
     *pkt_pts = block->i_pts;
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts, 0);
+    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts);
 
     block_Release(block);
 
@@ -447,8 +447,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         }
     }
 
-    aom_codec_err_t res = aom_codec_encode(ctx, &img, p_pict->date, 1, 0,
-                                           AOM_DL_GOOD_QUALITY);
+    aom_codec_err_t res = aom_codec_encode(ctx, &img, p_pict->date, 1, 0);
     if (res != AOM_CODEC_OK) {
         AOM_ERR(p_enc, ctx, "Failed to encode frame");
         aom_img_free(&img);
