@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "Modul VLC pro prohlížeče Mozilla a Mozilla 
 ${LangFileString} Desc_Section04 "Modul VLC ActiveX"
 ${LangFileString} Desc_Section05 "Registrace přehrávání CD a DVD"
 ${LangFileString} Desc_Section06 "Nastaví přehrávač VLC jako výchozí aplikaci pro daný typ souborů"
-${LangFileString} Desc_Section07 "Přidá položky kontextové nabídky (\"Přehrát s VLC\" a \"Přidat do seznamu skladeb VLC\")"
+${LangFileString} Desc_Section07 "Přidá položky kontextové nabídky ($\"Přehrát s VLC$\" a $\"Přidat do seznamu skladeb VLC$\")"
 ${LangFileString} Desc_Section08 "Smaže nastavení a mezipaměť přehrávače VLC, které jsou pozůstatkem z předchozích instalací"
 ${LangFileString} Name_Section91 "Odinstalovat"
 ${LangFileString} Name_Section92 "Smazat nastavení a mezipaměť"

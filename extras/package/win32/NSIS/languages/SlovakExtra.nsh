@@ -19,7 +19,7 @@ ${LangFileString} Desc_Section03 "Prídavný modul pre prehliadač Mozilla a Moz
 ${LangFileString} Desc_Section04 "Prídavný modul pre ActiveX"
 ${LangFileString} Desc_Section05 "Zaregistruje program ako prehrávač DVD a CD"
 ${LangFileString} Desc_Section06 "Nastaví prehrávač VLC Media Player ako predvolenú aplikáciu pre špecifikovaný typ súboru"
-${LangFileString} Desc_Section07 "Pridá položky kontextového menu (\'Prehrať v programe VLC\' a \'Pridať do playlistu programu VLC\')"
+${LangFileString} Desc_Section07 "Pridá položky kontextového menu ('Prehrať v programe VLC' a 'Pridať do playlistu programu VLC')"
 ${LangFileString} Desc_Section08 "Vymaže nastavenia prehrávača VLC media player a vyrovnávaciu pamäť z predchádzajúcich inštalácií"
 ${LangFileString} Name_Section91 "Odinštalovať"
 ${LangFileString} Name_Section92 "Vymazať nastavenia a vyrovnávaciu pamäť"
