@@ -257,10 +257,7 @@ static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
     int     i_result;
 
     va_start( args, i_query );
-    if ( !s->pf_control )
-        i_result = VLC_EGENERIC;
-    else
-        i_result = sout_StreamControlVa( s, i_query, args );
+    i_result = sout_StreamControlVa( s, i_query, args );
     va_end( args );
     return i_result;
 }
