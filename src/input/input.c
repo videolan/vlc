@@ -1886,10 +1886,9 @@ static void ControlNav( input_thread_t *p_input, int i_type )
 }
 
 #ifdef ENABLE_SOUT
-static void ControlUpdateSout( input_thread_t *p_input, const char* psz_chain )
+static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
 {
-    var_SetString( p_input, "sout", psz_chain );
-    if( psz_chain && *psz_chain )
+    if( b_enable )
     {
         if( InitSout( p_input ) != VLC_SUCCESS )
         {
@@ -2334,7 +2333,7 @@ static bool Control( input_thread_t *p_input,
 
             if ( p_priv->p_renderer )
             {
-                ControlUpdateSout( p_input, NULL );
+                ControlUpdateRenderer( p_input, false );
                 demux_FilterDisable( p_priv->master->p_demux,
                         vlc_renderer_item_demux_filter( p_priv->p_renderer ) );
                 vlc_renderer_item_release( p_priv->p_renderer );
@@ -2343,7 +2342,7 @@ static bool Control( input_thread_t *p_input,
             if( p_item != NULL )
             {
                 p_priv->p_renderer = vlc_renderer_item_hold( p_item );
-                ControlUpdateSout( p_input, vlc_renderer_item_sout( p_item ) );
+                ControlUpdateRenderer( p_input, true );
                 if( !demux_FilterEnable( p_priv->master->p_demux,
                                 vlc_renderer_item_demux_filter( p_priv->p_renderer ) ) )
                 {
