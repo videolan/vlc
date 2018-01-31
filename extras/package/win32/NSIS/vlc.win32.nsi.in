@@ -207,6 +207,8 @@ RequestExecutionLevel admin
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "CroatianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Icelandic"
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "IcelandicExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "Latvian"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "LatvianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
 
 ; Missing upstream translations:
 ;
