@@ -1041,10 +1041,7 @@ static int Control(sout_stream_t *p_stream, int i_query, va_list args)
         return VLC_SUCCESS;
     }
 
-    if ( !p_sys->p_out->pf_control )
-        return VLC_EGENERIC;
-
-    return p_sys->p_out->pf_control( p_sys->p_out, i_query, args );
+    return sout_StreamControlVa( p_sys->p_out, i_query, args );
 }
 
 /*****************************************************************************
