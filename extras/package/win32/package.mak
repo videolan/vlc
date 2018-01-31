@@ -216,6 +216,7 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/languages/SlovenianExtra.nsh \
 	extras/package/win32/NSIS/languages/SoraniExtra.nsh \
 	extras/package/win32/NSIS/languages/SpanishExtra.nsh \
-	extras/package/win32/NSIS/languages/SwedishExtra.nsh
+	extras/package/win32/NSIS/languages/SwedishExtra.nsh \
+	extras/package/win32/NSIS/languages/AfrikaansExtra.nsh
 
 
