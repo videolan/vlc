@@ -154,7 +154,7 @@ static int Decode(decoder_t *dec, block_t *block)
     *pkt_pts = block->i_pts;
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts, 0);
+    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts);
 
     block_Release(block);
 
