@@ -292,9 +292,12 @@ static int ProxyControl(sout_stream_t *p_stream, int i_query, va_list args)
 static int ProxyOpen(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
-    p_stream->p_sys = (sout_stream_sys_t *) var_InheritAddress(p_this, SOUT_CFG_PREFIX "sys");
-    if (p_stream->p_sys == NULL || p_stream->p_next == NULL)
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t *) var_InheritAddress(p_this, SOUT_CFG_PREFIX "sys");
+    if (p_sys == NULL || p_stream->p_next == NULL)
         return VLC_EGENERIC;
+
+    p_stream->p_sys = (sout_stream_sys_t *) p_sys;
+    p_sys->out_streams_added = 0;
 
     p_stream->pf_add     = ProxyAdd;
     p_stream->pf_del     = ProxyDel;
@@ -621,7 +624,6 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
 
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     cc_has_input = false;
-    out_streams_added = 0;
     out_streams = new_streams;
 
     p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
