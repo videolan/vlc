@@ -667,6 +667,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     if (p_out == NULL) {
         msg_Dbg(p_stream, "could not create sout chain:%s", sout.c_str());
         out_streams.clear();
+        access_out_live.clear();
         return false;
     }
 
