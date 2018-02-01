@@ -2035,9 +2035,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 }
 
 /*****************************************************************************
- * CloseDecoder: clean up the decoder
+ * webvtt_CloseDecoder: clean up the decoder
  *****************************************************************************/
-void CloseDecoder( vlc_object_t *p_this )
+void webvtt_CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -2052,9 +2052,9 @@ void CloseDecoder( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
+ * webvtt_OpenDecoder: probe the decoder and return score
  *****************************************************************************/
-int OpenDecoder( vlc_object_t *p_this )
+int webvtt_OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;

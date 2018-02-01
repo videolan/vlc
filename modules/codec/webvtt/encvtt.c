@@ -31,7 +31,7 @@
 
 static block_t *Encode ( encoder_t *, subpicture_t * );
 
-int OpenEncoder( vlc_object_t *p_this )
+int webvtt_OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
@@ -46,7 +46,7 @@ int OpenEncoder( vlc_object_t *p_this )
 }
 
 
-void CloseEncoder( vlc_object_t *p_this )
+void webvtt_CloseEncoder( vlc_object_t *p_this )
 {
     (void)p_this;
 }
