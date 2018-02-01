@@ -40,16 +40,29 @@
 
 #include <cassert>
 
+struct sout_access_out_sys_t
+{
+    httpd_url_t       *m_url;
+    vlc_fifo_t        *m_fifo;
+    block_t           *m_header;
+    bool               m_eof;
+    std::string        m_mime;
+
+    sout_access_out_sys_t(httpd_host_t *httpd_host, const char *psz_url);
+    ~sout_access_out_sys_t();
+
+    void clearUnlocked();
+    void clear();
+    void prepare(sout_stream_t *p_stream, const std::string &mime);
+    int url_cb(httpd_client_t *cl, httpd_message_t *answer, const httpd_message_t *query);
+};
+
 struct sout_stream_sys_t
 {
-    sout_stream_sys_t(httpd_host_t *httpd_host, httpd_url_t *httpd_url, vlc_fifo_t *httpd_url_fifo,
-                      intf_sys_t * const intf, bool has_video, int port,
+    sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port,
                       const char *psz_default_muxer, const char *psz_default_mime)
         : httpd_host(httpd_host)
-        , httpd_url(httpd_url)
-        , httpd_url_fifo(httpd_url_fifo)
-        , httpd_url_header(NULL)
-        , httpd_url_eof(true)
+        , access_out_live(httpd_host, "/stream")
         , p_out(NULL)
         , default_muxer(psz_default_muxer)
         , default_mime(psz_default_mime)
@@ -66,16 +79,11 @@ struct sout_stream_sys_t
         , previous_state( Authenticating )
     {
         assert(p_intf != NULL);
+
     }
 
     ~sout_stream_sys_t()
     {
-        sout_StreamChainDelete(p_out, NULL);
-        delete p_intf;
-        clearAccessOut();
-        httpd_UrlDelete(httpd_url);
-        httpd_HostDelete(httpd_host);
-        block_FifoRelease(httpd_url_fifo);
     }
 
     bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
@@ -85,15 +93,9 @@ struct sout_stream_sys_t
                         const std::vector<sout_stream_id_sys_t*> &new_streams);
     void stopSoutChain(sout_stream_t* p_stream);
     int  handleChromecastState(sout_stream_t* p_stream);
-    void clearAccessOutUnlocked();
-    void clearAccessOut();
 
     httpd_host_t      *httpd_host;
-    httpd_url_t       *httpd_url;
-    vlc_fifo_t        *httpd_url_fifo;
-    block_t           *httpd_url_header;
-    bool               httpd_url_eof;
-    std::string        httpd_url_mime;
+    sout_access_out_sys_t access_out_live;
 
     sout_stream_t     *p_out;
     std::string        sout;
@@ -119,6 +121,12 @@ struct sout_stream_sys_t
 
 private:
     bool UpdateOutput( sout_stream_t * );
+};
+
+struct sout_stream_id_sys_t
+{
+    es_format_t           fmt;
+    sout_stream_id_sys_t  *p_sub_id;
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -232,13 +240,6 @@ vlc_module_begin ()
         set_callbacks(AccessOpen, AccessClose)
 vlc_module_end ()
 
-
-struct sout_stream_id_sys_t
-{
-    es_format_t           fmt;
-    sout_stream_id_sys_t  *p_sub_id;
-};
-
 static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -309,40 +310,99 @@ static int ProxyOpen(vlc_object_t *p_this)
 static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
                         httpd_message_t *answer, const httpd_message_t *query)
 {
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *) data;
+    sout_access_out_sys_t *p_sys = (sout_access_out_sys_t *) data;
+    return p_sys->url_cb(cl, answer, query);
+}
 
+sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host, const char *psz_url)
+    : m_header(NULL)
+    , m_eof(true)
+{
+    m_fifo = block_FifoNew();
+    if (!m_fifo)
+        throw std::runtime_error( "block_FifoNew failed" );
+    m_url = httpd_UrlNew(httpd_host, psz_url, NULL, NULL);
+    if (m_url == NULL)
+    {
+        block_FifoRelease(m_fifo);
+        throw std::runtime_error( "httpd_UrlNew failed" );
+    }
+    httpd_UrlCatch(m_url, HTTPD_MSG_GET, httpd_url_cb,
+                   (httpd_callback_sys_t*)this);
+
+}
+
+sout_access_out_sys_t::~sout_access_out_sys_t()
+{
+    block_FifoRelease(m_fifo);
+    httpd_UrlDelete(m_url);
+}
+
+void sout_access_out_sys_t::clearUnlocked()
+{
+    block_ChainRelease(vlc_fifo_DequeueAllUnlocked(m_fifo));
+    if (m_header)
+    {
+        block_Release(m_header);
+        m_header = NULL;
+    }
+    m_eof = true;
+}
+
+void sout_access_out_sys_t::clear()
+{
+    vlc_fifo_Lock(m_fifo);
+    clearUnlocked();
+    vlc_fifo_Unlock(m_fifo);
+    vlc_fifo_Signal(m_fifo);
+}
+
+void sout_access_out_sys_t::prepare(sout_stream_t *p_stream, const std::string &mime)
+{
+    var_SetAddress(p_stream->p_sout, SOUT_CFG_PREFIX "access-out-sys", this);
+
+    vlc_fifo_Lock(m_fifo);
+    clearUnlocked();
+    m_mime = mime;
+    m_eof = false;
+    vlc_fifo_Unlock(m_fifo);
+}
+
+int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
+                                  const httpd_message_t *query)
+{
     if (!answer || !query || !cl)
         return VLC_SUCCESS;
 
-    vlc_fifo_Lock(p_sys->httpd_url_fifo);
+    vlc_fifo_Lock(m_fifo);
 
     block_t *p_block = NULL;
-    while ((p_block = vlc_fifo_DequeueUnlocked(p_sys->httpd_url_fifo)) == NULL
-       && !p_sys->httpd_url_eof)
-        vlc_fifo_Wait(p_sys->httpd_url_fifo);
+    while ((p_block = vlc_fifo_DequeueUnlocked(m_fifo)) == NULL
+       && !m_eof)
+        vlc_fifo_Wait(m_fifo);
 
     /* Handle block headers */
     if (p_block)
     {
         if (p_block->i_flags & BLOCK_FLAG_HEADER)
         {
-            if (p_sys->httpd_url_header)
-                block_Release(p_sys->httpd_url_header);
-            p_sys->httpd_url_header = p_block;
+            if (m_header)
+                block_Release(m_header);
+            m_header = p_block;
         }
         if (answer->i_body_offset == 0)
         {
-            if (p_sys->httpd_url_header != NULL && p_block != p_sys->httpd_url_header)
+            if (m_header != NULL && p_block != m_header)
             {
                 /* Using header block. Re-insert current block into fifo */
-                block_t *p_fifo = vlc_fifo_DequeueAllUnlocked(p_sys->httpd_url_fifo);
-                vlc_fifo_QueueUnlocked(p_sys->httpd_url_fifo, p_block);
-                vlc_fifo_QueueUnlocked(p_sys->httpd_url_fifo, p_fifo);
-                p_block = p_sys->httpd_url_header;
+                block_t *p_fifo = vlc_fifo_DequeueAllUnlocked(m_fifo);
+                vlc_fifo_QueueUnlocked(m_fifo, p_block);
+                vlc_fifo_QueueUnlocked(m_fifo, p_fifo);
+                p_block = m_header;
             }
         }
     }
-    vlc_fifo_Unlock(p_sys->httpd_url_fifo);
+    vlc_fifo_Unlock(m_fifo);
 
     answer->i_proto  = HTTPD_PROTO_HTTP;
     answer->i_version= 0;
@@ -354,7 +414,7 @@ static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
     {
         if (answer->i_body_offset == 0)
         {
-            httpd_MsgAdd(answer, "Content-type", "%s", p_sys->httpd_url_mime.c_str());
+            httpd_MsgAdd(answer, "Content-type", "%s", m_mime.c_str());
             httpd_MsgAdd(answer, "Cache-Control", "no-cache");
             b_close = true;
         }
@@ -368,7 +428,7 @@ static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
         else
             b_close = true;
 
-        if (p_block != p_sys->httpd_url_header)
+        if (p_block != m_header)
             block_Release(p_block);
     }
     else
@@ -380,23 +440,24 @@ static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
     return VLC_SUCCESS;
 }
 
+
 static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
 {
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *) p_access->p_sys;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
     size_t i_len = p_block->i_buffer;
 
-    vlc_fifo_Lock(p_sys->httpd_url_fifo);
+    vlc_fifo_Lock(p_sys->m_fifo);
 
-    while (vlc_fifo_GetBytes(p_sys->httpd_url_fifo) >= HTTPD_BUFFER_MAX)
+    while (vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX)
     {
-        block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->httpd_url_fifo);
+        block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->m_fifo);
         msg_Warn(p_access, "httpd buffer full: dropping %zuB", p_drop->i_buffer);
         block_Release(p_drop);
     }
-    vlc_fifo_QueueUnlocked(p_sys->httpd_url_fifo, p_block);
+    vlc_fifo_QueueUnlocked(p_sys->m_fifo, p_block);
 
-    vlc_fifo_Unlock(p_sys->httpd_url_fifo);
-    vlc_fifo_Signal(p_sys->httpd_url_fifo);
+    vlc_fifo_Unlock(p_sys->m_fifo);
+    vlc_fifo_Signal(p_sys->m_fifo);
 
     return i_len;
 }
@@ -420,23 +481,16 @@ static int AccessOpen(vlc_object_t *p_this)
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
 
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)
-        var_InheritAddress(p_access, SOUT_CFG_PREFIX "sys");
+    sout_access_out_sys_t *p_sys = (sout_access_out_sys_t *)
+        var_InheritAddress(p_access, SOUT_CFG_PREFIX "access-out-sys");
     if (p_sys == NULL)
         return VLC_EGENERIC;
 
-    assert(p_sys->httpd_host && p_sys->httpd_url && p_sys->httpd_url_fifo);
-
-    vlc_fifo_Lock(p_sys->httpd_url_fifo);
-    p_sys->clearAccessOutUnlocked();
-    p_sys->httpd_url_eof = false;
-    p_sys->httpd_url_mime = p_sys->mime;
-    vlc_fifo_Unlock(p_sys->httpd_url_fifo);
-    vlc_fifo_Signal(p_sys->httpd_url_fifo);
+    assert(!p_sys->m_eof);
 
     p_access->pf_write       = AccessWrite;
     p_access->pf_control     = AccessControl;
-    p_access->p_sys          = (sout_access_out_sys_t *)p_sys;
+    p_access->p_sys          = p_sys;
 
     return VLC_SUCCESS;
 }
@@ -444,31 +498,12 @@ static int AccessOpen(vlc_object_t *p_this)
 static void AccessClose(vlc_object_t *p_this)
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *) p_access->p_sys;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
 
-    vlc_fifo_Lock(p_sys->httpd_url_fifo);
-    p_sys->httpd_url_eof = true;
-    vlc_fifo_Unlock(p_sys->httpd_url_fifo);
-    vlc_fifo_Signal(p_sys->httpd_url_fifo);
-}
-
-void sout_stream_sys_t::clearAccessOutUnlocked()
-{
-    block_ChainRelease(vlc_fifo_DequeueAllUnlocked(httpd_url_fifo));
-    if (httpd_url_header)
-    {
-        block_Release(httpd_url_header);
-        httpd_url_header = NULL;
-    }
-    httpd_url_eof = true;
-}
-
-void sout_stream_sys_t::clearAccessOut()
-{
-    vlc_fifo_Lock(httpd_url_fifo);
-    clearAccessOutUnlocked();
-    vlc_fifo_Unlock(httpd_url_fifo);
-    vlc_fifo_Signal(httpd_url_fifo);
+    vlc_fifo_Lock(p_sys->m_fifo);
+    p_sys->m_eof = true;
+    vlc_fifo_Unlock(p_sys->m_fifo);
+    vlc_fifo_Signal(p_sys->m_fifo);
 }
 
 /*****************************************************************************
@@ -537,7 +572,7 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     {
         p_sys->stopSoutChain(p_stream);
         p_sys->p_intf->requestPlayerStop();
-        p_sys->clearAccessOut();
+        p_sys->access_out_live.clear();
         p_sys->sout = "";
         p_sys->transcode_attempt_idx = 0;
         p_sys->drained = false;
@@ -625,6 +660,8 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     previous_state = Authenticating;
     cc_has_input = false;
     out_streams = new_streams;
+
+    access_out_live.prepare( p_stream, mime );
 
     p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
     if (p_out == NULL) {
@@ -857,6 +894,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         p_intf->requestPlayerStop();
 
         sout_StreamChainDelete( p_out, NULL );
+        access_out_live.clear();
         p_out = NULL;
         sout = "";
     }
@@ -1022,8 +1060,6 @@ static int Open(vlc_object_t *p_this)
     char *psz_var_mime = NULL;
     sout_stream_t *p_sout = NULL;
     httpd_host_t *httpd_host = NULL;
-    httpd_url_t *httpd_url = NULL;
-    vlc_fifo_t *httpd_url_fifo = NULL;
     bool b_supports_video = true;
     int i_local_server_port;
     int i_device_port;
@@ -1089,23 +1125,13 @@ static int Open(vlc_object_t *p_this)
     }
     sout_StreamChainDelete( p_sout, NULL );
 
-    httpd_url = httpd_UrlNew(httpd_host, "/stream", NULL, NULL);
-    if (httpd_url == NULL)
-        goto error;
-
-    httpd_url_fifo = block_FifoNew();
-    if (!httpd_url_fifo)
-        goto error;
 
     b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
-    p_sys = new(std::nothrow) sout_stream_sys_t( httpd_host, httpd_url, httpd_url_fifo, p_intf, b_supports_video,
+    p_sys = new(std::nothrow) sout_stream_sys_t( httpd_host, p_intf, b_supports_video,
                                                  i_local_server_port, psz_mux, psz_var_mime );
     if (unlikely(p_sys == NULL))
         goto error;
-
-    httpd_UrlCatch(httpd_url, HTTPD_MSG_GET, httpd_url_cb,
-                   (httpd_callback_sys_t*)p_sys);
 
     /* prevent sout-mux-caching since chromecast-proxy is already doing it */
     var_Create( p_stream->p_sout, "sout-mux-caching", VLC_VAR_INTEGER );
@@ -1113,6 +1139,8 @@ static int Open(vlc_object_t *p_this)
 
     var_Create( p_stream->p_sout, SOUT_CFG_PREFIX "sys", VLC_VAR_ADDRESS );
     var_SetAddress( p_stream->p_sout, SOUT_CFG_PREFIX "sys", p_sys );
+
+    var_Create( p_stream->p_sout, SOUT_CFG_PREFIX "access-out-sys", VLC_VAR_ADDRESS );
 
     // Set the sout callbacks.
     p_stream->pf_add     = Add;
@@ -1131,12 +1159,8 @@ error:
     if (p_interrupt)
         vlc_interrupt_destroy(p_interrupt);
     delete p_intf;
-    if (httpd_url)
-        httpd_UrlDelete(httpd_url);
     if (httpd_host)
         httpd_HostDelete(httpd_host);
-    if (httpd_url_fifo)
-        block_FifoRelease(httpd_url_fifo);
     free(psz_ip);
     free(psz_mux);
     free(psz_var_mime);
@@ -1157,6 +1181,11 @@ static void Close(vlc_object_t *p_this)
     var_Destroy( p_stream->p_sout, SOUT_CFG_PREFIX "sout-mux-caching" );
 
     assert(p_sys->streams.empty() && p_sys->out_streams.empty());
+
+    httpd_host_t *httpd_host = p_sys->httpd_host;
+    delete p_sys->p_intf;
     delete p_sys;
+    /* Delete last since p_intf and p_sys depends on httpd_host */
+    httpd_HostDelete(httpd_host);
 }
 
