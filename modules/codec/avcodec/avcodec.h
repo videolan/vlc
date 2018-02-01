@@ -31,8 +31,8 @@ vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec );
 vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 
 /* Video encoder module */
-int  OpenEncoder ( vlc_object_t * );
-void CloseEncoder( vlc_object_t * );
+int  InitVideoEnc ( vlc_object_t * );
+void EndVideoEnc( vlc_object_t * );
 
 /* Video Decoder */
 int InitVideoDec( vlc_object_t * );
