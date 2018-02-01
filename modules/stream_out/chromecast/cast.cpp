@@ -687,7 +687,14 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
         else
             ++it;
     }
-    return out_streams.empty() == false;
+
+    if (out_streams.empty())
+    {
+        stopSoutChain( p_stream );
+        access_out_live.clear();
+        return false;
+    }
+    return true;
 }
 
 bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
@@ -890,13 +897,8 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
           << ",access=chromecast-http";
 
     if ( !startSoutChain( p_stream, new_streams, ssout.str() ) )
-    {
         p_intf->requestPlayerStop();
 
-        sout_StreamChainDelete( p_out, NULL );
-        access_out_live.clear();
-        p_out = NULL;
-    }
     return true;
 }
 
