@@ -90,6 +90,8 @@ enum States
     Stopping,
     // Something went wrong and the connection is dead.
     Dead,
+    // Another playback started on the same cast device
+    TakenOver,
 };
 
 class ChromecastCommunication
