@@ -87,8 +87,6 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
         {
             if( p_segment->psz_text == NULL )
                 continue;
-            if( p_segment != p_region->p_text )
-                bo_add_8( &box, '\n' );
 
             const text_style_t *style = p_segment->style;
             if( style && style->i_features )
