@@ -90,7 +90,8 @@ struct sout_stream_sys_t
     bool canDecodeAudio( sout_stream_t* p_stream, vlc_fourcc_t i_codec,
                          const audio_format_t* p_fmt ) const;
     bool startSoutChain(sout_stream_t* p_stream,
-                        const std::vector<sout_stream_id_sys_t*> &new_streams);
+                        const std::vector<sout_stream_id_sys_t*> &new_streams,
+                        const std::string &sout);
     void stopSoutChain(sout_stream_t* p_stream);
     int  handleChromecastState(sout_stream_t* p_stream);
 
@@ -98,7 +99,6 @@ struct sout_stream_sys_t
     sout_access_out_sys_t access_out_live;
 
     sout_stream_t     *p_out;
-    std::string        sout;
     const std::string  default_muxer;
     const std::string  default_mime;
     std::string        mime;
@@ -575,7 +575,6 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         p_sys->stopSoutChain(p_stream);
         p_sys->p_intf->requestPlayerStop();
         p_sys->access_out_live.clear();
-        p_sys->sout = "";
         p_sys->transcode_attempt_idx = 0;
         p_sys->drained = false;
     }
@@ -654,7 +653,8 @@ void sout_stream_sys_t::stopSoutChain(sout_stream_t *p_stream)
 }
 
 bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
-                                       const std::vector<sout_stream_id_sys_t*> &new_streams)
+                                       const std::vector<sout_stream_id_sys_t*> &new_streams,
+                                       const std::string &sout)
 {
     stopSoutChain( p_stream );
 
@@ -889,16 +889,13 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
           << "http{mux=" << default_muxer
           << ",access=chromecast-http";
 
-    sout = ssout.str();
-
-    if ( !startSoutChain( p_stream, new_streams ) )
+    if ( !startSoutChain( p_stream, new_streams, ssout.str() ) )
     {
         p_intf->requestPlayerStop();
 
         sout_StreamChainDelete( p_out, NULL );
         access_out_live.clear();
         p_out = NULL;
-        sout = "";
     }
     return true;
 }
