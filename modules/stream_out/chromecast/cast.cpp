@@ -893,7 +893,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 
     ssout << "chromecast-proxy:"
           << "http{mux=" << default_muxer
-          << ",access=chromecast-http";
+          << ",access=chromecast-http}";
 
     if ( !startSoutChain( p_stream, new_streams, ssout.str() ) )
         p_intf->requestPlayerStop();
