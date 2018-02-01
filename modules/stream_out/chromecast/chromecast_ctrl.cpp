@@ -190,13 +190,14 @@ int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *p
     if( !*pp_data )
         return VLC_EGENERIC;
 
-    *pi_data = size;
     ssize_t read = vlc_stream_Read( m_art_stream, *pp_data, size );
     if( read < 0 || (size_t)read != size )
     {
         free( *pp_data );
+        *pp_data = NULL;
         return VLC_EGENERIC;
     }
+    *pi_data = size;
 
     return VLC_SUCCESS;
 }
