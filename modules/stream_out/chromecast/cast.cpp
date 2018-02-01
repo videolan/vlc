@@ -909,9 +909,10 @@ int sout_stream_sys_t::handleChromecastState(sout_stream_t* p_stream)
             msg_Dbg( p_stream, "Playback started: Current configuration (%u) "
                      "accepted", transcode_attempt_idx );
         }
-        else if (s == Connected)
+        else if (s == Connected || s == TakenOver)
         {
-            msg_Warn(p_stream, "chromecast exited, aborting...\n");
+            msg_Warn(p_stream, "chromecast %s, aborting...\n",
+                     s == Connected ? "exited" : "was taken over");
             stopSoutChain(p_stream);
             return VLC_EGENERIC;
         }

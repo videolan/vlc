@@ -76,6 +76,8 @@ static const char* StateToStr( States s )
         return "Stopping";
     case Dead:
         return "Dead";
+    case TakenOver:
+        return "TakenOver";
     }
     vlc_assert_unreachable();
 }
@@ -265,7 +267,7 @@ void intf_sys_t::prepareHttpArtwork()
 void intf_sys_t::setHasInput( const std::string mime_type )
 {
     vlc_mutex_locker locker(&m_lock);
-    msg_Dbg( m_module, "Loading content for session: %" PRId64, m_mediaSessionId );
+    msg_Dbg( m_module, "Loading content" );
 
     this->m_mime = mime_type;
 
@@ -284,6 +286,8 @@ void intf_sys_t::setHasInput( const std::string mime_type )
 
     // We should now be in the ready state, and therefor have a valid transportId
     assert( m_appTransportId.empty() == false );
+    // Reset the mediaSessionID to allow the new session to become the current one.
+    m_mediaSessionId = 0;
     // we cannot start a new load when the last one is still processing
     m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, mime_type, m_meta );
     setState( Loading );
@@ -489,6 +493,7 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
         case Paused:
         case Seeking:
         case Ready:
+        case TakenOver:
             if ( p_app == NULL )
             {
                 msg_Warn( m_module, "Media receiver application got closed." );
@@ -537,9 +542,18 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
     if (type == "MEDIA_STATUS")
     {
         json_value status = (*p_data)["status"];
-        msg_Dbg( m_module, "Player state: %s sessionId:%d",
+
+        int64_t sessionId = (json_int_t) status[0]["mediaSessionId"];
+        if (m_mediaSessionId != sessionId && m_mediaSessionId != 0 )
+        {
+            msg_Dbg( m_module, "Ignoring message for a different media session" );
+            json_value_free(p_data);
+            return;
+        }
+
+        msg_Dbg( m_module, "Player state: %s sessionId: %" PRId64,
                 status[0]["playerState"].operator const char *(),
-                (int)(json_int_t) status[0]["mediaSessionId"]);
+                sessionId );
 
         std::string newPlayerState = (const char*)status[0]["playerState"];
         std::string idleReason = (const char*)status[0]["idleReason"];
@@ -556,13 +570,23 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
              * might have an empty status array.
              * If the media load indeed failed, we need to try another
              * transcode/remux configuration, or give up.
+             * In case we are now loading, we might also receive an INTERRUPTED
+             * state for the previous session, which we wouldn't ignore earlier
+             * since our mediaSessionID was reset to 0.
+             * In this case, don't assume we're being taken over, as we are
+             * actually doing the take over.
              */
-            if ( m_state != Ready && m_state != LoadFailed )
+            if ( m_state != Ready && m_state != LoadFailed && m_state != Loading )
             {
                 // The playback stopped
-                m_mediaSessionId = 0;
                 m_time_playback_started = VLC_TS_INVALID;
-                if ( m_state == Buffering )
+                if ( idleReason == "INTERRUPTED" )
+                {
+                    setState( TakenOver );
+                    // Do not reset the mediaSessionId to ensure we refuse all
+                    // other MEDIA_STATUS from the new session.
+                }
+                else if ( m_state == Buffering )
                     setState( LoadFailed );
                 else
                 {
@@ -574,12 +598,10 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
         }
         else
         {
-            int64_t sessionId = (json_int_t) status[0]["mediaSessionId"];
-            if (m_mediaSessionId != sessionId) {
-                if (m_mediaSessionId != 0)
-                    msg_Warn( m_module, "different mediaSessionId detected % " PRId64
-                              " was %" PRId64, sessionId, m_mediaSessionId );
+            if ( m_mediaSessionId == 0 )
+            {
                 m_mediaSessionId = sessionId;
+                msg_Dbg( m_module, "New mediaSessionId: %" PRId64, m_mediaSessionId );
             }
 
             if (newPlayerState == "PLAYING")
@@ -768,7 +790,7 @@ void intf_sys_t::requestPlayerStop()
         m_art_stream = NULL;
     }
 
-    if ( m_mediaSessionId == 0 )
+    if ( m_mediaSessionId == 0 || m_state == TakenOver )
         return;
     queueMessage( Stop );
 }
