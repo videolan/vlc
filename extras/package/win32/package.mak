@@ -126,6 +126,7 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/
 	cp -r $(srcdir)/extras/package/win32/NSIS/languages    "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      "$(win32_destdir)/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
+	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
 
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
