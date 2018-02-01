@@ -37,6 +37,14 @@
   Call InstallFolderInternal
 !macroend
 
+!macro InstallFolderOptional FOLDER
+  SetOutPath "$INSTDIR\${FOLDER}"
+  File /nonfatal /r "${FOLDER}\*.*"
+  SetOutPath "$INSTDIR"
+  Push "${FOLDER}"
+  Call InstallFolderInternal
+!macroend
+
 Function InstallFolderInternal
   Pop $9
   !define Index 'Line${__LINE__}'
