@@ -79,6 +79,11 @@ RequestExecutionLevel admin
   !define MUI_UNICON "vlc.ico"
   !define MUI_COMPONENTSPAGE_SMALLDESC
 
+  ; Banner (welcome and finish page) for installer
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "NSIS/vlc_branding.bmp"
+  ; Banner for uninstaller
+  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "NSIS/vlc_branding.bmp"
+
 ; Installer pages
   ; Welcome page
     !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
