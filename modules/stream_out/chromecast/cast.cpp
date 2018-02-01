@@ -141,6 +141,7 @@ struct sout_stream_sys_t
     std::vector<sout_stream_id_sys_t*> streams;
     std::vector<sout_stream_id_sys_t*> out_streams;
     unsigned int                       out_streams_added;
+    unsigned int                       spu_streams_count;
 
 private:
     bool UpdateOutput( sout_stream_t * );
@@ -288,7 +289,8 @@ static int ProxySend(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                      block_t *p_buffer)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    if (p_sys->cc_has_input || p_sys->out_streams_added >= p_sys->out_streams.size())
+    if (p_sys->cc_has_input
+     || p_sys->out_streams_added >= p_sys->out_streams.size() - p_sys->spu_streams_count)
     {
         if (p_sys->has_video)
         {
@@ -731,6 +733,8 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                         p_sys->out_force_reload = reset_config;
                         if( p_sys_id->fmt.i_cat == VIDEO_ES )
                             p_sys->has_video = false;
+                        else if( p_sys_id->fmt.i_cat == SPU_ES )
+                            p_sys->spu_streams_count--;
                         break;
                     }
                     out_it++;
@@ -841,6 +845,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     video_proxy_id = NULL;
     has_video = false;
     out_streams = new_streams;
+    spu_streams_count = 0;
     transcoding_state = new_transcoding_state;
 
     access_out_live.prepare( p_stream, mime );
@@ -869,6 +874,8 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
         {
             if( p_sys_id->fmt.i_cat == VIDEO_ES )
                 has_video = true;
+            else if( p_sys_id->fmt.i_cat == SPU_ES )
+                spu_streams_count++;
             ++it;
         }
     }
@@ -913,6 +920,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     vlc_fourcc_t i_codec_video = 0, i_codec_audio = 0;
     const es_format_t *p_original_audio = NULL;
     const es_format_t *p_original_video = NULL;
+    const es_format_t *p_original_spu = NULL;
     bool b_out_streams_changed = false;
     std::vector<sout_stream_id_sys_t*> new_streams;
 
@@ -941,14 +949,22 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                              p_es->i_id, (const char*)&p_es->i_codec );
                     canRemux = false;
                 }
-                else if (i_codec_video == 0)
+                else if (i_codec_video == 0 && !p_original_spu)
                     i_codec_video = p_es->i_codec;
                 p_original_video = p_es;
                 new_streams.push_back(*it);
             }
+            else if (p_es->i_cat == SPU_ES && p_original_spu == NULL)
+            {
+                msg_Dbg( p_stream, "forcing video transcode because of subtitle '%4.4s'",
+                         p_es->i_id, (const char*)&p_es->i_codec );
+                canRemux = false;
+                i_codec_video = 0;
+                p_original_spu = p_es;
+                new_streams.push_back(*it);
+            }
             else
                 continue;
-            /* TODO: else handle ttml/webvtt */
         }
         else
             continue;
@@ -1096,6 +1112,8 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             }
             new_transcoding_state |= TRANSCODING_VIDEO;
         }
+        if ( p_original_spu )
+            ssout << "soverlay,";
         ssout << "}:";
     }
 
