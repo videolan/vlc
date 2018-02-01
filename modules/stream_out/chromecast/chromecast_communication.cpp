@@ -321,9 +321,9 @@ void ChromecastCommunication::msgPlayerLoad( const std::string& destinationId, u
     pushMediaPlayerMessage( destinationId, ss );
 }
 
-void ChromecastCommunication::msgPlayerPlay( const std::string& destinationId, const std::string& mediaSessionId )
+void ChromecastCommunication::msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId )
 {
-    assert(!mediaSessionId.empty());
+    assert(mediaSessionId != 0);
 
     std::stringstream ss;
     ss << "{\"type\":\"PLAY\","
@@ -334,9 +334,9 @@ void ChromecastCommunication::msgPlayerPlay( const std::string& destinationId, c
     pushMediaPlayerMessage( destinationId, ss );
 }
 
-void ChromecastCommunication::msgPlayerStop( const std::string& destinationId, const std::string& mediaSessionId )
+void ChromecastCommunication::msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId )
 {
-    assert(!mediaSessionId.empty());
+    assert(mediaSessionId != 0);
 
     std::stringstream ss;
     ss << "{\"type\":\"STOP\","
@@ -347,9 +347,9 @@ void ChromecastCommunication::msgPlayerStop( const std::string& destinationId, c
     pushMediaPlayerMessage( destinationId, ss );
 }
 
-void ChromecastCommunication::msgPlayerPause( const std::string& destinationId, const std::string& mediaSessionId )
+void ChromecastCommunication::msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId )
 {
-    assert(!mediaSessionId.empty());
+    assert(mediaSessionId != 0);
 
     std::stringstream ss;
     ss << "{\"type\":\"PAUSE\","
@@ -360,9 +360,9 @@ void ChromecastCommunication::msgPlayerPause( const std::string& destinationId, 
     pushMediaPlayerMessage( destinationId, ss );
 }
 
-void ChromecastCommunication::msgPlayerSetVolume( const std::string& destinationId, const std::string& mediaSessionId, float f_volume, bool b_mute )
+void ChromecastCommunication::msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId, float f_volume, bool b_mute )
 {
-    assert(!mediaSessionId.empty());
+    assert(mediaSessionId != 0);
 
     if ( f_volume < 0.0 || f_volume > 1.0)
         return;
@@ -377,9 +377,9 @@ void ChromecastCommunication::msgPlayerSetVolume( const std::string& destination
     pushMediaPlayerMessage( destinationId, ss );
 }
 
-void ChromecastCommunication::msgPlayerSeek( const std::string& destinationId, const std::string& mediaSessionId, const std::string& currentTime )
+void ChromecastCommunication::msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId, const std::string& currentTime )
 {
-    assert(!mediaSessionId.empty());
+    assert(mediaSessionId != 0);
 
     std::stringstream ss;
     ss << "{\"type\":\"SEEK\","
