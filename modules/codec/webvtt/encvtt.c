@@ -51,6 +51,31 @@ void webvtt_CloseEncoder( vlc_object_t *p_this )
     (void)p_this;
 }
 
+static void WriteText( const char *psz, bo_t *box, char *c_last )
+{
+    /* We need to break any double newline sequence
+     * in or over segments */
+    while(*psz)
+    {
+        const char *p = strchr( psz, '\n' );
+        if( p )
+        {
+            bo_add_mem( box, p - psz, psz );
+            if( *c_last == '\n' )
+                bo_add_8( box, '!' ); /* Add space */
+            bo_add_8( box, '\n' );
+            *c_last = '\n';
+            psz = p + 1;
+        }
+        else
+        {
+            size_t len = strlen(psz);
+            bo_add_mem( box, len, psz );
+            *c_last = (len > 0) ? psz[len - 1] : '\0';
+            break;
+        }
+    }
+}
 
 static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 {
@@ -81,6 +106,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
         bo_add_32be( &box, 0 );
         bo_add_fourcc( &box, "payl" );
 
+        char prevchar = '\0';
         /* This should already be UTF-8 encoded, so not much effort... */
         for( const text_segment_t *p_segment = p_region->p_text;
              p_segment; p_segment = p_segment->p_next )
@@ -101,7 +127,9 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
                         bo_add_mem( &box, 3, "<i>" );
                 }
             }
-            bo_add_mem( &box, strlen(p_segment->psz_text), p_segment->psz_text );
+
+            WriteText( p_segment->psz_text, &box, &prevchar );
+
             if( style && style->i_features )
             {
                 if( style->i_features & STYLE_HAS_FLAGS )
