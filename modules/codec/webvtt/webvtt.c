@@ -98,7 +98,7 @@ bool webvtt_scan_time( const char *psz, mtime_t *p_time )
         *p_time = MakeTime( t );
         return true;
     }
-    else if( sscanf( psz, "%2u:%2u:%2u.%3u",
+    else if( sscanf( psz, "%u:%2u:%2u.%3u",
                           &t[0], &t[1], &t[2], &t[3] ) == 4 )
     {
         *p_time = MakeTime( t );
