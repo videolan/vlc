@@ -333,9 +333,9 @@ static int FrameSpanAddDescription( demux_t *p_demux, uint64_t i_desc_offset, fr
 static inline mtime_t FrameSpanGetTime( frame_span_t *span, uint32_t i_sample_rate )
 {
     if( !i_sample_rate )
-        return 0;
+        return VLC_TS_INVALID;
 
-    return ( span->i_samples * CLOCK_FREQ ) / i_sample_rate + 1;
+    return ( span->i_samples * CLOCK_FREQ ) / i_sample_rate + VLC_TS_0;
 }
 
 /* SetSpanWithSample returns the span from the beginning of the file up to and
@@ -998,7 +998,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + FrameSpanGetTime( &p_sys->position, p_sys->fmt.audio.i_rate );
+    p_block->i_pts = FrameSpanGetTime( &p_sys->position, p_sys->fmt.audio.i_rate );
 
     FrameSpanAddSpan( &p_sys->position, &advance );
 
