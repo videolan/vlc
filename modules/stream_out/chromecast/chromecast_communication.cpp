@@ -278,15 +278,15 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
             if( b_music )
             {
                 if( psz_artist )
-                    ss << ",\"artist\":\"" << psz_artist << "\""; 
+                    ss << ",\"artist\":\"" << psz_artist << "\"";
                 if( psz_album )
-                    ss << ",\"album\":\"" << psz_album << "\""; 
+                    ss << ",\"album\":\"" << psz_album << "\"";
                 if( psz_albumartist )
-                    ss << ",\"albumArtist\":\"" << psz_albumartist << "\""; 
+                    ss << ",\"albumArtist\":\"" << psz_albumartist << "\"";
                 if( psz_tracknumber )
-                    ss << ",\"trackNumber\":\"" << psz_tracknumber << "\""; 
+                    ss << ",\"trackNumber\":\"" << psz_tracknumber << "\"";
                 if( psz_discnumber )
-                    ss << ",\"discNumber\":\"" << psz_discnumber << "\""; 
+                    ss << ",\"discNumber\":\"" << psz_discnumber << "\"";
             }
 
             if ( psz_artwork && !strncmp( psz_artwork, "http", 4 ) )
