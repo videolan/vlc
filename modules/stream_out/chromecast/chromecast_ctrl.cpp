@@ -87,6 +87,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
                        int device_port, vlc_interrupt_t *p_interrupt, httpd_host_t *httpd_host)
  : m_module(p_this)
  , m_streaming_port(port)
+ , m_mediaSessionId( 0 )
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
  , m_eof( false )
@@ -264,7 +265,7 @@ void intf_sys_t::prepareHttpArtwork()
 void intf_sys_t::setHasInput( const std::string mime_type )
 {
     vlc_mutex_locker locker(&m_lock);
-    msg_Dbg( m_module, "Loading content for session:%s", m_mediaSessionId.c_str() );
+    msg_Dbg( m_module, "Loading content for session: %" PRId64, m_mediaSessionId );
 
     this->m_mime = mime_type;
 
@@ -493,7 +494,7 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
                 msg_Warn( m_module, "Media receiver application got closed." );
                 setState( Connected );
                 m_appTransportId = "";
-                m_mediaSessionId = "";
+                m_mediaSessionId = 0;
             }
             break;
         case Connected:
@@ -559,7 +560,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             if ( m_state != Ready && m_state != LoadFailed )
             {
                 // The playback stopped
-                m_mediaSessionId = "";
+                m_mediaSessionId = 0;
                 m_time_playback_started = VLC_TS_INVALID;
                 if ( m_state == Buffering )
                     setState( LoadFailed );
@@ -573,16 +574,12 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
         }
         else
         {
-            char session_id[32];
-            if( snprintf( session_id, sizeof(session_id), "%" PRId64, (json_int_t) status[0]["mediaSessionId"] ) >= (int)sizeof(session_id) )
-            {
-                msg_Err( m_module, "snprintf() truncated string for mediaSessionId" );
-                session_id[sizeof(session_id) - 1] = '\0';
-            }
-            if (session_id[0] && m_mediaSessionId != session_id) {
-                if (!m_mediaSessionId.empty())
-                    msg_Warn( m_module, "different mediaSessionId detected %s was %s", session_id, this->m_mediaSessionId.c_str());
-                m_mediaSessionId = session_id;
+            int64_t sessionId = (json_int_t) status[0]["mediaSessionId"];
+            if (m_mediaSessionId != sessionId) {
+                if (m_mediaSessionId != 0)
+                    msg_Warn( m_module, "different mediaSessionId detected % " PRId64
+                              " was %" PRId64, sessionId, m_mediaSessionId );
+                m_mediaSessionId = sessionId;
             }
 
             if (newPlayerState == "PLAYING")
@@ -676,7 +673,7 @@ void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg )
         // From this point on, we need to relaunch the media receiver app
         vlc_mutex_locker locker(&m_lock);
         m_appTransportId = "";
-        m_mediaSessionId = "";
+        m_mediaSessionId = 0;
         setState( Connected );
     }
     else
@@ -771,7 +768,7 @@ void intf_sys_t::requestPlayerStop()
         m_art_stream = NULL;
     }
 
-    if ( m_mediaSessionId.empty() == true )
+    if ( m_mediaSessionId == 0 )
         return;
     queueMessage( Stop );
 }
@@ -785,7 +782,7 @@ States intf_sys_t::state() const
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
-    if ( m_mediaSessionId.empty() == true )
+    if ( m_mediaSessionId == 0 )
         return;
     if ( pos != VLC_TS_INVALID )
         m_ts_local_start = pos;
@@ -798,14 +795,14 @@ void intf_sys_t::setPauseState(bool paused)
     vlc_mutex_locker locker( &m_lock );
     if ( !paused )
     {
-        if ( !m_mediaSessionId.empty() )
+        if ( m_mediaSessionId == 0 )
         {
             m_communication.msgPlayerPlay( m_appTransportId, m_mediaSessionId );
         }
     }
     else
     {
-        if ( !m_mediaSessionId.empty() && m_state != Paused )
+        if ( m_mediaSessionId == 0 && m_state != Paused )
         {
             m_communication.msgPlayerPause( m_appTransportId, m_mediaSessionId );
         }

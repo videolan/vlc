@@ -112,13 +112,13 @@ public:
     void msgAuth();
     void msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
                         const std::string& mime, const vlc_meta_t *p_meta );
-    void msgPlayerPlay( const std::string& destinationId, const std::string& mediaSessionId );
-    void msgPlayerStop( const std::string& destinationId, const std::string& mediaSessionId );
-    void msgPlayerPause( const std::string& destinationId, const std::string& mediaSessionId );
+    void msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId );
+    void msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId );
+    void msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId );
     void msgPlayerGetStatus( const std::string& destinationId );
-    void msgPlayerSeek( const std::string& destinationId, const std::string& mediaSessionId,
+    void msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId,
                         const std::string & currentTime );
-    void msgPlayerSetVolume( const std::string& destinationId, const std::string& mediaSessionId,
+    void msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId,
                              float volume, bool mute);
     ssize_t receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout );
 
@@ -223,7 +223,7 @@ private:
     std::string    m_mime;
 
     std::string m_appTransportId;
-    std::string m_mediaSessionId;
+    int64_t m_mediaSessionId;
 
     mutable vlc_mutex_t  m_lock;
     vlc_cond_t   m_stateChangedCond;
