@@ -56,16 +56,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define PROXY_TEXT N_("HTTP proxy")
-#define PROXY_LONGTEXT N_( \
-    "HTTP proxy to be used It must be of the form " \
-    "http://[user@]myproxy.mydomain:myport/ ; " \
-    "if empty, the http_proxy environment variable will be tried." )
-
-#define PROXY_PASS_TEXT N_("HTTP proxy password")
-#define PROXY_PASS_LONGTEXT N_( \
-    "If your HTTP proxy requires a password, set it here." )
-
 #define RECONNECT_TEXT N_("Auto re-connect")
 #define RECONNECT_LONGTEXT N_( \
     "Automatically try to reconnect to the stream in case of a sudden " \
@@ -78,11 +68,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
-                false )
-    add_password( "http-proxy-pwd", NULL,
-                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
-    add_obsolete_bool( "http-use-IE-proxy" )
     add_bool( "http-reconnect", false, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
     /* 'itpc' = iTunes Podcast */

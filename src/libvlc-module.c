@@ -844,6 +844,16 @@ static const char *const ppsz_prefres[] = {
 #define KEY_LONGTEXT N_( \
    "This private key file (PEM format) is used for server-side TLS.")
 
+#define PROXY_TEXT N_("HTTP proxy")
+#define PROXY_LONGTEXT N_( \
+    "HTTP proxy to be used It must be of the form " \
+    "http://[user@]myproxy.mydomain:myport/ ; " \
+    "if empty, the http_proxy environment variable will be tried." )
+
+#define PROXY_PASS_TEXT N_("HTTP proxy password")
+#define PROXY_PASS_LONGTEXT N_( \
+    "If your HTTP proxy requires a password, set it here." )
+
 #define SOCKS_SERVER_TEXT N_("SOCKS server")
 #define SOCKS_SERVER_LONGTEXT N_( \
     "SOCKS proxy server to use. This must be of the form " \
@@ -1801,6 +1811,18 @@ vlc_module_begin ()
     add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
     add_obsolete_string( "http-crl" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-crl" ) /* since 2.0.0 */
+
+#ifdef _WIN32
+    add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
+                false )
+    add_password( "http-proxy-pwd", NULL,
+                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
+#else
+    add_obsolete_string( "http-proxy" )
+    add_obsolete_string( "http-proxy-pwd" )
+
+#endif
+    add_obsolete_bool( "http-use-IE-proxy" )
 
     set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL,
