@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17C205" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17D47" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -2075,7 +2075,7 @@ Gw
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2679">
-                        <rect key="frame" x="98" y="102" width="244" height="34"/>
+                        <rect key="frame" x="159" y="102" width="122" height="34"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="3527">
                             <font key="font" metaFont="system"/>
                             <string key="title">Press new keys for
@@ -2122,11 +2122,11 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="2679" firstAttribute="leading" secondItem="2678" secondAttribute="leading" constant="100" id="3nd-rp-ZnD"/>
+                    <constraint firstItem="2679" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="3nd-rp-ZnD"/>
                     <constraint firstItem="2679" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="top" constant="17" id="55x-0r-0qV"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2800" secondAttribute="trailing" constant="17" id="6e5-ip-qeH"/>
                     <constraint firstItem="2803" firstAttribute="top" secondItem="2800" secondAttribute="bottom" constant="8" id="7lB-JR-wGe"/>
-                    <constraint firstAttribute="trailing" secondItem="2679" secondAttribute="trailing" constant="100" id="COG-xA-ijE"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2679" secondAttribute="trailing" constant="17" id="COG-xA-ijE"/>
                     <constraint firstAttribute="bottom" secondItem="2791" secondAttribute="bottom" constant="19" id="Hid-Pb-8rm"/>
                     <constraint firstAttribute="trailing" secondItem="2791" secondAttribute="trailing" constant="20" id="QIF-0S-zPw"/>
                     <constraint firstItem="2803" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="Ril-RK-86t"/>
