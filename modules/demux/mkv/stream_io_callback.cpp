@@ -64,7 +64,16 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     }
 
     if(i_pos == i_current)
+    {
+        if (mb_eof)
+        {
+            // if previous setFilePointer() failed we may be back in the available data
+            i_size = stream_Size( s );
+            if ( i_size != 0 && i_pos < i_size )
+                mb_eof = vlc_stream_Seek( s, i_pos ) != VLC_SUCCESS;
+        }
         return;
+    }
 
     if( i_pos < 0 || ( ( i_size = stream_Size( s ) ) != 0 && i_pos >= i_size ) )
     {
