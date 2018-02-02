@@ -377,10 +377,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
                 vout_display_cfg_t cfg_tmp = *cfg;
-                /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-                NSRect bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
-                cfg_tmp.display.width = bounds.size.width;
-                cfg_tmp.display.height = bounds.size.height;
 
                 /* Reverse vertical alignment as the GL tex are Y inverted */
                 if (cfg_tmp.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
