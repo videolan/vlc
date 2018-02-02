@@ -52,29 +52,6 @@ typedef struct
     int32_t (*setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t); /* can be NULL */
 } native_window_api_t;
 
-/**
- * native_window_priv_api_t. See system/core/include/system/window.h in AOSP.
- */
-typedef struct native_window_priv native_window_priv;
-typedef struct
-{
-    native_window_priv *(*connect)(ANativeWindow *);
-    int (*disconnect) (native_window_priv *);
-    int (*setUsage) (native_window_priv *, bool, int );
-    int (*setBuffersGeometry) (native_window_priv *, int, int, int );
-    int (*getMinUndequeued) (native_window_priv *, unsigned int *);
-    int (*getMaxBufferCount) (native_window_priv *, unsigned int *);
-    int (*setBufferCount) (native_window_priv *, unsigned int );
-    int (*setCrop) (native_window_priv *, int, int, int, int);
-    int (*dequeue) (native_window_priv *, void **);
-    int (*lock) (native_window_priv *, void *);
-    int (*queue) (native_window_priv *, void *);
-    int (*cancel) (native_window_priv *, void *);
-    int (*lockData) (native_window_priv *, void **, ANativeWindow_Buffer *);
-    int (*unlockData) (native_window_priv *, void *, bool b_render);
-    int (*setOrientation) (native_window_priv *, int);
-} native_window_priv_api_t;
-
 struct awh_mouse_coords
 {
     int i_action;
@@ -90,15 +67,6 @@ typedef struct
     void (*on_new_mouse_coords)(vout_window_t *wnd,
                                 const struct awh_mouse_coords *coords);
 } awh_events_t;
-
-/**
- * Load a private native window API
- *
- * This can be used to access the private ANativeWindow API.
- * \param api doesn't need to be released
- * \return 0 on success, -1 on error.
- */
-int android_loadNativeWindowPrivApi(native_window_priv_api_t *api);
 
 /**
  * Attach or get a JNIEnv*

@@ -45,7 +45,6 @@ struct AWindowHandler
     ptr_ANativeWindow_fromSurface pf_winFromSurface;
     ptr_ANativeWindow_release pf_winRelease;
     native_window_api_t anw_api;
-    native_window_priv_api_t anwpriv_api;
 
     struct {
         awh_events_t cb;
@@ -295,36 +294,6 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
         dlclose(p_library);
         LoadNativeSurfaceAPI(p_awh);
     }
-}
-
-/*
- * Android private NativeWindow (post android 2.3)
- */
-
-int
-android_loadNativeWindowPrivApi(native_window_priv_api_t *native)
-{
-#define LOAD(symbol) do { \
-if ((native->symbol = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_" #symbol)) == NULL) \
-    return -1; \
-} while(0)
-    LOAD(connect);
-    LOAD(disconnect);
-    LOAD(setUsage);
-    LOAD(setBuffersGeometry);
-    LOAD(getMinUndequeued);
-    LOAD(getMaxBufferCount);
-    LOAD(setBufferCount);
-    LOAD(setCrop);
-    LOAD(dequeue);
-    LOAD(lock);
-    LOAD(lockData);
-    LOAD(unlockData);
-    LOAD(queue);
-    LOAD(cancel);
-    LOAD(setOrientation);
-    return 0;
-#undef LOAD
 }
 
 /*
