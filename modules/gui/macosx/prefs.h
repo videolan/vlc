@@ -22,12 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <Cocoa/Cocoa.h>
+
 @class VLCTreeMainItem;
 
 /*****************************************************************************
  * VLCPrefs interface
  *****************************************************************************/
-@interface VLCPrefs : NSWindowController
+@interface VLCPrefs : NSWindowController<NSSplitViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
 @property (readwrite, weak) IBOutlet NSOutlineView *tree;
