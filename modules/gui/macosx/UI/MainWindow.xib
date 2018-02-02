@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17D47" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -118,7 +118,7 @@
                             <customView hidden="YES" focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="4665" customClass="VLCVoutView">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
                             </customView>
-                            <splitView dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680" customClass="VLCMainWindowSplitView">
+                            <splitView autosaveName="mainWindowSplitView" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680" customClass="VLCMainWindowSplitView">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
                                 <subviews>
                                     <customView id="4681">
@@ -138,7 +138,7 @@
                                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                             <tableColumns>
-                                                                <tableColumn editable="NO" width="200" minWidth="118" maxWidth="200" id="4717">
+                                                                <tableColumn identifier="" editable="NO" width="200" minWidth="118" maxWidth="200" id="4717">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
