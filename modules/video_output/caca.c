@@ -485,12 +485,12 @@ static void Manage(vout_display_t *vd)
                     const int vlc = keys[i].vlc;
 
                     if (vlc >= 0)
-                        vout_display_SendEventKey(vd, vlc);
+                        VoutDisplayEventKey(sys->et, vlc);
                     return;
                 }
             }
             if (caca >= 0x20 && caca <= 0x7f) {
-                vout_display_SendEventKey(vd, caca);
+                VoutDisplayEventKey(sys->et, caca);
                 return;
             }
             break;
