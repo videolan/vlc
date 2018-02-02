@@ -2195,24 +2195,14 @@ then
 fi
 
 dnl
-dnl openmax il vout plugin
-dnl
-AC_ARG_ENABLE(omxil-vout,
-  [  --enable-omxil-vout     openmax il video output module (default disabled)])
-if test "${enable_omxil_vout}" = "yes"
-then
-  VLC_ADD_PLUGIN([omxil_vout])
-fi
-
-dnl
 dnl raspberry pi openmax il configuration
 dnl
 AC_ARG_ENABLE(rpi-omxil,
   [  --enable-rpi-omxil     openmax il configured for raspberry pi (default disabled)])
 if test "${enable_rpi_omxil}" = "yes"
 then
-  VLC_ADD_PLUGIN([omxil omxil_vout])
-  VLC_ADD_CFLAGS([omxil omxil_vout],[-DRPI_OMX])
+  VLC_ADD_PLUGIN([omxil])
+  VLC_ADD_CFLAGS([omxil],[-DRPI_OMX])
 fi
 
 dnl

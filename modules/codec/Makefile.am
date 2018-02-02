@@ -482,11 +482,6 @@ libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_om
 libomxil_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
 libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 
-libomxil_vout_plugin_la_SOURCES = codec/omxil/vout.c codec/omxil/omxil_core.c codec/omxil/utils.c codec/omxil/qcom.c
-libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil_vout)
-libomxil_vout_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
-libomxil_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
@@ -497,8 +492,8 @@ libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacode
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 libmediacodec_plugin_la_LIBADD = libchroma_copy.la
-codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
-EXTRA_LTLIBRARIES += libomxil_plugin.la libomxil_vout_plugin.la
+codec_LTLIBRARIES += $(LTLIBomxil)
+EXTRA_LTLIBRARIES += libomxil_plugin.la
 if HAVE_ANDROID
 codec_LTLIBRARIES += libmediacodec_plugin.la
 endif

@@ -329,7 +329,6 @@ modules/codec/mpg123.c
 modules/codec/oggspots.c
 modules/codec/omxil/mediacodec.c
 modules/codec/omxil/omxil.c
-modules/codec/omxil/vout.c
 modules/codec/opus.c
 modules/codec/png.c
 modules/codec/qsv.c

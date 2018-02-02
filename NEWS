@@ -17,6 +17,7 @@ Codecs:
 Video ouput:
  * Remove aa plugin
  * Remove evas plugin
+ * Remove omxil_vout plugin
 
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------
