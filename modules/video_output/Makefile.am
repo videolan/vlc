@@ -403,17 +403,6 @@ EXTRA_LTLIBRARIES += libfb_plugin.la
 vout_LTLIBRARIES += $(LTLIBfb)
 
 
-### ASCII Art ###
-libaa_plugin_la_SOURCES = video_output/aa.c
-libaa_plugin_la_LIBADD = libevent_thread.la -laa
-if !HAVE_WIN32
-libaa_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
-endif
-libaa_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libaa_plugin.la
-vout_LTLIBRARIES += $(LTLIBaa)
-
-
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = video_output/caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)

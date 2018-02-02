@@ -13,6 +13,9 @@ Codecs:
  * Support for experimental AV1 video encoding
  * WebVTT encoder
 
+Video ouput:
+ * Remove aa plugin
+ * Remove evas plugin
 
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------

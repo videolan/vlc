@@ -3347,21 +3347,6 @@ AC_CHECK_HEADER([linux/fb.h], [
   VLC_ADD_PLUGIN([fb])
 ])
 
-
-dnl
-dnl  AA plugin
-dnl
-AC_ARG_ENABLE(aa,
-  [  --enable-aa             aalib output (default disabled)])
-if test "${enable_aa}" = "yes"
-then
-  AC_CHECK_HEADER(aalib.h,have_aa="true",have_aa="false")
-  if test "${have_aa}" = "true"
-  then
-    VLC_ADD_PLUGIN([aa])
-  fi
-fi
-
 dnl
 dnl  libcaca plugin
 dnl

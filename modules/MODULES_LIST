@@ -2,7 +2,6 @@ List of VLC plugins:
 $Id$
 
  * a52: A/52 audio decoder plugin, using liba52
- * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_concat: concatenated access
  * access_imem: memory bitstream access module
