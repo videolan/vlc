@@ -80,7 +80,7 @@
         timeInSec = [string intValue];
 
     if (_completionHandler)
-        _completionHandler(sender == _okButton ? NSOKButton : NSCancelButton, timeInSec);
+        _completionHandler(sender == _okButton ? NSModalResponseOK : NSModalResponseCancel, timeInSec);
 }
 
 - (void)runModalForWindow:(NSWindow *)window completionHandler:(TimeSelectionCompletionHandler)handler

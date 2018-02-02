@@ -797,7 +797,7 @@
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
-        if (returnCode != NSOKButton) {
+        if (returnCode != NSModalResponseOK) {
             [_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
@@ -868,7 +868,7 @@
 
         NSInteger activeProfileIndex = [_self currentProfileIndex];
 
-        if (returnCode != NSOKButton) {
+        if (returnCode != NSModalResponseOK) {
             [_profilePopup selectItemAtIndex:activeProfileIndex];
             return;
         }

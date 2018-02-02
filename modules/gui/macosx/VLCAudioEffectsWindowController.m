@@ -515,7 +515,7 @@
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
-        if (returnCode != NSOKButton) {
+        if (returnCode != NSModalResponseOK) {
             [_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
@@ -573,7 +573,7 @@
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
-        if (returnCode != NSOKButton) {
+        if (returnCode != NSModalResponseOK) {
             [_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
@@ -828,7 +828,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
         // EQ settings
-        if (returnCode != NSOKButton || [resultingText length] == 0)
+        if (returnCode != NSModalResponseOK || [resultingText length] == 0)
             return;
 
         NSString *decomposedStringWithCanonicalMapping = [resultingText decomposedStringWithCanonicalMapping];
@@ -872,7 +872,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     __unsafe_unretained typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
-        if (returnCode != NSOKButton)
+        if (returnCode != NSModalResponseOK)
             return;
 
         /* remove requested profile from the arrays */

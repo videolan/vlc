@@ -113,7 +113,7 @@ static const int kCurrentPreferencesVersion = 4;
         int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
                                                _NS("We just found an older version of VLC's preferences files."),
                                                _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
-        if (res != NSOKButton) {
+        if (res != NSModalResponseOK) {
             [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
             return;
         }

@@ -39,7 +39,7 @@
 
 /**
  * Completion handler for popup panel
- * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
+ * \param returnCode Result from panel. Can be NSModalResponseOK or NSModalResponseCancel.
  * \param selectedIndex Selected index of the popup in panel.
  */
 typedef void(^PopupPanelCompletionBlock)(NSInteger returnCode, NSInteger selectedIndex);

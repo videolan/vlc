@@ -164,8 +164,8 @@
          * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
          */
         NSCalendar *gregorian =
-        [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
+        [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
 
         if (dayOfYear >= 354)
             [o_icon_view setImage: [NSImage imageNamed:@"VLC-Xmas"]];

@@ -38,7 +38,7 @@
 
 /**
  * Completion handler for textfield panel
- * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
+ * \param returnCode Result from panel. Can be NSModalResponseOK or NSModalResponseCancel.
  * \param resultingText Resulting text string entered in panel.
  */
 typedef void(^TextfieldPanelCompletionBlock)(NSInteger returnCode, NSString *resultingText);

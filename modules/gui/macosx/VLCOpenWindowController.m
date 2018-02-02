@@ -572,7 +572,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [openPanel setTitle: _NS("Open File")];
     [openPanel setPrompt: _NS("Open")];
 
-    if ([openPanel runModal] == NSOKButton) {
+    if ([openPanel runModal] == NSModalResponseOK) {
         NSArray *URLs = [openPanel URLs];
         NSUInteger count = [URLs count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity:count];
@@ -679,7 +679,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         openPanel = [NSOpenPanel openPanel];
         [openPanel setCanChooseFiles: YES];
         [openPanel setCanChooseDirectories: NO];
-        if ([openPanel runModal] == NSOKButton) {
+        if ([openPanel runModal] == NSModalResponseOK) {
             _fileSlavePath = [[[openPanel URLs] firstObject] path];
         }
     }
@@ -895,7 +895,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [openPanel setCanChooseFiles: YES];
     [openPanel setAllowedFileTypes:[NSArray arrayWithObject:@"public.directory"]];
 
-    if ([openPanel runModal] == NSOKButton) {
+    if ([openPanel runModal] == NSModalResponseOK) {
         NSString *oPath = [[[openPanel URLs] firstObject] path];
         if ([oPath length] > 0) {
             [NSThread detachNewThreadSelector:@selector(scanSpecialPath:) toTarget:self withObject:oPath];
@@ -1258,7 +1258,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [openPanel setTitle: _NS("Open File")];
     [openPanel setPrompt: _NS("Open")];
 
-    if ([openPanel runModal] == NSOKButton) {
+    if ([openPanel runModal] == NSModalResponseOK) {
         _subPath = [[[openPanel URLs] firstObject] path];
         [_fileSubtitlesFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_subPath]];
         [_fileSubPathTextField setStringValue: [_fileSubtitlesFilenameLabel stringValue]];

@@ -46,7 +46,7 @@
     [NSApp endSheet: self.window];
 
     if (_completionBlock)
-        _completionBlock(sender == _okButton ? NSOKButton : NSCancelButton, [_textField stringValue]);
+        _completionBlock(sender == _okButton ? NSModalResponseOK : NSModalResponseCancel, [_textField stringValue]);
 }
 
 - (void)runModalForWindow:(NSWindow *)window completionHandler:(TextfieldPanelCompletionBlock)handler;

@@ -833,7 +833,7 @@
         [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
                              completionHandler:^(NSInteger returnCode, int64_t returnTime) {
 
-            if (returnCode != NSOKButton)
+            if (returnCode != NSModalResponseOK)
                 return;
 
             input_thread_t *p_input = pl_CurrentInput(getIntf());
@@ -1037,7 +1037,7 @@
 
     i_returnValue = [openPanel runModal];
 
-    if (i_returnValue == NSOKButton)
+    if (i_returnValue == NSModalResponseOK)
         [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
 }
 

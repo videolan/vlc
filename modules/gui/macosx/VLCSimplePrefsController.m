@@ -1163,7 +1163,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
-            if (returnCode == NSOKButton) {
+            if (returnCode == NSModalResponseOK) {
                 [_video_snap_folderTextField setStringValue: [[_selectFolderPanel URL] path]];
             }
         }];
@@ -1262,7 +1262,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
-            if (returnCode == NSOKButton)
+            if (returnCode == NSModalResponseOK)
             {
                 [_input_recordTextField setStringValue: [[_selectFolderPanel URL] path]];
                 _inputSettingChanged = YES;

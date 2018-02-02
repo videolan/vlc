@@ -313,7 +313,7 @@
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSOKButton)
+        if (returnCode == NSModalResponseOK)
         {
             [self setMRL: toNSStr(vlc_path2uri([[[openPanel URL] path] UTF8String], NULL))];
             [self updateOKButton];
@@ -342,7 +342,7 @@
     __unsafe_unretained typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
-        if (returnCode != NSOKButton)
+        if (returnCode != NSModalResponseOK)
             return;
 
         /* remove requested profile from the arrays */
@@ -413,7 +413,7 @@
     if ([[_customizeEncapMatrix selectedCell] tag] != RAW) // there is no clever guess for this
         [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:[self currentEncapsulationFormatAsFileExtension:YES]]];
     [saveFilePanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSOKButton) {
+        if (returnCode == NSModalResponseOK) {
             [self setOutputDestination:[[saveFilePanel URL] path]];
             [_fileDestinationFileName setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
             [[_fileDestinationFileNameStub animator] setHidden: YES];
@@ -477,7 +477,7 @@
 
     __unsafe_unretained typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:_customizePanel completionHandler:^(NSInteger returnCode, NSString *resultingText) {
-        if (returnCode != NSOKButton || [resultingText length] == 0)
+        if (returnCode != NSModalResponseOK || [resultingText length] == 0)
             return;
 
         /* prepare current data */
@@ -593,7 +593,7 @@
     [saveFilePanel setCanCreateDirectories: YES];
     [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:@"sdp"]];
     [saveFilePanel beginSheetModalForWindow:_streamPanel completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSOKButton)
+        if (returnCode == NSModalResponseOK)
             [_streamSDPField setStringValue:[[saveFilePanel URL] path]];
     }];
 }

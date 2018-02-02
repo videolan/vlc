@@ -197,7 +197,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"txt"]];
     [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).txt"), VERSION_MESSAGE]];
     [saveFolderPanel beginSheetModalForWindow: self.window completionHandler:^(NSInteger returnCode) {
-        if (returnCode != NSOKButton) {
+        if (returnCode != NSModalResponseOK) {
             return;
         }
         NSMutableString *string = [[NSMutableString alloc] init];

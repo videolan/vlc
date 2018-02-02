@@ -37,7 +37,7 @@
 
 /**
  * Completion handler for textfield panel
- * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
+ * \param returnCode Result from panel. Can be NSModalResponseOK or NSModalResponseCancel.
  * \param returnTime Resulting time in seconds entered in panel.
  */
 typedef void(^TimeSelectionCompletionHandler)(NSInteger returnCode, int64_t returnTime);
