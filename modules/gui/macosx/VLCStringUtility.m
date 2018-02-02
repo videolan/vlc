@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCStringUtility.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2014 VLC authors and VideoLAN
+ * Copyright (C) 2002-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -28,6 +28,9 @@
 
 #import "VLCMain.h"
 #import "CompatibilityFixes.h"
+
+#import <sys/param.h>
+#import <sys/mount.h>
 
 #import <IOKit/storage/IOMedia.h>
 #import <IOKit/storage/IOCDMedia.h>
@@ -383,77 +386,26 @@ NSString *toNSStr(const char *str) {
 
 - (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
 {
-    OSStatus err;
-    FSRef ref;
-    FSVolumeRefNum actualVolume;
-    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
-
-    // get a FSVolumeRefNum from mountPath
-    if (noErr == err) {
-        FSCatalogInfo   catalogInfo;
-        err = FSGetCatalogInfo (&ref,
-                                kFSCatInfoVolume,
-                                &catalogInfo,
-                                NULL,
-                                NULL,
-                                NULL
-                                );
-        if (noErr == err)
-            actualVolume = catalogInfo.volume;
-        else
-            return @"";
-    }
-    else
+    struct statfs stf;
+    int ret = statfs([mountPath fileSystemRepresentation], &stf);
+    if (ret != 0) {
         return @"";
-
-    GetVolParmsInfoBuffer volumeParms;
-    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
-    if (noErr == err) {
-        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
-        return [NSString stringWithFormat:@"/dev/r%@", bsdName];
     }
 
-    return @"";
+    return [NSString stringWithFormat:@"r%s", stf.f_mntfromname];
 }
 
 - (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath
 {
-    OSStatus err;
-    FSRef ref;
-    FSVolumeRefNum actualVolume;
+    struct statfs stf;
+    int ret = statfs([mountPath fileSystemRepresentation], &stf);
+    if (ret != 0) {
+        return @"";
+    }
+
+    CFMutableDictionaryRef matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, stf.f_mntfromname);
+    io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
     NSString *returnValue;
-    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
-
-    // get a FSVolumeRefNum from mountPath
-    if (noErr == err) {
-        FSCatalogInfo   catalogInfo;
-        err = FSGetCatalogInfo (&ref,
-                                kFSCatInfoVolume,
-                                &catalogInfo,
-                                NULL,
-                                NULL,
-                                NULL
-                                );
-        if (noErr == err)
-            actualVolume = catalogInfo.volume;
-        else
-            goto out;
-    }
-    else
-        goto out;
-
-    GetVolParmsInfoBuffer volumeParms;
-    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
-
-    CFMutableDictionaryRef matchingDict;
-    io_service_t service;
-
-    if (!volumeParms.vMDeviceID) {
-        goto out;
-    }
-
-    matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
-    service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
 
     if (IO_OBJECT_NULL != service) {
         if (IOObjectConformsTo(service, kIOCDMediaClass))
