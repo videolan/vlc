@@ -87,6 +87,9 @@
                             <real value="250"/>
                             <real value="250"/>
                         </holdingPriorities>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="7cX-do-6Lz"/>
+                        </connections>
                     </splitView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
                         <rect key="frame" x="691" y="12" width="70" height="32"/>
