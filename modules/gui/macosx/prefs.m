@@ -194,6 +194,7 @@
     [_prefsView setHasVerticalScroller: YES];
     [_prefsView setDrawsBackground: NO];
     [_prefsView setDocumentView: o_emptyView];
+    [self.window layoutIfNeeded];
     [_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
 }
 
