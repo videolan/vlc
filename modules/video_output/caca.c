@@ -47,17 +47,22 @@
 
 #include <caca.h>
 
-typedef struct vout_display_event_thread {
-    vout_display_t *vd;
+/* */
+struct vout_display_sys_t {
+    cucul_canvas_t *cv;
+    caca_display_t *dp;
+    cucul_dither_t *dither;
+
+    picture_pool_t *pool;
     block_fifo_t *fifo;
     vlc_thread_t thread;
-} vout_display_event_thread_t;
+};
 
 noreturn static void *VoutDisplayEventKeyDispatch(void *data)
 {
-    vout_display_event_thread_t *vdet = data;
-    vout_display_t *vd = vdet->vd;
-    block_fifo_t *fifo = vdet->fifo;
+    vout_display_t *vd = data;
+    vout_display_sys_t *sys = vd->sys;
+    block_fifo_t *fifo = sys->fifo;
 
     for (;;) {
         block_t *event = block_FifoGet(fifo);
@@ -72,58 +77,14 @@ noreturn static void *VoutDisplayEventKeyDispatch(void *data)
     }
 }
 
-static void VoutDisplayEventKey(vout_display_event_thread_t *vdet, int key)
+static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
 {
-    if (unlikely(vdet == NULL))
-        return;
-
     block_t *event = block_Alloc(sizeof (key));
     if (likely(event != NULL)) {
         memcpy(event->p_buffer, &key, sizeof (key));
-        block_FifoPut(vdet->fifo, event);
+        block_FifoPut(sys->fifo, event);
     }
 }
-
-static struct vout_display_event_thread *
-VoutDisplayEventCreateThread(vout_display_t *vd)
-{
-    vout_display_event_thread_t *vdet = malloc(sizeof (*vdet));
-    if (unlikely(vdet == NULL))
-        return NULL;
-
-    vdet->vd = vd;
-    vdet->fifo = block_FifoNew();
-    if (unlikely(vdet->fifo == NULL)) {
-        free(vdet);
-        return NULL;
-    }
-
-    if (vlc_clone(&vdet->thread, VoutDisplayEventKeyDispatch, vdet,
-                  VLC_THREAD_PRIORITY_LOW)) {
-        block_FifoRelease(vdet->fifo);
-        free(vdet);
-        return NULL;
-    }
-    return vdet;
-}
-
-static void VoutDisplayEventKillThread(vout_display_event_thread_t *vdet)
-{
-    vlc_cancel(vdet->thread);
-    vlc_join(vdet->thread, NULL);
-    block_FifoRelease(vdet->fifo);
-    free(vdet);
-}
-
-/* */
-struct vout_display_sys_t {
-    cucul_canvas_t *cv;
-    caca_display_t *dp;
-    cucul_dither_t *dither;
-
-    picture_pool_t *pool;
-    vout_display_event_thread_t *et;
-};
 
 /**
  * Return a pool of direct buffers
@@ -364,12 +325,12 @@ static void Manage(vout_display_t *vd)
                     const int vlc = keys[i].vlc;
 
                     if (vlc >= 0)
-                        VoutDisplayEventKey(sys->et, vlc);
+                        VoutDisplayEventKey(sys, vlc);
                     return;
                 }
             }
             if (caca >= 0x20 && caca <= 0x7f) {
-                VoutDisplayEventKey(sys->et, caca);
+                VoutDisplayEventKey(sys, caca);
                 return;
             }
             break;
@@ -513,7 +474,16 @@ static int Open(vlc_object_t *object)
         caca_set_display_title(sys->dp,
                                VOUT_TITLE "(Colour AsCii Art)");
 
-    sys->et = VoutDisplayEventCreateThread(vd);
+    block_fifo_t *fifo = block_FifoNew();
+    if (likely(fifo != NULL)) {
+        sys->fifo = fifo;
+
+        if (vlc_clone(&sys->thread, VoutDisplayEventKeyDispatch, vd,
+                      VLC_THREAD_PRIORITY_LOW)) {
+            block_FifoRelease(fifo);
+            sys->fifo = NULL;
+        }
+    }
 
     /* Fix format */
     video_format_t fmt = vd->fmt;
@@ -566,7 +536,11 @@ static void Close(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
-    VoutDisplayEventKillThread(sys->et);
+    if (sys->fifo != NULL) {
+        vlc_cancel(sys->thread);
+        vlc_join(sys->thread, NULL);
+        block_FifoRelease(sys->fifo);
+    }
     if (sys->pool)
         picture_pool_Release(sys->pool);
     if (sys->dither)
