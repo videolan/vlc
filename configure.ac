@@ -3420,25 +3420,6 @@ fi
 AM_CONDITIONAL([HAVE_MMAL], [test "${have_mmal}" = "yes"])
 
 dnl
-dnl evas plugin
-dnl
-AC_ARG_ENABLE(evas,
-  [AS_HELP_STRING([--enable-evas],
-    [use evas output module (default disabled)])])
-have_evas="no"
-AS_IF([test "${enable_evas}" = "yes"], [
-  PKG_CHECK_MODULES(EVAS, [evas >= 1.15.99 ecore >= 1.15.99], [
-      have_evas="yes"
-      AC_DEFINE([HAVE_EVAS], [1], [Define to 1 if evas is enabled.])
-    ],[
-    AS_IF([test "x${enable_evas}" != "x"], [
-      AC_MSG_ERROR([$EVAS_PKG_ERRORS. libevas and libecore 1.15.99 or later required.])
-    ])
-  ])
-])
-AM_CONDITIONAL([HAVE_EVAS], [test "${have_evas}" = "yes"])
-
-dnl
 dnl  Audio plugins
 dnl
 

@@ -427,17 +427,6 @@ libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 vout_LTLIBRARIES += $(LTLIBcaca)
 
-
-### EFL Evas video output ###
-libevas_plugin_la_SOURCES = video_output/evas.c
-libevas_plugin_la_CFLAGS = $(AM_CFLAGS) $(EVAS_CFLAGS)
-libevas_plugin_la_LIBADD = $(EVAS_LIBS)
-libevas_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if HAVE_EVAS
-vout_LTLIBRARIES += libevas_plugin.la
-endif
-
-
 ### Common ###
 
 libflaschen_plugin_la_SOURCES = video_output/flaschen.c

@@ -137,7 +137,6 @@ $Id$
  * equalizer: a equalizer audio filter
  * erase: Logo erase video filter
  * es: input module for MPEG ES decapsulation
- * evas: EFL Evas video output with Tizen TBM Surface support
  * export: playlist export module
  * extract: Extract RGB components video filter
  * faad: AAC decoder using libfaad2

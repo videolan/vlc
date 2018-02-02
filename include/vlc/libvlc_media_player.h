@@ -587,19 +587,6 @@ LIBVLC_API void libvlc_media_player_set_android_context( libvlc_media_player_t *
                                                          void *p_awindow_handler );
 
 /**
- * Set the EFL Evas Object.
- *
- * \version LibVLC 3.0.0 and later.
- *
- * \param p_mi the media player
- * \param p_evas_object a valid EFL Evas Object (Evas_Object)
- * \return -1 if an error was detected, 0 otherwise.
- */
-LIBVLC_API int libvlc_media_player_set_evas_object( libvlc_media_player_t *p_mi,
-                                                    void *p_evas_object );
-
-
-/**
  * Callback prototype for audio playback.
  *
  * The LibVLC media player decodes and post-processes the audio signal

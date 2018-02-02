@@ -319,7 +319,6 @@ libVLC:
  * Deprecate libvlc_video_get_title_description, libvlc_video_get_chapter_description,
    libvlc_media_player_get_agl, libvlc_media_player_set_agl
  * Add libvlc_media_player_set_android_context to integrate in an Android surface
- * Add libvlc_media_player_set_evas_object to draw on an EFL/Evas Object
  * Add a new libvlc dialog API to forward dialogs requests to the applications:
    libvlc_dialog_set_context, libvlc_dialog_get_context, libvlc_dialog_set_callbacks,
    libvlc_dialog_dismiss, libvlc_dialog_post_action, libvlc_dialog_post_login

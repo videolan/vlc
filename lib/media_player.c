@@ -646,9 +646,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 #ifdef __ANDROID__
     var_Create (mp, "drawable-androidwindow", VLC_VAR_ADDRESS);
 #endif
-#ifdef HAVE_EVAS
-    var_Create (mp, "drawable-evasobject", VLC_VAR_ADDRESS);
-#endif
 
     var_Create (mp, "keyboard-events", VLC_VAR_BOOL);
     var_SetBool (mp, "keyboard-events", true);
@@ -1266,24 +1263,6 @@ void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
     assert(false);
     var_SetString (p_mi, "vout", "none");
     var_SetString (p_mi, "window", "none");
-#endif
-}
-
-/**************************************************************************
- * set_evas_object
- **************************************************************************/
-int libvlc_media_player_set_evas_object( libvlc_media_player_t *p_mi,
-                                         void *p_evas_object )
-{
-    assert (p_mi != NULL);
-#ifdef HAVE_EVAS
-    var_SetString (p_mi, "vout", "evas");
-    var_SetString (p_mi, "window", "none");
-    var_SetAddress (p_mi, "drawable-evasobject", p_evas_object);
-    return 0;
-#else
-    (void) p_mi; (void) p_evas_object;
-    return -1;
 #endif
 }
 
