@@ -27,10 +27,36 @@
 
 #include <vlc_common.h>
 #include <vlc_network.h>
+#include <vlc_url.h>
 
-char *vlc_getProxyUrl(const char *url)
+char *vlc_getProxyUrl(const char *psz_url)
 {
-    char *proxy_url = NULL;
+    VLC_UNUSED(psz_url);
+
+    char *proxy = config_GetPsz( (vlc_object_t *)(NULL), "http-proxy" );
+    if (proxy == NULL)
+        return NULL;
+
+    char *proxy_pwd = config_GetPsz( (vlc_object_t *)(NULL), "http-proxy-pwd" );
+    if (proxy_pwd == NULL)
+        return proxy;
+
+    vlc_url_t url;
+    if (vlc_UrlParse(&url, proxy) < 0) {
+        free (proxy);
+        free (proxy_pwd);
+        return NULL;
+    }
+
+    if (url.psz_password == NULL )
+        url.psz_password = vlc_uri_encode(proxy_pwd);
+
+    char *proxy_url = vlc_uri_compose (&url);
+    vlc_UrlClean (&url);
+
+    free (proxy_pwd);
+    free (proxy);
+
 #if 0
     /* Try to get the proxy server address from Windows internet settings. */
     HKEY h_key;
