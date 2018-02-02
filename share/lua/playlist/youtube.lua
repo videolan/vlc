@@ -227,8 +227,10 @@ end
 -- Probe function.
 function probe()
     return ( ( vlc.access == "http" or vlc.access == "https" )
-             and string.match( vlc.path, "^www%.youtube%.com/" )
              and (
+               string.match( vlc.path, "^www%.youtube%.com/" )
+            or string.match( vlc.path, "^gaming%.youtube%.com/" )
+             ) and (
                string.match( vlc.path, "/watch%?" ) -- the html page
             or string.match( vlc.path, "/live$" ) -- user live stream html page
             or string.match( vlc.path, "/live%?" ) -- user live stream html page
@@ -240,6 +242,10 @@ end
 
 -- Parse function.
 function parse()
+    if string.match( vlc.path, "^gaming%.youtube%.com/" ) then
+        url = string.gsub( vlc.path, "^gaming%.youtube%.com", "www.youtube.com" )
+        return { { path = vlc.access.."://"..url } }
+    end
     if string.match( vlc.path, "/watch%?" )
         or string.match( vlc.path, "/live$" )
         or string.match( vlc.path, "/live%?" )
