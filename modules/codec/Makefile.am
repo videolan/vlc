@@ -478,10 +478,6 @@ libomxil_plugin_la_SOURCES = \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h \
 	codec/omxil/qcom.c codec/omxil/qcom.h \
 	codec/omxil/omxil.c codec/omxil/omxil.h codec/omxil/omxil_core.c codec/omxil/omxil_core.h
-if HAVE_ANDROID
-libomxil_plugin_la_SOURCES += video_output/android/utils.c video_output/android/utils.h \
-	video_output/android/display.h
-endif
 libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil)
 libomxil_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
 libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
@@ -490,10 +486,6 @@ libomxil_vout_plugin_la_SOURCES = codec/omxil/vout.c codec/omxil/omxil_core.c co
 libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil_vout)
 libomxil_vout_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
 libomxil_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-
-libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
-libiomx_plugin_la_CPPFLAGS = $(libomxil_plugin_la_CPPFLAGS) -DUSE_IOMX
-libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
@@ -508,7 +500,7 @@ libmediacodec_plugin_la_LIBADD = libchroma_copy.la
 codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
 EXTRA_LTLIBRARIES += libomxil_plugin.la libomxil_vout_plugin.la
 if HAVE_ANDROID
-codec_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
+codec_LTLIBRARIES += libmediacodec_plugin.la
 endif
 
 

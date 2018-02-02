@@ -29,15 +29,8 @@
 #endif
 
 #include <dlfcn.h>
-#if defined(USE_IOMX)
-/* On dll_open, just check that the OMX_Init symbol already is loaded */
-# define dll_open(name) dlsym(RTLD_DEFAULT, "OMX_Init")
-# define dll_close(handle) do { } while (0)
-# define dlsym(handle, name) dlsym(RTLD_DEFAULT, "I" name)
-#else
-# define dll_open(name) dlopen( name, RTLD_NOW )
-# define dll_close(handle) dlclose(handle)
-#endif
+#define dll_open(name) dlopen( name, RTLD_NOW )
+#define dll_close(handle) dlclose(handle)
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -53,9 +46,7 @@
  *****************************************************************************/
 static const char *ppsz_dll_list[] =
 {
-#if defined(USE_IOMX)
-    "libiomx.so", /* Not used when using IOMX, the lib should already be loaded */
-#elif defined(RPI_OMX)
+#if defined(RPI_OMX)
     "/opt/vc/lib/libopenmaxil.so",  /* Broadcom IL core */
 #elif 1
     "libOMX_Core.so", /* TI OMAP IL core */
@@ -88,9 +79,6 @@ OMX_ERRORTYPE (*pf_get_handle) (OMX_HANDLETYPE *, OMX_STRING,
 OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
-OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
-OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
-OMX_ERRORTYPE (*pf_get_hal_format) (const char *, int *);
 
 #ifdef RPI_OMX
 static void *extra_dll_handle;
@@ -164,11 +152,6 @@ int InitOmxCore(vlc_object_t *p_this)
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
-#if defined(USE_IOMX)
-    pf_enable_graphic_buffers = dlsym( dll_handle, "OMXAndroid_EnableGraphicBuffers" );
-    pf_get_graphic_buffer_usage = dlsym( dll_handle, "OMXAndroid_GetGraphicBufferUsage" );
-    pf_get_hal_format = dlsym( dll_handle, "OMXAndroid_GetHalFormat" );
-#endif
 
     /* Initialise the OMX core */
     OMX_ERRORTYPE omx_error = pf_init();

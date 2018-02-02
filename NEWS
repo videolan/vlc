@@ -12,6 +12,7 @@ Platform support changes:
 Codecs:
  * Support for experimental AV1 video encoding
  * WebVTT encoder
+ * Remove iomx support for Android
 
 Video ouput:
  * Remove aa plugin
