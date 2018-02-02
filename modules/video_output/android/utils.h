@@ -118,16 +118,6 @@ ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
  */
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
                                          enum AWindow_ID id);
-/**
- * Pre-ICS hack of ANativeWindow_setBuffersGeometry
- *
- * This function is a fix up of ANativeWindow_setBuffersGeometry that doesn't
- * work before Android ICS. It configures the Surface from the Android
- * MainThread via a SurfaceHolder. It returns VLC_SUCCESS if the Surface was
- * configured (it returns VLC_EGENERIC after Android ICS).
- */
-int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
-                                      int i_width, int i_height, int i_format);
 
 /**
  * Returns true if the video layout can be changed

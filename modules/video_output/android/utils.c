@@ -79,7 +79,6 @@ static struct
         jmethodID getSubtitlesSurface;
         jmethodID registerNative;
         jmethodID unregisterNative;
-        jmethodID setBuffersGeometry;
         jmethodID setVideoLayout;
     } AndroidNativeWindow;
     struct {
@@ -424,8 +423,6 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
                "registerNative", "(J)I", true);
     GET_METHOD(AndroidNativeWindow.unregisterNative,
                "unregisterNative", "()V", true);
-    GET_METHOD(AndroidNativeWindow.setBuffersGeometry,
-               "setBuffersGeometry", "(Landroid/view/Surface;III)Z", true);
     GET_METHOD(AndroidNativeWindow.setVideoLayout,
                "setVideoLayout", "(IIIIII)V", true);
 
@@ -683,24 +680,6 @@ AndroidNativeWindow_onWindowSize(JNIEnv* env, jobject clazz, jlong handle,
 
     if (width >= 0 && height >= 0)
         p_awh->event.cb.on_new_window_size(p_awh->wnd, width, height);
-}
-
-int
-AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
-                                  int i_width, int i_height, int i_format)
-{
-    jobject jsurf;
-    JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
-    if (!p_env)
-        return VLC_EGENERIC;
-
-    jsurf = AWindowHandler_getSurface(p_awh, id);
-    if (!jsurf)
-        return VLC_EGENERIC;
-
-    return JNI_ANWCALL(CallBooleanMethod, setBuffersGeometry,
-                       jsurf, i_width, i_height, i_format) ? VLC_SUCCESS
-                                                           : VLC_EGENERIC;
 }
 
 bool

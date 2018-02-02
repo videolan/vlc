@@ -393,31 +393,6 @@ static void AndroidWindow_Destroy(vout_display_t *vd,
     free(p_window);
 }
 
-static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
-                                              android_window *p_window,
-                                              bool *p_java_configured)
-{
-    /* setBuffersGeometry is broken before ics. Use
-     * AJavaWindow_setBuffersGeometry to configure the surface on the java side
-     * synchronously.  AJavaWindow_setBuffersGeometry return en error when you
-     * don't need to call it (ie, after ics). if this call succeed, you need to
-     * get a new surface handle. That's why AndroidWindow_DisconnectSurface is
-     * called here. */
-    if (AWindowHandler_setBuffersGeometry(sys->p_awh, p_window->id,
-                                          p_window->fmt.i_width,
-                                          p_window->fmt.i_height,
-                                          p_window->i_android_hal) == VLC_SUCCESS)
-    {
-        *p_java_configured = true;
-        AndroidWindow_DisconnectSurface(sys, p_window);
-        if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
-            return -1;
-    } else
-        *p_java_configured = false;
-
-    return 0;
-}
-
 static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
                                   android_window *p_window,
                                   bool b_java_configured)
@@ -452,10 +427,6 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->fmt.i_height = p_pic->format.i_height;
         p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
         picture_Release(p_pic);
-
-        if (AndroidWindow_ConfigureJavaSurface(sys, p_window,
-                                               &b_java_configured) != 0)
-            return -1;
 
         if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
             return -1;
