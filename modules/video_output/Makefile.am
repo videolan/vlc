@@ -406,7 +406,7 @@ vout_LTLIBRARIES += $(LTLIBfb)
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = video_output/caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
-libcaca_plugin_la_LIBADD = libevent_thread.la $(CACA_LIBS)
+libcaca_plugin_la_LIBADD = $(CACA_LIBS)
 if !HAVE_WIN32
 if !HAVE_DARWIN
 libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
@@ -430,8 +430,3 @@ vout_LTLIBRARIES += \
 	libvdummy_plugin.la \
 	libvmem_plugin.la \
 	libyuv_plugin.la
-
-libevent_thread_la_SOURCES = \
-	video_output/event_thread.c video_output/event_thread.h
-libevent_thread_la_LDFLAGS = -static
-noinst_LTLIBRARIES += libevent_thread.la

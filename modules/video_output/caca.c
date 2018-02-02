@@ -30,7 +30,11 @@
 # include "config.h"
 #endif
 
+#include <stdnoreturn.h>
+#include <stdlib.h>
+#include <string.h>
 #include <vlc_common.h>
+#include <vlc_block.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
@@ -42,7 +46,74 @@
 #endif
 
 #include <caca.h>
-#include "event_thread.h"
+
+typedef struct vout_display_event_thread {
+    vout_display_t *vd;
+    block_fifo_t *fifo;
+    vlc_thread_t thread;
+} vout_display_event_thread_t;
+
+noreturn static void *VoutDisplayEventKeyDispatch(void *data)
+{
+    vout_display_event_thread_t *vdet = data;
+    vout_display_t *vd = vdet->vd;
+    block_fifo_t *fifo = vdet->fifo;
+
+    for (;;) {
+        block_t *event = block_FifoGet(fifo);
+
+        int cancel = vlc_savecancel();
+        int key;
+
+        memcpy(&key, event->p_buffer, sizeof (key));
+        block_Release(event);
+        vout_display_SendEventKey(vd, key);
+        vlc_restorecancel(cancel);
+    }
+}
+
+static void VoutDisplayEventKey(vout_display_event_thread_t *vdet, int key)
+{
+    if (unlikely(vdet == NULL))
+        return;
+
+    block_t *event = block_Alloc(sizeof (key));
+    if (likely(event != NULL)) {
+        memcpy(event->p_buffer, &key, sizeof (key));
+        block_FifoPut(vdet->fifo, event);
+    }
+}
+
+static struct vout_display_event_thread *
+VoutDisplayEventCreateThread(vout_display_t *vd)
+{
+    vout_display_event_thread_t *vdet = malloc(sizeof (*vdet));
+    if (unlikely(vdet == NULL))
+        return NULL;
+
+    vdet->vd = vd;
+    vdet->fifo = block_FifoNew();
+    if (unlikely(vdet->fifo == NULL)) {
+        free(vdet);
+        return NULL;
+    }
+
+    if (vlc_clone(&vdet->thread, VoutDisplayEventKeyDispatch, vdet,
+                  VLC_THREAD_PRIORITY_LOW)) {
+        block_FifoRelease(vdet->fifo);
+        free(vdet);
+        return NULL;
+    }
+    return vdet;
+}
+
+static void VoutDisplayEventKillThread(vout_display_event_thread_t *vdet)
+{
+    vlc_cancel(vdet->thread);
+    vlc_join(vdet->thread, NULL);
+    block_FifoRelease(vdet->fifo);
+    free(vdet);
+}
 
 /*****************************************************************************
  * Module descriptor
