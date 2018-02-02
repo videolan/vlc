@@ -371,10 +371,6 @@ static const char *const ppsz_pos_descriptions[] =
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
-#define INHIBIT_TEXT N_("Inhibit the power management daemon during playback")
-#define INHIBIT_LONGTEXT N_("Inhibits the power management daemon during any " \
-    "playback, to avoid the computer being suspended because of inactivity.")
-
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
     "VLC can avoid creating window caption, frames, etc... around the video" \
@@ -2032,8 +2028,7 @@ vlc_module_begin ()
 #endif
 
 #if defined(HAVE_DBUS)
-    add_bool( "inhibit", 1, INHIBIT_TEXT,
-              INHIBIT_LONGTEXT, true )
+    add_obsolete_bool( "inhibit" ) /* since 3.0.0 */
 #endif
 
 #if defined(_WIN32) || defined(__OS2__)
