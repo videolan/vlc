@@ -486,6 +486,11 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
             mark_range_as_searched( Range( i_cluster_pos, ms.es.I_O().getFilePointer() ) );
         }
     }
+    else if (ms.cluster != NULL)
+    {
+        // make sure we start reading after the Cluster start
+        ms.es.I_O().setFilePointer(ms.cluster->GetDataStart());
+    }
 
     ms.ep.Down();
 
