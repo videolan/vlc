@@ -14,7 +14,7 @@
                 <outlet property="saveButton" destination="1541" id="Ng1-aE-PqI"/>
                 <outlet property="showBasicButton" destination="3642" id="E0I-T2-hF5"/>
                 <outlet property="titleLabel" destination="2257" id="Dzk-M9-HUc"/>
-                <outlet property="tree" destination="1534" id="ZfU-1d-7BL"/>
+                <outlet property="tree" destination="nHP-lF-pOd" id="jfN-zb-F5B"/>
                 <outlet property="window" destination="1530" id="tB4-5c-gLR"/>
             </connections>
         </customObject>
@@ -33,59 +33,70 @@
                     <splitView autosaveName="prefsSplitView" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1538">
                         <rect key="frame" x="20" y="60" width="735" height="394"/>
                         <subviews>
-                            <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1533">
-                                <rect key="frame" x="0.0" y="0.0" width="188" height="394"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
-                                <clipView key="contentView" id="Y1g-am-kHc">
-                                    <rect key="frame" x="1" y="1" width="186" height="392"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="1535" id="1534">
-                                            <rect key="frame" x="0.0" y="0.0" width="186" height="19"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <size key="intercellSpacing" width="3" height="2"/>
+                            <customView id="3Xe-Ml-HIN" userLabel="Left split view">
+                                <rect key="frame" x="0.0" y="0.0" width="163" height="394"/>
+                                <subviews>
+                                    <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KPO-r9-Tu6">
+                                        <rect key="frame" x="0.0" y="0.0" width="163" height="394"/>
+                                        <clipView key="contentView" id="Kwy-tD-cgu">
+                                            <rect key="frame" x="1" y="1" width="161" height="392"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" indentationPerLevel="16" outlineTableColumn="g4F-6K-jQg" id="nHP-lF-pOd">
+                                                    <rect key="frame" x="0.0" y="0.0" width="161" height="19"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <size key="intercellSpacing" width="3" height="2"/>
+                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                    <tableColumns>
+                                                        <tableColumn identifier="" width="158" minWidth="40" maxWidth="1000" id="g4F-6K-jQg">
+                                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                                <font key="font" metaFont="smallSystem"/>
+                                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                            </tableHeaderCell>
+                                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="Iey-II-boS">
+                                                                <font key="font" metaFont="system"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                        </tableColumn>
+                                                    </tableColumns>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="-2" id="Hax-Vb-Gtg"/>
+                                                        <outlet property="delegate" destination="-2" id="pI6-sb-kum"/>
+                                                    </connections>
+                                                </outlineView>
+                                            </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="gridColor" red="0.80000000999999998" green="0.089180939000000001" blue="0.063131474000000007" alpha="1" colorSpace="calibratedRGB"/>
-                                            <tableColumns>
-                                                <tableColumn identifier="" editable="NO" width="183" minWidth="16" maxWidth="1000" id="1535">
-                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                        <font key="font" metaFont="smallSystem"/>
-                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </tableHeaderCell>
-                                                    <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" id="3534">
-                                                        <font key="font" metaFont="smallSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </textFieldCell>
-                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                </tableColumn>
-                                            </tableColumns>
-                                            <connections>
-                                                <outlet property="dataSource" destination="-2" id="mjP-Y3-e81"/>
-                                                <outlet property="delegate" destination="-2" id="Wdi-xB-wsa"/>
-                                            </connections>
-                                        </outlineView>
-                                    </subviews>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="3538">
-                                    <rect key="frame" x="1" y="382" width="143" height="11"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="3537">
-                                    <rect key="frame" x="144" y="1" width="11" height="381"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
+                                        </clipView>
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="K2h-V0-dTr">
+                                            <rect key="frame" x="1" y="119" width="223" height="15"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="Ju2-RS-Pj2">
+                                            <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="KPO-r9-Tu6" firstAttribute="leading" secondItem="3Xe-Ml-HIN" secondAttribute="leading" id="Ibt-jf-dJv"/>
+                                    <constraint firstAttribute="bottom" secondItem="KPO-r9-Tu6" secondAttribute="bottom" id="Pua-bW-iNr"/>
+                                    <constraint firstItem="KPO-r9-Tu6" firstAttribute="top" secondItem="3Xe-Ml-HIN" secondAttribute="top" id="mBU-6M-32u"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="pQ8-rv-754"/>
+                                    <constraint firstAttribute="trailing" secondItem="KPO-r9-Tu6" secondAttribute="trailing" id="yH8-i5-5p8"/>
+                                </constraints>
+                            </customView>
                             <customView fixedFrame="YES" id="1537" customClass="NSScrollView">
-                                <rect key="frame" x="197" y="0.0" width="538" height="394"/>
+                                <rect key="frame" x="172" y="0.0" width="563" height="394"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES"/>
                             </customView>
                         </subviews>
                         <holdingPriorities>
                             <real value="250"/>
-                            <real value="250"/>
+                            <real value="1"/>
                         </holdingPriorities>
                         <connections>
                             <outlet property="delegate" destination="-2" id="7cX-do-6Lz"/>
