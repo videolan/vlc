@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="17E139j" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -106,6 +106,9 @@
                 <outlet property="rate_slowerLabel" destination="4600" id="vRN-S8-MSb"/>
                 <outlet property="rate_view" destination="4596" id="MPC-hG-6bj"/>
                 <outlet property="record" destination="5137" id="Ka3-jl-auY"/>
+                <outlet property="rendererMenu" destination="ODg-VN-8Tv" id="3Ox-BO-HyW"/>
+                <outlet property="rendererMenuItem" destination="wYl-A2-q30" id="obH-UF-FmA"/>
+                <outlet property="rendererNoneItem" destination="eE8-qf-9x9" id="Ol2-yz-0eF"/>
                 <outlet property="repeat" destination="5143" id="ulG-wD-gtG"/>
                 <outlet property="revealInFinder" destination="3945" id="z7n-A2-K5o"/>
                 <outlet property="save_playlist" destination="1599" id="spC-pk-6W4"/>
@@ -487,26 +490,13 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Renderer" id="ODg-VN-8Tv">
                                     <items>
-                                        <menuItem title="Renderer discovery off" enabled="NO" id="kZC-S6-b2M">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="Enable renderer discovery" id="5gR-ec-KSL">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="toggleRendererDiscovery:" target="GfD-zq-JqC" id="tGk-pM-MVQ"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="sbF-Ji-lAl"/>
                                         <menuItem title="No Renderer" state="on" id="eE8-qf-9x9">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="selectRenderer:" target="GfD-zq-JqC" id="JA3-zV-4I0"/>
+                                                <action selector="selectRenderer:" target="-2" id="80x-Dh-S0n"/>
                                             </connections>
                                         </menuItem>
                                     </items>
-                                    <connections>
-                                        <outlet property="delegate" destination="GfD-zq-JqC" id="9Fg-VF-zbg"/>
-                                    </connections>
                                 </menu>
                             </menuItem>
                             <menuItem title="Program" id="5150">
@@ -1083,14 +1073,6 @@
             </constraints>
             <point key="canvasLocation" x="296.5" y="285.5"/>
         </customView>
-        <customObject id="GfD-zq-JqC" customClass="VLCRendererMenuController">
-            <connections>
-                <outlet property="rendererDiscoveryState" destination="kZC-S6-b2M" id="Ur7-YL-R4x"/>
-                <outlet property="rendererDiscoveryToggle" destination="5gR-ec-KSL" id="CEI-18-tX4"/>
-                <outlet property="rendererMenu" destination="ODg-VN-8Tv" id="bMa-lk-ryz"/>
-                <outlet property="rendererNoneItem" destination="eE8-qf-9x9" id="p9J-VU-Dg9"/>
-            </connections>
-        </customObject>
         <userDefaultsController representsSharedInstance="YES" id="uFO-sP-uo6"/>
     </objects>
 </document>

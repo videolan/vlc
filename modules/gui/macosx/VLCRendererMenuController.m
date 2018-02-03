@@ -1,10 +1,11 @@
 /*****************************************************************************
  * VLCRendererMenuController.m: Controller class for the renderer menu
  *****************************************************************************
- * Copyright (C) 2016 VLC authors and VideoLAN
+ * Copyright (C) 2016-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Marvin Scholz <epirat07 at gmail dot com>
+ *          Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,23 +60,11 @@
 - (void)awakeFromNib
 {
     _selectedItem = _rendererNoneItem;
-    [self setupMenu];
 }
 
 - (void)dealloc
 {
     [self stopRendererDiscoveries];
-}
-
-- (void)setupMenu
-{
-    [_rendererDiscoveryState setTitle:_NS("Renderer discovery off")];
-    [_rendererDiscoveryState setEnabled:NO];
-
-    [_rendererDiscoveryToggle setTitle:_NS("Enable renderer discovery")];
-
-    [_rendererNoneItem setTitle:_NS("No renderer")];
-    [_rendererNoneItem setState:NSOnState];
 }
 
 - (void)loadRendererDiscoveries
@@ -131,8 +120,6 @@
 - (void)startRendererDiscoveries
 {
     _isDiscoveryEnabled = YES;
-    [_rendererDiscoveryState setTitle:_NS("Renderer discovery on")];
-    [_rendererDiscoveryToggle setTitle:_NS("Disable renderer discovery")];
     for (VLCRendererDiscovery *dc in _rendererDiscoveries) {
         [dc startDiscovery];
     }
@@ -141,8 +128,6 @@
 - (void)stopRendererDiscoveries
 {
     _isDiscoveryEnabled = NO;
-    [_rendererDiscoveryState setTitle:_NS("Renderer discovery off")];
-    [_rendererDiscoveryToggle setTitle:_NS("Enable renderer discovery")];
     for (VLCRendererDiscovery *dc in _rendererDiscoveries) {
         [dc stopDiscovery];
     }
@@ -156,7 +141,7 @@
     return [menuItem isEnabled];
 }
 
-- (IBAction)selectRenderer:(NSMenuItem *)sender
+- (void)selectRenderer:(NSMenuItem *)sender
 {
     [_selectedItem setState:NSOffState];
     [sender setState:NSOnState];

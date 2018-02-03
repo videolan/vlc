@@ -1,7 +1,7 @@
 /*****************************************************************************
  *MainMenu.m: MacOS X interface module
  *****************************************************************************
- *Copyright (C) 2011-2015 Felix Paul Kühne
+ *Copyright (C) 2011-2018 Felix Paul Kühne
  *$Id$
  *
  *Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -50,21 +50,23 @@
 #import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
 #import "NSScreen+VLCAdditions.h"
+#import "VLCRendererMenuController.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
 #endif
 
-@interface VLCMainMenu()
+@interface VLCMainMenu() <NSMenuDelegate>
 {
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
+    VLCRendererMenuController *_rendererMenuController;
+    NSTimer *_cancelRendererDiscoveryTimer;
 
     NSMenu *_playlistTableColumnsContextMenu;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
-
 }
 @end
 
@@ -205,6 +207,13 @@
     FREENULL(key);
 
     [self setSubmenusEnabled: FALSE];
+
+    /* configure playback / controls menu */
+    self.controlsMenu.delegate = self;
+    [_rendererNoneItem setState:NSOnState];
+    _rendererMenuController = [[VLCRendererMenuController alloc] init];
+    _rendererMenuController.rendererNoneItem = _rendererNoneItem;
+    _rendererMenuController.rendererMenu = _rendererMenu;
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(refreshVoutDeviceMenu:)
@@ -394,6 +403,8 @@
     [_fwd setTitle: _NS("Step Forward")];
     [_bwd setTitle: _NS("Step Backward")];
     [_jumpToTime setTitle: _NS("Jump to Time")];
+    [_rendererMenuItem setTitle:_NS("Renderer")];
+    [_rendererNoneItem setTitle:_NS("No renderer")];
     [_program setTitle: _NS("Program")];
     [_programMenu setTitle: _NS("Program")];
     [_title setTitle: _NS("Title")];
@@ -845,6 +856,11 @@
 
         vlc_object_release(p_input);
     }
+}
+
+- (IBAction)selectRenderer:(id)sender
+{
+    [_rendererMenuController selectRenderer:sender];
 }
 
 #pragma mark - audio menu
@@ -1559,6 +1575,28 @@
         }
         return VLC_EGENERIC;
     }
+}
+
+#pragma mark - menu delegation
+
+- (void)menuWillOpen:(NSMenu *)menu
+{
+    [_cancelRendererDiscoveryTimer invalidate];
+    [_rendererMenuController startRendererDiscoveries];
+}
+
+- (void)menuDidClose:(NSMenu *)menu
+{
+    _cancelRendererDiscoveryTimer = [NSTimer scheduledTimerWithTimeInterval:20.
+                                                                     target:self
+                                                                   selector:@selector(cancelRendererDiscovery)
+                                                                   userInfo:nil
+                                                                    repeats:NO];
+}
+
+- (void)cancelRendererDiscovery
+{
+    [_rendererMenuController stopRendererDiscoveries];
 }
 
 @end
