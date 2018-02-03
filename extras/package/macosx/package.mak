@@ -5,7 +5,7 @@ endif
 # Symlink a pseudo-bundle
 pseudo-bundle:
 	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
-	$(LN_S) -hf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
+	$(LN_S) -hf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/Base.lproj
 	$(LN_S) -hf $(abs_top_builddir)/share/macosx/Info.plist $(top_builddir)/bin/Contents/Info.plist
 	$(LN_S) -hf $(CONTRIB_DIR)/Frameworks
 	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
@@ -17,7 +17,7 @@ VLC.app: install
 	## Copy Contents
 	cp -R $(prefix)/share/macosx/ $@
 	## Copy .strings file and .nib files
-	cp -R $(top_builddir)/modules/gui/macosx/UI $@/Contents/Resources/English.lproj
+	cp -R $(top_builddir)/modules/gui/macosx/UI $@/Contents/Resources/Base.lproj
 	## Copy Info.plist and convert to binary
 	cp -R $(top_builddir)/share/macosx/Info.plist $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
@@ -30,7 +30,7 @@ endif
 if HAVE_BREAKPAD
 	cp -R $(CONTRIB_DIR)/Frameworks/Breakpad.framework $@/Contents/Frameworks
 endif
-	mkdir -p $@/Contents/MacOS/share/locale/
+	mkdir -p $@/Contents/MacOS/share/
 if BUILD_LUA
 	## Copy lua scripts
 	cp -r "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
@@ -42,13 +42,7 @@ endif
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	## Copy translations
-	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  $(INSTALL) -d $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
-	  $(INSTALL) $(srcdir)/po/$${i}.gmo $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo; \
-	  mkdir -p $@/Contents/Resources/$${i}.lproj/ ; \
-	  $(LN_S) -f ../English.lproj/InfoPlist.strings ../English.lproj/MainMenu.nib \
-		$@/Contents/Resources/$${i}.lproj/ ; \
-	done
+	cp -r "$(prefix)/share/locale" $@/Contents/MacOS/share/
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
 	mkdir -p $@/Contents/MacOS/lib

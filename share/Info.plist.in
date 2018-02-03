@@ -6,6 +6,8 @@
 	<string>English</string>
 	<key>NSRequiresAquaSystemAppearance</key>
 	<true/>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
