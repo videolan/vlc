@@ -32,6 +32,7 @@
 {
     intf_thread_t               *p_intf;
     vlc_renderer_discovery_t    *p_rd;
+    BOOL                        _isRunning;
 }
 
 - (void)handleItemAdded:(vlc_renderer_item_t *)item;
@@ -77,6 +78,10 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
 
 - (bool)startDiscovery
 {
+    if (_isRunning) {
+        return YES;
+    }
+
     struct vlc_renderer_discovery_owner owner =
     {
         (__bridge void *) self,
@@ -91,10 +96,12 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     p_rd = vlc_rd_new(VLC_OBJECT(p_intf), _name.UTF8String, &owner);
 
     if (!p_rd) {
+        _isRunning = NO;
         msg_Err(p_intf, "Could not create '%s' renderer discovery service", _name.UTF8String);
         return false;
     }
 
+    _isRunning = YES;
     return true;
 }
 
@@ -103,6 +110,7 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     if (p_rd != NULL) {
         vlc_rd_release(p_rd);
         p_rd = NULL;
+        _isRunning = NO;
     }
 }
 
