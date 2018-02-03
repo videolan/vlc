@@ -33,8 +33,8 @@ endif
 	mkdir -p $@/Contents/MacOS/share/
 if BUILD_LUA
 	## Copy lua scripts
-	cp -r "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
-	cp -r "$(prefix)/lib/vlc/lua" $@/Contents/MacOS/
+	cp -r "$(pkgdatadir)/lua" $@/Contents/MacOS/share/
+	cp -r "$(pkglibdir)/lua" $@/Contents/MacOS/
 endif
 	## HRTFs
 	cp -r $(srcdir)/share/hrtfs $@/Contents/MacOS/share/
