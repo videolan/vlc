@@ -58,7 +58,7 @@ end
 -- Make a request to the Twitch API endpoint given by url
 -- Returns: obj, err
 function twitch_api_req(url)
-    local obj, pos, err = parse_json(url .. "?client_id=jzkbprff40iqj646a697cyrvl0zt2m6")
+    local obj, pos, err = parse_json(url .. "?client_id=1ht9oitznxzdo3agmdbn3dydbm06q2")
 
     if err then
         return nil, "Error getting JSON object: " .. err
