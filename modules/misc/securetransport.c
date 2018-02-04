@@ -221,7 +221,7 @@ static OSStatus st_SocketWriteFunc (SSLConnectionRef connection,
     return retValue;
 }
 
-static int st_validateServerCertificate (vlc_tls_t *session, const char *hostname) {
+static int st_validateServerCertificate (vlc_tls_t *session, vlc_tls_creds_t *cred, const char *hostname) {
 
     vlc_tls_st_t *sys = (vlc_tls_st_t *)session;
     int result = -1;
@@ -267,6 +267,12 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
         case kSecTrustResultDeny:
         default:
             msg_Warn(sys->obj, "cerfificate verification failed, result is %d", trust_eval_result);
+    }
+
+    if (cred->obj.flags & OBJECT_FLAGS_INSECURE) {
+        msg_Warn(sys->obj, "Accepting untrusted certificate, this is very insecure!");
+        result = 0;
+        goto out;
     }
 
     /* get leaf certificate */
@@ -402,7 +408,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
 
     switch (retValue) {
         case noErr:
-            if (sys->b_server_mode == false && st_validateServerCertificate(session, host) != 0) {
+            if (sys->b_server_mode == false && st_validateServerCertificate(session, crd, host) != 0) {
                 return -1;
             }
             msg_Dbg(crd, "handshake completed successfully");
