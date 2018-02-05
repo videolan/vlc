@@ -165,6 +165,7 @@ struct intf_sys_t
     bool isFinishedPlaying();
 
     void setHasInput(const std::string mime_type = "");
+    bool isStatePlaying() const;
 
     void requestPlayerSeek(mtime_t pos);
     void requestPlayerStop();
