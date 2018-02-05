@@ -185,10 +185,10 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     }
 
     RECT srcRect;
-    srcRect.left = 0;
-    srcRect.top = 0;
-    srcRect.right  = p_pic->format.i_visible_width;
-    srcRect.bottom = p_pic->format.i_visible_height;
+    srcRect.left   = p_pic->format.i_x_offset;
+    srcRect.top    = p_pic->format.i_y_offset;
+    srcRect.right  = srcRect.left + p_pic->format.i_visible_width;
+    srcRect.bottom = srcRect.top  + p_pic->format.i_visible_height;
     ID3D11VideoContext_VideoProcessorSetStreamSourceRect(p_sys->d3dvidctx, p_sys->videoProcessor,
                                                          0, TRUE, &srcRect);
     ID3D11VideoContext_VideoProcessorSetStreamDestRect(p_sys->d3dvidctx, p_sys->videoProcessor,
