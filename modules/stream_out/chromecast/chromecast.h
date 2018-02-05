@@ -234,6 +234,7 @@ private:
     ChromecastCommunication m_communication;
     std::queue<QueueableMessages> m_msgQueue;
     States m_state;
+    bool m_request_stop;
     bool m_eof;
 
     vlc_meta_t *m_meta;
