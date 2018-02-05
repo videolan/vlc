@@ -20,7 +20,7 @@
 # Tobias Bannert <tobannert@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2018-01-08 23:07+0100\n"
@@ -90,8 +90,8 @@ msgstr "Einstellungen für die VLC-Steuerinterfaces"
 msgid "Hotkeys settings"
 msgstr "Tastenkürzeleinstellungen"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -753,7 +753,8 @@ msgstr "Kopfhörer"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatisch"
@@ -1030,8 +1031,8 @@ msgstr "Sprache"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -1296,11 +1297,12 @@ msgstr ""
 "VLC kann die Medienadresse '%s' nicht öffnen. Für Details bitte im "
 "Fehlerprotokoll nachsehen."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1792,7 +1794,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5073,7 +5076,8 @@ msgid "Browser Stop"
 msgstr "Browser-Stopp"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6942,9 +6946,10 @@ msgstr ""
 "gegebenen Frequenz gruppiert. Dies ist erforderlich, um den Empfänger "
 "abzustimmen."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
-msgstr "Modulation / Ausrichtung"
+msgstr "Modulation/Ausrichtung"
 
 #: modules/access/dtv/access.c:62
 msgid "Layer A modulation"
@@ -7759,7 +7764,8 @@ msgstr "Anzahl der Kanäle eines Audio-Elementar-Streams"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Breite"
@@ -8750,7 +8756,8 @@ msgstr "Radiogerät"
 msgid "Radio tuner device node."
 msgstr "Geräteknoten des Radiotuners"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frequenz"
 
@@ -16653,7 +16660,8 @@ msgid "Name"
 msgstr "Name"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autor"
@@ -18866,7 +18874,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -20558,10 +20567,11 @@ msgid "Extract"
 msgstr "Extrahieren"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20573,7 +20583,8 @@ msgstr "S&chließen"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Konvertieren"
 
@@ -21007,7 +21018,8 @@ msgstr "Version"
 msgid "Website"
 msgstr "Internetseite"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Dateien"
 
@@ -22111,7 +22123,7 @@ msgstr "Stellen Sie das Bildgamma zwischen 0.01 und 10 ein. Standardmäßig 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
-msgstr "Direct3D9 Filter anpassen"
+msgstr "Direct3D9 Einstellungs-Filter"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -22211,7 +22223,7 @@ msgstr "Video-beschleunigte API-Filter"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
-msgstr "Einstellung des VDPAU-Videofilters"
+msgstr "VDPAU-Einstellungs-Videofilter"
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
@@ -24058,7 +24070,8 @@ msgstr "MPEG Video"
 msgid "VC-1 packetizer"
 msgstr "VC-1-Paketisierer"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf Netzwerkservice"
 
@@ -24374,7 +24387,7 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
-msgstr "Audio-Balkenanzeige Video Nebenquelle"
+msgstr "Audio-Balkenanzeige der Video-Nebenquelle"
 
 #: modules/spu/audiobargraph_v.c:80
 msgid "Audio Bar Graph Video"
@@ -25338,12 +25351,10 @@ msgid "Enable Audio passthrough"
 msgstr "Audio-Passthrough aktivieren"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Deaktivieren, wenn Ihr Empfänger Dolby® nicht unterstützen sollte."
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Hoch (hohe Qualität und eine hohe Bandbreite)"
 
@@ -25352,12 +25363,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Mittel (mittlere Qualität und eine mittlere Bandbreite)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Niedrig (geringe Qualität und eine geringe Bandbreite)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Niedrige CPU (geringe Qualität, aber eine hohe Bandbreite)"
 
@@ -25373,7 +25382,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:165
 msgid "IP Address of the Chromecast."
-msgstr "IP-Adresse des Chromecast"
+msgstr "IP-Adresse vom Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:166
 msgid "Chromecast port"
@@ -26393,7 +26402,7 @@ msgstr "Dummy-Font-Renderer"
 
 #: modules/video_chroma/chain.c:46
 msgid "Video filtering using a chain of video filter modules"
-msgstr "Video-Filterung unter Benutzung einer Kette von Videofilter-Modulen"
+msgstr "Video-Filterung mit einer Kette von Videofilter-Modulen"
 
 #: modules/video_chroma/grey_yuv.c:55 modules/video_chroma/i420_yuy2.c:86
 #: modules/video_chroma/i422_i420.c:57 modules/video_chroma/i422_yuy2.c:71
@@ -26551,7 +26560,7 @@ msgstr "Definieren Sie die Farbpalette der Brille"
 
 #: modules/video_filter/anaglyph.c:71
 msgid "Convert 3D picture to anaglyph image video filter"
-msgstr "3D-Bild zu Anaglyphenbild Videofilter konvertieren"
+msgstr "Konvertierung von 3D-Bild zu Anaglyphbild-Videofilter"
 
 #: modules/video_filter/antiflicker.c:51
 msgid "Window size"
@@ -27100,7 +27109,7 @@ msgstr "FPS-Konverter"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
-msgstr "Interaktiven Videofilter einfrieren"
+msgstr "Interaktiver-Einfrieren-Videofilter "
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
@@ -27245,7 +27254,7 @@ msgstr "HQ Entrauscher 3D"
 
 #: modules/video_filter/hqdn3d.c:64
 msgid "High Quality 3D Denoiser filter"
-msgstr "Hochqualitativer Entrauscher-Filter 3D"
+msgstr "Hochqualitativer 3D-Entrauscher-Filter"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
@@ -30093,10 +30102,6 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Media Manager-Liste"
 
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9 Filter anpassen"
-
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
 #~ "the expense of a pipeline delay."
@@ -31309,6 +31314,10 @@ msgstr "Media Manager-Liste"
 
 #~ msgid "VLC Debug Log (%s).rtf"
 #~ msgstr "VLC-Fehlerdiagnoseprotokoll (%s).rtf"
+
+#, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9 Einstellungs-Filter"
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
