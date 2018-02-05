@@ -817,14 +817,14 @@ void intf_sys_t::setPauseState(bool paused)
     vlc_mutex_locker locker( &m_lock );
     if ( !paused )
     {
-        if ( m_mediaSessionId == 0 )
+        if ( m_mediaSessionId != 0 )
         {
             m_communication.msgPlayerPlay( m_appTransportId, m_mediaSessionId );
         }
     }
     else
     {
-        if ( m_mediaSessionId == 0 && m_state != Paused )
+        if ( m_mediaSessionId != 0 && m_state != Paused )
         {
             m_communication.msgPlayerPause( m_appTransportId, m_mediaSessionId );
         }
