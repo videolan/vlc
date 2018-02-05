@@ -24,6 +24,8 @@
 #include "ConnectionParams.hpp"
 
 #include <vlc_url.h>
+#include <ctype.h>
+#include <algorithm>
 #include <sstream>
 
 using namespace adaptive::http;
@@ -83,15 +85,14 @@ uint16_t ConnectionParams::getPort() const
 
 void ConnectionParams::parse()
 {
-    std::size_t pos = uri.find("://");
-    if(pos != std::string::npos)
-    {
-        scheme = uri.substr(0, pos);
-    }
-
     vlc_url_t url_components;
     vlc_UrlParse(&url_components, uri.c_str());
 
+    if(url_components.psz_protocol)
+    {
+        scheme = url_components.psz_protocol;
+        std::transform(scheme.begin(), scheme.end(), scheme.begin(), tolower);
+    }
     if(url_components.psz_path)
         path = url_components.psz_path;
     if(url_components.psz_option)
