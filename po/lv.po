@@ -14,7 +14,7 @@
 # Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-10-21 14:50+0000\n"
@@ -85,8 +85,8 @@ msgstr "Iestatījumi VLC vadības saskarnēm"
 msgid "Hotkeys settings"
 msgstr "Karsto taustiņu iestatījumi"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -748,7 +748,8 @@ msgstr "Austiņas"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automātiski"
@@ -1030,8 +1031,8 @@ msgstr "Valoda"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Apraksts"
 
@@ -1295,11 +1296,12 @@ msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "VLC nevar atvērt MRL '%s'. Pārbaudiet žurnālu, lai iegūtu sīkāku informāciju."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1786,7 +1788,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2825,8 +2828,8 @@ msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
 msgstr ""
-"Jūs varat dot komatu atdalītu sarakstu ar ievadēm, kuras tiks saķēdētas kopā "
-"pēc normālās ievades."
+"Jūs varat dot komatu atdalītu sarakstu ar ievadēm, kuras tiks savirknētas "
+"kopā pēc normālās ievades."
 
 #: src/libvlc-module.c:663
 msgid "Input slave (experimental)"
@@ -5006,7 +5009,8 @@ msgid "Browser Stop"
 msgstr "Pārlūka apturēšana"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6339,7 +6343,7 @@ msgstr "Ievažu saraksts"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "Komatu atdalīts saraksts ar vietrāžiem URL, kurus savirknēt."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
@@ -6852,7 +6856,8 @@ msgstr ""
 "TV kanāli tiek grupēti ar retranslatoru (pazīstamu arī kā blīvētāju) uz "
 "dotās frekvences. Šis ir vajadzīgs, lai noskaņotu uztvērēju."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulācija / zvaigznājs"
 
@@ -7663,7 +7668,8 @@ msgstr "Audio elementārās straumes kanālu skaits"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Platums"
@@ -8634,7 +8640,8 @@ msgstr "Radio ierīce"
 msgid "Radio tuner device node."
 msgstr "Radio uztvērēja ierīces mezgls."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvence"
 
@@ -9364,6 +9371,9 @@ msgid ""
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
+"Datne tiek nolasīta, kad segments sākas un tiek pieņemts, ka ir formātā: "
+"atslēgas-uri\\natslēgas-datne. Datne tiek nolasīta pie segmenta atvēršanas "
+"un vērtības tiek lietotas uz šī segmenta."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -10634,6 +10644,8 @@ msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
+"Mainīt šo vērtību, ja jums ir problēma ar HD kodekiem, kad lietojat HDMI "
+"uztvērēju."
 
 #: modules/audio_output/mmdevice.c:1302
 msgid "Disabled"
@@ -15152,7 +15164,7 @@ msgstr "Lietot parastos HTTP moduļus"
 
 #: modules/demux/adaptive/adaptive.cpp:77
 msgid "Connect using HTTP access instead of custom HTTP code"
-msgstr ""
+msgstr "Pieslēgties, lietojot HTTP piekļuvi, nevis pielāgotu HTTP kodu"
 
 #: modules/demux/adaptive/adaptive.cpp:98
 msgid "Predictive"
@@ -15919,6 +15931,8 @@ msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
+"Atlasa režīmu ciparu TV standartam. Šis līdzeklis ietekmē EPG informāciju un "
+"subtitrus."
 
 #: modules/demux/mpeg/ts.c:131
 msgid "MPEG Transport Stream demuxer"
@@ -16487,7 +16501,8 @@ msgid "Name"
 msgstr "Nosaukums"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autors"
@@ -18679,7 +18694,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/video"
 
@@ -20357,10 +20373,11 @@ msgid "Extract"
 msgstr "Izvilkt"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20372,7 +20389,8 @@ msgstr "Aizvērt"
 msgid "Bytes"
 msgstr "Baiti"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Pārveidot"
 
@@ -20799,7 +20817,8 @@ msgstr "Versija"
 msgid "Website"
 msgstr "Tīmekļa vietne"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Datnes"
 
@@ -22107,7 +22126,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:59
 msgid "Accessibility type for all future passwords saved to the Keychain"
-msgstr ""
+msgstr "Pieejamības tips visām nākotnes parolēm, saglabātām uz Keychain"
 
 #: modules/keystore/keychain.m:61
 msgid "Keychain access group"
@@ -22221,7 +22240,7 @@ msgstr ""
 
 #: modules/logger/file.c:219
 msgid "Logger"
-msgstr ""
+msgstr "Žurnalētājs"
 
 #: modules/logger/file.c:220
 msgid "File logger"
@@ -23798,7 +23817,8 @@ msgstr "MPEG Video"
 msgid "VC-1 packetizer"
 msgstr "VC-1 paketizētājs"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf tīkla pakalpojumi"
 
@@ -24821,7 +24841,7 @@ msgstr "ADF straumes filtrs"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
-msgstr ""
+msgstr "ARIB STD-B25 Cam modulis"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
@@ -25052,7 +25072,6 @@ msgid "Enable Audio passthrough"
 msgstr "Ieslēgt audio cauriešanu"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Izslēgt, ja jūsu uztvērējs neatbalsta Dolby®."
 
@@ -29308,9 +29327,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Izlaist H.264 iekš-cikla atblokošanas filtru"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profila un līmeņa atlase"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29713,10 +29731,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Mediju pārvaldnieka saraksts"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9 pielāgošanas filtrs"
 
 #~ msgid "Scan"
 #~ msgstr "Skenēt"
@@ -31005,6 +31019,10 @@ msgstr "Mediju pārvaldnieka saraksts"
 #, fuzzy
 #~ msgid "Seam Carving"
 #~ msgstr "Straumē/saglabā:"
+
+#, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9 pielāgošanas filtrs"
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
