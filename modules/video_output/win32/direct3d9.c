@@ -248,6 +248,9 @@ static int Open(vlc_object_t *object)
     if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
+    if ( !vd->obj.force && vd->source.mastering.max_luminance != 0)
+        return VLC_EGENERIC; /* let a module who can handle it do it */
+
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     if(GetVersionEx(&winVer) && winVer.dwMajorVersion < 6 && !object->obj.force)
