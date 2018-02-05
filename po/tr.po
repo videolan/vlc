@@ -17,7 +17,7 @@
 # Yaşar TAY <yasartay@yahoo.com>, 2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-12-11 00:15+0100\n"
@@ -86,8 +86,8 @@ msgstr "VLC denetim arayüzleri ayarları"
 msgid "Hotkeys settings"
 msgstr "Kısayol tuşları ayarları"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -747,7 +747,8 @@ msgstr "Kulaklık"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Otomatik"
@@ -1024,8 +1025,8 @@ msgstr "Dil"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Açıklama"
 
@@ -1290,11 +1291,12 @@ msgstr ""
 "VLC, '%s' ortam kaynağı adresini (MRL) açamıyor. Ayrıntılar için günlük "
 "dosyasına bakın."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1782,7 +1784,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5068,7 +5071,8 @@ msgid "Browser Stop"
 msgstr "Tarayıcı Durdurma"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6920,7 +6924,8 @@ msgstr ""
 "TV kanalları, verilen bir frekansta, yayınlandığı transponder ile gruplanır "
 "(ya da çoklanır). Alıcıyı ayarlamak için bu gereklidir."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modülasyon / Burç"
 
@@ -7728,7 +7733,8 @@ msgstr "Bir ses temel akışının kanal sayısı"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "En"
@@ -8705,7 +8711,8 @@ msgstr "Radyo Aygıtı"
 msgid "Radio tuner device node."
 msgstr "Radyo alıcısı aygıtı düğümü."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekans"
 
@@ -16607,7 +16614,8 @@ msgid "Name"
 msgstr "Ad"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Yazar"
@@ -18816,7 +18824,8 @@ msgid "sec."
 msgstr "sn."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Ses/Görüntü"
 
@@ -20491,10 +20500,11 @@ msgid "Extract"
 msgstr "Ayıkla"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20506,7 +20516,8 @@ msgstr "&Kapat"
 msgid "Bytes"
 msgstr "Bayt"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Dönüştürün"
 
@@ -20933,7 +20944,8 @@ msgstr "Sürüm"
 msgid "Website"
 msgstr "Web sitesi"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Dosyalar"
 
@@ -23971,7 +23983,8 @@ msgstr "MPEG Görüntü"
 msgid "VC-1 packetizer"
 msgstr "VC-1 Paketleyicisi"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf ağ hizmetleri"
 
@@ -25229,26 +25242,23 @@ msgstr "Doğrudan ses geçişi kullanılsın"
 
 #: modules/stream_out/chromecast/cast.cpp:133
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "Alıcınızda Dolby® desteği yoksa devre dışı bırakın."
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
-msgstr "Orta (orta kalite ve orta bant genişliği)"
+msgstr "Yüksek (yüksek kalite ve yüksek bant genişliği)"
 
 #: modules/stream_out/chromecast/cast.cpp:156
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Orta (orta kalite ve orta bant genişliği)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
-msgstr "Orta (orta kalite ve orta bant genişliği)"
+msgstr "Düşük (düşük kalite ve düşük bant genişliği)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr "Orta (orta kalite ve orta bant genişliği)"
+msgstr "Düşük İşlemci (düşük kalite ve yüksek bant genişliği)"
 
 #: modules/stream_out/chromecast/cast.cpp:161
 msgid "Conversion quality"
@@ -29509,9 +29519,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 çevrim içi engel kaldırma süzgeci atlansın"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profil ve düzey seçimi"
+msgstr "x264 ön ayar ve ince ayar seçimi"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29915,10 +29924,6 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Ortam Yöneticisi Listesi"
 
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9 süzgecini ayarlayın"
-
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
 #~ "the expense of a pipeline delay."
@@ -29940,6 +29945,10 @@ msgstr "Ortam Yöneticisi Listesi"
 
 #~ msgid "Sent"
 #~ msgstr "Gönderilen"
+
+#, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9 süzgecini ayarlayın"
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
