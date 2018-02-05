@@ -9,7 +9,7 @@
 # iskr <iscreamd@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-11-16 02:54+0100\n"
@@ -80,8 +80,8 @@ msgstr "A VLC kezelőfelületeinek beállításai"
 msgid "Hotkeys settings"
 msgstr "Gyorsbillentyűk beállításai"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -741,7 +741,8 @@ msgstr "Fejhallgató"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatikus"
@@ -1019,8 +1020,8 @@ msgstr "Nyelv"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Leírás"
 
@@ -1283,11 +1284,12 @@ msgstr "A bemenet nem nyitható meg"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "A VLC nem képes megnyitni a(z) „%s” MRL-t."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1772,7 +1774,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -5037,7 +5040,8 @@ msgid "Browser Stop"
 msgstr "Böngésző leállítása"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6894,7 +6898,8 @@ msgstr ""
 "A TV-csatornák adóvevő (avagy multiplex) szerint vannak csoportosítva egy "
 "adott frekvencián. Ez a vevő hangolásához szükséges."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Moduláció / konstelláció"
 
@@ -7705,7 +7710,8 @@ msgstr "Az elemi hangfolyam csatornáinak száma"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Szélesség"
@@ -8679,7 +8685,8 @@ msgstr "Rádióeszköz"
 msgid "Radio tuner device node."
 msgstr "Rádióvevő eszköz csomópontja."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvencia"
 
@@ -10688,15 +10695,15 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1302
 msgid "Disabled"
-msgstr ""
+msgstr "Kikapcsolva"
 
 #: modules/audio_output/mmdevice.c:1303
 msgid "Enabled (without HD codecs)"
-msgstr ""
+msgstr "Engedélyezve (HD kodekek nélkül)"
 
 #: modules/audio_output/mmdevice.c:1304
 msgid "Enabled"
-msgstr ""
+msgstr "Engedélyezve"
 
 #: modules/audio_output/mmdevice.c:1309
 msgid "Windows Multimedia Device output"
@@ -16569,7 +16576,8 @@ msgid "Name"
 msgstr "Név"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Szerző"
@@ -18769,7 +18777,8 @@ msgid "sec."
 msgstr "mp"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Hang/videó"
 
@@ -20442,10 +20451,11 @@ msgid "Extract"
 msgstr "Kivonás"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20457,7 +20467,8 @@ msgstr "Be&zárás"
 msgid "Bytes"
 msgstr "Bájt"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Átalakítás"
 
@@ -20884,7 +20895,8 @@ msgstr "Verzió"
 msgid "Website"
 msgstr "Weboldal"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Fájlok"
 
@@ -21554,7 +21566,7 @@ msgstr "<Helyi>"
 
 #: modules/gui/qt/menus.cpp:1656
 msgid "Scanning..."
-msgstr ""
+msgstr "Letapogatás…"
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -22350,19 +22362,19 @@ msgstr "Hibakeresési üzenetek a rendszernaplóban."
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
-msgstr ""
+msgstr "Személyazonosság"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Személyazonosság feldolgozása a rendszernaplóban."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
-msgstr ""
+msgstr "Szolgáltatás"
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Rendszernapló-szolgáltatás"
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
@@ -22370,7 +22382,7 @@ msgstr "syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Rendszernapló (syslog)"
 
 #: modules/lua/extension.c:1192
 msgid "Extension not responding!"
@@ -23170,6 +23182,8 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Azonban a kiszolgáló által bemutatott biztonsági tanúsítvány ismeretlen, és "
+"egyetlen megbízható hitelesítésszolgáltató által sem hitelesíthető."
 
 #: modules/misc/gnutls.c:483
 msgid ""
@@ -23626,6 +23640,8 @@ msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
+"Megadja az egyes SDT-k leíróit. Ez megköveteli az „A PID beállítása az ES "
+"azonosítójára” lehetőség engedélyezését."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23901,7 +23917,8 @@ msgstr "MPEG videó"
 msgid "VC-1 packetizer"
 msgstr "VC-1 daraboló"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf hálózati szolgáltatások"
 
@@ -24394,6 +24411,8 @@ msgstr "Betűméret képpontokban"
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
+"Betűméret képpontokban. Az alapértelmezett a 0 (alapértelmezett betűméret "
+"használata)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24535,6 +24554,7 @@ msgid ""
 "Number of image columns in the mosaic (only used if positioning method is "
 "set to \"fixed\")."
 msgstr ""
+"A mozaik képoszlopainak száma (csak ha az elhelyezési módszer „rögzített”)."
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24562,6 +24582,9 @@ msgid ""
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
+"A mozaik elemsorrendjének kényszerítése. Adja meg a képazonosítók listájának "
+"vesszőkkel elválasztott listáját. Ezek az azonosítók a mozaikhíd modulban "
+"vannak kiosztva."
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24638,6 +24661,8 @@ msgstr "VNC lekérési időköz"
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
+"A VNC frissítése ekkora időközönként lesz kérve, alapértelmezésben 300 "
+"ezredmásodperc."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24971,7 +24996,7 @@ msgstr "Tekerési küszöb"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
-msgstr ""
+msgstr "Az előre felolvasás háttérben használt olvasási mennyisége (bájtban)"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
@@ -25054,6 +25079,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
+"Ha igazra van állítva, a híd eldob minden bemeneti elemi műsort, kivéve ha "
+"nem kap adatokat másik bemeneti hídtól. Ez helykitöltő műsor beállítására "
+"használható, ha a valódi forrás meghibásodik. A forrás és helykitöltő "
+"műsoroknak azonos formátumúnak kell lenniük."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25138,39 +25167,39 @@ msgstr "Ez megadja a Chromecast számára küldött MIMI tartalomtípust."
 #: modules/stream_out/chromecast/cast.cpp:130
 #: modules/stream_out/chromecast/cast.cpp:525
 msgid "Performance warning"
-msgstr ""
+msgstr "Teljesítmény figyelmeztetés"
 
 #: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Teljesítmény figyelmeztetés megjelenítése átkódoláskor"
 
 #: modules/stream_out/chromecast/cast.cpp:132
 msgid "Enable Audio passthrough"
-msgstr ""
+msgstr "Hang áteresztés engedélyezése"
 
 #: modules/stream_out/chromecast/cast.cpp:133
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "Letiltás, ha a vevő nem támogatja a Dolby®-t."
 
 #: modules/stream_out/chromecast/cast.cpp:155
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "Magas (magas minőség és magas sávszélesség)"
 
 #: modules/stream_out/chromecast/cast.cpp:156
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "Közepes (közepes minőség és közepes sávszélesség)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "Alacsony (alacsony minőség és alacsony sávszélesség)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "Alacsony CPU (alacsony minőség, de magas sávszélesség)"
 
 #: modules/stream_out/chromecast/cast.cpp:161
 msgid "Conversion quality"
-msgstr ""
+msgstr "Átalakítási minőség"
 
 #: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
@@ -25198,13 +25227,15 @@ msgstr "Chromecast folyamkimenet"
 
 #: modules/stream_out/chromecast/cast.cpp:524
 msgid "Ok, Don't warn me again"
-msgstr ""
+msgstr "Oké, ne figyelmeztessen újra"
 
 #: modules/stream_out/chromecast/cast.cpp:526
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"A videóvetítés átalakítást igényel. Ez az átalakítás az összes erőforrást "
+"elhasználhatja, és gyorsan lemerítheti az akkumulátort."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:391
 msgid "Chromecast demux wrapper"
@@ -25212,11 +25243,11 @@ msgstr "Chromecast szétválasztó csomagoló"
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
-msgstr ""
+msgstr "kör"
 
 #: modules/stream_out/cycle.c:326
 msgid "Cyclic stream output"
-msgstr ""
+msgstr "Körkörös folyamkimenet"
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25772,23 +25803,28 @@ msgstr ""
 
 #: modules/stream_out/standard.c:51
 msgid "Address to bind to (helper setting for dst)"
-msgstr ""
+msgstr "Cím a kapcsolathoz (segédbeállítás a célhoz)"
 
 #: modules/stream_out/standard.c:53
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
+"Cím:port, amelyhez a VLC a bejövő műsorok figyelése érdekében csatlakozik. "
+"Cél=kapcsolat+„/”+útvonal. Ez a cél segédbeállítása. A cél paramétere ezt "
+"felülírja."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr ""
+msgstr "A folyam fájlneve (segédbeállítás a célhoz)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
+"Fájlnév a cél műsorsegéd-beállításához. Cél=kapcsolat+„/”+útvonal. A cél "
+"paramétere ezt felülírja."
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -25957,6 +25993,10 @@ msgid ""
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
+"Ez lehetővé teszi (az „alképek” néven is ismert) átfedések hozzáadását az "
+"átkódolt videoműsorhoz. A szűrők által előállított alképek közvetlenül a "
+"videót fogják átfedni. Itt megadhatja az alképmodulok vesszőkkel "
+"elválasztott listáját."
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -27042,6 +27082,7 @@ msgstr "Tükrözés tájolása"
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
+"A tükrözési felosztás tájolásának megadása. Függőleges vagy vízszintes lehet."
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -27172,6 +27213,7 @@ msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
+"A kép átméretezése ennyivel a belső OpenCV szűrőnek való elküldés előtt"
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27601,7 +27643,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:81
 msgid "Picture to display on input signal loss"
-msgstr ""
+msgstr "A bemeneti jel elvesztésekor megjelenítendő kép"
 
 #: modules/video_output/decklink.cpp:84
 msgid "Output card"
@@ -27657,7 +27699,7 @@ msgstr "Decklink kimenet"
 
 #: modules/video_output/decklink.cpp:235
 msgid "Output module to write to Blackmagic SDI card"
-msgstr ""
+msgstr "Kimeneti modul Blackmagic SDI kártyára íráshoz"
 
 #: modules/video_output/decklink.cpp:236
 msgid "DeckLink General Options"
@@ -28655,6 +28697,8 @@ msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
+"A Kaiser ablak alfa paramétere. Az alfa növelése növeli a fő hullám "
+"szélességét, és csökkenti az oldalsó hullám amplitúdóját."
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
@@ -29422,9 +29466,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 cikluson belüli blokkbontási szűrő kihagyása"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profil és szint kiválasztása"
+msgstr "x264 előbeállítás és hangolás kiválasztása"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29827,10 +29870,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Médiakezelési lista"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9 igazítási szűrő"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
@@ -33919,6 +33958,10 @@ msgstr "Médiakezelési lista"
 #~ msgstr "Klasszikus AtmoLight"
 
 #, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9 igazítási szűrő"
+
+#, fuzzy
 #~ msgid "Screen capture (with Wayland)"
 #~ msgstr "Képernyőfelvétel (X11/XCB használatával)"
 
@@ -34860,7 +34903,7 @@ msgstr "Médiakezelési lista"
 
 #, fuzzy
 #~ msgid "disabled"
-#~ msgstr "Letiltás"
+#~ msgstr "Kikapcsolva"
 
 #, fuzzy
 #~ msgid "Zone 3:left"
@@ -36055,7 +36098,7 @@ msgstr "Médiakezelési lista"
 
 #, fuzzy
 #~ msgid "Disable ES id"
-#~ msgstr "Letiltás"
+#~ msgstr "Kikapcsolva"
 
 #, fuzzy
 #~ msgid "Enable ES id"
