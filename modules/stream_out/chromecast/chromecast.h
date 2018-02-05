@@ -148,6 +148,8 @@ private:
     std::string m_serverIp;
 };
 
+typedef void (*on_seek_done_itf)( void *data );
+
 /*****************************************************************************
  * intf_sys_t: description and status of interface
  *****************************************************************************/
@@ -167,6 +169,7 @@ struct intf_sys_t
     void setHasInput(const std::string mime_type = "");
 
     void requestPlayerSeek(mtime_t pos);
+    void setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data);
     void requestPlayerStop();
     States state() const;
 
@@ -217,8 +220,6 @@ private:
 
     static void pace(void*);
 
-    static void request_seek(void*, mtime_t pos);
-
     static void set_pause_state(void*, bool paused);
 
     static void set_meta(void*, vlc_meta_t *p_meta);
@@ -237,6 +238,9 @@ private:
     vlc_cond_t   m_stateChangedCond;
     vlc_cond_t   m_pace_cond;
     vlc_thread_t m_chromecastThread;
+
+    on_seek_done_itf m_on_seek_done;
+    void            *m_on_seek_done_data;
 
     ChromecastCommunication m_communication;
     std::queue<QueueableMessages> m_msgQueue;
@@ -260,6 +264,7 @@ private:
     mtime_t           m_time_playback_started;
     /* local playback time of the input when playback started/resumed */
     mtime_t           m_ts_local_start;
+    mtime_t           m_ts_seek;
     mtime_t           m_length;
 
     /* shared structure with the demux-filter */

@@ -47,8 +47,6 @@
 static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
                           uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
 
-static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
-
 static const char* StateToStr( States s )
 {
     switch (s )
@@ -105,6 +103,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_art_url(NULL)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
+ , m_ts_seek( VLC_TS_INVALID )
  , m_length( VLC_TS_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
@@ -126,7 +125,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_common.pf_set_length       = set_length;
     m_common.pf_set_initial_time = set_initial_time;
     m_common.pf_pace             = pace;
-    m_common.pf_request_seek     = request_seek;
     m_common.pf_set_pause_state  = set_pause_state;
     m_common.pf_set_meta         = set_meta;
 
@@ -469,16 +467,16 @@ void intf_sys_t::mainLoop()
                     break;
                 case Seek:
                 {
-                    if( !isStatePlaying() || m_mediaSessionId == 0 )
+                    if( !isStatePlaying() || m_mediaSessionId == 0 || m_ts_seek == VLC_TS_INVALID )
                         break;
                     char current_time[32];
-                    mtime_t seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
                     if( snprintf( current_time, sizeof(current_time), "%.3f",
-                                  double( seek_request_time ) / 1000000.0 ) >= (int)sizeof(current_time) )
+                                  double( m_ts_seek ) / 1000000.0 ) >= (int)sizeof(current_time) )
                     {
                         msg_Err( m_module, "snprintf() truncated string for mediaSessionId" );
                         current_time[sizeof(current_time) - 1] = '\0';
                     }
+                    m_ts_seek = VLC_TS_INVALID;
                     /* send a fake time to seek to, to make sure the device flushes its buffers */
                     m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
                     setState( Seeking );
@@ -891,6 +889,7 @@ void intf_sys_t::requestPlayerStop()
     vlc_mutex_locker locker(&m_lock);
 
     m_request_load = false;
+    m_ts_seek = VLC_TS_INVALID;
 
     if( !isStatePlaying() )
         return;
@@ -909,9 +908,15 @@ void intf_sys_t::requestPlayerSeek(mtime_t pos)
     vlc_mutex_locker locker(&m_lock);
     if( !isStatePlaying() || m_mediaSessionId == 0 )
         return;
-    if ( pos != VLC_TS_INVALID )
-        m_ts_local_start = pos;
+    m_ts_seek = pos;
     queueMessage( Seek );
+}
+
+void intf_sys_t::setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data)
+{
+    vlc_mutex_locker locker(&m_lock);
+    m_on_seek_done = on_seek_done;
+    m_on_seek_done_data = on_seek_done_data;
 }
 
 void intf_sys_t::setPauseState(bool paused)
@@ -991,6 +996,9 @@ void intf_sys_t::setState( States state )
 #ifndef NDEBUG
         msg_Dbg( m_module, "Switching from state %s to %s", StateToStr( m_state ), StateToStr( state ) );
 #endif
+        if (state == Seeking)
+            if (m_on_seek_done != NULL)
+                m_on_seek_done(m_on_seek_done_data);
         m_state = state;
 
         switch( m_state )
@@ -1037,12 +1045,6 @@ void intf_sys_t::pace(void *pt)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->pace();
-}
-
-void intf_sys_t::request_seek(void *pt, mtime_t pos)
-{
-    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->requestPlayerSeek(pos);
 }
 
 void intf_sys_t::set_pause_state(void *pt, bool paused)

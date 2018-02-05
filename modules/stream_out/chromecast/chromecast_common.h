@@ -44,8 +44,6 @@ typedef struct
 
     void (*pf_pace)(void*);
 
-    void (*pf_request_seek)(void*, mtime_t pos);
-
     void (*pf_set_pause_state)(void*, bool paused);
 
     void (*pf_set_meta)(void*, vlc_meta_t *p_meta);

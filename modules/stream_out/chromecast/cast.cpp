@@ -47,6 +47,8 @@ struct sout_access_out_sys_t
     vlc_fifo_t        *m_fifo;
     block_t           *m_header;
     bool               m_eof;
+    bool               m_flushing;
+    bool               m_seeking;
     std::string        m_mime;
 
     sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
@@ -55,8 +57,10 @@ struct sout_access_out_sys_t
 
     void clearUnlocked();
     void clear();
+    void flush();
     void prepare(sout_stream_t *p_stream, const std::string &mime);
     int url_cb(httpd_client_t *cl, httpd_message_t *answer, const httpd_message_t *query);
+    void seek_done_cb();
 };
 
 struct sout_stream_sys_t
@@ -312,8 +316,14 @@ static int ProxyOpen(vlc_object_t *p_this)
 static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
                         httpd_message_t *answer, const httpd_message_t *query)
 {
-    sout_access_out_sys_t *p_sys = (sout_access_out_sys_t *) data;
+    sout_access_out_sys_t *p_sys = reinterpret_cast<sout_access_out_sys_t *>(data);
     return p_sys->url_cb(cl, answer, query);
+}
+
+static void on_seek_done_cb(void *data)
+{
+    sout_access_out_sys_t *p_sys = reinterpret_cast<sout_access_out_sys_t *>(data);
+    p_sys->seek_done_cb();
 }
 
 sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
@@ -322,6 +332,8 @@ sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
     : m_intf(intf)
     , m_header(NULL)
     , m_eof(true)
+    , m_flushing(false)
+    , m_seeking(false)
 {
     m_fifo = block_FifoNew();
     if (!m_fifo)
@@ -362,6 +374,19 @@ void sout_access_out_sys_t::clear()
     vlc_fifo_Signal(m_fifo);
 }
 
+void sout_access_out_sys_t::flush()
+{
+    vlc_fifo_Lock(m_fifo);
+    block_ChainRelease(vlc_fifo_DequeueAllUnlocked(m_fifo));
+    vlc_fifo_Unlock(m_fifo);
+
+    m_intf->setPacing(false);
+
+    /* Don't seek from here since flush can be called several time (one time
+     * per id). */
+    m_flushing = true;
+}
+
 void sout_access_out_sys_t::prepare(sout_stream_t *p_stream, const std::string &mime)
 {
     var_SetAddress(p_stream->p_sout, SOUT_CFG_PREFIX "access-out-sys", this);
@@ -370,7 +395,17 @@ void sout_access_out_sys_t::prepare(sout_stream_t *p_stream, const std::string &
     clearUnlocked();
     m_mime = mime;
     m_eof = false;
+    m_flushing = false;
+    m_seeking = false;
     vlc_fifo_Unlock(m_fifo);
+}
+
+void sout_access_out_sys_t::seek_done_cb()
+{
+    vlc_fifo_Lock(m_fifo);
+    m_seeking = false;
+    vlc_fifo_Unlock(m_fifo);
+    vlc_fifo_Signal(m_fifo);
 }
 
 int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
@@ -384,6 +419,11 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
     block_t *p_block = NULL;
     while ((p_block = vlc_fifo_DequeueUnlocked(m_fifo)) == NULL
        && !m_eof)
+        vlc_fifo_Wait(m_fifo);
+
+    /* Wait for the seek to be done. This will prevent the CC to flush this
+     * buffer that came after a flush. */
+    while (m_seeking && !m_eof)
         vlc_fifo_Wait(m_fifo);
 
     /* Handle block headers */
@@ -456,6 +496,17 @@ static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
     size_t i_len = p_block->i_buffer;
 
     vlc_fifo_Lock(p_sys->m_fifo);
+
+    if (p_sys->m_flushing)
+    {
+        p_sys->m_flushing = false;
+        p_sys->m_seeking = true;
+
+        vlc_fifo_Unlock(p_sys->m_fifo);
+        /* TODO: put better timestamp */
+        p_sys->m_intf->requestPlayerSeek(mdate() + INT64_C(1000000));
+        vlc_fifo_Lock(p_sys->m_fifo);
+    }
 
     /* Tell the demux filter to pace when the fifo starts to be full */
     bool do_pace = vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX;
@@ -1029,10 +1080,8 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     if ( id == NULL || p_sys->drained )
         return;
 
-    /* a seek on the Chromecast flushes its buffers */
-    p_sys->p_intf->requestPlayerSeek( VLC_TS_INVALID );
-
     sout_StreamFlush( p_sys->p_out, id );
+    p_sys->access_out_live.flush();
 }
 
 static int Control(sout_stream_t *p_stream, int i_query, va_list args)
@@ -1148,6 +1197,8 @@ static int Open(vlc_object_t *p_this)
     if (unlikely(p_sys == NULL))
         goto error;
 
+    p_intf->setOnSeekDoneCb(on_seek_done_cb, &p_sys->access_out_live);
+
     /* prevent sout-mux-caching since chromecast-proxy is already doing it */
     var_Create( p_stream->p_sout, "sout-mux-caching", VLC_VAR_INTEGER );
     var_SetInteger( p_stream->p_sout, "sout-mux-caching", 0 );
@@ -1199,6 +1250,7 @@ static void Close(vlc_object_t *p_this)
 
     httpd_host_t *httpd_host = p_sys->httpd_host;
     intf_sys_t *p_intf = p_sys->p_intf;
+    p_intf->setOnSeekDoneCb(NULL, NULL);
     delete p_sys;
     delete p_intf;
     /* Delete last since p_intf and p_sys depends on httpd_host */
