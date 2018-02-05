@@ -44,7 +44,7 @@
 # Vincenzo Reale <vinx.reale@gmail.com>, 2014-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-11-16 03:00+0100\n"
@@ -63,7 +63,7 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Questo programma viene fornito SENZA GARANZIA, per quanto permesso dalla "
+"Questo programma viene fornito SENZA GARANZIA, per quanto consentito dalla "
 "legge.\n"
 "Può essere ridistribuito secondo i termini della licenza GNU GPL;\n"
 "per ulteriori informazioni, leggere il file COPYING.\n"
@@ -113,8 +113,8 @@ msgstr "Impostazioni delle interfacce di controllo di VLC"
 msgid "Hotkeys settings"
 msgstr "Impostazioni delle scorciatoie"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -317,8 +317,8 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"Le impostazioni di uscita come flusso (stream) sono utilizzate quando VLC "
-"agisce come server di trasmissione (streaming) o salva i flussi in entrata.\n"
+"Le impostazioni di uscita del flusso sono utilizzate quando VLC agisce come "
+"server di trasmissione o salva i flussi in entrata.\n"
 "I flussi prima passano attraverso un muxer e poi vengono inviati ad un "
 "modulo di uscita che può salvare il flusso in un file, o trasmetterlo come "
 "flusso (UDP, HTTP, RTP/RTSP).\n"
@@ -340,11 +340,11 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"I muxer creano dei formati di incapsulamento che vengono usati per unire i "
+"I muxer creano dei formati di incapsulamento che sono utilizzati per unire i "
 "flussi elementari (video, audio, ...). Queste impostazioni permettono di "
 "forzare l'uso di un muxer specifico. Questo probabilmente non dovrebbe "
 "essere fatto.\n"
-"Possono anche essere impostati i parametri predefiniti per ogni muxer."
+"Puoi inoltre impostare i parametri predefiniti per ogni muxer."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -358,9 +358,9 @@ msgid ""
 "You can also set default parameters for each access output."
 msgstr ""
 "I moduli di uscita controllano i modi nei quali i flussi miscelati sono "
-"inviati. Questa impostazione ti permette di forzare uno specifico metodo di "
+"inviati. Questa impostazione ti consente di forzare uno specifico metodo di "
 "accesso in uscita. Probabilmente non dovresti farlo.\n"
-"Puoi anche impostare i parametri predefiniti per ogni modulo di uscita."
+"Puoi inoltre impostare i parametri predefiniti per ogni modulo di uscita."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
@@ -778,7 +778,8 @@ msgstr "Cuffie"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatico"
@@ -1058,8 +1059,8 @@ msgstr "Lingua"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Descrizione"
 
@@ -1283,15 +1284,15 @@ msgstr ""
 #: src/input/es_out.c:3271
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Campo di vista"
 
 #: src/input/es_out.c:3276
 msgid "Max. luminance"
-msgstr ""
+msgstr "Luminanza massima"
 
 #: src/input/es_out.c:3281
 msgid "Min. luminance"
-msgstr ""
+msgstr "Luminanza minima"
 
 #: src/input/es_out.c:3289
 msgid "Primary R"
@@ -1324,11 +1325,12 @@ msgstr ""
 "VLC non è in grado di aprire il MRL '%s'. Controlla il registro per i "
 "dettagli."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1819,7 +1821,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2790,7 +2793,7 @@ msgstr "ID del flusso della traccia di sottotitoli da utilizzare."
 
 #: src/libvlc-module.c:616
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Decodificatore preferito dei sottotitoli"
 
 #: src/libvlc-module.c:620
 msgid "Preferred video resolution"
@@ -4867,19 +4870,19 @@ msgstr "Non ritaglia un pixel dalla parte destra del video"
 
 #: src/libvlc-module.c:1453
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Riduci il campo del punto di vista (360°)"
 
 #: src/libvlc-module.c:1454
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Espandi il campo del punto di vista (360°)"
 
 #: src/libvlc-module.c:1455
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "Ruota il punto di vista in senso orario (360*)"
 
 #: src/libvlc-module.c:1456
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "Ruota il punto di vista in senso anti-orario (360*)"
 
 #: src/libvlc-module.c:1458
 msgid "Toggle wallpaper mode in video output"
@@ -5091,7 +5094,8 @@ msgid "Browser Stop"
 msgstr "Browser Ferma"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6960,7 +6964,8 @@ msgstr ""
 "I canali TV sono raggruppati per transponder (noto anche come multiplex) in "
 "una frequenza data. Ciò è richiesto per sintonizzare il ricevitore."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulazione / Costellazione"
 
@@ -7780,7 +7785,8 @@ msgstr "Numero di canali di un flusso audio elementare"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Larghezza"
@@ -8770,7 +8776,8 @@ msgstr "Dispositivo radio"
 msgid "Radio tuner device node."
 msgstr "Nodo di dispositivo del sintonizzatore radio."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frequenza"
 
@@ -10388,7 +10395,7 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
 msgid "Audio pitch changer"
-msgstr ""
+msgstr "Modificatore tonalità audio"
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
@@ -10432,7 +10439,7 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
-msgstr ""
+msgstr "Regola la tonalità in semitoni."
 
 #: modules/audio_filter/spatializer/spatializer.cpp:54
 msgid "Room size"
@@ -11030,7 +11037,7 @@ msgstr "Mostra fotogrammi danneggiati"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
-msgstr ""
+msgstr "Preferisci artefatti visivi ai fotogrammi mancanti"
 
 #: modules/codec/avcodec/avcodec.h:62
 msgid "Error resilience"
@@ -13516,6 +13523,10 @@ msgid ""
 " - 1: Realtime\n"
 " - 2: Best quality"
 msgstr ""
+"Impostazione di qualità che determinerà il tempo massimo di codifica\n"
+"- 0: Buona qualità\n"
+"- 1: Tempo reale\n"
+"- 2: Migliore qualità"
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
@@ -15972,7 +15983,7 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
 msgid "Do not seek"
-msgstr ""
+msgstr "Non posizionare"
 
 #: modules/demux/mp4/mp4.c:1683
 msgid "Build index"
@@ -16708,7 +16719,8 @@ msgid "Name"
 msgstr "Nome"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Autore"
@@ -17983,7 +17995,7 @@ msgstr "Ricerca nella scaletta. I risultati saranno selezionati nella tabella."
 
 #: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Open a dialog to select the media to play"
-msgstr "Apri una finestra per seleziinare il media da riprodurre"
+msgstr "Apri una finestra per selezionare il media da riprodurre"
 
 #: modules/gui/macosx/VLCMainWindow.m:198
 #: modules/gui/macosx/VLCMainWindow.m:204
@@ -18920,7 +18932,8 @@ msgid "sec."
 msgstr "sec."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -19913,7 +19926,7 @@ msgstr "Guadagno di compensazione"
 
 #: modules/gui/qt/components/extended_panels.cpp:1333
 msgid "Adjust pitch"
-msgstr ""
+msgstr "Regola la tonalità"
 
 #: modules/gui/qt/components/extended_panels.cpp:1367
 msgid "(Hastened)"
@@ -20600,10 +20613,11 @@ msgid "Extract"
 msgstr "Estrai"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20615,7 +20629,8 @@ msgstr "&Chiudi"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Converti"
 
@@ -21043,7 +21058,8 @@ msgstr "Versione"
 msgid "Website"
 msgstr "Sito web"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "File"
 
@@ -21884,6 +21900,8 @@ msgstr "Definisci quale schermo usare a schermo intero"
 #: modules/gui/qt/qt.cpp:155
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
 msgstr ""
+"Numero dello schermo a schermo intero, invece dello stesso schermo dove si "
+"trova l'interfaccia."
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
@@ -21912,11 +21930,11 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:168
 msgid "Expanding background cone or art"
-msgstr ""
+msgstr "Espansione cono di sfondo o grafica"
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
-msgstr ""
+msgstr "La grafica di sfondo si adatta alle dimensioni della finestra"
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -22138,7 +22156,7 @@ msgstr "Imposta la gamma dell'immagine, tra 0.01 e 10. Predefinita a 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:429
 msgid "Direct3D9 adjust filter"
-msgstr ""
+msgstr "Filtro di regolazione Direct3D9"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -22467,7 +22485,7 @@ msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
-"Seleziona la verbosità dei log o lacia il valore predefinito per utilizzare "
+"Seleziona la verbosità dei log o lascia il valore predefinito per utilizzare "
 "la stessa verbosità data da --verbose."
 
 #: modules/logger/file.c:219
@@ -24064,7 +24082,8 @@ msgstr "MPEG Video"
 msgid "VC-1 packetizer"
 msgstr "Incapsulamento VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Servizi di rete Zeroconf"
 
@@ -25337,12 +25356,10 @@ msgid "Enable Audio passthrough"
 msgstr "Abilita passthrough audio"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Disabilitala se il tuo ricevitore non supporta Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Alta (alta qualità e molta banda)"
 
@@ -25351,12 +25368,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Media (qualità media e banda media)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Bassa (qualità bassa e poca banda)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Bassa CPU (qualità bassa, ma molta banda)"
 
@@ -26678,7 +26693,7 @@ msgstr "Crominanza con la quale l'immagine miscelata sarà caricata"
 
 #: modules/video_filter/blendbench.c:75
 msgid "Blending benchmark filter"
-msgstr "Combinamento Filtri Benchmark"
+msgstr "Mescolamento filtri benchmark"
 
 #: modules/video_filter/blendbench.c:76
 msgid "Blendbench"
@@ -27819,7 +27834,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:73
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Valore del descrittore di formato attivo"
 
 #: modules/video_output/decklink.cpp:76
 msgid "Aspect Ratio of the source picture."
@@ -27827,7 +27842,7 @@ msgstr "Proporzioni dell'immagine sorgente."
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Riga del descrittore di formato attivo"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
@@ -29975,7 +29990,7 @@ msgstr "completo"
 
 #: modules/gui/qt/ui/video_effects.h:1277
 msgid "none"
-msgstr "no"
+msgstr "nessuno"
 
 #: modules/gui/qt/ui/video_effects.h:1281
 msgid "Logo erase"
@@ -30076,10 +30091,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Elenco gestore multimediale"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Accelerazione video Direct3D11"
 
 #~ msgid "Scan"
 #~ msgstr "Analizza"
@@ -35762,6 +35773,10 @@ msgstr "Elenco gestore multimediale"
 #~ "Se il tuo framebuffer supporta l'accelerazione hardware o esegue il "
 #~ "doppio buffering hardware, dovresti disabilitare questa opzione. Sarà "
 #~ "eseguito il doppio buffering software."
+
+#, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Filtro di regolazione Direct3D9"
 
 #, fuzzy
 #~ msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
