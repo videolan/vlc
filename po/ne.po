@@ -17,11 +17,11 @@
 # Suyogya <suyogya.tamrakar@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: Prabin Thapa Magar <prabinmagar526@gmail.com>, 2018\n"
+"Last-Translator: Surit Aryal <surit_people@hotmail.com>, 2018\n"
 "Language-Team: Nepali (Nepal) (https://www.transifex.com/yaron/teams/16553/"
 "ne_NP/)\n"
 "Language: ne\n"
@@ -87,8 +87,8 @@ msgstr "VLC को नियन्त्रण इन्टरफेसहरू
 msgid "Hotkeys settings"
 msgstr "हटकी सेटिङहरू"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -222,7 +222,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr ""
+msgstr "स्ट्रिम फिल्टरहरू"
 
 #: include/vlc_config_cat.h:109
 msgid ""
@@ -727,7 +727,8 @@ msgstr "हेडफोन"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "स्वचालित"
@@ -969,8 +970,8 @@ msgstr "भाषा"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "वर्णन"
 
@@ -1177,28 +1178,24 @@ msgid "Projection"
 msgstr "प्रोजेक्शन"
 
 #: src/input/es_out.c:3264
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "य"
+msgstr ""
 
 #: src/input/es_out.c:3266
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "पिच"
 
 #: src/input/es_out.c:3268
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "रोल"
+msgstr ""
 
 #: src/input/es_out.c:3271
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "दृश्य को क्षेत्र"
+msgstr ""
 
 #: src/input/es_out.c:3276
 msgid "Max. luminance"
@@ -1237,11 +1234,12 @@ msgstr "तपाईंको ईनपुट खोल्न सकिदैन
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC को MRL '%s' खोल्न असमर्थ छौ। विवरण को लागि प्रवेश को जाँच गरौ। "
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1714,7 +1712,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -4775,7 +4774,8 @@ msgid "Browser Stop"
 msgstr "Browser रोक"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6563,7 +6563,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -7330,7 +7331,8 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "चौडाइ"
@@ -8250,7 +8252,8 @@ msgstr "रेडियो यन्त्र"
 msgid "Radio tuner device node."
 msgstr ""
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "आवृत्ति"
 
@@ -15658,7 +15661,8 @@ msgid "Name"
 msgstr "नाम"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "लेखक"
@@ -17782,7 +17786,8 @@ msgid "sec."
 msgstr "सेकेन्ड"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "अडियो / भिडियो"
 
@@ -19415,10 +19420,11 @@ msgid "Extract"
 msgstr "निकाल्नुहोस्"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19430,7 +19436,8 @@ msgstr "बन्द गर्नुहोस्"
 msgid "Bytes"
 msgstr "बाइटहरू"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr ""
 
@@ -19832,7 +19839,8 @@ msgstr "संस्करण"
 msgid "Website"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "फाइलहरू"
 
@@ -22727,7 +22735,8 @@ msgstr ""
 msgid "VC-1 packetizer"
 msgstr ""
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -23893,18 +23902,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:130
 #: modules/stream_out/chromecast/cast.cpp:525
-#, fuzzy
 msgid "Performance warning"
-msgstr "कार्यसम्पादन विकल्प"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:132
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "अडियो प्रवाह निर्गत सक्षम पार्नुहोस्"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:133
 msgid "Disable if your receiver does not support Dolby®."
@@ -23927,9 +23934,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:161
-#, fuzzy
 msgid "Conversion quality"
-msgstr "सङ्केतन गुणस्तर"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
@@ -32309,7 +32315,7 @@ msgstr "मिडिया प्रबन्धक सूची"
 
 #, fuzzy
 #~ msgid "Stream to network"
-#~ msgstr "प्रवाह नाम"
+#~ msgstr "स्ट्रिम फिल्टरहरू"
 
 #, fuzzy
 #~ msgid "Select a stream"
@@ -32648,7 +32654,7 @@ msgstr "मिडिया प्रबन्धक सूची"
 
 #, fuzzy
 #~ msgid "Search Filter"
-#~ msgstr "बजाउने सूचीमा खोजी गर्नुहोस्"
+#~ msgstr "स्ट्रिम फिल्टरहरू"
 
 #, fuzzy
 #~ msgid "Image clone"
