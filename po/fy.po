@@ -10,11 +10,11 @@
 # Wiebe Tokkel <justmarkus@gmx.net>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"Last-Translator: Wiebe Tokkel <justmarkus@gmx.net>, 2018\n"
 "Language-Team: Western Frisian (https://www.transifex.com/yaron/teams/16553/"
 "fy/)\n"
 "Language: fy\n"
@@ -80,8 +80,8 @@ msgstr "Ynstellingen foar betsjinningsynterface VLC"
 msgid "Hotkeys settings"
 msgstr "Fluchtoetsen"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -191,11 +191,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Splitsers"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Fideo-splitsers skiede de stream yn meardere fideo's."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -660,7 +660,7 @@ msgstr "Spektrum"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU-mjitter"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -682,7 +682,7 @@ msgstr "Mono"
 
 #: src/audio_output/output.c:428
 msgid "Original"
-msgstr ""
+msgstr "Orizjineel"
 
 #: src/audio_output/output.c:434 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -740,7 +740,8 @@ msgstr "Koptelefoon"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatysk"
@@ -838,11 +839,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(standert ynskeakele)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(standert útskeakele)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -992,7 +993,7 @@ msgstr "Ja"
 #: src/input/es_out.c:2135
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC Undertitels %u"
 
 #: src/input/es_out.c:2137
 #, c-format
@@ -1020,8 +1021,8 @@ msgstr "Taal"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Beskriuwing"
 
@@ -1080,11 +1081,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3139
 msgid "Video resolution"
-msgstr ""
+msgstr "Fideoresolúsje"
 
 #: src/input/es_out.c:3144
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Bufferôfmjittingen"
 
 #: src/input/es_out.c:3154 src/input/es_out.c:3157 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1102,39 +1103,39 @@ msgstr "Dekodeard formaat"
 
 #: src/input/es_out.c:3170
 msgid "Top left"
-msgstr ""
+msgstr "Boppe-links"
 
 #: src/input/es_out.c:3170
 msgid "Left top"
-msgstr ""
+msgstr "Links-boppe"
 
 #: src/input/es_out.c:3171
 msgid "Right bottom"
-msgstr ""
+msgstr "Rjochts-beneden"
 
 #: src/input/es_out.c:3171
 msgid "Top right"
-msgstr ""
+msgstr "Boppe-rjochts"
 
 #: src/input/es_out.c:3172
 msgid "Bottom left"
-msgstr ""
+msgstr "Beneden-links"
 
 #: src/input/es_out.c:3172
 msgid "Bottom right"
-msgstr ""
+msgstr "Beneden-rjochts"
 
 #: src/input/es_out.c:3173
 msgid "Left bottom"
-msgstr ""
+msgstr "Links-beneden"
 
 #: src/input/es_out.c:3173
 msgid "Right top"
-msgstr ""
+msgstr "Rjochts-boppe"
 
 #: src/input/es_out.c:3175
 msgid "Orientation"
-msgstr ""
+msgstr "Oriïntaasje"
 
 #: src/input/es_out.c:3181 src/input/es_out.c:3199 src/input/es_out.c:3217
 #: src/input/es_out.c:3231 src/playlist/tree.c:67
@@ -1144,15 +1145,15 @@ msgstr "Ongedefinieerd"
 
 #: src/input/es_out.c:3183
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 rigels, 60 Hz)"
 
 #: src/input/es_out.c:3185
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 rigels, 50 Hz)"
 
 #: src/input/es_out.c:3193
 msgid "Color primaries"
-msgstr ""
+msgstr "Primêre kleuren"
 
 #: src/input/es_out.c:3200 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1161,24 +1162,24 @@ msgstr "Lineêr"
 
 #: src/input/es_out.c:3207
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Hybride Log-Gamma"
 
 #: src/input/es_out.c:3211
 msgid "Color transfer function"
-msgstr ""
+msgstr "Kleuroersetfunksje"
 
 #: src/input/es_out.c:3224
 msgid "Color space"
-msgstr ""
+msgstr "Kleurromte"
 
 #: src/input/es_out.c:3224
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Berik"
 
 #: src/input/es_out.c:3226
 msgid "Full"
-msgstr ""
+msgstr "Folslein"
 
 #: src/input/es_out.c:3233 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1193,84 +1194,83 @@ msgstr "Sintrearje"
 
 #: src/input/es_out.c:3234
 msgid "Top Left"
-msgstr ""
+msgstr "Boppe-links"
 
 #: src/input/es_out.c:3235
 msgid "Top Center"
-msgstr ""
+msgstr "Boppe-midden"
 
 #: src/input/es_out.c:3236
 msgid "Bottom Left"
-msgstr ""
+msgstr "Beneden-links"
 
 #: src/input/es_out.c:3237
 msgid "Bottom Center"
-msgstr ""
+msgstr "Beneden-midden"
 
 #: src/input/es_out.c:3241
 msgid "Chroma location"
-msgstr ""
+msgstr "Chromalokaasje"
 
 #: src/input/es_out.c:3250
 msgid "Rectangular"
-msgstr ""
+msgstr "Rjockthoekich"
 
 #: src/input/es_out.c:3253
 msgid "Equirectangular"
-msgstr ""
+msgstr "Equidistant"
 
 #: src/input/es_out.c:3256
 msgid "Cubemap"
-msgstr ""
+msgstr "Cubemap"
 
 #: src/input/es_out.c:3262
 msgid "Projection"
-msgstr ""
+msgstr "Projeksje"
 
 #: src/input/es_out.c:3264
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Koers"
 
 #: src/input/es_out.c:3266
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Pitch"
+msgstr "Helling"
 
 #: src/input/es_out.c:3268
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rôling"
 
 #: src/input/es_out.c:3271
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Gesichtsfjild"
 
 #: src/input/es_out.c:3276
 msgid "Max. luminance"
-msgstr ""
+msgstr "Max. helderens"
 
 #: src/input/es_out.c:3281
 msgid "Min. luminance"
-msgstr ""
+msgstr "Min. helderens"
 
 #: src/input/es_out.c:3289
 msgid "Primary R"
-msgstr ""
+msgstr "Primêre R"
 
 #: src/input/es_out.c:3296
 msgid "Primary G"
-msgstr ""
+msgstr "Primêre G"
 
 #: src/input/es_out.c:3303
 msgid "Primary B"
-msgstr ""
+msgstr "Primêre B"
 
 #: src/input/es_out.c:3310
 msgid "White point"
-msgstr ""
+msgstr "Wytpunt"
 
 #: src/input/es_out.c:3325 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1285,11 +1285,12 @@ msgstr "Jo ynfier kin net iepene wurde"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC kin de MRL '%s' net iepenje. Sjoch it loch foar details."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1384,11 +1385,11 @@ msgstr "Akteurs"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Albumartyst"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Skiifnûmer"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1430,11 +1431,11 @@ msgstr "Foarige titel"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Menutitel"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "Menudialoochfinster"
 
 #: src/input/var.c:319
 #, c-format
@@ -1589,6 +1590,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"Dit stiet it kleuren ta fan de berjochten dy't nei de konsole stjoerd wurde "
+"ta. Dit wurket allinnich at jo terminal Linux-kleuren stipet."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1640,11 +1643,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "Media-rol"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Media(spiler)-rol foar it belied fan it bestjoeringssysteem"
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:268
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
@@ -1661,11 +1664,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Muzyk"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Kommunikaasje"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1673,23 +1676,23 @@ msgstr "Spellen"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Notifikaasje"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animaasje"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Produksje"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Tagonklikens"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1740,16 +1743,21 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Dit stelt de modus yn foar de audioútfierkanalen dy't wannear mooglik "
+"standert brûkt wurde as jo hardware en de audiostream dy't ôfspile wurdt dit "
+"stypje."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "Forsearje S/PDIF-stipe"
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Dizze opsje soe brûkt wurde moatte as de audioútfier gjin S/PDIF-stipe foar "
+"elkoar krije kin."
 
 #: src/libvlc-module.c:178 modules/gui/macosx/VLCSimplePrefsController.m:266
 msgid "Force detection of Dolby Surround"
@@ -1769,7 +1777,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -2102,7 +2111,7 @@ msgstr "Altyd it fideofinster boppe de oare finsters delsette."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Behangmodus ynskeakelje"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2726,7 +2735,7 @@ msgstr "Stream-ID fan it ûndertitelspoar om te brûken."
 
 #: src/libvlc-module.c:616
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Earste kar foar ûndertiteldekodearder"
 
 #: src/libvlc-module.c:620
 msgid "Preferred video resolution"
@@ -2858,11 +2867,11 @@ msgstr ""
 
 #: src/libvlc-module.c:675
 msgid "Record directory"
-msgstr ""
+msgstr "Opnamemap"
 
 #: src/libvlc-module.c:677
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "Map wêr't de opnames bewarre wurde."
 
 #: src/libvlc-module.c:679
 msgid "Prefer native stream recording"
@@ -2914,7 +2923,7 @@ msgstr ""
 
 #: src/libvlc-module.c:699
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "Alle lua-ynstekkers útskeakelje"
 
 #: src/libvlc-module.c:703
 msgid ""
@@ -2942,11 +2951,11 @@ msgstr ""
 
 #: src/libvlc-module.c:714
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "Undertitel-skaalfaktor"
 
 #: src/libvlc-module.c:715
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Passet wêr't mooglik de ûndertitelgrutte oan "
 
 #: src/libvlc-module.c:717
 msgid "Enable sub-pictures"
@@ -3119,7 +3128,7 @@ msgstr "TCP-ferbiningstimeout"
 
 #: src/libvlc-module.c:805
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "Standert TCP-ferbiningstimeout (yn milisekonden)."
 
 #: src/libvlc-module.c:807
 msgid "HTTP server address"
@@ -3519,14 +3528,17 @@ msgstr "Streamfiltermodule"
 #: src/libvlc-module.c:1003
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
+"Streamfilters wurde brûkt foar it oanpassen fan de stream dy't lêsen wurd."
 
 #: src/libvlc-module.c:1005
 msgid "Demux filter module"
-msgstr ""
+msgstr "Demuksfiltermodule"
 
 #: src/libvlc-module.c:1007
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
+"Streamfilters wurde brûkt foar it oanpassen/bestjoeren fan de stream dy't "
+"lêsen wurd."
 
 #: src/libvlc-module.c:1009
 msgid "Demux module"
@@ -3553,6 +3565,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"Jo kinne selektearje hokke VoD-tsjinnermodule jo brûke wolle. Set hjir "
+"'vod_rtsp' del om werom te skeakeljen nei de âlde, ferâldere module."
 
 #: src/libvlc-module.c:1021
 msgid "Allow real-time priority"
@@ -3608,21 +3622,23 @@ msgstr "Brûk in ynstekkerbuffer wêrtroch VLC in protte flugger starte kin."
 
 #: src/libvlc-module.c:1047
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "Scan foar nije ynstekkers"
 
 #: src/libvlc-module.c:1049
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
+"Scan de ynstekkertriemtafels foar nije ynstekkers by it opstarten. Dit "
+"makket de opstarttiid fan VLC langer."
 
 #: src/libvlc-module.c:1052
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "Foarkarlist foar keystore"
 
 #: src/libvlc-module.c:1054
 msgid "List of keystores that VLC will use in priority."
-msgstr ""
+msgstr "Prioriteitslist fan keystores dy't VLC brûkt."
 
 #: src/libvlc-module.c:1056
 msgid "Locally collect statistics"
@@ -3717,11 +3733,13 @@ msgstr ""
 
 #: src/libvlc-module.c:1098
 msgid "Expose media player via D-Bus"
-msgstr ""
+msgstr "Bekend meitsje mediaspiler fia D-Bus"
 
 #: src/libvlc-module.c:1099
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
+"Stean ta dat oare applikaasjes VLC bestjoere meie fia it D-Bus MPRIS-"
+"protokol."
 
 #: src/libvlc-module.c:1108
 msgid ""
@@ -3733,21 +3751,24 @@ msgstr ""
 
 #: src/libvlc-module.c:1111
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "Automatysk items foarferwurkje"
 
 #: src/libvlc-module.c:1113
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
+"Foarferwurkje automatysk items dy't oan de ôfspyllist taheakke binne (om "
+"ferskate metadata op te heljen). "
 
 #: src/libvlc-module.c:1116
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "Foarferwurkings-timeout"
 
 #: src/libvlc-module.c:1118
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
+"Maksimaal tasteane tijd foar it foarferwurkjen fan in item, yn millisekonden."
 
 #: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3798,11 +3819,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1141
 msgid "Show hidden files"
-msgstr ""
+msgstr "Ferburgen triemen sjen litte"
 
 #: src/libvlc-module.c:1143
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Triemen dy't begjinne mei '.' negearje"
 
 #: src/libvlc-module.c:1145
 msgid "Services discovery modules"
@@ -3869,11 +3890,11 @@ msgstr "Elk item in de afspeellijst pauzeren op het laatste beeld."
 
 #: src/libvlc-module.c:1174
 msgid "Start paused"
-msgstr ""
+msgstr "Begjin skofte"
 
 #: src/libvlc-module.c:1176
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "Skoftsje elk item op de ôfspyllist op it earte byld."
 
 #: src/libvlc-module.c:1178
 msgid "Auto start"
@@ -3931,35 +3952,39 @@ msgstr "Negearje"
 
 #: src/libvlc-module.c:1208
 msgid "Volume control"
-msgstr ""
+msgstr "Folumebehear"
 
 #: src/libvlc-module.c:1209
 msgid "Position control"
-msgstr ""
+msgstr "Posysjebehear "
 
 #: src/libvlc-module.c:1209
 msgid "Position control reversed"
-msgstr ""
+msgstr "Posysjebehear omkeard"
 
 #: src/libvlc-module.c:1212
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Behear mûstsjil fertikale as"
 
 #: src/libvlc-module.c:1214
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"De fertikale as fan de mûstsjil (omheech/omleech) kin folume of posysje "
+"beheare of negeard wurde."
 
 #: src/libvlc-module.c:1216
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Behear mûstsjil horizontale as"
 
 #: src/libvlc-module.c:1218
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"De horizontale as fan de mûstsjil (links/rjochts) kin folume of posysje "
+"beheare of negeard wurde."
 
 #: src/libvlc-module.c:1220 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -4224,7 +4249,7 @@ msgstr "Naar boven navigeren"
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr ""
+msgstr "Selektearje de toets om omheech te gean yn DVD-menu's (helling)."
 
 #: src/libvlc-module.c:1291
 msgid "Navigate down"
@@ -4234,7 +4259,7 @@ msgstr "Naar beneden navigeren"
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr ""
+msgstr "Selektearje de toets om omleech te gean yn DVD-menu's (helling)."
 
 #: src/libvlc-module.c:1293
 msgid "Navigate left"
@@ -4244,7 +4269,7 @@ msgstr "Naar links navigeren"
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr ""
+msgstr "Selektearje de toets om links te gean yn DVD-menu's (draai)."
 
 #: src/libvlc-module.c:1295
 msgid "Navigate right"
@@ -4254,7 +4279,7 @@ msgstr "Naar rechts navigeren"
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr ""
+msgstr "Selektearje de toets om rjochts te gean yn DVD-menu's (draai)."
 
 #: src/libvlc-module.c:1297
 msgid "Activate"
@@ -4352,19 +4377,19 @@ msgstr ""
 
 #: src/libvlc-module.c:1319
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Undertitel-skaalfaktor tebeksette"
 
 #: src/libvlc-module.c:1320
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Undertitel-skaalfaktor omheech stelle"
 
 #: src/libvlc-module.c:1321
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Undertitel-skaalfaktor omleech stelle"
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "Selektearje de toets foar it oanpassen fan de ûndertitel-skaalfaktor"
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4589,11 +4614,11 @@ msgstr "Rin troch de beskikbere audiospoaren (talen)"
 
 #: src/libvlc-module.c:1385
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "Ûndertitelspoar trochrinne in omkearde folchoarder"
 
 #: src/libvlc-module.c:1386
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "Rin troch de beskikbere ûndertitelspoaren yn omkearde folchoarder"
 
 #: src/libvlc-module.c:1387
 msgid "Cycle subtitle track"
@@ -4765,19 +4790,19 @@ msgstr "Pixel aan rechterkant video toevoegen"
 
 #: src/libvlc-module.c:1453
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Krimp it gesichtsfjild (360°)"
 
 #: src/libvlc-module.c:1454
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Wreidzje it gesichtsfjild út (360°)"
 
 #: src/libvlc-module.c:1455
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "Rolje it gesichtsfjild mei de klok mei (360°)"
 
 #: src/libvlc-module.c:1456
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "Rolje it gesichtsfjild tjsin de klok yn (360°)"
 
 #: src/libvlc-module.c:1458
 msgid "Toggle wallpaper mode in video output"
@@ -4992,7 +5017,8 @@ msgid "Browser Stop"
 msgstr "Blêder Stopje"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5254,7 +5280,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> B"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5363,6 +5389,8 @@ msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
+"De nije ferzje fan VLC is mei sukses ynladen. Wolle jo op dit stuit VLC "
+"ôfslute en de nije ferzje ynstalleare?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6136,21 +6164,23 @@ msgstr "Bijvoegsel invoer"
 
 #: modules/access/avcapture.m:57
 msgid "AVFoundation Video Capture"
-msgstr ""
+msgstr "AVFoundation Fideo-opname"
 
 #: modules/access/avcapture.m:58
 msgid "AVFoundation video capture module."
-msgstr ""
+msgstr "AVFoundation fideo-opnamemodule."
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 msgid "No video devices found"
-msgstr ""
+msgstr "Gjin fideo-apparaten fûn."
 
 #: modules/access/avcapture.m:287
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
+"Jo Mac liket net útriste te wezen mei in passend fideo-ynfierapparaat. "
+"Kontrolearje jo stekkers en bestjoeringsprogramma's."
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6252,7 +6282,7 @@ msgstr "De BD+ decodeerbibliotheek werkt niet. Ontbrekende configuratie?"
 
 #: modules/access/bluray.c:799
 msgid "Java required"
-msgstr ""
+msgstr "Java nedich"
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6260,10 +6290,12 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"Dizze Blu-rayskiif hat Java nedich foar menu's.%s\n"
+"De skiif sil sûnder menu's ôfspile wurde."
 
 #: modules/access/bluray.c:801
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Java waard net op jo systeem fûn."
 
 #: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -6841,7 +6873,8 @@ msgstr ""
 "Tv-kanalen worden gegroepeerd op transponder (multiplex) bij een gegeven "
 "frequentie. Dit is vereist om de ontvanger af te stemmen."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulatie / Constellatie"
 
@@ -7642,7 +7675,8 @@ msgstr "Aantal kanalen van een elementaire audiostream"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Breedte"
@@ -8614,7 +8648,8 @@ msgstr "Radio-apparaat"
 msgid "Radio tuner device node."
 msgstr "Radiotuner-aparaatnode"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frequentie"
 
@@ -16408,7 +16443,8 @@ msgid "Name"
 msgstr "Naam"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Auteur"
@@ -18601,7 +18637,8 @@ msgid "sec."
 msgstr "seconden"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audio/Video"
 
@@ -20278,10 +20315,11 @@ msgid "Extract"
 msgstr "Extract"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20293,7 +20331,8 @@ msgstr "&Sluiten"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Converteren"
 
@@ -20718,7 +20757,8 @@ msgstr "Ferzje"
 msgid "Website"
 msgstr "Webstee"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Triemen"
 
@@ -23709,7 +23749,8 @@ msgstr "MPEG video"
 msgid "VC-1 packetizer"
 msgstr "VC-1 packetizer"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -24948,18 +24989,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:130
 #: modules/stream_out/chromecast/cast.cpp:525
-#, fuzzy
 msgid "Performance warning"
-msgstr "Prestatie-opties"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:132
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Audiostreamuitvoer inschakelen"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:133
 msgid "Disable if your receiver does not support Dolby®."
@@ -24982,9 +25021,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:161
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Kwaliteit weergave"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
@@ -25011,9 +25049,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:524
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Software-versterking"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:526
 msgid ""
@@ -29244,9 +29281,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 in-loop deblocking filter overslaan"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profiel- en niveauselectie"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -30430,9 +30466,6 @@ msgstr "Mediabeherlist"
 #~ msgstr ""
 #~ "Selecteer de syslog-faciliteit waar logs naar doorgestuurd zullen worden."
 
-#~ msgid "Buffer Size (Seconds)"
-#~ msgstr "Buffergrootte (seconden)"
-
 #~ msgid "DASH"
 #~ msgstr "DASH"
 
@@ -30806,14 +30839,19 @@ msgstr "Mediabeherlist"
 #~ msgid "DirectFB video output http://www.directfb.org/"
 #~ msgstr "DirectFB video-uitvoer http://www.directfb.org"
 
-#~ msgid "YUV4MPEG2 header (default disabled)"
-#~ msgstr "YUV4MPEG2 header (standaard gedeactiveerd)"
-
 #~ msgid "Output Color Filtermode"
 #~ msgstr "Uitvoer kleurfiltermodus"
 
 #~ msgid "Mark analyzed Pixels"
 #~ msgstr "Geanalyseerde pixels markeren"
+
+#, fuzzy
+#~ msgid "Buffer Size (Seconds)"
+#~ msgstr "Bufferôfmjittingen"
+
+#, fuzzy
+#~ msgid "YUV4MPEG2 header (default disabled)"
+#~ msgstr "(standert útskeakele)"
 
 #, fuzzy
 #~ msgid "Screen capture (with Wayland)"
@@ -30905,7 +30943,7 @@ msgstr "Mediabeherlist"
 
 #, fuzzy
 #~ msgid "Display resolution"
-#~ msgstr "Weergave-instellingen"
+#~ msgstr "Fideoresolúsje"
 
 #, fuzzy
 #~ msgid "Navigation"
@@ -31589,7 +31627,7 @@ msgstr "Mediabeherlist"
 
 #, fuzzy
 #~ msgid "Color when paused"
-#~ msgstr "Kleurdrompel"
+#~ msgstr "Kleurromte"
 
 #, fuzzy
 #~ msgid "Pause-Red"
@@ -31713,7 +31751,7 @@ msgstr "Mediabeherlist"
 
 #, fuzzy
 #~ msgid "Zone 1:right"
-#~ msgstr "Rechtsachter"
+#~ msgstr "Boppe-rjochts"
 
 #, fuzzy
 #~ msgid "Zone 2:bottom"
