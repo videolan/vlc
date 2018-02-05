@@ -1,0 +1,122 @@
+resetează actualul cache al pluginurilor
+utilizați un fișier de configurare alternativ
+resetați configurația curentă la valorile implicite
+salvați opțiunile din linia de comandă curentă în config
+nici o opțiune de configurare nu va fi încărcată și nici nu va fi salvată în fișierul config
+ajutor de imprimare pe un anumit modul (poate fi combinat cu --advanced și -help-verbose). Prefixați numele modulului cu = pentru potrivirile stricte.
+tipăriți o listă a modulelor disponibile cu detalii suplimentare
+tipăriți o listă a modulelor disponibile
+Decupați un pixel din stânga videoclipului
+Scoateți un pixel din partea de sus a videoclipului
+Decupați un pixel din partea de sus a videoclipului
+VLC va continua să redea playlistul pe o perioadă nedeterminată.
+VLC va reda în mod aleatoriu fișierele din lista de redare până când va fi întreruptă.
+Redați fișierele la întâmplare pentru totdeauna
+Specifică modulele de descoperire a serviciilor care se încarcă, separate de semi-coloane. Valorile tipice sunt sap, hal, ...
+Modulele serviciului de descoperire
+Imediat ce se adaugă un element
+Când începe redarea piesei
+Numai descărcarea manuală
+Alegeți cum va fi descărcată imaginea albumului.
+Politica privind arta albumelor
+Pregătește automat fișierele adăugate în lista de redare (pentru a prelua unele metadate).
+Pregătește automat fișiere
+Aceste opțiuni definesc comportamentul listei de redare. Unele dintre ele pot fi înlocuite în caseta de dialog a listei de redare.
+Când utilizați opțiunea numai pentru o singură instanță, introduceți elemente în lista de redare și continuați să redați articolul curent.
+Încărcați articole în lista de redare atunci când este în modul de instanță unică
+Creșterea priorității procesului va îmbunătăți probabil experiența dvs. de rulare, deoarece permite ca VLC să nu fie deranjat de alte aplicații care altfel ar putea lua prea mult timp procesorului. Cu toate acestea, trebuie să vă informați că, în anumite circumstanțe (bug-uri), VLC ar putea să ia tot timpul procesorului și să facă întregul sistem să nu răspundă, ceea ce ar putea necesita repornirea aparatului.
+Măriți prioritatea procesului
+Permiteți o singură instanță să ruleze atunci când este pornită din fișier.	
+O instanță când este pornită din fișier
+Spuneți VLC-ului că este lansat din cauza unei asocieri de fișiere în sistemul de operare
+VLC este pornită de la asocierea fișierelor
+Permiterea unei singure instanțe VLC să ruleaze poate fi uneori utilă, de exemplu dacă ați asociat VLC cu unele tipuri de suporturi media și nu doriți ca o nouă instanță a VLC să fie deschisă de fiecare dată când faceți dublu clic pe un fișier în explorator. Această opțiune vă va permite să redați fișierul cu instanța deja deschisa sau să o introduceți în execuție.
+Permiteți numai o singură instanță să ruleze
+Conectați toate mesajele VLC la syslog (sistemele UNIX).
+Conectați-vă la syslog
+Conectați toate mesajele VLC la un fișier text.
+Conectați-vă la fișier
+Scrie id-ul procesului în fișierul specificat.
+Scrieți id-ul procesului în fișier
+Rulați VLC ca proces daemon de fundal.
+Compilați ca proces daemon
+Colectați statistici diverse.
+Strânge statistici
+Utilizați o memorie cache a pluginurilor care va îmbunătăți considerabil timpul de pornire al VLC.
+Utilizați o memorie cache a pluginurilor
+Citiți un fișier de configurare VLM imediat ce este pornit VLM.
+Fișier de configurare VLM
+Cale suplimentară pentru ca VLC să caute modulele sale. Puteți adăuga mai multe căi prin concatenarea lor folosind "PATH_SEP" ca separator	
+Căutarea căilor de module
+Această opțiune este utilă dacă doriți să reduceți latența atunci când citiți un flux
+(Experimental) Nu faceți cache-ul la nivelul de acces.
+Această opțiune adaugă o compensare (pozitivă sau negativă) la prioritățile implicite pentru VLC. Puteți să o utilizați pentru a acorda prioritate VLC împotriva altor programe sau împotriva altor instanțe VLC.
+Reglați prioritatea VLC
+Rularea VLC în prioritate în timp real va permite programarea mult mai precisă și randamentul mai bun, mai ales când se transmite conținut în flux. Cu toate acestea, puteți bloca întreaga mașină sau îl puteți face foarte lent. Ar trebui să activați acest lucru numai dacă știți ce faceți.
+Permiteți priorități în timp real
+Demultiplexoarele sunt utilizate pentru a separa fluxurile "elementare" (cum ar fi fluxurile audio și video). Puteți să o utilizați dacă nu este detectat automat demulgatorul corect. Nu ar trebui să setați această opțiune globală decât dacă știți cu adevărat ce faceți.
+Modul Demux
+Filtrele de flux sunt folosite pentru a modifica fluxul care este citit. 
+Modul de filtrare a fluxului
+Utilizați numere secvențiale în locul marcajelor de timp
+Afișați previzualizarea instantaneului în colțul din stânga sus al ecranului.
+Afișați previzualizarea instantaneului video
+Formatul de imagine care va fi utilizat pentru stocarea instantaneelor video
+Formatul instantaneului video
+Prefixul fișierului instantaneu video
+Directorul în care vor fi stocate instantaneele video.
+Directorul de instantanee video (sau numele fișierului)
+Aceasta adaugă filtre de post-procesare pentru a îmbunătăți calitatea imaginii, de exemplu dezinterlarea sau distorsionarea videoclipului.
+Modul de filtrare video
+Aceasta adaugă filtre de ieșire video cum ar fi clona sau perete
+Modulul filtru de ieșire al video-ului
+VLC poate evita crearea capturilor ferestrelor, a cadrelor, etc... în jurul videoclipului, oferind o fereastră "minimală".
+Decorațiunile ferestrei
+Inhibă daemonul de gestionare a energiei în timpul oricăror redări, pentru a evita suspendarea calculatorului din cauza inactivității.
+Inhibați daemonul de gestionare a alimentării în timpul redării
+Dezactivați screensaverul în timpul redării video.
+Dezactivați screen saver
+Ascundeți cursorul mouse-ului și controlerul ecranului complet după n milisecunde, implicit este 3000 ms (3 sec.)
+Ascundeți cursorul și controlerul de ecran complet după x milisecunde
+Locul din videoclip unde să se afișeze titlul (centru inferior implicit).
+Poziția titlului videoclipului
+Afișați titlul videoclipului pentru n milisecunde, implicit este 5000 ms (5 sec)
+Afișați titlul videoclipului pentru x milisecunde
+Afișați titlul videoclipului deasupra filmului.
+Afișați titlul media pe video
+Plasați întotdeauna fereastra video peste celelalte ferestre.
+Media &Informații
+Selectați unul sau mai multe fișiere pentru a fi deschise
+Deschide &Folder...
+&Deschidere avansată...
+Fișier Rapid și Deschis...
+\nAvertisment: dacă nu mai puteți accesa interfața grafică, deschideți fereastra liniei de comandă, mergeți la directorul unde ați instalat VLC și executați "vlc -I qt\n
+Nu există ajutor pentru aceste module.
+Nu există ajutor disponibil
+În această secțiune puteți forța comportamentul subtitrărilor demuxer, de exemplu prin setarea tipului de subtitrări sau a numelui fișierului.
+Setările subtitrărilor demuxer
+Furnizorii de dialog pot fi configurați aici.
+Setările furnizorilor de dialog
+Acestea sunt setări generale pentru modulele de codare video / audio / subtitrări.
+Setările codificatorului
+Setările modulelor Packetizer
+Aceste setări afectează modulele de transformare chroma.
+Setările modulelor Chroma
+Aceste module oferă funcții de rețea pentru toate celelalte părți ale VLC-ului.
+Rețea
+Setări avansate
+Puteți alege să dezactivați unele accelerații ale procesorului aici. Folosiți cu mare grijă!
+Caracteristicile procesorului
+Setări avansate. Folosiți cu grijă...
+Avansat
+Modulele de descoperire a serviciilor sunt facilități ce adaugă în mod automat elemente la lista de redare.
+Servicii de descoperire
+Comportamentul general al listei de redare
+Setările referitoare la comportamentul listei de redare(de exemplu, modul de redare) și modulele care adaugă elemente automat în lista de redare(modulele de "descoperire de servicii").
+Listă de redare
+Implementarea VLC-ului al unui video la cerere
+VOD
+SAP este o modalitate de a anunța public fluxurile ce sunt trimise prin multicast UDP sau RTP.
+SAP
+Modulele de flux Sout permit construirea unui lanț de prelucrare a produselor. Pentru mai multe informații, consultați secțiunea Streaming Howto. Puteți configura opțiunile implicite pentru fiecare modul sout stream aici.
+Sout stream
