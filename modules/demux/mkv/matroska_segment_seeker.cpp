@@ -462,6 +462,7 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
     fptr_t i_cluster_pos = -1;
     ms.cluster = NULL;
 
+    if (!_cluster_positions.empty())
     {
         cluster_positions_t::iterator cluster_it = greatest_lower_bound(
           _cluster_positions.begin(), _cluster_positions.end(), fpos
