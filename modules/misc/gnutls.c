@@ -445,7 +445,8 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
         gnutls_free (desc.data);
     }
 
-    if (status == (GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID) &&
+    const unsigned status_insecure = GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
+    if ((status & status_insecure) == status_insecure &&
             (creds->obj.flags & OBJECT_FLAGS_INSECURE))
     {
         msg_Info( creds, "Accepting self-signed/untrusted CA certificate." );
