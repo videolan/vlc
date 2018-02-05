@@ -7,7 +7,7 @@
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-11-16 03:02+0100\n"
@@ -76,8 +76,8 @@ msgstr "VLCの制御インターフェース設定"
 msgid "Hotkeys settings"
 msgstr "ホットキー設定"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -232,7 +232,7 @@ msgstr "デマルチプレクサー"
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
 msgstr ""
-"デマルチプレクサーはオーディオとビデオのストリームを分離するために使われま"
+"デマルチプレクサーはオーディオとビデオのストリームを分離するために使用されま"
 "す。"
 
 #: include/vlc_config_cat.h:115
@@ -262,7 +262,7 @@ msgstr "字幕、テレテキストおよび、CCデコーダーとエンコー�
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "入力の一般的な設定、注意して使ってください..."
+msgstr "入力の一般的な設定、注意して使用してください..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1944
 #: modules/access/avio.h:50
@@ -280,7 +280,7 @@ msgid ""
 "duplicating...)."
 msgstr ""
 "ストリーミングサーバーとして動作する時、または受信するストリームを保存する時"
-"に使用されるストリーム出力設定を行います。\n"
+"に使用されるストリーム出力設定です。\n"
 "ストリームは最初にマルチプレクサーで混合され、\"出力手段\"のモジュールを通し"
 "てストリームとして送信(UDP, HTTP, RTP/RTSP)されるか、ファイルに保存されま"
 "す。\n"
@@ -422,7 +422,7 @@ msgstr "詳細設定で開く (&A)..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "ディレクトリを開く... (&I)"
+msgstr "ディレクトリを開く(&I)..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
@@ -482,7 +482,7 @@ msgstr "再生"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr "選択されたものを削除"
+msgstr "選択項目を削除"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
@@ -510,7 +510,7 @@ msgstr "含まれるディレクトリの表示..."
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
-msgstr "メディアの存在フォルダー..."
+msgstr "含まれるフォルダーの表示..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
@@ -737,7 +737,8 @@ msgstr "ヘッドフォン"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "自動"
@@ -760,7 +761,7 @@ msgstr "文字列"
 
 #: src/config/help.c:164
 msgid "To get exhaustive help, use '-H'."
-msgstr "網羅的なヘルプを表示するためには、'-H'オプションを指定してください。"
+msgstr "包括的なヘルプを表示するためには、'-H'オプションを指定してください。"
 
 #: src/config/help.c:168
 #, c-format
@@ -898,7 +899,7 @@ msgstr ""
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
-msgstr "不明のエラー"
+msgstr "不明なエラー"
 
 #: src/input/control.c:204
 #, c-format
@@ -916,7 +917,7 @@ msgstr "コーデックがサポートされていません。"
 #: src/input/decoder.c:1885
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLCはフォーマット \"%4.4s\" (%s) をデコードできませんでした。"
+msgstr "VLCは形式 \"%4.4s\" (%s) をデコードできませんでした。"
 
 #: src/input/decoder.c:1889
 msgid "Unidentified codec"
@@ -1010,8 +1011,8 @@ msgstr "言語"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "説明"
 
@@ -1088,7 +1089,7 @@ msgstr "フレームレート"
 
 #: src/input/es_out.c:3165
 msgid "Decoded format"
-msgstr "デコードフォーマット"
+msgstr "デコード形式"
 
 #: src/input/es_out.c:3170
 msgid "Top left"
@@ -1274,11 +1275,12 @@ msgstr "入力を開くことができません"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLCはMRL '%s'を開けません。詳細はログを確認してください。"
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1506,7 +1508,7 @@ msgstr "1:1 オリジナル"
 
 #: src/libvlc.h:168 src/libvlc-module.c:1343 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
-msgstr "2:1 二倍"
+msgstr "2:1 2倍"
 
 #: src/libvlc-module.c:64
 msgid ""
@@ -1764,7 +1766,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1849,7 +1852,7 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
-"オーディオのピッチに影響を与えることなく、オーディオを遅く、または早く再生す"
+"オーディオのピッチに影響を与えることなく、オーディオを遅く、または速く再生す"
 "ることが可能となります。"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1125
@@ -1970,7 +1973,7 @@ msgstr ""
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
-msgstr "ビデオの位置あわせ"
+msgstr "ビデオの位置合わせ"
 
 #: src/libvlc-module.c:290
 msgid ""
@@ -2044,7 +2047,7 @@ msgstr "右下"
 
 #: src/libvlc-module.c:298
 msgid "Zoom video"
-msgstr "ビデオの拡大"
+msgstr "ビデオのズーム"
 
 #: src/libvlc-module.c:300
 msgid "You can zoom the video by the specified factor."
@@ -2080,11 +2083,11 @@ msgstr "全画面表示モードでビデオを開始します。"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
-msgstr "常に最前面"
+msgstr "常に手前に表示"
 
 #: src/libvlc-module.c:317
 msgid "Always place the video window on top of other windows."
-msgstr "常にビデオウィンドウを他のウィンドウの前面に表示します。"
+msgstr "常にビデオウィンドウを他のウィンドウの手前に表示します。"
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
@@ -2247,8 +2250,7 @@ msgstr "ビデオスナップショットの形式"
 
 #: src/libvlc-module.c:403
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
-"ビデオスナップショットを保存する際に用いる画像フォーマットを指定します。"
+msgstr "ビデオスナップショットを保存する際に使用する画像形式を指定します。"
 
 #: src/libvlc-module.c:405
 msgid "Display video snapshot preview"
@@ -2376,9 +2378,9 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
-"もし、エンコーダーが誤って高さを1088行に指定した場合でも、HDTV-1080のビデオ"
-"フォーマットを適正に扱うことを可能とします。もし、ビデオが非標準的なフォー"
-"マットで1088行である場合には、このオプションを無効にする必要があります。"
+"もし、エンコーダーが誤って高さを1088行に指定した場合でも、HDTV-1080のビデオ形"
+"式を適切に扱うことを可能とします。もし、ビデオが1088行必要な非標準的な形式で"
+"ある場合にのみ、このオプションを無効にする必要があります。"
 
 #: src/libvlc-module.c:466
 msgid "Monitor pixel aspect ratio"
@@ -2712,10 +2714,10 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
-"複数のビデオフォーマットが利用可能な場合、それらの解像度の中からこの値に最も"
-"近い(しかしそれを超えない)ものをライン数で選択してください。このオプションは"
-"高解像度の再生を行うためにCPUパワーかネットワークの帯域が十分でない場合に使用"
-"してください。"
+"複数のビデオ形式が利用可能な場合、それらの解像度の中からこの値に最も近い(しか"
+"しそれを超えない)ものをライン数で選択してください。このオプションは高解像度の"
+"再生を行うためにCPUパワーかネットワークの帯域が十分でない場合に使用してくださ"
+"い。"
 
 #: src/libvlc-module.c:628
 msgid "Best available"
@@ -2812,8 +2814,8 @@ msgid ""
 "inputs."
 msgstr ""
 "同時に複数の入力ストリームを再生することを可能とします。この機能はまだ実験的"
-"な実装の段階で、すべてのフォーマットはサポートされていません。'#'で区切られた"
-"入力ストリームリストを指定してください。"
+"な実装の段階で、すべての形式はサポートされていません。'#'で区切られた入力スト"
+"リームリストを指定してください。"
 
 #: src/libvlc-module.c:669
 msgid "Bookmarks list for a stream"
@@ -2846,8 +2848,8 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
-"可能な場合、ストリーム出力モジュールを使わずに入力ストリームをレコーディング"
-"します。"
+"可能な場合、ストリーム出力モジュールを使用せずに入力ストリームをレコーディン"
+"グします。"
 
 #: src/libvlc-module.c:684
 msgid "Timeshift directory"
@@ -3176,8 +3178,8 @@ msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
 msgstr ""
-"このX.509証明書ファイル(PEMフォーマット)はサーバーサイドTLSに使用されます。こ"
-"の文字列はOS Xではキーチェーン中の証明書を検索するラベルとして使用されます"
+"このX.509証明書ファイル(PEM形式)はサーバー側のTLSに使用されます。この文字列は"
+"OS Xではキーチェーン中の証明書を検索するラベルとして使用されます"
 
 #: src/libvlc-module.c:847
 msgid "HTTP/TLS server private key"
@@ -3185,7 +3187,7 @@ msgstr "HTTP/TLSサーバー秘密鍵"
 
 #: src/libvlc-module.c:849
 msgid "This private key file (PEM format) is used for server-side TLS."
-msgstr "この秘密鍵ファイル(PEMフォーマット)はサーバーサイドTLSに使用されます。"
+msgstr "この秘密キーファイル(PEM形式)はサーバー側のTLSに使用されます。"
 
 #: src/libvlc-module.c:851
 msgid "SOCKS server"
@@ -4047,7 +4049,7 @@ msgstr "再生を停止するホットキーを選択します。"
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 #: modules/gui/qt/ui/video_effects.h:1279
 msgid "Position"
-msgstr "再生位置表示"
+msgstr "再生位置"
 
 #: src/libvlc-module.c:1247
 msgid "Select the hotkey to display the position."
@@ -4215,7 +4217,7 @@ msgstr "選択"
 
 #: src/libvlc-module.c:1298
 msgid "Select the key to activate selected item in DVD menus."
-msgstr "DVDメニューの選択された項目を有効化するキーを設定します。"
+msgstr "DVDメニューの選択項目を有効化するキーを設定します。"
 
 #: src/libvlc-module.c:1299 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
@@ -4235,7 +4237,7 @@ msgstr "前のDVDタイトルを選択するキーを設定します。"
 
 #: src/libvlc-module.c:1303
 msgid "Select next DVD title"
-msgstr "次のDVDタイトルを選択する"
+msgstr "次のDVDタイトルを選択"
 
 #: src/libvlc-module.c:1304
 msgid "Select the key to choose the next title from the DVD"
@@ -4251,7 +4253,7 @@ msgstr "前のDVDチャプターを選択するキーを設定します。"
 
 #: src/libvlc-module.c:1307
 msgid "Select next DVD chapter"
-msgstr "次のDVDチャプターを選択する"
+msgstr "次のDVDチャプターを選択"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the next chapter from the DVD"
@@ -4310,7 +4312,7 @@ msgstr "字幕の文字サイズを大きく"
 
 #: src/libvlc-module.c:1321
 msgid "Scale down subtitles text"
-msgstr "字幕の文字サイズを小く"
+msgstr "字幕の文字サイズを小さく"
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to change subtitles text scaling"
@@ -4337,7 +4339,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1327
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr "字幕同期 / オーディオと字幕タイムスタンプを同期"
+msgstr "字幕の同期 / オーディオと字幕タイムスタンプを同期"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
@@ -4587,7 +4589,7 @@ msgstr "ビデオのクロッピングの切り替え"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through a predefined list of crop formats."
-msgstr "事前に定義されたクロッピングを切り替えます。"
+msgstr "定義済みのトリミング形式のリストを循環します。"
 
 #: src/libvlc-module.c:1399
 msgid "Toggle autoscaling"
@@ -4674,7 +4676,7 @@ msgstr "プレイリストのランダム再生の切り替え"
 
 #: src/libvlc-module.c:1429 src/libvlc-module.c:1430
 msgid "Un-Zoom"
-msgstr "縮小"
+msgstr "アンズーム"
 
 #: src/libvlc-module.c:1432 src/libvlc-module.c:1433
 msgid "Crop one pixel from the top of the video"
@@ -4722,7 +4724,7 @@ msgstr "時計回りにビューポイントを回転 (360°)"
 
 #: src/libvlc-module.c:1456
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr "反時計周りにビューポイントを回転 (360°)"
+msgstr "反時計回りにビューポイントを回転 (360°)"
 
 #: src/libvlc-module.c:1458
 msgid "Toggle wallpaper mode in video output"
@@ -4877,7 +4879,7 @@ msgstr "現在の設定を既定値にリセットする"
 
 #: src/libvlc-module.c:2759
 msgid "use alternate config file"
-msgstr "別の設定ファイルを使う"
+msgstr "別の設定ファイルを使用"
 
 #: src/libvlc-module.c:2761
 msgid "resets the current plugins cache"
@@ -4932,7 +4934,8 @@ msgid "Browser Stop"
 msgstr "ブラウザ 停止"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6654,7 +6657,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
 "Select audio input format with the given number of audio channels (if non 0)"
-msgstr "オーディオのチャンネル数と共に入力フォーマットを指定します。"
+msgstr "オーディオのチャンネル数と共に入力形式を指定します。(0以外の場合)"
 
 #: modules/access/dshow/dshow.cpp:201
 #: modules/stream_out/transcode/transcode.c:94
@@ -6664,7 +6667,8 @@ msgstr "オーディオサンプリングレート"
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
-msgstr "サンプリングレートと共にオーディオの入力フォーマットを指定します。"
+msgstr ""
+"サンプリングレートと共にオーディオの入力形式を指定します。(0以外の場合)"
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
@@ -6672,7 +6676,8 @@ msgstr "オーディオのサンプルあたりのビット数"
 
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
-msgstr "サンプルごとのビット数と共にオーディオの入力フォーマットを指定します。"
+msgstr ""
+"サンプルごとのビット数と共にオーディオの入力形式を指定します。(0以外の場合)"
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
@@ -6789,7 +6794,8 @@ msgstr ""
 "トランスポンダーによってTVチャンネルはあたえられた周波数でグループ化(マルチプ"
 "レクス)されます。これは受信機でチューンする必要があります。"
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "変調方式 / コンステレーション"
 
@@ -7596,7 +7602,8 @@ msgstr "オーディオの基本ストリームのチャンネル数"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "幅"
@@ -8064,8 +8071,8 @@ msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key. This must be a 32-character-long hexadecimal string."
 msgstr ""
-"このセキュアなマスター共有秘密鍵を使ってRTPパケットの認証と暗号解読が行われま"
-"す。32文字の16進文字列で指定します。"
+"このセキュリティで保護されたマスター共有シークレットキーを使用してRTPパケット"
+"の認証と暗号解読が行われます。32文字の16進文字列で指定します。"
 
 #: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:150
 msgid "SRTP salt (hexadecimal)"
@@ -8122,15 +8129,15 @@ msgstr ""
 
 #: modules/access/rtp/rtp.c:78
 msgid "RTP payload format assumed for dynamic payloads"
-msgstr "RTPペイロードのフォーマットをダイナミックペイロードと仮定"
+msgstr "RTPペイロードの形式をダイナミックペイロードと仮定"
 
 #: modules/access/rtp/rtp.c:81
 msgid ""
 "This payload format will be assumed for dynamic payload types (between 96 "
 "and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 msgstr ""
-"帯域外マッピング(SDP)でない、このペイロードのフォーマットが決定できない場合、"
-"ダイナミックペイロードタイプ(96-127)と仮定されます。"
+"このペイロード形式は、帯域外マッピング (SDP) を使用して、それ以外の方法で判断"
+"できない場合は、ダイナミックペイロードタイプ(96-127)と仮定されます。"
 
 #: modules/access/rtp/rtp.c:95 modules/stream_out/rtp.c:187
 msgid "RTP"
@@ -8150,8 +8157,8 @@ msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
 "rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 msgstr ""
-"RTPストリームを受信するためには、SDPフォーマット中の記述が必要です。rtp:://の"
-"URIは動的RTPペイロードフォーマット(%<PRIu8>)では動作しません。"
+"RTPストリームを受信するには、SDP形式の記述が必要です。rtp:://のURIはダイナ"
+"ミックRTPペイロード形式(%<PRIu8>)では動作しません。"
 
 #: modules/access/rtsp/access.c:48 modules/access/rtsp/access.c:49
 msgid "Real RTSP"
@@ -8567,7 +8574,8 @@ msgstr "ラジオデバイス"
 msgid "Radio tuner device node."
 msgstr "ラジオチューナーデバイスノード"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "周波数"
 
@@ -9040,11 +9048,11 @@ msgstr "開始"
 
 #: modules/access/vnc.c:48
 msgid "X.509 Certificate Authority"
-msgstr "X.509認証局"
+msgstr "X.509証明機関"
 
 #: modules/access/vnc.c:49
 msgid "Certificate of the Authority to verify server's against"
-msgstr "サーバーを確認するための認証証明書"
+msgstr "サーバーを確認する認証証明書"
 
 #: modules/access/vnc.c:50
 msgid "X.509 Certificate Revocation List"
@@ -9152,11 +9160,11 @@ msgstr "ファイルが存在する場合、置き換えるのではなく、追
 
 #: modules/access_output/file.c:381
 msgid "Format time and date"
-msgstr "日時のフォーマット"
+msgstr "日時の形式"
 
 #: modules/access_output/file.c:382
 msgid "Perform ISO C time and date formatting on the file path"
-msgstr "ファイルパスにISO C標準の日時フォーマットを使用"
+msgstr "ファイルパスにISO C標準の日時形式を使用"
 
 #: modules/access_output/file.c:384
 msgid "Synchronous writing"
@@ -9675,8 +9683,7 @@ msgstr "バイノーラル化のHRTFファイル"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
-msgstr ""
-"SOFAフォーマットのカスタムHRTF (Head-related transfer function)ファイル"
+msgstr "SOFA形式のカスタムHRTF (Head-related transfer function)ファイル"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
@@ -9844,7 +9851,7 @@ msgstr "ダイナミックレンジ圧縮"
 
 #: modules/audio_filter/converter/format.c:49
 msgid "Audio filter for PCM format conversion"
-msgstr "PCMフォーマット変換のためのオーディオフィルター"
+msgstr "PCM形式変換のためのオーディオフィルター"
 
 #: modules/audio_filter/converter/tospdif.c:49
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
@@ -10397,7 +10404,7 @@ msgstr "オーディオメモリー出力"
 
 #: modules/audio_output/amem.c:42
 msgid "Sample format"
-msgstr "サンプルフォーマット"
+msgstr "サンプル形式"
 
 #: modules/audio_output/auhal.c:45
 msgid "Last audio device"
@@ -10452,8 +10459,8 @@ msgid ""
 "Select speaker configuration you want to use. This option doesn't upmix! So "
 "NO e.g. Stereo -> 5.1 conversion."
 msgstr ""
-"使用するスピーカー設定を選択します。このオプションでは、たとえば、ステレオ -"
-"> 5.1への変換などのアップミックスは行いません！"
+"使用するスピーカー設定を選択します。このオプションでは、例えば、ステレオ -> "
+"5.1への変換などのアップミックスは行いません！"
 
 #: modules/audio_output/directsound.c:70
 msgid "Audio volume in hundredths of decibels (dB)."
@@ -10465,7 +10472,7 @@ msgstr "DirectXオーディオ出力"
 
 #: modules/audio_output/file.c:83
 msgid "Output format"
-msgstr "出力フォーマット"
+msgstr "出力形式"
 
 #: modules/audio_output/file.c:85
 msgid "Number of output channels"
@@ -11749,9 +11756,9 @@ msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
-"KateストリームはTigerライブラリを使ってレンダリングすることが可能です。この機"
-"能を無効にするとスタティックなテキストとビットマップをベースとするストリーム"
-"のみ、レンダリングされます。"
+"KateストリームはTigerライブラリを使用してレンダリングすることが可能です。この"
+"機能を無効にするとスタティックなテキストとビットマップをベースとするストリー"
+"ムのみ、レンダリングされます。"
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
@@ -11796,8 +11803,8 @@ msgid ""
 "font parameters where appropriate."
 msgstr ""
 "Kateストリームが特定のフォントパラメーター(名前、サイズなど)を指定しなかった"
-"場合に使うフォントの説明を指定します。指定されなかった場合は、適切なフォント"
-"パラメーターが選択されます。"
+"場合に使用するフォントの説明を指定します。指定されなかった場合は、適切なフォ"
+"ントパラメーターが選択されます。"
 
 #: modules/codec/kate.c:237
 msgid "Default font color"
@@ -13080,8 +13087,8 @@ msgid ""
 "your subtitles don't appear."
 msgstr ""
 "いくつかのフランスのチャンネルでは、初期の歴史的なミスから字幕ページのフラグ"
-"を正しく設定してません。もし字幕が表示されない場合は、このオプションを使って"
-"ください。"
+"を正しく設定してません。もし字幕が表示されない場合は、このオプションを使用し"
+"てください。"
 
 #: modules/codec/telx.c:71
 msgid "Teletext subtitles decoder"
@@ -14009,7 +14016,7 @@ msgstr "CPU最適化"
 
 #: modules/codec/x264.c:388
 msgid "Use assembler CPU optimizations."
-msgstr "アセンブラーCPU最適化を使います。"
+msgstr "アセンブラーCPU最適化を使用します。"
 
 #: modules/codec/x264.c:390
 msgid "Filename for 2 pass stats file"
@@ -14213,7 +14220,7 @@ msgstr ""
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
-msgstr "テレテキストの位置あわせ"
+msgstr "テレテキストの位置合わせ"
 
 #: modules/codec/zvbi.c:71
 msgid ""
@@ -14451,11 +14458,11 @@ msgstr "クロッピング: %s"
 
 #: modules/control/hotkeys.c:1145
 msgid "Zooming reset"
-msgstr "拡大/縮小のリセット"
+msgstr "ズームのリセット"
 
 #: modules/control/hotkeys.c:1152
 msgid "Scaled to screen"
-msgstr "画面にあわせる"
+msgstr "画面に合わせる"
 
 #: modules/control/hotkeys.c:1154
 msgid "Original Size"
@@ -14517,7 +14524,7 @@ msgid ""
 "Tell lirc to read this configuration file. By default it searches in the "
 "users home directory."
 msgstr ""
-"LIRCniこの設定ファイルを読み込むように指示します。デフォルトでは、ユーザーの"
+"LIRCにこの設定ファイルを読み込むように指示します。デフォルトでは、ユーザーの"
 "ホームディレクトリを検索します。"
 
 #: modules/control/lirc.c:59
@@ -15364,7 +15371,7 @@ msgstr "チャプターコーデック"
 
 #: modules/demux/mkv/mkv.cpp:61
 msgid "Use chapter codecs found in the segment."
-msgstr "セグメントで見つかったチャプターコーデックを使います。"
+msgstr "セグメントで見つかったチャプターコーデックを使用します。"
 
 #: modules/demux/mkv/mkv.cpp:64 modules/gui/qt/ui/sprefs_input.h:370
 msgid "Preload MKV files in the same directory"
@@ -15393,8 +15400,8 @@ msgstr "ダミー要素"
 #: modules/demux/mkv/mkv.cpp:73
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
-"未知のEBMLエレメントを読み込み、廃棄します。(壊れたファイルの場合、指定しない"
-"でください。"
+"不明なEBMLエレメントを読み取り、破棄します。(壊れたファイルには適していませ"
+"ん)"
 
 #: modules/demux/mkv/mkv.cpp:76
 msgid "Preload clusters"
@@ -15509,7 +15516,7 @@ msgstr "条件"
 
 #: modules/demux/mp4/meta.c:74
 msgid "Original Format"
-msgstr "オリジナルフォーマット"
+msgstr "オリジナル形式"
 
 #: modules/demux/mp4/meta.c:75
 msgid "Display Source As"
@@ -15706,7 +15713,7 @@ msgid ""
 "duration. However sometimes this might not be usable. Disable this option to "
 "calculate from the bitrate instead."
 msgstr ""
-"通常、MPEGファイルのタイムスタンプを使って長さと位置を計測します。しかし、"
+"通常、MPEGファイルのタイムスタンプを使用して長さと位置を計測します。しかし、"
 "時々これが利用できない場合があります。このオプションを無効にすると、タイムス"
 "タンプからではなく、ビットレートから計算します。"
 
@@ -15900,7 +15907,7 @@ msgid ""
 "prevent adding them to the playlist."
 msgstr ""
 "通常、このオプションは広告の検出を行ってスキップし、それらをプレイリストに追"
-"加されないようにするために使われます。"
+"加しないようにするために使用されます。"
 
 #: modules/demux/playlist/playlist.c:67
 msgid "M3U playlist import"
@@ -16055,11 +16062,11 @@ msgstr ""
 
 #: modules/demux/rawaud.c:49
 msgid "FOURCC code of raw input format"
-msgstr "RAW入力フォーマットのFOURCCコード"
+msgstr "RAW入力形式のFOURCCコード"
 
 #: modules/demux/rawaud.c:51
 msgid "FOURCC code of the raw input format. This is a four character string."
-msgstr "RAW入力フォーマットの4文字のFOURCCコードを指定します。"
+msgstr "RAW入力形式の4文字のFOURCCコードを指定します。"
 
 #: modules/demux/rawaud.c:53
 msgid "Forces the audio language"
@@ -16150,8 +16157,7 @@ msgid ""
 "Force the subtiles format. Selecting \"auto\" means autodetection and should "
 "always work."
 msgstr ""
-"字幕のフォーマットを指定します。\"自動\"は自動検出を行うため、常に動作するで"
-"しょう。"
+"字幕の形式を指定します。\"自動\"は自動検出を行うため、常に動作するでしょう。"
 
 #: modules/demux/subtitle.c:60
 msgid "Override the default track description."
@@ -16312,10 +16318,10 @@ msgstr ""
 "ティによって開発されたフリーのオープンソースのエンコーダー、ストリーミング機"
 "能を持つメディアプレイヤーです。</p><p>VLCは様々なプラットフォームで実行可能"
 "な自身の内部コーデックを使用し、ほとんどすべてのファイル、CD、DVD、ネットワー"
-"クストリーム、キャプチャーカードおよび、その他のメディアフォーマットを読み込"
-"むことができます！</p><p><a href=\"http://www.videolan.org/contribute/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">一緒に参加しま"
-"しょう！</span></a></p>"
+"クストリーム、キャプチャーカードおよび、その他のメディア形式を読み込むことが"
+"できます！</p><p><a href=\"http://www.videolan.org/contribute/\"><span style="
+"\" text-decoration: underline; color:#0057ae;\">一緒に参加しましょう！</"
+"span></a></p>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16378,7 +16384,8 @@ msgid "Name"
 msgstr "名前"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "作成者"
@@ -16771,7 +16778,7 @@ msgid ""
 "autodetect the other using the original aspect ratio"
 msgstr ""
 "以下の3つのパラメーターのうち、ひとつを入力する必要があります。VLCはオリジナ"
-"ルのアスペクト比を使ってその他を自動的に検出します。"
+"ルのアスペクト比を使用してその他を自動的に検出します。"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:169
 #: modules/gui/macosx/VLCOutput.m:88 modules/gui/qt/ui/profiles.h:741
@@ -16857,7 +16864,7 @@ msgstr "SDP URL"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:270
 msgid "Invalid container format for HTTP streaming"
-msgstr "HTTPストリーミングに無効なコンテナーフォーマット"
+msgstr "HTTPストリーミングに無効なコンテナ形式"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:272
 msgid ""
@@ -17000,15 +17007,17 @@ msgstr "全画面表示時のブラックスクリーン表示"
 #: modules/gui/macosx/macosx.m:61
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
 msgstr ""
-"全画面表示の時にビデオが表示されていないスクリーンをブラックスクリーンとする"
+"全画面表示モードでビデオが表示されていないスクリーンをブラックスクリーンとす"
+"る"
 
 #: modules/gui/macosx/macosx.m:64
 msgid "Show Fullscreen controller"
-msgstr "全画面表示の時にコントローラーを表示"
+msgstr "全画面表示コントローラーを表示"
 
 #: modules/gui/macosx/macosx.m:65
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "全画面表示時にマウスを動作させると透明なコントローラーを表示します。"
+msgstr ""
+"全画面表示モードでマウスを動作させると透明なコントローラーを表示します。"
 
 #: modules/gui/macosx/macosx.m:68
 msgid "Auto-playback of new items"
@@ -17105,7 +17114,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:95
 #: modules/gui/macosx/VLCSimplePrefsController.m:363
 msgid "Use the native fullscreen mode"
-msgstr "ネイティブの全画面モードを使用"
+msgstr "ネイティブの全画面表示モードを使用"
 
 #: modules/gui/macosx/macosx.m:96
 msgid ""
@@ -17113,8 +17122,8 @@ msgid ""
 "releases. It can also use the native fullscreen mode on Mac OS X 10.7 and "
 "later."
 msgstr ""
-"以前のMac OS XリリースからVLCはデフォルトで全画面モードを使用します。Mac OS "
-"X 10.7以降ではネイティブの全画面モードも使用します。"
+"以前のMac OS XリリースからVLCはデフォルトで全画面表示モードを使用します。Mac "
+"OS X 10.7以降ではネイティブの全画面表示モードも使用します。"
 
 #: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:95
 msgid "Resize interface to the native video size"
@@ -17375,7 +17384,7 @@ msgstr "キャプチャーデバイスを開く..."
 
 #: modules/gui/macosx/VLCMainMenu.m:351
 msgid "Open Recent"
-msgstr "最近使った項目を開く"
+msgstr "最近使用した項目を開く"
 
 #: modules/gui/macosx/VLCMainMenu.m:352
 msgid "Close Window"
@@ -17482,12 +17491,12 @@ msgstr "2倍サイズ"
 
 #: modules/gui/macosx/VLCMainMenu.m:421
 msgid "Fit to Screen"
-msgstr "画面にあわせる"
+msgstr "画面に合わせる"
 
 #: modules/gui/macosx/VLCMainMenu.m:423
 #: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
-msgstr "常に前面に表示"
+msgstr "常に手前に表示"
 
 #: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
@@ -17619,7 +17628,7 @@ msgstr "拡張M3U"
 
 #: modules/gui/macosx/VLCMainMenu.m:1145
 msgid "XML Shareable Playlist Format (XSPF)"
-msgstr "XML共有可能プレイリストフォーマット(XSPF)"
+msgstr "XML共有可能プレイリスト形式(XSPF)"
 
 #: modules/gui/macosx/VLCMainMenu.m:1146
 #: modules/gui/qt/dialogs_provider.cpp:642
@@ -17646,31 +17655,31 @@ msgstr "再生するメディアを選択するダイアログを表示"
 #: modules/gui/macosx/VLCMainWindow.m:204
 #: modules/gui/qt/components/playlist/selector.cpp:580
 msgid "Subscribe"
-msgstr "視聴申込"
+msgstr "視聴登録"
 
 #: modules/gui/macosx/VLCMainWindow.m:199
 #: modules/gui/macosx/VLCMainWindow.m:210
 #: modules/gui/qt/components/playlist/selector.cpp:597
 msgid "Unsubscribe"
-msgstr "視聴申込解除"
+msgstr "視聴登録解除"
 
 #: modules/gui/macosx/VLCMainWindow.m:202
 #: modules/gui/qt/components/playlist/selector.cpp:279
 msgid "Subscribe to a podcast"
-msgstr "Podcastの申込"
+msgstr "Podcastの登録"
 
 #: modules/gui/macosx/VLCMainWindow.m:203
 #: modules/gui/qt/components/playlist/selector.cpp:581
 msgid "Enter URL of the podcast to subscribe to:"
-msgstr "視聴申込するPodcastのURLを入力:"
+msgstr "視聴登録するPodcastのURLを入力:"
 
 #: modules/gui/macosx/VLCMainWindow.m:208
 msgid "Unsubscribe from a podcast"
-msgstr "Podcastのサブスクライブを停止"
+msgstr "Podcastの登録を解除"
 
 #: modules/gui/macosx/VLCMainWindow.m:209
 msgid "Select the podcast you would like to unsubscribe from:"
-msgstr "サブスクライブを停止したいPodcastを選択:"
+msgstr "登録を解除したいPodcastを選択:"
 
 #: modules/gui/macosx/VLCMainWindow.m:235
 msgid "Check for album art and metadata?"
@@ -17870,8 +17879,8 @@ msgstr ""
 "ぞれのIPアドレスを入力してください。ユニキャストモードでは、VLCはコンピュー"
 "ターのIPアドレスを自動的に使用します。\n"
 "\n"
-"異なるプトロコルを使ってストリームを開くには、キャンセルを選択してこのシート"
-"を閉じてください。"
+"異なるプトロコルを使用してストリームを開くには、キャンセルを選択してこのシー"
+"トを閉じてください。"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
 msgid ""
@@ -18414,7 +18423,7 @@ msgstr "フォルダー"
 #: modules/gui/macosx/VLCSimplePrefsController.m:369
 #: modules/gui/qt/ui/sprefs_video.h:336
 msgid "Format"
-msgstr "フォーマット"
+msgstr "形式"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/qt/ui/sprefs_video.h:333
@@ -18572,7 +18581,8 @@ msgid "sec."
 msgstr "秒"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "オーディオ/ビデオ"
 
@@ -19263,11 +19273,11 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Previous / Backward"
-msgstr "前 / 戻る"
+msgstr "前へ / 戻る"
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Next / Forward"
-msgstr "次 / 進む"
+msgstr "次へ / 進む"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "De-Fullscreen"
@@ -19375,7 +19385,7 @@ msgstr "字幕ファイルを開く"
 
 #: modules/gui/qt/components/controller.hpp:127
 msgid "Dock/undock fullscreen controller to/from bottom of screen"
-msgstr "全画面コントローラーをスクリーン下端へドック/アンドック"
+msgstr "全画面表示コントローラーをスクリーン下端へドック/アンドック"
 
 #: modules/gui/qt/components/controller_widget.cpp:136
 msgctxt "Tooltip|Unmute"
@@ -20197,26 +20207,26 @@ msgstr "パス"
 msgid ""
 "This module outputs the transcoded stream to a network via the mms protocol."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをmmsプロトコルを使って"
+"このモジュールはトランスコーディングされたストリームをmmsプロトコルを使用して"
 "ネットワークに出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:278
 msgid "This module outputs the transcoded stream to a network via RTSP."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをRTPを使ってネットワーク"
-"に出力します。"
+"このモジュールはトランスコーディングされたストリームをRTPを使用してネットワー"
+"クに出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:324
 msgid "This module outputs the transcoded stream to a network via UDP."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをUDPを使ってネットワーク"
-"に出力します。"
+"このモジュールはトランスコーディングされたストリームをUDPを使用してネットワー"
+"クに出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:366
 msgid "This module outputs the transcoded stream to a network via RTP."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをRTPを使ってネットワーク"
-"に出力します。"
+"このモジュールはトランスコーディングされたストリームをRTPを使用してネットワー"
+"クに出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:373
 msgid "Base port"
@@ -20246,7 +20256,7 @@ msgstr "新しいブックマークを作成"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:51
 msgid "Delete the selected item"
-msgstr "選択された項目を削除"
+msgstr "選択項目を削除"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:54
 msgid "Delete all the bookmarks"
@@ -20257,10 +20267,11 @@ msgid "Extract"
 msgstr "抽出"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20272,7 +20283,8 @@ msgstr "閉じる (&C)"
 msgid "Bytes"
 msgstr "バイト"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "変換"
 
@@ -20417,7 +20429,7 @@ msgstr "指定時間に移動"
 
 #: modules/gui/qt/dialogs/gototime.cpp:48
 msgid "&Go"
-msgstr "再生 (&G)"
+msgstr "移動 (&G)"
 
 #: modules/gui/qt/dialogs/gototime.cpp:56
 msgid "Go to time"
@@ -20698,13 +20710,14 @@ msgstr "バージョン"
 msgid "Website"
 msgstr "ウェブサイト"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "ファイル"
 
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:35
 msgid "Deletes the selected item"
-msgstr "選択された項目を削除"
+msgstr "選択項目を削除"
 
 #: modules/gui/qt/dialogs/preferences.cpp:72
 msgid "Show settings"
@@ -21072,7 +21085,7 @@ msgstr "字幕 (&T)"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr "ツール (&s)"
+msgstr "ツール (&S)"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21084,7 +21097,7 @@ msgstr "ヘルプ (&H)"
 
 #: modules/gui/qt/menus.cpp:357
 msgid "Open &File..."
-msgstr "ファイルを開く... (&F)"
+msgstr "ファイルを開く(&F)..."
 
 #: modules/gui/qt/menus.cpp:359
 msgid "&Open Multiple Files..."
@@ -21116,7 +21129,7 @@ msgstr "変換 / 保存 (&R)..."
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
-msgstr "ストリーム... (&S)"
+msgstr "ストリーム (&S)..."
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
@@ -21168,11 +21181,11 @@ msgstr "プレイリストをドッキング"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr "常に最前面 (&T)"
+msgstr "常に手前に表示 (&T)"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
-msgstr "最小化インターフェース (&N)"
+msgstr "最小インターフェース (&N)"
 
 #: modules/gui/qt/menus.cpp:510
 msgid "Ctrl+H"
@@ -21200,7 +21213,7 @@ msgstr "音量を上げる (&I)"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr "音量を下げる (&e)"
+msgstr "音量を下げる (&E)"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -21240,7 +21253,7 @@ msgstr "全画面表示 (&F)"
 
 #: modules/gui/qt/menus.cpp:682
 msgid "Always Fit &Window"
-msgstr "常にウィンドウにあわせて表示 (&W)"
+msgstr "常にウィンドウに合わせて表示 (&W)"
 
 #: modules/gui/qt/menus.cpp:683
 msgid "Set as Wall&paper"
@@ -21248,7 +21261,7 @@ msgstr "壁紙として設定 (&P)"
 
 #: modules/gui/qt/menus.cpp:687
 msgid "&Zoom"
-msgstr "拡大 (&Z)"
+msgstr "ズーム (&Z)"
 
 #: modules/gui/qt/menus.cpp:688
 msgid "&Aspect Ratio"
@@ -21296,11 +21309,11 @@ msgstr "停止 (&S)"
 
 #: modules/gui/qt/menus.cpp:845
 msgid "Pre&vious"
-msgstr "前 (&V)"
+msgstr "前へ (&V)"
 
 #: modules/gui/qt/menus.cpp:851
 msgid "Ne&xt"
-msgstr "次 (&X)"
+msgstr "次へ (&X)"
 
 #: modules/gui/qt/menus.cpp:869
 msgid "Sp&eed"
@@ -21447,8 +21460,8 @@ msgid ""
 "playlist and extended panel. This option only works with Windows and X11 "
 "with composite extensions."
 msgstr ""
-"全画面表示時のコントローラーの不透明度を0.1～1の間で指定します。このオプショ"
-"ンはWindowsとX11上で複数のエクステンションとあわせて動作します。"
+"全画面表示コントローラーの不透明度を0.1～1の間で指定します。このオプションは"
+"WindowsとX11上で複数のエクステンションとあわせて動作します。"
 
 #: modules/gui/qt/qt.cpp:122
 msgid "Show unimportant error and warnings dialogs"
@@ -21529,13 +21542,13 @@ msgstr "'開く'ダイアログにファイルブラウザーを埋め込む"
 
 #: modules/gui/qt/qt.cpp:154
 msgid "Define which screen fullscreen goes"
-msgstr "全画面表示時を行うスクリーンの定義"
+msgstr "全画面表示をするスクリーンの定義"
 
 #: modules/gui/qt/qt.cpp:155
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
 msgstr ""
-"インターフェースを表示しているスクリーンではなく、全画面表示するスクリーン番"
-"号を指定"
+"インターフェースと同じスクリーンではなく、全画面表示をするスクリーン番号を指"
+"定します。"
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
@@ -21587,19 +21600,19 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr "インターフェースを最前面にするタイミング"
+msgstr "インターフェースを手前に表示するタイミング"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"ビデオ/オーディオの再生開始時に自動的にインターフェースを前面に表示するかしな"
+"ビデオ/オーディオの再生開始時に自動的にインターフェースを手前に表示するかしな"
 "いかを指定します。"
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "前画面表示コントローラーのマウス感度"
+msgstr "全画面表示コントローラーのマウス感度"
 
 #: modules/gui/qt/qt.cpp:200
 msgid "When minimized"
@@ -22103,11 +22116,11 @@ msgstr "ログファイル名を指定します。"
 
 #: modules/logger/file.c:211
 msgid "Log format"
-msgstr "ログフォーマット"
+msgstr "ログ形式"
 
 #: modules/logger/file.c:212
 msgid "Specify the logging format."
-msgstr "ログフォーマットを指定してください。"
+msgstr "ログ形式を指定してください。"
 
 #: modules/logger/file.c:214
 msgid "Verbosity"
@@ -22216,8 +22229,8 @@ msgid ""
 "Lua interface configuration string. Format is: '[\"<interface module name>"
 "\"] = { <option> = <value>, ...}, ...'."
 msgstr ""
-"Luaインターフェース設定の文字列を指定します。フォーマットは: '[\"<インター"
-"フェースモジュール名>\"] = { <オプション> = <値>, ...}, ...'です。"
+"Luaインターフェース設定の文字列を指定します。形式は: '[\"<インターフェースモ"
+"ジュール名>\"] = { <オプション> = <値>, ...}, ...'です。"
 
 #: modules/lua/vlc.c:55 modules/lua/vlc.c:71
 msgid "A single password restricts access to this interface."
@@ -22977,8 +22990,8 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
-"サーバーが提示したセキュリティ証明書は不明で信用できる認証局に認証されません"
-"でした。"
+"サーバーが提示したセキュリティ証明書は不明であり、信頼された証明機関では認証"
+"できませんでした。"
 
 #: modules/misc/gnutls.c:483
 msgid ""
@@ -22986,8 +22999,8 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
-"サーバーが提示したセキュリティ証明書は前回のアクセスから変更されたため、信用"
-"できる認証局に認証されませんでした。"
+"サーバーが提示したセキュリティ証明書は前回のアクセスから変更されたため、信頼"
+"された証明機関では認証されませんでした。"
 
 #: modules/misc/gnutls.c:494 modules/misc/gnutls.c:515
 #: modules/misc/securetransport.c:338
@@ -23013,10 +23026,10 @@ msgid ""
 "If in doubt, abort now.\n"
 msgstr ""
 "%s. %sへのアクセスを試みました。\n"
-"この問題はセキュリティ違反、プライバシーへの妥協または、設定エラーによって発"
-"生します。\n"
+"この問題は、セキュリティ違反、プライバシーの侵害、または構成エラーの原因とな"
+"る可能性があります。\n"
 "\n"
-"正しくない場合、直ちに終了してください。\n"
+"疑わしい場合、直ちに終了してください。\n"
 
 #: modules/misc/gnutls.c:515
 msgid "Accept 24 hours"
@@ -23201,11 +23214,12 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
-"%sへのアクセスを試みましたが、サーバーが提示したセキュリティ証明書は不明で信"
-"用できる認証局に認証されませんでした。この問題は設定エラーやあなたのセキュリ"
-"ティまたは、プライバシー違反によって発生します。\n"
+"%sへのアクセスを試みましたが、サーバーが提示したセキュリティ証明書は不明であ"
+"り、信頼された証明機関では認証できませんでした。この問題は、構成エラーやセ"
+"キュリティまたはプライバシーを侵害しようとした場合に発生することがありま"
+"す。\n"
 "\n"
-"疑わしい場合には、直ちに終了してください。\n"
+"疑わしい場合、直ちに終了してください。\n"
 
 #: modules/misc/securetransport.c:339
 msgid "Accept certificate temporarily"
@@ -23291,7 +23305,7 @@ msgstr "ASFマルチプレクサー"
 
 #: modules/mux/asf.c:563
 msgid "Unknown Video"
-msgstr "不明のビデオ"
+msgstr "不明なビデオ"
 
 #: modules/mux/avi.c:55
 msgid "Subject"
@@ -23716,7 +23730,8 @@ msgstr "MPEGビデオ"
 msgid "VC-1 packetizer"
 msgstr "VC-1パケッタイザー"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconfネットワークサービス"
 
@@ -24061,10 +24076,10 @@ msgid ""
 "<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. If you only have one file, "
 "simply enter its filename."
 msgstr ""
-"使用される画像ファイルのフルパスを指定します。フォーマットは、<画像ファイル"
-">[,<遅延時間(ミリ秒)>[,<アルファ値>]][;<画像ファイル>[,<遅延時間>[,<アルファ"
-"値>]]][;...]です。ただ一つのファイルを指定する場合、単純にファイルのパスを指"
-"定するだけで構いません。"
+"使用される画像ファイルのフルパスを指定します。形式は、<画像ファイル>[,<遅延時"
+"間(ミリ秒)>[,<アルファ値>]][;<画像ファイル>[,<遅延時間>[,<アルファ値>]]]"
+"[;...]です。ただ一つのファイルを指定する場合、単純にファイルのパスを指定する"
+"だけで構いません。"
 
 #: modules/spu/logo.c:53
 msgid "Logo animation # of loops"
@@ -24862,7 +24877,7 @@ msgstr ""
 "オプションが設定された場合、ブリッジは他の入力ブリッジからデータを受信しない"
 "場合を除き、すべての基本ストリームを廃棄します。これはソースからのデータが途"
 "切れた場合のプレースホルダーの設定を行うために使用します。ソースとプレースホ"
-"ルダーストリームは同じフォーマットである必要があります。"
+"ルダーストリームは同じ形式である必要があります。"
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -24957,12 +24972,10 @@ msgid "Enable Audio passthrough"
 msgstr "オーディオパススルーの有効化"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "受信機がDolby®をサポートしていない場合、無効化してください"
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "高 (高品質、高帯域)"
 
@@ -24971,12 +24984,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "中間 (中間品質、中間帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "低 (低品質、低帯域)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "低CPU (低品質、高帯域)"
 
@@ -26591,7 +26602,8 @@ msgid ""
 "Upconvert: output in 4:2:2 format (independent chroma for each field). Best "
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
-"入力フレームの境界に接触する出力フレーム内の色の取扱いについて選択します。\n"
+"入力フレームの境界に接触する出力フレーム内の色の取り扱いについて選択しま"
+"す。\n"
 "\n"
 "最新: 新しい(明るい)フィールドのみからクロマを取り出します。カムコーダーから"
 "のビデオなどのインターレス入力に適しています。\n"
@@ -26603,9 +26615,8 @@ msgstr ""
 "ブレンド: 入力フィールドクロマの平均です。新しい(明るい)フィールドをひずませ"
 "る可能性があります。\n"
 "\n"
-"アップコンバート: 4:2:2フォーマット(それぞれのフィールドに独立したクロマ)の出"
-"力です。最適なシミュレーションですが、より多くのCPUとメモリの帯域幅を必要とし"
-"ます。"
+"アップコンバート: 4:2:2形式(それぞれのフィールドに独立したクロマ)の出力です。"
+"最適なシミュレーションですが、より多くのCPUとメモリの帯域幅を必要とします。"
 
 #: modules/video_filter/deinterlace/deinterlace.c:291
 msgid "Phosphor old field dimmer strength"
@@ -27203,11 +27214,11 @@ msgstr "回転"
 
 #: modules/video_filter/scene.c:59
 msgid "Image format"
-msgstr "画像フォーマット"
+msgstr "画像形式"
 
 #: modules/video_filter/scene.c:60
 msgid "Format of the output images (png, jpeg, ...)."
-msgstr "出力画像のフォーマットを指定します。(png、またはjpeg、...)"
+msgstr "出力画像の形式を指定します。(png、またはjpeg、...)"
 
 #: modules/video_filter/scene.c:63
 msgid ""
@@ -27552,7 +27563,7 @@ msgstr "ソフトウェアでのダブルバッファリングを無効化"
 
 #: modules/video_output/fb.c:73
 msgid "Image format (default RGB)"
-msgstr "画像フォーマット(デフォルトはRGB)"
+msgstr "画像形式(デフォルトはRGB)"
 
 #: modules/video_output/fb.c:74
 msgid ""
@@ -27740,10 +27751,10 @@ msgid ""
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"ビデオメモリーのかわりにシステムメモリー中にビデオバッファーを作成します。ビ"
-"デオメモリを使った(再スケーリングやYUVからRGBへの変換のような)ハードウェアア"
-"クセラレーションの効果を有効にするため、このオプションは推奨しません。このオ"
-"プションは、オーバレイを使用する場合には何の効果もありません。"
+"ビデオメモリーの代わりにシステムメモリー中にビデオバッファーを作成します。ビ"
+"デオメモリを使用した(再スケーリングやYUVからRGBへの変換のような)ハードウェア"
+"アクセラレーションの効果を有効にするため、このオプションは推奨しません。この"
+"オプションは、オーバレイを使用する場合には何の効果もありません。"
 
 #: modules/video_output/win32/directdraw.c:82
 msgid "Use triple buffering for overlays"
@@ -27812,8 +27823,8 @@ msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
-"最適なフォーマットを使用してパフォーマンスの改善を試みるかわりに、特定のクロ"
-"マフォーマットを使用して画像を作成するためにダミーのビデオ出力を強制します。"
+"最適な形式を使用してパフォーマンスの改善を試みる代わりに、特定のクロマフォー"
+"マットを使用して画像を作成するためにダミーのビデオ出力を強制します。"
 
 #: modules/video_output/vdummy.c:48
 msgid "Dummy video output"
@@ -28696,11 +28707,11 @@ msgstr "プレイリストを空に"
 
 #: share/lua/http/index.html:243
 msgid "Queue Selected"
-msgstr "選択されたものをキューに"
+msgstr "選択項目をキューに"
 
 #: share/lua/http/index.html:244
 msgid "Play Selected"
-msgstr "選択されたものを再生"
+msgstr "選択項目を再生"
 
 #: share/lua/http/index.html:245
 msgid "Refresh List"
@@ -28728,9 +28739,9 @@ msgid ""
 "configuration, or to modify the default settings, select the button to the "
 "right: <i>Manage Streams</i>"
 msgstr ""
-"デフォルトの設定を使ってストリームは生成されます。詳細な設定、またはデフォル"
-"ト設定を変更するためには、<i>ストリームの管理</i>の右側のボタンを選択してくだ"
-"さい。"
+"デフォルトの設定を使用してストリームは生成されます。詳細な設定、またはデフォ"
+"ルト設定を変更するためには、<i>ストリームの管理</i>の右側のボタンを選択してく"
+"ださい。"
 
 #: share/lua/http/index.html:268
 msgid ""
@@ -28752,8 +28763,8 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
-"現在再生中の項目がストリーミングされます。現在再生中の項目が内場合には、<i>ラ"
-"イブラリー</i>から最初に選択された項目がストリームの再生項目となります。"
+"現在再生中の項目がストリーミングされます。現在再生中の項目がない場合には、<i>"
+"ライブラリー</i>から最初に選択された項目がストリームの再生項目となります。"
 
 #: share/lua/http/index.html:275
 msgid ""
@@ -29095,7 +29106,7 @@ msgid ""
 "with transcoding that the format is compatible with the method used."
 msgstr ""
 "出力先としたいストリーミング方法を以下から追加します。トランスコーディングと"
-"フォーマットが互換性があることを確認してください。"
+"形式が互換性があることを確認してください。"
 
 #: modules/gui/qt/ui/sout.h:208
 msgid "New destination"
@@ -29251,7 +29262,7 @@ msgstr "メニュー言語:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:532
 msgid "Look and feel"
-msgstr "ルックアンドフィール"
+msgstr "外観と操作性"
 
 #: modules/gui/qt/ui/sprefs_interface.h:533
 msgid "Use custom skin"
@@ -29301,7 +29312,7 @@ msgstr "システムトレイアイコン"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
 msgid "Auto raising the interface:"
-msgstr "インターフェースを手前に:"
+msgstr "インターフェースを手前に表示:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29393,7 +29404,7 @@ msgstr "背景を追加"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "O&utput"
-msgstr "出力 (&u)"
+msgstr "出力 (&U)"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -29453,7 +29464,7 @@ msgstr "P/P"
 
 #: modules/gui/qt/ui/streampanel.h:182
 msgid "Prev"
-msgstr "前"
+msgstr "前へ"
 
 #: modules/gui/qt/ui/streampanel.h:183
 msgid "Add Input"
@@ -29616,10 +29627,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "メディアマネージャーリスト"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9調整フィルター"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
@@ -33021,6 +33028,10 @@ msgstr "メディアマネージャーリスト"
 #~ msgstr "%i 項目"
 
 #, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9調整フィルター"
+
+#, fuzzy
 #~ msgid "Screen capture (with Wayland)"
 #~ msgstr "画面キャプチャー(X11/XCB)"
 
@@ -33090,7 +33101,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Always &on Top"
-#~ msgstr "常に最前面"
+#~ msgstr "常に手前に表示"
 
 #, fuzzy
 #~ msgid "Sox Resampling quality"
@@ -33130,7 +33141,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "HTTP/TLS Certificate Authority"
-#~ msgstr "X.509認証局"
+#~ msgstr "X.509証明機関"
 
 #, fuzzy
 #~ msgid "HTTP/TLS Certificate Revocation List"
@@ -33295,7 +33306,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "VCD Format"
-#~ msgstr "フォーマット"
+#~ msgstr "形式"
 
 #, fuzzy
 #~ msgid "Volume Set"
@@ -33387,7 +33398,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "VDA output pixel format"
-#~ msgstr "出力フォーマット"
+#~ msgstr "出力形式"
 
 #, fuzzy
 #~ msgid "\"%s\" is no video encoder."
@@ -33529,7 +33540,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Always continue"
-#~ msgstr "常に最前面"
+#~ msgstr "常に手前に表示"
 
 #, fuzzy
 #~ msgid "Hardware Acceleration"
@@ -33537,7 +33548,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Show Fullscreen Controller"
-#~ msgstr "全画面表示の時にコントローラーを表示"
+#~ msgstr "全画面表示コントローラーを表示"
 
 #, fuzzy
 #~ msgid "MPEG Program Stream"
@@ -33549,7 +33560,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "MPEG 1 Format"
-#~ msgstr "フォーマット"
+#~ msgstr "形式"
 
 #, fuzzy
 #~ msgid "Enter the address of the computer to stream to."
@@ -33633,7 +33644,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Encap. format"
-#~ msgstr "サンプルフォーマット"
+#~ msgstr "サンプル形式"
 
 #, fuzzy
 #~ msgid "Input stream"
@@ -34048,9 +34059,8 @@ msgstr "メディアマネージャーリスト"
 #~ "Force the SDL renderer to use a specific chroma format instead of trying "
 #~ "to improve performances by using the most efficient one."
 #~ msgstr ""
-#~ "最適なフォーマットを使用してパフォーマンスの改善を試みるかわりに、特定のク"
-#~ "ロマフォーマットを使用して画像を作成するためにダミーのビデオ出力を強制しま"
-#~ "す。"
+#~ "最適な形式を使用してパフォーマンスの改善を試みる代わりに、特定のクロマ"
+#~ "フォーマットを使用して画像を作成するためにダミーのビデオ出力を強制します。"
 
 #, fuzzy
 #~ msgid "Simple DirectMedia Layer video output"
@@ -34201,7 +34211,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "PCMフォーマット変換のためのオーディオフィルター"
+#~ msgstr "PCM形式変換のためのオーディオフィルター"
 
 #, fuzzy
 #~ msgid "Discard cropping information"
@@ -34611,7 +34621,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Capture format (default s16l)"
-#~ msgstr "画像フォーマット(デフォルトはRGB)"
+#~ msgstr "画像形式(デフォルトはRGB)"
 
 #, fuzzy
 #~ msgid "Capture format of audio stream."
@@ -34880,7 +34890,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Fixed point audio format conversions"
-#~ msgstr "PCMフォーマット変換のためのオーディオフィルター"
+#~ msgstr "PCM形式変換のためのオーディオフィルター"
 
 #, fuzzy
 #~ msgid "Fixed-point audio mixer"
@@ -35309,7 +35319,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Use the native fullscreen mode on OS X Lion"
-#~ msgstr "ネイティブの全画面モードを使用"
+#~ msgstr "ネイティブの全画面表示モードを使用"
 
 #, fuzzy
 #~ msgid "Automatically save the volume on exit"
@@ -35690,7 +35700,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "&Tools"
-#~ msgstr "ツール (&s)"
+#~ msgstr "ツール (&S)"
 
 #, fuzzy
 #~ msgid "&Open (advanced)..."
@@ -36189,7 +36199,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Display on &Desktop"
-#~ msgstr "常に最前面 (&T)"
+#~ msgstr "常に手前に表示 (&T)"
 
 #, fuzzy
 #~ msgid "Video standard (Default, SECAM_D, PAL_B, NTSC_M, etc...)."
@@ -36220,8 +36230,8 @@ msgstr "メディアマネージャーリスト"
 #~ "RTP packets will be authenticated and deciphered with this Secure RTP "
 #~ "master shared secret key."
 #~ msgstr ""
-#~ "このセキュアなマスター共有秘密鍵を使ってRTPパケットの認証と暗号解読が行わ"
-#~ "れます。32文字の16進文字列で指定します。"
+#~ "このセキュリティで保護されたマスター共有シークレットキーを使用してRTPパ"
+#~ "ケットの認証と暗号解読が行われます。32文字の16進文字列で指定します。"
 
 #, fuzzy
 #~ msgid "Secure RTP requires a (non-secret) master salt value."
@@ -36308,8 +36318,8 @@ msgstr "メディアマネージャーリスト"
 #~ "later. It can also use the custom mode known from previous Mac OS X "
 #~ "releases."
 #~ msgstr ""
-#~ "以前のMac OS XリリースからVLCはデフォルトで全画面モードを使用します。Mac "
-#~ "OS X 10.7以降ではネイティブの全画面モードも使用します。"
+#~ "以前のMac OS XリリースからVLCはデフォルトで全画面表示モードを使用します。"
+#~ "Mac OS X 10.7以降ではネイティブの全画面表示モードも使用します。"
 
 #, fuzzy
 #~ msgid "Override parametters"
@@ -36317,11 +36327,11 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Previous/Backward"
-#~ msgstr "前 / 戻る"
+#~ msgstr "前へ / 戻る"
 
 #, fuzzy
 #~ msgid "Next/Forward"
-#~ msgstr "次 / 進む"
+#~ msgstr "次へ / 進む"
 
 #, fuzzy
 #~ msgid ""
@@ -36364,8 +36374,8 @@ msgstr "メディアマネージャーリスト"
 #~ "Force the subtiles format. Use \"auto\", the set of supported values "
 #~ "varies."
 #~ msgstr ""
-#~ "字幕のフォーマットを指定します。\"自動\"は自動検出を行うため、常に動作する"
-#~ "でしょう。"
+#~ "字幕の形式を指定します。\"自動\"は自動検出を行うため、常に動作するでしょ"
+#~ "う。"
 
 #, fuzzy
 #~ msgid "Rewind"
@@ -37045,7 +37055,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Unknown soundcard"
-#~ msgstr "不明のエラー"
+#~ msgstr "不明なエラー"
 
 #, fuzzy
 #~ msgid "Roku HD1000 audio output"
@@ -37397,7 +37407,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "&Streaming..."
-#~ msgstr "ストリーム... (&S)"
+#~ msgstr "ストリーム (&S)..."
 
 #, fuzzy
 #~ msgid "Direct3D Desktop mode"
@@ -37573,7 +37583,7 @@ msgstr "メディアマネージャーリスト"
 
 #, fuzzy
 #~ msgid "Text alignment:"
-#~ msgstr "テレテキストの位置あわせ"
+#~ msgstr "テレテキストの位置合わせ"
 
 #, fuzzy
 #~ msgid "Enter the URL of the network stream here."
