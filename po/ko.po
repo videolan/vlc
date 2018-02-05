@@ -12,7 +12,7 @@
 # Seongki Shin <skshin@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-09-20 03:42+0000\n"
@@ -80,8 +80,8 @@ msgstr "VLC 제어 인터페이스 설정"
 msgid "Hotkeys settings"
 msgstr "단축키 설정"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -730,7 +730,8 @@ msgstr "헤드폰"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "자동"
@@ -1001,8 +1002,8 @@ msgstr "언어"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "설명"
 
@@ -1265,11 +1266,12 @@ msgstr "입력을 열 수 없습니다"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC에서 '%s' MRL을 열 수 없습니다. 자세한 내용은 로그를 확인하세요."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1750,7 +1752,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1948,7 +1951,7 @@ msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
-"비디오 윈도우의 사용자 지정 제목 (비디오가 인터페이스에 내장되지 않은 경우)."
+"비디오 창의 사용자 지정 제목 (비디오가 인터페이스와 결합되지 않은 경우)."
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
@@ -2079,15 +2082,15 @@ msgstr "배경 모드는 동영상을 데스크탑의 배경으로 재생할 수
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
-msgstr "비디오에 미디어 제목 보이기"
+msgstr "비디오 재생시 미디어 제목 표시"
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr "영화 상단에 비디오 제목을 표시합니다."
+msgstr "동영상 위에 비디오 제목을 표시합니다."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
-msgstr "x 밀리초 동안 비디오 제목 보이기"
+msgstr "비디오 제목 표시 시간 (밀리초)"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
@@ -2099,15 +2102,15 @@ msgstr "비디오 제목 위치"
 
 #: src/libvlc-module.c:334
 msgid "Place on video where to display the title (default bottom center)."
-msgstr "제목이 표시되는 비디오에 놓기 (기본값 하단 가운데)."
+msgstr "비디오 재생을 시작할 때 제목을 표시할 위치입니다 (기본값 하단 가운데)."
 
 #: src/libvlc-module.c:336
 msgid "Hide cursor and fullscreen controller after x milliseconds"
-msgstr "x 밀리초 후 커서 및 전체화면 컨트롤 숨기기"
+msgstr "커서 및 전체화면 조작바 표시 시간 (밀리초)"
 
 #: src/libvlc-module.c:339
 msgid "Hide mouse cursor and fullscreen controller after n milliseconds."
-msgstr "n 밀리초 후 마우스 커서 및 전체화면 컨트롤을 감춥니다."
+msgstr "n 밀리초 후 마우스 커서 및 전체화면 조작바를 감춥니다."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:433
@@ -2746,7 +2749,7 @@ msgstr "스트림은 이 시간 동안 실행될 것입니다 (초 단위)."
 
 #: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
-msgstr "빠른 찾기"
+msgstr "빠른 탐색 사용하기"
 
 #: src/libvlc-module.c:652
 msgid "Favor speed over precision while seeking"
@@ -4007,7 +4010,7 @@ msgstr "재생을 정지할 단축키를 선택하세요."
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 #: modules/gui/qt/ui/video_effects.h:1279
 msgid "Position"
-msgstr "재생 시간 보기"
+msgstr "위치"
 
 #: src/libvlc-module.c:1247
 msgid "Select the hotkey to display the position."
@@ -4587,7 +4590,7 @@ msgstr "다음 디인터레이스 모드를 순차적으로 선택합니다."
 
 #: src/libvlc-module.c:1409
 msgid "Show controller in fullscreen"
-msgstr "전체화면에서 컨트롤러 보이기"
+msgstr "전체화면에서 조작바 보이기"
 
 #: src/libvlc-module.c:1410
 msgid "Boss key"
@@ -4896,7 +4899,8 @@ msgid "Browser Stop"
 msgstr "브라우저 정지"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6730,7 +6734,8 @@ msgstr ""
 "TV 채널은 주어진 주파수상에서 트랜스폰터 (멀티플렉스라고 알려진) 에 의해 그룹"
 "화됩니다. 이것은 수신기를 조정하기 위해 필요합니다."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "변조 / 성상도"
 
@@ -7530,7 +7535,8 @@ msgstr "오디오 엘러멘터리 스트림의 채널 수"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "너비"
@@ -8489,7 +8495,8 @@ msgstr "라디오 장치"
 msgid "Radio tuner device node."
 msgstr "라디오 튜너 장치 노드"
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "주파수"
 
@@ -16224,7 +16231,8 @@ msgid "Name"
 msgstr "이름"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "작성자"
@@ -16848,11 +16856,11 @@ msgstr "전체화면 모드일때 검게 표시된 비디오 없는 화면 유�
 
 #: modules/gui/macosx/macosx.m:64
 msgid "Show Fullscreen controller"
-msgstr "전체화면 컨트롤 보이기"
+msgstr "전체화면 조작바 보이기"
 
 #: modules/gui/macosx/macosx.m:65
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "전체화면 모드에서 마우스를 움직일 때 투명한 컨트롤러를 보여줍니다."
+msgstr "전체화면 모드에서 마우스를 움직일 때 투명한 조작바를 보여줍니다."
 
 #: modules/gui/macosx/macosx.m:68
 msgid "Auto-playback of new items"
@@ -18404,7 +18412,8 @@ msgid "sec."
 msgstr "초"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "오디오/비디오"
 
@@ -19138,7 +19147,7 @@ msgstr "자막 열기"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Dock fullscreen controller"
-msgstr "전체화면 컨트롤러 도킹하기"
+msgstr "전체화면 조작바 도킹하기"
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Stop playback"
@@ -19207,7 +19216,7 @@ msgstr "자막 파일 열기"
 
 #: modules/gui/qt/components/controller.hpp:127
 msgid "Dock/undock fullscreen controller to/from bottom of screen"
-msgstr "전체화면 컨트롤러를 화면 하단에 붙이기/떼기"
+msgstr "전체화면 조작바를 화면 하단에 붙이기/떼기"
 
 #: modules/gui/qt/components/controller_widget.cpp:136
 msgctxt "Tooltip|Unmute"
@@ -20073,10 +20082,11 @@ msgid "Extract"
 msgstr "RGB 추출"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20088,7 +20098,8 @@ msgstr "닫기(&C)"
 msgid "Bytes"
 msgstr "바이트"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "변환"
 
@@ -20510,7 +20521,8 @@ msgstr "버전"
 msgid "Website"
 msgstr "웹사이트"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "파일"
 
@@ -20654,7 +20666,7 @@ msgstr "고급 위젯"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
-msgstr "전체화면 컨트롤"
+msgstr "전체화면 조작바"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:147
 msgid "New profile"
@@ -21406,7 +21418,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
-msgstr "전체화면 컨트롤 마우스 감도"
+msgstr "전체화면 조작바 마우스 감도"
 
 #: modules/gui/qt/qt.cpp:200
 msgid "When minimized"
@@ -23507,7 +23519,8 @@ msgstr "MPEG 비디오"
 msgid "VC-1 packetizer"
 msgstr "VC-1 패킷타이저"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf 네트워크 서비스"
 
@@ -24733,12 +24746,10 @@ msgid "Enable Audio passthrough"
 msgstr "오디오 패스쓰루 사용"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "리시버가 돌비를 지원하지 않으면 비활성화하세요."
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "높음 (고품질 및 높은 대역폭)"
 
@@ -24747,12 +24758,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "중간 (중품질 및 중간 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "낮음 (저품질 및 낮은 대역폭)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "낮은 CPU (저품질이지만 높은 대역폭)"
 
@@ -29006,7 +29015,7 @@ msgstr "비디오 크기에 인터페이스 맞추기"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Show controls in full screen mode"
-msgstr "전체화면에서 컨트롤 보이기"
+msgstr "전체화면에서 조작바 보이기"
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Pause playback when minimized"
@@ -29086,7 +29095,7 @@ msgstr "화면 표시 메시지 (OSD) 사용하기"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
 msgid "Show media title on video start"
-msgstr "동영상 시작시 미디어 제목 보이기"
+msgstr "비디오 재생 시작시 미디어 제목 보이기"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Enable subtitles"
@@ -29349,10 +29358,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "미디어 관리자 목록"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Direct3D9 조절 필터"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
@@ -33502,6 +33507,10 @@ msgstr "미디어 관리자 목록"
 #~ msgstr "엔트리"
 
 #, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Direct3D9 조절 필터"
+
+#, fuzzy
 #~ msgid "Screen capture (with Wayland)"
 #~ msgstr "화면 캡처 (X11/XCB에서)"
 
@@ -34030,7 +34039,7 @@ msgstr "미디어 관리자 목록"
 
 #, fuzzy
 #~ msgid "Show Fullscreen Controller"
-#~ msgstr "전체화면 컨트롤 보이기"
+#~ msgstr "전체화면 조작바 보이기"
 
 #, fuzzy
 #~ msgid "MPEG Program Stream"
@@ -35913,7 +35922,7 @@ msgstr "미디어 관리자 목록"
 
 #, fuzzy
 #~ msgid "Display XOSD output at the bottom of the screen instead of the top."
-#~ msgstr "영화 상단에 비디오 제목을 표시합니다."
+#~ msgstr "동영상 위에 비디오 제목을 표시합니다."
 
 #, fuzzy
 #~ msgid "Vertical offset"
@@ -36716,7 +36725,7 @@ msgstr "미디어 관리자 목록"
 #~ msgid ""
 #~ "Hide mouse cursor and fullscreen controller after n milliseconds, default "
 #~ "is 3000 ms (3 sec.)"
-#~ msgstr "n 밀리초 후 마우스 커서 및 전체화면 컨트롤을 감춥니다."
+#~ msgstr "n 밀리초 후 마우스 커서 및 전체화면 조작바를 감춥니다."
 
 #, fuzzy
 #~ msgid "Video output filter module"
@@ -38240,7 +38249,7 @@ msgstr "미디어 관리자 목록"
 
 #, fuzzy
 #~ msgid "Screen to be used for fullscreen mode."
-#~ msgstr "전체화면에서 컨트롤 보이기"
+#~ msgstr "전체화면에서 조작바 보이기"
 
 #, fuzzy
 #~ msgid "XVMC extension video output"
@@ -38658,7 +38667,7 @@ msgstr "미디어 관리자 목록"
 
 #, fuzzy
 #~ msgid "Position:"
-#~ msgstr "재생 시간 보기"
+#~ msgstr "위치"
 
 #, fuzzy
 #~ msgid "Timestamp:"
