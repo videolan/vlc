@@ -839,7 +839,7 @@ States intf_sys_t::state() const
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
-    if( !isStatePlaying() || m_mediaSessionId == 0 )
+    if( !isPlaying() || m_mediaSessionId == 0 )
         return;
     if ( pos != VLC_TS_INVALID )
         m_ts_local_start = pos;
