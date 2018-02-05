@@ -10,7 +10,7 @@
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-11-05 20:02+0000\n"
@@ -79,8 +79,8 @@ msgstr "Innstillingar for kontrollgrensesnitta i VLC"
 msgid "Hotkeys settings"
 msgstr "Innstillingar for snøggtastar"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -734,7 +734,8 @@ msgstr "Øyretelefonar"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatisk"
@@ -974,8 +975,8 @@ msgstr "Språk"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Skildring"
 
@@ -1187,10 +1188,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3266
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Nivå"
+msgstr ""
 
 #: src/input/es_out.c:3268
 msgctxt "ViewPoint"
@@ -1239,11 +1239,12 @@ msgstr "Klarer ikkje opna inndataa dine"
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC klarer ikkje opna MRL-en «%s». Sjå loggen for detaljar."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1714,7 +1715,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -3486,7 +3488,7 @@ msgstr "Skriv prosess-ID til den oppgjevne fila."
 
 #: src/libvlc-module.c:1068
 msgid "Allow only one running instance"
-msgstr "Tillat berre éin køyrande instans"
+msgstr "Tillat berre éin køyrande spelar"
 
 #: src/libvlc-module.c:1070
 msgid ""
@@ -4780,7 +4782,8 @@ msgid "Browser Stop"
 msgstr "Nettlesar stopp"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6568,7 +6571,8 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr ""
 
@@ -7329,7 +7333,8 @@ msgstr "Tal på kanalar i ein lydhovudstraum"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Breidde"
@@ -7626,7 +7631,7 @@ msgstr ""
 
 #: modules/access/mms/mms.c:58
 msgid "TCP/UDP timeout (ms)"
-msgstr ""
+msgstr "TCP/UDP tidsavbrot (ms)"
 
 #: modules/access/mms/mms.c:59
 msgid ""
@@ -8245,7 +8250,8 @@ msgstr "Radio-eining"
 msgid "Radio tuner device node."
 msgstr "Radiomottakar-einingens node."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvens"
 
@@ -13792,7 +13798,7 @@ msgstr ""
 
 #: modules/control/netsync.c:65
 msgid "UDP timeout (in ms)"
-msgstr ""
+msgstr "UDP-tidsavbrot (i ms)"
 
 #: modules/control/netsync.c:66
 msgid "Length of time (in ms) until aborting data reception."
@@ -14285,7 +14291,7 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:103
 msgid "Highest Bandwidth/Quality"
-msgstr ""
+msgstr "Høgaste bandbreidde/kvalitet"
 
 #: modules/demux/adaptive/adaptive.cpp:112
 msgid "Adaptive"
@@ -14512,7 +14518,7 @@ msgstr ""
 
 #: modules/demux/image.c:70
 msgid "Real-time"
-msgstr ""
+msgstr "Sanntid"
 
 #: modules/demux/image.c:72
 msgid ""
@@ -15538,7 +15544,8 @@ msgid "Name"
 msgstr "Namn"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Utviklar"
@@ -15801,7 +15808,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
 msgid "Playback time"
-msgstr ""
+msgstr "Avspelingstid"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
@@ -17563,11 +17570,11 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:698
 msgid "Higher Latency"
-msgstr ""
+msgstr "Høgare ventetid"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:700
 msgid "Highest Latency"
-msgstr ""
+msgstr "Høgaste ventetid"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:820
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -17664,7 +17671,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Lyd/video"
 
@@ -18783,15 +18791,15 @@ msgstr "Total/Attståande tid"
 
 #: modules/gui/qt/components/interface_widgets.cpp:919
 msgid "Click to toggle between total and remaining time"
-msgstr "Klikk for å veksle mellom total og fortvarande tid"
+msgstr "Klikk for å veksle mellom total og attståande tid"
 
 #: modules/gui/qt/components/interface_widgets.cpp:925
 msgid "Click to toggle between elapsed and remaining time"
-msgstr "Klikk for å veksle mellom forløpt og fortvarande tid"
+msgstr "Klikk for å veksle mellom gått tid og attståande tid"
 
 #: modules/gui/qt/components/interface_widgets.cpp:927
 msgid "Double click to jump to a chosen time position"
-msgstr "Dobbeltklikk for å hoppe til ein vald tidsposisjon."
+msgstr "Dobbelklikk for å hoppe til ein vald tidsposisjon."
 
 #: modules/gui/qt/components/open_panels.cpp:58
 msgid "Select a device or a VIDEO_TS directory"
@@ -19306,10 +19314,11 @@ msgid "Extract"
 msgstr "Pakk ut"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19321,7 +19330,8 @@ msgstr "&Lukk"
 msgid "Bytes"
 msgstr "Byte"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Konverter"
 
@@ -19723,7 +19733,8 @@ msgstr "Versjon"
 msgid "Website"
 msgstr "Nettstad"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Filer"
 
@@ -19904,7 +19915,7 @@ msgstr "Splittar"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:460
 msgid "Time Slider"
-msgstr ""
+msgstr "Tidsglidebrytar"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:473
 msgid "Small Volume"
@@ -20162,7 +20173,7 @@ msgstr "&Programtillegg og utvidingar"
 
 #: modules/gui/qt/menus.cpp:442
 msgid "Customi&ze Interface..."
-msgstr "Tilpass &grensesnittet …"
+msgstr "Tilpass &grensesnittet…"
 
 #: modules/gui/qt/menus.cpp:445
 msgid "&Preferences"
@@ -20907,7 +20918,7 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:906
 msgid "High quality scaling level"
-msgstr ""
+msgstr "Høgkvalitets skaleringsnivå"
 
 #: modules/hw/vdpau/deinterlace.c:134
 msgid "VDPAU deinterlacing filter"
@@ -22597,7 +22608,8 @@ msgstr "MPEG-video"
 msgid "VC-1 packetizer"
 msgstr "VC-1-førpakkar"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr ""
 
@@ -23733,18 +23745,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:130
 #: modules/stream_out/chromecast/cast.cpp:525
-#, fuzzy
 msgid "Performance warning"
-msgstr "Ytingsval"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:131
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:132
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Slå på lyd"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:133
 msgid "Disable if your receiver does not support Dolby®."
@@ -23767,9 +23777,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:161
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Teikningskvalitet"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:162
 msgid "Change this option to increase conversion speed or quality."
@@ -24063,7 +24072,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:96
 msgid "Session category"
-msgstr ""
+msgstr "Øktkategori"
 
 #: modules/stream_out/rtp.c:98
 msgid ""
@@ -24142,7 +24151,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
-msgstr ""
+msgstr "Transportprotokoll"
 
 #: modules/stream_out/rtp.c:142
 msgid "This selects which transport protocol to use for RTP."
@@ -24157,7 +24166,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:163
 msgid "MP4A LATM"
-msgstr ""
+msgstr "MP4A LATM"
 
 #: modules/stream_out/rtp.c:165
 msgid "This allows you to stream MPEG4 LATM audio streams (see RFC3016)."
@@ -24184,7 +24193,7 @@ msgstr "RTSP VoD-tenar"
 
 #: modules/stream_out/setid.c:45
 msgid "New ES ID"
-msgstr ""
+msgstr "Ny ES-ID"
 
 #: modules/stream_out/setid.c:47
 msgid "Specify an new identifier integer for this elementary stream"
@@ -24563,7 +24572,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:86
 msgid "Font size in pixels"
-msgstr "Fontstorleik i piksel"
+msgstr "Skriftstorleik i pikslar"
 
 #: modules/text_renderer/freetype/freetype.c:87
 msgid ""
@@ -24596,7 +24605,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:100
 msgid "Relative font size"
-msgstr ""
+msgstr "Relativ skriftstorleik"
 
 #: modules/text_renderer/freetype/freetype.c:101
 msgid ""
@@ -24610,7 +24619,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:107
 msgid "Background color"
-msgstr ""
+msgstr "Bakgrunnsfarge"
 
 #: modules/text_renderer/freetype/freetype.c:109
 msgid "Outline opacity"
@@ -24622,7 +24631,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:114
 msgid "Shadow color"
-msgstr "Skyggefarge"
+msgstr "Skuggefarge"
 
 #: modules/text_renderer/freetype/freetype.c:115
 msgid "Shadow angle"
@@ -24634,7 +24643,7 @@ msgstr "Skuggeavstand"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "Tekstretning"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -24660,11 +24669,11 @@ msgstr "Tjukk"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Left to right"
-msgstr ""
+msgstr "Venstre til høgre"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Right to left"
-msgstr ""
+msgstr "Høgre til venstre"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -24693,7 +24702,7 @@ msgstr ""
 
 #: modules/text_renderer/tdummy.c:36
 msgid "Dummy font renderer"
-msgstr "Stumtener-tekstteiknar"
+msgstr "Stumtenar-tekstteiknar"
 
 #: modules/video_chroma/chain.c:46
 msgid "Video filtering using a chain of video filter modules"
@@ -24823,7 +24832,7 @@ msgstr ""
 
 #: modules/video_filter/adjust.c:78 modules/gui/qt/ui/video_effects.h:1215
 msgid "Image adjust"
-msgstr ""
+msgstr "Bildejustering"
 
 #: modules/video_filter/alphamask.c:41
 msgid "Use an image's alpha channel as a transparency mask."
@@ -24847,7 +24856,7 @@ msgstr ""
 
 #: modules/video_filter/anaglyph.c:39
 msgid "Color scheme"
-msgstr ""
+msgstr "Fargeskjema"
 
 #: modules/video_filter/anaglyph.c:40
 msgid "Define the glasses' color scheme"
@@ -25055,7 +25064,7 @@ msgstr ""
 
 #: modules/video_filter/bluescreen.c:78
 msgid "Bluescreen video filter"
-msgstr "Blåskjerm videofilter"
+msgstr "Blåskjerm-videofilter"
 
 #: modules/video_filter/bluescreen.c:79
 msgid "Bluescreen"
@@ -25493,7 +25502,7 @@ msgstr ""
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
-msgstr "Omvend videofilteret"
+msgstr "Inverter videofilteret"
 
 #: modules/video_filter/invert.c:51
 msgid "Color inversion"
@@ -26217,7 +26226,7 @@ msgstr ""
 
 #: modules/video_output/kva.c:62
 msgid "SNAP"
-msgstr ""
+msgstr "SNAP"
 
 #: modules/video_output/kva.c:62
 msgid "WarpOverlay!"
@@ -26225,11 +26234,11 @@ msgstr ""
 
 #: modules/video_output/kva.c:62
 msgid "VMAN"
-msgstr ""
+msgstr "VMAN"
 
 #: modules/video_output/kva.c:62
 msgid "DIVE"
-msgstr ""
+msgstr "DIVE"
 
 #: modules/video_output/kva.c:72
 msgid "K Video Acceleration video output"
@@ -26372,7 +26381,7 @@ msgstr ""
 
 #: modules/video_output/win32/directdraw.c:87
 msgid "Name of desired display device"
-msgstr "Namn på den ønska visingseiningen"
+msgstr "Namn på ønskt visingseining"
 
 #: modules/video_output/win32/directdraw.c:88
 msgid ""
@@ -26825,7 +26834,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:154
 msgid "White Level for Red"
-msgstr "Kvitnivå for raudt"
+msgstr "Kvittnivå for raudt"
 
 #: modules/video_splitter/panoramix.c:155
 msgid "Select the White Level of blended zone (Red or Y component)"
@@ -26833,7 +26842,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:156
 msgid "White Level for Green"
-msgstr "Kvitnivå for grønt"
+msgstr "Kvittnivå for grønt"
 
 #: modules/video_splitter/panoramix.c:157
 msgid "Select the White Level of blended zone (Green or U component)"
@@ -26841,7 +26850,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:158
 msgid "White Level for Blue"
-msgstr "Kvitnivå for grønt"
+msgstr "Kvittnivå for grønt"
 
 #: modules/video_splitter/panoramix.c:159
 msgid "Select the White Level of blended zone (Blue or V component)"
@@ -27040,7 +27049,7 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:76
 msgid "Amplification"
-msgstr ""
+msgstr "Forsterking"
 
 #: modules/visualization/visual/visual.c:78
 msgid "This is a coefficient that modifies the height of the bands."
@@ -27136,7 +27145,7 @@ msgstr "Kaiser"
 
 #: modules/visualization/vsxu.cpp:59 modules/visualization/vsxu.cpp:60
 msgid "vsxu"
-msgstr ""
+msgstr "vsxu"
 
 #: share/lua/http/dialogs/batch_window.html:28
 msgid "#paste your VLM commands here"
@@ -27170,11 +27179,11 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
-msgstr ""
+msgstr "Video-FPS"
 
 #: share/lua/http/dialogs/create_stream.html:297
 msgid "MUX options"
-msgstr ""
+msgstr "MUX-innstillingar"
 
 #: share/lua/http/dialogs/create_stream.html:303
 msgid "Video scale"
@@ -27245,7 +27254,7 @@ msgstr "Tid:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "VLC media player - nettgrensesnitt"
+msgstr "VLC mediaspelar - nettgrensesnitt"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -27368,7 +27377,7 @@ msgstr "&Filter:"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
-msgstr "&Lagra som"
+msgstr "&Lagra som…"
 
 #: modules/gui/qt/ui/messages_panel.h:143
 msgid "Modules Tree"
@@ -27400,7 +27409,7 @@ msgstr "Starttid"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Stop Time"
-msgstr ""
+msgstr "Stopptid"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27428,7 +27437,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
 msgid "Change the stop time for the media"
-msgstr ""
+msgstr "Endra stopptid for mediet"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27456,7 +27465,7 @@ msgstr "Vis avanserte innstillingar for å finjustera eininga"
 
 #: modules/gui/qt/ui/open_capture.h:106
 msgid "Advanced options..."
-msgstr "Avanserte innstillingar …"
+msgstr "Avanserte innstillingar…"
 
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Disc Selection"
@@ -27468,7 +27477,7 @@ msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
 msgid "Disable Disc Menus"
-msgstr "Slå av diskmenyar"
+msgstr "Slå av platemenyar"
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
@@ -27726,7 +27735,7 @@ msgstr "Visualiseringar:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Enable Time-Stretching audio"
-msgstr "Aktiver tidstreknad av lyd"
+msgstr "Slå på tids-strekking av lyd"
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
@@ -27766,7 +27775,7 @@ msgstr "x264 profil- og nivå-val"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Hardware-accelerated decoding"
-msgstr "Maskinvareframskynda dekoding"
+msgstr "Maskinvare-framskunda dekoding"
 
 #: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
@@ -27777,9 +27786,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Hopp over intern avblokkingsfilter for H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profil- og nivå-val"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -27835,7 +27843,7 @@ msgstr "Bruk innebygd stil"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Resize interface to video size"
-msgstr "Tilpass grensesnittet til videostorleika"
+msgstr "Tilpass grensesnittet til videostorleiken"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Show controls in full screen mode"
@@ -27875,7 +27883,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
 msgid "Playlist and Instances"
-msgstr "Spelelistar og instansar"
+msgstr "Spelelister og førekomstar"
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -27883,7 +27891,7 @@ msgstr "Pause på det siste biletet i ein video"
 
 #: modules/gui/qt/ui/sprefs_interface.h:555
 msgid "Allow only one instance"
-msgstr "Tillat berre éin instans"
+msgstr "Tillat berre éin førekomst"
 
 #: modules/gui/qt/ui/sprefs_interface.h:557
 msgid "Activate updates notifier"
@@ -27935,7 +27943,7 @@ msgstr "Standardkoding"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Subtitle effects"
-msgstr "Undderteksteffektar"
+msgstr "Underteksteffektar"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -32186,7 +32194,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Win32 font renderer"
-#~ msgstr "Stumtener-tekstteiknar"
+#~ msgstr "Stumtenar-tekstteiknar"
 
 #, fuzzy
 #~ msgid "Device type"
@@ -32214,7 +32222,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "White Blue"
-#~ msgstr "Kvitnivå for grønt"
+#~ msgstr "Kvittnivå for grønt"
 
 #, fuzzy
 #~ msgid "No Filtering"
@@ -32827,7 +32835,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Quartz font renderer"
-#~ msgstr "Stumtener-tekstteiknar"
+#~ msgstr "Stumtenar-tekstteiknar"
 
 #, fuzzy
 #~ msgid "Shoutcast Radio"
@@ -33353,7 +33361,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Save this Log..."
-#~ msgstr "&Lagra som"
+#~ msgstr "&Lagra som…"
 
 #, fuzzy
 #~ msgid ""
@@ -33860,7 +33868,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "MUX Options"
-#~ msgstr "Innstillingar"
+#~ msgstr "MUX-innstillingar"
 
 #, fuzzy
 #~ msgid "Output Destination"
@@ -33964,7 +33972,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "Media, tid"
+#~ msgstr "Stopptid"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
