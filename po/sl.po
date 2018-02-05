@@ -12,7 +12,7 @@
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-01-30 00:41+0100\n"
 "PO-Revision-Date: 2017-10-08 10:16+0000\n"
@@ -83,8 +83,8 @@ msgstr "Nastavitve vmesnikov upravljanja predvajalnika VLC"
 msgid "Hotkeys settings"
 msgstr "Nastavitve hitrih tipk"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091 src/libvlc-module.c:1486
-#: modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
+#: src/libvlc-module.c:1486 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
@@ -742,7 +742,8 @@ msgstr "Slušalke"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137
+#: modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Samodejno"
@@ -1025,8 +1026,8 @@ msgstr "Jezik"
 
 #: src/input/es_out.c:3085 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
-#: modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112
+#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Opis"
 
@@ -1290,11 +1291,12 @@ msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "Ni mogoče odpreti MRL »%s«. Podrobnosti so zabeležene v dnevniški datoteki."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:399
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170
+#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1779,7 +1781,8 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124
+#: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1830,7 +1833,7 @@ msgstr "Izbor načina usklajevanja glasnosti"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr "Predokrepitev ponovnega predvajanja"
+msgstr "Predojačitev glasnosti"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -1847,8 +1850,8 @@ msgstr "Privzeta vrednost usklajevanja glasnosti"
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
-"Možnost določa uskladitev glasnosti za pretok, pri katerem podrobnosti o "
-"usklajevanju ni mogoče najti."
+"Možnost določa uskladitev glasnosti za pretok, pri katerem podatkov za "
+"usklajevanje ni mogoče najti."
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -2203,24 +2206,24 @@ msgstr "Onemogoči ohranjevalnik zaslona"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr "Onemogoči ohranjevalnik zaslona med predvajanjem. "
+msgstr "Možnost onemogoči zagon ohranjevalnika zaslona med predvajanjem. "
 
 #: src/libvlc-module.c:374
 msgid "Inhibit the power management daemon during playback"
-msgstr "Onemogoči upravljalnik napajanja med predvajanjem"
+msgstr "Onemogoči ozadnji program upravljalnika napajanja"
 
 #: src/libvlc-module.c:375
 msgid ""
 "Inhibits the power management daemon during any playback, to avoid the "
 "computer being suspended because of inactivity."
 msgstr ""
-"Onemogoči delovanje upravljalnika napajanja med predvajanjem posnetka, ter s "
-"tem prepreči prehod naprave v stanje pripravljenosti."
+"Možnost onemogoči delovanje upravljalnika napajanja med predvajanjem "
+"posnetka, kar prepreči prehod naprave v stanje pripravljenosti."
 
 #: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "Window decorations"
-msgstr "Omogoči spreminjanje videza vmesnika"
+msgstr "Omogoči predmete vmesnika"
 
 #: src/libvlc-module.c:380
 msgid ""
@@ -2228,7 +2231,7 @@ msgid ""
 "giving a \"minimal\" window."
 msgstr ""
 "Možnosti omogočajo nastavitev videza vmesnika predvajalnika VLC. Okno je "
-"lahko na primer brez naslovne vrstice, brez okna videa in drugih elementov. "
+"lahko na primer brez naslovne vrstice, brez okna videa in drugih predmetov. "
 "Z nastavitvami je mogoče določiti »najmanjši« vmesnik."
 
 #: src/libvlc-module.c:383
@@ -2237,7 +2240,7 @@ msgstr "Modul razdelilnika videa"
 
 #: src/libvlc-module.c:385
 msgid "This adds video splitters like clone or wall"
-msgstr "S tem dodate video razdelilnike, kot je kloniranje ali stena"
+msgstr "Možnost omogoča uporabo razdelilnikov, kot sta kloniranje ali stena."
 
 #: src/libvlc-module.c:387
 msgid "Video filter module"
@@ -2248,8 +2251,8 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
-"Doda filtriranje po obdelavi z namenom izboljšanja kakovosti slike, kot na "
-"primer razpletanje, preoblikovanje in podobno."
+"Možnost omogoča filtriranje po obdelavi z namenom izboljšanja kakovosti "
+"slike, kot na primer razpletanje, preoblikovanje in podobno."
 
 #: src/libvlc-module.c:393
 msgid "Video snapshot directory (or filename)"
@@ -2257,7 +2260,7 @@ msgstr "Mapa za zajemanje videa (ali datoteka)"
 
 #: src/libvlc-module.c:395
 msgid "Directory where the video snapshots will be stored."
-msgstr "Mapa v kateri bodo shranjene zajete slike."
+msgstr "Mapa, v kateri bodo shranjen zajet posnetek."
 
 #: src/libvlc-module.c:397 src/libvlc-module.c:399
 msgid "Video snapshot file prefix"
@@ -2269,7 +2272,7 @@ msgstr "Zapis zajetega posnetka"
 
 #: src/libvlc-module.c:403
 msgid "Image format which will be used to store the video snapshots"
-msgstr "Zapis zajetega posnetka bo uporabljen med shranjevanjem slik."
+msgstr "Zapis, ki naj bo uporabljen za shranjevanje zajetega posnetka."
 
 #: src/libvlc-module.c:405
 msgid "Display video snapshot preview"
@@ -2277,7 +2280,7 @@ msgstr "Predogled zajetega posnetka"
 
 #: src/libvlc-module.c:407
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr "Pokaži predogled zajetega posnetka v zgornjem levem kotu okna."
+msgstr "Pokaže predogled zajetega posnetka v zgornjem levem kotu okna."
 
 #: src/libvlc-module.c:409
 msgid "Use sequential numbers instead of timestamps"
@@ -2286,25 +2289,25 @@ msgstr "Uporabi zaporedna števila namesto časovnega žiga"
 #: src/libvlc-module.c:411
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
-"Uporabi zaporedna števila namesto časovnega žiga pri označevanju zajetih "
-"slik."
+"Možnost omogoča uporabo zaporednih števil namesto časovnega žiga pri "
+"označevanju zajetega posnetka."
 
 #: src/libvlc-module.c:413
 msgid "Video snapshot width"
-msgstr "Širina zajete slike"
+msgstr "Širina zajetega posnetka"
 
 #: src/libvlc-module.c:415
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"Mogoče je vsiliti širino zajete slike. Privzeta ohranja izvorno velikost "
-"(-1). Vrednost 0 prilagodi velikost slike tako, da ohrani razmerje višine in "
-"širine."
+"Mogoče je vsiliti širino zajete slike. Privzeta nastavitev ohranja izvorno "
+"velikost (-1). Vrednost 0 prilagodi velikost slike tako, da ohrani razmerje "
+"višine in širine."
 
 #: src/libvlc-module.c:419
 msgid "Video snapshot height"
-msgstr "Višina zajete slike"
+msgstr "Višina zajetega posnetka"
 
 #: src/libvlc-module.c:421
 msgid ""
@@ -2312,21 +2315,22 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"Mogoče je vsiliti višino zajete slike. Privzeta ohranja izvorno velikost "
-"(-1). Vrednost 0 prilagodi velikost slike tako, da ohrani razmerje višine in "
-"širine."
+"Mogoče je vsiliti višino zajete slike. Privzeta vrednost ohranja izvorno "
+"velikost (-1). Vrednost 0 prilagodi velikost slike tako, da ohrani razmerje "
+"višine in širine."
 
 #: src/libvlc-module.c:425
 msgid "Video cropping"
-msgstr "Obrezovanje slike"
+msgstr "Obrezovanje videa"
 
 #: src/libvlc-module.c:427
 msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
-"Neposredno obrezovanje izvorne slike. Sprejete oblike so x:y (4:3, "
-"16:9, ...) in opisujejo splošne vrednosti razmerij."
+"Nastavitev določa neposredno obrezovanje izvorne slike. Vrednost določa "
+"ustrezno razmerje x:y (4:3, 16:9, ...) in opisujejo splošna razmerja višine "
+"in širine."
 
 #: src/libvlc-module.c:431
 msgid "Source aspect ratio"
@@ -2341,11 +2345,12 @@ msgid ""
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
 "Izbira določa vsiljeno razmerje velikosti slike. Nekateri pogoni DVD "
-"javljajo privzeto vrednost razmerja kot 16:9, čeprav so dejansko v razmerju "
-"4:3. Možnost določa tudi privzet način prikazovanja v predvajalniku VLC, "
-"kadar posnetki nimajo teh podatkov. Sprejeta razmerja so lahko x:y (4:3, "
-"16:9, ...) in določajo splošne vrednosti razmerij, ali pa plavajoča števila "
-"v obliki (1.25, 1.3333, ...), ki opredeljujejo kvadratnost točk."
+"javljajo privzeto vrednost razmerja kot 16:9, čeprav so posnetki dejansko v "
+"razmerju 4:3. Možnost določa tudi privzet način prikazovanja v predvajalniku "
+"VLC, kadar posnetki nimajo teh podatkov. Vrednost določa ustrezno razmerje x:"
+"y (4:3, 16:9, ...) širine in višine, ali pa je razmerje določeno s "
+"plavajočimi števili, ki opredeljujejo kvadratnost točk v obliki (1.25, "
+"1.3333, ...)."
 
 #: src/libvlc-module.c:440
 msgid "Video Auto Scaling"
@@ -2365,8 +2370,8 @@ msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
-"Faktor prilagajanja velikosti, ko je onemogočena možnost samodejnega "
-"prilagajanja.\n"
+"Vrednost določa prilagajanje velikosti, če je onemogočena možnost "
+"samodejnega prilagajanja.\n"
 "Privzeta vrednost je 1.0 (izvorna velikost posnetka)"
 
 #: src/libvlc-module.c:449
@@ -2378,8 +2383,8 @@ msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr ""
-"Seznam razmerij obrezovanja je seznam vrednosti, ki bodo dodana na seznam za "
-"uporabo."
+"Seznam razmerij obrezovanja je seznam vrednosti, ki bodo prikazana na seznam "
+"za uporabo v programu."
 
 #: src/libvlc-module.c:454
 msgid "Custom aspect ratios list"
@@ -2408,7 +2413,7 @@ msgstr ""
 
 #: src/libvlc-module.c:466
 msgid "Monitor pixel aspect ratio"
-msgstr "Razmerje velikosti zaslona"
+msgstr "Točkovno razmerje velikosti zaslona"
 
 #: src/libvlc-module.c:468
 msgid ""
@@ -2416,9 +2421,9 @@ msgid ""
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
-"Nastavitev razmerja velikosti zaslona. Večina zaslonov ima kvadratne točke "
-"(1:1). Če poteka predvajanje na zaslonu v razmerju 16:9, je treba spremeniti "
-"vrednost na 4:3, da se ohrani ustrezno razmerje stranic."
+"Nastavitev vsili točkovno razmerje velikosti zaslona. Večina zaslonov ima "
+"kvadratne točke (1:1). Če poteka predvajanje na zaslonu v razmerju 16:9, je "
+"treba spremeniti vrednost na 4:3, da se ohrani ustrezno razmerje stranic."
 
 #: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
@@ -2563,7 +2568,7 @@ msgid ""
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
 "Možnost omogoča oddaljeno usklajevanje časa za strežnike in odjemalce. "
-"Privzete nastavitve so določene v meniju Napredno / Omrežno usklajevanje."
+"Podrobne nastavitve so zbrane v meniju Napredno / Omrežno usklajevanje."
 
 #: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -3025,13 +3030,13 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
-"Program poskuša samodejno naložiti datoteko s podnapisi, če ta posebej "
-"določena datoteka (program išče ime datoteke podnapisa, ki je enak imenu "
-"datoteke posnetka)."
+"Program poskuša samodejno naložiti datoteko s podnapisi, če ta ni posebej "
+"določena (program išče datoteko podnapisa, ki ima enako ime datoteke, kot "
+"posnetek)."
 
 #: src/libvlc-module.c:745
 msgid "Subtitle autodetection fuzziness"
-msgstr "Zaznavanje imena podnapisov"
+msgstr "Ohlapnost samodejnega zaznavanja imena podnapisov"
 
 #: src/libvlc-module.c:747
 msgid ""
@@ -3043,17 +3048,17 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
-"Nastavitev določa odstopanje med imeni datotek filmov in imeni datotek "
-"podnapisov. Možnosti so:\n"
-"0 = ni samodejnega zaznavanja\n"
+"Nastavitev določa dovoljeno odstopanje med imenom datoteke posnetka in "
+"imenom datoteke podnapisov. Možnosti so:\n"
+"0 = brez samodejnega zaznavanja\n"
 "1 = katerakoli datoteka s podnapisi\n"
-"2 = katerakoli datoteka, ki ima v imenu ime filma\n"
-"3 = enako ime kot ime datoteke filma z dodanimi znaki\n"
-"4 = popolno skladanje imen datotek"
+"2 = katerakoli datoteka, ki ima v imenu tudi naslov filma\n"
+"3 = imeni se skladata, ime datoteke podnapisov ima lahko dodatne znake\n"
+"4 = imeni datotek se popolnoma skladata"
 
 #: src/libvlc-module.c:755
 msgid "Subtitle autodetection paths"
-msgstr "Samodejno poišči podnapise na določenih poteh"
+msgstr "Samodejno poišči podnapise na določenih mestih"
 
 #: src/libvlc-module.c:757
 msgid ""
@@ -3071,7 +3076,7 @@ msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
 msgstr ""
-"Datoteka, ki bo naložena, če ni mogoče samodejno zaznati datoteke po imenu."
+"Datoteka, ki bo naložena, če po imenu ni mogoče samodejno določiti datoteke."
 
 #: src/libvlc-module.c:766
 msgid "DVD device"
@@ -3090,16 +3095,16 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Privzeti pogon DVD ali datoteka, ki naj se uporabi. Pogon mora biti v okolju "
-"Windows določen s črko in dvopičjem (primer: D:)"
+"Privzeti pogon DVD (ali datoteka), ki naj se uporabi. Pogon mora biti v "
+"okolju Windows določen s črko in dvopičjem (primer: D:)"
 
 #: src/libvlc-module.c:775
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Privzeti pogon VCD ali datoteka, ki naj se uporabi. Pogon mora biti v okolju "
-"Windows določen s črko in dvopičjem (primer: D:)"
+"Privzeti pogon VCD (ali datoteka), ki naj se uporabi. Pogon mora biti v "
+"okolju Windows določen s črko in dvopičjem (primer: D:)"
 
 #: src/libvlc-module.c:778 modules/access/cdda.c:704
 msgid ""
@@ -3139,9 +3144,9 @@ msgid ""
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
 "them to a specific network interface."
 msgstr ""
-"Privzeto bo strežnik spremljal vse krajevne naslove IP. Naveden naslov IP "
+"Privzeto spremlja strežnik vse krajevne naslove IP. Naveden naslov IP "
 "(npr. ::1 ali 127.0.0.1) oziroma ime gostitelja (npr. krajevni gostitelj) "
-"omeji sledenje le na določen del naslovov omrežja."
+"omeji sledenje le na določen del omrežja."
 
 #: src/libvlc-module.c:813
 msgid "RTSP server address"
@@ -3159,8 +3164,8 @@ msgstr ""
 "osnovno potjo do vsebine videa na zahtevo RTSP VOD. Skladnja je opredeljena "
 "s podatkoma naslov/pot. Strežnik privzeto spremlja na vseh krajevnih "
 "naslovih IP. Navesti je treba torej naslov IP (npr. ::1 ali 127.0.0.1) ali "
-"ime gostitelja (npr. krajevni gostitelj), kar omeji tudi določen vmesnik "
-"omrežja."
+"ime gostitelja (npr. krajevni gostitelj), kar omeji sledenje le na določen "
+"del omrežja."
 
 #: src/libvlc-module.c:821
 msgid "HTTP server port"
@@ -3172,9 +3177,9 @@ msgid ""
 "is 80. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"Strežnik HTTP bo spremljal dogajanje na vratih TCP. Standardna številka vrat "
-"HTTP je 80, sicer pa operacijski sistem omejuje dodelitev števil vrat pod "
-"1025."
+"Strežnik HTTP bo spremljal dogajanje na navedenih vratih TCP. Standardna "
+"številka vrat HTTP je 80, sicer pa operacijski sistem omejuje dodelitev "
+"števil vrat pod 1025."
 
 #: src/libvlc-module.c:828
 msgid "HTTPS server port"
@@ -3186,9 +3191,9 @@ msgid ""
 "number is 443. However allocation of port numbers below 1025 is usually "
 "restricted by the operating system."
 msgstr ""
-"Strežnik HTTPS bo spremljal dogajanje na vratih TCP. Standardna številka "
-"vrat HTTPS je 443, sicer pa operacijski sistem omejuje dodelitev števil vrat "
-"pod 1025."
+"Strežnik HTTPS bo spremljal dogajanje na navedenih vratih TCP. Standardna "
+"številka vrat HTTPS je 443, sicer pa operacijski sistem omejuje dodelitev "
+"števil vrat pod 1025."
 
 #: src/libvlc-module.c:835
 msgid "RTSP server port"
@@ -3200,9 +3205,9 @@ msgid ""
 "is 554. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"Strežnik RTSP bo spremljal dogajanje na vratih TCP. Standardna številk avrat "
-"RTSP je 554, sicer pa operacijski sistem omejuje dodelitev števil vrat pod "
-"1025."
+"Strežnik RTSP bo spremljal dogajanje na navedenih vratih TCP. Standardna "
+"številka vrat RTSP je 554, sicer pa operacijski sistem omejuje dodelitev "
+"števil vrat pod 1025."
 
 #: src/libvlc-module.c:842
 msgid "HTTP/TLS server certificate"
@@ -3213,8 +3218,9 @@ msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
 msgstr ""
-"To datoteko potrdila X.509 (oblika PEM) uporablja strežnik za protokol TLS. "
-"Na OS X se niz uporablja kot oznako za iskanje potrdila v verigi ključev."
+"Navedeno datoteko potrdila X.509 (oblika PEM) uporablja strežnik za protokol "
+"TLS. Na OS X se niz uporablja kot oznako za iskanje potrdila v verigi "
+"ključev."
 
 #: src/libvlc-module.c:847
 msgid "HTTP/TLS server private key"
@@ -3223,8 +3229,8 @@ msgstr "Zasebni ključ strežnika HTTP/TLS"
 #: src/libvlc-module.c:849
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr ""
-"Ta datoteka zasebnega ključa (zapis PEM) se uporablja za strežniški protokol "
-"TLS."
+"Navedena datoteka zasebnega ključa (zapis PEM) se uporablja za strežniški "
+"protokol TLS."
 
 #: src/libvlc-module.c:851
 msgid "SOCKS server"
@@ -3235,12 +3241,12 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
-"Uporaba namestniškega strežnika SOCKS. Vnos mora biti v obliki naslov:vrata. "
-"Nastavitev bo uporabljena ta vse TCP povezave."
+"Določilo namestniškega strežnika SOCKS za uporabo. Vnos mora biti v obliki "
+"naslov:vrata. Nastavitev bo uporabljena ta vse povezave TCP."
 
 #: src/libvlc-module.c:856
 msgid "SOCKS user name"
-msgstr "Uporabniško ime za SOCKS"
+msgstr "Uporabniško ime za strežnik SOCKS"
 
 #: src/libvlc-module.c:858
 msgid "User name to be used for connection to the SOCKS proxy."
@@ -3248,7 +3254,7 @@ msgstr "Uporabniško ime za povezavo z posredovalnim strežnikom SOCKS."
 
 #: src/libvlc-module.c:860
 msgid "SOCKS password"
-msgstr "Geslo SOCKS"
+msgstr "Geslo za strežnik SOCKS"
 
 #: src/libvlc-module.c:862
 msgid "Password to be used for connection to the SOCKS proxy."
@@ -3260,7 +3266,7 @@ msgstr "Metapodatek naslova"
 
 #: src/libvlc-module.c:866
 msgid "Allows you to specify a \"title\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Naslov« dovoda."
+msgstr "Možnost omogoča določitev vsiljenega metapodatka »Naslova« na dovodu."
 
 #: src/libvlc-module.c:868
 msgid "Author metadata"
@@ -3268,7 +3274,7 @@ msgstr "Metapodatek avtorja"
 
 #: src/libvlc-module.c:870
 msgid "Allows you to specify an \"author\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Avtor« dovoda."
+msgstr "Možnost omogoča določitev vsiljenega metapodatka »Avtorja« na dovodu."
 
 #: src/libvlc-module.c:872
 msgid "Artist metadata"
@@ -3276,7 +3282,8 @@ msgstr "Metapodatek izvajalca"
 
 #: src/libvlc-module.c:874
 msgid "Allows you to specify an \"artist\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Iizvajalec« dovoda."
+msgstr ""
+"Možnost omogoča določitev vsiljenega metapodatka »Izvajalca« na dovodu."
 
 #: src/libvlc-module.c:876
 msgid "Genre metadata"
@@ -3284,7 +3291,7 @@ msgstr "Metapodatek zvrsti"
 
 #: src/libvlc-module.c:878
 msgid "Allows you to specify a \"genre\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Zvrsti« dovoda."
+msgstr "Možnost omogoča določitev vsiljenega metapodatka »Zvrsti« na dovodu."
 
 #: src/libvlc-module.c:880
 msgid "Copyright metadata"
@@ -3292,7 +3299,9 @@ msgstr "Metapodatek avtorskih pravic"
 
 #: src/libvlc-module.c:882
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Avtorske pravice« dovoda."
+msgstr ""
+"Možnost omogoča določitev vsiljenega metapodatka »Avtorskih pravic« na "
+"dovodu."
 
 #: src/libvlc-module.c:884
 msgid "Description metadata"
@@ -3300,7 +3309,7 @@ msgstr "Metapodatek opisa"
 
 #: src/libvlc-module.c:886
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Opis« dovoda."
+msgstr "Možnost omogoča določitev vsiljenega metapodatka »Opisa« na dovodu."
 
 #: src/libvlc-module.c:888
 msgid "Date metadata"
@@ -3308,7 +3317,7 @@ msgstr "Metapodatek datuma"
 
 #: src/libvlc-module.c:890
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Datum« dovoda."
+msgstr "Možnost omogoča določitev vsiljenega metapodatka »Datuma« na dovodu."
 
 #: src/libvlc-module.c:892
 msgid "URL metadata"
@@ -3316,7 +3325,8 @@ msgstr "Metapodatek naslova URL"
 
 #: src/libvlc-module.c:894
 msgid "Allows you to specify a \"url\" metadata for an input."
-msgstr "Dovoli določitev vsiljenega metapodatka »Naslov URL« dovoda."
+msgstr ""
+"Možnost omogoča določitev vsiljenega metapodatka »Naslova URL« na dovodu."
 
 #: src/libvlc-module.c:898
 msgid ""
@@ -3324,8 +3334,9 @@ msgid ""
 "(decompression methods). Only advanced users should alter this option as it "
 "can break playback of all your streams."
 msgstr ""
-"Možnost določuje način izbora kodekov (način odkodiranja). Le uporabniki z "
-"naprednejšim razumevanjem možnosti naj spreminjajo nastavitve."
+"Možnost omogoča način izbora kodekov (način odkodiranja). Spreminjanje teh "
+"nastavitev sicer ni priporočljivo, ker vplivajo na predvajanje vseh vrst "
+"pretokov."
 
 #: src/libvlc-module.c:902
 msgid "Preferred decoders list"
@@ -3338,9 +3349,8 @@ msgid ""
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
 "Prednostni seznam odkodirnikov, ki naj jih uporablja predvajalnik VLC. "
-"Nastavitev »dummy,a52« določi uporabo brez odkodirnika in uporabo "
-"odkodirnika a52 prednostno pred drugimi. Spreminjanje teh nastavitev sicer "
-"ni priporočljivo."
+"Nastavitev »dummy,a52« določi prednostno uporabo teh dveh odkodirnikov pred "
+"drugimi. Spreminjanje teh nastavitev sicer ni priporočljivo."
 
 #: src/libvlc-module.c:909
 msgid "Preferred encoders list"
@@ -3384,11 +3394,11 @@ msgstr "Omogoči pretakanje vseh osnovnih zapisov (videa, zvoka, podnapisov)."
 
 #: src/libvlc-module.c:933
 msgid "Display while streaming"
-msgstr "Prikaži med pretakanjem"
+msgstr "Pokaži med pretakanjem"
 
 #: src/libvlc-module.c:935
 msgid "Play locally the stream while streaming it."
-msgstr "Omogoči krajevno predvajanje pretoka med pretakanjem."
+msgstr "Omogoči krajevno predvajanje vsebine pretoka med pretakanjem."
 
 #: src/libvlc-module.c:937
 msgid "Enable video stream output"
@@ -3562,8 +3572,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
-"Izbrati je mogoče strežnik VoD, ki naj bo prednostno v uporabi. Nastavitev "
-"»vod_rtsp« povrne nastavitev na privzeti modul."
+"Izbrati je mogoče strežnik VoD (video na  zahtevo), ki naj bo prednostno v "
+"uporabi. Nastavitev »vod_rtsp« povrne nastavitev na privzet modul."
 
 #: src/libvlc-module.c:1021
 msgid "Allow real-time priority"
@@ -3576,14 +3586,14 @@ msgid ""
 "however lock up your whole machine, or make it very very slow. You should "
 "only activate this if you know what you're doing."
 msgstr ""
-"Zaganjanje predvajalnika VLC v trenutnem času, omogoča bolj natančno boljši "
-"izkoristek delovanja, še posebej pri pretakanju vsebine. V primeru, da "
-"nastopijo napake pa lahko tak zagon postavi celoten sistem v neodzivno "
-"stanje. Nastavitve ni priporočljivo spreminjati."
+"Zaganjanje predvajalnika VLC prednostno za trenutno predvajanje omogoča "
+"natančnejše usklajevanje in boljši izkoristek delovanja, še posebej med "
+"pretakanjem vsebine. V primeru napak v delovanju lahko možnost vpliva na "
+"neodzivnost sistema. Nastavitve ni priporočljivo spreminjati."
 
 #: src/libvlc-module.c:1029
 msgid "Adjust VLC priority"
-msgstr "Prilagodi VLC prednosti"
+msgstr "Prilagodi prednost VLC"
 
 #: src/libvlc-module.c:1031
 msgid ""
@@ -3591,14 +3601,14 @@ msgid ""
 "You can use it to tune VLC priority against other programs, or against other "
 "VLC instances."
 msgstr ""
-"Možnost doda odmik (pozitiven ali negativen) prednosti predvajalnika VLC. "
-"Nastavitev lahko uporabite pri nastavljanju prednosi izvajanja pred drugimi "
-"programi oziroma pred drugimi primerki programa VLC."
+"Možnost določa prednost (pozitivno ali negativno) za predvajalnik VLC. "
+"Nastavitev je mogoče uporabiti pri nastavljanju prednosti izvajanja pred "
+"drugimi programi oziroma pred drugimi primerki programa VLC."
 
 #: src/libvlc-module.c:1036
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
-msgstr "Možnost je uporabna pri zmanjševanju zakasnitve ob branju pretoka"
+msgstr "Možnost je uporabna pri zmanjševanju zakasnitve med branjem pretoka."
 
 #: src/libvlc-module.c:1039
 msgid "VLM configuration file"
@@ -3643,7 +3653,7 @@ msgstr "Zbiraj krajevno statistiko predvajanja"
 
 #: src/libvlc-module.c:1058
 msgid "Collect miscellaneous local statistics about the playing media."
-msgstr "Omogoči zbiranje krajevne statistike predvajanja videa in glasbe"
+msgstr "Omogoči zbiranje krajevne statistike predvajanja videa in glasbe."
 
 #: src/libvlc-module.c:1060
 msgid "Run as daemon process"
@@ -3677,17 +3687,18 @@ msgid ""
 msgstr ""
 "Nastavitev omejitve na le en sočasen zagon predvajalnika ima nekaj "
 "prednosti. Ko predvajalnik določene vrste predstavnih datotek zažene prek "
-"programski vezi, najverjetneje ni zaželeno, da se vsakič odpre novo okno. "
+"programskih vezi, najverjetneje ni zaželeno, da se vsakič odpre novo okno. "
 "Možnost omogoča predvajanje novega posnetka v istem oknu in postavitev novih "
 "predmetov v vrsto seznama predvajanja."
 
 #: src/libvlc-module.c:1076
 msgid "VLC is started from file association"
-msgstr "Predvajalnik VLC je zagnan prek datotečne vezi"
+msgstr "Predvajalnik VLC je zagnan prek programske vezi"
 
 #: src/libvlc-module.c:1078
 msgid "Tell VLC that it is being launched due to a file association in the OS"
-msgstr "Predvajalnik VLC je zagnan prek sistemske datotečne vezi."
+msgstr ""
+"Predvajalnik VLC je zagnan prek sistemske programske vezi vrste datoteke."
 
 #: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
@@ -3695,7 +3706,7 @@ msgstr "Zagon prek upravljalnika datotek ne odpre novega primerka"
 
 #: src/libvlc-module.c:1083
 msgid "Increase the priority of the process"
-msgstr "Povečaj prednost procesa"
+msgstr "Povečaj prednost opravila"
 
 #: src/libvlc-module.c:1085
 msgid ""
@@ -3778,7 +3789,7 @@ msgstr "Razširi"
 
 #: src/libvlc-module.c:1127
 msgid "Subdirectory behavior"
-msgstr "Vedenje podmap"
+msgstr "Delovanje prikazovanja podmap"
 
 #: src/libvlc-module.c:1129
 msgid ""
@@ -3794,7 +3805,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1134
 msgid "Ignored extensions"
-msgstr "Prezrte razširitve"
+msgstr "Prezrte pripone datotek"
 
 #: src/libvlc-module.c:1136
 msgid ""
@@ -3803,10 +3814,10 @@ msgid ""
 "This is useful if you add directories that contain playlist files for "
 "instance. Use a comma-separated list of extensions."
 msgstr ""
-"Datoteke s temi priponami ne bodo dodane na seznam predvajanja ob odpiranju "
-"mape.\n"
-"Nastavitev omogoča dodajanje map s seznami predvajanja. Vrednosti ločite z "
-"vejico."
+"Datoteke z navedenimi priponami ne bodo dodane na seznam predvajanja ob "
+"odpiranju mape.\n"
+"Nastavitev omogoča dodajanje map s seznami predvajanja. Zapisi pripon morajo "
+"biti ločeni z vejico."
 
 #: src/libvlc-module.c:1141
 msgid "Show hidden files"
@@ -3864,7 +3875,7 @@ msgstr "Predvajaj izbrano, nato ustavi predvajanje"
 
 #: src/libvlc-module.c:1164
 msgid "Stop the playlist after each played playlist item."
-msgstr "Zaustavi po predvajanem zadnjem predmetu seznama."
+msgstr "Zaustavi po predvajanem zadnjem predmetu na seznamu."
 
 #: src/libvlc-module.c:1166
 msgid "Play and exit"
@@ -3899,7 +3910,8 @@ msgstr "Ob zagonu samodejno začni s predvajanjem"
 
 #: src/libvlc-module.c:1179
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr "Ob zagonu samodejno začni s predvajanjem vsebine seznama predvajanja."
+msgstr ""
+"Ob zagonu samodejno začni s predvajanjem vsebine na seznamu predvajanja."
 
 #: src/libvlc-module.c:1182
 msgid "Pause on audio communication"
@@ -3910,8 +3922,8 @@ msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
 msgstr ""
-"Če je zaznana prihajajoča zvočna komunikacija, bo predvajanje samodejno v "
-"premoru."
+"Če sistem najavi prihajajočo zvočno sporočilo ali klic, se predvajanje "
+"samodejno ustavi."
 
 #: src/libvlc-module.c:1187
 msgid "Use media library"
@@ -5018,7 +5030,8 @@ msgid "Browser Stop"
 msgstr "Ustavi brskalnik"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:231
+#: modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -6880,7 +6893,8 @@ msgstr ""
 "TV kanali so združeni po transponderju (zvijalniku) na dani frekvenci. To je "
 "zahtevano za uglaševanje sprejemnika."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61
+#: modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulacija / Konstelacija"
 
@@ -7691,7 +7705,8 @@ msgstr "Število kanalov osnovnega zvokovnega pretoka"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42
+#: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Širina"
@@ -8658,7 +8673,8 @@ msgstr "Radijska naprava"
 msgid "Radio tuner device node."
 msgstr "Vozlišče naprave za radijski sprejem."
 
-#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75
+#: modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Frekvenca"
 
@@ -8796,7 +8812,7 @@ msgstr "Samodejno nastavi ojačanje videa."
 
 #: modules/access/v4l2/v4l2.c:117 modules/audio_filter/gain.c:62
 msgid "Gain"
-msgstr "Usklajevanje glasnosti"
+msgstr "Usklajevanje"
 
 #: modules/access/v4l2/v4l2.c:119
 msgid "Picture gain."
@@ -9840,7 +9856,7 @@ msgstr "Povratno usklajevanje"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
-msgstr "Ojačanje na povratni zanki"
+msgstr "Usklajevanje na povratni zanki"
 
 #: modules/audio_filter/chorus_flanger.c:91
 msgid "Wet mix"
@@ -9948,7 +9964,7 @@ msgstr "Predloge za uporabo uravnalnika zvoka"
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Bands gain"
-msgstr "Doseg trakov"
+msgstr "Usklajevanje kanalov"
 
 #: modules/audio_filter/equalizer.c:63
 msgid ""
@@ -9982,12 +9998,12 @@ msgstr "Dvakratno filtriranje zvoka. Moč učinka se s tem podvoji."
 
 #: modules/audio_filter/equalizer.c:76
 msgid "Global gain"
-msgstr "Celotna pridobitev"
+msgstr "Splošno usklajevanje"
 
 #: modules/audio_filter/equalizer.c:77
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:219
 msgid "Set the global gain in dB (-20 ... 20)."
-msgstr "Določilo celotne pridobitve v dB (-20 ... 20)."
+msgstr "Določilo splošnega usklajevanja v dB (-20 ... 20)."
 
 #: modules/audio_filter/equalizer.c:80
 msgid "Equalizer with 10 bands"
@@ -10077,11 +10093,11 @@ msgstr "Tehno"
 
 #: modules/audio_filter/gain.c:58
 msgid "Gain multiplier"
-msgstr "Množitelj ojačanja"
+msgstr "Množilnik usklajevanja"
 
 #: modules/audio_filter/gain.c:59
 msgid "Increase or decrease the gain (default 1.0)"
-msgstr "Povečaj ali zmanjšaj ojačanje (privzeto je 1.0)"
+msgstr "Povečanje ali zmanjšanje usklajevanja (privzeto je 1.0)"
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
@@ -10371,7 +10387,7 @@ msgid ""
 "delay effect of left signal in right output and vice versa which gives "
 "widening effect."
 msgstr ""
-"Količina ojačitve zakasnjenega signala levega kanala napram desnemu in "
+"Vrednost prilagoditve zakasnjenega signala levega kanala proti desnemu in "
 "obratno. Prilagoditev ustvari učinek zakasnitve signala levega kanala na "
 "desnem izhodu in obratno, to pa vpliva na občutek prostornosti zvoka."
 
@@ -16497,7 +16513,8 @@ msgid "Name"
 msgstr "Ime"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108
+#: modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Avtor"
@@ -18699,7 +18716,8 @@ msgid "sec."
 msgstr "sek."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391
+#: modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Zvok / Video"
 
@@ -20383,10 +20401,11 @@ msgid "Extract"
 msgstr "Pretvori"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
-#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
-#: modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49
+#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
+#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84
+#: modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20398,7 +20417,8 @@ msgstr "&Zapri"
 msgid "Bytes"
 msgstr "Bajti"
 
-#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48
+#: modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Pretvori"
 
@@ -20824,7 +20844,8 @@ msgstr "Različica"
 msgid "Website"
 msgstr "Spletišče"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533
+#: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Datoteke"
 
@@ -23825,7 +23846,8 @@ msgstr "Video MPEG"
 msgid "VC-1 packetizer"
 msgstr "Paketnik VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52
+#: modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Omrežne storitve Zeroconf"
 
@@ -25088,12 +25110,10 @@ msgid "Enable Audio passthrough"
 msgstr "Omogoči zvočni prehod"
 
 #: modules/stream_out/chromecast/cast.cpp:133
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Onemogoči, v kolikor sprejemnik ne podpira sistema Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:155
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Visoka (visoka kakovost in pasovna širina)"
 
@@ -25102,12 +25122,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Srednja (srednja kakovost in pasovna širina)"
 
 #: modules/stream_out/chromecast/cast.cpp:157
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Nizka (nizka kakovost in pasovna širina)"
 
 #: modules/stream_out/chromecast/cast.cpp:158
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Omejena CPE (nizka kakovost, vendar visoka pasovna širina)"
 
@@ -29305,7 +29323,7 @@ msgstr "Omogoči časovno raztegovanje zvoka"
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
-msgstr "Raven ponovnega predvajanja:"
+msgstr "Način usklajevanja:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -29352,9 +29370,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Izpusti filter kroženja pri H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "Izbira profila in ravni x264"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29757,10 +29774,6 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Seznam upravljalnika predstavnih vsebin"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "Filter prilagajanja Direct3D9"
 
 #~ msgid "Scan"
 #~ msgstr "Preišči"
@@ -34302,6 +34315,10 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 #~ "yourip:8080."
 
 #, fuzzy
+#~ msgid "Direct3D11 filter"
+#~ msgstr "Filter prilagajanja Direct3D9"
+
+#, fuzzy
 #~ msgid "Screen capture (with Wayland)"
 #~ msgstr "Zaslonsko zajemanje (z X11/XCB)"
 
@@ -34435,9 +34452,9 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 #~ msgstr ""
 #~ "Nastavitev omejitve na le en sočasen zagon predvajalnika ima nekaj "
 #~ "prednosti. Ko predvajalnik določene vrste predstavnih datotek zažene prek "
-#~ "programski vezi, najverjetneje ni zaželeno, da se vsakič odpre novo okno. "
-#~ "Možnost omogoča predvajanje novega posnetka v istem oknu in postavitev "
-#~ "novih predmetov v vrsto seznama predvajanja."
+#~ "programskih vezi, najverjetneje ni zaželeno, da se vsakič odpre novo "
+#~ "okno. Možnost omogoča predvajanje novega posnetka v istem oknu in "
+#~ "postavitev novih predmetov v vrsto seznama predvajanja."
 
 #, fuzzy
 #~ msgid ""
@@ -34477,7 +34494,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "FTP user name"
-#~ msgstr "Uporabniško ime za SOCKS"
+#~ msgstr "Uporabniško ime za strežnik SOCKS"
 
 #, fuzzy
 #~ msgid "FTP password"
@@ -34510,7 +34527,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "RTSP user name"
-#~ msgstr "Uporabniško ime za SOCKS"
+#~ msgstr "Uporabniško ime za strežnik SOCKS"
 
 #, fuzzy
 #~ msgid "RTSP password"
@@ -34532,11 +34549,11 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Video Capture width"
-#~ msgstr "Širina zajete slike"
+#~ msgstr "Širina zajetega posnetka"
 
 #, fuzzy
 #~ msgid "Video Capture height"
-#~ msgstr "Višina zajete slike"
+#~ msgstr "Višina zajetega posnetka"
 
 #, fuzzy
 #~ msgid "RDP Password"
@@ -34556,11 +34573,11 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "SMB user name"
-#~ msgstr "Uporabniško ime za SOCKS"
+#~ msgstr "Uporabniško ime za strežnik SOCKS"
 
 #, fuzzy
 #~ msgid "SMB password"
-#~ msgstr "Geslo SOCKS"
+#~ msgstr "Geslo za strežnik SOCKS"
 
 #, fuzzy
 #~ msgid "Segments"
@@ -34734,7 +34751,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Click to enable fullscreen video playback."
-#~ msgstr "Onemogoči ohranjevalnik zaslona med predvajanjem. "
+#~ msgstr "Možnost onemogoči zagon ohranjevalnika zaslona med predvajanjem. "
 
 #, fuzzy
 #~ msgid "Click to stop playback."
@@ -34956,7 +34973,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "A directory where to save the files has to be selected."
-#~ msgstr "Mapa v kateri bodo shranjene zajete slike."
+#~ msgstr "Mapa, v kateri bodo shranjen zajet posnetek."
 
 #, fuzzy
 #~ msgid "Finish"
@@ -36206,9 +36223,9 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 #~ msgstr ""
 #~ "Nastavitev omejitve na le en sočasen zagon predvajalnika ima nekaj "
 #~ "prednosti. Ko predvajalnik določene vrste predstavnih datotek zažene prek "
-#~ "programski vezi, najverjetneje ni zaželeno, da se vsakič odpre novo okno. "
-#~ "Možnost omogoča predvajanje novega posnetka v istem oknu in postavitev "
-#~ "novih predmetov v vrsto seznama predvajanja."
+#~ "programskih vezi, najverjetneje ni zaželeno, da se vsakič odpre novo "
+#~ "okno. Možnost omogoča predvajanje novega posnetka v istem oknu in "
+#~ "postavitev novih predmetov v vrsto seznama predvajanja."
 
 #, fuzzy
 #~ msgid "Allow only one running instance when started from file."
@@ -36358,7 +36375,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "SFTP user name"
-#~ msgstr "Uporabniško ime za SOCKS"
+#~ msgstr "Uporabniško ime za strežnik SOCKS"
 
 #, fuzzy
 #~ msgid "SFTP password"
@@ -38012,7 +38029,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Image cropping"
-#~ msgstr "Obrezovanje slike"
+#~ msgstr "Obrezovanje videa"
 
 #, fuzzy
 #~ msgid "Inverts the colors of the image"
@@ -38312,7 +38329,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Snapshot width"
-#~ msgstr "Širina zajete slike"
+#~ msgstr "Širina zajetega posnetka"
 
 #, fuzzy
 #~ msgid "Width of the snapshot image."
@@ -38320,7 +38337,7 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Snapshot height"
-#~ msgstr "Višina zajete slike"
+#~ msgstr "Višina zajetega posnetka"
 
 #, fuzzy
 #~ msgid ""
@@ -39469,8 +39486,8 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 #~ "This adds post-processing filters to enhance the picture quality, for "
 #~ "instance deinterlacing, or to clone or distort the video window."
 #~ msgstr ""
-#~ "Doda filtriranje po obdelavi z namenom izboljšanja kakovosti slike, kot "
-#~ "na primer razpletanje, preoblikovanje in podobno."
+#~ "Možnost omogoča filtriranje po obdelavi z namenom izboljšanja kakovosti "
+#~ "slike, kot na primer razpletanje, preoblikovanje in podobno."
 
 #, fuzzy
 #~ msgid "Audio CD - Track "
@@ -40006,11 +40023,11 @@ msgstr "Seznam upravljalnika predstavnih vsebin"
 
 #, fuzzy
 #~ msgid "Video canvas width"
-#~ msgstr "Širina zajete slike"
+#~ msgstr "Širina zajetega posnetka"
 
 #, fuzzy
 #~ msgid "Video canvas height"
-#~ msgstr "Višina zajete slike"
+#~ msgstr "Višina zajetega posnetka"
 
 #, fuzzy
 #~ msgid "Video canvas aspect ratio"
