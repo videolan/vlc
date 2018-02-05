@@ -151,24 +151,6 @@ struct demux_sys_t
         this->canSeek = canSeek;
     }
 
-    bool seekTo( double pos )
-    {
-        if (i_length == -1)
-            return false;
-        return seekTo( mtime_t( i_length * pos ) );
-    }
-
-    bool seekTo( mtime_t i_pos )
-    {
-        if ( !canSeek )
-            return false;
-
-        /* seeking will be handled with the Chromecast */
-        p_renderer->pf_request_seek( p_renderer->p_opaque, i_pos );
-
-        return true;
-    }
-
     void setLength( mtime_t length )
     {
         this->i_length = length;
@@ -236,45 +218,13 @@ struct demux_sys_t
 
         case DEMUX_SET_POSITION:
         {
-            va_list ap;
-
-            va_copy( ap, args );
-            double pos = va_arg( ap, double );
-            va_end( ap );
-
-            if ( getPlaybackTime() == VLC_TS_INVALID )
-            {
-                msg_Dbg( p_demux_filter, "internal seek to %f when the playback didn't start", pos );
-                break; // seek before device started, likely on-the-fly restart
-            }
-
-            if ( !seekTo( pos ) )
-            {
-                msg_Err( p_demux_filter, "failed to seek to %f", pos );
-                return VLC_EGENERIC;
-            }
+            m_startTime = VLC_TS_INVALID;
             break;
         }
 
         case DEMUX_SET_TIME:
         {
-            va_list ap;
-
-            va_copy( ap, args );
-            mtime_t pos = va_arg( ap, mtime_t );
-            va_end( ap );
-
-            if ( getPlaybackTime() == VLC_TS_INVALID )
-            {
-                msg_Dbg( p_demux_filter, "internal seek to %" PRId64 " when the playback didn't start", pos );
-                break; // seek before device started, likely on-the-fly restart
-            }
-
-            if ( !seekTo( pos ) )
-            {
-                msg_Err( p_demux_filter, "failed to seek to time %" PRId64, pos );
-                return VLC_EGENERIC;
-            }
+            m_startTime = VLC_TS_INVALID;
             break;
         }
         case DEMUX_SET_PAUSE_STATE:
