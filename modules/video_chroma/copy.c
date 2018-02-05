@@ -832,9 +832,9 @@ void picture_SwapUV(picture_t *picture)
 {
     assert(picture->i_planes == 3);
 
-    plane_t tmp_plane = picture->p[1];
-    picture->p[1] = picture->p[2];
-    picture->p[2] = tmp_plane;
+    plane_t tmp_plane   = picture->p[U_PLANE];
+    picture->p[U_PLANE] = picture->p[V_PLANE];
+    picture->p[V_PLANE] = tmp_plane;
 }
 
 int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
