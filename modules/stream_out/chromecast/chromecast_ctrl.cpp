@@ -92,6 +92,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_mediaSessionId( 0 )
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
+ , m_request_stop( false )
  , m_eof( false )
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
@@ -268,6 +269,8 @@ void intf_sys_t::setHasInput( const std::string mime_type )
 {
     vlc_mutex_locker locker(&m_lock);
     msg_Dbg( m_module, "Loading content" );
+
+    m_request_stop = false;
 
     this->m_mime = mime_type;
 
@@ -604,7 +607,13 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                 msg_Dbg( m_module, "New mediaSessionId: %" PRId64, m_mediaSessionId );
             }
 
-            if (newPlayerState == "PLAYING")
+            if (m_request_stop)
+            {
+                m_request_stop = false;
+                m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+                setState( Stopping );
+            }
+            else if (newPlayerState == "PLAYING")
             {
                 msg_Dbg( m_module, "Playback started now:%" PRId64 " i_ts_local_start:%" PRId64,
                          m_time_playback_started, m_ts_local_start);
@@ -790,8 +799,15 @@ void intf_sys_t::requestPlayerStop()
         m_art_stream = NULL;
     }
 
-    if ( m_mediaSessionId == 0 || m_state == TakenOver )
+    if ( m_state == TakenOver )
         return;
+
+    if ( m_mediaSessionId == 0 )
+    {
+        m_request_stop = true;
+        return;
+    }
+
     queueMessage( Stop );
 }
 
