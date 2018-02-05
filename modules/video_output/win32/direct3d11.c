@@ -1945,6 +1945,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         msg_Dbg(vd,"psz_peak_luminance %s", psz_peak_luminance);
         msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
         msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
+        msg_Dbg(vd,"psz_sampler %s", psz_sampler);
     }
 #endif
     free(psz_range);
