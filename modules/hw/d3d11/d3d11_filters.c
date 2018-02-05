@@ -137,7 +137,8 @@ static bool ApplyFilter( filter_sys_t *p_sys,
                          D3D11_VIDEO_PROCESSOR_FILTER filter,
                          const struct filter_level *p_level,
                          ID3D11VideoProcessorInputView *input,
-                         ID3D11VideoProcessorOutputView *output )
+                         ID3D11VideoProcessorOutputView *output,
+                         const video_format_t *fmt)
 {
     HRESULT hr;
 
@@ -151,6 +152,16 @@ static bool ApplyFilter( filter_sys_t *p_sys,
                                                      filter,
                                                      TRUE,
                                                      level);
+
+    RECT srcRect;
+    srcRect.left   = fmt->i_x_offset;
+    srcRect.top    = fmt->i_y_offset;
+    srcRect.right  = srcRect.left + fmt->i_visible_width;
+    srcRect.bottom = srcRect.top  + fmt->i_visible_height;
+    ID3D11VideoContext_VideoProcessorSetStreamSourceRect(p_sys->d3dvidctx, p_sys->videoProcessor,
+                                                         0, TRUE, &srcRect);
+    ID3D11VideoContext_VideoProcessorSetStreamDestRect(p_sys->d3dvidctx, p_sys->videoProcessor,
+                                                       0, TRUE, &srcRect);
 
     D3D11_VIDEO_PROCESSOR_STREAM stream = {0};
     stream.Enable = TRUE;
@@ -256,7 +267,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     /* contrast */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_CONTRAST, &p_sys->Contrast,
-                      inputs[idx], outputs[idx] ) )
+                      inputs[idx], outputs[idx], &p_filter->fmt_out.video ) )
     {
         idx++;
         count++;
@@ -264,7 +275,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     /* brightness */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_BRIGHTNESS, &p_sys->Brightness,
-                      inputs[idx], outputs[idx] ) )
+                      inputs[idx], outputs[idx], &p_filter->fmt_out.video ) )
     {
         idx++;
         count++;
@@ -272,7 +283,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     /* hue */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_HUE, &p_sys->Hue,
-                      inputs[idx], outputs[idx] ) )
+                      inputs[idx], outputs[idx], &p_filter->fmt_out.video ) )
     {
         idx++;
         count++;
@@ -280,7 +291,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     /* saturation */
     if ( ApplyFilter( p_sys,
                       D3D11_VIDEO_PROCESSOR_FILTER_SATURATION, &p_sys->Saturation,
-                      inputs[idx], outputs[idx] ) )
+                      inputs[idx], outputs[idx], &p_filter->fmt_out.video ) )
     {
         idx++;
         count++;
