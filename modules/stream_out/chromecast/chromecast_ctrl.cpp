@@ -297,6 +297,21 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     m_eof = false;
 }
 
+bool intf_sys_t::isPlaying() const
+{
+    switch( m_state )
+    {
+        case Loading:
+        case Buffering:
+        case Playing:
+        case Paused:
+        case Seeking:
+            return true;
+        default:
+            return false;
+    }
+}
+
 /**
  * @brief Process a message received from the Chromecast
  * @param msg the CastMessage to process
@@ -367,11 +382,21 @@ void intf_sys_t::mainLoop()
             switch ( msg )
             {
                 case Stop:
-                    m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
-                    setState( Stopping );
+                    if( isPlaying() )
+                    {
+                        if ( m_mediaSessionId == 0 )
+                            m_request_stop = true;
+                        else
+                        {
+                            m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+                            setState( Stopping );
+                        }
+                    }
                     break;
                 case Seek:
                 {
+                    if( !isPlaying() || m_mediaSessionId == 0 )
+                        break;
                     char current_time[32];
                     mtime_t seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
                     if( snprintf( current_time, sizeof(current_time), "%.3f",
@@ -799,14 +824,8 @@ void intf_sys_t::requestPlayerStop()
         m_art_stream = NULL;
     }
 
-    if ( m_state == TakenOver )
+    if( !isPlaying() )
         return;
-
-    if ( m_mediaSessionId == 0 )
-    {
-        m_request_stop = true;
-        return;
-    }
 
     queueMessage( Stop );
 }
@@ -820,7 +839,7 @@ States intf_sys_t::state() const
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
-    if ( m_mediaSessionId == 0 )
+    if( !isPlaying() || m_mediaSessionId == 0 )
         return;
     if ( pos != VLC_TS_INVALID )
         m_ts_local_start = pos;
@@ -860,7 +879,7 @@ void intf_sys_t::waitAppStarted()
             m_state = Launching;
             m_communication.msgReceiverLaunchApp();
         }
-        msg_Dbg( m_module, "Waiting for Chromecast media receiver app to be ready" );
+        msg_Info( m_module, "Waiting for Chromecast media receiver app to be ready: %d", m_state );
         vlc_cond_wait(&m_stateChangedCond, &m_lock);
     }
     msg_Dbg( m_module, "Done waiting for application. transportId: %s", m_appTransportId.c_str() );
