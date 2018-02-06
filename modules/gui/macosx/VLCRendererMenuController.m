@@ -96,6 +96,17 @@
 
 - (void)addRendererItem:(VLCRendererItem *)item
 {
+    // Check if the item is already selected
+    if (_selectedItem.representedObject != nil)
+    {
+        VLCRendererItem *selected_rd_item = _selectedItem.representedObject;
+        if ([selected_rd_item.identifier isEqualToString:item.identifier])
+        {
+            [_selectedItem setRepresentedObject:item];
+            return;
+        }
+    }
+
     // Create a menu item
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:item.name
                                                       action:@selector(selectRenderer:)
@@ -110,10 +121,9 @@
     NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
     if (index != NSNotFound) {
         NSMenuItem *menuItem = [_rendererMenu itemAtIndex:index];
-        if (menuItem == _selectedItem) {
-            [self selectRenderer:_rendererNoneItem];
-        }
-        [_rendererMenu removeItemAtIndex:index];
+        // Don't remove selected item
+        if (menuItem != _selectedItem)
+            [_rendererMenu removeItemAtIndex:index];
     }
 }
 
