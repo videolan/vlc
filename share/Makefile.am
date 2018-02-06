@@ -153,9 +153,7 @@ nobase_vlclib_DATA += \
 	lua/playlist/vocaroo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/twitch.luac \
-	lua/sd/fmc.luac \
 	lua/sd/icecast.luac \
-	lua/sd/icast.luac \
 	lua/sd/jamendo.luac \
 	$(NULL)
 
