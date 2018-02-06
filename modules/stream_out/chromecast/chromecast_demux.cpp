@@ -42,8 +42,6 @@ struct demux_sys_t
         :p_demux(demux)
         ,p_renderer(renderer)
         ,i_length(-1)
-        ,demuxReady(false)
-        ,m_seektime( VLC_TS_INVALID )
         ,m_enabled( true )
         ,m_startTime( VLC_TS_INVALID )
     {
@@ -166,7 +164,6 @@ struct demux_sys_t
             return false;
 
         /* seeking will be handled with the Chromecast */
-        m_seektime = i_pos;
         p_renderer->pf_request_seek( p_renderer->p_opaque, i_pos );
 
         return true;
@@ -183,27 +180,14 @@ struct demux_sys_t
         if ( !m_enabled )
             return demux_Demux( p_demux->p_next );
 
-        if (!demuxReady)
-        {
-            msg_Dbg(p_demux, "wait to demux");
-            p_renderer->pf_wait_app_started( p_renderer->p_opaque );
-            demuxReady = true;
-            msg_Dbg(p_demux, "ready to demux");
-        }
+        p_renderer->pf_pace( p_renderer->p_opaque );
+
         if( m_startTime == VLC_TS_INVALID )
         {
             if( demux_Control( p_demux->p_next, DEMUX_GET_TIME,
                                &m_startTime ) == VLC_SUCCESS )
                 p_renderer->pf_set_initial_time( p_renderer->p_opaque,
                                                  m_startTime );
-        }
-
-        /* hold the data while seeking */
-        /* wait until the device is buffering for data after the seek command */
-        if ( m_seektime != VLC_TS_INVALID )
-        {
-            p_renderer->pf_wait_seek_done( p_renderer->p_opaque );
-            m_seektime = VLC_TS_INVALID;
         }
 
         return demux_Demux( p_demux->p_next );
@@ -349,10 +333,7 @@ protected:
     demux_t     * const p_demux;
     chromecast_common  * p_renderer;
     mtime_t       i_length;
-    bool          demuxReady;
     bool          canSeek;
-    /* seek time kept while waiting for the chromecast to "seek" */
-    mtime_t       m_seektime;
     bool          m_enabled;
     mtime_t       m_startTime;
 };

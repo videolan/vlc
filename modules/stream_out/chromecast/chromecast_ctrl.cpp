@@ -98,6 +98,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_request_stop( false )
  , m_request_load( false )
  , m_eof( false )
+ , m_pace( false )
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
  , m_httpd_host(httpd_host)
@@ -109,6 +110,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 {
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
+    vlc_cond_init( &m_pace_cond );
 
     const char *psz_artmime = "application/octet-stream";
     m_httpd_file = httpd_FileNew( m_httpd_host, "/art", psz_artmime, NULL, NULL,
@@ -123,9 +125,8 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_common.pf_get_time         = get_time;
     m_common.pf_set_length       = set_length;
     m_common.pf_set_initial_time = set_initial_time;
-    m_common.pf_wait_app_started = wait_app_started;
+    m_common.pf_pace             = pace;
     m_common.pf_request_seek     = request_seek;
-    m_common.pf_wait_seek_done   = wait_seek_done;
     m_common.pf_set_pause_state  = set_pause_state;
     m_common.pf_set_meta         = set_meta;
 
@@ -181,6 +182,7 @@ intf_sys_t::~intf_sys_t()
     free( m_art_url );
 
     vlc_cond_destroy(&m_stateChangedCond);
+    vlc_cond_destroy(&m_pace_cond);
     vlc_mutex_destroy(&m_lock);
 }
 
@@ -342,6 +344,46 @@ bool intf_sys_t::isStateReady() const
         default:
             return true;
     }
+}
+
+void intf_sys_t::setPacing(bool do_pace)
+{
+    vlc_mutex_lock( &m_lock );
+    if( m_pace == do_pace )
+    {
+        vlc_mutex_unlock( &m_lock );
+        return;
+    }
+    m_pace = do_pace;
+    vlc_mutex_unlock( &m_lock );
+    vlc_cond_signal( &m_pace_cond );
+}
+
+static void interrupt_wake_up_cb( void *data )
+{
+    intf_sys_t *p_sys = static_cast<intf_sys_t*>((void *)data);
+    p_sys->interrupt_wake_up();
+}
+
+void intf_sys_t::interrupt_wake_up()
+{
+    vlc_mutex_locker locker( &m_lock );
+    m_interrupted = true;
+    vlc_cond_signal( &m_pace_cond );
+}
+
+void intf_sys_t::pace()
+{
+    vlc_mutex_locker locker(&m_lock);
+    if( !m_pace )
+        return;
+
+    m_interrupted = false;
+    vlc_interrupt_register( interrupt_wake_up_cb, this );
+
+    while( m_pace && !m_interrupted )
+        vlc_cond_wait( &m_pace_cond, &m_lock );
+    vlc_interrupt_unregister();
 }
 
 /**
@@ -889,40 +931,6 @@ void intf_sys_t::setPauseState(bool paused)
     }
 }
 
-void intf_sys_t::waitAppStarted()
-{
-    while ( m_state == Connected || m_state == Launching ||
-            m_state == Authenticating || m_state == Connecting ||
-            m_state == Stopping )
-    {
-        if ( m_state == Connected )
-        {
-            msg_Dbg( m_module, "Starting the media receiver application" );
-            // Don't use setState as we don't want to signal the condition in this case.
-            m_state = Launching;
-            m_communication.msgReceiverLaunchApp();
-        }
-        msg_Info( m_module, "Waiting for Chromecast media receiver app to be ready: %d", m_state );
-        vlc_cond_wait(&m_stateChangedCond, &m_lock);
-    }
-    msg_Dbg( m_module, "Done waiting for application. transportId: %s", m_appTransportId.c_str() );
-}
-
-void intf_sys_t::waitSeekDone()
-{
-    vlc_mutex_locker locker(&m_lock);
-    while ( m_state == Seeking )
-    {
-#ifndef NDEBUG
-        msg_Dbg( m_module, "waiting for Chromecast seek" );
-#endif
-        vlc_cond_wait(&m_stateChangedCond, &m_lock);
-#ifndef NDEBUG
-        msg_Dbg( m_module, "finished waiting for Chromecast seek" );
-#endif
-    }
-}
-
 bool intf_sys_t::isFinishedPlaying()
 {
     vlc_mutex_locker locker(&m_lock);
@@ -1022,23 +1030,16 @@ void intf_sys_t::set_length(void *pt, mtime_t length)
     p_this->m_length = length;
 }
 
-void intf_sys_t::wait_app_started(void *pt)
+void intf_sys_t::pace(void *pt)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    vlc_mutex_locker locker( &p_this->m_lock);
-    p_this->waitAppStarted();
+    p_this->pace();
 }
 
 void intf_sys_t::request_seek(void *pt, mtime_t pos)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->requestPlayerSeek(pos);
-}
-
-void intf_sys_t::wait_seek_done(void *pt)
-{
-    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->waitSeekDone();
 }
 
 void intf_sys_t::set_pause_state(void *pt, bool paused)

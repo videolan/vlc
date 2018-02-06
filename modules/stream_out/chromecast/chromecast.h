@@ -170,7 +170,11 @@ struct intf_sys_t
     void requestPlayerStop();
     States state() const;
 
+    void setPacing(bool do_pace);
+    void pace();
+
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+    void interrupt_wake_up();
 private:
     bool handleMessages();
 
@@ -211,10 +215,9 @@ private:
     static double get_position(void*);
     static void set_initial_time( void*, mtime_t time );
 
-    static void wait_app_started(void*);
+    static void pace(void*);
 
     static void request_seek(void*, mtime_t pos);
-    static void wait_seek_done(void*);
 
     static void set_pause_state(void*, bool paused);
 
@@ -232,6 +235,7 @@ private:
 
     mutable vlc_mutex_t  m_lock;
     vlc_cond_t   m_stateChangedCond;
+    vlc_cond_t   m_pace_cond;
     vlc_thread_t m_chromecastThread;
 
     ChromecastCommunication m_communication;
@@ -240,6 +244,8 @@ private:
     bool m_request_stop;
     bool m_request_load;
     bool m_eof;
+    bool m_pace;
+    bool m_interrupted;
 
     vlc_meta_t *m_meta;
 

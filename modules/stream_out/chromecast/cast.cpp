@@ -42,13 +42,15 @@
 
 struct sout_access_out_sys_t
 {
+    intf_sys_t * const m_intf;
     httpd_url_t       *m_url;
     vlc_fifo_t        *m_fifo;
     block_t           *m_header;
     bool               m_eof;
     std::string        m_mime;
 
-    sout_access_out_sys_t(httpd_host_t *httpd_host, const char *psz_url);
+    sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
+                          const char *psz_url);
     ~sout_access_out_sys_t();
 
     void clearUnlocked();
@@ -62,7 +64,7 @@ struct sout_stream_sys_t
     sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port,
                       const char *psz_default_muxer, const char *psz_default_mime)
         : httpd_host(httpd_host)
-        , access_out_live(httpd_host, "/stream")
+        , access_out_live(httpd_host, intf, "/stream")
         , p_out(NULL)
         , default_muxer(psz_default_muxer)
         , default_mime(psz_default_mime)
@@ -316,8 +318,11 @@ static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
     return p_sys->url_cb(cl, answer, query);
 }
 
-sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host, const char *psz_url)
-    : m_header(NULL)
+sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
+                                             intf_sys_t * const intf,
+                                             const char *psz_url)
+    : m_intf(intf)
+    , m_header(NULL)
     , m_eof(true)
 {
     m_fifo = block_FifoNew();
@@ -404,7 +409,11 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
             }
         }
     }
+    bool do_unpace = vlc_fifo_GetBytes(m_fifo) < HTTPD_BUFFER_MAX;
     vlc_fifo_Unlock(m_fifo);
+
+    if (do_unpace)
+        m_intf->setPacing(false);
 
     answer->i_proto  = HTTPD_PROTO_HTTP;
     answer->i_version= 0;
@@ -450,7 +459,11 @@ static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
 
     vlc_fifo_Lock(p_sys->m_fifo);
 
-    while (vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX)
+    /* Tell the demux filter to pace when the fifo starts to be full */
+    bool do_pace = vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX;
+
+    /* Drop buffer is the fifo is really full */
+    while (vlc_fifo_GetBytes(p_sys->m_fifo) >= (HTTPD_BUFFER_MAX * 2))
     {
         block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->m_fifo);
         msg_Warn(p_access, "httpd buffer full: dropping %zuB", p_drop->i_buffer);
@@ -460,6 +473,9 @@ static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
 
     vlc_fifo_Unlock(p_sys->m_fifo);
     vlc_fifo_Signal(p_sys->m_fifo);
+
+    if (do_pace)
+        p_sys->m_intf->setPacing(true);
 
     return i_len;
 }
@@ -506,6 +522,8 @@ static void AccessClose(vlc_object_t *p_this)
     p_sys->m_eof = true;
     vlc_fifo_Unlock(p_sys->m_fifo);
     vlc_fifo_Signal(p_sys->m_fifo);
+
+    p_sys->m_intf->setPacing(false);
 }
 
 /*****************************************************************************
@@ -1185,8 +1203,9 @@ static void Close(vlc_object_t *p_this)
     assert(p_sys->streams.empty() && p_sys->out_streams.empty());
 
     httpd_host_t *httpd_host = p_sys->httpd_host;
-    delete p_sys->p_intf;
+    intf_sys_t *p_intf = p_sys->p_intf;
     delete p_sys;
+    delete p_intf;
     /* Delete last since p_intf and p_sys depends on httpd_host */
     httpd_HostDelete(httpd_host);
 }
