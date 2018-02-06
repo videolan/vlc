@@ -49,6 +49,8 @@
  */
 - (NSString*)name;
 
+- (NSString*)identifier;
+
 /**
  The iconURI of the renderer item
  */
