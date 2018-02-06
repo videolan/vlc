@@ -50,7 +50,7 @@ char *vlc_getProxyUrl(const char *psz_url)
     }
 
     if (url.psz_password == NULL )
-        url.psz_password = vlc_uri_encode(proxy_pwd);
+        url.psz_password = proxy_pwd;
 
     char *proxy_url = vlc_uri_compose (&url);
     vlc_UrlClean (&url);
