@@ -456,19 +456,15 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys, const char *path 
                         NULL, NULL );
     do
     {
-        if( credential.psz_username != NULL )
-        {
-            if( LoginUserPwd( p_access, p_sys, credential.psz_username,
-                              credential.psz_password, &b_logged ) != 0
-             || b_logged )
-                break;
-        }
-        else
-        {
-            /* No crendential specified: show the dialog with a "anonymous"
-             * user pre-filled */
-            credential.psz_username = "anonymous";
-        }
+        const char *psz_username = credential.psz_username;
+
+        if( psz_username == NULL ) /* use anonymous by default */
+            psz_username = "anonymous";
+
+        if( LoginUserPwd( p_access, p_sys, psz_username,
+                          credential.psz_password, &b_logged ) != 0
+         || b_logged )
+            break;
     }
     while( vlc_credential_get( &credential, p_access, "ftp-user", "ftp-pwd",
                                LOGIN_DIALOG_TITLE, LOGIN_DIALOG_TEXT,
