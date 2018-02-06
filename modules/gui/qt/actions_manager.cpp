@@ -53,6 +53,15 @@ ActionsManager::ActionsManager( intf_thread_t * _p_i )
 ActionsManager::~ActionsManager()
 {
     StopRendererScan();
+    /* reset the list of renderers */
+    foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+    {
+        QVariant data = action->data();
+        if (!data.canConvert<QVariantHash>())
+            continue;
+        VLCMenuBar::rendererMenu->removeAction(action);
+        VLCMenuBar::rendererGroup->removeAction(action);
+    }
 }
 
 void ActionsManager::doAction( int id_action )
@@ -344,15 +353,6 @@ void ActionsManager::RendererMenuCountdown()
 
 void ActionsManager::StopRendererScan()
 {
-    /* reset the list of renderers */
-    foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
-    {
-        QVariant data = action->data();
-        if (!data.canConvert<QVariantHash>())
-            continue;
-        VLCMenuBar::rendererMenu->removeAction(action);
-        VLCMenuBar::rendererGroup->removeAction(action);
-    }
     foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
         vlc_rd_release( p_rd );
     m_rds.clear();
