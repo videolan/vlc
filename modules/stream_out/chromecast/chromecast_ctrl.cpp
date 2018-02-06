@@ -93,6 +93,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
  , m_request_stop( false )
+ , m_request_load( false )
  , m_eof( false )
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
@@ -265,6 +266,38 @@ void intf_sys_t::prepareHttpArtwork()
     vlc_meta_Set( m_meta, vlc_meta_ArtworkURL, ss.str().c_str() );
 }
 
+void intf_sys_t::tryLoad()
+{
+    if( !m_request_load )
+        return;
+
+    if ( !isStateReady() )
+    {
+        if ( m_state == Dead )
+        {
+            msg_Warn( m_module, "no Chromecast hook possible");
+            m_request_load = false;
+        }
+        else if( m_state == Connected )
+        {
+            msg_Dbg( m_module, "Starting the media receiver application" );
+            // Don't use setState as we don't want to signal the condition in this case.
+            m_state = Launching;
+            m_communication.msgReceiverLaunchApp();
+        }
+        return;
+    }
+
+    m_request_load = false;
+
+    // We should now be in the ready state, and therefor have a valid transportId
+    assert( m_appTransportId.empty() == false );
+    // Reset the mediaSessionID to allow the new session to become the current one.
+    // we cannot start a new load when the last one is still processing
+    m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_mime, m_meta );
+    m_state = Loading;
+}
+
 void intf_sys_t::setHasInput( const std::string mime_type )
 {
     vlc_mutex_locker locker(&m_lock);
@@ -278,23 +311,14 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     std::queue<QueueableMessages> empty;
     std::swap(m_msgQueue, empty);
 
-    waitAppStarted();
-    if ( m_state == Dead )
-    {
-        msg_Warn( m_module, "no Chromecast hook possible");
-        return;
-    }
-
     prepareHttpArtwork();
 
-    // We should now be in the ready state, and therefor have a valid transportId
-    assert( m_appTransportId.empty() == false );
-    // Reset the mediaSessionID to allow the new session to become the current one.
-    m_mediaSessionId = 0;
-    // we cannot start a new load when the last one is still processing
-    m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, mime_type, m_meta );
-    setState( Loading );
     m_eof = false;
+    m_mediaSessionId = 0;
+    m_request_load = true;
+
+    tryLoad();
+    vlc_cond_signal( &m_stateChangedCond );
 }
 
 bool intf_sys_t::isStatePlaying() const
@@ -309,6 +333,22 @@ bool intf_sys_t::isStatePlaying() const
             return true;
         default:
             return false;
+    }
+}
+
+bool intf_sys_t::isStateReady() const
+{
+    switch( m_state )
+    {
+        case Connected:
+        case Launching:
+        case Authenticating:
+        case Connecting:
+        case Stopping:
+        case Dead:
+            return false;
+        default:
+            return true;
     }
 }
 
@@ -498,8 +538,8 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
             {
                 msg_Dbg( m_module, "Media receiver application was already running" );
                 m_appTransportId = (const char*)(*p_app)["transportId"];
-                setState( Ready );
                 m_communication.msgConnect( m_appTransportId );
+                setState( Ready );
             }
             else
             {
@@ -511,9 +551,9 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
             if ( p_app != NULL )
             {
                 msg_Dbg( m_module, "Media receiver application has been started." );
-                setState( Ready );
                 m_appTransportId = (const char*)(*p_app)["transportId"];
                 m_communication.msgConnect( m_appTransportId );
+                setState( Ready );
             }
             break;
         case Loading:
@@ -813,6 +853,8 @@ void intf_sys_t::requestPlayerStop()
 {
     vlc_mutex_locker locker(&m_lock);
 
+    m_request_load = false;
+
     if( m_httpd_file )
     {
         httpd_FileDelete( m_httpd_file );
@@ -958,6 +1000,16 @@ void intf_sys_t::setState( States state )
         msg_Dbg( m_module, "Switching from state %s to %s", StateToStr( m_state ), StateToStr( state ) );
 #endif
         m_state = state;
+
+        switch( m_state )
+        {
+            case Connected:
+            case Ready:
+                tryLoad();
+                break;
+            default:
+                break;
+        }
         vlc_cond_signal( &m_stateChangedCond );
     }
 }
