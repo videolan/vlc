@@ -1589,6 +1589,8 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             msg_Err(p_dec, "unspecified video dimensions");
             continue;
         }
+        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
+        msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
         if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
             continue; /* Unsupported brand of hardware acceleration */
         post_mt(p_sys);
