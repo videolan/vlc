@@ -272,7 +272,6 @@ EXTRA_DIST += \
 	lua/playlist/appletrailers.lua \
 	lua/playlist/bbc_co_uk.lua \
 	lua/playlist/break.lua \
-	lua/playlist/canalplus.lua \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/extreme.lua \
