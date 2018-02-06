@@ -153,6 +153,8 @@
 
 - (void)selectRenderer:(NSMenuItem *)sender
 {
+    [_rendererNoneItem setState:NSOffState];
+
     [_selectedItem setState:NSOffState];
     [sender setState:NSOnState];
     _selectedItem = sender;
