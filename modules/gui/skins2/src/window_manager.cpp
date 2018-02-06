@@ -438,10 +438,10 @@ void WindowManager::showAll( bool firstTime ) const
 
 void WindowManager::show( TopWindow &rWindow ) const
 {
-    rWindow.show();
-
     if( isOpacityNeeded() )
         rWindow.setOpacity( m_alpha );
+
+    rWindow.show();
 }
 
 
