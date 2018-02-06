@@ -203,7 +203,7 @@ static const char *const conversion_quality_list_text[] = {
 #define PORT_TEXT N_("Chromecast port")
 #define PORT_LONGTEXT N_("The port used to talk to the Chromecast.")
 
-#define HTTPD_BUFFER_MAX INT64_C(32 * 1024 * 1024) /* 32 MB */
+#define HTTPD_BUFFER_MAX INT64_C(16 * 1024 * 1024) /* 16 MB */
 
 vlc_module_begin ()
 
