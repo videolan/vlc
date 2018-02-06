@@ -182,6 +182,8 @@ private:
 
     void setPauseState(bool paused);
     bool isStatePlaying() const;
+    bool isStateReady() const;
+    void tryLoad();
 
     void setMeta( vlc_meta_t *p_meta );
 
@@ -236,6 +238,7 @@ private:
     std::queue<QueueableMessages> m_msgQueue;
     States m_state;
     bool m_request_stop;
+    bool m_request_load;
     bool m_eof;
 
     vlc_meta_t *m_meta;
