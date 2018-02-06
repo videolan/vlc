@@ -44,6 +44,9 @@
 #define PING_WAIT_TIME 6000
 #define PING_WAIT_RETRIES 1
 
+static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
+                          uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+
 static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
 
 static const char* StateToStr( States s )
@@ -98,9 +101,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
  , m_httpd_host(httpd_host)
- , m_httpd_file(NULL)
  , m_art_url(NULL)
- , m_art_stream(NULL)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
  , m_length( VLC_TS_INVALID )
@@ -108,6 +109,10 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 {
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
+
+    const char *psz_artmime = "application/octet-stream";
+    m_httpd_file = httpd_FileNew( m_httpd_host, "/art", psz_artmime, NULL, NULL,
+                                  httpd_file_fill_cb, (httpd_file_sys_t *) this );
 
     std::stringstream ss;
     ss << "http://" << m_communication.getServerIp() << ":" << port;
@@ -172,8 +177,8 @@ intf_sys_t::~intf_sys_t()
 
     if( m_httpd_file )
         httpd_FileDelete( m_httpd_file );
-    if( m_art_stream )
-        vlc_stream_Delete( m_art_stream );
+
+    free( m_art_url );
 
     vlc_cond_destroy(&m_stateChangedCond);
     vlc_mutex_destroy(&m_lock);
@@ -183,19 +188,39 @@ int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *p
 {
     (void) psz_request;
 
-    if( vlc_stream_Seek( m_art_stream, 0 ) )
+    vlc_mutex_lock( &m_lock );
+    if( !m_art_url )
+    {
+        vlc_mutex_unlock( &m_lock );
+        return VLC_EGENERIC;
+    }
+    char *psz_art = strdup( m_art_url );
+    vlc_mutex_unlock( &m_lock );
+
+    stream_t *s = vlc_stream_NewURL( m_module, psz_art );
+    free( psz_art );
+    if( !s )
         return VLC_EGENERIC;
 
     uint64_t size;
-    if( vlc_stream_GetSize( m_art_stream, &size ) != VLC_SUCCESS
+    if( vlc_stream_GetSize( s, &size ) != VLC_SUCCESS
      || size > INT64_C( 10000000 ) )
+    {
+        msg_Warn( m_module, "art stream is too big or invalid" );
+        vlc_stream_Delete( s );
         return VLC_EGENERIC;
+    }
 
     *pp_data = (uint8_t *)malloc( size );
     if( !*pp_data )
+    {
+        vlc_stream_Delete( s );
         return VLC_EGENERIC;
+    }
 
-    ssize_t read = vlc_stream_Read( m_art_stream, *pp_data, size );
+    ssize_t read = vlc_stream_Read( s, *pp_data, size );
+    vlc_stream_Delete( s );
+
     if( read < 0 || (size_t)read != size )
     {
         free( *pp_data );
@@ -217,49 +242,16 @@ static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
 
 void intf_sys_t::prepareHttpArtwork()
 {
+    if( !m_httpd_file )
+        return;
+
     const char *psz_art = m_meta ? vlc_meta_Get( m_meta, vlc_meta_ArtworkURL ) : NULL;
     /* Abort if there is no art or if the art is already served */
-    if( !psz_art || strncmp( psz_art, "http", 4) == 0
-     || ( m_art_url && strcmp( psz_art, m_art_url ) == 0 ) )
+    if( !psz_art || strncmp( psz_art, "http", 4) == 0 )
         return;
 
-    if( m_httpd_file )
-    {
-        httpd_FileDelete( m_httpd_file );
-        m_httpd_file = NULL;
-    }
-    if( m_art_stream )
-    {
-        vlc_stream_Delete( m_art_stream );
-        m_art_stream = NULL;
-    }
-
-    m_art_stream = vlc_stream_NewURL( m_module, psz_art );
-    if( !m_art_stream )
-        return;
-
-    uint64_t size;
-    if( vlc_stream_GetSize( m_art_stream, &size ) != VLC_SUCCESS
-     || size > INT64_C( 10000000 ) )
-    {
-        msg_Warn( m_module, "art stream is too big or invalid" );
-        vlc_stream_Delete( m_art_stream );
-        return;
-    }
-
-    const char *psz_artmime = "application/octet-stream";
-    char *psz_streammime = stream_MimeType( m_art_stream );
-    if( psz_streammime )
-        psz_artmime = psz_streammime;
-
-    m_httpd_file = httpd_FileNew( m_httpd_host, "/art", psz_artmime, NULL, NULL,
-                                  httpd_file_fill_cb, (httpd_file_sys_t *) this );
-    free( psz_streammime );
-    if( !m_httpd_file )
-    {
-        vlc_stream_Delete( m_art_stream );
-        return;
-    }
+    free( m_art_url );
+    m_art_url = strdup( psz_art );
 
     std::stringstream ss;
     ss << m_art_http_ip << "/art";
@@ -854,17 +846,6 @@ void intf_sys_t::requestPlayerStop()
     vlc_mutex_locker locker(&m_lock);
 
     m_request_load = false;
-
-    if( m_httpd_file )
-    {
-        httpd_FileDelete( m_httpd_file );
-        m_httpd_file = NULL;
-    }
-    if( m_art_stream )
-    {
-        vlc_stream_Delete( m_art_stream );
-        m_art_stream = NULL;
-    }
 
     if( !isStatePlaying() )
         return;
