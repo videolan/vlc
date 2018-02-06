@@ -381,6 +381,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
         SecKeychainItemRef itemRef = (__bridge SecKeychainItemRef)([listOfResults objectAtIndex:i]);
 
         SecKeychainAttributeInfo attrInfo;
+        attrInfo.count = 0;
 
 #ifndef NDEBUG
         attrInfo.count = 1;
