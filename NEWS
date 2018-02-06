@@ -19,33 +19,35 @@ Video ouput:
  * Remove evas plugin
  * Remove omxil_vout plugin
 
-Changes between 2.2.x and 3.0.0-git:
+Changes between 2.2.8 and 3.0.0:
 --------------------------------
 
 Platform support changes:
- * 3.0.x will be LTS (on a best-effort basis) that will be the last
-   working version for a lot of systems.
-   Indeed 3.0.x will be the last releases running on:
-     - Windows XP, Vista, and the servers equivalent of those releases
-     - macOS 10.7, 10,8 & 10.9, iOS 7 & 8
-     - Android 2.x, 3.x & 4.0.x
-     - Compilers before gcc 5.0 and clang 3.4
+ * 3.0.x will be maintained as a LTS (best-effort basis, mostly for security)
+   that will be the last working version for quite a few systems.
 
- * For 3.0, please note:
-     * The Windows XP/2003/2003R2 support for VLC is now on a best-efforts basis:
-       it should work, but not without limitations.
-       libVLC support for Windows XP is deprecated.
-       You _really_ should upgrade.
-     * Windows Vista (all versions) without Platform Upgrade is not supported.
-     * Linux support requires now a kernel newer than 2.6.26
-     * Mac OS X 10.6 support is now removed. You need OS X 10.7.
+   Indeed the 3.0.x branch will contain the last releases running on:
+     - Windows XP, Vista, and the servers equivalent of those Windows versions
+     - macOS 10.7, 10.8 & 10.9, iOS 7 & 8
+     - Android 2.x, 3.x, 4.0.x & 4.1.x
+     - Compilers before gcc 5.0 and clang 3.4, or equivalent
+
+ * For the 3.0 branch, please note:
+   * The Windows XP/2003/2003R2 support for VLC is now on a best-effort basis:
+     it should work, but not without limitations.
+     libVLC support for Windows XP is deprecated.
+     You _really_ should upgrade to a more modern Windows version!
+   * Windows Vista (all versions) without Platform Upgrade is not supported.
+   * 64bit version of VLC for Windows is recommended.
+   * Linux support requires now a kernel newer than 2.6.26.
+   * Mac OS X 10.6 support is now removed. You need OS X 10.7.
 
 Core:
- * Support network browsing for distant file system (SMB, FTP, SFTP, NFS...)
-   and rewrite the parsing of the media files
+ * Support network browsing for distant filesystems (SMB, FTP, SFTP, NFS...)
+   and rewrite the parsing of the media files and inputs
  * Support keystores: fetch and store passwords securely (sic!) for common
    protocols (HTTP, SMB, SFTP, FTP, RTSP ...)
- * Autodetect external audio tracks (ac3, m4a, aac, dts...), similar to subtitles
+ * Autodetect external audio tracks (ac3, m4a, aac, dts...) similar to subtitles
  * Support HDMI passthrough for Audio HD codecs, like E-AC3, TrueHD or DTS-HD
  * Support for 12bits codec and extended colorspaces (HDR)
  * Support output renderers, like ChromeCast
@@ -54,12 +56,12 @@ Core:
  * Support wayland surface type
  * Allow to start the video paused on the first frame
  * Refactor preparsing input
- * EPG reworked: table and single event updates, now using network time
- * Refactored and fixed subtitles es selection. Demuxers can now override
+ * EPG rework: table and single event updates, now using network time
+ * Refactor and fix subtitles es selection. Demuxers can now override
    es category single only or multiple es behavior
- * Support for 360 video and audio, including viewpoint setting
+ * Support for 360 video and audio, including viewpoint modification
  * Support for ambisonic audio and more than 8 audio channels
- * Support subtitles size live changing
+ * Support subtitles size live adjustments
 
 Access:
  * New NFS access module using libnfs
@@ -116,7 +118,7 @@ Decoders:
  * Support for experimental Daala video
  * New MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder based on libmpg123
  * New BPG decoder based on libbpg
- * Fixed uncompressed DVD-Audio (AOB) LPCM decoding
+ * Fix uncompressed DVD-Audio (AOB) LPCM decoding
  * Rewrite WPL playlists and add ZPL playlists support (Zune)
  * Support TDSC, Canopus HQX, Cineform, SpeedHQ, Pixlet, QDMC and FMVC codecs
  * TTML subtitles support, including EBU-TT-D variant
@@ -132,7 +134,7 @@ Decoders:
  * Support VPX high bit depth support
  * Extend MicroDVD support with color, fontname, size, position extensions
  * BluRay text subtitles (HDMV) are now decoded
- * Improved Closed Captions detection, notably inside the video streams
+ * Improve Closed Captions detection, notably inside the video streams
  * CEA-708 decoder
  * New MIDI decoder for macOS and iOS using the AudioToolbox framework, works
    without a soundfont or with SoundFont2 and DLS soundfonts
@@ -151,18 +153,18 @@ Demuxers:
     * Add new metadata fields
  * Important rework of the TS demuxer, including:
     * Support Opus in MPEG Transport Stream
-    * Fixed program selection with recorded TS (TopField, DreamBox and others)
-    * Fixed TS playback with PAT/PMT less recordings
+    * Fix program selection with recorded TS (TopField, DreamBox and others)
+    * Fix TS playback with PAT/PMT less recordings
     * Basic support for MPEG4-SL in TS and T-DMB
     * Support SCTE-18 / EAS inside TS
     * Support for new descriptors and ETT tables
     * Support for ARIB channel logos, as attachements, ARIB TR-B21/TR-B14-1
-    * Improved broken-PCR probing and fixing
+    * Improve broken-PCR probing and fixing
     * Improvements for scrambled state detection
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Important rework of the PS demuxer, including:
     * HEVC support
-    * Fixed a large number of samples, notably with PSM-less H264
+    * Fix large number of samples, notably with PSM-less H264
     * Partial support of PSMF
     * Fix broken SCR samples
     * Fix CDXA mpeg-1 support
@@ -186,8 +188,8 @@ Demuxers:
  * Support for Scenarist Closed Caption
  * Fix Quicktime Mp4 inside MKV and unpacketized VC1
  * Support for isofLaC
- * Improved fLaC seeking
- * Replaced --demux dvb-open option with --stream-filter dvb to parse
+ * Improve fLaC seeking
+ * Replace --demux dvb-open option with --stream-filter dvb to parse
    channels.conf digital TV channel list files
 
 Stream filter:
@@ -195,7 +197,7 @@ Stream filter:
  * Add a ARIB STD-B25 TS streams decoder
  * Add a stream prebuffering plugin
  * Rewrite libarchive module as a stream_extractor
- * Removed HTTP Live streaming stream filter
+ * Remove HTTP Live streaming stream filter
  * Add a zlib (a.k.a. deflate) decompression filter
  * Add a skiptags module to help demuxers skip ID3/APE tags
 
@@ -240,7 +242,7 @@ Video ouput:
  * Large rework of the Android video outputs: there is now Surface (2.1, 2.2)
    NativeWindow (2.3+, supports hw rotation, subpicture blending, opaque)
  * Support rotation in Android NativeWindow output and hardware decoders
- * Renamed the Direct3D output module to Direct3D9
+ * Rename the Direct3D output module to Direct3D9
  * Add a Direct3D11 video output supporting both Windows desktop and WinRT modes,
    supporting subpicture blending and hardware acceleration
  * Support HDR10 in Direct3D11 with Windows 10 Fall Creator Update
@@ -249,7 +251,7 @@ Video ouput:
 Video filter:
  * Hardware deinterlacing on the rPI, using MMAL
  * New video filter to convert between fps rates
- * Added 9-bit and 10-bit support to image adjust filter
+ * Add 9-bit and 10-bit support to image adjust filter
  * New edge detection filter uses the Sobel operator to detect edges
  * Hardware accelerated deinterlacing/adjust/sharpen/chroma with VA-API
  * Hardware accelerated adjust/invert/posterize/sepia/sharpen with CoreImage
@@ -270,8 +272,8 @@ Encoder:
  * VP8 and VP9 encoder using libvpx
 
 Muxers:
- * Added fragmented/streamable MP4 muxer
- * Added support for muxing VC1 and WMAPro in MP4
+ * Add fragmented/streamable MP4 muxer
+ * Add support for muxing VC1 and WMAPro in MP4
  * Opus in MPEG Transport Stream
  * Daala in Ogg
 
@@ -282,20 +284,20 @@ Service Discovery:
  * Rewrite of the UPnP service discovery
 
 Mac OS X Interface
- * Dropped support for Mac OS X 10.6 Snow Leopard
+ * Drop support for Mac OS X 10.6 Snow Leopard
  * Support right-to-left user interface layout for right-to-left languages
  * New resizable fullscreen controller with improved design
  * Add status bar icon which displays metadata and play controls
  * Add support for keyboard blacklight dimming during fullscreen video playback
- * Improved and simplified preferences window
+ * Improve and simplify preferences window
  * Huge performance improvements in playlist handling and other areas
  * New AppleScript API giving access to audio desynchronization
- * Expanded AppleScript API for menu detection and navigation
+ * Expand AppleScript API for menu detection and navigation
  * Support for building with disabled sparkle update mechanism
  * Remove deprecated transcoding wizard, use convert and save dialog instead
 
 iOS:
- * Dropped support for iOS 6.x
+ * Drop support for iOS 6.x
 
 Qt interface:
  * Batch convert support
