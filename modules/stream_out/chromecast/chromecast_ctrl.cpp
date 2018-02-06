@@ -297,7 +297,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     m_eof = false;
 }
 
-bool intf_sys_t::isPlaying() const
+bool intf_sys_t::isStatePlaying() const
 {
     switch( m_state )
     {
@@ -382,7 +382,7 @@ void intf_sys_t::mainLoop()
             switch ( msg )
             {
                 case Stop:
-                    if( isPlaying() )
+                    if( isStatePlaying() )
                     {
                         if ( m_mediaSessionId == 0 )
                             m_request_stop = true;
@@ -395,7 +395,7 @@ void intf_sys_t::mainLoop()
                     break;
                 case Seek:
                 {
-                    if( !isPlaying() || m_mediaSessionId == 0 )
+                    if( !isStatePlaying() || m_mediaSessionId == 0 )
                         break;
                     char current_time[32];
                     mtime_t seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
@@ -824,7 +824,7 @@ void intf_sys_t::requestPlayerStop()
         m_art_stream = NULL;
     }
 
-    if( !isPlaying() )
+    if( !isStatePlaying() )
         return;
 
     queueMessage( Stop );
@@ -839,7 +839,7 @@ States intf_sys_t::state() const
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
-    if( !isPlaying() || m_mediaSessionId == 0 )
+    if( !isStatePlaying() || m_mediaSessionId == 0 )
         return;
     if ( pos != VLC_TS_INVALID )
         m_ts_local_start = pos;
