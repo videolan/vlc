@@ -43,6 +43,7 @@ char *vlc_getProxyUrl(const char *psz_url)
 
     vlc_url_t url;
     if (vlc_UrlParse(&url, proxy) < 0) {
+        vlc_UrlClean(&url);
         free (proxy);
         free (proxy_pwd);
         return NULL;
