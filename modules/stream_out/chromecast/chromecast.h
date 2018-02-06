@@ -249,7 +249,6 @@ private:
     httpd_file_t     *m_httpd_file;
     std::string       m_art_http_ip;
     char             *m_art_url;
-    stream_t         *m_art_stream;
 
     /* local date when playback started/resumed, used by monotone clock */
     mtime_t           m_time_playback_started;
