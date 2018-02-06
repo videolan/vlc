@@ -596,6 +596,7 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
         case Seeking:
         case Ready:
         case TakenOver:
+        case Dead:
             if ( p_app == NULL )
             {
                 msg_Warn( m_module, "Media receiver application got closed." );
@@ -625,6 +626,8 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
         msg_Err( m_module, "Failed to start the MediaPlayer: %s",
                 (const char *)reason);
         vlc_mutex_locker locker(&m_lock);
+        m_appTransportId = "";
+        m_mediaSessionId = 0;
         setState( Dead );
     }
     else
