@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-01-30 00:41+0100\n"
+"POT-Creation-Date: 2018-02-06 22:47+0100\n"
 "PO-Revision-Date: 2017-11-16 03:18+0100\n"
 "Last-Translator: Dian Li <xslidian@gmail.com>, 2017\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
@@ -81,10 +81,10 @@ msgstr "VLC 控制界面设置"
 msgid "Hotkeys settings"
 msgstr "热键设置"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
-#: src/libvlc-module.c:1486 modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3095 src/libvlc-module.c:1492
+#: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
-#: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
+#: modules/gui/macosx/VLCMainMenu.m:415 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/info_panels.cpp:572
@@ -118,7 +118,7 @@ msgid "Audio resampler"
 msgstr "音频重采样器"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
-#: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
+#: modules/gui/macosx/VLCMainMenu.m:425 modules/gui/macosx/VLCMainMenu.m:426
 msgid "Visualizations"
 msgstr "可视化"
 
@@ -135,7 +135,7 @@ msgstr "输出模块"
 msgid "General settings for audio output modules."
 msgstr "音频输出模块的常规设置。"
 
-#: include/vlc_config_cat.h:69 src/libvlc-module.c:2009
+#: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
@@ -145,17 +145,17 @@ msgstr "其他"
 msgid "Miscellaneous audio settings and modules."
 msgstr "其他音频设置及模块。"
 
-#: include/vlc_config_cat.h:73 src/input/es_out.c:3135 src/libvlc-module.c:142
-#: src/libvlc-module.c:1545 modules/access/imem.c:64
+#: include/vlc_config_cat.h:73 src/input/es_out.c:3139 src/libvlc-module.c:142
+#: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
-#: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCOutput.m:82
+#: modules/gui/macosx/VLCMainMenu.m:428 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
 #: modules/gui/macosx/VLCSimplePrefsController.m:231
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:124 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:165 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -260,7 +260,7 @@ msgstr "字幕、电视文字广播（teletext）与隐藏式字幕（CC）的�
 msgid "General input settings. Use with care..."
 msgstr "常规输入设置。请谨慎使用..."
 
-#: include/vlc_config_cat.h:127 src/libvlc-module.c:1944
+#: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
 msgid "Stream output"
 msgstr "串流输出"
@@ -350,7 +350,7 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC 的视频点播（VoD）实现"
 
-#: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
+#: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
 #: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
 #: modules/gui/macosx/VLCMainWindow.m:296
@@ -384,7 +384,7 @@ msgid ""
 "playlist."
 msgstr "服务发现模块是可以自动将项目添加到播放列表的装置。"
 
-#: include/vlc_config_cat.h:184 src/libvlc-module.c:1844
+#: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
 #: modules/gui/qt/dialogs/extended.cpp:93
 #: modules/gui/qt/ui/video_effects.h:1308
 msgid "Advanced"
@@ -457,9 +457,9 @@ msgstr "关于(&A)"
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:64
 #: modules/gui/macosx/VLCControlsBarCommon.m:394
-#: modules/gui/macosx/VLCMainMenu.m:377 modules/gui/macosx/VLCMainMenu.m:487
-#: modules/gui/macosx/VLCMainMenu.m:494 modules/gui/macosx/VLCMainMenu.m:1324
-#: modules/gui/macosx/VLCMainMenu.m:1325 modules/gui/macosx/VLCMainMenu.m:1326
+#: modules/gui/macosx/VLCMainMenu.m:386 modules/gui/macosx/VLCMainMenu.m:498
+#: modules/gui/macosx/VLCMainMenu.m:505 modules/gui/macosx/VLCMainMenu.m:1340
+#: modules/gui/macosx/VLCMainMenu.m:1341 modules/gui/macosx/VLCMainMenu.m:1342
 #: modules/gui/macosx/VLCPlaylist.m:230
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:539 modules/gui/qt/ui/open.h:261
@@ -507,17 +507,17 @@ msgid "Save..."
 msgstr "保存..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
-#: modules/gui/macosx/VLCMainMenu.m:391
+#: modules/gui/macosx/VLCMainMenu.m:400
 msgid "Repeat All"
 msgstr "全部循环"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
-#: modules/gui/macosx/VLCMainMenu.m:390
+#: modules/gui/macosx/VLCMainMenu.m:399
 msgid "Repeat One"
 msgstr "单曲循环"
 
-#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1423
-#: modules/gui/macosx/VLCMainMenu.m:389
+#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
+#: modules/gui/macosx/VLCMainMenu.m:398
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Random"
@@ -617,8 +617,8 @@ msgstr "音频过滤失败"
 msgid "The maximum number of filters (%u) was reached."
 msgstr "已达到最大的滤镜数量 (%u)。"
 
-#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:943
-#: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
+#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:947
+#: src/libvlc-module.c:540 modules/gui/macosx/VLCMainMenu.m:243
 #: modules/gui/macosx/VLCMainWindow.m:1002 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "禁用"
@@ -647,8 +647,8 @@ msgstr "音频滤镜"
 msgid "Replay gain"
 msgstr "回放增益"
 
-#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:410
-#: modules/gui/macosx/VLCMainMenu.m:411
+#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:421
+#: modules/gui/macosx/VLCMainMenu.m:422
 msgid "Stereo audio mode"
 msgstr "立体音频模式"
 
@@ -672,7 +672,7 @@ msgstr "杜比环绕"
 msgid "Stereo"
 msgstr "立体声"
 
-#: src/audio_output/output.c:448 src/input/es_out.c:3232
+#: src/audio_output/output.c:448 src/input/es_out.c:3236
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
@@ -717,8 +717,7 @@ msgstr "耳机"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137
-#: modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "自动"
@@ -910,8 +909,8 @@ msgstr "封包器"
 msgid "decoder"
 msgstr "解码器"
 
-#: src/input/decoder.c:1909 src/input/decoder.c:2190
-#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:882
+#: src/input/decoder.c:1909 src/input/decoder.c:2191
+#: modules/codec/avcodec/encoder.c:365 modules/codec/avcodec/encoder.c:879
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "串流 / 转码失败"
@@ -921,55 +920,55 @@ msgstr "串流 / 转码失败"
 msgid "VLC could not open the %s module."
 msgstr "VLC 无法打开 %s 模块。"
 
-#: src/input/decoder.c:2191
+#: src/input/decoder.c:2192
 msgid "VLC could not open the decoder module."
 msgstr "VLC 无法打开解码器模块。"
 
-#: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
+#: src/input/es_out.c:967 src/input/es_out.c:972 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
 msgstr "轨道"
 
-#: src/input/es_out.c:1185
+#: src/input/es_out.c:1189
 #, c-format
 msgid "%s [%s %d]"
 msgstr "%s [%s %d]"
 
-#: src/input/es_out.c:1186 src/input/es_out.c:1191 src/input/es_out.c:1206
-#: src/input/var.c:160 src/libvlc-module.c:568
-#: modules/gui/macosx/VLCMainMenu.m:397 modules/gui/macosx/VLCMainMenu.m:398
+#: src/input/es_out.c:1190 src/input/es_out.c:1195 src/input/es_out.c:1210
+#: src/input/var.c:160 src/libvlc-module.c:564
+#: modules/gui/macosx/VLCMainMenu.m:408 modules/gui/macosx/VLCMainMenu.m:409
 msgid "Program"
 msgstr "节目"
 
-#: src/input/es_out.c:1216
+#: src/input/es_out.c:1220
 #, c-format
 msgid "Stream %d"
 msgstr "流 %d"
 
-#: src/input/es_out.c:1468 src/input/es_out.c:1470
+#: src/input/es_out.c:1472 src/input/es_out.c:1474
 msgid "Scrambled"
 msgstr "已混淆"
 
-#: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: src/input/es_out.c:1472 modules/keystore/keychain.m:40
 #: modules/lua/extension.c:1191
 msgid "Yes"
 msgstr "是"
 
-#: src/input/es_out.c:2135
+#: src/input/es_out.c:2139
 #, c-format
 msgid "DTVCC Closed captions %u"
 msgstr "DTVCC 隐藏式字幕 %u"
 
-#: src/input/es_out.c:2137
+#: src/input/es_out.c:2141
 #, c-format
 msgid "Closed captions %u"
 msgstr "隐藏式字幕 %u"
 
-#: src/input/es_out.c:3067
+#: src/input/es_out.c:3071
 msgid "Original ID"
 msgstr "原始 ID"
 
-#: src/input/es_out.c:3075 src/input/es_out.c:3078 modules/access/imem.c:67
+#: src/input/es_out.c:3079 src/input/es_out.c:3082 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:173
 #: modules/gui/qt/ui/profiles.h:728 modules/gui/qt/ui/profiles.h:754
@@ -977,48 +976,48 @@ msgstr "原始 ID"
 msgid "Codec"
 msgstr "编解码器"
 
-#: src/input/es_out.c:3082 src/input/meta.c:66 modules/access/imem.c:71
+#: src/input/es_out.c:3086 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:311
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "语言"
 
-#: src/input/es_out.c:3085 src/input/meta.c:61
+#: src/input/es_out.c:3089 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112
-#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "描述"
 
-#: src/input/es_out.c:3091 src/input/es_out.c:3135 src/input/es_out.c:3325
+#: src/input/es_out.c:3095 src/input/es_out.c:3139 src/input/es_out.c:3329
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
 msgid "Type"
 msgstr "类型"
 
-#: src/input/es_out.c:3094
+#: src/input/es_out.c:3098
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
 #: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:756
 msgid "Channels"
 msgstr "声道"
 
-#: src/input/es_out.c:3099 modules/access/alsa.c:39 modules/access/imem.c:75
+#: src/input/es_out.c:3103 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
 msgstr "采样率"
 
-#: src/input/es_out.c:3099
+#: src/input/es_out.c:3103
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:3109
+#: src/input/es_out.c:3113
 msgid "Bits per sample"
 msgstr "位每采样"
 
-#: src/input/es_out.c:3114 modules/access_output/shout.c:92
+#: src/input/es_out.c:3118 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
@@ -1026,33 +1025,33 @@ msgstr "位每采样"
 msgid "Bitrate"
 msgstr "码率"
 
-#: src/input/es_out.c:3114
+#: src/input/es_out.c:3118
 #, c-format
 msgid "%u kb/s"
 msgstr "%u kb/s"
 
-#: src/input/es_out.c:3126
+#: src/input/es_out.c:3130
 msgid "Track replay gain"
 msgstr "音轨回放增益"
 
-#: src/input/es_out.c:3128
+#: src/input/es_out.c:3132
 msgid "Album replay gain"
 msgstr "专辑回放增益"
 
-#: src/input/es_out.c:3129
+#: src/input/es_out.c:3133
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:3139
+#: src/input/es_out.c:3143
 msgid "Video resolution"
 msgstr "视频分辨率"
 
-#: src/input/es_out.c:3144
+#: src/input/es_out.c:3148
 msgid "Buffer dimensions"
 msgstr "缓冲分辨率"
 
-#: src/input/es_out.c:3154 src/input/es_out.c:3157 modules/access/imem.c:93
+#: src/input/es_out.c:3158 src/input/es_out.c:3161 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
 #: modules/access/screen/xcb.c:39 modules/access/shm.c:42
 #: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
@@ -1062,91 +1061,91 @@ msgstr "缓冲分辨率"
 msgid "Frame rate"
 msgstr "帧率"
 
-#: src/input/es_out.c:3165
+#: src/input/es_out.c:3169
 msgid "Decoded format"
 msgstr "已解码格式"
 
-#: src/input/es_out.c:3170
+#: src/input/es_out.c:3174
 msgid "Top left"
 msgstr "上左"
 
-#: src/input/es_out.c:3170
+#: src/input/es_out.c:3174
 msgid "Left top"
 msgstr "左上"
 
-#: src/input/es_out.c:3171
+#: src/input/es_out.c:3175
 msgid "Right bottom"
 msgstr "右下"
 
-#: src/input/es_out.c:3171
+#: src/input/es_out.c:3175
 msgid "Top right"
 msgstr "上右"
 
-#: src/input/es_out.c:3172
+#: src/input/es_out.c:3176
 msgid "Bottom left"
 msgstr "下左"
 
-#: src/input/es_out.c:3172
+#: src/input/es_out.c:3176
 msgid "Bottom right"
 msgstr "下右"
 
-#: src/input/es_out.c:3173
+#: src/input/es_out.c:3177
 msgid "Left bottom"
 msgstr "左下"
 
-#: src/input/es_out.c:3173
+#: src/input/es_out.c:3177
 msgid "Right top"
 msgstr "右上"
 
-#: src/input/es_out.c:3175
+#: src/input/es_out.c:3179
 msgid "Orientation"
 msgstr "方向"
 
-#: src/input/es_out.c:3181 src/input/es_out.c:3199 src/input/es_out.c:3217
-#: src/input/es_out.c:3231 src/playlist/tree.c:67
+#: src/input/es_out.c:3185 src/input/es_out.c:3203 src/input/es_out.c:3221
+#: src/input/es_out.c:3235 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:75 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "未定义"
 
-#: src/input/es_out.c:3183
+#: src/input/es_out.c:3187
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
 msgstr "ITU-R BT.601 (525 行, 60 Hz)"
 
-#: src/input/es_out.c:3185
+#: src/input/es_out.c:3189
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr "ITU-R BT.601 (625 行, 50 Hz)"
 
-#: src/input/es_out.c:3193
+#: src/input/es_out.c:3197
 msgid "Color primaries"
 msgstr "颜色基准"
 
-#: src/input/es_out.c:3200 src/libvlc-module.c:362
+#: src/input/es_out.c:3204 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
 msgstr "线性"
 
-#: src/input/es_out.c:3207
+#: src/input/es_out.c:3211
 msgid "Hybrid Log-Gamma"
 msgstr "log/gamma 混合（HLG）"
 
-#: src/input/es_out.c:3211
+#: src/input/es_out.c:3215
 msgid "Color transfer function"
 msgstr "颜色映射函数"
 
-#: src/input/es_out.c:3224
+#: src/input/es_out.c:3228
 msgid "Color space"
 msgstr "颜色空间"
 
-#: src/input/es_out.c:3224
+#: src/input/es_out.c:3228
 #, c-format
 msgid "%s Range"
 msgstr "%s 范围"
 
-#: src/input/es_out.c:3226
+#: src/input/es_out.c:3230
 msgid "Full"
 msgstr "完整"
 
-#: src/input/es_out.c:3233 src/libvlc-module.c:295 src/libvlc-module.c:368
+#: src/input/es_out.c:3237 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
@@ -1157,105 +1156,104 @@ msgstr "完整"
 msgid "Center"
 msgstr "居中"
 
-#: src/input/es_out.c:3234
+#: src/input/es_out.c:3238
 msgid "Top Left"
 msgstr "上左"
 
-#: src/input/es_out.c:3235
+#: src/input/es_out.c:3239
 msgid "Top Center"
 msgstr "上中"
 
-#: src/input/es_out.c:3236
+#: src/input/es_out.c:3240
 msgid "Bottom Left"
 msgstr "下左"
 
-#: src/input/es_out.c:3237
+#: src/input/es_out.c:3241
 msgid "Bottom Center"
 msgstr "下中"
 
-#: src/input/es_out.c:3241
+#: src/input/es_out.c:3245
 msgid "Chroma location"
 msgstr "色度位置"
 
-#: src/input/es_out.c:3250
+#: src/input/es_out.c:3254
 msgid "Rectangular"
 msgstr "长方形"
 
-#: src/input/es_out.c:3253
+#: src/input/es_out.c:3257
 msgid "Equirectangular"
 msgstr "等距圆柱"
 
-#: src/input/es_out.c:3256
+#: src/input/es_out.c:3260
 msgid "Cubemap"
 msgstr "六面体"
 
-#: src/input/es_out.c:3262
+#: src/input/es_out.c:3266
 msgid "Projection"
 msgstr "投影"
 
-#: src/input/es_out.c:3264
+#: src/input/es_out.c:3268
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "yaw（上下轴不动）"
 
-#: src/input/es_out.c:3266
+#: src/input/es_out.c:3270
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "pitch（左右轴不动）"
 
-#: src/input/es_out.c:3268
+#: src/input/es_out.c:3272
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "roll（前后轴不动）"
 
-#: src/input/es_out.c:3271
+#: src/input/es_out.c:3275
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "视角"
 
-#: src/input/es_out.c:3276
+#: src/input/es_out.c:3280
 msgid "Max. luminance"
 msgstr "最大亮度"
 
-#: src/input/es_out.c:3281
+#: src/input/es_out.c:3285
 msgid "Min. luminance"
 msgstr "最小亮度"
 
-#: src/input/es_out.c:3289
+#: src/input/es_out.c:3293
 msgid "Primary R"
 msgstr "原色 R"
 
-#: src/input/es_out.c:3296
+#: src/input/es_out.c:3300
 msgid "Primary G"
 msgstr "原色 G"
 
-#: src/input/es_out.c:3303
+#: src/input/es_out.c:3307
 msgid "Primary B"
 msgstr "原色 B"
 
-#: src/input/es_out.c:3310
+#: src/input/es_out.c:3314
 msgid "White point"
 msgstr "白点"
 
-#: src/input/es_out.c:3325 modules/access/imem.c:64
+#: src/input/es_out.c:3329 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "字幕"
 
-#: src/input/input.c:2658
+#: src/input/input.c:2662
 msgid "Your input can't be opened"
 msgstr "您的输入无法被打开"
 
-#: src/input/input.c:2659
+#: src/input/input.c:2663
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC 无法打开 MRL「%s」。详情请检查日志。"
 
-#: src/input/meta.c:55 src/input/var.c:170
-#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:410
+#: modules/gui/macosx/VLCMainMenu.m:411
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107
-#: modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1360,25 +1358,25 @@ msgstr "盘号"
 msgid "Bookmark"
 msgstr "书签"
 
-#: src/input/var.c:165 src/libvlc-module.c:574
+#: src/input/var.c:165 src/libvlc-module.c:570
 msgid "Programs"
 msgstr "节目列表"
 
-#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:401
-#: modules/gui/macosx/VLCMainMenu.m:402
+#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:412
+#: modules/gui/macosx/VLCMainMenu.m:413
 #: modules/gui/macosx/VLCOpenWindowController.m:179
 #: modules/gui/macosx/VLCOpenWindowController.m:181
 #: modules/gui/qt/ui/open_disk.h:310
 msgid "Chapter"
 msgstr "章节"
 
-#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:425
-#: modules/gui/macosx/VLCMainMenu.m:426
+#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:436
+#: modules/gui/macosx/VLCMainMenu.m:437
 msgid "Video Track"
 msgstr "视频轨道"
 
-#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:408
-#: modules/gui/macosx/VLCMainMenu.m:409
+#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:419
+#: modules/gui/macosx/VLCMainMenu.m:420
 msgid "Audio Track"
 msgstr "音频轨道"
 
@@ -1425,8 +1423,8 @@ msgstr "上一个章节"
 msgid "Media: %s"
 msgstr "媒体: %s"
 
-#: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:337
-#: modules/gui/macosx/VLCMainMenu.m:338
+#: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:346
+#: modules/gui/macosx/VLCMainMenu.m:347
 msgid "Add Interface"
 msgstr "添加界面"
 
@@ -1461,25 +1459,25 @@ msgstr "正在以默认界面运行 vlc。使用“cvlc”可以无界面模式�
 msgid "C"
 msgstr "zh_CN"
 
-#: src/libvlc.h:164 src/libvlc-module.c:1426 src/libvlc-module.c:1427
-#: src/libvlc-module.c:2642 src/video_output/vout_intf.c:176
-#: modules/gui/macosx/VLCMainMenu.m:465
+#: src/libvlc.h:164 src/libvlc-module.c:1432 src/libvlc-module.c:1433
+#: src/libvlc-module.c:2659 src/video_output/vout_intf.c:176
+#: modules/gui/macosx/VLCMainMenu.m:476
 msgid "Zoom"
 msgstr "缩放"
 
-#: src/libvlc.h:165 src/libvlc-module.c:1340 src/video_output/vout_intf.c:87
+#: src/libvlc.h:165 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
 msgstr "1:4 四分之一"
 
-#: src/libvlc.h:166 src/libvlc-module.c:1341 src/video_output/vout_intf.c:88
+#: src/libvlc.h:166 src/libvlc-module.c:1347 src/video_output/vout_intf.c:88
 msgid "1:2 Half"
 msgstr "1:2 二分之一"
 
-#: src/libvlc.h:167 src/libvlc-module.c:1342 src/video_output/vout_intf.c:89
+#: src/libvlc.h:167 src/libvlc-module.c:1348 src/video_output/vout_intf.c:89
 msgid "1:1 Original"
 msgstr "1:1 原始"
 
-#: src/libvlc.h:168 src/libvlc-module.c:1343 src/video_output/vout_intf.c:90
+#: src/libvlc.h:168 src/libvlc-module.c:1349 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
 msgstr "2:1 双倍"
 
@@ -1716,8 +1714,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124
-#: modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1800,7 +1797,7 @@ msgid ""
 "audio pitch"
 msgstr "这允许以稍低或稍高的速度播放音频而不影响音频音调"
 
-#: src/libvlc-module.c:239 src/libvlc-module.c:1125
+#: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
@@ -2064,8 +2061,8 @@ msgid "Hide mouse cursor and fullscreen controller after n milliseconds."
 msgstr "在 n 毫秒后隐藏鼠标指针和全屏控制器。"
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
-#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:433
-#: modules/gui/macosx/VLCMainMenu.m:434
+#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:444
+#: modules/gui/macosx/VLCMainMenu.m:445
 #: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
@@ -2074,7 +2071,7 @@ msgid "Deinterlace"
 msgstr "反交错"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
-#: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:436
+#: modules/gui/macosx/VLCMainMenu.m:446 modules/gui/macosx/VLCMainMenu.m:447
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
@@ -2118,86 +2115,76 @@ msgstr "禁用屏幕保护"
 msgid "Disable the screensaver during video playback."
 msgstr "在播放视频时禁用屏幕保护程序。"
 
-#: src/libvlc-module.c:374
-msgid "Inhibit the power management daemon during playback"
-msgstr "播放时关闭电源管理服务"
-
-#: src/libvlc-module.c:375
-msgid ""
-"Inhibits the power management daemon during any playback, to avoid the "
-"computer being suspended because of inactivity."
-msgstr "在播放时关闭电源管理服务，防止计算机由于长时间无活动而被关闭。"
-
-#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:358
+#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "Window decorations"
 msgstr "窗口装饰"
 
-#: src/libvlc-module.c:380
+#: src/libvlc-module.c:376
 msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr "VLC 可以避免在视频周围创建窗口标题、边框等等... 给您一个“极简”的窗口。"
 
-#: src/libvlc-module.c:383
+#: src/libvlc-module.c:379
 msgid "Video splitter module"
 msgstr "视频切割器模块"
 
-#: src/libvlc-module.c:385
+#: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
 msgstr "添加视频切割器，如克隆或视频墙等"
 
-#: src/libvlc-module.c:387
+#: src/libvlc-module.c:383
 msgid "Video filter module"
 msgstr "视频滤镜模块"
 
-#: src/libvlc-module.c:389
+#: src/libvlc-module.c:385
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr "此选项将添加后期处理滤镜来提高画质，例如反交错或视频变形。"
 
-#: src/libvlc-module.c:393
+#: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
 msgstr "视频截图目录 (或文件名)"
 
-#: src/libvlc-module.c:395
+#: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
 msgstr "存放视频截图的目录。"
 
-#: src/libvlc-module.c:397 src/libvlc-module.c:399
+#: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
 msgstr "视频截图文件前缀"
 
-#: src/libvlc-module.c:401
+#: src/libvlc-module.c:397
 msgid "Video snapshot format"
 msgstr "视频截图格式"
 
-#: src/libvlc-module.c:403
+#: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
 msgstr "用于保存视频截图的图像格式"
 
-#: src/libvlc-module.c:405
+#: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
 msgstr "显示视频截图预览"
 
-#: src/libvlc-module.c:407
+#: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr "在屏幕的左上角显示截图预览。"
 
-#: src/libvlc-module.c:409
+#: src/libvlc-module.c:405
 msgid "Use sequential numbers instead of timestamps"
 msgstr "使用顺序编号代替时间戳"
 
-#: src/libvlc-module.c:411
+#: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr "使用顺序编号代替时间戳作为截图编号"
 
-#: src/libvlc-module.c:413
+#: src/libvlc-module.c:409
 msgid "Video snapshot width"
 msgstr "视频截图宽度"
 
-#: src/libvlc-module.c:415
+#: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
@@ -2205,11 +2192,11 @@ msgstr ""
 "您可以强制指定视频截图的宽度。默认为保持原始宽度 (-1)。使用 0 将缩放宽度以保"
 "持宽高比。"
 
-#: src/libvlc-module.c:419
+#: src/libvlc-module.c:415
 msgid "Video snapshot height"
 msgstr "视频截图高度"
 
-#: src/libvlc-module.c:421
+#: src/libvlc-module.c:417
 msgid ""
 "You can enforce the height of the video snapshot. By default it will keep "
 "the original height (-1). Using 0 will scale the height to keep the aspect "
@@ -2218,22 +2205,22 @@ msgstr ""
 "您可以强制指定视频截图的高度。默认为保持原始高度 (-1)。使用 0 将缩放高度以保"
 "持宽高比。"
 
-#: src/libvlc-module.c:425
+#: src/libvlc-module.c:421
 msgid "Video cropping"
 msgstr "视频裁剪"
 
-#: src/libvlc-module.c:427
+#: src/libvlc-module.c:423
 msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
 "强制裁剪源视频。可接受的格式为 x:y (4:3、16:9 等)，表示全局图像宽高比。"
 
-#: src/libvlc-module.c:431
+#: src/libvlc-module.c:427
 msgid "Source aspect ratio"
 msgstr "源宽高比"
 
-#: src/libvlc-module.c:433
+#: src/libvlc-module.c:429
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
@@ -2245,19 +2232,19 @@ msgstr ""
 "没有宽高比信息时用来给 VLC 一个提示。可接受的格式为 x:y (4:3、16:9 等) 表示全"
 "局图像宽高比，或一个浮点值 (1.25、1.3333 等) 表示像素宽高比。"
 
-#: src/libvlc-module.c:440
+#: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
 msgstr "视频自动缩放"
 
-#: src/libvlc-module.c:442
+#: src/libvlc-module.c:438
 msgid "Let the video scale to fit a given window or fullscreen."
 msgstr "让视频缩放至适合现有窗口或全屏。"
 
-#: src/libvlc-module.c:444
+#: src/libvlc-module.c:440
 msgid "Video scaling factor"
 msgstr "视频缩放比例"
 
-#: src/libvlc-module.c:446
+#: src/libvlc-module.c:442
 msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
@@ -2265,31 +2252,31 @@ msgstr ""
 "禁用自动缩放时使用的缩放系数。\n"
 "默认值为 1.0 (原始视频大小)。"
 
-#: src/libvlc-module.c:449
+#: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
 msgstr "自定义裁剪宽高比列表"
 
-#: src/libvlc-module.c:451
+#: src/libvlc-module.c:447
 msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr "逗号分隔的裁剪宽高比列表，将被添加到界面菜单。"
 
-#: src/libvlc-module.c:454
+#: src/libvlc-module.c:450
 msgid "Custom aspect ratios list"
 msgstr "自定义宽高比列表"
 
-#: src/libvlc-module.c:456
+#: src/libvlc-module.c:452
 msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
 msgstr "逗号分隔的宽高比列表，将被添加到界面的宽高比菜单。"
 
-#: src/libvlc-module.c:459
+#: src/libvlc-module.c:455
 msgid "Fix HDTV height"
 msgstr "修复 HDTV 高度"
 
-#: src/libvlc-module.c:461
+#: src/libvlc-module.c:457
 msgid ""
 "This allows proper handling of HDTV-1080 video format even if broken encoder "
 "incorrectly sets height to 1088 lines. You should only disable this option "
@@ -2298,11 +2285,11 @@ msgstr ""
 "允许正确处理高度被坑爹编码器错误设为 1088 线的 HDTV-1080 视频。仅在视频为非标"
 "准格式（需要全部 1088 线）时，您才应关闭本选项。"
 
-#: src/libvlc-module.c:466
+#: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
 msgstr "显示器像素宽高比"
 
-#: src/libvlc-module.c:468
+#: src/libvlc-module.c:464
 msgid ""
 "This forces the monitor aspect ratio. Most monitors have square pixels "
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
@@ -2311,53 +2298,53 @@ msgstr ""
 "强制设置显示器宽高比。大部分显示器的像素为正方形 (1:1)。如果您的屏幕是 16:9，"
 "可能需要更改此设置为 4:3 来保持正确比例。"
 
-#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:301
+#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
 msgstr "跳帧"
 
-#: src/libvlc-module.c:474
+#: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr "对 MPEG2 流启用帧丢弃。丢帧在您的计算机性能不够强大时发生"
 
-#: src/libvlc-module.c:477
+#: src/libvlc-module.c:473
 msgid "Drop late frames"
 msgstr "丢弃延迟的帧"
 
-#: src/libvlc-module.c:479
+#: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr "丢弃延迟的帧 (在它们应该显示的时间之后才抵达视频输出)。"
 
-#: src/libvlc-module.c:482
+#: src/libvlc-module.c:478
 msgid "Quiet synchro"
 msgstr "静默同步"
 
-#: src/libvlc-module.c:484
+#: src/libvlc-module.c:480
 msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
 msgstr "防止消息日志被视频输出同步机制的调试输出灌满。"
 
-#: src/libvlc-module.c:487
+#: src/libvlc-module.c:483
 msgid "Key press events"
 msgstr "按键事件"
 
-#: src/libvlc-module.c:489
+#: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
 msgstr "对 (非嵌入的) 视频窗口启用 VLC 热键。"
 
-#: src/libvlc-module.c:491 modules/spu/remoteosd.c:91
+#: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
 msgstr "鼠标事件"
 
-#: src/libvlc-module.c:493
+#: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
 msgstr "启用对视频上鼠标点击事件的处理。"
 
-#: src/libvlc-module.c:501
+#: src/libvlc-module.c:497
 msgid ""
 "These options allow you to modify the behavior of the input subsystem, such "
 "as the DVD or VCD device, the network interface settings or the subtitle "
@@ -2366,81 +2353,81 @@ msgstr ""
 "这些选项允许您修改输入子系统的行为，例如 DVD 或 VCD 设备、网络接口设置或字幕"
 "通道等。"
 
-#: src/libvlc-module.c:505
+#: src/libvlc-module.c:501
 msgid "File caching (ms)"
 msgstr "文件缓存 (ms)"
 
-#: src/libvlc-module.c:507
+#: src/libvlc-module.c:503
 msgid "Caching value for local files, in milliseconds."
 msgstr "本地文件的缓存值，单位为毫秒。"
 
-#: src/libvlc-module.c:509
+#: src/libvlc-module.c:505
 msgid "Live capture caching (ms)"
 msgstr "直播捕获缓存 (ms)"
 
-#: src/libvlc-module.c:511
+#: src/libvlc-module.c:507
 msgid "Caching value for cameras and microphones, in milliseconds."
 msgstr "摄像头与话筒的缓存值，单位为毫秒。"
 
-#: src/libvlc-module.c:513
+#: src/libvlc-module.c:509
 msgid "Disc caching (ms)"
 msgstr "光盘缓存 (ms)"
 
-#: src/libvlc-module.c:515
+#: src/libvlc-module.c:511
 msgid "Caching value for optical media, in milliseconds."
 msgstr "光学媒体的缓存值，单位为毫秒。"
 
-#: src/libvlc-module.c:517
+#: src/libvlc-module.c:513
 msgid "Network caching (ms)"
 msgstr "网络缓存 (ms)"
 
-#: src/libvlc-module.c:519
+#: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
 msgstr "网络资源的缓存值，单位为毫秒。"
 
-#: src/libvlc-module.c:521
+#: src/libvlc-module.c:517
 msgid "Clock reference average counter"
 msgstr "平均时钟引用计数器"
 
-#: src/libvlc-module.c:523
+#: src/libvlc-module.c:519
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
 msgstr "在使用 PVR 输入时 (或一个非常不规范的来源)，请设置它为 10000。"
 
-#: src/libvlc-module.c:526
+#: src/libvlc-module.c:522
 msgid "Clock synchronisation"
 msgstr "时钟同步"
 
-#: src/libvlc-module.c:528
+#: src/libvlc-module.c:524
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
 "允许关闭实时源的输入时钟同步。若您的网络流播放起来忽动忽停，请使用本功能。"
 
-#: src/libvlc-module.c:532
+#: src/libvlc-module.c:528
 msgid "Clock jitter"
 msgstr "时钟抖动"
 
-#: src/libvlc-module.c:534
+#: src/libvlc-module.c:530
 msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr "定义同步算法应尝试弥补的最大输入延迟抖动 (单位为毫秒)。"
 
-#: src/libvlc-module.c:537
+#: src/libvlc-module.c:533
 msgid "Network synchronisation"
 msgstr "网络同步"
 
-#: src/libvlc-module.c:538
+#: src/libvlc-module.c:534
 msgid ""
 "This allows you to remotely synchronise clocks for server and client. The "
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
 "允许您远程同步服务器和客户端的时钟。详细的设置位于「高级 / 网络同步」。"
 
-#: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
+#: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
@@ -2448,7 +2435,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
-#: modules/gui/macosx/VLCMainMenu.m:592
+#: modules/gui/macosx/VLCMainMenu.m:603
 #: modules/gui/macosx/VLCSimplePrefsController.m:656
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
@@ -2460,7 +2447,7 @@ msgstr ""
 msgid "Default"
 msgstr "默认"
 
-#: src/libvlc-module.c:544
+#: src/libvlc-module.c:540
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:214
 #: modules/gui/macosx/VLCMainWindow.m:1000
 #: modules/gui/qt/components/extended_panels.cpp:928
@@ -2468,21 +2455,21 @@ msgstr "默认"
 msgid "Enable"
 msgstr "启用"
 
-#: src/libvlc-module.c:546
+#: src/libvlc-module.c:542
 msgid "MTU of the network interface"
 msgstr "网络接口的 MTU"
 
-#: src/libvlc-module.c:548
+#: src/libvlc-module.c:544
 msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
 msgstr "允许通过网络传输的最大应用层数据包大小 (单位为字节)。"
 
-#: src/libvlc-module.c:553 modules/stream_out/rtp.c:124
+#: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
 msgstr "跳数限制 (TTL)"
 
-#: src/libvlc-module.c:555 modules/stream_out/rtp.c:126
+#: src/libvlc-module.c:551 modules/stream_out/rtp.c:126
 msgid ""
 "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
 "multicast packets sent by the stream output (-1 = use operating system built-"
@@ -2491,19 +2478,19 @@ msgstr ""
 "流输出发送的多播数据包的跳跃限制 (也被称为“生命周期”或 TTL) (-1 = 使用操作系"
 "统内建的默认值)。"
 
-#: src/libvlc-module.c:559
+#: src/libvlc-module.c:555
 msgid "Multicast output interface"
 msgstr "多播输出接口"
 
-#: src/libvlc-module.c:561
+#: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
 msgstr "默认多播接口。这将忽略路由表。"
 
-#: src/libvlc-module.c:563
+#: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
 msgstr "DiffServ 服务代码"
 
-#: src/libvlc-module.c:564
+#: src/libvlc-module.c:560
 msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
@@ -2511,14 +2498,14 @@ msgstr ""
 "出站 UDP 流的 DSCP 值 (或 IPv4 服务类别、IPv6 流量类别)。用于网络服务保证"
 "（QoS）。"
 
-#: src/libvlc-module.c:570
+#: src/libvlc-module.c:566
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
 "按照指定服务 ID 选择节目。仅在您希望读取多节目流 (例如 DVB 流) 时使用此选项。"
 
-#: src/libvlc-module.c:576
+#: src/libvlc-module.c:572
 msgid ""
 "Choose the programs to select by giving a comma-separated list of Service "
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
@@ -2527,27 +2514,27 @@ msgstr ""
 "按照指定服务 ID (SID) 列表选择节目，列表以逗号分隔。仅在您希望读取多节目流时 "
 "(例如 DVB 流) 使用此选项。"
 
-#: src/libvlc-module.c:582 modules/gui/qt/ui/open_disk.h:312
+#: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:312
 msgid "Audio track"
 msgstr "音频轨道"
 
-#: src/libvlc-module.c:584
+#: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr "要使用的音轨流编号 (从 0 到 n)。"
 
-#: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
+#: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
 msgstr "字幕轨道"
 
-#: src/libvlc-module.c:589
+#: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
 msgstr "要使用的字幕轨道流编号 (从 0 到 n)。"
 
-#: src/libvlc-module.c:592 modules/stream_out/transcode/transcode.c:97
+#: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
 msgstr "音频语言"
 
-#: src/libvlc-module.c:594
+#: src/libvlc-module.c:590
 msgid ""
 "Language of the audio track you want to use (comma separated, two or three "
 "letter country code, you may use 'none' to avoid a fallback to another "
@@ -2556,11 +2543,11 @@ msgstr ""
 "您希望使用的音频轨道语言 (由逗号分隔，两个或三个字母的国家代码，可使用"
 "「none」避免回落到其他语言)。"
 
-#: src/libvlc-module.c:597
+#: src/libvlc-module.c:593
 msgid "Subtitle language"
 msgstr "字幕语言"
 
-#: src/libvlc-module.c:599
+#: src/libvlc-module.c:595
 msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
@@ -2568,11 +2555,11 @@ msgstr ""
 "您希望使用的字幕轨道语言 (由逗号分隔，两个或三个字母的国家代码，可使用「any」"
 "允许回落到任意语言)。"
 
-#: src/libvlc-module.c:602
+#: src/libvlc-module.c:598
 msgid "Menu language"
 msgstr "菜单语言"
 
-#: src/libvlc-module.c:604
+#: src/libvlc-module.c:600
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
@@ -2580,31 +2567,31 @@ msgstr ""
 "您希望使用的 DVD/BluRay 菜单语言 (由逗号分隔，两个或三个字母的国家代码，可使"
 "用「any」作为回退设置)。"
 
-#: src/libvlc-module.c:608
+#: src/libvlc-module.c:604
 msgid "Audio track ID"
 msgstr "音频轨道 ID"
 
-#: src/libvlc-module.c:610
+#: src/libvlc-module.c:606
 msgid "Stream ID of the audio track to use."
 msgstr "要使用的音频轨道的流 ID。"
 
-#: src/libvlc-module.c:612
+#: src/libvlc-module.c:608
 msgid "Subtitle track ID"
 msgstr "字幕轨道 ID"
 
-#: src/libvlc-module.c:614
+#: src/libvlc-module.c:610
 msgid "Stream ID of the subtitle track to use."
 msgstr "要使用的字幕轨道的流 ID。"
 
-#: src/libvlc-module.c:616
+#: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
 msgstr "优选的隐藏式字幕解码器"
 
-#: src/libvlc-module.c:620
+#: src/libvlc-module.c:616
 msgid "Preferred video resolution"
 msgstr "首选视频分辨率（上限）"
 
-#: src/libvlc-module.c:622
+#: src/libvlc-module.c:618
 msgid ""
 "When several video formats are available, select one whose resolution is "
 "closest to (but not higher than) this setting, in number of lines. Use this "
@@ -2614,93 +2601,93 @@ msgstr ""
 "当有多种视频格式可用时，将选择纵向分辨率最接近 (但不高于) 该设置的格式。请在 "
 "CPU 运算能力有限或网络带宽不足以播放较高分辨率时使用该选项。"
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "Best available"
 msgstr "最佳可用"
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "Full HD (1080p)"
 msgstr "全高清 (1080p)"
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "HD (720p)"
 msgstr "高清 (720p)"
 
-#: src/libvlc-module.c:629
+#: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
 msgstr "标清 (576 或 480 行)"
 
-#: src/libvlc-module.c:630
+#: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
 msgstr "低清晰度 (360 行)"
 
-#: src/libvlc-module.c:631
+#: src/libvlc-module.c:627
 msgid "Very Low Definition (240 lines)"
 msgstr "极低清晰度 (240 行)"
 
-#: src/libvlc-module.c:634
+#: src/libvlc-module.c:630
 msgid "Input repetitions"
 msgstr "输入重复"
 
-#: src/libvlc-module.c:636
+#: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
 msgstr "相同的输入要重复的次数"
 
-#: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:159
+#: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
 msgstr "起始时间"
 
-#: src/libvlc-module.c:640
+#: src/libvlc-module.c:636
 msgid "The stream will start at this position (in seconds)."
 msgstr "流将在此位置开始 (单位为秒)。"
 
-#: src/libvlc-module.c:642 modules/gui/macosx/VLCOpenWindowController.m:161
+#: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
 msgstr "停止时间"
 
-#: src/libvlc-module.c:644
+#: src/libvlc-module.c:640
 msgid "The stream will stop at this position (in seconds)."
 msgstr "流将会在此处停止 (单位为秒)。"
 
-#: src/libvlc-module.c:646
+#: src/libvlc-module.c:642
 msgid "Run time"
 msgstr "时长"
 
-#: src/libvlc-module.c:648
+#: src/libvlc-module.c:644
 msgid "The stream will run this duration (in seconds)."
 msgstr "流将会持续此长度的时间 (单位为秒)。"
 
-#: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
+#: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
 msgstr "快速定位"
 
-#: src/libvlc-module.c:652
+#: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
 msgstr "定位时相对于准确度更偏好速度"
 
-#: src/libvlc-module.c:654
+#: src/libvlc-module.c:650
 msgid "Playback speed"
 msgstr "回放速度"
 
-#: src/libvlc-module.c:656
+#: src/libvlc-module.c:652
 msgid "This defines the playback speed (nominal speed is 1.0)."
 msgstr "定义回放的速度 (额定速度为 1.0)。"
 
-#: src/libvlc-module.c:658
+#: src/libvlc-module.c:654
 msgid "Input list"
 msgstr "输入列表"
 
-#: src/libvlc-module.c:660
+#: src/libvlc-module.c:656
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
 msgstr "您可以给出一个逗号分隔的输入列表，它们将会接续在现有输入之后。"
 
-#: src/libvlc-module.c:663
+#: src/libvlc-module.c:659
 msgid "Input slave (experimental)"
 msgstr "从输入 (实验性)"
 
-#: src/libvlc-module.c:665
+#: src/libvlc-module.c:661
 msgid ""
 "This allows you to play from several inputs at the same time. This feature "
 "is experimental, not all formats are supported. Use a '#' separated list of "
@@ -2709,11 +2696,11 @@ msgstr ""
 "允许您同时从多个输入源播放。此功能是实验性的，尚不支持所有格式。输入列表用"
 "「#」分隔。"
 
-#: src/libvlc-module.c:669
+#: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
 msgstr "流的书签列表"
 
-#: src/libvlc-module.c:671
+#: src/libvlc-module.c:667
 msgid ""
 "You can manually give a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
@@ -2722,47 +2709,47 @@ msgstr ""
 "您可以手动以「{name=书签名称,time=可选的时间偏移,bytes=可选的字节偏移},{…}」"
 "的形式给出一个流的书签列表"
 
-#: src/libvlc-module.c:675
+#: src/libvlc-module.c:671
 msgid "Record directory"
 msgstr "录像目录"
 
-#: src/libvlc-module.c:677
+#: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
 msgstr "存储录像的目录"
 
-#: src/libvlc-module.c:679
+#: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
 msgstr "偏好原生串流录制"
 
-#: src/libvlc-module.c:681
+#: src/libvlc-module.c:677
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr "如果可能，输入流将被录制而不是使用流输出模块"
 
-#: src/libvlc-module.c:684
+#: src/libvlc-module.c:680
 msgid "Timeshift directory"
 msgstr "时移目录"
 
-#: src/libvlc-module.c:686
+#: src/libvlc-module.c:682
 msgid "Directory used to store the timeshift temporary files."
 msgstr "用于储存时移临时文件的目录。"
 
-#: src/libvlc-module.c:688
+#: src/libvlc-module.c:684
 msgid "Timeshift granularity"
 msgstr "时移范围"
 
-#: src/libvlc-module.c:690
+#: src/libvlc-module.c:686
 msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
 msgstr "用于保存时移流数据的临时文件大小上限，单位为字节。"
 
-#: src/libvlc-module.c:693
+#: src/libvlc-module.c:689
 msgid "Change title according to current media"
 msgstr "根据当前媒体更改标题"
 
-#: src/libvlc-module.c:694
+#: src/libvlc-module.c:690
 msgid ""
 "This option allows you to set the title according to what's being played<br>"
 "$a: Artist<br>$b: Album<br>$c: Copyright<br>$t: Title<br>$g: Genre<br>$n: "
@@ -2773,11 +2760,11 @@ msgstr ""
 "<br>$t: 标题<br>$g: 流派<br>$n: 轨道号<br>$p: 正在播放<br>$A: 日期<br>$D: 时"
 "长<br>$Z: “正在播放” (回退至 标题 - 艺术家)"
 
-#: src/libvlc-module.c:699
+#: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
 msgstr "禁用所有 lua 插件"
 
-#: src/libvlc-module.c:703
+#: src/libvlc-module.c:699
 msgid ""
 "These options allow you to modify the behavior of the subpictures subsystem. "
 "You can for example enable subpictures sources (logo, etc.). Enable these "
@@ -2788,11 +2775,11 @@ msgstr ""
 "在此启用滤镜并在“子画面来源滤镜”模块区域配置它们。您还可以设置很多其它子画面"
 "选项。"
 
-#: src/libvlc-module.c:709 modules/gui/qt/ui/sprefs_subtitles.h:305
+#: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:305
 msgid "Force subtitle position"
 msgstr "强制字幕位置"
 
-#: src/libvlc-module.c:711
+#: src/libvlc-module.c:707
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
@@ -2800,49 +2787,49 @@ msgstr ""
 "您可以使用此选项将字幕放置到影片画面下方，而不是覆盖在影片画面中。请尝试多个"
 "位置。"
 
-#: src/libvlc-module.c:714
+#: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
 msgstr "字幕文件缩放系数"
 
-#: src/libvlc-module.c:715
+#: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
 msgstr "调整字幕大小（可能时）"
 
-#: src/libvlc-module.c:717
+#: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
 msgstr "启用子画面"
 
-#: src/libvlc-module.c:719
+#: src/libvlc-module.c:715
 msgid "You can completely disable the sub-picture processing."
 msgstr "您可以完全禁用子画面处理。"
 
-#: src/libvlc-module.c:721 src/libvlc-module.c:1668 src/text/iso-639_def.h:145
+#: src/libvlc-module.c:717 src/libvlc-module.c:1674 src/text/iso-639_def.h:145
 #: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
 msgstr "屏幕显示（OSD）"
 
-#: src/libvlc-module.c:723
+#: src/libvlc-module.c:719
 msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
 msgstr "VLC 可以在视频上显示消息。这被称为 OSD (屏幕显示)。"
 
-#: src/libvlc-module.c:726
+#: src/libvlc-module.c:722
 msgid "Text rendering module"
 msgstr "文本渲染模块"
 
-#: src/libvlc-module.c:728
+#: src/libvlc-module.c:724
 msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
 msgstr "VLC 通常使用 Freetype 进行渲染，但本选项允许您使用其他模块，例如 svg。"
 
-#: src/libvlc-module.c:730
+#: src/libvlc-module.c:726
 msgid "Subpictures source module"
 msgstr "子画面来源模块"
 
-#: src/libvlc-module.c:732
+#: src/libvlc-module.c:728
 msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
@@ -2850,11 +2837,11 @@ msgstr ""
 "添加所谓的「子画面源」。这些滤镜可将图像或文本覆盖在视频上 (例如 logo、任意文"
 "本等)。"
 
-#: src/libvlc-module.c:735
+#: src/libvlc-module.c:731
 msgid "Subpictures filter module"
 msgstr "子画面滤镜模块"
 
-#: src/libvlc-module.c:737
+#: src/libvlc-module.c:733
 msgid ""
 "This adds so-called \"subpicture filters\". These filter subpictures created "
 "by subtitle decoders or other subpictures sources."
@@ -2862,21 +2849,21 @@ msgstr ""
 "添加所谓的「子画面滤镜」。这些滤镜将处理由字幕解码器或其他子画面来源创建的子"
 "画面。"
 
-#: src/libvlc-module.c:740
+#: src/libvlc-module.c:736
 msgid "Autodetect subtitle files"
 msgstr "自动检测字幕文件"
 
-#: src/libvlc-module.c:742
+#: src/libvlc-module.c:738
 msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr "如果未指定字幕文件名，则自动检测字幕文件 (根据影片的文件名)。"
 
-#: src/libvlc-module.c:745
+#: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
 msgstr "字幕自动检测模糊度"
 
-#: src/libvlc-module.c:747
+#: src/libvlc-module.c:743
 msgid ""
 "This determines how fuzzy subtitle and movie filename matching will be. "
 "Options are:\n"
@@ -2893,84 +2880,84 @@ msgstr ""
 "3 = 名称与影片名称匹配（可以有多余字符）的字幕文件\n"
 "4 = 完全匹配影片名称的字幕文件"
 
-#: src/libvlc-module.c:755
+#: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
 msgstr "字幕自动检测路径"
 
-#: src/libvlc-module.c:757
+#: src/libvlc-module.c:753
 msgid ""
 "Look for a subtitle file in those paths too, if your subtitle file was not "
 "found in the current directory."
 msgstr "若未能在当前目录中找到字幕文件，也去这些路径中查找。"
 
-#: src/libvlc-module.c:760
+#: src/libvlc-module.c:756
 msgid "Use subtitle file"
 msgstr "使用字幕文件"
 
-#: src/libvlc-module.c:762
+#: src/libvlc-module.c:758
 msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
 msgstr "载入该字幕文件。在自动检测未能检测到字幕文件时使用。"
 
-#: src/libvlc-module.c:766
+#: src/libvlc-module.c:762
 msgid "DVD device"
 msgstr "DVD 设备"
 
-#: src/libvlc-module.c:767
+#: src/libvlc-module.c:763
 msgid "VCD device"
 msgstr "VCD 设备"
 
-#: src/libvlc-module.c:768 modules/access/cdda.c:701
+#: src/libvlc-module.c:764 modules/access/cdda.c:701
 msgid "Audio CD device"
 msgstr "音频 CD 设备"
 
-#: src/libvlc-module.c:772
+#: src/libvlc-module.c:768
 msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
 "这是要使用的默认 DVD 驱动器（或文件）。请不要忘记盘符后的冒号 (例如 D:)"
 
-#: src/libvlc-module.c:775
+#: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
 "这是要使用的默认 VCD 驱动器（或文件）。请不要忘记盘符后的冒号 (例如 D:)"
 
-#: src/libvlc-module.c:778 modules/access/cdda.c:704
+#: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
 "这是要使用的默认音频 CD 驱动器（或文件）。请不要忘记盘符后的冒号 (例如 D:)"
 
-#: src/libvlc-module.c:785
+#: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
 msgstr "这是要使用的默认 DVD 设备。"
 
-#: src/libvlc-module.c:787
+#: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
 msgstr "这是要使用的默认 VCD 设备。"
 
-#: src/libvlc-module.c:789 modules/access/cdda.c:709
+#: src/libvlc-module.c:785 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
 msgstr "这是要使用的默认音频 CD 设备。"
 
-#: src/libvlc-module.c:803
+#: src/libvlc-module.c:799
 msgid "TCP connection timeout"
 msgstr "TCP 连接超时"
 
-#: src/libvlc-module.c:805
+#: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
 msgstr "默认 TCP 连接超时 (毫秒)。"
 
-#: src/libvlc-module.c:807
+#: src/libvlc-module.c:803
 msgid "HTTP server address"
 msgstr "HTTP 服务器地址"
 
-#: src/libvlc-module.c:809
+#: src/libvlc-module.c:805
 msgid ""
 "By default, the server will listen on any local IP address. Specify an IP "
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
@@ -2979,11 +2966,11 @@ msgstr ""
 "服务器默认会监听所有本地 IP 地址。指定 IP 地址 (如 ::1 或 127.0.0.1) 或主机"
 "名 (如 localhost) 可限制只监听特定的网络接口。"
 
-#: src/libvlc-module.c:813
+#: src/libvlc-module.c:809
 msgid "RTSP server address"
 msgstr "RTSP 服务器地址"
 
-#: src/libvlc-module.c:815
+#: src/libvlc-module.c:811
 msgid ""
 "This defines the address the RTSP server will listen on, along with the base "
 "path of the RTSP VOD media. Syntax is address/path. By default, the server "
@@ -2995,11 +2982,11 @@ msgstr ""
 "径。服务器默认会监听所有本地 IP 地址。指定 IP 地址 (如 ::1 或 127.0.0.1) 或主"
 "机名 (如 localhost) 可限制只监听特定的网络接口。"
 
-#: src/libvlc-module.c:821
+#: src/libvlc-module.c:817
 msgid "HTTP server port"
 msgstr "HTTP 服务器端口"
 
-#: src/libvlc-module.c:823
+#: src/libvlc-module.c:819
 msgid ""
 "The HTTP server will listen on this TCP port. The standard HTTP port number "
 "is 80. However allocation of port numbers below 1025 is usually restricted "
@@ -3008,11 +2995,11 @@ msgstr ""
 "HTTP 服务器将监听该 TCP 端口。HTTP 的标准端口号为 80。然而 1025 以内端口号的"
 "分配通常受操作系统限制。"
 
-#: src/libvlc-module.c:828
+#: src/libvlc-module.c:824
 msgid "HTTPS server port"
 msgstr "HTTPS 服务器端口"
 
-#: src/libvlc-module.c:830
+#: src/libvlc-module.c:826
 msgid ""
 "The HTTPS server will listen on this TCP port. The standard HTTPS port "
 "number is 443. However allocation of port numbers below 1025 is usually "
@@ -3021,11 +3008,11 @@ msgstr ""
 "HTTPS 服务器将监听该 TCP 端口。HTTPS 的标准端口号为 443。然而 1025 以内端口号"
 "的分配通常受操作系统限制。"
 
-#: src/libvlc-module.c:835
+#: src/libvlc-module.c:831
 msgid "RTSP server port"
 msgstr "RTSP 服务器端口"
 
-#: src/libvlc-module.c:837
+#: src/libvlc-module.c:833
 msgid ""
 "The RTSP server will listen on this TCP port. The standard RTSP port number "
 "is 554. However allocation of port numbers below 1025 is usually restricted "
@@ -3034,11 +3021,11 @@ msgstr ""
 "RTSP 服务器将监听该 TCP 端口。RTSP 的标准端口号为 554。然而 1025 以内端口号的"
 "分配通常受操作系统限制。"
 
-#: src/libvlc-module.c:842
+#: src/libvlc-module.c:838
 msgid "HTTP/TLS server certificate"
 msgstr "HTTP/TLS 服务器证书"
 
-#: src/libvlc-module.c:844
+#: src/libvlc-module.c:840
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
@@ -3046,105 +3033,125 @@ msgstr ""
 "该 X.509 证书文件 (PEM 格式) 用于服务器端 TLS。在 OS X 平台，该字符串是在 "
 "keychain 中搜索证书所需的标签。"
 
-#: src/libvlc-module.c:847
+#: src/libvlc-module.c:843
 msgid "HTTP/TLS server private key"
 msgstr "HTTP/TLS 服务器私钥"
 
-#: src/libvlc-module.c:849
+#: src/libvlc-module.c:845
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr "用于服务端 TLS 的私钥文件 (PEM 格式)。"
 
-#: src/libvlc-module.c:851
+#: src/libvlc-module.c:847
+msgid "HTTP proxy"
+msgstr "HTTP 代理"
+
+#: src/libvlc-module.c:849
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"要使用的 HTTP 代理必须是以下形式 http://[用户名@]我的代理.我的域名:我的端口/ "
+"的形式;如果为空将会尝试 http_proxy 环境变量。"
+
+#: src/libvlc-module.c:853
+msgid "HTTP proxy password"
+msgstr "HTTP 代理密码"
+
+#: src/libvlc-module.c:855
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "如果您的 HTTP 代理需要密码，请在这里设置它。"
+
+#: src/libvlc-module.c:857
 msgid "SOCKS server"
 msgstr "SOCKS 服务器"
 
-#: src/libvlc-module.c:853
+#: src/libvlc-module.c:859
 msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr "要使用的 SOCKS 代理服务器。格式为“地址:端口”。它将用于所有 TCP 连接"
 
-#: src/libvlc-module.c:856
+#: src/libvlc-module.c:862
 msgid "SOCKS user name"
 msgstr "SOCKS 用户名"
 
-#: src/libvlc-module.c:858
+#: src/libvlc-module.c:864
 msgid "User name to be used for connection to the SOCKS proxy."
 msgstr "连接 SOCKS 代理时使用的用户名。"
 
-#: src/libvlc-module.c:860
+#: src/libvlc-module.c:866
 msgid "SOCKS password"
 msgstr "SOCKS 密码"
 
-#: src/libvlc-module.c:862
+#: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
 msgstr "连接 SOCKS 代理时所用的密码。"
 
-#: src/libvlc-module.c:864
+#: src/libvlc-module.c:870
 msgid "Title metadata"
 msgstr "标题元数据"
 
-#: src/libvlc-module.c:866
+#: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
 msgstr "允许您为输入内容指定“标题”元数据。"
 
-#: src/libvlc-module.c:868
+#: src/libvlc-module.c:874
 msgid "Author metadata"
 msgstr "作者元数据"
 
-#: src/libvlc-module.c:870
+#: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
 msgstr "允许您为输入内容指定“作者”元数据。"
 
-#: src/libvlc-module.c:872
+#: src/libvlc-module.c:878
 msgid "Artist metadata"
 msgstr "艺术家元数据"
 
-#: src/libvlc-module.c:874
+#: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
 msgstr "允许您为输入内容指定“艺术家”元数据。"
 
-#: src/libvlc-module.c:876
+#: src/libvlc-module.c:882
 msgid "Genre metadata"
 msgstr "流派元数据"
 
-#: src/libvlc-module.c:878
+#: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
 msgstr "允许您为输入内容指定“流派”元数据。"
 
-#: src/libvlc-module.c:880
+#: src/libvlc-module.c:886
 msgid "Copyright metadata"
 msgstr "版权元数据"
 
-#: src/libvlc-module.c:882
+#: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
 msgstr "允许您为输入内容指定“版权”元数据。"
 
-#: src/libvlc-module.c:884
+#: src/libvlc-module.c:890
 msgid "Description metadata"
 msgstr "描述元数据"
 
-#: src/libvlc-module.c:886
+#: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
 msgstr "允许您为输入内容指定“描述”元数据。"
 
-#: src/libvlc-module.c:888
+#: src/libvlc-module.c:894
 msgid "Date metadata"
 msgstr "日期元数据"
 
-#: src/libvlc-module.c:890
+#: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
 msgstr "允许您为输入内容指定“日期”元数据。"
 
-#: src/libvlc-module.c:892
+#: src/libvlc-module.c:898
 msgid "URL metadata"
 msgstr "URL 元数据"
 
-#: src/libvlc-module.c:894
+#: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
 msgstr "允许您为输入内容指定“url”元数据。"
 
-#: src/libvlc-module.c:898
+#: src/libvlc-module.c:904
 msgid ""
 "This option can be used to alter the way VLC selects its codecs "
 "(decompression methods). Only advanced users should alter this option as it "
@@ -3153,11 +3160,11 @@ msgstr ""
 "此选项可用来调整 VLC 选择编解码器 (解压缩方法) 的方式。仅高级用户才应该调整此"
 "选项，因为可能会影响您所有流的正常播放。"
 
-#: src/libvlc-module.c:902
+#: src/libvlc-module.c:908
 msgid "Preferred decoders list"
 msgstr "首选的解码器列表"
 
-#: src/libvlc-module.c:904
+#: src/libvlc-module.c:910
 msgid ""
 "List of codecs that VLC will use in priority. For instance, 'dummy,a52' will "
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
@@ -3167,26 +3174,26 @@ msgstr ""
 "先尝试 dummy 和 a52 编解码器。仅高级用户才应调整此选项，因为可能会影响您所有"
 "串流的回放。"
 
-#: src/libvlc-module.c:909
+#: src/libvlc-module.c:915
 msgid "Preferred encoders list"
 msgstr "首选的编码器列表"
 
-#: src/libvlc-module.c:911
+#: src/libvlc-module.c:917
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
 msgstr "允许您选择 VLC 按优先级使用的编码器列表。"
 
-#: src/libvlc-module.c:920
+#: src/libvlc-module.c:926
 msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
 msgstr "这些选项将允许您为流输出子系统设置默认的全局选项。"
 
-#: src/libvlc-module.c:923
+#: src/libvlc-module.c:929
 msgid "Default stream output chain"
 msgstr "默认流输出链"
 
-#: src/libvlc-module.c:925
+#: src/libvlc-module.c:931
 msgid ""
 "You can enter here a default stream output chain. Refer to the documentation "
 "to learn how to build such chains. Warning: this chain will be enabled for "
@@ -3195,59 +3202,59 @@ msgstr ""
 "您可以在这里输入默认的流输出链。请参考文档学习如何构建此类链。警告: 此链将会"
 "为所有流启用。"
 
-#: src/libvlc-module.c:929
+#: src/libvlc-module.c:935
 msgid "Enable streaming of all ES"
 msgstr "启用所有 ES 的流式处理"
 
-#: src/libvlc-module.c:931
+#: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
 msgstr "流式化所有基本流 (视频、音频和字幕)"
 
-#: src/libvlc-module.c:933
+#: src/libvlc-module.c:939
 msgid "Display while streaming"
 msgstr "串流时显示"
 
-#: src/libvlc-module.c:935
+#: src/libvlc-module.c:941
 msgid "Play locally the stream while streaming it."
 msgstr "在发布流的同时在本地播放流。"
 
-#: src/libvlc-module.c:937
+#: src/libvlc-module.c:943
 msgid "Enable video stream output"
 msgstr "启用视频串流输出"
 
-#: src/libvlc-module.c:939
+#: src/libvlc-module.c:945
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr "选择在启用最后一个视频串流时，此视频串流是否应该重定向到串流输出设备。"
 
-#: src/libvlc-module.c:942
+#: src/libvlc-module.c:948
 msgid "Enable audio stream output"
 msgstr "启用音频串流输出"
 
-#: src/libvlc-module.c:944
+#: src/libvlc-module.c:950
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
 "选择在启用最后一个音频串流时，此音频串流是否应该重定向到串流输出设备中。"
 
-#: src/libvlc-module.c:947
+#: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
 msgstr "启用 SPU 串流输出"
 
-#: src/libvlc-module.c:949
+#: src/libvlc-module.c:955
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
 "选择在启用最后一个 SPU 串流时，此 SPU 串流是否应该重定向到串流输出设备中。"
 
-#: src/libvlc-module.c:952
+#: src/libvlc-module.c:958
 msgid "Keep stream output open"
 msgstr "保持流输出打开"
 
-#: src/libvlc-module.c:954
+#: src/libvlc-module.c:960
 msgid ""
 "This allows you to keep an unique stream output instance across multiple "
 "playlist item (automatically insert the gather stream output if not "
@@ -3256,42 +3263,42 @@ msgstr ""
 "允许您在播放列表各项之间保持唯一的流输出实例 (如果未指定则自动插入 gather 流"
 "输出模块)"
 
-#: src/libvlc-module.c:958
+#: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
 msgstr "流输出混流器缓存 (毫秒)"
 
-#: src/libvlc-module.c:960
+#: src/libvlc-module.c:966
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
 msgstr "允许您为流输出混流器配置初始缓存值。单位为毫秒。"
 
-#: src/libvlc-module.c:963
+#: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
 msgstr "首选的封包器列表"
 
-#: src/libvlc-module.c:965
+#: src/libvlc-module.c:971
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr "设置 VLC 选择封包器的顺序。"
 
-#: src/libvlc-module.c:968
+#: src/libvlc-module.c:974
 msgid "Mux module"
 msgstr "混流模块"
 
-#: src/libvlc-module.c:970
+#: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
 msgstr "这是一个遗留条目，允许您配置混流模块"
 
-#: src/libvlc-module.c:972
+#: src/libvlc-module.c:978
 msgid "Access output module"
 msgstr "访问输出模块"
 
-#: src/libvlc-module.c:974
+#: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr "这是一个遗留条目，允许您配置访问输出模块"
 
-#: src/libvlc-module.c:977
+#: src/libvlc-module.c:983
 msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
@@ -3299,27 +3306,27 @@ msgstr ""
 "如果启用此选项，SAP 多播地址的流量将会被控制。若您希望在 MBone 上发布通告，则"
 "需要该项。"
 
-#: src/libvlc-module.c:981
+#: src/libvlc-module.c:987
 msgid "SAP announcement interval"
 msgstr "SAP 通告间隔"
 
-#: src/libvlc-module.c:983
+#: src/libvlc-module.c:989
 msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
 msgstr "在 SAP 流量控制关闭时，此项允许设置 SAP 通告之间的固定间隔。"
 
-#: src/libvlc-module.c:992
+#: src/libvlc-module.c:998
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr "这些选项允许您选择默认模块。不要修改这些设置，除非您清楚自己在做什么。"
 
-#: src/libvlc-module.c:995
+#: src/libvlc-module.c:1001
 msgid "Access module"
 msgstr "访问模块"
 
-#: src/libvlc-module.c:997
+#: src/libvlc-module.c:1003
 msgid ""
 "This allows you to force an access module. You can use it if the correct "
 "access is not automatically detected. You should not set this as a global "
@@ -3328,27 +3335,27 @@ msgstr ""
 "允许强制指定一个访问模块。若未自动检测到正确的访问，可以在此修改。除非您真的"
 "知道自己在做什么，不要将此项设为全局选项。"
 
-#: src/libvlc-module.c:1001
+#: src/libvlc-module.c:1007
 msgid "Stream filter module"
 msgstr "流滤镜模块"
 
-#: src/libvlc-module.c:1003
+#: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr "流滤镜用于修改正被读取的流。"
 
-#: src/libvlc-module.c:1005
+#: src/libvlc-module.c:1011
 msgid "Demux filter module"
 msgstr "分流滤镜模块"
 
-#: src/libvlc-module.c:1007
+#: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr "分流滤镜用于修改/控制正被读取的流。"
 
-#: src/libvlc-module.c:1009
+#: src/libvlc-module.c:1015
 msgid "Demux module"
 msgstr "分流模块"
 
-#: src/libvlc-module.c:1011
+#: src/libvlc-module.c:1017
 msgid ""
 "Demultiplexers are used to separate the \"elementary\" streams (like audio "
 "and video streams). You can use it if the correct demuxer is not "
@@ -3358,21 +3365,21 @@ msgstr ""
 "分流器用于分离出“基本”流 (如音频与视频流)。若未自动检测到正确的分流器，可以在"
 "此修改。除非您真的知道自己在做什么，不要将此项设为全局选项。"
 
-#: src/libvlc-module.c:1016
+#: src/libvlc-module.c:1022
 msgid "VoD server module"
 msgstr "VoD 服务器模块"
 
-#: src/libvlc-module.c:1018
+#: src/libvlc-module.c:1024
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr "选择要使用的 VoD 服务器模块。设为「vod_rtsp」可切回旧式传统模块。"
 
-#: src/libvlc-module.c:1021
+#: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
 msgstr "允许实时优先级"
 
-#: src/libvlc-module.c:1023
+#: src/libvlc-module.c:1029
 msgid ""
 "Running VLC in real-time priority will allow for much more precise "
 "scheduling and yield better, especially when streaming content. It can "
@@ -3383,11 +3390,11 @@ msgstr ""
 "时。然而，它可能导致您的整台机器假死，或者使它变得非常非常慢。您应当只在您确"
 "实知道您在做什么的情况下激活它。"
 
-#: src/libvlc-module.c:1029
+#: src/libvlc-module.c:1035
 msgid "Adjust VLC priority"
 msgstr "调节 VLC 优先级"
 
-#: src/libvlc-module.c:1031
+#: src/libvlc-module.c:1037
 msgid ""
 "This option adds an offset (positive or negative) to VLC default priorities. "
 "You can use it to tune VLC priority against other programs, or against other "
@@ -3396,74 +3403,74 @@ msgstr ""
 "此选项将添加一个偏移 (正值或负值) 到 VLC 默认的优先级中。您可以使用它调节 "
 "VLC 的优先级高于其它程序或其它 VLC 实例。"
 
-#: src/libvlc-module.c:1036
+#: src/libvlc-module.c:1042
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr "如果您希望降低读取流的延迟，此选项将非常有用"
 
-#: src/libvlc-module.c:1039
+#: src/libvlc-module.c:1045
 msgid "VLM configuration file"
 msgstr "VLM 配置文件"
 
-#: src/libvlc-module.c:1041
+#: src/libvlc-module.c:1047
 msgid "Read a VLM configuration file as soon as VLM is started."
 msgstr "在 VLM 启动时读取一个 VLM 配置文件。"
 
-#: src/libvlc-module.c:1043
+#: src/libvlc-module.c:1049
 msgid "Use a plugins cache"
 msgstr "使用插件缓存"
 
-#: src/libvlc-module.c:1045
+#: src/libvlc-module.c:1051
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr "使用插件缓存将会极大的改善 VLC 的启动时间。"
 
-#: src/libvlc-module.c:1047
+#: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
 msgstr "扫描新插件"
 
-#: src/libvlc-module.c:1049
+#: src/libvlc-module.c:1055
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr "启动时扫描插件目录寻找新的插件。会延长 VLC 的启动时间。"
 
-#: src/libvlc-module.c:1052
+#: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
 msgstr "首选的 keystore 列表"
 
-#: src/libvlc-module.c:1054
+#: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
 msgstr "VLC 将优先使用的 keystore 列表。"
 
-#: src/libvlc-module.c:1056
+#: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
 msgstr "在本地收集统计信息"
 
-#: src/libvlc-module.c:1058
+#: src/libvlc-module.c:1064
 msgid "Collect miscellaneous local statistics about the playing media."
 msgstr "收集关于正在播放的媒体的各类本地统计数据。"
 
-#: src/libvlc-module.c:1060
+#: src/libvlc-module.c:1066
 msgid "Run as daemon process"
 msgstr "作为服务进程运行"
 
-#: src/libvlc-module.c:1062
+#: src/libvlc-module.c:1068
 msgid "Runs VLC as a background daemon process."
 msgstr "将 VLC 作为后台服务进程运行。"
 
-#: src/libvlc-module.c:1064
+#: src/libvlc-module.c:1070
 msgid "Write process id to file"
 msgstr "将进程 id 写入到文件中"
 
-#: src/libvlc-module.c:1066
+#: src/libvlc-module.c:1072
 msgid "Writes process id into specified file."
 msgstr "写入进程 id 到指定的文件中。"
 
-#: src/libvlc-module.c:1068
+#: src/libvlc-module.c:1074
 msgid "Allow only one running instance"
 msgstr "仅允许运行一个实例"
 
-#: src/libvlc-module.c:1070
+#: src/libvlc-module.c:1076
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -3475,23 +3482,23 @@ msgstr ""
 "且不希望每次在文件管理器中打开文件时都打开新的 VLC 实例。此选项将允许您使用已"
 "经在运行中的实例播放文件或者将文件加入队列。"
 
-#: src/libvlc-module.c:1076
+#: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
 msgstr "VLC 由文件关联启动"
 
-#: src/libvlc-module.c:1078
+#: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr "告诉 VLC 它是因操作系统的文件关联而启动的"
 
-#: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:550
+#: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
 msgstr "从文件管理器启动时，只允许一个实例"
 
-#: src/libvlc-module.c:1083
+#: src/libvlc-module.c:1089
 msgid "Increase the priority of the process"
 msgstr "提高进程的优先级"
 
-#: src/libvlc-module.c:1085
+#: src/libvlc-module.c:1091
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
@@ -3504,25 +3511,25 @@ msgstr ""
 "改善您的播放体验。不过要注意在某些情况下 (例如存在 bug) VLC 可能会占用全部的"
 "处理器时间并使整个系统失去响应，那样可能需要重启机器才能恢复正常。"
 
-#: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:553
+#: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
 msgstr "在单实例模式中将项目添加到播放列表队列中"
 
-#: src/libvlc-module.c:1095
+#: src/libvlc-module.c:1101
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr "在使用单实例选项时添加项目到播放队列中，不打断当前正在播放的项目。"
 
-#: src/libvlc-module.c:1098
+#: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
 msgstr "通过 D-Bus 对外暴露媒体播放器"
 
-#: src/libvlc-module.c:1099
+#: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr "允许其他应用程序使用 D-Bus MPRIS 协议控制 VLC。"
 
-#: src/libvlc-module.c:1108
+#: src/libvlc-module.c:1114
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
@@ -3530,43 +3537,43 @@ msgstr ""
 "这些选项定义播放列表的行为。它们中的某些选项会被播放列表对话框中的设置所覆"
 "盖。"
 
-#: src/libvlc-module.c:1111
+#: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
 msgstr "自动预解析项目"
 
-#: src/libvlc-module.c:1113
+#: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr "自动预解析添加到播放列表的项目 (获取一些元数据)。"
 
-#: src/libvlc-module.c:1116
+#: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
 msgstr "预解析超时"
 
-#: src/libvlc-module.c:1118
+#: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr "预解析项目允许的最长时间（毫秒）"
 
-#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:328
+#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
 msgstr "允许访问网络查询元数据"
 
-#: src/libvlc-module.c:1125
+#: src/libvlc-module.c:1131
 msgid "Collapse"
 msgstr "收缩"
 
-#: src/libvlc-module.c:1125
+#: src/libvlc-module.c:1131
 msgid "Expand"
 msgstr "展开"
 
-#: src/libvlc-module.c:1127
+#: src/libvlc-module.c:1133
 msgid "Subdirectory behavior"
 msgstr "子目录行为"
 
-#: src/libvlc-module.c:1129
+#: src/libvlc-module.c:1135
 msgid ""
 "Select whether subdirectories must be expanded.\n"
 "none: subdirectories do not appear in the playlist.\n"
@@ -3578,11 +3585,11 @@ msgstr ""
 "收缩: 子目录显示但是只在播放前展开。\n"
 "展开: 展开所有子目录。\n"
 
-#: src/libvlc-module.c:1134
+#: src/libvlc-module.c:1140
 msgid "Ignored extensions"
 msgstr "忽略扩展名"
 
-#: src/libvlc-module.c:1136
+#: src/libvlc-module.c:1142
 msgid ""
 "Files with these extensions will not be added to playlist when opening a "
 "directory.\n"
@@ -3592,279 +3599,279 @@ msgstr ""
 "在打开一个目录时这些扩展名将不会被添加到播放列表中。\n"
 "例如在您添加的目录中含有播放列表文件时就非常有用。使用逗号分隔的扩展名列表。"
 
-#: src/libvlc-module.c:1141
+#: src/libvlc-module.c:1147
 msgid "Show hidden files"
 msgstr "显示隐藏文件"
 
-#: src/libvlc-module.c:1143
+#: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
 msgstr "忽略以「.」开头的文件"
 
-#: src/libvlc-module.c:1145
+#: src/libvlc-module.c:1151
 msgid "Services discovery modules"
 msgstr "服务发现模块"
 
-#: src/libvlc-module.c:1147
+#: src/libvlc-module.c:1153
 msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr "指定要预加载的服务发现模块，用冒号分隔。典型值为“sap”。"
 
-#: src/libvlc-module.c:1150
+#: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
 msgstr "永远随机播放文件"
 
-#: src/libvlc-module.c:1152
+#: src/libvlc-module.c:1158
 msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr "VLC 将随机播放播放列表中的文件，直到被中断。"
 
-#: src/libvlc-module.c:1154
+#: src/libvlc-module.c:1160
 msgid "Repeat all"
 msgstr "全部循环"
 
-#: src/libvlc-module.c:1156
+#: src/libvlc-module.c:1162
 msgid "VLC will keep playing the playlist indefinitely."
 msgstr "VLC 将反复播放播放列表中的内容。"
 
-#: src/libvlc-module.c:1158
+#: src/libvlc-module.c:1164
 msgid "Repeat current item"
 msgstr "循环播放当前的项目"
 
-#: src/libvlc-module.c:1160
+#: src/libvlc-module.c:1166
 msgid "VLC will keep playing the current playlist item."
 msgstr "VLC 将一直播放当前的播放列表项目。"
 
-#: src/libvlc-module.c:1162
+#: src/libvlc-module.c:1168
 msgid "Play and stop"
 msgstr "播放并停止"
 
-#: src/libvlc-module.c:1164
+#: src/libvlc-module.c:1170
 msgid "Stop the playlist after each played playlist item."
 msgstr "在每个播放列表项目结束后停止播放。"
 
-#: src/libvlc-module.c:1166
+#: src/libvlc-module.c:1172
 msgid "Play and exit"
 msgstr "播放并退出"
 
-#: src/libvlc-module.c:1168
+#: src/libvlc-module.c:1174
 msgid "Exit if there are no more items in the playlist."
 msgstr "如果播放列表中没有其他项目则退出。"
 
-#: src/libvlc-module.c:1170
+#: src/libvlc-module.c:1176
 msgid "Play and pause"
 msgstr "播放并暂停"
 
-#: src/libvlc-module.c:1172
+#: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
 msgstr "在播放列表中各项的最后一帧处暂停。"
 
-#: src/libvlc-module.c:1174
+#: src/libvlc-module.c:1180
 msgid "Start paused"
 msgstr "开始时暂停"
 
-#: src/libvlc-module.c:1176
+#: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
 msgstr "对播放列表中的每一项，均在第一帧处暂停。"
 
-#: src/libvlc-module.c:1178
+#: src/libvlc-module.c:1184
 msgid "Auto start"
 msgstr "自动开始播放"
 
-#: src/libvlc-module.c:1179
+#: src/libvlc-module.c:1185
 msgid "Automatically start playing the playlist content once it's loaded."
 msgstr "在播放列表被载入后自动开始播放其中的内容。"
 
-#: src/libvlc-module.c:1182
+#: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
 msgstr "音频通信时暂停"
 
-#: src/libvlc-module.c:1184
+#: src/libvlc-module.c:1190
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
 msgstr "若侦测到挂起的音频通信，自动暂停回放。"
 
-#: src/libvlc-module.c:1187
+#: src/libvlc-module.c:1193
 msgid "Use media library"
 msgstr "使用媒体库"
 
-#: src/libvlc-module.c:1189
+#: src/libvlc-module.c:1195
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
 msgstr "媒体库将被自动保存并在每次您启动 VLC 时重新载入。"
 
-#: src/libvlc-module.c:1192 modules/gui/qt/ui/sprefs_interface.h:551
+#: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Display playlist tree"
 msgstr "显示播放列表树"
 
-#: src/libvlc-module.c:1194
+#: src/libvlc-module.c:1200
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
 msgstr "播放列表可以使用树形结构来分类某些项目，类似目录中的内容。"
 
-#: src/libvlc-module.c:1203
+#: src/libvlc-module.c:1209
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr "这些设置是 VLC 的全局快捷键绑定，也被称作“热键“。"
 
-#: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:115
+#: src/libvlc-module.c:1214 modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Ignore"
 msgstr "忽略"
 
-#: src/libvlc-module.c:1208
+#: src/libvlc-module.c:1214
 msgid "Volume control"
 msgstr "音量控制"
 
-#: src/libvlc-module.c:1209
+#: src/libvlc-module.c:1215
 msgid "Position control"
 msgstr "位置控制"
 
-#: src/libvlc-module.c:1209
+#: src/libvlc-module.c:1215
 msgid "Position control reversed"
 msgstr "反向位置控制"
 
-#: src/libvlc-module.c:1212
+#: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
 msgstr "鼠标滚轮纵轴控制"
 
-#: src/libvlc-module.c:1214
+#: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr "鼠标滚轮纵轴 (上/下) 可控制音量、位置或忽略。"
 
-#: src/libvlc-module.c:1216
+#: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
 msgstr "鼠标滚轮横轴控制"
 
-#: src/libvlc-module.c:1218
+#: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr "鼠标滚轮横轴 (左/右) 可控制音量、位置或忽略。"
 
-#: src/libvlc-module.c:1220 src/video_output/vout_intf.c:268
+#: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
-#: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:501
+#: modules/gui/macosx/VLCMainMenu.m:433 modules/gui/macosx/VLCMainMenu.m:512
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/ui/sprefs_video.h:318
 msgid "Fullscreen"
 msgstr "全屏"
 
-#: src/libvlc-module.c:1221
+#: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "选择切换全屏状态的热键。"
 
-#: src/libvlc-module.c:1222
+#: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
 msgstr "退出全屏"
 
-#: src/libvlc-module.c:1223
+#: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to exit fullscreen state."
 msgstr "选择用于退出全屏模式的热键。"
 
-#: src/libvlc-module.c:1224 modules/gui/macosx/VLCFSPanelController.m:109
+#: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
 msgstr "播放/暂停"
 
-#: src/libvlc-module.c:1225
+#: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
 msgstr "选择用于切换暂停状态的热键。"
 
-#: src/libvlc-module.c:1226
+#: src/libvlc-module.c:1232
 msgid "Pause only"
 msgstr "仅暂停"
 
-#: src/libvlc-module.c:1227
+#: src/libvlc-module.c:1233
 msgid "Select the hotkey to use to pause."
 msgstr "选择用于暂停的热键。"
 
-#: src/libvlc-module.c:1228
+#: src/libvlc-module.c:1234
 msgid "Play only"
 msgstr "仅播放"
 
-#: src/libvlc-module.c:1229
+#: src/libvlc-module.c:1235
 msgid "Select the hotkey to use to play."
 msgstr "选择用于播放的热键。"
 
-#: src/libvlc-module.c:1230 modules/gui/macosx/VLCMainMenu.m:385
+#: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Faster"
 msgstr "较快"
 
-#: src/libvlc-module.c:1231 src/libvlc-module.c:1237
+#: src/libvlc-module.c:1237 src/libvlc-module.c:1243
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "选择由于加快播放的热键。"
 
-#: src/libvlc-module.c:1232 modules/gui/macosx/VLCMainMenu.m:383
+#: src/libvlc-module.c:1238 modules/gui/macosx/VLCMainMenu.m:392
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
 msgstr "较慢"
 
-#: src/libvlc-module.c:1233 src/libvlc-module.c:1239
+#: src/libvlc-module.c:1239 src/libvlc-module.c:1245
 msgid "Select the hotkey to use for slow motion playback."
 msgstr "选择用于减慢播放的热键。"
 
-#: src/libvlc-module.c:1234
+#: src/libvlc-module.c:1240
 msgid "Normal rate"
 msgstr "正常速率"
 
-#: src/libvlc-module.c:1235
+#: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr "选择将播放速率设为正常值的热键。"
 
-#: src/libvlc-module.c:1236 modules/gui/qt/menus.cpp:883
+#: src/libvlc-module.c:1242 modules/gui/qt/menus.cpp:883
 msgid "Faster (fine)"
 msgstr "较快 (微调)"
 
-#: src/libvlc-module.c:1238 modules/gui/qt/menus.cpp:891
+#: src/libvlc-module.c:1244 modules/gui/qt/menus.cpp:891
 msgid "Slower (fine)"
 msgstr "较慢 (微调)"
 
-#: src/libvlc-module.c:1240 modules/control/hotkeys.c:410
+#: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
 #: modules/gui/macosx/VLCFSPanelController.m:112
-#: modules/gui/macosx/VLCMainMenu.m:388 modules/gui/macosx/VLCMainMenu.m:489
-#: modules/gui/macosx/VLCMainMenu.m:497
+#: modules/gui/macosx/VLCMainMenu.m:397 modules/gui/macosx/VLCMainMenu.m:500
+#: modules/gui/macosx/VLCMainMenu.m:508
 #: modules/gui/qt/components/controller.hpp:112
 #: modules/gui/qt/dialogs/sout.cpp:93 modules/notify/notify.c:335
 #: modules/gui/qt/ui/streampanel.h:181
 msgid "Next"
 msgstr "下一个"
 
-#: src/libvlc-module.c:1241
+#: src/libvlc-module.c:1247
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr "选择用于跳到下一个播放列表项目的热键。"
 
-#: src/libvlc-module.c:1242 modules/control/hotkeys.c:414
+#: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
 #: modules/gui/macosx/VLCFSPanelController.m:115
-#: modules/gui/macosx/VLCMainMenu.m:387 modules/gui/macosx/VLCMainMenu.m:490
-#: modules/gui/macosx/VLCMainMenu.m:496
+#: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:501
+#: modules/gui/macosx/VLCMainMenu.m:507
 #: modules/gui/qt/components/controller.hpp:112 modules/notify/notify.c:333
 msgid "Previous"
 msgstr "上一个"
 
-#: src/libvlc-module.c:1243
+#: src/libvlc-module.c:1249
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr "选择用于跳到上一个播放列表项目的热键。"
 
-#: src/libvlc-module.c:1244 modules/gui/macosx/VLCMainMenu.m:378
-#: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/macosx/VLCMainMenu.m:495
+#: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:387
+#: modules/gui/macosx/VLCMainMenu.m:499 modules/gui/macosx/VLCMainMenu.m:506
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:61
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:545 modules/gui/qt/ui/streampanel.h:180
 msgid "Stop"
 msgstr "停止"
 
-#: src/libvlc-module.c:1245
+#: src/libvlc-module.c:1251
 msgid "Select the hotkey to stop playback."
 msgstr "选择用于停止播放的热键。"
 
-#: src/libvlc-module.c:1246 modules/gui/macosx/VLCControlsBarCommon.m:75
+#: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:286
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:308
@@ -3874,115 +3881,115 @@ msgstr "选择用于停止播放的热键。"
 msgid "Position"
 msgstr "位置"
 
-#: src/libvlc-module.c:1247
+#: src/libvlc-module.c:1253
 msgid "Select the hotkey to display the position."
 msgstr "选择用于显示位置的热键。"
 
-#: src/libvlc-module.c:1249
+#: src/libvlc-module.c:1255
 msgid "Very short backwards jump"
 msgstr "非常短的向后跳转"
 
-#: src/libvlc-module.c:1251
+#: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a very short backwards jump."
 msgstr "选择用于非常短向后跳转的热键。"
 
-#: src/libvlc-module.c:1252
+#: src/libvlc-module.c:1258
 msgid "Short backwards jump"
 msgstr "短向后跳转"
 
-#: src/libvlc-module.c:1254
+#: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a short backwards jump."
 msgstr "选择用于短向后跳转的热键。"
 
-#: src/libvlc-module.c:1255
+#: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
 msgstr "中向后跳转"
 
-#: src/libvlc-module.c:1257
+#: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a medium backwards jump."
 msgstr "选择用于中向后跳转的热键。"
 
-#: src/libvlc-module.c:1258
+#: src/libvlc-module.c:1264
 msgid "Long backwards jump"
 msgstr "长向后跳转"
 
-#: src/libvlc-module.c:1260
+#: src/libvlc-module.c:1266
 msgid "Select the hotkey to make a long backwards jump."
 msgstr "选择用于长向后跳转的热键。"
 
-#: src/libvlc-module.c:1262
+#: src/libvlc-module.c:1268
 msgid "Very short forward jump"
 msgstr "非常短的向前跳转"
 
-#: src/libvlc-module.c:1264
+#: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a very short forward jump."
 msgstr "选择用于非常短的向前跳转的热键。"
 
-#: src/libvlc-module.c:1265
+#: src/libvlc-module.c:1271
 msgid "Short forward jump"
 msgstr "短向前跳转"
 
-#: src/libvlc-module.c:1267
+#: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a short forward jump."
 msgstr "选择用于短向前跳转的热键。"
 
-#: src/libvlc-module.c:1268
+#: src/libvlc-module.c:1274
 msgid "Medium forward jump"
 msgstr "中向前跳转"
 
-#: src/libvlc-module.c:1270
+#: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a medium forward jump."
 msgstr "选择用于中向前跳转的热键。"
 
-#: src/libvlc-module.c:1271
+#: src/libvlc-module.c:1277
 msgid "Long forward jump"
 msgstr "长向前跳转"
 
-#: src/libvlc-module.c:1273
+#: src/libvlc-module.c:1279
 msgid "Select the hotkey to make a long forward jump."
 msgstr "选择用于长向前跳转的热键。"
 
-#: src/libvlc-module.c:1274 modules/control/hotkeys.c:599
+#: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
 msgstr "下一帧"
 
-#: src/libvlc-module.c:1276
+#: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
 msgstr "选择跳转至下一帧的热键。"
 
-#: src/libvlc-module.c:1278
+#: src/libvlc-module.c:1284
 msgid "Very short jump length"
 msgstr "非常短的跳转长度"
 
-#: src/libvlc-module.c:1279
+#: src/libvlc-module.c:1285
 msgid "Very short jump length, in seconds."
 msgstr "非常短的跳转长度，单位为秒。"
 
-#: src/libvlc-module.c:1280
+#: src/libvlc-module.c:1286
 msgid "Short jump length"
 msgstr "短跳转长度"
 
-#: src/libvlc-module.c:1281
+#: src/libvlc-module.c:1287
 msgid "Short jump length, in seconds."
 msgstr "短跳转长度，单位为秒。"
 
-#: src/libvlc-module.c:1282
+#: src/libvlc-module.c:1288
 msgid "Medium jump length"
 msgstr "中跳转长度"
 
-#: src/libvlc-module.c:1283
+#: src/libvlc-module.c:1289
 msgid "Medium jump length, in seconds."
 msgstr "中跳转长度，单位为秒。"
 
-#: src/libvlc-module.c:1284
+#: src/libvlc-module.c:1290
 msgid "Long jump length"
 msgstr "长跳转长度"
 
-#: src/libvlc-module.c:1285
+#: src/libvlc-module.c:1291
 msgid "Long jump length, in seconds."
 msgstr "长跳转长度，单位为秒。"
 
-#: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: src/libvlc-module.c:1293 modules/control/hotkeys.c:361
 #: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:954
@@ -3990,696 +3997,696 @@ msgstr "长跳转长度，单位为秒。"
 msgid "Quit"
 msgstr "退出"
 
-#: src/libvlc-module.c:1288
+#: src/libvlc-module.c:1294
 msgid "Select the hotkey to quit the application."
 msgstr "选择退出应用程序的热键。"
 
-#: src/libvlc-module.c:1289
+#: src/libvlc-module.c:1295
 msgid "Navigate up"
 msgstr "导航上"
 
-#: src/libvlc-module.c:1290
+#: src/libvlc-module.c:1296
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr "选择在 DVD 菜单中将光标 / 视角 (pitch 轴) 上移的快捷键。"
 
-#: src/libvlc-module.c:1291
+#: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "导航下"
 
-#: src/libvlc-module.c:1292
+#: src/libvlc-module.c:1298
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr "选择在 DVD 菜单中将光标 / 视角 (pitch 轴) 下移的快捷键。"
 
-#: src/libvlc-module.c:1293
+#: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "导航左"
 
-#: src/libvlc-module.c:1294
+#: src/libvlc-module.c:1300
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr "选择在 DVD 菜单中将光标 / 视角 (yaw 轴) 左移的快捷键。"
 
-#: src/libvlc-module.c:1295
+#: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "导航右"
 
-#: src/libvlc-module.c:1296
+#: src/libvlc-module.c:1302
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr "选择在 DVD 菜单中将光标 / 视角 (yaw 轴) 右移的快捷键。"
 
-#: src/libvlc-module.c:1297
+#: src/libvlc-module.c:1303
 msgid "Activate"
 msgstr "导航点击"
 
-#: src/libvlc-module.c:1298
+#: src/libvlc-module.c:1304
 msgid "Select the key to activate selected item in DVD menus."
 msgstr "选择用于激活 DVD 菜单中选中项目的按键。"
 
-#: src/libvlc-module.c:1299 modules/gui/qt/dialogs/toolbar.cpp:500
+#: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
 msgstr "转到 DVD 菜单"
 
-#: src/libvlc-module.c:1300
+#: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
 msgstr "选择用于转到 DVD 菜单的按键"
 
-#: src/libvlc-module.c:1301
+#: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
 msgstr "选择上一个 DVD 标题"
 
-#: src/libvlc-module.c:1302
+#: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
 msgstr "选择用于转到上一个 DVD 标题的按键"
 
-#: src/libvlc-module.c:1303
+#: src/libvlc-module.c:1309
 msgid "Select next DVD title"
 msgstr "选择下一个 DVD 标题"
 
-#: src/libvlc-module.c:1304
+#: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
 msgstr "选择用于转到下一个 DVD 标题的按键"
 
-#: src/libvlc-module.c:1305
+#: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
 msgstr "选择上一个 DVD 章节"
 
-#: src/libvlc-module.c:1306
+#: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr "选择用于选择上一个 DVD 章节的按键"
 
-#: src/libvlc-module.c:1307
+#: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
 msgstr "选择下一个 DVD 章节"
 
-#: src/libvlc-module.c:1308
+#: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr "选择用于选择下一个 DVD 章节的按键"
 
-#: src/libvlc-module.c:1309
+#: src/libvlc-module.c:1315
 msgid "Volume up"
 msgstr "音量 +"
 
-#: src/libvlc-module.c:1310
+#: src/libvlc-module.c:1316
 msgid "Select the key to increase audio volume."
 msgstr "选择用于增大音频音量的按键。"
 
-#: src/libvlc-module.c:1311
+#: src/libvlc-module.c:1317
 msgid "Volume down"
 msgstr "音量 -"
 
-#: src/libvlc-module.c:1312
+#: src/libvlc-module.c:1318
 msgid "Select the key to decrease audio volume."
 msgstr "选择用于减小音量的按键。"
 
-#: src/libvlc-module.c:1313 modules/access/v4l2/v4l2.c:181
-#: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:491
-#: modules/gui/macosx/VLCMainMenu.m:500
+#: src/libvlc-module.c:1319 modules/access/v4l2/v4l2.c:181
+#: modules/gui/macosx/VLCMainMenu.m:418 modules/gui/macosx/VLCMainMenu.m:502
+#: modules/gui/macosx/VLCMainMenu.m:511
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 msgid "Mute"
 msgstr "静音"
 
-#: src/libvlc-module.c:1314
+#: src/libvlc-module.c:1320
 msgid "Select the key to mute audio."
 msgstr "选择用于静音的按键。"
 
-#: src/libvlc-module.c:1315
+#: src/libvlc-module.c:1321
 msgid "Subtitle delay up"
 msgstr "字幕延迟 +"
 
-#: src/libvlc-module.c:1316
+#: src/libvlc-module.c:1322
 msgid "Select the key to increase the subtitle delay."
 msgstr "选择用于增加字幕延迟的按键。"
 
-#: src/libvlc-module.c:1317
+#: src/libvlc-module.c:1323
 msgid "Subtitle delay down"
 msgstr "字幕延迟 -"
 
-#: src/libvlc-module.c:1318
+#: src/libvlc-module.c:1324
 msgid "Select the key to decrease the subtitle delay."
 msgstr "选择用于减少字幕延迟的按键。"
 
-#: src/libvlc-module.c:1319
+#: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
 msgstr "重置字幕文本缩放"
 
-#: src/libvlc-module.c:1320
+#: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
 msgstr "放大字幕文本"
 
-#: src/libvlc-module.c:1321
+#: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
 msgstr "缩小字幕文本"
 
-#: src/libvlc-module.c:1322
+#: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
 msgstr "选择更改字幕文本缩放的快捷键"
 
-#: src/libvlc-module.c:1323
+#: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
 msgstr "字幕同步 / 将音频时间戳加入书签"
 
-#: src/libvlc-module.c:1324
+#: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr "选择同步字幕时用于将音频时间戳加入书签的快捷键。"
 
-#: src/libvlc-module.c:1325
+#: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
 msgstr "字幕同步 / 将字幕时间戳加入书签"
 
-#: src/libvlc-module.c:1326
+#: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
 msgstr "选择同步字幕时用于将字幕时间戳加入书签的快捷键。"
 
-#: src/libvlc-module.c:1327
+#: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
 msgstr "字幕同步 / 同步音频及字幕时间戳"
 
-#: src/libvlc-module.c:1328
+#: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr "选择用于同步音频及字幕时间戳的快捷键。"
 
-#: src/libvlc-module.c:1329
+#: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
 msgstr "字幕同步 / 重置音频及字幕同步状态"
 
-#: src/libvlc-module.c:1330
+#: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr "选择重置音频及字幕时间戳同步状态的快捷键。"
 
-#: src/libvlc-module.c:1331
+#: src/libvlc-module.c:1337
 msgid "Subtitle position up"
 msgstr "字幕位置上移"
 
-#: src/libvlc-module.c:1332
+#: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
 msgstr "选择用于上移字幕位置的热键。"
 
-#: src/libvlc-module.c:1333
+#: src/libvlc-module.c:1339
 msgid "Subtitle position down"
 msgstr "字幕位置下移"
 
-#: src/libvlc-module.c:1334
+#: src/libvlc-module.c:1340
 msgid "Select the key to move subtitles lower."
 msgstr "选择用于下移字幕位置的热键。"
 
-#: src/libvlc-module.c:1335
+#: src/libvlc-module.c:1341
 msgid "Audio delay up"
 msgstr "音频延迟 +"
 
-#: src/libvlc-module.c:1336
+#: src/libvlc-module.c:1342
 msgid "Select the key to increase the audio delay."
 msgstr "选择用于增加音频延迟的按键。"
 
-#: src/libvlc-module.c:1337
+#: src/libvlc-module.c:1343
 msgid "Audio delay down"
 msgstr "音频延迟 -"
 
-#: src/libvlc-module.c:1338
+#: src/libvlc-module.c:1344
 msgid "Select the key to decrease the audio delay."
 msgstr "选择用于减少音频延迟的按键。"
 
-#: src/libvlc-module.c:1345
+#: src/libvlc-module.c:1351
 msgid "Play playlist bookmark 1"
 msgstr "播放播放列表书签 1"
 
-#: src/libvlc-module.c:1346
+#: src/libvlc-module.c:1352
 msgid "Play playlist bookmark 2"
 msgstr "播放播放列表书签 2"
 
-#: src/libvlc-module.c:1347
+#: src/libvlc-module.c:1353
 msgid "Play playlist bookmark 3"
 msgstr "播放播放列表书签 3"
 
-#: src/libvlc-module.c:1348
+#: src/libvlc-module.c:1354
 msgid "Play playlist bookmark 4"
 msgstr "播放播放列表书签 4"
 
-#: src/libvlc-module.c:1349
+#: src/libvlc-module.c:1355
 msgid "Play playlist bookmark 5"
 msgstr "播放播放列表书签 5"
 
-#: src/libvlc-module.c:1350
+#: src/libvlc-module.c:1356
 msgid "Play playlist bookmark 6"
 msgstr "播放播放列表书签 6"
 
-#: src/libvlc-module.c:1351
+#: src/libvlc-module.c:1357
 msgid "Play playlist bookmark 7"
 msgstr "播放播放列表书签 7"
 
-#: src/libvlc-module.c:1352
+#: src/libvlc-module.c:1358
 msgid "Play playlist bookmark 8"
 msgstr "播放播放列表书签 8"
 
-#: src/libvlc-module.c:1353
+#: src/libvlc-module.c:1359
 msgid "Play playlist bookmark 9"
 msgstr "播放播放列表书签 9"
 
-#: src/libvlc-module.c:1354
+#: src/libvlc-module.c:1360
 msgid "Play playlist bookmark 10"
 msgstr "播放播放列表书签 10"
 
-#: src/libvlc-module.c:1355
+#: src/libvlc-module.c:1361
 msgid "Select the key to play this bookmark."
 msgstr "选择播放此书签的按键。"
 
-#: src/libvlc-module.c:1356
+#: src/libvlc-module.c:1362
 msgid "Set playlist bookmark 1"
 msgstr "设置播放列表书签 1"
 
-#: src/libvlc-module.c:1357
+#: src/libvlc-module.c:1363
 msgid "Set playlist bookmark 2"
 msgstr "设置播放列表书签 2"
 
-#: src/libvlc-module.c:1358
+#: src/libvlc-module.c:1364
 msgid "Set playlist bookmark 3"
 msgstr "设置播放列表书签 3"
 
-#: src/libvlc-module.c:1359
+#: src/libvlc-module.c:1365
 msgid "Set playlist bookmark 4"
 msgstr "设置播放列表书签 4"
 
-#: src/libvlc-module.c:1360
+#: src/libvlc-module.c:1366
 msgid "Set playlist bookmark 5"
 msgstr "设置播放列表书签 5"
 
-#: src/libvlc-module.c:1361
+#: src/libvlc-module.c:1367
 msgid "Set playlist bookmark 6"
 msgstr "设置播放列表书签 6"
 
-#: src/libvlc-module.c:1362
+#: src/libvlc-module.c:1368
 msgid "Set playlist bookmark 7"
 msgstr "设置播放列表书签 7"
 
-#: src/libvlc-module.c:1363
+#: src/libvlc-module.c:1369
 msgid "Set playlist bookmark 8"
 msgstr "设置播放列表书签 8"
 
-#: src/libvlc-module.c:1364
+#: src/libvlc-module.c:1370
 msgid "Set playlist bookmark 9"
 msgstr "设置播放列表书签 9"
 
-#: src/libvlc-module.c:1365
+#: src/libvlc-module.c:1371
 msgid "Set playlist bookmark 10"
 msgstr "设置播放列表书签 10"
 
-#: src/libvlc-module.c:1366
+#: src/libvlc-module.c:1372
 msgid "Select the key to set this playlist bookmark."
 msgstr "选择设置此播放列表书签的按键。"
 
-#: src/libvlc-module.c:1367
+#: src/libvlc-module.c:1373
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
 msgstr "清除播放列表"
 
-#: src/libvlc-module.c:1368
+#: src/libvlc-module.c:1374
 msgid "Select the key to clear the current playlist."
 msgstr "选择用于清除当前播放列表的快捷键。"
 
-#: src/libvlc-module.c:1370
+#: src/libvlc-module.c:1376
 msgid "Playlist bookmark 1"
 msgstr "播放列表书签 1"
 
-#: src/libvlc-module.c:1371
+#: src/libvlc-module.c:1377
 msgid "Playlist bookmark 2"
 msgstr "播放列表书签 2"
 
-#: src/libvlc-module.c:1372
+#: src/libvlc-module.c:1378
 msgid "Playlist bookmark 3"
 msgstr "播放列表书签 3"
 
-#: src/libvlc-module.c:1373
+#: src/libvlc-module.c:1379
 msgid "Playlist bookmark 4"
 msgstr "播放列表书签 4"
 
-#: src/libvlc-module.c:1374
+#: src/libvlc-module.c:1380
 msgid "Playlist bookmark 5"
 msgstr "播放列表书签 5"
 
-#: src/libvlc-module.c:1375
+#: src/libvlc-module.c:1381
 msgid "Playlist bookmark 6"
 msgstr "播放列表书签 6"
 
-#: src/libvlc-module.c:1376
+#: src/libvlc-module.c:1382
 msgid "Playlist bookmark 7"
 msgstr "播放列表书签 7"
 
-#: src/libvlc-module.c:1377
+#: src/libvlc-module.c:1383
 msgid "Playlist bookmark 8"
 msgstr "播放列表书签 8"
 
-#: src/libvlc-module.c:1378
+#: src/libvlc-module.c:1384
 msgid "Playlist bookmark 9"
 msgstr "播放列表书签 9"
 
-#: src/libvlc-module.c:1379
+#: src/libvlc-module.c:1385
 msgid "Playlist bookmark 10"
 msgstr "播放列表书签 10"
 
-#: src/libvlc-module.c:1381
+#: src/libvlc-module.c:1387
 msgid "This allows you to define playlist bookmarks."
 msgstr "允许定义播放列表书签。"
 
-#: src/libvlc-module.c:1383
+#: src/libvlc-module.c:1389
 msgid "Cycle audio track"
 msgstr "切换音轨"
 
-#: src/libvlc-module.c:1384
+#: src/libvlc-module.c:1390
 msgid "Cycle through the available audio tracks(languages)."
 msgstr "在可用的音轨 (语言) 之间切换。"
 
-#: src/libvlc-module.c:1385
+#: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
 msgstr "逆序切换字幕轨道"
 
-#: src/libvlc-module.c:1386
+#: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
 msgstr "逆序循环可用的字幕轨道。"
 
-#: src/libvlc-module.c:1387
+#: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
 msgstr "切换字幕轨道"
 
-#: src/libvlc-module.c:1388
+#: src/libvlc-module.c:1394
 msgid "Cycle through the available subtitle tracks."
 msgstr "在可用的字幕轨道之间切换。"
 
-#: src/libvlc-module.c:1389
+#: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
 msgstr "切换字幕"
 
-#: src/libvlc-module.c:1390
+#: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
 msgstr "切换字幕轨的显示。"
 
-#: src/libvlc-module.c:1391
+#: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
 msgstr "向后切换节目服务 ID"
 
-#: src/libvlc-module.c:1392
+#: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
 msgstr "在可用的下一节目服务 ID (SID) 中进行循环。"
 
-#: src/libvlc-module.c:1393
+#: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
 msgstr "向前切换节目服务 ID"
 
-#: src/libvlc-module.c:1394
+#: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
 msgstr "在可用的上一节目服务 ID (SID) 中进行循环。"
 
-#: src/libvlc-module.c:1395
+#: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
 msgstr "切换源宽高比"
 
-#: src/libvlc-module.c:1396
+#: src/libvlc-module.c:1402
 msgid "Cycle through a predefined list of source aspect ratios."
 msgstr "在预定义的源宽高比列表之间切换。"
 
-#: src/libvlc-module.c:1397
+#: src/libvlc-module.c:1403
 msgid "Cycle video crop"
 msgstr "切换视频裁剪"
 
-#: src/libvlc-module.c:1398
+#: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
 msgstr "在预定义的裁剪格式列表之间切换。"
 
-#: src/libvlc-module.c:1399
+#: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
 msgstr "打开或关闭自动缩放"
 
-#: src/libvlc-module.c:1400
+#: src/libvlc-module.c:1406
 msgid "Activate or deactivate autoscaling."
 msgstr "激活或关闭自动缩放。"
 
-#: src/libvlc-module.c:1401
+#: src/libvlc-module.c:1407
 msgid "Increase scale factor"
 msgstr "增大缩放系数"
 
-#: src/libvlc-module.c:1403
+#: src/libvlc-module.c:1409
 msgid "Decrease scale factor"
 msgstr "减小缩放系数"
 
-#: src/libvlc-module.c:1405
+#: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
 msgstr "切换反交错"
 
-#: src/libvlc-module.c:1406
+#: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
 msgstr "开启或关闭反交错。"
 
-#: src/libvlc-module.c:1407
+#: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
 msgstr "切换反交错模式"
 
-#: src/libvlc-module.c:1408
+#: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
 msgstr "在可用的反交错模式中循环切换。"
 
-#: src/libvlc-module.c:1409
+#: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
 msgstr "全屏时显示控制器"
 
-#: src/libvlc-module.c:1410
+#: src/libvlc-module.c:1416
 msgid "Boss key"
 msgstr "老板键"
 
-#: src/libvlc-module.c:1411
+#: src/libvlc-module.c:1417
 msgid "Hide the interface and pause playback."
 msgstr "隐藏界面并暂停回放。"
 
-#: src/libvlc-module.c:1412
+#: src/libvlc-module.c:1418
 msgid "Context menu"
 msgstr "右键菜单"
 
-#: src/libvlc-module.c:1413
+#: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
 msgstr "显示右键弹出菜单。"
 
-#: src/libvlc-module.c:1414
+#: src/libvlc-module.c:1420
 msgid "Take video snapshot"
 msgstr "视频截图"
 
-#: src/libvlc-module.c:1415
+#: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "获取一张视频截图并将其写入到磁盘。"
 
-#: src/libvlc-module.c:1417 modules/gui/macosx/VLCMainMenu.m:379
+#: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:388
 #: modules/gui/qt/components/controller.hpp:110
 #: modules/gui/qt/components/controller.hpp:121 modules/gui/qt/menus.cpp:857
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "录制"
 
-#: src/libvlc-module.c:1418
+#: src/libvlc-module.c:1424
 msgid "Record access filter start/stop."
 msgstr "录制访问滤镜开始/停止。"
 
-#: src/libvlc-module.c:1420
+#: src/libvlc-module.c:1426
 msgid "Normal/Loop/Repeat"
 msgstr "普通/循环/单曲循环"
 
-#: src/libvlc-module.c:1421
+#: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
 msgstr "切换「普通/循环/单曲循环」播放列表模式"
 
-#: src/libvlc-module.c:1424
+#: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
 msgstr "切换播放列表随机播放模式"
 
-#: src/libvlc-module.c:1429 src/libvlc-module.c:1430
+#: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
 msgstr "取消缩放"
 
-#: src/libvlc-module.c:1432 src/libvlc-module.c:1433
+#: src/libvlc-module.c:1438 src/libvlc-module.c:1439
 msgid "Crop one pixel from the top of the video"
 msgstr "从视频顶端裁剪一个像素"
 
-#: src/libvlc-module.c:1434 src/libvlc-module.c:1435
+#: src/libvlc-module.c:1440 src/libvlc-module.c:1441
 msgid "Uncrop one pixel from the top of the video"
 msgstr "取消从视频顶端裁剪一个像素"
 
-#: src/libvlc-module.c:1437 src/libvlc-module.c:1438
+#: src/libvlc-module.c:1443 src/libvlc-module.c:1444
 msgid "Crop one pixel from the left of the video"
 msgstr "从视频左侧裁剪一个像素"
 
-#: src/libvlc-module.c:1439 src/libvlc-module.c:1440
+#: src/libvlc-module.c:1445 src/libvlc-module.c:1446
 msgid "Uncrop one pixel from the left of the video"
 msgstr "取消从视频左侧裁剪一个像素"
 
-#: src/libvlc-module.c:1442 src/libvlc-module.c:1443
+#: src/libvlc-module.c:1448 src/libvlc-module.c:1449
 msgid "Crop one pixel from the bottom of the video"
 msgstr "从视频底端裁剪一个像素"
 
-#: src/libvlc-module.c:1444 src/libvlc-module.c:1445
+#: src/libvlc-module.c:1450 src/libvlc-module.c:1451
 msgid "Uncrop one pixel from the bottom of the video"
 msgstr "取消从视频底端裁剪一个像素"
 
-#: src/libvlc-module.c:1447 src/libvlc-module.c:1448
+#: src/libvlc-module.c:1453 src/libvlc-module.c:1454
 msgid "Crop one pixel from the right of the video"
 msgstr "从视频右侧裁剪一个像素"
 
-#: src/libvlc-module.c:1449 src/libvlc-module.c:1450
+#: src/libvlc-module.c:1455 src/libvlc-module.c:1456
 msgid "Uncrop one pixel from the right of the video"
 msgstr "取消从视频右侧裁剪一个像素"
 
-#: src/libvlc-module.c:1453
+#: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
 msgstr "收缩查看视角 (360°)"
 
-#: src/libvlc-module.c:1454
+#: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
 msgstr "展开查看视角 (360°)"
 
-#: src/libvlc-module.c:1455
+#: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
 msgstr "顺时针滚动视角 (360°)"
 
-#: src/libvlc-module.c:1456
+#: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
 msgstr "逆时针滚动视角 (360°)"
 
-#: src/libvlc-module.c:1458
+#: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
 msgstr "在视频输出模式中切换壁纸输出"
 
-#: src/libvlc-module.c:1460
+#: src/libvlc-module.c:1466
 msgid "Toggle wallpaper mode in video output."
 msgstr "在视频输出中切换壁纸输出模式。"
 
-#: src/libvlc-module.c:1462
+#: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
 msgstr "切换音频设备"
 
-#: src/libvlc-module.c:1463
+#: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
 msgstr "在可用的音频设备之间循环切换"
 
-#: src/libvlc-module.c:1592 src/video_output/vout_intf.c:274
-#: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:502
+#: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
+#: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:513
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Snapshot"
 msgstr "截图"
 
-#: src/libvlc-module.c:1609
+#: src/libvlc-module.c:1615
 msgid "Window properties"
 msgstr "窗口属性"
 
-#: src/libvlc-module.c:1669
+#: src/libvlc-module.c:1675
 msgid "Subpictures"
 msgstr "子画面"
 
-#: src/libvlc-module.c:1677 modules/codec/subsdec.c:181
+#: src/libvlc-module.c:1683 modules/codec/subsdec.c:181
 #: modules/demux/subtitle.c:71 modules/demux/xiph_metadata.h:49
 #: modules/demux/xiph_metadata.h:62
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:158
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:178
-#: modules/gui/macosx/VLCMainMenu.m:440
+#: modules/gui/macosx/VLCMainMenu.m:451
 #: share/lua/http/dialogs/create_stream.html:153
 #: modules/gui/qt/ui/profiles.h:718 modules/gui/qt/ui/profiles.h:762
 #: modules/gui/qt/ui/profiles.h:765
 msgid "Subtitles"
 msgstr "字幕"
 
-#: src/libvlc-module.c:1697 modules/stream_out/transcode/transcode.c:116
+#: src/libvlc-module.c:1703 modules/stream_out/transcode/transcode.c:116
 msgid "Overlays"
 msgstr "覆盖"
 
-#: src/libvlc-module.c:1707
+#: src/libvlc-module.c:1713
 msgid "Track settings"
 msgstr "轨道设置"
 
-#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:316
+#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "Playback control"
 msgstr "播放控制"
 
-#: src/libvlc-module.c:1776
+#: src/libvlc-module.c:1782
 msgid "Default devices"
 msgstr "默认设备"
 
-#: src/libvlc-module.c:1783
+#: src/libvlc-module.c:1789
 msgid "Network settings"
 msgstr "网络设置"
 
-#: src/libvlc-module.c:1809
+#: src/libvlc-module.c:1827
 msgid "Socks proxy"
 msgstr "Socks 代理"
 
-#: src/libvlc-module.c:1818 modules/demux/xiph_metadata.h:55
+#: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
 msgstr "元数据"
 
-#: src/libvlc-module.c:1919
+#: src/libvlc-module.c:1937
 msgid "Decoders"
 msgstr "解码器"
 
-#: src/libvlc-module.c:1926 modules/access/avio.h:40
+#: src/libvlc-module.c:1944 modules/access/avio.h:40
 #: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:85
 msgid "Input"
 msgstr "输入"
 
-#: src/libvlc-module.c:1962
+#: src/libvlc-module.c:1980
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:2008
+#: src/libvlc-module.c:2026
 msgid "Special modules"
 msgstr "特殊模块"
 
-#: src/libvlc-module.c:2013 modules/gui/qt/dialogs/plugins.cpp:89
+#: src/libvlc-module.c:2031 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
 msgstr "插件"
 
-#: src/libvlc-module.c:2025
+#: src/libvlc-module.c:2043
 msgid "Performance options"
 msgstr "性能选项"
 
-#: src/libvlc-module.c:2044
+#: src/libvlc-module.c:2061
 msgid "Clock source"
 msgstr "时钟源"
 
-#: src/libvlc-module.c:2162
+#: src/libvlc-module.c:2179
 msgid "Hot keys"
 msgstr "热键"
 
-#: src/libvlc-module.c:2652
+#: src/libvlc-module.c:2669
 msgid "Jump sizes"
 msgstr "跳跃大小"
 
-#: src/libvlc-module.c:2737
+#: src/libvlc-module.c:2754
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr "打印 VLC 帮助 (可以和 --advanced 和 --help-verbose 一起使用)"
 
-#: src/libvlc-module.c:2740
+#: src/libvlc-module.c:2757
 msgid "Exhaustive help for VLC and its modules"
 msgstr "VLC 及其模块的全面帮助"
 
-#: src/libvlc-module.c:2742
+#: src/libvlc-module.c:2759
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 "打印 VLC 及其全部模块的帮助 (可以和 --advanced 和 --help-verbose 一起使用)"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2762
 msgid "ask for extra verbosity when displaying help"
 msgstr "在显示帮助时询问是否显示额外的解释"
 
-#: src/libvlc-module.c:2747
+#: src/libvlc-module.c:2764
 msgid "print a list of available modules"
 msgstr "打印一份可用模块的列表"
 
-#: src/libvlc-module.c:2749
+#: src/libvlc-module.c:2766
 msgid "print a list of available modules with extra detail"
 msgstr "打印一份带详细信息的可用模块列表"
 
-#: src/libvlc-module.c:2751
+#: src/libvlc-module.c:2768
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
@@ -4687,27 +4694,27 @@ msgstr ""
 "输出关于指定模块的帮助 (可以和 --advanced 和 --help-verbose 一起使用)。在模块"
 "名前面加 = 可严格匹配。"
 
-#: src/libvlc-module.c:2755
+#: src/libvlc-module.c:2772
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr "不会加载配置选项，也不会保存到配置文件"
 
-#: src/libvlc-module.c:2757
+#: src/libvlc-module.c:2774
 msgid "reset the current config to the default values"
 msgstr "重置当前配置为默认值"
 
-#: src/libvlc-module.c:2759
+#: src/libvlc-module.c:2776
 msgid "use alternate config file"
 msgstr "使用其他配置文件"
 
-#: src/libvlc-module.c:2761
+#: src/libvlc-module.c:2778
 msgid "resets the current plugins cache"
 msgstr "重置当前的插件缓存"
 
-#: src/libvlc-module.c:2763
+#: src/libvlc-module.c:2780
 msgid "print version information"
 msgstr "打印版本信息"
 
-#: src/libvlc-module.c:2803
+#: src/libvlc-module.c:2820
 msgid "core program"
 msgstr "主程序"
 
@@ -4751,9 +4758,8 @@ msgstr "浏览器搜索"
 msgid "Browser Stop"
 msgstr "浏览器停止"
 
-#: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231
-#: modules/gui/qt/dialogs/bookmarks.cpp:50
+#: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:370
+#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -4933,8 +4939,8 @@ msgstr "向上翻页"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
-#: modules/gui/macosx/VLCMainMenu.m:1331 modules/gui/macosx/VLCMainMenu.m:1332
-#: modules/gui/macosx/VLCMainMenu.m:1333
+#: modules/gui/macosx/VLCMainMenu.m:1347 modules/gui/macosx/VLCMainMenu.m:1348
+#: modules/gui/macosx/VLCMainMenu.m:1349
 #: modules/gui/qt/components/playlist/standardpanel.cpp:196
 #: modules/gui/qt/menus.cpp:831
 msgid "Pause"
@@ -4956,7 +4962,7 @@ msgstr "Tab"
 msgid "Up"
 msgstr "向上"
 
-#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:499
+#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:510
 msgid "Volume Down"
 msgstr "音量减小"
 
@@ -4964,7 +4970,7 @@ msgstr "音量减小"
 msgid "Volume Mute"
 msgstr "静音"
 
-#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
+#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:509
 msgid "Volume Up"
 msgstr "音量增大"
 
@@ -5027,7 +5033,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "无法以写入模式打开「%s」"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2719
+#: modules/demux/avi/avi.c:2713
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
@@ -5056,7 +5062,7 @@ msgstr "无法以写入模式打开「%s」"
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "Cancel"
 msgstr "取消"
 
@@ -5796,8 +5802,8 @@ msgstr "祖鲁语"
 msgid "Autoscale video"
 msgstr "自动缩放视频"
 
-#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:429
-#: modules/gui/macosx/VLCMainMenu.m:430
+#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:440
+#: modules/gui/macosx/VLCMainMenu.m:441
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:193
 #: modules/video_filter/croppadd.c:87 modules/gui/qt/ui/video_effects.h:1239
 msgid "Crop"
@@ -5806,8 +5812,8 @@ msgstr "裁剪"
 #: src/video_output/vout_intf.c:230 modules/access/decklink.cpp:92
 #: modules/access/linsys/linsys_hdsdi.c:78
 #: modules/access/linsys/linsys_sdi.c:74 modules/demux/rawvid.c:58
-#: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCMainMenu.m:428
-#: modules/gui/macosx/VLCMainMenu.m:1443
+#: modules/gui/macosx/VLCMainMenu.m:438 modules/gui/macosx/VLCMainMenu.m:439
+#: modules/gui/macosx/VLCMainMenu.m:1459
 msgid "Aspect ratio"
 msgstr "宽高比"
 
@@ -6552,8 +6558,7 @@ msgid ""
 "frequency. This is required to tune the receiver."
 msgstr "TV 频道被脉冲转发器按指定频率分组 (即混流)。调谐接收器时需要此项。"
 
-#: modules/access/dtv/access.c:61
-#: modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "调制 / 组合"
 
@@ -7160,7 +7165,7 @@ msgstr "FTP 输入"
 msgid "FTP upload output"
 msgstr "FTP 上传输出"
 
-#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:541
+#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
 msgid "Network interaction failed"
 msgstr "网络交互失败"
 
@@ -7172,52 +7177,32 @@ msgstr "VLC 无法连接指定的服务器。"
 msgid "VLC's connection to the given server was rejected."
 msgstr "VLC 到指定服务器的连接被拒绝。"
 
-#: modules/access/ftp.c:542
+#: modules/access/ftp.c:538
 msgid "Your account was rejected."
 msgstr "您的帐号已被拒绝。"
 
 #: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP 代理"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"要使用的 HTTP 代理必须是以下形式 http://[用户名@]我的代理.我的域名:我的端口/ "
-"的形式;如果为空将会尝试 http_proxy 环境变量。"
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "HTTP 代理密码"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "如果您的 HTTP 代理需要密码，请在这里设置它。"
-
-#: modules/access/http.c:69
 msgid "Auto re-connect"
 msgstr "自动重新连接"
 
-#: modules/access/http.c:71
+#: modules/access/http.c:61
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr "如果流被断开连接将会自动尝试重新连接。"
 
-#: modules/access/http.c:75
+#: modules/access/http.c:65
 msgid "HTTP input"
 msgstr "HTTP 输入"
 
-#: modules/access/http.c:77
+#: modules/access/http.c:67
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:318 modules/access/http/access.c:214
+#: modules/access/http.c:303 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "HTTP 身份验证"
 
-#: modules/access/http.c:319 modules/access/http/access.c:215
+#: modules/access/http.c:304 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "请为验证方案 %s 输入一个有效的登录名和密码。"
@@ -7337,8 +7322,7 @@ msgstr "音频基本流的声道数目"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42
-#: share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "宽度"
@@ -8000,7 +7984,7 @@ msgid "Screen Input"
 msgstr "屏幕输入"
 
 #: modules/access/screen/screen.c:99 modules/access/screen/xcb.c:70
-#: modules/gui/macosx/VLCMainMenu.m:600
+#: modules/gui/macosx/VLCMainMenu.m:611
 #: modules/gui/macosx/VLCOpenWindowController.m:207
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
@@ -8046,11 +8030,11 @@ msgstr "服务器端所用的 SFTP 端口号"
 msgid "SFTP input"
 msgstr "SFTP 输入"
 
-#: modules/access/sftp.c:400
+#: modules/access/sftp.c:399
 msgid "SFTP authentication"
 msgstr "SFTP 身份验证"
 
-#: modules/access/sftp.c:401
+#: modules/access/sftp.c:400
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr "请为到 %s 的 sftp 连接输入有效的登录名和密码"
@@ -8277,8 +8261,7 @@ msgstr "电台设备"
 msgid "Radio tuner device node."
 msgstr "无线电调谐器设备节点。"
 
-#: modules/access/v4l2/v4l2.c:75
-#: modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "频率"
 
@@ -10824,7 +10807,7 @@ msgstr "Direct3D11 视频加速"
 msgid "DirectX Video Acceleration (DXVA) 2.0"
 msgstr "DirectX 视频加速 (DXVA) 2.0"
 
-#: modules/codec/avcodec/encoder.c:373
+#: modules/codec/avcodec/encoder.c:370
 #, c-format
 msgid ""
 "It seems your Libav/FFmpeg (libavcodec) installation lacks the following "
@@ -10842,23 +10825,23 @@ msgstr ""
 "这不是 VLC media player 本身的问题。\n"
 "请不要联系 VideoLAN 项目组寻求此问题的帮助。\n"
 
-#: modules/codec/avcodec/encoder.c:869
+#: modules/codec/avcodec/encoder.c:866
 msgid "unknown"
 msgstr "未知"
 
-#: modules/codec/avcodec/encoder.c:869
+#: modules/codec/avcodec/encoder.c:866
 msgid "video"
 msgstr "视频"
 
-#: modules/codec/avcodec/encoder.c:870
+#: modules/codec/avcodec/encoder.c:867
 msgid "audio"
 msgstr "音频"
 
-#: modules/codec/avcodec/encoder.c:870
+#: modules/codec/avcodec/encoder.c:867
 msgid "subpicture"
 msgstr "子画面"
 
-#: modules/codec/avcodec/encoder.c:883
+#: modules/codec/avcodec/encoder.c:880
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "VLC 无法打开 %4.4s %s 编码器。"
@@ -11276,8 +11259,8 @@ msgstr "白色"
 msgid "Maroon"
 msgstr "红褐色"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:458
-#: modules/gui/macosx/VLCMainMenu.m:1088 modules/spu/marq.c:62
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:469
+#: modules/gui/macosx/VLCMainMenu.m:1104 modules/spu/marq.c:62
 #: modules/spu/rss.c:70 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119 modules/video_filter/colorthres.c:65
 msgid "Red"
@@ -11289,8 +11272,8 @@ msgstr "红色"
 msgid "Fuchsia"
 msgstr "紫红色"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:460
-#: modules/gui/macosx/VLCMainMenu.m:1092 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:471
+#: modules/gui/macosx/VLCMainMenu.m:1108 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/colorthres.c:65
 msgid "Yellow"
@@ -11301,8 +11284,8 @@ msgstr "黄色"
 msgid "Olive"
 msgstr "橄榄绿"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:459
-#: modules/gui/macosx/VLCMainMenu.m:1090 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:470
+#: modules/gui/macosx/VLCMainMenu.m:1106 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119
 msgid "Green"
@@ -11329,8 +11312,8 @@ msgstr "紫色"
 msgid "Navy"
 msgstr "藏青色"
 
-#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:461
-#: modules/gui/macosx/VLCMainMenu.m:1094 modules/spu/marq.c:64
+#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:472
+#: modules/gui/macosx/VLCMainMenu.m:1110 modules/spu/marq.c:64
 #: modules/spu/rss.c:72 modules/text_renderer/freetype/freetype.c:137
 #: modules/video_filter/ball.c:120 modules/video_filter/colorthres.c:65
 msgid "Blue"
@@ -13645,11 +13628,11 @@ msgstr "tesa"
 msgid "Fast"
 msgstr "快"
 
-#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
-#: modules/gui/macosx/VLCMainMenu.m:384
+#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:290
+#: modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/macosx/VLCSimplePrefsController.m:696
 #: modules/gui/qt/components/simple_preferences.cpp:673
-#: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
+#: modules/misc/gnutls.c:779 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
 msgstr "普通"
@@ -14616,7 +14599,7 @@ msgid "Avformat muxer"
 msgstr "Avformat 混流器"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:126 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:167 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "混流器"
 
@@ -14702,11 +14685,11 @@ msgstr "原样播放"
 msgid "Broken or missing Index"
 msgstr "索引损坏或缺失"
 
-#: modules/demux/avi/avi.c:2720
+#: modules/demux/avi/avi.c:2714
 msgid "Broken or missing AVI Index"
 msgstr "AVI 索引损坏或丢失"
 
-#: modules/demux/avi/avi.c:2721
+#: modules/demux/avi/avi.c:2715
 msgid "Fixing AVI Index..."
 msgstr "正在修复 AVI 索引..."
 
@@ -15309,7 +15292,7 @@ msgstr "供听觉障碍人士使用的清晰音频"
 msgid "Spoken subtitles for the visually impaired"
 msgstr "供视觉障碍人士使用的播报式字幕"
 
-#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:466
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "Teletext"
@@ -15735,7 +15718,7 @@ msgid "Slides (images)"
 msgstr "幻灯片 (图像)"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
-#: modules/gui/macosx/VLCMainMenu.m:330
+#: modules/gui/macosx/VLCMainMenu.m:339
 msgid "About VLC media player"
 msgstr "关于 VLC media player"
 
@@ -15745,7 +15728,7 @@ msgid "Credits"
 msgstr "贡献者名单"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:104
-#: modules/gui/macosx/VLCMainMenu.m:480 modules/gui/qt/dialogs/help.cpp:119
+#: modules/gui/macosx/VLCMainMenu.m:491 modules/gui/qt/dialogs/help.cpp:119
 msgid "License"
 msgstr "许可"
 
@@ -15807,7 +15790,7 @@ msgstr "封面与元数据装取器"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:112
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
-#: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
+#: modules/gui/macosx/VLCMainMenu.m:343 modules/gui/macosx/VLCMainMenu.m:344
 #: modules/gui/qt/dialogs/plugins.cpp:395
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
@@ -15823,7 +15806,7 @@ msgid "Find more addons online"
 msgstr "在线查找更多插件"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
-#: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
+#: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
 msgstr "插件管理器"
 
@@ -15840,8 +15823,7 @@ msgid "Name"
 msgstr "名称"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108
-#: modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "作者"
@@ -15947,7 +15929,7 @@ msgstr "输入新配置文件的名称:"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
-#: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
+#: modules/gui/macosx/VLCMainMenu.m:1165 modules/gui/macosx/VLCOutput.m:411
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 #: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
@@ -16021,7 +16003,7 @@ msgid "Clear"
 msgstr "清除"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:80
-#: modules/gui/macosx/VLCMainMenu.m:357
+#: modules/gui/macosx/VLCMainMenu.m:366
 msgid "Edit"
 msgstr "编辑"
 
@@ -16046,12 +16028,12 @@ msgstr "时间"
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1363
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "OK"
 msgstr "确定"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:131
-#: modules/gui/macosx/VLCMainMenu.m:1139
+#: modules/gui/macosx/VLCMainMenu.m:1155
 msgid "Untitled"
 msgstr "无标题"
 
@@ -16596,7 +16578,7 @@ msgid ""
 "This option allows the interface to change its icon on various occasions."
 msgstr "本选项允许界面在多种情况下自动更改图标。"
 
-#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1445
+#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1461
 msgid "Lock Aspect Ratio"
 msgstr "锁定宽高比"
 
@@ -16613,7 +16595,7 @@ msgstr ""
 "视频全屏播放期间，关闭 MacBook 的键盘背光。需要在「系统偏好设置」中禁用「自动"
 "亮度调节」。"
 
-#: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:366
+#: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
 msgstr "显示「向前」「向后」按钮"
 
@@ -16621,7 +16603,7 @@ msgstr "显示「向前」「向后」按钮"
 msgid "Shows the previous and next buttons in the main window."
 msgstr "在主窗口中显示向前与向后按钮。"
 
-#: modules/gui/macosx/macosx.m:119 modules/gui/macosx/VLCMainMenu.m:368
+#: modules/gui/macosx/macosx.m:119 modules/gui/macosx/VLCMainMenu.m:377
 msgid "Show Shuffle & Repeat Buttons"
 msgstr "显示「随机」「循环」按钮"
 
@@ -16629,7 +16611,7 @@ msgstr "显示「随机」「循环」按钮"
 msgid "Shows the shuffle and repeat buttons in the main window."
 msgstr "在主窗口中显示随机与循环按钮。"
 
-#: modules/gui/macosx/macosx.m:122 modules/gui/macosx/VLCMainMenu.m:370
+#: modules/gui/macosx/macosx.m:122 modules/gui/macosx/VLCMainMenu.m:379
 msgid "Show Audio Effects Button"
 msgstr "显示音频效果按钮"
 
@@ -16637,7 +16619,7 @@ msgstr "显示音频效果按钮"
 msgid "Shows the audio effects button in the main window."
 msgstr "在主窗口显示音频效果按钮。"
 
-#: modules/gui/macosx/macosx.m:125 modules/gui/macosx/VLCMainMenu.m:372
+#: modules/gui/macosx/macosx.m:125 modules/gui/macosx/VLCMainMenu.m:381
 msgid "Show Sidebar"
 msgstr "显示侧边栏"
 
@@ -16732,338 +16714,347 @@ msgstr "我们发现了旧版本的 VLC 偏好设置文件。"
 msgid "Move To Trash and Relaunch VLC"
 msgstr "移动到回收站并重新启动 VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:240
+#: modules/gui/macosx/VLCMainMenu.m:249
 #, c-format
 msgid "Level %i"
 msgstr "级别 %i"
 
-#: modules/gui/macosx/VLCMainMenu.m:279
+#: modules/gui/macosx/VLCMainMenu.m:288
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Smaller"
 msgstr "较小"
 
-#: modules/gui/macosx/VLCMainMenu.m:280
+#: modules/gui/macosx/VLCMainMenu.m:289
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Small"
 msgstr "小"
 
-#: modules/gui/macosx/VLCMainMenu.m:282
+#: modules/gui/macosx/VLCMainMenu.m:291
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Large"
 msgstr "大"
 
-#: modules/gui/macosx/VLCMainMenu.m:283
+#: modules/gui/macosx/VLCMainMenu.m:292
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Larger"
 msgstr "较大"
 
-#: modules/gui/macosx/VLCMainMenu.m:332
+#: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
 msgstr "检查更新..."
 
-#: modules/gui/macosx/VLCMainMenu.m:333
+#: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
 msgstr "偏好设置..."
 
-#: modules/gui/macosx/VLCMainMenu.m:339
+#: modules/gui/macosx/VLCMainMenu.m:348
 msgid "Services"
 msgstr "服务"
 
-#: modules/gui/macosx/VLCMainMenu.m:340
+#: modules/gui/macosx/VLCMainMenu.m:349
 msgid "Hide VLC"
 msgstr "隐藏 VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:341
+#: modules/gui/macosx/VLCMainMenu.m:350
 msgid "Hide Others"
 msgstr "隐藏其它"
 
-#: modules/gui/macosx/VLCMainMenu.m:342
+#: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:377
 msgid "Show All"
 msgstr "全部显示"
 
-#: modules/gui/macosx/VLCMainMenu.m:343
+#: modules/gui/macosx/VLCMainMenu.m:352
 msgid "Quit VLC"
 msgstr "退出 VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:345
+#: modules/gui/macosx/VLCMainMenu.m:354
 msgid "1:File"
 msgstr "1:文件"
 
-#: modules/gui/macosx/VLCMainMenu.m:346
+#: modules/gui/macosx/VLCMainMenu.m:355
 msgid "Advanced Open File..."
 msgstr "高级打开文件..."
 
-#: modules/gui/macosx/VLCMainMenu.m:347
+#: modules/gui/macosx/VLCMainMenu.m:356
 msgid "Open File..."
 msgstr "打开文件..."
 
-#: modules/gui/macosx/VLCMainMenu.m:348
+#: modules/gui/macosx/VLCMainMenu.m:357
 msgid "Open Disc..."
 msgstr "打开光盘..."
 
-#: modules/gui/macosx/VLCMainMenu.m:349
+#: modules/gui/macosx/VLCMainMenu.m:358
 msgid "Open Network..."
 msgstr "打开网络..."
 
-#: modules/gui/macosx/VLCMainMenu.m:350
+#: modules/gui/macosx/VLCMainMenu.m:359
 msgid "Open Capture Device..."
 msgstr "打开捕获设备..."
 
-#: modules/gui/macosx/VLCMainMenu.m:351
+#: modules/gui/macosx/VLCMainMenu.m:360
 msgid "Open Recent"
 msgstr "打开最近"
 
-#: modules/gui/macosx/VLCMainMenu.m:352
+#: modules/gui/macosx/VLCMainMenu.m:361
 msgid "Close Window"
 msgstr "关闭窗口"
 
-#: modules/gui/macosx/VLCMainMenu.m:353
+#: modules/gui/macosx/VLCMainMenu.m:362
 msgid "Convert / Stream..."
 msgstr "转换 / 串流..."
 
-#: modules/gui/macosx/VLCMainMenu.m:354
+#: modules/gui/macosx/VLCMainMenu.m:363
 msgid "Save Playlist..."
 msgstr "保存播放列表..."
 
-#: modules/gui/macosx/VLCMainMenu.m:355 modules/gui/macosx/VLCPlaylist.m:236
+#: modules/gui/macosx/VLCMainMenu.m:364 modules/gui/macosx/VLCPlaylist.m:236
 msgid "Reveal in Finder"
 msgstr "在 Finder 中显示"
 
-#: modules/gui/macosx/VLCMainMenu.m:358
+#: modules/gui/macosx/VLCMainMenu.m:367
 msgid "Cut"
 msgstr "剪切"
 
-#: modules/gui/macosx/VLCMainMenu.m:359
+#: modules/gui/macosx/VLCMainMenu.m:368
 msgid "Copy"
 msgstr "复制"
 
-#: modules/gui/macosx/VLCMainMenu.m:360
+#: modules/gui/macosx/VLCMainMenu.m:369
 msgid "Paste"
 msgstr "粘帖"
 
-#: modules/gui/macosx/VLCMainMenu.m:362 modules/gui/macosx/VLCPlaylist.m:234
+#: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:234
 msgid "Select All"
 msgstr "全部选择"
 
-#: modules/gui/macosx/VLCMainMenu.m:363
+#: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
 msgstr "查找"
 
-#: modules/gui/macosx/VLCMainMenu.m:365
+#: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
 msgstr "查看"
 
-#: modules/gui/macosx/VLCMainMenu.m:374
+#: modules/gui/macosx/VLCMainMenu.m:383
 msgid "Playlist Table Columns"
 msgstr "播放列表选择列"
 
-#: modules/gui/macosx/VLCMainMenu.m:376
+#: modules/gui/macosx/VLCMainMenu.m:385
 msgid "Playback"
 msgstr "播放"
 
-#: modules/gui/macosx/VLCMainMenu.m:382
+#: modules/gui/macosx/VLCMainMenu.m:391
 msgid "Playback Speed"
 msgstr "回放速度"
 
-#: modules/gui/macosx/VLCMainMenu.m:386
+#: modules/gui/macosx/VLCMainMenu.m:395
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
 msgstr "轨道同步"
 
-#: modules/gui/macosx/VLCMainMenu.m:392
+#: modules/gui/macosx/VLCMainMenu.m:401
 #: modules/gui/qt/components/controller.hpp:110
 msgid "A→B Loop"
 msgstr "A→B 循环"
 
-#: modules/gui/macosx/VLCMainMenu.m:393
+#: modules/gui/macosx/VLCMainMenu.m:402
 msgid "Quit after Playback"
 msgstr "播放后退出"
 
-#: modules/gui/macosx/VLCMainMenu.m:394
+#: modules/gui/macosx/VLCMainMenu.m:403
 msgid "Step Forward"
 msgstr "向前步进"
 
-#: modules/gui/macosx/VLCMainMenu.m:395
+#: modules/gui/macosx/VLCMainMenu.m:404
 msgid "Step Backward"
 msgstr "向后步进"
 
-#: modules/gui/macosx/VLCMainMenu.m:396
+#: modules/gui/macosx/VLCMainMenu.m:405
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
 msgid "Jump to Time"
 msgstr "转到时间"
 
-#: modules/gui/macosx/VLCMainMenu.m:405
+#: modules/gui/macosx/VLCMainMenu.m:406
+#, fuzzy
+msgid "Renderer"
+msgstr "渲染器(&R)"
+
+#: modules/gui/macosx/VLCMainMenu.m:407
+msgid "No renderer"
+msgstr "无渲染器"
+
+#: modules/gui/macosx/VLCMainMenu.m:416
 msgid "Increase Volume"
 msgstr "增大音量"
 
-#: modules/gui/macosx/VLCMainMenu.m:406
+#: modules/gui/macosx/VLCMainMenu.m:417
 msgid "Decrease Volume"
 msgstr "减小音量"
 
-#: modules/gui/macosx/VLCMainMenu.m:412 modules/gui/macosx/VLCMainMenu.m:413
+#: modules/gui/macosx/VLCMainMenu.m:423 modules/gui/macosx/VLCMainMenu.m:424
 msgid "Audio Device"
 msgstr "音频设备"
 
-#: modules/gui/macosx/VLCMainMenu.m:418
+#: modules/gui/macosx/VLCMainMenu.m:429
 msgid "Half Size"
 msgstr "一半尺寸"
 
-#: modules/gui/macosx/VLCMainMenu.m:419
+#: modules/gui/macosx/VLCMainMenu.m:430
 msgid "Normal Size"
 msgstr "普通尺寸"
 
-#: modules/gui/macosx/VLCMainMenu.m:420
+#: modules/gui/macosx/VLCMainMenu.m:431
 msgid "Double Size"
 msgstr "双倍尺寸"
 
-#: modules/gui/macosx/VLCMainMenu.m:421
+#: modules/gui/macosx/VLCMainMenu.m:432
 msgid "Fit to Screen"
 msgstr "适合屏幕"
 
-#: modules/gui/macosx/VLCMainMenu.m:423
+#: modules/gui/macosx/VLCMainMenu.m:434
 #: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
 msgstr "悬浮在顶部"
 
-#: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
+#: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "全屏视频设备"
 
-#: modules/gui/macosx/VLCMainMenu.m:437 modules/gui/macosx/VLCMainMenu.m:438
+#: modules/gui/macosx/VLCMainMenu.m:448 modules/gui/macosx/VLCMainMenu.m:449
 #: modules/video_filter/postproc.c:201
 msgid "Post processing"
 msgstr "后处理"
 
-#: modules/gui/macosx/VLCMainMenu.m:441
+#: modules/gui/macosx/VLCMainMenu.m:452
 msgid "Add Subtitle File..."
 msgstr "添加字幕文件..."
 
-#: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
+#: modules/gui/macosx/VLCMainMenu.m:453 modules/gui/macosx/VLCMainMenu.m:454
 msgid "Subtitles Track"
 msgstr "字幕轨道"
 
-#: modules/gui/macosx/VLCMainMenu.m:444
+#: modules/gui/macosx/VLCMainMenu.m:455
 msgid "Text Size"
 msgstr "文字大小"
 
-#: modules/gui/macosx/VLCMainMenu.m:445
+#: modules/gui/macosx/VLCMainMenu.m:456
 msgid "Text Color"
 msgstr "文字颜色"
 
-#: modules/gui/macosx/VLCMainMenu.m:446
+#: modules/gui/macosx/VLCMainMenu.m:457
 msgid "Outline Thickness"
 msgstr "轮廓宽度"
 
-#: modules/gui/macosx/VLCMainMenu.m:452 modules/gui/macosx/VLCMainMenu.m:453
+#: modules/gui/macosx/VLCMainMenu.m:463 modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Opacity"
 msgstr "背景不透明度"
 
-#: modules/gui/macosx/VLCMainMenu.m:454
+#: modules/gui/macosx/VLCMainMenu.m:465
 msgid "Background Color"
 msgstr "背景颜色"
 
-#: modules/gui/macosx/VLCMainMenu.m:456
+#: modules/gui/macosx/VLCMainMenu.m:467
 msgid "Transparent"
 msgstr "透明度"
 
-#: modules/gui/macosx/VLCMainMenu.m:457 modules/gui/macosx/VLCMainMenu.m:1086
+#: modules/gui/macosx/VLCMainMenu.m:468 modules/gui/macosx/VLCMainMenu.m:1102
 msgid "Index"
 msgstr "索引"
 
-#: modules/gui/macosx/VLCMainMenu.m:463
+#: modules/gui/macosx/VLCMainMenu.m:474
 msgid "Window"
 msgstr "窗口"
 
-#: modules/gui/macosx/VLCMainMenu.m:464
+#: modules/gui/macosx/VLCMainMenu.m:475
 msgid "Minimize"
 msgstr "最小化"
 
-#: modules/gui/macosx/VLCMainMenu.m:466
+#: modules/gui/macosx/VLCMainMenu.m:477
 msgid "Player..."
 msgstr "播放器..."
 
-#: modules/gui/macosx/VLCMainMenu.m:467
+#: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Main Window..."
 msgstr "主窗口..."
 
-#: modules/gui/macosx/VLCMainMenu.m:468
+#: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Audio Effects..."
 msgstr "音频效果..."
 
-#: modules/gui/macosx/VLCMainMenu.m:469
+#: modules/gui/macosx/VLCMainMenu.m:480
 msgid "Video Effects..."
 msgstr "视频效果..."
 
-#: modules/gui/macosx/VLCMainMenu.m:470
+#: modules/gui/macosx/VLCMainMenu.m:481
 msgid "Bookmarks..."
 msgstr "书签..."
 
-#: modules/gui/macosx/VLCMainMenu.m:471
+#: modules/gui/macosx/VLCMainMenu.m:482
 msgid "Playlist..."
 msgstr "播放列表..."
 
-#: modules/gui/macosx/VLCMainMenu.m:472 modules/gui/macosx/VLCPlaylist.m:235
+#: modules/gui/macosx/VLCMainMenu.m:483 modules/gui/macosx/VLCPlaylist.m:235
 msgid "Media Information..."
 msgstr "媒体信息..."
 
-#: modules/gui/macosx/VLCMainMenu.m:473
+#: modules/gui/macosx/VLCMainMenu.m:484
 msgid "Messages..."
 msgstr "消息..."
 
-#: modules/gui/macosx/VLCMainMenu.m:474
+#: modules/gui/macosx/VLCMainMenu.m:485
 msgid "Errors and Warnings..."
 msgstr "错误和警告..."
 
-#: modules/gui/macosx/VLCMainMenu.m:476
+#: modules/gui/macosx/VLCMainMenu.m:487
 msgid "Bring All to Front"
 msgstr "显示所有窗口"
 
-#: modules/gui/macosx/VLCMainMenu.m:478 modules/gui/qt/dialogs/help.cpp:54
+#: modules/gui/macosx/VLCMainMenu.m:489 modules/gui/qt/dialogs/help.cpp:54
 #: modules/gui/qt/menus.cpp:950 modules/gui/qt/menus.cpp:1137
 msgid "Help"
 msgstr "帮助"
 
-#: modules/gui/macosx/VLCMainMenu.m:479
+#: modules/gui/macosx/VLCMainMenu.m:490
 msgid "VLC media player Help..."
 msgstr "VLC media player 帮助..."
 
-#: modules/gui/macosx/VLCMainMenu.m:481
+#: modules/gui/macosx/VLCMainMenu.m:492
 msgid "Online Documentation..."
 msgstr "在线文档..."
 
-#: modules/gui/macosx/VLCMainMenu.m:482
+#: modules/gui/macosx/VLCMainMenu.m:493
 msgid "VideoLAN Website..."
 msgstr "VideoLAN 网站..."
 
-#: modules/gui/macosx/VLCMainMenu.m:483
+#: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Make a donation..."
 msgstr "捐献..."
 
-#: modules/gui/macosx/VLCMainMenu.m:484
+#: modules/gui/macosx/VLCMainMenu.m:495
 msgid "Online Forum..."
 msgstr "在线论坛..."
 
-#: modules/gui/macosx/VLCMainMenu.m:1143
+#: modules/gui/macosx/VLCMainMenu.m:1159
 msgid "File Format:"
 msgstr "文件格式:"
 
-#: modules/gui/macosx/VLCMainMenu.m:1144
+#: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "Extended M3U"
 msgstr "扩展 M3U"
 
-#: modules/gui/macosx/VLCMainMenu.m:1145
+#: modules/gui/macosx/VLCMainMenu.m:1161
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML 可分享播放列表格式 (XSPF)"
 
-#: modules/gui/macosx/VLCMainMenu.m:1146
+#: modules/gui/macosx/VLCMainMenu.m:1162
 #: modules/gui/qt/dialogs_provider.cpp:642
 msgid "HTML playlist"
 msgstr "HTML 播放列表"
 
-#: modules/gui/macosx/VLCMainMenu.m:1148
+#: modules/gui/macosx/VLCMainMenu.m:1164
 msgid "Save Playlist"
 msgstr "保存播放列表"
 
@@ -17278,7 +17269,7 @@ msgid "Enable DVD menus"
 msgstr "启用 DVD 菜单"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:164
+#: modules/stream_out/chromecast/cast.cpp:205
 msgid "IP Address"
 msgstr "IP 地址"
 
@@ -17543,28 +17534,6 @@ msgstr "在保存元数据时发生错误"
 #: modules/gui/macosx/VLCPlaylistInfo.m:341
 msgid "VLC was unable to save the meta data."
 msgstr "VLC 无法保存元数据。"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:72
-#: modules/gui/macosx/VLCRendererMenuController.m:144
-msgid "Renderer discovery off"
-msgstr "渲染器发现 关闭"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:75
-#: modules/gui/macosx/VLCRendererMenuController.m:145
-msgid "Enable renderer discovery"
-msgstr "启用渲染器发现"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:77
-msgid "No renderer"
-msgstr "无渲染器"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:134
-msgid "Renderer discovery on"
-msgstr "渲染器发现 开启"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:135
-msgid "Disable renderer discovery"
-msgstr "禁用渲染器发现"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
@@ -17996,8 +17965,7 @@ msgid "sec."
 msgstr "秒"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391
-#: modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "音频/视频"
 
@@ -19658,11 +19626,10 @@ msgid "Extract"
 msgstr "提取"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84
-#: modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -19674,8 +19641,7 @@ msgstr "关闭(&C)"
 msgid "Bytes"
 msgstr "字节"
 
-#: modules/gui/qt/dialogs/convert.cpp:48
-#: modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "转换"
 
@@ -20089,8 +20055,7 @@ msgstr "版本"
 msgid "Website"
 msgstr "网站"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533
-#: modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "文件"
 
@@ -20743,19 +20708,19 @@ msgstr "显示 VLC media player (&W)"
 msgid "&Open Media"
 msgstr "打开媒体(&O)"
 
-#: modules/gui/qt/menus.cpp:1631
+#: modules/gui/qt/menus.cpp:1633
 msgid "&Clear"
 msgstr "清除(&C)"
 
-#: modules/gui/qt/menus.cpp:1639
+#: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
 msgstr "渲染器(&R)"
 
-#: modules/gui/qt/menus.cpp:1643
+#: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
 msgstr "<本地>"
 
-#: modules/gui/qt/menus.cpp:1656
+#: modules/gui/qt/menus.cpp:1658
 msgid "Scanning..."
 msgstr "正在扫描..."
 
@@ -22317,13 +22282,13 @@ msgstr "acoustid"
 msgid "Track fingerprinter (based on Acoustid)"
 msgstr "轨道指纹识别服务 (基于 Acoustid)"
 
-#: modules/misc/gnutls.c:477
+#: modules/misc/gnutls.c:485
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr "然而，服务器出示的安全证书未知，无法通过任何可信证书机构（CA）的验证。"
 
-#: modules/misc/gnutls.c:483
+#: modules/misc/gnutls.c:491
 msgid ""
 "However, the security certificate presented by the server changed since the "
 "previous visit and was not authenticated by any trusted Certificate "
@@ -22332,21 +22297,21 @@ msgstr ""
 "然而，服务器出示的安全证书与上次访问时出示的不同，且无法通过任何可信证书机构"
 "（CA）的验证。"
 
-#: modules/misc/gnutls.c:494 modules/misc/gnutls.c:515
-#: modules/misc/securetransport.c:338
+#: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
+#: modules/misc/securetransport.c:344
 msgid "Abort"
 msgstr "中止"
 
-#: modules/misc/gnutls.c:494
+#: modules/misc/gnutls.c:502
 msgid "View certificate"
 msgstr "查看证书"
 
-#: modules/misc/gnutls.c:495 modules/misc/gnutls.c:516
-#: modules/misc/securetransport.c:340
+#: modules/misc/gnutls.c:503 modules/misc/gnutls.c:524
+#: modules/misc/securetransport.c:346
 msgid "Insecure site"
 msgstr "不安全的站点"
 
-#: modules/misc/gnutls.c:496
+#: modules/misc/gnutls.c:504
 #, c-format
 msgid ""
 "You attempted to reach %s. %s\n"
@@ -22361,15 +22326,15 @@ msgstr ""
 "\n"
 "若您没有把握，请立即中止。\n"
 
-#: modules/misc/gnutls.c:515
+#: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
 msgstr "接受 24 小时"
 
-#: modules/misc/gnutls.c:515
+#: modules/misc/gnutls.c:523
 msgid "Accept permanently"
 msgstr "永久接受"
 
-#: modules/misc/gnutls.c:517
+#: modules/misc/gnutls.c:525
 #, c-format
 msgid ""
 "This is the certificate presented by %s:\n"
@@ -22382,31 +22347,31 @@ msgstr ""
 "\n"
 "若您对此存在疑问，请选择「中止」。\n"
 
-#: modules/misc/gnutls.c:748
+#: modules/misc/gnutls.c:756
 msgid "Use system trust database"
 msgstr "使用系统信任数据库"
 
-#: modules/misc/gnutls.c:750
+#: modules/misc/gnutls.c:758
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr "验证 TLS 会话时，信任操作系统信任数据库中存储的证书机构（CA）根证书。"
 
-#: modules/misc/gnutls.c:753
+#: modules/misc/gnutls.c:761
 msgid "Trust directory"
 msgstr "信任目录"
 
-#: modules/misc/gnutls.c:755
+#: modules/misc/gnutls.c:763
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr "验证 TLS 会话时，信任指定目录中存储的证书机构（CA）根证书。"
 
-#: modules/misc/gnutls.c:758
+#: modules/misc/gnutls.c:766
 msgid "TLS cipher priorities"
 msgstr "TLS 算法优先级"
 
-#: modules/misc/gnutls.c:759
+#: modules/misc/gnutls.c:767
 msgid ""
 "Ciphers, key exchange methods, hash functions and compression methods can be "
 "selected. Refer to GNU TLS documentation for detailed syntax."
@@ -22414,27 +22379,27 @@ msgstr ""
 "可以选择算法、密钥交换方法、hash 功能以及压缩方法。详细语法请参考 GNU TLS 文"
 "档。"
 
-#: modules/misc/gnutls.c:770
+#: modules/misc/gnutls.c:778
 msgid "Performance (prioritize faster ciphers)"
 msgstr "性能 (较快算法优先)"
 
-#: modules/misc/gnutls.c:772
+#: modules/misc/gnutls.c:780
 msgid "Secure 128-bits (exclude 256-bits ciphers)"
 msgstr "安全 128 位 (排除 256 位算法)"
 
-#: modules/misc/gnutls.c:773
+#: modules/misc/gnutls.c:781
 msgid "Secure 256-bits (prioritize 256-bits ciphers)"
 msgstr "安全 256 位 (256 位算法优先)"
 
-#: modules/misc/gnutls.c:774
+#: modules/misc/gnutls.c:782
 msgid "Export (include insecure ciphers)"
 msgstr "导出 (包括不安全算法)"
 
-#: modules/misc/gnutls.c:779
+#: modules/misc/gnutls.c:787
 msgid "GNU TLS transport layer security"
 msgstr "GNU TLS 传输层安全"
 
-#: modules/misc/gnutls.c:793
+#: modules/misc/gnutls.c:801
 msgid "GNU TLS server"
 msgstr "GNU TLS 服务器"
 
@@ -22527,7 +22492,7 @@ msgstr "OS X 及 iOS 的 TLS 支持"
 msgid "TLS server support for OS X"
 msgstr "OS X 的 TLS 服务器支持"
 
-#: modules/misc/securetransport.c:330
+#: modules/misc/securetransport.c:336
 #, c-format
 msgid ""
 "You attempted to reach %s. However the security certificate presented by the "
@@ -22543,7 +22508,7 @@ msgstr ""
 "\n"
 "若您对此存在疑问，请立刻中止访问。\n"
 
-#: modules/misc/securetransport.c:339
+#: modules/misc/securetransport.c:345
 msgid "Accept certificate temporarily"
 msgstr "临时接受证书"
 
@@ -23029,8 +22994,7 @@ msgstr "MPEG 视频"
 msgid "VC-1 packetizer"
 msgstr "VC-1 封包器"
 
-#: modules/services_discovery/avahi.c:52
-#: modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf 网络服务"
 
@@ -23269,7 +23233,7 @@ msgid "Applications"
 msgstr "应用程序"
 
 #: modules/services_discovery/xcb_apps.c:361
-#: modules/video_output/win32/direct3d9.c:315
+#: modules/video_output/win32/direct3d9.c:318
 msgid "Desktop"
 msgstr "桌面"
 
@@ -24180,98 +24144,98 @@ msgstr "默认: 90 秒"
 msgid "Chromaprint stream output"
 msgstr "Chromaprint 串流输出"
 
-#: modules/stream_out/chromecast/cast.cpp:121
+#: modules/stream_out/chromecast/cast.cpp:162
 msgid "HTTP port"
 msgstr "HTTP 端口"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:163
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr "设置用于将媒体串流到 Chromecast 的本地服务器 HTTP 端口。"
 
-#: modules/stream_out/chromecast/cast.cpp:125
+#: modules/stream_out/chromecast/cast.cpp:166
 msgid "The Chromecast receiver can receive video."
 msgstr "Chromecast 接收器可接收视频。"
 
-#: modules/stream_out/chromecast/cast.cpp:127
+#: modules/stream_out/chromecast/cast.cpp:168
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr "将所使用的混流器设为串流到 Chromecast。"
 
-#: modules/stream_out/chromecast/cast.cpp:128
+#: modules/stream_out/chromecast/cast.cpp:169
 msgid "MIME content type"
 msgstr "MIME 内容类型"
 
-#: modules/stream_out/chromecast/cast.cpp:129
+#: modules/stream_out/chromecast/cast.cpp:170
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr "设置发给 Chromecast 的媒体 MIME 内容类型。"
 
-#: modules/stream_out/chromecast/cast.cpp:130
-#: modules/stream_out/chromecast/cast.cpp:525
+#: modules/stream_out/chromecast/cast.cpp:171
+#: modules/stream_out/chromecast/cast.cpp:855
 msgid "Performance warning"
 msgstr "性能警告"
 
-#: modules/stream_out/chromecast/cast.cpp:131
+#: modules/stream_out/chromecast/cast.cpp:172
 msgid "Display a performance warning when transcoding"
 msgstr "转码时显示性能警告"
 
-#: modules/stream_out/chromecast/cast.cpp:132
+#: modules/stream_out/chromecast/cast.cpp:173
 msgid "Enable Audio passthrough"
 msgstr "启用音频呈递"
 
-#: modules/stream_out/chromecast/cast.cpp:133
+#: modules/stream_out/chromecast/cast.cpp:174
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "若您的接收设备不支持 Dolby® 技术，请禁用。"
 
-#: modules/stream_out/chromecast/cast.cpp:155
+#: modules/stream_out/chromecast/cast.cpp:196
 msgid "High (high quality and high bandwidth)"
 msgstr "高 (高质量，高带宽占用)"
 
-#: modules/stream_out/chromecast/cast.cpp:156
+#: modules/stream_out/chromecast/cast.cpp:197
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr "中 (中等质量，中等带宽占用)"
 
-#: modules/stream_out/chromecast/cast.cpp:157
+#: modules/stream_out/chromecast/cast.cpp:198
 msgid "Low (low quality and low bandwidth)"
 msgstr "低 (低质量，低带宽占用)"
 
-#: modules/stream_out/chromecast/cast.cpp:158
+#: modules/stream_out/chromecast/cast.cpp:199
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "低 CPU (低质量，高带宽占用)"
 
-#: modules/stream_out/chromecast/cast.cpp:161
+#: modules/stream_out/chromecast/cast.cpp:202
 msgid "Conversion quality"
 msgstr "转换质量"
 
-#: modules/stream_out/chromecast/cast.cpp:162
+#: modules/stream_out/chromecast/cast.cpp:203
 msgid "Change this option to increase conversion speed or quality."
 msgstr "更改该选项可提高转换速度/质量。"
 
-#: modules/stream_out/chromecast/cast.cpp:165
+#: modules/stream_out/chromecast/cast.cpp:206
 msgid "IP Address of the Chromecast."
 msgstr "Chromecast 的 IP 地址。"
 
-#: modules/stream_out/chromecast/cast.cpp:166
+#: modules/stream_out/chromecast/cast.cpp:207
 msgid "Chromecast port"
 msgstr "Chromecast 端口"
 
-#: modules/stream_out/chromecast/cast.cpp:167
+#: modules/stream_out/chromecast/cast.cpp:208
 msgid "The port used to talk to the Chromecast."
 msgstr "用于与 Chromecast 沟通的端口。"
 
-#: modules/stream_out/chromecast/cast.cpp:171
+#: modules/stream_out/chromecast/cast.cpp:214
 msgid "Chromecast"
 msgstr "Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:172
+#: modules/stream_out/chromecast/cast.cpp:215
 msgid "Chromecast stream output"
 msgstr "Chromecast 流输出"
 
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "Ok, Don't warn me again"
 msgstr "确定，不再显示警告"
 
-#: modules/stream_out/chromecast/cast.cpp:526
+#: modules/stream_out/chromecast/cast.cpp:856
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -24279,7 +24243,7 @@ msgstr ""
 "cast 此视频需要进行格式转换。此类转换将令处理器全速运转，可能会迅速耗尽您的电"
 "池。"
 
-#: modules/stream_out/chromecast/chromecast_demux.cpp:391
+#: modules/stream_out/chromecast/chromecast_demux.cpp:339
 msgid "Chromecast demux wrapper"
 msgstr "chromecast 分流封包器"
 
@@ -28731,6 +28695,26 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "媒体管理器列表"
+
+#~ msgid "Inhibit the power management daemon during playback"
+#~ msgstr "播放时关闭电源管理服务"
+
+#~ msgid ""
+#~ "Inhibits the power management daemon during any playback, to avoid the "
+#~ "computer being suspended because of inactivity."
+#~ msgstr "在播放时关闭电源管理服务，防止计算机由于长时间无活动而被关闭。"
+
+#~ msgid "Renderer discovery off"
+#~ msgstr "渲染器发现 关闭"
+
+#~ msgid "Enable renderer discovery"
+#~ msgstr "启用渲染器发现"
+
+#~ msgid "Renderer discovery on"
+#~ msgstr "渲染器发现 开启"
+
+#~ msgid "Disable renderer discovery"
+#~ msgstr "禁用渲染器发现"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-rc8\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-01-30 00:41+0100\n"
+"POT-Creation-Date: 2018-02-06 22:47+0100\n"
 "PO-Revision-Date: 2016-04-04 16:53+0000\n"
 "Last-Translator: julen, 2017\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
@@ -79,10 +79,10 @@ msgstr "VLCren kontrol-interfazeetarako ezarpenak"
 msgid "Hotkeys settings"
 msgstr "Laster-teklen ezarpenak"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3091
-#: src/libvlc-module.c:1486 modules/access/imem.c:64
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3095 src/libvlc-module.c:1492
+#: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
-#: modules/gui/macosx/VLCMainMenu.m:404 modules/gui/macosx/VLCOutput.m:92
+#: modules/gui/macosx/VLCMainMenu.m:415 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/info_panels.cpp:572
@@ -117,7 +117,7 @@ msgid "Audio resampler"
 msgstr "Audio berlagingailua"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
-#: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCMainMenu.m:415
+#: modules/gui/macosx/VLCMainMenu.m:425 modules/gui/macosx/VLCMainMenu.m:426
 msgid "Visualizations"
 msgstr "Bistaratzeak"
 
@@ -134,7 +134,7 @@ msgstr "Irteera-moduluak"
 msgid "General settings for audio output modules."
 msgstr "Audio-irteeretarako moduluen ezarpen orokorrak."
 
-#: include/vlc_config_cat.h:69 src/libvlc-module.c:2009
+#: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
@@ -144,17 +144,17 @@ msgstr "Askotarikoak"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Askotariko audio-ezarpenak eta moduluak."
 
-#: include/vlc_config_cat.h:73 src/input/es_out.c:3135 src/libvlc-module.c:142
-#: src/libvlc-module.c:1545 modules/access/imem.c:64
+#: include/vlc_config_cat.h:73 src/input/es_out.c:3139 src/libvlc-module.c:142
+#: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
-#: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCOutput.m:82
+#: modules/gui/macosx/VLCMainMenu.m:428 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
 #: modules/gui/macosx/VLCSimplePrefsController.m:231
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:124 modules/stream_out/es.c:102
+#: modules/stream_out/chromecast/cast.cpp:165 modules/stream_out/es.c:102
 #: modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
@@ -273,7 +273,7 @@ msgstr ""
 msgid "General input settings. Use with care..."
 msgstr "Sarrera orokorraren ezarpenak. Kontuz erabili..."
 
-#: include/vlc_config_cat.h:127 src/libvlc-module.c:1944
+#: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
 msgid "Stream output"
 msgstr "Transmisio jarraituaren irteera"
@@ -375,7 +375,7 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLCren eskatu ahalako bideoaren inplementazioa"
 
-#: include/vlc_config_cat.h:173 src/libvlc-module.c:2053
+#: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
 #: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
 #: modules/gui/macosx/VLCMainWindow.m:296
@@ -412,7 +412,7 @@ msgstr ""
 "Zerbitzuen aurkikuntzako moduluak erreprodukzio-zerrendari automatikoki "
 "elementuak gehitzen dizkioten baliabideak dira."
 
-#: include/vlc_config_cat.h:184 src/libvlc-module.c:1844
+#: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
 #: modules/gui/qt/dialogs/extended.cpp:93
 #: modules/gui/qt/ui/video_effects.h:1308
 msgid "Advanced"
@@ -485,9 +485,9 @@ msgstr "&Honi buruz"
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:64
 #: modules/gui/macosx/VLCControlsBarCommon.m:394
-#: modules/gui/macosx/VLCMainMenu.m:377 modules/gui/macosx/VLCMainMenu.m:487
-#: modules/gui/macosx/VLCMainMenu.m:494 modules/gui/macosx/VLCMainMenu.m:1324
-#: modules/gui/macosx/VLCMainMenu.m:1325 modules/gui/macosx/VLCMainMenu.m:1326
+#: modules/gui/macosx/VLCMainMenu.m:386 modules/gui/macosx/VLCMainMenu.m:498
+#: modules/gui/macosx/VLCMainMenu.m:505 modules/gui/macosx/VLCMainMenu.m:1340
+#: modules/gui/macosx/VLCMainMenu.m:1341 modules/gui/macosx/VLCMainMenu.m:1342
 #: modules/gui/macosx/VLCPlaylist.m:230
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:539 modules/gui/qt/ui/open.h:261
@@ -535,17 +535,17 @@ msgid "Save..."
 msgstr "Gorde..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
-#: modules/gui/macosx/VLCMainMenu.m:391
+#: modules/gui/macosx/VLCMainMenu.m:400
 msgid "Repeat All"
 msgstr "Errepikatu dena"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
-#: modules/gui/macosx/VLCMainMenu.m:390
+#: modules/gui/macosx/VLCMainMenu.m:399
 msgid "Repeat One"
 msgstr "Errepikatu bat"
 
-#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1423
-#: modules/gui/macosx/VLCMainMenu.m:389
+#: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
+#: modules/gui/macosx/VLCMainMenu.m:398
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Random"
@@ -654,8 +654,8 @@ msgstr "Audio-iragazkiak huts egin du"
 msgid "The maximum number of filters (%u) was reached."
 msgstr "Iragazki kopuru maximora (%u) iritsi da."
 
-#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:943
-#: src/libvlc-module.c:544 modules/gui/macosx/VLCMainMenu.m:234
+#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:947
+#: src/libvlc-module.c:540 modules/gui/macosx/VLCMainMenu.m:243
 #: modules/gui/macosx/VLCMainWindow.m:1002 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "Desgaitu"
@@ -684,8 +684,8 @@ msgstr "Audio-iragazkiak"
 msgid "Replay gain"
 msgstr "Erreprodukzio-irabazia"
 
-#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:410
-#: modules/gui/macosx/VLCMainMenu.m:411
+#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:421
+#: modules/gui/macosx/VLCMainMenu.m:422
 msgid "Stereo audio mode"
 msgstr "Estereo\taudio modua"
 
@@ -709,7 +709,7 @@ msgstr "Dolby Surround"
 msgid "Stereo"
 msgstr "Estereoa"
 
-#: src/audio_output/output.c:448 src/input/es_out.c:3232
+#: src/audio_output/output.c:448 src/input/es_out.c:3236
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
@@ -754,8 +754,7 @@ msgstr "Aurikularrak"
 #: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
 #: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
 #: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
-#: modules/access/v4l2/v4l2.c:137
-#: modules/gui/qt/components/open_panels.cpp:974
+#: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:974
 #: modules/gui/qt/components/simple_preferences.cpp:370
 msgid "Automatic"
 msgstr "Automatikoa"
@@ -959,8 +958,8 @@ msgstr "paketatzailea"
 msgid "decoder"
 msgstr "deskodetzailea"
 
-#: src/input/decoder.c:1909 src/input/decoder.c:2190
-#: modules/codec/avcodec/encoder.c:368 modules/codec/avcodec/encoder.c:882
+#: src/input/decoder.c:1909 src/input/decoder.c:2191
+#: modules/codec/avcodec/encoder.c:365 modules/codec/avcodec/encoder.c:879
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "Transmisio jarraituak / Transkodeketak huts egin du"
@@ -970,55 +969,55 @@ msgstr "Transmisio jarraituak / Transkodeketak huts egin du"
 msgid "VLC could not open the %s module."
 msgstr "VLCk ezin izan du %s deskodetzailea ireki."
 
-#: src/input/decoder.c:2191
+#: src/input/decoder.c:2192
 msgid "VLC could not open the decoder module."
 msgstr "VLCk ezin izan du %s deskodetzailea ireki."
 
-#: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
+#: src/input/es_out.c:967 src/input/es_out.c:972 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
 msgstr "Pista"
 
-#: src/input/es_out.c:1185
+#: src/input/es_out.c:1189
 #, c-format
 msgid "%s [%s %d]"
 msgstr "%s [%s %d]"
 
-#: src/input/es_out.c:1186 src/input/es_out.c:1191 src/input/es_out.c:1206
-#: src/input/var.c:160 src/libvlc-module.c:568
-#: modules/gui/macosx/VLCMainMenu.m:397 modules/gui/macosx/VLCMainMenu.m:398
+#: src/input/es_out.c:1190 src/input/es_out.c:1195 src/input/es_out.c:1210
+#: src/input/var.c:160 src/libvlc-module.c:564
+#: modules/gui/macosx/VLCMainMenu.m:408 modules/gui/macosx/VLCMainMenu.m:409
 msgid "Program"
 msgstr "Programa"
 
-#: src/input/es_out.c:1216
+#: src/input/es_out.c:1220
 #, c-format
 msgid "Stream %d"
 msgstr "Transmisio jarraitua %d"
 
-#: src/input/es_out.c:1468 src/input/es_out.c:1470
+#: src/input/es_out.c:1472 src/input/es_out.c:1474
 msgid "Scrambled"
 msgstr "Zifratuta"
 
-#: src/input/es_out.c:1468 modules/keystore/keychain.m:40
+#: src/input/es_out.c:1472 modules/keystore/keychain.m:40
 #: modules/lua/extension.c:1191
 msgid "Yes"
 msgstr "Bai"
 
-#: src/input/es_out.c:2135
+#: src/input/es_out.c:2139
 #, c-format
 msgid "DTVCC Closed captions %u"
 msgstr "DTVCC azpititulu ezkutuak %u"
 
-#: src/input/es_out.c:2137
+#: src/input/es_out.c:2141
 #, c-format
 msgid "Closed captions %u"
 msgstr "Hautazko epigrafeak %u"
 
-#: src/input/es_out.c:3067
+#: src/input/es_out.c:3071
 msgid "Original ID"
 msgstr "Jatorrizko identifikatzailea"
 
-#: src/input/es_out.c:3075 src/input/es_out.c:3078 modules/access/imem.c:67
+#: src/input/es_out.c:3079 src/input/es_out.c:3082 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:173
 #: modules/gui/qt/ui/profiles.h:728 modules/gui/qt/ui/profiles.h:754
@@ -1026,48 +1025,48 @@ msgstr "Jatorrizko identifikatzailea"
 msgid "Codec"
 msgstr "Kodeka"
 
-#: src/input/es_out.c:3082 src/input/meta.c:66 modules/access/imem.c:71
+#: src/input/es_out.c:3086 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:311
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "Hizkuntza"
 
-#: src/input/es_out.c:3085 src/input/meta.c:61
+#: src/input/es_out.c:3089 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
-#: modules/gui/macosx/VLCPlaylist.m:112
-#: modules/gui/qt/dialogs/bookmarks.cpp:75 modules/gui/qt/dialogs/epg.cpp:55
+#: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
+#: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "Deskribapena"
 
-#: src/input/es_out.c:3091 src/input/es_out.c:3135 src/input/es_out.c:3325
+#: src/input/es_out.c:3095 src/input/es_out.c:3139 src/input/es_out.c:3329
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
 msgid "Type"
 msgstr "Mota"
 
-#: src/input/es_out.c:3094
+#: src/input/es_out.c:3098
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
 #: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:756
 msgid "Channels"
 msgstr "Kanalak"
 
-#: src/input/es_out.c:3099 modules/access/alsa.c:39 modules/access/imem.c:75
+#: src/input/es_out.c:3103 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
 msgstr "Lagin-emaria"
 
-#: src/input/es_out.c:3099
+#: src/input/es_out.c:3103
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:3109
+#: src/input/es_out.c:3113
 msgid "Bits per sample"
 msgstr "Bit lagineko"
 
-#: src/input/es_out.c:3114 modules/access_output/shout.c:92
+#: src/input/es_out.c:3118 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
@@ -1075,33 +1074,33 @@ msgstr "Bit lagineko"
 msgid "Bitrate"
 msgstr "Bit-emaria"
 
-#: src/input/es_out.c:3114
+#: src/input/es_out.c:3118
 #, c-format
 msgid "%u kb/s"
 msgstr "%u kb/s"
 
-#: src/input/es_out.c:3126
+#: src/input/es_out.c:3130
 msgid "Track replay gain"
 msgstr "Pistaren erreprodukzio-irabazia"
 
-#: src/input/es_out.c:3128
+#: src/input/es_out.c:3132
 msgid "Album replay gain"
 msgstr "Albumaren erreprodukzio-irabazia"
 
-#: src/input/es_out.c:3129
+#: src/input/es_out.c:3133
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:3139
+#: src/input/es_out.c:3143
 msgid "Video resolution"
 msgstr "Bideo-bereizmena"
 
-#: src/input/es_out.c:3144
+#: src/input/es_out.c:3148
 msgid "Buffer dimensions"
 msgstr "Buffer tamaina"
 
-#: src/input/es_out.c:3154 src/input/es_out.c:3157 modules/access/imem.c:93
+#: src/input/es_out.c:3158 src/input/es_out.c:3161 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
 #: modules/access/screen/xcb.c:39 modules/access/shm.c:42
 #: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
@@ -1111,91 +1110,91 @@ msgstr "Buffer tamaina"
 msgid "Frame rate"
 msgstr "Marko-emaria"
 
-#: src/input/es_out.c:3165
+#: src/input/es_out.c:3169
 msgid "Decoded format"
 msgstr "Deskodetutako formatua"
 
-#: src/input/es_out.c:3170
+#: src/input/es_out.c:3174
 msgid "Top left"
 msgstr "Goian ezkerrean"
 
-#: src/input/es_out.c:3170
+#: src/input/es_out.c:3174
 msgid "Left top"
 msgstr "Ezkerrean goian"
 
-#: src/input/es_out.c:3171
+#: src/input/es_out.c:3175
 msgid "Right bottom"
 msgstr "Eskuinean behean"
 
-#: src/input/es_out.c:3171
+#: src/input/es_out.c:3175
 msgid "Top right"
 msgstr "Goian eskuinean"
 
-#: src/input/es_out.c:3172
+#: src/input/es_out.c:3176
 msgid "Bottom left"
 msgstr "Behean ezkerrean"
 
-#: src/input/es_out.c:3172
+#: src/input/es_out.c:3176
 msgid "Bottom right"
 msgstr "Behean eskuinean"
 
-#: src/input/es_out.c:3173
+#: src/input/es_out.c:3177
 msgid "Left bottom"
 msgstr "Ezkerrean behean"
 
-#: src/input/es_out.c:3173
+#: src/input/es_out.c:3177
 msgid "Right top"
 msgstr "Eskuinean goian"
 
-#: src/input/es_out.c:3175
+#: src/input/es_out.c:3179
 msgid "Orientation"
 msgstr "Orientazioa"
 
-#: src/input/es_out.c:3181 src/input/es_out.c:3199 src/input/es_out.c:3217
-#: src/input/es_out.c:3231 src/playlist/tree.c:67
+#: src/input/es_out.c:3185 src/input/es_out.c:3203 src/input/es_out.c:3221
+#: src/input/es_out.c:3235 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:75 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "Zehaztu gabea"
 
-#: src/input/es_out.c:3183
+#: src/input/es_out.c:3187
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
 msgstr "ITU-R BT.601 (525 lerro, 60 Hz)"
 
-#: src/input/es_out.c:3185
+#: src/input/es_out.c:3189
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr "ITU-R BT.601 (625 lerro, 50 Hz)"
 
-#: src/input/es_out.c:3193
+#: src/input/es_out.c:3197
 msgid "Color primaries"
 msgstr "Koloreen oinarriak"
 
-#: src/input/es_out.c:3200 src/libvlc-module.c:362
+#: src/input/es_out.c:3204 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
 msgstr "Lineala"
 
-#: src/input/es_out.c:3207
+#: src/input/es_out.c:3211
 msgid "Hybrid Log-Gamma"
 msgstr "Log-Gamma hibridoa"
 
-#: src/input/es_out.c:3211
+#: src/input/es_out.c:3215
 msgid "Color transfer function"
 msgstr "Koloreen transferentzia-funtzioa"
 
-#: src/input/es_out.c:3224
+#: src/input/es_out.c:3228
 msgid "Color space"
 msgstr "Kolore-eremua"
 
-#: src/input/es_out.c:3224
+#: src/input/es_out.c:3228
 #, c-format
 msgid "%s Range"
 msgstr "%s barrutia"
 
-#: src/input/es_out.c:3226
+#: src/input/es_out.c:3230
 msgid "Full"
 msgstr "Osoa"
 
-#: src/input/es_out.c:3233 src/libvlc-module.c:295 src/libvlc-module.c:368
+#: src/input/es_out.c:3237 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
@@ -1206,105 +1205,104 @@ msgstr "Osoa"
 msgid "Center"
 msgstr "Erdian"
 
-#: src/input/es_out.c:3234
+#: src/input/es_out.c:3238
 msgid "Top Left"
 msgstr "Goian ezkerrean"
 
-#: src/input/es_out.c:3235
+#: src/input/es_out.c:3239
 msgid "Top Center"
 msgstr "Goian erdian"
 
-#: src/input/es_out.c:3236
+#: src/input/es_out.c:3240
 msgid "Bottom Left"
 msgstr "Behean ezkerrean"
 
-#: src/input/es_out.c:3237
+#: src/input/es_out.c:3241
 msgid "Bottom Center"
 msgstr "Behean erdian"
 
-#: src/input/es_out.c:3241
+#: src/input/es_out.c:3245
 msgid "Chroma location"
 msgstr "Krominantzia-kokapena"
 
-#: src/input/es_out.c:3250
+#: src/input/es_out.c:3254
 msgid "Rectangular"
 msgstr "Angeluzuzena"
 
-#: src/input/es_out.c:3253
+#: src/input/es_out.c:3257
 msgid "Equirectangular"
 msgstr "Angeluzuzenkidea"
 
-#: src/input/es_out.c:3256
+#: src/input/es_out.c:3260
 msgid "Cubemap"
 msgstr "Cubemap"
 
-#: src/input/es_out.c:3262
+#: src/input/es_out.c:3266
 msgid "Projection"
 msgstr "Proiekzioa"
 
-#: src/input/es_out.c:3264
+#: src/input/es_out.c:3268
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr "Yaw"
 
-#: src/input/es_out.c:3266
+#: src/input/es_out.c:3270
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr "Pitch"
 
-#: src/input/es_out.c:3268
+#: src/input/es_out.c:3272
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr "Roll"
 
-#: src/input/es_out.c:3271
+#: src/input/es_out.c:3275
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "Ikusmen-eremua"
 
-#: src/input/es_out.c:3276
+#: src/input/es_out.c:3280
 msgid "Max. luminance"
 msgstr "Luminantzia maximoa"
 
-#: src/input/es_out.c:3281
+#: src/input/es_out.c:3285
 msgid "Min. luminance"
 msgstr "Luminantzia minimoa"
 
-#: src/input/es_out.c:3289
+#: src/input/es_out.c:3293
 msgid "Primary R"
 msgstr "G nagusia"
 
-#: src/input/es_out.c:3296
+#: src/input/es_out.c:3300
 msgid "Primary G"
 msgstr "B nagusia"
 
-#: src/input/es_out.c:3303
+#: src/input/es_out.c:3307
 msgid "Primary B"
 msgstr "U nagusia"
 
-#: src/input/es_out.c:3310
+#: src/input/es_out.c:3314
 msgid "White point"
 msgstr "Puntu zuria"
 
-#: src/input/es_out.c:3325 modules/access/imem.c:64
+#: src/input/es_out.c:3329 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "Azpititulua"
 
-#: src/input/input.c:2658
+#: src/input/input.c:2662
 msgid "Your input can't be opened"
 msgstr "Zure sarrera ezin da ireki"
 
-#: src/input/input.c:2659
+#: src/input/input.c:2663
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLCk ezin du ireki '%s' MRLa. Begiratu egunkaria xehetasunak jakiteko."
 
-#: src/input/meta.c:55 src/input/var.c:170
-#: modules/gui/macosx/VLCMainMenu.m:399 modules/gui/macosx/VLCMainMenu.m:400
+#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:410
+#: modules/gui/macosx/VLCMainMenu.m:411
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107
-#: modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1409,25 +1407,25 @@ msgstr "Disko-zenbakia"
 msgid "Bookmark"
 msgstr "Laster-marka"
 
-#: src/input/var.c:165 src/libvlc-module.c:574
+#: src/input/var.c:165 src/libvlc-module.c:570
 msgid "Programs"
 msgstr "Programak"
 
-#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:401
-#: modules/gui/macosx/VLCMainMenu.m:402
+#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:412
+#: modules/gui/macosx/VLCMainMenu.m:413
 #: modules/gui/macosx/VLCOpenWindowController.m:179
 #: modules/gui/macosx/VLCOpenWindowController.m:181
 #: modules/gui/qt/ui/open_disk.h:310
 msgid "Chapter"
 msgstr "Kapitulua"
 
-#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:425
-#: modules/gui/macosx/VLCMainMenu.m:426
+#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:436
+#: modules/gui/macosx/VLCMainMenu.m:437
 msgid "Video Track"
 msgstr "Bideo-pista"
 
-#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:408
-#: modules/gui/macosx/VLCMainMenu.m:409
+#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:419
+#: modules/gui/macosx/VLCMainMenu.m:420
 msgid "Audio Track"
 msgstr "Audio-pista"
 
@@ -1474,8 +1472,8 @@ msgstr "Aurreko kapitulua"
 msgid "Media: %s"
 msgstr "Euskarria: %s"
 
-#: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:337
-#: modules/gui/macosx/VLCMainMenu.m:338
+#: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:346
+#: modules/gui/macosx/VLCMainMenu.m:347
 msgid "Add Interface"
 msgstr "Gehitu interfazea"
 
@@ -1512,25 +1510,25 @@ msgstr ""
 msgid "C"
 msgstr "eu"
 
-#: src/libvlc.h:164 src/libvlc-module.c:1426 src/libvlc-module.c:1427
-#: src/libvlc-module.c:2642 src/video_output/vout_intf.c:176
-#: modules/gui/macosx/VLCMainMenu.m:465
+#: src/libvlc.h:164 src/libvlc-module.c:1432 src/libvlc-module.c:1433
+#: src/libvlc-module.c:2659 src/video_output/vout_intf.c:176
+#: modules/gui/macosx/VLCMainMenu.m:476
 msgid "Zoom"
 msgstr "Zooma"
 
-#: src/libvlc.h:165 src/libvlc-module.c:1340 src/video_output/vout_intf.c:87
+#: src/libvlc.h:165 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
 msgstr "1:4 Laurdena"
 
-#: src/libvlc.h:166 src/libvlc-module.c:1341 src/video_output/vout_intf.c:88
+#: src/libvlc.h:166 src/libvlc-module.c:1347 src/video_output/vout_intf.c:88
 msgid "1:2 Half"
 msgstr "1:2 Erdia"
 
-#: src/libvlc.h:167 src/libvlc-module.c:1342 src/video_output/vout_intf.c:89
+#: src/libvlc.h:167 src/libvlc-module.c:1348 src/video_output/vout_intf.c:89
 msgid "1:1 Original"
 msgstr "1:1 Jatorrizkoa"
 
-#: src/libvlc.h:168 src/libvlc-module.c:1343 src/video_output/vout_intf.c:90
+#: src/libvlc.h:168 src/libvlc-module.c:1349 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
 msgstr "2:1 Bikoitza"
 
@@ -1796,8 +1794,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/x264.c:440
-#: modules/demux/mpeg/ts.c:124
-#: modules/gui/macosx/VLCSimplePrefsController.m:54
+#: modules/demux/mpeg/ts.c:124 modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:66
 #: modules/gui/qt/components/sout/profile_selector.cpp:582
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
@@ -1889,7 +1886,7 @@ msgstr ""
 "Honen bidez audioa abiadura motelagoan edo azkarragoan erreproduzi dezakezu "
 "audio-tonuari eragin gabe"
 
-#: src/libvlc-module.c:239 src/libvlc-module.c:1125
+#: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
 #: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
@@ -2180,8 +2177,8 @@ msgstr ""
 "igaro ondoren."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
-#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:433
-#: modules/gui/macosx/VLCMainMenu.m:434
+#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:444
+#: modules/gui/macosx/VLCMainMenu.m:445
 #: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
@@ -2190,7 +2187,7 @@ msgid "Deinterlace"
 msgstr "Bereizi gurutzelarkatuak"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
-#: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:436
+#: modules/gui/macosx/VLCMainMenu.m:446 modules/gui/macosx/VLCMainMenu.m:447
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
@@ -2235,25 +2232,12 @@ msgstr "Desgaitu pantaila-babeslea"
 msgid "Disable the screensaver during video playback."
 msgstr "Desgaitu pantaila-babeslea bideoa erreproduzitzean."
 
-#: src/libvlc-module.c:374
-msgid "Inhibit the power management daemon during playback"
-msgstr ""
-"Desaktibatu energia kudeatzeko daemon-a erreproduzitzen ari den bitartean"
-
-#: src/libvlc-module.c:375
-msgid ""
-"Inhibits the power management daemon during any playback, to avoid the "
-"computer being suspended because of inactivity."
-msgstr ""
-"Energia kudeatzeko daemon-a desaktibatu egiten du erreprodukzio baten "
-"dirauen artean, ordenagailua geldirik egoteagatik eseki ez dadin."
-
-#: src/libvlc-module.c:378 modules/gui/macosx/VLCSimplePrefsController.m:358
+#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "Window decorations"
 msgstr "Leiho-dekorazioak"
 
-#: src/libvlc-module.c:380
+#: src/libvlc-module.c:376
 msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
@@ -2261,19 +2245,19 @@ msgstr ""
 "VLCk bideoaren inguruan leiho-epigrafeak, markoak eta abar sortzea eragotz "
 "dezake, eta leiho \"minimo\" bat bistaratu."
 
-#: src/libvlc-module.c:383
+#: src/libvlc-module.c:379
 msgid "Video splitter module"
 msgstr "Bideo-zatitzaileen modulua"
 
-#: src/libvlc-module.c:385
+#: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
 msgstr "Bideo-zatitzaileak gehitzen ditu, adibidez klonatzea edo horma"
 
-#: src/libvlc-module.c:387
+#: src/libvlc-module.c:383
 msgid "Video filter module"
 msgstr "Bideo-iragazkien modulua"
 
-#: src/libvlc-module.c:389
+#: src/libvlc-module.c:385
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
@@ -2281,48 +2265,48 @@ msgstr ""
 "Honek prozesatu ondorengo iragazkiak gehitzen ditu irudiaren kalitatea "
 "hobetzeko, adibidez, gurutzelarkatuak bereiztea edo bideoa distortsionatzea."
 
-#: src/libvlc-module.c:393
+#: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
 msgstr "Bideo-argazkien direktorioa (edo fitxategi-izena)"
 
-#: src/libvlc-module.c:395
+#: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
 msgstr "Bideo-argazkiak gordetzen diren direktorioa."
 
-#: src/libvlc-module.c:397 src/libvlc-module.c:399
+#: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
 msgstr "Bideo-argazkien fitxategien aurrizkia"
 
-#: src/libvlc-module.c:401
+#: src/libvlc-module.c:397
 msgid "Video snapshot format"
 msgstr "Bideo-argazkien formatua"
 
-#: src/libvlc-module.c:403
+#: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
 msgstr "Bideo-argazkiak gordetzeko erabiliko den irudi-formatua"
 
-#: src/libvlc-module.c:405
+#: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
 msgstr "Bistaratu bideo-argazkiaren aurrebista"
 
-#: src/libvlc-module.c:407
+#: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr "Bistaratu argazkiaren aurrebista pantailaren goiko ezkerreko izkinan."
 
-#: src/libvlc-module.c:409
+#: src/libvlc-module.c:405
 msgid "Use sequential numbers instead of timestamps"
 msgstr "Erabili zenbaki sekuentzialak data-zigiluen ordez"
 
-#: src/libvlc-module.c:411
+#: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
 "Erabili zenbaki sekuentzialak data-zigiluen ordez argazkiak zenbakitzeko"
 
-#: src/libvlc-module.c:413
+#: src/libvlc-module.c:409
 msgid "Video snapshot width"
 msgstr "Bideo-argazkiaren zabalera"
 
-#: src/libvlc-module.c:415
+#: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
@@ -2331,11 +2315,11 @@ msgstr ""
 "edukiko du (-1). 0 adierazten baduzu, zabalera doitu egingo da aspektu-"
 "erlazioa mantentzeko."
 
-#: src/libvlc-module.c:419
+#: src/libvlc-module.c:415
 msgid "Video snapshot height"
 msgstr "Bideo-argazkiaren altuera"
 
-#: src/libvlc-module.c:421
+#: src/libvlc-module.c:417
 msgid ""
 "You can enforce the height of the video snapshot. By default it will keep "
 "the original height (-1). Using 0 will scale the height to keep the aspect "
@@ -2345,11 +2329,11 @@ msgstr ""
 "edukiko du (-1). 0 adierazten baduzu, altuera doitu egingo da aspektu-"
 "erlazioa mantentzeko."
 
-#: src/libvlc-module.c:425
+#: src/libvlc-module.c:421
 msgid "Video cropping"
 msgstr "Bideo-mozketa"
 
-#: src/libvlc-module.c:427
+#: src/libvlc-module.c:423
 msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
@@ -2357,11 +2341,11 @@ msgstr ""
 "Honek jatorrizko bideoa moztea behartzen du. Onartutako formatuak x:y (4:3, "
 "16:9, etab.) dira, eta irudiaren aspektu orokorra adierazten dute."
 
-#: src/libvlc-module.c:431
+#: src/libvlc-module.c:427
 msgid "Source aspect ratio"
 msgstr "Jatorrizko aspektu-erlazioa"
 
-#: src/libvlc-module.c:433
+#: src/libvlc-module.c:429
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
@@ -2376,20 +2360,20 @@ msgstr ""
 "16:9, etab.) formatuak edo pixelen karratutasuna adierazten duten koma "
 "mugikorreko balioak dira."
 
-#: src/libvlc-module.c:440
+#: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
 msgstr "Bideoa automatikoki doitzea"
 
-#: src/libvlc-module.c:442
+#: src/libvlc-module.c:438
 msgid "Let the video scale to fit a given window or fullscreen."
 msgstr ""
 "Bideoa doitu egiten da, leiho jakin batera edo pantaila osora egokitzeko."
 
-#: src/libvlc-module.c:444
+#: src/libvlc-module.c:440
 msgid "Video scaling factor"
 msgstr "Bideoaren doitze-faktorea"
 
-#: src/libvlc-module.c:446
+#: src/libvlc-module.c:442
 msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
@@ -2397,11 +2381,11 @@ msgstr ""
 "Doitze automatikoa desgaituta dagoenean erabiltzen den doitze-faktorea.\n"
 "Balio lehenetsia 1.0 da (jatorrizko bideoaren tamaina)."
 
-#: src/libvlc-module.c:449
+#: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
 msgstr "Mozte-erlazioen zerrenda pertsonalizatua"
 
-#: src/libvlc-module.c:451
+#: src/libvlc-module.c:447
 msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
@@ -2409,11 +2393,11 @@ msgstr ""
 "Komaz bereizitako mozte-erlazioen zerrenda bat; interfazearen mozte-"
 "erlazioen zerrendan gehituko da."
 
-#: src/libvlc-module.c:454
+#: src/libvlc-module.c:450
 msgid "Custom aspect ratios list"
 msgstr "Aspektu-erlazioen zerrenda pertsonalizatua"
 
-#: src/libvlc-module.c:456
+#: src/libvlc-module.c:452
 msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
@@ -2421,11 +2405,11 @@ msgstr ""
 "Komaz bereizitako aspektu-erlazioen zerrenda bat; interfazearen aspektu-"
 "erlazioen zerrendan gehituko da."
 
-#: src/libvlc-module.c:459
+#: src/libvlc-module.c:455
 msgid "Fix HDTV height"
 msgstr "Konpondu HDTV altuera"
 
-#: src/libvlc-module.c:461
+#: src/libvlc-module.c:457
 msgid ""
 "This allows proper handling of HDTV-1080 video format even if broken encoder "
 "incorrectly sets height to 1088 lines. You should only disable this option "
@@ -2436,11 +2420,11 @@ msgstr ""
 "gaizki ezartzen badu ere. Bideoak 1088 lerroak behar dituen eta estandarra "
 "ez den formatu bat badauka bakarrik desgaitu beharko zenuke aukera hau."
 
-#: src/libvlc-module.c:466
+#: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
 msgstr "Monitorearen pixelek aspektu-erlazioa"
 
-#: src/libvlc-module.c:468
+#: src/libvlc-module.c:464
 msgid ""
 "This forces the monitor aspect ratio. Most monitors have square pixels "
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
@@ -2450,11 +2434,11 @@ msgstr ""
 "karratuak dauzkate (1:1). 16:9 pantaila bat badaukazu, baliteke horren ordez "
 "4:3 ezarri behar izatea proportzioak gordetzeko."
 
-#: src/libvlc-module.c:472 modules/gui/macosx/VLCSimplePrefsController.m:301
+#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
 msgstr "Saltatu markoak"
 
-#: src/libvlc-module.c:474
+#: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
@@ -2462,11 +2446,11 @@ msgstr ""
 "MPEG2 transmisio jarraituetan marko-bazterketa gaitzen du. Marko-bazterketa "
 "ordenagailuak behar adina ahalmen ez daukanean gertatzen da"
 
-#: src/libvlc-module.c:477
+#: src/libvlc-module.c:473
 msgid "Drop late frames"
 msgstr "Baztertu atzeratutako markoak"
 
-#: src/libvlc-module.c:479
+#: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
@@ -2474,11 +2458,11 @@ msgstr ""
 "Honen bidez, atzeratutako markoak baztertu egingo dira (bideo-irteerara "
 "bistaratze-data baino beranduago iristen direnak)."
 
-#: src/libvlc-module.c:482
+#: src/libvlc-module.c:478
 msgid "Quiet synchro"
 msgstr "Sinkronizazio isila"
 
-#: src/libvlc-module.c:484
+#: src/libvlc-module.c:480
 msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
@@ -2486,25 +2470,25 @@ msgstr ""
 "Bideo-irteeraren sinkronizazio-mekanismoko arazketa-irteerekin mezuaren "
 "egunkaria gainezkatzea eragozten du."
 
-#: src/libvlc-module.c:487
+#: src/libvlc-module.c:483
 msgid "Key press events"
 msgstr "Tekla-sakatzeen gertaerak"
 
-#: src/libvlc-module.c:489
+#: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
 msgstr ""
 "Ezarpen honek (kapsulatu gabeko) VLC laster-teklak gaitzen ditu bideoaren "
 "leihoan."
 
-#: src/libvlc-module.c:491 modules/spu/remoteosd.c:91
+#: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
 msgstr "Saguaren gertaerak"
 
-#: src/libvlc-module.c:493
+#: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
 msgstr "Bideoan sagu-klikak kudeatzeko aukera ematen du."
 
-#: src/libvlc-module.c:501
+#: src/libvlc-module.c:497
 msgid ""
 "These options allow you to modify the behavior of the input subsystem, such "
 "as the DVD or VCD device, the network interface settings or the subtitle "
@@ -2513,43 +2497,43 @@ msgstr ""
 "Aukera honen bidez, sarrera-azpisistemaren portaera alda dezakezu, adibidez, "
 "DVD edo VCD gailua, sareko interfazearen ezarpenak edo azpitituluen kanala."
 
-#: src/libvlc-module.c:505
+#: src/libvlc-module.c:501
 msgid "File caching (ms)"
 msgstr "Fitxategien katxea (ms)"
 
-#: src/libvlc-module.c:507
+#: src/libvlc-module.c:503
 msgid "Caching value for local files, in milliseconds."
 msgstr "Fitxategi lokalen katxea, milisegundotan."
 
-#: src/libvlc-module.c:509
+#: src/libvlc-module.c:505
 msgid "Live capture caching (ms)"
 msgstr "Zuzeneko kapturaren katxea (ms)"
 
-#: src/libvlc-module.c:511
+#: src/libvlc-module.c:507
 msgid "Caching value for cameras and microphones, in milliseconds."
 msgstr "Kamera eta mikrofonoen katxea, milisegundotan."
 
-#: src/libvlc-module.c:513
+#: src/libvlc-module.c:509
 msgid "Disc caching (ms)"
 msgstr "Diskoen katxea (ms)"
 
-#: src/libvlc-module.c:515
+#: src/libvlc-module.c:511
 msgid "Caching value for optical media, in milliseconds."
 msgstr "Gailu optikoen katxea, milisegundotan."
 
-#: src/libvlc-module.c:517
+#: src/libvlc-module.c:513
 msgid "Network caching (ms)"
 msgstr "Sarearen katxea (ms)"
 
-#: src/libvlc-module.c:519
+#: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
 msgstr "Sareko baliabideen katxea, milisegundotan."
 
-#: src/libvlc-module.c:521
+#: src/libvlc-module.c:517
 msgid "Clock reference average counter"
 msgstr "Erlojuaren erreferentziako batezbestekoaren kontagailua"
 
-#: src/libvlc-module.c:523
+#: src/libvlc-module.c:519
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
@@ -2557,11 +2541,11 @@ msgstr ""
 "PVR sarrera (edo oso iturburu irregularra) erabiltzean, ezarpen honetan "
 "10000 ezarri beharko zenuke."
 
-#: src/libvlc-module.c:526
+#: src/libvlc-module.c:522
 msgid "Clock synchronisation"
 msgstr "Erlojuaren sinkronizazioa"
 
-#: src/libvlc-module.c:528
+#: src/libvlc-module.c:524
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
@@ -2570,11 +2554,11 @@ msgstr ""
 "iturburuetarako. Erabili aukera hau sareko transmisio jarraituak ondo "
 "ikusten ez badituzu."
 
-#: src/libvlc-module.c:532
+#: src/libvlc-module.c:528
 msgid "Clock jitter"
 msgstr "Erlojuaren atzerapena"
 
-#: src/libvlc-module.c:534
+#: src/libvlc-module.c:530
 msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
@@ -2582,11 +2566,11 @@ msgstr ""
 "Sinkronizazio-algoritmoek orekatzen saiatu behar luketen sarreraren "
 "atzerapen maximoa definitzen du (milisegundotan)."
 
-#: src/libvlc-module.c:537
+#: src/libvlc-module.c:533
 msgid "Network synchronisation"
 msgstr "Sareko sinkronizazioa"
 
-#: src/libvlc-module.c:538
+#: src/libvlc-module.c:534
 msgid ""
 "This allows you to remotely synchronise clocks for server and client. The "
 "detailed settings are available in Advanced / Network Sync."
@@ -2595,7 +2579,7 @@ msgstr ""
 "ematen du. Ezarpen xehatuak Aurreratua / Sareko sinkronizazioa aukeran ikus "
 "ditzakezu."
 
-#: src/libvlc-module.c:544 src/video_output/vout_intf.c:98
+#: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
@@ -2603,7 +2587,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
-#: modules/gui/macosx/VLCMainMenu.m:592
+#: modules/gui/macosx/VLCMainMenu.m:603
 #: modules/gui/macosx/VLCSimplePrefsController.m:656
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
@@ -2615,7 +2599,7 @@ msgstr ""
 msgid "Default"
 msgstr "Lehenetsia"
 
-#: src/libvlc-module.c:544
+#: src/libvlc-module.c:540
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:214
 #: modules/gui/macosx/VLCMainWindow.m:1000
 #: modules/gui/qt/components/extended_panels.cpp:928
@@ -2623,11 +2607,11 @@ msgstr "Lehenetsia"
 msgid "Enable"
 msgstr "Gaitu"
 
-#: src/libvlc-module.c:546
+#: src/libvlc-module.c:542
 msgid "MTU of the network interface"
 msgstr "Sareko interfazearen MTU"
 
-#: src/libvlc-module.c:548
+#: src/libvlc-module.c:544
 msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
@@ -2635,11 +2619,11 @@ msgstr ""
 "Hau da sarearen bide transmiti daitekeen aplikazio-geruzako paketeen "
 "gehienezko tamaina (bytetan)."
 
-#: src/libvlc-module.c:553 modules/stream_out/rtp.c:124
+#: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
 msgstr "Jauzi-muga (TTL)"
 
-#: src/libvlc-module.c:555 modules/stream_out/rtp.c:126
+#: src/libvlc-module.c:551 modules/stream_out/rtp.c:126
 msgid ""
 "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
 "multicast packets sent by the stream output (-1 = use operating system built-"
@@ -2649,19 +2633,19 @@ msgstr ""
 "jauzi-muga (\"Time-To-Live\" edo TTL ere deitzen zaio) (-1 = erabili sistema "
 "eragilearen balio barneratu lehenetsia)."
 
-#: src/libvlc-module.c:559
+#: src/libvlc-module.c:555
 msgid "Multicast output interface"
 msgstr "Multidifusioko irteeren interfazea"
 
-#: src/libvlc-module.c:561
+#: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
 msgstr "Multidifusioko interfaze lehenetsia. Bideratze-taula gainidazten du."
 
-#: src/libvlc-module.c:563
+#: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
 msgstr "DiffServ Code Point"
 
-#: src/libvlc-module.c:564
+#: src/libvlc-module.c:560
 msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
@@ -2670,7 +2654,7 @@ msgstr ""
 "(edo IPv4 zerbitzu mota, edo IPv6 trafiko klasea). Hau sareko zerbitzu-"
 "kalitaterako erabiltzen da."
 
-#: src/libvlc-module.c:570
+#: src/libvlc-module.c:566
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
@@ -2680,7 +2664,7 @@ msgstr ""
 "bakarrik erabili beharko zenuke aukera hau (adibidez, DVB transmisio "
 "jarraituak)."
 
-#: src/libvlc-module.c:576
+#: src/libvlc-module.c:572
 msgid ""
 "Choose the programs to select by giving a comma-separated list of Service "
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
@@ -2691,31 +2675,31 @@ msgstr ""
 "bat irakurri nahi baduzu bakarrik erabili beharko zenuke aukera hau "
 "(adibidez, DVB transmisio jarraituak)."
 
-#: src/libvlc-module.c:582 modules/gui/qt/ui/open_disk.h:312
+#: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:312
 msgid "Audio track"
 msgstr "Audio-pista"
 
-#: src/libvlc-module.c:584
+#: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr ""
 "Erabili beharreko audio-pistaren transmisio jarraituaren zenbakia (0 eta n "
 "artekoa)."
 
-#: src/libvlc-module.c:587 modules/gui/qt/ui/open_disk.h:313
+#: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
 msgstr "Azpitituluen pista"
 
-#: src/libvlc-module.c:589
+#: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
 msgstr ""
 "Erabili beharreko azpitituluen pistaren transmisio jarraituaren zenbakia (0 "
 "eta n artekoa)."
 
-#: src/libvlc-module.c:592 modules/stream_out/transcode/transcode.c:97
+#: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
 msgstr "Audio-hizkuntza"
 
-#: src/libvlc-module.c:594
+#: src/libvlc-module.c:590
 msgid ""
 "Language of the audio track you want to use (comma separated, two or three "
 "letter country code, you may use 'none' to avoid a fallback to another "
@@ -2725,11 +2709,11 @@ msgstr ""
 "letrako herrialde-kodea; 'bat ere ez' adieraz dezakezu beste hizkuntza "
 "batera ez aldatzeko)."
 
-#: src/libvlc-module.c:597
+#: src/libvlc-module.c:593
 msgid "Subtitle language"
 msgstr "Azpitituluen hizkuntza"
 
-#: src/libvlc-module.c:599
+#: src/libvlc-module.c:595
 msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
@@ -2738,11 +2722,11 @@ msgstr ""
 "hiru letrako herrialde-kodea; 'edozein' adieraz dezakezu beste hizkuntza "
 "batera aldatzeko)."
 
-#: src/libvlc-module.c:602
+#: src/libvlc-module.c:598
 msgid "Menu language"
 msgstr "Menu hizkuntza"
 
-#: src/libvlc-module.c:604
+#: src/libvlc-module.c:600
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
@@ -2750,34 +2734,34 @@ msgstr ""
 "DVD/BluRayrekin erabili nahi dituzun menuen hizkuntza (komaz banandua, bi "
 "edo hiru hizkiko herrialde kodea, 'edozein' erabili behar duzu ordezko)."
 
-#: src/libvlc-module.c:608
+#: src/libvlc-module.c:604
 msgid "Audio track ID"
 msgstr "Audio-pistaren identifikatzailea"
 
-#: src/libvlc-module.c:610
+#: src/libvlc-module.c:606
 msgid "Stream ID of the audio track to use."
 msgstr ""
 "Erabili beharreko audio-pistaren transmisio jarraituaren identifikatzailea."
 
-#: src/libvlc-module.c:612
+#: src/libvlc-module.c:608
 msgid "Subtitle track ID"
 msgstr "Azpitituluen pistaren IDa"
 
-#: src/libvlc-module.c:614
+#: src/libvlc-module.c:610
 msgid "Stream ID of the subtitle track to use."
 msgstr ""
 "Erabili beharreko azpitituluen pistaren transmisio jarraituaren "
 "identifikatzailea."
 
-#: src/libvlc-module.c:616
+#: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
 msgstr "Azpititulu itxien deskodetzaile hobetsia"
 
-#: src/libvlc-module.c:620
+#: src/libvlc-module.c:616
 msgid "Preferred video resolution"
 msgstr "Hobetsitako bideo-bereizmena"
 
-#: src/libvlc-module.c:622
+#: src/libvlc-module.c:618
 msgid ""
 "When several video formats are available, select one whose resolution is "
 "closest to (but not higher than) this setting, in number of lines. Use this "
@@ -2789,83 +2773,83 @@ msgstr ""
 "Erabili aukera hau ez badaukazu nahikoa PUZ indarrik edo sareko banda-"
 "zabalerarik bereizmen handiagoak erreproduzitzeko."
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "Best available"
 msgstr "Dagoen onena"
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "Full HD (1080p)"
 msgstr "Full HD (1080p)"
 
-#: src/libvlc-module.c:628
+#: src/libvlc-module.c:624
 msgid "HD (720p)"
 msgstr "HD (720p)"
 
-#: src/libvlc-module.c:629
+#: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
 msgstr "Definizio Estandarra (576 edo 480 lerro)"
 
-#: src/libvlc-module.c:630
+#: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
 msgstr "Definizio baxua (360 lerro)"
 
-#: src/libvlc-module.c:631
+#: src/libvlc-module.c:627
 msgid "Very Low Definition (240 lines)"
 msgstr "Definizio oso baxua (240 lerro)"
 
-#: src/libvlc-module.c:634
+#: src/libvlc-module.c:630
 msgid "Input repetitions"
 msgstr "Sarrera-errepikapenak"
 
-#: src/libvlc-module.c:636
+#: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
 msgstr "Sarrera bera zenbat aldiz errepikatuko den"
 
-#: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:159
+#: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
 msgstr "Hasiera-denbora"
 
-#: src/libvlc-module.c:640
+#: src/libvlc-module.c:636
 msgid "The stream will start at this position (in seconds)."
 msgstr "Transmisio jarraitua posizio honetan hasiko da (segundotan)."
 
-#: src/libvlc-module.c:642 modules/gui/macosx/VLCOpenWindowController.m:161
+#: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
 msgstr "Gelditze-denbora"
 
-#: src/libvlc-module.c:644
+#: src/libvlc-module.c:640
 msgid "The stream will stop at this position (in seconds)."
 msgstr "Transmisio jarraitua posizio honetan geldituko da (segundotan)."
 
-#: src/libvlc-module.c:646
+#: src/libvlc-module.c:642
 msgid "Run time"
 msgstr "Exekuzio-denbora"
 
-#: src/libvlc-module.c:648
+#: src/libvlc-module.c:644
 msgid "The stream will run this duration (in seconds)."
 msgstr "Transmisio jarraituak iraupen hau izango du (segundotan)."
 
-#: src/libvlc-module.c:650 modules/gui/qt/ui/sprefs_input.h:363
+#: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
 msgstr "Bilaketa azkarra"
 
-#: src/libvlc-module.c:652
+#: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
 msgstr "Bilatzean, eman lehentasun handiagoa abiadurari zehaztasunari baino"
 
-#: src/libvlc-module.c:654
+#: src/libvlc-module.c:650
 msgid "Playback speed"
 msgstr "Erreprodukzio-abiadura"
 
-#: src/libvlc-module.c:656
+#: src/libvlc-module.c:652
 msgid "This defines the playback speed (nominal speed is 1.0)."
 msgstr "Honek erreprodukzio-abiadura definitzen du (abiadura nominala 1.0 da)."
 
-#: src/libvlc-module.c:658
+#: src/libvlc-module.c:654
 msgid "Input list"
 msgstr "Sarrera-zerrenda"
 
-#: src/libvlc-module.c:660
+#: src/libvlc-module.c:656
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
@@ -2873,11 +2857,11 @@ msgstr ""
 "Sarrera normalaren atzetik elkarrekin kateatuko diren sarreren zerrenda bat "
 "adieraz dezakezu, komaz bereizita."
 
-#: src/libvlc-module.c:663
+#: src/libvlc-module.c:659
 msgid "Input slave (experimental)"
 msgstr "Sarreren morroia (esperimentala)"
 
-#: src/libvlc-module.c:665
+#: src/libvlc-module.c:661
 msgid ""
 "This allows you to play from several inputs at the same time. This feature "
 "is experimental, not all formats are supported. Use a '#' separated list of "
@@ -2887,11 +2871,11 @@ msgstr ""
 "hau esperimentala da eta ez ditu formatu guztiak onartzen. Erabili '#' "
 "ikurrez bereizitako sarrera-zerrenda bat."
 
-#: src/libvlc-module.c:669
+#: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
 msgstr "Transmisio jarraitu baten laster-marken zerrenda"
 
-#: src/libvlc-module.c:671
+#: src/libvlc-module.c:667
 msgid ""
 "You can manually give a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
@@ -2901,19 +2885,19 @@ msgstr ""
 "dezakezu, forma honekin: \"{name=bookmark-name,time=optional-time-offset,"
 "bytes=optional-byte-offset},{...}\""
 
-#: src/libvlc-module.c:675
+#: src/libvlc-module.c:671
 msgid "Record directory"
 msgstr "Grabazioen direktorioa"
 
-#: src/libvlc-module.c:677
+#: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
 msgstr "Grabazioak gordeko diren direktorioa"
 
-#: src/libvlc-module.c:679
+#: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
 msgstr "Hobetsi transmisio jarraituen jatorrizko grabazioa"
 
-#: src/libvlc-module.c:681
+#: src/libvlc-module.c:677
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
@@ -2921,20 +2905,20 @@ msgstr ""
 "Posible denean, sarrerako transmisio jarraitua grabatuko da transmisio "
 "jarraituen irteerako modulua erabili beharrean"
 
-#: src/libvlc-module.c:684
+#: src/libvlc-module.c:680
 msgid "Timeshift directory"
 msgstr "Timeshift direktorioa"
 
-#: src/libvlc-module.c:686
+#: src/libvlc-module.c:682
 msgid "Directory used to store the timeshift temporary files."
 msgstr ""
 "Aldi baterako timeshift fitxategiak gordetzeko erabiltzen den direktorioa."
 
-#: src/libvlc-module.c:688
+#: src/libvlc-module.c:684
 msgid "Timeshift granularity"
 msgstr "Timeshift pikortatzea"
 
-#: src/libvlc-module.c:690
+#: src/libvlc-module.c:686
 msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
@@ -2942,11 +2926,11 @@ msgstr ""
 "Timeshift transmisio jarraituak gordetzeko erabiliko diren aldi baterako "
 "fitxategien gehienezko tamaina, bytetan."
 
-#: src/libvlc-module.c:693
+#: src/libvlc-module.c:689
 msgid "Change title according to current media"
 msgstr "Aldatu izenburua uneko multimediaren arabera"
 
-#: src/libvlc-module.c:694
+#: src/libvlc-module.c:690
 msgid ""
 "This option allows you to set the title according to what's being played<br>"
 "$a: Artist<br>$b: Album<br>$c: Copyright<br>$t: Title<br>$g: Genre<br>$n: "
@@ -2959,11 +2943,11 @@ msgstr ""
 "Data<br>$D: Iraupena<br>$Z: \"Orain erreproduzitzen\" (Atzera horra: "
 "Izenburua - Artista) "
 
-#: src/libvlc-module.c:699
+#: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
 msgstr "Desgaitu lua plugin guztiak"
 
-#: src/libvlc-module.c:703
+#: src/libvlc-module.c:699
 msgid ""
 "These options allow you to modify the behavior of the subpictures subsystem. "
 "You can for example enable subpictures sources (logo, etc.). Enable these "
@@ -2975,11 +2959,11 @@ msgstr ""
 "iragazki horiek hemen, eta konfigura itzazu \"azpi-iturburuen iragazkiak\" "
 "moduluen atalean. Askotariko azpiirudi-aukera ugari ere ezar ditzakezu."
 
-#: src/libvlc-module.c:709 modules/gui/qt/ui/sprefs_subtitles.h:305
+#: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:305
 msgid "Force subtitle position"
 msgstr "Behartu azpitituluen posizioa"
 
-#: src/libvlc-module.c:711
+#: src/libvlc-module.c:707
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
@@ -2987,29 +2971,29 @@ msgstr ""
 "Aukera hau erabil dezakezu azpitituluak filmaren azpian jartzeko, filmaren "
 "gainean jarri beharrean. Probatu posizio bat baino gehiago."
 
-#: src/libvlc-module.c:714
+#: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
 msgstr "Azpitituluen testuaren eskala-faktorea"
 
-#: src/libvlc-module.c:715
+#: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
 msgstr "Ahal denean azpitituluen tamaina aldatzen du"
 
-#: src/libvlc-module.c:717
+#: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
 msgstr "Gaitu azpiirudiak"
 
-#: src/libvlc-module.c:719
+#: src/libvlc-module.c:715
 msgid "You can completely disable the sub-picture processing."
 msgstr "Azpiirudien prozesatzea erabat desgaitu dezakezu."
 
-#: src/libvlc-module.c:721 src/libvlc-module.c:1668 src/text/iso-639_def.h:145
+#: src/libvlc-module.c:717 src/libvlc-module.c:1674 src/text/iso-639_def.h:145
 #: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_subtitles.h:290
 msgid "On Screen Display"
 msgstr "Pantailako bistaratzea"
 
-#: src/libvlc-module.c:723
+#: src/libvlc-module.c:719
 msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
@@ -3017,11 +3001,11 @@ msgstr ""
 "VLCk mezuak bistara ditzake bideoan. Horri OSD (On Screen Display edo "
 "pantailako bistaratzea) deitzen zaio."
 
-#: src/libvlc-module.c:726
+#: src/libvlc-module.c:722
 msgid "Text rendering module"
 msgstr "Testua errendatzeko modulua"
 
-#: src/libvlc-module.c:728
+#: src/libvlc-module.c:724
 msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
@@ -3029,11 +3013,11 @@ msgstr ""
 "VLCk normalean Freetype erabiltzen du errendatzeko, baina ezarpen honen "
 "bidez svg erabil dezakezu, esate baterako."
 
-#: src/libvlc-module.c:730
+#: src/libvlc-module.c:726
 msgid "Subpictures source module"
 msgstr "Azpiirudien iturburu-modulua"
 
-#: src/libvlc-module.c:732
+#: src/libvlc-module.c:728
 msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
@@ -3042,11 +3026,11 @@ msgstr ""
 "irudi edo idazki batzuk gainean ezartzen dituzte bideoan (esaterako, logo "
 "bat, gogoko idazkia...)."
 
-#: src/libvlc-module.c:735
+#: src/libvlc-module.c:731
 msgid "Subpictures filter module"
 msgstr "Azpiirudiak iragazteko modulua"
 
-#: src/libvlc-module.c:737
+#: src/libvlc-module.c:733
 msgid ""
 "This adds so-called \"subpicture filters\". These filter subpictures created "
 "by subtitle decoders or other subpictures sources."
@@ -3055,11 +3039,11 @@ msgstr ""
 "egiten ditu azpititulu-dekodegailuek sortutako azpirudiak edo beste azpirudi "
 "iturburuak."
 
-#: src/libvlc-module.c:740
+#: src/libvlc-module.c:736
 msgid "Autodetect subtitle files"
 msgstr "Automatikoki detektatu azpitituluen fitxategiak"
 
-#: src/libvlc-module.c:742
+#: src/libvlc-module.c:738
 msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
@@ -3067,11 +3051,11 @@ msgstr ""
 "Automatikoki detektatzen du azpitituluen fitxategi bat, azpitituluen "
 "fitxategi-izenik zehazten ez denean (filmaren fitxategi-izenean oinarrituz)."
 
-#: src/libvlc-module.c:745
+#: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
 msgstr "Azpitituluak automatikoki detektatzeko zehaztasun-maila"
 
-#: src/libvlc-module.c:747
+#: src/libvlc-module.c:743
 msgid ""
 "This determines how fuzzy subtitle and movie filename matching will be. "
 "Options are:\n"
@@ -3090,11 +3074,11 @@ msgstr ""
 "fitxategia\n"
 "4 = zehatz-mehatz filmaren izenarekin bat datorren azpitituluen fitxategia"
 
-#: src/libvlc-module.c:755
+#: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
 msgstr "Azpitituluak automatikoki detektatzeko bide-izenak"
 
-#: src/libvlc-module.c:757
+#: src/libvlc-module.c:753
 msgid ""
 "Look for a subtitle file in those paths too, if your subtitle file was not "
 "found in the current directory."
@@ -3102,11 +3086,11 @@ msgstr ""
 "Bilatu azpitituluen fitxategi bat bide-izen horietan ere, nahi duzun "
 "azpitituluen fitxategia ez bada uneko direktorioan aurkitu."
 
-#: src/libvlc-module.c:760
+#: src/libvlc-module.c:756
 msgid "Use subtitle file"
 msgstr "Erabili azpitituluen fitxategia"
 
-#: src/libvlc-module.c:762
+#: src/libvlc-module.c:758
 msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
@@ -3114,19 +3098,19 @@ msgstr ""
 "Kargatu azpitituluen fitxategi hau. Detekzio automatikoak azpitituluen "
 "fitxategia detektatu ezin duenean erabiltzeko."
 
-#: src/libvlc-module.c:766
+#: src/libvlc-module.c:762
 msgid "DVD device"
 msgstr "DVD gailua"
 
-#: src/libvlc-module.c:767
+#: src/libvlc-module.c:763
 msgid "VCD device"
 msgstr "VCD gailua"
 
-#: src/libvlc-module.c:768 modules/access/cdda.c:701
+#: src/libvlc-module.c:764 modules/access/cdda.c:701
 msgid "Audio CD device"
 msgstr "Audio CD gailua"
 
-#: src/libvlc-module.c:772
+#: src/libvlc-module.c:768
 msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
@@ -3134,7 +3118,7 @@ msgstr ""
 "Erabili beharreko DVD unitate (edo fitxategi) lehenetsia da hau. Ez ahaztu "
 "bi puntuak unitatearen letraren ondoren (adib. D:)"
 
-#: src/libvlc-module.c:775
+#: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
@@ -3142,7 +3126,7 @@ msgstr ""
 "Erabili beharreko VCD unitate (edo fitxategi) lehenetsia da hau. Ez ahaztu "
 "bi puntuak unitatearen letraren ondoren (adib. D:)"
 
-#: src/libvlc-module.c:778 modules/access/cdda.c:704
+#: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
@@ -3150,31 +3134,31 @@ msgstr ""
 "Erabili beharreko CD unitate (edo fitxategi) lehenetsia da hau. Ez ahaztu bi "
 "puntuak unitatearen letraren ondoren (adib. D:)"
 
-#: src/libvlc-module.c:785
+#: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
 msgstr "Erabili beharreko DVD gailu lehenetsia."
 
-#: src/libvlc-module.c:787
+#: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
 msgstr "Erabili beharreko VCD gailu lehenetsia."
 
-#: src/libvlc-module.c:789 modules/access/cdda.c:709
+#: src/libvlc-module.c:785 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
 msgstr "Erabili beharreko Audio CD gailu lehenetsia."
 
-#: src/libvlc-module.c:803
+#: src/libvlc-module.c:799
 msgid "TCP connection timeout"
 msgstr "TCP konexioaren denbora-muga"
 
-#: src/libvlc-module.c:805
+#: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
 msgstr "TCP konexioetarako denbora-muga lehenetsia (milisegundotan)."
 
-#: src/libvlc-module.c:807
+#: src/libvlc-module.c:803
 msgid "HTTP server address"
 msgstr "HTTP zerbitzariaren helbidea "
 
-#: src/libvlc-module.c:809
+#: src/libvlc-module.c:805
 msgid ""
 "By default, the server will listen on any local IP address. Specify an IP "
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
@@ -3184,11 +3168,11 @@ msgstr ""
 "IP helbidea (adib. ::1 edo 127.0.0.1) edo ostalari-izena (adib. localhost) "
 "sareko interfaze zehatzetara mugatzeko."
 
-#: src/libvlc-module.c:813
+#: src/libvlc-module.c:809
 msgid "RTSP server address"
 msgstr "RTSP zerbitzariaren helbidea"
 
-#: src/libvlc-module.c:815
+#: src/libvlc-module.c:811
 msgid ""
 "This defines the address the RTSP server will listen on, along with the base "
 "path of the RTSP VOD media. Syntax is address/path. By default, the server "
@@ -3203,11 +3187,11 @@ msgstr ""
 "helbide bat (adib. :1 edo 127.0.0.1) edo ostalari izen bat (adib. "
 "bertoko_ostalaria) mugatzeko zehaztutako sare interfaze batera."
 
-#: src/libvlc-module.c:821
+#: src/libvlc-module.c:817
 msgid "HTTP server port"
 msgstr "HTTP zerbitzariaren ataka"
 
-#: src/libvlc-module.c:823
+#: src/libvlc-module.c:819
 msgid ""
 "The HTTP server will listen on this TCP port. The standard HTTP port number "
 "is 80. However allocation of port numbers below 1025 is usually restricted "
@@ -3217,11 +3201,11 @@ msgstr ""
 "du. HTTP atakaren zenbaki estandarra 80 da. Hala ere, 1025 ataka zenbakitik "
 "beherako izendapenak sistema eragileak eragotzi ohi ditu."
 
-#: src/libvlc-module.c:828
+#: src/libvlc-module.c:824
 msgid "HTTPS server port"
 msgstr "HTTPS zerbitzariaren ataka"
 
-#: src/libvlc-module.c:830
+#: src/libvlc-module.c:826
 msgid ""
 "The HTTPS server will listen on this TCP port. The standard HTTPS port "
 "number is 443. However allocation of port numbers below 1025 is usually "
@@ -3231,11 +3215,11 @@ msgstr ""
 "dio. HTTPS ataka zenbaki estandarra 443 da. Hala ere, 1025 ataka zenbakitik "
 "beherako izendapenak sistema eragileak eragotzi ohi ditu."
 
-#: src/libvlc-module.c:835
+#: src/libvlc-module.c:831
 msgid "RTSP server port"
 msgstr "RTSP zerbitzariaren ataka"
 
-#: src/libvlc-module.c:837
+#: src/libvlc-module.c:833
 msgid ""
 "The RTSP server will listen on this TCP port. The standard RTSP port number "
 "is 554. However allocation of port numbers below 1025 is usually restricted "
@@ -3246,11 +3230,11 @@ msgstr ""
 "ere, 1025 ataka zenbakitik beherako izendapenak sistema eragileak eragotzi "
 "ohi ditu."
 
-#: src/libvlc-module.c:842
+#: src/libvlc-module.c:838
 msgid "HTTP/TLS server certificate"
 msgstr "HTTP/TLS zerbitzariaren ziurtagiria"
 
-#: src/libvlc-module.c:844
+#: src/libvlc-module.c:840
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
@@ -3259,21 +3243,42 @@ msgstr ""
 "erabiltzen da. OS X-n, katea etiketa gisa erabiltzen da, gako-katean "
 "ziurtagiria bilatzeko."
 
-#: src/libvlc-module.c:847
+#: src/libvlc-module.c:843
 msgid "HTTP/TLS server private key"
 msgstr "HTTP/TLS zerbitzariaren gako pribatua"
 
-#: src/libvlc-module.c:849
+#: src/libvlc-module.c:845
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr ""
 "Gako pribatuko fitxategi hau (PEM formatua) zerbitzariko TLSrako erabiltzen "
 "da."
 
-#: src/libvlc-module.c:851
+#: src/libvlc-module.c:847
+msgid "HTTP proxy"
+msgstr "HTTP proxya"
+
+#: src/libvlc-module.c:849
+msgid ""
+"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
+"myport/ ; if empty, the http_proxy environment variable will be tried."
+msgstr ""
+"Erabili beharreko HTTP proxyak forma hau eduki behar du: http://"
+"[erabiltzailea[:pasahitza]@]nireproxya.niredomeinua:nireataka/; hutsik "
+"badago, http_proxy ingurune-aldagaiarekin saiatuko da."
+
+#: src/libvlc-module.c:853
+msgid "HTTP proxy password"
+msgstr "HTTP proxyaren pasahitza"
+
+#: src/libvlc-module.c:855
+msgid "If your HTTP proxy requires a password, set it here."
+msgstr "Zure HTTP proxyak pasahitza eskatzen badu, ezar ezazu hemen."
+
+#: src/libvlc-module.c:857
 msgid "SOCKS server"
 msgstr "SOCKS zerbitzaria"
 
-#: src/libvlc-module.c:853
+#: src/libvlc-module.c:859
 msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
@@ -3281,92 +3286,92 @@ msgstr ""
 "Erabili beharreko SOCKS proxy-zerbitzaria. Forma hau eduki behar du: "
 "helbidea:ataka. TCP konexio guztietarako erabiliko da"
 
-#: src/libvlc-module.c:856
+#: src/libvlc-module.c:862
 msgid "SOCKS user name"
 msgstr "SOCKS erabiltzaile-izena"
 
-#: src/libvlc-module.c:858
+#: src/libvlc-module.c:864
 msgid "User name to be used for connection to the SOCKS proxy."
 msgstr "SOCKS proxyarekin konektatzeko erabiliko den erabiltzaile-izena."
 
-#: src/libvlc-module.c:860
+#: src/libvlc-module.c:866
 msgid "SOCKS password"
 msgstr "SOCKS pasahitza"
 
-#: src/libvlc-module.c:862
+#: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
 msgstr "SOCKS proxyarekin konektatzeko erabiliko den pasahitza."
 
-#: src/libvlc-module.c:864
+#: src/libvlc-module.c:870
 msgid "Title metadata"
 msgstr "Tituluaren metadatuak"
 
-#: src/libvlc-module.c:866
+#: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
 msgstr ""
 "Sarrera baterako \"titulua\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:868
+#: src/libvlc-module.c:874
 msgid "Author metadata"
 msgstr "Egilearen metadatuak"
 
-#: src/libvlc-module.c:870
+#: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
 msgstr "Sarrera baterako \"egilea\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:872
+#: src/libvlc-module.c:878
 msgid "Artist metadata"
 msgstr "Artistaren metadatuak"
 
-#: src/libvlc-module.c:874
+#: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
 msgstr ""
 "Sarrera baterako \"artista\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:876
+#: src/libvlc-module.c:882
 msgid "Genre metadata"
 msgstr "Generoaren metadatuak"
 
-#: src/libvlc-module.c:878
+#: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
 msgstr ""
 "Sarrera baterako \"generoa\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:880
+#: src/libvlc-module.c:886
 msgid "Copyright metadata"
 msgstr "Copyright-aren metadatuak"
 
-#: src/libvlc-module.c:882
+#: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
 msgstr ""
 "Sarrera baterako \"copyright\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:884
+#: src/libvlc-module.c:890
 msgid "Description metadata"
 msgstr "Azalpenaren metadatuak"
 
-#: src/libvlc-module.c:886
+#: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
 msgstr ""
 "Sarrera baterako \"azalpena\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:888
+#: src/libvlc-module.c:894
 msgid "Date metadata"
 msgstr "Dataren metadatuak"
 
-#: src/libvlc-module.c:890
+#: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
 msgstr "Sarrera baterako \"data\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:892
+#: src/libvlc-module.c:898
 msgid "URL metadata"
 msgstr "URLaren metadatuak"
 
-#: src/libvlc-module.c:894
+#: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
 msgstr "Sarrera baterako \"url\" metadatu bat zehazteko aukera ematen dizu."
 
-#: src/libvlc-module.c:898
+#: src/libvlc-module.c:904
 msgid ""
 "This option can be used to alter the way VLC selects its codecs "
 "(decompression methods). Only advanced users should alter this option as it "
@@ -3377,11 +3382,11 @@ msgstr ""
 "beharko lukete aukera hau, transmisio jarraitu guztien erreprodukzioa eten "
 "dezakeelako."
 
-#: src/libvlc-module.c:902
+#: src/libvlc-module.c:908
 msgid "Preferred decoders list"
 msgstr "Deskodetzaile hobetsien zerrenda"
 
-#: src/libvlc-module.c:904
+#: src/libvlc-module.c:910
 msgid ""
 "List of codecs that VLC will use in priority. For instance, 'dummy,a52' will "
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
@@ -3392,18 +3397,18 @@ msgstr ""
 "Erabiltzaile aurreratuek bakarrik aldatu beharko lukete aukera hau, "
 "transmisio jarraitu guztien erreprodukzioa eten dezakeelako."
 
-#: src/libvlc-module.c:909
+#: src/libvlc-module.c:915
 msgid "Preferred encoders list"
 msgstr "Kodetzaile hobetsien zerrenda"
 
-#: src/libvlc-module.c:911
+#: src/libvlc-module.c:917
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
 msgstr ""
 "VLCk lehentasunez erabiliko dituen kodetzaileen zerrenda bat hautatzeko "
 "aukera ematen dizu."
 
-#: src/libvlc-module.c:920
+#: src/libvlc-module.c:926
 msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
@@ -3411,11 +3416,11 @@ msgstr ""
 "Aukera hauen bidez, transmisio jarraituko irteeren azpisistemarako aukera "
 "orokor lehenetsiak ezar ditzakezu."
 
-#: src/libvlc-module.c:923
+#: src/libvlc-module.c:929
 msgid "Default stream output chain"
 msgstr "Transmisio jarraituen irteerako katea"
 
-#: src/libvlc-module.c:925
+#: src/libvlc-module.c:931
 msgid ""
 "You can enter here a default stream output chain. Refer to the documentation "
 "to learn how to build such chains. Warning: this chain will be enabled for "
@@ -3425,32 +3430,32 @@ msgstr ""
 "Kontsultatu dokumentazioa horrelako kateak nola eraiki ditzakezun jakiteko. "
 "Abisua: kate hori transmisio jarraitu guztietarako gaituko da."
 
-#: src/libvlc-module.c:929
+#: src/libvlc-module.c:935
 msgid "Enable streaming of all ES"
 msgstr ""
 "Gaitu oinarrizko transmisio jarraitu guztiak modu jarraituan transmititzea"
 
-#: src/libvlc-module.c:931
+#: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
 msgstr ""
 "Oinarrizko transmisio jarraitu guztiak modu jarraituan transmititu (bideoa, "
 "audioa eta azpitituluak)"
 
-#: src/libvlc-module.c:933
+#: src/libvlc-module.c:939
 msgid "Display while streaming"
 msgstr "Bistaratu modu jarraituan transmititzean"
 
-#: src/libvlc-module.c:935
+#: src/libvlc-module.c:941
 msgid "Play locally the stream while streaming it."
 msgstr ""
 "Erreproduzitu lokalki transmisio jarraitua modu jarraituan transmititzen den "
 "bitartean."
 
-#: src/libvlc-module.c:937
+#: src/libvlc-module.c:943
 msgid "Enable video stream output"
 msgstr "Gaitu bideoaren transmisio jarraituaren irteera"
 
-#: src/libvlc-module.c:939
+#: src/libvlc-module.c:945
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3458,11 +3463,11 @@ msgstr ""
 "Aukeratu bideoaren transmisio jarraitua transmisio jarraituen irteerako "
 "gailura birbideratu behar den azken hori gaituta dagoenean."
 
-#: src/libvlc-module.c:942
+#: src/libvlc-module.c:948
 msgid "Enable audio stream output"
 msgstr "Gaitu audioaren transmisio jarraituaren irteera"
 
-#: src/libvlc-module.c:944
+#: src/libvlc-module.c:950
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3470,11 +3475,11 @@ msgstr ""
 "Aukeratu audioaren transmisio jarraitua transmisio jarraituen irteerako "
 "gailura birbideratu behar den azken hori gaituta dagoenean."
 
-#: src/libvlc-module.c:947
+#: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
 msgstr "Gaitu SPU transmisio jarraituaren irteera"
 
-#: src/libvlc-module.c:949
+#: src/libvlc-module.c:955
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -3482,11 +3487,11 @@ msgstr ""
 "Aukeratu SPU transmisio jarraituak transmisio jarraituen irteerako gailura "
 "birbideratu behar diren edo ez, azken hori gaituta dagoenean."
 
-#: src/libvlc-module.c:952
+#: src/libvlc-module.c:958
 msgid "Keep stream output open"
 msgstr "Eduki transmisio jarraituaren irteera irekita"
 
-#: src/libvlc-module.c:954
+#: src/libvlc-module.c:960
 msgid ""
 "This allows you to keep an unique stream output instance across multiple "
 "playlist item (automatically insert the gather stream output if not "
@@ -3496,12 +3501,12 @@ msgstr ""
 "eduki dezakezu erreprodukzio-zerrendako hainbat elementutan (hau zehazten ez "
 "baduzu, automatikoki transmisio jarraituaren irteera bateratua txertatzen da)"
 
-#: src/libvlc-module.c:958
+#: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
 msgstr ""
 "Transmisio jarraituaren irteeraren demultiplexadorea cachean gordetzea (ms)"
 
-#: src/libvlc-module.c:960
+#: src/libvlc-module.c:966
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
@@ -3510,38 +3515,38 @@ msgstr ""
 "hasierako cachea konfigura dezakezu. Balio hori milisegundotan zehaztu behar "
 "da."
 
-#: src/libvlc-module.c:963
+#: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
 msgstr "Paketatzaile hobetsien zerrenda"
 
-#: src/libvlc-module.c:965
+#: src/libvlc-module.c:971
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "Ezarpen honen bidez VLCk bere paketatzaileak zer ordenatan aukeratuko dituen "
 "hauta dezakezu."
 
-#: src/libvlc-module.c:968
+#: src/libvlc-module.c:974
 msgid "Mux module"
 msgstr "Multiplexadoreen modulua"
 
-#: src/libvlc-module.c:970
+#: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
 msgstr ""
 "Hau aurreko bertsioetako sarrera bat da, eta multiplexadoreen moduluak "
 "konfiguratzeko aukera ematen dizu"
 
-#: src/libvlc-module.c:972
+#: src/libvlc-module.c:978
 msgid "Access output module"
 msgstr "Atzipen-irteerako modulua"
 
-#: src/libvlc-module.c:974
+#: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
 "Hau aurreko bertsioetako sarrera bat da, eta atzipen-irteerako moduluak "
 "konfiguratzeko aukera ematen dizu"
 
-#: src/libvlc-module.c:977
+#: src/libvlc-module.c:983
 msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
@@ -3549,11 +3554,11 @@ msgstr ""
 "Aukera hau gaituta badago, SAP multidifusioko helbideko fluxua kontrolatu "
 "egingo da. Hau beharrezkoa da MBone-n iragarpenak egin nahi badituzu."
 
-#: src/libvlc-module.c:981
+#: src/libvlc-module.c:987
 msgid "SAP announcement interval"
 msgstr "SAP iragarpenen arteko tartea"
 
-#: src/libvlc-module.c:983
+#: src/libvlc-module.c:989
 msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
@@ -3561,7 +3566,7 @@ msgstr ""
 "SAP fluxu-kontrola desgaituta dagoenean, ezarpen honek SAP iragarpenen "
 "artean finkatutako tartea ezartzeko aukera ematen dizu."
 
-#: src/libvlc-module.c:992
+#: src/libvlc-module.c:998
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
@@ -3569,11 +3574,11 @@ msgstr ""
 "Aukera horiek modulu lehenetsiak hautatzeko aukera ematen dizute. Ez ukitu "
 "aukera horiek benetan zertan ari zaren ez badakizu."
 
-#: src/libvlc-module.c:995
+#: src/libvlc-module.c:1001
 msgid "Access module"
 msgstr "Atzipen-modulua"
 
-#: src/libvlc-module.c:997
+#: src/libvlc-module.c:1003
 msgid ""
 "This allows you to force an access module. You can use it if the correct "
 "access is not automatically detected. You should not set this as a global "
@@ -3584,31 +3589,31 @@ msgstr ""
 "ezarpen hau aukera orokor gisa konfiguratu beharko benetan zer egiten ari "
 "zaren ez badakizu."
 
-#: src/libvlc-module.c:1001
+#: src/libvlc-module.c:1007
 msgid "Stream filter module"
 msgstr "Transmisio jarraituak iragazteko modulua"
 
-#: src/libvlc-module.c:1003
+#: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
 "Transmisio jarraituen iragazkiak irakurtzen ari den transmisio jarraitua "
 "aldatzeko erabiltzen dira."
 
-#: src/libvlc-module.c:1005
+#: src/libvlc-module.c:1011
 msgid "Demux filter module"
 msgstr "Demultiplexadoreen iragazkien modulua"
 
-#: src/libvlc-module.c:1007
+#: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
 "Demultiplexadoreen iragazkiak irakurtzen ari den transmisio jarraitua aldatu "
 "eta kontrolatzeko erabiltzen dira."
 
-#: src/libvlc-module.c:1009
+#: src/libvlc-module.c:1015
 msgid "Demux module"
 msgstr "Demultiplexadoreen modulua"
 
-#: src/libvlc-module.c:1011
+#: src/libvlc-module.c:1017
 msgid ""
 "Demultiplexers are used to separate the \"elementary\" streams (like audio "
 "and video streams). You can use it if the correct demuxer is not "
@@ -3621,11 +3626,11 @@ msgstr ""
 "dezakezu. Ez zenuke ezarpen hau aukera orokor gisa konfiguratu beharko "
 "benetan zer egiten ari zaren ez badakizu."
 
-#: src/libvlc-module.c:1016
+#: src/libvlc-module.c:1022
 msgid "VoD server module"
 msgstr "VoD zerbitzariaren modulua"
 
-#: src/libvlc-module.c:1018
+#: src/libvlc-module.c:1024
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
@@ -3633,11 +3638,11 @@ msgstr ""
 "Zein VoD zerbitzari-modulu erabili nahi duzun hauta dezakezu. Ezarri hau "
 "'vod_rtsp' baliora modulu zaharrera itzultzeko."
 
-#: src/libvlc-module.c:1021
+#: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
 msgstr "Onartu denbora errealeko lehentasuna"
 
-#: src/libvlc-module.c:1023
+#: src/libvlc-module.c:1029
 msgid ""
 "Running VLC in real-time priority will allow for much more precise "
 "scheduling and yield better, especially when streaming content. It can "
@@ -3651,11 +3656,11 @@ msgstr ""
 "Benetan zer egiten duzun baldin badakizu bakarrik aktibatu beharko zenuke "
 "aukera hau."
 
-#: src/libvlc-module.c:1029
+#: src/libvlc-module.c:1035
 msgid "Adjust VLC priority"
 msgstr "Doitu VLCren lehentasuna"
 
-#: src/libvlc-module.c:1031
+#: src/libvlc-module.c:1037
 msgid ""
 "This option adds an offset (positive or negative) to VLC default priorities. "
 "You can use it to tune VLC priority against other programs, or against other "
@@ -3665,36 +3670,36 @@ msgstr ""
 "lehentasun lehenetsiei. VLCren lehentasuna beste programa batzuekiko edo "
 "VLCren beste instantzia batzuekiko doitzeko erabil dezakezu."
 
-#: src/libvlc-module.c:1036
+#: src/libvlc-module.c:1042
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr ""
 "Aukera hau erabilgarria izan daiteke transmisio jarraitu bat irakurtzean "
 "latentzia-maila jaitsi nahi baduzu"
 
-#: src/libvlc-module.c:1039
+#: src/libvlc-module.c:1045
 msgid "VLM configuration file"
 msgstr "VLMren konfigurazio-fitxategia"
 
-#: src/libvlc-module.c:1041
+#: src/libvlc-module.c:1047
 msgid "Read a VLM configuration file as soon as VLM is started."
 msgstr "Irakurri VLMren konfigurazio-fitxategi bat VLM abiarazi bezain laster."
 
-#: src/libvlc-module.c:1043
+#: src/libvlc-module.c:1049
 msgid "Use a plugins cache"
 msgstr "Erabili pluginen cachea"
 
-#: src/libvlc-module.c:1045
+#: src/libvlc-module.c:1051
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr ""
 "Pluginen cache bat erabiltzen baduzu, VLCk askoz denbora gutxiago beharko du "
 "abiarazteko."
 
-#: src/libvlc-module.c:1047
+#: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
 msgstr "Eskaneatu plugin berrien bila"
 
-#: src/libvlc-module.c:1049
+#: src/libvlc-module.c:1055
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
@@ -3702,43 +3707,43 @@ msgstr ""
 "Eskaneatu abioan pluginen direktorioak plugin berrien bila. VLCren abio-"
 "denbora handitzen du honek."
 
-#: src/libvlc-module.c:1052
+#: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
 msgstr "Gako-biltegiratzearen zerrenda lehenetsia"
 
-#: src/libvlc-module.c:1054
+#: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
 msgstr "VLCk lehentasunez erabiliko dituen gako-biltegiratzeen zerrendak."
 
-#: src/libvlc-module.c:1056
+#: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
 msgstr "Bildu estatistika lokalak"
 
-#: src/libvlc-module.c:1058
+#: src/libvlc-module.c:1064
 msgid "Collect miscellaneous local statistics about the playing media."
 msgstr "Bildu erreprodukzio-euskarriei buruzko askotariko estatistika lokalak."
 
-#: src/libvlc-module.c:1060
+#: src/libvlc-module.c:1066
 msgid "Run as daemon process"
 msgstr "Exekutatu daemon prozesu gisa"
 
-#: src/libvlc-module.c:1062
+#: src/libvlc-module.c:1068
 msgid "Runs VLC as a background daemon process."
 msgstr "VLC atzeko planoko daemon prozesu gisa exekutatzen du."
 
-#: src/libvlc-module.c:1064
+#: src/libvlc-module.c:1070
 msgid "Write process id to file"
 msgstr "Idatzi prozesu-identifikatzailea fitxategian"
 
-#: src/libvlc-module.c:1066
+#: src/libvlc-module.c:1072
 msgid "Writes process id into specified file."
 msgstr "Prozesu-identifikatzailea zehaztutako fitxategian idazten du."
 
-#: src/libvlc-module.c:1068
+#: src/libvlc-module.c:1074
 msgid "Allow only one running instance"
 msgstr "Instantzia bakarra exekutatzea onartu"
 
-#: src/libvlc-module.c:1070
+#: src/libvlc-module.c:1076
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -3753,25 +3758,25 @@ msgstr ""
 "exekutatzen ari den instantziarekin erreproduzitu edo ilaran jarri ahal "
 "izango duzu."
 
-#: src/libvlc-module.c:1076
+#: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
 msgstr "VLC fitxategi-asoziaziotik abiarazi da"
 
-#: src/libvlc-module.c:1078
+#: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr ""
 "Esan VLCri sistema eragileko fitxategi-asoziazio baten ondorioz abiarazten "
 "ari dela"
 
-#: src/libvlc-module.c:1081 modules/gui/qt/ui/sprefs_interface.h:550
+#: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
 msgstr "Erabili instantzia bakarra fitxategi-kudeatzailetik abiatzerakoan."
 
-#: src/libvlc-module.c:1083
+#: src/libvlc-module.c:1089
 msgid "Increase the priority of the process"
 msgstr "Handitu prozesuaren lehentasuna"
 
-#: src/libvlc-module.c:1085
+#: src/libvlc-module.c:1091
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
@@ -3787,12 +3792,12 @@ msgstr ""
 "dezakeela, sistema guztiak erantzuteari utz diezaiokeela eta, ondorioz, "
 "agian makina berrabiarazi beharko duzula."
 
-#: src/libvlc-module.c:1093 modules/gui/qt/ui/sprefs_interface.h:553
+#: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
 msgstr ""
 "Jarri elementuak erreprodukzio-zerrendaren ilaran instantzia bakarreko moduan"
 
-#: src/libvlc-module.c:1095
+#: src/libvlc-module.c:1101
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
@@ -3801,16 +3806,16 @@ msgstr ""
 "erreprodukzio-zerrendaren ilaran eta jarraitu uneko elementua "
 "erreproduzitzen."
 
-#: src/libvlc-module.c:1098
+#: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
 msgstr "Jarri agerian multimedia erreproduzigailua D-Bus bidez"
 
-#: src/libvlc-module.c:1099
+#: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
 "Baimendu beste aplikazioei VLC kontrolatzea D-Bus MPRIS protokoloa erabiliz."
 
-#: src/libvlc-module.c:1108
+#: src/libvlc-module.c:1114
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
@@ -3819,11 +3824,11 @@ msgstr ""
 "horietako batzuk indargabetuta geratzea erreprodukzio-zerrendaren "
 "elkarrizketa-koadroan."
 
-#: src/libvlc-module.c:1111
+#: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
 msgstr "Automatikoki aurrez analizatu elementuak"
 
-#: src/libvlc-module.c:1113
+#: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
@@ -3831,34 +3836,34 @@ msgstr ""
 "Automatikoki aurrez analizatu erreprodukzio-zerrendan gehitutako elementuak "
 "(metadatu batzuk eskuratzeko)."
 
-#: src/libvlc-module.c:1116
+#: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
 msgstr "Aurrez analizatzeko denbora-muga"
 
-#: src/libvlc-module.c:1118
+#: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
 "Elementu bat aurrez analizatzeko baimendutako denbora maximoa, milisegundotan"
 
-#: src/libvlc-module.c:1120 modules/gui/macosx/VLCSimplePrefsController.m:328
+#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
 msgstr "Onartu metadatuen sarerako sarbidea"
 
-#: src/libvlc-module.c:1125
+#: src/libvlc-module.c:1131
 msgid "Collapse"
 msgstr "Tolestu"
 
-#: src/libvlc-module.c:1125
+#: src/libvlc-module.c:1131
 msgid "Expand"
 msgstr "Zabaldu"
 
-#: src/libvlc-module.c:1127
+#: src/libvlc-module.c:1133
 msgid "Subdirectory behavior"
 msgstr "Azpidirektorioaren portaera"
 
-#: src/libvlc-module.c:1129
+#: src/libvlc-module.c:1135
 msgid ""
 "Select whether subdirectories must be expanded.\n"
 "none: subdirectories do not appear in the playlist.\n"
@@ -3871,11 +3876,11 @@ msgstr ""
 "egiten dira.\n"
 "hedatu: azpidirektorio guztiak hedatuta daude.\n"
 
-#: src/libvlc-module.c:1134
+#: src/libvlc-module.c:1140
 msgid "Ignored extensions"
 msgstr "Ez ikusi egindako luzapenak"
 
-#: src/libvlc-module.c:1136
+#: src/libvlc-module.c:1142
 msgid ""
 "Files with these extensions will not be added to playlist when opening a "
 "directory.\n"
@@ -3888,19 +3893,19 @@ msgstr ""
 "direktorioak gehitzen badituzu. Erabili komaz bereizitako luzapenen zerrenda "
 "bat."
 
-#: src/libvlc-module.c:1141
+#: src/libvlc-module.c:1147
 msgid "Show hidden files"
 msgstr "Erakutsi ezkutuko fitxategiak"
 
-#: src/libvlc-module.c:1143
+#: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
 msgstr "Ezikusi puntu bidez ('.') hasten diren fitxategiak"
 
-#: src/libvlc-module.c:1145
+#: src/libvlc-module.c:1151
 msgid "Services discovery modules"
 msgstr "Zerbitzu-aurkikuntzako moduluak"
 
-#: src/libvlc-module.c:1147
+#: src/libvlc-module.c:1153
 msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
@@ -3908,83 +3913,83 @@ msgstr ""
 "Aurrekargatzeko zerbitzuen aurkikuntza-moduluak zehazten ditu, bi puntuz "
 "bereiziak. Ohiko balioa \"sap\" da."
 
-#: src/libvlc-module.c:1150
+#: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
 msgstr "Erreproduzitu fitxategiak ausaz gelditu gabe"
 
-#: src/libvlc-module.c:1152
+#: src/libvlc-module.c:1158
 msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr ""
 "VLCk erreprodukzio-zerrendako fitxategiak ausaz erreproduzituko ditu, eten "
 "arte."
 
-#: src/libvlc-module.c:1154
+#: src/libvlc-module.c:1160
 msgid "Repeat all"
 msgstr "Errepikatu dena"
 
-#: src/libvlc-module.c:1156
+#: src/libvlc-module.c:1162
 msgid "VLC will keep playing the playlist indefinitely."
 msgstr ""
 "VLCk erreprodukzio-zerrenda mugarik gabe erreproduzitzen jarraituko du."
 
-#: src/libvlc-module.c:1158
+#: src/libvlc-module.c:1164
 msgid "Repeat current item"
 msgstr "Errepikatu uneko elementua"
 
-#: src/libvlc-module.c:1160
+#: src/libvlc-module.c:1166
 msgid "VLC will keep playing the current playlist item."
 msgstr ""
 "VLCk erreprodukzio-zerrendako uneko elementua erreproduzitzen jarraituko du."
 
-#: src/libvlc-module.c:1162
+#: src/libvlc-module.c:1168
 msgid "Play and stop"
 msgstr "Erreproduzitu eta gelditu"
 
-#: src/libvlc-module.c:1164
+#: src/libvlc-module.c:1170
 msgid "Stop the playlist after each played playlist item."
 msgstr ""
 "Gelditu erreprodukzio-zerrenda erreproduzitutako elementu bakoitzaren "
 "ondoren."
 
-#: src/libvlc-module.c:1166
+#: src/libvlc-module.c:1172
 msgid "Play and exit"
 msgstr "Erreproduzitu eta irten"
 
-#: src/libvlc-module.c:1168
+#: src/libvlc-module.c:1174
 msgid "Exit if there are no more items in the playlist."
 msgstr "Irten erreprodukzio-zerrendan elementu gehiago ez badaude."
 
-#: src/libvlc-module.c:1170
+#: src/libvlc-module.c:1176
 msgid "Play and pause"
 msgstr "Erreproduzitu eta pausarazi"
 
-#: src/libvlc-module.c:1172
+#: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
 msgstr "Pausarazi erreprodukzio-zerrendako elementu bakoitza azken markoan."
 
-#: src/libvlc-module.c:1174
+#: src/libvlc-module.c:1180
 msgid "Start paused"
 msgstr "Hasi pausarazita"
 
-#: src/libvlc-module.c:1176
+#: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
 msgstr "Pausarazi erreprodukzio-zerrendako elementu bakoitza lehen markoan."
 
-#: src/libvlc-module.c:1178
+#: src/libvlc-module.c:1184
 msgid "Auto start"
 msgstr "Hasi automatikoki"
 
-#: src/libvlc-module.c:1179
+#: src/libvlc-module.c:1185
 msgid "Automatically start playing the playlist content once it's loaded."
 msgstr ""
 "Automatikoki hasten da erreprodukzio-zerrendaren edukia erreproduzitzen, "
 "kargatu ondoren."
 
-#: src/libvlc-module.c:1182
+#: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
 msgstr "Pausatu audio komunikazioan"
 
-#: src/libvlc-module.c:1184
+#: src/libvlc-module.c:1190
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
@@ -3992,11 +3997,11 @@ msgstr ""
 "Audio komunikazioren bat itxaroten dagoela atzematen bada, atzerakako "
 "erreprodukzioa automatikoki etenaldian geratuko da."
 
-#: src/libvlc-module.c:1187
+#: src/libvlc-module.c:1193
 msgid "Use media library"
 msgstr "Erabili multimedia-fitxategien liburutegia"
 
-#: src/libvlc-module.c:1189
+#: src/libvlc-module.c:1195
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
@@ -4004,11 +4009,11 @@ msgstr ""
 "Multimedia-fitxategien liburutegia automatikoki gordetzen eta kargatzen da "
 "VLC abiarazten duzun bakoitzean."
 
-#: src/libvlc-module.c:1192 modules/gui/qt/ui/sprefs_interface.h:551
+#: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Display playlist tree"
 msgstr "Bistaratu erreprodukzio-zerrendaren zuhaitza"
 
-#: src/libvlc-module.c:1194
+#: src/libvlc-module.c:1200
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
@@ -4016,33 +4021,33 @@ msgstr ""
 "Erreprodukzio-zerrendak zuhaitz bat erabil dezake elementu batzuk "
 "kategorizatzeko, adibidez, direktorio baten edukia."
 
-#: src/libvlc-module.c:1203
+#: src/libvlc-module.c:1209
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr ""
 "Ezarpen horiek VLC tekla-asoziazio orokorrak dira, \"laster-tekla\" "
 "deiturikoak."
 
-#: src/libvlc-module.c:1208 modules/gui/macosx/VLCMain+OldPrefs.m:115
+#: src/libvlc-module.c:1214 modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Ignore"
 msgstr "Ez ikusi egin"
 
-#: src/libvlc-module.c:1208
+#: src/libvlc-module.c:1214
 msgid "Volume control"
 msgstr "Bolumenaren kontrola"
 
-#: src/libvlc-module.c:1209
+#: src/libvlc-module.c:1215
 msgid "Position control"
 msgstr "Kokalekuaren kontrola"
 
-#: src/libvlc-module.c:1209
+#: src/libvlc-module.c:1215
 msgid "Position control reversed"
 msgstr "Kokalekuaren kontrola alderantzikatuta"
 
-#: src/libvlc-module.c:1212
+#: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
 msgstr "Saguaren gurpilaren ardatz bertikalaren kontrola"
 
-#: src/libvlc-module.c:1214
+#: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
@@ -4050,11 +4055,11 @@ msgstr ""
 "Saguaren gurpilaren ardatz bertikalak (gora/behera) bolumena eta kokalekua "
 "kontrola ditzake edo ezikusi egin daiteke."
 
-#: src/libvlc-module.c:1216
+#: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
 msgstr "Saguaren gurpilaren ardatz horizontalaren kontrola"
 
-#: src/libvlc-module.c:1218
+#: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
@@ -4062,129 +4067,129 @@ msgstr ""
 "Saguaren gurpilaren ardatz horizontalak (ezker/eskuin) bolumena eta "
 "kokalekua kontrola ditzake edo ezikusi egin daiteke."
 
-#: src/libvlc-module.c:1220 src/video_output/vout_intf.c:268
+#: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
-#: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:501
+#: modules/gui/macosx/VLCMainMenu.m:433 modules/gui/macosx/VLCMainMenu.m:512
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/ui/sprefs_video.h:318
 msgid "Fullscreen"
 msgstr "Pantaila osoa"
 
-#: src/libvlc-module.c:1221
+#: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Hautatu pantaila osora aldatzeko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1222
+#: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
 msgstr "Irten pantaila osotik"
 
-#: src/libvlc-module.c:1223
+#: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to exit fullscreen state."
 msgstr "Hautatu pantaila osotik irteteko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1224 modules/gui/macosx/VLCFSPanelController.m:109
+#: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
 msgstr "Erreproduzitu/Pausarazi"
 
-#: src/libvlc-module.c:1225
+#: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
 msgstr "Hautatu pausarazitako egoerara aldatzeko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1226
+#: src/libvlc-module.c:1232
 msgid "Pause only"
 msgstr "Pausarazi bakarrik"
 
-#: src/libvlc-module.c:1227
+#: src/libvlc-module.c:1233
 msgid "Select the hotkey to use to pause."
 msgstr "Hautatu pausarazteko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1228
+#: src/libvlc-module.c:1234
 msgid "Play only"
 msgstr "Erreproduzitu bakarrik"
 
-#: src/libvlc-module.c:1229
+#: src/libvlc-module.c:1235
 msgid "Select the hotkey to use to play."
 msgstr "Hautatu erreproduzitzeko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1230 modules/gui/macosx/VLCMainMenu.m:385
+#: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Faster"
 msgstr "Bizkorrago"
 
-#: src/libvlc-module.c:1231 src/libvlc-module.c:1237
+#: src/libvlc-module.c:1237 src/libvlc-module.c:1243
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "Hautatu fitxategia bizkor erreproduzitzeko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1232 modules/gui/macosx/VLCMainMenu.m:383
+#: src/libvlc-module.c:1238 modules/gui/macosx/VLCMainMenu.m:392
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
 msgstr "Mantsoago"
 
-#: src/libvlc-module.c:1233 src/libvlc-module.c:1239
+#: src/libvlc-module.c:1239 src/libvlc-module.c:1245
 msgid "Select the hotkey to use for slow motion playback."
 msgstr "Hautatu fitxategia mantso erreproduzitzeko erabiliko den laster-tekla."
 
-#: src/libvlc-module.c:1234
+#: src/libvlc-module.c:1240
 msgid "Normal rate"
 msgstr "Emari normala"
 
-#: src/libvlc-module.c:1235
+#: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr "Hautatu erreprodukzio-emaria normala berrezartzeko laster-tekla."
 
-#: src/libvlc-module.c:1236 modules/gui/qt/menus.cpp:883
+#: src/libvlc-module.c:1242 modules/gui/qt/menus.cpp:883
 msgid "Faster (fine)"
 msgstr "Bizkorrago (zehatz)"
 
-#: src/libvlc-module.c:1238 modules/gui/qt/menus.cpp:891
+#: src/libvlc-module.c:1244 modules/gui/qt/menus.cpp:891
 msgid "Slower (fine)"
 msgstr "Mantsoago (zehatz)"
 
-#: src/libvlc-module.c:1240 modules/control/hotkeys.c:410
+#: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
 #: modules/gui/macosx/VLCFSPanelController.m:112
-#: modules/gui/macosx/VLCMainMenu.m:388 modules/gui/macosx/VLCMainMenu.m:489
-#: modules/gui/macosx/VLCMainMenu.m:497
+#: modules/gui/macosx/VLCMainMenu.m:397 modules/gui/macosx/VLCMainMenu.m:500
+#: modules/gui/macosx/VLCMainMenu.m:508
 #: modules/gui/qt/components/controller.hpp:112
 #: modules/gui/qt/dialogs/sout.cpp:93 modules/notify/notify.c:335
 #: modules/gui/qt/ui/streampanel.h:181
 msgid "Next"
 msgstr "Hurrengoa"
 
-#: src/libvlc-module.c:1241
+#: src/libvlc-module.c:1247
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 "Hautatu erreprodukzio-zerrendako hurrengo elementura joateko laster-tekla."
 
-#: src/libvlc-module.c:1242 modules/control/hotkeys.c:414
+#: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
 #: modules/gui/macosx/VLCFSPanelController.m:115
-#: modules/gui/macosx/VLCMainMenu.m:387 modules/gui/macosx/VLCMainMenu.m:490
-#: modules/gui/macosx/VLCMainMenu.m:496
+#: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:501
+#: modules/gui/macosx/VLCMainMenu.m:507
 #: modules/gui/qt/components/controller.hpp:112 modules/notify/notify.c:333
 msgid "Previous"
 msgstr "Aurrekoa"
 
-#: src/libvlc-module.c:1243
+#: src/libvlc-module.c:1249
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
 "Hautatu erreprodukzio-zerrendako aurreko elementura joateko laster-tekla."
 
-#: src/libvlc-module.c:1244 modules/gui/macosx/VLCMainMenu.m:378
-#: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/macosx/VLCMainMenu.m:495
+#: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:387
+#: modules/gui/macosx/VLCMainMenu.m:499 modules/gui/macosx/VLCMainMenu.m:506
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:61
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:545 modules/gui/qt/ui/streampanel.h:180
 msgid "Stop"
 msgstr "Gelditu"
 
-#: src/libvlc-module.c:1245
+#: src/libvlc-module.c:1251
 msgid "Select the hotkey to stop playback."
 msgstr "Hautatu erreproduzitzeari uzteko laster-tekla."
 
-#: src/libvlc-module.c:1246 modules/gui/macosx/VLCControlsBarCommon.m:75
+#: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:286
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:308
@@ -4194,115 +4199,115 @@ msgstr "Hautatu erreproduzitzeari uzteko laster-tekla."
 msgid "Position"
 msgstr "Kokalekua"
 
-#: src/libvlc-module.c:1247
+#: src/libvlc-module.c:1253
 msgid "Select the hotkey to display the position."
 msgstr "Hautatu kokalekua bistaratzeko laster-tekla."
 
-#: src/libvlc-module.c:1249
+#: src/libvlc-module.c:1255
 msgid "Very short backwards jump"
 msgstr "Atzeranzko oso jauzi laburra"
 
-#: src/libvlc-module.c:1251
+#: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a very short backwards jump."
 msgstr "Hautatu atzeranzko oso jauzi laburra egiteko laster-tekla."
 
-#: src/libvlc-module.c:1252
+#: src/libvlc-module.c:1258
 msgid "Short backwards jump"
 msgstr "Atzeranzko jauzi laburra"
 
-#: src/libvlc-module.c:1254
+#: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a short backwards jump."
 msgstr "Hautatu atzeranzko jauzi laburra egiteko laster-tekla."
 
-#: src/libvlc-module.c:1255
+#: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
 msgstr "Atzeranzko jauzi ertaina"
 
-#: src/libvlc-module.c:1257
+#: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a medium backwards jump."
 msgstr "Hautatu atzeranzko jauzi ertaina egiteko laster-tekla."
 
-#: src/libvlc-module.c:1258
+#: src/libvlc-module.c:1264
 msgid "Long backwards jump"
 msgstr "Atzeranzko jauzi luzea"
 
-#: src/libvlc-module.c:1260
+#: src/libvlc-module.c:1266
 msgid "Select the hotkey to make a long backwards jump."
 msgstr "Hautatu atzeranzko jauzi luzea egiteko laster-tekla."
 
-#: src/libvlc-module.c:1262
+#: src/libvlc-module.c:1268
 msgid "Very short forward jump"
 msgstr "Aurreranzko oso jauzi laburra"
 
-#: src/libvlc-module.c:1264
+#: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a very short forward jump."
 msgstr "Hautatu aurreranzko oso jauzi laburra egiteko laster-tekla."
 
-#: src/libvlc-module.c:1265
+#: src/libvlc-module.c:1271
 msgid "Short forward jump"
 msgstr "Aurreranzko jauzi laburra"
 
-#: src/libvlc-module.c:1267
+#: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a short forward jump."
 msgstr "Hautatu aurreranzko jauzi laburra egiteko laster-tekla."
 
-#: src/libvlc-module.c:1268
+#: src/libvlc-module.c:1274
 msgid "Medium forward jump"
 msgstr "Aurreranzko jauzi ertaina"
 
-#: src/libvlc-module.c:1270
+#: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a medium forward jump."
 msgstr "Hautatu aurreranzko jauzi ertaina egiteko laster-tekla."
 
-#: src/libvlc-module.c:1271
+#: src/libvlc-module.c:1277
 msgid "Long forward jump"
 msgstr "Aurreranzko jauzi luzea"
 
-#: src/libvlc-module.c:1273
+#: src/libvlc-module.c:1279
 msgid "Select the hotkey to make a long forward jump."
 msgstr "Hautatu aurreranzko jauzi luzea egiteko laster-tekla."
 
-#: src/libvlc-module.c:1274 modules/control/hotkeys.c:599
+#: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
 msgstr "Hurrengo markoa"
 
-#: src/libvlc-module.c:1276
+#: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
 msgstr "Hautatu hurrengo bideo-markora joateko laster-tekla."
 
-#: src/libvlc-module.c:1278
+#: src/libvlc-module.c:1284
 msgid "Very short jump length"
 msgstr "Oso jauzi laburraren luzera"
 
-#: src/libvlc-module.c:1279
+#: src/libvlc-module.c:1285
 msgid "Very short jump length, in seconds."
 msgstr "Oso jauzi laburraren luzera, segundotan."
 
-#: src/libvlc-module.c:1280
+#: src/libvlc-module.c:1286
 msgid "Short jump length"
 msgstr "Jauzi laburraren luzera"
 
-#: src/libvlc-module.c:1281
+#: src/libvlc-module.c:1287
 msgid "Short jump length, in seconds."
 msgstr "Jauzi laburraren luzera, segundotan."
 
-#: src/libvlc-module.c:1282
+#: src/libvlc-module.c:1288
 msgid "Medium jump length"
 msgstr "Jauzi ertainaren luzera"
 
-#: src/libvlc-module.c:1283
+#: src/libvlc-module.c:1289
 msgid "Medium jump length, in seconds."
 msgstr "Jauzi ertainaren luzera, segundotan."
 
-#: src/libvlc-module.c:1284
+#: src/libvlc-module.c:1290
 msgid "Long jump length"
 msgstr "Jauzi luzearen luzera"
 
-#: src/libvlc-module.c:1285
+#: src/libvlc-module.c:1291
 msgid "Long jump length, in seconds."
 msgstr "Jauzi luzearen luzera, segundotan."
 
-#: src/libvlc-module.c:1287 modules/control/hotkeys.c:361
+#: src/libvlc-module.c:1293 modules/control/hotkeys.c:361
 #: modules/gui/macosx/VLCStatusBarIcon.m:116
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:123 modules/gui/qt/menus.cpp:954
@@ -4310,15 +4315,15 @@ msgstr "Jauzi luzearen luzera, segundotan."
 msgid "Quit"
 msgstr "Irten"
 
-#: src/libvlc-module.c:1288
+#: src/libvlc-module.c:1294
 msgid "Select the hotkey to quit the application."
 msgstr "Hautatu aplikaziotik irteteko laster-tekla."
 
-#: src/libvlc-module.c:1289
+#: src/libvlc-module.c:1295
 msgid "Navigate up"
 msgstr "Joan gora"
 
-#: src/libvlc-module.c:1290
+#: src/libvlc-module.c:1296
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
@@ -4326,11 +4331,11 @@ msgstr ""
 "Hautatu DVD menuetan hautatzailea gora eramateko / ikuspuntua gora igotzeko "
 "tekla."
 
-#: src/libvlc-module.c:1291
+#: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "Joan behera"
 
-#: src/libvlc-module.c:1292
+#: src/libvlc-module.c:1298
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
@@ -4338,679 +4343,679 @@ msgstr ""
 "Hautatu DVD menuetan hautatzailea behera eramateko / ikuspuntua behera "
 "jaisteko tekla."
 
-#: src/libvlc-module.c:1293
+#: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "Joan ezkerrera"
 
-#: src/libvlc-module.c:1294
+#: src/libvlc-module.c:1300
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
 "Hautatu DVD menuetan hautatzailea / ikuspuntua ezkerrera eramateko tekla."
 
-#: src/libvlc-module.c:1295
+#: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "Joan eskuinera"
 
-#: src/libvlc-module.c:1296
+#: src/libvlc-module.c:1302
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
 "Hautatu DVD menuetan hautatzailea / ikuspuntua eskuinera eramateko tekla."
 
-#: src/libvlc-module.c:1297
+#: src/libvlc-module.c:1303
 msgid "Activate"
 msgstr "Aktibatu"
 
-#: src/libvlc-module.c:1298
+#: src/libvlc-module.c:1304
 msgid "Select the key to activate selected item in DVD menus."
 msgstr "Hautatu DVDen menuetan hautatutako elementua aktibatzeko tekla."
 
-#: src/libvlc-module.c:1299 modules/gui/qt/dialogs/toolbar.cpp:500
+#: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:500
 msgid "Go to the DVD menu"
 msgstr "Joan DVDaren menura"
 
-#: src/libvlc-module.c:1300
+#: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
 msgstr "Hautatu DVDaren menura joateko tekla"
 
-#: src/libvlc-module.c:1301
+#: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
 msgstr "Hautatu DVDaren aurreko titulua"
 
-#: src/libvlc-module.c:1302
+#: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
 msgstr "Hautatu DVDko aurreko titulua aukeratzeko tekla"
 
-#: src/libvlc-module.c:1303
+#: src/libvlc-module.c:1309
 msgid "Select next DVD title"
 msgstr "Hautatu DVDaren hurrengo titulua"
 
-#: src/libvlc-module.c:1304
+#: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
 msgstr "Hautatu DVDko hurrengo titulua aukeratzeko tekla"
 
-#: src/libvlc-module.c:1305
+#: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
 msgstr "Hautatu DVDaren aurreko kapitulua"
 
-#: src/libvlc-module.c:1306
+#: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr "Hautatu DVDko aurreko kapitulua aukeratzeko tekla"
 
-#: src/libvlc-module.c:1307
+#: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
 msgstr "Hautatu DVDaren hurrengo kapitulua"
 
-#: src/libvlc-module.c:1308
+#: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr "Hautatu DVDko hurrengo kapitulua aukeratzeko tekla"
 
-#: src/libvlc-module.c:1309
+#: src/libvlc-module.c:1315
 msgid "Volume up"
 msgstr "Igo bolumena"
 
-#: src/libvlc-module.c:1310
+#: src/libvlc-module.c:1316
 msgid "Select the key to increase audio volume."
 msgstr "Hautatu audio-bolumena igotzeko tekla."
 
-#: src/libvlc-module.c:1311
+#: src/libvlc-module.c:1317
 msgid "Volume down"
 msgstr "Jaitsi bolumena"
 
-#: src/libvlc-module.c:1312
+#: src/libvlc-module.c:1318
 msgid "Select the key to decrease audio volume."
 msgstr "Hautatu audio-bolumena jaisteko tekla."
 
-#: src/libvlc-module.c:1313 modules/access/v4l2/v4l2.c:181
-#: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:491
-#: modules/gui/macosx/VLCMainMenu.m:500
+#: src/libvlc-module.c:1319 modules/access/v4l2/v4l2.c:181
+#: modules/gui/macosx/VLCMainMenu.m:418 modules/gui/macosx/VLCMainMenu.m:502
+#: modules/gui/macosx/VLCMainMenu.m:511
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 msgid "Mute"
 msgstr "Mututu"
 
-#: src/libvlc-module.c:1314
+#: src/libvlc-module.c:1320
 msgid "Select the key to mute audio."
 msgstr "Hautatu audio-bolumena mututzeko tekla."
 
-#: src/libvlc-module.c:1315
+#: src/libvlc-module.c:1321
 msgid "Subtitle delay up"
 msgstr "Handitu azpitituluen atzerapena"
 
-#: src/libvlc-module.c:1316
+#: src/libvlc-module.c:1322
 msgid "Select the key to increase the subtitle delay."
 msgstr "Hautatu azpitituluen atzerapena handitzeko tekla."
 
-#: src/libvlc-module.c:1317
+#: src/libvlc-module.c:1323
 msgid "Subtitle delay down"
 msgstr "Txikitu azpitituluen atzerapena"
 
-#: src/libvlc-module.c:1318
+#: src/libvlc-module.c:1324
 msgid "Select the key to decrease the subtitle delay."
 msgstr "Hautatu azpitituluen atzerapena txikitzeko tekla."
 
-#: src/libvlc-module.c:1319
+#: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
 msgstr "Berrezarri azpitituluen testuaren tamaina"
 
-#: src/libvlc-module.c:1320
+#: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
 msgstr "Handitu azpitituluen testuaren tamaina"
 
-#: src/libvlc-module.c:1321
+#: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
 msgstr "Txikitu azpitituluen testuaren tamaina"
 
-#: src/libvlc-module.c:1322
+#: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
 msgstr "Hautatu azpitituluen testuaren tamaina aldatzeko tekla"
 
-#: src/libvlc-module.c:1323
+#: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
 msgstr "Azpitituluen sinkr. / audio laster-marken denbora-zigilua"
 
-#: src/libvlc-module.c:1324
+#: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr ""
 "Hautatu giltza audioaren denbora-zigilua laster-markatzeko azpitituluak "
 "sinkronizatzerakoan."
 
-#: src/libvlc-module.c:1325
+#: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
 msgstr "Azpitituluen sinkr. / audio azpitituluen denbora-zigilua"
 
-#: src/libvlc-module.c:1326
+#: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
 msgstr ""
 "Hautatu giltza azpitituluen denbora-zigilua laster-markartzeko, azpitituluak "
 "sinkronizatzerakoan."
 
-#: src/libvlc-module.c:1327
+#: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
 msgstr ""
 "Sinkronizatu azpitituluak / sinkronizatu audioen & azpitituluen denbora-"
 "zigiluak"
 
-#: src/libvlc-module.c:1328
+#: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr ""
 "Hautatu giltza sinkronizatzeko laster-markaturiko audio & azpitituluen "
 "denbora-zigiluak."
 
-#: src/libvlc-module.c:1329
+#: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
 msgstr ""
 "Azpitituluen sinkronizazioa / berrezarri audio & azpitituluen sinkronizazioa"
 
-#: src/libvlc-module.c:1330
+#: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr ""
 "Hautatu giltza berrezartzeko audio & azpitituluen denbora-zigiluen "
 "sinkronizazioa."
 
-#: src/libvlc-module.c:1331
+#: src/libvlc-module.c:1337
 msgid "Subtitle position up"
 msgstr "Azpitituluak gorago"
 
-#: src/libvlc-module.c:1332
+#: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
 msgstr "Hautatu azpitituluak gorago eramateko tekla."
 
-#: src/libvlc-module.c:1333
+#: src/libvlc-module.c:1339
 msgid "Subtitle position down"
 msgstr "Azpitituluak beherago"
 
-#: src/libvlc-module.c:1334
+#: src/libvlc-module.c:1340
 msgid "Select the key to move subtitles lower."
 msgstr "Hautatu azpitituluak beherago eramateko tekla."
 
-#: src/libvlc-module.c:1335
+#: src/libvlc-module.c:1341
 msgid "Audio delay up"
 msgstr "Handitu audio-atzerapena"
 
-#: src/libvlc-module.c:1336
+#: src/libvlc-module.c:1342
 msgid "Select the key to increase the audio delay."
 msgstr "Hautatu audioaren atzerapena handitzeko tekla."
 
-#: src/libvlc-module.c:1337
+#: src/libvlc-module.c:1343
 msgid "Audio delay down"
 msgstr "Txikitu audio-atzerapena"
 
-#: src/libvlc-module.c:1338
+#: src/libvlc-module.c:1344
 msgid "Select the key to decrease the audio delay."
 msgstr "Hautatu audioaren atzerapena txikitzeko tekla."
 
-#: src/libvlc-module.c:1345
+#: src/libvlc-module.c:1351
 msgid "Play playlist bookmark 1"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 1. laster-marka"
 
-#: src/libvlc-module.c:1346
+#: src/libvlc-module.c:1352
 msgid "Play playlist bookmark 2"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 2. laster-marka"
 
-#: src/libvlc-module.c:1347
+#: src/libvlc-module.c:1353
 msgid "Play playlist bookmark 3"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 3. laster-marka"
 
-#: src/libvlc-module.c:1348
+#: src/libvlc-module.c:1354
 msgid "Play playlist bookmark 4"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 4. laster-marka"
 
-#: src/libvlc-module.c:1349
+#: src/libvlc-module.c:1355
 msgid "Play playlist bookmark 5"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 5. laster-marka"
 
-#: src/libvlc-module.c:1350
+#: src/libvlc-module.c:1356
 msgid "Play playlist bookmark 6"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 6. laster-marka"
 
-#: src/libvlc-module.c:1351
+#: src/libvlc-module.c:1357
 msgid "Play playlist bookmark 7"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 7. laster-marka"
 
-#: src/libvlc-module.c:1352
+#: src/libvlc-module.c:1358
 msgid "Play playlist bookmark 8"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 8. laster-marka"
 
-#: src/libvlc-module.c:1353
+#: src/libvlc-module.c:1359
 msgid "Play playlist bookmark 9"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 9. laster-marka"
 
-#: src/libvlc-module.c:1354
+#: src/libvlc-module.c:1360
 msgid "Play playlist bookmark 10"
 msgstr "Erreproduzitu erreprodukzio-zerrendako 10. laster-marka"
 
-#: src/libvlc-module.c:1355
+#: src/libvlc-module.c:1361
 msgid "Select the key to play this bookmark."
 msgstr "Hautatu laster-marka hau erreproduzitzeko tekla."
 
-#: src/libvlc-module.c:1356
+#: src/libvlc-module.c:1362
 msgid "Set playlist bookmark 1"
 msgstr "Ezarri erreprodukzio-zerrendako 1. laster-marka"
 
-#: src/libvlc-module.c:1357
+#: src/libvlc-module.c:1363
 msgid "Set playlist bookmark 2"
 msgstr "Ezarri erreprodukzio-zerrendako 2. laster-marka"
 
-#: src/libvlc-module.c:1358
+#: src/libvlc-module.c:1364
 msgid "Set playlist bookmark 3"
 msgstr "Ezarri erreprodukzio-zerrendako 3. laster-marka"
 
-#: src/libvlc-module.c:1359
+#: src/libvlc-module.c:1365
 msgid "Set playlist bookmark 4"
 msgstr "Ezarri erreprodukzio-zerrendako 4. laster-marka"
 
-#: src/libvlc-module.c:1360
+#: src/libvlc-module.c:1366
 msgid "Set playlist bookmark 5"
 msgstr "Ezarri erreprodukzio-zerrendako 5. laster-marka"
 
-#: src/libvlc-module.c:1361
+#: src/libvlc-module.c:1367
 msgid "Set playlist bookmark 6"
 msgstr "Ezarri erreprodukzio-zerrendako 6. laster-marka"
 
-#: src/libvlc-module.c:1362
+#: src/libvlc-module.c:1368
 msgid "Set playlist bookmark 7"
 msgstr "Ezarri erreprodukzio-zerrendako 7. laster-marka"
 
-#: src/libvlc-module.c:1363
+#: src/libvlc-module.c:1369
 msgid "Set playlist bookmark 8"
 msgstr "Ezarri erreprodukzio-zerrendako 8. laster-marka"
 
-#: src/libvlc-module.c:1364
+#: src/libvlc-module.c:1370
 msgid "Set playlist bookmark 9"
 msgstr "Ezarri erreprodukzio-zerrendako 9. laster-marka"
 
-#: src/libvlc-module.c:1365
+#: src/libvlc-module.c:1371
 msgid "Set playlist bookmark 10"
 msgstr "Ezarri erreprodukzio-zerrendako 10. laster-marka"
 
-#: src/libvlc-module.c:1366
+#: src/libvlc-module.c:1372
 msgid "Select the key to set this playlist bookmark."
 msgstr "Hautatu laster-marka hau ezartzeko tekla."
 
-#: src/libvlc-module.c:1367
+#: src/libvlc-module.c:1373
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
 msgid "Clear the playlist"
 msgstr "Garbitu erreprodukzio-zerrenda"
 
-#: src/libvlc-module.c:1368
+#: src/libvlc-module.c:1374
 msgid "Select the key to clear the current playlist."
 msgstr "Hautatu giltza garbitzeko oraingo erreprodukzio-zerrenda."
 
-#: src/libvlc-module.c:1370
+#: src/libvlc-module.c:1376
 msgid "Playlist bookmark 1"
 msgstr "Erreprodukzio-zerrendako 1. laster-marka"
 
-#: src/libvlc-module.c:1371
+#: src/libvlc-module.c:1377
 msgid "Playlist bookmark 2"
 msgstr "Erreprodukzio-zerrendako 2. laster-marka"
 
-#: src/libvlc-module.c:1372
+#: src/libvlc-module.c:1378
 msgid "Playlist bookmark 3"
 msgstr "Erreprodukzio-zerrendako 3. laster-marka"
 
-#: src/libvlc-module.c:1373
+#: src/libvlc-module.c:1379
 msgid "Playlist bookmark 4"
 msgstr "Erreprodukzio-zerrendako 4. laster-marka"
 
-#: src/libvlc-module.c:1374
+#: src/libvlc-module.c:1380
 msgid "Playlist bookmark 5"
 msgstr "Erreprodukzio-zerrendako 5. laster-marka"
 
-#: src/libvlc-module.c:1375
+#: src/libvlc-module.c:1381
 msgid "Playlist bookmark 6"
 msgstr "Erreprodukzio-zerrendako 6. laster-marka"
 
-#: src/libvlc-module.c:1376
+#: src/libvlc-module.c:1382
 msgid "Playlist bookmark 7"
 msgstr "Erreprodukzio-zerrendako 7. laster-marka"
 
-#: src/libvlc-module.c:1377
+#: src/libvlc-module.c:1383
 msgid "Playlist bookmark 8"
 msgstr "Erreprodukzio-zerrendako 8. laster-marka"
 
-#: src/libvlc-module.c:1378
+#: src/libvlc-module.c:1384
 msgid "Playlist bookmark 9"
 msgstr "Erreprodukzio-zerrendako 9. laster-marka"
 
-#: src/libvlc-module.c:1379
+#: src/libvlc-module.c:1385
 msgid "Playlist bookmark 10"
 msgstr "Erreprodukzio-zerrendako 10. laster-marka"
 
-#: src/libvlc-module.c:1381
+#: src/libvlc-module.c:1387
 msgid "This allows you to define playlist bookmarks."
 msgstr ""
 "Ezarpen honek erreprodukzio-zerrendako laster-markak zehazteko aukera ematen "
 "dizu."
 
-#: src/libvlc-module.c:1383
+#: src/libvlc-module.c:1389
 msgid "Cycle audio track"
 msgstr "Zikloka aldatu audio-pista"
 
-#: src/libvlc-module.c:1384
+#: src/libvlc-module.c:1390
 msgid "Cycle through the available audio tracks(languages)."
 msgstr "Zikloka aldatu erabilgarri dauden audio-pistak (hizkuntzak)."
 
-#: src/libvlc-module.c:1385
+#: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
 msgstr "Zikloka aldatu azpitituluen pista alderantzizko ordenan"
 
-#: src/libvlc-module.c:1386
+#: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
 msgstr ""
 "Zikloka aldatu erabilgarri dauden azpitituluen pistak alderantzizko ordenan."
 
-#: src/libvlc-module.c:1387
+#: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
 msgstr "Zikloka aldatu azpitituluen pista"
 
-#: src/libvlc-module.c:1388
+#: src/libvlc-module.c:1394
 msgid "Cycle through the available subtitle tracks."
 msgstr "Zikloka aldatu erabilgarri dauden azpitituluen pistak."
 
-#: src/libvlc-module.c:1389
+#: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
 msgstr "Txandakatu azpitituluak"
 
-#: src/libvlc-module.c:1390
+#: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
 msgstr "Txandakatu azpitituluen pista ikusgaitasuna."
 
-#: src/libvlc-module.c:1391
+#: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
 msgstr "Zikloka aldatu hurrengo programaren zerbitzuaren IDa"
 
-#: src/libvlc-module.c:1392
+#: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
 msgstr ""
 "Zikloka aldatu eskuragarri dauden hurrengo programa zerbitzuen IDen, "
 "(Service ID horien), artean."
 
-#: src/libvlc-module.c:1393
+#: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
 msgstr "Zikloka aldatu aurreko programaren zerbitzuaren IDa"
 
-#: src/libvlc-module.c:1394
+#: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
 msgstr ""
 "Zikloka aldatu eskuragarri dauden aurreko programa zerbitzuen IDen, (Service "
 "ID horien), artean."
 
-#: src/libvlc-module.c:1395
+#: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
 msgstr "Zikloka aldatu iturburuaren aspektu-erlazioa"
 
-#: src/libvlc-module.c:1396
+#: src/libvlc-module.c:1402
 msgid "Cycle through a predefined list of source aspect ratios."
 msgstr ""
 "Zikloka aldatu iturburuen aspektu-erlazioen aurrez definitutako zerrenda "
 "bateko elementuak."
 
-#: src/libvlc-module.c:1397
+#: src/libvlc-module.c:1403
 msgid "Cycle video crop"
 msgstr "Zikloka aldatu bideo-mozketa"
 
-#: src/libvlc-module.c:1398
+#: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
 msgstr ""
 "Zikloka aldatu mozte-formatuen aurrez definituriko zerrenda bateko "
 "elementuak."
 
-#: src/libvlc-module.c:1399
+#: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
 msgstr "Txandakatu tamainaren doitze automatikoa"
 
-#: src/libvlc-module.c:1400
+#: src/libvlc-module.c:1406
 msgid "Activate or deactivate autoscaling."
 msgstr "Aktibatu edo desaktibatu tamainaren doitze automatikoa."
 
-#: src/libvlc-module.c:1401
+#: src/libvlc-module.c:1407
 msgid "Increase scale factor"
 msgstr "Handitu doitze-faktorea"
 
-#: src/libvlc-module.c:1403
+#: src/libvlc-module.c:1409
 msgid "Decrease scale factor"
 msgstr "Txikitu doitze-faktorea"
 
-#: src/libvlc-module.c:1405
+#: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
 msgstr "Txandakatu gurutzelarkatzea"
 
-#: src/libvlc-module.c:1406
+#: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
 msgstr "Aktibatu edo desaktibatu gurutzelarkatzea."
 
-#: src/libvlc-module.c:1407
+#: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
 msgstr "Zikloka aldatu gurutzelarkatuak bereizteko moduak"
 
-#: src/libvlc-module.c:1408
+#: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
 msgstr "Zikloka aldatu gurutzelarkatuak bereizteko modu erabilgarriak."
 
-#: src/libvlc-module.c:1409
+#: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
 msgstr "Erakutsi kontroladorea pantaila osoan"
 
-#: src/libvlc-module.c:1410
+#: src/libvlc-module.c:1416
 msgid "Boss key"
 msgstr "Boss tekla"
 
-#: src/libvlc-module.c:1411
+#: src/libvlc-module.c:1417
 msgid "Hide the interface and pause playback."
 msgstr "Ezkutatu interfazea eta pausatu erreprodukzioa."
 
-#: src/libvlc-module.c:1412
+#: src/libvlc-module.c:1418
 msgid "Context menu"
 msgstr "Testuinguru-menua"
 
-#: src/libvlc-module.c:1413
+#: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
 msgstr "Erakutsi testuinguruko laster-menua."
 
-#: src/libvlc-module.c:1414
+#: src/libvlc-module.c:1420
 msgid "Take video snapshot"
 msgstr "Atera bideoaren argazkia"
 
-#: src/libvlc-module.c:1415
+#: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "Bideoaren argazkia ateratzen du eta diskoan idazten du."
 
-#: src/libvlc-module.c:1417 modules/gui/macosx/VLCMainMenu.m:379
+#: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:388
 #: modules/gui/qt/components/controller.hpp:110
 #: modules/gui/qt/components/controller.hpp:121 modules/gui/qt/menus.cpp:857
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "Grabatu"
 
-#: src/libvlc-module.c:1418
+#: src/libvlc-module.c:1424
 msgid "Record access filter start/stop."
 msgstr "Hasi/Gelditu grabazioaren atzipen-iragazkia."
 
-#: src/libvlc-module.c:1420
+#: src/libvlc-module.c:1426
 msgid "Normal/Loop/Repeat"
 msgstr "Normala/Begizta/Errepikatu"
 
-#: src/libvlc-module.c:1421
+#: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
 msgstr "Txandakatu normala/begizta/errepikatu erreprodukzio-zerrendaren moduak"
 
-#: src/libvlc-module.c:1424
+#: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
 msgstr "Txandakatu erreprodukzio-zerrenda ausaz erreproduzitzea"
 
-#: src/libvlc-module.c:1429 src/libvlc-module.c:1430
+#: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
 msgstr "Kendu zooma"
 
-#: src/libvlc-module.c:1432 src/libvlc-module.c:1433
+#: src/libvlc-module.c:1438 src/libvlc-module.c:1439
 msgid "Crop one pixel from the top of the video"
 msgstr "Moztu pixel bat bideoaren goiko aldetik"
 
-#: src/libvlc-module.c:1434 src/libvlc-module.c:1435
+#: src/libvlc-module.c:1440 src/libvlc-module.c:1441
 msgid "Uncrop one pixel from the top of the video"
 msgstr "Desegin bideoaren goiko aldetik pixel bat moztea"
 
-#: src/libvlc-module.c:1437 src/libvlc-module.c:1438
+#: src/libvlc-module.c:1443 src/libvlc-module.c:1444
 msgid "Crop one pixel from the left of the video"
 msgstr "Moztu pixel bat bideoaren ezkerreko aldetik"
 
-#: src/libvlc-module.c:1439 src/libvlc-module.c:1440
+#: src/libvlc-module.c:1445 src/libvlc-module.c:1446
 msgid "Uncrop one pixel from the left of the video"
 msgstr "Desegin bideoaren ezkerreko aldetik pixel bat moztea"
 
-#: src/libvlc-module.c:1442 src/libvlc-module.c:1443
+#: src/libvlc-module.c:1448 src/libvlc-module.c:1449
 msgid "Crop one pixel from the bottom of the video"
 msgstr "Moztu pixel bat bideoaren beheko aldetik"
 
-#: src/libvlc-module.c:1444 src/libvlc-module.c:1445
+#: src/libvlc-module.c:1450 src/libvlc-module.c:1451
 msgid "Uncrop one pixel from the bottom of the video"
 msgstr "Desegin bideoaren beheko aldetik pixel bat moztea"
 
-#: src/libvlc-module.c:1447 src/libvlc-module.c:1448
+#: src/libvlc-module.c:1453 src/libvlc-module.c:1454
 msgid "Crop one pixel from the right of the video"
 msgstr "Moztu pixel bat bideoaren eskuineko aldetik"
 
-#: src/libvlc-module.c:1449 src/libvlc-module.c:1450
+#: src/libvlc-module.c:1455 src/libvlc-module.c:1456
 msgid "Uncrop one pixel from the right of the video"
 msgstr "Desegin bideoaren eskuineko aldetik pixel bat moztea"
 
-#: src/libvlc-module.c:1453
+#: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
 msgstr "Txikitu ikuspuntuaren ikusmen-eremua (360°)"
 
-#: src/libvlc-module.c:1454
+#: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
 msgstr "Zabaldu ikuspuntuaren ikusmen-eremua (360°)"
 
-#: src/libvlc-module.c:1455
+#: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
 msgstr "Bildu ikuspuntua erlojuaren noranzkoan (360°)"
 
-#: src/libvlc-module.c:1456
+#: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
 msgstr "Bildu ikuspuntua erlojuaren aurkako noranzkoan (360°)"
 
-#: src/libvlc-module.c:1458
+#: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
 msgstr "Txandakatu horma-paperaren modua bideo-irteeran"
 
-#: src/libvlc-module.c:1460
+#: src/libvlc-module.c:1466
 msgid "Toggle wallpaper mode in video output."
 msgstr "Txandakatu horma-paperaren modua bideo-irteeran."
 
-#: src/libvlc-module.c:1462
+#: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
 msgstr "Zikloka aldatu audio-gailuak"
 
-#: src/libvlc-module.c:1463
+#: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
 msgstr "Zikloka aldatu erabilgarri dauden audio-gailuak"
 
-#: src/libvlc-module.c:1592 src/video_output/vout_intf.c:274
-#: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:502
+#: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
+#: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:513
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Snapshot"
 msgstr "Argazkia"
 
-#: src/libvlc-module.c:1609
+#: src/libvlc-module.c:1615
 msgid "Window properties"
 msgstr "Leihoaren propietateak"
 
-#: src/libvlc-module.c:1669
+#: src/libvlc-module.c:1675
 msgid "Subpictures"
 msgstr "Azpiirudiak"
 
-#: src/libvlc-module.c:1677 modules/codec/subsdec.c:181
+#: src/libvlc-module.c:1683 modules/codec/subsdec.c:181
 #: modules/demux/subtitle.c:71 modules/demux/xiph_metadata.h:49
 #: modules/demux/xiph_metadata.h:62
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:158
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:178
-#: modules/gui/macosx/VLCMainMenu.m:440
+#: modules/gui/macosx/VLCMainMenu.m:451
 #: share/lua/http/dialogs/create_stream.html:153
 #: modules/gui/qt/ui/profiles.h:718 modules/gui/qt/ui/profiles.h:762
 #: modules/gui/qt/ui/profiles.h:765
 msgid "Subtitles"
 msgstr "Azpitituluak"
 
-#: src/libvlc-module.c:1697 modules/stream_out/transcode/transcode.c:116
+#: src/libvlc-module.c:1703 modules/stream_out/transcode/transcode.c:116
 msgid "Overlays"
 msgstr "Gainjartzeak"
 
-#: src/libvlc-module.c:1707
+#: src/libvlc-module.c:1713
 msgid "Track settings"
 msgstr "Pista-ezarpenak"
 
-#: src/libvlc-module.c:1747 modules/gui/macosx/VLCSimplePrefsController.m:316
+#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "Playback control"
 msgstr "Erreprodukzioaren kontrola"
 
-#: src/libvlc-module.c:1776
+#: src/libvlc-module.c:1782
 msgid "Default devices"
 msgstr "Gailu lehenetsiak"
 
-#: src/libvlc-module.c:1783
+#: src/libvlc-module.c:1789
 msgid "Network settings"
 msgstr "Sareko ezarpenak"
 
-#: src/libvlc-module.c:1809
+#: src/libvlc-module.c:1827
 msgid "Socks proxy"
 msgstr "Socks proxya"
 
-#: src/libvlc-module.c:1818 modules/demux/xiph_metadata.h:55
+#: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
 msgstr "Metadatuak"
 
-#: src/libvlc-module.c:1919
+#: src/libvlc-module.c:1937
 msgid "Decoders"
 msgstr "Deskodetzaileak"
 
-#: src/libvlc-module.c:1926 modules/access/avio.h:40
+#: src/libvlc-module.c:1944 modules/access/avio.h:40
 #: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:85
 msgid "Input"
 msgstr "Sarrera"
 
-#: src/libvlc-module.c:1962
+#: src/libvlc-module.c:1980
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:2008
+#: src/libvlc-module.c:2026
 msgid "Special modules"
 msgstr "Modulu bereziak"
 
-#: src/libvlc-module.c:2013 modules/gui/qt/dialogs/plugins.cpp:89
+#: src/libvlc-module.c:2031 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
 msgstr "Pluginak"
 
-#: src/libvlc-module.c:2025
+#: src/libvlc-module.c:2043
 msgid "Performance options"
 msgstr "Errendimendu-aukerak"
 
-#: src/libvlc-module.c:2044
+#: src/libvlc-module.c:2061
 msgid "Clock source"
 msgstr "Erloju iturburua"
 
-#: src/libvlc-module.c:2162
+#: src/libvlc-module.c:2179
 msgid "Hot keys"
 msgstr "Laster-teklak"
 
-#: src/libvlc-module.c:2652
+#: src/libvlc-module.c:2669
 msgid "Jump sizes"
 msgstr "Jauzien tamainak"
 
-#: src/libvlc-module.c:2737
+#: src/libvlc-module.c:2754
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 "inprimatu VLCren laguntza (hauekin konbina daiteke: --advanced eta --help-"
 "verbose)"
 
-#: src/libvlc-module.c:2740
+#: src/libvlc-module.c:2757
 msgid "Exhaustive help for VLC and its modules"
 msgstr "VLCren eta haren moduluen laguntza zehatza"
 
-#: src/libvlc-module.c:2742
+#: src/libvlc-module.c:2759
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
@@ -5018,20 +5023,20 @@ msgstr ""
 "inprimatu VLCren eta haren moduluen laguntza (hauekin konbina daiteke: --"
 "advanced eta --help-verbose)"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2762
 msgid "ask for extra verbosity when displaying help"
 msgstr "eskatu xehetasun-maila handiagoa laguntza bistaratzean"
 
-#: src/libvlc-module.c:2747
+#: src/libvlc-module.c:2764
 msgid "print a list of available modules"
 msgstr "inprimatu erabilgarri dauden moduluen zerrenda bat"
 
-#: src/libvlc-module.c:2749
+#: src/libvlc-module.c:2766
 msgid "print a list of available modules with extra detail"
 msgstr ""
 "inprimatu erabilgarri dauden moduluen zerrenda bat xehetasun-maila handiagoaz"
 
-#: src/libvlc-module.c:2751
+#: src/libvlc-module.c:2768
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
@@ -5040,28 +5045,28 @@ msgstr ""
 "advanced eta --help-verbose) Bilaketa zehatza egiteko, jarri = moduluaren "
 "izenaren aurretik."
 
-#: src/libvlc-module.c:2755
+#: src/libvlc-module.c:2772
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 "ez da konfigurazioko aukerarik kargatuko, ezta config fitxategian gordeko ere"
 
-#: src/libvlc-module.c:2757
+#: src/libvlc-module.c:2774
 msgid "reset the current config to the default values"
 msgstr "berrezarri balio lehenetsiak uneko config fitxategian"
 
-#: src/libvlc-module.c:2759
+#: src/libvlc-module.c:2776
 msgid "use alternate config file"
 msgstr "erabili beste config fitxategi bat"
 
-#: src/libvlc-module.c:2761
+#: src/libvlc-module.c:2778
 msgid "resets the current plugins cache"
 msgstr "uneko pluginen cachea berrezartzen du"
 
-#: src/libvlc-module.c:2763
+#: src/libvlc-module.c:2780
 msgid "print version information"
 msgstr "inprimatu bertsioari buruzko informazioa"
 
-#: src/libvlc-module.c:2803
+#: src/libvlc-module.c:2820
 msgid "core program"
 msgstr "programa nagusia"
 
@@ -5105,9 +5110,8 @@ msgstr "Nabigatzailearen bilatze lana"
 msgid "Browser Stop"
 msgstr "Nabigatzailea gelditu"
 
-#: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:361
-#: modules/gui/macosx/VLCPlaylist.m:231
-#: modules/gui/qt/dialogs/bookmarks.cpp:50
+#: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:370
+#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5287,8 +5291,8 @@ msgstr "Orria gora"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
-#: modules/gui/macosx/VLCMainMenu.m:1331 modules/gui/macosx/VLCMainMenu.m:1332
-#: modules/gui/macosx/VLCMainMenu.m:1333
+#: modules/gui/macosx/VLCMainMenu.m:1347 modules/gui/macosx/VLCMainMenu.m:1348
+#: modules/gui/macosx/VLCMainMenu.m:1349
 #: modules/gui/qt/components/playlist/standardpanel.cpp:196
 #: modules/gui/qt/menus.cpp:831
 msgid "Pause"
@@ -5310,7 +5314,7 @@ msgstr "Tabuladorea"
 msgid "Up"
 msgstr "Gora"
 
-#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:499
+#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:510
 msgid "Volume Down"
 msgstr "Jaitsi bolumena"
 
@@ -5318,7 +5322,7 @@ msgstr "Jaitsi bolumena"
 msgid "Volume Mute"
 msgstr "Mututu bolumena"
 
-#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:498
+#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:509
 msgid "Volume Up"
 msgstr "Igo bolumena"
 
@@ -5381,7 +5385,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Huts egin du \"%s\" idazteko irekitzean"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2719
+#: modules/demux/avi/avi.c:2713
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
@@ -5410,7 +5414,7 @@ msgstr "Huts egin du \"%s\" idazteko irekitzean"
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "Cancel"
 msgstr "Utzi"
 
@@ -6159,8 +6163,8 @@ msgstr "Zuluera"
 msgid "Autoscale video"
 msgstr "Doitu automatikoki bideoaren tamaina"
 
-#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:429
-#: modules/gui/macosx/VLCMainMenu.m:430
+#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:440
+#: modules/gui/macosx/VLCMainMenu.m:441
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:193
 #: modules/video_filter/croppadd.c:87 modules/gui/qt/ui/video_effects.h:1239
 msgid "Crop"
@@ -6169,8 +6173,8 @@ msgstr "Moztu"
 #: src/video_output/vout_intf.c:230 modules/access/decklink.cpp:92
 #: modules/access/linsys/linsys_hdsdi.c:78
 #: modules/access/linsys/linsys_sdi.c:74 modules/demux/rawvid.c:58
-#: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCMainMenu.m:428
-#: modules/gui/macosx/VLCMainMenu.m:1443
+#: modules/gui/macosx/VLCMainMenu.m:438 modules/gui/macosx/VLCMainMenu.m:439
+#: modules/gui/macosx/VLCMainMenu.m:1459
 msgid "Aspect ratio"
 msgstr "Aspektu-erlazioa"
 
@@ -6968,8 +6972,7 @@ msgstr ""
 "Telebista-kateak satelite-errepikagailuaren arabera taldekatzen dira "
 "maiztasun jakin batean. Hori beharrezkoa da hargailua sintonizatzeko."
 
-#: modules/access/dtv/access.c:61
-#: modules/gui/qt/components/open_panels.cpp:970
+#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:970
 msgid "Modulation / Constellation"
 msgstr "Modulazioa / Konstelazioa"
 
@@ -7612,7 +7615,7 @@ msgstr "FTP sarrera"
 msgid "FTP upload output"
 msgstr "FTP kargatze-irteera"
 
-#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:541
+#: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
 msgid "Network interaction failed"
 msgstr "Sareko interakzioak huts egin du"
 
@@ -7624,55 +7627,34 @@ msgstr "VLC ezin izan da konektatu adierazitako zerbitzariarekin."
 msgid "VLC's connection to the given server was rejected."
 msgstr "VLCren adierazitako zerbitzariarekiko konexioa baztertu egin da."
 
-#: modules/access/ftp.c:542
+#: modules/access/ftp.c:538
 msgid "Your account was rejected."
 msgstr "Zure kontua baztertu egin da."
 
 #: modules/access/http.c:59
-msgid "HTTP proxy"
-msgstr "HTTP proxya"
-
-#: modules/access/http.c:61
-msgid ""
-"HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
-"myport/ ; if empty, the http_proxy environment variable will be tried."
-msgstr ""
-"Erabili beharreko HTTP proxyak forma hau eduki behar du: http://"
-"[erabiltzailea[:pasahitza]@]nireproxya.niredomeinua:nireataka/; hutsik "
-"badago, http_proxy ingurune-aldagaiarekin saiatuko da."
-
-#: modules/access/http.c:65
-msgid "HTTP proxy password"
-msgstr "HTTP proxyaren pasahitza"
-
-#: modules/access/http.c:67
-msgid "If your HTTP proxy requires a password, set it here."
-msgstr "Zure HTTP proxyak pasahitza eskatzen badu, ezar ezazu hemen."
-
-#: modules/access/http.c:69
 msgid "Auto re-connect"
 msgstr "Konektatu berriro automatikoki"
 
-#: modules/access/http.c:71
+#: modules/access/http.c:61
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr ""
 "Automatikoki saiatu transmisio jarraituarekin berriro konektatzen, bat-"
 "batean deskonektatzen bada."
 
-#: modules/access/http.c:75
+#: modules/access/http.c:65
 msgid "HTTP input"
 msgstr "HTTP sarrera"
 
-#: modules/access/http.c:77
+#: modules/access/http.c:67
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:318 modules/access/http/access.c:214
+#: modules/access/http.c:303 modules/access/http/access.c:214
 msgid "HTTP authentication"
 msgstr "HTTP autentifikazioa"
 
-#: modules/access/http.c:319 modules/access/http/access.c:215
+#: modules/access/http.c:304 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Sartu baliozko saio-hasierako izena eta pasahitza %s domeinurako."
@@ -7794,8 +7776,7 @@ msgstr "Audioaren oinarrizko transmisio jarraituaren kanal kopurua"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:238
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:167
 #: modules/gui/qt/components/extended_panels.cpp:1297 modules/spu/mosaic.c:94
-#: modules/video_output/vmem.c:42
-#: share/lua/http/dialogs/mosaic_window.html:108
+#: modules/video_output/vmem.c:42 share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt/ui/profiles.h:743
 msgid "Width"
 msgstr "Zabalera"
@@ -8498,7 +8479,7 @@ msgid "Screen Input"
 msgstr "Pantaila-sarrera"
 
 #: modules/access/screen/screen.c:99 modules/access/screen/xcb.c:70
-#: modules/gui/macosx/VLCMainMenu.m:600
+#: modules/gui/macosx/VLCMainMenu.m:611
 #: modules/gui/macosx/VLCOpenWindowController.m:207
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
@@ -8544,11 +8525,11 @@ msgstr "Zerbitzarian erabili beharreko SFTP ataka-zenbakia"
 msgid "SFTP input"
 msgstr "SFTP sarrera"
 
-#: modules/access/sftp.c:400
+#: modules/access/sftp.c:399
 msgid "SFTP authentication"
 msgstr "SFTP autentifikazioa"
 
-#: modules/access/sftp.c:401
+#: modules/access/sftp.c:400
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
 msgstr ""
@@ -8786,8 +8767,7 @@ msgstr "Irrati-gailua"
 msgid "Radio tuner device node."
 msgstr "Irrati sintonizadorearen nodoa."
 
-#: modules/access/v4l2/v4l2.c:75
-#: modules/gui/qt/components/open_panels.cpp:1077
+#: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1077
 msgid "Frequency"
 msgstr "Maiztasuna"
 
@@ -11462,7 +11442,7 @@ msgstr "Direct3D11 bideo-azelerazioa"
 msgid "DirectX Video Acceleration (DXVA) 2.0"
 msgstr "DirectX bideo-azelerazioa (DXVA) 2.0"
 
-#: modules/codec/avcodec/encoder.c:373
+#: modules/codec/avcodec/encoder.c:370
 #, c-format
 msgid ""
 "It seems your Libav/FFmpeg (libavcodec) installation lacks the following "
@@ -11481,23 +11461,23 @@ msgstr ""
 "Hau ez da VLC multimedia-erreproduzigailuaren errorea.\n"
 "Ez jarri harremanetan VideoLAN proiektuarekin arazo hau konpontzeko.\n"
 
-#: modules/codec/avcodec/encoder.c:869
+#: modules/codec/avcodec/encoder.c:866
 msgid "unknown"
 msgstr "ezezaguna"
 
-#: modules/codec/avcodec/encoder.c:869
+#: modules/codec/avcodec/encoder.c:866
 msgid "video"
 msgstr "bideoa"
 
-#: modules/codec/avcodec/encoder.c:870
+#: modules/codec/avcodec/encoder.c:867
 msgid "audio"
 msgstr "audioa"
 
-#: modules/codec/avcodec/encoder.c:870
+#: modules/codec/avcodec/encoder.c:867
 msgid "subpicture"
 msgstr "azpiirudia"
 
-#: modules/codec/avcodec/encoder.c:883
+#: modules/codec/avcodec/encoder.c:880
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "VLC-k ezin izan du %4.4s %s kodetzailea ireki."
@@ -11937,8 +11917,8 @@ msgstr "Zuria"
 msgid "Maroon"
 msgstr "Granatea"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:458
-#: modules/gui/macosx/VLCMainMenu.m:1088 modules/spu/marq.c:62
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:469
+#: modules/gui/macosx/VLCMainMenu.m:1104 modules/spu/marq.c:62
 #: modules/spu/rss.c:70 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119 modules/video_filter/colorthres.c:65
 msgid "Red"
@@ -11950,8 +11930,8 @@ msgstr "Gorria"
 msgid "Fuchsia"
 msgstr "Fuksia"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:460
-#: modules/gui/macosx/VLCMainMenu.m:1092 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:471
+#: modules/gui/macosx/VLCMainMenu.m:1108 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/colorthres.c:65
 msgid "Yellow"
@@ -11962,8 +11942,8 @@ msgstr "Horia"
 msgid "Olive"
 msgstr "Oliba"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:459
-#: modules/gui/macosx/VLCMainMenu.m:1090 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:470
+#: modules/gui/macosx/VLCMainMenu.m:1106 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119
 msgid "Green"
@@ -11990,8 +11970,8 @@ msgstr "Morea"
 msgid "Navy"
 msgstr "Urdin iluna"
 
-#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:461
-#: modules/gui/macosx/VLCMainMenu.m:1094 modules/spu/marq.c:64
+#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:472
+#: modules/gui/macosx/VLCMainMenu.m:1110 modules/spu/marq.c:64
 #: modules/spu/rss.c:72 modules/text_renderer/freetype/freetype.c:137
 #: modules/video_filter/ball.c:120 modules/video_filter/colorthres.c:65
 msgid "Blue"
@@ -14447,11 +14427,11 @@ msgstr "tesa"
 msgid "Fast"
 msgstr "Azkarra"
 
-#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:281
-#: modules/gui/macosx/VLCMainMenu.m:384
+#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:290
+#: modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/macosx/VLCSimplePrefsController.m:696
 #: modules/gui/qt/components/simple_preferences.cpp:673
-#: modules/misc/gnutls.c:771 modules/text_renderer/freetype/freetype.c:124
+#: modules/misc/gnutls.c:779 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
 msgstr "Normala"
@@ -15460,7 +15440,7 @@ msgid "Avformat muxer"
 msgstr "Avformat multiplexadorea"
 
 #: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:126 modules/stream_out/rtp.c:87
+#: modules/stream_out/chromecast/cast.cpp:167 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "Multiplexadorea"
 
@@ -15548,11 +15528,11 @@ msgstr "Erreproduzitu dagoen bezala"
 msgid "Broken or missing Index"
 msgstr "Hondatutako edo galdutako indizea"
 
-#: modules/demux/avi/avi.c:2720
+#: modules/demux/avi/avi.c:2714
 msgid "Broken or missing AVI Index"
 msgstr "Hondatutako edo galdutako AVI indizea"
 
-#: modules/demux/avi/avi.c:2721
+#: modules/demux/avi/avi.c:2715
 msgid "Fixing AVI Index..."
 msgstr "AVI indizea konpontzen..."
 
@@ -16185,7 +16165,7 @@ msgstr "Garbitu audioa entzumen-urritasunak dituztenentzat"
 msgid "Spoken subtitles for the visually impaired"
 msgstr "Ahozko azpitituluak ikusmen-urritasunak dituztenentzat"
 
-#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:455
+#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:466
 #: modules/gui/qt/dialogs/toolbar.cpp:532
 msgid "Teletext"
 msgstr "Teletestua"
@@ -16632,7 +16612,7 @@ msgid "Slides (images)"
 msgstr "Diapositibak (irudiak)"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
-#: modules/gui/macosx/VLCMainMenu.m:330
+#: modules/gui/macosx/VLCMainMenu.m:339
 msgid "About VLC media player"
 msgstr "VLC multimedia-erreproduzigailuari buruz"
 
@@ -16642,7 +16622,7 @@ msgid "Credits"
 msgstr "Kredituak"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:104
-#: modules/gui/macosx/VLCMainMenu.m:480 modules/gui/qt/dialogs/help.cpp:119
+#: modules/gui/macosx/VLCMainMenu.m:491 modules/gui/qt/dialogs/help.cpp:119
 msgid "License"
 msgstr "Lizentzia"
 
@@ -16708,7 +16688,7 @@ msgstr "Arte eta metadatuen eskuratzaileak"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:112
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
-#: modules/gui/macosx/VLCMainMenu.m:334 modules/gui/macosx/VLCMainMenu.m:335
+#: modules/gui/macosx/VLCMainMenu.m:343 modules/gui/macosx/VLCMainMenu.m:344
 #: modules/gui/qt/dialogs/plugins.cpp:395
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
@@ -16724,7 +16704,7 @@ msgid "Find more addons online"
 msgstr "Bilatu gehigarri gehiago linean"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
-#: modules/gui/macosx/VLCMainMenu.m:336 modules/gui/qt/dialogs/plugins.cpp:85
+#: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
 msgstr "Gehigarri-kudeatzailea"
 
@@ -16741,8 +16721,7 @@ msgid "Name"
 msgstr "Izena"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
-#: modules/gui/macosx/VLCPlaylist.m:108
-#: modules/gui/qt/dialogs/plugins.cpp:1397
+#: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "Egilea"
@@ -16848,7 +16827,7 @@ msgstr "Sartu izen bat profil berriarentzat:"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
-#: modules/gui/macosx/VLCMainMenu.m:1149 modules/gui/macosx/VLCOutput.m:411
+#: modules/gui/macosx/VLCMainMenu.m:1165 modules/gui/macosx/VLCOutput.m:411
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 #: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
@@ -16922,7 +16901,7 @@ msgid "Clear"
 msgstr "Garbitu"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:80
-#: modules/gui/macosx/VLCMainMenu.m:357
+#: modules/gui/macosx/VLCMainMenu.m:366
 msgid "Edit"
 msgstr "Editatu"
 
@@ -16947,12 +16926,12 @@ msgstr "Denbora"
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1363
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "OK"
 msgstr "Ados"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:131
-#: modules/gui/macosx/VLCMainMenu.m:1139
+#: modules/gui/macosx/VLCMainMenu.m:1155
 msgid "Untitled"
 msgstr "Titulurik gabea"
 
@@ -17532,7 +17511,7 @@ msgstr ""
 "Aukera honek interfazeari bere ikonoak behin baino gehiagotan aldatzeko "
 "aukera ematen dio."
 
-#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1445
+#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1461
 msgid "Lock Aspect Ratio"
 msgstr "Blokeatu aspektu-erlazioa"
 
@@ -17550,7 +17529,7 @@ msgstr ""
 "erreproduzitzen ari den bitartean. Distiraren doitze automatikoa desgaitu "
 "egin behar da sistemaren ezarpenetan."
 
-#: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:366
+#: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
 msgstr "Erakutsi aurrekora eta hurrengora joateko botoiak"
 
@@ -17559,7 +17538,7 @@ msgid "Shows the previous and next buttons in the main window."
 msgstr ""
 "Aurrekora eta hurrengora joateko botoiak erakusten ditu leiho nagusian."
 
-#: modules/gui/macosx/macosx.m:119 modules/gui/macosx/VLCMainMenu.m:368
+#: modules/gui/macosx/macosx.m:119 modules/gui/macosx/VLCMainMenu.m:377
 msgid "Show Shuffle & Repeat Buttons"
 msgstr "Erakutsi nahasteko eta errepikatzeko botoiak"
 
@@ -17567,7 +17546,7 @@ msgstr "Erakutsi nahasteko eta errepikatzeko botoiak"
 msgid "Shows the shuffle and repeat buttons in the main window."
 msgstr "Nahasteko eta errepikatzeko botoiak erakusten ditu leiho nagusian."
 
-#: modules/gui/macosx/macosx.m:122 modules/gui/macosx/VLCMainMenu.m:370
+#: modules/gui/macosx/macosx.m:122 modules/gui/macosx/VLCMainMenu.m:379
 msgid "Show Audio Effects Button"
 msgstr "Erakutsi audio efektuen botoia"
 
@@ -17575,7 +17554,7 @@ msgstr "Erakutsi audio efektuen botoia"
 msgid "Shows the audio effects button in the main window."
 msgstr "Audio efektuen botoia erakusten du leiho nagusian."
 
-#: modules/gui/macosx/macosx.m:125 modules/gui/macosx/VLCMainMenu.m:372
+#: modules/gui/macosx/macosx.m:125 modules/gui/macosx/VLCMainMenu.m:381
 msgid "Show Sidebar"
 msgstr "Erakutsi alboko barra"
 
@@ -17674,338 +17653,347 @@ msgstr "VLCren hobespen-fitxategien bertsio zaharragoa aurkitu dugu."
 msgid "Move To Trash and Relaunch VLC"
 msgstr "Eraman zakar-ontzira eta berrabiarazi VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:240
+#: modules/gui/macosx/VLCMainMenu.m:249
 #, c-format
 msgid "Level %i"
 msgstr "%i maila"
 
-#: modules/gui/macosx/VLCMainMenu.m:279
+#: modules/gui/macosx/VLCMainMenu.m:288
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Smaller"
 msgstr "Txikiagoa"
 
-#: modules/gui/macosx/VLCMainMenu.m:280
+#: modules/gui/macosx/VLCMainMenu.m:289
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Small"
 msgstr "Txikia"
 
-#: modules/gui/macosx/VLCMainMenu.m:282
+#: modules/gui/macosx/VLCMainMenu.m:291
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Large"
 msgstr "Handia"
 
-#: modules/gui/macosx/VLCMainMenu.m:283
+#: modules/gui/macosx/VLCMainMenu.m:292
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Larger"
 msgstr "Handiagoa"
 
-#: modules/gui/macosx/VLCMainMenu.m:332
+#: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
 msgstr "Begiratu eguneratzerik badagoen..."
 
-#: modules/gui/macosx/VLCMainMenu.m:333
+#: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
 msgstr "Hobespenak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:339
+#: modules/gui/macosx/VLCMainMenu.m:348
 msgid "Services"
 msgstr "Zerbitzuak"
 
-#: modules/gui/macosx/VLCMainMenu.m:340
+#: modules/gui/macosx/VLCMainMenu.m:349
 msgid "Hide VLC"
 msgstr "Ezkutatu VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:341
+#: modules/gui/macosx/VLCMainMenu.m:350
 msgid "Hide Others"
 msgstr "Ezkutatu besteak"
 
-#: modules/gui/macosx/VLCMainMenu.m:342
+#: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:377
 msgid "Show All"
 msgstr "Erakutsi dena"
 
-#: modules/gui/macosx/VLCMainMenu.m:343
+#: modules/gui/macosx/VLCMainMenu.m:352
 msgid "Quit VLC"
 msgstr "Itxi VLC"
 
-#: modules/gui/macosx/VLCMainMenu.m:345
+#: modules/gui/macosx/VLCMainMenu.m:354
 msgid "1:File"
 msgstr "1:Fitxategia"
 
-#: modules/gui/macosx/VLCMainMenu.m:346
+#: modules/gui/macosx/VLCMainMenu.m:355
 msgid "Advanced Open File..."
 msgstr "Ireki fitxategia modu aurreratuan..."
 
-#: modules/gui/macosx/VLCMainMenu.m:347
+#: modules/gui/macosx/VLCMainMenu.m:356
 msgid "Open File..."
 msgstr "Ireki fitxategia..."
 
-#: modules/gui/macosx/VLCMainMenu.m:348
+#: modules/gui/macosx/VLCMainMenu.m:357
 msgid "Open Disc..."
 msgstr "Ireki diskoa..."
 
-#: modules/gui/macosx/VLCMainMenu.m:349
+#: modules/gui/macosx/VLCMainMenu.m:358
 msgid "Open Network..."
 msgstr "Ireki sarea..."
 
-#: modules/gui/macosx/VLCMainMenu.m:350
+#: modules/gui/macosx/VLCMainMenu.m:359
 msgid "Open Capture Device..."
 msgstr "Ireki kaptura-gailua..."
 
-#: modules/gui/macosx/VLCMainMenu.m:351
+#: modules/gui/macosx/VLCMainMenu.m:360
 msgid "Open Recent"
 msgstr "Ireki azkena"
 
-#: modules/gui/macosx/VLCMainMenu.m:352
+#: modules/gui/macosx/VLCMainMenu.m:361
 msgid "Close Window"
 msgstr "Itxi leihoa"
 
-#: modules/gui/macosx/VLCMainMenu.m:353
+#: modules/gui/macosx/VLCMainMenu.m:362
 msgid "Convert / Stream..."
 msgstr "Bihurtu/Transmititu"
 
-#: modules/gui/macosx/VLCMainMenu.m:354
+#: modules/gui/macosx/VLCMainMenu.m:363
 msgid "Save Playlist..."
 msgstr "Gorde erreprodukzio-zerrenda..."
 
-#: modules/gui/macosx/VLCMainMenu.m:355 modules/gui/macosx/VLCPlaylist.m:236
+#: modules/gui/macosx/VLCMainMenu.m:364 modules/gui/macosx/VLCPlaylist.m:236
 msgid "Reveal in Finder"
 msgstr "Agerrarazi bilatzailean"
 
-#: modules/gui/macosx/VLCMainMenu.m:358
+#: modules/gui/macosx/VLCMainMenu.m:367
 msgid "Cut"
 msgstr "Ebaki"
 
-#: modules/gui/macosx/VLCMainMenu.m:359
+#: modules/gui/macosx/VLCMainMenu.m:368
 msgid "Copy"
 msgstr "Kopiatu"
 
-#: modules/gui/macosx/VLCMainMenu.m:360
+#: modules/gui/macosx/VLCMainMenu.m:369
 msgid "Paste"
 msgstr "Itsatsi"
 
-#: modules/gui/macosx/VLCMainMenu.m:362 modules/gui/macosx/VLCPlaylist.m:234
+#: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:234
 msgid "Select All"
 msgstr "Hautatu dena"
 
-#: modules/gui/macosx/VLCMainMenu.m:363
+#: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
 msgstr "Bilatu"
 
-#: modules/gui/macosx/VLCMainMenu.m:365
+#: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
 msgstr "Ikusi"
 
-#: modules/gui/macosx/VLCMainMenu.m:374
+#: modules/gui/macosx/VLCMainMenu.m:383
 msgid "Playlist Table Columns"
 msgstr "Erreprodukzio-zerrenda taula zutabeak"
 
-#: modules/gui/macosx/VLCMainMenu.m:376
+#: modules/gui/macosx/VLCMainMenu.m:385
 msgid "Playback"
 msgstr "Erreproduzitu"
 
-#: modules/gui/macosx/VLCMainMenu.m:382
+#: modules/gui/macosx/VLCMainMenu.m:391
 msgid "Playback Speed"
 msgstr "Erreprodukzio-abiadura"
 
-#: modules/gui/macosx/VLCMainMenu.m:386
+#: modules/gui/macosx/VLCMainMenu.m:395
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
 msgstr "Pista-sinkronizazioa"
 
-#: modules/gui/macosx/VLCMainMenu.m:392
+#: modules/gui/macosx/VLCMainMenu.m:401
 #: modules/gui/qt/components/controller.hpp:110
 msgid "A→B Loop"
 msgstr "A→B begizta"
 
-#: modules/gui/macosx/VLCMainMenu.m:393
+#: modules/gui/macosx/VLCMainMenu.m:402
 msgid "Quit after Playback"
 msgstr "Irten erreproduzitu ondoren"
 
-#: modules/gui/macosx/VLCMainMenu.m:394
+#: modules/gui/macosx/VLCMainMenu.m:403
 msgid "Step Forward"
 msgstr "Urrats bat aurrera"
 
-#: modules/gui/macosx/VLCMainMenu.m:395
+#: modules/gui/macosx/VLCMainMenu.m:404
 msgid "Step Backward"
 msgstr "Urrats bat atzera"
 
-#: modules/gui/macosx/VLCMainMenu.m:396
+#: modules/gui/macosx/VLCMainMenu.m:405
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
 msgid "Jump to Time"
 msgstr "Jauzi egin denborara"
 
-#: modules/gui/macosx/VLCMainMenu.m:405
+#: modules/gui/macosx/VLCMainMenu.m:406
+#, fuzzy
+msgid "Renderer"
+msgstr "E&rrendatzailea"
+
+#: modules/gui/macosx/VLCMainMenu.m:407
+msgid "No renderer"
+msgstr "Errendatzailerik ez"
+
+#: modules/gui/macosx/VLCMainMenu.m:416
 msgid "Increase Volume"
 msgstr "Igo bolumena"
 
-#: modules/gui/macosx/VLCMainMenu.m:406
+#: modules/gui/macosx/VLCMainMenu.m:417
 msgid "Decrease Volume"
 msgstr "Jaitsi bolumena"
 
-#: modules/gui/macosx/VLCMainMenu.m:412 modules/gui/macosx/VLCMainMenu.m:413
+#: modules/gui/macosx/VLCMainMenu.m:423 modules/gui/macosx/VLCMainMenu.m:424
 msgid "Audio Device"
 msgstr "Audio-gailua"
 
-#: modules/gui/macosx/VLCMainMenu.m:418
+#: modules/gui/macosx/VLCMainMenu.m:429
 msgid "Half Size"
 msgstr "Tamainaren erdia"
 
-#: modules/gui/macosx/VLCMainMenu.m:419
+#: modules/gui/macosx/VLCMainMenu.m:430
 msgid "Normal Size"
 msgstr "Tamaina normala"
 
-#: modules/gui/macosx/VLCMainMenu.m:420
+#: modules/gui/macosx/VLCMainMenu.m:431
 msgid "Double Size"
 msgstr "Tamaina bikoitza"
 
-#: modules/gui/macosx/VLCMainMenu.m:421
+#: modules/gui/macosx/VLCMainMenu.m:432
 msgid "Fit to Screen"
 msgstr "Doitu pantailari"
 
-#: modules/gui/macosx/VLCMainMenu.m:423
+#: modules/gui/macosx/VLCMainMenu.m:434
 #: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
 msgstr "Flotatu goian"
 
-#: modules/gui/macosx/VLCMainMenu.m:431 modules/gui/macosx/VLCMainMenu.m:432
+#: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "Pantaila osoko bideo-gailua"
 
-#: modules/gui/macosx/VLCMainMenu.m:437 modules/gui/macosx/VLCMainMenu.m:438
+#: modules/gui/macosx/VLCMainMenu.m:448 modules/gui/macosx/VLCMainMenu.m:449
 #: modules/video_filter/postproc.c:201
 msgid "Post processing"
 msgstr "Ondorengo prozesatzea"
 
-#: modules/gui/macosx/VLCMainMenu.m:441
+#: modules/gui/macosx/VLCMainMenu.m:452
 msgid "Add Subtitle File..."
 msgstr "Gehitu azpitituluen fitxategia..."
 
-#: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
+#: modules/gui/macosx/VLCMainMenu.m:453 modules/gui/macosx/VLCMainMenu.m:454
 msgid "Subtitles Track"
 msgstr "Azpitituluen pista"
 
-#: modules/gui/macosx/VLCMainMenu.m:444
+#: modules/gui/macosx/VLCMainMenu.m:455
 msgid "Text Size"
 msgstr "Testuaren tamaina"
 
-#: modules/gui/macosx/VLCMainMenu.m:445
+#: modules/gui/macosx/VLCMainMenu.m:456
 msgid "Text Color"
 msgstr "Testuaren kolorea"
 
-#: modules/gui/macosx/VLCMainMenu.m:446
+#: modules/gui/macosx/VLCMainMenu.m:457
 msgid "Outline Thickness"
 msgstr "Ingeradaren loditasuna"
 
-#: modules/gui/macosx/VLCMainMenu.m:452 modules/gui/macosx/VLCMainMenu.m:453
+#: modules/gui/macosx/VLCMainMenu.m:463 modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Opacity"
 msgstr "Atzeko planoaren opakutasuna"
 
-#: modules/gui/macosx/VLCMainMenu.m:454
+#: modules/gui/macosx/VLCMainMenu.m:465
 msgid "Background Color"
 msgstr "Atzeko planoaren kolorea"
 
-#: modules/gui/macosx/VLCMainMenu.m:456
+#: modules/gui/macosx/VLCMainMenu.m:467
 msgid "Transparent"
 msgstr "Gardena"
 
-#: modules/gui/macosx/VLCMainMenu.m:457 modules/gui/macosx/VLCMainMenu.m:1086
+#: modules/gui/macosx/VLCMainMenu.m:468 modules/gui/macosx/VLCMainMenu.m:1102
 msgid "Index"
 msgstr "Indizea"
 
-#: modules/gui/macosx/VLCMainMenu.m:463
+#: modules/gui/macosx/VLCMainMenu.m:474
 msgid "Window"
 msgstr "Leihoa"
 
-#: modules/gui/macosx/VLCMainMenu.m:464
+#: modules/gui/macosx/VLCMainMenu.m:475
 msgid "Minimize"
 msgstr "Ikonotu"
 
-#: modules/gui/macosx/VLCMainMenu.m:466
+#: modules/gui/macosx/VLCMainMenu.m:477
 msgid "Player..."
 msgstr "Erreproduzigailua..."
 
-#: modules/gui/macosx/VLCMainMenu.m:467
+#: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Main Window..."
 msgstr "Leiho nagusia..."
 
-#: modules/gui/macosx/VLCMainMenu.m:468
+#: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Audio Effects..."
 msgstr "Audio-efektuak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:469
+#: modules/gui/macosx/VLCMainMenu.m:480
 msgid "Video Effects..."
 msgstr "Bideo-efektuak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:470
+#: modules/gui/macosx/VLCMainMenu.m:481
 msgid "Bookmarks..."
 msgstr "Laster-markak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:471
+#: modules/gui/macosx/VLCMainMenu.m:482
 msgid "Playlist..."
 msgstr "Erreprodukzio-zerrenda..."
 
-#: modules/gui/macosx/VLCMainMenu.m:472 modules/gui/macosx/VLCPlaylist.m:235
+#: modules/gui/macosx/VLCMainMenu.m:483 modules/gui/macosx/VLCPlaylist.m:235
 msgid "Media Information..."
 msgstr "Multimedia-informazioa..."
 
-#: modules/gui/macosx/VLCMainMenu.m:473
+#: modules/gui/macosx/VLCMainMenu.m:484
 msgid "Messages..."
 msgstr "Mezuak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:474
+#: modules/gui/macosx/VLCMainMenu.m:485
 msgid "Errors and Warnings..."
 msgstr "Erroreak eta abisuak..."
 
-#: modules/gui/macosx/VLCMainMenu.m:476
+#: modules/gui/macosx/VLCMainMenu.m:487
 msgid "Bring All to Front"
 msgstr "Ekarri dena aurrera"
 
-#: modules/gui/macosx/VLCMainMenu.m:478 modules/gui/qt/dialogs/help.cpp:54
+#: modules/gui/macosx/VLCMainMenu.m:489 modules/gui/qt/dialogs/help.cpp:54
 #: modules/gui/qt/menus.cpp:950 modules/gui/qt/menus.cpp:1137
 msgid "Help"
 msgstr "Laguntza"
 
-#: modules/gui/macosx/VLCMainMenu.m:479
+#: modules/gui/macosx/VLCMainMenu.m:490
 msgid "VLC media player Help..."
 msgstr "VLC multimedia-erreproduzigailuaren laguntza..."
 
-#: modules/gui/macosx/VLCMainMenu.m:481
+#: modules/gui/macosx/VLCMainMenu.m:492
 msgid "Online Documentation..."
 msgstr "Lineako dokumentazioa..."
 
-#: modules/gui/macosx/VLCMainMenu.m:482
+#: modules/gui/macosx/VLCMainMenu.m:493
 msgid "VideoLAN Website..."
 msgstr "VideoLAN webgunea..."
 
-#: modules/gui/macosx/VLCMainMenu.m:483
+#: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Make a donation..."
 msgstr "Egin donazioa..."
 
-#: modules/gui/macosx/VLCMainMenu.m:484
+#: modules/gui/macosx/VLCMainMenu.m:495
 msgid "Online Forum..."
 msgstr "Lineako foroa..."
 
-#: modules/gui/macosx/VLCMainMenu.m:1143
+#: modules/gui/macosx/VLCMainMenu.m:1159
 msgid "File Format:"
 msgstr "Fitxategi-formatua:"
 
-#: modules/gui/macosx/VLCMainMenu.m:1144
+#: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "Extended M3U"
 msgstr "M3U hedatua"
 
-#: modules/gui/macosx/VLCMainMenu.m:1145
+#: modules/gui/macosx/VLCMainMenu.m:1161
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML Shareable Playlist Format (XSPF)"
 
-#: modules/gui/macosx/VLCMainMenu.m:1146
+#: modules/gui/macosx/VLCMainMenu.m:1162
 #: modules/gui/qt/dialogs_provider.cpp:642
 msgid "HTML playlist"
 msgstr "HTML erreprodukzio-zerrenda"
 
-#: modules/gui/macosx/VLCMainMenu.m:1148
+#: modules/gui/macosx/VLCMainMenu.m:1164
 msgid "Save Playlist"
 msgstr "Gorde erreprodukzio-zerrenda"
 
@@ -18226,7 +18214,7 @@ msgid "Enable DVD menus"
 msgstr "Gaitu DVD menuak"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:164
+#: modules/stream_out/chromecast/cast.cpp:205
 msgid "IP Address"
 msgstr "IP helbidea"
 
@@ -18496,28 +18484,6 @@ msgstr "Errorea datuak bidaltzean"
 #: modules/gui/macosx/VLCPlaylistInfo.m:341
 msgid "VLC was unable to save the meta data."
 msgstr "VLCk ezin izan ditu metadatuak gorde."
-
-#: modules/gui/macosx/VLCRendererMenuController.m:72
-#: modules/gui/macosx/VLCRendererMenuController.m:144
-msgid "Renderer discovery off"
-msgstr "Errendatzaileen aurkikuntza desgaituta"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:75
-#: modules/gui/macosx/VLCRendererMenuController.m:145
-msgid "Enable renderer discovery"
-msgstr "Gaitu errendatzaileen aurkikuntza"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:77
-msgid "No renderer"
-msgstr "Errendatzailerik ez"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:134
-msgid "Renderer discovery on"
-msgstr "Errendatzaileen aurkikuntza gaituta"
-
-#: modules/gui/macosx/VLCRendererMenuController.m:135
-msgid "Disable renderer discovery"
-msgstr "Desgaitu errendatzaileen aurkikuntza"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
@@ -18956,8 +18922,7 @@ msgid "sec."
 msgstr "seg."
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:50
-#: modules/gui/qt/components/extended_panels.cpp:1391
-#: modules/gui/qt/qt.cpp:213
+#: modules/gui/qt/components/extended_panels.cpp:1391 modules/gui/qt/qt.cpp:213
 msgid "Audio/Video"
 msgstr "Audioa/Bideoa"
 
@@ -20659,11 +20624,10 @@ msgid "Extract"
 msgstr "Erauzi"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
-#: modules/gui/qt/dialogs/errors.cpp:49
-#: modules/gui/qt/dialogs/extended.cpp:130 modules/gui/qt/dialogs/help.cpp:66
-#: modules/gui/qt/dialogs/help.cpp:212 modules/gui/qt/dialogs/mediainfo.cpp:80
-#: modules/gui/qt/dialogs/messages.cpp:84
-#: modules/gui/qt/dialogs/plugins.cpp:93
+#: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
+#: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
+#: modules/gui/qt/dialogs/mediainfo.cpp:80
+#: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:93
 #: modules/gui/qt/dialogs/plugins.cpp:1430
 #: modules/gui/qt/dialogs/plugins.cpp:1543
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
@@ -20675,8 +20639,7 @@ msgstr "&Itxi"
 msgid "Bytes"
 msgstr "Byteak"
 
-#: modules/gui/qt/dialogs/convert.cpp:48
-#: modules/gui/qt/dialogs/convert.cpp:106
+#: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
 msgstr "Bihurtu"
 
@@ -21109,8 +21072,7 @@ msgstr "Bertsioa"
 msgid "Website"
 msgstr "Webgunea"
 
-#: modules/gui/qt/dialogs/plugins.cpp:1533
-#: modules/gui/qt/ui/sprefs_input.h:366
+#: modules/gui/qt/dialogs/plugins.cpp:1533 modules/gui/qt/ui/sprefs_input.h:366
 msgid "Files"
 msgstr "Fitxategiak"
 
@@ -21769,19 +21731,19 @@ msgstr "Erakut&si VLC multimedia-erreproduzigailua"
 msgid "&Open Media"
 msgstr "&Ireki multimedia-fitxategia"
 
-#: modules/gui/qt/menus.cpp:1631
+#: modules/gui/qt/menus.cpp:1633
 msgid "&Clear"
 msgstr "&Garbitu"
 
-#: modules/gui/qt/menus.cpp:1639
+#: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
 msgstr "E&rrendatzailea"
 
-#: modules/gui/qt/menus.cpp:1643
+#: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
 msgstr "<Lokala>"
 
-#: modules/gui/qt/menus.cpp:1656
+#: modules/gui/qt/menus.cpp:1658
 msgid "Scanning..."
 msgstr "Eskaneatzen..."
 
@@ -23398,7 +23360,7 @@ msgstr "acoustid"
 msgid "Track fingerprinter (based on Acoustid)"
 msgstr "Jarraitu hatz-marka (Acoustid-n oinarrituta)"
 
-#: modules/misc/gnutls.c:477
+#: modules/misc/gnutls.c:485
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
@@ -23406,7 +23368,7 @@ msgstr ""
 "Halere, zerbitzariak aurkeztutako segurtasun-ziurtagiria ezezaguna da eta "
 "ezin da egiaztatu inongo ziurtagiri autoritate (CA) fidagarrien bidez."
 
-#: modules/misc/gnutls.c:483
+#: modules/misc/gnutls.c:491
 msgid ""
 "However, the security certificate presented by the server changed since the "
 "previous visit and was not authenticated by any trusted Certificate "
@@ -23416,21 +23378,21 @@ msgstr ""
 "aurreko bisitatik eta ez da egiaztatu inongo ziurtagiri-autoritate (CA) "
 "fidagarrien bidez."
 
-#: modules/misc/gnutls.c:494 modules/misc/gnutls.c:515
-#: modules/misc/securetransport.c:338
+#: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
+#: modules/misc/securetransport.c:344
 msgid "Abort"
 msgstr "Abortatu"
 
-#: modules/misc/gnutls.c:494
+#: modules/misc/gnutls.c:502
 msgid "View certificate"
 msgstr "Ikusi ziurtagiria"
 
-#: modules/misc/gnutls.c:495 modules/misc/gnutls.c:516
-#: modules/misc/securetransport.c:340
+#: modules/misc/gnutls.c:503 modules/misc/gnutls.c:524
+#: modules/misc/securetransport.c:346
 msgid "Insecure site"
 msgstr "Gune ez-segurua"
 
-#: modules/misc/gnutls.c:496
+#: modules/misc/gnutls.c:504
 #, c-format
 msgid ""
 "You attempted to reach %s. %s\n"
@@ -23446,15 +23408,15 @@ msgstr ""
 "\n"
 "Zalantzarik izanez gero, abortatu orain.\n"
 
-#: modules/misc/gnutls.c:515
+#: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
 msgstr "Onartu 24 orduz"
 
-#: modules/misc/gnutls.c:515
+#: modules/misc/gnutls.c:523
 msgid "Accept permanently"
 msgstr "Onartu betirako"
 
-#: modules/misc/gnutls.c:517
+#: modules/misc/gnutls.c:525
 #, c-format
 msgid ""
 "This is the certificate presented by %s:\n"
@@ -23467,11 +23429,11 @@ msgstr ""
 "\n"
 "Zalantzarik baduzu, utzi orain.\n"
 
-#: modules/misc/gnutls.c:748
+#: modules/misc/gnutls.c:756
 msgid "Use system trust database"
 msgstr "Erabili sistemaren konfiantzazko datu-basea"
 
-#: modules/misc/gnutls.c:750
+#: modules/misc/gnutls.c:758
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
@@ -23479,11 +23441,11 @@ msgstr ""
 "TLS saioak egiaztatzerakoan, fidatu sistema eragilearen konfiantzazko datu-"
 "basean gordeta dauden ziurtagiri-autoritateen (CA) erro-ziurtagiriez."
 
-#: modules/misc/gnutls.c:753
+#: modules/misc/gnutls.c:761
 msgid "Trust directory"
 msgstr "Konfiantzazko direktorioa"
 
-#: modules/misc/gnutls.c:755
+#: modules/misc/gnutls.c:763
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
@@ -23491,11 +23453,11 @@ msgstr ""
 "TLS saioak egiaztatzerakoan, fidatu emandako direktorioan dauden ziurtagiri-"
 "autoritateen (CA) erro-ziurtagiriez."
 
-#: modules/misc/gnutls.c:758
+#: modules/misc/gnutls.c:766
 msgid "TLS cipher priorities"
 msgstr "TLS zifratze-lehentasunak"
 
-#: modules/misc/gnutls.c:759
+#: modules/misc/gnutls.c:767
 msgid ""
 "Ciphers, key exchange methods, hash functions and compression methods can be "
 "selected. Refer to GNU TLS documentation for detailed syntax."
@@ -23503,27 +23465,27 @@ msgstr ""
 "Zifratzeak, tekla aldaketa metodoak, hash funtzioak eta konpresio metodoak "
 "hautatu daitezke. Irakurri GNU TLS dokumentazioa sintaxi-xehetasunetarako."
 
-#: modules/misc/gnutls.c:770
+#: modules/misc/gnutls.c:778
 msgid "Performance (prioritize faster ciphers)"
 msgstr "Errendimendua (lehentasuna eman zifratze-azkarragoei)"
 
-#: modules/misc/gnutls.c:772
+#: modules/misc/gnutls.c:780
 msgid "Secure 128-bits (exclude 256-bits ciphers)"
 msgstr "Segurtatu 128-bit (baztertu 256-biteko zifratzeak)"
 
-#: modules/misc/gnutls.c:773
+#: modules/misc/gnutls.c:781
 msgid "Secure 256-bits (prioritize 256-bits ciphers)"
 msgstr "Segurtatu 256-bit (lehentasuna eman 256-biteko zifratzeei)"
 
-#: modules/misc/gnutls.c:774
+#: modules/misc/gnutls.c:782
 msgid "Export (include insecure ciphers)"
 msgstr "Esportatu (segurtatu gabeko zifratzeak barne)"
 
-#: modules/misc/gnutls.c:779
+#: modules/misc/gnutls.c:787
 msgid "GNU TLS transport layer security"
 msgstr "GnuTLS garraio geruza segurtasuna"
 
-#: modules/misc/gnutls.c:793
+#: modules/misc/gnutls.c:801
 msgid "GNU TLS server"
 msgstr "GNU TLS zerbitzaria"
 
@@ -23620,7 +23582,7 @@ msgstr "TLS euskarria OS X eta iOSrako"
 msgid "TLS server support for OS X"
 msgstr "TLS zerbitzari-euskarria OS Xrako"
 
-#: modules/misc/securetransport.c:330
+#: modules/misc/securetransport.c:336
 #, c-format
 msgid ""
 "You attempted to reach %s. However the security certificate presented by the "
@@ -23637,7 +23599,7 @@ msgstr ""
 "\n"
 "Zalantzarik baduzu, utzi orain\n"
 
-#: modules/misc/securetransport.c:339
+#: modules/misc/securetransport.c:345
 msgid "Accept certificate temporarily"
 msgstr "Onartu ziurtagiria aldi baterako"
 
@@ -24153,8 +24115,7 @@ msgstr "MPEG bideoa"
 msgid "VC-1 packetizer"
 msgstr "VC-1 paketatzailea"
 
-#: modules/services_discovery/avahi.c:52
-#: modules/services_discovery/avahi.c:277
+#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
 msgstr "Zeroconf sareko zerbitzuak"
 
@@ -24401,7 +24362,7 @@ msgid "Applications"
 msgstr "Aplikazioak"
 
 #: modules/services_discovery/xcb_apps.c:361
-#: modules/video_output/win32/direct3d9.c:315
+#: modules/video_output/win32/direct3d9.c:318
 msgid "Desktop"
 msgstr "Mahaigaina"
 
@@ -25390,11 +25351,11 @@ msgstr "Lehenetsia: 90 seg"
 msgid "Chromaprint stream output"
 msgstr "Chromaprint transmisio jarraituaren irteera"
 
-#: modules/stream_out/chromecast/cast.cpp:121
+#: modules/stream_out/chromecast/cast.cpp:162
 msgid "HTTP port"
 msgstr "HTTP ataka"
 
-#: modules/stream_out/chromecast/cast.cpp:122
+#: modules/stream_out/chromecast/cast.cpp:163
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
@@ -25402,91 +25363,91 @@ msgstr ""
 "Zerbitzari lokalaren HTTP ataka ezartzen du, Chromecast gailura "
 "multimediaren transmisio jarraitua egiteko."
 
-#: modules/stream_out/chromecast/cast.cpp:125
+#: modules/stream_out/chromecast/cast.cpp:166
 msgid "The Chromecast receiver can receive video."
 msgstr "Chromecast hargailuak bideoa har dezake."
 
-#: modules/stream_out/chromecast/cast.cpp:127
+#: modules/stream_out/chromecast/cast.cpp:168
 msgid "This sets the muxer used to stream to the Chromecast."
 msgstr ""
 "Chromecast gailura transmisio jarraitua egiteko erabiliko den "
 "multiplexadorea ezartzen du."
 
-#: modules/stream_out/chromecast/cast.cpp:128
+#: modules/stream_out/chromecast/cast.cpp:169
 msgid "MIME content type"
 msgstr "MIME eduki-mota"
 
-#: modules/stream_out/chromecast/cast.cpp:129
+#: modules/stream_out/chromecast/cast.cpp:170
 msgid "This sets the media MIME content type sent to the Chromecast."
 msgstr ""
 "Chromecast gailura bidaliko den multimediaren MIME eduki-mota ezartzen du."
 
-#: modules/stream_out/chromecast/cast.cpp:130
-#: modules/stream_out/chromecast/cast.cpp:525
+#: modules/stream_out/chromecast/cast.cpp:171
+#: modules/stream_out/chromecast/cast.cpp:855
 msgid "Performance warning"
 msgstr "Errendimendu-abisua"
 
-#: modules/stream_out/chromecast/cast.cpp:131
+#: modules/stream_out/chromecast/cast.cpp:172
 msgid "Display a performance warning when transcoding"
 msgstr "Bistaratu errendimendu-abisua transkodetzerakoan"
 
-#: modules/stream_out/chromecast/cast.cpp:132
+#: modules/stream_out/chromecast/cast.cpp:173
 msgid "Enable Audio passthrough"
 msgstr "Gaitu audioaren igarobidea"
 
-#: modules/stream_out/chromecast/cast.cpp:133
+#: modules/stream_out/chromecast/cast.cpp:174
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Desgaitu zure hargailuak ez badu Dolby® onartzen."
 
-#: modules/stream_out/chromecast/cast.cpp:155
+#: modules/stream_out/chromecast/cast.cpp:196
 msgid "High (high quality and high bandwidth)"
 msgstr "Altua (kalitate altua eta banda-zabalera handia)"
 
-#: modules/stream_out/chromecast/cast.cpp:156
+#: modules/stream_out/chromecast/cast.cpp:197
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Ertaina (kalitate eta banda-zabalera ertainak)"
 
-#: modules/stream_out/chromecast/cast.cpp:157
+#: modules/stream_out/chromecast/cast.cpp:198
 msgid "Low (low quality and low bandwidth)"
 msgstr "Baxua (kalitate baxua eta banda-zabalera txikia)"
 
-#: modules/stream_out/chromecast/cast.cpp:158
+#: modules/stream_out/chromecast/cast.cpp:199
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "CPU baxua (kalitate baxua baina banda-zabalera handia)"
 
-#: modules/stream_out/chromecast/cast.cpp:161
+#: modules/stream_out/chromecast/cast.cpp:202
 msgid "Conversion quality"
 msgstr "Bihurketaren kalitatea"
 
-#: modules/stream_out/chromecast/cast.cpp:162
+#: modules/stream_out/chromecast/cast.cpp:203
 msgid "Change this option to increase conversion speed or quality."
 msgstr "Aldatu aukera hau bihurketaren abiadura edo kalitatea handitzeko."
 
-#: modules/stream_out/chromecast/cast.cpp:165
+#: modules/stream_out/chromecast/cast.cpp:206
 msgid "IP Address of the Chromecast."
 msgstr "Chromecast gailuaren IP helbidea."
 
-#: modules/stream_out/chromecast/cast.cpp:166
+#: modules/stream_out/chromecast/cast.cpp:207
 msgid "Chromecast port"
 msgstr "Chromecast ataka"
 
-#: modules/stream_out/chromecast/cast.cpp:167
+#: modules/stream_out/chromecast/cast.cpp:208
 msgid "The port used to talk to the Chromecast."
 msgstr "Chromecast gailuari hitz egiteko erabiliko den ataka."
 
-#: modules/stream_out/chromecast/cast.cpp:171
+#: modules/stream_out/chromecast/cast.cpp:214
 msgid "Chromecast"
 msgstr "Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:172
+#: modules/stream_out/chromecast/cast.cpp:215
 msgid "Chromecast stream output"
 msgstr "Chromecast transmisio jarraituaren irteera"
 
-#: modules/stream_out/chromecast/cast.cpp:524
+#: modules/stream_out/chromecast/cast.cpp:854
 msgid "Ok, Don't warn me again"
 msgstr "Ados, ez abisatu berriro"
 
-#: modules/stream_out/chromecast/cast.cpp:526
+#: modules/stream_out/chromecast/cast.cpp:856
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -25494,7 +25455,7 @@ msgstr ""
 "Bideo hau igortzeak bihurketa egitea eskatzen du. Honek erabilgarri dagoen "
 "energia guztia erabili eta bateria azkar agor lezake."
 
-#: modules/stream_out/chromecast/chromecast_demux.cpp:391
+#: modules/stream_out/chromecast/chromecast_demux.cpp:339
 msgid "Chromecast demux wrapper"
 msgstr "Chromecast demultiplexadorearen bilgarria"
 
@@ -30157,6 +30118,29 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
+
+#~ msgid "Inhibit the power management daemon during playback"
+#~ msgstr ""
+#~ "Desaktibatu energia kudeatzeko daemon-a erreproduzitzen ari den bitartean"
+
+#~ msgid ""
+#~ "Inhibits the power management daemon during any playback, to avoid the "
+#~ "computer being suspended because of inactivity."
+#~ msgstr ""
+#~ "Energia kudeatzeko daemon-a desaktibatu egiten du erreprodukzio baten "
+#~ "dirauen artean, ordenagailua geldirik egoteagatik eseki ez dadin."
+
+#~ msgid "Renderer discovery off"
+#~ msgstr "Errendatzaileen aurkikuntza desgaituta"
+
+#~ msgid "Enable renderer discovery"
+#~ msgstr "Gaitu errendatzaileen aurkikuntza"
+
+#~ msgid "Renderer discovery on"
+#~ msgstr "Errendatzaileen aurkikuntza gaituta"
+
+#~ msgid "Disable renderer discovery"
+#~ msgstr "Desgaitu errendatzaileen aurkikuntza"
 
 #~ msgid ""
 #~ "If interlaced content is detected, temporal deinterlacing is enabled at "
