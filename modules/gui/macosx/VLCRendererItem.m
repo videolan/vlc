@@ -55,6 +55,14 @@
     return [NSString stringWithUTF8String:name];
 }
 
+- (NSString*)identifier
+{
+    const char *sout = vlc_renderer_item_sout(_rendererItem);
+    if (!sout)
+        return nil;
+    return [NSString stringWithUTF8String:sout];
+}
+
 - (NSString*)iconURI
 {
     const char *uri = vlc_renderer_item_icon_uri(_rendererItem);
