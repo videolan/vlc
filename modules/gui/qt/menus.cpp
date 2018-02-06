@@ -1345,6 +1345,8 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         FREENULL( text.psz_string );
         return;
     }
+    else
+        action->setEnabled( false );
 
     switch( i_type & VLC_VAR_TYPE )
     {
