@@ -286,7 +286,6 @@ EXTRA_DIST += \
 	lua/playlist/mpora.lua \
 	lua/playlist/newgrounds.lua \
 	lua/playlist/pinkbike.lua \
-	lua/playlist/pluzz.lua \
 	lua/playlist/rockbox_fm_presets.lua \
 	lua/playlist/soundcloud.lua \
 	lua/playlist/vimeo.lua \
