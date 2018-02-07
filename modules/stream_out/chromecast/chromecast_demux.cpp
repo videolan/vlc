@@ -170,7 +170,12 @@ struct demux_sys_t
         if ( !m_enabled )
             return demux_Demux( p_demux->p_next );
 
-        p_renderer->pf_pace( p_renderer->p_opaque );
+        if( !p_renderer->pf_pace( p_renderer->p_opaque ) )
+        {
+            // Still pacing, but we return now in order to let the input thread
+            // do some controls.
+            return VLC_DEMUXER_SUCCESS;
+        }
 
         if( m_startTime == VLC_TS_INVALID )
         {

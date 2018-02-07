@@ -375,18 +375,22 @@ void intf_sys_t::interrupt_wake_up()
     vlc_cond_signal( &m_pace_cond );
 }
 
-void intf_sys_t::pace()
+bool intf_sys_t::pace()
 {
     vlc_mutex_locker locker(&m_lock);
     if( !m_pace )
-        return;
+        return true;
 
     m_interrupted = false;
     vlc_interrupt_register( interrupt_wake_up_cb, this );
 
-    while( m_pace && !m_interrupted )
-        vlc_cond_wait( &m_pace_cond, &m_lock );
+    int ret = 0;
+    mtime_t deadline = mdate() + INT64_C(500000);
+    while( m_pace && !m_interrupted && ret == 0 )
+        ret = vlc_cond_timedwait( &m_pace_cond, &m_lock, deadline );
     vlc_interrupt_unregister();
+
+    return ret == 0;
 }
 
 /**
@@ -1064,10 +1068,10 @@ void intf_sys_t::set_length(void *pt, mtime_t length)
     p_this->m_length = length;
 }
 
-void intf_sys_t::pace(void *pt)
+bool intf_sys_t::pace(void *pt)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->pace();
+    return p_this->pace();
 }
 
 void intf_sys_t::set_pause_state(void *pt, bool paused)

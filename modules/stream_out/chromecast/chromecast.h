@@ -176,7 +176,7 @@ struct intf_sys_t
     States state() const;
 
     void setPacing(bool do_pace);
-    void pace();
+    bool pace();
 
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
@@ -220,7 +220,7 @@ private:
     static double get_position(void*);
     static void set_initial_time( void*, mtime_t time );
 
-    static void pace(void*);
+    static bool pace(void*);
     static void set_on_paused_changed_cb(void *, on_paused_changed_itf, void *);
 
     static void set_pause_state(void*, bool paused);
