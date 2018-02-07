@@ -921,22 +921,15 @@ void intf_sys_t::setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_do
 
 void intf_sys_t::setPauseState(bool paused)
 {
-    msg_Dbg( m_module, "%s state", paused ? "paused" : "playing" );
     vlc_mutex_locker locker( &m_lock );
+    if ( m_mediaSessionId == 0 )
+        return;
+
+    msg_Dbg( m_module, "%s state", paused ? "paused" : "playing" );
     if ( !paused )
-    {
-        if ( m_mediaSessionId != 0 )
-        {
-            m_communication.msgPlayerPlay( m_appTransportId, m_mediaSessionId );
-        }
-    }
-    else
-    {
-        if ( m_mediaSessionId != 0 && m_state != Paused )
-        {
-            m_communication.msgPlayerPause( m_appTransportId, m_mediaSessionId );
-        }
-    }
+        m_communication.msgPlayerPlay( m_appTransportId, m_mediaSessionId );
+    else if ( m_state != Paused )
+        m_communication.msgPlayerPause( m_appTransportId, m_mediaSessionId );
 }
 
 bool intf_sys_t::isFinishedPlaying()
