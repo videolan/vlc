@@ -481,18 +481,25 @@ static void SetupISO639Descriptor( demux_t *p_demux, ts_es_t *p_es,
         return;
     }
 
-    p_es->fmt.psz_language = malloc( 4 );
-    if( p_es->fmt.psz_language )
+    if( !p_es->fmt.psz_language )
     {
-        memcpy( p_es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
-        p_es->fmt.psz_language[3] = 0;
-        msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
+        p_es->fmt.psz_language = malloc( 4 );
+        if( p_es->fmt.psz_language )
+        {
+            memcpy( p_es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
+            p_es->fmt.psz_language[3] = 0;
+            msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
+        }
     }
 
     uint8_t type = p_decoded->code[0].i_audio_type;
-    p_es->fmt.psz_description = GetIso639AudioTypeDesc( type );
+    if( !p_es->fmt.psz_description )
+        p_es->fmt.psz_description = GetIso639AudioTypeDesc( type );
     if (type == 0x00) /* Undefined */
         p_es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1; // prioritize normal audio tracks
+
+    if( p_es->fmt.p_extra_languages )
+        return;
 
     p_es->fmt.i_extra_languages = p_decoded->i_code_count-1;
     if( p_es->fmt.i_extra_languages > 0 )
@@ -1817,7 +1824,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
             msg_Dbg( p_demux, "   => pid %d content is *unknown*",
                      p_dvbpsies->i_pid );
-            p_pes->p_es->fmt.psz_description = strdup( psz_typedesc );
+            if( !p_pes->p_es->fmt.psz_description )
+                p_pes->p_es->fmt.psz_description = strdup( psz_typedesc );
         }
         else
         {
