@@ -427,25 +427,13 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
         vlc_fifo_Wait(m_fifo);
 
     /* Handle block headers */
-    if (p_block)
+    if (p_block && answer->i_body_offset == 0 && m_header != NULL)
     {
-        if (p_block->i_flags & BLOCK_FLAG_HEADER)
-        {
-            if (m_header)
-                block_Release(m_header);
-            m_header = p_block;
-        }
-        if (answer->i_body_offset == 0)
-        {
-            if (m_header != NULL && p_block != m_header)
-            {
-                /* Using header block. Re-insert current block into fifo */
-                block_t *p_fifo = vlc_fifo_DequeueAllUnlocked(m_fifo);
-                vlc_fifo_QueueUnlocked(m_fifo, p_block);
-                vlc_fifo_QueueUnlocked(m_fifo, p_fifo);
-                p_block = m_header;
-            }
-        }
+        /* Using header block. Re-insert current block into fifo */
+        block_t *p_fifo = vlc_fifo_DequeueAllUnlocked(m_fifo);
+        vlc_fifo_QueueUnlocked(m_fifo, p_block);
+        vlc_fifo_QueueUnlocked(m_fifo, p_fifo);
+        p_block = m_header;
     }
     bool do_unpace = vlc_fifo_GetBytes(m_fifo) < HTTPD_BUFFER_MAX;
     vlc_fifo_Unlock(m_fifo);
@@ -508,17 +496,27 @@ static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
         vlc_fifo_Lock(p_sys->m_fifo);
     }
 
-    /* Tell the demux filter to pace when the fifo starts to be full */
-    bool do_pace = vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX;
-
-    /* Drop buffer is the fifo is really full */
-    while (vlc_fifo_GetBytes(p_sys->m_fifo) >= (HTTPD_BUFFER_MAX * 2))
+    bool do_pace = false;
+    if (p_block->i_flags & BLOCK_FLAG_HEADER)
     {
-        block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->m_fifo);
-        msg_Warn(p_access, "httpd buffer full: dropping %zuB", p_drop->i_buffer);
-        block_Release(p_drop);
+        if (p_sys->m_header)
+            block_Release(p_sys->m_header);
+        p_sys->m_header = p_block;
     }
-    vlc_fifo_QueueUnlocked(p_sys->m_fifo, p_block);
+    else
+    {
+        /* Tell the demux filter to pace when the fifo starts to be full */
+        do_pace = vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX;
+
+        /* Drop buffer is the fifo is really full */
+        while (vlc_fifo_GetBytes(p_sys->m_fifo) >= (HTTPD_BUFFER_MAX * 2))
+        {
+            block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->m_fifo);
+            msg_Warn(p_access, "httpd buffer full: dropping %zuB", p_drop->i_buffer);
+            block_Release(p_drop);
+        }
+        vlc_fifo_QueueUnlocked(p_sys->m_fifo, p_block);
+    }
 
     vlc_fifo_Unlock(p_sys->m_fifo);
     vlc_fifo_Signal(p_sys->m_fifo);
