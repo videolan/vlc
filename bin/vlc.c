@@ -133,6 +133,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 #ifdef TOP_BUILDDIR
     setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
     setenv ("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
+    setenv ("VLC_LIB_PATH", TOP_BUILDDIR"/modules", 1);
 #endif
 
     /* Clear the X.Org startup notification ID. Otherwise the UI might try to
