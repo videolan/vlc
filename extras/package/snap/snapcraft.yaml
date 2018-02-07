@@ -43,14 +43,16 @@ parts:
     build: |
       cd contrib && mkdir linux && cd linux
       ../bootstrap
+      make list
       make -j $(getconf _NPROCESSORS_ONLN) .libplacebo
       make -j $(getconf _NPROCESSORS_ONLN) .ffmpeg
+      make -j $(getconf _NPROCESSORS_ONLN) .spatialaudio
+      make -j $(getconf _NPROCESSORS_ONLN) .microdns
       cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
       ./configure \
           --prefix=$SNAPCRAFT_PART_INSTALL/usr \
-          --disable-chromecast \
           --disable-wayland
       make -j $(getconf _NPROCESSORS_ONLN)
     install: |
@@ -101,6 +103,7 @@ parts:
       - libgles2-mesa-dev
       - libgnutls28-dev
       - libgtk2.0-dev
+      - libgtk-3-dev
       - libidn11-dev
       - libiso9660-dev
       - libjack-dev
@@ -121,6 +124,7 @@ parts:
       - libopus-dev
       - libpng-dev
       - libpostproc-dev
+      - libprojectm-dev
       - libpulse-dev
       - libqt5x11extras5-dev
       - qtbase5-private-dev
@@ -130,6 +134,7 @@ parts:
       - libsamplerate0-dev
       - libsdl-image1.2-dev
       - libsdl1.2-dev
+      - libsecret-1-dev
       - libshine-dev
       - libshout3-dev
       - libsidplay2-dev
@@ -172,6 +177,8 @@ parts:
       - bison
       - flex
       - zsh
+      - protobuf-compiler
+      - protobuf-c-compiler
     stage-packages:
       - fonts-freefont-ttf
       - dbus-x11
@@ -194,6 +201,7 @@ parts:
       - librsvg2-2
       - libsdl-image1.2
       - libsdl1.2debian
+      - libsecret-1-0
       - libva-drm1
       - libva-x11-1
       - libva1
@@ -215,6 +223,8 @@ parts:
       - mesa-utils
       - mesa-vdpau-drivers
       - zlib1g
+      - libprojectm2v5
+      - projectm-data
 
   wrapper:
     plugin: dump
