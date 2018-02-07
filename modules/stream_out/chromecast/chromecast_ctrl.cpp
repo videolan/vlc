@@ -35,6 +35,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <iomanip>
 
 #include <vlc_stream.h>
 
@@ -926,18 +927,22 @@ States intf_sys_t::state() const
     return m_state;
 }
 
+std::string intf_sys_t::timeVLCToCC(mtime_t time)
+{
+    std::stringstream ss;
+    ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+    ss << std::setprecision(6) << (double (time) / 1000000.0);
+    return ss.str();
+}
+
 bool intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
     if( !isStatePlaying() || m_mediaSessionId == 0 )
         return false;
 
-    char current_time[32];
-    if( snprintf( current_time, sizeof(current_time), "%.3f",
-                  double( pos ) / 1000000.0 ) >= (int)sizeof(current_time) )
-        return false;
-
-    int ret = m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
+    int ret = m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId,
+                                             timeVLCToCC( pos ) );
     if( ret == VLC_SUCCESS )
     {
         setState( Seeking );

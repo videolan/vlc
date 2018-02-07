@@ -228,6 +228,8 @@ private:
 
     void prepareHttpArtwork();
 
+    static std::string  timeVLCToCC(mtime_t);
+
 private:
     vlc_object_t  * const m_module;
     const int      m_streaming_port;
