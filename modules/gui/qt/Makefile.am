@@ -448,7 +448,14 @@ nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
 gui/qt/resources.cpp: gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
+vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp
+vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC
+vlc_qt_check_LDADD = $(QT_LIBS)
+
 if ENABLE_QT
 gui_LTLIBRARIES += libqt_plugin.la
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
+if !HAVE_WIN32
+pkglibexec_PROGRAMS += vlc-qt-check
+endif
 endif

@@ -3,6 +3,7 @@ check_LTLIBRARIES =
 pkglib_LTLIBRARIES =
 noinst_HEADERS =
 check_PROGRAMS =
+pkglibexec_PROGRAMS =
 EXTRA_DIST =
 
 EXTRA_SUBDIRS = \
