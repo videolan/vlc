@@ -104,7 +104,9 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_meta( NULL )
  , m_ctl_thread_interrupt(p_interrupt)
  , m_httpd_host(httpd_host)
+ , m_httpd_file(NULL)
  , m_art_url(NULL)
+ , m_art_idx(0)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
  , m_ts_seek( VLC_TS_INVALID )
@@ -114,10 +116,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
     vlc_cond_init( &m_pace_cond );
-
-    const char *psz_artmime = "application/octet-stream";
-    m_httpd_file = httpd_FileNew( m_httpd_host, "/art", psz_artmime, NULL, NULL,
-                                  httpd_file_fill_cb, (httpd_file_sys_t *) this );
 
     std::stringstream ss;
     ss << "http://" << m_communication.getServerIp() << ":" << port;
@@ -247,19 +245,45 @@ static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
 
 void intf_sys_t::prepareHttpArtwork()
 {
-    if( !m_httpd_file )
-        return;
-
     const char *psz_art = m_meta ? vlc_meta_Get( m_meta, vlc_meta_ArtworkURL ) : NULL;
     /* Abort if there is no art or if the art is already served */
     if( !psz_art || strncmp( psz_art, "http", 4) == 0 )
         return;
 
-    free( m_art_url );
-    m_art_url = strdup( psz_art );
+    std::stringstream ss_art_idx;
+
+    if( m_art_url && strcmp( m_art_url, psz_art ) == 0 )
+    {
+        /* Same art: use the previous cached artwork url */
+        assert( m_art_idx != 0 );
+        ss_art_idx << "/art" << (m_art_idx - 1);
+    }
+    else
+    {
+        /* New art: create a new httpd file instance with a new url. The
+         * artwork has to be different since the CC will cache the content. */
+
+        ss_art_idx << "/art" << m_art_idx;
+        m_art_idx++;
+
+        vlc_mutex_unlock( &m_lock );
+
+        if( m_httpd_file )
+            httpd_FileDelete( m_httpd_file );
+        m_httpd_file = httpd_FileNew( m_httpd_host, ss_art_idx.str().c_str(),
+                                      "application/octet-stream", NULL, NULL,
+                                      httpd_file_fill_cb, (httpd_file_sys_t *) this );
+
+        vlc_mutex_lock( &m_lock );
+        if( !m_httpd_file )
+            return;
+
+        free( m_art_url );
+        m_art_url = strdup( psz_art );
+    }
 
     std::stringstream ss;
-    ss << m_art_http_ip << "/art";
+    ss << m_art_http_ip << ss_art_idx.str();
     vlc_meta_Set( m_meta, vlc_meta_ArtworkURL, ss.str().c_str() );
 }
 
