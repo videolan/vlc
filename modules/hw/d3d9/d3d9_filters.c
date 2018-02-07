@@ -107,7 +107,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     picture_sys_t *p_src_sys = ActivePictureSys(p_pic);
 
     picture_t *p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic || !p_outpic->p_sys->surface )
+    if( !p_outpic || !p_outpic->p_sys || !p_outpic->p_sys->surface )
         goto failed;
 
     picture_CopyProperties( p_outpic, p_pic );
