@@ -28,6 +28,18 @@
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 
+#include <stdlib.h>
+#include <unistd.h>
+#ifndef _POSIX_SPAWN
+# define _POSIX_SPAWN (-1)
+#endif
+#if (_POSIX_SPAWN >= 0)
+# include <spawn.h>
+# include <sys/wait.h>
+
+extern "C" char **environ;
+#endif
+
 #include <QApplication>
 #include <QDate>
 #include <QMutex>
@@ -420,6 +432,38 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #endif
 #if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
         return VLC_EGENERIC;
+#endif
+
+#if (_POSIX_SPAWN >= 0)
+    /* Check if QApplication works */
+    char *libdir = config_GetLibDir();
+    if (likely(libdir != NULL))
+    {
+        char *path;
+
+        if (unlikely(asprintf(&path, "%s/vlc-qt-check", libdir) < 0))
+            path = NULL;
+        free(libdir);
+        if (unlikely(path == NULL))
+            return VLC_ENOMEM;
+
+        char *argv[] = { path, NULL };
+        pid_t pid;
+
+        int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
+        free(path);
+        if (val)
+            return VLC_ENOMEM;
+
+        int status;
+        while (waitpid(pid, &status, 0) == -1);
+
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+        {
+            msg_Dbg(p_this, "Qt check failed (%d). Skipping.", status);
+            return VLC_EGENERIC;
+        }
+    }
 #endif
 
     QMutexLocker locker (&lock);
