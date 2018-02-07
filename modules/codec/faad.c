@@ -519,7 +519,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         bool b_reorder = false;
         if (p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_BITMAP)
         {
-            for( size_t i = 0; i < frame.channels; i++ )
+            for( size_t i = 0; i < frame.channels && i < FAAD_CHANNEL_ID_COUNT; i++ )
             {
                 unsigned pos = frame.channel_position[i];
                 if( likely(pos < FAAD_CHANNEL_ID_COUNT) )
