@@ -528,6 +528,14 @@ static void SetupStandardESDescriptors( demux_t *p_demux, ts_es_t *p_es,
                      p_es->fmt.i_codec != VLC_CODEC_TELETEXT) )
                     SetupISO639Descriptor( p_demux, p_es, p_dr );
                 break;
+
+            case 0x0E:
+            {
+                dvbpsi_max_bitrate_dr_t *p_btdr = dvbpsi_DecodeMaxBitrateDr( p_dr );
+                if( p_btdr && !p_es->fmt.i_bitrate )
+                    p_es->fmt.i_bitrate = p_btdr->i_max_bitrate * 50 * 8;
+            }
+            break;
         }
     }
 }
