@@ -110,7 +110,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_art_idx(0)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
- , m_ts_seek( VLC_TS_INVALID )
  , m_length( VLC_TS_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
@@ -455,8 +454,6 @@ void intf_sys_t::queueMessage( QueueableMessages msg )
     vlc_interrupt_raise( m_ctl_thread_interrupt );
 }
 
-
-
 /*****************************************************************************
  * Chromecast thread
  *****************************************************************************/
@@ -500,23 +497,6 @@ void intf_sys_t::mainLoop()
                         }
                     }
                     break;
-                case Seek:
-                {
-                    if( !isStatePlaying() || m_mediaSessionId == 0 || m_ts_seek == VLC_TS_INVALID )
-                        break;
-                    char current_time[32];
-                    if( snprintf( current_time, sizeof(current_time), "%.3f",
-                                  double( m_ts_seek ) / 1000000.0 ) >= (int)sizeof(current_time) )
-                    {
-                        msg_Err( m_module, "snprintf() truncated string for mediaSessionId" );
-                        current_time[sizeof(current_time) - 1] = '\0';
-                    }
-                    m_ts_seek = VLC_TS_INVALID;
-                    /* send a fake time to seek to, to make sure the device flushes its buffers */
-                    m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
-                    setState( Seeking );
-                    break;
-                }
             }
             m_msgQueue.pop();
         }
@@ -924,7 +904,6 @@ void intf_sys_t::requestPlayerStop()
     vlc_mutex_locker locker(&m_lock);
 
     m_request_load = false;
-    m_ts_seek = VLC_TS_INVALID;
 
     if( !isStatePlaying() )
         return;
@@ -943,8 +922,14 @@ bool intf_sys_t::requestPlayerSeek(mtime_t pos)
     vlc_mutex_locker locker(&m_lock);
     if( !isStatePlaying() || m_mediaSessionId == 0 )
         return false;
-    m_ts_seek = pos;
-    queueMessage( Seek );
+
+    char current_time[32];
+    if( snprintf( current_time, sizeof(current_time), "%.3f",
+                  double( pos ) / 1000000.0 ) >= (int)sizeof(current_time) )
+        return false;
+
+    m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
+    setState( Seeking );
 
     return true;
 }
@@ -1038,7 +1023,6 @@ void intf_sys_t::setState( States state )
             if (m_on_seek_done != NULL)
                 m_on_seek_done(m_on_seek_done_data);
 
-        States old_state = m_state;
         m_state = state;
 
         switch( m_state )

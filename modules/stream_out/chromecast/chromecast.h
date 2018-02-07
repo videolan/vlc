@@ -158,7 +158,6 @@ struct intf_sys_t
     enum QueueableMessages
     {
         Stop,
-        Seek
     };
     intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr,
                int device_port, vlc_interrupt_t *, httpd_host_t *);
@@ -272,7 +271,6 @@ private:
     mtime_t           m_time_playback_started;
     /* local playback time of the input when playback started/resumed */
     mtime_t           m_ts_local_start;
-    mtime_t           m_ts_seek;
     mtime_t           m_length;
 
     /* shared structure with the demux-filter */
