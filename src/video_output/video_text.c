@@ -80,6 +80,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
     const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;
     const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 
+    r->i_text_align = sys->position;
     r->i_align = sys->position;
     r->i_x = 0;
     if (r->i_align & SUBPICTURE_ALIGN_LEFT)
