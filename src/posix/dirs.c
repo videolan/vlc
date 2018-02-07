@@ -54,7 +54,8 @@ char *config_GetDataDir (void)
  */
 char *config_GetLibDir (void)
 {
-    return strdup (PKGLIBDIR);
+    const char *path = getenv("VLC_LIB_PATH");
+    return strdup((path != NULL) ? path : PKGLIBDIR);
 }
 #endif
 

@@ -33,7 +33,9 @@
 
 static char *config_GetLibDirRaw(void)
 {
-    char *path = NULL;
+    char *path = getenv("VLC_LIB_PATH");
+    if (path != NULL)
+        return strdup(path);
 
     /* Find the path to libvlc (i.e. ourselves) */
     FILE *maps = fopen ("/proc/self/maps", "rte");
