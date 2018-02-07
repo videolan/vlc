@@ -251,6 +251,7 @@ private:
     ChromecastCommunication m_communication;
     std::queue<QueueableMessages> m_msgQueue;
     States m_state;
+    bool m_played_once;
     bool m_request_stop;
     bool m_request_load;
     bool m_eof;
