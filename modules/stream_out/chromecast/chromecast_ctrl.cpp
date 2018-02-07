@@ -989,7 +989,7 @@ void intf_sys_t::setState( States state )
 #ifndef NDEBUG
         msg_Dbg( m_module, "Switching from state %s to %s", StateToStr( m_state ), StateToStr( state ) );
 #endif
-        if (state == Seeking)
+        if (m_state == Seeking)
             if (m_on_seek_done != NULL)
                 m_on_seek_done(m_on_seek_done_data);
         m_state = state;
