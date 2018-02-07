@@ -492,8 +492,10 @@ static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
 
         vlc_fifo_Unlock(p_sys->m_fifo);
         /* TODO: put better timestamp */
-        p_sys->m_intf->requestPlayerSeek(mdate() + INT64_C(1000000));
+        bool success = p_sys->m_intf->requestPlayerSeek(mdate() + INT64_C(1000000));
         vlc_fifo_Lock(p_sys->m_fifo);
+        if (!success)
+            p_sys->m_seeking = false;
     }
 
     bool do_pace = false;

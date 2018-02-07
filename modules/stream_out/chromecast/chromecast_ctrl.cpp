@@ -912,13 +912,15 @@ States intf_sys_t::state() const
     return m_state;
 }
 
-void intf_sys_t::requestPlayerSeek(mtime_t pos)
+bool intf_sys_t::requestPlayerSeek(mtime_t pos)
 {
     vlc_mutex_locker locker(&m_lock);
     if( !isStatePlaying() || m_mediaSessionId == 0 )
-        return;
+        return false;
     m_ts_seek = pos;
     queueMessage( Seek );
+
+    return true;
 }
 
 void intf_sys_t::setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data)

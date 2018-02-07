@@ -168,7 +168,7 @@ struct intf_sys_t
 
     void setHasInput(const std::string mime_type = "");
 
-    void requestPlayerSeek(mtime_t pos);
+    bool requestPlayerSeek(mtime_t pos);
     void setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data);
     void setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
                               void *on_paused_changed_data);
