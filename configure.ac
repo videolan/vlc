@@ -1169,6 +1169,10 @@ case "${host_cpu}" in
   "")
     ARCH=unknown
     ;;
+  armv*)
+    ARCH="arm"
+    host_cpu="arm"
+    ;;
   *)
     ARCH="${host_cpu}"
     ;;
