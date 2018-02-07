@@ -485,6 +485,7 @@ libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
+	codec/omxil/omxil_utils.h codec/omxil/qcom.c codec/omxil/qcom.h \
 	video_output/android/utils.c video_output/android/utils.h \
 	video_output/android/display.h \
 	codec/hxxx_helper.c codec/hxxx_helper.h \
