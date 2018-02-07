@@ -42,6 +42,21 @@
 
 struct sout_access_out_sys_t
 {
+    sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
+                          const char *psz_url);
+    ~sout_access_out_sys_t();
+
+    void clear();
+    void flush();
+    void prepare(sout_stream_t *p_stream, const std::string &mime);
+    int url_cb(httpd_client_t *cl, httpd_message_t *answer, const httpd_message_t *query);
+    void seek_done_cb();
+    ssize_t write(sout_access_out_t *p_access, block_t *p_block);
+    void close();
+
+private:
+    void clearUnlocked();
+
     intf_sys_t * const m_intf;
     httpd_url_t       *m_url;
     vlc_fifo_t        *m_fifo;
@@ -50,17 +65,6 @@ struct sout_access_out_sys_t
     bool               m_flushing;
     bool               m_seeking;
     std::string        m_mime;
-
-    sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
-                          const char *psz_url);
-    ~sout_access_out_sys_t();
-
-    void clearUnlocked();
-    void clear();
-    void flush();
-    void prepare(sout_stream_t *p_stream, const std::string &mime);
-    int url_cb(httpd_client_t *cl, httpd_message_t *answer, const httpd_message_t *query);
-    void seek_done_cb();
 };
 
 struct sout_stream_sys_t
@@ -489,56 +493,71 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
     return VLC_SUCCESS;
 }
 
-
-static ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
+ssize_t sout_access_out_sys_t::write(sout_access_out_t *p_access, block_t *p_block)
 {
-    sout_access_out_sys_t *p_sys = p_access->p_sys;
     size_t i_len = p_block->i_buffer;
 
-    vlc_fifo_Lock(p_sys->m_fifo);
+    vlc_fifo_Lock(m_fifo);
 
-    if (p_sys->m_flushing)
+    if (m_flushing)
     {
-        p_sys->m_flushing = false;
-        p_sys->m_seeking = true;
+        m_flushing = false;
+        m_seeking = true;
 
-        vlc_fifo_Unlock(p_sys->m_fifo);
+        vlc_fifo_Unlock(m_fifo);
         /* TODO: put better timestamp */
-        bool success = p_sys->m_intf->requestPlayerSeek(mdate() + INT64_C(1000000));
-        vlc_fifo_Lock(p_sys->m_fifo);
+        bool success = m_intf->requestPlayerSeek(mdate() + INT64_C(1000000));
+        vlc_fifo_Lock(m_fifo);
         if (!success)
-            p_sys->m_seeking = false;
+            m_seeking = false;
     }
 
     bool do_pace = false;
     if (p_block->i_flags & BLOCK_FLAG_HEADER)
     {
-        if (p_sys->m_header)
-            block_Release(p_sys->m_header);
-        p_sys->m_header = p_block;
+        if (m_header)
+            block_Release(m_header);
+        m_header = p_block;
     }
     else
     {
         /* Tell the demux filter to pace when the fifo starts to be full */
-        do_pace = vlc_fifo_GetBytes(p_sys->m_fifo) >= HTTPD_BUFFER_MAX;
+        do_pace = vlc_fifo_GetBytes(m_fifo) >= HTTPD_BUFFER_MAX;
 
         /* Drop buffer is the fifo is really full */
-        while (vlc_fifo_GetBytes(p_sys->m_fifo) >= (HTTPD_BUFFER_MAX * 2))
+        while (vlc_fifo_GetBytes(m_fifo) >= (HTTPD_BUFFER_MAX * 2))
         {
-            block_t *p_drop = vlc_fifo_DequeueUnlocked(p_sys->m_fifo);
+            block_t *p_drop = vlc_fifo_DequeueUnlocked(m_fifo);
             msg_Warn(p_access, "httpd buffer full: dropping %zuB", p_drop->i_buffer);
             block_Release(p_drop);
         }
-        vlc_fifo_QueueUnlocked(p_sys->m_fifo, p_block);
+        vlc_fifo_QueueUnlocked(m_fifo, p_block);
     }
 
-    vlc_fifo_Unlock(p_sys->m_fifo);
-    vlc_fifo_Signal(p_sys->m_fifo);
+    vlc_fifo_Unlock(m_fifo);
+    vlc_fifo_Signal(m_fifo);
 
     if (do_pace)
-        p_sys->m_intf->setPacing(true);
+        m_intf->setPacing(true);
 
     return i_len;
+}
+
+void sout_access_out_sys_t::close()
+{
+    vlc_fifo_Lock(m_fifo);
+    m_eof = true;
+    m_flushing = false;
+    vlc_fifo_Unlock(m_fifo);
+    vlc_fifo_Signal(m_fifo);
+
+    m_intf->setPacing(false);
+}
+
+ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    return p_sys->write(p_access, p_block);
 }
 
 static int AccessControl(sout_access_out_t *p_access, int i_query, va_list args)
@@ -565,8 +584,6 @@ static int AccessOpen(vlc_object_t *p_this)
     if (p_sys == NULL)
         return VLC_EGENERIC;
 
-    assert(!p_sys->m_eof);
-
     p_access->pf_write       = AccessWrite;
     p_access->pf_control     = AccessControl;
     p_access->p_sys          = p_sys;
@@ -579,13 +596,7 @@ static void AccessClose(vlc_object_t *p_this)
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
-    vlc_fifo_Lock(p_sys->m_fifo);
-    p_sys->m_eof = true;
-    p_sys->m_flushing = false;
-    vlc_fifo_Unlock(p_sys->m_fifo);
-    vlc_fifo_Signal(p_sys->m_fifo);
-
-    p_sys->m_intf->setPacing(false);
+    p_sys->close();
 }
 
 /*****************************************************************************
