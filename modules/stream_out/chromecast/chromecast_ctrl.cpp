@@ -97,6 +97,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_on_paused_changed_data( NULL )
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
+ , m_played_once( false )
  , m_request_stop( false )
  , m_request_load( false )
  , m_eof( false )
@@ -334,6 +335,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
 
     prepareHttpArtwork();
 
+    m_played_once = false;
     m_eof = false;
     m_mediaSessionId = 0;
     m_request_load = true;
@@ -1046,12 +1048,13 @@ void intf_sys_t::setState( States state )
                 tryLoad();
                 break;
             case Paused:
-                if (m_on_paused_changed != NULL)
+                if (m_played_once && m_on_paused_changed != NULL)
                     m_on_paused_changed(m_on_paused_changed_data, true);
                 break;
             case Playing:
-                if (m_on_paused_changed != NULL && old_state == Paused)
+                if (m_played_once && m_on_paused_changed != NULL)
                     m_on_paused_changed(m_on_paused_changed_data, false);
+                m_played_once = true;
                 break;
             default:
                 break;
