@@ -104,24 +104,24 @@ public:
      */
     void disconnect();
 
-    void msgPing();
-    void msgPong();
-    void msgConnect( const std::string& destinationId );
+    int msgPing();
+    int msgPong();
+    int msgConnect( const std::string& destinationId );
 
-    void msgReceiverLaunchApp();
-    void msgReceiverGetStatus();
-    void msgReceiverClose(const std::string& destinationId);
-    void msgAuth();
-    void msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
+    int msgReceiverLaunchApp();
+    int msgReceiverGetStatus();
+    int msgReceiverClose(const std::string& destinationId);
+    int msgAuth();
+    int msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
                         const std::string& mime, const vlc_meta_t *p_meta );
-    void msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId );
-    void msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId );
-    void msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId );
-    void msgPlayerGetStatus( const std::string& destinationId );
-    void msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId,
+    int msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId );
+    int msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId );
+    int msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId );
+    int msgPlayerGetStatus( const std::string& destinationId );
+    int msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId,
                         const std::string & currentTime );
-    void msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId,
-                             float volume, bool mute);
+    int msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId,
+                            float volume, bool mute);
     ssize_t receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout );
 
     const std::string getServerIp()
@@ -131,11 +131,11 @@ public:
 private:
     int sendMessage(const castchannel::CastMessage &msg);
 
-    void buildMessage(const std::string & namespace_,
-                      const std::string & payload,
-                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
-                      castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
-    void pushMediaPlayerMessage( const std::string& destinationId, const std::stringstream & payload );
+    int buildMessage(const std::string & namespace_,
+                     const std::string & payload,
+                     const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
+                     castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
+    int pushMediaPlayerMessage( const std::string& destinationId, const std::stringstream & payload );
     std::string GetMedia( unsigned int i_port, const std::string& mime,
                           const vlc_meta_t *p_meta );
 
