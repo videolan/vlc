@@ -4634,6 +4634,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
         {
             i_traf_base_data_offset = BOXDATA(p_tfhd)->i_base_data_offset;
         }
+        /* ignored if MP4_TFHD_BASE_DATA_OFFSET */
         else if ( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DEFAULT_BASE_IS_MOOF )
         {
             i_traf_base_data_offset = p_moof->i_pos /* + 8*/;
@@ -4671,6 +4672,11 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
                 else if( (BOXDATA(p_tfhd)->i_flags & MP4_TFHD_BASE_DATA_OFFSET) )
                 {
                     i_trun_data_offset = BOXDATA(p_tfhd)->i_base_data_offset + p_trundata->i_data_offset;
+                }
+                /* ignored if MP4_TFHD_BASE_DATA_OFFSET */
+                else if ( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DEFAULT_BASE_IS_MOOF )
+                {
+                    i_trun_data_offset = p_moof->i_pos + p_trundata->i_data_offset;
                 }
                 else
                 {
