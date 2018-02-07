@@ -928,10 +928,13 @@ bool intf_sys_t::requestPlayerSeek(mtime_t pos)
                   double( pos ) / 1000000.0 ) >= (int)sizeof(current_time) )
         return false;
 
-    m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
-    setState( Seeking );
-
-    return true;
+    int ret = m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
+    if( ret == VLC_SUCCESS )
+    {
+        setState( Seeking );
+        return true;
+    }
+    return false;
 }
 
 void intf_sys_t::setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data)
