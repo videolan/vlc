@@ -62,7 +62,7 @@ TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
     m_rWindowManager( rWindowManager ),
     m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
     m_pCapturingControl( NULL ), m_pFocusControl( NULL ),
-    m_pDragControl( NULL ), m_currModifier( 0 )
+    m_pDragControl( NULL )
 {
     // Register as a moving window
     m_rWindowManager.registerWindow( *this );
@@ -209,9 +209,6 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
     {
         getIntf()->p_sys->p_dialogs->sendKey( rEvtKey.getModKey() );
     }
-
-    // Always store the modifier, which can be needed for scroll events.
-    m_currModifier = rEvtKey.getMod();
 }
 
 void TopWindow::processEvent( EvtScroll &rEvtScroll )
@@ -237,7 +234,7 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
     {
         // Treat the scroll event as a hotkey plus current modifiers
         int i = (rEvtScroll.getDirection() == EvtScroll::kUp ?
-                 KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN) | m_currModifier;
+                 KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN) | rEvtScroll.getMod();
 
         getIntf()->p_sys->p_dialogs->sendKey( i );
     }

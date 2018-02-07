@@ -119,8 +119,6 @@ private:
     CtrlGeneric *m_pFocusControl;
     /// Control over which drag&drop is hovering
     CtrlGeneric *m_pDragControl;
-    /// Current key modifier (also used for mouse)
-    int m_currModifier;
 
     /// Variable for the visibility of the window
     VarBoolImpl *m_pVarMaximized;
