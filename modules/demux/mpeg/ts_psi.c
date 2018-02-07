@@ -530,9 +530,7 @@ static void SetupStandardESDescriptors( demux_t *p_demux, ts_es_t *p_es,
         switch( p_dr->i_tag )
         {
             case 0x0a:
-                if( p_es->fmt.i_cat != SPU_ES ||
-                    (p_es->fmt.i_codec != VLC_CODEC_DVBS &&
-                     p_es->fmt.i_codec != VLC_CODEC_TELETEXT) )
+                if( p_es->fmt.i_cat == AUDIO_ES )
                     SetupISO639Descriptor( p_demux, p_es, p_dr );
                 break;
 
