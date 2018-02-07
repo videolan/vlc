@@ -118,6 +118,15 @@ void VoutWindow::processEvent( EvtKey &rEvtKey )
 }
 
 
+void VoutWindow::processEvent( EvtScroll &rEvtScroll )
+{
+    int i = (rEvtScroll.getDirection() == EvtScroll::kUp ?
+            KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN) | rEvtScroll.getMod();
+
+    getIntf()->p_sys->p_dialogs->sendKey( i );
+}
+
+
 void VoutWindow::processEvent( EvtMotion &rEvtMotion )
 {
     int x = rEvtMotion.getXPos() - m_pParentWindow->getLeft() - getLeft();
