@@ -49,9 +49,11 @@ function i420_yuyv_neon
 	sub		OPAD,	OPITCH,	WIDTH,	lsl #1
 	sub		YPAD,	YPITCH,	WIDTH
 1:
+	it		gt
 	movsgt		COUNT,	WIDTH
 	add		O2,	O1,	OPITCH
 	add		Y2,	Y1,	YPITCH
+	it		le
 	pople		{r4-r8,r10-r11,pc}
 2:
 	pld		[U, #64]
@@ -86,9 +88,11 @@ function i420_uyvy_neon
 	sub		OPAD,	OPITCH,	WIDTH,	lsl #1
 	sub		YPAD,	YPITCH,	WIDTH
 1:
+	it		gt
 	movsgt		COUNT,	WIDTH
 	add		O2,	O1,	OPITCH
 	add		Y2,	Y1,	YPITCH
+	it		le
 	pople		{r4-r8,r10-r11,pc}
 2:
 	pld		[U, #64]

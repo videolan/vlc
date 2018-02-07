@@ -45,6 +45,7 @@ function yuyv_i422_neon
 	sub		YPAD,	YPAD,	WIDTH
 	sub		IPAD,	IPAD,	WIDTH,	lsl #1
 1:
+	ite		gt
 	movsgt		COUNT,	WIDTH
 	pople		{r4-r6,pc}
 2:
@@ -74,6 +75,7 @@ function uyvy_i422_neon
 	sub		YPAD,	YPAD,	WIDTH
 	sub		IPAD,	IPAD,	WIDTH,	lsl #1
 1:
+	ite		gt
 	movsgt		COUNT,	WIDTH
 	pople		{r4-r6,pc}
 2:
