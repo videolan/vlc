@@ -456,6 +456,82 @@ static void SetupAudioExtendedDescriptors( demux_t *p_demux, ts_es_t *p_es,
     }
 }
 
+static char *GetIso639AudioTypeDesc( uint8_t type )
+{
+    static const char *audio_type[] = {
+        /* "Main audio", */
+        N_("clean effects"),
+        N_("hearing impaired"),
+        N_("visual impaired commentary"),
+    };
+
+    if ( type == 0 || type >= ARRAY_SIZE(audio_type) )
+        return NULL;
+
+    return strdup( audio_type[ --type ] );
+}
+
+static void SetupISO639Descriptor( demux_t *p_demux, ts_es_t *p_es,
+                                   dvbpsi_descriptor_t *p_dr )
+{
+    dvbpsi_iso639_dr_t *p_decoded = dvbpsi_DecodeISO639Dr( p_dr );
+    if( !p_decoded )
+    {
+        msg_Err( p_demux, "      Failed to decode a ISO 639 descriptor" );
+        return;
+    }
+
+    p_es->fmt.psz_language = malloc( 4 );
+    if( p_es->fmt.psz_language )
+    {
+        memcpy( p_es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
+        p_es->fmt.psz_language[3] = 0;
+        msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
+    }
+
+    uint8_t type = p_decoded->code[0].i_audio_type;
+    p_es->fmt.psz_description = GetIso639AudioTypeDesc( type );
+    if (type == 0x00) /* Undefined */
+        p_es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1; // prioritize normal audio tracks
+
+    p_es->fmt.i_extra_languages = p_decoded->i_code_count-1;
+    if( p_es->fmt.i_extra_languages > 0 )
+        p_es->fmt.p_extra_languages =
+            malloc( sizeof(*p_es->fmt.p_extra_languages) *
+                    p_es->fmt.i_extra_languages );
+    if( p_es->fmt.p_extra_languages )
+    {
+        for( unsigned i = 0; i < p_es->fmt.i_extra_languages; i++ )
+        {
+            extra_languages_t *p_lang = &p_es->fmt.p_extra_languages[i];
+            if( (p_lang->psz_language = malloc(4)) )
+            {
+                memcpy( p_lang->psz_language, p_decoded->code[i+1].iso_639_code, 3 );
+                p_lang->psz_language[3] = '\0';
+            }
+            p_lang->psz_description = GetIso639AudioTypeDesc( p_decoded->code[i].i_audio_type );
+        }
+    }
+}
+
+static void SetupStandardESDescriptors( demux_t *p_demux, ts_es_t *p_es,
+                                        const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    for( dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
+                              p_dr; p_dr = p_dr->p_next )
+    {
+        switch( p_dr->i_tag )
+        {
+            case 0x0a:
+                if( p_es->fmt.i_cat != SPU_ES ||
+                    (p_es->fmt.i_codec != VLC_CODEC_DVBS &&
+                     p_es->fmt.i_codec != VLC_CODEC_TELETEXT) )
+                    SetupISO639Descriptor( p_demux, p_es, p_dr );
+                break;
+        }
+    }
+}
+
 static void SetupISO14496Descriptors( demux_t *p_demux, ts_stream_t *p_pes,
                                       const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -1332,70 +1408,6 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_es_t *p_es,
     return false;
 }
 
-static char *GetIso639AudioTypeDesc( uint8_t type )
-{
-    static const char *audio_type[] = {
-        /* "Main audio", */
-        N_("clean effects"),
-        N_("hearing impaired"),
-        N_("visual impaired commentary"),
-    };
-
-    if ( type == 0 || type >= ARRAY_SIZE(audio_type) )
-        return NULL;
-
-    return strdup( audio_type[ --type ] );
-}
-
-static void PMTParseEsIso639( demux_t *p_demux, ts_es_t *p_es,
-                              const dvbpsi_pmt_es_t *p_dvbpsies )
-{
-    /* get language descriptor */
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x0a );
-
-    if( !p_dr )
-        return;
-
-    dvbpsi_iso639_dr_t *p_decoded = dvbpsi_DecodeISO639Dr( p_dr );
-    if( !p_decoded )
-    {
-        msg_Err( p_demux, "      Failed to decode a ISO 639 descriptor" );
-        return;
-    }
-
-    p_es->fmt.psz_language = malloc( 4 );
-    if( p_es->fmt.psz_language )
-    {
-        memcpy( p_es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
-        p_es->fmt.psz_language[3] = 0;
-        msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
-    }
-
-    uint8_t type = p_decoded->code[0].i_audio_type;
-    p_es->fmt.psz_description = GetIso639AudioTypeDesc( type );
-    if (type == 0x00) /* Undefined */
-        p_es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1; // prioritize normal audio tracks
-
-    p_es->fmt.i_extra_languages = p_decoded->i_code_count-1;
-    if( p_es->fmt.i_extra_languages > 0 )
-        p_es->fmt.p_extra_languages =
-            malloc( sizeof(*p_es->fmt.p_extra_languages) *
-                    p_es->fmt.i_extra_languages );
-    if( p_es->fmt.p_extra_languages )
-    {
-        for( unsigned i = 0; i < p_es->fmt.i_extra_languages; i++ )
-        {
-            extra_languages_t *p_lang = &p_es->fmt.p_extra_languages[i];
-            if( (p_lang->psz_language = malloc(4)) )
-            {
-                memcpy( p_lang->psz_language, p_decoded->code[i+1].iso_639_code, 3 );
-                p_lang->psz_language[3] = '\0';
-            }
-            p_lang->psz_description = GetIso639AudioTypeDesc( p_decoded->code[i].i_audio_type );
-        }
-    }
-}
-
 static void PIDFillFormat( demux_t *p_demux, ts_stream_t *p_pes,
                            int i_stream_type, ts_transport_type_t *p_datatype )
 {
@@ -1573,18 +1585,12 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         }
     }
 
-    if( p_pes->p_es->fmt.i_cat == AUDIO_ES ||
-        ( p_pes->p_es->fmt.i_cat == SPU_ES &&
-          p_pes->p_es->fmt.i_codec != VLC_CODEC_DVBS &&
-          p_pes->p_es->fmt.i_codec != VLC_CODEC_TELETEXT ) )
-    {
-        PMTParseEsIso639( p_demux, p_pes->p_es, p_dvbpsies );
-    }
-
     if( p_pes->p_es->fmt.i_cat == AUDIO_ES )
     {
         SetupAudioExtendedDescriptors( p_demux, p_pes->p_es, p_dvbpsies );
     }
+
+    SetupStandardESDescriptors(  p_demux, p_pes->p_es, p_dvbpsies );
 
     /* PES packets usually contain truncated frames */
     p_pes->p_es->fmt.b_packetized = false;
