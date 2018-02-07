@@ -85,15 +85,9 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
     else
     {
         hide();
-        int w = VoutManager::instance( getIntf() )->getVoutMainWindow()->getWidth();
-        int h = VoutManager::instance( getIntf() )->getVoutMainWindow()->getHeight();
-
-        setParent( VoutManager::instance( getIntf() )->getVoutMainWindow(),
-                   0, 0, w, h );
+        setParent( VoutManager::instance( getIntf() )->getVoutMainWindow() );
         m_pParentWindow =
                   VoutManager::instance( getIntf() )->getVoutMainWindow();
-
-        resize( w, h );
         show();
     }
 
