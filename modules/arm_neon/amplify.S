@@ -21,7 +21,6 @@
 #include "asm.S"
 
 	.syntax	unified
-	.arm
 #if HAVE_AS_FPU_DIRECTIVE
 	.fpu	neon
 #endif
@@ -33,6 +32,7 @@
 	.align 2
 function amplify_float_arm_neon
 	cmp		SIZE,	#0
+	it		eq
 	bxeq		lr
 #ifdef __ARM_PCS
 	vmov		s0,	r3	@ softfp
