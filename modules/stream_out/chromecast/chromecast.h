@@ -170,6 +170,8 @@ struct intf_sys_t
 
     void requestPlayerSeek(mtime_t pos);
     void setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_done_data);
+    void setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
+                              void *on_paused_changed_data);
     void requestPlayerStop();
     States state() const;
 
@@ -219,6 +221,7 @@ private:
     static void set_initial_time( void*, mtime_t time );
 
     static void pace(void*);
+    static void set_on_paused_changed_cb(void *, on_paused_changed_itf, void *);
 
     static void set_pause_state(void*, bool paused);
 
@@ -241,6 +244,9 @@ private:
 
     on_seek_done_itf m_on_seek_done;
     void            *m_on_seek_done_data;
+
+    on_paused_changed_itf m_on_paused_changed;
+    void                 *m_on_paused_changed_data;
 
     ChromecastCommunication m_communication;
     std::queue<QueueableMessages> m_msgQueue;

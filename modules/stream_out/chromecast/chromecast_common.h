@@ -33,9 +33,13 @@ extern "C" {
 
 #define CC_SHARED_VAR_NAME "cc_sout"
 
+typedef void (*on_paused_changed_itf)( void *data, bool );
+
 typedef struct
 {
     void *p_opaque;
+
+    void (*pf_set_on_paused_changed_cb)(void *, on_paused_changed_itf, void *);
 
     void (*pf_set_length)(void*, mtime_t length);
     mtime_t (*pf_get_time)(void*);
