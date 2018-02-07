@@ -46,7 +46,7 @@ typedef struct
     double (*pf_get_position)(void*);
     void (*pf_set_initial_time)( void*, mtime_t time );
 
-    void (*pf_pace)(void*);
+    bool (*pf_pace)(void*);
 
     void (*pf_set_pause_state)(void*, bool paused);
 
