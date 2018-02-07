@@ -417,14 +417,24 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
     vlc_fifo_Lock(m_fifo);
 
     block_t *p_block = NULL;
-    while ((p_block = vlc_fifo_DequeueUnlocked(m_fifo)) == NULL
-       && !m_eof)
-        vlc_fifo_Wait(m_fifo);
+    do
+    {
+        while ((p_block = vlc_fifo_DequeueUnlocked(m_fifo)) == NULL
+           && !m_eof)
+            vlc_fifo_Wait(m_fifo);
 
-    /* Wait for the seek to be done. This will prevent the CC to flush this
-     * buffer that came after a flush. */
-    while (m_seeking && !m_eof)
-        vlc_fifo_Wait(m_fifo);
+        /* Wait for the seek to be done. This will prevent the CC to flush this
+         * buffer that came after a flush. */
+        while (m_seeking && !m_eof)
+            vlc_fifo_Wait(m_fifo);
+
+        if (m_flushing && p_block)
+        {
+            block_Release(p_block);
+            p_block = NULL;
+        }
+
+    } while (m_flushing);
 
     /* Handle block headers */
     if (p_block && answer->i_body_offset == 0 && m_header != NULL)
@@ -569,6 +579,7 @@ static void AccessClose(vlc_object_t *p_this)
 
     vlc_fifo_Lock(p_sys->m_fifo);
     p_sys->m_eof = true;
+    p_sys->m_flushing = false;
     vlc_fifo_Unlock(p_sys->m_fifo);
     vlc_fifo_Signal(p_sys->m_fifo);
 
