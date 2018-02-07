@@ -91,6 +91,10 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  : m_module(p_this)
  , m_streaming_port(port)
  , m_mediaSessionId( 0 )
+ , m_on_seek_done( NULL )
+ , m_on_seek_done_data( NULL )
+ , m_on_paused_changed( NULL )
+ , m_on_paused_changed_data( NULL )
  , m_communication( p_this, device_addr.c_str(), device_port )
  , m_state( Authenticating )
  , m_request_stop( false )
@@ -120,6 +124,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_art_http_ip = ss.str();
 
     m_common.p_opaque = this;
+    m_common.pf_set_on_paused_changed_cb = set_on_paused_changed_cb;
     m_common.pf_get_position     = get_position;
     m_common.pf_get_time         = get_time;
     m_common.pf_set_length       = set_length;
@@ -919,6 +924,14 @@ void intf_sys_t::setOnSeekDoneCb(on_seek_done_itf on_seek_done, void *on_seek_do
     m_on_seek_done_data = on_seek_done_data;
 }
 
+void intf_sys_t::setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
+                                      void *on_paused_changed_data)
+{
+    vlc_mutex_locker locker(&m_lock);
+    m_on_paused_changed = on_paused_changed;
+    m_on_paused_changed_data = on_paused_changed_data;
+}
+
 void intf_sys_t::setPauseState(bool paused)
 {
     vlc_mutex_locker locker( &m_lock );
@@ -992,6 +1005,8 @@ void intf_sys_t::setState( States state )
         if (m_state == Seeking)
             if (m_on_seek_done != NULL)
                 m_on_seek_done(m_on_seek_done_data);
+
+        States old_state = m_state;
         m_state = state;
 
         switch( m_state )
@@ -999,6 +1014,14 @@ void intf_sys_t::setState( States state )
             case Connected:
             case Ready:
                 tryLoad();
+                break;
+            case Paused:
+                if (m_on_paused_changed != NULL)
+                    m_on_paused_changed(m_on_paused_changed_data, true);
+                break;
+            case Playing:
+                if (m_on_paused_changed != NULL && old_state == Paused)
+                    m_on_paused_changed(m_on_paused_changed_data, false);
                 break;
             default:
                 break;
@@ -1026,6 +1049,13 @@ void intf_sys_t::set_initial_time(void *pt, mtime_t time )
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock );
     return p_this->setInitialTime( time );
+}
+
+void intf_sys_t::set_on_paused_changed_cb(void *pt,
+                                          on_paused_changed_itf itf, void *data)
+{
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
+    p_this->setOnPausedChangedCb(itf, data);
 }
 
 void intf_sys_t::set_length(void *pt, mtime_t length)
