@@ -1,0 +1,42 @@
+From 508d617dc3b1032e553475fbe9819eda8b55468c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Wed, 7 Feb 2018 18:00:06 +0100
+Subject: [PATCH] os_mcast_join: Work around an issue in android < 8
+
+Before Android 8, using MCAST_JOIN_GROUP with group_req::gr_interface
+right after the connection gets established will always fail with
+ENODEV.
+Doing so on Oreo works fine.
+When the interface is forced to any non-0 index, all is good.
+---
+ compat/compat.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/compat/compat.c b/compat/compat.c
+index 46b3079..a1fc7d6 100644
+--- a/compat/compat.c
++++ b/compat/compat.c
+@@ -151,9 +151,19 @@ os_mcast_join(sock_t s, const struct sockaddr_storage *ss, multicast_if mintf)
+ 
+         memset(&mgroup, 0, sizeof(mgroup));
+         memcpy(&mgroup.gr_group, ss, ss_len(ss));
++#ifdef __ANDROID__
++        while ( mgroup.gr_interface <= 5 )
++#endif
++        {
+         if (setsockopt(s, ss_level(ss), MCAST_JOIN_GROUP,
+-            (const void *) &mgroup, sizeof(mgroup)) < 0)
++            (const void *) &mgroup, sizeof(mgroup)) < 0) {
++#ifdef __ANDROID__
++                mgroup.gr_interface++;
++                continue;
++#endif
+                 return (-1);
++        }
++        }
+ #else
+         union {
+                 struct sockaddr_storage ss;
+-- 
+2.11.0
+
