@@ -1048,7 +1048,7 @@ static void UpdateQuadLuminanceScale(vout_display_t *vd, d3d_quad_t *quad, float
     if (quad->f_luminance_scale == luminanceScale)
         return;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE, 0, &mappedResource);
     if (SUCCEEDED(hr)) {
         PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
         quad->f_luminance_scale = luminanceScale;
@@ -2882,7 +2882,7 @@ static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float 
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE, 0, &mappedResource);
     if (SUCCEEDED(hr)) {
         PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
         dst_data->Opacity = opacity;
