@@ -31,7 +31,7 @@
 - (void)startScrolling {
     // Start our timer unless running
     if (!scrollTimer) {
-        scrollTimer = [NSTimer scheduledTimerWithTimeInterval: 1/6
+        scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.025
                                                        target:self
                                                      selector:@selector(scrollTick:)
                                                      userInfo:nil
