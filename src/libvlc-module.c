@@ -2054,8 +2054,10 @@ vlc_module_begin ()
 #ifdef HAVE_DYNAMIC_PLUGINS
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
+        change_volatile ()
     add_bool( "plugins-scan", true, PLUGINS_SCAN_TEXT,
               PLUGINS_SCAN_LONGTEXT, true )
+        change_volatile ()
     add_obsolete_string( "plugin-path" ) /* since 2.0.0 */
 #endif
     add_obsolete_string( "data-path" ) /* since 2.1.0 */
