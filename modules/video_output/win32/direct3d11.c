@@ -1188,24 +1188,27 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         sys->d3dregions      = subpicture_regions;
     }
 
-    if (sys->dxgiswapChain4 && picture->format.mastering.max_luminance)
+    if (picture->format.mastering.max_luminance)
     {
         UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / sys->display.luminance_peak);
 
-        DXGI_HDR_METADATA_HDR10 hdr10 = {0};
-        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
-        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
-        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
-        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
-        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
-        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
-        hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
-        hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
-        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
-        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
-        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
-        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-        IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+        if (sys->dxgiswapChain4)
+        {
+            DXGI_HDR_METADATA_HDR10 hdr10 = {0};
+            hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
+            hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
+            hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
+            hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
+            hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
+            hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
+            hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
+            hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
+            hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
+            hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+            hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
+            hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
+            IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+        }
     }
 
     FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
