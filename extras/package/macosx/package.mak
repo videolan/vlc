@@ -42,7 +42,7 @@ endif
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	## Copy translations
-	cp -r "$(prefix)/share/locale" $@/Contents/MacOS/share/
+	test -d "$(prefix)/share/locale" && cp -r "$(prefix)/share/locale" $@/Contents/MacOS/share/ || true
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
 	mkdir -p $@/Contents/MacOS/lib
