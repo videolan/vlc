@@ -82,25 +82,9 @@ fi
 # Call with $1 = file or folder, $2 = identifier (if empty, file name is used)
 sign()
 {
-    IDENTIFIER="$2"
-    if [ -z "$IDENTIFIER" ]; then
-        filename=$(basename "$1")
-        IDENTIFIER="${filename%.*}"
-    fi
-
     # info "Signing file $1 with identifier $IDENTIFIER"
 
-    if [ -z "$GK" ]; then
-        codesign --force --verbose -s "$IDENTITY" --prefix "org.videolan." "$1"
-    else
-        REQUIREMENT="=designated => anchor apple generic  and identifier \"$IDENTIFIER\" "
-        REQUIREMENT+="and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or "
-        REQUIREMENT+="( certificate 1[field.1.2.840.113635.100.6.2.6] exists and "
-        REQUIREMENT+="certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and "
-        REQUIREMENT+="certificate leaf[subject.OU] = \"75GAHG3SZQ\" ))"
-
-        codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$REQUIREMENT" --timestamp=none "$1"
-    fi
+    codesign --force --verbose -s "$IDENTITY" "$1"
 }
 
 
@@ -154,7 +138,7 @@ done
 
 info "Signing the modules"
 
-for i in $(find VLC.app/Contents/MacOS/plugins -type f -name "*.dylib" -exec echo {} \;)
+for i in $(find VLC.app/Contents/MacOS/plugins -type f \( -name "*.dylib" -o -name "*.jar" \)  -exec echo {} \;)
 do
     sign "$i"
 done
