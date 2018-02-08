@@ -33,6 +33,9 @@
 
 #include "freetype.h"
 
+typedef struct ruby_block_t ruby_block_t;
+typedef struct line_desc_t line_desc_t;
+
 typedef struct
 {
     FT_BitmapGlyph p_glyph;
@@ -40,16 +43,15 @@ typedef struct
     FT_BitmapGlyph p_shadow;
     FT_BBox        bbox;
     const text_style_t *p_style;
+    const ruby_block_t *p_ruby;
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
     bool           b_in_karaoke;
 } line_character_t;
 
-typedef struct line_desc_t line_desc_t;
 struct line_desc_t
 {
     line_desc_t      *p_next;
-
     int              i_width;
     int              i_height;
     int              i_base_line;
@@ -64,6 +66,18 @@ void FreeLines( line_desc_t *p_lines );
 line_desc_t *NewLine( int i_count );
 
 /**
+ * \struct layout_ruby_t
+ * \brief LayoutText parameters
+ */
+struct ruby_block_t
+{
+    uni_char_t *p_uchars;       /*!< array of size \p i_count character codepoints */
+    size_t i_count;             /*!< length of the array */
+    text_style_t *p_style;      /*!< own style */
+    line_desc_t *p_laid;
+};
+
+/**
  * \struct layout_text_block_t
  * \brief LayoutText parameters
  */
@@ -71,6 +85,7 @@ typedef struct
 {
     uni_char_t *p_uchars;       /*!< array of size \p i_count character codepoints */
     text_style_t **pp_styles;   /*!< array of size \p i_count character styles */
+    ruby_block_t **pp_ruby;     /*!< array of size \p  */
     uint32_t *pi_k_durations;   /*!< array of size \p i_count karaoke timestamps */
     size_t i_count;             /*!< length of the arrays */
 

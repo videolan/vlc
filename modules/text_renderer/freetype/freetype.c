@@ -841,6 +841,17 @@ static void RenderCharAXYZ( filter_t *p_filter,
             break;
         }
 
+        if(ch->p_ruby && ch->p_ruby->p_laid)
+        {
+            RenderCharAXYZ( p_filter,
+                            p_picture,
+                            ch->p_ruby->p_laid,
+                            i_offset_x, i_offset_y,
+                            2,
+                            ExtractComponents,
+                            BlendPixel );
+        }
+
         /* Don't render if invisible or not wanted */
         if( i_a == STYLE_ALPHA_TRANSPARENT ||
            (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
@@ -1001,6 +1012,27 @@ static void FillDefaultStyles( filter_t *p_filter )
     text_style_Merge( p_sys->p_default_style, p_sys->p_forced_style, true );
 }
 
+static void FreeRubyBlockArray( ruby_block_t **pp_array, size_t i_array )
+{
+    ruby_block_t *p_lyt = NULL;
+    for( size_t i = 0; i< i_array; i++ )
+    {
+        if( p_lyt != pp_array[i] )
+        {
+            p_lyt = pp_array[i];
+            if( p_lyt )
+            {
+                free( p_lyt->p_uchars );
+                text_style_Delete( p_lyt->p_style );
+                if( p_lyt->p_laid )
+                    FreeLines( p_lyt->p_laid );
+                free( p_lyt );
+            }
+        }
+    }
+    free( pp_array );
+}
+
 static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
 {
     text_style_t *p_style = NULL;
@@ -1016,7 +1048,8 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
 }
 
 static size_t AddTextAndStyles( filter_sys_t *p_sys,
-                                const char *psz_text, const text_style_t *p_style,
+                                const char *psz_text, const char *psz_rt,
+                                const text_style_t *p_style,
                                 layout_text_block_t *p_text_block )
 {
     /* Convert chars to unicode */
@@ -1046,6 +1079,15 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
         return 0;
     p_text_block->pp_styles = p_realloc;
 
+    /* Same for ruby text */
+    if( SIZE_MAX / sizeof(text_segment_ruby_t *) < p_text_block->i_count + i_newchars )
+        return 0;
+    i_realloc = (p_text_block->i_count + i_newchars) * sizeof(text_segment_ruby_t *);
+    p_realloc = realloc( p_text_block->pp_ruby, i_realloc );
+    if ( unlikely(!p_realloc) )
+        return 0;
+    p_text_block->pp_ruby = p_realloc;
+
     /* Copy data */
     memcpy( &p_text_block->p_uchars[p_text_block->i_count], p_ucs4, i_newchars * 4 );
     free( p_ucs4 );
@@ -1065,6 +1107,33 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     for ( size_t i = 0; i < i_newchars; ++i )
         p_text_block->pp_styles[p_text_block->i_count + i] = p_mgstyle;
 
+    ruby_block_t *p_rubyblock = NULL;
+    if( psz_rt )
+    {
+        p_ucs4 = ToCharset( FREETYPE_TO_UCS, psz_rt, &i_bytes );
+        if( !p_ucs4 )
+            return 0;
+        p_rubyblock = malloc(sizeof(ruby_block_t));
+        if( p_rubyblock )
+        {
+            p_rubyblock->p_style = text_style_Duplicate( p_mgstyle );
+            if( !p_rubyblock->p_style )
+            {
+                free( p_ucs4 );
+                free( p_rubyblock );
+                return 0;
+            }
+            p_rubyblock->p_style->i_font_size *= 0.4;
+            p_rubyblock->p_style->f_font_relsize *= 0.4;
+            p_rubyblock->p_uchars = p_ucs4;
+            p_rubyblock->i_count = i_bytes / 4;
+            p_rubyblock->p_laid = NULL;
+        }
+        else free( p_ucs4 );
+    }
+    for ( size_t i = 0; i < i_newchars; ++i )
+        p_text_block->pp_ruby[p_text_block->i_count + i] = p_rubyblock;
+
     /* now safe to update total nb */
     p_text_block->i_count += i_newchars;
 
@@ -1081,8 +1150,22 @@ static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t 
         if( !s->psz_text || !s->psz_text[0] )
             continue;
 
-        i_nb_char += AddTextAndStyles( p_filter->p_sys, s->psz_text,
-                                       s->style, p_text_block );
+        if( s->p_ruby )
+        {
+            for( const text_segment_ruby_t *p_ruby = s->p_ruby;
+                                            p_ruby; p_ruby = p_ruby->p_next )
+            {
+                i_nb_char += AddTextAndStyles( p_filter->p_sys,
+                                               p_ruby->psz_base, p_ruby->psz_rt,
+                                               s->style, p_text_block );
+            }
+        }
+        else
+        {
+            i_nb_char += AddTextAndStyles( p_filter->p_sys,
+                                           s->psz_text, NULL,
+                                           s->style, p_text_block );
+        }
     }
 
     return i_nb_char;
@@ -1283,6 +1366,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     free( text_block.p_uchars );
     FreeStylesArray( text_block.pp_styles, text_block.i_count );
+    if( text_block.pp_ruby )
+        FreeRubyBlockArray( text_block.pp_ruby, text_block.i_count );
     free( text_block.pi_k_durations );
 
     return rv;
