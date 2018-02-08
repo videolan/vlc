@@ -75,6 +75,7 @@
 #define DBUS_INSTANCE_ID_PREFIX "instance"
 
 #define SEEK_THRESHOLD 1000 /* µsec */
+#define EVENTS_DELAY INT64_C(100000) /* 100 ms */
 
 /*****************************************************************************
  * Local prototypes.
@@ -768,6 +769,8 @@ static void *Run( void *data )
 
     int canc = vlc_savecancel();
 
+    mtime_t events_last_date = VLC_TS_INVALID;
+    int events_poll_timeout = -1;
     for( ;; )
     {
         vlc_mutex_lock( &p_sys->lock );
@@ -783,6 +786,8 @@ static void *Run( void *data )
 
         /* thread cancellation is allowed while the main loop sleeps */
         vlc_restorecancel( canc );
+        if( timeout == -1 )
+            timeout = events_poll_timeout;
 
         while (poll(fds, i_fds, timeout) == -1)
         {
@@ -822,18 +827,43 @@ static void *Run( void *data )
 
         /* Get the list of events to process */
         size_t i_events = vlc_array_count( &p_sys->events );
-        callback_info_t* p_info[i_events ? i_events : 1];
-        for( size_t i = 0; i < i_events; i++ )
-        {
-            p_info[i] = vlc_array_item_at_index( &p_sys->events, i );
-        }
+        callback_info_t** pp_info = NULL;
 
-        vlc_array_clear( &p_sys->events );
+        if( i_events > 0 )
+        {
+            mtime_t now = mdate();
+            if( now - events_last_date > EVENTS_DELAY )
+            {
+                /* Send events every EVENTS_DELAY */
+                events_last_date = now;
+                events_poll_timeout = -1;
+
+                pp_info = vlc_alloc( i_events, sizeof(*pp_info) );
+                if( pp_info )
+                {
+                    for( size_t i = 0; i < i_events; i++ )
+                        pp_info[i] = vlc_array_item_at_index( &p_sys->events, i );
+                    vlc_array_clear( &p_sys->events );
+                }
+            }
+            else if( events_poll_timeout == -1 )
+            {
+                /* Request poll to wake up in order to send these events after
+                 * some delay */
+                events_poll_timeout = ( EVENTS_DELAY - ( now - events_last_date ) ) / 1000;
+            }
+        }
+        else /* No events: clear timeout */
+            events_poll_timeout = -1;
 
         /* now we can release the lock and process what's pending */
         vlc_mutex_unlock( &p_intf->p_sys->lock );
 
-        ProcessEvents( p_intf, p_info, i_events );
+        if( pp_info )
+        {
+            ProcessEvents( p_intf, pp_info, i_events );
+            free( pp_info );
+        }
         ProcessWatches( p_intf, p_watches, i_watches, fds, i_fds );
 
         DispatchDBusMessages( p_intf );
