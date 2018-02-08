@@ -787,7 +787,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             unsigned *restrict flags = va_arg(args, unsigned *);
             *flags &= p_sys->updates;
-            p_sys->updates = ~*flags;
+            p_sys->updates &= ~*flags;
             return VLC_SUCCESS;
         }
 
