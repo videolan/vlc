@@ -62,6 +62,9 @@ extern "C" char **environ;
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#ifndef X_DISPLAY_MISSING
+# include <vlc_xlib.h>
+#endif
 
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
@@ -355,12 +358,7 @@ static bool active = false;
  * Module callbacks
  *****************************************************************************/
 
-static void *ThreadPlatform( void *, char * );
-
-static void *Thread( void *data )
-{
-    return ThreadPlatform( data, NULL );
-}
+static void *Thread( void * );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
@@ -371,66 +369,13 @@ static void Abort( void *obj )
 }
 #endif
 
-#if defined (QT5_HAS_X11)
-# include <vlc_xlib.h>
-
-static void *ThreadXCB( void *data )
-{
-    char platform_name[] = "xcb";
-    return ThreadPlatform( data, platform_name );
-}
-
-static bool HasX11( vlc_object_t *obj )
-{
-    if( !vlc_xlib_init( obj ) )
-        return false;
-
-    Display *dpy = XOpenDisplay( NULL );
-    if( dpy == NULL )
-        return false;
-
-    XCloseDisplay( dpy );
-    return true;
-}
-#endif
-
-#ifdef QT5_HAS_WAYLAND
-# include <wayland-client.h>
-
-static void *ThreadWayland( void *data )
-{
-    char platform_name[] = "wayland";
-    return ThreadPlatform( data, platform_name );
-}
-
-static bool HasWayland( void )
-{
-    struct wl_display *dpy = wl_display_connect( NULL );
-    if( dpy == NULL )
-        return false;
-
-    wl_display_disconnect( dpy );
-    return true;
-}
-#endif
-
 /* Open Interface */
 static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    void *(*thread)(void *) = Thread;
 
-#ifdef QT5_HAS_WAYLAND
-    if( HasWayland() )
-        thread = ThreadWayland;
-    else
-#endif
-#ifdef QT5_HAS_X11
-    if( HasX11( p_this ) )
-        thread = ThreadXCB;
-    else
-#endif
-#if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
+#ifndef X_DISPLAY_MISSING
+    if (!vlc_xlib_init(p_this))
         return VLC_EGENERIC;
 #endif
 
@@ -492,7 +437,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     libvlc_SetExitHandler( p_intf->obj.libvlc, Abort, p_intf );
     thread( (void *)p_intf );
 #else
-    if( vlc_clone( &p_sys->thread, thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         delete p_sys;
         return VLC_ENOMEM;
@@ -548,21 +493,15 @@ static void Close( vlc_object_t *p_this )
     busy = false;
 }
 
-static void *ThreadPlatform( void *obj, char *platform_name )
+static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     intf_sys_t *p_sys = p_intf->p_sys;
     char vlc_name[] = "vlc"; /* for WM_CLASS */
-    char platform_parm[] = "-platform";
-    char *argv[4];
+    char *argv[2];
     int argc = 0;
 
     argv[argc++] = vlc_name;
-    if( platform_name != NULL )
-    {
-        argv[argc++] = platform_parm;
-        argv[argc++] = platform_name;
-    }
     argv[argc] = NULL;
 
     Q_INIT_RESOURCE( vlc );
