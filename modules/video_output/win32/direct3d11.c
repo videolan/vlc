@@ -2300,14 +2300,81 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
 {
     unsigned int src_width = quad->i_width;
     unsigned int src_height = quad->i_height;
-    float MidY = (output->top + output->bottom) / 2.f;
-    float MidX = (output->left + output->right) / 2.f;
+    float MidX,MidY;
 
     float top, bottom, left, right;
-    top    =  MidY / (MidY - output->top);
-    bottom = -(src_height - MidY) / (output->bottom - MidY);
-    left   = -MidX / (MidX - output->left);
-    right  =  (src_width  - MidX) / (output->right - MidX);
+    switch (orientation)
+    {
+    case ORIENT_ROTATED_90: /* 90° anti clockwise */
+        /* right/top aligned */
+        MidY = (output->left + output->right) / 2.f;
+        MidX = (output->top + output->bottom) / 2.f;
+        top    =  (src_width  - MidX) / (output->right - MidX);
+        bottom = -MidY / (MidY - output->top);
+        left   = -(src_height - MidY) / (output->bottom - MidY);
+        right  =   MidX / (MidX - output->left);
+        break;
+    case ORIENT_ROTATED_180: /* 180° */
+        /* right/top aligned */
+        MidY = (output->top + output->bottom) / 2.f;
+        MidX = (output->left + output->right) / 2.f;
+        top    =  (src_height - MidY) / (output->bottom - MidY);
+        bottom = -MidY / (MidY - output->top);
+        left   = -MidX / (MidX - output->left);
+        right  =  (src_width  - MidX) / (output->right - MidX);
+        break;
+    case ORIENT_ROTATED_270: /* 90° clockwise */
+        /* right/top aligned */
+        MidY = (output->left + output->right) / 2.f;
+        MidX = (output->top + output->bottom) / 2.f;
+        top    =  (src_width  - MidX) / (output->right - MidX);
+        bottom = -MidY / (MidY - output->top);
+        left   = -MidX / (MidX - output->left);
+        right  =  (src_height - MidY) / (output->bottom - MidY);
+        break;
+    case ORIENT_ANTI_TRANSPOSED:
+        MidY = (output->left + output->right) / 2.f;
+        MidX = (output->top + output->bottom) / 2.f;
+        top    =  (src_width  - MidX) / (output->right - MidX);
+        bottom = -MidY / (MidY - output->top);
+        left   = -(src_height - MidY) / (output->bottom - MidY);
+        right  =  MidX / (MidX - output->left);
+        break;
+    case ORIENT_TRANSPOSED:
+        MidY = (output->left + output->right) / 2.f;
+        MidX = (output->top + output->bottom) / 2.f;
+        top    =  (src_width  - MidX) / (output->right - MidX);
+        bottom = -MidY / (MidY - output->top);
+        left   = -MidX / (MidX - output->left);
+        right  =  (src_height - MidY) / (output->bottom - MidY);
+        break;
+    case ORIENT_VFLIPPED:
+        MidY = (output->top + output->bottom) / 2.f;
+        MidX = (output->left + output->right) / 2.f;
+        top    =  (src_height - MidY) / (output->bottom - MidY);
+        bottom = -MidY / (MidY - output->top);
+        left   = -MidX / (MidX - output->left);
+        right  =  (src_width  - MidX) / (output->right - MidX);
+        break;
+    case ORIENT_HFLIPPED:
+        MidY = (output->top + output->bottom) / 2.f;
+        MidX = (output->left + output->right) / 2.f;
+        top    =  MidY / (MidY - output->top);
+        bottom = -(src_height - MidY) / (output->bottom - MidY);
+        left   = -(src_width  - MidX) / (output->right - MidX);
+        right  =  MidX / (MidX - output->left);
+        break;
+    case ORIENT_NORMAL:
+    default:
+        /* left/top aligned */
+        MidY = (output->top + output->bottom) / 2.f;
+        MidX = (output->left + output->right) / 2.f;
+        top    =  MidY / (MidY - output->top);
+        bottom = -(src_height - MidY) / (output->bottom - MidY);
+        left   = -MidX / (MidX - output->left);
+        right  =  (src_width  - MidX) / (output->right - MidX);
+        break;
+    }
 
     const float vertices_coords[4][2] = {
         { left,  bottom },
