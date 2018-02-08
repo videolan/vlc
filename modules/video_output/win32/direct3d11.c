@@ -1190,7 +1190,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     if (picture->format.mastering.max_luminance)
     {
-        UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / sys->display.luminance_peak);
+        if ( picture->format.mastering.max_luminance < 10000)
+            UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / sys->display.luminance_peak);
+        else
+            UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / (1000 * sys->display.luminance_peak));
 
         if (sys->dxgiswapChain4)
         {
