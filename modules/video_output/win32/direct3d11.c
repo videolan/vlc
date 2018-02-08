@@ -92,6 +92,13 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
+typedef struct {
+    FLOAT Opacity;
+    FLOAT BoundaryX;
+    FLOAT BoundaryY;
+    FLOAT LuminanceScale;
+} PS_CONSTANT_BUFFER;
+
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
 {
@@ -108,7 +115,8 @@ typedef struct
     D3D11_VIEWPORT            cropViewport;
     unsigned int              i_width;
     unsigned int              i_height;
-    float                     f_luminance_scale;
+
+    PS_CONSTANT_BUFFER        shaderConstants;
 } d3d_quad_t;
 
 typedef enum video_color_axis {
@@ -184,13 +192,6 @@ typedef struct d3d_vertex_t {
         FLOAT y;
     } texture;
 } d3d_vertex_t;
-
-typedef struct {
-    FLOAT Opacity;
-    FLOAT BoundaryX;
-    FLOAT BoundaryY;
-    FLOAT LuminanceScale;
-} PS_CONSTANT_BUFFER;
 
 typedef struct {
     FLOAT WhitePoint[4*4];
@@ -1040,24 +1041,32 @@ static void Manage(vout_display_t *vd)
     }
 }
 
+static bool D3D11_ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad)
+{
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    HRESULT hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(hr))
+    {
+        msg_Err(o, "Failed to lock the picture shader constants (hr=0x%lX)", hr);
+        return false;
+    }
+
+    PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
+    *dst_data = quad->shaderConstants;
+    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
+    return true;
+}
+
 static void UpdateQuadLuminanceScale(vout_display_t *vd, d3d_quad_t *quad, float luminanceScale)
 {
     vout_display_sys_t *sys = vd->sys;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-    if (quad->f_luminance_scale == luminanceScale)
+    if (quad->shaderConstants.LuminanceScale == luminanceScale)
         return;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE, 0, &mappedResource);
-    if (SUCCEEDED(hr)) {
-        PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
-        quad->f_luminance_scale = luminanceScale;
-        dst_data->LuminanceScale = quad->f_luminance_scale;
-        ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
-    }
-    else {
-        msg_Err(vd, "Failed to lock the picture shader constants (hr=0x%lX)", hr);
-    }
+    float old = quad->shaderConstants.LuminanceScale;
+    quad->shaderConstants.LuminanceScale = luminanceScale;
+    if (!D3D11_ShaderUpdateConstants(VLC_OBJECT(vd), &sys->d3d_dev, quad))
+        quad->shaderConstants.LuminanceScale = old;
 }
 
 static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
@@ -2614,20 +2623,18 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             src_luminance_peak = DEFAULT_BRIGHTNESS;
             break;
     }
-    quad->f_luminance_scale = (float)src_luminance_peak / (float)sys->display.luminance_peak;
+    quad->shaderConstants.LuminanceScale = (float)src_luminance_peak / (float)sys->display.luminance_peak;
 
     /* pixel shader constant buffer */
-    PS_CONSTANT_BUFFER defaultConstants;
-    defaultConstants.Opacity = 1.0;
+    quad->shaderConstants.Opacity = 1.0;
     if (fmt->i_visible_width == fmt->i_width)
-        defaultConstants.BoundaryX = 1.0; /* let texture clamping happen */
+        quad->shaderConstants.BoundaryX = 1.0; /* let texture clamping happen */
     else
-        defaultConstants.BoundaryX = (FLOAT) (fmt->i_visible_width - 1) / fmt->i_width;
+        quad->shaderConstants.BoundaryX = (FLOAT) (fmt->i_visible_width - 1) / fmt->i_width;
     if (fmt->i_visible_height == fmt->i_height)
-        defaultConstants.BoundaryY = 1.0; /* let texture clamping happen */
+        quad->shaderConstants.BoundaryY = 1.0; /* let texture clamping happen */
     else
-        defaultConstants.BoundaryY = (FLOAT) (fmt->i_visible_height - 1) / fmt->i_height;
-    defaultConstants.LuminanceScale = quad->f_luminance_scale;
+        quad->shaderConstants.BoundaryY = (FLOAT) (fmt->i_visible_height - 1) / fmt->i_height;
 
     static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
     D3D11_BUFFER_DESC constantDesc = {
@@ -2636,7 +2643,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
         .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
     };
-    D3D11_SUBRESOURCE_DATA constantInit = { .pSysMem = &defaultConstants };
+    D3D11_SUBRESOURCE_DATA constantInit = { .pSysMem = &quad->shaderConstants };
     hr = ID3D11Device_CreateBuffer(sys->d3d_dev.d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants[0]);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
@@ -2883,20 +2890,16 @@ static void DestroyPictureQuad(picture_t *p_picture)
     free( p_picture );
 }
 
-static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float opacity)
+static void UpdateQuadOpacity(vout_display_t *vd, d3d_quad_t *quad, float opacity)
 {
     vout_display_sys_t *sys = vd->sys;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    if (quad->shaderConstants.Opacity == opacity)
+        return;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE, 0, &mappedResource);
-    if (SUCCEEDED(hr)) {
-        PS_CONSTANT_BUFFER *dst_data = mappedResource.pData;
-        dst_data->Opacity = opacity;
-        ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
-    }
-    else {
-        msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
-    }
+    float old = quad->shaderConstants.Opacity;
+    quad->shaderConstants.Opacity = opacity;
+    if (!D3D11_ShaderUpdateConstants(VLC_OBJECT(vd), &sys->d3d_dev, quad))
+        quad->shaderConstants.Opacity = old;
 }
 
 static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_count,
