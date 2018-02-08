@@ -113,7 +113,10 @@ endif
 endif
 
 ifdef HAVE_MACOSX
+MIN_OSX_VERSION=10.7
+EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
 EXTRA_CXXFLAGS += -stdlib=libc++
+EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -isysroot $(MACOSX_SDK) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
 ifeq ($(ARCH),x86_64)
 EXTRA_CFLAGS += -m64
 EXTRA_LDFLAGS += -m64
@@ -129,10 +132,18 @@ endif
 CCAS=$(CC) -c
 
 ifdef HAVE_IOS
+CC=xcrun clang
+CXX=xcrun clang++
 ifdef HAVE_NEON
 AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
+else
+CCAS=$(CC) -c
 endif
+AR=xcrun ar
+LD=xcrun ld
+STRIP=xcrun strip
+RANLIB=xcrun ranlib
 EXTRA_CFLAGS += $(CFLAGS)
 endif
 
@@ -335,7 +346,7 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_IOS
 AUTORECONF = AUTOPOINT=true autoreconf
 else
 AUTORECONF = autoreconf
