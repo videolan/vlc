@@ -2298,18 +2298,16 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
                           const d3d_quad_t *quad,
                           WORD *triangle_pos, video_orientation_t orientation)
 {
-    unsigned int dst_x = output->left;
-    unsigned int dst_y = output->top;
     unsigned int src_width = quad->i_width;
     unsigned int src_height = quad->i_height;
-    LONG MidY = output->top + output->bottom; // /2
-    LONG MidX = output->left + output->right; // /2
+    float MidY = (output->top + output->bottom) / 2.f;
+    float MidX = (output->left + output->right) / 2.f;
 
     float top, bottom, left, right;
-    top    =  (float)MidY / (float)(MidY - 2*dst_y);
-    bottom = -(2.f*src_height - MidY) / (float)(MidY - 2*dst_y);
-    right  =  (2.f*src_width  - MidX) / (float)(MidX - 2*dst_x);
-    left   = -(float)MidX / (float)(MidX - 2*dst_x);
+    top    =  MidY / (MidY - output->top);
+    bottom = -(src_height - MidY) / (output->bottom - MidY);
+    left   = -MidX / (MidX - output->left);
+    right  =  (src_width  - MidX) / (output->right - MidX);
 
     const float vertices_coords[4][2] = {
         { left,  bottom },
