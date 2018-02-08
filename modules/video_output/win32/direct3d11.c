@@ -2440,8 +2440,11 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
 #define nbLatBands SPHERE_SLICES
 #define nbLonBands SPHERE_SLICES
 
-static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
+static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
+                            const d3d_quad_t *quad, WORD *triangle_pos)
 {
+    const float scaleX = (float)(output->right  - output->left) / quad->i_width;
+    const float scaleY = (float)(output->bottom - output->top)   / quad->i_height;
     for (unsigned lat = 0; lat <= nbLatBands; lat++) {
         float theta = lat * (float) M_PI / nbLatBands;
         float sinTheta, cosTheta;
@@ -2463,8 +2466,8 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
             dst_data[off1].position.y = SPHERE_RADIUS * y;
             dst_data[off1].position.z = SPHERE_RADIUS * z;
 
-            dst_data[off1].texture.x = lon / (float) nbLonBands; // 0(left) to 1(right)
-            dst_data[off1].texture.y = lat / (float) nbLatBands; // 0(top) to 1 (bottom)
+            dst_data[off1].texture.x = scaleX * lon / (float) nbLonBands; // 0(left) to 1(right)
+            dst_data[off1].texture.y = scaleY * lat / (float) nbLatBands; // 0(top) to 1 (bottom)
         }
     }
 
@@ -2567,7 +2570,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     if ( projection == PROJECTION_MODE_RECTANGULAR )
         SetupQuadFlat(dst_data, output, quad, triangle_pos, orientation);
     else
-        SetupQuadSphere(dst_data, triangle_pos);
+        SetupQuadSphere(dst_data, output, quad, triangle_pos);
 
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
