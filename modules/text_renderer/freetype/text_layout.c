@@ -1478,8 +1478,61 @@ error:
     return VLC_EGENERIC;
 }
 
+static paragraph_t * BuildParagraph( filter_t *p_filter,
+                                     int i_size,
+                                     const uni_char_t *p_uchars,
+                                     text_style_t **pp_styles,
+                                     uint32_t *pi_k_dates,
+                                     int i_runs_size,
+                                     unsigned *pi_max_advance_x )
+{
+    paragraph_t *p_paragraph = NewParagraph( p_filter, i_size,
+                                p_uchars,
+                                pp_styles,
+                                pi_k_dates,
+                                i_runs_size );
+    if( !p_paragraph )
+        return NULL;
+
+#ifdef HAVE_FRIBIDI
+    if( AnalyzeParagraph( p_paragraph ) )
+        goto error;
+#endif
+
+    if( ItemizeParagraph( p_filter, p_paragraph ) )
+        goto error;
+
+#if defined HAVE_HARFBUZZ
+    if( ShapeParagraphHarfBuzz( p_filter, &p_paragraph ) )
+        goto error;
+
+    if( LoadGlyphs( p_filter, p_paragraph, true, false, pi_max_advance_x ) )
+        goto error;
+
+#elif defined HAVE_FRIBIDI
+    if( ShapeParagraphFriBidi( p_filter, p_paragraph ) )
+        goto error;
+    if( LoadGlyphs( p_filter, p_paragraph, false, true, pi_max_advance_x ) )
+        goto error;
+    if( RemoveZeroWidthCharacters( p_paragraph ) )
+        goto error;
+    if( ZeroNsmAdvance( p_paragraph ) )
+        goto error;
+#else
+    if( LoadGlyphs( p_filter, p_paragraph, false, true, pi_max_advance_x ) )
+        goto error;
+#endif
+    return p_paragraph;
+
+error:
+    if( p_paragraph )
+        FreeParagraph( p_paragraph );
+
+    return NULL;
+}
+
 int LayoutText( filter_t *p_filter,
-                const uni_char_t *psz_text, text_style_t **pp_styles,
+                const uni_char_t *p_uchars, text_style_t **pp_styles,
                 uint32_t *pi_k_dates, int i_len,
                 bool b_grid, bool b_balance,
                 unsigned i_max_width, unsigned i_max_height,
@@ -1487,7 +1540,6 @@ int LayoutText( filter_t *p_filter,
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
-    paragraph_t *p_paragraph = 0;
     int i_paragraph_start = 0;
     unsigned i_total_height = 0;
     unsigned i_max_advance_x = 0;
@@ -1495,7 +1547,7 @@ int LayoutText( filter_t *p_filter,
 
     for( int i = 0; i <= i_len; ++i )
     {
-        if( i == i_len || psz_text[ i ] == '\n' )
+        if( i == i_len || p_uchars[ i ] == '\n' )
         {
             if( i_paragraph_start == i )
             {
@@ -1503,54 +1555,30 @@ int LayoutText( filter_t *p_filter,
                 continue;
             }
 
-            p_paragraph = NewParagraph( p_filter, i - i_paragraph_start,
-                                        psz_text + i_paragraph_start,
-                                        pp_styles + i_paragraph_start,
-                                        pi_k_dates ?
-                                        pi_k_dates + i_paragraph_start : 0,
-                                        20 );
+            paragraph_t *p_paragraph =
+                    BuildParagraph( p_filter,
+                                    i - i_paragraph_start,
+                                    &p_uchars[i_paragraph_start],
+                                    &pp_styles[i_paragraph_start],
+                                    pi_k_dates ?
+                                    &pi_k_dates[i_paragraph_start] : NULL,
+                                    20, &i_max_advance_x );
             if( !p_paragraph )
             {
                 if( p_first_line ) FreeLines( p_first_line );
                 return VLC_ENOMEM;
             }
 
-#ifdef HAVE_FRIBIDI
-            if( AnalyzeParagraph( p_paragraph ) )
-                goto error;
-#endif
-
-            if( ItemizeParagraph( p_filter, p_paragraph ) )
-                goto error;
-
-#if defined HAVE_HARFBUZZ
-            if( ShapeParagraphHarfBuzz( p_filter, &p_paragraph ) )
-                goto error;
-
-            if( LoadGlyphs( p_filter, p_paragraph, true, false, &i_max_advance_x ) )
-                goto error;
-
-#elif defined HAVE_FRIBIDI
-            if( ShapeParagraphFriBidi( p_filter, p_paragraph ) )
-                goto error;
-            if( LoadGlyphs( p_filter, p_paragraph, false, true, &i_max_advance_x ) )
-                goto error;
-            if( RemoveZeroWidthCharacters( p_paragraph ) )
-                goto error;
-            if( ZeroNsmAdvance( p_paragraph ) )
-                goto error;
-#else
-            if( LoadGlyphs( p_filter, p_paragraph, false, true, &i_max_advance_x ) )
-                goto error;
-#endif
-
             if( LayoutParagraph( p_filter, p_paragraph,
                                  i_max_width, i_max_advance_x, pp_line,
                                  b_grid, b_balance ) )
-                goto error;
+            {
+                FreeParagraph( p_paragraph );
+                if( p_first_line ) FreeLines( p_first_line );
+                return VLC_EGENERIC;
+            }
 
             FreeParagraph( p_paragraph );
-            p_paragraph = 0;
 
             for( ; *pp_line; pp_line = &(*pp_line)->p_next )
             {
@@ -1598,10 +1626,5 @@ int LayoutText( filter_t *p_filter,
     *pp_lines = p_first_line;
     *p_bbox = bbox;
     return VLC_SUCCESS;
-
-error:
-    if( p_first_line ) FreeLines( p_first_line );
-    if( p_paragraph ) FreeParagraph( p_paragraph );
-    return VLC_EGENERIC;
 }
 

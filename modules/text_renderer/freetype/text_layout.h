@@ -67,7 +67,7 @@ line_desc_t *NewLine( int i_count );
  * Layout the text with shaping, bidirectional support, and font fallback if available.
  *
  * \param p_filter the FreeType module object [IN]
- * \param psz_text array of size \p i_len containing character codepoints [IN]
+ * \param p_uchars array of size \p i_len containing character codepoints [IN]
  * \param pp_styles array of size \p i_len containing character styles [IN]
  * \param pi_k_dates array of size \p i_len containing karaoke timestamps for characters [IN]
  * \param i_len length of the arrays \p psz_text, \p pp_styles, and \p pi_k_dates [IN]
@@ -80,7 +80,7 @@ line_desc_t *NewLine( int i_count );
  * \param pi_max_face_height maximum line height [OUT]
  */
 int LayoutText( filter_t *p_filter,
-                const uni_char_t *psz_text, text_style_t **pp_styles,
+                const uni_char_t *p_uchars, text_style_t **pp_styles,
                 uint32_t *pi_k_dates, int i_len, bool b_grid, bool b_balance,
                 unsigned i_max_width, unsigned i_max_height,
                 line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height );
