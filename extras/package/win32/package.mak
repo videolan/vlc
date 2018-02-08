@@ -172,6 +172,7 @@ package-win32-release: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll pac
 	cp -r $(srcdir)/extras/package/win32/NSIS/languages    		  "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      		  "$(win32_destdir)/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
+	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
 
 	7z a $(7Z_OPTS) $(WINVERSION)-release.7z $(win32_debugdir) "$(win32_destdir)/"
 
