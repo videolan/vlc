@@ -174,7 +174,7 @@ void CtrlResize::CmdStillResize::execute()
 void CtrlResize::CmdResizeStill::execute()
 {
     // Set the cursor
-    m_pParent->changeCursor( m_pParent->m_direction );
+    m_pParent->changeCursor( WindowManager::kNone );
 
     m_pParent->releaseMouse();
 
