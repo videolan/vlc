@@ -287,9 +287,7 @@ void DialogHandler::displayProgress(vlc_dialog_id *p_id, const QString &title,
         new QProgressDialog(text, cancel.isEmpty() ? QString() : "&" + cancel,
                             0, b_indeterminate ? 0 : 1000);
     progress->setWindowTitle(title);
-    if (!cancel.isEmpty())
-        progress->setModal(true);
-    else
+    if (cancel.isEmpty())
     {
         /* not cancellable: remove close button */
         progress->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
