@@ -87,6 +87,7 @@ struct  ci_filters_ctx
     CVPixelBufferPoolRef        outconv_cvpx_pool;
     CIContext *                 ci_ctx;
     struct filter_chain *       fchain;
+    filter_t *                  src_converter;
     filter_t *                  dst_converter;
 };
 
@@ -377,6 +378,13 @@ Filter(filter_t *filter, picture_t *src)
     }
     CFRelease(cvpx);
 
+    if (ctx->src_converter)
+    {
+        src = ctx->dst_converter->pf_video_filter(ctx->src_converter, src);
+        if (!src)
+            return NULL;
+    }
+
     @autoreleasepool {
         CIImage *ci_img = [CIImage imageWithCVImageBuffer: cvpxpic_get_ref(src)];
         if (!ci_img)
@@ -515,80 +523,59 @@ Open_CreateFilters(filter_t *filter, struct filter_chain **p_last_filter,
     return VLC_SUCCESS;
 }
 
-static picture_t *
-CVPX_buffer_new(filter_t *converter)
-{
-    CVPixelBufferPoolRef pool = converter->owner.sys;
-    CVPixelBufferRef cvpx = cvpxpool_new_cvpx(pool);
-    if (!cvpx)
-        return NULL;
-
-    picture_t *pic = picture_NewFromFormat(&converter->fmt_out.video);
-    if (!pic || cvpxpic_attach(pic, cvpx))
-    {
-        CFRelease(cvpx);
-        return NULL;
-    }
-    CFRelease(cvpx);
-
-    return pic;
-}
-
 static void
 Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
 {
     VLC_UNUSED(filter);
+    if (ctx->src_converter)
+    {
+        module_unneed(ctx->src_converter, ctx->src_converter->p_module);
+        vlc_object_release(ctx->src_converter);
+    }
     if (ctx->dst_converter)
     {
         module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
         vlc_object_release(ctx->dst_converter);
-        CVPixelBufferPoolRelease(ctx->outconv_cvpx_pool);
     }
 }
 
-static int
-Open_AddConverter(filter_t *filter, struct ci_filters_ctx *ctx)
+static picture_t *CVPX_to_CVPX_converter_BufferNew(filter_t *p_filter)
 {
-    ctx->cvpx_pool_fmt = filter->fmt_in.video;
-    ctx->cvpx_pool_fmt.i_chroma = VLC_CODEC_CVPX_BGRA;
-    ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 3);
-    if (!ctx->cvpx_pool)
-        goto error;
+    return picture_NewFromFormat(&p_filter->fmt_out.video);
+}
 
-    ctx->dst_converter = vlc_object_create(filter, sizeof(filter_t));
-    if (!ctx->dst_converter)
-        goto error;
+static filter_t *
+CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
+{
+    filter_t *converter = vlc_object_create(filter, sizeof(filter_t));
+    if (!converter)
+        return NULL;
 
-    ctx->dst_converter->fmt_in = filter->fmt_out;
-    ctx->dst_converter->fmt_out = filter->fmt_out;
-    ctx->dst_converter->fmt_in.video.i_chroma =
-    ctx->dst_converter->fmt_in.i_codec = VLC_CODEC_CVPX_BGRA;
+    converter->fmt_in = filter->fmt_out;
+    converter->fmt_out = filter->fmt_out;
 
-    ctx->outconv_cvpx_pool =
-        cvpxpool_create(&filter->fmt_out.video, 2);
-    if (!ctx->outconv_cvpx_pool)
-        goto error;
-
-    ctx->dst_converter->owner.sys = ctx->outconv_cvpx_pool;
-    ctx->dst_converter->owner.video.buffer_new = CVPX_buffer_new;
-
-    ctx->dst_converter->p_module =
-        module_need(ctx->dst_converter, "video converter", NULL, false);
-    if (!ctx->dst_converter->p_module)
-        goto error;
-
-    return VLC_SUCCESS;
-
-error:
-    if (ctx->dst_converter)
+    if (to_rgba)
     {
-        if (ctx->dst_converter->p_module)
-            module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
-        vlc_object_release(ctx->dst_converter);
-        if (ctx->outconv_cvpx_pool)
-            CVPixelBufferPoolRelease(ctx->outconv_cvpx_pool);
+        converter->fmt_out.video.i_chroma =
+        converter->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
     }
-    return VLC_EGENERIC;
+    else
+    {
+        converter->fmt_in.video.i_chroma =
+        converter->fmt_in.i_codec = VLC_CODEC_CVPX_BGRA;
+    }
+
+    converter->owner.video.buffer_new = CVPX_to_CVPX_converter_BufferNew;
+
+
+    converter->p_module = module_need(converter, "video converter", NULL, false);
+    if (!converter->p_module)
+    {
+        vlc_object_release(converter);
+        return NULL;
+    }
+
+    return converter;
 }
 
 static int
@@ -626,10 +613,19 @@ Open(vlc_object_t *obj, char const *psz_filter)
         if (!ctx)
             goto error;
 
+        ctx->cvpx_pool_fmt = filter->fmt_out.video;
+
         if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
-         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA
-         && Open_AddConverter(filter, ctx))
-            goto error;
+         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA)
+        {
+            ctx->src_converter =
+                    CVPX_to_CVPX_converter_Create(filter, true);
+            ctx->dst_converter = ctx->src_converter ?
+                    CVPX_to_CVPX_converter_Create(filter, false) : NULL;
+            if (!ctx->src_converter || !ctx->dst_converter)
+                goto error;
+            ctx->cvpx_pool_fmt.i_chroma = VLC_CODEC_CVPX_BGRA;
+        }
 
 #if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
@@ -654,13 +650,9 @@ Open(vlc_object_t *obj, char const *psz_filter)
         if (!ctx->ci_ctx)
             goto error;
 
+        ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 2);
         if (!ctx->cvpx_pool)
-        {
-            ctx->cvpx_pool_fmt = filter->fmt_out.video;
-            ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 2);
-            if (!ctx->cvpx_pool)
-                goto error;
-        }
+            goto error;
 
         if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
             goto error;

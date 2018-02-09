@@ -45,40 +45,29 @@ static int Open_CVPX_to_CVPX(vlc_object_t *);
 static void Close_CVPX_to_CVPX(vlc_object_t *);
 #endif
 
+struct filter_sys_t
+{
+    CVPixelBufferPoolRef pool;
+    union
+    {
+        filter_t *p_sw_filter;
+#if !TARGET_OS_IPHONE
+        VTPixelTransferSessionRef vttransfer;
+#endif
+    };
+};
+
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")
     set_capability("video converter", 10)
     set_callbacks(Open, Close)
-
-#if TARGET_OS_IPHONE
-vlc_module_end ()
-
-struct filter_sys_t
-{
-    filter_t *p_sw_filter;
-    CVPixelBufferPoolRef pool;
-};
-
-#else
+#if !TARGET_OS_IPHONE
     add_submodule()
     set_description("Conversions between CoreVideo buffers")
     set_callbacks(Open_CVPX_to_CVPX, Close_CVPX_to_CVPX)
+#endif
 vlc_module_end ()
 
-struct filter_sys_t
-{
-    union
-    {
-        struct
-        {
-            filter_t *p_sw_filter;
-            CVPixelBufferPoolRef pool;
-        };
-
-        VTPixelTransferSessionRef vttransfer;
-    };
-};
-#endif
 
 /********************************
  * CVPX to/from I420 conversion *
@@ -334,6 +323,8 @@ error:
 static picture_t *
 Filter(filter_t *filter, picture_t *src)
 {
+    filter_sys_t *p_sys = filter->p_sys;
+
     CVPixelBufferRef src_cvpx = cvpxpic_get_ref(src);
     assert(src_cvpx);
 
@@ -344,8 +335,13 @@ Filter(filter_t *filter, picture_t *src)
         return NULL;
     }
 
-    CVPixelBufferRef dst_cvpx = cvpxpic_get_ref(dst);
-    assert(dst_cvpx);
+    CVPixelBufferRef dst_cvpx = cvpxpool_new_cvpx(p_sys->pool);
+    if (dst_cvpx == NULL)
+    {
+        picture_Release(src);
+        picture_Release(dst);
+        return NULL;
+    }
 
     if (VTPixelTransferSessionTransferImage(filter->p_sys->vttransfer,
                                             src_cvpx, dst_cvpx) != noErr)
@@ -354,6 +350,8 @@ Filter(filter_t *filter, picture_t *src)
         picture_Release(src);
         return NULL;
     }
+
+    cvpxpic_attach(dst, dst_cvpx);
 
     picture_CopyProperties(dst, src);
     picture_Release(src);
@@ -383,19 +381,26 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
     CHECK_CHROMA(filter->fmt_out.video.i_chroma)
 #undef CHECK_CHROMA
 
-    filter->p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!filter->p_sys)
+    filter_sys_t *p_sys  = filter->p_sys = calloc(1, sizeof(filter_sys_t));
+    if (!p_sys)
         return VLC_ENOMEM;
 
-    if (VTPixelTransferSessionCreate(NULL, &filter->p_sys->vttransfer)
+    if (VTPixelTransferSessionCreate(NULL, &p_sys->vttransfer)
         != noErr)
     {
-        free(filter->p_sys);
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+
+    if ((p_sys->pool = cvpxpool_create(&filter->fmt_out.video, 3)) == NULL)
+    {
+        VTPixelTransferSessionInvalidate(p_sys->vttransfer);
+        CFRelease(p_sys->vttransfer);
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
     filter->pf_video_filter = Filter;
-
     return VLC_SUCCESS;
 }
 
@@ -403,9 +408,11 @@ static void
 Close_CVPX_to_CVPX(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
+    filter_sys_t *p_sys = filter->p_sys;
 
-    VTPixelTransferSessionInvalidate(filter->p_sys->vttransfer);
-    CFRelease(filter->p_sys->vttransfer);
+    VTPixelTransferSessionInvalidate(p_sys->vttransfer);
+    CFRelease(p_sys->vttransfer);
+    CVPixelBufferPoolRelease(p_sys->pool);
     free(filter->p_sys);
 }
 
