@@ -1973,6 +1973,11 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
             assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
+        case 'xf20': /* kCVPixelFormatType_420YpCbCr10BiPlanarFullRange */
+        case 'x420': /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+            p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_P010;
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            break;
         case kCVPixelFormatType_420YpCbCr8Planar:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_I420;
             assert(CVPixelBufferIsPlanar(imageBuffer) == true);
