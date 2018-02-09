@@ -167,7 +167,8 @@ Open(vlc_object_t *obj)
     if (tc->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_NV12
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_I420
-     && tc->fmt.i_chroma != VLC_CODEC_CVPX_BGRA)
+     && tc->fmt.i_chroma != VLC_CODEC_CVPX_BGRA
+     && tc->fmt.i_chroma != VLC_CODEC_CVPX_P010)
         return VLC_EGENERIC;
 
     struct priv *priv = calloc(1, sizeof(struct priv));
@@ -230,6 +231,14 @@ Open(vlc_object_t *obj)
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_NV12,
+                                            tc->fmt.space);
+            tc->texs[1].h = (vlc_rational_t) { 1, 2 };
+            break;
+        }
+        case VLC_CODEC_CVPX_P010:
+        {
+            fragment_shader =
+                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_P010,
                                             tc->fmt.space);
             tc->texs[1].h = (vlc_rational_t) { 1, 2 };
             break;
