@@ -238,6 +238,10 @@ static void Close (vlc_object_t *p_this)
             [sys->container removeVoutLayer:sys->cgLayer];
         else
             [sys->cgLayer removeFromSuperlayer];
+
+        if ([sys->cgLayer glContext])
+            CGLReleaseContext([sys->cgLayer glContext]);
+
         [sys->cgLayer release];
     }
 
@@ -261,9 +265,6 @@ static void Close (vlc_object_t *p_this)
         }
         vlc_object_release(sys->gl);
     }
-
-    if ([sys->cgLayer glContext])
-        CGLReleaseContext([sys->cgLayer glContext]);
 
     free(sys);
 }
