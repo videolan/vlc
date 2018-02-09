@@ -2158,7 +2158,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
                                         ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->flatVSShader);
 
     if(FAILED(hr)) {
-      ID3D11Device_Release(pVSBlob);
+      ID3D10Blob_Release(pVSBlob);
       msg_Err(vd, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
@@ -2189,7 +2189,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
                                         ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionVSShader);
 
     if(FAILED(hr)) {
-      ID3D11Device_Release(pVSBlob);
+      ID3D10Blob_Release(pVSBlob);
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
