@@ -303,6 +303,9 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
      || !p_paragraph->pi_reordered_indices )
         goto error;
 
+    for( int i=0; i<i_size; i++ )
+        p_paragraph->pi_reordered_indices[i] = i;
+
     int i_direction = var_InheritInteger( p_filter, "freetype-text-direction" );
     if( i_direction == 0 )
         p_paragraph->paragraph_type = FRIBIDI_PAR_LTR;
@@ -1370,9 +1373,6 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
     for( int i = 0; i < p_paragraph->i_size; ++i )
     {
-#ifdef HAVE_FRIBIDI
-        p_paragraph->pi_reordered_indices[ i ] = i;
-#endif
         if( !IsWhitespaceAt( p_paragraph, i ) || i != i_last_space + 1 )
             i_total_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
         else
