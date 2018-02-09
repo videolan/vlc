@@ -996,58 +996,51 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
     free( pp_styles );
 }
 
-static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length,
-                                            text_style_t ***ppp_styles, size_t *pi_styles )
+static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment,
+                                       uni_char_t **pp_uchar, text_style_t ***ppp_styles )
 {
+    uni_char_t *p_uchars = NULL;
     text_style_t **pp_styles = NULL;
-    uni_char_t *psz_uni = NULL;
-    size_t i_size = 0;
     size_t i_nb_char = 0;
-    *pi_styles = 0;
+
     for( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
     {
         if( !s->psz_text || !s->psz_text[0] )
             continue;
-        size_t i_string_bytes = 0;
-        uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
-        if( !psz_tmp )
-        {
-            free( psz_uni );
-            FreeStylesArray( pp_styles, *pi_styles );
-            return NULL;
-        }
-        uni_char_t *psz_realloc = realloc(psz_uni, i_size + i_string_bytes);
-        if( unlikely( !psz_realloc ) )
-        {
-            FreeStylesArray( pp_styles, *pi_styles );
-            free( psz_uni );
-            free( psz_tmp );
-            return NULL;
-        }
-        psz_uni = psz_realloc;
-        memcpy( psz_uni + i_nb_char, psz_tmp, i_string_bytes );
-        free( psz_tmp );
 
-        // We want one text_style_t* per character. The amount of characters is the number of bytes divided by
-        // the size of one glyph, in byte
-        const size_t i_newsize = (i_size + i_string_bytes) / sizeof( *psz_uni );
-        text_style_t **pp_styles_realloc = realloc( pp_styles, i_newsize * sizeof( *pp_styles ));
-        if ( unlikely( !pp_styles_realloc ) )
+        /* Convert chars to unicode */
+        size_t i_bytes;
+        uni_char_t *p_ucs4 = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_bytes );
+        if( !p_ucs4 )
+            continue;
+
+        const size_t i_newchars = i_bytes / 4;
+        if( SIZE_MAX / 4 < i_nb_char + i_newchars )
         {
-            FreeStylesArray( pp_styles, *pi_styles );
-            free( psz_uni );
-            return NULL;
+            free( p_ucs4 );
+            break;
         }
-        pp_styles = pp_styles_realloc;
-        *pi_styles = i_newsize;
+        size_t i_realloc = (i_nb_char + i_newchars) * 4;
+        void *p_realloc = realloc( p_uchars, i_realloc );
+        if( unlikely(!p_realloc) )
+            break;
+        p_uchars = p_realloc;
+
+        memcpy( &p_uchars[i_nb_char], p_ucs4, i_newchars * 4 );
+        free( p_ucs4 );
+
+        /* We want one per segment shared text_style_t* per unicode character */
+        if( SIZE_MAX / sizeof(text_style_t *) < i_nb_char + i_newchars )
+            break;
+        i_realloc = (i_nb_char + i_newchars) * sizeof(text_style_t *);
+        p_realloc = realloc( pp_styles, i_realloc );
+        if ( unlikely(!p_realloc) )
+            break;
+        pp_styles = p_realloc;
 
         text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
         if ( p_style == NULL )
-        {
-            FreeStylesArray( pp_styles, *pi_styles );
-            free( psz_uni );
-            return NULL;
-        }
+            break;
 
         if( s->style )
             /* Replace defaults with segment values */
@@ -1056,15 +1049,26 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         /* Overwrite any default or value with forced ones */
         text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
 
-        // i_string_bytes is a number of bytes, while here we're going to assign pointer by pointer
-        for ( size_t i = 0; i < i_string_bytes / sizeof( *psz_uni ); ++i )
+        /* map it to each char of that segment */
+        for ( size_t i = 0; i < i_newchars; ++i )
             pp_styles[i_nb_char + i] = p_style;
-        i_size += i_string_bytes;
-        i_nb_char = i_size / sizeof( *psz_uni );
+
+        /* now safe to update total nb */
+        i_nb_char += i_newchars;
     }
-    *pi_string_length = i_nb_char;
-    *ppp_styles = pp_styles;
-    return psz_uni;
+
+    if( i_nb_char == 0 ) /* break on 0 char */
+    {
+        free( p_uchars );
+        free( pp_styles );
+    }
+    else
+    {
+        *pp_uchar = p_uchars;
+        *ppp_styles = pp_styles;
+    }
+
+    return i_nb_char;
 }
 
 /**
@@ -1097,14 +1101,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     text_style_t **pp_styles = NULL;
-    size_t i_text_length = 0;
-    size_t i_styles = 0;
-    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length,
-                                                    &pp_styles, &i_styles );
-    if( !psz_text || !pp_styles )
-    {
+    uni_char_t *p_uchars = NULL;
+    size_t i_uchars = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
+                                               &p_uchars, &pp_styles );
+    if( i_uchars == 0 )
         return VLC_EGENERIC;
-    }
 
     /* */
     int rv = VLC_SUCCESS;
@@ -1133,13 +1134,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_margin = 0;
 
     rv = LayoutText( p_filter,
-                     psz_text, pp_styles, pi_k_durations, i_text_length,
+                     p_uchars, pp_styles, pi_k_durations, i_uchars,
                      p_region_in->b_gridmode, p_region_in->b_balanced_text,
                      i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
-    if( !rv && i_text_length > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
+    if( !rv && i_uchars > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
         const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
         const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
@@ -1261,8 +1262,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     FreeLines( p_lines );
 
-    free( psz_text );
-    FreeStylesArray( pp_styles, i_styles );
+    free( p_uchars );
+    FreeStylesArray( pp_styles, i_uchars );
     free( pi_k_durations );
 
     return rv;
