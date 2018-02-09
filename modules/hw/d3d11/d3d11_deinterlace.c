@@ -51,6 +51,7 @@ typedef UINT D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS;
 
 struct filter_sys_t
 {
+    d3d11_handle_t                 hd3d;
     d3d11_device_t                 d3d_dev;
     ID3D11VideoDevice              *d3dviddev;
     ID3D11VideoContext             *d3dvidctx;
@@ -364,6 +365,9 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOOBJ;
     }
 
+    if (D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS)
+        goto error;
+
     hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, (void **)&sys->d3dviddev);
     if (FAILED(hr)) {
        msg_Err(filter, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
@@ -560,6 +564,7 @@ error:
         ID3D11VideoDevice_Release(sys->d3dviddev);
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    D3D11_Destroy(&sys->hd3d);
     free(sys);
 
     return VLC_EGENERIC;
@@ -578,6 +583,7 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
     ID3D11VideoContext_Release(sys->d3dvidctx);
     ID3D11VideoDevice_Release(sys->d3dviddev);
     D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    D3D11_Destroy(&sys->hd3d);
 
     free(sys);
 }
