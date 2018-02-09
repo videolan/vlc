@@ -301,7 +301,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 sei.i_pic_struct = UINT8_MAX;
 
                 for(size_t i=0; i<i_sei_count; i++)
-                    HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal, 1,
+                    HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal, 2,
                                  ParseH264SEI, &sei);
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
@@ -643,7 +643,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
 
                 for(size_t i=0; i<i_sei_count; i++)
                     HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal,
-                                 1, ParseHEVCSEI, &sei);
+                                 2, ParseHEVCSEI, &sei);
 
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
