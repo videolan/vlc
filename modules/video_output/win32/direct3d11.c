@@ -2552,6 +2552,8 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
     hr = ID3D11Device_CreateBuffer(sys->d3d_dev.d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
+        ID3D11Buffer_Release(quad->pVertexBuffer);
+        quad->pVertexBuffer = NULL;
         return false;
     }
 
