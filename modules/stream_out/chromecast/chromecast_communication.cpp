@@ -32,9 +32,6 @@
 # include <poll.h>
 #endif
 
-/* deadline regarding pings sent from receiver */
-#define PING_WAIT_TIME 6000
-
 ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
     , m_creds( NULL )
