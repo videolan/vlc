@@ -167,14 +167,11 @@ void DialogHandler::cancel(vlc_dialog_id *p_id)
 void DialogHandler::updateProgress(vlc_dialog_id *p_id, float f_value,
                                    const QString &text)
 {
-    DialogWrapper *p_wrapper =
-        static_cast<DialogWrapper *>(vlc_dialog_id_get_context(p_id));
+    ProgressDialogWrapper *p_wrapper =
+        static_cast<ProgressDialogWrapper *>(vlc_dialog_id_get_context(p_id));
 
-    ProgressDialogWrapper *p_progress_wrapper
-        = dynamic_cast<ProgressDialogWrapper *>(p_wrapper);
-
-    if (p_progress_wrapper != NULL)
-        p_progress_wrapper->updateProgress(f_value, text);
+    if (p_wrapper != NULL)
+        p_wrapper->updateProgress(f_value, text);
 }
 
 void DialogHandler::displayError(const QString &title, const QString &text)
