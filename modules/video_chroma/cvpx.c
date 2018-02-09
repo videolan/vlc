@@ -247,6 +247,8 @@ static int Open(vlc_object_t *obj)
     {
         CASE_CVPX_INPUT(NV12)
             break;
+        CASE_CVPX_INPUT(P010)
+            break;
         CASE_CVPX_INPUT(UYVY)
             break;
         CASE_CVPX_INPUT(I420)
@@ -257,6 +259,8 @@ static int Open(vlc_object_t *obj)
             switch (p_filter->fmt_out.video.i_chroma)
             {
                 CASE_CVPX_OUTPUT(NV12)
+                    break;
+                CASE_CVPX_OUTPUT(P010)
                     break;
                 CASE_CVPX_OUTPUT(UYVY)
                     break;
@@ -361,6 +365,7 @@ Filter(filter_t *filter, picture_t *src)
 static vlc_fourcc_t const supported_chromas[] = { VLC_CODEC_CVPX_BGRA,
                                                   VLC_CODEC_CVPX_I420,
                                                   VLC_CODEC_CVPX_NV12,
+                                                  VLC_CODEC_CVPX_P010,
                                                   VLC_CODEC_CVPX_UYVY };
 
 static int
