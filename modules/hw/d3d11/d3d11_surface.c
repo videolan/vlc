@@ -682,6 +682,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     ID3D11Texture2D *texture = NULL;
     filter_t *p_cpu_filter = NULL;
     video_format_t fmt_staging;
+    filter_sys_t *p_sys = NULL;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
         return VLC_EGENERIC;
@@ -763,7 +764,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
             goto done;
     }
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    p_sys = calloc(1, sizeof(filter_sys_t));
     if (!p_sys) {
          err = VLC_ENOMEM;
          goto done;
