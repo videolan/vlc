@@ -1,0 +1,11 @@
+--- ebml/src/EbmlBinary.cpp	2018-02-09 13:51:37.752623200 +0100
++++ ebml/src/EbmlBinary.cpp.null_cmp	2018-02-09 13:50:41.409429100 +0100
+@@ -100,7 +100,7 @@ filepos_t EbmlBinary::ReadData(IOCallbac
+ 
+ bool EbmlBinary::operator==(const EbmlBinary & ElementToCompare) const
+ {
+-  return ((GetSize() == ElementToCompare.GetSize()) && !memcmp(Data, ElementToCompare.Data, GetSize()));
++  return ((GetSize() == ElementToCompare.GetSize()) && (GetSize() == 0 || !memcmp(Data, ElementToCompare.Data, GetSize())));
+ }
+ 
+ END_LIBEBML_NAMESPACE
