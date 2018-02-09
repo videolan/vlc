@@ -1531,12 +1531,10 @@ error:
     return NULL;
 }
 
-int LayoutText( filter_t *p_filter,
-                const uni_char_t *p_uchars, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len,
-                bool b_grid, bool b_balance,
-                unsigned i_max_width, unsigned i_max_height,
-                line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height )
+int LayoutTextBlock( filter_t *p_filter,
+                     const layout_text_block_t *p_textblock,
+                     line_desc_t **pp_lines, FT_BBox *p_bbox,
+                     int *pi_max_face_height )
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
@@ -1545,9 +1543,9 @@ int LayoutText( filter_t *p_filter,
     unsigned i_max_advance_x = 0;
     int i_max_face_height = 0;
 
-    for( int i = 0; i <= i_len; ++i )
+    for( int i = 0; i <= p_textblock->i_count; ++i )
     {
-        if( i == i_len || p_uchars[ i ] == '\n' )
+        if( i == p_textblock->i_count || p_textblock->p_uchars[ i ] == '\n' )
         {
             if( i_paragraph_start == i )
             {
@@ -1558,10 +1556,10 @@ int LayoutText( filter_t *p_filter,
             paragraph_t *p_paragraph =
                     BuildParagraph( p_filter,
                                     i - i_paragraph_start,
-                                    &p_uchars[i_paragraph_start],
-                                    &pp_styles[i_paragraph_start],
-                                    pi_k_dates ?
-                                    &pi_k_dates[i_paragraph_start] : NULL,
+                                    &p_textblock->p_uchars[i_paragraph_start],
+                                    &p_textblock->pp_styles[i_paragraph_start],
+                                    p_textblock->pi_k_durations ?
+                                    &p_textblock->pi_k_durations[i_paragraph_start] : NULL,
                                     20, &i_max_advance_x );
             if( !p_paragraph )
             {
@@ -1570,8 +1568,9 @@ int LayoutText( filter_t *p_filter,
             }
 
             if( LayoutParagraph( p_filter, p_paragraph,
-                                 i_max_width, i_max_advance_x, pp_line,
-                                 b_grid, b_balance ) )
+                                 p_textblock->i_max_width,
+                                 i_max_advance_x, pp_line,
+                                 p_textblock->b_grid, p_textblock->b_balanced ) )
             {
                 FreeParagraph( p_paragraph );
                 if( p_first_line ) FreeLines( p_first_line );
@@ -1584,9 +1583,9 @@ int LayoutText( filter_t *p_filter,
             {
                 /* only cut at max i_max_height + 1 line due to
                  * approximate font sizing vs region size */
-                if( i_max_height > 0 && i_total_height > i_max_height )
+                if( p_textblock->i_max_height > 0 && i_total_height > p_textblock->i_max_height )
                 {
-                    i_total_height = i_max_height + 1;
+                    i_total_height = p_textblock->i_max_height + 1;
                     line_desc_t *p_todelete = *pp_line;
                     while( p_todelete ) /* Drop extra lines */
                     {
@@ -1595,7 +1594,7 @@ int LayoutText( filter_t *p_filter,
                         p_todelete = p_next;
                     }
                     *pp_line = NULL;
-                    i = i_len + 1; /* force no more paragraphs */
+                    i = p_textblock->i_count + 1; /* force no more paragraphs */
                     break; /* ! no p_next ! */
                 }
                 else if( (*pp_line)->i_height > i_max_face_height )

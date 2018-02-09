@@ -1119,11 +1119,12 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
     }
 
-    text_style_t **pp_styles = NULL;
-    uni_char_t *p_uchars = NULL;
-    size_t i_uchars = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
-                                               &p_uchars, &pp_styles );
-    if( i_uchars == 0 )
+    layout_text_block_t text_block = { 0 };
+    text_block.b_balanced = p_region_in->b_balanced_text;
+    text_block.b_grid = p_region_in->b_gridmode;
+    text_block.i_count = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
+                                                  &text_block.p_uchars, &text_block.pp_styles );
+    if( text_block.i_count == 0 )
         return VLC_EGENERIC;
 
     /* */
@@ -1132,7 +1133,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     int i_max_face_height;
     line_desc_t *p_lines = NULL;
 
-    uint32_t *pi_k_durations   = NULL;
     unsigned i_max_width = p_filter->fmt_out.video.i_visible_width;
     if( p_region_in->i_max_width > 0 && (unsigned) p_region_in->i_max_width < i_max_width )
         i_max_width = p_region_in->i_max_width;
@@ -1152,14 +1152,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
         i_margin = 0;
 
-    rv = LayoutText( p_filter,
-                     p_uchars, pp_styles, pi_k_durations, i_uchars,
-                     p_region_in->b_gridmode, p_region_in->b_balanced_text,
-                     i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
+    text_block.i_max_width = i_max_width;
+    text_block.i_max_height = i_max_height;
+    rv = LayoutTextBlock( p_filter, &text_block, &p_lines, &bbox, &i_max_face_height );
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
-    if( !rv && i_uchars > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
+    if( !rv && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
         const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
         const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
@@ -1275,15 +1274,15 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         /* With karaoke, we're going to have to render the text a number
          * of times to show the progress marker on the text.
          */
-        if( pi_k_durations )
+        if( text_block.pi_k_durations )
             var_SetBool( p_filter, "text-rerender", true );
     }
 
     FreeLines( p_lines );
 
-    free( p_uchars );
-    FreeStylesArray( pp_styles, i_uchars );
-    free( pi_k_durations );
+    free( text_block.p_uchars );
+    FreeStylesArray( text_block.pp_styles, text_block.i_count );
+    free( text_block.pi_k_durations );
 
     return rv;
 }
