@@ -1,6 +1,8 @@
 Changes between 3.0.0 and 3.0.1:
 --------------------------------
 
+Hardware Decoder:
+ * macOS: Improve HEVC 10bits performances with Videotoolbox
 
 
 Changes between 2.2.8 and 3.0.0:
