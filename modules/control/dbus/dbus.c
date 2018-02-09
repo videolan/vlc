@@ -852,6 +852,29 @@ static void   wakeup_main_loop( void *p_data )
                  vlc_strerror_c(errno) );
 }
 
+static bool add_event_locked( intf_thread_t *p_intf, callback_info_t *p_info )
+{
+    if( !p_info->signal )
+    {
+        free( p_info );
+        return false;
+    }
+
+    for( size_t i = 0; i < vlc_array_count( &p_intf->p_sys->events ); ++ i )
+    {
+        callback_info_t *oldinfo =
+            vlc_array_item_at_index( &p_intf->p_sys->events, i );
+        if( p_info->signal == oldinfo->signal )
+        {
+            free( p_info );
+            return false;
+        }
+    }
+
+    vlc_array_append( &p_intf->p_sys->events, p_info );
+    return true;
+}
+
 /* Flls a callback_info_t data structure in response
  * to an "intf-event" input event.
  *
@@ -941,13 +964,11 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
         p_sys->i_playing_state = i_state;
         p_info->signal = SIGNAL_STATE;
     }
-    if( p_info->signal )
-        vlc_array_append_or_abort( &p_sys->events, p_info );
-    else
-        free( p_info );
+    bool added = add_event_locked( p_intf, p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
-    wakeup_main_loop( p_intf );
+    if( added )
+        wakeup_main_loop( p_intf );
 
     (void)psz_var;
     (void)oldval;
@@ -1003,10 +1024,12 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     // Append the event
     *p_info = info;
     vlc_mutex_lock( &p_intf->p_sys->lock );
-    vlc_array_append_or_abort( &p_intf->p_sys->events, p_info );
+    bool added = add_event_locked( p_intf, p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
-    wakeup_main_loop( p_intf );
+    if( added )
+        wakeup_main_loop( p_intf );
+
     (void) p_this;
     return VLC_SUCCESS;
 }
