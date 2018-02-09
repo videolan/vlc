@@ -14,10 +14,11 @@ Codecs:
  * WebVTT encoder
  * Remove iomx support for Android
 
-Video ouput:
+Video output:
  * Remove aa plugin
  * Remove evas plugin
  * Remove omxil_vout plugin
+
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
@@ -226,7 +227,7 @@ Audio filters:
    headphones effects
  * Add a pitch shifting module
 
-Video ouput:
+Video output:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
  * OpenGL:
     * New OpenGL provider for Windows
@@ -534,7 +535,7 @@ Decoder:
  * Fix crashes with libvpx
  * Use libass without caching dialog
 
-Video Ouptut:
+Video Output:
  * Fix green lines on Direct3D output
 
 Skins2:
@@ -3964,7 +3965,7 @@ Interfaces:
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*
-    - Support for RTP streaming in Stream Ouput dialog
+    - Support for RTP streaming in Stream Output dialog
     - Now require wx2.6 with Unicode support
  * Skins2
     - Tree playlist
