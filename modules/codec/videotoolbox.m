@@ -721,6 +721,20 @@ static bool LateStartHEVC(decoder_t *p_dec)
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)
 {
+#if !TARGET_OS_IPHONE
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->i_forced_cvpx_format == 0)
+    {
+        /* Force P010 chroma instead of RGBA in order to improve performances. */
+        uint8_t i_profile, i_level;
+        if (hxxx_helper_get_current_profile_level(&p_sys->hh, &i_profile,
+                                                  &i_level))
+            return true;
+        if (i_profile == HEVC_PROFILE_MAIN_10)
+            p_sys->i_forced_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+    }
+#endif
     return true;
 }
 
