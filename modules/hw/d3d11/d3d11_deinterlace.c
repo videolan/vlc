@@ -570,7 +570,8 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
 
-    ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
+    if (likely(sys->processorOutput))
+        ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
     ID3D11Texture2D_Release(sys->outTexture);
     ID3D11VideoProcessor_Release(sys->videoProcessor);
     ID3D11VideoProcessorEnumerator_Release(sys->procEnumerator);
