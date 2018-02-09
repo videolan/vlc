@@ -1089,11 +1089,6 @@ static int LayoutLine( filter_t *p_filter,
         return VLC_EGENERIC;
     }
 
-    line_desc_t *p_line = NewLine( 1 + i_last_char - i_first_char );
-
-    if( !p_line )
-        return VLC_ENOMEM;
-
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_last_run = -1;
     run_desc_t *p_run = 0;
@@ -1109,21 +1104,27 @@ static int LayoutLine( filter_t *p_filter,
     int i_ul_thickness = 0;
 
 #ifdef HAVE_FRIBIDI
-    fribidi_reorder_line( 0, &p_paragraph->p_types[i_first_char],
+    bool b_reordered = ( 0 ==
+        fribidi_reorder_line( 0, &p_paragraph->p_types[i_first_char],
                           1 + i_last_char - i_first_char,
                           0, p_paragraph->paragraph_type,
                           &p_paragraph->p_levels[i_first_char],
-                          0, &p_paragraph->pi_reordered_indices[i_first_char] );
+                          0, &p_paragraph->pi_reordered_indices[i_first_char] ) );
 #endif
+
+    line_desc_t *p_line = NewLine( 1 + i_last_char - i_first_char );
+    if( !p_line )
+        return VLC_ENOMEM;
 
     for( int i = i_first_char; i <= i_last_char; ++i, ++i_line_index )
     {
         int i_paragraph_index;
 #ifdef HAVE_FRIBIDI
-        i_paragraph_index = p_paragraph->pi_reordered_indices[ i ];
-#else
-        i_paragraph_index = i;
+        if( b_reordered )
+            i_paragraph_index = p_paragraph->pi_reordered_indices[ i ];
+        else
 #endif
+        i_paragraph_index = i;
 
         line_character_t *p_ch = p_line->p_character + i_line_index;
         p_ch->p_style = p_paragraph->pp_styles[ i_paragraph_index ];
