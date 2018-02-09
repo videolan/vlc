@@ -1577,15 +1577,22 @@ bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *p_sps,
         p_sps->vui.field_seq_flag )
         return false;
 
-    if( p_sps->profile_tier_level.general.interlaced_source_flag &&
-       !p_sps->profile_tier_level.general.progressive_source_flag )
-        return false;
-
-    if( p_timing && p_sps->vui.frame_field_info_present_flag )
+    const hevc_inner_profile_tier_level_t *p_profile = &p_sps->profile_tier_level.general;
+    /* 1 & 0, 0 & 1, global */
+    if( p_profile->progressive_source_flag != p_profile->interlaced_source_flag )
     {
-        if( p_timing->source_scan_type < 2 )
-            return p_timing->source_scan_type != 0;
+        return p_profile->progressive_source_flag > p_profile->interlaced_source_flag;
     }
+    /* 1 & 1, defined in SEI */
+    else if( p_profile->progressive_source_flag )
+    {
+        if( p_timing && p_sps->vui.frame_field_info_present_flag )
+        {
+            if( p_timing->source_scan_type < 2 )
+                return p_timing->source_scan_type != 0;
+        }
+    }
+    /* else 0 & 0, unspec */
 
     return true;
 }
