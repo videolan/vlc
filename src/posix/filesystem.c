@@ -36,6 +36,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #ifndef HAVE_LSTAT
 # define lstat(a, b) stat(a, b)
@@ -112,6 +113,13 @@ int vlc_mkstemp (char *template)
 int vlc_memfd (void)
 {
     int fd;
+
+#ifdef HAVE_MEMFD_CREATE
+    fd = memfd_create(PACKAGE_NAME"-memfd", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    if (fd != -1 || errno != ENOSYS)
+        return fd;
+#endif
+
 #ifdef O_TMPFILE
     fd = vlc_open ("/tmp", O_RDWR|O_TMPFILE, S_IRUSR|S_IWUSR);
     if (fd != -1)
