@@ -631,7 +631,6 @@ VIDEO_FILTER_WRAPPER (NV12_D3D11)
 int D3D11OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
-    int err = VLC_EGENERIC;
 
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
         return VLC_EGENERIC;
@@ -652,27 +651,20 @@ int D3D11OpenConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys = vlc_obj_calloc(obj, 1, sizeof(filter_sys_t));
     if (!p_sys)
-         goto done;
+         return VLC_EGENERIC;
 
     if (D3D11_Create(p_filter, &p_sys->hd3d) != VLC_SUCCESS)
     {
         msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
-        goto done;
+        return VLC_EGENERIC;
     }
 
     CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width );
     vlc_mutex_init(&p_sys->staging_lock);
     p_filter->p_sys = p_sys;
-    err = VLC_SUCCESS;
-
-done:
-    if (err != VLC_SUCCESS)
-    {
-        free(p_sys);
-    }
-    return err;
+    return VLC_SUCCESS;
 }
 
 int D3D11OpenCPUConverter( vlc_object_t *obj )
@@ -764,7 +756,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
             goto done;
     }
 
-    p_sys = calloc(1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys = vlc_obj_calloc(obj, 1, sizeof(filter_sys_t));
     if (!p_sys) {
          err = VLC_ENOMEM;
          goto done;
@@ -790,7 +782,6 @@ done:
         if (texture)
             ID3D11Texture2D_Release(texture);
         D3D11_FilterReleaseInstance(&d3d_dev);
-        free(p_sys);
     }
     else
     {
@@ -819,8 +810,6 @@ void D3D11CloseConverter( vlc_object_t *obj )
         ID3D11Texture2D_Release(p_sys->staging);
     D3D11_FilterReleaseInstance(&p_sys->d3d_dev);
     D3D11_Destroy(&p_sys->hd3d);
-    free( p_sys );
-    p_filter->p_sys = NULL;
 }
 
 void D3D11CloseCPUConverter( vlc_object_t *obj )
@@ -830,6 +819,4 @@ void D3D11CloseCPUConverter( vlc_object_t *obj )
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging_pic);
     D3D11_Destroy(&p_sys->hd3d);
-    free( p_sys );
-    p_filter->p_sys = NULL;
 }
