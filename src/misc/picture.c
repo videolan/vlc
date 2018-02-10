@@ -248,44 +248,47 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
 
 picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
 {
+    assert(p_resource != NULL);
+
     picture_priv_t *priv = picture_NewPrivate(p_fmt);
     if (unlikely(priv == NULL))
         return NULL;
 
     picture_t *p_picture = &priv->picture;
 
-    if( p_resource )
-    {
-        p_picture->p_sys = p_resource->p_sys;
+    p_picture->p_sys = p_resource->p_sys;
 
-        if( p_resource->pf_destroy != NULL )
-            priv->gc.destroy = p_resource->pf_destroy;
-        else
-            priv->gc.destroy = picture_DestroyFromResource;
-
-        for( int i = 0; i < p_picture->i_planes; i++ )
-        {
-            p_picture->p[i].p_pixels = p_resource->p[i].p_pixels;
-            p_picture->p[i].i_lines  = p_resource->p[i].i_lines;
-            p_picture->p[i].i_pitch  = p_resource->p[i].i_pitch;
-        }
-    }
+    if( p_resource->pf_destroy != NULL )
+        priv->gc.destroy = p_resource->pf_destroy;
     else
+        priv->gc.destroy = picture_DestroyFromResource;
+
+    for( int i = 0; i < p_picture->i_planes; i++ )
     {
-        if( AllocatePicture( p_picture ) )
-        {
-            free( p_picture );
-            return NULL;
-        }
-        priv->gc.destroy = picture_Destroy;
+        p_picture->p[i].p_pixels = p_resource->p[i].p_pixels;
+        p_picture->p[i].i_lines  = p_resource->p[i].i_lines;
+        p_picture->p[i].i_pitch  = p_resource->p[i].i_pitch;
     }
 
     return p_picture;
 }
 
-picture_t *picture_NewFromFormat( const video_format_t *p_fmt )
+picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 {
-    return picture_NewFromResource( p_fmt, NULL );
+    picture_priv_t *priv = picture_NewPrivate(fmt);
+    if (unlikely(priv == NULL))
+        return NULL;
+
+    picture_t *pic = &priv->picture;
+
+    if( AllocatePicture( pic ) )
+    {
+        free( pic );
+        return NULL;
+    }
+    priv->gc.destroy = picture_Destroy;
+
+    return pic;
 }
 
 picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den )
