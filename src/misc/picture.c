@@ -207,7 +207,8 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 /*****************************************************************************
  *
  *****************************************************************************/
-picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
+
+static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
 {
     video_format_t fmt = *p_fmt;
 
@@ -241,6 +242,17 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
     atomic_init( &priv->gc.refs, 1 );
     priv->gc.opaque = NULL;
+
+    return priv;
+}
+
+picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
+{
+    picture_priv_t *priv = picture_NewPrivate(p_fmt);
+    if (unlikely(priv == NULL))
+        return NULL;
+
+    picture_t *p_picture = &priv->picture;
 
     if( p_resource )
     {
