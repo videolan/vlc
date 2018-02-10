@@ -57,33 +57,22 @@ static int AllocatePicture( picture_t *p_pic )
 
         if( p->i_pitch < 0 || p->i_lines <= 0 ||
             (size_t)p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
-        {
-            p_pic->i_planes = 0;
             return VLC_ENOMEM;
-        }
         i_bytes += p->i_pitch * p->i_lines;
     }
 
     if( i_bytes >= PICTURE_SW_SIZE_MAX )
-    {
-        p_pic->i_planes = 0;
         return VLC_ENOMEM;
-    }
 
     uint8_t *p_data = aligned_alloc( 16, i_bytes );
     if( i_bytes > 0 && p_data == NULL )
-    {
-        p_pic->i_planes = 0;
         return VLC_EGENERIC;
-    }
 
     /* Fill the p_pixels field for each plane */
     p_pic->p[0].p_pixels = p_data;
     for( int i = 1; i < p_pic->i_planes; i++ )
-    {
         p_pic->p[i].p_pixels = &p_pic->p[i-1].p_pixels[ p_pic->p[i-1].i_lines *
                                                         p_pic->p[i-1].i_pitch ];
-    }
 
     return VLC_SUCCESS;
 }
