@@ -56,8 +56,7 @@ static int AllocatePicture( picture_t *p_pic )
     {
         const plane_t *p = &p_pic->p[i];
 
-        if( p->i_pitch < 0 || p->i_lines <= 0 ||
-            (size_t)p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
+        if( (size_t)p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
             return VLC_ENOMEM;
         i_bytes += p->i_pitch * p->i_lines;
     }
