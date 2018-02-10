@@ -68,7 +68,7 @@
                                     <action selector="buttonAction:" target="4850" id="4915"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4899" customClass="VLCWindowTitleTextField">
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="4899" customClass="VLCWindowTitleTextField">
                                 <rect key="frame" x="65" y="3" width="577" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="VLC media player" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" id="4900">
                                     <font key="font" metaFont="system"/>
