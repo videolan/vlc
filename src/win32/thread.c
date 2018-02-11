@@ -992,7 +992,6 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             InitializeCriticalSection(&super_mutex);
             InitializeConditionVariable(&super_variable);
             vlc_rwlock_init (&config_lock);
-            vlc_CPU_init ();
             break;
         }
 

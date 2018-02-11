@@ -153,7 +153,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
-            vlc_CPU_init ();
 
             return 1;
 

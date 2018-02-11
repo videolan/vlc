@@ -40,7 +40,6 @@ void system_End(void);
 size_t EnumClockSource( vlc_object_t *, const char *, char ***, char *** );
 #endif
 #endif
-void vlc_CPU_init(void);
 void vlc_CPU_dump(vlc_object_t *);
 
 /*
