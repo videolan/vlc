@@ -1026,12 +1026,14 @@ int main(void)
 {
     alarm(10);
 
-    unsigned cpu = vlc_CPU();
 #ifndef COPY_TEST_NOOPTIM
+# ifndef __SSE2__
+    unsigned cpu = vlc_CPU();
+# endif
     if (!vlc_CPU_SSE2())
     {
         fprintf(stderr, "WARNING: could not test SSE\n");
-        return 0;
+        return 77;
     }
 #endif
 
