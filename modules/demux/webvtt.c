@@ -335,7 +335,7 @@ static void BuildIndex( demux_t *p_demux )
     }
 }
 
-static block_t *demux_Range( demux_t *p_demux, mtime_t i_start, mtime_t i_end )
+static block_t *demux_From( demux_t *p_demux, mtime_t i_start )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -546,7 +546,7 @@ static int Demux( demux_t *p_demux )
             }
         }
 
-        block_t *p_block = demux_Range( p_demux, i_start_time, i_end_time );
+        block_t *p_block = demux_From( p_demux, i_start_time );
         if( p_block )
         {
             p_block->i_length = i_end_time - i_start_time;
