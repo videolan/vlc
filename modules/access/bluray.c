@@ -1024,6 +1024,8 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         }
         setStreamLang(p_sys, &fmt);
         break ;
+    default:
+        ;
     }
 
     es_out_id_t *p_es = es_out_Add(p_demux->out, &fmt);
