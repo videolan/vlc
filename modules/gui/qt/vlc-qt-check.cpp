@@ -22,9 +22,18 @@
 # include "config.h"
 #endif
 
+#include <stdlib.h>
 #include <QApplication>
+
+static void messageOutput(QtMsgType type, const QMessageLogContext &,
+                          const QString &)
+{
+    if (type == QtFatalMsg)
+        exit(1);
+}
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(messageOutput);
     QApplication app(argc, argv);
 }
