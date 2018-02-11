@@ -32,15 +32,13 @@
 #include <vlc_subpicture.h>
 
 /**
- * \defgroup codec Codec
- * Decoders and encoders
- * @{
- * \file
- * Decoder and encoder modules interface
- *
  * \defgroup decoder Decoder
+ * \ingroup input
  * Audio, video and text decoders
  * @{
+ *
+ * \file
+ * Decoder and encoder modules interface
  */
 
 typedef struct decoder_owner_sys_t decoder_owner_sys_t;
@@ -204,6 +202,7 @@ struct decoder_cc_desc_t
 
 /**
  * \defgroup encoder Encoder
+ * \ingroup sout
  * Audio, video and text encoders
  * @{
  */

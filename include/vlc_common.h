@@ -24,13 +24,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * \file
- * This file is a collection of common definitions and types
- */
-
 #ifndef VLC_COMMON_H
 # define VLC_COMMON_H 1
+
+/**
+ * \defgroup vlc VLC plug-in programming interface
+ * \file
+ * \ingroup vlc
+ * This file is a collection of common definitions and types
+ */
 
 /*****************************************************************************
  * Required vlc headers
@@ -54,6 +56,7 @@
 
 /**
  * \defgroup cext C programming language extensions
+ * \ingroup vlc
  *
  * This section defines a number of macros and inline functions extending the
  * C language. Most extensions are implemented by GCC and LLVM/Clang, and have

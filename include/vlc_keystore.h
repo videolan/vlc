@@ -37,6 +37,7 @@ libvlc_InternalKeystoreClean(libvlc_int_t *p_libvlc);
 
 /**
  * @defgroup keystore Keystore and credential API
+ * @ingroup os
  * @{
  * @file
  * This file declares vlc keystore API

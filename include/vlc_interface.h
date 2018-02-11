@@ -34,6 +34,7 @@ typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
  * \defgroup interface Interface
+ * \ingroup vlc
  * VLC user interfaces
  * @{
  * \file

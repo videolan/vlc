@@ -29,6 +29,7 @@
 
 /**
  * \defgroup server VLM
+ * \ingroup interface
  * VLC stream manager
  *
  * VLM is the server core in vlc that allows streaming of multiple media streams

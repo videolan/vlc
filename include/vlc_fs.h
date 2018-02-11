@@ -48,8 +48,9 @@ struct iovec;
 
 /**
  * \defgroup os Operating system
- * @{
+ * \ingroup vlc
  * \defgroup file File system
+ * \ingroup os
  * @{
  *
  * \file
@@ -250,7 +251,6 @@ VLC_API int vlc_mkdir(const char *dirname, mode_t mode);
  */
 VLC_API char *vlc_getcwd(void) VLC_USED;
 
-/** @} */
 /** @} */
 
 #if defined( _WIN32 )

@@ -32,6 +32,7 @@
 
 /**
  * \defgroup output Output
+ * \ingroup vlc
  * \defgroup video_output Video output
  * \ingroup output
  * Video rendering, output and window management

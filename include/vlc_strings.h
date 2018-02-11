@@ -26,6 +26,7 @@
 
 /**
  * \defgroup strings String helpers
+ * \ingroup cext
  * @{
  * \file
  * Helper functions for nul-terminated strings

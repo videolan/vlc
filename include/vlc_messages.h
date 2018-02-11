@@ -31,6 +31,7 @@
 
 /**
  * \defgroup messages Logging
+ * \ingroup os
  * \brief Message logs
  *
  * Functions for modules to emit log messages.

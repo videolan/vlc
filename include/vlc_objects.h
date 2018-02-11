@@ -23,6 +23,7 @@
 
 /**
  * \defgroup vlc_object VLC objects
+ * \ingroup vlc
  * @{
  * \file
  * Common VLC object defintions

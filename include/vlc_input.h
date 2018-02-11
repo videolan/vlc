@@ -27,6 +27,7 @@
 
 /**
  * \defgroup input Input
+ * \ingroup vlc
  * Input thread
  * @{
  * \file

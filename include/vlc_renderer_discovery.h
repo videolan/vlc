@@ -27,6 +27,7 @@
 
 /**
  * @defgroup vlc_renderer VLC renderer discovery
+ * @ingroup interface
  * @{
  *
  * @file

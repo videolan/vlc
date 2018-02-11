@@ -20,6 +20,7 @@
 
 /**
  * \defgroup http HTTP
+ * \ingroup net
  * Hyper-Text Transfer Protocol
  * \defgroup http_connmgr Connection manager
  * HTTP connection management

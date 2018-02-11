@@ -18,11 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * @file
- * This file declares interruptible sleep functions.
- */
-
 #ifndef VLC_INTERRUPT_H
 # define VLC_INTERRUPT_H 1
 # include <vlc_threads.h>
@@ -39,7 +34,10 @@ struct msghdr;
 
 /**
  * @defgroup interrupt Interruptible sleep
+ * @ingroup thread
  * @{
+ * @file
+ * This file declares interruptible sleep functions.
  * @defgroup interrupt_sleep Interruptible sleep functions
  * @{
  */

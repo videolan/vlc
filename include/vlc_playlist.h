@@ -37,6 +37,7 @@ struct intf_thread_t;
 
 /**
  * \defgroup playlist VLC playlist
+ * \ingroup interface
  * VLC playlist controls
  * @{
  * \file
