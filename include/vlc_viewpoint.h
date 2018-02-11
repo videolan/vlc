@@ -26,10 +26,6 @@
 #include <math.h>
 
 /**
- * \defgroup output Output
- * \ingroup output
- *
- * @{
  * \file
  * Video and audio viewpoint struct and helpers
  */
@@ -62,7 +58,5 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
     p_vp->fov = VLC_CLIP( p_vp->fov, FIELD_OF_VIEW_DEGREES_MIN,
                           FIELD_OF_VIEW_DEGREES_MAX );
 }
-
-/**@}*/
 
 #endif /* VLC_VIEWPOINT_H_ */
