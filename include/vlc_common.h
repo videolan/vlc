@@ -469,6 +469,20 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
         unsigned: __builtin_ctz(x), \
         unsigned long: __builtin_ctzl(x), \
         unsigned long long: __builtin_ctzll(x))
+
+#  define popcount(x) \
+    _Generic((x), \
+        unsigned char:      __builtin_popcount(x), \
+          signed char:      __builtin_popcount((unsigned char)(x)), \
+        unsigned short:     __builtin_popcount(x), \
+          signed short:     __builtin_popcount((unsigned short)(x)), \
+        unsigned int:       __builtin_popcount(x), \
+          signed int:       __builtin_popcount(x), \
+        unsigned long:      __builtin_popcountl(x), \
+          signed long:      __builtin_popcountl(x), \
+        unsigned long long: __builtin_popcountll(x), \
+          signed long long: __builtin_popcountll(x))
+
 # else
 VLC_USED static inline int ctz(unsigned x)
 {
@@ -483,6 +497,31 @@ VLC_USED static inline int ctz(unsigned long x)
 VLC_USED static inline int ctz(unsigned long long x)
 {
     return __builtin_ctzll(x);
+}
+
+VLC_USED static inline int popcount(unsigned char x)
+{
+    return __builtin_popcount(x);
+}
+
+VLC_USED static inline int popcount(unsigned short x)
+{
+    return __builtin_popcount(x);
+}
+
+VLC_USED static inline int popcount(unsigned x)
+{
+    return __builtin_popcount(x);
+}
+
+VLC_USED static inline int popcount(unsigned long x)
+{
+    return __builtin_popcountl(x);
+}
+
+VLC_USED static inline int popcount(unsigned long long x)
+{
+    return __builtin_popcountll(x);
 }
 # endif
 #else /* __GNUC__ */
@@ -541,38 +580,9 @@ VLC_USED static inline int ctz(unsigned long long x)
     }
     return i;
 }
-#endif /* __GNUC__ */
 
-/**
- * Bit weight / population count
- *
- * This function counts the number of non-zero bits in an integer.
- *
- * \return The count of non-zero bits.
- */
-VLC_USED
-static inline unsigned (popcount)(unsigned x)
+VLC_USED static inline int popcount(unsigned long long x)
 {
-#ifdef __GNUC__
-    return __builtin_popcount (x);
-#else
-    unsigned count = 0;
-    while (x)
-    {
-        count += x & 1;
-        x = x >> 1;
-    }
-    return count;
-#endif
-}
-
-/** Bit weight of long long */
-VLC_USED
-static inline int (popcountll)(unsigned long long x)
-{
-#ifdef __GNUC__
-    return __builtin_popcountll(x);
-#else
     int count = 0;
     while (x)
     {
@@ -580,8 +590,31 @@ static inline int (popcountll)(unsigned long long x)
         x = x >> 1;
     }
     return count;
-#endif
 }
+
+# ifndef __cplusplus
+/**
+ * Bit weight / population count
+ *
+ * This function counts the number of non-zero bits in an integer.
+ *
+ * \return The count of non-zero bits.
+ */
+#  define popcount(x) \
+    _Generic((x), \
+        unsigned char:      popcount(x), \
+          signed char:      popcount((unsigned char)(x)), \
+        unsigned short:     popcount(x), \
+          signed short:     popcount((unsigned short)(x)), \
+        unsigned int:       popcount(x), \
+          signed int:       popcount((unsigned int)(x)), \
+        unsigned long:      popcount(x), \
+          signed long:      popcount((unsigned long)(x)), \
+        unsigned long long: popcount(x), \
+          signed long long: popcount(x))
+#endif
+
+#endif /* __GNUC__ */
 
 /**
  * Parity
