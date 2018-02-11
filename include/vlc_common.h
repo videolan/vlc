@@ -443,14 +443,28 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
     else           return a;
 }
 
-/** Count leading zeroes */
-VLC_USED
-static inline unsigned (clz)(unsigned x)
+
+#ifndef __cplusplus
+# ifdef __GNUC__
+/**
+ * Count leading zeroes
+ *
+ * (assumes CHAR_BIT==8)
+ */
+#  define clz(x) \
+    _Generic((x), \
+        unsigned char: (__builtin_clz(x) \
+		- (sizeof (unsigned) - 1) * 8), \
+        unsigned short: (__builtin_clz(x) \
+		- (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
+        unsigned: __builtin_clz(x), \
+        unsigned long: __builtin_clzl(x), \
+        unsigned long long: __builtin_clzll(x))
+
+# else
+VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
 {
-#ifdef __GNUC__
-    return __builtin_clz (x);
-#else
-    unsigned i = sizeof (x) * 8;
+    int i = maxbits;
 
     while (x)
     {
@@ -458,13 +472,22 @@ static inline unsigned (clz)(unsigned x)
         i--;
     }
     return i;
-#endif
 }
+#  define clztype(x, type) clzbits(x, sizeof (type) * 8)
 
-#define clz8( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint8_t)) * 8))
-#define clz16( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint16_t)) * 8))
-/* XXX: this assumes that int is 32-bits or more */
-#define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
+#  define clz(x) \
+    _Generic((x), \
+        unsigned char: clzbits(x, char), \
+        unsigned short: clzbits(x, short), \
+        unsigned: clzbits(x, int), \
+        unsigned long: clzbits(x, long), \
+        unsigned long long: clzbits(x, long long))
+# endif
+#endif
+
+#define clz8(x)  clz((uint8_t)(x))
+#define clz16(x) clz((uint16_t)(x))
+#define clz32(x) clz((uint32_t)(x))
 
 /** Count trailing zeroes */
 VLC_USED
