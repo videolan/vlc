@@ -25,7 +25,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_memory.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <limits.h>

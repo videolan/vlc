@@ -113,7 +113,6 @@ noinst_HEADERS = \
 	../include/vlc_fixups.h \
 	../include/vlc_intf_strings.h \
 	../include/vlc_iso_lang.h \
-	../include/vlc_memory.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \

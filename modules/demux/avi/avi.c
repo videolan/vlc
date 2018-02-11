@@ -42,7 +42,6 @@
 #include <vlc_meta.h>
 #include <vlc_codecs.h>
 #include <vlc_charset.h>
-#include <vlc_memory.h>
 
 #include "libavi.h"
 #include "../rawdv.h"

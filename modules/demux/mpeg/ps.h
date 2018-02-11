@@ -23,7 +23,6 @@
 
 #include <assert.h>
 #include <vlc_demux.h>
-#include <vlc_memory.h>
 #include "timestamps.h"
 
 #define PS_STREAM_ID_END_STREAM       0xB9

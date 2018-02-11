@@ -36,7 +36,6 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
-#include <vlc_memory.h>
 
 #include "audio_output/windows_audio_common.h"
 #include "audio_output/mmdevice.h"

@@ -29,7 +29,6 @@
 #include <vlc_demux.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
-#include <vlc_memory.h>
 #include <vlc_memstream.h>
 #include <vlc_es_out.h>
 #include <vlc_charset.h>          /* FromCharset */

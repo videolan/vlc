@@ -25,7 +25,6 @@
 #import "coreaudio_common.h"
 
 #import <vlc_plugin.h>
-#import <vlc_memory.h>
 
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>

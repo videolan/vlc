@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
-#include <vlc_memory.h>
 #include "internal.h"
 
 #ifndef GL_UNPACK_ROW_LENGTH

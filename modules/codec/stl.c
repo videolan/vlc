@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_memory.h>
 #include <vlc_charset.h>
 
 #include "substext.h" /* required for font scaling / updater */
