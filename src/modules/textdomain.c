@@ -44,15 +44,15 @@ int vlc_bindtextdomain (const char *domain)
     if (unlikely(ret == -1))
         return -1;
 
-    char *lpath = ToLocaleDup (upath);
+    char *lpath = ToLocale(upath);
     if (lpath == NULL || bindtextdomain (domain, lpath) == NULL)
     {
-        free (lpath);
+        LocaleFree(lpath);
         fprintf (stderr, "%s: text domain not found in %s\n", domain, upath);
         free (upath);
         return -1;
     }
-    free (lpath);
+    LocaleFree(lpath);
     free (upath);
 
     /* LibVLC wants all messages in UTF-8.
