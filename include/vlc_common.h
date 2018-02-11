@@ -52,14 +52,19 @@
 # include <stdbool.h>
 #endif
 
-/*****************************************************************************
- * Compilers definitions
- *****************************************************************************/
-/* Helper for GCC version checks */
+/**
+ * \defgroup cext C programming language extensions
+ *
+ * This section defines a number of macros and inline functions extending the
+ * C language. Most extensions are implemented by GCC and LLVM/Clang, and have
+ * unoptimized fallbacks for other C11/C++11 conforming compilers.
+ * @{
+ */
 #ifdef __GNUC__
 # define VLC_GCC_VERSION(maj,min) \
     ((__GNUC__ > (maj)) || (__GNUC__ == (maj) && __GNUC_MINOR__ >= (min)))
 #else
+/** GCC version check */
 # define VLC_GCC_VERSION(maj,min) (0)
 #endif
 
@@ -99,11 +104,81 @@
 # define VLC_USED __attribute__ ((warn_unused_result))
 
 #else
+/**
+ * Deprecated functions or compound members annotation
+ *
+ * Use this macro in front of a function declaration or compound member
+ * within a compound type declaration.
+ * The compiler may emit a warning every time the function or member is used.
+ *
+ * Use \ref VLC_DEPRECATED_ENUM instead for enumeration members.
+ */
 # define VLC_DEPRECATED
+
+/**
+ * Deprecated enum member annotation
+ *
+ * Use this macro after an enumerated type member declaration.
+ * The compiler may emit a warning every time the enumeration member is used.
+ *
+ * See also \ref VLC_DEPRECATED.
+ */
 # define VLC_DEPRECATED_ENUM
+
+/**
+ * String format function annotation
+ *
+ * Use this macro after a function prototype/declaration if the function
+ * expects a standard C format string. This helps compiler diagnostics.
+ *
+ * @param x the position (starting from 1) of the format string argument
+ * @param y the first position (also starting from 1) of the variable arguments
+ *          following the format string (usually but not always \p x+1).
+ */
 # define VLC_FORMAT(x,y)
+
+/**
+ * Format string translation function annotation
+ *
+ * Use this macro after a function prototype/declaration if the function
+ * expects a format string as input and returns another format string as output
+ * to another function.
+ *
+ * This is primarily intended for localization functions such as gettext().
+ */
 # define VLC_FORMAT_ARG(x)
+
+/**
+ * Heap allocated result function annotation
+ *
+ * Use this macro to annotate a function that returns a pointer to memory that
+ * cannot alias any other valid pointer.
+ *
+ * This is primarily used for functions that return a pointer to heap-allocated
+ * memory, but it can be used for other applicable purposes.
+ *
+ * \warning Do not use this annotation if the returned pointer can in any way
+ * alias a valid pointer at the time the function exits. This could lead to
+ * very weird memory corruption bugs.
+ */
 # define VLC_MALLOC
+
+/**
+ * Used result function annotation
+ *
+ * Use this macro to annotate a function whose result must be used.
+ *
+ * There are several cases where this is useful:
+ * - If a function has no side effects (or no useful side effects), such that
+ *   the only useful purpose of calling said function is to obtain its
+ *   return value.
+ * - If ignoring the function return value would lead to a resource leak
+ *   (including but not limited to a memory leak).
+ * - If a function cannot be used correctly without checking its return value.
+ *   For instance, if the function can fail at any time.
+ *
+ * The compiler may warn if the return value of a function call is ignored.
+ */
 # define VLC_USED
 #endif
 
@@ -114,11 +189,48 @@
 # define unlikely(p)   __builtin_expect(!!(p), 0)
 # define unreachable() __builtin_unreachable()
 #else
+/**
+ * Predicted true condition
+ *
+ * This macro indicates that the condition is expected most often true.
+ * The compiler may optimize the code assuming that this condition is usually
+ * met.
+ */
 # define likely(p)     (!!(p))
+
+/**
+ * Predicted false condition
+ *
+ * This macro indicates that the condition is expected most often false.
+ * The compiler may optimize the code assuming that this condition is rarely
+ * met.
+ */
 # define unlikely(p)   (!!(p))
+
+/**
+ * Impossible branch
+ *
+ * This macro indicates that the branch cannot be reached at run-time, and
+ * represents undefined behaviour.
+ * The compiler may optimize the code assuming that the call flow will never
+ * logically reach the point where this macro is expanded.
+ *
+ * See also \ref vlc_assert_unreachable.
+ */
 # define unreachable() ((void)0)
 #endif
 
+/**
+ * Impossible branch assertion
+ *
+ * This macro asserts that the branch cannot be reached at run-time.
+ *
+ * If the branch is reached in a debug build, it will trigger an assertion
+ * failure and abnormal program termination.
+ *
+ * If the branch is reached in a non-debug build, this macro is equivalent to
+ * \ref unreachable and the behaviour is undefined.
+ */
 #define vlc_assert_unreachable() (assert(!"unreachable"), unreachable())
 
 /* Linkage */
@@ -136,8 +248,15 @@
 # define VLC_EXPORT
 #endif
 
+/**
+ * Exported API call annotation
+ *
+ * This macro is placed before a function declaration to indicate that the
+ * function is an API call of the LibVLC plugin API.
+ */
 #define VLC_API VLC_EXTERN VLC_EXPORT
 
+/** @} */
 
 /*****************************************************************************
  * Basic types definitions
@@ -410,6 +529,7 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 
 /**
  * \defgroup intops Integer operations
+ * \ingroup cext
  *
  * Common integer functions.
  * @{
