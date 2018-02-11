@@ -486,10 +486,15 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 #  define parity(x) \
     _Generic((x), \
         unsigned char: __builtin_parity(x), \
+          signed char: __builtin_parity(x), \
         unsigned short: __builtin_parity(x), \
-        unsigned: __builtin_parity(x), \
+          signed short: __builtin_parity(x), \
+        unsigned int: __builtin_parity(x), \
+          signed int: __builtin_parity(x), \
         unsigned long: __builtin_parityl(x), \
-        unsigned long long: __builtin_parityll(x))
+          signed long: __builtin_parityl(x), \
+        unsigned long long: __builtin_parityll(x), \
+          signed long long: __builtin_parityll(x))
 
 # else
 VLC_USED static inline int ctz(unsigned x)
