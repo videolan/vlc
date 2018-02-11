@@ -806,6 +806,71 @@ static inline void RenderBackground( subpicture_region_t *p_region,
     }
 }
 
+static int RenderCharAXYZ( filter_t *p_filter,
+                           picture_t *p_picture,
+                           const line_desc_t *p_line,
+                           int i_offset_x,
+                           int i_offset_y,
+                           int g,
+                           void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
+                           void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+{
+    VLC_UNUSED(p_filter);
+    /* Render all glyphs and underline/strikethrough */
+    for( int i = p_line->i_first_visible_char_index; i <= p_line->i_last_visible_char_index; i++ )
+    {
+        const line_character_t *ch = &p_line->p_character[i];
+        const FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
+        if( !p_glyph )
+            continue;
+
+        uint8_t i_a = ch->p_style->i_font_alpha;
+
+        uint32_t i_color;
+        switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
+        case 0:
+            i_a     = i_a * ch->p_style->i_shadow_alpha / 255;
+            i_color = ch->p_style->i_shadow_color;
+            break;
+        case 1:
+            i_a     = i_a * ch->p_style->i_outline_alpha / 255;
+            i_color = ch->p_style->i_outline_color;
+            break;
+        default:
+            i_color = ch->p_style->i_font_color;
+            break;
+        }
+
+        /* Don't render if invisible or not wanted */
+        if( i_a == STYLE_ALPHA_TRANSPARENT ||
+           (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
+           (g == 1 && 0 == (ch->p_style->i_style_flags & STYLE_OUTLINE) )
+          )
+            continue;
+
+        uint8_t i_x, i_y, i_z;
+        ExtractComponents( i_color, &i_x, &i_y, &i_z );
+
+        int i_glyph_y = i_offset_y - p_glyph->top;
+        int i_glyph_x = i_offset_x + p_glyph->left;
+
+        BlendAXYZGlyph( p_picture,
+                        i_glyph_x, i_glyph_y,
+                        i_a, i_x, i_y, i_z,
+                        p_glyph,
+                        BlendPixel );
+
+        /* underline/strikethrough are only rendered for the normal glyph */
+        if( g == 2 && ch->i_line_thickness > 0 )
+            BlendAXYZLine( p_picture,
+                           i_glyph_x, i_glyph_y + p_glyph->top,
+                           i_a, i_x, i_y, i_z,
+                           &ch[0],
+                           i + 1 < p_line->i_character_count ? &ch[1] : NULL,
+                           BlendPixel );
+    }
+}
+
 static inline int RenderAXYZ( filter_t *p_filter,
                               subpicture_region_t *p_region,
                               line_desc_t *p_line_head,
@@ -862,58 +927,12 @@ static inline int RenderAXYZ( filter_t *p_filter,
         {
             FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
 
-            /* Render all glyphs and underline/strikethrough */
-            for( int i = p_line->i_first_visible_char_index; i <= p_line->i_last_visible_char_index; i++ )
-            {
-                const line_character_t *ch = &p_line->p_character[i];
-                const FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
-                if( !p_glyph )
-                    continue;
+            int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->i_base_line;
+            int i_glyph_offset_x = offset.x - p_regionbbox->xMin;
 
-                uint8_t i_a = ch->p_style->i_font_alpha;
-
-                uint32_t i_color;
-                switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
-                case 0:
-                    i_a     = i_a * ch->p_style->i_shadow_alpha / 255;
-                    i_color = ch->p_style->i_shadow_color;
-                    break;
-                case 1:
-                    i_a     = i_a * ch->p_style->i_outline_alpha / 255;
-                    i_color = ch->p_style->i_outline_color;
-                    break;
-                default:
-                    i_color = ch->p_style->i_font_color;
-                    break;
-                }
-
-                /* Don't render if invisible or not wanted */
-                if( i_a == STYLE_ALPHA_TRANSPARENT ||
-                   (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
-                   (g == 1 && 0 == (ch->p_style->i_style_flags & STYLE_OUTLINE) )
-                  )
-                    continue;
-
-                ExtractComponents( i_color, &i_x, &i_y, &i_z );
-
-                int i_glyph_y = offset.y + p_regionbbox->yMax - p_glyph->top + p_line->i_base_line;
-                int i_glyph_x = offset.x + p_glyph->left - p_regionbbox->xMin;
-
-                BlendAXYZGlyph( p_picture,
-                                i_glyph_x, i_glyph_y,
-                                i_a, i_x, i_y, i_z,
-                                p_glyph,
-                                BlendPixel );
-
-                /* underline/strikethrough are only rendered for the normal glyph */
-                if( g == 2 && ch->i_line_thickness > 0 )
-                    BlendAXYZLine( p_picture,
-                                   i_glyph_x, i_glyph_y + p_glyph->top,
-                                   i_a, i_x, i_y, i_z,
-                                   &ch[0],
-                                   i + 1 < p_line->i_character_count ? &ch[1] : NULL,
-                                   BlendPixel );
-            }
+            RenderCharAXYZ( p_filter, p_picture, p_line,
+                            i_glyph_offset_x, i_glyph_offset_y, g,
+                            ExtractComponents, BlendPixel );
         }
     }
 
