@@ -36,6 +36,7 @@
 #include "languages.h"
 #include <math.h>
 #include <assert.h>
+#include <limits.h>
 
 /* Some assumptions:
  * The input method HAS to be seekable
