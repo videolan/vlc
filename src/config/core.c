@@ -46,11 +46,6 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
-/*****************************************************************************
- * config_GetType: get the type of a variable (bool, int, float, string)
- *****************************************************************************
- * This function is used to get the type of a variable from its name.
- *****************************************************************************/
 int config_GetType(const char *psz_name)
 {
     module_config_t *p_config = config_FindConfig(psz_name);
@@ -83,13 +78,6 @@ bool config_IsSafe( const char *name )
 }
 
 #undef config_GetInt
-/*****************************************************************************
- * config_GetInt: get the value of an int variable
- *****************************************************************************
- * This function is used to get the value of variables which are internally
- * represented by an integer (CONFIG_ITEM_INTEGER and
- * CONFIG_ITEM_BOOL).
- *****************************************************************************/
 int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
 {
     module_config_t *p_config = config_FindConfig( psz_name );
@@ -112,12 +100,6 @@ int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
 }
 
 #undef config_GetFloat
-/*****************************************************************************
- * config_GetFloat: get the value of a float variable
- *****************************************************************************
- * This function is used to get the value of variables which are internally
- * represented by a float (CONFIG_ITEM_FLOAT).
- *****************************************************************************/
 float config_GetFloat( vlc_object_t *p_this, const char *psz_name )
 {
     module_config_t *p_config;
@@ -142,17 +124,6 @@ float config_GetFloat( vlc_object_t *p_this, const char *psz_name )
 }
 
 #undef config_GetPsz
-/*****************************************************************************
- * config_GetPsz: get the string value of a string variable
- *****************************************************************************
- * This function is used to get the value of variables which are internally
- * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_*FILE,
- * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
- *
- * Important note: remember to free() the returned char* because it's a
- *   duplicate of the actual value. It isn't safe to return a pointer to the
- *   actual value as it can be modified at any time.
- *****************************************************************************/
 char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
 {
     module_config_t *p_config;
@@ -177,13 +148,6 @@ char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
 }
 
 #undef config_PutPsz
-/*****************************************************************************
- * config_PutPsz: set the string value of a string variable
- *****************************************************************************
- * This function is used to set the value of variables which are internally
- * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_*FILE,
- * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
- *****************************************************************************/
 void config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
 {
@@ -215,13 +179,6 @@ void config_PutPsz( vlc_object_t *p_this,
 }
 
 #undef config_PutInt
-/*****************************************************************************
- * config_PutInt: set the integer value of an int variable
- *****************************************************************************
- * This function is used to set the value of variables which are internally
- * represented by an integer (CONFIG_ITEM_INTEGER and
- * CONFIG_ITEM_BOOL).
- *****************************************************************************/
 void config_PutInt( vlc_object_t *p_this, const char *psz_name,
                     int64_t i_value )
 {
@@ -248,12 +205,6 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
 }
 
 #undef config_PutFloat
-/*****************************************************************************
- * config_PutFloat: set the value of a float variable
- *****************************************************************************
- * This function is used to set the value of variables which are internally
- * represented by a float (CONFIG_ITEM_FLOAT).
- *****************************************************************************/
 void config_PutFloat( vlc_object_t *p_this,
                       const char *psz_name, float f_value )
 {
@@ -282,14 +233,6 @@ void config_PutFloat( vlc_object_t *p_this,
     vlc_rwlock_unlock (&config_lock);
 }
 
-/**
- * Determines a list of suggested values for an integer configuration item.
- * \param values pointer to a table of integer values [OUT]
- * \param texts pointer to a table of descriptions strings [OUT]
- * \return number of choices, or -1 on error
- * \note the caller is responsible for calling free() on all descriptions and
- * on both tables. In case of error, both pointers are set to NULL.
- */
 ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
                              int64_t **restrict values, char ***restrict texts)
 {
@@ -385,15 +328,6 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
     return n + 2;
 }
 
-/**
- * Determines a list of suggested values for a string configuration item.
- * \param values pointer to a table of value strings [OUT]
- * \param texts pointer to a table of descriptions strings [OUT]
- * \return number of choices, or -1 on error
- * \note the caller is responsible for calling free() on all values, on all
- * descriptions and on both tables.
- * In case of error, both pointers are set to NULL.
- */
 ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
                               char ***restrict values, char ***restrict texts)
 {
@@ -517,9 +451,6 @@ void config_UnsortConfig (void)
     free (clist);
 }
 
-/*****************************************************************************
- * config_FindConfig: find the config structure associated with an option.
- *****************************************************************************/
 module_config_t *config_FindConfig(const char *name)
 {
     if (unlikely(name == NULL))
@@ -555,9 +486,6 @@ void config_Free (module_config_t *tab, size_t confsize)
 }
 
 #undef config_ResetAll
-/*****************************************************************************
- * config_ResetAll: reset the configuration data for all the modules.
- *****************************************************************************/
 void config_ResetAll( vlc_object_t *p_this )
 {
     vlc_rwlock_wrlock (&config_lock);

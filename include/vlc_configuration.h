@@ -27,6 +27,18 @@
 #define VLC_CONFIGURATION_H 1
 
 /**
+ * \defgroup config User settings
+ * \ingroup interface
+ * VLC provides a simple name-value dictionary for user settings.
+ *
+ * Those settings are per-user per-system - they are shared by all LibVLC
+ * instances in a single process, and potentially other processes as well.
+ *
+ * Each name-value pair is called a configuration item.
+ * @{
+ */
+
+/**
  * \file
  * This file describes the programming interface for the configuration module.
  * It includes functions allowing to declare, get or set configuration options.
@@ -57,63 +69,209 @@ typedef int (*vlc_string_list_cb)(vlc_object_t *, const char *,
 typedef int (*vlc_integer_list_cb)(vlc_object_t *, const char *,
                                    int64_t **, char ***);
 
+/**
+ * Configuration item
+ *
+ * This is the internal reprensation of a configuration item.
+ * See also config_FindConfig().
+ */
 struct module_config_t
 {
-    uint8_t     i_type;                        /* Configuration type */
-    char        i_short;               /* Optional short option name */
-    unsigned    b_advanced:1;                     /* Advanced option */
-    unsigned    b_internal:1;          /* Hidden from prefs and help */
-    unsigned    b_unsaveable:1;       /* Not stored in configuration */
-    unsigned    b_safe:1;       /* Safe in web plugins and playlists */
-    unsigned    b_removed:1;                           /* Deprecated */
+    uint8_t     i_type; /**< Configuration type */
+    char        i_short; /**< Optional short option name */
+    unsigned    b_advanced:1; /**< Advanced option */
+    unsigned    b_internal:1; /**< Hidden from preferences and help */
+    unsigned    b_unsaveable:1; /**< Not stored in configuration */
+    unsigned    b_safe:1; /**< Safe for web plugins and playlist files */
+    unsigned    b_removed:1; /**< Obsolete */
 
-    const char *psz_type;                           /* Configuration subtype */
-    const char *psz_name;                                     /* Option name */
-    const char *psz_text;       /* Short comment on the configuration option */
-    const char *psz_longtext;    /* Long comment on the configuration option */
+    const char *psz_type; /**< Configuration subtype */
+    const char *psz_name; /**< Option name */
+    const char *psz_text; /**< Short comment on the configuration option */
+    const char *psz_longtext; /**< Long comment on the configuration option */
 
-    module_value_t value;                                    /* Option value */
-    module_value_t orig;
-    module_value_t min;
-    module_value_t max;
+    module_value_t value; /**< Current value */
+    module_value_t orig; /**< Default value */
+    module_value_t min; /**< Minimum value (for scalars only) */
+    module_value_t max; /**< Maximum value (for scalars only) */
 
     /* Values list */
-    uint16_t list_count;                                /* Options list size */
+    uint16_t list_count; /**< Choices count */
     union
     {
-        const char **psz;          /* List of possible values for the option */
-        const int  *i;
-        vlc_string_list_cb psz_cb;
-        vlc_integer_list_cb i_cb;
-    } list;
-    const char **list_text;                /* Friendly names for list values */
-    const char *list_cb_name;
-    void *owner;
+        const char **psz; /**< Table of possible string choices */
+        const int  *i; /**< Table of possible integer choices */
+        vlc_string_list_cb psz_cb; /**< Callback to enumerate string choices */
+        vlc_integer_list_cb i_cb; /**< Callback to enumerate integer choices */
+    } list; /**< Possible choices */
+    const char **list_text; /**< Human-readable names for list values */
+    const char *list_cb_name; /**< Symbol name of the enumeration callback */
+    void *owner; /**< Origin run-time linker module handle */
 };
 
-/*****************************************************************************
- * Prototypes - these methods are used to get, set or manipulate configuration
- * data.
- *****************************************************************************/
-VLC_API int config_GetType(const char *) VLC_USED;
+/**
+ * Gets a configuration item type
+ *
+ * This function checks the type of configuration item by name.
+ * \param name Configuration item name
+ * \return The configuration item type or 0 if not found.
+ */
+VLC_API int config_GetType(const char *name) VLC_USED;
+
+/**
+ * Gets an integer configuration item.
+ *
+ * This function retrieves the current value of a configuration item of
+ * integral type (\ref CONFIG_ITEM_INTEGER and \ref CONFIG_ITEM_BOOL).
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of integer or boolean type.
+ *
+ * \param name Configuration item name
+ * \return The configuration item value or -1 if not found.
+ * \bug A legitimate integer value of -1 cannot be distinguished from an error.
+ */
 VLC_API int64_t config_GetInt(vlc_object_t *, const char *) VLC_USED;
-VLC_API void config_PutInt(vlc_object_t *, const char *, int64_t);
-VLC_API float config_GetFloat(vlc_object_t *, const char *) VLC_USED;
-VLC_API void config_PutFloat(vlc_object_t *, const char *, float);
-VLC_API char * config_GetPsz(vlc_object_t *, const char *) VLC_USED VLC_MALLOC;
-VLC_API void config_PutPsz(vlc_object_t *, const char *, const char *);
+
+/**
+ * Sets an integer configuration item.
+ *
+ * This function changes the current value of a configuration item of
+ * integral type (\ref CONFIG_ITEM_INTEGER and \ref CONFIG_ITEM_BOOL).
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of integer or boolean type.
+ *
+ * \note If no configuration item by the specified exist, the function has no
+ * effects.
+ *
+ * \param name Configuration item name
+ * \param val New value
+ */
+VLC_API void config_PutInt(vlc_object_t *, const char *name, int64_t val);
+
+/**
+ * Gets an floating point configuration item.
+ *
+ * This function retrieves the current value of a configuration item of
+ * floating point type (\ref CONFIG_ITEM_FLOAT).
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of floating point type.
+ *
+ * \param name Configuration item name
+ * \return The configuration item value or -1 if not found.
+ * \bug A legitimate floating point value of -1 cannot be distinguished from an
+ * error.
+ */
+VLC_API float config_GetFloat(vlc_object_t *, const char *name) VLC_USED;
+
+/**
+ * Sets an integer configuration item.
+ *
+ * This function changes the current value of a configuration item of
+ * integral type (\ref CONFIG_ITEM_FLOAT).
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of floating point type.
+ *
+ * \note If no configuration item by the specified exist, the function has no
+ * effects.
+ *
+ * \param name Configuration item name
+ * \param val New value
+ */
+VLC_API void config_PutFloat(vlc_object_t *, const char *name, float val);
+
+/**
+ * Gets an string configuration item.
+ *
+ * This function retrieves the current value of a configuration item of
+ * string type (\ref CONFIG_ITEM_STRING).
+ *
+ * \note The caller must free() the returned pointer (if non-NULL), which is a
+ * duplicate of the current value. It is not safe to return a pointer to the
+ * current value internally as it can be modified at any time by any other
+ * thread.
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of floating point type.
+ *
+ * \param name Configuration item name
+ * \return Normally, a heap-allocated copy of the configuration item value.
+ * If the value is the empty string, if the configuration does not exist,
+ * or if an error occurs, NULL is returned.
+ * \bug The empty string value cannot be distinguished from an error.
+ */
+VLC_API char * config_GetPsz(vlc_object_t *, const char *name)
+VLC_USED VLC_MALLOC;
+
+/**
+ * Sets an string configuration item.
+ *
+ * This function changes the current value of a configuration item of
+ * string type (e.g. \ref CONFIG_ITEM_STRING).
+ *
+ * \warning The behaviour is undefined if the configuration item exists but is
+ * not of a string type.
+ *
+ * \note If no configuration item by the specified exist, the function has no
+ * effects.
+ *
+ * \param name Configuration item name
+ * \param val New value (will be copied)
+ * \bug This function allocates memory but errors cannot be detected.
+ */
+VLC_API void config_PutPsz(vlc_object_t *, const char *name, const char *val);
+
+/**
+ * Enumerates integer configuration choices.
+ *
+ * Determines a list of suggested values for an integer configuration item.
+ * \param values pointer to a table of integer values [OUT]
+ * \param texts pointer to a table of descriptions strings [OUT]
+ * \return number of choices, or -1 on error
+ * \note the caller is responsible for calling free() on all descriptions and
+ * on both tables. In case of error, both pointers are set to NULL.
+ */
 VLC_API ssize_t config_GetIntChoices(vlc_object_t *, const char *,
                                      int64_t **, char ***) VLC_USED;
+
+/**
+ * Determines a list of suggested values for a string configuration item.
+ * \param values pointer to a table of value strings [OUT]
+ * \param texts pointer to a table of descriptions strings [OUT]
+ * \return number of choices, or -1 on error
+ * \note the caller is responsible for calling free() on all values, on all
+ * descriptions and on both tables.
+ * In case of error, both pointers are set to NULL.
+ */
 VLC_API ssize_t config_GetPszChoices(vlc_object_t *, const char *,
                                      char ***, char ***) VLC_USED;
 
 VLC_API int config_SaveConfigFile( vlc_object_t * );
 #define config_SaveConfigFile(a) config_SaveConfigFile(VLC_OBJECT(a))
 
+/**
+ * Resets the configuration.
+ *
+ * This function resets all configuration items to their respective
+ * compile-time default value.
+ */
 VLC_API void config_ResetAll( vlc_object_t * );
 #define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
-VLC_API module_config_t * config_FindConfig(const char *) VLC_USED;
+/**
+ * Looks up a configuration item.
+ *
+ * This function looks for the internal representation of a configuration item.
+ * Where possible, this should be avoided in favor of more specific function
+ * calls.
+ *
+ * \param name Configuration item name
+ * \return The internal structure, or NULL if not found.
+ */
+VLC_API module_config_t *config_FindConfig(const char *name) VLC_USED;
 
 /**
  * Gets the arch-independent installation directory.
@@ -259,5 +417,7 @@ VLC_API char * config_StringEscape( const char *psz_string ) VLC_USED VLC_MALLOC
 # ifdef __cplusplus
 }
 # endif
+
+/** @} */
 
 #endif /* _VLC_CONFIGURATION_H */
