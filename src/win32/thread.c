@@ -196,6 +196,22 @@ void vlc_sem_wait (vlc_sem_t *sem)
 }
 #endif
 
+/*** One-time initialization ***/
+static BOOL CALLBACK vlc_once_callback(INIT_ONCE *once, void *parm, void **ctx)
+{
+    void (*cb)(void) = parm;
+
+    cb();
+    (void) once;
+    (void) ctx;
+    return TRUE;
+}
+
+void vlc_once(vlc_once_t *once, void (*cb)(void))
+{
+    InitOnceExecuteOnce(once, vlc_once_callback, cb, NULL);
+}
+
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
 {

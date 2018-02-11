@@ -369,6 +369,12 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
     VLC_THREAD_ASSERT ("releasing R/W lock");
 }
 
+void vlc_once(vlc_once_t *once, void (*cb)(void))
+{
+    int val = pthread_once(once, cb);
+    VLC_THREAD_ASSERT("initializing once");
+}
+
 int vlc_threadvar_create (vlc_threadvar_t *key, void (*destr) (void *))
 {
     return pthread_key_create (key, destr);
