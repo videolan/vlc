@@ -204,7 +204,7 @@ static int vlc_h2_stream_error(void *ctx, uint_fast32_t id, uint_fast32_t code)
 
 static int vlc_h2_stream_reset(void *ctx, uint_fast32_t code)
 {
-    assert(ctx = &stream_cookie);
+    assert(ctx == &stream_cookie);
     assert(code == VLC_H2_CANCEL);
     return 0;
 }
