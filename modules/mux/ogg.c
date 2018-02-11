@@ -278,7 +278,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    ogg_stream_t *p_stream;
 
     msg_Info( p_mux, "Close" );
 
@@ -290,10 +289,12 @@ static void Close( vlc_object_t * p_this )
         /* Remove deleted logical streams */
         for(int i = 0; i < p_sys->i_del_streams; i++ )
         {
-            OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] );
-            free( p_sys->pp_del_streams[i]->p_oggds_header );
-            free( p_sys->pp_del_streams[i]->skeleton.p_index );
-            free( p_sys->pp_del_streams[i] );
+            ogg_stream_t *p_stream = p_sys->pp_del_streams[i];
+
+            OggCreateStreamFooter( p_mux, p_stream );
+            free( p_stream->p_oggds_header );
+            free( p_stream->skeleton.p_index );
+            free( p_stream );
         }
         free( p_sys->pp_del_streams );
         p_sys->i_streams -= p_sys->i_del_streams;
