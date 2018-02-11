@@ -443,9 +443,12 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
     else           return a;
 }
 
-
-#ifndef __cplusplus
-# ifdef __GNUC__
+/**
+ * \defgroup bitops Bit operations
+ * @{
+ */
+#ifdef __GNUC__
+# ifndef __cplusplus
 /**
  * Count leading zeroes
  *
@@ -461,7 +464,34 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
         unsigned long: __builtin_clzl(x), \
         unsigned long long: __builtin_clzll(x))
 
+/**
+ * Count trailing zeroes
+ */
+#  define ctz(x) \
+    _Generic((x), \
+        unsigned char: __builtin_ctz(x), \
+        unsigned short: __builtin_ctz(x), \
+        unsigned: __builtin_ctz(x), \
+        unsigned long: __builtin_ctzl(x), \
+        unsigned long long: __builtin_ctzll(x))
 # else
+VLC_USED static inline int ctz(unsigned x)
+{
+    return __builtin_ctz(x);
+}
+
+VLC_USED static inline int ctz(unsigned long x)
+{
+    return __builtin_ctzl(x);
+}
+
+VLC_USED static inline int ctz(unsigned long long x)
+{
+    return __builtin_ctzll(x);
+}
+# endif
+#else /* __GNUC__ */
+# ifndef __cplusplus
 VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
 {
     int i = maxbits;
@@ -483,15 +513,9 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
         unsigned long: clzbits(x, long), \
         unsigned long long: clzbits(x, long long))
 # endif
-#endif
 
-/** Count trailing zeroes */
-VLC_USED
-static inline unsigned (ctz)(unsigned x)
+VLC_USED static inline int ctz(unsigned long long x)
 {
-#ifdef __GNUC__
-    return __builtin_ctz (x);
-#else
     unsigned i = sizeof (x) * 8;
 
     while (x)
@@ -500,8 +524,8 @@ static inline unsigned (ctz)(unsigned x)
         i--;
     }
     return i;
-#endif
 }
+#endif /* __GNUC__ */
 
 /** Bit weight */
 VLC_USED
@@ -596,6 +620,7 @@ static inline uint64_t (bswap64)(uint64_t x)
          | ((x & 0xFF00000000000000ULL) >> 56);
 #endif
 }
+/** @} */
 
 /* Integer overflow */
 static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
