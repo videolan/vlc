@@ -21,6 +21,7 @@ endif
 
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(UNPACK)
+	$(APPLY) $(SRC)/libdsm/0001-pkg-config-don-t-hardcode-liconv.patch
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
