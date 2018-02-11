@@ -360,9 +360,9 @@ static int vnc_connect( filter_t *p_filter )
 
     msg_Dbg( p_filter, "Server version is %s", pv );
 
-    strncpy(pv, "RFB 003.003\n", sz_rfbProtocolVersionMsg);
+    static const char version[sz_rfbProtocolVersionMsg] = "RFB 003.003\n";
 
-    if( !write_exact(p_filter, fd, pv, sz_rfbProtocolVersionMsg) )
+    if( !write_exact(p_filter, fd, version, sz_rfbProtocolVersionMsg) )
     {
         msg_Err( p_filter, "Could not write version message" );
         goto error;
