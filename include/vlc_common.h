@@ -109,7 +109,7 @@
 
 
 /* Branch prediction */
-#ifdef __GNUC__
+#if defined (__GNUC__) || defined (__clang__)
 # define likely(p)     __builtin_expect(!!(p), 1)
 # define unlikely(p)   __builtin_expect(!!(p), 0)
 # define unreachable() __builtin_unreachable()
