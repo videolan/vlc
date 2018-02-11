@@ -721,15 +721,9 @@ static void DecodeWSS( demux_t *p_demux )
     {
         unsigned int i_old_aspect = p_sys->i_aspect;
         uint8_t *p = p_sliced[0].data;
-        int i_aspect, i_parity;
+        int i_aspect = p[0] & 7;
 
-        i_aspect = p[0] & 15;
-        i_parity = i_aspect;
-        i_parity ^= i_parity >> 2;
-        i_parity ^= i_parity >> 1;
-        i_aspect &= 7;
-
-        if ( !(i_parity & 1) )
+        if ( !parity(p[0] & 15) )
             msg_Warn( p_demux, "WSS parity error" );
         else if ( i_aspect == 7 )
             p_sys->i_aspect = 16 * VOUT_ASPECT_FACTOR / 9;
