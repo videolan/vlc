@@ -766,7 +766,6 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     assert( h );
     ts_pid_t *p_pid = (ts_pid_t *) p_pid_cbdata;
     demux_t *p_demux = (demux_t *) h->p_sys;
-    demux_sys_t *p_sys = p_demux->p_sys;
 #if 0
     msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
              i_table_id, i_table_id, i_extension, i_extension );
