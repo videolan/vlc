@@ -714,8 +714,6 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                                      void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
                                      void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
-    FT_BBox prevbox;
-
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
         FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
