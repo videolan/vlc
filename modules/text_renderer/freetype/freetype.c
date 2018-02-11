@@ -111,9 +111,6 @@ static void Destroy( vlc_object_t * );
 #define TEXT_DIRECTION_LONGTEXT N_("Paragraph base direction for the Unicode bi-directional algorithm.")
 
 
-static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
-static const char *const ppsz_sizes_text[] = {
-    N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
 #define YUVP_TEXT N_("Use YUVP renderer")
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
