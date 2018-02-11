@@ -408,10 +408,12 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 #include "vlc_mtime.h"
 #include "vlc_threads.h"
 
-/*****************************************************************************
- * Macros and inline functions
- *****************************************************************************/
-
+/**
+ * \defgroup intops Integer operations
+ *
+ * Common integer functions.
+ * @{
+ */
 /* __MAX and __MIN: self explanatory */
 #ifndef __MAX
 #   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
@@ -423,6 +425,7 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 /* clip v in [min, max] */
 #define VLC_CLIP(v, min, max)    __MIN(__MAX((v), (min)), (max))
 
+/** Greatest common divisor */
 VLC_USED
 static inline int64_t GCD ( int64_t a, int64_t b )
 {
@@ -449,11 +452,6 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
  */
 #ifdef __GNUC__
 # ifndef __cplusplus
-/**
- * Count leading zeroes
- *
- * (assumes CHAR_BIT==8)
- */
 #  define clz(x) \
     _Generic((x), \
         unsigned char: (__builtin_clz(x) \
@@ -464,9 +462,6 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
         unsigned long: __builtin_clzl(x), \
         unsigned long long: __builtin_clzll(x))
 
-/**
- * Count trailing zeroes
- */
 #  define ctz(x) \
     _Generic((x), \
         unsigned char: __builtin_ctz(x), \
@@ -505,6 +500,17 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
 }
 #  define clztype(x, type) clzbits(x, sizeof (type) * 8)
 
+/**
+ * Count leading zeroes
+ *
+ * This function counts the number of consecutive zero (clear) bits
+ * down from the highest order bit in an unsigned integer.
+ *
+ * \param x a non-zero integer
+ * \note This macro assumes that CHAR_BIT equals 8.
+ * \warning By definition, the result depends on the (width of the) type of x.
+ * \return The number of leading zero bits in x.
+ */
 #  define clz(x) \
     _Generic((x), \
         unsigned char: clzbits(x, char), \
@@ -514,6 +520,16 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
         unsigned long long: clzbits(x, long long))
 # endif
 
+/**
+ * Count trailing zeroes
+ *
+ * This function counts the number of consecutive zero bits
+ * up from the lowest order bit in an unsigned integer.
+ *
+ * \param x a non-zero integer
+ * \note This function assumes that CHAR_BIT equals 8.
+ * \return The number of trailing zero bits in x.
+ */
 VLC_USED static inline int ctz(unsigned long long x)
 {
     unsigned i = sizeof (x) * 8;
@@ -527,7 +543,13 @@ VLC_USED static inline int ctz(unsigned long long x)
 }
 #endif /* __GNUC__ */
 
-/** Bit weight */
+/**
+ * Bit weight / population count
+ *
+ * This function counts the number of non-zero bits in an integer.
+ *
+ * \return The count of non-zero bits.
+ */
 VLC_USED
 static inline unsigned (popcount)(unsigned x)
 {
@@ -561,6 +583,13 @@ static inline int (popcountll)(unsigned long long x)
 #endif
 }
 
+/**
+ * Parity
+ *
+ * This function determines the parity of an integer.
+ * \retval 0 if x has an even number of set bits.
+ * \retval 1 if x has an odd number of set bits.
+ */
 VLC_USED
 static inline unsigned (parity)(unsigned x)
 {
@@ -622,7 +651,10 @@ static inline uint64_t (bswap64)(uint64_t x)
 }
 /** @} */
 
-/* Integer overflow */
+/**
+ * \defgroup overflow Overflowing arithmetic
+ * @{
+ */
 static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
 {
 #if VLC_GCC_VERSION(5,0) || defined(__clang__)
@@ -656,6 +688,19 @@ static inline bool uaddll_overflow(unsigned long long a, unsigned long long b,
 }
 
 #ifndef __cplusplus
+/**
+ * Overflowing addition
+ *
+ * Converts \p a and \p b to the type of \p *r.
+ * Then computes the sum of both conversions while checking for overflow.
+ * Finally stores the result in \p *r.
+ *
+ * \param a an integer
+ * \param b an integer
+ * \param r a pointer to an integer [OUT]
+ * \retval false The sum did not overflow.
+ * \retval true The sum overflowed.
+ */
 # define add_overflow(a,b,r) \
     _Generic(*(r), \
         unsigned: uadd_overflow(a, b, (unsigned *)(r)), \
@@ -717,6 +762,19 @@ static inline bool umulll_overflow(unsigned long long a, unsigned long long b,
 }
 
 #ifndef __cplusplus
+/**
+ * Overflowing multiplication
+ *
+ * Converts \p a and \p b to the type of \p *r.
+ * Then computes the product of both conversions while checking for overflow.
+ * Finally stores the result in \p *r.
+ *
+ * \param a an integer
+ * \param b an integer
+ * \param r a pointer to an integer [OUT]
+ * \retval false The product did not overflow.
+ * \retval true The product overflowed.
+ */
 #define mul_overflow(a,b,r) \
     _Generic(*(r), \
         unsigned: umul_overflow(a, b, (unsigned *)(r)), \
@@ -740,6 +798,8 @@ static inline bool mul_overflow(unsigned long long a, unsigned long long b,
     return umulll_overflow(a, b, res);
 }
 #endif
+/** @} */
+/** @} */
 
 /* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
