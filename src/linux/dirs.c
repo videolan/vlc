@@ -111,20 +111,22 @@ char *config_GetDataDir (void)
     if (libdir == NULL)
         return NULL; /* OOM */
 
+    /* Look for common prefix between lib and data directories. */
+    size_t prefix_len = 0;
+    while (PKGLIBDIR[prefix_len] == PKGDATADIR[prefix_len])
+    {
+        if (PKGLIBDIR[prefix_len] == '\0')
+            return libdir; /* corner case: directories are identical */
+        prefix_len++;
+    }
+
     char *datadir = NULL;
 
-    /* There are no clean ways to do this, are there?
-     * Due to multilibs, we cannot simply append ../share/. */
-    char *p = strstr (libdir, "/lib/");
+    char *p = strstr(libdir, PKGLIBDIR + prefix_len);
     if (p != NULL)
     {
-        char *p2;
-        /* Deal with nested "lib" directories. Grmbl. */
-        while ((p2 = strstr (p + 4, "/lib/")) != NULL)
-            p = p2;
-        *p = '\0';
-
-        if (unlikely(asprintf (&datadir, "%s/share/"PACKAGE, libdir) == -1))
+        if (unlikely(asprintf(&datadir, "%.*s%s", (int)(p - libdir), libdir,
+                              PKGDATADIR + prefix_len) == -1))
             datadir = NULL;
     }
     free (libdir);
