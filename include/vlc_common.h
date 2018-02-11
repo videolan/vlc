@@ -483,6 +483,14 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
         unsigned long long: __builtin_popcountll(x), \
           signed long long: __builtin_popcountll(x))
 
+#  define parity(x) \
+    _Generic((x), \
+        unsigned char: __builtin_parity(x), \
+        unsigned short: __builtin_parity(x), \
+        unsigned: __builtin_parity(x), \
+        unsigned long: __builtin_parityl(x), \
+        unsigned long long: __builtin_parityll(x))
+
 # else
 VLC_USED static inline int ctz(unsigned x)
 {
@@ -614,8 +622,6 @@ VLC_USED static inline int popcount(unsigned long long x)
           signed long long: popcount(x))
 #endif
 
-#endif /* __GNUC__ */
-
 /**
  * Parity
  *
@@ -623,17 +629,14 @@ VLC_USED static inline int popcount(unsigned long long x)
  * \retval 0 if x has an even number of set bits.
  * \retval 1 if x has an odd number of set bits.
  */
-VLC_USED
-static inline unsigned (parity)(unsigned x)
+VLC_USED static inline int parity(unsigned long long x)
 {
-#ifdef __GNUC__
-    return __builtin_parity (x);
-#else
     for (unsigned i = 4 * sizeof (x); i > 0; i /= 2)
         x ^= x >> i;
     return x & 1;
-#endif
 }
+
+#endif /* __GNUC__ */
 
 /** Byte swap (16 bits) */
 VLC_USED
