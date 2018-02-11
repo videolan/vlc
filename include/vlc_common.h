@@ -485,10 +485,6 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
 # endif
 #endif
 
-#define clz8(x)  clz((uint8_t)(x))
-#define clz16(x) clz((uint16_t)(x))
-#define clz32(x) clz((uint32_t)(x))
-
 /** Count trailing zeroes */
 VLC_USED
 static inline unsigned (ctz)(unsigned x)

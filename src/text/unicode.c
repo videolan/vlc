@@ -121,7 +121,7 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
     if (unlikely(c > 0xF4))
         return -1;
 
-    int charlen = clz8 (c ^ 0xFF);
+    int charlen = clz((unsigned char)(c ^ 0xFF));
     switch (charlen)
     {
         case 0: // 7-bit ASCII character -> short cut
