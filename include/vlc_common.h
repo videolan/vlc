@@ -570,7 +570,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
  * \defgroup bitops Bit operations
  * @{
  */
-#ifdef __GNUC__
+#if defined (__GNUC__) || defined (__clang__)
 # ifndef __cplusplus
 #  define clz(x) \
     _Generic((x), \
