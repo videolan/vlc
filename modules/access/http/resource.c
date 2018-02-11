@@ -256,7 +256,8 @@ char *vlc_http_res_get_redirect(struct vlc_http_resource *restrict res)
         char *url;
 
         /* HACK: Seems like an MMS server. Redirect to MMSH scheme. */
-        if (vlc_http_msg_get_token(res->response, "Pragma", "features") != NULL
+        const char *pragma = vlc_http_msg_get_header(res->response, "Pragma");
+        if (pragma != NULL && !vlc_ascii_strcasecmp(pragma, "features")
          && asprintf(&url, "mmsh://%s%s", res->authority, res->path) >= 0)
             return url;
 
