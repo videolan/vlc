@@ -765,9 +765,13 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (FAILED(D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
-                                 &vd->source, &sys->d3d_dev)))
+    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
+                                 &vd->source, &sys->d3d_dev);
+
+    if (FAILED(hr)) {
+        msg_Err( vd, "D3D9 Creation failed! (hr=0x%0lx)", hr);
         return VLC_EGENERIC;
+    }
 
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
     /* */
