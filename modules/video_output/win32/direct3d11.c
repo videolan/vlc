@@ -365,10 +365,6 @@ static const char* globPixelShaderDefault = "\
       %s;\
   }\
   \
-  inline float3 adjustPeakLuminance(float3 rgb) {\
-      %s;\
-  }\
-  \
   inline float3 adjustRange(float3 rgb) {\
       %s;\
   }\
@@ -392,7 +388,6 @@ static const char* globPixelShaderDefault = "\
     float3 rgb = (float3)rgba;\
     rgb = sourceToLinear(rgb);\
     rgb = toneMapping(rgb);\
-    rgb = adjustPeakLuminance(rgb);\
     rgb = linearToDisplay(rgb);\
     rgb = adjustRange(rgb);\
     return float4(rgb, saturate(opacity));\
@@ -1752,7 +1747,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     const char *psz_src_transform     = DEFAULT_NOOP;
     const char *psz_display_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
-    const char *psz_peak_luminance    = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
     char *psz_range = NULL;
 
@@ -1848,7 +1842,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                         /* HDR tone mapping */
                         psz_tone_mapping =
                             "static const float3 HABLE_DIV = hable(11.2);\
-                            rgb = hable(rgb) / HABLE_DIV;\
+                            rgb = hable(rgb * LuminanceScale) / HABLE_DIV;\
                             return rgb";
                     }
                 }
@@ -1875,11 +1869,6 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                 break;
         }
     }
-
-    if ( transfer == TRANSFER_FUNC_SMPTE_ST2084 &&
-         sys->display.colorspace->transfer != TRANSFER_FUNC_SMPTE_ST2084 )
-        /* the luminance may be dynamic */
-        psz_peak_luminance = "return rgb * LuminanceScale";
 
     int range_adjust = 0;
     if (sys->display.colorspace->b_full_range) {
@@ -1958,7 +1947,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
 
     char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
                           strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_peak_luminance) + strlen(psz_adjust_range));
+                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
@@ -1966,12 +1955,11 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         return E_OUTOFMEMORY;
     }
     sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_peak_luminance, psz_adjust_range, psz_sampler);
+            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
 #ifndef NDEBUG
     if (!IsRGBShader(format)) {
         msg_Dbg(vd,"psz_src_transform %s", psz_src_transform);
         msg_Dbg(vd,"psz_tone_mapping %s", psz_tone_mapping);
-        msg_Dbg(vd,"psz_peak_luminance %s", psz_peak_luminance);
         msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
         msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
         msg_Dbg(vd,"psz_sampler %s", psz_sampler);
