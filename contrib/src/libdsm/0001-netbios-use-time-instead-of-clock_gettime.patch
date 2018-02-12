@@ -1,0 +1,68 @@
+From 9bebdc7ba3da352269ff5b92a2eb568756a3105d Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Mon, 12 Feb 2018 10:46:51 +0100
+Subject: [PATCH] netbios: use time() instead of clock_gettime()
+
+We don't need more than second precisions and this function is available on
+more platforms.
+---
+ src/netbios_ns.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/netbios_ns.c b/src/netbios_ns.c
+index ff37c55..89992ee 100644
+--- a/src/netbios_ns.c
++++ b/src/netbios_ns.c
+@@ -831,7 +831,6 @@ static void *netbios_ns_discover_thread(void *opaque)
+     netbios_ns *ns = (netbios_ns *) opaque;
+     while (true)
+     {
+-        struct timespec tp;
+         const int remove_timeout = 5 * ns->discover_broadcast_timeout;
+         netbios_ns_entry  *entry, *entry_next;
+ 
+@@ -840,12 +839,12 @@ static void *netbios_ns_discover_thread(void *opaque)
+ 
+         // check if cached entries timeout, the timeout value is 5 times the
+         // broadcast timeout.
+-        clock_gettime(CLOCK_REALTIME, &tp);
++        time_t now = time(NULL);
+         for (entry = TAILQ_FIRST(&ns->entry_queue);
+              entry != NULL; entry = entry_next)
+         {
+             entry_next = TAILQ_NEXT(entry, next);
+-            if (tp.tv_sec - entry->last_time_seen > remove_timeout)
++            if (now - entry->last_time_seen > remove_timeout)
+             {
+                 if (entry->flag & NS_ENTRY_FLAG_VALID_NAME)
+                 {
+@@ -886,7 +885,7 @@ static void *netbios_ns_discover_thread(void *opaque)
+             if (res == 0)
+                 break;
+ 
+-            clock_gettime(CLOCK_REALTIME, &tp);
++            time_t now = time(NULL);
+ 
+             if (name_query.type == NAME_QUERY_TYPE_NB)
+             {
+@@ -899,7 +898,7 @@ static void *netbios_ns_discover_thread(void *opaque)
+                     if (!entry)
+                         return NULL;
+                 }
+-                entry->last_time_seen = tp.tv_sec;
++                entry->last_time_seen = now;
+ 
+                 // if entry is already valid, don't send NBSTAT query
+                 if (entry->flag & NS_ENTRY_FLAG_VALID_NAME)
+@@ -922,7 +921,7 @@ static void *netbios_ns_discover_thread(void *opaque)
+                 if (!entry)
+                     continue;
+ 
+-                entry->last_time_seen = tp.tv_sec;
++                entry->last_time_seen = now;
+ 
+                 send_callback = !(entry->flag & NS_ENTRY_FLAG_VALID_NAME);
+ 
+-- 
+2.11.0
+
