@@ -956,14 +956,14 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdateBackBuffer(vd);
 
-    UpdatePicQuadPosition(vd);
-
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
     {
         WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
     }
 #endif
+
+    UpdatePicQuadPosition(vd);
 
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
                        vd->fmt.projection_mode, vd->fmt.orientation);
