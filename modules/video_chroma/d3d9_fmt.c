@@ -123,9 +123,10 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
                                      &out->pp, &out->dev);
 
     if (SUCCEEDED(hr))
-    {
         out->owner = true;
-    }
+    else
+        msg_Err(o, "failed to create the D3D9%s device %d/%d flags 0x%x. (hr=0x%lX)",
+                   hd3d->use_ex?"Ex":"", AdapterToUse, DeviceType, creationFlags, hr);
     return hr;
 }
 
