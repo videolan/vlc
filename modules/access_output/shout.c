@@ -180,6 +180,15 @@ static int Open( vlc_object_t *p_this )
     if( url.i_port <= 0 )
         url.i_port = 8000;
 
+    if( url.psz_host == NULL )
+    {   /* Backward compatibility with bind@path syntax */
+        vlc_UrlClean( &url );
+        if( unlikely(asprintf( &psz_url, "//%s", p_access->psz_path ) == -1) )
+            return VLC_ENOMEM;
+        vlc_UrlParse( &url, psz_url );
+        free( psz_url );
+    }
+
     p_sys = p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) );
     if( !p_sys )
     {
