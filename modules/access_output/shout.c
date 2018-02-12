@@ -176,13 +176,6 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    if( !p_access->psz_path )
-    {
-        msg_Err( p_access,
-                 "please specify url=user:password@host:port/mountpoint" );
-        return VLC_EGENERIC;
-    }
-
     vlc_UrlParse( &url , p_access->psz_path );
     if( url.i_port <= 0 )
         url.i_port = 8000;
