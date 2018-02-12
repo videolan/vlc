@@ -943,7 +943,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
 
 void TimeLabel::setRemainingTime( bool remainingTime )
 {
-    b_remainingTime = remainingTime;
+    if (displayType != TimeLabel::Elapsed)
+        b_remainingTime = remainingTime;
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
