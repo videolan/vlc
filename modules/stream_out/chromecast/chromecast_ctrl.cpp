@@ -138,7 +138,12 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     // Start the Chromecast event thread.
     if (vlc_clone(&m_chromecastThread, ChromecastThread, this,
                   VLC_THREAD_PRIORITY_LOW))
+    {
+        vlc_cond_destroy( &m_stateChangedCond );
+        vlc_cond_destroy( &m_pace_cond );
+        var_SetAddress( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME, NULL );
         throw std::runtime_error( "error creating cc thread" );
+    }
 }
 
 intf_sys_t::~intf_sys_t()
