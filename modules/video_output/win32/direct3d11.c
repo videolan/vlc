@@ -2552,6 +2552,9 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
+    if (unlikely(quad->pVertexBuffer == NULL))
+        return false;
+
     /* create the vertices */
     hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (FAILED(hr)) {
