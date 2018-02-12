@@ -591,6 +591,13 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
+    if (SetupQuad( vd, &surface_fmt, &sys->picQuad, &sys->sys.rect_src_clipped,
+                   sys->picQuadConfig, sys->picQuadPixelShader,
+                   surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
+        msg_Err(vd, "Could not Create the main quad picture.");
+        return NULL;
+    }
+
     if (!vd->info.is_slow) {
         HRESULT           hr;
         ID3D10Multithread *pMultithread;
@@ -601,7 +608,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    if (sys->picQuadConfig->formatTexture != DXGI_FORMAT_UNKNOWN)
+    if (sys->picQuadConfig->formatTexture == DXGI_FORMAT_UNKNOWN)
+        sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
+    else
     {
         if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->picQuadConfig, &surface_fmt, pool_size, textures))
             goto error;
@@ -638,31 +647,19 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             /* each picture_t holds a ref to the context and release it on Destroy */
             ID3D11DeviceContext_AddRef(picsys->context);
         }
-    }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
+        if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
 #endif
-    {
-        for (picture_count = 0; picture_count < pool_size; picture_count++) {
-            if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
-                                   pictures[picture_count]->p_sys->texture, picture_count,
-                                   pictures[picture_count]->p_sys->resourceView))
-                goto error;
+        {
+            for (picture_count = 0; picture_count < pool_size; picture_count++) {
+                if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
+                                       pictures[picture_count]->p_sys->texture, picture_count,
+                                       pictures[picture_count]->p_sys->resourceView))
+                    goto error;
+            }
         }
-    }
 
-    if (SetupQuad( vd, &surface_fmt, &sys->picQuad, &sys->sys.rect_src_clipped,
-                   sys->picQuadConfig, sys->picQuadPixelShader,
-                   surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
-        msg_Err(vd, "Could not Create the main quad picture.");
-        return NULL;
-    }
-
-    if (sys->picQuadConfig->formatTexture == DXGI_FORMAT_UNKNOWN)
-        sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
-    else
-    {
         picture_pool_configuration_t pool_cfg = {
             .picture       = pictures,
             .picture_count = pool_size,
