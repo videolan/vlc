@@ -160,7 +160,7 @@ struct intf_sys_t
         Stop,
     };
     intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr,
-               int device_port, vlc_interrupt_t *, httpd_host_t *);
+               int device_port, httpd_host_t *);
     ~intf_sys_t();
 
     bool isFinishedPlaying();

@@ -1151,10 +1151,6 @@ static int Open(vlc_object_t *p_this)
     int i_device_port;
     std::stringstream ss;
 
-    vlc_interrupt_t *p_interrupt = vlc_interrupt_create();
-    if (unlikely(p_interrupt == NULL))
-        goto error;
-
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
 
     psz_ip = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "ip");
@@ -1178,7 +1174,7 @@ static int Open(vlc_object_t *p_this)
     try
     {
         p_intf = new intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port,
-                                 p_interrupt, httpd_host );
+                                 httpd_host );
     }
     catch (const std::runtime_error& err )
     {
@@ -1190,8 +1186,6 @@ static int Open(vlc_object_t *p_this)
         p_intf = NULL;
         goto error;
     }
-
-    p_interrupt = NULL;
 
     psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
     if (psz_mux == NULL)
@@ -1244,8 +1238,6 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    if (p_interrupt)
-        vlc_interrupt_destroy(p_interrupt);
     delete p_intf;
     if (httpd_host)
         httpd_HostDelete(httpd_host);
