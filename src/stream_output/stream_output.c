@@ -257,6 +257,8 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
                                    psz_access );
     free( psz_next );
     p_access->psz_path   = strdup( psz_name ? psz_name : "" );
+    if( unlikely(p_access->psz_path == NULL) )
+        goto error;
     p_access->p_sys      = NULL;
     p_access->pf_seek    = NULL;
     p_access->pf_read    = NULL;
@@ -269,8 +271,9 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
 
     if( !p_access->p_module )
     {
-        free( p_access->psz_access );
         free( p_access->psz_path );
+error:
+        free( p_access->psz_access );
         vlc_object_release( p_access );
         return( NULL );
     }
