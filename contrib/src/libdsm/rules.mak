@@ -23,6 +23,7 @@ endif
 
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(UNPACK)
+	$(APPLY) $(SRC)/libdsm/0001-netbios-use-time-instead-of-clock_gettime.patch
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
