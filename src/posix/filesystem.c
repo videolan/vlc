@@ -56,7 +56,7 @@ int vlc_open (const char *filename, int flags, ...)
     va_list ap;
 
     va_start (ap, flags);
-    if (flags & (O_CREAT|O_TMPFILE))
+    if (flags & O_CREAT)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
@@ -76,7 +76,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     va_list ap;
 
     va_start (ap, flags);
-    if (flags & (O_CREAT|O_TMPFILE))
+    if (flags & O_CREAT)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
