@@ -87,7 +87,7 @@ static const char* StateToStr( States s )
  * intf_sys_t: class definition
  *****************************************************************************/
 intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr,
-                       int device_port, vlc_interrupt_t *p_interrupt, httpd_host_t *httpd_host)
+                       int device_port, httpd_host_t *httpd_host)
  : m_module(p_this)
  , m_streaming_port(port)
  , m_mediaSessionId( 0 )
@@ -103,7 +103,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_eof( false )
  , m_pace( false )
  , m_meta( NULL )
- , m_ctl_thread_interrupt(p_interrupt)
  , m_httpd_host(httpd_host)
  , m_httpd_file(NULL)
  , m_art_url(NULL)
@@ -113,6 +112,10 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_length( VLC_TS_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
+    m_ctl_thread_interrupt = vlc_interrupt_create();
+    if( unlikely(m_ctl_thread_interrupt == NULL) )
+        throw std::runtime_error( "error creating interrupt context" );
+
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
     vlc_cond_init( &m_pace_cond );
@@ -139,6 +142,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     if (vlc_clone(&m_chromecastThread, ChromecastThread, this,
                   VLC_THREAD_PRIORITY_LOW))
     {
+        vlc_interrupt_destroy( m_ctl_thread_interrupt );
         vlc_cond_destroy( &m_stateChangedCond );
         vlc_cond_destroy( &m_pace_cond );
         var_SetAddress( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME, NULL );
