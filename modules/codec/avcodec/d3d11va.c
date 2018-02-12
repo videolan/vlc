@@ -847,7 +847,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
             if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
             {
-                ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture};
+                ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
                 AllocateShaderView(VLC_OBJECT(va), sys->d3d_dev.d3ddevice, textureFmt, textures, surface_idx,
                                    &sys->resourceView[surface_idx * D3D11_MAX_SHADER_VIEW]);
             }
