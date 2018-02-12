@@ -428,6 +428,7 @@ if HAVE_LINUX
 libvlccore_la_SOURCES += \
 	linux/cpu.c \
 	linux/dirs.c \
+	linux/filesystem.c \
 	linux/thread.c
 endif
 if HAVE_LIBANL

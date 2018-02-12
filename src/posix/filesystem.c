@@ -36,16 +36,12 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #ifndef HAVE_LSTAT
 # define lstat(a, b) stat(a, b)
 #endif
 #include <dirent.h>
 #include <sys/socket.h>
-#ifndef O_TMPFILE
-# define O_TMPFILE 0
-#endif
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
@@ -110,29 +106,10 @@ int vlc_mkstemp (char *template)
 #endif
 }
 
-int vlc_memfd (void)
+VLC_WEAK int vlc_memfd(void)
 {
-    int fd;
-
-#ifdef HAVE_MEMFD_CREATE
-    fd = memfd_create(PACKAGE_NAME"-memfd", MFD_CLOEXEC | MFD_ALLOW_SEALING);
-    if (fd != -1 || errno != ENOSYS)
-        return fd;
-#endif
-
-#ifdef O_TMPFILE
-    fd = vlc_open ("/tmp", O_RDWR|O_TMPFILE, S_IRUSR|S_IWUSR);
-    if (fd != -1)
-        return fd;
-    /* ENOENT means either /tmp is missing (!) or the kernel does not support
-     * O_TMPFILE. EISDIR means /tmp exists but the kernel does not support
-     * O_TMPFILE. EOPNOTSUPP means the kernel supports O_TMPFILE but the /tmp
-     * filesystem does not. Do not fallback on other errors. */
-    if (errno != ENOENT && errno != EISDIR && errno != EOPNOTSUPP)
-        return -1;
-#endif
-
     char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
+    int fd;
 
     fd = vlc_mkstemp (bufpath);
     if (fd != -1)
