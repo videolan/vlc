@@ -556,12 +556,10 @@ vlc_thread_t vlc_thread_self (void)
     return thread;
 }
 
-#if !defined (__linux__)
-unsigned long vlc_thread_id (void)
+VLC_WEAK unsigned long vlc_thread_id(void)
 {
      return -1;
 }
-#endif
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {

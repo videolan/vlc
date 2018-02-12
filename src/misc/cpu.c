@@ -37,7 +37,6 @@
 
 #include <assert.h>
 
-#ifndef __linux__
 #include <sys/types.h>
 #ifndef _WIN32
 #include <unistd.h>
@@ -266,13 +265,12 @@ out:
 /**
  * Retrieves pre-computed CPU capability flags
  */
-unsigned vlc_CPU (void)
+VLC_WEAK unsigned vlc_CPU(void)
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
     vlc_once(&once, vlc_CPU_init);
     return cpu_flags;
 }
-#endif
 
 void vlc_CPU_dump (vlc_object_t *obj)
 {

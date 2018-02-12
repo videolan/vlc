@@ -35,13 +35,12 @@
 #include <assert.h>
 #include <limits.h>
 
-#if !defined (__linux__)
 /**
  * Determines the shared data directory
  *
  * @return a nul-terminated string or NULL. Use free() to release it.
  */
-char *config_GetDataDir (void)
+VLC_WEAK char *config_GetDataDir(void)
 {
     const char *path = getenv ("VLC_DATA_PATH");
     return strdup ((path != NULL) ? path : PKGDATADIR);
@@ -52,12 +51,11 @@ char *config_GetDataDir (void)
  *
  * @return a string (always succeeds).
  */
-char *config_GetLibDir (void)
+VLC_WEAK char *config_GetLibDir(void)
 {
     const char *path = getenv("VLC_LIB_PATH");
     return strdup((path != NULL) ? path : PKGLIBDIR);
 }
-#endif
 
 static char *config_GetHomeDir (void)
 {
