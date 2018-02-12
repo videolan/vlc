@@ -185,6 +185,18 @@
 # define VLC_USED
 #endif
 
+#ifdef __ELF__
+# define VLC_WEAK __attribute__((weak))
+#else
+/**
+ * Weak symbol annotation
+ *
+ * Use this macro before an external identifier \b definition to mark it as a
+ * weak symbol. A weak symbol can be overriden by another symbol of the same
+ * name at the link time.
+ */
+# define VLC_WEAK
+#endif
 
 /* Branch prediction */
 #if defined (__GNUC__) || defined (__clang__)

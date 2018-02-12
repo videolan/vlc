@@ -173,11 +173,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
 }
 
 #if defined(__ELF__) || !HAVE_DYNAMIC_PLUGINS
-# ifdef __GNUC__
-__attribute__((weak))
-# else
-#  pragma weak vlc_static_modules
-# endif
+VLC_WEAK
 extern vlc_plugin_cb vlc_static_modules[];
 
 static void module_InitStaticModules(void)
