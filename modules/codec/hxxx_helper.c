@@ -923,7 +923,7 @@ hxxx_helper_get_current_profile_level(const struct hxxx_helper *hh,
     else if(hh->i_codec == VLC_CODEC_HEVC)
     {
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
-        if (hsps &&
+        if (hsps && hsps->hevc_sps &&
             hevc_get_sps_profile_tier_level(hsps->hevc_sps, p_profile, p_level))
             return VLC_SUCCESS;
     }
