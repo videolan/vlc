@@ -105,6 +105,7 @@ int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
         resviewDesc.Texture2DArray.MipLevels = -1;
         resviewDesc.Texture2DArray.ArraySize = 1;
         resviewDesc.Texture2DArray.FirstArraySlice = slice_index;
+        assert(slice_index < texDesc.ArraySize);
     }
     for (i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
