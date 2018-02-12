@@ -1131,7 +1131,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     int rv = VLC_SUCCESS;
     FT_BBox bbox;
     int i_max_face_height;
-    line_desc_t *p_lines = NULL;
 
     unsigned i_max_width = p_filter->fmt_out.video.i_visible_width;
     if( p_region_in->i_max_width > 0 && (unsigned) p_region_in->i_max_width < i_max_width )
@@ -1154,7 +1153,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     text_block.i_max_width = i_max_width;
     text_block.i_max_height = i_max_height;
-    rv = LayoutTextBlock( p_filter, &text_block, &p_lines, &bbox, &i_max_face_height );
+    rv = LayoutTextBlock( p_filter, &text_block, &text_block.p_laid, &bbox, &i_max_face_height );
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
@@ -1243,24 +1242,24 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         {
             rv = VLC_EGENERIC;
             if( *p_chroma == VLC_CODEC_YUVP )
-                rv = RenderYUVP( p_filter, p_region_out, p_lines,
+                rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox );
             else if( *p_chroma == VLC_CODEC_YUVA )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_YUVA,
                                  YUVFromRGB,
                                  FillYUVAPicture,
                                  BlendYUVAPixel );
             else if( *p_chroma == VLC_CODEC_RGBA )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_RGBA,
                                  RGBFromRGB,
                                  FillRGBAPicture,
                                  BlendRGBAPixel );
             else if( *p_chroma == VLC_CODEC_ARGB )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines,
+                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_ARGB,
                                  RGBFromRGB,
@@ -1278,7 +1277,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             var_SetBool( p_filter, "text-rerender", true );
     }
 
-    FreeLines( p_lines );
+    FreeLines( text_block.p_laid );
 
     free( text_block.p_uchars );
     FreeStylesArray( text_block.pp_styles, text_block.i_count );

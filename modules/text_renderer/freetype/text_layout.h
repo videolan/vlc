@@ -78,6 +78,8 @@ typedef struct
     bool b_grid;                /*!< true for balanced wrapped lines */
     unsigned i_max_width;       /*!< maximum available width to layout text */
     unsigned i_max_height;      /*!< maximum available height to layout text */
+
+    line_desc_t *p_laid;
 } layout_text_block_t;
 
 /**
