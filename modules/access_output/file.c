@@ -236,12 +236,6 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    if( !p_access->psz_path )
-    {
-        msg_Err( p_access, "no file name specified" );
-        return VLC_EGENERIC;
-    }
-
     bool overwrite = var_GetBool (p_access, SOUT_CFG_PREFIX"overwrite");
     bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
 
