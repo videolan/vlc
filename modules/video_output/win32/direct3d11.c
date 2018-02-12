@@ -2943,24 +2943,20 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         picture_t *quad_picture = (*region)[i];
         if (quad_picture == NULL) {
-            ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
             d3d_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->d3dregion_format, &r->fmt, 1, textures)) {
+            if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->d3dregion_format, &r->fmt, 1, d3dquad->picSys.texture)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
-                    if (textures[j])
-                        ID3D11Texture2D_Release(textures[j]);
+                    if (d3dquad->picSys.texture[j])
+                        ID3D11Texture2D_Release(d3dquad->picSys.texture[j]);
                 free(d3dquad);
                 continue;
             }
 
-            for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++) {
-                d3dquad->picSys.texture[plane] = textures[plane];
-            }
             if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->d3dregion_format,
                                    d3dquad->picSys.texture, 0,
                                    d3dquad->picSys.resourceView)) {
