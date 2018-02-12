@@ -121,7 +121,7 @@ static void Altivec_test (void)
  * Determines the CPU capabilities and stores them in cpu_flags.
  * The result can be retrieved with vlc_CPU().
  */
-void vlc_CPU_init (void)
+static void vlc_CPU_init(void)
 {
     uint32_t i_capabilities = 0;
 
