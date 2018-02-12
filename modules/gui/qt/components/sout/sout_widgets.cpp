@@ -464,7 +464,7 @@ QString ICEDestBox::getMRL( const QString& )
     m.option( "access", "shout" );
     m.option( "mux", "ogg" );
 
-    QString url = ICEPassEdit->text() + "@"
+    QString url = "//" + ICEPassEdit->text() + "@"
         + ICEEdit->text()
         + ":" + QString::number( ICEPort->value(), 10 )
         + "/" + ICEMountEdit->text();
