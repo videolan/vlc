@@ -37,9 +37,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef HAVE_LSTAT
-# define lstat(a, b) stat(a, b)
-#endif
 #include <dirent.h>
 #include <sys/socket.h>
 
