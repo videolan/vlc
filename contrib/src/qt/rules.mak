@@ -1,6 +1,6 @@
 # Qt
 
-QT_VERSION := 5.6.2
+QT_VERSION := 5.6.3
 QT_URL := https://download.qt.io/official_releases/qt/5.6/$(QT_VERSION)/submodules/qtbase-opensource-src-$(QT_VERSION).tar.xz
 
 ifdef HAVE_MACOSX
