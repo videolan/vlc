@@ -212,34 +212,46 @@ bool HTTPChunkSource::prepare(int i_redir)
     if(!connManager)
         return false;
 
-    if(!connection)
+    ConnectionParams connparams = params; /* can be changed on 301 */
+
+    while(i_redir++ < 3)
     {
-        connection = connManager->getConnection(params);
         if(!connection)
-            return false;
-    }
-
-    int i_ret = connection->request(params.getPath(), bytesRange);
-    if(i_ret != VLC_SUCCESS)
-    {
-        if(i_ret == VLC_ETIMEOUT && i_redir < 3)
         {
-            connection->setUsed(false);
-            connection = NULL;
-            return HTTPChunkSource::prepare(i_redir + 1);
+            connection = connManager->getConnection(connparams);
+            if(!connection)
+                break;
         }
-        return false;
-    }
-    /* Because we don't know Chunk size at start, we need to get size
-           from content length */
-    contentLength = connection->getContentLength();
-    prepared = true;
 
-    return true;
+        int i_ret = connection->request(connparams.getPath(), bytesRange);
+        if(i_ret != VLC_SUCCESS)
+        {
+            if(i_ret == VLC_ETIMEOUT) /* redirection */
+            {
+                HTTPConnection *httpconn = dynamic_cast<HTTPConnection *>(connection);
+                if(httpconn)
+                    connparams = httpconn->getRedirection();
+                connection->setUsed(false);
+                connection = NULL;
+                if(httpconn)
+                    continue;
+            }
+            break;
+        }
+
+        /* Because we don't know Chunk size at start, we need to get size
+               from content length */
+        contentLength = connection->getContentLength();
+        prepared = true;
+        return true;
+    }
+
+    return false;
 }
 
 block_t * HTTPChunkSource::readBlock()
 {
+    printf("READ\n");
     return read(HTTPChunkSource::CHUNK_SIZE);
 }
 
