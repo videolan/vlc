@@ -204,7 +204,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
     return p_block;
 }
 
-bool HTTPChunkSource::prepare(int i_redir)
+bool HTTPChunkSource::prepare()
 {
     if(prepared)
         return true;
@@ -214,7 +214,8 @@ bool HTTPChunkSource::prepare(int i_redir)
 
     ConnectionParams connparams = params; /* can be changed on 301 */
 
-    while(i_redir++ < 3)
+    int i_redirects = 0;
+    while(i_redirects++ < HTTPConnection::MAX_REDIRECTS)
     {
         if(!connection)
         {
