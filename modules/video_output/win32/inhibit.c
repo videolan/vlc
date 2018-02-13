@@ -53,7 +53,6 @@ static void RestoreStateOnCancel( void* p_opaque )
 {
     VLC_UNUSED(p_opaque);
     SetThreadExecutionState( ES_CONTINUOUS );
-    msg_Err( (vlc_object_t*)p_opaque, "Restored context" );
 }
 
 static void* Run(void* obj)
