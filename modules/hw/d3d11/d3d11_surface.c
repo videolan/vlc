@@ -262,8 +262,14 @@ ok:
 
 static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
+    if (src->context == NULL)
+    {
+        /* the previous stages creating a D3D11 picture should always fill the context */
+        msg_Err(p_filter, "missing source context");
+        return;
+    }
+
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
-    assert(src->context != NULL);
     picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
@@ -397,8 +403,14 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 
 static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
+    if (src->context == NULL)
+    {
+        /* the previous stages creating a D3D11 picture should always fill the context */
+        msg_Err(p_filter, "missing source context");
+        return;
+    }
+
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
-    assert(src->context != NULL);
     picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
