@@ -94,7 +94,7 @@ namespace adaptive
                 static const size_t CHUNK_SIZE = 32768;
 
             protected:
-                virtual bool      prepare(int = 0);
+                virtual bool        prepare();
                 AbstractConnection    *connection;
                 AbstractConnectionManager *connManager;
                 size_t              consumed; /* read pointer */

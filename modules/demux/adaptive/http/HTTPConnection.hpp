@@ -74,6 +74,7 @@ namespace adaptive
 
                 void setUsed( bool );
                 const ConnectionParams &getRedirection() const;
+                static const unsigned MAX_REDIRECTS = 3;
 
             protected:
                 virtual bool    connected   () const;
