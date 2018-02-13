@@ -361,12 +361,12 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-#if VLC_WINSTORE_APP
-    return VLC_SUCCESS;
-#else
     if (vendorId && adapterDesc.VendorId != vendorId)
         return VLC_SUCCESS;
 
+#if VLC_WINSTORE_APP
+    return VLC_EGENERIC;
+#else
     bool newer =
            d3d_dev->WDDM.wddm > min_ver->wddm ||
           (d3d_dev->WDDM.wddm == min_ver->wddm && (d3d_dev->WDDM.d3d_features > min_ver->d3d_features ||
