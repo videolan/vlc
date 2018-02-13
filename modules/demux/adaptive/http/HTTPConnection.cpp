@@ -135,6 +135,7 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
 
     /* Set new path for this query */
     params.setPath(path);
+    locationparams = ConnectionParams();
 
     msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
                        range.isValid() ? range.getStartByte() : 0);
@@ -179,11 +180,6 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
     else if(i_ret == VLC_ETIMEOUT) /* redir */
     {
         socket->disconnect();
-        if(locationparams.getScheme().empty())
-            params.setPath(locationparams.getPath());
-        else
-            params = locationparams;
-        locationparams = ConnectionParams();
     }
     else if(i_ret == VLC_EGENERIC)
     {
@@ -386,7 +382,14 @@ void HTTPConnection::onHeader(const std::string &key,
     }
     else if(key == "Location")
     {
-        locationparams = ConnectionParams( value );
+        locationparams = ConnectionParams();
+        ConnectionParams loc = ConnectionParams( value );
+        if(loc.getScheme().empty())
+        {
+            locationparams = params;
+            locationparams.setPath(loc.getPath());
+        }
+        else locationparams = loc;
     }
     else if(key == "Set-Cookie" && authStorage)
     {
