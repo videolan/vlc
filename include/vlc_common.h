@@ -671,6 +671,22 @@ VLC_USED static inline int popcount(unsigned long long x)
 {
     return __builtin_popcountll(x);
 }
+
+VLC_USED static inline int parity(unsigned x)
+{
+    return __builtin_parity(x);
+}
+
+VLC_USED static inline int parity(unsigned long x)
+{
+    return __builtin_parityl(x);
+}
+
+VLC_USED static inline int parity(unsigned long long x)
+{
+    return __builtin_parityll(x);
+}
+
 # endif
 #else /* __GNUC__ */
 # ifndef __cplusplus
