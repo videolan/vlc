@@ -223,7 +223,11 @@ bool HTTPChunkSource::prepare(int i_redir)
     if(i_ret != VLC_SUCCESS)
     {
         if(i_ret == VLC_ETIMEOUT && i_redir < 3)
+        {
+            connection->setUsed(false);
+            connection = NULL;
             return HTTPChunkSource::prepare(i_redir + 1);
+        }
         return false;
     }
     /* Because we don't know Chunk size at start, we need to get size
