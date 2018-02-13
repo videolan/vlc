@@ -1094,6 +1094,26 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11S
     ID3D11DeviceContext_DrawIndexed(sys->d3d_dev.d3dcontext, quad->indexCount, 0, 0);
 }
 
+static float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
+{
+    switch (fmt->transfer)
+    {
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            /* that's the default PQ value if the metadata are not set */
+            return MAX_PQ_BRIGHTNESS;
+        case TRANSFER_FUNC_HLG:
+            return 1000;
+        case TRANSFER_FUNC_BT470_BG:
+        case TRANSFER_FUNC_BT470_M:
+        case TRANSFER_FUNC_BT709:
+        case TRANSFER_FUNC_SRGB:
+            return DEFAULT_BRIGHTNESS;
+        default:
+            msg_Dbg(o, "unhandled source transfer %d", fmt->transfer);
+            return DEFAULT_BRIGHTNESS;
+    }
+}
+
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1199,10 +1219,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     if (picture->format.mastering.max_luminance)
     {
-        if ( picture->format.mastering.max_luminance < 10000)
-            UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / sys->display.luminance_peak);
-        else
-            UpdateQuadLuminanceScale(vd, &sys->picQuad, (float) picture->format.mastering.max_luminance / (1000 * sys->display.luminance_peak));
+        UpdateQuadLuminanceScale(vd, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
 
         if (sys->dxgiswapChain4)
         {
@@ -2602,28 +2619,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     HRESULT hr;
     const bool RGB_shader = IsRGBShader(cfg);
 
-    unsigned src_luminance_peak;
-    switch (fmt->transfer)
-    {
-        case TRANSFER_FUNC_SMPTE_ST2084:
-            /* that's the default PQ value if the metadata are not set */
-            src_luminance_peak = MAX_PQ_BRIGHTNESS;
-            break;
-        case TRANSFER_FUNC_HLG:
-            src_luminance_peak = 1000;
-            break;
-        case TRANSFER_FUNC_BT470_BG:
-        case TRANSFER_FUNC_BT470_M:
-        case TRANSFER_FUNC_BT709:
-        case TRANSFER_FUNC_SRGB:
-            src_luminance_peak = DEFAULT_BRIGHTNESS;
-            break;
-        default:
-            msg_Dbg(vd, "unhandled source transfer %d", fmt->transfer);
-            src_luminance_peak = DEFAULT_BRIGHTNESS;
-            break;
-    }
-    quad->shaderConstants.LuminanceScale = (float)src_luminance_peak / (float)sys->display.luminance_peak;
+    quad->shaderConstants.LuminanceScale = GetFormatLuminance(VLC_OBJECT(vd), fmt) / (float)sys->display.luminance_peak;
 
     /* pixel shader constant buffer */
     quad->shaderConstants.Opacity = 1.0;
