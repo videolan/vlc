@@ -1259,8 +1259,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     {
         const char *psz_current_title = vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title );
         const char *psz_new_title = vlc_meta_Get( p_meta, vlc_meta_Title );
-        if( !psz_current_title != !psz_new_title ||
-            ( psz_new_title && psz_new_title && strcmp(psz_new_title, psz_current_title)) )
+        if( (psz_current_title != NULL && psz_new_title != NULL)
+            ? strcmp(psz_new_title, psz_current_title)
+            : (psz_current_title != psz_new_title) )
         {
             /* Remove old entries */
             char *psz_oldinfokey = EsOutProgramGetMetaName( p_pgrm );
