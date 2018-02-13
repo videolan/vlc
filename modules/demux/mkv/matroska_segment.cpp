@@ -96,7 +96,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
     if( b_cues )
     {
-        msg_Err( &sys.demuxer, "There can be only 1 Cues per section." );
+        msg_Warn( &sys.demuxer, "There can be only 1 Cues per section." );
         return;
     }
 
