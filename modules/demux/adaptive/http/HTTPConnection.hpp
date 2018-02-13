@@ -73,6 +73,7 @@ namespace adaptive
                 virtual ssize_t read        (void *p_buffer, size_t len);
 
                 void setUsed( bool );
+                const ConnectionParams &getRedirection() const;
 
             protected:
                 virtual bool    connected   () const;

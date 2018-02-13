@@ -439,6 +439,11 @@ std::string HTTPConnection::extraRequestHeaders() const
     return ss.str();
 }
 
+const ConnectionParams & HTTPConnection::getRedirection() const
+{
+    return locationparams;
+}
+
 StreamUrlConnection::StreamUrlConnection(vlc_object_t *p_object)
     : AbstractConnection(p_object)
 {
