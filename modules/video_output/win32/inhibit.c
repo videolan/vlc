@@ -49,6 +49,13 @@ static void Inhibit (vlc_inhibit_t *ih, unsigned mask)
     vlc_cond_signal(&sys->cond);
 }
 
+static void RestoreStateOnCancel( void* p_opaque )
+{
+    VLC_UNUSED(p_opaque);
+    SetThreadExecutionState( ES_CONTINUOUS );
+    msg_Err( (vlc_object_t*)p_opaque, "Restored context" );
+}
+
 static void* Run(void* obj)
 {
     vlc_inhibit_t *ih = (vlc_inhibit_t*)obj;
@@ -62,11 +69,13 @@ static void* Run(void* obj)
 
         vlc_mutex_lock(&sys->mutex);
         mutex_cleanup_push(&sys->mutex);
+        vlc_cleanup_push(RestoreStateOnCancel, ih);
         while (!sys->signaled)
             vlc_cond_wait(&sys->cond, &sys->mutex);
         mask = sys->mask;
         sys->signaled = false;
         vlc_mutex_unlock(&sys->mutex);
+        vlc_cleanup_pop();
         vlc_cleanup_pop();
 
         bool suspend = (mask & VLC_INHIBIT_DISPLAY) != 0;
