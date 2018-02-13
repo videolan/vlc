@@ -103,6 +103,7 @@ typedef struct {
 typedef struct
 {
     picture_sys_t             picSys;
+    UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;
     ID3D11VertexShader        *d3dvertexShader;
@@ -647,6 +648,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
 #endif
         {
+            sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuadConfig);
             for (picture_count = 0; picture_count < pool_size; picture_count++) {
                 if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
                                        pictures[picture_count]->p_sys->texture, picture_count,
@@ -1079,7 +1081,7 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11S
     ID3D11DeviceContext_PSSetShader(sys->d3d_dev.d3dcontext, quad->d3dpixelShader, NULL, 0);
 
     ID3D11DeviceContext_PSSetConstantBuffers(sys->d3d_dev.d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
-    ID3D11DeviceContext_PSSetShaderResources(sys->d3d_dev.d3dcontext, 0, D3D11_MAX_SHADER_VIEW, resourceView);
+    ID3D11DeviceContext_PSSetShaderResources(sys->d3d_dev.d3dcontext, 0, quad->resourceCount, resourceView);
 
     ID3D11DeviceContext_RSSetViewports(sys->d3d_dev.d3dcontext, 1, &quad->cropViewport);
 
@@ -2061,6 +2063,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
             return VLC_EGENERIC;
         }
 
+        sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuadConfig);
         if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
                                textures, 0, sys->stagingSys.resourceView))
         {
@@ -2944,6 +2947,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
+            d3dquad->resourceCount = DxgiResourceCount(sys->d3dregion_format);
             if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->d3dregion_format,
                                    d3dquad->picSys.texture, 0,
                                    d3dquad->picSys.resourceView)) {

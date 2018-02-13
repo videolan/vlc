@@ -147,3 +147,13 @@ const char *DxgiVendorStr(int gpu_vendor)
     }
     return vendors[i].name;
 }
+
+UINT DxgiResourceCount(const d3d_format_t *d3d_fmt)
+{
+    for (UINT count=0; count<D3D11_MAX_SHADER_VIEW; count++)
+    {
+        if (d3d_fmt->resourceFormat[count] == DXGI_FORMAT_UNKNOWN)
+            return count;
+    }
+    return D3D11_MAX_SHADER_VIEW;
+}
