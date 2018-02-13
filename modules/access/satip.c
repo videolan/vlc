@@ -410,7 +410,7 @@ static void satip_teardown(void *data) {
 
             /* Some SATIP servers send a few empty extra bytes after TEARDOWN.
              * Try to read them, to avoid a TCP socket reset */
-            while ((len = recv(sys->tcp_sock, discard_buf, sizeof(discard_buf), 0) > 0));
+            while (recv(sys->tcp_sock, discard_buf, sizeof(discard_buf), 0) > 0);
 
             /* Extra sleep for compatibility with some satip servers, that
              * can't handle new sessions right after teardown */
