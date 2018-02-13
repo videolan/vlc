@@ -166,21 +166,25 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                                 VLC_UNUSED( kcbn_ptr );
                             }
 #if LIBMATROSKA_VERSION >= 0x010401
-                            else if( MKV_IS_ID( el, KaxCueRelativePosition ) )
+                            else if( MKV_CHECKED_PTR_DECL( ignored, KaxCueRelativePosition, el ) )
                             {
                                 // IGNORE
+                                ignored->ReadData( es.I_O() );
                             }
-                            else if( MKV_IS_ID( el, KaxCueBlockNumber ) )
+                            else if( MKV_CHECKED_PTR_DECL( ignored, KaxCueBlockNumber, el ) )
                             {
                                 // IGNORE
+                                ignored->ReadData( es.I_O() );
                             }
-                            else if( MKV_IS_ID( el, KaxCueReference ) )
+                            else if( MKV_CHECKED_PTR_DECL( ignored, KaxCueReference, el ) )
                             {
                                 // IGNORE
+                                ignored->ReadData( es.I_O(), SCOPE_ALL_DATA );
                             }
-                            else if( MKV_IS_ID( el, KaxCueDuration ) )
+                            else if( MKV_CHECKED_PTR_DECL( ignored, KaxCueDuration, el ) )
                             {
                                 /* For future use */
+                                ignored->ReadData( es.I_O() );
                             }
 #endif
                             else
