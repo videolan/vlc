@@ -433,6 +433,9 @@ text_segment_NewInheritStyle
 text_segment_Delete
 text_segment_ChainDelete
 text_segment_Copy
+text_segment_FromRuby
+text_segment_ruby_New
+text_segment_ruby_ChainDelete
 vlc_tls_ClientCreate
 vlc_tls_ServerCreate
 vlc_tls_Delete
