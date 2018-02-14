@@ -763,8 +763,6 @@ static int Demux( demux_t *p_demux)
                 delete block;
                 return 1; // this block shall be ignored
             }
-
-            track.i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
         }
     }
 
