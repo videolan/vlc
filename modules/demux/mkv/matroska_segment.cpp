@@ -795,28 +795,7 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
-bool matroska_segment_c::FastSeek( demux_t &demuxer, mtime_t i_mk_date, mtime_t i_mk_time_offset )
-{
-    if( InternalSeek( demuxer, i_mk_date, i_mk_time_offset, false ) )
-    {
-        sys.i_start_pts = sys.i_pts;
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
-        return true;
-    }
-    return false;
-}
-
-bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_mk_date, mtime_t i_mk_time_offset )
-{
-    if( InternalSeek( demuxer, i_mk_date, i_mk_time_offset, true ) )
-    {
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
-        return true;
-    }
-    return false;
-}
-
-bool matroska_segment_c::InternalSeek( demux_t &demuxer, mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset, bool b_accurate )
+bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset, bool b_accurate )
 {
     SegmentSeeker::tracks_seekpoint_t seekpoints;
 
@@ -894,9 +873,12 @@ bool matroska_segment_c::InternalSeek( demux_t &demuxer, mtime_t i_absolute_mk_d
 
     // propogate seek information //
 
-    sys.i_pcr       = VLC_TS_INVALID;
-    sys.i_pts       = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
-    sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;
+    sys.i_pcr           = VLC_TS_INVALID;
+    sys.i_pts           = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
+    if (b_accurate)
+        sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;
+    else
+        sys.i_start_pts = sys.i_pts;
 
     // make the jump //
 
@@ -907,6 +889,7 @@ bool matroska_segment_c::InternalSeek( demux_t &demuxer, mtime_t i_absolute_mk_d
     msg_Dbg( &sys.demuxer, "seek: preroll{ req: %" PRId64 ", start-pts: %" PRId64 ", start-fpos: %" PRIu64 "} ",
       sys.i_start_pts, sys.i_pts, i_seek_position );
 
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
     return true;
 }
 

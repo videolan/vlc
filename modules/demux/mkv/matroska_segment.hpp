@@ -141,8 +141,7 @@ public:
     bool PreloadClusters( uint64 i_cluster_position );
     void InformationCreate();
 
-    bool FastSeek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset );
-    bool Seek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset );
+    bool Seek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset, bool b_accurate );
 
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
@@ -172,7 +171,6 @@ private:
     bool TrackInit( mkv_track_t * p_tk );
     void ComputeTrackPriority();
     void EnsureDuration();
-    bool InternalSeek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset, bool b_accurate );
 
     SegmentSeeker _seeker;
 
