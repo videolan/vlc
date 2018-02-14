@@ -420,7 +420,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *(demux_sys_t *)demux.p_sys;
     virtual_chapter_c *p_cur_vchapter = NULL;
-    virtual_edition_c *p_cur_vedition = veditions[ i_current_edition ];
+    virtual_edition_c *p_cur_vedition = CurrentEdition();
 
     bool b_has_seeked = false;
 
@@ -435,7 +435,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     {
         if ( p_current_vchapter != NULL && p_current_vchapter->ContainsTimestamp( sys.i_pts - VLC_TS_0 ))
             p_cur_vchapter = p_current_vchapter;
-        else
+        else if (p_cur_vedition != NULL)
             p_cur_vchapter = p_cur_vedition->getChapterbyTimecode( sys.i_pts - VLC_TS_0 );
     }
 
@@ -514,9 +514,9 @@ bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
 
 
     /* find the actual time for an ordered edition */
-    if ( p_vchapter == NULL )
+    if ( p_vchapter == NULL && CurrentEdition() )
         /* 1st, we need to know in which chapter we are */
-        p_vchapter = veditions[ i_current_edition ]->getChapterbyTimecode( i_mk_date );
+        p_vchapter = CurrentEdition()->getChapterbyTimecode( i_mk_date );
 
     if ( p_vchapter != NULL )
     {
@@ -568,7 +568,9 @@ virtual_chapter_c * virtual_chapter_c::FindChapter( int64_t i_find_uid )
 
 virtual_chapter_c * virtual_segment_c::FindChapter( int64_t i_find_uid )
 {
-    virtual_edition_c * p_edition = veditions[i_current_edition];
+    virtual_edition_c * p_edition = CurrentEdition();
+    if (unlikely(p_edition == NULL))
+        return NULL;
 
     for( size_t i = 0; i < p_edition->vchapters.size(); i++ )
     {
