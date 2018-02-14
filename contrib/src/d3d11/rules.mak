@@ -28,16 +28,16 @@ PKGS += d3d11
 endif
 
 $(TARBALLS)/d3d11.idl:
-	$(call download,$(D3D11_IDL_URL))
+	$(call download_pkg,$(D3D11_IDL_URL),d3d11)
 
 $(TARBALLS)/dxgidebug.idl:
 	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/dxgidebug.patch
 
 $(TARBALLS)/dxgi1_2.idl:
-	$(call download,$(DXGI12_IDL_URL))
+	$(call download_pkg,$(DXGI12_IDL_URL),d3d11)
 
 $(TARBALLS)/dxgitype.h:
-	$(call download,$(DXGITYPE_H_URL))
+	$(call download_pkg,$(DXGITYPE_H_URL),d3d11)
 
 .sum-d3d11: $(TARBALLS)/d3d11.idl $(TARBALLS)/dxgidebug.idl $(TARBALLS)/dxgi1_2.idl $(TARBALLS)/dxgitype.h
 
