@@ -576,11 +576,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
         o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
 
-    } else if ([o_identifier isEqualToString:STATUS_COLUMN]) {
-        if (input_item_HasErrorWhenReading(p_input)) {
-            o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
-            [o_value setSize: NSMakeSize(16,16)];
-        }
     }
 
     return o_value;
