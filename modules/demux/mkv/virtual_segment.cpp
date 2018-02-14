@@ -543,16 +543,9 @@ bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
         }
         else
         {
-            typedef bool( matroska_segment_c::* seek_callback_t )( demux_t &, mtime_t, mtime_t );
-
-            seek_callback_t pf_seek = &matroska_segment_c::Seek;
-
-            if( ! b_precise )
-                pf_seek = &matroska_segment_c::FastSeek;
-
             p_current_vchapter = p_vchapter;
 
-            return ( p_current_vchapter->segment.*pf_seek )( demuxer, i_mk_date, i_mk_time_offset );
+            return p_current_vchapter->segment.Seek( demuxer, i_mk_date, i_mk_time_offset, b_precise );
         }
     }
     return false;
