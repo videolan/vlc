@@ -1,6 +1,6 @@
 # libplacebo
 
-PLACEBO_VERSION := 0.2.0
+PLACEBO_VERSION := 0.2.1
 PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
 PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
 
@@ -26,10 +26,6 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
 	$(APPLY) $(SRC)/libplacebo/0001-build-use-a-Makefile.patch
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/libplacebo/0002-build-fix-win32-build.patch
-endif
-	$(APPLY) $(SRC)/libplacebo/0003-2.0-fixup.patch
 	$(MOVE)
 
 .libplacebo: libplacebo
