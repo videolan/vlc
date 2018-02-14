@@ -279,12 +279,12 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     {
         if( unlikely(p_item->i_id == INT_MAX) )
             p_item->i_id = 0;
-       
+
         p_item->i_id++;
 
         if( unlikely(p_item->i_id == p->i_last_playlist_id) )
             goto error; /* All IDs taken */
- 
+
         pp = tsearch( p_item, &p->id_tree, playlist_ItemCmpId );
         if( unlikely(pp == NULL) )
             goto error;
