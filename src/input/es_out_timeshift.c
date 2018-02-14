@@ -743,6 +743,8 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_RESTART_ES_BY_ID:
     case ES_OUT_SET_ES_DEFAULT_BY_ID:
     case ES_OUT_GET_ES_OBJECTS_BY_ID:
+    case ES_OUT_STOP_ALL_ES:
+    case ES_OUT_START_ALL_ES:
     case ES_OUT_SET_DELAY:
     case ES_OUT_SET_RECORD_STATE:
     default:
