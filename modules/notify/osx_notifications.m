@@ -87,7 +87,6 @@
     NSMutableDictionary *registrationDictionary;
     id lastNotification;
     bool isInForeground;
-    bool hasNativeNotifications;
     intf_thread_t *interfaceThread;
 }
 
@@ -256,11 +255,6 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
     // Start in background
     isInForeground = NO;
 
-    // Check for native notification support
-    Class userNotificationClass = NSClassFromString(@"NSUserNotification");
-    Class userNotificationCenterClass = NSClassFromString(@"NSUserNotificationCenter");
-    hasNativeNotifications = (userNotificationClass && userNotificationCenterClass) ? YES : NO;
-
     lastNotification = nil;
     applicationName = nil;
     notificationType = nil;
@@ -274,7 +268,7 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
 {
     // Clear the remaining lastNotification in Notification Center, if any
     @autoreleasepool {
-        if (lastNotification && hasNativeNotifications) {
+        if (lastNotification) {
             [NSUserNotificationCenter.defaultUserNotificationCenter
              removeDeliveredNotification:(NSUserNotification *)lastNotification];
             [lastNotification release];
@@ -304,10 +298,8 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
 
         [GrowlApplicationBridge setGrowlDelegate:self];
 
-        if (hasNativeNotifications) {
-            [[NSUserNotificationCenter defaultUserNotificationCenter]
-             setDelegate:(id<NSUserNotificationCenterDelegate>)self];
-        }
+        [[NSUserNotificationCenter defaultUserNotificationCenter]
+            setDelegate:(id<NSUserNotificationCenterDelegate>)self];
     }
 }
 
@@ -370,7 +362,7 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
                                            isSticky:NO
                                        clickContext:nil
                                          identifier:@"VLCNowPlayingNotification"];
-        } else if (hasNativeNotifications) {
+        } else {
             // Make the OS X notification and string
             NSUserNotification *notification = [NSUserNotification new];
             NSString *desc = nil;
