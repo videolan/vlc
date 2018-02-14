@@ -1,8 +1,14 @@
 Changes between 3.0.0 and 3.0.1:
 --------------------------------
 
+Core:
+ * Fix user after free when cleaning playlists
+
 Video output:
  * Fix HLG tone mapping on some systems like macOS.
+ * Fix screensaver inhibition on Windows XP
+ * Fix various direct3d11 crashes
+ * Fix HDR tone mapping in Direct3d11
 
 Access:
  * macOS: enable SMB file sharing
@@ -10,6 +16,8 @@ Access:
 Hardware Decoder:
  * macOS: Improve HEVC 10bits performances with Videotoolbox
 
+Demux:
+ * Improve MKV seeking speed
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
