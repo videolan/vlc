@@ -1417,6 +1417,11 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
         return false;
     }
 
+    bool b_seekable;
+    vlc_stream_Control( sys.demuxer.s, STREAM_CAN_SEEK, &b_seekable );
+    if (!b_seekable)
+        return false;
+
     try
     {
         EbmlElement *el;
