@@ -810,7 +810,7 @@ bool matroska_segment_c::InternalSeek( demux_t &demuxer, mtime_t i_absolute_mk_d
     {
         mkv_track_t &track = *it->second;
 
-        track.i_skip_until_fpos = -1;
+        track.i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
         if( track.i_last_dts > VLC_TS_INVALID )
             track.b_discontinuity = true;
         track.i_last_dts        = VLC_TS_INVALID;
@@ -863,7 +863,7 @@ bool matroska_segment_c::InternalSeek( demux_t &demuxer, mtime_t i_absolute_mk_d
         if ( b_accurate )
             trackit->second->i_skip_until_fpos = it->second.fpos;
         else
-            trackit->second->i_skip_until_fpos = -1;
+            trackit->second->i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
         trackit->second->i_last_dts        = it->second.pts;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " skip: %" PRIu64 "} ",
