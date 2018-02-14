@@ -41,7 +41,7 @@ class EbmlParser
     void Up( void );
     void Down( void );
     void Reset( demux_t *p_demux );
-    EbmlElement *Get( void );
+    EbmlElement *Get( bool allow_overshoot = true );
     void        Keep( void );
     void        Unkeep( void );
 
