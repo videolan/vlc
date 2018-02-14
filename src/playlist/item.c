@@ -533,7 +533,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     if( unlikely(p_item == NULL) )
         return NULL;
 
-    ARRAY_APPEND(p_playlist->items, p_item);
+    if( p_input->i_type != ITEM_TYPE_NODE )
+        ARRAY_APPEND(p_playlist->items, p_item);
 
     playlist_NodeInsert( p_parent, p_item, i_pos );
     playlist_SendAddNotify( p_playlist, p_item );
