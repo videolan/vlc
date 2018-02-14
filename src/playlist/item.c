@@ -37,7 +37,6 @@
 #include "playlist_internal.h"
 
 static void playlist_Preparse( playlist_t *, playlist_item_t * );
-static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 
 static int RecursiveAddIntoParent (
                 playlist_t *p_playlist, playlist_item_t *p_parent,
