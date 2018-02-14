@@ -214,6 +214,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
         bool ret =
             TPCircularBufferProduceBytes(&p_sys->circular_buffer,
                                          p_block->p_buffer, i_avalaible_bytes);
+        VLC_UNUSED(ret);
         assert(ret == true);
         p_block->p_buffer += i_avalaible_bytes;
         p_block->i_buffer -= i_avalaible_bytes;
