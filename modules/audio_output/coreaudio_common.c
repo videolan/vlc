@@ -497,26 +497,6 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 *warn_configuration = true;
         }
 
-        if (aout_FormatNbChannels(fmt) >= 8
-         && fmt->i_physical_channels != AOUT_CHANS_7_1)
-        {
-#if TARGET_OS_IPHONE
-            const bool b_8x_support = true;
-#else
-            SInt32 osx_min_version;
-            if (Gestalt(gestaltSystemVersionMinor, &osx_min_version) != noErr)
-                msg_Err(p_aout, "failed to check OSX version");
-            const bool b_8x_support = osx_min_version >= 7;
-#endif
-
-            if (!b_8x_support)
-            {
-                msg_Warn(p_aout, "8.0 audio output not supported on this "
-                         "device, layout will be incorrect");
-                fmt->i_physical_channels = AOUT_CHANS_7_1;
-            }
-        }
-
     }
 
 end:
