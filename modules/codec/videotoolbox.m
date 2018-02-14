@@ -1941,9 +1941,8 @@ skip:
 
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 {
-    CFDictionaryRef attachments = CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
-    NSDictionary *attachmentDict = (NSDictionary *)attachments;
-
+    NSDictionary *attachmentDict =
+        (__bridge NSDictionary *)CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
 
     if (attachmentDict != nil && attachmentDict.count > 0
      && p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF)
