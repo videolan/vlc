@@ -24,13 +24,13 @@ endif
 endif
 
 $(TARBALLS)/d3d9caps.h:
-	$(call download,$(D3D9CAPS_H_URL))
+	$(call download_pkg,$(D3D9CAPS_H_URL),d3d9)
 
 $(TARBALLS)/d3d9.h:
-	$(call download,$(D3D9_H_URL))
+	$(call download_pkg,$(D3D9_H_URL),d3d9)
 
 $(TARBALLS)/dxva2api.idl:
-	$(call download,$(DXVA2API_IDL_URL))
+	$(call download_pkg,$(DXVA2API_IDL_URL),d3d9)
 
 .sum-d3d9: $(TARBALLS)/d3d9caps.h $(TARBALLS)/d3d9.h $(TARBALLS)/dxva2api.idl
 
