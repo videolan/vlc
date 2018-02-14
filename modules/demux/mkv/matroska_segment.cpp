@@ -861,6 +861,7 @@ bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mti
             i_mk_seek_time  = it->second.pts;
         }
 
+        // blocks that will be not be read until this fpos
         if ( b_accurate )
             trackit->second->i_skip_until_fpos = it->second.fpos;
         else
@@ -889,6 +890,7 @@ bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mti
     msg_Dbg( &sys.demuxer, "seek: preroll{ req: %" PRId64 ", start-pts: %" PRId64 ", start-fpos: %" PRIu64 "} ",
       sys.i_start_pts, sys.i_pts, i_seek_position );
 
+    // blocks that will be read and decoded but discarded until this pts
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
     return true;
 }
