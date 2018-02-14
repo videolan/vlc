@@ -739,7 +739,7 @@ static int Demux( demux_t *p_demux)
                 return 1; // this block shall be ignored
             }
 
-            track.i_skip_until_fpos = -1;
+            track.i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
         }
     }
 
@@ -814,7 +814,7 @@ mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
   ,i_default_duration(0)
   ,f_timecodescale(1.0)
   ,i_last_dts(0)
-  ,i_skip_until_fpos(-1)
+  ,i_skip_until_fpos(std::numeric_limits<uint64_t>::max())
   ,f_fps(0)
   ,p_es(NULL)
   ,i_original_rate(0)

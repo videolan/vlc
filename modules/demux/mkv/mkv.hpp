@@ -205,7 +205,7 @@ class mkv_track_t
         uint64_t     i_default_duration;
         float        f_timecodescale;
         mtime_t      i_last_dts;
-        uint64_t     i_skip_until_fpos;
+        uint64_t     i_skip_until_fpos; /*< any block before this fpos should be ignored */
 
         /* video */
         es_format_t fmt;
