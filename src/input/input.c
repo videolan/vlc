@@ -1902,7 +1902,6 @@ static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
                                     input_priv(p_input)->p_sout, NULL );
         input_priv(p_input)->p_sout = NULL;
     }
-    es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESTART_ALL_ES );
 }
 #endif
 
@@ -2331,6 +2330,11 @@ static bool Control( input_thread_t *p_input,
             if ( p_item == NULL && p_priv->p_renderer == NULL )
                 break;
 
+            void *context;
+            if( es_out_Control( input_priv(p_input)->p_es_out_display,
+                                ES_OUT_STOP_ALL_ES, &context ) != VLC_SUCCESS )
+                break;
+
             if ( p_priv->p_renderer )
             {
                 ControlUpdateRenderer( p_input, false );
@@ -2351,6 +2355,8 @@ static bool Control( input_thread_t *p_input,
                 }
                 input_resource_TerminateVout( p_priv->p_resource );
             }
+            es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_START_ALL_ES,
+                            context );
 #endif
             break;
         }

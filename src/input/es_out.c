@@ -2390,16 +2390,39 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
         return VLC_SUCCESS;
     }
-    case ES_OUT_RESTART_ALL_ES:
+    case ES_OUT_STOP_ALL_ES:
     {
+        int *selected_es = vlc_alloc(p_sys->i_es + 1, sizeof(int));
+        if (!selected_es)
+            return VLC_ENOMEM;
+        selected_es[0] = p_sys->i_es;
         for( int i = 0; i < p_sys->i_es; i++ )
         {
             if( EsIsSelected( p_sys->es[i] ) )
             {
                 EsDestroyDecoder( out, p_sys->es[i] );
-                EsCreateDecoder( out, p_sys->es[i] );
+                selected_es[i + 1] = p_sys->es[i]->i_id;
+            }
+            else
+                selected_es[i + 1] = -1;
+        }
+        *va_arg( args, void **) = selected_es;
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_START_ALL_ES:
+    {
+        int *selected_es = va_arg( args, void * );
+        int count = selected_es[0];
+        for( int i = 0; i < count; ++i )
+        {
+            int i_id = selected_es[i + 1];
+            if( i_id != -1 )
+            {
+                es_out_id_t *p_es = EsOutGetFromID( out, i_id );
+                EsCreateDecoder( out, p_es );
             }
         }
+        free(selected_es);
         return VLC_SUCCESS;
     }
 
