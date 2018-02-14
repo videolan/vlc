@@ -29,34 +29,7 @@
 #ifndef VLC_OPENGL_VOUT_HELPER_H
 #define VLC_OPENGL_VOUT_HELPER_H
 
-#include <vlc_common.h>
-#include <vlc_picture_pool.h>
-#include <vlc_opengl.h>
-
-/* if USE_OPENGL_ES2 is defined, OpenGL ES version 2 will be used, otherwise
- * normal OpenGL will be used */
-#ifdef __APPLE__
-# include <TargetConditionals.h>
-# if !TARGET_OS_IPHONE
-#  undef USE_OPENGL_ES2
-#  define MACOS_OPENGL
-#  include <OpenGL/gl.h>
-# else /* Force ESv2 on iOS */
-#  define USE_OPENGL_ES2
-#  include <OpenGLES/ES1/gl.h>
-#  include <OpenGLES/ES2/gl.h>
-#  include <OpenGLES/ES2/glext.h>
-# endif
-#else /* !defined (__APPLE__) */
-# if defined (USE_OPENGL_ES2)
-#  include <GLES2/gl2.h>
-# else
-#  ifdef _WIN32
-#   include <GL/glew.h>
-#  endif
-#  include <GL/gl.h>
-# endif
-#endif
+#include "converter.h"
 
 #ifdef HAVE_LIBPLACEBO
 #include <libplacebo/shaders/colorspace.h>
@@ -236,19 +209,6 @@ static const vlc_fourcc_t gl_subpicture_chromas[] = {
     VLC_CODEC_RGBA,
     0
 };
-
-static inline bool HasExtension(const char *apis, const char *api)
-{
-    size_t apilen = strlen(api);
-    while (apis) {
-        while (*apis == ' ')
-            apis++;
-        if (!strncmp(apis, api, apilen) && memchr(" ", apis[apilen], 2))
-            return true;
-        apis = strchr(apis, ' ');
-    }
-    return false;
-}
 
 typedef struct vout_display_opengl_t vout_display_opengl_t;
 

@@ -40,6 +40,7 @@
 #include <vlc_vout.h>
 #include <vlc_viewpoint.h>
 
+#include "vout_helper.h"
 #include "internal.h"
 
 #ifndef GL_CLAMP_TO_EDGE
