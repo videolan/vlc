@@ -872,6 +872,9 @@ bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mti
           it->first, it->second.pts, it->second.fpos, trackit->second->i_skip_until_fpos );
     }
 
+    if ( i_seek_position == std::numeric_limits<SegmentSeeker::fptr_t>::max() )
+        return false;
+
     // propogate seek information //
 
     sys.i_pcr           = VLC_TS_INVALID;
