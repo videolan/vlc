@@ -1077,7 +1077,6 @@ static int LayoutLine( filter_t *p_filter,
     const text_style_t *p_style = 0;
     FT_Face p_face = 0;
     FT_Vector pen = { .x = 0, .y = 0 };
-    int i_line_index = 0;
 
     int i_font_size = 0;
     int i_font_width = 0;
@@ -1098,7 +1097,7 @@ static int LayoutLine( filter_t *p_filter,
     if( !p_line )
         return VLC_ENOMEM;
 
-    for( int i = i_first_char; i <= i_last_char; ++i, ++i_line_index )
+    for( int i = i_first_char; i <= i_last_char; ++i )
     {
         int i_paragraph_index;
 #ifdef HAVE_FRIBIDI
@@ -1108,7 +1107,7 @@ static int LayoutLine( filter_t *p_filter,
 #endif
         i_paragraph_index = i;
 
-        line_character_t *p_ch = p_line->p_character + i_line_index;
+        line_character_t *p_ch = &p_line->p_character[p_line->i_character_count];
         p_ch->p_style = p_paragraph->pp_styles[ i_paragraph_index ];
 
         glyph_bitmaps_t *p_bitmaps =
@@ -1117,7 +1116,6 @@ static int LayoutLine( filter_t *p_filter,
         if( !p_bitmaps->p_glyph )
         {
             BBoxInit( &p_ch->bbox );
-            --i_line_index;
             continue;
         }
 
@@ -1163,7 +1161,6 @@ static int LayoutLine( filter_t *p_filter,
                     FT_Done_Glyph( p_bitmaps->p_outline );
                 if( p_bitmaps->p_shadow )
                     FT_Done_Glyph( p_bitmaps->p_shadow );
-                --i_line_index;
                 continue;
             }
             else
@@ -1268,9 +1265,11 @@ static int LayoutLine( filter_t *p_filter,
         if( p_ch->p_glyph->bitmap.rows )
         {
             if( p_line->i_first_visible_char_index < 0 )
-                p_line->i_first_visible_char_index = i_line_index;
-            p_line->i_last_visible_char_index = i_line_index;
+                p_line->i_first_visible_char_index = p_line->i_character_count;
+            p_line->i_last_visible_char_index = p_line->i_character_count;
         }
+
+        p_line->i_character_count++;
     }
 
     p_line->i_width = __MAX( 0, p_line->bbox.xMax - p_line->bbox.xMin );
@@ -1279,8 +1278,6 @@ static int LayoutLine( filter_t *p_filter,
         p_line->i_height = i_font_max_advance_y;
     else
         p_line->i_height = __MAX( 0, p_line->bbox.yMax - p_line->bbox.yMin );
-
-    p_line->i_character_count = i_line_index;
 
     if( i_ul_thickness > 0 )
     {
