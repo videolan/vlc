@@ -21,12 +21,35 @@
 #ifndef VLC_OPENGL_CONVERTER_H
 #define VLC_OPENGL_CONVERTER_H
 
-#ifdef HAVE_LIBPLACEBO
-#include <libplacebo/shaders.h>
-#endif
-
-#include "vout_helper.h"
 #include <vlc_plugin.h>
+#include <vlc_common.h>
+#include <vlc_picture_pool.h>
+#include <vlc_opengl.h>
+
+/* if USE_OPENGL_ES2 is defined, OpenGL ES version 2 will be used, otherwise
+ * normal OpenGL will be used */
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+# if !TARGET_OS_IPHONE
+#  undef USE_OPENGL_ES2
+#  define MACOS_OPENGL
+#  include <OpenGL/gl.h>
+# else /* Force ESv2 on iOS */
+#  define USE_OPENGL_ES2
+#  include <OpenGLES/ES1/gl.h>
+#  include <OpenGLES/ES2/gl.h>
+#  include <OpenGLES/ES2/glext.h>
+# endif
+#else /* !defined (__APPLE__) */
+# if defined (USE_OPENGL_ES2)
+#  include <GLES2/gl2.h>
+# else
+#  ifdef _WIN32
+#   include <GL/glew.h>
+#  endif
+#  include <GL/gl.h>
+# endif
+#endif
 
 #define VLCGL_PICTURE_MAX 128
 
@@ -215,6 +238,23 @@ typedef struct {
     PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
 } opengl_vtable_t;
 
+static inline bool HasExtension(const char *apis, const char *api)
+{
+    size_t apilen = strlen(api);
+    while (apis) {
+        while (*apis == ' ')
+            apis++;
+        if (!strncmp(apis, api, apilen) && memchr(" ", apis[apilen], 2))
+            return true;
+        apis = strchr(apis, ' ');
+    }
+    return false;
+}
+
+struct pl_context;
+struct pl_shader;
+struct pl_shader_res;
+
 /*
  * Structure that is filled by "glhw converter" module probe function
  * The implementation should initialize every members of the struct that are
@@ -230,10 +270,8 @@ struct opengl_tex_converter_t
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 
-#ifdef HAVE_LIBPLACEBO
     /* libplacebo context, created by the caller (optional) */
     struct pl_context *pl_ctx;
-#endif
 
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
@@ -297,10 +335,8 @@ struct opengl_tex_converter_t
     bool yuv_color;
     GLfloat yuv_coefficients[16];
 
-#ifdef HAVE_LIBPLACEBO
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;
-#endif
 
     /* Private context */
     void *priv;

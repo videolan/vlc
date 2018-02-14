@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_memstream.h>
 #include "internal.h"
+#include "vout_helper.h"
 
 #ifndef GL_RED
 # define GL_RED 0x1903
