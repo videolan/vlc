@@ -102,32 +102,37 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
                 d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
     }
 
-    DWORD creationFlags = D3DCREATE_MULTITHREADED;
-    if ( (out->caps.DevCaps & D3DDEVCAPS_DRAWPRIMTLVERTEX) &&
-         (out->caps.DevCaps & D3DDEVCAPS_HWRASTERIZATION) ) {
-        creationFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
-    } else if (out->caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
-        creationFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
-    } else {
-        creationFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    DWORD thread_modes[] = { D3DCREATE_MULTITHREADED, 0 };
+    DWORD vertex_modes[] = { D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE,
+                             D3DCREATE_HARDWARE_VERTEXPROCESSING,
+                             D3DCREATE_MIXED_VERTEXPROCESSING,
+                             D3DCREATE_SOFTWARE_VERTEXPROCESSING };
+
+    for (size_t t = 0; t < ARRAY_SIZE(thread_modes); t++)
+    {
+        for (size_t v = 0; v < ARRAY_SIZE(vertex_modes); v++)
+        {
+            DWORD creationFlags = thread_modes[t] | vertex_modes[v];
+            if (hd3d->use_ex)
+                hr = IDirect3D9Ex_CreateDeviceEx(hd3d->objex, AdapterToUse,
+                                                 DeviceType, hwnd,
+                                                 creationFlags,
+                                                 &out->pp, NULL, &out->devex);
+            else
+                hr = IDirect3D9_CreateDevice(hd3d->obj, AdapterToUse,
+                                             DeviceType, hwnd,
+                                             creationFlags,
+                                             &out->pp, &out->dev);
+            if (SUCCEEDED(hr))
+            {
+                out->owner = true;
+                return hr;
+            }
+        }
     }
 
-    if (hd3d->use_ex)
-        hr = IDirect3D9Ex_CreateDeviceEx(hd3d->objex, AdapterToUse,
-                                         DeviceType, hwnd,
-                                         creationFlags,
-                                         &out->pp, NULL, &out->devex);
-    else
-        hr = IDirect3D9_CreateDevice(hd3d->obj, AdapterToUse,
-                                     DeviceType, hwnd,
-                                     creationFlags,
-                                     &out->pp, &out->dev);
-
-    if (SUCCEEDED(hr))
-        out->owner = true;
-    else
-        msg_Err(o, "failed to create the D3D9%s device %d/%d flags 0x%lx. (hr=0x%lX)",
-                   hd3d->use_ex?"Ex":"", AdapterToUse, DeviceType, creationFlags, hr);
+    msg_Err(o, "failed to create the D3D9%s device %d/%d. (hr=0x%lX)",
+               hd3d->use_ex?"Ex":"", AdapterToUse, DeviceType, hr);
     return hr;
 }
 
