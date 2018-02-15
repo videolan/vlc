@@ -301,6 +301,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 - (void)fadeIn
 {
+    if (!var_InheritBool(getIntf(), "macosx-fspanel"))
+        return;
+
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:0.4f];
     [[self.window animator] setAlphaValue:1.0f];
