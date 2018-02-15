@@ -2,22 +2,27 @@ Changes between 3.0.0 and 3.0.1:
 --------------------------------
 
 Core:
- * Fix user after free when cleaning playlists
+ * Fix use-after-free when cleaning playlists
 
 Video output:
  * Fix HLG tone mapping on some systems like macOS.
  * Fix screensaver inhibition on Windows XP
- * Fix various direct3d11 crashes
+ * Fix various Direct3d11 crashes
  * Fix HDR tone mapping in Direct3d11
 
 Access:
  * macOS: enable SMB file sharing
 
 Hardware Decoder:
- * macOS: Improve HEVC 10bits performances with Videotoolbox
+ * macOS: Improve HEVC 10bit performance with Videotoolbox
 
 Demux:
  * Improve MKV seeking speed
+ 
+macOS Interface:
+ * Re-add option to disable the fullscreen controller panel
+ * Auto-layout improvements
+ * Remove misleading playback warning indicator
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
@@ -225,7 +230,7 @@ Audio filters:
    headphones effects
  * Add a pitch shifting module
 
-Video ouput:
+Video output:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
  * OpenGL:
     * New OpenGL provider for Windows
@@ -282,7 +287,7 @@ Service Discovery:
  * New mDNS services discovery using Bonjour (Mac OS X, tvOS, iOS)
  * Rewrite of the UPnP service discovery
 
-Mac OS X Interface
+Mac OS X Interface:
  * Drop support for Mac OS X 10.6 Snow Leopard
  * Support right-to-left user interface layout for right-to-left languages
  * New resizable fullscreen controller with improved design
