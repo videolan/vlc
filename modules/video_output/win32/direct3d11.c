@@ -1778,11 +1778,18 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                 "sample = shaderTexture[0].Sample(samplerState, coords);";
         break;
     case DXGI_FORMAT_UNKNOWN:
-        psz_sampler =
-               "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
-                sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
-                sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
-                sample.a  = 1;";
+        if (format->fourcc == VLC_CODEC_I420_10L)
+            psz_sampler =
+                   "sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\
+                    sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\
+                    sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\
+                    sample.a  = 1;";
+        else
+            psz_sampler =
+                   "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
+                    sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
+                    sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
+                    sample.a  = 1;";
         break;
     default:
         vlc_assert_unreachable();
