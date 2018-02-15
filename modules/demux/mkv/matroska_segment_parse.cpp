@@ -1755,7 +1755,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_fmt->i_codec = VLC_CODEC_VORBIS;
             fill_extra_data( vars.p_tk, 0 );
         }
-        S_CASE("A_OPUS") {
+        static void A_OPUS__helper(HandlerPayload& vars) {
             vars.p_fmt->i_codec = VLC_CODEC_OPUS;
             vars.p_tk->b_no_duration = true;
             if( !vars.p_tk->fmt.audio.i_rate )
@@ -1774,6 +1774,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 ps, pkt, 2 ) )
                 msg_Err( vars.p_demuxer, "Couldn't pack OPUS headers");
         }
+        S_CASE("A_OPUS")                { A_OPUS__helper( vars ); }
+        S_CASE("A_OPUS/EXPERIMENTAL")   { A_OPUS__helper( vars ); }
         static void A_AAC_MPEG__helper(HandlerPayload& vars, int i_profile, bool sbr = false) {
             int i_srate;
 
