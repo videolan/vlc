@@ -67,6 +67,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
        msg_Err(o, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
        return hr;
     }
+    msg_Dbg(o, "D3D9 device caps 0x%0lX / 0x%0lX", out->caps.DevCaps, out->caps.DevCaps2);
 
     /* TODO: need to test device capabilities and select the right render function */
     if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
@@ -125,7 +126,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     if (SUCCEEDED(hr))
         out->owner = true;
     else
-        msg_Err(o, "failed to create the D3D9%s device %d/%d flags 0x%x. (hr=0x%lX)",
+        msg_Err(o, "failed to create the D3D9%s device %d/%d flags 0x%lx. (hr=0x%lX)",
                    hd3d->use_ex?"Ex":"", AdapterToUse, DeviceType, creationFlags, hr);
     return hr;
 }
