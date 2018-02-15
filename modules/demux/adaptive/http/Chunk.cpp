@@ -214,7 +214,7 @@ bool HTTPChunkSource::prepare()
 
     ConnectionParams connparams = params; /* can be changed on 301 */
 
-    int i_redirects = 0;
+    unsigned int i_redirects = 0;
     while(i_redirects++ < HTTPConnection::MAX_REDIRECTS)
     {
         if(!connection)
