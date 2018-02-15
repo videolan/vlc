@@ -1481,6 +1481,38 @@ struct render_variables_s
     float i_top;
 };
 
+static text_segment_t *ConvertRubyNodeToSegment( const webvtt_dom_node_t *p_node )
+{
+    text_segment_ruby_t *p_ruby = NULL;
+    text_segment_ruby_t **pp_rt_append = &p_ruby;
+
+    const char *psz_base = NULL;
+
+    for( ; p_node ; p_node = p_node->p_next )
+    {
+        if( p_node->type == NODE_TEXT )
+        {
+            const webvtt_dom_text_t *p_textnode = (const webvtt_dom_text_t *) p_node;
+            psz_base = p_textnode->psz_text;
+        }
+        else if( p_node->type == NODE_TAG )
+        {
+            const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
+            if( !strcmp(p_tag->psz_tag, "rt") && p_tag->p_child &&
+                p_tag->p_child->type == NODE_TEXT )
+            {
+                const webvtt_dom_text_t *p_rttext = (const webvtt_dom_text_t *)p_tag->p_child;
+                *pp_rt_append = text_segment_ruby_New( psz_base, p_rttext->psz_text );
+                if( *pp_rt_append )
+                    pp_rt_append = &(*pp_rt_append)->p_next;
+            }
+            psz_base = NULL;
+        }
+    }
+
+    return ( p_ruby ) ? text_segment_FromRuby( p_ruby ) : NULL;
+}
+
 static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue,
@@ -1510,8 +1542,11 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
         else if( p_node->type == NODE_TAG )
         {
             const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
-            *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
-                                                 p_tag->p_child );
+            if( strcmp(p_tag->psz_tag, "ruby") )
+                *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
+                                                     p_tag->p_child );
+            else
+                *pp_append = ConvertRubyNodeToSegment( p_tag->p_child );
         }
     }
     return p_head;
