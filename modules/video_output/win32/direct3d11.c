@@ -2527,24 +2527,126 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
     }
 }
 
+
+static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
+                          const d3d_quad_t *quad, WORD *triangle_pos)
+{
+    static const float coord[] = {
+        -1.0,    1.0,    -1.0f, // front
+        -1.0,    -1.0,   -1.0f,
+        1.0,     1.0,    -1.0f,
+        1.0,     -1.0,   -1.0f,
+
+        -1.0,    1.0,    1.0f, // back
+        -1.0,    -1.0,   1.0f,
+        1.0,     1.0,    1.0f,
+        1.0,     -1.0,   1.0f,
+
+        -1.0,    1.0,    -1.0f, // left
+        -1.0,    -1.0,   -1.0f,
+        -1.0,     1.0,    1.0f,
+        -1.0,     -1.0,   1.0f,
+
+        1.0f,    1.0,    -1.0f, // right
+        1.0f,   -1.0,    -1.0f,
+        1.0f,   1.0,     1.0f,
+        1.0f,   -1.0,    1.0f,
+
+        -1.0,    -1.0,    1.0f, // bottom
+        -1.0,    -1.0,   -1.0f,
+        1.0,     -1.0,    1.0f,
+        1.0,     -1.0,   -1.0f,
+
+        -1.0,    1.0,    1.0f, // top
+        -1.0,    1.0,   -1.0f,
+        1.0,     1.0,    1.0f,
+        1.0,     1.0,   -1.0f,
+    };
+
+    const float scaleX = (float)(output->right - output->left) / quad->i_width;
+    const float scaleY = (float)(output->bottom - output->top) / quad->i_height;
+
+    const float col[] = {0.f, scaleX / 3, scaleX * 2 / 3, scaleX};
+    const float row[] = {0.f, scaleY / 2, scaleY};
+
+    const float tex[] = {
+        col[1], row[1], // front
+        col[1], row[2],
+        col[2], row[1],
+        col[2], row[2],
+
+        col[3], row[1], // back
+        col[3], row[2],
+        col[2], row[1],
+        col[2], row[2],
+
+        col[2], row[0], // left
+        col[2], row[1],
+        col[1], row[0],
+        col[1], row[1],
+
+        col[0], row[0], // right
+        col[0], row[1],
+        col[1], row[0],
+        col[1], row[1],
+
+        col[0], row[2], // bottom
+        col[0], row[1],
+        col[1], row[2],
+        col[1], row[1],
+
+        col[2], row[0], // top
+        col[2], row[1],
+        col[3], row[0],
+        col[3], row[1],
+    };
+
+    const unsigned i_nbVertices = ARRAY_SIZE(coord) / 3;
+
+    for (unsigned v = 0; v < i_nbVertices; ++v)
+    {
+        dst_data[v].position.x = coord[3 * v];
+        dst_data[v].position.y = coord[3 * v + 1];
+        dst_data[v].position.z = coord[3 * v + 2];
+
+        dst_data[v].texture.x = tex[2 * v];
+        dst_data[v].texture.y = tex[2 * v + 1];
+    }
+
+    const WORD ind[] = {
+        2, 1, 0,       3, 1, 2, // front
+        4, 7, 6,       5, 7, 4, // back
+        8, 11, 10,     9, 11, 8, // left
+        14, 13, 12,    15, 13, 14, // right
+        16, 19, 18,    17, 19, 16, // bottom
+        22, 21, 20,    23, 21, 22, // top
+    };
+
+    memcpy(triangle_pos, ind, sizeof(ind));
+}
+
+
 static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
                               video_projection_mode_t projection)
 {
     HRESULT hr;
     vout_display_sys_t *sys = vd->sys;
 
-    if (projection == PROJECTION_MODE_RECTANGULAR)
+    switch (projection)
     {
+    case PROJECTION_MODE_RECTANGULAR:
         quad->vertexCount = 4;
         quad->indexCount = 2 * 3;
-    }
-    else if (projection == PROJECTION_MODE_EQUIRECTANGULAR)
-    {
-        quad->vertexCount = (SPHERE_SLICES+1) * (SPHERE_SLICES+1);
+        break;
+    case PROJECTION_MODE_EQUIRECTANGULAR:
+        quad->vertexCount = (SPHERE_SLICES + 1) * (SPHERE_SLICES + 1);
         quad->indexCount = nbLatBands * nbLonBands * 2 * 3;
-    }
-    else
-    {
+        break;
+    case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
+        quad->vertexCount = 4 * 6;
+        quad->indexCount = 6 * 2 * 3;
+        break;
+    default:
         msg_Warn(vd, "Projection mode %d not handled", projection);
         return false;
     }
@@ -2610,10 +2712,21 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     }
     WORD *triangle_pos = mappedResource.pData;
 
-    if ( projection == PROJECTION_MODE_RECTANGULAR )
+    switch (projection)
+    {
+    case PROJECTION_MODE_RECTANGULAR:
         SetupQuadFlat(dst_data, output, quad, triangle_pos, orientation);
-    else
+        break;
+    case PROJECTION_MODE_EQUIRECTANGULAR:
         SetupQuadSphere(dst_data, output, quad, triangle_pos);
+        break;
+    case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
+        SetupQuadCube(dst_data, output, quad, triangle_pos);
+        break;
+    default:
+        msg_Warn(vd, "Projection mode %d not handled", projection);
+        return false;
+    }
 
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
@@ -2762,7 +2875,8 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     quad->PSConstantsCount = 2;
 
     /* vertex shader constant buffer */
-    if ( projection == PROJECTION_MODE_EQUIRECTANGULAR )
+    if (projection == PROJECTION_MODE_EQUIRECTANGULAR
+        || projection == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
         constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
         static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
