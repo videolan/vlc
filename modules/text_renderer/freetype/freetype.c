@@ -1015,11 +1015,65 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
     free( pp_styles );
 }
 
-static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment,
-                                       uni_char_t **pp_uchar, text_style_t ***ppp_styles )
+static size_t AddTextAndStyles( filter_sys_t *p_sys,
+                                const char *psz_text, const text_style_t *p_style,
+                                layout_text_block_t *p_text_block )
 {
-    uni_char_t *p_uchars = NULL;
-    text_style_t **pp_styles = NULL;
+    /* Convert chars to unicode */
+    size_t i_bytes;
+    uni_char_t *p_ucs4 = ToCharset( FREETYPE_TO_UCS, psz_text, &i_bytes );
+    if( !p_ucs4 )
+        return 0;
+
+    const size_t i_newchars = i_bytes / 4;
+    if( SIZE_MAX / 4 < p_text_block->i_count + i_newchars )
+    {
+        free( p_ucs4 );
+        return 0;
+    }
+    size_t i_realloc = (p_text_block->i_count + i_newchars) * 4;
+    void *p_realloc = realloc( p_text_block->p_uchars, i_realloc );
+    if( unlikely(!p_realloc) )
+        return 0;
+    p_text_block->p_uchars = p_realloc;
+
+    /* We want one per segment shared text_style_t* per unicode character */
+    if( SIZE_MAX / sizeof(text_style_t *) < p_text_block->i_count + i_newchars )
+        return 0;
+    i_realloc = (p_text_block->i_count + i_newchars) * sizeof(text_style_t *);
+    p_realloc = realloc( p_text_block->pp_styles, i_realloc );
+    if ( unlikely(!p_realloc) )
+        return 0;
+    p_text_block->pp_styles = p_realloc;
+
+    /* Copy data */
+    memcpy( &p_text_block->p_uchars[p_text_block->i_count], p_ucs4, i_newchars * 4 );
+    free( p_ucs4 );
+
+    text_style_t *p_mgstyle = text_style_Duplicate( p_sys->p_default_style );
+    if ( p_mgstyle == NULL )
+        return 0;
+
+    if( p_style )
+        /* Replace defaults with segment values */
+        text_style_Merge( p_mgstyle, p_style, true );
+
+    /* Overwrite any default or value with forced ones */
+    text_style_Merge( p_mgstyle, p_sys->p_forced_style, true );
+
+    /* map it to each char of that segment */
+    for ( size_t i = 0; i < i_newchars; ++i )
+        p_text_block->pp_styles[p_text_block->i_count + i] = p_mgstyle;
+
+    /* now safe to update total nb */
+    p_text_block->i_count += i_newchars;
+
+    return i_newchars;
+}
+
+static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment,
+                                       layout_text_block_t *p_text_block )
+{
     size_t i_nb_char = 0;
 
     for( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
@@ -1027,64 +1081,8 @@ static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t 
         if( !s->psz_text || !s->psz_text[0] )
             continue;
 
-        /* Convert chars to unicode */
-        size_t i_bytes;
-        uni_char_t *p_ucs4 = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_bytes );
-        if( !p_ucs4 )
-            continue;
-
-        const size_t i_newchars = i_bytes / 4;
-        if( SIZE_MAX / 4 < i_nb_char + i_newchars )
-        {
-            free( p_ucs4 );
-            break;
-        }
-        size_t i_realloc = (i_nb_char + i_newchars) * 4;
-        void *p_realloc = realloc( p_uchars, i_realloc );
-        if( unlikely(!p_realloc) )
-            break;
-        p_uchars = p_realloc;
-
-        memcpy( &p_uchars[i_nb_char], p_ucs4, i_newchars * 4 );
-        free( p_ucs4 );
-
-        /* We want one per segment shared text_style_t* per unicode character */
-        if( SIZE_MAX / sizeof(text_style_t *) < i_nb_char + i_newchars )
-            break;
-        i_realloc = (i_nb_char + i_newchars) * sizeof(text_style_t *);
-        p_realloc = realloc( pp_styles, i_realloc );
-        if ( unlikely(!p_realloc) )
-            break;
-        pp_styles = p_realloc;
-
-        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
-        if ( p_style == NULL )
-            break;
-
-        if( s->style )
-            /* Replace defaults with segment values */
-            text_style_Merge( p_style, s->style, true );
-
-        /* Overwrite any default or value with forced ones */
-        text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
-
-        /* map it to each char of that segment */
-        for ( size_t i = 0; i < i_newchars; ++i )
-            pp_styles[i_nb_char + i] = p_style;
-
-        /* now safe to update total nb */
-        i_nb_char += i_newchars;
-    }
-
-    if( i_nb_char == 0 ) /* break on 0 char */
-    {
-        free( p_uchars );
-        free( pp_styles );
-    }
-    else
-    {
-        *pp_uchar = p_uchars;
-        *ppp_styles = pp_styles;
+        i_nb_char += AddTextAndStyles( p_filter->p_sys, s->psz_text,
+                                       s->style, p_text_block );
     }
 
     return i_nb_char;
@@ -1123,9 +1121,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     text_block.b_balanced = p_region_in->b_balanced_text;
     text_block.b_grid = p_region_in->b_gridmode;
     text_block.i_count = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
-                                                  &text_block.p_uchars, &text_block.pp_styles );
+                                                  &text_block );
     if( text_block.i_count == 0 )
+    {
+        free( text_block.pp_styles );
+        free( text_block.p_uchars );
         return VLC_EGENERIC;
+    }
 
     /* */
     int rv = VLC_SUCCESS;
