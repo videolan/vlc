@@ -1,0 +1,11 @@
+--- ebml/ebml/EbmlMaster.h	2017-08-19 09:04:53.000000000 +0200
++++ ebml/ebml/EbmlMaster.h.datastart	2018-02-15 14:44:20.473862200 +0100
+@@ -84,7 +84,7 @@ class EBML_DLL_API EbmlMaster : public E
+     }
+ 
+     uint64 GetDataStart() const {
+-      return GetElementPosition() + EBML_ID_LENGTH((const EbmlId&)*this) + CodedSizeLength(GetSize(), GetSizeLength(), IsFiniteSize());
++      return GetElementPosition() + EBML_ID_LENGTH((const EbmlId&)*this) + CodedSizeLength(EbmlElement::GetSize(), GetSizeLength(), IsFiniteSize());
+     }
+ 
+     /*!
