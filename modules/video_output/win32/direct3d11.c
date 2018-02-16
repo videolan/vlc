@@ -2332,16 +2332,18 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
     float MidX,MidY;
 
     float top, bottom, left, right;
+    /* find the middle of the visible part of the texture, it will be a 0,0
+     * the rest of the visible area must correspond to -1,1 */
     switch (orientation)
     {
     case ORIENT_ROTATED_90: /* 90° anti clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
-        top    =  (src_width  - MidX) / (output->right - MidX);
-        bottom = -MidY / (MidY - output->top);
-        left   = -(src_height - MidY) / (output->bottom - MidY);
-        right  =   MidX / (MidX - output->left);
+        top    =  MidY / (MidY - output->top);
+        bottom = -(src_height - MidX) / (MidX - output->top);
+        left   =  (MidX - src_height) / (MidX - output->left);
+        right  =                 MidX / (MidX - (src_width - output->right));
         break;
     case ORIENT_ROTATED_180: /* 180° */
         /* right/top aligned */
