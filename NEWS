@@ -22,7 +22,8 @@ Demux:
 macOS Interface:
  * Re-add option to disable the fullscreen controller panel
  * Auto-layout improvements
- * Remove misleading playback warning indicator
+ * Remove misleading playback warning indicato
+ * Fix crash with the interface for lua extensions (like VLSub)
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
