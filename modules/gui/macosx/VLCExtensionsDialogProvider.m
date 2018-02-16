@@ -59,6 +59,8 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
                 [field setEditable:NO];
                 [field setBordered:NO];
                 [field setDrawsBackground:NO];
+                [field setAllowsEditingTextAttributes:YES];
+                [field setSelectable:YES];
                 [field setFont:[NSFont systemFontOfSize:0]];
                 [[field cell] setControlSize:NSRegularControlSize];
                 [field setAutoresizingMask:NSViewNotSizable];
