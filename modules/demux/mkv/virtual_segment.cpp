@@ -441,53 +441,53 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 
     /* we have moved to a new chapter */
     if ( p_cur_vchapter != NULL && p_current_vchapter != p_cur_vchapter )
+    {
+        msg_Dbg( &demux, "New Chapter %" PRId64 " uid=%" PRIu64, sys.i_pts - VLC_TS_0, p_cur_vchapter->p_chapter->i_uid );
+        if ( p_cur_vedition->b_ordered )
         {
-            msg_Dbg( &demux, "New Chapter %" PRId64 " uid=%" PRIu64, sys.i_pts - VLC_TS_0, p_cur_vchapter->p_chapter->i_uid );
-            if ( p_cur_vedition->b_ordered )
+            /* FIXME EnterAndLeave has probably been broken for a long time */
+            // Leave/Enter up to the link point
+            b_has_seeked = p_cur_vchapter->EnterAndLeave( p_current_vchapter );
+            if ( !b_has_seeked )
             {
-                /* FIXME EnterAndLeave has probably been broken for a long time */
-                // Leave/Enter up to the link point
-                b_has_seeked = p_cur_vchapter->EnterAndLeave( p_current_vchapter );
-                if ( !b_has_seeked )
+                // only physically seek if necessary
+                if ( p_current_vchapter == NULL ||
+                    ( p_current_vchapter && &p_current_vchapter->segment != &p_cur_vchapter->segment ) ||
+                    ( p_current_vchapter->p_chapter->i_end_time != p_cur_vchapter->p_chapter->i_start_time ))
                 {
-                    // only physically seek if necessary
-                    if ( p_current_vchapter == NULL ||
-                        ( p_current_vchapter && &p_current_vchapter->segment != &p_cur_vchapter->segment ) ||
-                        ( p_current_vchapter->p_chapter->i_end_time != p_cur_vchapter->p_chapter->i_start_time ))
-                    {
-                        /* Forcing reset pcr */
-                        es_out_Control( demux.out, ES_OUT_RESET_PCR);
-                        Seek( demux, p_cur_vchapter->i_mk_virtual_start_time, p_cur_vchapter );
-                        return true;
-                    }
-                    sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
-                }
-            }
-
-            p_current_vchapter = p_cur_vchapter;
-            if ( p_cur_vchapter->i_seekpoint_num > 0 )
-            {
-                sys.i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-                sys.i_current_title = i_sys_title;
-                sys.i_current_seekpoint = p_cur_vchapter->i_seekpoint_num - 1;
-            }
-
-            return b_has_seeked;
-        }
-        else if ( p_cur_vchapter == NULL )
-        {
-            /* out of the scope of the data described by chapters, leave the edition */
-            if ( p_cur_vedition->b_ordered && p_current_vchapter != NULL )
-            {
-                if ( !p_current_vchapter->Leave( ) )
-                {
-                    p_current_vchapter = NULL;
-                    b_current_vchapter_entered = false;
-                }
-                else
+                    /* Forcing reset pcr */
+                    es_out_Control( demux.out, ES_OUT_RESET_PCR);
+                    Seek( demux, p_cur_vchapter->i_mk_virtual_start_time, p_cur_vchapter );
                     return true;
+                }
+                sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
             }
         }
+
+        p_current_vchapter = p_cur_vchapter;
+        if ( p_cur_vchapter->i_seekpoint_num > 0 )
+        {
+            sys.i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            sys.i_current_title = i_sys_title;
+            sys.i_current_seekpoint = p_cur_vchapter->i_seekpoint_num - 1;
+        }
+
+        return b_has_seeked;
+    }
+    else if ( p_cur_vchapter == NULL )
+    {
+        /* out of the scope of the data described by chapters, leave the edition */
+        if ( p_cur_vedition->b_ordered && p_current_vchapter != NULL )
+        {
+            if ( !p_current_vchapter->Leave( ) )
+            {
+                p_current_vchapter = NULL;
+                b_current_vchapter_entered = false;
+            }
+            else
+                return true;
+        }
+    }
     return false;
 }
 
