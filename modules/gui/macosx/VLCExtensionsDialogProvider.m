@@ -478,6 +478,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     }
 
     [dialogWindow setDelegate:nil];
+    [dialogWindow close];
     dialogWindow = nil;
 
     p_dialog->p_sys_intf = NULL;
