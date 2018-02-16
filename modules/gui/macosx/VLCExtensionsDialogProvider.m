@@ -81,6 +81,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
                 [button setWidget:widget];
                 [button setAction:@selector(triggerClick:)];
                 [button setTarget:self];
+                [button setFont:[NSFont systemFontOfSize:0.0]];
                 [[button cell] setControlSize:NSRegularControlSize];
                 [button setAutoresizingMask:NSViewWidthSizable];
                 return button;
@@ -92,6 +93,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
                 [button setWidget:widget];
                 [button setAction:@selector(triggerClick:)];
                 [button setTarget:self];
+                [button setFont:[NSFont systemFontOfSize:0.0]];
                 [[button cell] setControlSize:NSRegularControlSize];
                 [button setAutoresizingMask:NSViewNotSizable];
                 return button;
