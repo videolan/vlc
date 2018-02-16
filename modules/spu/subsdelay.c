@@ -271,8 +271,8 @@ static void SubsdelayEntryNewStopValueUpdated( subsdelay_heap_entry_t *p_entry )
  *****************************************************************************/
 
 vlc_module_begin()
-        set_shortname( _("Subsdelay") )
-        set_description( _("Subtitle delay") )
+        set_shortname( N_("Subsdelay") )
+        set_description( N_("Subtitle delay") )
         set_help( SUBSDELAY_HELP )
         set_capability( "sub filter", 0 )
         set_callbacks( SubsdelayCreate, SubsdelayDestroy )
