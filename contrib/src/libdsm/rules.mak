@@ -4,9 +4,6 @@
 LIBDSM_VERSION := 0.2.8
 LIBDSM_URL := https://github.com/videolabs/libdsm/releases/download/v$(LIBDSM_VERSION)/libdsm-$(LIBDSM_VERSION).tar.gz
 
-ifndef HAVE_WIN32
-PKGS += libdsm
-endif
 ifeq ($(call need_pkg,"libdsm >= 0.2.0"),)
 PKGS_FOUND += libdsm
 endif
