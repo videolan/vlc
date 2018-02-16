@@ -150,13 +150,16 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 static void updateControlFromWidget(NSView *control, extension_widget_t *widget, id self)
 {
     @autoreleasepool {
+        NSString * const defaultStyleCSS = @"<style>*{ font-family: \
+            -apple-system-body, -apple-system, \
+            HelveticaNeue, Arial, sans-serif; }</style>";
         switch (widget->type) {
             case EXTENSION_WIDGET_HTML:
             {
                 // Get the web view
                 assert([control isKindOfClass:[WebView class]]);
                 WebView *webView = (WebView *)control;
-                NSString *string = toNSStr(widget->psz_text);
+                NSString *string = [defaultStyleCSS stringByAppendingString:toNSStr(widget->psz_text)];
                 [[webView mainFrame] loadHTMLString:string baseURL:[NSURL URLWithString:@""]];
                 [webView setNeedsDisplay:YES];
                 break;
@@ -169,7 +172,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                     break;
                 assert([control isKindOfClass:[NSControl class]]);
                 NSControl *field = (NSControl *)control;
-                NSString *string = toNSStr(widget->psz_text);
+                NSString *string = [defaultStyleCSS stringByAppendingString:toNSStr(widget->psz_text)];
                 NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
                 [field setAttributedStringValue:attrString];
                 break;
