@@ -931,8 +931,15 @@ function get_available_translations()
   then
     openSub.actionLabel = lang["int_searching_transl"]
 
-    local translations_content, lol = get(translations_url)
+    local translations_content, status, resp = get(translations_url)
     local translations_avail = openSub.option.translations_avail
+
+    if translations_content == false then
+        -- Translation list download error
+        setMessage(error_tag(lang["mess_error"] .. " (" .. status .. ")"))
+        return
+    end
+
     all_trsl = parse_xml(translations_content)
     local lg, trsl
 
