@@ -1536,12 +1536,12 @@ int LayoutTextBlock( filter_t *p_filter,
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
-    int i_paragraph_start = 0;
+    size_t i_paragraph_start = 0;
     unsigned i_total_height = 0;
     unsigned i_max_advance_x = 0;
     int i_max_face_height = 0;
 
-    for( int i = 0; i <= p_textblock->i_count; ++i )
+    for( size_t i = 0; i <= p_textblock->i_count; ++i )
     {
         if( i == p_textblock->i_count || p_textblock->p_uchars[ i ] == '\n' )
         {
