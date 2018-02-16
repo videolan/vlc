@@ -474,7 +474,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 
         return b_has_seeked;
     }
-    else if ( p_cur_vchapter == NULL )
+    else if ( p_cur_vchapter == NULL && p_cur_vedition != NULL )
     {
         /* out of the scope of the data described by chapters, leave the edition */
         if ( p_cur_vedition->b_ordered && p_current_vchapter != NULL )
