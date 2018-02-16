@@ -55,7 +55,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             }
             case EXTENSION_WIDGET_LABEL:
             {
-                NSTextField *field = [[NSTextField alloc] init];
+                VLCDialogLabel *field = [[VLCDialogLabel alloc] init];
                 [field setEditable:NO];
                 [field setBordered:NO];
                 [field setDrawsBackground:NO];
