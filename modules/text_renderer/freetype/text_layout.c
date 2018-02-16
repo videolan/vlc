@@ -934,7 +934,8 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
         FT_Face p_face = 0;
         if( !p_run->p_face )
         {
-            p_face = SelectAndLoadFace( p_filter, p_style, p_paragraph->p_code_points );
+            p_face = SelectAndLoadFace( p_filter, p_style,
+                                        p_paragraph->p_code_points[p_run->i_start_offset] );
             if( !p_face )
             {
                 /* Uses the default font and style */
