@@ -468,7 +468,10 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 {
     assert(p_dialog);
 
-    VLCDialogWindow *dialogWindow = CFBridgingRelease(p_dialog->p_sys_intf);
+    /* FIXME: Creating the dialog, we CFBridgingRetain p_sys_intf but we can't
+     *        just CFBridgingRelease it here, as that causes a crash.
+     */
+    VLCDialogWindow *dialogWindow = (__bridge VLCDialogWindow*)p_dialog->p_sys_intf;
     if (!dialogWindow) {
         msg_Warn(getIntf(), "dialog window not found");
         return VLC_EGENERIC;
