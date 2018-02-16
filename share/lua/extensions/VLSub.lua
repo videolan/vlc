@@ -133,16 +133,16 @@ local options = {
       <a href='http://addons.videolan.org'>addons.videolan.org</a>.
       ]],
     int_no_support_mess = [[
-      <strong>VLSub is not working with Vlc 2.1.x on
+      <strong>VLSub is not working with VLC 2.1.x on
       any platform</strong>
       because the lua "net" module needed to interact
       with opensubtitles has been
       removed in this release for the extensions.
       <br>
-      <strong>Works with Vlc 2.2 on mac and linux.</strong>
+      <strong>Works with VLC 2.2 on mac and linux.</strong>
       <br>
       <strong>On windows you have to install an older version
-      of Vlc (2.0.8 for example)</strong>
+      of VLC (2.0.8 for example)</strong>
       to use Vlsub:
       <br>
       <a target="_blank" rel="nofollow"
