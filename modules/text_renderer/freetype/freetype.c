@@ -806,7 +806,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
     }
 }
 
-static int RenderCharAXYZ( filter_t *p_filter,
+static void RenderCharAXYZ( filter_t *p_filter,
                            picture_t *p_picture,
                            const line_desc_t *p_line,
                            int i_offset_x,
