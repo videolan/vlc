@@ -34,7 +34,9 @@ apps:
 
 parts:
   vlc:
-    after: [desktop-qt5]
+    after:
+      - desktop-qt5
+      - indicator-qt5-from-src
     source: ../../../
     source-type: git
     plugin: autotools
@@ -223,6 +225,9 @@ parts:
       - zlib1g
       - libprojectm2v5
       - projectm-data
+
+  desktop-qt5:
+    stage: [ -./**/lib/*/qt5/**/libappmenu-qt5.so ]
 
   wrapper:
     plugin: dump
