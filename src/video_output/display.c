@@ -923,12 +923,12 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
             if (!osys->fit_window)
                 osys->fit_window = 1;
-            osys->crop.left   = vd->source.i_x_offset - osys->source.i_x_offset;
-            osys->crop.top    = vd->source.i_y_offset - osys->source.i_y_offset;
+            osys->crop.left   = left - osys->source.i_x_offset;
+            osys->crop.top    = top  - osys->source.i_y_offset;
             /* FIXME for right/bottom we should keep the 'type' border vs window */
-            osys->crop.right  = (vd->source.i_x_offset + vd->source.i_visible_width) -
+            osys->crop.right  = right -
                                 (osys->source.i_x_offset + osys->source.i_visible_width);
-            osys->crop.bottom = (vd->source.i_y_offset + vd->source.i_visible_height) -
+            osys->crop.bottom = bottom -
                                 (osys->source.i_y_offset + osys->source.i_visible_height);
             osys->crop.num    = crop_num;
             osys->crop.den    = crop_den;
