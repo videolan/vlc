@@ -1870,6 +1870,7 @@
 					../../../build/include/vlc/,
 					../../../build/include/,
 					../../../build/,
+					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -1894,6 +1895,7 @@
 					../../../build/include/vlc/,
 					../../../build/include/,
 					../../../build/,
+					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -1917,6 +1919,7 @@
 					../../../build/include/vlc/,
 					../../../build/include/,
 					../../../build/,
+					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -1954,6 +1957,7 @@
 					../../../include/vlc/,
 					../../../build/include/vlc/,
 					../../../build/include/,
+					../../../modules/codec/,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1993,6 +1997,7 @@
 					../../../include/vlc/,
 					../../../build/include/vlc/,
 					../../../build/include/,
+					../../../modules/codec/,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PATH = $VLC_PATH;
@@ -2031,6 +2036,7 @@
 					../../../include/vlc/,
 					../../../build/include/vlc/,
 					../../../build/include/,
+					../../../modules/codec/,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PATH = $VLC_PATH;
