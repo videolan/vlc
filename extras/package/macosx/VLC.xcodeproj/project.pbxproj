@@ -94,7 +94,6 @@
 		6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBF9841F7B257100B404CD /* VLCLogMessage.m */; };
 		6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */; };
 		6BF56C3E1FCF00AF004A411A /* audiotoolbox_midi.c in Sources */ = {isa = PBXBuildFile; fileRef = 6BF56C3D1FCF00AF004A411A /* audiotoolbox_midi.c */; };
-		6BF5C5011EFE03CF008A9C12 /* VLCHUDStepperCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF5C5001EFE03CF008A9C12 /* VLCHUDStepperCell.m */; };
 		6BF5C5041EFE66EF008A9C12 /* VLCHUDTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF5C5031EFE66EF008A9C12 /* VLCHUDTableView.m */; };
 		6BF5C5071EFE7E58008A9C12 /* VLCTintedImageButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF5C5061EFE7E58008A9C12 /* VLCTintedImageButtonCell.m */; };
 /* End PBXBuildFile section */
@@ -638,8 +637,6 @@
 		6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCTimeField.m; sourceTree = "<group>"; };
 		6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = "Button-Icons/VLCPauseTemplate.pdf"; sourceTree = "<group>"; };
 		6BF56C3D1FCF00AF004A411A /* audiotoolbox_midi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = audiotoolbox_midi.c; path = ../../../modules/codec/audiotoolbox_midi.c; sourceTree = "<group>"; };
-		6BF5C4FF1EFE03CF008A9C12 /* VLCHUDStepperCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDStepperCell.h; sourceTree = "<group>"; };
-		6BF5C5001EFE03CF008A9C12 /* VLCHUDStepperCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDStepperCell.m; sourceTree = "<group>"; };
 		6BF5C5021EFE66EF008A9C12 /* VLCHUDTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableView.h; sourceTree = "<group>"; };
 		6BF5C5031EFE66EF008A9C12 /* VLCHUDTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableView.m; sourceTree = "<group>"; };
 		6BF5C5051EFE7E58008A9C12 /* VLCTintedImageButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCTintedImageButtonCell.h; sourceTree = "<group>"; };
@@ -1467,8 +1464,6 @@
 			children = (
 				6B846FDE1CF5D88C00112E54 /* VLCHUDCheckboxCell.h */,
 				6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */,
-				6BF5C4FF1EFE03CF008A9C12 /* VLCHUDStepperCell.h */,
-				6BF5C5001EFE03CF008A9C12 /* VLCHUDStepperCell.m */,
 				6B846FE21CF5D88C00112E54 /* VLCHUDSliderCell.h */,
 				6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */,
 				6B9FD0371EEB5D8A0085151F /* VLCHUDScroller.h */,
@@ -1787,7 +1782,6 @@
 				1C3113B11E508C6900D4DD76 /* VLCFSPanelDraggableView.m in Sources */,
 				1C3113B41E508C6900D4DD76 /* VLCInputManager.m in Sources */,
 				1C3113B61E508C6900D4DD76 /* VLCMain+OldPrefs.m in Sources */,
-				6BF5C5011EFE03CF008A9C12 /* VLCHUDStepperCell.m in Sources */,
 				1C3113B81E508C6900D4DD76 /* VLCMain.m in Sources */,
 				1C3113BA1E508C6900D4DD76 /* VLCApplication.m in Sources */,
 				1C3113BC1E508C6900D4DD76 /* VLCKeyboardBacklightControl.m in Sources */,
