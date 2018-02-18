@@ -21,6 +21,8 @@
 
 #import "VLCInputManager.h"
 
+#include <vlc_url.h>
+
 #import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"
 #import "VLCExtensionsManager.h"
@@ -159,6 +161,16 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 @implementation VLCInputManager
 
++ (void)initialize
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSArray array], @"recentlyPlayedMediaList",
+                                 [NSDictionary dictionary], @"recentlyPlayedMedia", nil];
+
+    [defaults registerDefaults:appDefaults];
+}
+
 - (id)initWithMain:(VLCMain *)o_mainObj
 {
     self = [super init];
@@ -179,7 +191,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     msg_Dbg(getIntf(), "Deinitializing input manager");
     if (p_current_input) {
         /* continue playback where you left off */
-        [[o_main playlist] storePlaybackPositionForItem:p_current_input];
+        [self storePlaybackPositionForItem:p_current_input];
 
         var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         vlc_object_release(p_current_input);
@@ -226,7 +238,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         [[o_main playlist] currentlyPlayingItemChanged];
 
-        [[o_main playlist] continuePlaybackWhereYouLeftOff:p_current_input];
+        [self continuePlaybackWhereYouLeftOff:p_current_input];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
                                                             object:nil];
@@ -296,7 +308,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (state == END_S || state == -1) {
             /* continue playback where you left off */
             if (p_current_input)
-                [[o_main playlist] storePlaybackPositionForItem:p_current_input];
+                [self storePlaybackPositionForItem:p_current_input];
 
             if (hasEndedTimer) {
                 [hasEndedTimer invalidate];
@@ -506,6 +518,139 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (BOOL)hasInput
 {
     return p_current_input != NULL;
+}
+
+#pragma mark -
+#pragma mark Resume logic
+
+
+- (BOOL)isValidResumeItem:(input_item_t *)p_item
+{
+    char *psz_url = input_item_GetURI(p_item);
+    NSString *urlString = toNSStr(psz_url);
+    free(psz_url);
+
+    if ([urlString isEqualToString:@""])
+        return NO;
+
+    NSURL *url = [NSURL URLWithString:urlString];
+
+    if (![url isFileURL])
+        return NO;
+
+    BOOL isDir = false;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDir])
+        return NO;
+
+    if (isDir)
+        return NO;
+
+    return YES;
+}
+
+- (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
+{
+    NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
+    if (!recentlyPlayedFiles)
+        return;
+
+    input_item_t *p_item = input_GetItem(p_input_thread);
+    if (!p_item)
+        return;
+
+    /* allow the user to over-write the start/stop/run-time */
+    if (var_GetFloat(p_input_thread, "run-time") > 0 ||
+        var_GetFloat(p_input_thread, "start-time") > 0 ||
+        var_GetFloat(p_input_thread, "stop-time") != 0) {
+        return;
+    }
+
+    /* check for file existance before resuming */
+    if (![self isValidResumeItem:p_item])
+        return;
+
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+    if (!psz_url)
+        return;
+    NSString *url = toNSStr(psz_url);
+    free(psz_url);
+
+    NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
+    if (!lastPosition || lastPosition.intValue <= 0)
+        return;
+
+    int settingValue = config_GetInt(getIntf(), "macosx-continue-playback");
+    if (settingValue == 2) // never resume
+        return;
+
+    CompletionBlock completionBlock = ^(enum ResumeResult result) {
+
+        if (result == RESUME_RESTART)
+            return;
+
+        mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
+        msg_Dbg(getIntf(), "continuing playback at %lld", lastPos);
+        var_SetInteger(p_input_thread, "time", lastPos);
+    };
+
+    if (settingValue == 1) { // always
+        completionBlock(RESUME_NOW);
+        return;
+    }
+
+    [[[VLCMain sharedInstance] resumeDialog] showWindowWithItem:p_item
+                                               withLastPosition:lastPosition.intValue
+                                                completionBlock:completionBlock];
+
+}
+
+- (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
+{
+    if (!var_InheritBool(getIntf(), "macosx-recentitems"))
+        return;
+
+    input_item_t *p_item = input_GetItem(p_input_thread);
+    if (!p_item)
+        return;
+
+    if (![self isValidResumeItem:p_item])
+        return;
+
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+    if (!psz_url)
+        return;
+    NSString *url = toNSStr(psz_url);
+    free(psz_url);
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
+
+    float relativePos = var_GetFloat(p_input_thread, "position");
+    mtime_t pos = var_GetInteger(p_input_thread, "time") / CLOCK_FREQ;
+    mtime_t dur = input_item_GetDuration(p_item) / 1000000;
+
+    NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
+
+    if (relativePos > .05 && relativePos < .95 && dur > 180) {
+        msg_Dbg(getIntf(), "Store current playback position of %f", relativePos);
+        [mutDict setObject:[NSNumber numberWithInt:pos] forKey:url];
+
+        [mediaList removeObject:url];
+        [mediaList addObject:url];
+        NSUInteger mediaListCount = mediaList.count;
+        if (mediaListCount > 30) {
+            for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
+                [mutDict removeObjectForKey:[mediaList firstObject]];
+                [mediaList removeObjectAtIndex:0];
+            }
+        }
+    } else {
+        [mutDict removeObjectForKey:url];
+        [mediaList removeObject:url];
+    }
+    [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
+    [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
+    [defaults synchronize];
 }
 
 @end
