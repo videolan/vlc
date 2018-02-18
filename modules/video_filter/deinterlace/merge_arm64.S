@@ -19,6 +19,8 @@
  // Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  //****************************************************************************/
 
+#include "../../arm_neon/asm.S"
+
 	.text
 
 #define	DEST	x0
@@ -27,10 +29,8 @@
 #define	SIZE	x3
 
 	.align 2
-	.global merge8_arm64_neon
-	.type	merge8_arm64_neon, %function
 	// NOTE: Offset and pitch must be multiple of 16-bytes in VLC.
-merge8_arm64_neon:
+function merge8_arm64_neon
 	ands		x5, SIZE, #~63
 	b.eq		2f
 	mov		x10, #64
@@ -66,9 +66,7 @@ merge8_arm64_neon:
 	ret
 
 	.align 2
-	.global merge16_arm64_neon
-	.type	merge16_arm64_neon, %function
-merge16_arm64_neon:
+function merge16_arm64_neon
 	ands		x5, SIZE, #~63
 	b.eq		2f
 1:

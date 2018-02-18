@@ -19,8 +19,12 @@
  @ Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  @****************************************************************************/
 
+#include "asm.S"
+
 	.syntax unified
-	.fpu neon
+#if HAVE_AS_FPU_DIRECTIVE
+	.fpu	neon
+#endif
 	.text
 
 /* ARM */
@@ -83,9 +87,7 @@ coefficients:
     .short  -18432
 
 	.align 2
-	.global i420_rv16_neon
-	.type	i420_rv16_neon, %function
-i420_rv16_neon:
+function i420_rv16_neon
 	push		{r4-r8,r10-r11,lr}
 	vpush		{q4-q7}
 
