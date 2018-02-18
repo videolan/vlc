@@ -114,6 +114,16 @@ void CloseIntf (vlc_object_t *p_this)
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
         [VLCMain killInstance];
 
+        /*
+         * Spinning the event loop here is important to help cleaning up all objects which should be
+         * destroyed here. Its possible that main thread selectors (which hold a strong reference
+         * to the target object), are still in the queue (e.g. fired from variable callback).
+         * Thus make sure those are still dispatched and the references to the targets are
+         * cleared, to allow the objects to be released.
+         */
+        msg_Dbg(p_this, "Spin the event loop to clean up the interface");
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate date]];
+
         p_interface_thread = nil;
     }
 }
@@ -321,6 +331,7 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+    msg_Dbg(getIntf(), "applicationWillTerminate called");
     if (b_intf_terminating)
         return;
     b_intf_terminating = true;
@@ -340,8 +351,6 @@ static VLCMain *sharedInstance = nil;
     config_PutInt(p_intf, "random", var_GetBool(p_playlist, "random"));
     config_PutInt(p_intf, "loop", var_GetBool(p_playlist, "loop"));
     config_PutInt(p_intf, "repeat", var_GetBool(p_playlist, "repeat"));
-
-    msg_Dbg(p_intf, "Terminating");
 
     var_DelCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
     var_DelCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
