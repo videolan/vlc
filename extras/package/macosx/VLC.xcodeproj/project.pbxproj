@@ -82,7 +82,6 @@
 		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
 		6B4D50961E7A7D16004479B5 /* NSSound+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */; };
 		6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */; };
-		6B5978C51EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B5978C41EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m */; };
 		6B6FFF701EF9EC350001CEB1 /* CompatibilityFixes.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6FFF6F1EF9EC350001CEB1 /* CompatibilityFixes.m */; };
 		6B7F1FDF1F07DA920002BDD8 /* VLCHexNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F1FDE1F07DA920002BDD8 /* VLCHexNumberFormatter.m */; };
 		6B8166291EBFC34300C26F1B /* VLCDefaultValueSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */; };
@@ -157,8 +156,6 @@
 		6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSound+VLCAdditions.m"; sourceTree = "<group>"; };
 		6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSScreen+VLCAdditions.h"; sourceTree = "<group>"; };
 		6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSScreen+VLCAdditions.m"; sourceTree = "<group>"; };
-		6B5978C31EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDPopUpButtonCell.h; sourceTree = "<group>"; };
-		6B5978C41EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDPopUpButtonCell.m; sourceTree = "<group>"; };
 		6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSlider.h; sourceTree = "<group>"; };
 		6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDefaultValueSlider.m; sourceTree = "<group>"; };
 		6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSliderCell.h; sourceTree = "<group>"; };
@@ -1471,8 +1468,6 @@
 		6B846FE81CF5D89500112E54 /* HUD UI Classes */ = {
 			isa = PBXGroup;
 			children = (
-				6B5978C31EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.h */,
-				6B5978C41EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m */,
 				6B846FDC1CF5D88C00112E54 /* VLCHUDButtonCell.h */,
 				6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */,
 				6B846FDE1CF5D88C00112E54 /* VLCHUDCheckboxCell.h */,
@@ -1804,7 +1799,6 @@
 				1C3113BC1E508C6900D4DD76 /* VLCKeyboardBacklightControl.m in Sources */,
 				1C3113BD1E508C6900D4DD76 /* macosx.m in Sources */,
 				1C3113BF1E508C6900D4DD76 /* VLCMainMenu.m in Sources */,
-				6B5978C51EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m in Sources */,
 				1C3113C11E508C6900D4DD76 /* VLCMainWindow.m in Sources */,
 				6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */,
 				1C3113C31E508C6900D4DD76 /* VLCMainWindowTitleView.m in Sources */,

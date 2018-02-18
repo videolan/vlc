@@ -82,7 +82,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHUDTableView.h gui/macosx/VLCHUDTableView.m \
 	gui/macosx/VLCHUDTableCornerView.h gui/macosx/VLCHUDTableCornerView.m \
 	gui/macosx/VLCHUDStepperCell.h gui/macosx/VLCHUDStepperCell.m \
-	gui/macosx/VLCHUDPopUpButtonCell.h gui/macosx/VLCHUDPopUpButtonCell.m \
 	gui/macosx/VLCInputManager.h gui/macosx/VLCInputManager.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
