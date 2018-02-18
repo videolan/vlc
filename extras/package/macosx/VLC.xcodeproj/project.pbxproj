@@ -94,7 +94,6 @@
 		6BA1A0642038D93D005EA18A /* ci_filters.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BA1A0632038D93D005EA18A /* ci_filters.m */; };
 		6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */; };
 		6BBB05E01EEFF165003A1019 /* VLCHUDTableCornerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */; };
-		6BBB05E31EF08181003A1019 /* VLCHUDSegmentedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05E21EF08181003A1019 /* VLCHUDSegmentedCell.m */; };
 		6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBF9841F7B257100B404CD /* VLCLogMessage.m */; };
 		6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */; };
 		6BF56C3E1FCF00AF004A411A /* audiotoolbox_midi.c in Sources */ = {isa = PBXBuildFile; fileRef = 6BF56C3D1FCF00AF004A411A /* audiotoolbox_midi.c */; };
@@ -634,8 +633,6 @@
 		6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDOutlineView.m; sourceTree = "<group>"; };
 		6BBB05DE1EEFF165003A1019 /* VLCHUDTableCornerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableCornerView.h; sourceTree = "<group>"; };
 		6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableCornerView.m; sourceTree = "<group>"; };
-		6BBB05E11EF08181003A1019 /* VLCHUDSegmentedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDSegmentedCell.h; sourceTree = "<group>"; };
-		6BBB05E21EF08181003A1019 /* VLCHUDSegmentedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDSegmentedCell.m; sourceTree = "<group>"; };
 		6BBBB8A71D108A17001BD9BA /* VLCRendererMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCRendererMenuController.h; sourceTree = "<group>"; };
 		6BBBB8A81D108A17001BD9BA /* VLCRendererMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCRendererMenuController.m; sourceTree = "<group>"; };
 		6BBBB8B01D10A994001BD9BA /* VLCRendererItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCRendererItem.h; sourceTree = "<group>"; };
@@ -1497,8 +1494,6 @@
 				6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */,
 				6BBB05DE1EEFF165003A1019 /* VLCHUDTableCornerView.h */,
 				6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */,
-				6BBB05E11EF08181003A1019 /* VLCHUDSegmentedCell.h */,
-				6BBB05E21EF08181003A1019 /* VLCHUDSegmentedCell.m */,
 			);
 			name = "HUD UI Classes";
 			sourceTree = "<group>";
@@ -1847,7 +1842,6 @@
 				6B7F1FDF1F07DA920002BDD8 /* VLCHexNumberFormatter.m in Sources */,
 				1C3113E91E508C6900D4DD76 /* VLCScrollingClipView.m in Sources */,
 				1C3113EB1E508C6900D4DD76 /* VLCStatusBarIcon.m in Sources */,
-				6BBB05E31EF08181003A1019 /* VLCHUDSegmentedCell.m in Sources */,
 				1C3113ED1E508C6900D4DD76 /* VLCTimeSelectionPanelController.m in Sources */,
 				1C06F2A31F08F1250068846F /* osx_notifications.m in Sources */,
 			);
