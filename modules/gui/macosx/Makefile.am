@@ -74,7 +74,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCCoreDialogProvider.h gui/macosx/VLCCoreDialogProvider.m \
 	gui/macosx/VLCLogMessage.h gui/macosx/VLCLogMessage.m \
 	gui/macosx/VLCLogWindowController.h gui/macosx/VLCLogWindowController.m \
-	gui/macosx/VLCHUDScroller.h gui/macosx/VLCHUDScroller.m \
 	gui/macosx/VLCHUDOutlineView.h gui/macosx/VLCHUDOutlineView.m \
 	gui/macosx/VLCHUDTableView.h gui/macosx/VLCHUDTableView.m \
 	gui/macosx/VLCHUDTableCornerView.h gui/macosx/VLCHUDTableCornerView.m \
