@@ -465,14 +465,7 @@ NSString *toNSStr(const char *str) {
 
 @end
 
-NSImage *imageFromRes(NSString *o_id)
+NSImage *imageFromRes(NSString *name)
 {
-    NSString *result = @"";
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        result = [result stringByAppendingString:@"ys-"];
-    }
-
-    result = [result stringByAppendingString:o_id];
-
-    return [NSImage imageNamed:result];
+    return [NSImage imageNamed:name];
 }
