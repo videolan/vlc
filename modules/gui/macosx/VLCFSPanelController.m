@@ -80,17 +80,12 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     /* Set autosave name after we changed window mask to resizable */
     [self.window setFrameAutosaveName:@"VLCFullscreenControls"];
 
-#ifdef MAC_OS_X_VERSION_10_10
     /* Inject correct background view depending on OS support */
     if (OSX_YOSEMITE_AND_HIGHER) {
         [self injectVisualEffectView];
     } else {
         [self injectBackgroundView];
     }
-#else
-    /* Compiled with old SDK, always use legacy style */
-    [self injectBackgroundView];
-#endif
 
     [self setupControls];
 }
@@ -428,7 +423,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 #pragma mark -
 #pragma mark Helpers
 
-#ifdef MAC_OS_X_VERSION_10_10
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
 
@@ -483,7 +477,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self.window.contentView addSubview:_controlsView];
 }
 #pragma clang diagnostic pop
-#endif
 
 /**
  Injects the standard background view in the Windows view hierarchy
