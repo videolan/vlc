@@ -81,11 +81,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self.window setFrameAutosaveName:@"VLCFullscreenControls"];
 
     /* Inject correct background view depending on OS support */
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        [self injectVisualEffectView];
-    } else {
-        [self injectBackgroundView];
-    }
+    [self injectVisualEffectView];
 
     [self setupControls];
 }
@@ -459,7 +455,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
  This is necessary as we can't use the NSVisualEffect view on
  all macOS Versions and therefore need to dynamically insert it.
 
- \warning Never call both, \c injectVisualEffectView and \c injectBackgroundView
  */
 - (void)injectVisualEffectView
 {
@@ -477,35 +472,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self.window.contentView addSubview:_controlsView];
 }
 #pragma clang diagnostic pop
-
-/**
- Injects the standard background view in the Windows view hierarchy
-
- This is necessary on macOS versions that do not support the
- NSVisualEffectView that usually is injected.
-
- \warning Never call both, \c injectVisualEffectView and \c injectBackgroundView
- */
-- (void)injectBackgroundView
-{
-    /* Setup the view */
-    CGColorRef color = CGColorCreateGenericGray(0.0, 0.8);
-    NSView *view = [[NSView alloc] initWithFrame:self.window.contentView.frame];
-    [view setWantsLayer:YES];
-    [view.layer setBackgroundColor:color];
-    [view.layer setCornerRadius:8.0];
-    [view setAutoresizesSubviews:YES];
-    CGColorRelease(color);
-
-    /* Inject view in view hierarchy */
-    [self.window setContentView:view];
-    [self.window.contentView addSubview:_controlsView];
-
-    /* Disable adjusting height to workaround autolayout problems */
-    [_heightMaxConstraint setConstant:42.0];
-    [self.window setMaxSize:NSMakeSize(4068, 80)];
-    [self.window setMinSize:NSMakeSize(480, 80)];
-}
 
 - (void)dealloc
 {
