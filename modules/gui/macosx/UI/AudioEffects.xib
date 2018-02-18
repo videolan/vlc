@@ -213,7 +213,7 @@
                                             <subviews>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="196">
                                                     <rect key="frame" x="14" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197"/>
                                                     <connections>
                                                         <action selector="equalizerPreAmpSliderUpdated:" target="-2" id="7Xa-Z8-5gG"/>
                                                     </connections>
@@ -332,70 +332,70 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="198">
                                                     <rect key="frame" x="91" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="199" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="199"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="Pq9-mK-6gi"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="200">
                                                     <rect key="frame" x="120" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="201" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="201"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="V5y-cd-ebf"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="202">
                                                     <rect key="frame" x="149" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="203" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="203"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="KN9-Ll-nEK"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="204">
                                                     <rect key="frame" x="178" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="205" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="205"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="35G-ln-i5e"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="206">
                                                     <rect key="frame" x="207" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="207" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="207"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LEn-my-NvY"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="208">
                                                     <rect key="frame" x="236" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="209" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="209"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="h2x-ra-iQ3"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="210">
                                                     <rect key="frame" x="265" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="211" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="211"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="m57-Q8-ZCE"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="212">
                                                     <rect key="frame" x="294" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="213" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="213"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="wbc-hi-c1U"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="214">
                                                     <rect key="frame" x="323" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="215" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="215"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LPs-jK-YbG"/>
                                                     </connections>
                                                 </slider>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="216">
                                                     <rect key="frame" x="352" y="31" width="18" height="150"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="217" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="217"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="ATa-AV-o2U"/>
                                                     </connections>
@@ -535,7 +535,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="46" id="JbG-c4-qiJ"/>
                                                     </constraints>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
                                                     </connections>
@@ -558,7 +558,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="225">
                                                     <rect key="frame" x="66" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
                                                     </connections>
@@ -581,7 +581,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="229">
                                                     <rect key="frame" x="122" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="2" maxValue="800" doubleValue="245.06977982954544" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="2" maxValue="800" doubleValue="245.06977982954544" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
                                                     </connections>
@@ -604,7 +604,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="233">
                                                     <rect key="frame" x="178" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
                                                     </connections>
@@ -627,7 +627,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="237">
                                                     <rect key="frame" x="234" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
                                                     </connections>
@@ -650,7 +650,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="241">
                                                     <rect key="frame" x="290" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
                                                     </connections>
@@ -665,7 +665,7 @@
                                                 </textField>
                                                 <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="245">
                                                     <rect key="frame" x="346" y="44" width="46" height="134"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="iSY-Me-sMB"/>
                                                     </connections>
@@ -814,7 +814,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="46" id="WiR-no-cPu"/>
                                                     </constraints>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="301" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="301"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="TzD-ul-6Gx"/>
                                                     </connections>
@@ -829,7 +829,7 @@
                                                 </textField>
                                                 <slider translatesAutoresizingMaskIntoConstraints="NO" id="268">
                                                     <rect key="frame" x="66" y="47" width="46" height="131"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="299" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="299"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="smf-XD-GHV"/>
                                                     </connections>
@@ -844,7 +844,7 @@
                                                 </textField>
                                                 <slider translatesAutoresizingMaskIntoConstraints="NO" id="270">
                                                     <rect key="frame" x="122" y="47" width="46" height="131"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="297" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="297"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="bnX-CW-h45"/>
                                                     </connections>
@@ -859,7 +859,7 @@
                                                 </textField>
                                                 <slider translatesAutoresizingMaskIntoConstraints="NO" id="272">
                                                     <rect key="frame" x="178" y="47" width="46" height="131"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="295" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="295"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="wM1-xe-t5e"/>
                                                     </connections>
@@ -874,7 +874,7 @@
                                                 </textField>
                                                 <slider translatesAutoresizingMaskIntoConstraints="NO" id="274">
                                                     <rect key="frame" x="234" y="47" width="46" height="131"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="293" customClass="VLCHUDSliderCell"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="293"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="CoP-xd-gur"/>
                                                     </connections>
@@ -1033,7 +1033,7 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="342">
                                                         <rect key="frame" x="110" y="9" width="310" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347" customClass="VLCHUDSliderCell"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347"/>
                                                         <connections>
                                                             <action selector="filterVolumeNormSliderUpdated:" target="-2" id="YLf-gK-UkJ"/>
                                                         </connections>
