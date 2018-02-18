@@ -419,9 +419,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 #pragma mark -
 #pragma mark Helpers
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-
 /**
  Create an image mask for the NSVisualEffectView
  with rounded corners in the given rect
@@ -471,7 +468,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_controlsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [self.window.contentView addSubview:_controlsView];
 }
-#pragma clang diagnostic pop
 
 - (void)dealloc
 {
