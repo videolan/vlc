@@ -61,7 +61,6 @@
 		1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */; };
 		1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B11D10A994001BD9BA /* VLCRendererItem.m */; };
 		1C3113F31E508C7600D4DD76 /* VLCRendererMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8A81D108A17001BD9BA /* VLCRendererMenuController.m */; };
-		1C3113F51E508C7600D4DD76 /* VLCHUDTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */; };
 		1C3113F71E508C7600D4DD76 /* VLCHUDButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */; };
 		1C3113F91E508C7600D4DD76 /* VLCHUDCheckboxCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */; };
 		1C3113FD1E508C7600D4DD76 /* VLCHUDSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */; };
@@ -624,8 +623,6 @@
 		6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDCheckboxCell.m; sourceTree = "<group>"; };
 		6B846FE21CF5D88C00112E54 /* VLCHUDSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDSliderCell.h; sourceTree = "<group>"; };
 		6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDSliderCell.m; sourceTree = "<group>"; };
-		6B846FE91CF5DBFF00112E54 /* VLCHUDTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTextFieldCell.h; sourceTree = "<group>"; };
-		6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTextFieldCell.m; sourceTree = "<group>"; };
 		6B9FD0371EEB5D8A0085151F /* VLCHUDScroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCHUDScroller.h; sourceTree = "<group>"; };
 		6B9FD0381EEB5D8A0085151F /* VLCHUDScroller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCHUDScroller.m; sourceTree = "<group>"; };
 		6BA1A0632038D93D005EA18A /* ci_filters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ci_filters.m; path = ../../../modules/video_filter/ci_filters.m; sourceTree = "<group>"; };
@@ -1474,8 +1471,6 @@
 		6B846FE81CF5D89500112E54 /* HUD UI Classes */ = {
 			isa = PBXGroup;
 			children = (
-				6B846FE91CF5DBFF00112E54 /* VLCHUDTextFieldCell.h */,
-				6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */,
 				6B5978C31EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.h */,
 				6B5978C41EFBFBF2003D9C80 /* VLCHUDPopUpButtonCell.m */,
 				6B846FDC1CF5D88C00112E54 /* VLCHUDButtonCell.h */,
@@ -1772,7 +1767,6 @@
 				1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */,
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
 				1C3113F31E508C7600D4DD76 /* VLCRendererMenuController.m in Sources */,
-				1C3113F51E508C7600D4DD76 /* VLCHUDTextFieldCell.m in Sources */,
 				1C3113F71E508C7600D4DD76 /* VLCHUDButtonCell.m in Sources */,
 				6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */,
 				1C3113F91E508C7600D4DD76 /* VLCHUDCheckboxCell.m in Sources */,
