@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCBookmarksWindowController">
@@ -35,7 +35,7 @@
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88">
                         <rect key="frame" x="20" y="224" width="59" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -45,7 +45,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
                         <rect key="frame" x="20" y="199" width="59" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -55,7 +55,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
                         <rect key="frame" x="20" y="174" width="59" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -65,7 +65,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
                         <rect key="frame" x="20" y="149" width="59" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -77,7 +77,7 @@
                         <rect key="frame" x="87" y="20" width="459" height="232"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="KmY-DA-2er">
                             <rect key="frame" x="1" y="1" width="457" height="230"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" autosaveName="bookmarks-table" headerView="111" id="110" customClass="VLCHUDTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="457" height="207"/>
@@ -186,7 +186,7 @@
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="141">
                         <rect key="frame" x="246" y="18" width="32" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -199,7 +199,7 @@ DQ
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="143">
                         <rect key="frame" x="185" y="18" width="53" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">

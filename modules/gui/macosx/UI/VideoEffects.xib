@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -157,7 +157,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="755" height="216"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="48">
+                                        <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="48">
                                             <rect key="frame" x="8" y="32" width="369" height="166"/>
                                             <view key="contentView" id="wwn-Le-8VF">
                                                 <rect key="frame" x="1" y="1" width="367" height="164"/>
@@ -253,7 +253,7 @@
                                                     </slider>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="704">
                                                         <rect key="frame" x="310" y="10" width="39" height="17"/>
-                                                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="705" customClass="VLCHUDButtonCell">
+                                                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="705">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="miniSystem"/>
                                                         </buttonCell>
@@ -320,7 +320,7 @@
                                                 <action selector="enableSharpen:" target="-2" id="hMo-bi-uqx"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="57">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="57">
                                             <rect key="frame" x="379" y="156" width="368" height="42"/>
                                             <view key="contentView" id="XDn-1w-i62">
                                                 <rect key="frame" x="1" y="1" width="366" height="40"/>
@@ -364,7 +364,7 @@
                                                 <action selector="enableBanding:" target="-2" id="qkS-Sl-QqY"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="61">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="61">
                                             <rect key="frame" x="379" y="94" width="368" height="42"/>
                                             <view key="contentView" id="ppw-UH-GKm">
                                                 <rect key="frame" x="1" y="1" width="366" height="40"/>
@@ -408,7 +408,7 @@
                                                 <action selector="enableGrain:" target="-2" id="dLd-Zu-eFG"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="68">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="68">
                                             <rect key="frame" x="379" y="32" width="368" height="42"/>
                                             <view key="contentView" id="xSw-Z6-2rH">
                                                 <rect key="frame" x="1" y="1" width="366" height="40"/>
@@ -697,7 +697,7 @@
                                                 <action selector="enableZoom:" target="-2" id="hEF-sf-KtP"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="117">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="117">
                                             <rect key="frame" x="8" y="153" width="369" height="46"/>
                                             <view key="contentView" id="3KQ-fd-kER">
                                                 <rect key="frame" x="1" y="1" width="367" height="44"/>
@@ -741,7 +741,7 @@
                                                 <action selector="enablePuzzle:" target="-2" id="yT9-tI-VZc"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="124">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="124">
                                             <rect key="frame" x="379" y="125" width="368" height="74"/>
                                             <view key="contentView" id="HUd-nt-fzr">
                                                 <rect key="frame" x="1" y="1" width="366" height="72"/>
@@ -850,7 +850,7 @@
                                                 <action selector="enableWall:" target="-2" id="pHR-DP-Yje"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="755">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="755">
                                             <rect key="frame" x="8" y="31" width="369" height="74"/>
                                             <view key="contentView" id="ne3-lY-k8h">
                                                 <rect key="frame" x="1" y="1" width="367" height="72"/>
@@ -963,7 +963,7 @@
                                                 <action selector="enableClone:" target="-2" id="S7F-h8-33g"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="730">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="730">
                                             <rect key="frame" x="379" y="58" width="368" height="47"/>
                                             <view key="contentView" id="uom-ff-xWb">
                                                 <rect key="frame" x="1" y="1" width="366" height="45"/>
@@ -1065,7 +1065,7 @@
                                                 <action selector="enableThreshold:" target="-2" id="EXx-Au-HPF"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="272" userLabel="Color Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="272" userLabel="Color Box">
                                             <rect key="frame" x="8" y="87" width="245" height="112"/>
                                             <view key="contentView" id="VxL-14-NoR">
                                                 <rect key="frame" x="1" y="1" width="243" height="110"/>
@@ -1155,7 +1155,7 @@
                                                 <action selector="enableSepia:" target="-2" id="f8B-Kt-uqG"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="243" userLabel="Sepia Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="243" userLabel="Sepia Box">
                                             <rect key="frame" x="8" y="23" width="245" height="47"/>
                                             <view key="contentView" id="3iv-gg-bsG">
                                                 <rect key="frame" x="1" y="1" width="243" height="45"/>
@@ -1224,7 +1224,7 @@
                                                 <action selector="enableGradient:" target="-2" id="Lxe-qa-iOE"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="203" userLabel="Gradient Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="203" userLabel="Gradient Box">
                                             <rect key="frame" x="255" y="87" width="244" height="112"/>
                                             <view key="contentView" id="q62-YN-hEA">
                                                 <rect key="frame" x="1" y="1" width="242" height="110"/>
@@ -1312,7 +1312,7 @@
                                                 <action selector="enableExtract:" target="-2" id="BTh-5r-NvI"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="279" userLabel="Extraction Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="279" userLabel="Extraction Box">
                                             <rect key="frame" x="255" y="23" width="244" height="47"/>
                                             <view key="contentView" id="hin-eg-GKX">
                                                 <rect key="frame" x="1" y="1" width="242" height="45"/>
@@ -1373,7 +1373,7 @@
                                                 <action selector="enablePosterize:" target="-2" id="1nY-6G-Qz1"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="207" userLabel="Posterize Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="207" userLabel="Posterize Box">
                                             <rect key="frame" x="501" y="152" width="245" height="47"/>
                                             <view key="contentView" id="s4h-VJ-0fi">
                                                 <rect key="frame" x="1" y="1" width="243" height="45"/>
@@ -1442,7 +1442,7 @@
                                                 <action selector="enableBlur:" target="-2" id="ofo-zv-aYJ"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="218" userLabel="Blur Box">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="218" userLabel="Blur Box">
                                             <rect key="frame" x="501" y="87" width="245" height="47"/>
                                             <view key="contentView" id="zp9-ZY-iRy">
                                                 <rect key="frame" x="1" y="1" width="243" height="45"/>
@@ -1585,7 +1585,7 @@
                                                 <action selector="enableAddText:" target="-2" id="9eK-f2-5u9"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="303">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="303">
                                             <rect key="frame" x="8" y="126" width="346" height="72"/>
                                             <view key="contentView" id="0S4-qU-SrJ">
                                                 <rect key="frame" x="1" y="1" width="344" height="70"/>
@@ -1665,7 +1665,7 @@
                                                 <action selector="enableAddLogo:" target="-2" id="mbp-aI-eNo"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
                                             <rect key="frame" x="358" y="104" width="346" height="95"/>
                                             <view key="contentView" id="4L0-QJ-InP">
                                                 <rect key="frame" x="1" y="1" width="344" height="93"/>

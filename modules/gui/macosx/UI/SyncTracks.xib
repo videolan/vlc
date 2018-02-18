@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -45,7 +45,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box title="Audio/Video" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="5">
+                    <box borderType="line" title="Audio/Video" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="5">
                         <rect key="frame" x="13" y="154" width="425" height="47"/>
                         <view key="contentView" id="cSz-hU-mVM">
                             <rect key="frame" x="1" y="1" width="423" height="45"/>
@@ -99,7 +99,6 @@
                                 <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="16" id="zeF-Id-Fsw"/>
                             </constraints>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="37">
                         <rect key="frame" x="21" y="138" width="85" height="14"/>
@@ -109,7 +108,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box title="Subtitles/Video" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="16">
+                    <box borderType="line" title="Subtitles/Video" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="16">
                         <rect key="frame" x="13" y="32" width="427" height="108"/>
                         <view key="contentView" id="KDu-mg-vUb">
                             <rect key="frame" x="1" y="1" width="425" height="106"/>
@@ -239,11 +238,10 @@
                                 <constraint firstItem="105" firstAttribute="centerY" secondItem="99" secondAttribute="centerY" id="yuz-V3-h8W"/>
                             </constraints>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="41">
                         <rect key="frame" x="16" y="12" width="39" height="17"/>
-                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="550729BE-D47E-42DA-83CA-5870649529AC" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="42" customClass="VLCHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:42:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="42">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="miniSystem"/>
                         </buttonCell>
@@ -272,45 +270,45 @@
         </window>
     </objects>
     <resources>
-        <image name="550729BE-D47E-42DA-83CA-5870649529AC" width="1" height="1">
+        <image name="buttonCell:42:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
 c1dOU0NvbG9ygAKADRIgywAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
-BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGNE1NACoAAAAKAAAADgEAAAMA
-AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAERAAQA
-AAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMA
-AAABAAEAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAV8AAAAuAAAAAAAAAV8YXBwbAIgAABt
-bnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAAAAAAAAAA9tYA
-AQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVk
-ZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3dHB0AAAFWAAAABRrVFJDAAAFbAAAAA5k
-ZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMgR3JheSBQcm9m
-aWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAA
-AAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcAAAAQAAABSGl0SVQAAAAuAAABWG5iTk8A
-AAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UAAAAuAAACBHpoQ04AAAAQAAACMmphSlAA
-AAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMAAAAoAAACumZpRkkAAAAsAAAC4nBsUEwA
-AAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMAAAAoAAADkmRhREsAAAA0AAADugBQAGUA
-cgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMAbwBQAHIAbwBmAGkAbAAgAGcA6QBuAOkA
-cgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AAUAByAG8AZgBpAGwAbwAgAGcAcgBpAGcA
-aQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDlAHQAbwBuAGUAcAByAG8A
-ZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwAZwBlAG0AZQBpAG4AZQBzACAARwByAGEA
-dQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDlAHMAawBhAGwA
-ZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw7DCkMNcw7TDVMKEwpDDrAFAAZQByAGYA
-aQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4AegBlAG4AdABvAHMAQQBsAGcAZQBtAGUA
-ZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIAZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A
-6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEAYQBwAHIAbwBmAGkAaQBsAGkAVQBuAGkA
-dwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAE
-QQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQG
-OQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIAbwBmAGkAbABlAEcAZQBuAGUAcgBlAGwA
-IABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMAZQAAdGV4dAAAAABDb3B5cmlnaHQgMjAw
-NyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBYWVogAAAAAAAA81EAAQAAAAEWzGN1cnYA
-AAAAAAAAAQHNAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpa
-TlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrSJSYvMF5OU011dGFibGVBcnJheaMvLCrT
-MjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iUmODlXTlNDb2xvcqI4KtIlJjs8V05T
-SW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIABAAgAEQAaACMALQAyADcARgBMAFcAXgBl
-AHIAeQCBAIMAhQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3ALkAuwDAANcA2QDbBxMHGAcjBywHPwdD
-B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
-AEEAAAAAAAAAAAAAAAAAAAfgA
+BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMA
+AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMA
+AAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQA
+AAABAAAAAgEcAAMAAAABAAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcA
+AAV8AAAA0AAAAAAAAAV8YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABu
+b25lAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3
+dHB0AAAFWAAAABRrVFJDAAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAA
+AAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcA
+AAAQAAABSGl0SVQAAAAuAAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UA
+AAAuAAACBHpoQ04AAAAQAAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMA
+AAAoAAACumZpRkkAAAAsAAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMA
+AAAoAAADkmRhREsAAAA0AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMA
+bwBQAHIAbwBmAGkAbAAgAGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AA
+UAByAG8AZgBpAGwAbwAgAGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMA
+awAgAGcAcgDlAHQAbwBuAGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwA
+ZwBlAG0AZQBpAG4AZQBzACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUA
+cgBpAHMAawAgAGcAcgDlAHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw
+7DCkMNcw7TDVMKEwpDDrAFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4A
+egBlAG4AdABvAHMAQQBsAGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIA
+ZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEA
+YQBwAHIAbwBmAGkAaQBsAGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoA
+YQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioG
+OQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIA
+bwBmAGkAbABlAEcAZQBuAGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMA
+ZQAAdGV4dAAAAABDb3B5cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBY
+WVogAAAAAAAA81EAAQAAAAEWzGN1cnYAAAAAAAAAAQHNAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2Vz
+XxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpaTlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrS
+JSYvMF5OU011dGFibGVBcnJheaMvLCrTMjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM
+0iUmODlXTlNDb2xvcqI4KtIlJjs8V05TSW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIAB
+AAgAEQAaACMALQAyADcARgBMAFcAXgBlAHIAeQCBAIMAhQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3
+ALkAuwDAANcA2QDbBysHMAc7B0QHVwdbB2YHbwd0B3wHfweEB5MHlweeB6YHswe4B7oHvAfBB8kHzAfR
+B9kH3AfuB/EH9gAAAAAAAAIBAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAf4A
 </mutableData>
         </image>
     </resources>
