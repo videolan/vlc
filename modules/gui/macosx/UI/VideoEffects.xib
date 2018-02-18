@@ -128,7 +128,7 @@
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PmS-HT-UdA">
                         <rect key="frame" x="204" y="265" width="352" height="24"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7" customClass="VLCHUDSegmentedCell">
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7">
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment label="Basic" selected="YES"/>

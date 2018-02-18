@@ -685,7 +685,7 @@
                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
                         <rect key="frame" x="124" y="448" width="258" height="24"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GbO-Eb-YgC" customClass="VLCHUDSegmentedCell">
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GbO-Eb-YgC">
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment label="General" selected="YES"/>

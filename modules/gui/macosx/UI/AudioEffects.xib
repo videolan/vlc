@@ -92,7 +92,7 @@
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jb1-f1-iF3">
                         <rect key="frame" x="80" y="254" width="314" height="24"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH" customClass="VLCHUDSegmentedCell">
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH">
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment label="Equalizer" selected="YES"/>
