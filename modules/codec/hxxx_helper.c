@@ -862,7 +862,7 @@ hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
     else if(hh->i_codec == VLC_CODEC_HEVC)
     {
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
-        if(hsps && hevc_get_picture_size(hsps->hevc_sps, p_w, p_h, p_vw, p_vh))
+        if(hsps && hsps->hevc_sps && hevc_get_picture_size(hsps->hevc_sps, p_w, p_h, p_vw, p_vh))
             return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
@@ -885,7 +885,7 @@ hxxx_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den
     {
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
         unsigned num, den;
-        if(hsps && hevc_get_aspect_ratio(hsps->hevc_sps, &num, &den))
+        if(hsps && hsps->hevc_sps && hevc_get_aspect_ratio(hsps->hevc_sps, &num, &den))
         {
             *p_num = num;
             *p_den = den;
@@ -951,7 +951,7 @@ hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
         case VLC_CODEC_HEVC:
         {
             const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
-            if (hsps == NULL)
+            if (hsps == NULL || hsps->hevc_sps == NULL)
                 return VLC_EGENERIC;
 
             return hevc_get_colorimetry(hsps->hevc_sps, p_primaries, p_transfer,
