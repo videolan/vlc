@@ -122,7 +122,7 @@
                                     <subviews>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="192">
                                             <rect key="frame" x="14" y="193" width="58" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -132,7 +132,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="194">
                                             <rect key="frame" x="92" y="193" width="57" height="18"/>
-                                            <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -493,7 +493,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="218">
                                             <rect key="frame" x="14" y="190" width="203" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -780,7 +780,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="262">
                                             <rect key="frame" x="7" y="190" width="116" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1009,7 +1009,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="343">
                                             <rect key="frame" x="14" y="179" width="135" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1051,7 +1051,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="709">
                                             <rect key="frame" x="14" y="126" width="65" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1061,7 +1061,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="344">
                                             <rect key="frame" x="14" y="106" width="154" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1071,7 +1071,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="wYr-HG-zA2">
                                             <rect key="frame" x="14" y="86" width="84" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Scaletempo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="9yB-r8-GZB" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Scaletempo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="9yB-r8-GZB">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1081,7 +1081,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="NUi-0U-gqN">
                                             <rect key="frame" x="14" y="66" width="109" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Stereo Enhancer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kvM-H1-VS8" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Stereo Enhancer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kvM-H1-VS8">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1135,7 +1135,7 @@
                     </popUpButton>
                     <button horizontalHuggingPriority="200" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="Dqv-cc-ZvK">
                         <rect key="frame" x="197" y="8" width="258" height="18"/>
-                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fiO-IL-qum" customClass="VLCHUDCheckboxCell">
+                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fiO-IL-qum">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>

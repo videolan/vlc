@@ -205,7 +205,7 @@
                                                     </slider>
                                                     <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="46">
                                                         <rect key="frame" x="175" y="73" width="135" height="18"/>
-                                                        <buttonCell key="cell" type="check" title="Brightness Threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="47" customClass="VLCHUDCheckboxCell">
+                                                        <buttonCell key="cell" type="check" title="Brightness Threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="47">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
@@ -302,7 +302,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="49">
                                             <rect key="frame" x="8" y="197" width="91" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Image Adjust" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="50" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Image Adjust" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="50">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -312,7 +312,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="58">
                                             <rect key="frame" x="379" y="197" width="66" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Sharpen" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="59" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Sharpen" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="59">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -356,7 +356,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="60">
                                             <rect key="frame" x="379" y="135" width="110" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Banding removal" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="66" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Banding removal" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="66">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -400,7 +400,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="67">
                                             <rect key="frame" x="379" y="73" width="75" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Film Grain" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="73" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Film Grain" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="73">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -618,7 +618,7 @@
                                         </stepper>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="110">
                                             <rect key="frame" x="14" y="35" width="171" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Synchronize top and bottom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="111" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Synchronize top and bottom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="111">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -628,7 +628,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="112">
                                             <rect key="frame" x="14" y="15" width="158" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Synchronize left and right" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="113" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Synchronize left and right" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="113">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -679,7 +679,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="116">
                                             <rect key="frame" x="8" y="197" width="76" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Transform" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="122" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Transform" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="122">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -689,7 +689,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="150">
                                             <rect key="frame" x="8" y="129" width="127" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Magnification/Zoom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="151" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Magnification/Zoom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="151">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -733,7 +733,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="123">
                                             <rect key="frame" x="379" y="197" width="89" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Puzzle game" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="129" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Puzzle game" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="129">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -842,7 +842,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="754">
                                             <rect key="frame" x="8" y="103" width="44" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Wall" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="772" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Wall" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="772">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -955,7 +955,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="729">
                                             <rect key="frame" x="379" y="103" width="53" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Clone" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="747" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Clone" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="747">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1057,7 +1057,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="271">
                                             <rect key="frame" x="8" y="197" width="104" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Color threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="277" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Color threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="277">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1147,7 +1147,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="242">
                                             <rect key="frame" x="8" y="69" width="52" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Sepia" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="251" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Sepia" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="251">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1216,7 +1216,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="204">
                                             <rect key="frame" x="255" y="198" width="68" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Gradient" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="205" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Gradient" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="205">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1249,7 +1249,7 @@
                                                     </popUpButton>
                                                     <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="201">
                                                         <rect key="frame" x="14" y="37" width="220" height="18"/>
-                                                        <buttonCell key="cell" type="check" title="Cartoon" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="202" customClass="VLCHUDCheckboxCell">
+                                                        <buttonCell key="cell" type="check" title="Cartoon" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="202">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <userDefinedRuntimeAttributes>
@@ -1264,7 +1264,7 @@
                                                     </button>
                                                     <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="199">
                                                         <rect key="frame" x="14" y="57" width="220" height="18"/>
-                                                        <buttonCell key="cell" type="check" title="Color" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="200" customClass="VLCHUDCheckboxCell">
+                                                        <buttonCell key="cell" type="check" title="Color" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="200">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <userDefinedRuntimeAttributes>
@@ -1304,7 +1304,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="278">
                                             <rect key="frame" x="255" y="69" width="106" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Color extraction" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="287" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Color extraction" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="287">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1355,7 +1355,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="300">
                                             <rect key="frame" x="255" y="7" width="88" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Invert colors" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="301" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Invert colors" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="301">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1365,7 +1365,7 @@
                                         </button>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="213">
                                             <rect key="frame" x="501" y="198" width="71" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Posterize" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="214" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Posterize" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="214">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1434,7 +1434,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="217">
                                             <rect key="frame" x="501" y="132" width="82" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Motion blur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="223" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Motion blur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="223">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1478,7 +1478,7 @@
                                         </box>
                                         <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="254">
                                             <rect key="frame" x="501" y="70" width="244" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Motion Detect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="255" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Motion Detect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="255">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1488,7 +1488,7 @@
                                         </button>
                                         <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="256">
                                             <rect key="frame" x="501" y="55" width="244" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Water effect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="257" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Water effect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="257">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1498,7 +1498,7 @@
                                         </button>
                                         <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="258">
                                             <rect key="frame" x="501" y="40" width="244" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Waves" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="259" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Waves" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="259">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1508,7 +1508,7 @@
                                         </button>
                                         <button horizontalHuggingPriority="249" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="260">
                                             <rect key="frame" x="501" y="25" width="244" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Psychedelic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="261" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Psychedelic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="261">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1577,7 +1577,7 @@
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="302">
                                             <rect key="frame" x="8" y="197" width="66" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Add text" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="320" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Add text" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="320">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1657,7 +1657,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="643">
                                             <rect key="frame" x="358" y="197" width="69" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Add logo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="667" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Add logo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="667">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1754,7 +1754,7 @@
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="708">
                                             <rect key="frame" x="8" y="84" width="90" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Anaglyph 3D" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="709" customClass="VLCHUDCheckboxCell">
+                                            <buttonCell key="cell" type="check" title="Anaglyph 3D" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="709">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1801,7 +1801,7 @@
                     </popUpButton>
                     <button horizontalHuggingPriority="200" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
                         <rect key="frame" x="470" y="8" width="267" height="18"/>
-                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5" customClass="VLCHUDCheckboxCell">
+                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
