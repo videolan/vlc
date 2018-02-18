@@ -423,11 +423,11 @@
                                                     </outlineView>
                                                 </subviews>
                                             </clipView>
-                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518" customClass="VLCHUDScroller">
+                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518">
                                                 <rect key="frame" x="0.0" y="428" width="510" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517" customClass="VLCHUDScroller">
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517">
                                                 <rect key="frame" x="-100" y="-100" width="15" height="458"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>

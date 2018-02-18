@@ -121,11 +121,11 @@
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="Y3p-2z-GZy"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="vLK-mg-OaO"/>
                         </constraints>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="109" customClass="VLCHUDScroller">
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="109">
                             <rect key="frame" x="1" y="259" width="148" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="108" customClass="VLCHUDScroller">
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="108">
                             <rect key="frame" x="378" y="18" width="15" height="242"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
