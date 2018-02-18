@@ -75,7 +75,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCLogMessage.h gui/macosx/VLCLogMessage.m \
 	gui/macosx/VLCLogWindowController.h gui/macosx/VLCLogWindowController.m \
 	gui/macosx/VLCHUDSliderCell.h gui/macosx/VLCHUDSliderCell.m \
-	gui/macosx/VLCHUDButtonCell.h gui/macosx/VLCHUDButtonCell.m \
 	gui/macosx/VLCHUDCheckboxCell.h gui/macosx/VLCHUDCheckboxCell.m \
 	gui/macosx/VLCHUDScroller.h gui/macosx/VLCHUDScroller.m \
 	gui/macosx/VLCHUDOutlineView.h gui/macosx/VLCHUDOutlineView.m \
