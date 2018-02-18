@@ -142,7 +142,7 @@
                                         </button>
                                         <popUpButton horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="168">
                                             <rect key="frame" x="156" y="190" width="310" height="22"/>
-                                            <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169" customClass="VLCHUDPopUpButtonCell">
+                                            <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <menu key="menu" title="OtherViews" id="170">
@@ -1118,7 +1118,7 @@
                     </tabView>
                     <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="400" translatesAutoresizingMaskIntoConstraints="NO" id="701">
                         <rect key="frame" x="17" y="6" width="175" height="22"/>
-                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" id="702" customClass="VLCHUDPopUpButtonCell">
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" id="702">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="703">
