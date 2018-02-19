@@ -784,17 +784,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
-            for( size_t i = 0; i + 1< p_sys->subtitles.i_count; i++ )
+            p_sys->b_first_time = true;
+            p_sys->i_next_demux_date = i64;
+            for( size_t i = 0; i < p_sys->subtitles.i_count; i++ )
             {
-                if( p_sys->subtitles.p_array[i + 1].i_start >= i64 )
-                {
-                    p_sys->subtitles.i_current = i;
-                    p_sys->i_next_demux_date = i64;
-                    p_sys->b_first_time = true;
-                    return VLC_SUCCESS;
-                }
+                if( p_sys->subtitles.p_array[i].i_start > i64 )
+                    break;
+                p_sys->subtitles.i_current = i;
             }
-            break;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
