@@ -587,6 +587,13 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
+#if VLC_WINSTORE_APP
+    /* Phones and the Xbox are memory constrained, rely on the d3d11va pool
+     * which is always smaller, we still get direct rendering from the decoder */
+    if (is_d3d11_opaque(surface_fmt.i_chroma))
+        pool_size = __MIN(pool_size, 6);
+#endif
+
     if (SetupQuad( vd, &surface_fmt, &sys->picQuad, &sys->sys.rect_src_clipped,
                    sys->picQuadConfig, sys->picQuadPixelShader,
                    surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
