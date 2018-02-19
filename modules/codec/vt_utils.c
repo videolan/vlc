@@ -242,7 +242,7 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
             cvpx_format = kCVPixelFormatType_32BGRA;
             break;
         case VLC_CODEC_CVPX_P010:
-            cvpx_format = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
+            cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
             break;
         default:
             return NULL;
