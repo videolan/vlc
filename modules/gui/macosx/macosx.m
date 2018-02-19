@@ -122,9 +122,6 @@ void WindowClose  (vout_window_t *);
 #define EFFECTSBUTTON_TEXT N_("Show Audio Effects Button")
 #define EFFECTSBUTTON_LONGTEXT N_("Shows the audio effects button in the main window.")
 
-#define SIDEBAR_TEXT N_("Show Sidebar")
-#define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources.")
-
 #define ITUNES_TEXT N_("Control external music players")
 #define ITUNES_LONGTEXT N_("VLC will pause and resume supported music players on playback.")
 
@@ -164,7 +161,6 @@ vlc_module_begin()
         add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-playmode-buttons", false, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-effects-button", false, EFFECTSBUTTON_TEXT, EFFECTSBUTTON_LONGTEXT, false)
-        add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
         add_integer_with_range("macosx-max-volume", 125, 60, 200, VOLUME_MAX_TEXT, VOLUME_MAX_TEXT, true)
         add_bool("macosx-large-text", false, LARGE_LISTFONT_TEXT, LARGE_LISTFONT_TEXT, false)
 
@@ -190,6 +186,7 @@ vlc_module_begin()
     add_obsolete_bool("macosx-stretch") /* since 2.0.0 */
     add_obsolete_bool("macosx-eq-keep") /* since 2.0.0 */
     add_obsolete_bool("macosx-autosave-volume") /* since 2.1.0 */
+    add_obsolete_bool("macosx-show-sidebar") /* since 3.0.1 */
 
     add_submodule()
         set_description("Mac OS X Video Output Provider")

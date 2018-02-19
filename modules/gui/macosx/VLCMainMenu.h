@@ -214,7 +214,7 @@
 - (void)setupMenus;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
-- (void)updateSidebarMenuItem;
+- (void)updateSidebarMenuItem:(BOOL)show;
 
 - (IBAction)openAddonManager:(id)sender;
 
