@@ -409,12 +409,26 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-    /* */
-    hr = D3D11_CreateDevice(va, &sys->hd3d, true, &sys->d3d_dev);
-    if (FAILED(hr)) {
-        msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
+#if VLC_WINSTORE_APP
+    sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext");
+    if (likely(sys->d3d_dev.d3dcontext))
+    {
+        ID3D11Device* d3ddevice = NULL;
+        ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
+        ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
+        ID3D11Device_Release(sys->d3d_dev.d3ddevice);
     }
+#endif
+
+    /* */
+    if (!sys->d3d_dev.d3ddevice)
+    {
+        hr = D3D11_CreateDevice(va, &sys->hd3d, true, &sys->d3d_dev);
+        if (FAILED(hr)) {
+            msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
+	}
 
     void *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
