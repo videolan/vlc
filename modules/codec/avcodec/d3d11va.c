@@ -378,7 +378,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt);
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice));
     if (err != VLC_SUCCESS)
         goto error;
 

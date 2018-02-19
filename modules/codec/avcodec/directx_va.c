@@ -283,7 +283,7 @@ char *directx_va_GetDecoderName(const GUID *guid)
 
 /* */
 int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *avctx,
-                     const es_format_t *fmt)
+                     const es_format_t *fmt, int flag_xbox)
 {
     /* */
     if (FindVideoServiceConversion(va, dx_sys, fmt, avctx)) {
@@ -306,7 +306,11 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
     case AV_CODEC_ID_HEVC:
         /* the HEVC DXVA2 spec asks for 128 pixel aligned surfaces to ensure
            all coding features have enough room to work with */
-        surface_alignment = 128;
+           /* On the Xbox 1/S, the decoder cannot do 4K aligned to 128 but is OK with 64 */
+        if (flag_xbox)
+            surface_alignment = 16;
+        else
+            surface_alignment = 128;
         surface_count += 16;
         break;
     case AV_CODEC_ID_H264:
