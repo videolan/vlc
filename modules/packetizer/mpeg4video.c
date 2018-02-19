@@ -362,11 +362,13 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
 
     for( ;; )
     {
+        if( i_vol <= 5 )
+            return VLC_EGENERIC;
+
         if( p_vol[0] == 0x00 && p_vol[1] == 0x00 && p_vol[2] == 0x01 &&
             p_vol[3] >= 0x20 && p_vol[3] <= 0x2f ) break;
 
         p_vol++; i_vol--;
-        if( i_vol <= 4 ) return VLC_EGENERIC;
     }
 
     bs_init( &s, &p_vol[4], i_vol - 4 );
