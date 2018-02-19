@@ -420,6 +420,8 @@ static int D3dCreateDevice(vlc_va_t *va)
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
     if (FAILED(hr)) {
        msg_Err(va, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
+       ID3D11DeviceContext_Release(sys->d3d_dev.d3dcontext);
+       ID3D11Device_Release(sys->d3d_dev.d3ddevice);
        return VLC_EGENERIC;
     }
     sys->d3dvidctx = d3dvidctx;
