@@ -508,7 +508,8 @@ static bool parse_track_node COMPLEX_INTERFACE
  */
 static bool set_item_info SIMPLE_INTERFACE
 {
-    VLC_UNUSED(opaque);
+    xspf_sys_t *p_sys = (xspf_sys_t *) opaque;
+
     /* exit if setting is impossible */
     if (!psz_name || !psz_value || !p_input)
         return false;
@@ -529,9 +530,19 @@ static bool set_item_info SIMPLE_INTERFACE
     else if (!strcmp(psz_name, "annotation"))
         input_item_SetDescription(p_input, psz_value);
     else if (!strcmp(psz_name, "info"))
-        input_item_SetURL(p_input, psz_value);
+    {
+        char *psz_mrl = ProcessMRL( psz_value, p_sys->psz_base );
+        if( psz_mrl )
+            input_item_SetURL(p_input, psz_mrl);
+        free( psz_mrl );
+    }
     else if (!strcmp(psz_name, "image") && *psz_value)
-        input_item_SetArtURL(p_input, psz_value);
+    {
+        char *psz_mrl = ProcessMRL( psz_value, p_sys->psz_base );
+        if( psz_mrl )
+            input_item_SetArtURL(p_input, psz_mrl);
+        free( psz_mrl );
+    }
     return true;
 }
 
