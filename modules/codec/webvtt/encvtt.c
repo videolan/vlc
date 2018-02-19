@@ -114,6 +114,21 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
             if( p_segment->psz_text == NULL )
                 continue;
 
+            if( p_segment->p_ruby )
+            {
+                bo_add_mem( &box, 6, "<ruby>" );
+                for( const text_segment_ruby_t *p_ruby = p_segment->p_ruby;
+                                                p_ruby; p_ruby = p_ruby->p_next )
+                {
+                    WriteText( p_ruby->psz_base, &box, &prevchar );
+                    bo_add_mem( &box, 4, "<rt>" );
+                    WriteText( p_ruby->psz_rt, &box, &prevchar );
+                    bo_add_mem( &box, 5, "</rt>" );
+                }
+                bo_add_mem( &box, 7, "</ruby>" );
+                continue;
+            }
+
             const text_style_t *style = p_segment->style;
             if( style && style->i_features )
             {
