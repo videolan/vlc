@@ -1516,7 +1516,8 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             const ruby_block_t *p_rubyseq = p_paragraph->pp_ruby[i];
             int i_advance = 0;
             int i_advanceruby = p_rubyseq->p_laid->i_width;
-            while( i < p_paragraph->i_size && p_rubyseq == p_paragraph->pp_ruby[i] )
+            while( i + 1 < p_paragraph->i_size &&
+                   p_rubyseq == p_paragraph->pp_ruby[i + 1] )
                 i_advance += p_paragraph->p_glyph_bitmaps[ i++ ].i_x_advance;
             /* Just forward as non breakable */
             i_width += (i_advance < i_advanceruby) ? i_advanceruby : i_advance;
