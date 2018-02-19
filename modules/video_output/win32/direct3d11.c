@@ -661,7 +661,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .picture       = pictures,
             .picture_count = pool_size,
         };
-        if (vd->info.is_slow) {
+        if (vd->info.is_slow && !is_d3d11_opaque(surface_fmt.i_chroma)) {
             pool_cfg.lock          = Direct3D11MapPoolTexture;
             //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
         }
