@@ -379,7 +379,6 @@
     [_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
     [_toggleEffectsButton setState: var_InheritBool(getIntf(), "macosx-show-effects-button")];
     [_toggleSidebar setTitle: _NS("Show Sidebar")];
-    [_toggleSidebar setState: var_InheritBool(getIntf(), "macosx-show-sidebar")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -704,9 +703,9 @@
     [[[VLCMain sharedInstance] mainWindow] toggleLeftSubSplitView];
 }
 
-- (void)updateSidebarMenuItem
+- (void)updateSidebarMenuItem:(BOOL)show;
 {
-    [_toggleSidebar setState: var_InheritBool(getIntf(), "macosx-show-sidebar")];
+    [_toggleSidebar setState:show];
 }
 
 #pragma mark - Playback
