@@ -314,24 +314,30 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     if(b_empty_node)
         return false;
 
+    bool b_version_found = false;
     /* read all playlist attributes */
-    const char *psz_version = get_node_attribute(p_xml_reader, "version");
-    if(!psz_version || (strcmp(psz_version, "0") && strcmp(psz_version, "1")))
+    const char *psz_name, *psz_value;
+    while ((psz_name = xml_ReaderNextAttr(p_xml_reader, &psz_value)) != NULL)
     {
-        /* attribute version is mandatory !!! */
-        if(!psz_version)
-            msg_Warn(p_stream, "<playlist> requires \"version\" attribute");
+        if (!strcmp(psz_name, "version"))
+        {
+            b_version_found = true;
+            if (strcmp(psz_value, "0") && strcmp(psz_value, "1"))
+                msg_Warn(p_stream, "unsupported XSPF version %s", psz_value);
+        }
+        else if (!strcmp(psz_name, "xmlns") || !strcmp(psz_name, "xmlns:vlc"))
+            ;
+        else if (!strcmp(psz_name, "xml:base"))
+        {
+            free(sys->psz_base);
+            sys->psz_base = strdup(psz_value);
+        }
         else
-            msg_Warn(p_stream, "unsupported XSPF version %s", psz_version);
-        return false;
+            msg_Warn(p_stream, "invalid <playlist> attribute: \"%s\"", psz_name);
     }
-
-    const char *psz_base = get_node_attribute(p_xml_reader, "xml:base");
-    if(psz_base)
-    {
-        free(sys->psz_base);
-        sys->psz_base = strdup(psz_base);
-    }
+    /* attribute version is mandatory !!! */
+    if (!b_version_found)
+        msg_Warn(p_stream, "<playlist> requires \"version\" attribute");
 
     static const xml_elem_hnd_t pl_elements[] =
         { {"title",        {.smpl = set_item_info}, false },
@@ -620,6 +626,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
     if(b_empty_node)
         return false;
 
+    /* read all extension node attributes */
     const char *psz_application = get_node_attribute(p_xml_reader, "application");
     if (!psz_application)
     {
@@ -661,6 +668,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     if(!b_empty_node)
         return false;
 
+    /* read all extension node attributes */
     const char *psz_tid = get_node_attribute(p_xml_reader, "tid");
     if(psz_tid)
         i_tid = atoi(psz_tid);
