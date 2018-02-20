@@ -70,13 +70,6 @@ void CopyFromI420_10ToP010(picture_t *dst, const uint8_t *src[static 3],
                            unsigned height, const copy_cache_t *cache);
 
 /**
- * Swap UV planes of a Tri Planars picture.
- *
- * It just swap the planes information without doing any copy.
- */
-void picture_SwapUV(picture_t *picture);
-
-/**
  * This functions sets the internal plane pointers/dimensions for the given
  * buffer.
  * This is useful when mapping opaque surfaces into CPU planes.

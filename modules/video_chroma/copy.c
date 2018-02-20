@@ -777,15 +777,6 @@ void Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
                src[2], src_pitch[2], height / 2);
 }
 
-void picture_SwapUV(picture_t *picture)
-{
-    assert(picture->i_planes == 3);
-
-    plane_t tmp_plane   = picture->p[U_PLANE];
-    picture->p[U_PLANE] = picture->p[V_PLANE];
-    picture->p[V_PLANE] = tmp_plane;
-}
-
 int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
 {
     /* fill in buffer info in first plane */

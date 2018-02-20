@@ -26,6 +26,8 @@
 #ifndef VLC_PICTURE_H
 #define VLC_PICTURE_H 1
 
+#include <assert.h>
+
 /**
  * \file
  * This file defines picture structures and functions in vlc
@@ -264,6 +266,20 @@ static inline void plane_SwapUV(plane_t p[PICTURE_PLANE_MAX])
     uint8_t *buf = p[V_PLANE].p_pixels;
     p[V_PLANE].p_pixels = p[U_PLANE].p_pixels;
     p[U_PLANE].p_pixels = buf;
+}
+
+/**
+ * Swap UV planes of a Tri Planars picture.
+ *
+ * It just swap the planes information without doing any copy.
+ */
+static inline void picture_SwapUV(picture_t *picture)
+{
+    assert(picture->i_planes == 3);
+
+    plane_t tmp_plane   = picture->p[U_PLANE];
+    picture->p[U_PLANE] = picture->p[V_PLANE];
+    picture->p[V_PLANE] = tmp_plane;
 }
 
 /**@}*/
