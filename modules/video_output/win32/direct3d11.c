@@ -55,7 +55,7 @@
 #include "common.h"
 
 #if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    sys->hd3d.OurD3DCompile(args)
+# define D3DCompile(args...)                    hd3d->OurD3DCompile(args)
 #endif
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
@@ -1674,25 +1674,25 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 #endif
 }
 
-static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool pixel)
+static ID3DBlob* CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
+                               const char *psz_shader, bool pixel, bool legacy_shader)
 {
-    vout_display_sys_t *sys = vd->sys;
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
     const char *target;
     if (pixel)
     {
-        if (likely(sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_10_0))
+        if (likely(d3d_dev->feature_level >= D3D_FEATURE_LEVEL_10_0))
             target = "ps_4_0";
-        else if (sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_9_3)
+        else if (d3d_dev->feature_level >= D3D_FEATURE_LEVEL_9_3)
             target = "ps_4_0_level_9_3";
         else
             target = "ps_4_0_level_9_1";
     }
     else
     {
-        if (likely(sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_10_0))
+        if (likely(d3d_dev->feature_level >= D3D_FEATURE_LEVEL_10_0))
             target = "vs_4_0";
-        else if (sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_9_3)
+        else if (d3d_dev->feature_level >= D3D_FEATURE_LEVEL_9_3)
             target = "vs_4_0_level_9_3";
         else
             target = "vs_4_0_level_9_1";
@@ -1704,7 +1704,7 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 
     if (FAILED(hr)) {
         char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
-        msg_Err(vd, "invalid %s Shader (hr=0x%lX): %s", pixel?"Pixel":"Vertex", hr, err );
+        msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixel?"Pixel":"Vertex", hr, err );
         if (pErrBlob)
             ID3D10Blob_Release(pErrBlob);
         return NULL;
@@ -1719,12 +1719,12 @@ static bool IsRGBShader(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_YUY2;
 }
 
-static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format,
-                                  video_transfer_func_t transfer, bool src_full_range,
-                                  ID3D11PixelShader **output)
+static HRESULT D3D11_CompilePixelShader(vlc_object_t *vd, d3d11_handle_t *hd3d, bool legacy_shader,
+                                        d3d11_device_t *d3d_dev,
+                                        const d3d_format_t *format, const display_info_t *display,
+                                        video_transfer_func_t transfer, bool src_full_range,
+                                        ID3D11PixelShader **output)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler;
     const char *psz_src_transform     = DEFAULT_NOOP;
@@ -1776,7 +1776,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
 
     video_transfer_func_t src_transfer;
 
-    if (transfer != sys->display.colorspace->transfer)
+    if (transfer != display->colorspace->transfer)
     {
         /* we need to go in linear mode */
         switch (transfer)
@@ -1819,7 +1819,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                 break;
         }
 
-        switch (sys->display.colorspace->transfer)
+        switch (display->colorspace->transfer)
         {
             case TRANSFER_FUNC_SRGB:
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
@@ -1855,13 +1855,13 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                     msg_Warn(vd, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
                 break;
             default:
-                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display.colorspace->transfer);
+                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, display->colorspace->transfer);
                 break;
         }
     }
 
     int range_adjust = 0;
-    if (sys->display.colorspace->b_full_range) {
+    if (display->colorspace->b_full_range) {
         if (!src_full_range)
             range_adjust = 1; /* raise the source to full range */
     } else {
@@ -1944,7 +1944,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         free(psz_range);
         return E_OUTOFMEMORY;
     }
-    sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
+    sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
             psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
 #ifndef NDEBUG
     if (!IsRGBShader(format)) {
@@ -1957,12 +1957,12 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
 #endif
     free(psz_range);
 
-    ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
+    ID3DBlob *pPSBlob = CompileShader(VLC_OBJECT(vd), hd3d, d3d_dev, shader, true, legacy_shader);
     free(shader);
     if (!pPSBlob)
         return E_INVALIDARG;
 
-    HRESULT hr = ID3D11Device_CreatePixelShader(sys->d3d_dev.d3ddevice,
+    HRESULT hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
                                                 (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
                                                 ID3D10Blob_GetBufferSize(pPSBlob), NULL, output);
 
@@ -1999,7 +1999,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
-    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
+    hr = D3D11_CompilePixelShader(VLC_OBJECT(vd), &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+                                  sys->picQuadConfig, &sys->display, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
@@ -2115,7 +2116,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->d3dregion_format != NULL)
     {
-        hr = CompilePixelShader(vd, sys->d3dregion_format, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
+        hr = D3D11_CompilePixelShader(VLC_OBJECT(vd), &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+                                      sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
             if (sys->picQuadPixelShader)
@@ -2128,7 +2130,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    ID3DBlob *pVSBlob = CompileShader(vd, globVertexShaderFlat , false);
+    ID3DBlob *pVSBlob = CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderFlat,
+                                      false, sys->legacy_shader);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
@@ -2159,7 +2162,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     ID3D11DeviceContext_IASetInputLayout(sys->d3d_dev.d3dcontext, pVertexLayout);
     ID3D11InputLayout_Release(pVertexLayout);
 
-    pVSBlob = CompileShader(vd, globVertexShaderProjection, false);
+    pVSBlob = CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection,
+                            false, sys->legacy_shader);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
