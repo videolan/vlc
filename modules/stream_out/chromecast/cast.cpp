@@ -70,6 +70,9 @@ private:
     httpd_client_t    *m_client;
     vlc_fifo_t        *m_fifo;
     block_t           *m_header;
+    block_t           *m_copy_chain;
+    block_t           **m_copy_last;
+    size_t             m_copy_size;
     bool               m_eof;
     std::string        m_mime;
 };
@@ -228,6 +231,7 @@ static const char *const conversion_quality_list_text[] = {
 #define HTTPD_BUFFER_PACE INT64_C(2 * 1024 * 1024) /* 2 MB */
 /* Fifo size after we drop packets (should not happen) */
 #define HTTPD_BUFFER_MAX INT64_C(32 * 1024 * 1024) /* 32 MB */
+#define HTTPD_BUFFER_COPY_MAX INT64_C(10 * 1024 * 1024) /* 10 MB */
 
 vlc_module_begin ()
 
@@ -365,6 +369,7 @@ sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
     : m_intf(intf)
     , m_client(NULL)
     , m_header(NULL)
+    , m_copy_chain(NULL)
     , m_eof(true)
 {
     m_fifo = block_FifoNew();
@@ -378,7 +383,7 @@ sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
     }
     httpd_UrlCatch(m_url, HTTPD_MSG_GET, httpd_url_cb,
                    (httpd_callback_sys_t*)this);
-
+    initCopy();
 }
 
 sout_access_out_sys_t::~sout_access_out_sys_t()
@@ -396,6 +401,44 @@ void sout_access_out_sys_t::clearUnlocked()
         m_header = NULL;
     }
     m_eof = true;
+    initCopy();
+}
+
+void sout_access_out_sys_t::initCopy()
+{
+    block_ChainRelease(m_copy_chain);
+    m_copy_chain = NULL;
+    m_copy_last = &m_copy_chain;
+    m_copy_size = 0;
+}
+
+void sout_access_out_sys_t::putCopy(block_t *p_block)
+{
+    while (m_copy_size >= HTTPD_BUFFER_COPY_MAX)
+    {
+        assert(m_copy_chain);
+        block_t *copy = m_copy_chain;
+        m_copy_chain = copy->p_next;
+        m_copy_size -= copy->i_buffer;
+        block_Release(copy);
+    }
+    if (!m_copy_chain)
+    {
+        assert(m_copy_size == 0);
+        m_copy_last = &m_copy_chain;
+    }
+    block_ChainLastAppend(&m_copy_last, p_block);
+    m_copy_size += p_block->i_buffer;
+}
+
+void sout_access_out_sys_t::restoreCopy()
+{
+    if (m_copy_chain)
+    {
+        fifo_put_back(m_copy_chain);
+        m_copy_chain = NULL;
+        initCopy();
+    }
 }
 
 void sout_access_out_sys_t::clear()
@@ -445,6 +488,10 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
 
     if (!answer->i_body_offset)
     {
+        /* When doing a lot a load requests, we can serve data to a client that
+         * will be closed (the close request is already sent). In that case, we
+         * should also serve data used by the old client to the new one. */
+        restoreCopy();
         m_client = cl;
     }
 
@@ -494,7 +541,7 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
         }
 
         if (p_block != m_header)
-            block_Release(p_block);
+            putCopy(p_block);
     }
     else
         httpd_MsgAdd(answer, "Connection", "close");
