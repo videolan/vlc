@@ -89,26 +89,6 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
-typedef enum video_color_axis {
-    COLOR_AXIS_RGB,
-    COLOR_AXIS_YCBCR,
-} video_color_axis;
-
-typedef struct {
-    DXGI_COLOR_SPACE_TYPE   dxgi;
-    const char              *name;
-    video_color_axis        axis;
-    video_color_primaries_t primaries;
-    video_transfer_func_t   transfer;
-    video_color_space_t     color;
-    bool                    b_full_range;
-} dxgi_color_space;
-
-typedef struct {
-    const dxgi_color_space   *colorspace;
-    unsigned                 luminance_peak;
-} display_info_t;
-
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
@@ -230,9 +210,6 @@ static const char* globVertexShaderFlat = "\
   }\
 ";
 
-#define STRINGIZE2(s) #s
-#define STRINGIZE(s) STRINGIZE2(s)
-
 static const char* globVertexShaderProjection = "\
   cbuffer VS_PROJECTION_CONST : register(b0)\
   {\
@@ -268,94 +245,6 @@ static const char* globVertexShaderProjection = "\
     return Output;\
   }\
 ";
-
-static const char* globPixelShaderDefault = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float BoundaryX;\
-    float BoundaryY;\
-    float LuminanceScale;\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float4x4 WhitePoint;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
-  SamplerState SamplerStates[2];\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\
-  inline float3 hable(float3 x) {\
-      const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\
-      return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\
-  }\
-  \
-  /* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\
-  inline float inverse_HLG(float x){\
-      const float B67_a = 0.17883277;\
-      const float B67_b = 0.28466892;\
-      const float B67_c = 0.55991073;\
-      const float B67_inv_r2 = 4.0; /* 1/0.5² */\
-      if (x <= 0.5)\
-          x = x * x * B67_inv_r2;\
-      else\
-          x = exp((x - B67_c) / B67_a) + B67_b;\
-      return x;\
-  }\
-  \
-  inline float3 sourceToLinear(float3 rgb) {\
-      %s;\
-  }\
-  \
-  inline float3 linearToDisplay(float3 rgb) {\
-      %s;\
-  }\
-  \
-  inline float3 toneMapping(float3 rgb) {\
-      %s;\
-  }\
-  \
-  inline float3 adjustRange(float3 rgb) {\
-      %s;\
-  }\
-  \
-  inline float4 sampleTexture(SamplerState samplerState, float4 coords) {\
-      float4 sample;\
-      %s /* sampling routine in sample */\
-      return sample;\
-  }\
-  \
-  float4 main( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 sample;\
-    \
-    if (In.Texture.x > BoundaryX || In.Texture.y > BoundaryY) \
-        sample = sampleTexture( SamplerStates[1], In.Texture );\
-    else\
-        sample = sampleTexture( SamplerStates[0], In.Texture );\
-    float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\
-    float opacity = rgba.a * Opacity;\
-    float3 rgb = (float3)rgba;\
-    rgb = sourceToLinear(rgb);\
-    rgb = toneMapping(rgb);\
-    rgb = linearToDisplay(rgb);\
-    rgb = adjustRange(rgb);\
-    return float4(rgb, saturate(opacity));\
-  }\
-";
-
-#define ST2084_PQ_CONSTANTS  "const float ST2084_m1 = 2610.0 / (4096.0 * 4);\
-const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\
-const float ST2084_c1 = 3424.0 / 4096.0;\
-const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\
-const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;"
 
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
@@ -1671,264 +1560,6 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 #endif
 }
 
-static bool IsRGBShader(const d3d_format_t *cfg)
-{
-    return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
-           cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
-           cfg->formatTexture != DXGI_FORMAT_YUY2;
-}
-
-static HRESULT D3D11_CompilePixelShader(vlc_object_t *vd, d3d11_handle_t *hd3d, bool legacy_shader,
-                                        d3d11_device_t *d3d_dev,
-                                        const d3d_format_t *format, const display_info_t *display,
-                                        video_transfer_func_t transfer, bool src_full_range,
-                                        ID3D11PixelShader **output)
-{
-    static const char *DEFAULT_NOOP = "return rgb";
-    const char *psz_sampler;
-    const char *psz_src_transform     = DEFAULT_NOOP;
-    const char *psz_display_transform = DEFAULT_NOOP;
-    const char *psz_tone_mapping      = DEFAULT_NOOP;
-    const char *psz_adjust_range      = DEFAULT_NOOP;
-    char *psz_range = NULL;
-
-    switch (format->formatTexture)
-    {
-    case DXGI_FORMAT_NV12:
-    case DXGI_FORMAT_P010:
-        psz_sampler =
-                "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
-                sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\
-                sample.a  = 1;";
-        break;
-    case DXGI_FORMAT_YUY2:
-        psz_sampler =
-                "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
-                sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\
-                sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\
-                sample.a  = 1;";
-        break;
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8X8_UNORM:
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        psz_sampler =
-                "sample = shaderTexture[0].Sample(samplerState, coords);";
-        break;
-    case DXGI_FORMAT_UNKNOWN:
-        if (format->fourcc == VLC_CODEC_I420_10L)
-            psz_sampler =
-                   "sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\
-                    sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\
-                    sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\
-                    sample.a  = 1;";
-        else
-            psz_sampler =
-                   "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\
-                    sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\
-                    sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\
-                    sample.a  = 1;";
-        break;
-    default:
-        vlc_assert_unreachable();
-    }
-
-    video_transfer_func_t src_transfer;
-
-    if (transfer != display->colorspace->transfer)
-    {
-        /* we need to go in linear mode */
-        switch (transfer)
-        {
-            case TRANSFER_FUNC_SMPTE_ST2084:
-                /* ST2084 to Linear */
-                psz_src_transform =
-                       ST2084_PQ_CONSTANTS
-                       "rgb = pow(rgb, 1.0/ST2084_m2);\
-                        rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\
-                        rgb = pow(rgb, 1.0/ST2084_m1);\
-                        return rgb";
-                src_transfer = TRANSFER_FUNC_LINEAR;
-                break;
-            case TRANSFER_FUNC_HLG:
-                /* HLG to Linear */
-                psz_src_transform =
-                       "rgb.r = inverse_HLG(rgb.r);\
-                        rgb.g = inverse_HLG(rgb.g);\
-                        rgb.b = inverse_HLG(rgb.b);\
-                        return rgb / 20.0";
-                src_transfer = TRANSFER_FUNC_LINEAR;
-                break;
-            case TRANSFER_FUNC_BT709:
-                psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
-                src_transfer = TRANSFER_FUNC_LINEAR;
-                break;
-            case TRANSFER_FUNC_BT470_M:
-            case TRANSFER_FUNC_SRGB:
-                psz_src_transform = "return pow(rgb, 2.2)";
-                src_transfer = TRANSFER_FUNC_LINEAR;
-                break;
-            case TRANSFER_FUNC_BT470_BG:
-                psz_src_transform = "return pow(rgb, 2.8)";
-                src_transfer = TRANSFER_FUNC_LINEAR;
-                break;
-            default:
-                msg_Dbg(vd, "unhandled source transfer %d", transfer);
-                src_transfer = transfer;
-                break;
-        }
-
-        switch (display->colorspace->transfer)
-        {
-            case TRANSFER_FUNC_SRGB:
-                if (src_transfer == TRANSFER_FUNC_LINEAR)
-                {
-                    /* Linear to sRGB */
-                    psz_display_transform = "return pow(rgb, 1.0 / 2.2)";
-
-                    if (transfer == TRANSFER_FUNC_SMPTE_ST2084 || transfer == TRANSFER_FUNC_HLG)
-                    {
-                        /* HDR tone mapping */
-                        psz_tone_mapping =
-                            "static const float3 HABLE_DIV = hable(11.2);\
-                            rgb = hable(rgb * LuminanceScale) / HABLE_DIV;\
-                            return rgb";
-                    }
-                }
-                else
-                    msg_Warn(vd, "don't know how to transfer from %d to sRGB", src_transfer);
-                break;
-
-            case TRANSFER_FUNC_SMPTE_ST2084:
-                if (src_transfer == TRANSFER_FUNC_LINEAR)
-                {
-                    /* Linear to ST2084 */
-                    psz_display_transform =
-                           ST2084_PQ_CONSTANTS
-                           "rgb = pow(rgb, ST2084_m1);\
-                            rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\
-                            rgb = pow(rgb, ST2084_m2);\
-                            return rgb";
-                }
-                else
-                    msg_Warn(vd, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
-                break;
-            default:
-                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, display->colorspace->transfer);
-                break;
-        }
-    }
-
-    int range_adjust = 0;
-    if (display->colorspace->b_full_range) {
-        if (!src_full_range)
-            range_adjust = 1; /* raise the source to full range */
-    } else {
-        if (src_full_range)
-            range_adjust = -1; /* lower the source to studio range */
-    }
-    if (!IsRGBShader(format) && !src_full_range)
-        range_adjust--; /* the YUV->RGB conversion already output full range */
-
-    if (range_adjust != 0)
-    {
-        psz_range = malloc(256);
-        if (likely(psz_range))
-        {
-            FLOAT itu_black_level;
-            FLOAT itu_range_factor;
-            FLOAT itu_white_level;
-            switch (format->bitsPerChannel)
-            {
-            case 8:
-                /* Rec. ITU-R BT.709-6 §4.6 */
-                itu_black_level  =              16.f / 255.f;
-                itu_white_level  =             235.f / 255.f;
-                itu_range_factor = (float)(235 - 16) / 255.f;
-                break;
-            case 10:
-                /* Rec. ITU-R BT.709-6 §4.6 */
-                itu_black_level  =              64.f / 1023.f;
-                itu_white_level  =             940.f / 1023.f;
-                itu_range_factor = (float)(940 - 64) / 1023.f;
-                break;
-            case 12:
-                /* Rec. ITU-R BT.2020-2 Table 5 */
-                itu_black_level  =               256.f / 4095.f;
-                itu_white_level  =              3760.f / 4095.f;
-                itu_range_factor = (float)(3760 - 256) / 4095.f;
-                break;
-            default:
-                /* unknown bitdepth, use approximation for infinite bit depth */
-                itu_black_level  =              16.f / 256.f;
-                itu_white_level  =             235.f / 256.f;
-                itu_range_factor = (float)(235 - 16) / 256.f;
-                break;
-            }
-
-            FLOAT black_level = 0;
-            FLOAT range_factor = 1.0f;
-            if (range_adjust > 0)
-            {
-                /* expand the range from studio to full range */
-                while (range_adjust--)
-                {
-                    black_level -= itu_black_level;
-                    range_factor /= itu_range_factor;
-                }
-                sprintf(psz_range, "return max(0,min(1,(rgb + %f) * %f))",
-                        black_level, range_factor);
-            }
-            else
-            {
-                /* shrink the range to studio range */
-                while (range_adjust++)
-                {
-                    black_level += itu_black_level;
-                    range_factor *= itu_range_factor;
-                }
-                sprintf(psz_range, "return clamp(rgb + %f * %f,%f,%f)",
-                        black_level, range_factor, itu_black_level, itu_white_level);
-            }
-            psz_adjust_range = psz_range;
-        }
-    }
-
-    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
-                          strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
-    if (!shader)
-    {
-        msg_Err(vd, "no room for the Pixel Shader");
-        free(psz_range);
-        return E_OUTOFMEMORY;
-    }
-    sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
-#ifndef NDEBUG
-    if (!IsRGBShader(format)) {
-        msg_Dbg(vd,"psz_src_transform %s", psz_src_transform);
-        msg_Dbg(vd,"psz_tone_mapping %s", psz_tone_mapping);
-        msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
-        msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
-        msg_Dbg(vd,"psz_sampler %s", psz_sampler);
-    }
-#endif
-    free(psz_range);
-
-    ID3DBlob *pPSBlob = D3D11_CompileShader(vd, hd3d, d3d_dev, shader, true);
-    free(shader);
-    if (!pPSBlob)
-        return E_INVALIDARG;
-
-    HRESULT hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                                (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
-                                                ID3D10Blob_GetBufferSize(pPSBlob), NULL, output);
-
-    ID3D10Blob_Release(pPSBlob);
-    return hr;
-}
-
 static bool CanUseTextureArray(vout_display_t *vd)
 {
 #ifndef HAVE_ID3D11VIDEODECODER
@@ -1958,7 +1589,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
-    hr = D3D11_CompilePixelShader(VLC_OBJECT(vd), &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+    hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
                                   sys->picQuadConfig, &sys->display, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
@@ -2075,7 +1706,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->d3dregion_format != NULL)
     {
-        hr = D3D11_CompilePixelShader(VLC_OBJECT(vd), &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+        hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
                                       sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
