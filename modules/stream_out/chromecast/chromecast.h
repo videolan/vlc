@@ -151,7 +151,7 @@ private:
     vlc_tls_creds_t *m_creds;
     vlc_tls_t *m_tls;
     unsigned m_receiver_requestId;
-    std::atomic_uint m_requestId;
+    unsigned m_requestId;
     std::string m_serverIp;
 };
 
