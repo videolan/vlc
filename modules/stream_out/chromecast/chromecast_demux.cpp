@@ -262,6 +262,7 @@ struct demux_sys_t
             p_renderer = static_cast<chromecast_common *>(
                         var_InheritAddress( p_demux, CC_SHARED_VAR_NAME ) );
             m_enabled = true;
+            init();
             return VLC_SUCCESS;
 
         case DEMUX_FILTER_DISABLE:
