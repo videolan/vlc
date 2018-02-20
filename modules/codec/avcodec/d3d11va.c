@@ -764,7 +764,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
             D3D11_TEXTURE2D_DESC texDesc;
             ID3D11Texture2D_GetDesc(pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
-            if (texDesc.ArraySize < surface_count)
+            if (unlikely(texDesc.ArraySize < surface_count))
             {
                 msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
                          texDesc.ArraySize, surface_count);
