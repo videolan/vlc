@@ -59,6 +59,11 @@ const BytesRange & AbstractChunkSource::getBytesRange() const
     return bytesRange;
 }
 
+std::string AbstractChunkSource::getContentType() const
+{
+    return std::string();
+}
+
 AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
 {
     bytesRead = 0;
@@ -68,6 +73,11 @@ AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
 AbstractChunk::~AbstractChunk()
 {
     delete source;
+}
+
+std::string AbstractChunk::getContentType()
+{
+    return source->getContentType();
 }
 
 size_t AbstractChunk::getBytesRead() const
@@ -202,6 +212,11 @@ block_t * HTTPChunkSource::read(size_t readsize)
     }
 
     return p_block;
+}
+
+std::string HTTPChunkSource::getContentType() const
+{
+    return connection->getContentType();
 }
 
 bool HTTPChunkSource::prepare()

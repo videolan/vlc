@@ -65,6 +65,16 @@ stream_t * ChunksSourceStream::makeStream()
     return p_stream;
 }
 
+std::string ChunksSourceStream::getContentType()
+{
+    if(!b_eof && !p_block)
+    {
+        p_block = source->readNextBlock();
+        b_eof = !p_block;
+    }
+    return source->getContentType();
+}
+
 ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
 {
     size_t i_copied = 0;
@@ -112,8 +122,9 @@ int ChunksSourceStream::seek_Callback(stream_t *, uint64_t)
     return VLC_EGENERIC;
 }
 
-int ChunksSourceStream::control_Callback(stream_t *, int i_query, va_list args)
+int ChunksSourceStream::control_Callback(stream_t *s, int i_query, va_list args)
 {
+    ChunksSourceStream *me = reinterpret_cast<ChunksSourceStream *>(s->p_sys);
     switch( i_query )
     {
         case STREAM_GET_SIZE:
@@ -127,13 +138,25 @@ int ChunksSourceStream::control_Callback(stream_t *, int i_query, va_list args)
             *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
 
+        case STREAM_GET_CONTENT_TYPE:
+        {
+            std::string type = me->getContentType();
+            if(!type.empty())
+            {
+                *va_arg( args, char ** ) = strdup(type.c_str());
+                return VLC_SUCCESS;
+            }
+        }
+        break;
+
         case STREAM_GET_PTS_DELAY:
             *(va_arg( args, uint64_t * )) = DEFAULT_PTS_DELAY;
             return VLC_SUCCESS;
 
         default:
-            return VLC_EGENERIC;
+            break;
     }
+    return VLC_EGENERIC;
 }
 
 void ChunksSourceStream::delete_Callback(stream_t *)

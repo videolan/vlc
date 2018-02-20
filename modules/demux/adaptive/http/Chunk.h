@@ -52,6 +52,7 @@ namespace adaptive
                 virtual bool        hasMoreData     () const = 0;
                 void                setBytesRange   (const BytesRange &);
                 const BytesRange &  getBytesRange   () const;
+                virtual std::string getContentType  () const;
 
             protected:
                 size_t              contentLength;
@@ -63,6 +64,7 @@ namespace adaptive
             public:
                 virtual ~AbstractChunk();
 
+                std::string         getContentType          ();
                 size_t              getBytesRead            () const;
                 uint64_t            getStartByteInFile      () const;
                 bool                isEmpty                 () const;
@@ -90,6 +92,7 @@ namespace adaptive
                 virtual block_t *   readBlock       (); /* impl */
                 virtual block_t *   read            (size_t); /* impl */
                 virtual bool        hasMoreData     () const; /* impl */
+                virtual std::string getContentType  () const; /* reimpl */
 
                 static const size_t CHUNK_SIZE = 32768;
 

@@ -92,8 +92,11 @@ namespace adaptive
         mtime_t getPlaybackTime() const;
         void runUpdates();
 
+        /* Used by demuxers fake streams */
+        virtual std::string getContentType(); /* impl */
         virtual block_t *readNextBlock(); /* impl */
 
+        /**/
         virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
         virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
 

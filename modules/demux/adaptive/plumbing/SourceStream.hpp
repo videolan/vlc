@@ -22,6 +22,7 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
+#include <string>
 
 namespace adaptive
 {
@@ -44,6 +45,7 @@ namespace adaptive
             virtual void Reset(); /* impl */
 
         protected:
+            std::string getContentType();
             ssize_t Read(uint8_t *, size_t);
 
         private:
