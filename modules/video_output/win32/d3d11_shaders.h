@@ -24,9 +24,38 @@
 #define VLC_D3D11_SHADERS_H
 
 #include "../../video_chroma/d3d11_fmt.h"
+#include <dxgi1_4.h>
+
+typedef enum video_color_axis {
+    COLOR_AXIS_RGB,
+    COLOR_AXIS_YCBCR,
+} video_color_axis;
+
+typedef struct {
+    DXGI_COLOR_SPACE_TYPE   dxgi;
+    const char              *name;
+    video_color_axis        axis;
+    video_color_primaries_t primaries;
+    video_transfer_func_t   transfer;
+    video_color_space_t     color;
+    bool                    b_full_range;
+} dxgi_color_space;
+
+typedef struct {
+    const dxgi_color_space   *colorspace;
+    unsigned                 luminance_peak;
+} display_info_t;
 
 ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 #define D3D11_CompileShader(a,b,c,d,e)  D3D11_CompileShader(VLC_OBJECT(a),b,c,d,e)
 
+bool IsRGBShader(const d3d_format_t *);
+
+HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_shader,
+                                 d3d11_device_t *, const d3d_format_t *, const display_info_t *,
+                                 video_transfer_func_t, bool src_full_range,
+                                 ID3D11PixelShader **output);
+#define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i) \
+    D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 #endif /* VLC_D3D11_SHADERS_H */
