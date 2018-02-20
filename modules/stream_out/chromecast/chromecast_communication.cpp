@@ -403,21 +403,6 @@ unsigned ChromecastCommunication::msgPlayerSetVolume( const std::string& destina
     return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-unsigned ChromecastCommunication::msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId, const std::string& currentTime )
-{
-    assert(mediaSessionId != 0);
-    unsigned id = getNextRequestId();
-
-    std::stringstream ss;
-    ss << "{\"type\":\"SEEK\","
-       <<  "\"currentTime\":" << currentTime << ","
-       <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << id
-       << "}";
-
-    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
-}
-
 /**
  * @brief Send a message to the Chromecast
  * @param msg the CastMessage to send
