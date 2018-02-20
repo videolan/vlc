@@ -82,7 +82,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         desc.Format == MAKEFOURCC('I','M','C','3')) {
 
         if (dst->format.i_chroma == VLC_CODEC_I420)
-            plane_SwapUV( dst->p );
+            picture_SwapUV( dst );
 
         bool imc3 = desc.Format == MAKEFOURCC('I','M','C','3');
         size_t chroma_pitch = imc3 ? lock.Pitch : (lock.Pitch / 2);
@@ -108,7 +108,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         Copy420_P_to_P(dst, plane, pitch, src->format.i_height, p_copy_cache);
 
         if (dst->format.i_chroma == VLC_CODEC_I420)
-            plane_SwapUV( dst->p );
+            picture_SwapUV( dst );
     } else if (desc.Format == MAKEFOURCC('N','V','1','2')) {
         const uint8_t *plane[2] = {
             lock.pBits,

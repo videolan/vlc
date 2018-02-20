@@ -353,7 +353,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     if (dst->format.i_chroma == VLC_CODEC_I420)
-        plane_SwapUV( dst->p );
+        picture_SwapUV( dst );
 
     ID3D11Texture2D_GetDesc(sys->staging, &desc);
 
@@ -394,7 +394,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     if (dst->format.i_chroma == VLC_CODEC_I420)
-        plane_SwapUV( dst->p );
+        picture_SwapUV( dst );
 
     /* */
     ID3D11DeviceContext_Unmap(p_sys->context, sys->staging_resource, 0);
