@@ -87,9 +87,11 @@ struct sout_stream_sys_t
         , p_intf(intf)
         , b_supports_video(has_video)
         , i_port(port)
+        , first_video_keyframe_pts( -1 )
         , es_changed( true )
         , cc_has_input( false )
         , cc_reload( false )
+        , has_video( false )
         , out_force_reload( false )
         , transcoding_state( TRANSCODING_NONE )
         , out_streams_added( 0 )
@@ -128,10 +130,13 @@ struct sout_stream_sys_t
     const bool b_supports_video;
     const int i_port;
 
+    sout_stream_id_sys_t *             video_proxy_id;
+    mtime_t                            first_video_keyframe_pts;
 
     bool                               es_changed;
     bool                               cc_has_input;
     bool                               cc_reload;
+    bool                               has_video;
     bool                               out_force_reload;
     int                                transcoding_state;
     std::vector<sout_stream_id_sys_t*> streams;
@@ -266,7 +271,11 @@ static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = sout_StreamIdAdd(p_stream->p_next, p_fmt);
     if (id)
+    {
+        if (p_fmt->i_cat == VIDEO_ES)
+            p_sys->video_proxy_id = id;
         p_sys->out_streams_added++;
+    }
     return id;
 }
 
@@ -274,6 +283,8 @@ static void ProxyDel(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     p_sys->out_streams_added--;
+    if (id == p_sys->video_proxy_id)
+        p_sys->video_proxy_id = NULL;
     return sout_StreamIdDel(p_stream->p_next, id);
 }
 
@@ -283,6 +294,25 @@ static int ProxySend(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     if (p_sys->cc_has_input || p_sys->out_streams_added >= p_sys->out_streams.size())
     {
+        if (p_sys->has_video)
+        {
+            // In case of video, the first block must be a keyframe
+            if (id == p_sys->video_proxy_id)
+            {
+                if (p_sys->first_video_keyframe_pts == -1
+                 && p_buffer->i_flags & BLOCK_FLAG_TYPE_I)
+                    p_sys->first_video_keyframe_pts = p_buffer->i_pts;
+            }
+            else // no keyframe for audio
+                p_buffer->i_flags &= ~BLOCK_FLAG_TYPE_I;
+
+            if (p_buffer->i_pts < p_sys->first_video_keyframe_pts
+             || p_sys->first_video_keyframe_pts == -1)
+            {
+                block_Release(p_buffer);
+                return VLC_SUCCESS;
+            }
+        }
         int ret = sout_StreamIdSend(p_stream->p_next, id, p_buffer);
         if (ret == VLC_SUCCESS && !p_sys->cc_has_input)
         {
@@ -622,6 +652,8 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                         p_sys->out_streams.erase(out_it);
                         p_sys->es_changed = reset_config;
                         p_sys->out_force_reload = reset_config;
+                        if( p_sys_id->fmt.i_cat == VIDEO_ES )
+                            p_sys->has_video = false;
                         break;
                     }
                     out_it++;
@@ -728,6 +760,9 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     cc_has_input = false;
     cc_reload = false;
+    first_video_keyframe_pts = -1;
+    video_proxy_id = NULL;
+    has_video = false;
     out_streams = new_streams;
     transcoding_state = new_transcoding_state;
 
@@ -754,7 +789,11 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
             it = out_streams.erase( it );
         }
         else
+        {
+            if( p_sys_id->fmt.i_cat == VIDEO_ES )
+                has_video = true;
             ++it;
+        }
     }
 
     if (out_streams.empty())
