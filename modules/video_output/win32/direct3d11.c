@@ -577,6 +577,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     picture_t *picture;
     unsigned  picture_count = 0;
 
+    memset(textures, 0, sizeof(textures));
+
     if (sys->sys.pool)
         return sys->sys.pool;
 
@@ -586,10 +588,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     video_format_t surface_fmt = vd->fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
-
-    if (is_d3d11_opaque(surface_fmt.i_chroma) && !CanUseVoutPool(&sys->d3d_dev, pool_size))
-        /* only provide enough for the filters, we can still do direct rendering */
-        pool_size = __MIN(pool_size, 6);
 
     if (SetupQuad( vd, &surface_fmt, &sys->picQuad, &sys->sys.rect_src_clipped,
                    sys->picQuadConfig, sys->picQuadPixelShader,
@@ -612,7 +610,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
     else
     {
-        if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->picQuadConfig, &surface_fmt, pool_size, textures))
+        unsigned slices = pool_size;
+        if (!CanUseVoutPool(&sys->d3d_dev, pool_size))
+            /* only provide enough for the filters, we can still do direct rendering */
+            slices = __MIN(slices, 6);
+
+        if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->picQuadConfig, &surface_fmt, slices, textures))
             goto error;
 
         pictures = calloc(pool_size, sizeof(*pictures));
@@ -654,6 +657,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         {
             sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuadConfig);
             for (picture_count = 0; picture_count < pool_size; picture_count++) {
+                if (!pictures[picture_count]->p_sys->texture[0])
+                    continue;
                 if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
                                        pictures[picture_count]->p_sys->texture, picture_count,
                                        pictures[picture_count]->p_sys->resourceView))
