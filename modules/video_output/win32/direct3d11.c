@@ -1093,31 +1093,32 @@ static void UpdateQuadLuminanceScale(vout_display_t *vd, d3d_quad_t *quad, float
         quad->shaderConstants.LuminanceScale = old;
 }
 
-static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
+static void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW],
+                             ID3D11RenderTargetView *d3drenderTargetView)
 {
     UINT stride = sizeof(d3d_vertex_t);
     UINT offset = 0;
 
-    ID3D11DeviceContext_OMSetRenderTargets(sys->d3d_dev.d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
+    ID3D11DeviceContext_OMSetRenderTargets(d3d_dev->d3dcontext, 1, &d3drenderTargetView, NULL);
 
     /* Render the quad */
     /* vertex shader */
-    ID3D11DeviceContext_IASetVertexBuffers(sys->d3d_dev.d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
-    ID3D11DeviceContext_IASetIndexBuffer(sys->d3d_dev.d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
+    ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     if ( quad->pVertexShaderConstants )
-        ID3D11DeviceContext_VSSetConstantBuffers(sys->d3d_dev.d3dcontext, 0, 1, &quad->pVertexShaderConstants);
+        ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexShaderConstants);
 
-    ID3D11DeviceContext_VSSetShader(sys->d3d_dev.d3dcontext, quad->d3dvertexShader, NULL, 0);
+    ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, quad->d3dvertexShader, NULL, 0);
 
     /* pixel shader */
-    ID3D11DeviceContext_PSSetShader(sys->d3d_dev.d3dcontext, quad->d3dpixelShader, NULL, 0);
+    ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader, NULL, 0);
 
-    ID3D11DeviceContext_PSSetConstantBuffers(sys->d3d_dev.d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
-    ID3D11DeviceContext_PSSetShaderResources(sys->d3d_dev.d3dcontext, 0, quad->resourceCount, resourceView);
+    ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
+    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
 
-    ID3D11DeviceContext_RSSetViewports(sys->d3d_dev.d3dcontext, 1, &quad->cropViewport);
+    ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport);
 
-    ID3D11DeviceContext_DrawIndexed(sys->d3d_dev.d3dcontext, quad->indexCount, 0, 0);
+    ID3D11DeviceContext_DrawIndexed(d3d_dev->d3dcontext, quad->indexCount, 0, 0);
 }
 
 static float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
@@ -1272,10 +1273,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     /* Render the quad */
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
-        DisplayD3DPicture(sys, &sys->picQuad, sys->stagingSys.resourceView);
+        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, sys->stagingSys.resourceView, sys->d3drenderTargetView);
     else {
         picture_sys_t *p_sys = ActivePictureSys(picture);
-        DisplayD3DPicture(sys, &sys->picQuad, p_sys->resourceView);
+        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, p_sys->resourceView, sys->d3drenderTargetView);
     }
 
     if (subpicture) {
@@ -1284,7 +1285,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                DisplayD3DPicture(sys, quad, quad->picSys.resourceView);
+                D3D11_RenderQuad(&sys->d3d_dev, quad, quad->picSys.resourceView, sys->d3drenderTargetView);
             }
         }
     }
