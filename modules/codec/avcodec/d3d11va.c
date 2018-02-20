@@ -648,9 +648,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
         if ( sys->render == processorInput[idx] )
         {
-            /* NVIDIA cards crash when calling CreateVideoDecoderOutputView
-             * on more than 30 slices */
-            if (sys->totalTextureSlices <= 30 || !isNvidiaHardware(sys->d3d_dev.d3ddevice))
+            if (CanUseVoutPool(&sys->d3d_dev, sys->totalTextureSlices))
                 dx_sys->can_extern_pool = true;
             else
                 msg_Warn( va, "NVIDIA GPU with too many slices (%d) detected, use internal pool",
