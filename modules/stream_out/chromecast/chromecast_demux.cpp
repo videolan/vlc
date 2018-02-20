@@ -47,11 +47,16 @@ struct demux_sys_t
         ,m_enabled( true )
         ,m_startTime( VLC_TS_INVALID )
     {
+        init();
+    }
+
+    void init()
+    {
         vlc_meta_t *p_meta = vlc_meta_New();
         if( likely(p_meta != NULL) )
         {
-            input_item_t *p_item = demux->p_next->p_input ?
-                                   input_GetItem( demux->p_next->p_input ) : NULL;
+            input_item_t *p_item = p_demux->p_next->p_input ?
+                                   input_GetItem( p_demux->p_next->p_input ) : NULL;
             if( p_item )
             {
                 /* Favor Meta from the input item of the input_thread since
@@ -76,12 +81,13 @@ struct demux_sys_t
                 }
                 p_renderer->pf_set_meta( p_renderer->p_opaque, p_meta );
             }
-            else if (demux_Control( demux->p_next, DEMUX_GET_META, p_meta) == VLC_SUCCESS)
+            else if (demux_Control( p_demux->p_next, DEMUX_GET_META, p_meta) == VLC_SUCCESS)
                 p_renderer->pf_set_meta( p_renderer->p_opaque, p_meta );
             else
                 vlc_meta_Delete( p_meta );
         }
-        if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
+
+        if (demux_Control( p_demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
             canSeek = false;
 
         int i_current_title;
@@ -90,7 +96,7 @@ struct demux_sys_t
         {
             input_title_t** pp_titles;
             int i_nb_titles, i_title_offset, i_chapter_offset;
-            if( demux_Control( demux->p_next, DEMUX_GET_TITLE_INFO, &pp_titles,
+            if( demux_Control( p_demux->p_next, DEMUX_GET_TITLE_INFO, &pp_titles,
                               &i_nb_titles, &i_title_offset,
                               &i_chapter_offset ) == VLC_SUCCESS )
             {
@@ -123,7 +129,7 @@ struct demux_sys_t
         }
 
         p_renderer->pf_set_on_paused_changed_cb(p_renderer->p_opaque,
-                                                on_paused_changed_cb, demux);
+                                                on_paused_changed_cb, p_demux);
     }
 
     ~demux_sys_t()
