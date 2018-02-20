@@ -483,8 +483,6 @@ void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int 
 #endif /* HAVE_SEARCH_H */
 #ifndef HAVE_TDESTROY
 void tdestroy( void *root, void (*free_node)(void *nodep) );
-void vlc_tdestroy( void *, void (*)(void *) );
-# define tdestroy vlc_tdestroy
 #endif
 
 /* Random numbers */
