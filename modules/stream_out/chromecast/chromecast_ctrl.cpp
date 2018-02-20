@@ -1029,7 +1029,7 @@ void intf_sys_t::setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
     m_on_paused_changed_data = on_paused_changed_data;
 }
 
-void intf_sys_t::setPauseState(bool paused)
+void intf_sys_t::setPauseState(bool paused, mtime_t delay)
 {
     vlc_mutex_locker locker( &m_lock );
     if ( m_mediaSessionId == 0 || paused == m_paused )
@@ -1041,10 +1041,17 @@ void intf_sys_t::setPauseState(bool paused)
     {
         m_last_request_id =
             m_communication.msgPlayerPlay( m_appTransportId, m_mediaSessionId );
+        m_pause_delay = delay;
     }
     else if ( m_state != Paused )
         m_last_request_id =
             m_communication.msgPlayerPause( m_appTransportId, m_mediaSessionId );
+}
+
+mtime_t intf_sys_t::getPauseDelay()
+{
+    vlc_mutex_locker locker( &m_lock );
+    return m_pause_delay;
 }
 
 bool intf_sys_t::isFinishedPlaying()
@@ -1143,10 +1150,10 @@ void intf_sys_t::send_input_event(void *pt, enum cc_input_event event, union cc_
     return p_this->sendInputEvent(event, arg);
 }
 
-void intf_sys_t::set_pause_state(void *pt, bool paused)
+void intf_sys_t::set_pause_state(void *pt, bool paused, mtime_t delay)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->setPauseState( paused );
+    p_this->setPauseState( paused, delay );
 }
 
 void intf_sys_t::set_meta(void *pt, vlc_meta_t *p_meta)
