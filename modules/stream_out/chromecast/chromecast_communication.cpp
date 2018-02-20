@@ -36,8 +36,8 @@ ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const 
     : m_module( p_module )
     , m_creds( NULL )
     , m_tls( NULL )
-    , m_receiver_requestId( 0 )
-    , m_requestId( 0 )
+    , m_receiver_requestId( 1 )
+    , m_requestId( 1 )
 {
     if (devicePort == 0)
         devicePort = CHROMECAST_CONTROL_PORT;
