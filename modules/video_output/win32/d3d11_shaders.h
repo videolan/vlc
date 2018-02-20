@@ -46,6 +46,9 @@ typedef struct {
     unsigned                 luminance_peak;
 } display_info_t;
 
+const char* globVertexShaderFlat;
+const char* globVertexShaderProjection;
+
 ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 #define D3D11_CompileShader(a,b,c,d,e)  D3D11_CompileShader(VLC_OBJECT(a),b,c,d,e)

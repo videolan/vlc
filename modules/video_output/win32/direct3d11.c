@@ -190,62 +190,6 @@ static void UpdatePicQuadPosition(vout_display_t *);
 static int Control(vout_display_t *vd, int query, va_list args);
 static void Manage(vout_display_t *vd);
 
-/* TODO: Move to a direct3d11_shaders header */
-static const char* globVertexShaderFlat = "\
-  struct VS_INPUT\
-  {\
-    float4 Position   : POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  struct VS_OUTPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  VS_OUTPUT main( VS_INPUT In )\
-  {\
-    return In;\
-  }\
-";
-
-static const char* globVertexShaderProjection = "\
-  cbuffer VS_PROJECTION_CONST : register(b0)\
-  {\
-     float4x4 RotX;\
-     float4x4 RotY;\
-     float4x4 RotZ;\
-     float4x4 View;\
-     float4x4 Projection;\
-  };\
-  struct VS_INPUT\
-  {\
-    float4 Position   : POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  struct VS_OUTPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  VS_OUTPUT main( VS_INPUT In )\
-  {\
-    VS_OUTPUT Output;\
-    float4 pos = In.Position;\
-    pos = mul(RotY, pos);\
-    pos = mul(RotX, pos);\
-    pos = mul(RotZ, pos);\
-    pos = mul(View, pos);\
-    pos = mul(Projection, pos);\
-    Output.Position = pos;\
-    Output.Texture = In.Texture;\
-    return Output;\
-  }\
-";
-
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;

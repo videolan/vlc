@@ -133,6 +133,61 @@ static const char* globPixelShaderDefault = "\
   }\n\
 ";
 
+const char* globVertexShaderFlat = "\
+struct VS_INPUT\n\
+{\n\
+  float4 Position   : POSITION;\n\
+  float4 Texture    : TEXCOORD0;\n\
+};\n\
+\n\
+struct VS_OUTPUT\n\
+{\n\
+  float4 Position   : SV_POSITION;\n\
+  float4 Texture    : TEXCOORD0;\n\
+};\n\
+\n\
+VS_OUTPUT main( VS_INPUT In )\n\
+{\n\
+  return In;\n\
+}\n\
+";
+
+const char* globVertexShaderProjection = "\n\
+cbuffer VS_PROJECTION_CONST : register(b0)\n\
+{\n\
+   float4x4 RotX;\n\
+   float4x4 RotY;\n\
+   float4x4 RotZ;\n\
+   float4x4 View;\n\
+   float4x4 Projection;\n\
+};\n\
+struct VS_INPUT\n\
+{\n\
+  float4 Position   : POSITION;\n\
+  float4 Texture    : TEXCOORD0;\n\
+};\n\
+\n\
+struct VS_OUTPUT\n\
+{\n\
+  float4 Position   : SV_POSITION;\n\
+  float4 Texture    : TEXCOORD0;\n\
+};\n\
+\n\
+VS_OUTPUT main( VS_INPUT In )\n\
+{\n\
+  VS_OUTPUT Output;\n\
+  float4 pos = In.Position;\n\
+  pos = mul(RotY, pos);\n\
+  pos = mul(RotX, pos);\n\
+  pos = mul(RotZ, pos);\n\
+  pos = mul(View, pos);\n\
+  pos = mul(Projection, pos);\n\
+  Output.Position = pos;\n\
+  Output.Texture = In.Texture;\n\
+  return Output;\n\
+}\n\
+";
+
 bool IsRGBShader(const d3d_format_t *cfg)
 {
     return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
