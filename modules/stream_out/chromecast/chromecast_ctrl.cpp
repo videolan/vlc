@@ -667,6 +667,8 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
     json_value *p_data = json_parse(msg.payload_utf8().c_str());
     std::string type((*p_data)["type"]);
 
+    vlc_mutex_locker locker( &m_lock );
+
     if (type == "MEDIA_STATUS")
     {
         json_value status = (*p_data)["status"];
@@ -686,7 +688,6 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
         std::string newPlayerState = (const char*)status[0]["playerState"];
         std::string idleReason = (const char*)status[0]["idleReason"];
 
-        vlc_mutex_locker locker( &m_lock );
 
         if (newPlayerState == "IDLE" || newPlayerState.empty() == true )
         {
@@ -797,7 +798,6 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
     else if (type == "LOAD_FAILED")
     {
         msg_Err( m_module, "Media load failed");
-        vlc_mutex_locker locker(&m_lock);
         setState( LoadFailed );
     }
     else if (type == "LOAD_CANCELLED")
@@ -873,9 +873,9 @@ bool intf_sys_t::handleMessages()
         else if ( b_timeout == true )
         {
             // If no commands were queued to be sent, we timed out. Let's ping the chromecast
+            vlc_mutex_locker locker(&m_lock);
             if ( m_pingRetriesLeft == 0 )
             {
-                vlc_mutex_locker locker(&m_lock);
                 m_state = Dead;
                 msg_Warn( m_module, "No PING response from the chromecast" );
                 return false;
