@@ -581,16 +581,14 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             break;
         case VLC_CODEC_H263: mime = "video/3gpp"; break;
         case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_MP2V:
+            mime = "video/mpeg2";
+            break;
         case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
         case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
         case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
         case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
-        /* FIXME: mpeg2 is disabled: sar num/den can't be updated from
-         * MediaCodec. Use avcodec instead that will update it. The proper
-         * solution is to update sar from a mpeg2 packetizer.
-         *
-         * case VLC_CODEC_MPGV: mime = "video/mpeg2"; break;
-         */
         }
     }
     else
