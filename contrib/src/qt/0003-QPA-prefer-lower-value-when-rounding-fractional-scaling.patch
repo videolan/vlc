@@ -1,0 +1,25 @@
+From 169f145af591e78c3edc68a5a02130c8fd0973c5 Mon Sep 17 00:00:00 2001
+From: VideoLAN Buildbot <buildbot@videolan.org>
+Date: Tue, 13 Feb 2018 09:31:44 +0000
+Subject: [PATCH] Windows QPA: prefer lower value when rounding fractional scaling
+
+---
+ src/plugins/platforms/windows/qwindowsscreen.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/platforms/windows/qwindowsscreen.cpp b/src/plugins/platforms/windows/qwindowsscreen.cpp
+index 5accbe8..9b4cd55 100644
+--- a/src/plugins/platforms/windows/qwindowsscreen.cpp
++++ b/src/plugins/platforms/windows/qwindowsscreen.cpp
+@@ -258,7 +258,7 @@ qreal QWindowsScreen::pixelDensity() const
+     // the pixel density since it is reflects the Windows UI scaling.
+     // High DPI auto scaling should be disabled when the user chooses
+     // small fonts on a High DPI monitor, resulting in lower logical DPI.
+-    return qRound(logicalDpi().first / 96);
++    return ceil(logicalDpi().first / 96. - 0.5);
+ }
+ 
+ /*!
+-- 
+2.11.0
+
