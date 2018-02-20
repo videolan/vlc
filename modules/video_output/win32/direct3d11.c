@@ -1674,8 +1674,8 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 #endif
 }
 
-static ID3DBlob* CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
-                               const char *psz_shader, bool pixel, bool legacy_shader)
+static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
+                                     const char *psz_shader, bool pixel, bool legacy_shader)
 {
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
     const char *target;
@@ -1957,7 +1957,7 @@ static HRESULT D3D11_CompilePixelShader(vlc_object_t *vd, d3d11_handle_t *hd3d, 
 #endif
     free(psz_range);
 
-    ID3DBlob *pPSBlob = CompileShader(VLC_OBJECT(vd), hd3d, d3d_dev, shader, true, legacy_shader);
+    ID3DBlob *pPSBlob = D3D11_CompileShader(VLC_OBJECT(vd), hd3d, d3d_dev, shader, true, legacy_shader);
     free(shader);
     if (!pPSBlob)
         return E_INVALIDARG;
@@ -2130,8 +2130,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    ID3DBlob *pVSBlob = CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderFlat,
-                                      false, sys->legacy_shader);
+    ID3DBlob *pVSBlob = D3D11_CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderFlat,
+                                            false, sys->legacy_shader);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
@@ -2162,8 +2162,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     ID3D11DeviceContext_IASetInputLayout(sys->d3d_dev.d3dcontext, pVertexLayout);
     ID3D11InputLayout_Release(pVertexLayout);
 
-    pVSBlob = CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection,
-                            false, sys->legacy_shader);
+    pVSBlob = D3D11_CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection,
+                                  false, sys->legacy_shader);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
