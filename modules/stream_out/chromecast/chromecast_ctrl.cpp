@@ -496,16 +496,7 @@ void intf_sys_t::mainLoop()
             switch ( msg )
             {
                 case Stop:
-                    if( isStatePlaying() )
-                    {
-                        if ( m_mediaSessionId == 0 )
-                            m_request_stop = true;
-                        else
-                        {
-                            m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
-                            setState( Stopping );
-                        }
-                    }
+                    doStop();
                     break;
             }
             m_msgQueue.pop();
@@ -909,16 +900,37 @@ bool intf_sys_t::handleMessages()
     return true;
 }
 
+void intf_sys_t::doStop()
+{
+    if( !isStatePlaying() )
+        return;
+
+    if ( m_mediaSessionId == 0 )
+        m_request_stop = true;
+    else
+    {
+        m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+        setState( Stopping );
+    }
+}
+
 void intf_sys_t::requestPlayerStop()
 {
     vlc_mutex_locker locker(&m_lock);
 
+    std::queue<QueueableMessages> empty;
+    std::swap(m_msgQueue, empty);
+
     m_request_load = false;
 
-    if( !isStatePlaying() )
-        return;
-
-    queueMessage( Stop );
+    if( vlc_killed() )
+    {
+        if( !isStatePlaying() )
+            return;
+        queueMessage( Stop );
+    }
+    else
+        doStop();
 }
 
 States intf_sys_t::state() const

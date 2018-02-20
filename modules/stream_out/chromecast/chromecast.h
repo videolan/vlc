@@ -199,6 +199,7 @@ private:
     bool isStatePlaying() const;
     bool isStateReady() const;
     void tryLoad();
+    void doStop();
 
     void setMeta( vlc_meta_t *p_meta );
 
