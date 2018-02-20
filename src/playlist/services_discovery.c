@@ -147,23 +147,22 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     return VLC_SUCCESS;
 }
 
-static void playlist_ServicesDiscoveryInternalRemoveLocked(playlist_t *playlist,
-                                                           vlc_sd_internal_t *sds)
+static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
+                                                     vlc_sd_internal_t *sds)
 {
     assert(sds->sd != NULL);
-
-    playlist_Unlock(playlist);
-
     vlc_sd_Destroy(sds->sd);
+
     /* Remove the sd playlist node if it exists */
     playlist_Lock(playlist);
-
     if (sds->node != NULL)
         playlist_NodeDeleteExplicit(playlist, sds->node,
             PLAYLIST_DELETE_FORCE | PLAYLIST_DELETE_STOP_IF_CURRENT );
+    playlist_Unlock(playlist);
 
     free(sds);
 }
+
 
 int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
 {
@@ -182,18 +181,15 @@ int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
             break;
         }
     }
+    playlist_Unlock(playlist);
 
     if (sds == NULL)
     {
         msg_Warn(playlist, "discovery %s is not loaded", name);
-        playlist_Unlock(playlist);
         return VLC_EGENERIC;
     }
 
-    playlist_ServicesDiscoveryInternalRemoveLocked(playlist, sds);
-
-    playlist_Unlock(playlist);
-
+    playlist_ServicesDiscoveryInternalRemove(playlist, sds);
     return VLC_SUCCESS;
 }
 
@@ -248,14 +244,8 @@ void playlist_ServicesDiscoveryKillAll(playlist_t *playlist)
 {
     playlist_private_t *priv = pl_priv(playlist);
 
-    playlist_Lock(playlist);
-    while (priv->i_sds > 0)
-    {
-        vlc_sd_internal_t *sds = priv->pp_sds[priv->i_sds - 1];
-        TAB_ERASE(priv->i_sds, priv->pp_sds, priv->i_sds - 1);
+    for (int i = 0; i < priv->i_sds; i++)
+        playlist_ServicesDiscoveryInternalRemove(playlist, priv->pp_sds[i]);
 
-        playlist_ServicesDiscoveryInternalRemoveLocked(playlist, sds);
-    }
-
-    playlist_Unlock(playlist);
+    TAB_CLEAN(priv->i_sds, priv->pp_sds);
 }
