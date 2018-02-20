@@ -477,12 +477,11 @@ void *tsearch( const void *key, void **rootp, int(*cmp)(const void *, const void
 void *tfind( const void *key, const void **rootp, int(*cmp)(const void *, const void *) );
 void *tdelete( const void *key, void **rootp, int(*cmp)(const void *, const void *) );
 void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int depth) );
+#endif /* HAVE_SEARCH_H */
+#ifndef HAVE_TDESTROY
 void tdestroy( void *root, void (*free_node)(void *nodep) );
-#else // HAVE_SEARCH_H
-# ifndef HAVE_TDESTROY
 void vlc_tdestroy( void *, void (*)(void *) );
-#  define tdestroy vlc_tdestroy
-# endif
+# define tdestroy vlc_tdestroy
 #endif
 
 /* Random numbers */
