@@ -193,6 +193,7 @@ private:
     void queueMessage( QueueableMessages msg );
 
     void setPauseState(bool paused);
+    bool isStateError() const;
     bool isStatePlaying() const;
     bool isStateReady() const;
     void tryLoad();

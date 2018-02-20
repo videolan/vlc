@@ -353,6 +353,19 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     vlc_cond_signal( &m_stateChangedCond );
 }
 
+bool intf_sys_t::isStateError() const
+{
+    switch( m_state )
+    {
+        case LoadFailed:
+        case Dead:
+        case TakenOver:
+            return true;
+        default:
+            return false;
+    }
+}
+
 bool intf_sys_t::isStatePlaying() const
 {
     switch( m_state )
