@@ -580,7 +580,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     if (IsEqualGUID(input,&DXVA_ModeHEVC_VLD_Main10) && !CanUseIntelHEVC(va))
         return VLC_EGENERIC;
 
-    DXGI_FORMAT processorInput[4];
+    DXGI_FORMAT processorInput[5];
     int idx = 0;
     if ( sys->render != DXGI_FORMAT_UNKNOWN )
         processorInput[idx++] = sys->render;
