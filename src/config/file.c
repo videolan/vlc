@@ -210,6 +210,9 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         /* Reject values of options that are unsaveable */
         if (item->b_unsaveable)
             continue;
+        /* Ignore options that are obsolete */
+        if (item->b_removed)
+            continue;
 
         const char *psz_option_value = ptr + 1;
         switch (CONFIG_CLASS(item->i_type))
