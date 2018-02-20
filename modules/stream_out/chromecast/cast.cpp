@@ -353,8 +353,8 @@ sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
 
 sout_access_out_sys_t::~sout_access_out_sys_t()
 {
-    block_FifoRelease(m_fifo);
     httpd_UrlDelete(m_url);
+    block_FifoRelease(m_fifo);
 }
 
 void sout_access_out_sys_t::clearUnlocked()
