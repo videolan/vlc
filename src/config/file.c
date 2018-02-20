@@ -137,7 +137,6 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
     return p_stream;
 }
 
-
 static int64_t vlc_strtoi (const char *str)
 {
     char *end;
@@ -206,6 +205,10 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 
         module_config_t *item = config_FindConfig(psz_option_name);
         if (item == NULL)
+            continue;
+
+        /* Reject values of options that are unsaveable */
+        if (item->b_unsaveable)
             continue;
 
         const char *psz_option_value = ptr + 1;
