@@ -216,7 +216,7 @@ void AttributesTag::parseAttributes(const std::string &field)
                 break;
             }
             else /* out of range */
-                return;
+                iss.get();
         }
 
         std::string attrname = oss.str();
@@ -239,6 +239,11 @@ void AttributesTag::parseAttributes(const std::string &field)
             else if(c == '"')
             {
                 b_quoted = !b_quoted;
+            }
+            else if(!b_quoted && (c < '-' || c > 'z')) /* out of range */
+            {
+                iss.get();
+                continue;
             }
 
             if(!iss.eof())
