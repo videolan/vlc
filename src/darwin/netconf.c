@@ -62,11 +62,8 @@ char *vlc_getProxyUrl(const char *url)
             char host_buffer[4096];
             memset(host_buffer, 0, sizeof(host_buffer));
             if (CFStringGetCString(proxyCFstr, host_buffer, sizeof(host_buffer)
-                                   - 1, kCFStringEncodingUTF8)) {
-                char buffer[4096];
-                sprintf(buffer, "%s:%d", host_buffer, port);
-                proxy_url = strdup(buffer);
-            }
+                                   - 1, kCFStringEncodingUTF8))
+                asprintf(&proxy_url, "http://%s:%d", host_buffer, port);
         }
 
         CFRelease(dicRef);
