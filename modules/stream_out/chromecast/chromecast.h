@@ -180,6 +180,7 @@ struct intf_sys_t
     void setPacing(bool do_pace);
     int pace();
     void sendInputEvent(enum cc_input_event event, union cc_input_arg arg);
+    mtime_t getPauseDelay();
 
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
@@ -189,7 +190,7 @@ private:
     void processMessage(const castchannel::CastMessage &msg);
     void queueMessage( QueueableMessages msg );
 
-    void setPauseState(bool paused);
+    void setPauseState(bool paused, mtime_t delay);
     bool isFinishedPlaying();
     bool isStateError() const;
     bool isStatePlaying() const;
@@ -224,7 +225,7 @@ private:
     static void send_input_event(void *, enum cc_input_event event, union cc_input_arg arg);
     static void set_on_paused_changed_cb(void *, on_paused_changed_itf, void *);
 
-    static void set_pause_state(void*, bool paused);
+    static void set_pause_state(void*, bool paused, mtime_t delay);
 
     static void set_meta(void*, vlc_meta_t *p_meta);
 
