@@ -167,68 +167,90 @@ ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_
 /*****************************************************************************
  * Message preparation
  *****************************************************************************/
-int ChromecastCommunication::msgAuth()
+unsigned ChromecastCommunication::getNextReceiverRequestId()
+{
+    unsigned id = m_receiver_requestId++;
+    return likely(id != 0) ? id : m_receiver_requestId++;
+}
+
+unsigned ChromecastCommunication::getNextRequestId()
+{
+    unsigned id = m_requestId++;
+    return likely(id != 0) ? id : m_requestId++;
+}
+
+unsigned ChromecastCommunication::msgAuth()
 {
     castchannel::DeviceAuthMessage authMessage;
     authMessage.mutable_challenge();
 
     return buildMessage(NAMESPACE_DEVICEAUTH, authMessage.SerializeAsString(),
-                        DEFAULT_CHOMECAST_RECEIVER, castchannel::CastMessage_PayloadType_BINARY);
+                        DEFAULT_CHOMECAST_RECEIVER, castchannel::CastMessage_PayloadType_BINARY)
+           == VLC_SUCCESS ? 1 : kInvalidId;
 }
 
 
-int ChromecastCommunication::msgPing()
+unsigned ChromecastCommunication::msgPing()
 {
     std::string s("{\"type\":\"PING\"}");
-    return buildMessage( NAMESPACE_HEARTBEAT, s, DEFAULT_CHOMECAST_RECEIVER );
+    return buildMessage( NAMESPACE_HEARTBEAT, s, DEFAULT_CHOMECAST_RECEIVER )
+           == VLC_SUCCESS ? 1 : kInvalidId;
 }
 
 
-int ChromecastCommunication::msgPong()
+unsigned ChromecastCommunication::msgPong()
 {
     std::string s("{\"type\":\"PONG\"}");
-    return buildMessage( NAMESPACE_HEARTBEAT, s, DEFAULT_CHOMECAST_RECEIVER );
+    return buildMessage( NAMESPACE_HEARTBEAT, s, DEFAULT_CHOMECAST_RECEIVER )
+           == VLC_SUCCESS ? 1 : kInvalidId;
 }
 
-int ChromecastCommunication::msgConnect( const std::string& destinationId )
+unsigned ChromecastCommunication::msgConnect( const std::string& destinationId )
 {
     std::string s("{\"type\":\"CONNECT\"}");
-    return buildMessage( NAMESPACE_CONNECTION, s, destinationId );
+    return buildMessage( NAMESPACE_CONNECTION, s, destinationId )
+           == VLC_SUCCESS ? 1 : kInvalidId;
 }
 
-int ChromecastCommunication::msgReceiverClose( const std::string& destinationId )
+unsigned ChromecastCommunication::msgReceiverClose( const std::string& destinationId )
 {
     std::string s("{\"type\":\"CLOSE\"}");
-    return buildMessage( NAMESPACE_CONNECTION, s, destinationId );
+    return buildMessage( NAMESPACE_CONNECTION, s, destinationId )
+           == VLC_SUCCESS ? 1 : kInvalidId;
 }
 
-int ChromecastCommunication::msgReceiverGetStatus()
+unsigned ChromecastCommunication::msgReceiverGetStatus()
 {
+    unsigned id = getNextReceiverRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"GET_STATUS\","
-       <<  "\"requestId\":" << m_receiver_requestId++ << "}";
+       <<  "\"requestId\":" << id << "}";
 
-    return buildMessage( NAMESPACE_RECEIVER, ss.str(), DEFAULT_CHOMECAST_RECEIVER );
+    return buildMessage( NAMESPACE_RECEIVER, ss.str(), DEFAULT_CHOMECAST_RECEIVER )
+           == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgReceiverLaunchApp()
+unsigned ChromecastCommunication::msgReceiverLaunchApp()
 {
+    unsigned id = getNextReceiverRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"LAUNCH\","
        <<  "\"appId\":\"" << APP_ID << "\","
-       <<  "\"requestId\":" << m_receiver_requestId++ << "}";
+       <<  "\"requestId\":" << id << "}";
 
-    return buildMessage( NAMESPACE_RECEIVER, ss.str(), DEFAULT_CHOMECAST_RECEIVER );
+    return buildMessage( NAMESPACE_RECEIVER, ss.str(), DEFAULT_CHOMECAST_RECEIVER )
+           == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerGetStatus( const std::string& destinationId )
+unsigned ChromecastCommunication::msgPlayerGetStatus( const std::string& destinationId )
 {
+    unsigned id = getNextRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"GET_STATUS\","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
 std::string ChromecastCommunication::GetMedia( unsigned int i_port,
@@ -305,61 +327,66 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
     return ss.str();
 }
 
-int ChromecastCommunication::msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
+unsigned ChromecastCommunication::msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
                                              const std::string& mime, const vlc_meta_t *p_meta )
 {
+    unsigned id = getNextRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
        <<  "\"media\":{" << GetMedia( i_port, mime, p_meta ) << "},"
        <<  "\"autoplay\":\"false\","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId )
+unsigned ChromecastCommunication::msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId )
 {
     assert(mediaSessionId != 0);
+    unsigned id = getNextRequestId();
 
     std::stringstream ss;
     ss << "{\"type\":\"PLAY\","
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId )
+unsigned ChromecastCommunication::msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId )
 {
     assert(mediaSessionId != 0);
+    unsigned id = getNextRequestId();
 
     std::stringstream ss;
     ss << "{\"type\":\"STOP\","
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId )
+unsigned ChromecastCommunication::msgPlayerPause( const std::string& destinationId, int64_t mediaSessionId )
 {
     assert(mediaSessionId != 0);
+    unsigned id = getNextRequestId();
 
     std::stringstream ss;
     ss << "{\"type\":\"PAUSE\","
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId, float f_volume, bool b_mute )
+unsigned ChromecastCommunication::msgPlayerSetVolume( const std::string& destinationId, int64_t mediaSessionId, float f_volume, bool b_mute )
 {
     assert(mediaSessionId != 0);
+    unsigned id = getNextRequestId();
 
     if ( f_volume < 0.0 || f_volume > 1.0)
         return VLC_EGENERIC;
@@ -368,24 +395,25 @@ int ChromecastCommunication::msgPlayerSetVolume( const std::string& destinationI
     ss << "{\"type\":\"SET_VOLUME\","
        <<  "\"volume\":{\"level\":" << f_volume << ",\"muted\":" << ( b_mute ? "true" : "false" ) << "},"
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
-int ChromecastCommunication::msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId, const std::string& currentTime )
+unsigned ChromecastCommunication::msgPlayerSeek( const std::string& destinationId, int64_t mediaSessionId, const std::string& currentTime )
 {
     assert(mediaSessionId != 0);
+    unsigned id = getNextRequestId();
 
     std::stringstream ss;
     ss << "{\"type\":\"SEEK\","
        <<  "\"currentTime\":" << currentTime << ","
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << m_requestId++
+       <<  "\"requestId\":" << id
        << "}";
 
-    return pushMediaPlayerMessage( destinationId, ss );
+    return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
 /**

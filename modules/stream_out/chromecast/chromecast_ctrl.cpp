@@ -941,9 +941,9 @@ bool intf_sys_t::requestPlayerSeek(mtime_t pos)
     if( !isStatePlaying() || m_mediaSessionId == 0 )
         return false;
 
-    int ret = m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId,
-                                             timeVLCToCC( pos ) );
-    if( ret == VLC_SUCCESS )
+    unsigned ret = m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId,
+                                                  timeVLCToCC( pos ) );
+    if( ret != ChromecastCommunication::kInvalidId )
     {
         setState( Seeking );
         return true;
