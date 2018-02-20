@@ -438,7 +438,6 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
         fifo_put_back(p_block);
         p_block = m_header;
     }
-    vlc_fifo_Unlock(m_fifo);
 
     if (vlc_fifo_GetBytes(m_fifo) < HTTPD_BUFFER_PACE)
         m_intf->setPacing(false);
@@ -470,6 +469,7 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
     else
         httpd_MsgAdd(answer, "Connection", "close");
 
+    vlc_fifo_Unlock(m_fifo);
     return VLC_SUCCESS;
 }
 
