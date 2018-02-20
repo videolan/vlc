@@ -239,6 +239,11 @@ void AttributesTag::parseAttributes(const std::string &field)
             else if(c == '"')
             {
                 b_quoted = !b_quoted;
+                if(!b_quoted)
+                {
+                    oss.put((char)iss.get());
+                    break;
+                }
             }
             else if(!b_quoted && (c < '-' || c > 'z')) /* out of range */
             {
