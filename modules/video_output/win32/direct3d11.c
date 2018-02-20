@@ -51,12 +51,9 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_quad.h"
+#include "d3d11_shaders.h"
 
 #include "common.h"
-
-#if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    hd3d->OurD3DCompile(args)
-#endif
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
 DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
@@ -1674,44 +1671,6 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 #endif
 }
 
-static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
-                                     const char *psz_shader, bool pixel, bool legacy_shader)
-{
-    ID3DBlob* pShaderBlob = NULL, *pErrBlob;
-    const char *target;
-    if (pixel)
-    {
-        if (likely(d3d_dev->feature_level >= D3D_FEATURE_LEVEL_10_0))
-            target = "ps_4_0";
-        else if (d3d_dev->feature_level >= D3D_FEATURE_LEVEL_9_3)
-            target = "ps_4_0_level_9_3";
-        else
-            target = "ps_4_0_level_9_1";
-    }
-    else
-    {
-        if (likely(d3d_dev->feature_level >= D3D_FEATURE_LEVEL_10_0))
-            target = "vs_4_0";
-        else if (d3d_dev->feature_level >= D3D_FEATURE_LEVEL_9_3)
-            target = "vs_4_0_level_9_3";
-        else
-            target = "vs_4_0_level_9_1";
-    }
-
-    HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
-                            NULL, NULL, NULL, "main", target,
-                            0, 0, &pShaderBlob, &pErrBlob);
-
-    if (FAILED(hr)) {
-        char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
-        msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixel?"Pixel":"Vertex", hr, err );
-        if (pErrBlob)
-            ID3D10Blob_Release(pErrBlob);
-        return NULL;
-    }
-    return pShaderBlob;
-}
-
 static bool IsRGBShader(const d3d_format_t *cfg)
 {
     return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
@@ -1957,7 +1916,7 @@ static HRESULT D3D11_CompilePixelShader(vlc_object_t *vd, d3d11_handle_t *hd3d, 
 #endif
     free(psz_range);
 
-    ID3DBlob *pPSBlob = D3D11_CompileShader(VLC_OBJECT(vd), hd3d, d3d_dev, shader, true, legacy_shader);
+    ID3DBlob *pPSBlob = D3D11_CompileShader(vd, hd3d, d3d_dev, shader, true);
     free(shader);
     if (!pPSBlob)
         return E_INVALIDARG;
@@ -2130,8 +2089,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    ID3DBlob *pVSBlob = D3D11_CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderFlat,
-                                            false, sys->legacy_shader);
+    ID3DBlob *pVSBlob = D3D11_CompileShader(vd, &sys->hd3d, &sys->d3d_dev, globVertexShaderFlat, false);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
@@ -2162,8 +2120,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     ID3D11DeviceContext_IASetInputLayout(sys->d3d_dev.d3dcontext, pVertexLayout);
     ID3D11InputLayout_Release(pVertexLayout);
 
-    pVSBlob = D3D11_CompileShader(VLC_OBJECT(vd), &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection,
-                                  false, sys->legacy_shader);
+    pVSBlob = D3D11_CompileShader(vd, &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection, false);
     if (!pVSBlob)
         return VLC_EGENERIC;
 
