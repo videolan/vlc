@@ -189,9 +189,6 @@ struct intf_sys_t
 private:
     bool handleMessages();
 
-    void waitAppStarted();
-    void waitSeekDone();
-
     void processMessage(const castchannel::CastMessage &msg);
     void queueMessage( QueueableMessages msg );
 
