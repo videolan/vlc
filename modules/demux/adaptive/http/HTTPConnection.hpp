@@ -50,6 +50,7 @@ namespace adaptive
                 virtual ssize_t read        (void *p_buffer, size_t len) = 0;
 
                 virtual size_t  getContentLength() const;
+                virtual const std::string & getContentType() const;
                 virtual void    setUsed( bool ) = 0;
 
             protected:
@@ -57,6 +58,7 @@ namespace adaptive
                 ConnectionParams   params;
                 bool               available;
                 size_t             contentLength;
+                std::string        contentType;
                 BytesRange         bytesRange;
                 size_t             bytesRead;
         };

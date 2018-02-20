@@ -59,6 +59,11 @@ size_t AbstractConnection::getContentLength() const
     return contentLength;
 }
 
+const std::string & AbstractConnection::getContentType() const
+{
+    return contentType;
+}
+
 HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
                                Socket *socket_, const ConnectionParams &proxy, bool persistent)
     : AbstractConnection( p_object_ )
@@ -123,6 +128,7 @@ void HTTPConnection::disconnect()
     chunked = false;
     chunkLength = 0;
     bytesRange = BytesRange();
+    contentType = std::string();
     socket->disconnect();
 }
 
@@ -380,6 +386,10 @@ void HTTPConnection::onHeader(const std::string &key,
     {
         chunked = true;
     }
+    else if(key == "Content-Type")
+    {
+        contentType = value;
+    }
     else if(key == "Location")
     {
         locationparams = ConnectionParams();
@@ -464,6 +474,7 @@ void StreamUrlConnection::reset()
     p_streamurl = NULL;
     bytesRead = 0;
     contentLength = 0;
+    contentType = std::string();
     bytesRange = BytesRange();
 }
 
@@ -485,6 +496,13 @@ int StreamUrlConnection::request(const std::string &path, const BytesRange &rang
     p_streamurl = vlc_stream_NewURL(p_object, params.getUrl().c_str());
     if(!p_streamurl)
         return VLC_EGENERIC;
+
+    char *psz_type = stream_ContentType(p_streamurl);
+    if(psz_type)
+    {
+        contentType = std::string(psz_type);
+        free(psz_type);
+    }
 
     stream_t *p_chain = vlc_stream_FilterNew( p_streamurl, "inflate" );
     if( p_chain )
