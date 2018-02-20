@@ -51,6 +51,7 @@
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "../../video_chroma/d3d11_fmt.h"
+#include "d3d11_quad.h"
 
 #include "common.h"
 
@@ -91,35 +92,6 @@ vlc_module_begin ()
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
 vlc_module_end ()
-
-typedef struct {
-    FLOAT Opacity;
-    FLOAT BoundaryX;
-    FLOAT BoundaryY;
-    FLOAT LuminanceScale;
-} PS_CONSTANT_BUFFER;
-
-/* A Quad is texture that can be displayed in a rectangle */
-typedef struct
-{
-    picture_sys_t             picSys;
-    UINT                      resourceCount;
-    ID3D11Buffer              *pVertexBuffer;
-    UINT                      vertexCount;
-    ID3D11VertexShader        *d3dvertexShader;
-    ID3D11Buffer              *pIndexBuffer;
-    UINT                      indexCount;
-    ID3D11Buffer              *pVertexShaderConstants;
-    ID3D11Buffer              *pPixelShaderConstants[2];
-    UINT                       PSConstantsCount;
-    ID3D11PixelShader         *d3dpixelShader;
-    D3D11_VIEWPORT            cropViewport;
-    unsigned int              i_width;
-    unsigned int              i_height;
-    video_projection_mode_t   projection;
-
-    PS_CONSTANT_BUFFER        shaderConstants;
-} d3d_quad_t;
 
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
