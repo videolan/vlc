@@ -651,8 +651,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
             if (CanUseVoutPool(&sys->d3d_dev, sys->totalTextureSlices))
                 dx_sys->can_extern_pool = true;
             else
-                msg_Warn( va, "NVIDIA GPU with too many slices (%d) detected, use internal pool",
-                          sys->totalTextureSlices );
+                msg_Warn( va, "use internal pool" );
         }
         sys->render = processorInput[idx];
         free(psz_decoder_name);
