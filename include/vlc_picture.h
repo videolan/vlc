@@ -256,18 +256,6 @@ enum
 #define A_PIXELS     p[A_PLANE].p_pixels
 #define A_PITCH      p[A_PLANE].i_pitch
 
-
-/*****************************************************************************
- * plane helper funcions
- *****************************************************************************/
-
-static inline void plane_SwapUV(plane_t p[PICTURE_PLANE_MAX])
-{
-    uint8_t *buf = p[V_PLANE].p_pixels;
-    p[V_PLANE].p_pixels = p[U_PLANE].p_pixels;
-    p[U_PLANE].p_pixels = buf;
-}
-
 /**
  * Swap UV planes of a Tri Planars picture.
  *
