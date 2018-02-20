@@ -449,6 +449,16 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
     return AbstractStream::status_buffering;
 }
 
+std::string AbstractStream::getContentType()
+{
+    if (currentChunk == NULL && !eof)
+        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
+    if(currentChunk)
+        return currentChunk->getContentType();
+    else
+        return std::string();
+}
+
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == NULL && !eof)

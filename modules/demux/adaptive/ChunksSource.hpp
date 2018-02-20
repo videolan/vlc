@@ -29,6 +29,7 @@ namespace adaptive
         public:
             virtual ~ChunksSource() {}
             virtual block_t *readNextBlock() = 0;
+            virtual std::string getContentType() = 0;
     };
 }
 
