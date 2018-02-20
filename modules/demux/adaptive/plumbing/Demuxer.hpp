@@ -26,6 +26,8 @@
 namespace adaptive
 {
     class AbstractSourceStream;
+    class DemuxerFactoryInterface;
+    class StreamFormat;
 
     class AbstractDemuxer
     {
@@ -48,6 +50,25 @@ namespace adaptive
             bool b_reinitsonseek;
             bool b_alwaysrestarts;
             bool b_candetectswitches;
+    };
+
+    class MimeDemuxer : public AbstractDemuxer
+    {
+        public:
+            MimeDemuxer(demux_t *, const DemuxerFactoryInterface *,
+                        es_out_t *, AbstractSourceStream *);
+            virtual ~MimeDemuxer();
+            virtual int demux(mtime_t); /* impl */
+            virtual void drain(); /* impl */
+            virtual bool create(); /* impl */
+            virtual void destroy(); /* impl */
+
+        protected:
+            AbstractSourceStream *sourcestream;
+            demux_t *p_realdemux;
+            AbstractDemuxer *demuxer;
+            const DemuxerFactoryInterface *factory;
+            es_out_t *p_es_out;
     };
 
     class Demuxer : public AbstractDemuxer
