@@ -773,6 +773,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
     quad->d3dpixelShader = d3dpixelShader;
     quad->d3dvertexShader = d3dvertexShader;
+    quad->resourceCount = DxgiResourceCount(quad->formatInfo);
 
     return VLC_SUCCESS;
 
