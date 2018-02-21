@@ -54,6 +54,7 @@ parts:
       make -j $(getconf _NPROCESSORS_ONLN) .ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN) .spatialaudio
       make -j $(getconf _NPROCESSORS_ONLN) .microdns
+      make -j $(getconf _NPROCESSORS_ONLN) .libarchive
       cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
