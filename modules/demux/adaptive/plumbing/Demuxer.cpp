@@ -27,6 +27,7 @@
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include "SourceStream.hpp"
+#include "../StreamFormat.hpp"
 #include "CommandsQueue.hpp"
 #include "../ChunksSource.hpp"
 

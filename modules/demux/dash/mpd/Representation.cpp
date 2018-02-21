@@ -51,9 +51,9 @@ Representation::~Representation ()
 StreamFormat Representation::getStreamFormat() const
 {
     if(getMimeType().empty())
-        return MPD::mimeToFormat(adaptationSet->getMimeType());
+        return StreamFormat(adaptationSet->getMimeType());
     else
-        return MPD::mimeToFormat(getMimeType());
+        return StreamFormat(getMimeType());
 }
 
 TrickModeType*      Representation::getTrickModeType        () const
