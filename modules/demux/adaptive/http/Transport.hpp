@@ -1,7 +1,7 @@
 /*
- * ConnectionParams.hpp
+ * Transport.hpp
  *****************************************************************************
- * Copyright (C) 2016 - VideoLAN and VLC Authors
+ * Copyright (C) 2015-2018 - VideoLabs, VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,39 +17,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef CONNECTIONPARAMS_HPP
-#define CONNECTIONPARAMS_HPP
+#ifndef TRANSPORT_HPP
+#define TRANSPORT_HPP
 
 #include <vlc_common.h>
+#include <vlc_tls.h>
 #include <string>
 
 namespace adaptive
 {
     namespace http
     {
-        class Transport;
-
-        class ConnectionParams
+        class Transport
         {
             public:
-                ConnectionParams();
-                ConnectionParams(const std::string &);
-                const std::string & getUrl() const;
-                const std::string & getScheme() const;
-                const std::string & getHostname() const;
-                const std::string & getPath() const;
-                void setPath(const std::string &);
-                uint16_t getPort() const;
+                Transport(bool b_secure = false);
+                ~Transport();
+                bool    connect     (vlc_object_t *, const std::string&, int port = 80);
+                bool    connected   () const;
+                bool    send        (const void *buf, size_t size);
+                ssize_t read        (void *p_buffer, size_t len);
+                std::string readline();
+                void    disconnect  ();
 
-            private:
-                void parse();
-                std::string uri;
-                std::string scheme;
-                std::string hostname;
-                std::string path;
-                uint16_t port;
+            protected:
+                vlc_tls_creds_t *creds;
+                vlc_tls_t *tls;
+                bool b_secure;
         };
     }
 }
 
-#endif // CONNECTIONPARAMS_HPP
+#endif // TRANSPORT_HPP

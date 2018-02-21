@@ -34,7 +34,7 @@ namespace adaptive
 {
     namespace http
     {
-        class Socket;
+        class Transport;
         class AuthStorage;
 
         class AbstractConnection
@@ -66,7 +66,7 @@ namespace adaptive
         class HTTPConnection : public AbstractConnection
         {
             public:
-                HTTPConnection(vlc_object_t *, AuthStorage *,  Socket *,
+                HTTPConnection(vlc_object_t *, AuthStorage *,  Transport *,
                                const ConnectionParams &, bool = false);
                 virtual ~HTTPConnection();
 
@@ -107,7 +107,7 @@ namespace adaptive
                 static const int    retryCount = 5;
 
             private:
-                Socket *socket;
+                Transport *transport;
        };
 
        class StreamUrlConnection : public AbstractConnection
