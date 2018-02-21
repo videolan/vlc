@@ -124,7 +124,6 @@ vlc_module_begin()
     set_capability( "services_discovery", 0 );
     set_callbacks( SD::Open, SD::Close );
 
-    set_description( "SAT>IP" )
     add_string( "satip-channelist", "ASTRA_19_2E", SATIP_CHANNEL_LIST,
                 SATIP_CHANNEL_LIST, false )
     change_string_list( ppsz_satip_channel_lists, ppsz_readible_satip_channel_lists )
