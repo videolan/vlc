@@ -32,6 +32,8 @@
 # include <poll.h>
 #endif
 
+#include <iomanip>
+
 ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
     , m_creds( NULL )
@@ -255,6 +257,29 @@ unsigned ChromecastCommunication::msgPlayerGetStatus( const std::string& destina
     return pushMediaPlayerMessage( destinationId, ss ) == VLC_SUCCESS ? id : kInvalidId;
 }
 
+static std::string escape_json(const std::string &s)
+{
+    /* Control characters ('\x00' to '\x1f'), '"' and '\"  must be escaped */
+    std::ostringstream o;
+    for (std::string::const_iterator c = s.begin(); c != s.end(); c++)
+    {
+        if (*c == '"' || *c == '\\' || ('\x00' <= *c && *c <= '\x1f'))
+            o << "\\u"
+              << std::hex << std::setw(4) << std::setfill('0') << (int)*c;
+        else
+            o << *c;
+    }
+    return o.str();
+}
+
+static std::string meta_get_escaped(const vlc_meta_t *p_meta, vlc_meta_type_t type)
+{
+    const char *psz = vlc_meta_Get(p_meta, type);
+    if (!psz)
+        return std::string();
+    return escape_json(std::string(psz));
+}
+
 std::string ChromecastCommunication::GetMedia( unsigned int i_port,
                                                const std::string& mime,
                                                const vlc_meta_t *p_meta )
@@ -263,55 +288,55 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
 
     bool b_music = strncmp(mime.c_str(), "audio", strlen("audio")) == 0;
 
-    const char *psz_title = NULL;
-    const char *psz_artwork = NULL;
-    const char *psz_artist = NULL;
-    const char *psz_album = NULL;
-    const char *psz_albumartist = NULL;
-    const char *psz_tracknumber = NULL;
-    const char *psz_discnumber = NULL;
+    std::string title;
+    std::string artwork;
+    std::string artist;
+    std::string album;
+    std::string albumartist;
+    std::string tracknumber;
+    std::string discnumber;
 
     if( p_meta )
     {
-        psz_title = vlc_meta_Get( p_meta, vlc_meta_Title );
-        psz_artwork = vlc_meta_Get( p_meta, vlc_meta_ArtworkURL );
+        title = meta_get_escaped( p_meta, vlc_meta_Title );
+        artwork = meta_get_escaped( p_meta, vlc_meta_ArtworkURL );
 
-        if( b_music && psz_title )
+        if( b_music && !title.empty() )
         {
-            psz_artist = vlc_meta_Get( p_meta, vlc_meta_Artist );
-            psz_album = vlc_meta_Get( p_meta, vlc_meta_Album );
-            psz_albumartist = vlc_meta_Get( p_meta, vlc_meta_AlbumArtist );
-            psz_tracknumber = vlc_meta_Get( p_meta, vlc_meta_TrackNumber );
-            psz_discnumber = vlc_meta_Get( p_meta, vlc_meta_DiscNumber );
+            artist = meta_get_escaped( p_meta, vlc_meta_Artist );
+            album = meta_get_escaped( p_meta, vlc_meta_Album );
+            albumartist = meta_get_escaped( p_meta, vlc_meta_AlbumArtist );
+            tracknumber = meta_get_escaped( p_meta, vlc_meta_TrackNumber );
+            discnumber = meta_get_escaped( p_meta, vlc_meta_DiscNumber );
         }
-        if( !psz_title )
+        if( title.empty() )
         {
-            psz_title = vlc_meta_Get( p_meta, vlc_meta_NowPlaying );
-            if( !psz_title )
-                psz_title = vlc_meta_Get( p_meta, vlc_meta_ESNowPlaying );
+            title = meta_get_escaped( p_meta, vlc_meta_NowPlaying );
+            if( title.empty() )
+                title = meta_get_escaped( p_meta, vlc_meta_ESNowPlaying );
         }
 
-        if ( psz_title )
+        if ( !title.empty() )
         {
             ss << "\"metadata\":{"
                << " \"metadataType\":" << ( b_music ? "3" : "0" )
-               << ",\"title\":\"" << psz_title << "\"";
+               << ",\"title\":\"" << title << "\"";
             if( b_music )
             {
-                if( psz_artist )
-                    ss << ",\"artist\":\"" << psz_artist << "\"";
-                if( psz_album )
-                    ss << ",\"album\":\"" << psz_album << "\"";
-                if( psz_albumartist )
-                    ss << ",\"albumArtist\":\"" << psz_albumartist << "\"";
-                if( psz_tracknumber )
-                    ss << ",\"trackNumber\":\"" << psz_tracknumber << "\"";
-                if( psz_discnumber )
-                    ss << ",\"discNumber\":\"" << psz_discnumber << "\"";
+                if( !artist.empty() )
+                    ss << ",\"artist\":\"" << artist << "\"";
+                if( album.empty() )
+                    ss << ",\"album\":\"" << album << "\"";
+                if( albumartist.empty() )
+                    ss << ",\"albumArtist\":\"" << albumartist << "\"";
+                if( tracknumber.empty() )
+                    ss << ",\"trackNumber\":\"" << tracknumber << "\"";
+                if( discnumber.empty() )
+                    ss << ",\"discNumber\":\"" << discnumber << "\"";
             }
 
-            if ( psz_artwork && !strncmp( psz_artwork, "http", 4 ) )
-                ss << ",\"images\":[{\"url\":\"" << psz_artwork << "\"}]";
+            if ( !artwork.empty() && !strncmp( artwork.c_str(), "http", 4 ) )
+                ss << ",\"images\":[{\"url\":\"" << artwork << "\"}]";
 
             ss << "},";
         }
