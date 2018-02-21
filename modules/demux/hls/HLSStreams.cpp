@@ -148,6 +148,10 @@ AbstractDemuxer *HLSStream::newDemux(demux_t *p_realdemux, const StreamFormat &f
                 ret->setRestartsOnEachSegment(true);
             break;
 
+        case StreamFormat::UNKNOWN:
+            ret = new MimeDemuxer(p_realdemux, this, out, source);
+            break;
+
         default:
         case StreamFormat::UNSUPPORTED:
             break;

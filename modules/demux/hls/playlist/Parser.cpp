@@ -99,7 +99,7 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         }
         else
         {
-            rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
+            rep->streamFormat = StreamFormat(StreamFormat::UNKNOWN);
         }
     }
 }
