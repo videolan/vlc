@@ -182,7 +182,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* AV_CODEC_ID_V210X */
     { VLC_CODEC_TMV, AV_CODEC_ID_TMV },
     { VLC_CODEC_V210, AV_CODEC_ID_V210 },
-#if LIBAVCODEC_VERSION_CHECK( 54, 999, 999, 50, 100 )
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 54, 50, 100 ) && LIBAVCODEC_VERSION_MICRO >= 100
     { VLC_CODEC_VUYA, AV_CODEC_ID_AYUV },
 #endif
     /* AV_CODEC_ID_DPX */
