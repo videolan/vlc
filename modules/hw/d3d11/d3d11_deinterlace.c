@@ -278,7 +278,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             video_format_t fmt = p_filter->fmt_out.video;
             fmt.i_width  = dstDesc.Width;
             fmt.i_height = dstDesc.Height;
-            if (AllocateTextures(VLC_OBJECT(p_filter), &p_sys->d3d_dev, cfg,
+            if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
                                  &fmt, 1, pic_sys->texture) != VLC_SUCCESS)
             {
                 free(pic_sys);
