@@ -227,6 +227,19 @@ parts:
       - zlib1g
       - libprojectm2v5
       - projectm-data
+    filesets:
+      exclusion:
+      - "-usr/lib/*/cmake/*"
+      - "-usr/include/*"
+      - "-usr/share/ECM/*"
+      - "-usr/share/doc/*"
+      - "-usr/share/man/*"
+      - "-usr/share/icons/breeze-dark*"
+      - "-usr/bin/X11"
+      - "-usr/lib/gcc/x86_64-linux-gnu/6.0.0"
+      - "-usr/lib/aspell/*"
+    prime:
+      - "$exclusion"
 
   wrapper:
     plugin: dump
