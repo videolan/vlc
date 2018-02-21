@@ -67,47 +67,6 @@ void HLSStream::setTimeOffset(mtime_t i_offset)
     AbstractStream::setTimeOffset(i_offset);
 }
 
-AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
-{
-    AbstractDemuxer *ret = NULL;
-    switch((unsigned)format)
-    {
-
-        case StreamFormat::PACKEDAAC:
-            ret = new Demuxer(p_realdemux, "aac", fakeesout->getEsOut(), demuxersource);
-            break;
-
-        case StreamFormat::MPEG2TS:
-            ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
-            if(ret)
-                ret->setCanDetectSwitches(false); /* HLS and unique PAT/PMT versions */
-            break;
-
-        case StreamFormat::MP4:
-            ret = new Demuxer(p_realdemux, "mp4", fakeesout->getEsOut(), demuxersource);
-            break;
-
-        case StreamFormat::WEBVTT:
-            ret = new Demuxer(p_realdemux, "webvttstream", fakeesout->getEsOut(), demuxersource);
-            if(ret)
-                ret->setRestartsOnEachSegment(true);
-            break;
-
-        default:
-        case StreamFormat::UNSUPPORTED:
-            break;
-    }
-
-    if(ret && !ret->create())
-    {
-        delete ret;
-        ret = NULL;
-    }
-    else commandsqueue->Commit();
-
-    return ret;
-}
-
 int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
 {
     if(i_payload == 53 &&
@@ -161,6 +120,39 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     }
 
     return p_block;
+}
+
+AbstractDemuxer *HLSStream::newDemux(demux_t *p_realdemux, const StreamFormat &format,
+                                     es_out_t *out, AbstractSourceStream *source) const
+{
+    AbstractDemuxer *ret = NULL;
+    switch((unsigned)format)
+    {
+        case StreamFormat::PACKEDAAC:
+            ret = new Demuxer(p_realdemux, "aac", out, source);
+            break;
+
+        case StreamFormat::MPEG2TS:
+            ret = new Demuxer(p_realdemux, "ts", out, source);
+            if(ret)
+                ret->setCanDetectSwitches(false); /* HLS and unique PAT/PMT versions */
+            break;
+
+        case StreamFormat::MP4:
+            ret = AbstractStream::newDemux(p_realdemux, format, out, source);
+            break;
+
+        case StreamFormat::WEBVTT:
+            ret = new Demuxer(p_realdemux, "webvttstream", out, source);
+            if(ret)
+                ret->setRestartsOnEachSegment(true);
+            break;
+
+        default:
+        case StreamFormat::UNSUPPORTED:
+            break;
+    }
+    return ret;
 }
 
 AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &,

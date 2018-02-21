@@ -31,28 +31,12 @@ SmoothStream::SmoothStream(demux_t *demux)
 {
 }
 
-AbstractDemuxer * SmoothStream::createDemux(const StreamFormat &format)
+AbstractDemuxer *SmoothStream::newDemux(demux_t *p_realdemux, const StreamFormat &format,
+                                        es_out_t *out, AbstractSourceStream *source) const
 {
-    AbstractDemuxer *ret = NULL;
-    switch((unsigned)format)
-    {
-        case StreamFormat::MP4:
-            ret = new Demuxer(p_realdemux, "mp4", fakeesout->getEsOut(), demuxersource);
-            break;
-
-        default:
-        case StreamFormat::UNSUPPORTED:
-            break;
-    }
-
-    if(ret && !ret->create())
-    {
-        delete ret;
-        ret = NULL;
-    }
-    else commandsqueue->Commit();
-
-    return ret;
+    if((unsigned)format != StreamFormat::MP4)
+        return NULL;
+    return AbstractStream::newDemux(p_realdemux, format, out, source);
 }
 
 block_t * SmoothStream::checkBlock(block_t *p_block, bool)

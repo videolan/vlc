@@ -51,7 +51,8 @@ namespace adaptive
 
     class AbstractStream : public ChunksSource,
                            public ExtraFMTInfoInterface,
-                           public SegmentTrackerListenerInterface
+                           public SegmentTrackerListenerInterface,
+                           public DemuxerFactoryInterface
     {
     public:
         AbstractStream(demux_t *);
@@ -100,7 +101,9 @@ namespace adaptive
         bool seekAble() const;
         virtual void setTimeOffset(mtime_t);
         virtual block_t *checkBlock(block_t *, bool) = 0;
-        virtual AbstractDemuxer * createDemux(const StreamFormat &) = 0;
+        AbstractDemuxer * createDemux(const StreamFormat &);
+        virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+                                           es_out_t *, AbstractSourceStream *) const; /* impl */
         virtual bool startDemux();
         virtual bool restartDemux();
 
