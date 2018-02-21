@@ -1586,6 +1586,25 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_MPEGH/ISO/HEVC") {
             vars.p_tk->fmt.i_codec = VLC_CODEC_HEVC;
+
+            uint8_t* p_extra = (uint8_t*) vars.p_tk->p_extra_data;
+
+            /* HACK: if we found invalid format, made by mkvmerge < 16.0.0,
+             *       we try to fix it. They fixed it in 16.0.0. */
+            const char* app = vars.obj->psz_writing_application;
+            if( p_extra && p_extra[0] == 0 && app != NULL &&
+                    strncmp(app, "mkvmerge", strlen("mkvmerge")) == 0 )
+            {
+                int major_version;
+                if( sscanf(app, "mkvmerge v%d.", &major_version) && major_version < 16 )
+                {
+                    msg_Dbg(vars.p_demuxer,
+                            "Invalid HEVC reserved bits in mkv file"
+                            "made by mkvmerge < v16.0.0 detected, fixing it");
+                    p_extra[0] = 0x01;
+                }
+            }
+
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE("V_QUICKTIME") {
