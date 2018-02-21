@@ -89,7 +89,7 @@
 #  define VLC_DEPRECATED_ENUM
 # endif
 
-# if defined( _WIN32 )
+# if defined( _WIN32 ) && !defined( __clang__ )
 #  define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
 # else
 #  define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
