@@ -25,4 +25,10 @@ fi
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/usr/lib/vlc"
 
+# KDE specific
+## Do not start slaves through klauncher but fork them directly.
+export KDE_FORK_SLAVES=1
+## Neon PATCH! make KIO look for slaves in a dynamic location depending on $SNAP
+export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
+
 exec $SNAP/usr/bin/vlc "$@"
