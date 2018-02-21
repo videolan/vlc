@@ -37,6 +37,7 @@ namespace adaptive
             static const unsigned UNKNOWN     = 0xFF; /* will probe */
 
             StreamFormat( unsigned = UNSUPPORTED );
+            explicit StreamFormat( const std::string &mime );
             ~StreamFormat();
             operator unsigned() const;
             std::string str() const;

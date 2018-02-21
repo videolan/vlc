@@ -23,6 +23,7 @@
 #endif
 
 #include "StreamFormat.hpp"
+#include <algorithm>
 
 using namespace adaptive;
 
@@ -56,6 +57,26 @@ std::string StreamFormat::str() const
 StreamFormat::StreamFormat( unsigned formatid_ )
 {
     formatid = formatid_;
+}
+
+StreamFormat::StreamFormat( const std::string &mimetype )
+{
+    std::string mime = mimetype;
+    std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+    std::string::size_type pos = mime.find("/");
+    formatid = UNSUPPORTED;
+    if(pos != std::string::npos)
+    {
+        std::string tail = mime.substr(pos + 1);
+        if(tail == "mp4")
+            formatid = StreamFormat::MP4;
+        else if (tail == "mp2t")
+            formatid = StreamFormat::MPEG2TS;
+        else if (tail == "vtt")
+            formatid = StreamFormat::WEBVTT;
+        else if (tail == "ttml+xml")
+            formatid = StreamFormat::TTML;
+    }
 }
 
 StreamFormat::~StreamFormat()

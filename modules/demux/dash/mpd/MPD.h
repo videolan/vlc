@@ -48,8 +48,6 @@ namespace dash
                 virtual bool                    isLive() const;
                 virtual void                    debug();
 
-                static StreamFormat             mimeToFormat(const std::string &);
-
                 Property<ProgramInformation *>      programInfo;
 
             private:
