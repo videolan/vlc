@@ -155,6 +155,11 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexShaderConstants);
         quad->pVertexShaderConstants = NULL;
     }
+    if (quad->d3dpixelShader)
+    {
+        ID3D11PixelShader_Release(quad->d3dpixelShader);
+        quad->d3dpixelShader = NULL;
+    }
     ReleasePictureSys(&quad->picSys);
 }
 

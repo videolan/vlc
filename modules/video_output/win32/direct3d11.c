@@ -99,7 +99,6 @@ struct vout_display_sys_t
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
-    ID3D11PixelShader        *picQuadPixelShader;
 
     picture_sys_t            stagingSys;
 
@@ -332,7 +331,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_height = sys->picQuad.i_height;
 
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   sys->picQuad.formatInfo, sys->picQuadPixelShader,
+                   sys->picQuad.formatInfo, sys->picQuad.d3dpixelShader,
                    vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->flatVSShader : sys->projectionVSShader,
                    surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
@@ -404,7 +403,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
 #endif
         {
-            sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
             for (picture_count = 0; picture_count < pool_size; picture_count++) {
                 picture_sys_t *p_sys = pictures[picture_count]->p_sys;
                 if (!p_sys->texture[0])
@@ -1432,7 +1430,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                  sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
+                                  sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->b_color_range_full, &sys->picQuad.d3dpixelShader);
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
@@ -1473,7 +1471,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
             return VLC_EGENERIC;
         }
 
-        sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
         if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.formatInfo,
                                      textures, 0, sys->stagingSys.resourceView))
         {
@@ -1558,10 +1555,10 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
                                       sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
-            if (sys->picQuadPixelShader)
+            if (sys->picQuad.d3dpixelShader)
             {
-                ID3D11PixelShader_Release(sys->picQuadPixelShader);
-                sys->picQuadPixelShader = NULL;
+                ID3D11PixelShader_Release(sys->picQuad.d3dpixelShader);
+                sys->picQuad.d3dpixelShader = NULL;
             }
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
@@ -1695,11 +1692,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     {
         ID3D11PixelShader_Release(sys->pSPUPixelShader);
         sys->pSPUPixelShader = NULL;
-    }
-    if (sys->picQuadPixelShader)
-    {
-        ID3D11PixelShader_Release(sys->picQuadPixelShader);
-        sys->picQuadPixelShader = NULL;
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
