@@ -136,9 +136,9 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     UINT supportFlags);
 #define FindD3D11Format(a,b,c,d,e,f,g)  FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g)
 
-int AllocateTextures(vlc_object_t *obj, d3d11_device_t *d3d_dev,
-                     const d3d_format_t *cfg, const video_format_t *fmt,
-                     unsigned pool_size, ID3D11Texture2D *textures[]);
+int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
+                     const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[]);
+#define AllocateTextures(a,b,c,d,e,f)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f)
 
 #ifndef NDEBUG
 void D3D11_LogProcessorSupport(vlc_object_t*, ID3D11VideoProcessorEnumerator*);

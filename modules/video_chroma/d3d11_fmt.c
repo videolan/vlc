@@ -531,6 +531,7 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
     return NULL;
 }
 
+#undef AllocateTextures
 int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                       const d3d_format_t *cfg, const video_format_t *fmt,
                       unsigned pool_size, ID3D11Texture2D *textures[] )
