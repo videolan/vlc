@@ -59,7 +59,8 @@ parts:
       autoreconf -fi
       ./configure \
           --prefix=$SNAPCRAFT_PART_INSTALL/usr \
-          --disable-wayland
+          --disable-wayland \
+          --enable-merge-ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN)
     install: |
       echo $(git describe HEAD) > $SNAPCRAFT_STAGE/version
