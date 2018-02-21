@@ -105,13 +105,12 @@ static int vlc_h2_ping(void *ctx, uint_fast64_t opaque)
     return 0;
 }
 
-static uint_fast32_t local_error;
 static uint_fast32_t remote_error;
 
 static void vlc_h2_error(void *ctx, uint_fast32_t code)
 {
     assert(ctx == CTX);
-    local_error = code;
+    (void) code;
 }
 
 static int vlc_h2_reset(void *ctx, uint_fast32_t last_seq, uint_fast32_t code)
@@ -332,7 +331,7 @@ static unsigned test_seq(void *ctx, ...)
 
     settings = settings_acked = 0;
     pings = 0;
-    local_error = remote_error = -1;
+    remote_error = -1;
     stream_header_tables = stream_blocks = stream_ends = 0;
 
     p = vlc_h2_parse_init(ctx, &vlc_h2_frame_test_callbacks);
