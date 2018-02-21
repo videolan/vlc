@@ -227,6 +227,11 @@ parts:
       - zlib1g
       - libprojectm2v5
       - projectm-data
+      - kde-style-breeze
+      - breeze-icon-theme
+      - frameworkintegration
+      - plasma-integration
+      - phonon4qt5-backend-null
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
