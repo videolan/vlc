@@ -1102,7 +1102,6 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
             return out_streams[i]->p_sub_id;
     }
 
-    msg_Err( p_stream, "unknown stream ID" );
     return NULL;
 }
 
