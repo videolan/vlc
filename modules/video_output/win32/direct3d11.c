@@ -500,15 +500,7 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
     out->SampleDesc.Quality = 0;
     out->Width = vd->source.i_visible_width;
     out->Height = vd->source.i_visible_height;
-    switch(vd->source.i_chroma)
-    {
-    case VLC_CODEC_D3D11_OPAQUE_10B:
-        out->Format = DXGI_FORMAT_R10G10B10A2_UNORM;
-        break;
-    default:
-        out->Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
-        break;
-    }
+    out->Format = vd->sys->display.pixelFormat->formatTexture;
     //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 }
@@ -1282,7 +1274,6 @@ static int Direct3D11Open(vout_display_t *vd)
     HRESULT hr = S_OK;
 
     DXGI_SWAP_CHAIN_DESC1 scd;
-    FillSwapChainDesc(vd, &scd);
 
     hr = D3D11_CreateDevice(vd, &sys->hd3d,
                             is_d3d11_opaque(vd->source.i_chroma),
@@ -1304,6 +1295,20 @@ static int Direct3D11Open(vout_display_t *vd)
        msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
+
+    sys->display.pixelFormat = FindD3D11Format( sys->d3d_dev.d3ddevice, 0, true,
+                                                vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
+                                                false, D3D11_FORMAT_SUPPORT_DISPLAY );
+    if (unlikely(sys->display.pixelFormat == NULL))
+        sys->display.pixelFormat = FindD3D11Format( sys->d3d_dev.d3ddevice, 0, false,
+                                                    vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
+                                                    false, D3D11_FORMAT_SUPPORT_DISPLAY );
+    if (unlikely(sys->display.pixelFormat == NULL)) {
+        msg_Err(vd, "Could not get the SwapChain format.");
+        return VLC_EGENERIC;
+    }
+
+    FillSwapChainDesc(vd, &scd);
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
                                               sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);

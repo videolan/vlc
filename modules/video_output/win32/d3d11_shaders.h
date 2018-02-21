@@ -44,6 +44,7 @@ typedef struct {
 typedef struct {
     const dxgi_color_space   *colorspace;
     unsigned                 luminance_peak;
+    const d3d_format_t       *pixelFormat;
 } display_info_t;
 
 const char* globVertexShaderFlat;
