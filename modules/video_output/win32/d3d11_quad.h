@@ -32,6 +32,7 @@
 typedef struct
 {
     picture_sys_t             picSys;
+    const d3d_format_t        *formatInfo;
     UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;
