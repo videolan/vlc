@@ -32,8 +32,9 @@ namespace smooth
             SmoothStream(demux_t *);
 
         protected:
-            virtual AbstractDemuxer * createDemux(const StreamFormat &); /* impl */
             virtual block_t *checkBlock(block_t *, bool) /* impl */;
+            virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+                                               es_out_t *, AbstractSourceStream *) const; /* reimpl */
     };
 
     class SmoothStreamFactory : public AbstractStreamFactory

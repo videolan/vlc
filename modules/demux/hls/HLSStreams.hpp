@@ -33,9 +33,10 @@ namespace hls
             virtual ~HLSStream();
 
         protected:
-            virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
             virtual void setTimeOffset(mtime_t); /* reimpl */
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
+            virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+                                               es_out_t *, AbstractSourceStream *) const; /* reimpl */
 
         private:
             static int ID3TAG_Parse_Handler(uint32_t, const uint8_t *, size_t, void *);

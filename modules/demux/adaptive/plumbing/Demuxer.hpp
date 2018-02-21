@@ -81,6 +81,12 @@ namespace adaptive
             mtime_t length;
     };
 
+    class DemuxerFactoryInterface
+    {
+        public:
+            virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+                                               es_out_t *, AbstractSourceStream *) const = 0;
+    };
 }
 
 #endif // DEMUXER_HPP
