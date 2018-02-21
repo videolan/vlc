@@ -41,9 +41,15 @@ parts:
     prepare: |
       sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
     build: |
+      cd extras/tools
+      ./bootstrap
+      make -j $(getconf _NPROCESSORS_ONLN) .protoc
+      cd ../../
+      export PATH=$PWD/extras/tools/build/bin:$PATH
       cd contrib && mkdir linux && cd linux
       ../bootstrap
       make list
+      make -j $(getconf _NPROCESSORS_ONLN) .protobuf
       make -j $(getconf _NPROCESSORS_ONLN) .libplacebo
       make -j $(getconf _NPROCESSORS_ONLN) .ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN) .spatialaudio
@@ -175,8 +181,6 @@ parts:
       - bison
       - flex
       - zsh
-      - protobuf-compiler
-      - protobuf-c-compiler
     stage-packages:
       - fonts-freefont-ttf
       - dbus-x11
