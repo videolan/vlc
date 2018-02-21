@@ -1081,6 +1081,9 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
 
+    if (sys->dev == NULL)
+        return -1;
+
     const bool b_spdif = AOUT_FMT_SPDIF(fmt);
     const bool b_hdmi = AOUT_FMT_HDMI(fmt);
     if (b_spdif || b_hdmi)
@@ -1108,14 +1111,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
-
-    if (sys->dev == NULL)
-    {
-        LeaveCriticalSection(&sys->lock);
-        LeaveMTA();
-        return -1;
-    }
-
     for (;;)
     {
         char *modlist = var_InheritString(aout, "mmdevice-backend");
