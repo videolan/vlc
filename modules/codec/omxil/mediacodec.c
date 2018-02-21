@@ -1602,7 +1602,7 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 static int VideoMPEG2_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     if (pp_block == NULL || (*pp_block)->i_buffer <= 7)
-        return Video_OnNewBlock(p_dec, pp_block);
+        return 1;
 
     decoder_sys_t *p_sys = p_dec->p_sys;
     const int startcode = (*pp_block)->p_buffer[3];
@@ -1623,13 +1623,13 @@ static int VideoMPEG2_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
         int mpeg_dar_code = (*pp_block)->p_buffer[7] >> 4;
 
         if (mpeg_dar_code >= 16)
-            return Video_OnNewBlock(p_dec, pp_block);
+            return 0;
 
         p_sys->video.i_mpeg_dar_num = mpeg2_aspect[mpeg_dar_code][0];
         p_sys->video.i_mpeg_dar_den = mpeg2_aspect[mpeg_dar_code][1];
     }
 
-    return Video_OnNewBlock(p_dec, pp_block);
+    return 1;
 }
 
 static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
