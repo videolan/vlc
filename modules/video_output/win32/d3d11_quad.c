@@ -611,11 +611,11 @@ void D3D11_UpdateQuadLuminanceScale(vlc_object_t *o, d3d11_device_t *d3d_dev, d3
 #undef D3D11_SetupQuad
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat, const RECT *output,
-                    const d3d_format_t *cfg, ID3D11PixelShader *d3dpixelShader, ID3D11VertexShader *d3dvertexShader,
+                    ID3D11VertexShader *d3dvertexShader,
                     video_projection_mode_t projection, video_orientation_t orientation)
 {
     HRESULT hr;
-    const bool RGB_shader = IsRGBShader(cfg);
+    const bool RGB_shader = IsRGBShader(quad->formatInfo);
 
     quad->shaderConstants.LuminanceScale = GetFormatLuminance(o, fmt) / (float)displayFormat->luminance_peak;
 
@@ -648,7 +648,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     FLOAT itu_achromacy   = 0.f;
     if (!RGB_shader)
     {
-        switch (cfg->bitsPerChannel)
+        switch (quad->formatInfo->bitsPerChannel)
         {
         case 8:
             /* Rec. ITU-R BT.709-6 §4.6 */
@@ -762,7 +762,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         }
     }
 
-    quad->picSys.formatTexture = cfg->formatTexture;
+    quad->picSys.formatTexture = quad->formatInfo->formatTexture;
     quad->picSys.context = d3d_dev->d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
@@ -771,7 +771,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     if (!D3D11_UpdateQuadPosition(o, d3d_dev, quad, output, orientation))
         goto error;
 
-    quad->d3dpixelShader = d3dpixelShader;
     quad->d3dvertexShader = d3dvertexShader;
     quad->resourceCount = DxgiResourceCount(quad->formatInfo);
 
