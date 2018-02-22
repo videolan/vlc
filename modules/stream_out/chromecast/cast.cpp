@@ -1066,8 +1066,11 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             vlc_fourcc_to_char( i_codec_audio, s_fourcc );
             s_fourcc[4] = '\0';
             ssout << s_fourcc << ',';
+
+            /* XXX: higher vorbis qualities can cause glitches on some CC
+             * devices (Chromecast 1 & 2) */
             if( i_codec_audio == VLC_CODEC_VORBIS )
-                ssout << "aenc=vorbis{quality=6},";
+                ssout << "aenc=vorbis{quality=4},";
             new_transcoding_state |= TRANSCODING_AUDIO;
         }
         if ( i_codec_video == 0 && p_original_video )
