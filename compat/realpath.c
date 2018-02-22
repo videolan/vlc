@@ -37,7 +37,7 @@ char *realpath(const char * restrict relpath, char * restrict resolved_path)
     }
 
 #ifdef _WIN32
-    int len = MultiByteToWideChar( CP_UTF8, 0, relpath, -1, NULL, 0 );
+    size_t len = MultiByteToWideChar( CP_UTF8, 0, relpath, -1, NULL, 0 );
     if (len == 0)
         return NULL;
 
@@ -51,7 +51,7 @@ char *realpath(const char * restrict relpath, char * restrict resolved_path)
     free(wrelpath);
     if (wfullpath != NULL)
     {
-        size_t len = WideCharToMultiByte( CP_UTF8, 0, wfullpath, -1, NULL, 0, NULL, NULL );
+        len = WideCharToMultiByte( CP_UTF8, 0, wfullpath, -1, NULL, 0, NULL, NULL );
         if (len != 0)
         {
             if (resolved_path != NULL)
