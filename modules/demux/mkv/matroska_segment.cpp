@@ -414,6 +414,10 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                             vars.tag.i_uid = static_cast<uint64>( entry );
                             msg_Dbg( &vars.sys.demuxer, "|   |   + AttachmentUID: %" PRIu64, vars.tag.i_uid);
                         }
+                        E_CASE( KaxTagTargetType, entry )
+                        {
+                            msg_Dbg( &vars.sys.demuxer, "|   |   + TargetType: %s", entry.GetValue().c_str());
+                        }
                         E_CASE_DEFAULT( el )
                         {
                             msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", typeid(el).name() );
