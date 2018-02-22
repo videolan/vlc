@@ -613,6 +613,9 @@ bool demux_sys_t::PreloadLinked()
     if ( !p_current_vsegment )
         return false;
 
+    if ( unlikely(p_current_vsegment->CurrentEdition() == NULL) )
+        return false;
+
     /* Set current chapter */
     p_current_vsegment->p_current_vchapter = p_current_vsegment->CurrentEdition()->getChapterbyTimecode(0);
     msg_Dbg( &demuxer, "NEW START CHAPTER uid=%" PRId64, p_current_vsegment->p_current_vchapter && p_current_vsegment->p_current_vchapter->p_chapter ?
