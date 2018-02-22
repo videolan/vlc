@@ -401,6 +401,7 @@ struct demux_sys_t
              * flush sout streams, make sout del/add called right away and
              * clear CC buffers. */
             seekBack(m_last_time, m_last_pos);
+            initTimes();
             resetDemuxEof();
             break;
         case DEMUX_FILTER_ENABLE:
