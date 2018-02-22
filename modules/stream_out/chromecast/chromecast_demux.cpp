@@ -138,7 +138,13 @@ struct demux_sys_t
         p_renderer->pf_set_on_paused_changed_cb(p_renderer->p_opaque,
                                                 on_paused_changed_cb, p_demux);
 
-        initTimes();
+        resetTimes();
+    }
+
+    void resetTimes()
+    {
+        m_start_time = m_last_time = -1;
+        m_start_pos = m_last_pos = -1.0f;
     }
 
     void initTimes()
@@ -262,9 +268,10 @@ struct demux_sys_t
         int ret = VLC_DEMUXER_SUCCESS;
         if( !m_demux_eof )
         {
-            if( m_start_time < 0 || m_start_pos < 0.0f )
-                initTimes();
             ret = demux_Demux( p_demux->p_next );
+            if( ret != VLC_DEMUXER_EGENERIC
+             && ( m_start_time < 0 || m_start_pos < 0.0f ) )
+                initTimes();
             if( ret == VLC_DEMUXER_EOF )
                 m_demux_eof = true;
         }
@@ -353,7 +360,7 @@ struct demux_sys_t
             if( ret != VLC_SUCCESS )
                 return ret;
 
-            initTimes();
+            resetTimes();
             resetDemuxEof();
             return VLC_SUCCESS;
         }
@@ -367,7 +374,7 @@ struct demux_sys_t
             if( ret != VLC_SUCCESS )
                 return ret;
 
-            initTimes();
+            resetTimes();
             resetDemuxEof();
             return VLC_SUCCESS;
         }
@@ -401,7 +408,7 @@ struct demux_sys_t
              * flush sout streams, make sout del/add called right away and
              * clear CC buffers. */
             seekBack(m_last_time, m_last_pos);
-            initTimes();
+            resetTimes();
             resetDemuxEof();
             break;
         case DEMUX_FILTER_ENABLE:
