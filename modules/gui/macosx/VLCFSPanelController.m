@@ -134,6 +134,12 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_volumeSlider setMaxValue:[[VLCCoreInteraction sharedInstance] maxVolume]];
     [_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
     [_volumeSlider setDefaultValue:AOUT_VOLUME_DEFAULT];
+
+    /* Identifier to store the state of the remaining or total time label,
+     * this is the same identifier as used for the window playback cotrols
+     * so the state is shared between those.
+     */
+    [_remainingOrTotalTime setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
 }
 
 #undef setupButton
