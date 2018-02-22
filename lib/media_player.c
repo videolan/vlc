@@ -290,6 +290,18 @@ input_scrambled_changed( vlc_object_t * p_this, char const * psz_cmd,
     return VLC_SUCCESS;
 }
 
+
+static int ViewpointMovedEvent( vlc_object_t *p_this, char const *psz_var,
+                                vlc_value_t oldval, vlc_value_t newval,
+                                void *p_userdata )
+{
+    (void) p_this; (void) psz_var; (void) oldval;
+    input_thread_t * p_input = (input_thread_t *)p_userdata;
+    input_UpdateViewpoint( p_input, newval.p_address, true );
+    return VLC_SUCCESS;
+}
+
+
 static int
 input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
@@ -397,6 +409,36 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.type = libvlc_MediaPlayerVout;
         event.u.media_player_vout.new_count = i_vout;
         libvlc_event_send( &p_mi->event_manager, &event );
+
+        /* Setup viewpoint callback */
+
+        vout_thread_t *p_vout = input_GetVout( p_input );
+        bool b_vrnav_can_change;
+        if( p_vout != NULL )
+            b_vrnav_can_change = var_GetBool( p_vout, "viewpoint-changeable" );
+
+        vout_thread_t *p_old_vout = p_mi->p_vout;
+        bool b_vrnav_could_change = p_mi->b_viewpoint_can_change;
+        p_mi->p_vout = p_vout;
+        if( p_vout != NULL )
+            p_mi->b_viewpoint_can_change = b_vrnav_can_change;
+        else
+            p_mi->b_viewpoint_can_change = false;
+
+        if( p_old_vout != NULL )
+        {
+            if( b_vrnav_could_change )
+                var_DelCallback( p_old_vout, "viewpoint-moved", ViewpointMovedEvent,
+                                 p_input );
+            vlc_object_release( p_old_vout );
+        }
+
+        if( p_mi->b_viewpoint_can_change )
+        {
+            assert( p_mi->p_vout != NULL );
+            var_AddCallback( p_mi->p_vout, "viewpoint-moved", ViewpointMovedEvent,
+                             p_input );
+        }
     }
     else if ( newval.i_int == INPUT_EVENT_TITLE )
     {

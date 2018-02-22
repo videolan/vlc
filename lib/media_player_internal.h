@@ -56,6 +56,8 @@ struct libvlc_media_player_t
     libvlc_event_manager_t event_manager;
     libvlc_state_t state;
     vlc_viewpoint_t viewpoint;
+    vout_thread_t *p_vout;
+    bool b_viewpoint_can_change;
     int selected_es[3];
 };
 
