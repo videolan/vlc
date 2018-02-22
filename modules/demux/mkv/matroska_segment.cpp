@@ -414,6 +414,12 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                                 tag.i_uid = static_cast<uint64>( *ktau_ptr );
                                 msg_Dbg( &sys.demuxer, "|   |   + AttachmentUID: %" PRIu64, tag.i_uid);
                             }
+                            if( MKV_CHECKED_PTR_DECL ( ktttv_ptr, KaxTagTargetType, el ) )
+                            {
+                                ktttv_ptr->ReadData( es.I_O() );
+
+                                msg_Dbg( &sys.demuxer, "|   |   + TargetType: %u", ktttv_ptr->GetValue().c_str());
+                            }
                             else
                             {
                                 msg_Dbg( &sys.demuxer, "|   |   + LoadTag Unknown (%s)", typeid( *el ).name() );
