@@ -320,16 +320,13 @@ void *aligned_alloc(size_t, size_t);
 
 /* locale.h */
 #ifndef HAVE_USELOCALE
-#define LC_ALL_MASK      0
-#define LC_NUMERIC_MASK  0
-#define LC_MESSAGES_MASK 0
-#define LC_GLOBAL_LOCALE ((locale_t)(uintptr_t)1)
+# ifndef HAVE_NEWLOCALE
+#  define LC_ALL_MASK      0
+#  define LC_NUMERIC_MASK  0
+#  define LC_MESSAGES_MASK 0
+#  define LC_GLOBAL_LOCALE ((locale_t)(uintptr_t)1)
 typedef void *locale_t;
-static inline locale_t uselocale(locale_t loc)
-{
-    (void)loc;
-    return NULL;
-}
+
 static inline void freelocale(locale_t loc)
 {
     (void)loc;
@@ -337,6 +334,15 @@ static inline void freelocale(locale_t loc)
 static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 {
     (void)mask; (void)locale; (void)base;
+    return NULL;
+}
+# else
+#  include <locale.h>
+# endif
+
+static inline locale_t uselocale(locale_t loc)
+{
+    (void)loc;
     return NULL;
 }
 #endif
