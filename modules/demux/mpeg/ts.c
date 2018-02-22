@@ -2189,8 +2189,13 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
         if( p_sys->b_access_control == false &&
             vlc_stream_Tell( p_sys->stream ) > p_pmt->i_last_dts_byte )
         {
-            p_pmt->i_last_dts = i_pcr;
-            p_pmt->i_last_dts_byte = vlc_stream_Tell( p_sys->stream );
+            if( p_pmt->i_last_dts_byte == 0 ) /* first run */
+                p_pmt->i_last_dts_byte = stream_Size( p_sys->stream );
+            else
+            {
+                p_pmt->i_last_dts = i_pcr;
+                p_pmt->i_last_dts_byte = vlc_stream_Tell( p_sys->stream );
+            }
         }
     }
 }
