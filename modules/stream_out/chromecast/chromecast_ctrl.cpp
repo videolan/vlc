@@ -1073,13 +1073,14 @@ mtime_t intf_sys_t::getPlaybackTimestamp()
     switch( m_state )
     {
         case Buffering:
+        case Paused:
             if( !m_played_once )
                 return VLC_TS_INVALID;
             /* fallthrough */
         case Playing:
         {
             mtime_t now = mdate();
-            if( m_last_request_id == 0
+            if( m_state == Playing && m_last_request_id == 0
              && now - m_cc_time_last_request_date > INT64_C(4000000) )
             {
                 m_cc_time_last_request_date = now;
