@@ -788,7 +788,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_next_demux_date = i64;
             for( size_t i = 0; i < p_sys->subtitles.i_count; i++ )
             {
-                if( p_sys->subtitles.p_array[i].i_start > i64 )
+                if( p_sys->subtitles.p_array[i].i_start > i64 && i > 0 )
                     break;
                 p_sys->subtitles.i_current = i;
             }
