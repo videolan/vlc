@@ -42,6 +42,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
    0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
@@ -98,6 +99,7 @@ struct aout_sys_t
     float requested_volume; /**< Requested volume, negative if none */
     signed char requested_mute; /**< Requested mute, negative if none */
     wchar_t *acquired_device; /**< Acquired device identifier, NULL if none */
+    bool request_device_restart;
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
@@ -574,7 +576,15 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     if (role != eConsole)
         return S_OK;
 
-    msg_Dbg(aout, "default device changed: %ls", wid); /* TODO? migrate */
+    EnterCriticalSection(&sys->lock);
+    if (sys->acquired_device == default_device)
+    {
+        msg_Dbg(aout, "default device changed: %ls", wid);
+        sys->request_device_restart = true;
+        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+    }
+    LeaveCriticalSection(&sys->lock);
+
     return S_OK;
 }
 
@@ -723,6 +733,8 @@ static int DeviceRequestLocked(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     assert(sys->requested_device);
+
+    sys->request_device_restart = false;
 
     WakeConditionVariable(&sys->work);
     while (sys->requested_device != NULL)
@@ -1122,6 +1134,10 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
+
+    if (sys->request_device_restart)
+        DeviceRestartLocked(aout);
+
     for (;;)
     {
         HRESULT hr;
@@ -1232,6 +1248,7 @@ static int Open(vlc_object_t *obj)
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
     sys->acquired_device = NULL;
+    sys->request_device_restart = false;
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
