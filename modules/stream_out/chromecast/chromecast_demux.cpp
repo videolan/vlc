@@ -388,6 +388,7 @@ struct demux_sys_t
              * flush sout streams, make sout del/add called right away and
              * clear CC buffers. */
             seekBack(m_last_time, m_last_pos);
+            resetDemuxEof();
             break;
         case DEMUX_FILTER_ENABLE:
             p_renderer = static_cast<chromecast_common *>(
