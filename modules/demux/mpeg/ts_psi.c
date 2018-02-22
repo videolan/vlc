@@ -1584,6 +1584,12 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
          PMTEsHasRegistration( p_demux, p_dvbpsies, "HDMV" ) )
         p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
 
+    /* Disable dolbyvision */
+    if ( registration_type == TS_PMT_REGISTRATION_BLURAY &&
+         p_dvbpsies->i_pid == 0x1015 &&
+         PMTEsHasRegistration( p_demux, p_dvbpsies, "HDMV" ) )
+        p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+
     /* PES packets usually contain truncated frames */
     p_pes->p_es->fmt.b_packetized = false;
 
