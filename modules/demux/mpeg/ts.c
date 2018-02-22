@@ -197,6 +197,9 @@ static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 #define TS_PACKET_SIZE_MAX 204
 #define TS_HEADER_SIZE 4
 
+#define PROBE_CHUNK_COUNT 500
+#define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
+
 static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
 {
     const uint8_t *p_peek;
@@ -2000,8 +2003,6 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
     return VLC_SUCCESS;
 }
 
-#define PROBE_CHUNK_COUNT 2500
-
 static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_pcr, bool *pb_found )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -2125,7 +2126,8 @@ int ProbeStart( demux_t *p_demux, int i_program )
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
         i_probe_count += PROBE_CHUNK_COUNT;
-    } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (2 * PROBE_CHUNK_COUNT) );
+    } while( i_pos > 0 && (i_pcr == -1 || !b_found) &&
+             i_probe_count < PROBE_MAX );
 
     if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
@@ -2156,7 +2158,8 @@ int ProbeEnd( demux_t *p_demux, int i_program )
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
         i_probe_count += PROBE_CHUNK_COUNT;
-    } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (6 * PROBE_CHUNK_COUNT) );
+    } while( i_pos > 0 && (i_pcr == -1 || !b_found) &&
+             i_probe_count < PROBE_MAX );
 
     if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
