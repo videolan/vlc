@@ -109,7 +109,7 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
 # include <windows.h>
 # include <winsock2.h>
 
-int poll(struct pollfd *fds, unsigned nfds, int timeout)
+static int poll_compat(struct pollfd *fds, unsigned nfds, int timeout)
 {
     DWORD to = (timeout >= 0) ? (DWORD)timeout : INFINITE;
 
@@ -251,4 +251,21 @@ int poll(struct pollfd *fds, unsigned nfds, int timeout)
     }
     return count;
 }
+
+int poll(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    if (timeout == -1)
+    {
+        /* HACK: In some cases, we lose some events because events are
+         * destroyed and recreated only when we need to poll. In order to work
+         * arround this issue, we try to call the poll compat function every
+         * 100ms (in case of infinite timeout). */
+        int ret;
+        while ((ret = poll_compat(fds, nfds, 100)) == 0);
+        return ret;
+    }
+    else
+        return poll_compat(fds, nfds, timeout);
+}
+
 #endif
