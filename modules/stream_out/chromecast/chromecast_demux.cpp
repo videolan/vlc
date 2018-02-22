@@ -144,10 +144,11 @@ struct demux_sys_t
     void initTimes()
     {
         if( demux_Control( p_demux->p_next, DEMUX_GET_TIME, &m_start_time ) != VLC_SUCCESS )
-            m_start_time = 0;
+            m_start_time = -1;
 
         if( demux_Control( p_demux->p_next, DEMUX_GET_POSITION, &m_start_pos ) != VLC_SUCCESS )
-            m_start_pos = 0.0f;
+            m_start_pos = -1.0f;
+
         m_last_time = m_start_time;
         m_last_pos = m_start_pos;
     }
@@ -188,6 +189,9 @@ struct demux_sys_t
 
     mtime_t getTime()
     {
+        if( m_start_time < 0 )
+            return -1;
+
         int64_t time = m_start_time;
         mtime_t cc_time = getCCTime();
 
@@ -199,7 +203,7 @@ struct demux_sys_t
 
     double getPosition()
     {
-        if( m_length >= 0 )
+        if( m_length >= 0 && m_start_pos >= 0 )
         {
             m_last_pos = ( getCCTime() / double( m_length ) ) + m_start_pos;
             return m_last_pos;
@@ -258,6 +262,8 @@ struct demux_sys_t
         int ret = VLC_DEMUXER_SUCCESS;
         if( !m_demux_eof )
         {
+            if( m_start_time < 0 || m_start_pos < 0.0f )
+                initTimes();
             ret = demux_Demux( p_demux->p_next );
             if( ret == VLC_DEMUXER_EOF )
                 m_demux_eof = true;
@@ -302,8 +308,15 @@ struct demux_sys_t
             return VLC_EGENERIC;
         }
         case DEMUX_GET_TIME:
-            *va_arg(args, int64_t *) = getTime();
-            return VLC_SUCCESS;
+        {
+            mtime_t time = getTime();
+            if( time >= 0 )
+            {
+                *va_arg(args, int64_t *) = time;
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
         case DEMUX_GET_LENGTH:
         {
             int ret;
