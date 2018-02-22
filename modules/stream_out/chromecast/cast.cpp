@@ -1045,6 +1045,11 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 break;
         }
 
+        /* If we were already transcoding: force mp3 because maybe the CC may
+         * have failed because of vorbis. */
+        if (transcoding_state & TRANSCODING_AUDIO)
+            b_audio_mp3 = true;
+
         /* TODO: provide audio samplerate and channels */
         ssout << "transcode{";
         char s_fourcc[5];
