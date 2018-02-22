@@ -298,8 +298,7 @@ struct demux_sys_t
                 *va_arg( args, double * ) = pos;
                 return VLC_SUCCESS;
             }
-            /* Fallback to original command */
-            break;
+            return VLC_EGENERIC;
         }
         case DEMUX_GET_TIME:
             *va_arg(args, int64_t *) = getTime();
