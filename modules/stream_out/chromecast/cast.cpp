@@ -502,29 +502,49 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
         m_client = cl;
     }
 
-    block_t *p_block = NULL;
-    while (m_client && (p_block = vlc_fifo_DequeueUnlocked(m_fifo)) == NULL && !m_eof)
+    /* Send data per 512kB minimum */
+    size_t i_min_buffer = 524288;
+    while (m_client && vlc_fifo_GetBytes(m_fifo) < i_min_buffer && !m_eof)
         vlc_fifo_Wait(m_fifo);
 
-    if (!m_client)
+    block_t *p_block = NULL;
+    if (m_client && vlc_fifo_GetBytes(m_fifo) > 0)
     {
-        if (p_block)
+        /* if less data is available, then we must be EOF */
+        if (vlc_fifo_GetBytes(m_fifo) < i_min_buffer)
         {
-            fifo_put_back(p_block);
-            p_block = NULL;
+            assert(m_eof);
+            i_min_buffer = vlc_fifo_GetBytes(m_fifo);
         }
-    }
+        block_t *p_first = vlc_fifo_DequeueUnlocked(m_fifo);
 
-    /* Handle block headers */
-    if (p_block && answer->i_body_offset == 0 && m_header != NULL)
-    {
-        /* Using header block. Re-insert current block into fifo */
-        fifo_put_back(p_block);
-        p_block = m_header;
-    }
+        assert(p_first);
+        size_t i_total_size = p_first->i_buffer;
+        block_t *p_next = NULL, *p_cur = p_first;
 
-    if (vlc_fifo_GetBytes(m_fifo) < HTTPD_BUFFER_PACE)
-        m_intf->setPacing(false);
+        while (i_total_size < i_min_buffer)
+        {
+            p_next = vlc_fifo_DequeueUnlocked(m_fifo);
+            assert(p_next);
+            i_total_size += p_next->i_buffer;
+            p_cur->p_next = p_next;
+            p_cur = p_cur->p_next;
+        }
+        assert(i_total_size >= i_min_buffer);
+
+        if (p_next != NULL)
+        {
+            p_block = block_Alloc(i_total_size);
+            if (p_block)
+                block_ChainExtract(p_first, p_block->p_buffer, p_block->i_buffer);
+            block_ChainRelease(p_first);
+        }
+        else
+            p_block = p_first;
+
+        if (vlc_fifo_GetBytes(m_fifo) < HTTPD_BUFFER_PACE)
+            m_intf->setPacing(false);
+    }
 
     answer->i_proto  = HTTPD_PROTO_HTTP;
     answer->i_version= 0;
@@ -539,18 +559,29 @@ int sout_access_out_sys_t::url_cb(httpd_client_t *cl, httpd_message_t *answer,
             httpd_MsgAdd(answer, "Cache-Control", "no-cache");
             httpd_MsgAdd(answer, "Connection", "close");
         }
-        answer->p_body = (uint8_t *) malloc(p_block->i_buffer);
+
+        const bool send_header = answer->i_body_offset == 0 && m_header != NULL;
+        size_t i_answer_size = p_block->i_buffer;
+        if (send_header)
+            i_answer_size += m_header->i_buffer;
+
+        answer->p_body = (uint8_t *) malloc(i_answer_size);
         if (answer->p_body)
         {
-            answer->i_body = p_block->i_buffer;
-            answer->i_body_offset += answer->i_body ;
-            memcpy(answer->p_body, p_block->p_buffer, p_block->i_buffer);
+            answer->i_body = i_answer_size;
+            answer->i_body_offset += answer->i_body;
+            size_t i_block_offset = 0;
+            if (send_header)
+            {
+                memcpy(answer->p_body, m_header->p_buffer, m_header->i_buffer);
+                i_block_offset = m_header->i_buffer;
+            }
+            memcpy(&answer->p_body[i_block_offset], p_block->p_buffer, p_block->i_buffer);
         }
 
-        if (p_block != m_header)
-            putCopy(p_block);
+        putCopy(p_block);
     }
-    else
+    if (!answer->i_body)
         httpd_MsgAdd(answer, "Connection", "close");
 
     vlc_fifo_Unlock(m_fifo);
