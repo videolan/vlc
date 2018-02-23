@@ -957,7 +957,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             else if (p_es->i_cat == SPU_ES && p_original_spu == NULL)
             {
                 msg_Dbg( p_stream, "forcing video transcode because of subtitle '%4.4s'",
-                         p_es->i_id, (const char*)&p_es->i_codec );
+                         (const char*)&p_es->i_codec );
                 canRemux = false;
                 i_codec_video = 0;
                 p_original_spu = p_es;
