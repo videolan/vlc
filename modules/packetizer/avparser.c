@@ -190,6 +190,8 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     memcpy( p_ret->p_buffer, p_outdata, i_outlen );
     p_ret->i_pts = p_block->i_pts;
     p_ret->i_dts = p_block->i_dts;
+    if( p_sys->p_parser_ctx->key_frame == 1 )
+        p_ret->i_flags |= BLOCK_FLAG_TYPE_I;
 
     p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
 
