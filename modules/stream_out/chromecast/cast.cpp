@@ -92,6 +92,7 @@ struct sout_stream_sys_t
         , cc_reload( false )
         , has_video( false )
         , out_force_reload( false )
+        , perf_warning_shown( false )
         , transcoding_state( TRANSCODING_NONE )
         , out_streams_added( 0 )
     {
@@ -135,6 +136,7 @@ struct sout_stream_sys_t
     bool                               cc_reload;
     bool                               has_video;
     bool                               out_force_reload;
+    bool                               perf_warning_shown;
     int                                transcoding_state;
     std::vector<sout_stream_id_sys_t*> streams;
     std::vector<sout_stream_id_sys_t*> out_streams;
@@ -977,7 +979,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     int new_transcoding_state = TRANSCODING_NONE;
     if ( !canRemux )
     {
-        if ( i_codec_video == 0 && p_original_video
+        if ( !perf_warning_shown && i_codec_video == 0 && p_original_video
           && var_InheritInteger( p_stream, SOUT_CFG_PREFIX "show-perf-warning" ) )
         {
             int res = vlc_dialog_wait_question( p_stream,
@@ -989,6 +991,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                            "could quickly drain your battery." ) );
             if ( res <= 0 )
                  return false;
+            perf_warning_shown = true;
             if ( res == 2 )
                 config_PutInt(p_stream, SOUT_CFG_PREFIX "show-perf-warning", 0 );
         }
