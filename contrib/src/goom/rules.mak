@@ -26,6 +26,7 @@ endif
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/goom/goom2k4-osx.patch
 endif
+	$(APPLY) $(SRC)/goom/clang-emms.patch
 	$(MOVE)
 
 .goom: goom

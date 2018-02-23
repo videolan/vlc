@@ -1,0 +1,54 @@
+From 94ad6724ba5c0136d385cc0f052db636bf99a86c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <slomo@circular-chaos.org>
+Date: Sat, 21 Sep 2013 18:46:29 +0200
+Subject: goom: Fix MMX assembly compilation with clang
+
+clang does not want or need a clobber list for emms:
+error: clobbers must be last on the x87 stack
+
+Patch taken from the FreeBSD ports, provided by
+Dan McGregor <dan.mcgregor@usask.ca>
+---
+Adapted from here:
+https://cgit.freedesktop.org/gstreamer/gst-plugins-good/commit/?id=94ad6724ba5c0136d385cc0f052db636bf99a86c
+---
+ src/mmx.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/mmx.h b/src/mmx.h
+index 3fae26b..2649e10 100644
+--- a/src/mmx.h
++++ b/src/mmx.h
+@@ -711,17 +711,29 @@ void zoom_filter_xmmx (int prevX, int prevY, Pixel *expix1, Pixel *expix2,
+ */
+ #ifdef	MMX_TRACE
+ 
++#ifdef __clang__
++#define emms() \
++	{ \
++		printf("emms()\n"); \
++		__asm__ __volatile__ ("emms"); \
++	}
++#else
+ #define	emms() \
+ 	{ \
+ 		printf("emms()\n"); \
+ 		__asm__ __volatile__ ("emms" \
+                         "st(1)","st(2)","st(3)","st(4)","st(5)","st(6)","st(7)"); \
+ 	}
++#endif
+ 
+ #else
+ 
++#ifdef __clang__
++#define	emms() __asm__ __volatile__ ("emms")
++#else
+ #define	emms() __asm__ __volatile__ ("emms"::: \
+                       "st(1)","st(2)","st(3)","st(4)","st(5)","st(6)","st(7)")
++#endif
+ 
+ #endif
+ 
+-- 
+cgit v1.1
+
