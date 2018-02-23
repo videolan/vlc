@@ -111,6 +111,10 @@
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:item.name
                                                       action:@selector(selectRenderer:)
                                                keyEquivalent:@""];
+    if (item.capabilityFlags & VLC_RENDERER_CAN_VIDEO)
+        [menuItem setImage:[NSImage imageNamed:@"sidebar-movie"]];
+    else
+        [menuItem setImage:[NSImage imageNamed:@"sidebar-music"]];
     [menuItem setTarget:self];
     [menuItem setRepresentedObject:item];
     [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
