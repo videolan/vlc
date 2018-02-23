@@ -2563,7 +2563,6 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         TAB_CLEAN( count, tab );
     }
 
-    in->p_original_demux =
     in->p_demux = InputDemuxNew( p_input, in, psz_access, psz_demux,
                                  psz_path, psz_anchor );
 
@@ -2770,7 +2769,7 @@ static void SlaveDemux( input_thread_t *p_input )
     int64_t i_time;
     int i;
 
-    if( demux_Control( input_priv(p_input)->master->p_original_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
         return;

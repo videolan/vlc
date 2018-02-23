@@ -50,9 +50,6 @@ typedef struct
 
     demux_t  *p_demux; /**< Demux object (most downstream) */
 
-    demux_t  *p_original_demux; /**< Unfiltered demux. Can be used to fetch the
-				 * original time for slave synchronisation. */
-
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */
     int          i_title;
