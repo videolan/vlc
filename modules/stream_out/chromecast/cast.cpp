@@ -79,14 +79,10 @@ private:
 
 struct sout_stream_sys_t
 {
-    sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port,
-                      const char *psz_default_muxer, const char *psz_default_mime)
+    sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port)
         : httpd_host(httpd_host)
         , access_out_live(httpd_host, intf, "/stream")
         , p_out(NULL)
-        , default_muxer(psz_default_muxer)
-        , default_mime(psz_default_mime)
-        , mime(psz_default_mime)
         , p_intf(intf)
         , b_supports_video(has_video)
         , i_port(port)
@@ -123,8 +119,6 @@ struct sout_stream_sys_t
     sout_access_out_sys_t access_out_live;
 
     sout_stream_t     *p_out;
-    const std::string  default_muxer;
-    const std::string  default_mime;
     std::string        mime;
 
     vlc_mutex_t        lock; /* for input events cb */
@@ -172,7 +166,7 @@ static int AccessOpen(vlc_object_t *);
 static void AccessClose(vlc_object_t *);
 
 static const char *const ppsz_sout_options[] = {
-    "ip", "port",  "http-port", "mux", "mime", "video", NULL
+    "ip", "port",  "http-port", "video", NULL
 };
 
 /*****************************************************************************
@@ -182,12 +176,6 @@ static const char *const ppsz_sout_options[] = {
 #define HTTP_PORT_TEXT N_("HTTP port")
 #define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the local server " \
                               "used to stream the media to the Chromecast.")
-#define HAS_VIDEO_TEXT N_("Video")
-#define HAS_VIDEO_LONGTEXT N_("The Chromecast receiver can receive video.")
-#define MUX_TEXT N_("Muxer")
-#define MUX_LONGTEXT N_("This sets the muxer used to stream to the Chromecast.")
-#define MIME_TEXT N_("MIME content type")
-#define MIME_LONGTEXT N_("This sets the media MIME content type sent to the Chromecast.")
 #define PERF_TEXT N_( "Performance warning" )
 #define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
@@ -243,14 +231,15 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(Open, Close)
 
-    add_string(SOUT_CFG_PREFIX "ip", NULL, IP_ADDR_TEXT, IP_ADDR_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "ip", NULL, NULL, NULL, false)
         change_private()
-    add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, PORT_TEXT, PORT_LONGTEXT, false)
+    add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, NULL, NULL, false)
+        change_private()
+    add_bool(SOUT_CFG_PREFIX "video", true, NULL, NULL, false)
         change_private()
     add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
-    add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT, false)
-    add_string(SOUT_CFG_PREFIX "mux", DEFAULT_MUXER, MUX_TEXT, MUX_LONGTEXT, false)
-    add_string(SOUT_CFG_PREFIX "mime", "video/x-matroska", MIME_TEXT, MIME_LONGTEXT, false)
+    add_obsolete_string(SOUT_CFG_PREFIX "mux")
+    add_obsolete_string(SOUT_CFG_PREFIX "mime")
     add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
         change_private()
     add_bool(SOUT_CFG_PREFIX "audio-passthrough", false, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
@@ -1105,17 +1094,16 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         }
         ssout << "}:";
     }
-    if ( !p_original_video && default_muxer == DEFAULT_MUXER )
+    if ( !p_original_video )
         mime = "audio/x-matroska";
     else if ( i_codec_audio == VLC_CODEC_VORBIS &&
-              i_codec_video == VLC_CODEC_VP8 &&
-              default_muxer == DEFAULT_MUXER )
+              i_codec_video == VLC_CODEC_VP8 )
         mime = "video/webm";
     else
-        mime = default_mime;
+        mime = "video/x-matroska";
 
     ssout << "chromecast-proxy:"
-          << "std{mux=" << default_muxer
+          << "std{mux=" << DEFAULT_MUXER
           << ",access=chromecast-http}";
 
     if ( !startSoutChain( p_stream, new_streams, ssout.str(),
@@ -1223,8 +1211,6 @@ static int Open(vlc_object_t *p_this)
     sout_stream_sys_t *p_sys = NULL;
     intf_sys_t *p_intf = NULL;
     char *psz_ip = NULL;
-    char *psz_mux = NULL;
-    char *psz_var_mime = NULL;
     sout_stream_t *p_sout = NULL;
     httpd_host_t *httpd_host = NULL;
     bool b_supports_video = true;
@@ -1268,17 +1254,8 @@ static int Open(vlc_object_t *p_this)
         goto error;
     }
 
-    psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
-    if (psz_mux == NULL)
-    {
-        goto error;
-    }
-    psz_var_mime = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mime");
-    if (psz_var_mime == NULL)
-        goto error;
-
     /* check if we can open the proper sout */
-    ss << "http{mux=" << psz_mux << "}";
+    ss << "http{mux=" << DEFAULT_MUXER << "}";
     p_sout = sout_StreamChainNew( p_stream->p_sout, ss.str().c_str(), NULL, NULL);
     if (p_sout == NULL) {
         msg_Dbg(p_stream, "could not create sout chain:%s", ss.str().c_str());
@@ -1289,7 +1266,7 @@ static int Open(vlc_object_t *p_this)
     b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
     p_sys = new(std::nothrow) sout_stream_sys_t( httpd_host, p_intf, b_supports_video,
-                                                 i_local_server_port, psz_mux, psz_var_mime );
+                                                 i_local_server_port );
     if (unlikely(p_sys == NULL))
         goto error;
 
@@ -1313,8 +1290,6 @@ static int Open(vlc_object_t *p_this)
     p_stream->p_sys = p_sys;
 
     free(psz_ip);
-    free(psz_mux);
-    free(psz_var_mime);
 
     return VLC_SUCCESS;
 
@@ -1323,8 +1298,6 @@ error:
     if (httpd_host)
         httpd_HostDelete(httpd_host);
     free(psz_ip);
-    free(psz_mux);
-    free(psz_var_mime);
     delete p_sys;
     return VLC_EGENERIC;
 }
