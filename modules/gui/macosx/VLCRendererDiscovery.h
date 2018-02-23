@@ -52,11 +52,8 @@
 /**
  Array of \c VLCRendererItems that the module discovered
  */
-#ifdef MAC_OS_X_VERSION_10_11
 @property (readonly) NSMutableArray<VLCRendererItem*> *rendererItems;
-#else
-@property (readonly) NSMutableArray *rendererItems;
-#endif
+
 
 /**
  Indicates if the discovery has been started
