@@ -562,7 +562,7 @@ QMenu *VLCMenuBar::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     varnames.append( "intf-add" );
     objects.append( VLC_OBJECT(p_intf) );
 
-    return Populate( p_intf, current, varnames, objects );
+    return Populate( current, varnames, objects );
 }
 
 /**
@@ -638,7 +638,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
         vlc_object_release( p_aout );
     }
 
-    return Populate( p_intf, current, varnames, objects );
+    return Populate( current, varnames, objects );
 }
 
 /* Subtitles */
@@ -659,7 +659,7 @@ QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current, bool b_p
     p_input = THEMIM->getInput();
     SubsAutoMenuBuilder( p_input, objects, varnames );
 
-    return Populate( p_intf, current, varnames, objects );
+    return Populate( current, varnames, objects );
 }
 
 /**
@@ -702,7 +702,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     VideoAutoMenuBuilder( THEPL, p_input, objects, varnames );
 
-    return Populate( p_intf, current, varnames, objects );
+    return Populate( current, varnames, objects );
 }
 
 /**
@@ -762,7 +762,7 @@ QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu, bool b_
 
     /* */
     EnableStaticEntries( menu, (p_object != NULL ) );
-    Populate( p_intf, menu, varnames, objects );
+    Populate( menu, varnames, objects );
 
     /* Remove playback actions to recreate them */
     if( !b_keep )
@@ -807,7 +807,7 @@ QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
 
 #define CREATE_POPUP \
     menu = new QMenu(); \
-    Populate( p_intf, menu, varnames, objects ); \
+    Populate( menu, varnames, objects ); \
     if( show ) \
         menu->popup( QCursor::pos() ); \
 
@@ -987,7 +987,7 @@ QMenu* VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
         menu->addSeparator();
     }
 
-    Populate( p_intf, menu, varnames, objects );
+    Populate( menu, varnames, objects );
 
     menu->addSeparator();
     PopupMenuPlaylistEntries( menu, p_intf, p_input );
@@ -1061,7 +1061,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
         submenu = new QMenu( menu );
         action = menu->addMenu( SubtitleMenu( p_intf, submenu, true ) );
         action->setText( qtr( "Subti&tle") );
-        UpdateItem( p_intf, submenu, "spu-es", VLC_OBJECT(p_input), true );
+        UpdateItem( submenu, "spu-es", VLC_OBJECT(p_input), true );
 
         /* Playback menu for chapters */
         submenu = new QMenu( menu );
@@ -1096,7 +1096,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
             objects.clear(); varnames.clear();
             objects.append( p_object );
             varnames.append( "intf-skins-interactive" );
-            Populate( p_intf, submenu, varnames, objects );
+            Populate( submenu, varnames, objects );
             QAction* action = submenu->actions().back();
             action->setShortcut( QKeySequence( "Ctrl+Shift+S" ));
 
@@ -1104,7 +1104,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
             objects.clear(); varnames.clear();
             objects.append( p_object );
             varnames.append( "intf-skins" );
-            Populate( p_intf, submenu, varnames, objects );
+            Populate( submenu, varnames, objects );
 
             submenu->addSeparator();
 
@@ -1203,10 +1203,9 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
 /*************************************************************************
  * Builders for automenus
  *************************************************************************/
-QMenu * VLCMenuBar::Populate( intf_thread_t *p_intf,
-                            QMenu *current,
-                            QVector< const char *> & varnames,
-                            QVector<vlc_object_t *> & objects )
+QMenu * VLCMenuBar::Populate( QMenu *current,
+                              QVector< const char *> & varnames,
+                              QVector<vlc_object_t *> & objects )
 {
     QMenu *menu = current;
     assert( menu );
@@ -1221,7 +1220,7 @@ QMenu * VLCMenuBar::Populate( intf_thread_t *p_intf,
             continue;
         }
 
-        UpdateItem( p_intf, menu, varnames[i], objects[i], true );
+        UpdateItem( menu, varnames[i], objects[i], true );
     }
     return menu;
 }
@@ -1243,7 +1242,7 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
 
 #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
 
-void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+void VLCMenuBar::UpdateItem( QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
     vlc_value_t val, text;

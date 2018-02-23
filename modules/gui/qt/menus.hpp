@@ -141,14 +141,13 @@ private:
     static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
 
     /* Generic automenu methods */
-    static QMenu * Populate( intf_thread_t *, QMenu *current,
+    static QMenu * Populate( QMenu *current,
                              QVector<const char*>&, QVector<vlc_object_t *>& );
 
     static void CreateAndConnect( QMenu *, const char *, const QString&,
                                   const QString&, int, vlc_object_t *,
                                   vlc_value_t, int, bool c = false );
-    static void UpdateItem( intf_thread_t *, QMenu *, const char *,
-                            vlc_object_t *, bool );
+    static void UpdateItem( QMenu *, const char *, vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t * );
     static void EnableStaticEntries( QMenu *, bool );
 
