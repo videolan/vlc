@@ -44,6 +44,11 @@
 #define TRANSCODING_VIDEO 0x1
 #define TRANSCODING_AUDIO 0x2
 
+#if 0
+/* TODO: works only with internal spu and transcoding/blending for now */
+#define CC_ENABLE_SPU
+#endif
+
 struct sout_access_out_sys_t
 {
     sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
@@ -954,6 +959,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 p_original_video = p_es;
                 new_streams.push_back(*it);
             }
+#ifdef CC_ENABLE_SPU
             else if (p_es->i_cat == SPU_ES && p_original_spu == NULL)
             {
                 msg_Dbg( p_stream, "forcing video transcode because of subtitle '%4.4s'",
@@ -963,6 +969,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 p_original_spu = p_es;
                 new_streams.push_back(*it);
             }
+#endif
             else
                 continue;
         }
