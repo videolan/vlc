@@ -1309,16 +1309,6 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         action->setData( psz_var );
     }
 
-    /* Some specific stuff */
-    bool forceDisabled = false;
-    if( !strcmp( psz_var, "spu-es" ) )
-    {
-        vout_thread_t *p_vout = THEMIM->getVout();
-        forceDisabled = ( p_vout == NULL );
-        if( p_vout )
-            vlc_object_release( p_vout );
-    }
-
     if( i_type & VLC_VAR_HASCHOICE )
     {
         /* Append choices menu */
@@ -1334,8 +1324,6 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
 
             action->setEnabled(
                 CreateChoicesMenu( submenu, psz_var, p_object ) == 0 );
-            if( forceDisabled )
-                action->setEnabled( false );
         }
         else
         {
