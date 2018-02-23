@@ -51,6 +51,11 @@ int demux_GetSeekpoint( demux_t * );
  * @param source input stream around which to build a filter chain
  * @param list colon-separated list of stream filters (upstream first)
  *
+ * @note Like stream_FilterAutoNew(), this function takes ownership of the
+ * source input stream, and transfers it to the first demux filter in the
+ * constructed chain. Any use of the source after the function call is invalid
+ * and undefined (unless the chain ends up empty).
+ *
  * @return The last demux (filter) in the chain.
  * The return value is always a valid (non-NULL) demux pointer.
  */
