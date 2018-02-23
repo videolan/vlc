@@ -441,9 +441,6 @@ static int UpdateVout(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_dec->fmt_out.video.i_sar_num = 1;
-    p_dec->fmt_out.video.i_sar_den = 1;
-
     if ((p_dec->fmt_in.i_codec == VLC_CODEC_MPGV ||
          p_dec->fmt_in.i_codec == VLC_CODEC_MP2V) &&
         (p_sys->video.i_mpeg_dar_num * p_sys->video.i_mpeg_dar_den != 0))
@@ -715,6 +712,12 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 p_sys->video.i_angle = 0;
 
             p_dec->fmt_out.video = p_dec->fmt_in.video;
+            if (p_dec->fmt_out.video.i_sar_num * p_dec->fmt_out.video.i_sar_den == 0)
+            {
+                p_dec->fmt_out.video.i_sar_num = 1;
+                p_dec->fmt_out.video.i_sar_den = 1;
+            }
+
             p_sys->video.i_input_width =
             p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
             p_sys->video.i_input_height =
