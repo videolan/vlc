@@ -315,9 +315,18 @@ void PreviewWidget::paintEvent( QPaintEvent * )
     int i_total = 0, i_offset = 0, i;
     QPainter painter( this );
     QPixmap pixmaps[3];
+
     for( int i=0; i<3; i++ )
     {
         pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+        /* Because non shown widgets do not have their bitmap updated, we need
+           to force redraw to grab a pixmap matching layout size */
+        if( pixmaps[i].size() != bars[i]->contentsRect().size() )
+        {
+            bars[i]->layout()->invalidate();
+            pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+        }
+
         for( int j=0; j < bars[i]->layout()->count(); j++ )
         {
             QLayoutItem *item = bars[i]->layout()->itemAt( j );
