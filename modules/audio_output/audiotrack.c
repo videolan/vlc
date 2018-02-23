@@ -820,7 +820,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
                 int i_channel_config, int i_format, int i_size )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    int64_t session_id = var_InheritInteger( p_aout, "audiotrack-session-id" );
+    jint session_id = var_InheritInteger( p_aout, "audiotrack-session-id" );
     jobject p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC,
                                        i_rate, i_channel_config, i_format,
                                        i_size, jfields.AudioTrack.MODE_STREAM,
