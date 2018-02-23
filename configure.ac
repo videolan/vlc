@@ -3516,6 +3516,16 @@ fi
 AM_CONDITIONAL([HAVE_MMAL], [test "${have_mmal}" = "yes"])
 
 dnl
+dnl OpenHMD
+dnl
+PKG_ENABLE_MODULES_VLC([OPENHMD], [], [openhmd], [OpenHMD head mounted display handler], [auto])
+
+dnl
+dnl Assimp
+dnl
+PKG_ENABLE_MODULES_VLC([ASSIMP], [], [assimp], [Assimp 3d object loader], [auto])
+
+dnl
 dnl  Audio plugins
 dnl
 

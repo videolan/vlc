@@ -43,6 +43,7 @@ include lua/Makefile.am
 include meta_engine/Makefile.am
 include misc/Makefile.am
 include notify/Makefile.am
+include object_loader/Makefile.am
 include packetizer/Makefile.am
 include services_discovery/Makefile.am
 include spu/Makefile.am
