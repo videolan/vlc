@@ -112,7 +112,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
     p_edition = p_edit;
     b_ordered = false;
 
-    int64_t usertime_offset = 0;
+    int64_t usertime_offset = 0; // microseconds
 
     /* ordered chapters */
     if( p_edition && p_edition->b_ordered )
@@ -461,6 +461,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                     return true;
                 }
                 sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
+                sys.i_mk_chapter_time = p_cur_vchapter->i_mk_virtual_start_time - p_cur_vchapter->segment.i_mk_start_time - ( ( p_cur_vchapter->p_chapter )? p_cur_vchapter->p_chapter->i_start_time : 0 ) /* + VLC_TS_0 */;
             }
         }
 
@@ -521,7 +522,8 @@ bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
     if ( p_vchapter != NULL )
     {
         mtime_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
-        p_sys->i_mk_chapter_time = i_mk_time_offset - p_vchapter->segment.i_mk_start_time /* + VLC_TS_0 */;
+        if (CurrentEdition()->b_ordered)
+            p_sys->i_mk_chapter_time = p_vchapter->i_mk_virtual_start_time - p_vchapter->segment.i_mk_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 ) /* + VLC_TS_0 */;
         if ( p_vchapter->p_chapter && p_vchapter->i_seekpoint_num > 0 )
         {
             p_sys->i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
