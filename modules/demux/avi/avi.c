@@ -1847,7 +1847,8 @@ static mtime_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
     if( !tk->i_rate )
         return i_dpts;
 
-    i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
+    if( tk->i_scale )
+        i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
 
     if( tk->i_samplesize )
     {
