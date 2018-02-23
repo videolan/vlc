@@ -156,6 +156,7 @@ struct sout_stream_id_sys_t
 
 static const vlc_fourcc_t DEFAULT_TRANSCODE_VIDEO = VLC_CODEC_H264;
 static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1}}";
+static const char DEFAULT_MUXER_WEBM[] = "avformat{mux=webm,options={live=1}}";
 
 
 /*****************************************************************************
@@ -1097,16 +1098,29 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         }
         ssout << "}:";
     }
+
+    const bool is_webm = ( i_codec_audio == 0 || i_codec_audio == VLC_CODEC_VORBIS ||
+                           i_codec_audio == VLC_CODEC_OPUS ) &&
+                         ( i_codec_video == 0 || i_codec_video == VLC_CODEC_VP8 ||
+                           i_codec_video == VLC_CODEC_VP9 );
+
     if ( !p_original_video )
-        mime = "audio/x-matroska";
-    else if ( i_codec_audio == VLC_CODEC_VORBIS &&
-              i_codec_video == VLC_CODEC_VP8 )
-        mime = "video/webm";
+    {
+        if( is_webm )
+            mime = "audio/webm";
+        else
+            mime = "audio/x-matroska";
+    }
     else
-        mime = "video/x-matroska";
+    {
+        if ( is_webm )
+            mime = "video/webm";
+        else
+            mime = "video/x-matroska";
+    }
 
     ssout << "chromecast-proxy:"
-          << "std{mux=" << DEFAULT_MUXER
+          << "std{mux=" << ( is_webm ? DEFAULT_MUXER_WEBM : DEFAULT_MUXER )
           << ",access=chromecast-http}";
 
     if ( !startSoutChain( p_stream, new_streams, ssout.str(),
