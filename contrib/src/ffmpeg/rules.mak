@@ -19,6 +19,7 @@ endif
 
 FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
 
+# bsf=vp9_superframe is needed to mux VP9 inside webm/mkv
 FFMPEGCONF = \
 	--cc="$(CC)" \
 	--pkg-config="$(PKG_CONFIG)" \
@@ -34,7 +35,8 @@ FFMPEGCONF = \
 	--disable-protocol=concat \
 	--disable-bsfs \
 	--disable-bzlib \
-	--disable-avresample
+	--disable-avresample \
+	--enable-bsf=vp9_superframe
 
 ifdef USE_FFMPEG
 FFMPEGCONF += \
