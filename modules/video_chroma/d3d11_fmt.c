@@ -334,19 +334,18 @@ bool isXboxHardware(ID3D11Device *d3ddev)
     return result;
 }
 
-bool isNvidiaHardware(ID3D11Device *d3ddev)
+static bool isNvidiaHardware(ID3D11Device *d3ddev)
 {
     IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
     if (!p_adapter)
-        return NULL;
+        return false;
 
-    bool result = false;
     DXGI_ADAPTER_DESC adapterDesc;
-    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
-        result = adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA;
-
+    if (FAILED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
+        adapterDesc.VendorId = 0;
     IDXGIAdapter_Release(p_adapter);
-    return result;
+
+    return adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA;
 }
 
 bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
