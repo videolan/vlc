@@ -712,6 +712,12 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         sys->textureWidth  = fmt->i_width;
         sys->textureHeight = fmt->i_height;
     }
+    if (sys->totalTextureSlices && sys->totalTextureSlices < surface_count)
+    {
+        msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
+                 sys->totalTextureSlices, surface_count);
+        dx_sys->can_extern_pool = false;
+    }
 #if VLC_WINSTORE_APP
     /* On the Xbox 1/S, any decoding of H264 with one dimension over 2304
      * crashes totally the device */
@@ -763,13 +769,6 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
             D3D11_TEXTURE2D_DESC texDesc;
             ID3D11Texture2D_GetDesc(pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
-            if (unlikely(texDesc.ArraySize < surface_count))
-            {
-                msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
-                         texDesc.ArraySize, surface_count);
-                dx_sys->can_extern_pool = false;
-                break;
-            }
             assert(texDesc.Format == sys->render);
             assert(texDesc.BindFlags & D3D11_BIND_DECODER);
 
