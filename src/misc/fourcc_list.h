@@ -1132,6 +1132,15 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_PIXLET, "Apple Pixlet" ),
         A("pxlt"),
+
+    B(VLC_CODEC_MAGICYUV, "MagicYUV lossless" ),
+        A("M8RG"),
+        A("M8RA"),
+        A("M8G0"),
+        A("M8Y0"),
+        A("M8Y2"),
+        A("M8Y4"),
+        A("M8YA"),
 };
 
 static const staticentry_t p_list_audio[] = {
