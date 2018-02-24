@@ -1,0 +1,49 @@
+diff -urN upnp-orig/upnp/src/inc/inet_pton.h upnp/upnp/src/inc/inet_pton.h
+--- upnp-orig/upnp/src/inc/inet_pton.h	2010-12-23 22:24:06.000000000 +0200
++++ upnp/upnp/src/inc/inet_pton.h	2018-02-24 23:44:22.359676036 +0200
+@@ -3,6 +3,8 @@
+ 
+ #ifdef WIN32
+ 
++#include "autoconfig.h"
++
+ #ifdef IPV6_
+ #define INET_IPV6
+ #endif
+@@ -13,6 +15,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
++#if _WIN32_WINNT < 0x600
++
+ /*!
+  * \file
+  *
+@@ -45,6 +49,8 @@
+  */
+ extern int inet_pton(int af, const char *src, void *dst);
+ 
++#endif /* _WIN32_WINNT < 0x600 */
++
+ #endif /* WIN32 */
+ 
+ #endif /* INET_PTON */
+diff -urN upnp-orig/upnp/src/inet_pton.c upnp/upnp/src/inet_pton.c
+--- upnp-orig/upnp/src/inet_pton.c	2010-12-23 22:24:06.000000000 +0200
++++ upnp/upnp/src/inet_pton.c	2018-02-24 23:44:16.771807657 +0200
+@@ -24,6 +24,8 @@
+ 
+ #include "inet_pton.h"
+ 
++#if _WIN32_WINNT < 0x600
++
+ /*!
+  * \brief format an IPv4 address
+  *
+@@ -320,4 +322,6 @@
+ 	/* NOTREACHED */
+ }
+ 
++#endif /* _WIN32_WINNT < 0x600 */
++
+ #endif /* WIN32 */

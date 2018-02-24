@@ -34,10 +34,10 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 	$(APPLY) $(SRC)/upnp/windows-random.patch
+	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/winrt-dont-force-win32-winnt.patch
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
-	$(APPLY) $(SRC)/upnp/winrt-inet.patch
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libpthread.patch
