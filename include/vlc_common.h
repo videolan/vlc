@@ -716,11 +716,11 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
  */
 #  define clz(x) \
     _Generic((x), \
-        unsigned char: clzbits(x, char), \
-        unsigned short: clzbits(x, short), \
-        unsigned: clzbits(x, int), \
-        unsigned long: clzbits(x, long), \
-        unsigned long long: clzbits(x, long long))
+        unsigned char: clztype(x, char), \
+        unsigned short: clztype(x, short), \
+        unsigned: clztype(x, int), \
+        unsigned long: clztype(x, long), \
+        unsigned long long: clztype(x, long long))
 # endif
 
 /**
@@ -776,7 +776,7 @@ VLC_USED static inline int popcount(unsigned long long x)
           signed long:      popcount((unsigned long)(x)), \
         unsigned long long: popcount(x), \
           signed long long: popcount(x))
-#endif
+# endif
 
 /**
  * Parity
