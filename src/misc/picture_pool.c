@@ -209,15 +209,12 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
     assert(pool->refs > 0);
     available = pool->available;
 
-    if (pool->canceled)
-    {
-        vlc_mutex_unlock(&pool->lock);
-        return NULL;
-    }
-
     while (available != 0)
     {
         int i = ctz(available);
+
+        if (unlikely(pool->canceled))
+            break;
 
         pool->available &= ~(1ULL << i);
         vlc_mutex_unlock(&pool->lock);
