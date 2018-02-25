@@ -152,6 +152,9 @@ typedef struct paragraph_t
 
 #ifdef HAVE_FRIBIDI
     FriBidiCharType     *p_types;
+#if FRIBIDI_MAJOR_VERSION >= 1
+    FriBidiBracketType  *p_btypes;
+#endif
     FriBidiLevel        *p_levels;
     FriBidiStrIndex     *pi_reordered_indices;
     FriBidiParType       paragraph_type;
@@ -290,6 +293,9 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
 #ifdef HAVE_FRIBIDI
     p_paragraph->p_levels = vlc_alloc( i_size, sizeof( *p_paragraph->p_levels ) );
     p_paragraph->p_types = vlc_alloc( i_size, sizeof( *p_paragraph->p_types ) );
+#if FRIBIDI_MAJOR_VERSION >= 1
+    p_paragraph->p_btypes = vlc_alloc( i_size, sizeof( *p_paragraph->p_btypes ) );
+#endif
     p_paragraph->pi_reordered_indices =
             vlc_alloc( i_size, sizeof( *p_paragraph->pi_reordered_indices ) );
 
@@ -323,6 +329,9 @@ error:
 #ifdef HAVE_FRIBIDI
     if( p_paragraph->p_levels ) free( p_paragraph->p_levels );
     if( p_paragraph->p_types ) free( p_paragraph->p_types );
+#if FRIBIDI_MAJOR_VERSION >= 1
+    if( p_paragraph->p_btypes ) free( p_paragraph->p_btypes );
+#endif
     if( p_paragraph->pi_reordered_indices )
         free( p_paragraph->pi_reordered_indices );
 #endif
@@ -348,6 +357,9 @@ static void FreeParagraph( paragraph_t *p_paragraph )
 #ifdef HAVE_FRIBIDI
     free( p_paragraph->pi_reordered_indices );
     free( p_paragraph->p_types );
+#if FRIBIDI_MAJOR_VERSION >= 1
+    free( p_paragraph->p_btypes );
+#endif
     free( p_paragraph->p_levels );
 #endif
 
@@ -360,10 +372,22 @@ static int AnalyzeParagraph( paragraph_t *p_paragraph )
     fribidi_get_bidi_types(  p_paragraph->p_code_points,
                              p_paragraph->i_size,
                              p_paragraph->p_types );
+#if FRIBIDI_MAJOR_VERSION >= 1
+    fribidi_get_bracket_types( p_paragraph->p_code_points,
+                               p_paragraph->i_size,
+                               p_paragraph->p_types,
+                               p_paragraph->p_btypes );
+    fribidi_get_par_embedding_levels_ex( p_paragraph->p_types,
+                                      p_paragraph->p_btypes,
+                                      p_paragraph->i_size,
+                                      &p_paragraph->paragraph_type,
+                                      p_paragraph->p_levels );
+#else
     fribidi_get_par_embedding_levels( p_paragraph->p_types,
                                       p_paragraph->i_size,
                                       &p_paragraph->paragraph_type,
                                       p_paragraph->p_levels );
+#endif
 
 #ifdef HAVE_HARFBUZZ
     hb_unicode_funcs_t *p_funcs = hb_unicode_funcs_get_default();
