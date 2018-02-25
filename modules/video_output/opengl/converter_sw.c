@@ -276,26 +276,19 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
     return VLC_SUCCESS;
 }
 
-/** Find next (bit) set */
-static int fnsll(unsigned long long x, unsigned i)
-{
-    if (i >= CHAR_BIT * sizeof (x))
-        return 0;
-    return ffsll(x & ~((1ULL << i) - 1));
-}
-
 static void
 persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
 {
     struct priv *priv = tc->priv;
+    unsigned long long list = priv->persistent.list;
 
     /* Release all pictures that are not used by the GPU anymore */
-    for (unsigned i = ffsll(priv->persistent.list); i;
-         i = fnsll(priv->persistent.list, i))
+    while (list != 0)
     {
-        assert(priv->persistent.pics[i - 1] != NULL);
+        int i = ctz(list);
+        assert(priv->persistent.pics[i] != NULL);
 
-        picture_t *pic = priv->persistent.pics[i - 1];
+        picture_t *pic = priv->persistent.pics[i];
         picture_sys_t *picsys = pic->p_sys;
 
         assert(picsys->fence != NULL);
@@ -307,10 +300,11 @@ persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
             tc->vt->DeleteSync(picsys->fence);
             picsys->fence = NULL;
 
-            priv->persistent.list &= ~(1ULL << (i - 1));
-            priv->persistent.pics[i - 1] = NULL;
+            priv->persistent.list &= ~(1ULL << i);
+            priv->persistent.pics[i] = NULL;
             picture_Release(pic);
         }
+        list &= ~(1ULL << i);
     }
 }
 
