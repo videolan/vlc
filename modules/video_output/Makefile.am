@@ -148,10 +148,19 @@ libvk_x11_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 			     -DVK_USE_PLATFORM_XCB_KHR -DPLATFORM_NAME=X11
 libvk_x11_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(XCB_LIBS)
 
+libvk_win32_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/surface.c \
+				video_output/vulkan/platform_win32.c
+libvk_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS) \
+			       -DVK_USE_PLATFORM_WIN32_KHR -DPLATFORM_NAME=Win32
+libvk_win32_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
+
 if HAVE_VULKAN
 vout_LTLIBRARIES += libvk_plugin.la
 if HAVE_XCB
 vout_LTLIBRARIES += libvk_x11_plugin.la
+endif
+if HAVE_WIN32_DESKTOP
+vout_LTLIBRARIES += libvk_win32_plugin.la
 endif
 endif
 
@@ -406,6 +415,7 @@ libdrawable_plugin_la_SOURCES = video_output/drawable.c
 if HAVE_WIN32
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
+
 
 ### OS/2 ###
 if HAVE_OS2
