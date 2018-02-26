@@ -84,6 +84,8 @@ ifneq ($(LEGACY_NDK), 1)
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
 endif
 endif
+	# Fix creating static libs on mingw
+	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
 
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
