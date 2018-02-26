@@ -119,7 +119,7 @@ vlc_module_begin ()
     add_bool("decklink-tenbits", false, N_("10 bits"), N_("10 bits"), true)
 
     add_shortcut("decklink")
-    set_capability("access_demux", 10)
+    set_capability("access_demux", 0)
     set_callbacks(Open, Close)
 vlc_module_end ()
 
