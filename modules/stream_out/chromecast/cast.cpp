@@ -95,6 +95,7 @@ struct sout_stream_sys_t
         , es_changed( true )
         , cc_has_input( false )
         , cc_reload( false )
+        , cc_flushing( false )
         , has_video( false )
         , out_force_reload( false )
         , perf_warning_shown( false )
@@ -118,6 +119,7 @@ struct sout_stream_sys_t
                         const std::string &sout, int new_transcoding_state);
     void stopSoutChain(sout_stream_t* p_stream);
     sout_stream_id_sys_t *GetSubId( sout_stream_t*, sout_stream_id_sys_t*, bool update = true );
+    bool isFlushing( sout_stream_t* );
     void setNextTranscodingState();
     bool transcodingCanFallback() const;
 
@@ -139,6 +141,7 @@ struct sout_stream_sys_t
     bool                               es_changed;
     bool                               cc_has_input;
     bool                               cc_reload;
+    bool                               cc_flushing;
     bool                               has_video;
     bool                               out_force_reload;
     bool                               perf_warning_shown;
@@ -156,6 +159,7 @@ struct sout_stream_id_sys_t
 {
     es_format_t           fmt;
     sout_stream_id_sys_t  *p_sub_id;
+    bool                  flushed;
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -706,6 +710,7 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
     {
         es_format_Copy( &p_sys_id->fmt, p_fmt );
         p_sys_id->p_sub_id = NULL;
+        p_sys_id->flushed = false;
 
         p_sys->streams.push_back( p_sys_id );
         p_sys->es_changed = true;
@@ -1174,11 +1179,41 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
     return NULL;
 }
 
+bool sout_stream_sys_t::isFlushing( sout_stream_t *p_stream )
+{
+    (void) p_stream;
+
+    /* Make sure that all out_streams are flushed when flushing. This avoids
+     * too many sout/cc restart when a stream is sending data while one other
+     * is flushing */
+
+    if (!cc_flushing)
+        return false;
+
+    for (size_t i = 0; i < out_streams.size(); ++i)
+    {
+        if ( !out_streams[i]->flushed )
+            return true;
+    }
+
+    cc_flushing = false;
+    for (size_t i = 0; i < out_streams.size(); ++i)
+        out_streams[i]->flushed = false;
+
+    return false;
+}
+
 static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 block_t *p_buffer)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_mutex_locker locker(&p_sys->lock);
+
+    if( p_sys->isFlushing( p_stream ) )
+    {
+        block_Release( p_buffer );
+        return VLC_SUCCESS;
+    }
 
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id );
     if ( next_id == NULL )
@@ -1202,15 +1237,23 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id, false );
     if ( next_id == NULL )
         return;
+    next_id->flushed = true;
 
-    p_sys->access_out_live.stop();
-
-    if (p_sys->cc_has_input)
+    if( !p_sys->cc_flushing )
     {
-        p_sys->p_intf->requestPlayerStop();
-        p_sys->cc_has_input = false;
+        p_sys->cc_flushing = true;
+
+        p_sys->stopSoutChain( p_stream );
+
+        p_sys->access_out_live.stop();
+
+        if (p_sys->cc_has_input)
+        {
+            p_sys->p_intf->requestPlayerStop();
+            p_sys->cc_has_input = false;
+        }
+        p_sys->out_force_reload = p_sys->es_changed = true;
     }
-    p_sys->out_force_reload = p_sys->es_changed = true;
 }
 
 static void on_input_event_cb(void *data, enum cc_input_event event, union cc_input_arg arg )
