@@ -235,9 +235,8 @@ void ConvertDialog::close()
 
             newFileName.replace( QChar('\''), "\\\'" );
 
-            mrl += "std{access=file{no-overwrite},mux=" + profile->getMux()
-                 + ",dst='" + newFileName
-                 + "'}";
+            mrl += QString("std{access=file{no-overwrite},mux=%1,dst='%2'}")
+                           .arg( profile->getMux() ).arg( newFileName );
             if( displayBox->isChecked() )
                 mrl += "}";
         }
