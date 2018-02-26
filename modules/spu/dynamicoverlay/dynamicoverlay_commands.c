@@ -31,6 +31,7 @@
 #include <vlc_vout.h>
 #include <vlc_filter.h>
 
+#include <limits.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -92,11 +93,17 @@ static int skip_space( char **psz_command )
 static int parse_digit( char **psz_command, int32_t *value )
 {
     char *psz_temp;
-    *value = strtol( *psz_command, &psz_temp, 10 );
+    long l = strtol( *psz_command, &psz_temp, 10 );
+
     if( psz_temp == *psz_command )
     {
         return VLC_EGENERIC;
     }
+#if LONG_MAX > INT32_MAX
+    if( l > INT32_MAX || l < INT32_MIN )
+        return VLC_EGENERIC;
+#endif
+    *value = l;
     *psz_command = psz_temp;
     return VLC_SUCCESS;
 }
