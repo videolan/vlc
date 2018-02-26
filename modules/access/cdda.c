@@ -746,6 +746,6 @@ vlc_module_begin ()
     add_shortcut( "cdda", "cddasimple" )
 
     add_submodule()
-    set_capability( "access_demux", 10 )
+    set_capability( "access_demux", 1 )
     set_callbacks(DemuxOpen, DemuxClose)
 vlc_module_end ()
