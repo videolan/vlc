@@ -27,7 +27,6 @@ x265: x265-$(X265_VERSION).tar.bz2 .sum-x265
 	mkdir -p $@-$(X265_VERSION)
 	tar xvjf "$<" --strip-components=1 -C $@-$(X265_VERSION)
 	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
-	$(APPLY) $(SRC)/x265/win-skip-res.patch
 	$(call pkg_static,"source/x265.pc.in")
 ifndef HAVE_WIN32
 	$(APPLY) $(SRC)/x265/x265-pkg-libs.patch
@@ -36,7 +35,7 @@ endif
 
 .x265: x265 toolchain.cmake
 	$(REQUIRE_GPL)
-	cd $</source && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_SHARED=OFF -DCMAKE_SYSTEM_PROCESSOR=$(ARCH)
+	cd $</source && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_SHARED=OFF -DCMAKE_SYSTEM_PROCESSOR=$(ARCH) -DENABLE_CLI=OFF
 	cd $</source && $(MAKE) install
 	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(PREFIX)/lib/pkgconfig/x265.pc"
 	touch $@
