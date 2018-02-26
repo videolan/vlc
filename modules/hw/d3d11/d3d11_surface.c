@@ -376,17 +376,21 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-    ID3D11VideoDecoderOutputView_GetDesc( p_sys->decoder, &viewDesc );
-
+    UINT srcSlice;
+    if (!p_sys->decoder)
+        srcSlice = p_sys->slice_index;
+    else
+    {
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+        ID3D11VideoDecoderOutputView_GetDesc( p_sys->decoder, &viewDesc );
+        srcSlice = viewDesc.Texture2D.ArraySlice;
+    }
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
-    UINT srcSlice = viewDesc.Texture2D.ArraySlice;
 
 #if CAN_PROCESSOR
     if (sys->d3d_proc.procEnumerator)
     {
         HRESULT hr;
-        assert(p_sys->slice_index == viewDesc.Texture2D.ArraySlice);
         if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &sys->d3d_proc, p_sys) ))
             return;
 
