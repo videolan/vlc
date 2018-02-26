@@ -64,14 +64,16 @@ void ts_pid_list_Release( demux_t *p_demux, ts_pid_list_t *p_list )
 struct searchkey
 {
     int16_t i_pid;
-    ts_pid_t **pp_last;
+    ts_pid_t *const *pp_last;
 };
 
-static int ts_bsearch_searchkey_Compare( void *key, void *other )
+static int ts_bsearch_searchkey_Compare( const void *key, const void *other )
 {
-    struct searchkey *p_key = (struct searchkey *) key;
-    ts_pid_t *p_pid = *((ts_pid_t **) other);
-    p_key->pp_last = (ts_pid_t **) other;
+    struct searchkey *p_key = (void *)key;
+    ts_pid_t *const *pp_pid = other;
+
+    ts_pid_t *p_pid = *pp_pid;
+    p_key->pp_last = other;
     return ( p_key->i_pid >= p_pid->i_pid ) ? p_key->i_pid - p_pid->i_pid : -1;
 }
 
