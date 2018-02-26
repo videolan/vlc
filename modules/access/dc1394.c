@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_shortname( N_("DC1394") )
     set_description( N_("IIDC Digital Camera (FireWire) input") )
-    set_capability( "access_demux", 10 )
+    set_capability( "access_demux", 0 )
     set_callbacks( Open, Close )
 vlc_module_end()
 
