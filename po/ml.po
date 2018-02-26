@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-02-06 22:47+0100\n"
+"POT-Creation-Date: 2018-02-26 18:24+0100\n"
 "PO-Revision-Date: 2016-01-14 07:00+0000\n"
 "Last-Translator: Mujeeb Rahman <mujeebcpy@gmail.com>, 2018\n"
 "Language-Team: Malayalam (https://www.transifex.com/yaron/teams/16553/ml/)\n"
@@ -76,10 +76,10 @@ msgstr "വിഎല്‍സികളുടെ കണ്‍ട്രോള്�
 msgid "Hotkeys settings"
 msgstr "ഹോട്ട്കീസ് ക്രമീകരണങ്ങള്‍"
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3095 src/libvlc-module.c:1492
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3115 src/libvlc-module.c:1492
 #: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
-#: modules/gui/macosx/VLCMainMenu.m:415 modules/gui/macosx/VLCOutput.m:92
+#: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:96
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/info_panels.cpp:572
@@ -113,7 +113,7 @@ msgid "Audio resampler"
 msgstr "ഓഡിയോ റീസാംപ്ലര്‍"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
-#: modules/gui/macosx/VLCMainMenu.m:425 modules/gui/macosx/VLCMainMenu.m:426
+#: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
 msgid "Visualizations"
 msgstr "വിഷ്വലൈസേഷനുകള്‍"
 
@@ -140,18 +140,17 @@ msgstr "പലതരത്തിലുള്ളവ"
 msgid "Miscellaneous audio settings and modules."
 msgstr "നിരവധി ഓഡിയോ ക്രമീകരണങ്ങളും മോഡ്യൂളുകളും."
 
-#: include/vlc_config_cat.h:73 src/input/es_out.c:3139 src/libvlc-module.c:142
+#: include/vlc_config_cat.h:73 src/input/es_out.c:3159 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
-#: modules/gui/macosx/VLCMainMenu.m:428 modules/gui/macosx/VLCOutput.m:82
+#: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
 #: modules/gui/macosx/VLCSimplePrefsController.m:231
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/gui/qt/components/info_panels.cpp:573
 #: modules/gui/qt/components/simple_preferences.cpp:227
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
-#: modules/stream_out/chromecast/cast.cpp:165 modules/stream_out/es.c:102
-#: modules/stream_out/transcode/transcode.c:153
+#: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt/ui/profiles.h:722 modules/gui/qt/ui/profiles.h:726
 #: modules/gui/qt/ui/sprefs_video.h:326
@@ -361,8 +360,8 @@ msgstr "വീഡിയോ ഓണ്‍ ഡിമാന്‍ഡിന്റെ 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
 #: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
-#: modules/gui/macosx/VLCMainWindow.m:296
-#: modules/gui/macosx/VLCMainWindow.m:859
+#: modules/gui/macosx/VLCMainWindow.m:294
+#: modules/gui/macosx/VLCMainWindow.m:856
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:165
 #: modules/gui/qt/components/playlist/selector.cpp:227
@@ -466,10 +465,10 @@ msgstr "കുറിച്ച്(_A)"
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:64
 #: modules/gui/macosx/VLCControlsBarCommon.m:394
-#: modules/gui/macosx/VLCMainMenu.m:386 modules/gui/macosx/VLCMainMenu.m:498
-#: modules/gui/macosx/VLCMainMenu.m:505 modules/gui/macosx/VLCMainMenu.m:1340
-#: modules/gui/macosx/VLCMainMenu.m:1341 modules/gui/macosx/VLCMainMenu.m:1342
-#: modules/gui/macosx/VLCPlaylist.m:230
+#: modules/gui/macosx/VLCMainMenu.m:385 modules/gui/macosx/VLCMainMenu.m:497
+#: modules/gui/macosx/VLCMainMenu.m:504 modules/gui/macosx/VLCMainMenu.m:1339
+#: modules/gui/macosx/VLCMainMenu.m:1340 modules/gui/macosx/VLCMainMenu.m:1341
+#: modules/gui/macosx/VLCPlaylist.m:228
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:539 modules/gui/qt/ui/open.h:261
 msgid "Play"
@@ -516,17 +515,17 @@ msgid "Save..."
 msgstr "സംരക്ഷിക്കുക..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
-#: modules/gui/macosx/VLCMainMenu.m:400
+#: modules/gui/macosx/VLCMainMenu.m:399
 msgid "Repeat All"
 msgstr "എല്ലാം ആവര്‍ത്തിക്കുക"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
-#: modules/gui/macosx/VLCMainMenu.m:399
+#: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
 msgstr "ഒന്ന് ആവര്‍ത്തിക്കുക"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
-#: modules/gui/macosx/VLCMainMenu.m:398
+#: modules/gui/macosx/VLCMainMenu.m:397
 #: modules/gui/qt/components/controller.hpp:111
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Random"
@@ -540,7 +539,7 @@ msgstr "റാന്‍ഡം ഓഫ്"
 msgid "Add to Playlist"
 msgstr "പ്ലേലിസ്റ്റിലേക്ക് ചേര്‍ക്കുക"
 
-#: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:237
+#: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:235
 msgid "Add File..."
 msgstr "ഫയല്‍ ചേര്‍ക്കുക..."
 
@@ -630,9 +629,9 @@ msgstr "ഓഡിയോ ഫില്‍റ്ററിംഗ് പരാജയ�
 msgid "The maximum number of filters (%u) was reached."
 msgstr "ഫില്‍റ്ററുകളുടെ കൂടിയ എണ്ണം  (%u)  എത്തി."
 
-#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:947
+#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:943
 #: src/libvlc-module.c:540 modules/gui/macosx/VLCMainMenu.m:243
-#: modules/gui/macosx/VLCMainWindow.m:1002 modules/video_filter/postproc.c:235
+#: modules/gui/macosx/VLCMainWindow.m:999 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "നിര്‍ജ്ജീവമാക്കുക"
 
@@ -660,8 +659,8 @@ msgstr "ഓഡിയോ ഫില്‍റ്ററുകള്‍"
 msgid "Replay gain"
 msgstr "ഗെയിന്‍ റീപ്ലേ ചെയ്യുക"
 
-#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:421
-#: modules/gui/macosx/VLCMainMenu.m:422
+#: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
+#: modules/gui/macosx/VLCMainMenu.m:421
 msgid "Stereo audio mode"
 msgstr "സ്റ്റീരിയോ ഓഡിയോ മോഡ്"
 
@@ -685,7 +684,7 @@ msgstr "ഡോള്‍ബി സറൗണ്ട്"
 msgid "Stereo"
 msgstr "സ്റ്റീരിയോ"
 
-#: src/audio_output/output.c:448 src/input/es_out.c:3236
+#: src/audio_output/output.c:448 src/input/es_out.c:3256
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
@@ -914,51 +913,51 @@ msgstr "വിഎല്‍സിക്ക് %s മോഡ്യൂള്‍ ത�
 msgid "VLC could not open the decoder module."
 msgstr "വിഎല്‍സിക്കു ഡീക്കോഡര്‍ മോഡ്യൂള്‍ തുറക്കാനായില്ല"
 
-#: src/input/es_out.c:967 src/input/es_out.c:972 src/libvlc-module.c:239
+#: src/input/es_out.c:963 src/input/es_out.c:968 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
 msgstr "ട്രാക്ക്"
 
-#: src/input/es_out.c:1189
+#: src/input/es_out.c:1185
 #, c-format
 msgid "%s [%s %d]"
 msgstr "%s [%s %d]"
 
-#: src/input/es_out.c:1190 src/input/es_out.c:1195 src/input/es_out.c:1210
+#: src/input/es_out.c:1186 src/input/es_out.c:1191 src/input/es_out.c:1206
 #: src/input/var.c:160 src/libvlc-module.c:564
-#: modules/gui/macosx/VLCMainMenu.m:408 modules/gui/macosx/VLCMainMenu.m:409
+#: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:408
 msgid "Program"
 msgstr "പ്രോഗ്രാം"
 
-#: src/input/es_out.c:1220
+#: src/input/es_out.c:1216
 #, c-format
 msgid "Stream %d"
 msgstr "സ്ട്രീം %d"
 
-#: src/input/es_out.c:1472 src/input/es_out.c:1474
+#: src/input/es_out.c:1469 src/input/es_out.c:1471
 msgid "Scrambled"
 msgstr "സ്ക്രാംബള്‍ഡ്"
 
-#: src/input/es_out.c:1472 modules/keystore/keychain.m:40
+#: src/input/es_out.c:1469 modules/keystore/keychain.m:40
 #: modules/lua/extension.c:1191
 msgid "Yes"
 msgstr "അതെ"
 
-#: src/input/es_out.c:2139
+#: src/input/es_out.c:2136
 #, c-format
 msgid "DTVCC Closed captions %u"
 msgstr ""
 
-#: src/input/es_out.c:2141
+#: src/input/es_out.c:2138
 #, c-format
 msgid "Closed captions %u"
 msgstr "അടച്ച ശീര്‍ഷകങ്ങള്‍  %u"
 
-#: src/input/es_out.c:3071
+#: src/input/es_out.c:3091
 msgid "Original ID"
 msgstr "യഥാര്‍ത്ഥ ഐഡി"
 
-#: src/input/es_out.c:3079 src/input/es_out.c:3082 modules/access/imem.c:67
+#: src/input/es_out.c:3099 src/input/es_out.c:3102 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:173
 #: modules/gui/qt/ui/profiles.h:728 modules/gui/qt/ui/profiles.h:754
@@ -966,48 +965,48 @@ msgstr "യഥാര്‍ത്ഥ ഐഡി"
 msgid "Codec"
 msgstr "കോഡെക്ക്"
 
-#: src/input/es_out.c:3086 src/input/meta.c:66 modules/access/imem.c:71
+#: src/input/es_out.c:3106 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:311
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Language"
 msgstr "ഭാഷ"
 
-#: src/input/es_out.c:3089 src/input/meta.c:61
+#: src/input/es_out.c:3109 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:83
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
 #: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "വിവരണം"
 
-#: src/input/es_out.c:3095 src/input/es_out.c:3139 src/input/es_out.c:3329
+#: src/input/es_out.c:3115 src/input/es_out.c:3159 src/input/es_out.c:3349
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
 msgid "Type"
 msgstr "തരം"
 
-#: src/input/es_out.c:3098
+#: src/input/es_out.c:3118
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
 #: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:756
 msgid "Channels"
 msgstr "ചാനലുകള്‍"
 
-#: src/input/es_out.c:3103 modules/access/alsa.c:39 modules/access/imem.c:75
+#: src/input/es_out.c:3123 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
 msgstr "സാംപിള്‍ നിരക്ക്"
 
-#: src/input/es_out.c:3103
+#: src/input/es_out.c:3123
 #, c-format
 msgid "%u Hz"
 msgstr "%u എച്ച്സെഡ്"
 
-#: src/input/es_out.c:3113
+#: src/input/es_out.c:3133
 msgid "Bits per sample"
 msgstr "പ്രതി സാമ്പിള്‍ ബിറ്റുകള്‍"
 
-#: src/input/es_out.c:3118 modules/access_output/shout.c:92
+#: src/input/es_out.c:3138 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
@@ -1015,33 +1014,33 @@ msgstr "പ്രതി സാമ്പിള്‍ ബിറ്റുകള്�
 msgid "Bitrate"
 msgstr "ബിറ്റ്റേറ്റ്"
 
-#: src/input/es_out.c:3118
+#: src/input/es_out.c:3138
 #, c-format
 msgid "%u kb/s"
 msgstr "%u കെബി/എസ്"
 
-#: src/input/es_out.c:3130
+#: src/input/es_out.c:3150
 msgid "Track replay gain"
 msgstr "ട്രാക്ക് റീപ്ലേ നേട്ടം"
 
-#: src/input/es_out.c:3132
+#: src/input/es_out.c:3152
 msgid "Album replay gain"
 msgstr "ആല്‍ബം റീപ്ലേ നേട്ടം"
 
-#: src/input/es_out.c:3133
+#: src/input/es_out.c:3153
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:3143
+#: src/input/es_out.c:3163
 msgid "Video resolution"
 msgstr "വി‍ഡിയോ റെസലൂഷ്യന്‍"
 
-#: src/input/es_out.c:3148
+#: src/input/es_out.c:3168
 msgid "Buffer dimensions"
 msgstr ""
 
-#: src/input/es_out.c:3158 src/input/es_out.c:3161 modules/access/imem.c:93
+#: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
 #: modules/access/screen/xcb.c:39 modules/access/shm.c:42
 #: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
@@ -1051,91 +1050,91 @@ msgstr ""
 msgid "Frame rate"
 msgstr "ഫ്രെയിം റേറ്റ്"
 
-#: src/input/es_out.c:3169
+#: src/input/es_out.c:3189
 msgid "Decoded format"
 msgstr "ഡീകോഡെഡ് ഘടന"
 
-#: src/input/es_out.c:3174
+#: src/input/es_out.c:3194
 msgid "Top left"
 msgstr "മുകളില്‍ ഇടതുഭാഗത്ത്"
 
-#: src/input/es_out.c:3174
+#: src/input/es_out.c:3194
 msgid "Left top"
 msgstr "ഇടതുഭാഗത്ത് മുകളില്‍"
 
-#: src/input/es_out.c:3175
+#: src/input/es_out.c:3195
 msgid "Right bottom"
 msgstr ""
 
-#: src/input/es_out.c:3175
+#: src/input/es_out.c:3195
 msgid "Top right"
 msgstr ""
 
-#: src/input/es_out.c:3176
+#: src/input/es_out.c:3196
 msgid "Bottom left"
 msgstr ""
 
-#: src/input/es_out.c:3176
+#: src/input/es_out.c:3196
 msgid "Bottom right"
 msgstr ""
 
-#: src/input/es_out.c:3177
+#: src/input/es_out.c:3197
 msgid "Left bottom"
 msgstr ""
 
-#: src/input/es_out.c:3177
+#: src/input/es_out.c:3197
 msgid "Right top"
 msgstr ""
 
-#: src/input/es_out.c:3179
+#: src/input/es_out.c:3199
 msgid "Orientation"
 msgstr ""
 
-#: src/input/es_out.c:3185 src/input/es_out.c:3203 src/input/es_out.c:3221
-#: src/input/es_out.c:3235 src/playlist/tree.c:67
+#: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
+#: src/input/es_out.c:3255 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:75 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "നിര്‍വചിക്കാത്തത്"
 
-#: src/input/es_out.c:3187
+#: src/input/es_out.c:3207
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3189
+#: src/input/es_out.c:3209
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3197
+#: src/input/es_out.c:3217
 msgid "Color primaries"
 msgstr "കളര്‍ പ്രൈമറികള്‍"
 
-#: src/input/es_out.c:3204 src/libvlc-module.c:362
+#: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
 msgstr "ലീനിയര്‍"
 
-#: src/input/es_out.c:3211
+#: src/input/es_out.c:3231
 msgid "Hybrid Log-Gamma"
 msgstr "ഹൈബ്രിഡ് ലോഗ്-ഗാമ"
 
-#: src/input/es_out.c:3215
+#: src/input/es_out.c:3235
 msgid "Color transfer function"
 msgstr ""
 
-#: src/input/es_out.c:3228
+#: src/input/es_out.c:3248
 msgid "Color space"
 msgstr "കളര്‍ സ്പേസ്"
 
-#: src/input/es_out.c:3228
+#: src/input/es_out.c:3248
 #, c-format
 msgid "%s Range"
 msgstr ""
 
-#: src/input/es_out.c:3230
+#: src/input/es_out.c:3250
 msgid "Full"
 msgstr ""
 
-#: src/input/es_out.c:3237 src/libvlc-module.c:295 src/libvlc-module.c:368
+#: src/input/es_out.c:3257 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
@@ -1146,101 +1145,101 @@ msgstr ""
 msgid "Center"
 msgstr "നടുക്ക്"
 
-#: src/input/es_out.c:3238
+#: src/input/es_out.c:3258
 msgid "Top Left"
 msgstr ""
 
-#: src/input/es_out.c:3239
+#: src/input/es_out.c:3259
 msgid "Top Center"
 msgstr ""
 
-#: src/input/es_out.c:3240
+#: src/input/es_out.c:3260
 msgid "Bottom Left"
 msgstr ""
 
-#: src/input/es_out.c:3241
+#: src/input/es_out.c:3261
 msgid "Bottom Center"
 msgstr ""
 
-#: src/input/es_out.c:3245
+#: src/input/es_out.c:3265
 msgid "Chroma location"
 msgstr ""
 
-#: src/input/es_out.c:3254
+#: src/input/es_out.c:3274
 msgid "Rectangular"
 msgstr ""
 
-#: src/input/es_out.c:3257
+#: src/input/es_out.c:3277
 msgid "Equirectangular"
 msgstr ""
 
-#: src/input/es_out.c:3260
+#: src/input/es_out.c:3280
 msgid "Cubemap"
 msgstr ""
 
-#: src/input/es_out.c:3266
+#: src/input/es_out.c:3286
 msgid "Projection"
 msgstr ""
 
-#: src/input/es_out.c:3268
+#: src/input/es_out.c:3288
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr ""
 
-#: src/input/es_out.c:3270
+#: src/input/es_out.c:3290
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr ""
 
-#: src/input/es_out.c:3272
+#: src/input/es_out.c:3292
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr ""
 
-#: src/input/es_out.c:3275
+#: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr ""
 
-#: src/input/es_out.c:3280
+#: src/input/es_out.c:3300
 msgid "Max. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3285
+#: src/input/es_out.c:3305
 msgid "Min. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3293
+#: src/input/es_out.c:3313
 msgid "Primary R"
 msgstr ""
 
-#: src/input/es_out.c:3300
+#: src/input/es_out.c:3320
 msgid "Primary G"
 msgstr ""
 
-#: src/input/es_out.c:3307
+#: src/input/es_out.c:3327
 msgid "Primary B"
 msgstr ""
 
-#: src/input/es_out.c:3314
+#: src/input/es_out.c:3334
 msgid "White point"
 msgstr ""
 
-#: src/input/es_out.c:3329 modules/access/imem.c:64
+#: src/input/es_out.c:3349 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "ഉപശീര്‍ഷകം"
 
-#: src/input/input.c:2662
+#: src/input/input.c:2668
 msgid "Your input can't be opened"
 msgstr "താങ്കളുടെ ഇന്‍പുട്ട് തുറക്കാനാകുന്നില്ല"
 
-#: src/input/input.c:2663
+#: src/input/input.c:2669
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "വിഎല്‍സിക്കു  '%s' എംആര്‍എല്‍ തുറക്കാനാകുന്നില്ല. വിശദാംശങ്ങള്‍ക്കായി ലോഗ് പരിശോധിക്കുക."
 
-#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:410
-#: modules/gui/macosx/VLCMainMenu.m:411
+#: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:409
+#: modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
 #: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
@@ -1352,21 +1351,21 @@ msgstr "ബുക്ക്മാര്‍ക്ക്"
 msgid "Programs"
 msgstr "പ്രോഗ്രാമുകള്‍"
 
-#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:412
-#: modules/gui/macosx/VLCMainMenu.m:413
+#: src/input/var.c:175 modules/gui/macosx/VLCMainMenu.m:411
+#: modules/gui/macosx/VLCMainMenu.m:412
 #: modules/gui/macosx/VLCOpenWindowController.m:179
 #: modules/gui/macosx/VLCOpenWindowController.m:181
 #: modules/gui/qt/ui/open_disk.h:310
 msgid "Chapter"
 msgstr "പാഠം"
 
-#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:436
-#: modules/gui/macosx/VLCMainMenu.m:437
+#: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:435
+#: modules/gui/macosx/VLCMainMenu.m:436
 msgid "Video Track"
 msgstr "വീഡിയോ ട്രാക്ക്"
 
-#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:419
-#: modules/gui/macosx/VLCMainMenu.m:420
+#: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:418
+#: modules/gui/macosx/VLCMainMenu.m:419
 msgid "Audio Track"
 msgstr "ഓഡിയോ ട്രാക്ക്"
 
@@ -1400,11 +1399,11 @@ msgstr "തലക്കെട്ട് %i%s"
 msgid "Chapter %i"
 msgstr "പാഠം %i"
 
-#: src/input/var.c:380 modules/gui/qt/dialogs/toolbar.cpp:505
+#: src/input/var.c:380 modules/gui/qt/dialogs/toolbar.cpp:514
 msgid "Next chapter"
 msgstr "അടുത്ത പാഠം"
 
-#: src/input/var.c:385 modules/gui/qt/dialogs/toolbar.cpp:495
+#: src/input/var.c:385 modules/gui/qt/dialogs/toolbar.cpp:504
 msgid "Previous chapter"
 msgstr "മുമ്പത്തെ പാഠം"
 
@@ -1453,7 +1452,7 @@ msgstr "ml"
 
 #: src/libvlc.h:164 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/libvlc-module.c:2659 src/video_output/vout_intf.c:176
-#: modules/gui/macosx/VLCMainMenu.m:476
+#: modules/gui/macosx/VLCMainMenu.m:475
 msgid "Zoom"
 msgstr "സൂം"
 
@@ -2091,8 +2090,8 @@ msgstr ""
 "n മില്ലിസെക്കന്‍ഡുകള്‍ക്ക് ശേഷം മൌസിന്‍റെ കര്‍സറും കൂടാതെ മുഴുവന്‍സ്ക്രീന്‍ നിയന്ത്രകനും മറച്ചുവെക്കുക."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
-#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:444
-#: modules/gui/macosx/VLCMainMenu.m:445
+#: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
+#: modules/gui/macosx/VLCMainMenu.m:444
 #: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
@@ -2101,7 +2100,7 @@ msgid "Deinterlace"
 msgstr "ഡീഇന്റര്‍ലേസ്"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
-#: modules/gui/macosx/VLCMainMenu.m:446 modules/gui/macosx/VLCMainMenu.m:447
+#: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
@@ -2490,7 +2489,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:320
-#: modules/gui/macosx/VLCMainMenu.m:603
+#: modules/gui/macosx/VLCMainMenu.m:602
 #: modules/gui/macosx/VLCSimplePrefsController.m:656
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:389
@@ -2504,7 +2503,7 @@ msgstr "സഹജമായ"
 
 #: src/libvlc-module.c:540
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:214
-#: modules/gui/macosx/VLCMainWindow.m:1000
+#: modules/gui/macosx/VLCMainWindow.m:997
 #: modules/gui/qt/components/extended_panels.cpp:928
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
@@ -3876,7 +3875,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
-#: modules/gui/macosx/VLCMainMenu.m:433 modules/gui/macosx/VLCMainMenu.m:512
+#: modules/gui/macosx/VLCMainMenu.m:432 modules/gui/macosx/VLCMainMenu.m:511
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/ui/sprefs_video.h:318
 msgid "Fullscreen"
@@ -3918,7 +3917,7 @@ msgstr "പ്ലേ മാത്രം"
 msgid "Select the hotkey to use to play."
 msgstr "പ്ലേ ചെയ്യാനായി ഉപയോഗിക്കേണ്ട ഹോട്ട്കീ തിരഞ്ഞെടുക്കുക"
 
-#: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:394
+#: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Faster"
@@ -3928,7 +3927,7 @@ msgstr "വേഗത്തില്‍"
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "ഫാസ്റ്റ് ഫോര്‍വേര്‍ഡ് പ്ലേബാക്ക് ചെയ്യാനായി ഉപയോഗിക്കേണ്ട ഹോട്ട്കീ തിരഞ്ഞെടുക്കുക"
 
-#: src/libvlc-module.c:1238 modules/gui/macosx/VLCMainMenu.m:392
+#: src/libvlc-module.c:1238 modules/gui/macosx/VLCMainMenu.m:391
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
@@ -3958,8 +3957,8 @@ msgstr "പതുക്കെ(ഫൈന്‍)"
 #: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
 #: modules/gui/macosx/VLCFSPanelController.m:112
-#: modules/gui/macosx/VLCMainMenu.m:397 modules/gui/macosx/VLCMainMenu.m:500
-#: modules/gui/macosx/VLCMainMenu.m:508
+#: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:499
+#: modules/gui/macosx/VLCMainMenu.m:507
 #: modules/gui/qt/components/controller.hpp:112
 #: modules/gui/qt/dialogs/sout.cpp:93 modules/notify/notify.c:335
 #: modules/gui/qt/ui/streampanel.h:181
@@ -3973,8 +3972,8 @@ msgstr "പ്ലേലിസ്റ്റിലെ അടുത്ത വസ്�
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
 #: modules/gui/macosx/VLCFSPanelController.m:115
-#: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:501
-#: modules/gui/macosx/VLCMainMenu.m:507
+#: modules/gui/macosx/VLCMainMenu.m:395 modules/gui/macosx/VLCMainMenu.m:500
+#: modules/gui/macosx/VLCMainMenu.m:506
 #: modules/gui/qt/components/controller.hpp:112 modules/notify/notify.c:333
 msgid "Previous"
 msgstr "മുന്‍പുള്ള"
@@ -3983,8 +3982,8 @@ msgstr "മുന്‍പുള്ള"
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr "പ്ലേലിസ്റ്റിലെ മുമ്പത്തെ വസ്തുവിലേക്ക് പോകുവാന്‍  ഉപയോഗിക്കേണ്ട ഹോട്ട്കീ തിരഞ്ഞെടുക്കുക"
 
-#: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:387
-#: modules/gui/macosx/VLCMainMenu.m:499 modules/gui/macosx/VLCMainMenu.m:506
+#: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:386
+#: modules/gui/macosx/VLCMainMenu.m:498 modules/gui/macosx/VLCMainMenu.m:505
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:61
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:545 modules/gui/qt/ui/streampanel.h:180
@@ -4173,7 +4172,7 @@ msgstr "സജീവമാക്കുക"
 msgid "Select the key to activate selected item in DVD menus."
 msgstr "ഡി‌വി‌ഡി മെനുവില്‍ തിരഞ്ഞെടുത്ത കാര്യം പ്രയോഗക്ഷമമാക്കാന്‍ ഈ കീ തിരഞ്ഞെടുക്കുക."
 
-#: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:500
+#: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:509
 msgid "Go to the DVD menu"
 msgstr "ഡിവിഡി മെനുവിലേക്ക് പോകുക"
 
@@ -4230,8 +4229,8 @@ msgid "Select the key to decrease audio volume."
 msgstr "ഓഡിയോ വോള്യം കുറയ്ക്കുവാനുള്ള കീ തിരഞ്ഞെടുക്കുക."
 
 #: src/libvlc-module.c:1319 modules/access/v4l2/v4l2.c:181
-#: modules/gui/macosx/VLCMainMenu.m:418 modules/gui/macosx/VLCMainMenu.m:502
-#: modules/gui/macosx/VLCMainMenu.m:511
+#: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCMainMenu.m:501
+#: modules/gui/macosx/VLCMainMenu.m:510
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 msgid "Mute"
 msgstr "നിശബ്ദമാക്കുക"
@@ -4603,7 +4602,7 @@ msgstr "വീഡിയോ സ്നാപ്ഷോട്ട് എടുക്�
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "ഒരു വീഡിയോ സ്നാപ്ഷോട് എടുക്കുകയും കൂടാതെ ഡിസ്കിലേക്ക് അത് എഴുതുക."
 
-#: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:388
+#: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:387
 #: modules/gui/qt/components/controller.hpp:110
 #: modules/gui/qt/components/controller.hpp:121 modules/gui/qt/menus.cpp:857
 #: modules/stream_out/record.c:60
@@ -4695,7 +4694,7 @@ msgid "Cycle through available audio devices"
 msgstr ""
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
-#: modules/gui/macosx/VLCMainMenu.m:435 modules/gui/macosx/VLCMainMenu.m:513
+#: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Snapshot"
 msgstr "സ്നാപ്ഷോട്ട്"
@@ -4713,7 +4712,7 @@ msgstr "ഉപചിത്രങ്ങള്‍"
 #: modules/demux/xiph_metadata.h:62
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:158
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:178
-#: modules/gui/macosx/VLCMainMenu.m:451
+#: modules/gui/macosx/VLCMainMenu.m:450
 #: share/lua/http/dialogs/create_stream.html:153
 #: modules/gui/qt/ui/profiles.h:718 modules/gui/qt/ui/profiles.h:762
 #: modules/gui/qt/ui/profiles.h:765
@@ -4888,7 +4887,7 @@ msgid "Browser Stop"
 msgstr "ബ്രൗസര്‍ സ്റ്റോപ്പ്"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:370
-#: modules/gui/macosx/VLCPlaylist.m:231 modules/gui/qt/dialogs/bookmarks.cpp:50
+#: modules/gui/macosx/VLCPlaylist.m:229 modules/gui/qt/dialogs/bookmarks.cpp:50
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
@@ -5068,8 +5067,8 @@ msgstr "പേജ് മുകളിലേക്ക്"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:386
-#: modules/gui/macosx/VLCMainMenu.m:1347 modules/gui/macosx/VLCMainMenu.m:1348
-#: modules/gui/macosx/VLCMainMenu.m:1349
+#: modules/gui/macosx/VLCMainMenu.m:1346 modules/gui/macosx/VLCMainMenu.m:1347
+#: modules/gui/macosx/VLCMainMenu.m:1348
 #: modules/gui/qt/components/playlist/standardpanel.cpp:196
 #: modules/gui/qt/menus.cpp:831
 msgid "Pause"
@@ -5091,7 +5090,7 @@ msgstr "ടാബ്"
 msgid "Up"
 msgstr "മുകളിലേക്ക്"
 
-#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:510
+#: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:509
 msgid "Volume Down"
 msgstr "ശബ്ദം താഴേക്ക്"
 
@@ -5099,7 +5098,7 @@ msgstr "ശബ്ദം താഴേക്ക്"
 msgid "Volume Mute"
 msgstr "ശബ്ദം മ്യൂട്ട്"
 
-#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:509
+#: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:508
 msgid "Volume Up"
 msgstr "ശബ്ദം മുകളിലേക്ക്"
 
@@ -5162,7 +5161,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക്കുന്നതില്‍ പരാജയപ്പെട്ടു"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2713
+#: modules/demux/avi/avi.c:2714
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
@@ -5191,7 +5190,7 @@ msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക�
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:446
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:854
+#: modules/stream_out/chromecast/cast.cpp:993
 msgid "Cancel"
 msgstr "ഉപേക്ഷിക്കുക"
 
@@ -5269,8 +5268,8 @@ msgid "Update VLC media player"
 msgstr "വിഎല്‍സി മീഡിയ പ്ലേയര്‍ പുതുക്കുക"
 
 #: src/playlist/engine.c:237 src/playlist/loadsave.c:159 lib/media_list.c:237
-#: modules/gui/macosx/VLCMainWindow.m:298
-#: modules/gui/macosx/VLCMainWindow.m:861
+#: modules/gui/macosx/VLCMainWindow.m:296
+#: modules/gui/macosx/VLCMainWindow.m:858
 #: modules/gui/qt/components/playlist/selector.cpp:236
 msgid "Media Library"
 msgstr "മീഡിയ ലൈബ്രറി"
@@ -5939,8 +5938,8 @@ msgstr "സുലു"
 msgid "Autoscale video"
 msgstr "ഓട്ടോസ്കെയില്‍ വീഡിയോ"
 
-#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:440
-#: modules/gui/macosx/VLCMainMenu.m:441
+#: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:439
+#: modules/gui/macosx/VLCMainMenu.m:440
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:193
 #: modules/video_filter/croppadd.c:87 modules/gui/qt/ui/video_effects.h:1239
 msgid "Crop"
@@ -5949,8 +5948,8 @@ msgstr "മുറിക്കുക"
 #: src/video_output/vout_intf.c:230 modules/access/decklink.cpp:92
 #: modules/access/linsys/linsys_hdsdi.c:78
 #: modules/access/linsys/linsys_sdi.c:74 modules/demux/rawvid.c:58
-#: modules/gui/macosx/VLCMainMenu.m:438 modules/gui/macosx/VLCMainMenu.m:439
-#: modules/gui/macosx/VLCMainMenu.m:1459
+#: modules/gui/macosx/VLCMainMenu.m:437 modules/gui/macosx/VLCMainMenu.m:438
+#: modules/gui/macosx/VLCMainMenu.m:1458
 msgid "Aspect ratio"
 msgstr "ആസ്പെക്ട് റേഷ്യോ"
 
@@ -7288,7 +7287,7 @@ msgstr ""
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
 #: modules/gui/macosx/VLCSimplePrefsController.m:273
-#: modules/gui/qt/dialogs/external.cpp:206 modules/misc/audioscrobbler.c:114
+#: modules/gui/qt/dialogs/external.cpp:203 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
 msgstr "ഉപയോക്തനാമം"
@@ -7307,7 +7306,7 @@ msgstr ""
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:272
 #: modules/gui/macosx/VLCSimplePrefsController.m:334
-#: modules/gui/qt/dialogs/external.cpp:211 modules/lua/vlc.c:54
+#: modules/gui/qt/dialogs/external.cpp:208 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
 msgid "Password"
@@ -8188,7 +8187,7 @@ msgid "Screen Input"
 msgstr "സ്ക്രീന്‍ ഇന്‍പുട്ട്"
 
 #: modules/access/screen/screen.c:99 modules/access/screen/xcb.c:70
-#: modules/gui/macosx/VLCMainMenu.m:611
+#: modules/gui/macosx/VLCMainMenu.m:610
 #: modules/gui/macosx/VLCOpenWindowController.m:207
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:480
@@ -10434,37 +10433,37 @@ msgstr ""
 msgid "K Audio Interface audio output"
 msgstr "കെ ഓഡിയോ ഇന്റര്‍ഫേസ് ഓഡിയോ ഔട്ട്പുട്ട്"
 
-#: modules/audio_output/mmdevice.c:1293 modules/gui/qt/ui/sprefs_audio.h:419
+#: modules/audio_output/mmdevice.c:1296 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1295
+#: modules/audio_output/mmdevice.c:1298
 msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1302
+#: modules/audio_output/mmdevice.c:1305
 msgid "Disabled"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1303
+#: modules/audio_output/mmdevice.c:1306
 msgid "Enabled (without HD codecs)"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1304
+#: modules/audio_output/mmdevice.c:1307
 msgid "Enabled"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1309
+#: modules/audio_output/mmdevice.c:1312
 msgid "Windows Multimedia Device output"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1315
+#: modules/audio_output/mmdevice.c:1318
 msgid "Output back-end"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1315
+#: modules/audio_output/mmdevice.c:1318
 msgid "Audio output back-end interface."
 msgstr ""
 
@@ -10653,7 +10652,7 @@ msgid "FFmpeg audio/video decoder"
 msgstr "എഫ്എഫ്എംപിഇജി ഓഡിയോ/വീഡിയോ ഡീക്കോഡര്‍"
 
 #: modules/codec/avcodec/avcodec.c:82 modules/codec/gstreamer/gstdecode.c:96
-#: modules/codec/omxil/mediacodec.c:183 modules/codec/omxil/omxil.c:148
+#: modules/codec/omxil/mediacodec.c:185 modules/codec/omxil/omxil.c:148
 msgid "Decoding"
 msgstr "ഡീക്കോഡിംഗ്"
 
@@ -11546,8 +11545,8 @@ msgstr "വെളുപ്പ്"
 msgid "Maroon"
 msgstr "മറൂണ്‍"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:469
-#: modules/gui/macosx/VLCMainMenu.m:1104 modules/spu/marq.c:62
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:468
+#: modules/gui/macosx/VLCMainMenu.m:1103 modules/spu/marq.c:62
 #: modules/spu/rss.c:70 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119 modules/video_filter/colorthres.c:65
 msgid "Red"
@@ -11559,8 +11558,8 @@ msgstr "ചുവപ്പ്"
 msgid "Fuchsia"
 msgstr "ഫുച്ച്സിയ"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:471
-#: modules/gui/macosx/VLCMainMenu.m:1108 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:470
+#: modules/gui/macosx/VLCMainMenu.m:1107 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/colorthres.c:65
 msgid "Yellow"
@@ -11571,8 +11570,8 @@ msgstr "മഞ്ഞ"
 msgid "Olive"
 msgstr "ഒലീവ്"
 
-#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:470
-#: modules/gui/macosx/VLCMainMenu.m:1106 modules/spu/marq.c:63
+#: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:469
+#: modules/gui/macosx/VLCMainMenu.m:1105 modules/spu/marq.c:63
 #: modules/spu/rss.c:71 modules/text_renderer/freetype/freetype.c:136
 #: modules/video_filter/ball.c:119
 msgid "Green"
@@ -11599,8 +11598,8 @@ msgstr "പര്‍പ്പിള്‍"
 msgid "Navy"
 msgstr "നേവി"
 
-#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:472
-#: modules/gui/macosx/VLCMainMenu.m:1110 modules/spu/marq.c:64
+#: modules/codec/kate.c:209 modules/gui/macosx/VLCMainMenu.m:471
+#: modules/gui/macosx/VLCMainMenu.m:1109 modules/spu/marq.c:64
 #: modules/spu/rss.c:72 modules/text_renderer/freetype/freetype.c:137
 #: modules/video_filter/ball.c:120 modules/video_filter/colorthres.c:65
 msgid "Blue"
@@ -13936,7 +13935,7 @@ msgid "Fast"
 msgstr "വേഗം"
 
 #: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:290
-#: modules/gui/macosx/VLCMainMenu.m:393
+#: modules/gui/macosx/VLCMainMenu.m:392
 #: modules/gui/macosx/VLCSimplePrefsController.m:696
 #: modules/gui/qt/components/simple_preferences.cpp:673
 #: modules/misc/gnutls.c:779 modules/text_renderer/freetype/freetype.c:124
@@ -14062,18 +14061,18 @@ msgstr "VBI യും ടെലിടെക്സ്റ്റ് ടീകോഡ
 msgid "VBI & Teletext"
 msgstr "VBI യും ടെലിടെക്സ്റ്റും"
 
-#: modules/control/dbus/dbus.c:136
+#: modules/control/dbus/dbus.c:137
 msgid "DBus"
 msgstr "ഡിബസ്"
 
-#: modules/control/dbus/dbus.c:138
+#: modules/control/dbus/dbus.c:139
 msgid "D-Bus control interface"
 msgstr "ഡി-ബസ് നിയന്ത്രണ പൊതുപ്രതലം"
 
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
-#: modules/gui/macosx/VLCMainWindow.m:665
-#: modules/gui/macosx/VLCMainWindow.m:671
-#: modules/gui/macosx/VLCMainWindow.m:1275
+#: modules/gui/macosx/VLCMainWindow.m:662
+#: modules/gui/macosx/VLCMainWindow.m:668
+#: modules/gui/macosx/VLCMainWindow.m:1272
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1267
 #: modules/gui/qt/main_interface.cpp:1271
@@ -14921,8 +14920,7 @@ msgstr "ഡീമക്സര്‍"
 msgid "Avformat muxer"
 msgstr "എവിഫോര്‍മാറ്റ് മക്സര്‍"
 
-#: modules/demux/avformat/avformat.c:56
-#: modules/stream_out/chromecast/cast.cpp:167 modules/stream_out/rtp.c:87
+#: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
 msgid "Muxer"
 msgstr "മക്സര്‍"
 
@@ -15004,11 +15002,11 @@ msgstr "ഉള്ളതുപോലേ പ്ലേ ചെയ്യുക"
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2714
+#: modules/demux/avi/avi.c:2715
 msgid "Broken or missing AVI Index"
 msgstr "പൊട്ടിപ്പോയ അല്ലെങ്കില്‍ നഷ്ട്ടപ്പെട്ട എ‌വി‌ഐ സൂചിക"
 
-#: modules/demux/avi/avi.c:2715
+#: modules/demux/avi/avi.c:2716
 msgid "Fixing AVI Index..."
 msgstr "എവിഐ ഇന്‍ഡെക്സ് ഫിക്സ് ചെയ്യുന്നു..."
 
@@ -15627,8 +15625,8 @@ msgstr ""
 msgid "Spoken subtitles for the visually impaired"
 msgstr ""
 
-#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:466
-#: modules/gui/qt/dialogs/toolbar.cpp:532
+#: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
+#: modules/gui/qt/dialogs/toolbar.cpp:541
 msgid "Teletext"
 msgstr "ടെലിടെക്സ്റ്റ്"
 
@@ -16071,7 +16069,7 @@ msgid "Credits"
 msgstr "ക്രെഡിറ്റുകള്‍"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:104
-#: modules/gui/macosx/VLCMainMenu.m:491 modules/gui/qt/dialogs/help.cpp:119
+#: modules/gui/macosx/VLCMainMenu.m:490 modules/gui/qt/dialogs/help.cpp:119
 msgid "License"
 msgstr "ലൈസന്‍സ്"
 
@@ -16273,7 +16271,7 @@ msgstr "പുതിയ പ്രൊഫൈലിനായി ഒരു പേര
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:476
-#: modules/gui/macosx/VLCMainMenu.m:1165 modules/gui/macosx/VLCOutput.m:411
+#: modules/gui/macosx/VLCMainMenu.m:1164 modules/gui/macosx/VLCOutput.m:411
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 #: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:793
@@ -16354,7 +16352,7 @@ msgstr "തിരുത്തുക"
 #: modules/gui/macosx/VLCBookmarksWindowController.m:85
 #: modules/gui/macosx/VLCBookmarksWindowController.m:91
 #: modules/gui/qt/dialogs/bookmarks.cpp:77
-#: modules/gui/qt/dialogs/toolbar.cpp:484
+#: modules/gui/qt/dialogs/toolbar.cpp:493
 msgid "Time"
 msgstr "സമയം"
 
@@ -16372,12 +16370,12 @@ msgstr "സമയം"
 #: modules/gui/macosx/VLCSimplePrefsController.m:282
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1363
-#: modules/stream_out/chromecast/cast.cpp:854
+#: modules/stream_out/chromecast/cast.cpp:993
 msgid "OK"
 msgstr "ശരി"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:131
-#: modules/gui/macosx/VLCMainMenu.m:1155
+#: modules/gui/macosx/VLCMainMenu.m:1154
 msgid "Untitled"
 msgstr "ശീര്‍ഷകമില്ലാത്തത്"
 
@@ -16744,7 +16742,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
-#: modules/gui/qt/dialogs/toolbar.cpp:468 modules/gui/qt/ui/sprefs_audio.h:411
+#: modules/gui/qt/dialogs/toolbar.cpp:477 modules/gui/qt/ui/sprefs_audio.h:411
 msgid "Volume"
 msgstr "ഒച്ച"
 
@@ -16943,7 +16941,7 @@ msgid ""
 msgstr ""
 "ഈ ഓപ്ഷന്‍ പൊതുപ്രതലത്തിനെ വിവിധ അവസരങ്ങളില്‍ അതിന്‍റെ ഐക്കണ്‍ വ്യത്യാസപ്പെടുത്താന്‍ സഹായിക്കുന്നു"
 
-#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1461
+#: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1460
 msgid "Lock Aspect Ratio"
 msgstr "ലോക്ക് ആസ്പെക്റ്റ് റേഷ്യോ"
 
@@ -16982,46 +16980,38 @@ msgstr "ആഡിയോ ഇഫക്റ്റ്സ് ബട്ടണ്‍ ക
 msgid "Shows the audio effects button in the main window."
 msgstr "ആഡിയോ ഇഫക്റ്റ്സ് ബട്ടണ്‍ പ്രധാന വിന്‍ഡോയില്‍ കാണിക്കുക"
 
-#: modules/gui/macosx/macosx.m:125 modules/gui/macosx/VLCMainMenu.m:381
-msgid "Show Sidebar"
-msgstr "സൈഡ്ബാര്‍ കാണിക്കുക"
-
-#: modules/gui/macosx/macosx.m:126
-msgid "Shows a sidebar in the main window listing media sources."
-msgstr "മീഡിയ ഉറവിടങ്ങളെ കാണിക്കുന്ന ഒരു സൈഡ്ബാര്‍  പ്രധാന വിന്‍ഡോയില്‍ കാണിക്കുന്നു"
-
-#: modules/gui/macosx/macosx.m:128
+#: modules/gui/macosx/macosx.m:125
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control external music players"
 msgstr "പുറമെയുള്ള മ്യൂസിക് പ്ലെയറുകള്‍ നിയന്ത്രിക്കുക"
 
-#: modules/gui/macosx/macosx.m:129
+#: modules/gui/macosx/macosx.m:126
 msgid "VLC will pause and resume supported music players on playback."
 msgstr ""
 "പ്ലേബാക്ക് ചെയ്യുന്ന സമയത്ത് പിന്താങ്ങുന്ന മറ്റ് മ്യൂസിക് പ്ലെയറുകളെ VLC  അല്‍പ്പനേരത്തേയ്ക്ക് നിര്‍"
 "ത്തുകയും പിന്നെ തുടരുകയും ചെയ്യുന്നു"
 
-#: modules/gui/macosx/macosx.m:131
+#: modules/gui/macosx/macosx.m:128
 msgid "Use large text for list views"
 msgstr "ലിസ്റ്റ് വ്യൂസീനായി വലിയ ടെക്സ്റ്റ് ഉപയോഗിക്കുക"
 
-#: modules/gui/macosx/macosx.m:136
+#: modules/gui/macosx/macosx.m:133
 msgid "Do nothing"
 msgstr "ഒന്നും ചെയ്യണ്ട"
 
-#: modules/gui/macosx/macosx.m:136
+#: modules/gui/macosx/macosx.m:133
 msgid "Pause iTunes / Spotify"
 msgstr "ഐട്യൂണ്‍സ് /സ്പോട്ടിഫൈയും അല്പ്പം നിര്‍ത്തുക"
 
-#: modules/gui/macosx/macosx.m:136
+#: modules/gui/macosx/macosx.m:133
 msgid "Pause and resume iTunes / Spotify"
 msgstr "ഐട്യൂണ്‍സും/സ്പോട്ടിഫൈയും അല്പ്പം നിര്‍ത്തി വീണ്ടും തുടരുക"
 
-#: modules/gui/macosx/macosx.m:139
+#: modules/gui/macosx/macosx.m:136
 msgid "Continue playback where you left off"
 msgstr "നിങ്ങള്‍ നിര്‍ത്തിയിടത്ത് നിന്നും പ്ലേബാക്ക് തുടരുക"
 
-#: modules/gui/macosx/macosx.m:140
+#: modules/gui/macosx/macosx.m:137
 msgid ""
 "VLC will store playback positions of the last 30 items you played. If you re-"
 "open one of those, playback will continue."
@@ -17029,41 +17019,41 @@ msgstr ""
 "നിങ്ങള്‍ പ്രവര്‍ത്തിപ്പിച്ച അവസാന 30 എണ്ണത്തിന്‍റെ പ്ലേബാക്ക് സ്ഥാനങ്ങള്‍ VLC സൂക്ഷിക്കുന്നു. അതില്‍ "
 "ഏതെങ്കിലും ഒന്ന്‍ നിങ്ങള്‍ വീണ്ടും തുറക്കുകയാണെങ്കില്‍, പ്ലേബാക്ക് തുടരും"
 
-#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:206
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:206
 msgid "Ask"
 msgstr "ചോദിക്ക്"
 
-#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:200
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:200
 #: modules/gui/qt/qt.cpp:206 modules/keystore/keychain.m:49
 msgid "Always"
 msgstr "(എപ്പോഴും)"
 
-#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:200
+#: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:200
 #: modules/gui/qt/qt.cpp:206 modules/gui/qt/qt.cpp:213
 msgid "Never"
 msgstr "ഒരിക്കലും"
 
-#: modules/gui/macosx/macosx.m:148 modules/gui/qt/qt.cpp:186
+#: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:186
 msgid "Maximum Volume displayed"
 msgstr "പരമാവധി ശബ്ദം പ്രദര്‍ശിപ്പിച്ചിട്ടുണ്ട്"
 
-#: modules/gui/macosx/macosx.m:152
+#: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
 msgstr "MAcOS X പൊതുപ്രതലം"
 
-#: modules/gui/macosx/macosx.m:159
+#: modules/gui/macosx/macosx.m:156
 msgid "Appearance"
 msgstr "ബാഹ്യരൂപം"
 
-#: modules/gui/macosx/macosx.m:171
+#: modules/gui/macosx/macosx.m:167
 msgid "Behavior"
 msgstr "പെരുമാറ്റം"
 
-#: modules/gui/macosx/macosx.m:184
+#: modules/gui/macosx/macosx.m:180
 msgid "Apple Remote and media keys"
 msgstr "ആപ്പിള്‍ റിമോട്ട് ആന്‍ഡ് മീഡിയ കീസ്"
 
-#: modules/gui/macosx/macosx.m:199
+#: modules/gui/macosx/macosx.m:196
 msgid "Video output"
 msgstr "വീഡിയോ ഔട്ട്പുട്ട്"
 
@@ -17173,7 +17163,7 @@ msgstr "രൂപാന്തരപ്പെടുത്തുക/ സ്ട്�
 msgid "Save Playlist..."
 msgstr "പ്ലേലിസ്റ്റ് സേവ് ചെയ്യുക..."
 
-#: modules/gui/macosx/VLCMainMenu.m:364 modules/gui/macosx/VLCPlaylist.m:236
+#: modules/gui/macosx/VLCMainMenu.m:364 modules/gui/macosx/VLCPlaylist.m:234
 msgid "Reveal in Finder"
 msgstr "ഫൈന്‍ഡറില്‍ കണ്ടെത്തുക"
 
@@ -17189,7 +17179,7 @@ msgstr "പകര്‍പ്പ്"
 msgid "Paste"
 msgstr "പേസ്റ്റ് ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:234
+#: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:232
 msgid "Select All"
 msgstr "എല്ലാം തിരഞ്ഞെടുക്കുക"
 
@@ -17201,225 +17191,229 @@ msgstr ""
 msgid "View"
 msgstr "കാണുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:383
+#: modules/gui/macosx/VLCMainMenu.m:381
+msgid "Show Sidebar"
+msgstr "സൈഡ്ബാര്‍ കാണിക്കുക"
+
+#: modules/gui/macosx/VLCMainMenu.m:382
 msgid "Playlist Table Columns"
 msgstr "പ്ലേലിസ്റ്റ് ടേബിള്‍ കോളം..."
 
-#: modules/gui/macosx/VLCMainMenu.m:385
+#: modules/gui/macosx/VLCMainMenu.m:384
 msgid "Playback"
 msgstr "പ്ലേബാക്ക്"
 
-#: modules/gui/macosx/VLCMainMenu.m:391
+#: modules/gui/macosx/VLCMainMenu.m:390
 msgid "Playback Speed"
 msgstr "പ്ലേബാക്ക് സ്പീഡ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:395
+#: modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
 msgstr "&ട്രാക്ക് സമന്വയം"
 
-#: modules/gui/macosx/VLCMainMenu.m:401
+#: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/qt/components/controller.hpp:110
 msgid "A→B Loop"
 msgstr "A→B ലൂപ്പ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:402
+#: modules/gui/macosx/VLCMainMenu.m:401
 msgid "Quit after Playback"
 msgstr "പ്ലേബാക്കിന് ശേഷം പുറത്തുപോവുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:403
+#: modules/gui/macosx/VLCMainMenu.m:402
 msgid "Step Forward"
 msgstr "പടി മുമ്പോട്ട്"
 
-#: modules/gui/macosx/VLCMainMenu.m:404
+#: modules/gui/macosx/VLCMainMenu.m:403
 msgid "Step Backward"
 msgstr "പടി പുറകിലേക്ക്"
 
-#: modules/gui/macosx/VLCMainMenu.m:405
+#: modules/gui/macosx/VLCMainMenu.m:404
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
 msgid "Jump to Time"
 msgstr "സമയത്തിലേക്ക് ചാടുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:406
+#: modules/gui/macosx/VLCMainMenu.m:405
 #, fuzzy
 msgid "Renderer"
 msgstr "ടെക്സ്റ്റ് ആവിഷ്കര്‍ത്താവ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:407
+#: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
 msgstr ""
 
-#: modules/gui/macosx/VLCMainMenu.m:416
+#: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
 msgstr "ശബ്ദം &വര്‍ദ്ധിപ്പിക്കുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:417
+#: modules/gui/macosx/VLCMainMenu.m:416
 msgid "Decrease Volume"
 msgstr "ശബ്ദം കുറയ്ക്കുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:423 modules/gui/macosx/VLCMainMenu.m:424
+#: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:423
 msgid "Audio Device"
 msgstr "ഓഡിയോ ഡിവൈസ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:429
+#: modules/gui/macosx/VLCMainMenu.m:428
 msgid "Half Size"
 msgstr "പകുതി വലുപ്പം"
 
-#: modules/gui/macosx/VLCMainMenu.m:430
+#: modules/gui/macosx/VLCMainMenu.m:429
 msgid "Normal Size"
 msgstr "സാധാരണ വലുപ്പം"
 
-#: modules/gui/macosx/VLCMainMenu.m:431
+#: modules/gui/macosx/VLCMainMenu.m:430
 msgid "Double Size"
 msgstr "ഇരട്ടി വലുപ്പം"
 
-#: modules/gui/macosx/VLCMainMenu.m:432
+#: modules/gui/macosx/VLCMainMenu.m:431
 msgid "Fit to Screen"
 msgstr "സ്ക്രീനിലേക്ക് ഫിറ്റ് ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:434
+#: modules/gui/macosx/VLCMainMenu.m:433
 #: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Float on Top"
 msgstr "മുകളില്‍ ഒഴുകി നടക്കുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:442 modules/gui/macosx/VLCMainMenu.m:443
+#: modules/gui/macosx/VLCMainMenu.m:441 modules/gui/macosx/VLCMainMenu.m:442
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
 msgstr "മുഴുവന്‍പ്രതല വീഡിയോ ഉപകരണം"
 
-#: modules/gui/macosx/VLCMainMenu.m:448 modules/gui/macosx/VLCMainMenu.m:449
+#: modules/gui/macosx/VLCMainMenu.m:447 modules/gui/macosx/VLCMainMenu.m:448
 #: modules/video_filter/postproc.c:201
 msgid "Post processing"
 msgstr "പ്രോസസ്സിംഗ് പോസ്റ്റ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:452
+#: modules/gui/macosx/VLCMainMenu.m:451
 msgid "Add Subtitle File..."
 msgstr "ഉപശീര്‍ഷക ഫയല്‍ ചേര്‍ക്കുക..."
 
-#: modules/gui/macosx/VLCMainMenu.m:453 modules/gui/macosx/VLCMainMenu.m:454
+#: modules/gui/macosx/VLCMainMenu.m:452 modules/gui/macosx/VLCMainMenu.m:453
 msgid "Subtitles Track"
 msgstr "ഉപശീര്‍ഷക ട്രാക്ക്"
 
-#: modules/gui/macosx/VLCMainMenu.m:455
+#: modules/gui/macosx/VLCMainMenu.m:454
 msgid "Text Size"
 msgstr "ടെക്സ്റ്റ് വലുപ്പം"
 
-#: modules/gui/macosx/VLCMainMenu.m:456
+#: modules/gui/macosx/VLCMainMenu.m:455
 msgid "Text Color"
 msgstr "ടെക്സ്റ്റ് നിറം"
 
-#: modules/gui/macosx/VLCMainMenu.m:457
+#: modules/gui/macosx/VLCMainMenu.m:456
 msgid "Outline Thickness"
 msgstr "ഔട്ട്ലൈന്‍ തിക്ക്നെസ്സ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:463 modules/gui/macosx/VLCMainMenu.m:464
+#: modules/gui/macosx/VLCMainMenu.m:462 modules/gui/macosx/VLCMainMenu.m:463
 msgid "Background Opacity"
 msgstr "പശ്ചാത്തല ഒപേസിറ്റി"
 
-#: modules/gui/macosx/VLCMainMenu.m:465
+#: modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Color"
 msgstr "പശ്ചാത്തല നിറം."
 
-#: modules/gui/macosx/VLCMainMenu.m:467
+#: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Transparent"
 msgstr "സുതാര്യം"
 
-#: modules/gui/macosx/VLCMainMenu.m:468 modules/gui/macosx/VLCMainMenu.m:1102
+#: modules/gui/macosx/VLCMainMenu.m:467 modules/gui/macosx/VLCMainMenu.m:1101
 msgid "Index"
 msgstr "സൂചിക"
 
-#: modules/gui/macosx/VLCMainMenu.m:474
+#: modules/gui/macosx/VLCMainMenu.m:473
 msgid "Window"
 msgstr "ജാലകം"
 
-#: modules/gui/macosx/VLCMainMenu.m:475
+#: modules/gui/macosx/VLCMainMenu.m:474
 msgid "Minimize"
 msgstr "മിനിമൈസ് ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainMenu.m:477
+#: modules/gui/macosx/VLCMainMenu.m:476
 msgid "Player..."
 msgstr "പ്ലേയര്‍"
 
-#: modules/gui/macosx/VLCMainMenu.m:478
+#: modules/gui/macosx/VLCMainMenu.m:477
 msgid "Main Window..."
 msgstr "പ്രധാന ജാലകം..."
 
-#: modules/gui/macosx/VLCMainMenu.m:479
+#: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Audio Effects..."
 msgstr "ഓഡിയോ പ്രഭാവങ്ങള്‍..."
 
-#: modules/gui/macosx/VLCMainMenu.m:480
+#: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Video Effects..."
 msgstr "വീഡിയോ പ്രഭാവങ്ങള്‍..."
 
-#: modules/gui/macosx/VLCMainMenu.m:481
+#: modules/gui/macosx/VLCMainMenu.m:480
 msgid "Bookmarks..."
 msgstr "ബുക്ക്മാര്‍ക്കുകള്‍..."
 
-#: modules/gui/macosx/VLCMainMenu.m:482
+#: modules/gui/macosx/VLCMainMenu.m:481
 msgid "Playlist..."
 msgstr "പ്ലേലിസ്റ്റ്..."
 
-#: modules/gui/macosx/VLCMainMenu.m:483 modules/gui/macosx/VLCPlaylist.m:235
+#: modules/gui/macosx/VLCMainMenu.m:482 modules/gui/macosx/VLCPlaylist.m:233
 msgid "Media Information..."
 msgstr "മീഡിയ വിവരം..."
 
-#: modules/gui/macosx/VLCMainMenu.m:484
+#: modules/gui/macosx/VLCMainMenu.m:483
 msgid "Messages..."
 msgstr "സന്ദേശങ്ങള്‍..."
 
-#: modules/gui/macosx/VLCMainMenu.m:485
+#: modules/gui/macosx/VLCMainMenu.m:484
 msgid "Errors and Warnings..."
 msgstr "പിശകുകളും കൂടാതെ മുന്നറിയിപ്പുകളും..."
 
-#: modules/gui/macosx/VLCMainMenu.m:487
+#: modules/gui/macosx/VLCMainMenu.m:486
 msgid "Bring All to Front"
 msgstr "എല്ലാം മുന്നിലേക്ക് കൊണ്ടു വരിക"
 
-#: modules/gui/macosx/VLCMainMenu.m:489 modules/gui/qt/dialogs/help.cpp:54
+#: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/qt/dialogs/help.cpp:54
 #: modules/gui/qt/menus.cpp:950 modules/gui/qt/menus.cpp:1137
 msgid "Help"
 msgstr "സഹായം"
 
-#: modules/gui/macosx/VLCMainMenu.m:490
+#: modules/gui/macosx/VLCMainMenu.m:489
 msgid "VLC media player Help..."
 msgstr "വി‌എല്‍‌സി മെഡിയ പ്ലേയര്‍ സഹായം"
 
-#: modules/gui/macosx/VLCMainMenu.m:492
+#: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
 msgstr "ഓണ്‍ലൈന്‍ ഡോക്യുമെന്റേഷന്‍..."
 
-#: modules/gui/macosx/VLCMainMenu.m:493
+#: modules/gui/macosx/VLCMainMenu.m:492
 msgid "VideoLAN Website..."
 msgstr "വീഡിയോലാന്‍ വെബ്ബ്സൈറ്റ്..."
 
-#: modules/gui/macosx/VLCMainMenu.m:494
+#: modules/gui/macosx/VLCMainMenu.m:493
 msgid "Make a donation..."
 msgstr "സംഭാവന നടത്തുക..."
 
-#: modules/gui/macosx/VLCMainMenu.m:495
+#: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
 msgstr "ഓണ്‍ലൈന്‍ ഫോറം..."
 
-#: modules/gui/macosx/VLCMainMenu.m:1159
+#: modules/gui/macosx/VLCMainMenu.m:1158
 msgid "File Format:"
 msgstr "ഫയലിന്‍റെ രീതി:"
 
-#: modules/gui/macosx/VLCMainMenu.m:1160
+#: modules/gui/macosx/VLCMainMenu.m:1159
 msgid "Extended M3U"
 msgstr "വിപുലീകരിച്ച M3U"
 
-#: modules/gui/macosx/VLCMainMenu.m:1161
+#: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XMLനാല്‍ ഷെയര്‍ചെയ്യപ്പെടാവുന്ന പ്ലേലിസ്റ്റ് രൂപഘടന (XSPF)"
 
-#: modules/gui/macosx/VLCMainMenu.m:1162
+#: modules/gui/macosx/VLCMainMenu.m:1161
 #: modules/gui/qt/dialogs_provider.cpp:642
 msgid "HTML playlist"
 msgstr "എച്ച്ടിഎംഎല്‍ പ്ലേലിസ്റ്റ്"
 
-#: modules/gui/macosx/VLCMainMenu.m:1164
+#: modules/gui/macosx/VLCMainMenu.m:1163
 msgid "Save Playlist"
 msgstr "പ്ലേലിസ്റ്റ് സേവ് ചെയ്യുക"
 
@@ -17489,23 +17483,23 @@ msgstr ""
 "VLC നിങ്ങളുടെ ഉള്ളടക്കത്തെക്കുറിച്ചുള്ള വിവരങ്ങള്‍ ഒരു വിശ്വസ്ത സേവനങ്ങളിലേയ്ക്ക് ഒരു അജ്ഞാത "
 "രൂപത്തില്‍‌ അയയ്ക്കുന്നു."
 
-#: modules/gui/macosx/VLCMainWindow.m:295
+#: modules/gui/macosx/VLCMainWindow.m:293
 msgid "LIBRARY"
 msgstr "ലൈബ്രറി"
 
-#: modules/gui/macosx/VLCMainWindow.m:300
+#: modules/gui/macosx/VLCMainWindow.m:298
 msgid "MY COMPUTER"
 msgstr "എന്റെ കംപ്യൂട്ടര്‍"
 
-#: modules/gui/macosx/VLCMainWindow.m:301
+#: modules/gui/macosx/VLCMainWindow.m:299
 msgid "DEVICES"
 msgstr "ഡിവൈസുകള്‍"
 
-#: modules/gui/macosx/VLCMainWindow.m:302
+#: modules/gui/macosx/VLCMainWindow.m:300
 msgid "LOCAL NETWORK"
 msgstr "ലോക്കല്‍ നെറ്റ്വര്‍ക്ക്"
 
-#: modules/gui/macosx/VLCMainWindow.m:303
+#: modules/gui/macosx/VLCMainWindow.m:301
 msgid "INTERNET"
 msgstr "ഇന്റര്‍നെറ്റ്"
 
@@ -17635,7 +17629,7 @@ msgid "Enable DVD menus"
 msgstr "ഡിവിഡി മെനുകള്‍ സാധ്യമാക്കുക"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:186
-#: modules/stream_out/chromecast/cast.cpp:205
+#: modules/stream_out/chromecast/cast.cpp:220
 msgid "IP Address"
 msgstr "IP വിലാസം"
 
@@ -17828,11 +17822,11 @@ msgstr "യുആര്‍ഐ"
 msgid "File Size"
 msgstr "ഫയലിന്റെ വലിപ്പം"
 
-#: modules/gui/macosx/VLCPlaylist.m:232
+#: modules/gui/macosx/VLCPlaylist.m:230
 msgid "Expand All"
 msgstr ""
 
-#: modules/gui/macosx/VLCPlaylist.m:233
+#: modules/gui/macosx/VLCPlaylist.m:231
 msgid "Collapse All"
 msgstr ""
 
@@ -19466,12 +19460,12 @@ msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
 msgstr "ചിത്ര ഫയലുകള്‍  (*.gif *.jpg *.jpeg *.png)"
 
 #: modules/gui/qt/components/interface_widgets.cpp:913
-#: modules/gui/qt/dialogs/toolbar.cpp:564
+#: modules/gui/qt/dialogs/toolbar.cpp:573
 msgid "Elapsed time"
 msgstr "കഴിഞ്ഞ സമയം"
 
 #: modules/gui/qt/components/interface_widgets.cpp:917
-#: modules/gui/qt/dialogs/toolbar.cpp:568
+#: modules/gui/qt/dialogs/toolbar.cpp:577
 msgid "Total/Remaining time"
 msgstr "മൊത്തം/അവശേഷിക്കുന്ന സമയം"
 
@@ -20129,7 +20123,7 @@ msgstr "v4l2 നിയന്ത്രണങ്ങള്‍"
 msgid "&Save"
 msgstr "സംരക്ഷിക്കുക(_S)"
 
-#: modules/gui/qt/dialogs/external.cpp:219
+#: modules/gui/qt/dialogs/external.cpp:216
 msgid "Store the Password"
 msgstr ""
 
@@ -20630,47 +20624,47 @@ msgstr "പ്രൊഫൈല്‍ നാമം"
 msgid "Please enter the new profile name."
 msgstr "ദയവായി പുതിയ പ്രൊഫൈല്‍ നാമം ചേര്‍ക്കുക."
 
-#: modules/gui/qt/dialogs/toolbar.cpp:414
+#: modules/gui/qt/dialogs/toolbar.cpp:423
 msgid "Spacer"
 msgstr "സ്പേസര്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:421
+#: modules/gui/qt/dialogs/toolbar.cpp:430
 msgid "Expanding Spacer"
 msgstr "വികസിപ്പിക്കുന്ന സ്പേസര്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:453
+#: modules/gui/qt/dialogs/toolbar.cpp:462
 msgid "Splitter"
 msgstr "സ്പ്ലിറ്റര്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:460
+#: modules/gui/qt/dialogs/toolbar.cpp:469
 msgid "Time Slider"
 msgstr "ടൈം സ്ലൈഡര്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:473
+#: modules/gui/qt/dialogs/toolbar.cpp:482
 msgid "Small Volume"
 msgstr "ചെറിയ ശബ്ദം"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:510
+#: modules/gui/qt/dialogs/toolbar.cpp:519
 msgid "DVD menus"
 msgstr "DVD മെനു"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:524
+#: modules/gui/qt/dialogs/toolbar.cpp:533
 msgid "Teletext transparency"
 msgstr "ടെലിടെക്സ്റ്റ് സ്വച്ഛത"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:539
+#: modules/gui/qt/dialogs/toolbar.cpp:548
 msgid "Advanced Buttons"
 msgstr "നൂതന ബട്ടണുകള്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:552
+#: modules/gui/qt/dialogs/toolbar.cpp:561
 msgid "Playback Buttons"
 msgstr "പ്ലേബാക്ക് ബട്ടണുകള്‍"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:556
+#: modules/gui/qt/dialogs/toolbar.cpp:565
 msgid "Aspect ratio selector"
 msgstr "വീക്ഷണ അനുപാതം തിരഞ്ഞെടുക്കലുപാധി"
 
-#: modules/gui/qt/dialogs/toolbar.cpp:560
+#: modules/gui/qt/dialogs/toolbar.cpp:569
 msgid "Speed selector"
 msgstr "വേഗത തിരഞ്ഞെടുക്കലുപാധി"
 
@@ -23452,7 +23446,7 @@ msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
-#: modules/services_discovery/bonjour.m:370
+#: modules/services_discovery/bonjour.m:398
 msgid "Bonjour Network Discovery"
 msgstr ""
 
@@ -23666,7 +23660,7 @@ msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
-#: modules/services_discovery/upnp.cpp:258
+#: modules/services_discovery/upnp.cpp:257
 msgid "Universal Plug'n'Play"
 msgstr "ആഗോള പ്ലഗ്ഗിന്‍ പ്ലേ"
 
@@ -24630,104 +24624,88 @@ msgstr ""
 msgid "Chromaprint stream output"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:162
+#: modules/stream_out/chromecast/cast.cpp:183
 msgid "HTTP port"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:163
+#: modules/stream_out/chromecast/cast.cpp:184
 msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:166
-msgid "The Chromecast receiver can receive video."
-msgstr ""
-
-#: modules/stream_out/chromecast/cast.cpp:168
-msgid "This sets the muxer used to stream to the Chromecast."
-msgstr ""
-
-#: modules/stream_out/chromecast/cast.cpp:169
-msgid "MIME content type"
-msgstr ""
-
-#: modules/stream_out/chromecast/cast.cpp:170
-msgid "This sets the media MIME content type sent to the Chromecast."
-msgstr ""
-
-#: modules/stream_out/chromecast/cast.cpp:171
-#: modules/stream_out/chromecast/cast.cpp:855
+#: modules/stream_out/chromecast/cast.cpp:186
+#: modules/stream_out/chromecast/cast.cpp:994
 msgid "Performance warning"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:172
+#: modules/stream_out/chromecast/cast.cpp:187
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:173
+#: modules/stream_out/chromecast/cast.cpp:188
 msgid "Enable Audio passthrough"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:174
+#: modules/stream_out/chromecast/cast.cpp:189
 msgid "Disable if your receiver does not support Dolby®."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:196
+#: modules/stream_out/chromecast/cast.cpp:211
 msgid "High (high quality and high bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:197
+#: modules/stream_out/chromecast/cast.cpp:212
 msgid "Medium (medium quality and medium bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:198
+#: modules/stream_out/chromecast/cast.cpp:213
 msgid "Low (low quality and low bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:199
+#: modules/stream_out/chromecast/cast.cpp:214
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:202
+#: modules/stream_out/chromecast/cast.cpp:217
 msgid "Conversion quality"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:203
+#: modules/stream_out/chromecast/cast.cpp:218
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:206
+#: modules/stream_out/chromecast/cast.cpp:221
 msgid "IP Address of the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:207
+#: modules/stream_out/chromecast/cast.cpp:222
 msgid "Chromecast port"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:208
+#: modules/stream_out/chromecast/cast.cpp:223
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:214
+#: modules/stream_out/chromecast/cast.cpp:233
 msgid "Chromecast"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:215
+#: modules/stream_out/chromecast/cast.cpp:234
 msgid "Chromecast stream output"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:854
+#: modules/stream_out/chromecast/cast.cpp:993
 msgid "Ok, Don't warn me again"
 msgstr ""
 
-#: modules/stream_out/chromecast/cast.cpp:856
+#: modules/stream_out/chromecast/cast.cpp:995
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
 
-#: modules/stream_out/chromecast/chromecast_demux.cpp:339
+#: modules/stream_out/chromecast/chromecast_demux.cpp:537
 msgid "Chromecast demux wrapper"
 msgstr ""
 
@@ -26111,16 +26089,16 @@ msgstr "കാന്‍വാസ്"
 msgid "Canvas video filter"
 msgstr "കാന്‍വാസ് വീഡിയോ ഫില്‍റ്റര്‍"
 
-#: modules/video_filter/ci_filters.m:760
+#: modules/video_filter/ci_filters.m:752
 msgid "Use a specific Core Image Filter"
 msgstr ""
 
-#: modules/video_filter/ci_filters.m:762
+#: modules/video_filter/ci_filters.m:754
 msgid ""
 "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 msgstr ""
 
-#: modules/video_filter/ci_filters.m:768
+#: modules/video_filter/ci_filters.m:760
 msgid "Mac OS X hardware video filters"
 msgstr ""
 
@@ -29305,6 +29283,9 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
+
+#~ msgid "Shows a sidebar in the main window listing media sources."
+#~ msgstr "മീഡിയ ഉറവിടങ്ങളെ കാണിക്കുന്ന ഒരു സൈഡ്ബാര്‍  പ്രധാന വിന്‍ഡോയില്‍ കാണിക്കുന്നു"
 
 #~ msgid "Inhibit the power management daemon during playback"
 #~ msgstr "പ്ലേബാക്കിനിടയില്‍ പവര്‍ മാനേജ്മെന്റ് ഡെമണ്‍ ഇന്‍ഹിബിറ്റ് ചെയ്യുക"
