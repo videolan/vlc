@@ -1145,6 +1145,15 @@ bool hevc_get_aspect_ratio( const hevc_sequence_parameter_set_t *p_sps,
     return false;
 }
 
+bool hevc_get_chroma_luma( const hevc_sequence_parameter_set_t *p_sps, uint8_t *pi_chroma_format,
+                           uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma )
+{
+    *pi_chroma_format = p_sps->chroma_format_idc;
+    *pi_depth_luma = p_sps->bit_depth_chroma_minus8 + 8;
+    *pi_depth_chroma = p_sps->bit_depth_chroma_minus8 + 8;
+    return true;
+}
+
 bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
