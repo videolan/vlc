@@ -250,7 +250,11 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(priv == NULL))
         return NULL;
 
+    priv->gc.destroy = picture_Destroy;
+
     picture_t *pic = &priv->picture;
+    if (pic->i_planes == 0)
+        return NULL;
 
     /* Calculate how big the new image should be */
     size_t plane_sizes[PICTURE_PLANE_MAX];
@@ -269,7 +273,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
         goto error;
 
     uint8_t *buf = aligned_alloc(16, pic_size);
-    if (unlikely(pic_size > 0 && buf == NULL))
+    if (unlikely(buf == NULL))
         goto error;
 
     /* Fill the p_pixels field for each plane */
@@ -279,7 +283,6 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
         buf += plane_sizes[i];
     }
 
-    priv->gc.destroy = picture_Destroy;
     return pic;
 error:
     free(pic);
