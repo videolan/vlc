@@ -707,6 +707,8 @@ static const struct
         VLC_CODEC_I420_10B },                  PLANAR_16(3, 2, 2, 10) },
     { { VLC_CODEC_I420_9L,
         VLC_CODEC_I420_9B },                   PLANAR_16(3, 2, 2,  9) },
+    { { VLC_CODEC_I422_16L,
+        VLC_CODEC_I422_16B },                  PLANAR_16(3, 2, 1, 16) },
     { { VLC_CODEC_I422_12L,
         VLC_CODEC_I422_12B },                  PLANAR_16(3, 2, 1, 12) },
     { { VLC_CODEC_I422_10L,
