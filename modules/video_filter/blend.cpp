@@ -597,9 +597,11 @@ static const struct {
 #ifdef WORDS_BIGENDIAN
     YUV(VLC_CODEC_I422_9B,  CPictureI422_16,  convert8To9Bits),
     YUV(VLC_CODEC_I422_10B, CPictureI422_16,  convert8To10Bits),
+    YUV(VLC_CODEC_I422_16B, CPictureI422_16,  convert8To16Bits),
 #else
     YUV(VLC_CODEC_I422_9L,  CPictureI422_16,  convert8To9Bits),
     YUV(VLC_CODEC_I422_10L, CPictureI422_16,  convert8To10Bits),
+    YUV(VLC_CODEC_I422_16L, CPictureI422_16,  convert8To16Bits),
 #endif
 
     YUV(VLC_CODEC_J444,     CPictureI444_8,   convertNone),
