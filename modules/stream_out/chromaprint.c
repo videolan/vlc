@@ -229,7 +229,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         if ( !p_sys->b_finished && id->i_samples > 0 && p_buf->i_buffer )
         {
             if(! chromaprint_feed( p_sys->p_chromaprint_ctx,
-                                   p_buf->p_buffer,
+                                   (int16_t *)p_buf->p_buffer,
                                    p_buf->i_buffer / BYTESPERSAMPLE ) )
                 msg_Warn( p_stream, "feed error" );
             id->i_samples -= i_samples;
