@@ -71,6 +71,7 @@ static void LeaveMTA(void)
 }
 
 static wchar_t default_device[1] = L"";
+static char default_device_b[1] = "";
 
 struct aout_sys_t
 {
@@ -733,7 +734,7 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     aout_sys_t *sys = aout->sys;
     assert(sys->requested_device == NULL);
 
-    if (id != NULL)
+    if (id != NULL && strcmp(id, default_device_b) != 0)
     {
         sys->requested_device = ToWide(id);
         if (unlikely(sys->requested_device == NULL))
@@ -835,15 +836,20 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {   /* Report actual device */
         LPWSTR wdevid;
 
-        hr = IMMDevice_GetId(sys->dev, &wdevid);
-        if (SUCCEEDED(hr))
+        if (sys->acquired_device == default_device)
+            aout_DeviceReport(aout, default_device_b);
+        else
         {
-            char *id = FromWide(wdevid);
-            CoTaskMemFree(wdevid);
-            if (likely(id != NULL))
+            hr = IMMDevice_GetId(sys->dev, &wdevid);
+            if (SUCCEEDED(hr))
             {
-                aout_DeviceReport(aout, id);
-                free(id);
+                char *id = FromWide(wdevid);
+                CoTaskMemFree(wdevid);
+                if (likely(id != NULL))
+                {
+                    aout_DeviceReport(aout, id);
+                    free(id);
+                }
             }
         }
     }
@@ -1230,6 +1236,8 @@ static int Open(vlc_object_t *obj)
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
 
+    aout_HotplugReport(aout, default_device_b, _("Default"));
+
     /* Initialize MMDevice API */
     if (TryEnterMTA(aout))
         goto error;
@@ -1267,6 +1275,7 @@ static int Open(vlc_object_t *obj)
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
+
     return VLC_SUCCESS;
 
 error:
