@@ -295,17 +295,20 @@
     else if ([mux isEqualToString: @"Raw"]) mux_string = @"raw";
     else mux_string = @"ts";
 
+    NSString *filename_string =
+            [[self.fileTextField stringValue] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+
     if ([mode isEqualToString: _NS("File")]) {
         if ([self.dumpCheckbox state] == NSOnState) {
             _soutMRL = [NSArray arrayWithObjects:@":demux=dump",
                         [NSString stringWithFormat:
-                        @":demuxdump-file=%@",
-                        [self.fileTextField stringValue]], nil];
+                        @":demuxdump-file=\"%@\"",
+                        filename_string], nil];
             return;
         } else
             [mrl_string appendFormat:@"standard{mux=%@,access=file{no-overwrite},dst=\"%@\"}",
              mux_string,
-             [self.fileTextField stringValue]];
+             filename_string];
     }
     else if ([mode isEqualToString: _NS("Stream")]) {
         mode = [self.streamTypePopup titleOfSelectedItem];
