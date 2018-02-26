@@ -75,6 +75,9 @@ struct stream_t
         demux_t *p_next;
     };
 
+    /* es output */
+    es_out_t    *out;   /* our p_es_out */
+
     /**
      * Read data.
      *
@@ -119,6 +122,8 @@ struct stream_t
      * NULL if the stream is not a directory.
      */
     int         (*pf_readdir)(stream_t *, input_item_node_t *);
+
+    int         (*pf_demux)(stream_t *);
 
     /**
      * Seek.
