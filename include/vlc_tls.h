@@ -332,21 +332,6 @@ VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *crd,
                                          const char *service,
                                          const char *const *alpn, char **alp);
 
-VLC_DEPRECATED
-static inline vlc_tls_t *
-vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
-                              const char *srv, const char *const *lp, char **p)
-{
-    vlc_tls_t *sock = vlc_tls_SocketOpen(fd);
-    if (unlikely(sock == NULL))
-        return NULL;
-
-    vlc_tls_t *tls = vlc_tls_ClientSessionCreate(crd, sock, host, srv, lp, p);
-    if (unlikely(tls == NULL))
-        free(sock);
-    return tls;
-}
-
 /** @} */
 
 #endif
