@@ -585,114 +585,24 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
  * \defgroup bitops Bit operations
  * @{
  */
+
+#define VLC_INT_FUNC(basename) \
+        VLC_INT_FUNC_TYPE(basename, unsigned, ) \
+        VLC_INT_FUNC_TYPE(basename, unsigned long, l) \
+        VLC_INT_FUNC_TYPE(basename, unsigned long long, ll)
+
 #if defined (__GNUC__) || defined (__clang__)
-# ifndef __cplusplus
-#  define clz(x) \
-    _Generic((x), \
-        unsigned char: (__builtin_clz(x) \
-		- (sizeof (unsigned) - 1) * 8), \
-        unsigned short: (__builtin_clz(x) \
-		- (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
-        unsigned: __builtin_clz(x), \
-        unsigned long: __builtin_clzl(x), \
-        unsigned long long: __builtin_clzll(x))
-
-#  define ctz(x) \
-    _Generic((x), \
-        unsigned char: __builtin_ctz(x), \
-        unsigned short: __builtin_ctz(x), \
-        unsigned: __builtin_ctz(x), \
-        unsigned long: __builtin_ctzl(x), \
-        unsigned long long: __builtin_ctzll(x))
-
-#  define vlc_popcount(x) \
-    _Generic((x), \
-        unsigned char:      __builtin_popcount(x), \
-          signed char:      __builtin_popcount((unsigned char)(x)), \
-        unsigned short:     __builtin_popcount(x), \
-          signed short:     __builtin_popcount((unsigned short)(x)), \
-        unsigned int:       __builtin_popcount(x), \
-          signed int:       __builtin_popcount(x), \
-        unsigned long:      __builtin_popcountl(x), \
-          signed long:      __builtin_popcountl(x), \
-        unsigned long long: __builtin_popcountll(x), \
-          signed long long: __builtin_popcountll(x))
-
-#  define parity(x) \
-    _Generic((x), \
-        unsigned char: __builtin_parity(x), \
-          signed char: __builtin_parity(x), \
-        unsigned short: __builtin_parity(x), \
-          signed short: __builtin_parity(x), \
-        unsigned int: __builtin_parity(x), \
-          signed int: __builtin_parity(x), \
-        unsigned long: __builtin_parityl(x), \
-          signed long: __builtin_parityl(x), \
-        unsigned long long: __builtin_parityll(x), \
-          signed long long: __builtin_parityll(x))
-
-# else
-VLC_USED static inline int ctz(unsigned x)
-{
-    return __builtin_ctz(x);
+# define VLC_INT_FUNC_TYPE(basename,type,suffix) \
+VLC_USED static inline int vlc_##basename##suffix(type x) \
+{ \
+    return __builtin_##basename##suffix(x); \
 }
 
-VLC_USED static inline int ctz(unsigned long x)
+VLC_INT_FUNC(clz)
+#else
+VLC_USED static inline int vlc_clzll(unsigned long long x)
 {
-    return __builtin_ctzl(x);
-}
-
-VLC_USED static inline int ctz(unsigned long long x)
-{
-    return __builtin_ctzll(x);
-}
-
-VLC_USED static inline int vlc_popcount(unsigned char x)
-{
-    return __builtin_popcount(x);
-}
-
-VLC_USED static inline int vlc_popcount(unsigned short x)
-{
-    return __builtin_popcount(x);
-}
-
-VLC_USED static inline int vlc_popcount(unsigned x)
-{
-    return __builtin_popcount(x);
-}
-
-VLC_USED static inline int vlc_popcount(unsigned long x)
-{
-    return __builtin_popcountl(x);
-}
-
-VLC_USED static inline int vlc_popcount(unsigned long long x)
-{
-    return __builtin_popcountll(x);
-}
-
-VLC_USED static inline int parity(unsigned x)
-{
-    return __builtin_parity(x);
-}
-
-VLC_USED static inline int parity(unsigned long x)
-{
-    return __builtin_parityl(x);
-}
-
-VLC_USED static inline int parity(unsigned long long x)
-{
-    return __builtin_parityll(x);
-}
-
-# endif
-#else /* __GNUC__ */
-# ifndef __cplusplus
-VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
-{
-    int i = maxbits;
+    int i = sizeof (x) * 8;
 
     while (x)
     {
@@ -701,7 +611,71 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
     }
     return i;
 }
-#  define clztype(x, type) clzbits(x, sizeof (type) * 8)
+
+VLC_USED static inline int vlc_clzl(unsigned long x)
+{
+    return vlc_clzll(x) - ((sizeof (long long) - sizeof (long)) * 8);
+}
+
+VLC_USED static inline int vlc_clz(unsigned x)
+{
+    return vlc_clzll(x) - ((sizeof (long long) - sizeof (int)) * 8);
+}
+
+VLC_USED static inline int vlc_ctz_generic(unsigned long long x)
+{
+    unsigned i = sizeof (x) * 8;
+
+    while (x)
+    {
+        x <<= 1;
+        i--;
+    }
+    return i;
+}
+
+VLC_USED static inline int vlc_parity_generic(unsigned long long x)
+{
+    for (unsigned i = 4 * sizeof (x); i > 0; i /= 2)
+        x ^= x >> i;
+    return x & 1;
+}
+
+VLC_USED static inline int vlc_popcount_generic(unsigned long long x)
+{
+    int count = 0;
+    while (x)
+    {
+        count += x & 1;
+        x = x >> 1;
+    }
+    return count;
+}
+
+# define VLC_INT_FUNC_TYPE(basename,type,suffix) \
+VLC_USED static inline int vlc_##basename##suffix(type x) \
+{ \
+    return vlc_##basename##_generic(x); \
+}
+#endif
+
+VLC_INT_FUNC(ctz)
+VLC_INT_FUNC(parity)
+VLC_INT_FUNC(popcount)
+
+#ifndef __cplusplus
+# define VLC_INT_GENERIC(func,x) \
+    _Generic((x), \
+        unsigned char:      func(x), \
+          signed char:      func(x), \
+        unsigned short:     func(x), \
+          signed short:     func(x), \
+        unsigned int:       func(x), \
+          signed int:       func(x), \
+        unsigned long:      func##l(x), \
+          signed long:      func##l(x), \
+        unsigned long long: func##ll(x), \
+          signed long long: func##ll(x))
 
 /**
  * Count leading zeroes
@@ -714,14 +688,14 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
  * \warning By definition, the result depends on the (width of the) type of x.
  * \return The number of leading zero bits in x.
  */
-#  define clz(x) \
+# define clz(x) \
     _Generic((x), \
-        unsigned char: clztype(x, char), \
-        unsigned short: clztype(x, short), \
-        unsigned: clztype(x, int), \
-        unsigned long: clztype(x, long), \
-        unsigned long long: clztype(x, long long))
-# endif
+        unsigned char: (vlc_clz(x) - (sizeof (unsigned) - 1) * 8), \
+        unsigned short: (vlc_clz(x) \
+		- (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
+        unsigned: vlc_clz(x), \
+        unsigned long: vlc_clzl(x), \
+        unsigned long long: vlc_clzll(x))
 
 /**
  * Count trailing zeroes
@@ -733,50 +707,7 @@ VLC_USED static inline int clzbits(unsigned long long x, int maxbits)
  * \note This function assumes that CHAR_BIT equals 8.
  * \return The number of trailing zero bits in x.
  */
-VLC_USED static inline int ctz(unsigned long long x)
-{
-    unsigned i = sizeof (x) * 8;
-
-    while (x)
-    {
-        x <<= 1;
-        i--;
-    }
-    return i;
-}
-
-VLC_USED static inline int vlc_popcount(unsigned long long x)
-{
-    int count = 0;
-    while (x)
-    {
-        count += x & 1;
-        x = x >> 1;
-    }
-    return count;
-}
-
-# ifndef __cplusplus
-/**
- * Bit weight / population count
- *
- * This function counts the number of non-zero bits in an integer.
- *
- * \return The count of non-zero bits.
- */
-#  define vlc_popcount(x) \
-    _Generic((x), \
-        unsigned char:      vlc_popcount(x), \
-          signed char:      vlc_popcount((unsigned char)(x)), \
-        unsigned short:     vlc_popcount(x), \
-          signed short:     vlc_popcount((unsigned short)(x)), \
-        unsigned int:       vlc_popcount(x), \
-          signed int:       vlc_popcount((unsigned int)(x)), \
-        unsigned long:      vlc_popcount(x), \
-          signed long:      vlc_popcount((unsigned long)(x)), \
-        unsigned long long: vlc_popcount(x), \
-          signed long long: vlc_popcount(x))
-# endif
+# define ctz(x) VLC_INT_GENERIC(vlc_ctz, x)
 
 /**
  * Parity
@@ -785,14 +716,41 @@ VLC_USED static inline int vlc_popcount(unsigned long long x)
  * \retval 0 if x has an even number of set bits.
  * \retval 1 if x has an odd number of set bits.
  */
-VLC_USED static inline int parity(unsigned long long x)
+# define parity(x) VLC_INT_GENERIC(vlc_parity, x)
+
+/**
+ * Bit weight / population count
+ *
+ * This function counts the number of non-zero bits in an integer.
+ *
+ * \return The count of non-zero bits.
+ */
+# define vlc_popcount(x) \
+    _Generic((x), \
+        signed char:  vlc_popcount((unsigned char)(x)), \
+        signed short: vlc_popcount((unsigned short)(x)), \
+        default: VLC_INT_GENERIC(vlc_popcount ,x))
+#else
+VLC_USED static inline int vlc_popcount(unsigned char x)
 {
-    for (unsigned i = 4 * sizeof (x); i > 0; i /= 2)
-        x ^= x >> i;
-    return x & 1;
+    return vlc_popcount((unsigned)x);
 }
 
-#endif /* __GNUC__ */
+VLC_USED static inline int vlc_popcount(unsigned short x)
+{
+    return vlc_popcount((unsigned)x);
+}
+
+VLC_USED static inline int vlc_popcount(unsigned long x)
+{
+    return vlc_popcountl(x);
+}
+
+VLC_USED static inline int vlc_popcount(unsigned long long x)
+{
+    return vlc_popcountll(x);
+}
+#endif
 
 /** Byte swap (16 bits) */
 VLC_USED
