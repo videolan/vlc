@@ -385,7 +385,7 @@ static BMDVideoConnection getVConn(vout_display_t *vd, BMDVideoConnection mask)
     }
     else /* Pick one as default connection */
     {
-        conn = ctz(mask);
+        conn = vlc_ctz(mask);
         conn = conn ? ( 1 << conn ) : bmdVideoConnectionSDI;
     }
     return conn;
@@ -865,7 +865,7 @@ static void send_AFD(uint8_t afdcode, uint8_t ar, uint8_t *buf)
 
     /* parity bit */
     for (size_t i = 3; i < len - 1; i++)
-        afd[i] |= parity((unsigned)afd[i]) ? 0x100 : 0x200;
+        afd[i] |= vlc_parity((unsigned)afd[i]) ? 0x100 : 0x200;
 
     /* vanc checksum */
     uint16_t vanc_sum = 0;
