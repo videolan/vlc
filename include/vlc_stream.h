@@ -56,8 +56,24 @@ struct stream_t
     char        *psz_filepath; /**< Local file path (if applicable) */
     bool         b_preparsing; /**< True if this access is used to preparse */
 
-    /* Stream source for stream filter */
-    stream_t    *s;
+    union {
+        /**
+         * Input stream
+         *
+         * Depending on the module capability:
+         * - "stream filter" or "demux": input byte stream (not NULL)
+         * - "access" or "access_demux": a NULL pointer
+         * - "demux_filter": undefined
+         */
+        stream_t    *s;
+        /**
+         * Input demuxer
+         *
+         * If the module capability is "demux_filter", this is the upstream
+         * demuxer or demux filter. Otherwise, this is undefined.
+         */
+        demux_t *p_next;
+    };
 
     /**
      * Read data.
