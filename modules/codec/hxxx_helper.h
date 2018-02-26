@@ -106,6 +106,10 @@ int h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
 int hxxx_helper_get_current_profile_level(const struct hxxx_helper *hh,
                                           uint8_t *p_profile, uint8_t *p_level);
 
+int
+hxxx_helper_get_chroma_chroma(const struct hxxx_helper *hh, uint8_t *pi_chroma_format,
+                              uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma);
+
 int hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
                                 video_color_primaries_t *p_primaries,
                                 video_transfer_func_t *p_transfer,
