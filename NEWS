@@ -12,9 +12,6 @@ Video output:
  * Fix HDR tone mapping in Direct3d11
  * Fix pink screen on Windows
 
-Access:
- * macOS: enable SMB file sharing
-
 Decoder:
  * Fix potential stack buffer overflow with faad
  * Enable Cineform HD in avcodec
