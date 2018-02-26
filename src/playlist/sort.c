@@ -79,9 +79,9 @@ static inline int meta_sort( const playlist_item_t *first,
 
     /* Nodes go first */
     if( first->i_children == -1 && second->i_children >= 0 )
-        i_ret = 1;
+        i_ret = -1;
     else if( first->i_children >= 0 && second->i_children == -1 )
-       i_ret = -1;
+        i_ret = 1;
     /* Both are nodes, sort by name */
     else if( first->i_children >= 0 && second->i_children >= 0 )
         i_ret = meta_strcasecmp_title( first, second );
