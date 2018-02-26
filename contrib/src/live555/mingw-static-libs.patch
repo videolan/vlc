@@ -1,0 +1,14 @@
+diff -urN live555-orig/config.mingw live555/config.mingw
+--- live555-orig/config.mingw	2018-02-26 11:28:41.446443807 +0200
++++ live555/config.mingw	2018-02-26 11:29:02.453948892 +0200
+@@ -9,8 +9,8 @@
+ LINK =                 $(CXX) -o 
+ LINK_OPTS =            -L.
+ CONSOLE_LINK_OPTS =    $(LINK_OPTS)
+-LIBRARY_LINK =         $(LD) -o 
+-LIBRARY_LINK_OPTS =    $(LINK_OPTS) -r -Bstatic
++LIBRARY_LINK =         $(AR) cr 
++LIBRARY_LINK_OPTS =
+ LIB_SUFFIX =                   a
+ LIBS_FOR_CONSOLE_APPLICATION = -lws2_32
+ LIBS_FOR_GUI_APPLICATION = -lws2_32
