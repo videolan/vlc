@@ -405,7 +405,6 @@ bool intf_sys_t::isStateReady() const
         case Authenticating:
         case Connecting:
         case Stopping:
-        case Stopped:
         case Dead:
             return false;
         default:
