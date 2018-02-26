@@ -196,7 +196,7 @@ static void Close (vlc_object_t *obj)
 vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
-    set_capability("stream_filter", 30)
+    set_capability("stream_filter", 330)
 
     set_description(N_("Zlib decompression filter"))
     set_callbacks(Open, Close)

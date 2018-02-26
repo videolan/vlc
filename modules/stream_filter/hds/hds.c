@@ -207,7 +207,7 @@ vlc_module_begin()
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     set_description( N_("HTTP Dynamic Streaming") )
     set_shortname( "Dynamic Streaming")
-    set_capability( "stream_filter", 30 )
+    set_capability( "stream_filter", 330 )
     set_callbacks( Open, Close )
 vlc_module_end()
 
