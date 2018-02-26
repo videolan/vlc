@@ -151,6 +151,11 @@ static void memstream_Grab( struct vlc_memstream *ms, void **pp, size_t *pi )
 {
     if( ms->stream != NULL && vlc_memstream_close( ms ) == VLC_SUCCESS )
     {
+        if( ms->length == 0 )
+        {
+            free( ms->ptr );
+            ms->ptr = NULL;
+        }
         *pp = ms->ptr;
         *pi = ms->length;
     }
