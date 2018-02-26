@@ -841,6 +841,9 @@ void D3D11CloseConverter( vlc_object_t *obj )
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 #if CAN_PROCESSOR
+    if (p_sys->procOutTexture)
+        ID3D11Texture2D_Release(p_sys->procOutTexture);
+
     if (p_sys->d3dviddev)
         ID3D11VideoDevice_Release(p_sys->d3dviddev);
     if (p_sys->d3dvidctx)
