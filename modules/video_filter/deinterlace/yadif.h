@@ -139,7 +139,11 @@ static void yadif_filter_line_c(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8
     FILTER
 }
 
-static void yadif_filter_line_c_16bit(uint16_t *dst, uint16_t *prev, uint16_t *cur, uint16_t *next, int w, int prefs, int mrefs, int parity, int mode) {
+static void yadif_filter_line_c_16bit(uint8_t *dst8, uint8_t *prev8, uint8_t *cur8, uint8_t *next8, int w, int prefs, int mrefs, int parity, int mode) {
+    uint8_t *dst = (uint8_t *)dst8;
+    uint8_t *prev = (uint8_t *)prev8;
+    uint8_t *cur = (uint8_t *)cur8;
+    uint8_t *next = (uint8_t *)next8;
     int x;
     uint16_t *prev2= parity ? prev : cur ;
     uint16_t *next2= parity ? cur  : next;
