@@ -40,53 +40,6 @@
  * Demultiplexer modules interface
  */
 
-struct demux_t
-{
-    struct vlc_common_members obj;
-
-    /* Module properties */
-    module_t    *p_module;
-
-    /* eg informative but needed (we can have access+demux) */
-    char        *psz_name;
-    char        *psz_url;
-    const char  *psz_location;
-    char        *psz_filepath;
-
-    union {
-        /**
-         * Input stream
-         *
-         * Depending on the module capability:
-         * - "demux": input byte stream (not NULL)
-         * - "access_demux": a NULL pointer
-         * - "demux_filter": undefined
-         */
-        stream_t *s;
-        /**
-         * Input demuxer
-         *
-         * If the module capability is "demux_filter", this is the upstream
-         * demuxer or demux filter. Otherwise, this is undefined.
-         */
-        demux_t *p_next;
-    };
-
-    /* es output */
-    es_out_t    *out;   /* our p_es_out */
-
-    bool         b_preparsing; /* True if the demux is used to preparse */
-
-    /* set by demuxer */
-    int (*pf_demux)  ( demux_t * );   /* demux one frame only */
-    int (*pf_control)( demux_t *, int i_query, va_list args);
-
-    void *p_sys;
-
-    /* Weak link to parent input */
-    input_thread_t *p_input;
-};
-
 /* pf_demux return values */
 #define VLC_DEMUXER_EOF       0
 #define VLC_DEMUXER_EGENERIC -1
