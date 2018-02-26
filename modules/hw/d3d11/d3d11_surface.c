@@ -435,11 +435,16 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-    ID3D11VideoDecoderOutputView_GetDesc( p_sys->decoder, &viewDesc );
-
+    UINT srcSlice;
+    if (!p_sys->decoder)
+        srcSlice = p_sys->slice_index;
+    else
+    {
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+        ID3D11VideoDecoderOutputView_GetDesc( p_sys->decoder, &viewDesc );
+        srcSlice = viewDesc.Texture2D.ArraySlice;
+    }
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
-    UINT srcSlice = viewDesc.Texture2D.ArraySlice;
 
 #if CAN_PROCESSOR
     if (sys->procEnumerator)
@@ -451,7 +456,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
                 .FourCC = 0,
                 .ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D,
                 .Texture2D.MipSlice = 0,
-                .Texture2D.ArraySlice = viewDesc.Texture2D.ArraySlice,
+                .Texture2D.ArraySlice = srcSlice,
             };
 
             hr = ID3D11VideoDevice_CreateVideoProcessorInputView(sys->d3dviddev,
