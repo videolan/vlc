@@ -184,6 +184,9 @@ enum vlc_module_properties
 #define SUBCAT_PLAYLIST_SD 702
 #define SUBCAT_PLAYLIST_EXPORT 703
 
+#define CAT_3D 8
+#define SUBCAT_3D_OBJECT_LOADER 801
+
 
 /**
  * Current plugin ABI version

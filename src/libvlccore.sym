@@ -965,3 +965,16 @@ vlc_hmd_MapDevice
 vlc_hmd_UnmapDevice
 vlc_hmd_ReadEvents
 vlc_hmd_ReadViewpoint
+objLoader_get
+objLoader_release
+objLoader_loadScene
+scene_object_New
+scene_object_Release
+scene_mesh_New
+scene_mesh_Release
+scene_material_New
+scene_material_LoadTexture
+scene_material_Release
+scene_CalcTransformationMatrix
+scene_New
+scene_Release

@@ -75,6 +75,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_mouse.h \
 	../include/vlc_network.h \
 	../include/vlc_objects.h \
+	../include/vlc_object_loader.h \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
@@ -390,7 +391,9 @@ libvlccore_la_SOURCES = \
 	misc/subpicture.c \
 	misc/subpicture.h \
 	misc/medialibrary.c \
-	misc/hmd.c
+	misc/hmd.c \
+	object_loader/object_loader.c
+
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \

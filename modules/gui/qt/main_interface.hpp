@@ -83,6 +83,7 @@ private:
     static void requestVideoState( struct vout_window_t *, unsigned );
     static void requestVideoWindowed( struct vout_window_t * );
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
+    static void requestSetHMDMode( struct vout_window_t *, bool, int );
 
 public:
     /* Getters */
