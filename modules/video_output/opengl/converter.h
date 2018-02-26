@@ -344,6 +344,8 @@ struct opengl_tex_converter_t
         GLint Coefficients;
         GLint FillColor;
         GLint *pl_vars; /* for pl_sh_res */
+        GLint IsUniformColor;
+        GLint UniformColor;
     } uloc;
     bool yuv_color;
     GLfloat yuv_coefficients[16];

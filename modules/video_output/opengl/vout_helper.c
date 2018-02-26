@@ -44,6 +44,7 @@
 
 #include "vout_helper.h"
 #include "internal.h"
+#include "objects.h"
 
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F
@@ -107,6 +108,8 @@ struct prgm
         GLfloat YRotMatrix[16];
         GLfloat XRotMatrix[16];
         GLfloat ZoomMatrix[16];
+        GLfloat ObjectTransformMatrix[16];
+        GLfloat SceneTransformMatrix[16];
         GLfloat SbSCoefs[2];
         GLfloat SbSOffsets[2];
     } var;
@@ -119,6 +122,8 @@ struct prgm
         GLint YRotMatrix;
         GLint XRotMatrix;
         GLint ZoomMatrix;
+        GLint ObjectTransformMatrix;
+        GLint SceneTransformMatrix;
         GLint SbSCoefs;
         GLint SbSOffsets;
     } uloc;
@@ -147,11 +152,12 @@ struct vout_display_opengl_t {
     picture_pool_t *pool;
 
     /* One YUV program and one RGBA program (for subpics) */
-    struct prgm prgms[4];
+    struct prgm prgms[5];
     struct prgm *prgm; /* Main program */
     struct prgm *sub_prgm; /* Subpicture program */
     struct prgm *ctl_prgm; /* HMD controller program */
     struct prgm *stereo_prgm; /* Stereo program */
+    struct prgm *scene_prgm; /* 3D scene program */
 
     unsigned nb_indices;
     GLuint vertex_buffer_object;
@@ -208,6 +214,9 @@ struct vout_display_opengl_t {
     GLuint vertex_buffer_object_stereo;
     GLuint index_buffer_object_stereo;
     GLuint texture_buffer_object_stereo;
+
+    /* 3D objects */
+    gl_scene_objects_display_t objDisplay;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -329,6 +338,8 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
         getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
         getZoomMatrix(vgl->f_z, prgm->var.ZoomMatrix);
+        memcpy(prgm->var.ObjectTransformMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.SceneTransformMatrix, identity, sizeof(identity));
     }
     else
     {
@@ -338,6 +349,8 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         memcpy(prgm->var.YRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.XRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.ObjectTransformMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.SceneTransformMatrix, identity, sizeof(identity));
     }
 }
 
@@ -488,10 +501,12 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 YRotMatrix;\n"
         "uniform mat4 ZRotMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
+        "uniform mat4 ObjectTransformMatrix;\n"
+        "uniform mat4 SceneTransformMatrix;\n"
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * SceneTransformMatrix * ObjectTransformMatrix * vec4(VertexPosition, 1.0);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -537,8 +552,8 @@ GenTextures(const opengl_tex_converter_t *tc,
 
         tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
     }
 
     if (tc->pf_allocate_textures != NULL)
@@ -655,6 +670,8 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(YRotMatrix, "YRotMatrix");
     GET_ULOC(XRotMatrix, "XRotMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
+    GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
+    GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
     GET_ULOC(SbSCoefs, "SbSCoefs");
     GET_ULOC(SbSOffsets, "SbSOffsets");
 
@@ -1201,6 +1218,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->sub_prgm = &vgl->prgms[1];
     vgl->stereo_prgm = &vgl->prgms[2];
     vgl->ctl_prgm = &vgl->prgms[3];
+    vgl->scene_prgm = &vgl->prgms[4];
 
     GL_ASSERT_NOERROR();
     int ret;
@@ -1235,6 +1253,26 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                  (const char *) &fmt->i_chroma);
         opengl_deinit_program(vgl, vgl->prgm);
         opengl_deinit_program(vgl, vgl->sub_prgm);
+        free(vgl);
+        return NULL;
+    }
+
+    GL_ASSERT_NOERROR();
+    video_format_t sceneTextureFmt;
+    sceneTextureFmt.i_chroma = VLC_CODEC_RGB32;
+    sceneTextureFmt.orientation = ORIENT_NORMAL;
+    sceneTextureFmt.primaries = COLOR_PRIMARIES_UNDEF;
+    sceneTextureFmt.transfer = TRANSFER_FUNC_UNDEF;
+    sceneTextureFmt.space = COLOR_SPACE_UNDEF;
+    ret = opengl_init_program(vgl, vgl->scene_prgm, extensions, &sceneTextureFmt, false,
+                              b_dump_shaders);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Warn(gl, "could not init 3d scene converter for %4.4s",
+                 (const char *) &fmt->i_chroma);
+        opengl_deinit_program(vgl, vgl->prgm);
+        opengl_deinit_program(vgl, vgl->sub_prgm);
+        opengl_deinit_program(vgl, vgl->ctl_prgm);
         free(vgl);
         return NULL;
     }
@@ -1286,11 +1324,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* */
     vgl->vt.Disable(GL_BLEND);
-    vgl->vt.Disable(GL_DEPTH_TEST);
-    vgl->vt.DepthMask(GL_FALSE);
+    //vgl->vt.Disable(GL_DEPTH_TEST);
+    //vgl->vt.DepthMask(GL_FALSE);
     vgl->vt.Enable(GL_CULL_FACE);
     vgl->vt.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
+    vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vgl->vt.GenBuffers(1, &vgl->vertex_buffer_object);
     vgl->vt.GenBuffers(1, &vgl->index_buffer_object);
@@ -1333,6 +1371,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     CreateFBO(vgl, &vgl->leftFBO, &vgl->leftColorTex, &vgl->leftDepthTex);
     CreateFBO(vgl, &vgl->rightFBO, &vgl->rightColorTex, &vgl->rightDepthTex);
 
+    vgl->objDisplay.gl = vgl->gl;
+    vgl->objDisplay.tc = vgl->scene_prgm->tc;
+    if (loadSceneObjects(&vgl->objDisplay, "VirtualTheater" DIR_SEP "Cinema_VLC_TARGO.fbx") != VLC_SUCCESS)
+        msg_Warn(vgl->gl, "Could not load the virtual theater");
+
     GL_ASSERT_NOERROR();
     return vgl;
 }
@@ -1344,6 +1387,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     /* */
     vgl->vt.Finish();
     vgl->vt.Flush();
+
+    releaseSceneObjects(&vgl->objDisplay);
 
     const size_t main_tex_count = vgl->prgm->tc->tex_count;
     const bool main_del_texs = !vgl->prgm->tc->handle_texs_gen;
@@ -1357,6 +1402,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     opengl_deinit_program(vgl, vgl->prgm);
     opengl_deinit_program(vgl, vgl->sub_prgm);
     opengl_deinit_program(vgl, vgl->ctl_prgm);
+    opengl_deinit_program(vgl, vgl->scene_prgm);
 
     vgl->vt.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->vt.DeleteBuffers(1, &vgl->index_buffer_object);
@@ -1439,6 +1485,7 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
         UpdateZ(vgl);
     }
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->scene_prgm);
 
     return VLC_SUCCESS;
 #undef RAD
@@ -1455,6 +1502,7 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
     UpdateFOVy(vgl);
     UpdateZ(vgl);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->scene_prgm);
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
@@ -1854,12 +1902,18 @@ static int BuildVirtualScreen(unsigned nbPlanes,
         return VLC_ENOMEM;
     }
 
+    #define SCREEN_POS 39.95f
+    #define SCREEN_SIZE 10.f
+    #define POS_Y 4.f
     const GLfloat coord[] = {
-        -1.0,    1.0 / f_ar,    1.0f,
-        -1.0,    -1.0 / f_ar,   1.0f,
-        -1.0,    1.0 / f_ar,    -1.0f,
-        -1.0,    -1.0 / f_ar,   -1.0f,
+        -SCREEN_POS,    SCREEN_SIZE + POS_Y,    SCREEN_SIZE * f_ar,
+        -SCREEN_POS,    -SCREEN_SIZE + POS_Y,   SCREEN_SIZE * f_ar,
+        -SCREEN_POS,    SCREEN_SIZE + POS_Y,    -SCREEN_SIZE * f_ar,
+        -SCREEN_POS,    -SCREEN_SIZE + POS_Y,   -SCREEN_SIZE * f_ar,
     };
+    #undef SCREEN_POS
+    #undef SCREEN_SIZE
+    #undef POS_Y
 
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
@@ -2071,6 +2125,10 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.XRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                               prgm->var.ZoomMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                              prgm->var.ObjectTransformMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
+                              prgm->var.SceneTransformMatrix);
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
@@ -2191,6 +2249,8 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         memcpy(prgm->var.YRotMatrix, vgl->prgm->var.YRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.XRotMatrix, vgl->prgm->var.XRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.ZoomMatrix, vgl->prgm->var.ZoomMatrix, 16 * sizeof(float));
+        memcpy(prgm->var.ObjectTransformMatrix, vgl->prgm->var.ObjectTransformMatrix, 16 * sizeof(float));
+        memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
 
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                                  prgm->var.OrientationMatrix);
@@ -2206,6 +2266,10 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
                                  prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                  prgm->var.ZoomMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                                 prgm->var.ObjectTransformMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
+                                 prgm->var.SceneTransformMatrix);
 
         float *SbSCoefs = prgm->var.SbSCoefs;
         float *SbSOffsets = prgm->var.SbSOffsets;
@@ -2219,6 +2283,115 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
     }
     vgl->vt.BlendFunc(GL_ONE, GL_ZERO);
     vgl->vt.Disable(GL_BLEND);
+}
+
+static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
+                             side_by_side_eye eye)
+{
+    GLuint program = prgm->id;
+    opengl_tex_converter_t *tc = prgm->tc;
+    vgl->vt.UseProgram(program);
+
+    vgl->vt.Enable(GL_DEPTH_TEST);
+
+    scene_t *p_scene = vgl->objDisplay.p_scene;
+    if (p_scene == NULL)
+        return;
+
+    memcpy(prgm->var.SceneTransformMatrix, p_scene->transformMatrix,
+           sizeof(p_scene->transformMatrix));
+
+    if (vgl->b_sideBySide)
+    {
+        if (eye == LEFT_EYE)
+        {
+            memcpy(prgm->var.ModelViewMatrix,
+                   vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
+            memcpy(prgm->var.ProjectionMatrix,
+                   vgl->hmd_cfg.left.projection, 16 * sizeof(float));
+        }
+        else if (eye == RIGHT_EYE)
+        {
+            memcpy(prgm->var.ModelViewMatrix,
+                   vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
+            memcpy(prgm->var.ProjectionMatrix,
+                   vgl->hmd_cfg.right.projection, 16 * sizeof(float));
+        }
+    }
+
+    vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
+                              prgm->var.OrientationMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
+                              prgm->var.ProjectionMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
+                              prgm->var.ModelViewMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
+                              prgm->var.ZRotMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
+                              prgm->var.YRotMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
+                              prgm->var.XRotMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
+                              prgm->var.ZoomMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
+                              prgm->var.SceneTransformMatrix);
+
+    getSbSParams(vgl, prgm, eye);
+    vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
+    vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
+
+    vgl->vt.ActiveTexture(GL_TEXTURE0);
+
+    for (unsigned o = 0; o < p_scene->nObjects; ++o)
+    {
+        scene_object_t *p_object = vgl->objDisplay.p_scene->objects[o];
+        scene_mesh_t *p_mesh = vgl->objDisplay.p_scene->meshes[p_object->meshId];
+        scene_material_t *p_material = vgl->objDisplay.p_scene->materials[p_object->textureId];
+
+        if (p_material->material_type == MATERIAL_TYPE_TEXTURE)
+        {
+            GLsizei i_width = p_material->p_pic->format.i_width;
+            GLsizei i_height = p_material->p_pic->format.i_height;
+            tc->pf_prepare_shader(tc, &i_width, &i_height, 1.0f);
+
+            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->objDisplay.index_buffer_object[p_object->meshId]);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.texture_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+            vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT, 0, 0, 0);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.vertex_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+
+            vgl->vt.BindTexture(tc->tex_target, vgl->objDisplay.textures[p_object->textureId]);
+            tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
+        }
+        else if (p_material->material_type == MATERIAL_TYPE_DIFFUSE_COLOR)
+        {
+            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->objDisplay.index_buffer_object[p_object->meshId]);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.vertex_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+
+            tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
+            tc->vt->Uniform4f(tc->uloc.UniformColor,
+                p_material->diffuse_color[0], p_material->diffuse_color[1], p_material->diffuse_color[2],
+                1.f);
+        }
+
+        memcpy(prgm->var.ObjectTransformMatrix, p_object->transformMatrix,
+               sizeof(p_object->transformMatrix));
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                                  prgm->var.ObjectTransformMatrix);
+
+        vgl->vt.DrawElements(GL_TRIANGLES, p_mesh->nFaces * 3, GL_UNSIGNED_INT, 0);
+
+        GL_ASSERT_NOERROR();
+    }
+
+    //vgl->vt.Disable(GL_DEPTH_TEST);
 }
 
 static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, side_by_side_eye eye)
@@ -2302,6 +2475,10 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
     if (vgl->b_show_hmd_controller)
         DrawHMDController(vgl, eye);
 
+    if (vgl->b_sideBySide
+        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR)
+        DrawSceneObjects(vgl, vgl->scene_prgm, eye);
+
     /* Draw the subpictures */
     // Change the program for overlays
     struct prgm *prgm = vgl->sub_prgm;
@@ -2376,6 +2553,10 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
                                   prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                   prgm->var.ZoomMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                                  prgm->var.ObjectTransformMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
+                                  prgm->var.SceneTransformMatrix);
 
         getSbSParams(vgl, prgm, eye);
         vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
@@ -2389,7 +2570,6 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
     return VLC_SUCCESS;
 }
 
-
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
@@ -2398,7 +2578,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
-    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
+    vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (vgl->b_sideBySide) {
         // Draw scene into framebuffers.

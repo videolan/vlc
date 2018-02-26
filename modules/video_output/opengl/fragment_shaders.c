@@ -358,6 +358,14 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
     if (tc->uloc.FillColor == -1)
         return VLC_EGENERIC;
 
+    tc->uloc.UniformColor = tc->vt->GetUniformLocation(program, "UniformColor");
+    if (tc->uloc.UniformColor == -1)
+        return VLC_EGENERIC;
+
+    tc->uloc.IsUniformColor = tc->vt->GetUniformLocation(program, "IsUniformColor");
+    if (tc->uloc.IsUniformColor == -1)
+        return VLC_EGENERIC;
+
 #ifdef HAVE_LIBPLACEBO
     const struct pl_shader_res *res = tc->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
@@ -383,6 +391,8 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
         tc->vt->Uniform1i(tc->uloc.Texture[i], i);
 
     tc->vt->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
+    tc->vt->Uniform4f(tc->uloc.UniformColor, 1.f, 0.f, 0.f, 1.f);
+    tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
 
     if (tc->tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -639,8 +649,13 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         ADD("uniform vec4 Coefficients[4];\n");
 
     ADD("uniform vec4 FillColor;\n"
+        "uniform bool IsUniformColor;\n"
+        "uniform vec4 UniformColor;\n"
         "void main(void) {\n"
-        " float val;vec4 colors;\n");
+        " float val;\n"
+        " vec4 colors;\n"
+        " vec4 result;\n"
+        " if (!IsUniformColor) {\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -678,9 +693,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
     if (is_yuv)
-        ADD(" vec4 result = (color0 * Coefficients[0]) + Coefficients[3];\n");
+        ADD(" result = (color0 * Coefficients[0]) + Coefficients[3];\n");
     else
-        ADD(" vec4 result = color0;\n");
+        ADD(" result = color0;\n");
 
     for (unsigned i = 1; i < color_count; ++i)
     {
@@ -708,7 +723,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     }
 #endif
 
-    ADD(" gl_FragColor = result * FillColor;\n"
+    ADD(" result = result * FillColor;\n"
+        " } else {\n"
+        "  result = UniformColor;\n"
+        " }\n"
+        " gl_FragColor = result;\n"
         "}");
 
 #undef ADD
