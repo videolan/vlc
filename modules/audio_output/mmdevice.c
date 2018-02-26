@@ -1201,6 +1201,9 @@ static void Stop(audio_output_t *aout)
 
 static int Open(vlc_object_t *obj)
 {
+    if (!var_InheritBool(obj, "volume-save"))
+        return VLC_EGENERIC;
+
     audio_output_t *aout = (audio_output_t *)obj;
 
     aout_sys_t *sys = malloc(sizeof (*sys));
