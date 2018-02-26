@@ -451,25 +451,17 @@ static const struct IAudioVolumeDuckNotificationVtbl vlc_AudioVolumeDuckNotifica
 /*** Audio devices ***/
 
 /** Gets the user-readable device name */
-static int DeviceHotplugReport(audio_output_t *aout, LPCWSTR wid,
-                               IMMDevice *dev)
+static char *DeviceGetFriendlyName(IMMDevice *dev)
 {
     IPropertyStore *props;
-    char *name;
     PROPVARIANT v;
     HRESULT hr;
 
-    char *id = FromWide(wid);
-    if (unlikely(id == NULL))
-        return VLC_ENOMEM;
-
     hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
     if (FAILED(hr))
-    {
-        free(id);
-        return VLC_EGENERIC;
-    }
+        return NULL;
 
+    char *name = NULL;
     PropVariantInit(&v);
     hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
     if (SUCCEEDED(hr))
@@ -477,10 +469,23 @@ static int DeviceHotplugReport(audio_output_t *aout, LPCWSTR wid,
         name = FromWide(v.pwszVal);
         PropVariantClear(&v);
     }
-    else
-        name = id;
 
     IPropertyStore_Release(props);
+
+    return name;
+}
+
+static int DeviceHotplugReport(audio_output_t *aout, LPCWSTR wid,
+                               IMMDevice *dev)
+{
+    char *id = FromWide(wid);
+    if (!id)
+        return VLC_EGENERIC;
+
+    char *name = DeviceGetFriendlyName(dev);
+    if (name == NULL)
+        name = id;
+
     aout_HotplugReport(aout, id, name);
 
     free(id);
