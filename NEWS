@@ -3,27 +3,65 @@ Changes between 3.0.0 and 3.0.1:
 
 Core:
  * Fix use-after-free when cleaning playlists
+ * Fix crash on exit on Windows
 
 Video output:
  * Fix HLG tone mapping on some systems like macOS.
  * Fix screensaver inhibition on Windows XP
- * Fix various Direct3d11 crashes
+ * Fix various Direct3D11 crashes
  * Fix HDR tone mapping in Direct3d11
+ * Fix pink screen on Windows
 
 Access:
  * macOS: enable SMB file sharing
 
+Decoder:
+ * Fix potential stack buffer overflow with faad
+ * Enable Cineform HD in avcodec
+
 Hardware Decoder:
  * macOS: Improve HEVC 10bit performance with Videotoolbox
+ * android: Add MPEG2 support via MediaCodec
+ * Fix HEVC decoding with some files on Android/macOS/iOS
+ * Improve Direct3D11 memory usage
 
 Demux:
  * Improve MKV seeking speed
- 
+ * Fix xspf base URL handling
+ * Fix reading mp4 trun with moof based offsets
+ * Fix adaptive http redirections
+ * Replace old API, fixing adaptive TLS leak
+ * Use mime type as fallback for HLS segment type
+ * Fix subtitle (srt,ssa..) seek when having a single entry
+ * Flag non default HDMV subset video streams
+ * Increase TS probing amount for 4K streams
+ * Miscellaneous MKV, MP4 & AVI crash fixes
+
+Packetizer:
+ * Fix out of bounds read in mpeg4video
+
+Stream Output:
+ * Improve chromecast loading speed
+ * Improve local/chromecast transition during playback
+ * Fix chromecast loading with some versions of Windows
+ * Fix chromecast loading with some chromecast devices (TVs and Android boxes)
+ * Fix wrong first cover art when casting
+ * Fix casting to VP9
+
 macOS Interface:
  * Re-add option to disable the fullscreen controller panel
  * Auto-layout improvements
- * Remove misleading playback warning indicato
+ * Remove misleading playback warning indicator
  * Fix crash with the interface for lua extensions (like VLSub)
+ * Fix show sidebar setting being ignored on restart
+ * Fix MKV files association
+ * Fix chromecast audio detection
+
+Qt Interface:
+ * Improve scaling on HiDPI displays
+
+Snap:
+ * Improve interface look and feel.
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
@@ -415,7 +453,7 @@ Mac OS X:
    update to the newest version.
 
 Video Output:
- * Fix Direct3D9 output with odd offsets
+ * Fix Direct2D9 output with odd offsets
 
 Misc:
  * Fix crash in MTP
