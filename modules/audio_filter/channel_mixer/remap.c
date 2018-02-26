@@ -321,7 +321,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     i_output_physical = CanonicaliseChannels( i_output_physical );
 
-    unsigned i_channels = popcount(i_output_physical);
+    unsigned i_channels = vlc_popcount(i_output_physical);
 
     /* condense out_channels */
     uint8_t out_ch_sorted[ AOUT_CHAN_MAX ];

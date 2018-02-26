@@ -340,7 +340,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                 {
                     char *endptr = (char *) &comment->entry[34] + comment->length;
                     const uint32_t i_wfxmask = strtoul( (char *) &comment->entry[34], &endptr, 16 );
-                    const unsigned i_wfxchannels = popcount( i_wfxmask );
+                    const unsigned i_wfxchannels = vlc_popcount( i_wfxmask );
                     if( i_wfxchannels > 0 && i_wfxchannels <= AOUT_CHAN_MAX )
                     {
                         /* Create the vlc bitmap from wfx channels */
@@ -356,7 +356,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                             }
                         }
                         /* Check if we have the 1 to 1 mapping */
-                        if( popcount(i_vlcmask) != i_wfxchannels )
+                        if( vlc_popcount(i_vlcmask) != i_wfxchannels )
                         {
                             msg_Warn( p_dec, "Unsupported channel mask %x", i_wfxmask );
                             return;

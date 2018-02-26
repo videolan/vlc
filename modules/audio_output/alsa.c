@@ -242,8 +242,8 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
         if (chans == -1)
             continue;
 
-        unsigned score = (popcount (chans & *mask) << 8)
-                       | (255 - popcount (chans));
+        unsigned score = (vlc_popcount (chans & *mask) << 8)
+                       | (255 - vlc_popcount (chans));
         if (score > best_score)
         {
             best_offset = p - maps;
@@ -469,7 +469,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         sys->chans_to_reorder = SetupChannels (VLC_OBJECT(aout), pcm, &map,
                                                sys->chans_table);
         fmt->i_physical_channels = map;
-        channels = popcount (map);
+        channels = vlc_popcount (map);
     }
     else
     {

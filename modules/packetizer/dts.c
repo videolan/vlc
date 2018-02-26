@@ -105,7 +105,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_chan_mode = p_sys->dts.i_chan_mode;
     p_dec->fmt_out.audio.i_physical_channels = p_sys->dts.i_physical_channels;
     p_dec->fmt_out.audio.i_channels =
-        popcount( p_dec->fmt_out.audio.i_physical_channels );
+        vlc_popcount( p_dec->fmt_out.audio.i_physical_channels );
 
     p_dec->fmt_out.i_bitrate = p_sys->dts.i_bitrate;
 

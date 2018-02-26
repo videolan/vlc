@@ -605,7 +605,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
         unsigned long: __builtin_ctzl(x), \
         unsigned long long: __builtin_ctzll(x))
 
-#  define popcount(x) \
+#  define vlc_popcount(x) \
     _Generic((x), \
         unsigned char:      __builtin_popcount(x), \
           signed char:      __builtin_popcount((unsigned char)(x)), \
@@ -647,27 +647,27 @@ VLC_USED static inline int ctz(unsigned long long x)
     return __builtin_ctzll(x);
 }
 
-VLC_USED static inline int popcount(unsigned char x)
+VLC_USED static inline int vlc_popcount(unsigned char x)
 {
     return __builtin_popcount(x);
 }
 
-VLC_USED static inline int popcount(unsigned short x)
+VLC_USED static inline int vlc_popcount(unsigned short x)
 {
     return __builtin_popcount(x);
 }
 
-VLC_USED static inline int popcount(unsigned x)
+VLC_USED static inline int vlc_popcount(unsigned x)
 {
     return __builtin_popcount(x);
 }
 
-VLC_USED static inline int popcount(unsigned long x)
+VLC_USED static inline int vlc_popcount(unsigned long x)
 {
     return __builtin_popcountl(x);
 }
 
-VLC_USED static inline int popcount(unsigned long long x)
+VLC_USED static inline int vlc_popcount(unsigned long long x)
 {
     return __builtin_popcountll(x);
 }
@@ -745,7 +745,7 @@ VLC_USED static inline int ctz(unsigned long long x)
     return i;
 }
 
-VLC_USED static inline int popcount(unsigned long long x)
+VLC_USED static inline int vlc_popcount(unsigned long long x)
 {
     int count = 0;
     while (x)
@@ -764,18 +764,18 @@ VLC_USED static inline int popcount(unsigned long long x)
  *
  * \return The count of non-zero bits.
  */
-#  define popcount(x) \
+#  define vlc_popcount(x) \
     _Generic((x), \
-        unsigned char:      popcount(x), \
-          signed char:      popcount((unsigned char)(x)), \
-        unsigned short:     popcount(x), \
-          signed short:     popcount((unsigned short)(x)), \
-        unsigned int:       popcount(x), \
-          signed int:       popcount((unsigned int)(x)), \
-        unsigned long:      popcount(x), \
-          signed long:      popcount((unsigned long)(x)), \
-        unsigned long long: popcount(x), \
-          signed long long: popcount(x))
+        unsigned char:      vlc_popcount(x), \
+          signed char:      vlc_popcount((unsigned char)(x)), \
+        unsigned short:     vlc_popcount(x), \
+          signed short:     vlc_popcount((unsigned short)(x)), \
+        unsigned int:       vlc_popcount(x), \
+          signed int:       vlc_popcount((unsigned int)(x)), \
+        unsigned long:      vlc_popcount(x), \
+          signed long:      vlc_popcount((unsigned long)(x)), \
+        unsigned long long: vlc_popcount(x), \
+          signed long long: vlc_popcount(x))
 # endif
 
 /**

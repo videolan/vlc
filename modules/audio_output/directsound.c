@@ -517,7 +517,7 @@ static HRESULT CreateDSBufferPCM( vlc_object_t *obj, aout_stream_sys_t *sys,
                                   int i_rate, bool b_probe )
 {
     HRESULT hr;
-    unsigned i_nb_channels = popcount( i_channels );
+    unsigned i_nb_channels = vlc_popcount( i_channels );
 
     if( var_GetBool( obj, "directx-audio-float32" ) )
     {

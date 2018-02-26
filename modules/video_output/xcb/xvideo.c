@@ -141,7 +141,7 @@ static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
         switch (f->num_planes)
         {
           case 1:
-            switch (popcount (f->red_mask | f->green_mask | f->blue_mask))
+            switch (vlc_popcount (f->red_mask | f->green_mask | f->blue_mask))
             {
               case 24:
                 if (f->bpp == 32 && f->depth == 32)

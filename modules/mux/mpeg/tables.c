@@ -544,7 +544,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         else if( p_stream->fmt->i_codec == VLC_CODEC_DTS )
         {
             /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
-            if(popcount(p_stream->fmt->audio.i_bytes_per_frame) == 1)
+            if(vlc_popcount(p_stream->fmt->audio.i_bytes_per_frame) == 1)
             {
                 uint8_t i_ver = ctz( p_stream->fmt->audio.i_bytes_per_frame >> 8 );
                 if(i_ver > 0 && i_ver < 4)
