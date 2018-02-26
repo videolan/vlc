@@ -296,10 +296,10 @@ SORTFN( SORT_TITLE, first, second )
 
 SORTFN( SORT_TITLE_NODES_FIRST, first, second )
 {
-    /* If first is a node but not second */
+    /* If second is a node but not first */
     if( first->i_children == -1 && second->i_children >= 0 )
         return -1;
-    /* If second is a node but not first */
+    /* If first is a node but not second */
     else if( first->i_children >= 0 && second->i_children == -1 )
         return 1;
     /* Both are nodes or both are not nodes */
