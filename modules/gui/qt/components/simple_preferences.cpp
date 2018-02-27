@@ -128,7 +128,15 @@ static struct {
 static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
 {
     if (!strcmp(aout, "") || !strcmp(aout, "any"))
+#ifdef _WIN32
+        /* All Windows aouts, that can be selected automatically, handle volume
+         * saving. In case of automatic mode, we'll save the last volume for
+         * every modules. Therefore, all volumes variable we be the same and we
+         * can use the first one (mmdevice). */
+        return config_GetFloat(obj, "mmdevice-volume") * 100.f + .5f;
+#else
         return -1;
+#endif
     else
     /* Note: For hysterical raisins, this is sorted by decreasing priority
      * order (then alphabetical order). */
