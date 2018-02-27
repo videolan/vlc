@@ -977,12 +977,6 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         {
             float level;
 
-            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
-            if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, cbrtf(level * sys->gain));
-            else
-                msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
-
             level = sys->requested_volume;
             if (level >= 0.f)
             {
@@ -992,6 +986,12 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                             hr);
             }
             sys->requested_volume = -1.f;
+
+            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
+            if (SUCCEEDED(hr))
+                aout_VolumeReport(aout, cbrtf(level * sys->gain));
+            else
+                msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
 
             BOOL mute;
 
