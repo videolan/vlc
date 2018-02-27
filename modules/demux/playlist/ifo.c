@@ -102,7 +102,7 @@ static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
     const char *psz_location = StreamLocation(p_stream);
 
     if( asprintf( &psz_url, "dvd://%s", psz_location ) == -1 )
-        return 0;
+        return VLC_EGENERIC;
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
     input_item_node_AppendItem( node, p_input );
@@ -121,7 +121,7 @@ static int ReadDVD_VR( stream_t *p_stream, input_item_node_t *node )
     char *psz_url = strdup( psz_location );
 
     if( unlikely( psz_url == NULL ) )
-        return 0;
+        return VLC_EGENERIC;
 
     strcpy( &psz_url[len - 12], "VR_MOVIE.VRO" );
 
