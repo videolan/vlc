@@ -1,0 +1,20 @@
+Libtool checks only for libraries linked as -l* when trying to
+find internal compiler libraries. Clang, however uses the absolute
+path to link its internal libraries e.g. compiler_rt. This patch
+handles clang's statically linked libraries when finding internal
+compiler libraries.
+https://crbug.com/749263
+https://debbugs.gnu.org/cgi/bugreport.cgi?bug=27866
+
+--- a/libltdl/m4/libtool.m4
++++ b/libltdl/m4/libtool.m4
+@@ -7531,7 +7544,7 @@
+   for p in `eval "$output_verbose_link_cmd"`; do
+     case $prev$p in
+
+-    -L* | -R* | -l*)
++    -L* | -R* | -l* | */libclang_rt.*.a)
+        # Some compilers place space between "-{L,R}" and the path.
+        # Remove the space.
+        if test x-L = "$p" ||
+
