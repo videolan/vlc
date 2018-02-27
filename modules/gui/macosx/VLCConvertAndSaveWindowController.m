@@ -938,7 +938,9 @@
 
 
         // add output destination
-        [composedOptions appendFormat:@",access=file{no-overwrite},dst=%@}", _outputDestination];
+        _outputDestination = [_outputDestination stringByReplacingOccurrencesOfString:@"\""
+                                                                           withString:@"\\\""];
+        [composedOptions appendFormat:@",access=file{no-overwrite},dst=\"%@\"}", _outputDestination];
     } else {
         /* streaming */
         if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"RTP"])
