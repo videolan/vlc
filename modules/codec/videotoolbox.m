@@ -176,7 +176,8 @@ struct decoder_sys_t
 
     enum vtsession_status       vtsession_status;
 
-    int                         i_forced_cvpx_format;
+    int                         i_cvpx_format;
+    bool                        b_cvpx_format_forced;
 
     h264_poc_context_t          h264_pocctx;
     hevc_poc_ctx_t              hevc_pocctx;
@@ -724,7 +725,7 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
 #if !TARGET_OS_IPHONE
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->i_forced_cvpx_format == 0)
+    if (p_sys->i_cvpx_format == 0)
     {
         /* Force P010 chroma instead of RGBA in order to improve performances. */
         uint8_t i_profile, i_level;
@@ -732,7 +733,7 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
                                                   &i_level))
             return true;
         if (i_profile == HEVC_PROFILE_MAIN_10)
-            p_sys->i_forced_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+            p_sys->i_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
     }
 #endif
     return true;
@@ -1206,13 +1207,13 @@ static int StartVideoToolbox(decoder_t *p_dec)
     cfdict_set_int32(destinationPixelBufferAttributes,
                      kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_visible_height);
 
-    if (p_sys->i_forced_cvpx_format != 0)
+    if (p_sys->i_cvpx_format != 0)
     {
-        int chroma = htonl(p_sys->i_forced_cvpx_format);
+        int chroma = htonl(p_sys->i_cvpx_format);
         msg_Warn(p_dec, "forcing CVPX format: %4.4s", (const char *) &chroma);
         cfdict_set_int32(destinationPixelBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
-                         p_sys->i_forced_cvpx_format);
+                         p_sys->i_cvpx_format);
     }
 
     cfdict_set_int32(destinationPixelBufferAttributes,
@@ -1317,6 +1318,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = nil;
     p_sys->i_pic_reorder_max = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
+    p_sys->b_cvpx_format_forced = false;
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1328,8 +1330,9 @@ static int OpenDecoder(vlc_object_t *p_this)
             free(p_sys);
             return VLC_EGENERIC;
         }
-        memcpy(&p_sys->i_forced_cvpx_format, cvpx_chroma, 4);
-        p_sys->i_forced_cvpx_format = ntohl(p_sys->i_forced_cvpx_format);
+        memcpy(&p_sys->i_cvpx_format, cvpx_chroma, 4);
+        p_sys->i_cvpx_format = ntohl(p_sys->i_cvpx_format);
+        p_sys->b_cvpx_format_forced = true;
         free(cvpx_chroma);
     }
 
@@ -1790,13 +1793,14 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                  "aborting...");
         p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
 #else
-        if (p_sys->i_forced_cvpx_format == 0)
+        if (!p_sys->b_cvpx_format_forced
+         && p_sys->i_cvpx_format != kCVPixelFormatType_420YpCbCr8Planar)
         {
             /* In case of interlaced content, force VT to output I420 since our
              * SW deinterlacer handle this chroma natively. This avoids having
              * 2 extra conversions (CVPX->I420 then I420->CVPX). */
 
-            p_sys->i_forced_cvpx_format = kCVPixelFormatType_420YpCbCr8Planar;
+            p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr8Planar;
             msg_Warn(p_dec, "Interlaced content: forcing VT to output I420");
             if (p_sys->session != nil && p_sys->vtsession_status == VTSESSION_STATUS_OK)
             {
