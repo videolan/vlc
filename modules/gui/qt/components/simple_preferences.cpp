@@ -142,7 +142,7 @@ static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
 #endif
 #ifdef _WIN32
     if (!strcmp(aout, "mmdevice"))
-        return -1;
+        return config_GetFloat(obj, "mmdevice-volume") * 100.f + .5f;
     else
 #endif
     if (!strcmp(aout, "sndio"))
@@ -1115,6 +1115,8 @@ void SPrefsPanel::apply()
         //FIXME this is moot
 #if defined( _WIN32 )
         VLC_UNUSED( f_gain );
+        if( save_vol_aout( "mmdevice" ) )
+            config_PutFloat( p_intf, "mmdevice-volume", i_volume / 100.f );
         if( save_vol_aout( "directsound" ) )
             config_PutFloat( p_intf, "directx-volume", i_volume / 100.f );
         if( save_vol_aout( "waveout" ) )
