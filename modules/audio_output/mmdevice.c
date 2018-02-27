@@ -42,6 +42,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
    0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
 
 #include <vlc_common.h>
+#include <vlc_memory.h>
 #include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -1259,7 +1260,6 @@ static int Open(vlc_object_t *obj)
     sys->ducks = 0;
 
     sys->gain = 1.f;
-    sys->requested_device = default_device;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
     sys->acquired_device = NULL;
@@ -1269,6 +1269,21 @@ static int Open(vlc_object_t *obj)
     InitializeConditionVariable(&sys->ready);
 
     aout_HotplugReport(aout, default_device_b, _("Default"));
+
+    char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
+    if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
+    {
+        sys->requested_device = ToWide(saved_device_b);
+        free(saved_device_b);
+
+        if (unlikely(sys->requested_device == NULL))
+            goto error;
+    }
+    else
+    {
+        free(saved_device_b);
+        sys->requested_device = default_device;
+    }
 
     /* Initialize MMDevice API */
     if (TryEnterMTA(aout))
@@ -1333,6 +1348,91 @@ static void Close(vlc_object_t *obj)
     free(sys);
 }
 
+struct mm_list
+{
+    size_t count;
+    char **ids;
+    char **names;
+};
+
+static void Reload_DevicesEnum_Added(void *data, LPCWSTR wid, IMMDevice *dev)
+{
+    struct mm_list *list = data;
+
+    size_t new_count = list->count + 1;
+    list->ids = realloc_or_free(list->ids, new_count * sizeof(char *));
+    list->names = realloc_or_free(list->names, new_count * sizeof(char *));
+    if (!list->ids || !list->names)
+    {
+        free(list->ids);
+        return;
+    }
+
+    char *id = FromWide(wid);
+    if (!id)
+        return;
+
+    char *name = DeviceGetFriendlyName(dev);
+    if (!name && !(name = strdup(id)))
+    {
+        free(id);
+        return;
+    }
+    list->ids[list->count] = id;
+    list->names[list->count] = name;
+
+    list->count = new_count;
+}
+
+static int ReloadAudioDevices(vlc_object_t *this, char const *name,
+                              char ***values, char ***descs)
+{
+    (void) name;
+
+    bool in_mta = TryEnterMTA(this) == 0;
+
+    struct mm_list list = { .count = 0 };
+    void *it;
+    HRESULT hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
+                                  &IID_IMMDeviceEnumerator, &it);
+    if (FAILED(hr))
+        goto error;
+
+    list.ids = malloc(sizeof (char *));
+    list.names = malloc(sizeof (char *));
+    if (!list.ids || !list.names)
+    {
+        free(list.ids);
+        goto error;
+    }
+
+    list.ids[0] = strdup("");
+    list.names[0] = strdup(_("Default"));
+    if (!list.ids[0] || !list.names[0])
+    {
+        free(list.ids[0]);
+        free(list.ids);
+        free(list.names);
+        goto error;
+    }
+    list.count++;
+
+    DevicesEnum(this, it, Reload_DevicesEnum_Added, &list);
+
+error:
+    IMMDeviceEnumerator_Release((IMMDeviceEnumerator *)it);
+    if (in_mta)
+        LeaveMTA();
+
+    if (list.count > 0)
+    {
+        *values = list.ids;
+        *descs = list.names;
+    }
+
+    return list.count;
+}
+
 #define MM_PASSTHROUGH_TEXT N_( \
     "HDMI/SPDIF audio passthrough")
 #define MM_PASSTHROUGH_LONGTEXT N_( \
@@ -1348,6 +1448,9 @@ static const char *const ppsz_mmdevice_passthrough_texts[] = {
     N_("Enabled"),
 };
 
+#define DEVICE_TEXT N_("Output device")
+#define DEVICE_LONGTEXT N_("Select your audio output device")
+
 vlc_module_begin()
     set_shortname("MMDevice")
     set_description(N_("Windows Multimedia Device output"))
@@ -1362,4 +1465,6 @@ vlc_module_begin()
                  MM_PASSTHROUGH_TEXT, MM_PASSTHROUGH_LONGTEXT, false )
         change_integer_list( pi_mmdevice_passthrough_values,
                              ppsz_mmdevice_passthrough_texts )
+    add_string("mmdevice-audio-device", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, false)
+        change_string_cb(ReloadAudioDevices)
 vlc_module_end()
