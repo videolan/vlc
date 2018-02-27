@@ -608,44 +608,49 @@
     NSString *desired_type = [paste availableTypeFromArray: types];
     NSData *carried_data = [paste dataForType: desired_type];
 
-    if (carried_data) {
-        if ([desired_type isEqualToString:NSFilenamesPboardType]) {
-            NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    if (carried_data == nil)
+        return NO;
 
-            if ([values count] > 0) {
-                [self setMRL: toNSStr(vlc_path2uri([[values firstObject] UTF8String], NULL))];
-                [self updateOKButton];
-                [self updateDropView];
-                return YES;
-            }
-        } else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
-            NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
-            NSUInteger count = [array count];
-            if (count > 0) {
-                playlist_t * p_playlist = pl_Get(getIntf());
-                playlist_item_t * p_item = NULL;
+    if ([desired_type isEqualToString:NSFilenamesPboardType]) {
+        NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
-                PL_LOCK;
-                /* let's look for the first proper input item */
-                for (NSUInteger x = 0; x < count; x++) {
-                    p_item = [[array objectAtIndex:x] pointerValue];
-                    if (p_item) {
-                        if (p_item->p_input) {
-                            if (p_item->p_input->psz_uri != nil) {
-                                [self setMRL: toNSStr(p_item->p_input->psz_uri)];
-                                [self updateDropView];
-                                [self updateOKButton];
-
-                                PL_UNLOCK;
-
-                                return YES;
-                            }
-                        }
-                    }
-                }
-                PL_UNLOCK;
-            }
+        if ([values count] > 0) {
+            [self setMRL: toNSStr(vlc_path2uri([[values firstObject] UTF8String], NULL))];
+            [self updateOKButton];
+            [self updateDropView];
+            return YES;
         }
+    } else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
+        NSArray *draggedItems = [[[VLCMain sharedInstance] playlist] draggedItems];
+
+        // Return early to prevent unnecessary playlist access/locking
+        if ([draggedItems count] <= 0) {
+            return NO;
+        }
+
+        playlist_t *p_playlist = pl_Get(getIntf());
+        playlist_item_t *p_item = NULL;
+
+        PL_LOCK;
+        for (VLCPLItem *draggedItem in draggedItems) {
+            p_item = playlist_ItemGetById(p_playlist, [draggedItem plItemId]);
+
+            // Check if the item is usable
+            if (!p_item || !p_item->p_input || !p_item->p_input->psz_uri) {
+                // Item not usable, reset it.
+                p_item = NULL;
+                continue;
+            }
+
+            // First usable item found
+            [self setMRL: toNSStr(p_item->p_input->psz_uri)];
+            [self updateDropView];
+            [self updateOKButton];
+            break;
+        }
+        PL_UNLOCK;
+
+        return (p_item != NULL) ? YES : NO;
     }
     return NO;
 }
