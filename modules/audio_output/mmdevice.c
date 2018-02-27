@@ -179,7 +179,7 @@ static void Flush(audio_output_t *aout, bool wait)
     vlc_FromHR(aout, hr);
 }
 
-static int VolumeSet(audio_output_t *aout, float vol)
+static int VolumeSetLocked(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
     float gain = 1.f;
@@ -194,12 +194,20 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     aout_GainRequest(aout, gain);
 
-    EnterCriticalSection(&sys->lock);
     sys->gain = gain;
     sys->requested_volume = vol;
+    return 0;
+}
+
+static int VolumeSet(audio_output_t *aout, float vol)
+{
+    aout_sys_t *sys = aout->sys;
+
+    EnterCriticalSection(&sys->lock);
+    int ret = VolumeSetLocked(aout, vol);
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
-    return 0;
+    return ret;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
@@ -891,7 +899,8 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     manager = pv;
     if (SUCCEEDED(hr))
     {
-        LPCGUID guid = &GUID_VLC_AUD_OUT;
+        LPCGUID guid = var_InheritBool(aout, "volume-save") ? &GUID_VLC_AUD_OUT
+                                                            : NULL;
 
         /* Register session control */
         hr = IAudioSessionManager_GetAudioSessionControl(manager, guid, 0,
@@ -1264,6 +1273,10 @@ static int Open(vlc_object_t *obj)
     sys->requested_mute = -1;
     sys->acquired_device = NULL;
     sys->request_device_restart = false;
+
+    if (!var_InheritBool(aout, "volume-save"))
+        VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
+
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
@@ -1451,6 +1464,9 @@ static const char *const ppsz_mmdevice_passthrough_texts[] = {
 #define DEVICE_TEXT N_("Output device")
 #define DEVICE_LONGTEXT N_("Select your audio output device")
 
+#define VOLUME_TEXT N_("Audio volume")
+#define VOLUME_LONGTEXT N_("Audio volume in hundredths of decibels (dB).")
+
 vlc_module_begin()
     set_shortname("MMDevice")
     set_description(N_("Windows Multimedia Device output"))
@@ -1467,4 +1483,6 @@ vlc_module_begin()
                              ppsz_mmdevice_passthrough_texts )
     add_string("mmdevice-audio-device", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, false)
         change_string_cb(ReloadAudioDevices)
+    add_float("mmdevice-volume", 1.f, VOLUME_TEXT, VOLUME_LONGTEXT, true)
+        change_float_range( 0.f, 1.25f )
 vlc_module_end()
