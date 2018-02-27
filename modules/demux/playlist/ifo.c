@@ -54,6 +54,9 @@ int Import_IFO( vlc_object_t *p_this )
 
     CHECK_FILE(p_stream);
 
+    if( !stream_HasExtension( p_stream, ".IFO" ) )
+        return VLC_EGENERIC;
+
     const char *psz_location = StreamLocation( p_stream );
     if( psz_location == NULL )
         return VLC_EGENERIC;
