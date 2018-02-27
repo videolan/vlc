@@ -98,12 +98,8 @@ int Import_IFO( vlc_object_t *p_this )
 
 static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
 {
-    char *psz_url, *psz_dir;
+    char *psz_url;
     const char *psz_location = StreamLocation(p_stream);
-
-    psz_dir = strrchr( psz_location, '/' );
-    if( psz_dir != NULL )
-       psz_dir[1] = '\0';
 
     if( asprintf( &psz_url, "dvd://%s", psz_location ) == -1 )
         return 0;
