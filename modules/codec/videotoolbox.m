@@ -201,6 +201,31 @@ static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t);
 
 /* Codec Specific */
 
+static void HXXXGetBestChroma(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->i_cvpx_format != 0)
+        return;
+
+    uint8_t i_chroma_format, i_depth_luma, i_depth_chroma;
+    if (hxxx_helper_get_chroma_chroma(&p_sys->hh, &i_chroma_format, &i_depth_luma,
+                                      &i_depth_chroma) != VLC_SUCCESS)
+        return;
+
+    if (i_chroma_format == 1 /* YUV 4:2:0 */)
+    {
+        if (i_depth_luma == 8 && i_depth_chroma == 8)
+            p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+#if !TARGET_OS_IPHONE
+        /* Not for iOS since there is no 10bits textures with the old iOS
+         * openGLES version, and therefore no P010 shaders */
+        else if (i_depth_luma == 10 && i_depth_chroma == 10 && deviceSupportsHEVC())
+            p_sys->i_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+#endif
+    }
+}
+
 static void GetxPSH264(uint8_t i_pps_id, void *priv,
                       const h264_sequence_parameter_set_t **pp_sps,
                       const h264_picture_parameter_set_t **pp_pps)
@@ -428,6 +453,8 @@ static bool CodecSupportedH264(decoder_t *p_dec)
                 PRIx8, i_level);
         return false;
     }
+
+    HXXXGetBestChroma(p_dec);
 
     return true;
 }
@@ -722,20 +749,8 @@ static bool LateStartHEVC(decoder_t *p_dec)
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)
 {
-#if !TARGET_OS_IPHONE
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    HXXXGetBestChroma(p_dec);
 
-    if (p_sys->i_cvpx_format == 0)
-    {
-        /* Force P010 chroma instead of RGBA in order to improve performances. */
-        uint8_t i_profile, i_level;
-        if (hxxx_helper_get_current_profile_level(&p_sys->hh, &i_profile,
-                                                  &i_level))
-            return true;
-        if (i_profile == HEVC_PROFILE_MAIN_10)
-            p_sys->i_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
-    }
-#endif
     return true;
 }
 
