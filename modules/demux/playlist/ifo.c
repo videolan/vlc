@@ -40,6 +40,11 @@
 static int ReadDVD( stream_t *, input_item_node_t * );
 static int ReadDVD_VR( stream_t *, input_item_node_t * );
 
+static const char *StreamLocation( const stream_t *s )
+{
+    return s->psz_filepath ? s->psz_filepath : s->psz_url;
+}
+
 /*****************************************************************************
  * Import_IFO: main import function
  *****************************************************************************/
@@ -48,12 +53,14 @@ int Import_IFO( vlc_object_t *p_this )
     stream_t *p_stream = (stream_t *)p_this;
 
     CHECK_FILE(p_stream);
-    if( p_stream->psz_filepath == NULL )
+
+    const char *psz_location = StreamLocation( p_stream );
+    if( psz_location == NULL )
         return VLC_EGENERIC;
 
-    size_t len = strlen( p_stream->psz_filepath );
+    size_t len = strlen( psz_location );
 
-    char *psz_file = p_stream->psz_filepath + len - strlen( "VIDEO_TS.IFO" );
+    const char *psz_file = psz_location + len - strlen( "VIDEO_TS.IFO" );
     /* Valid filenames are :
      *  - VIDEO_TS.IFO
      *  - VTS_XX_X.IFO where X are digits
@@ -72,7 +79,7 @@ int Import_IFO( vlc_object_t *p_this )
         p_stream->pf_readdir = ReadDVD;
     }
     /* Valid filename for DVD-VR is VR_MANGR.IFO */
-    else if( len >= 12 && !strcmp( &p_stream->psz_filepath[len-12], "VR_MANGR.IFO" ) )
+    else if( len >= 12 && !strcmp( &psz_location[len-12], "VR_MANGR.IFO" ) )
     {
         const uint8_t *p_peek;
         ssize_t i_peek = vlc_stream_Peek( p_stream->p_source, &p_peek, 8 );
@@ -93,12 +100,13 @@ int Import_IFO( vlc_object_t *p_this )
 static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
 {
     char *psz_url, *psz_dir;
+    const char *psz_location = StreamLocation(p_stream);
 
-    psz_dir = strrchr( p_stream->psz_location, '/' );
+    psz_dir = strrchr( psz_location, '/' );
     if( psz_dir != NULL )
        psz_dir[1] = '\0';
 
-    if( asprintf( &psz_url, "dvd://%s", p_stream->psz_location ) == -1 )
+    if( asprintf( &psz_url, "dvd://%s", psz_location ) == -1 )
         return 0;
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
@@ -112,14 +120,16 @@ static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
 
 static int ReadDVD_VR( stream_t *p_stream, input_item_node_t *node )
 {
-    size_t len = strlen( p_stream->psz_location );
+    const char *psz_location = StreamLocation(p_stream);
+
+    size_t len = strlen( psz_location );
     char *psz_url = malloc( len + 1 );
 
     if( unlikely( psz_url == NULL ) )
         return 0;
     assert( len >= 12 );
     len -= 12;
-    memcpy( psz_url, p_stream->psz_location, len );
+    memcpy( psz_url, psz_location, len );
     memcpy( psz_url + len, "VR_MOVIE.VRO", 13 );
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
