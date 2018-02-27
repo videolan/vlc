@@ -62,37 +62,33 @@ int Import_IFO( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     size_t len = strlen( psz_location );
+    if( len < 12 )
+        return VLC_EGENERIC;
 
-    const char *psz_file = psz_location + len - strlen( "VIDEO_TS.IFO" );
+    const char *psz_probe;
+    const char *psz_file = &psz_location[len - 12];
     /* Valid filenames are :
      *  - VIDEO_TS.IFO
      *  - VTS_XX_X.IFO where X are digits
      */
-    if( len > strlen( "VIDEO_TS.IFO" )
-        && ( !strcasecmp( psz_file, "VIDEO_TS.IFO" )
-        || (!strncasecmp( psz_file, "VTS_", 4 )
-        && !strcasecmp( psz_file + strlen( "VTS_00_0" ) , ".IFO" ) ) ) )
+    if( !strncasecmp( psz_file, "VIDEO_TS", 8 ) ||
+        !strncasecmp( psz_file, "VTS_", 4 ) )
     {
-        const uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 8 );
-
-        if( i_peek != 8 || memcmp( p_peek, "DVDVIDEO", 8 ) )
-            return VLC_EGENERIC;
-
+        psz_probe = "DVDVIDEO";
         p_stream->pf_readdir = ReadDVD;
     }
     /* Valid filename for DVD-VR is VR_MANGR.IFO */
-    else if( len >= 12 && !strcmp( &psz_location[len-12], "VR_MANGR.IFO" ) )
+    else if( !strncasecmp( psz_file, "VR_MANGR", 8 ) )
     {
-        const uint8_t *p_peek;
-        ssize_t i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 8 );
-
-        if( i_peek != 8 || memcmp( p_peek, "DVD_RTR_", 8 ) )
-            return VLC_EGENERIC;
-
+        psz_probe = "DVD_RTR_";
         p_stream->pf_readdir = ReadDVD_VR;
     }
     else
+        return VLC_EGENERIC;
+
+    const uint8_t *p_peek;
+    ssize_t i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 8 );
+    if( i_peek < 8 || memcmp( p_peek, psz_probe, 8 ) )
         return VLC_EGENERIC;
 
     p_stream->pf_control = access_vaDirectoryControlHelper;
@@ -126,14 +122,12 @@ static int ReadDVD_VR( stream_t *p_stream, input_item_node_t *node )
     const char *psz_location = StreamLocation(p_stream);
 
     size_t len = strlen( psz_location );
-    char *psz_url = malloc( len + 1 );
+    char *psz_url = strdup( psz_location );
 
     if( unlikely( psz_url == NULL ) )
         return 0;
-    assert( len >= 12 );
-    len -= 12;
-    memcpy( psz_url, psz_location, len );
-    memcpy( psz_url + len, "VR_MOVIE.VRO", 13 );
+
+    strcpy( &psz_url[len - 12], "VR_MOVIE.VRO" );
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
     input_item_node_AppendItem( node, p_input );
