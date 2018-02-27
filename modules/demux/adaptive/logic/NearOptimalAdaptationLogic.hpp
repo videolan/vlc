@@ -47,7 +47,7 @@ namespace adaptive
         class NearOptimalAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                NearOptimalAdaptationLogic(vlc_object_t *);
+                NearOptimalAdaptationLogic();
                 virtual ~NearOptimalAdaptationLogic();
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
@@ -65,7 +65,6 @@ namespace adaptive
                 std::map<uint64_t, float>   utilities;
                 unsigned                    currentBps;
                 unsigned                    usedBps;
-                vlc_object_t *              p_obj;
                 vlc_mutex_t                 lock;
         };
     }

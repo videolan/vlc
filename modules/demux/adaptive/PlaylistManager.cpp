@@ -762,7 +762,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
         case AbstractAdaptationLogic::NearOptimal:
         {
             NearOptimalAdaptationLogic *noplogic =
-                    new (std::nothrow) NearOptimalAdaptationLogic(VLC_OBJECT(p_demux));
+                    new (std::nothrow) NearOptimalAdaptationLogic();
             if(noplogic)
                 conn->setDownloadRateObserver(noplogic);
             logic = noplogic;
