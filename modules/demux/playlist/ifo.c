@@ -105,8 +105,11 @@ static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
         return VLC_EGENERIC;
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
-    input_item_node_AppendItem( node, p_input );
-    input_item_Release( p_input );
+    if( p_input )
+    {
+        input_item_node_AppendItem( node, p_input );
+        input_item_Release( p_input );
+    }
 
     free( psz_url );
 
@@ -126,8 +129,11 @@ static int ReadDVD_VR( stream_t *p_stream, input_item_node_t *node )
     strcpy( &psz_url[len - 12], "VR_MOVIE.VRO" );
 
     input_item_t *p_input = input_item_New( psz_url, psz_url );
-    input_item_node_AppendItem( node, p_input );
-    input_item_Release( p_input );
+    if( p_input )
+    {
+        input_item_node_AppendItem( node, p_input );
+        input_item_Release( p_input );
+    }
 
     free( psz_url );
 
