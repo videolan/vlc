@@ -490,6 +490,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 
 #ifdef _WIN32
+            audioControl( MMDevice );
+            optionWidgets["mmdeviceL" ] = MMDeviceLabel;
+            optionWidgets["mmdeviceW" ] = MMDeviceDevice;
+            CONFIG_GENERIC_NO_UI( "mmdevice-audio-device", StringList,
+                                  MMDeviceLabel, MMDeviceDevice );
+
             CONFIG_GENERIC( "mmdevice-passthrough", IntegerList,
                             ui.mmdevicePassthroughLabel, mmdevicePassthroughBox );
             optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
@@ -961,6 +967,8 @@ void SPrefsPanel::updateAudioOptions( int number)
     const bool mmDeviceEnabled = value == "mmdevice" || value == "any";
     optionWidgets["mmdevicePassthroughL"]->setVisible( mmDeviceEnabled );
     optionWidgets["mmdevicePassthroughB"]->setVisible( mmDeviceEnabled );
+    optionWidgets["mmdeviceW"]->setVisible( mmDeviceEnabled );
+    optionWidgets["mmdeviceL"]->setVisible( mmDeviceEnabled );
 
     optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
     optionWidgets["directxL"]->setVisible( ( value == "directsound" ) );
