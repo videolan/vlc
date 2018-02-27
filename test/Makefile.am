@@ -198,6 +198,10 @@ if HAVE_DVBPSI
 libvlc_demux_run_la_CPPFLAGS += -DHAVE_DVBPSI
 libvlc_demux_run_la_LIBADD += ../modules/libts_plugin.la
 endif
+if HAVE_MATROSKA
+libvlc_demux_run_la_CPPFLAGS += -DHAVE_MATROSKA
+libvlc_demux_run_la_LIBADD += ../modules/libmkv_plugin.la
+endif
 endif
 EXTRA_LTLIBRARIES = libvlc_demux_run.la
 

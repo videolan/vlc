@@ -402,6 +402,7 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(flacsys) \
     f(h26x) \
     f(mjpeg) \
+    PLUGIN_MKV(f) \
     f(mp4) \
     f(nsc) \
     f(nsv) \
@@ -438,6 +439,12 @@ extern vlc_plugin_cb vlc_static_modules[];
 # define PLUGIN_TS(f) f(ts)
 #else
 # define PLUGIN_TS(f)
+#endif
+
+#ifdef HAVE_MATROSKA
+# define PLUGIN_MKV(f) f(mkv)
+#else
+# define PLUGIN_MKV(f)
 #endif
 
 #define DECL_PLUGIN(p) \
