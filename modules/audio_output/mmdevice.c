@@ -685,16 +685,19 @@ static const struct IMMNotificationClientVtbl vlc_MMNotificationClient =
     vlc_MMNotificationClient_OnPropertyValueChanged,
 };
 
-static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
+static int DevicesEnum(vlc_object_t *this, IMMDeviceEnumerator *it,
+                       void (*added_cb)(void *data, LPCWSTR wid, IMMDevice *dev),
+                       void *added_cb_data)
 {
     HRESULT hr;
     IMMDeviceCollection *devs;
+    assert(added_cb != NULL);
 
     hr = IMMDeviceEnumerator_EnumAudioEndpoints(it, eRender,
                                                 DEVICE_STATE_ACTIVE, &devs);
     if (FAILED(hr))
     {
-        msg_Warn(aout, "cannot enumerate audio endpoints (error 0x%lx)", hr);
+        msg_Warn(this, "cannot enumerate audio endpoints (error 0x%lx)", hr);
         return -1;
     }
 
@@ -702,7 +705,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
     hr = IMMDeviceCollection_GetCount(devs, &count);
     if (FAILED(hr))
     {
-        msg_Warn(aout, "cannot count audio endpoints (error 0x%lx)", hr);
+        msg_Warn(this, "cannot count audio endpoints (error 0x%lx)", hr);
         count = 0;
     }
 
@@ -725,7 +728,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
             continue;
         }
 
-        DeviceHotplugReport(aout, devid, dev);
+        added_cb(added_cb_data, devid, dev);
         IMMDevice_Release(dev);
         CoTaskMemFree(devid);
         n++;
@@ -1046,6 +1049,13 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     return S_OK;
 }
 
+static void MMThread_DevicesEnum_Added(void *data, LPCWSTR wid, IMMDevice *dev)
+{
+    audio_output_t *aout = data;
+
+    DeviceHotplugReport(aout, wid, dev);
+}
+
 static void *MMThread(void *data)
 {
     audio_output_t *aout = data;
@@ -1055,7 +1065,7 @@ static void *MMThread(void *data)
     EnterMTA();
     IMMDeviceEnumerator_RegisterEndpointNotificationCallback(it,
                                                           &sys->device_events);
-    DevicesEnum(aout, it);
+    DevicesEnum(VLC_OBJECT(aout), it, MMThread_DevicesEnum_Added, aout);
 
     EnterCriticalSection(&sys->lock);
 
