@@ -83,8 +83,7 @@ static void GLConvClose(vlc_object_t *);
 
 #define D3D9_HELP N_("Recommended video output for Windows Vista and later versions")
 
-static int FindShadersCallback(vlc_object_t *, const char *,
-                               char ***, char ***);
+static int FindShadersCallback(const char *, char ***, char ***);
 
 vlc_module_begin ()
     set_shortname("Direct3D9")
@@ -1781,10 +1780,8 @@ static void ListShaders(enum_context_t *ctx)
 }
 
 /* Populate the list of available shader techniques in the options */
-static int FindShadersCallback(vlc_object_t *object, const char *name,
-                               char ***values, char ***descs)
+static int FindShadersCallback(const char *name, char ***values, char ***descs)
 {
-    VLC_UNUSED(object);
     VLC_UNUSED(name);
 
     enum_context_t ctx = { NULL, NULL, 0 };

@@ -74,8 +74,7 @@ static void WaveOutClean( aout_sys_t * p_sys );
 
 static void WaveOutClearBuffer( HWAVEOUT, WAVEHDR *);
 
-static int ReloadWaveoutDevices( vlc_object_t *, const char *,
-                                 char ***, char *** );
+static int ReloadWaveoutDevices( const char *, char ***, char *** );
 static uint32_t findDeviceID(char *);
 static int WaveOutTimeGet(audio_output_t * , mtime_t *);
 static void WaveOutFlush( audio_output_t *, bool);
@@ -696,12 +695,12 @@ static void WaveOutClearBuffer( HWAVEOUT h_waveout, WAVEHDR *p_waveheader )
 /*
   reload the configuration drop down list, of the Audio Devices
 */
-static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
+static int ReloadWaveoutDevices( char const *psz_name,
                                  char ***values, char ***descs )
 {
     int n = 0, nb_devices = waveOutGetNumDevs();
 
-    VLC_UNUSED( p_this); VLC_UNUSED( psz_name );
+    VLC_UNUSED( psz_name );
 
     *values = xmalloc( (nb_devices + 1) * sizeof(char *) );
     *descs = xmalloc( (nb_devices + 1) * sizeof(char *) );
@@ -806,7 +805,7 @@ static int Open(vlc_object_t *obj)
 
     /* WaveOut does not support hot-plug events so list devices at startup */
     char **ids, **names;
-    int count = ReloadWaveoutDevices(VLC_OBJECT(aout), NULL, &ids, &names);
+    int count = ReloadWaveoutDevices(NULL, &ids, &names);
     if (count >= 0)
     {
         for (int i = 0; i < count; i++)

@@ -59,7 +59,7 @@ struct aout_sys_t
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
-static int EnumDevices (vlc_object_t *, char const *, char ***, char ***);
+static int EnumDevices(char const *, char ***, char ***);
 
 #define AUDIO_DEV_TEXT N_("Audio output device")
 #define AUDIO_DEV_LONGTEXT N_("Audio output device (using ALSA syntax).")
@@ -719,12 +719,11 @@ static void Stop (audio_output_t *aout)
 /**
  * Enumerates ALSA output devices.
  */
-static int EnumDevices(vlc_object_t *obj, char const *varname,
+static int EnumDevices(char const *varname,
                        char ***restrict idp, char ***restrict namep)
 {
     void **hints;
 
-    msg_Dbg (obj, "Available ALSA PCM devices:");
     if (snd_device_name_hint(-1, "pcm", &hints) < 0)
         return -1;
 
@@ -745,7 +744,6 @@ static int EnumDevices(vlc_object_t *obj, char const *varname,
             desc = xstrdup (name);
         for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
             *lf = ' ';
-        msg_Dbg (obj, "%s (%s)", (desc != NULL) ? desc : name, name);
 
         ids = xrealloc (ids, (n + 1) * sizeof (*ids));
         names = xrealloc (names, (n + 1) * sizeof (*names));
@@ -809,11 +807,14 @@ static int Open(vlc_object_t *obj)
 
     /* ALSA does not support hot-plug events so list devices at startup */
     char **ids, **names;
-    int count = EnumDevices (VLC_OBJECT(aout), NULL, &ids, &names);
+    int count = EnumDevices(NULL, &ids, &names);
     if (count >= 0)
     {
+        msg_Dbg (obj, "Available ALSA PCM devices:");
+
         for (int i = 0; i < count; i++)
         {
+            msg_Dbg(obj, "%s: %s", ids[i], names[i]);
             aout_HotplugReport (aout, ids[i], names[i]);
             free (names[i]);
             free (ids[i]);

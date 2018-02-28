@@ -320,7 +320,7 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
 
         if (cfg->list.psz_cb == NULL)
             return 0;
-        return cfg->list.psz_cb(obj, name, values, texts);
+        return cfg->list.psz_cb(name, values, texts);
     }
 
     char **vals = xmalloc (sizeof (*vals) * count);

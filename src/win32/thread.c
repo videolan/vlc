@@ -877,8 +877,7 @@ static BOOL SelectClockSource(void *data)
     return TRUE;
 }
 
-size_t EnumClockSource (vlc_object_t *obj, const char *var,
-                        char ***vp, char ***np)
+size_t EnumClockSource(const char *var, char ***vp, char ***np)
 {
     const size_t max = 6;
     char **values = xmalloc (sizeof (*values) * max);
@@ -908,7 +907,7 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
 
     *vp = values;
     *np = names;
-    (void) obj; (void) var;
+    (void) var;
     return n;
 }
 

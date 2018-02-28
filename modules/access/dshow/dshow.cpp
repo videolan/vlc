@@ -74,7 +74,7 @@ static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               AM_MEDIA_TYPE *mt, size_t, bool );
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             IBaseFilter *, CaptureFilter * );
-static int FindDevices( vlc_object_t *, const char *, char ***, char *** );
+static int FindDevices( const char *, char ***, char *** );
 
 static void ShowPropertyPage( IUnknown * );
 static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
@@ -2043,8 +2043,7 @@ static int AppendAudioEnabledVDevs( vlc_object_t *p_this, std::list<std::string>
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
-static int FindDevices( vlc_object_t *p_this, const char *psz_name,
-                            char ***vp, char ***tp )
+static int FindDevices( const char *psz_name, char ***vp, char ***tp )
 {
     /* Find list of devices */
     std::list<std::string> list_devices;
@@ -2056,19 +2055,19 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
         // initialized as STA.
         ComContext ctx( COINIT_APARTMENTTHREADED );
 
-        FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+        FindCaptureDevice( NULL, NULL, &list_devices, b_audio );
 
         if( b_audio )
         {
             std::list<std::string> list_vdevs;
-            FindCaptureDevice( p_this, NULL, &list_vdevs, false );
+            FindCaptureDevice( NULL, NULL, &list_vdevs, false );
             if( !list_vdevs.empty() )
-                AppendAudioEnabledVDevs( p_this, list_devices, list_vdevs );
+                AppendAudioEnabledVDevs( NULL, list_devices, list_vdevs );
         }
     }
     catch (const std::runtime_error& ex)
     {
-        msg_Err( p_this, "Failed fetch devices: %s", ex.what() );
+        msg_Err( (vlc_object_t *)NULL, "Failed fetch devices: %s", ex.what() );
     }
 
     unsigned count = 2 + list_devices.size(), i = 2;

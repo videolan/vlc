@@ -1393,8 +1393,7 @@ static void Reload_DevicesEnum_Added(void *data, LPCWSTR wid, IMMDevice *dev)
     list->count = new_count;
 }
 
-static int ReloadAudioDevices(vlc_object_t *this, char const *name,
-                              char ***values, char ***descs)
+static int ReloadAudioDevices(char const *name, char ***values, char ***descs)
 {
     (void) name;
 
@@ -1426,7 +1425,7 @@ static int ReloadAudioDevices(vlc_object_t *this, char const *name,
     }
     list.count++;
 
-    DevicesEnum(this, it, Reload_DevicesEnum_Added, &list);
+    DevicesEnum(NULL, it, Reload_DevicesEnum_Added, &list);
 
 error:
     IMMDeviceEnumerator_Release((IMMDeviceEnumerator *)it);

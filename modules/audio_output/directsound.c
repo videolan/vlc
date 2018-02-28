@@ -48,8 +48,7 @@ static void Close( vlc_object_t * );
 static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
                             const GUID * );
 static HRESULT StreamStop( aout_stream_t * );
-static int ReloadDirectXDevices( vlc_object_t *, const char *,
-                                 char ***, char *** );
+static int ReloadDirectXDevices( const char *, char ***, char *** );
 static void * PlayedDataEraser( void * );
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
@@ -1018,7 +1017,7 @@ static int CALLBACK DeviceEnumCallback( LPGUID guid, LPCWSTR desc,
 /**
  * Stores the list of devices in preferences
  */
-static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
+static int ReloadDirectXDevices( char const *psz_name,
                                  char ***values, char ***descs )
 {
     ds_list_t list = {
@@ -1032,7 +1031,6 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
     (void) psz_name;
 
     DirectSoundEnumerate( DeviceEnumCallback, &list );
-    msg_Dbg( p_this, "found %u devices", list.count );
 
     *values = list.ids;
     *descs = list.names;
@@ -1068,7 +1066,8 @@ static int Open(vlc_object_t *obj)
 
     /* DirectSound does not support hot-plug events (unless with WASAPI) */
     char **ids, **names;
-    int count = ReloadDirectXDevices(obj, NULL, &ids, &names);
+    int count = ReloadDirectXDevices(NULL, &ids, &names);
+    msg_Dbg(obj, "found %d devices", count);
     if (count >= 0)
     {
         for (int i = 0; i < count; i++)

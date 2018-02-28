@@ -96,8 +96,8 @@
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
-static int FindDevicesCallback(vlc_object_t *, const char *,
-                               char ***, char ***);
+static int FindDevicesCallback(const char *, char ***, char ***);
+
 vlc_module_begin()
     set_shortname("DirectDraw")
     set_description(N_("DirectX (DirectDraw) video output"))
@@ -1484,8 +1484,7 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPSTR desc,
     return TRUE; /* Keep enumerating */
 }
 
-static int FindDevicesCallback(vlc_object_t *object, const char *name,
-                               char ***values, char ***descs)
+static int FindDevicesCallback(const char *name, char ***values, char ***descs)
 {
     enum_context_t ctx;
 
@@ -1509,7 +1508,6 @@ static int FindDevicesCallback(vlc_object_t *object, const char *name,
         FreeLibrary(hddraw_dll);
     }
 
-    VLC_UNUSED(object);
     VLC_UNUSED(name);
 
     *values = ctx.values;
