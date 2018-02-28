@@ -48,54 +48,54 @@ struct yuv_pack
 /* I420 to YUYV conversion. */
 void i420_yuyv_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
-                     int width, int height) asm("i420_yuyv_neon");
+                     int width, int height);
 
 /* I420 to UYVY conversion. */
 void i420_uyvy_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
-                     int width, int height) asm("i420_uyvy_neon");
+                     int width, int height);
 
 /* I422 to YUYV conversion. */
 void i422_yuyv_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
-                     int width, int height) asm("i422_yuyv_neon");
+                     int width, int height);
 
 /* I422 to UYVY conversion. */
 void i422_uyvy_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
-                     int width, int height) asm("i422_uyvy_neon");
+                     int width, int height);
 
 /* YUYV to I422 conversion. */
 void yuyv_i422_neon (struct yuv_planes *const out,
                      const struct yuv_pack *const in,
-                     int width, int height) asm("yuyv_i422_neon");
+                     int width, int height);
 
 /* UYVY to I422 conversion. */
 void uyvy_i422_neon (struct yuv_planes *const out,
                      const struct yuv_pack *const in,
-                     int width, int height) asm("uyvy_i422_neon");
+                     int width, int height);
 
 /* Semiplanar to planar conversion. */
 void deinterleave_chroma_neon (struct uv_planes *const out,
                                const struct yuv_pack *const in,
-                               int width, int height) asm("deinterleave_chroma_neon");
+                               int width, int height);
 
 /* I420 to RGBA conversion. */
 void i420_rgb_neon (struct yuv_pack *const out,
                     const struct yuv_planes *const in,
-                    int width, int height) asm("i420_rgb_neon");
+                    int width, int height);
 
 /* I420 to RV16 conversion. */
 void i420_rv16_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
-                     int width, int height) asm("i420_rv16_neon");
+                     int width, int height);
 
 /* NV21 to RGBA conversion. */
 void nv21_rgb_neon (struct yuv_pack *const out,
                     const struct yuv_planes *const in,
-                    int width, int height) asm("nv21_rgb_neon");
+                    int width, int height);
 
 /* NV12 to RGBA conversion. */
 void nv12_rgb_neon (struct yuv_pack *const out,
                     const struct yuv_planes *const in,
-                    int width, int height) asm("nv12_rgb_neon");
+                    int width, int height);
