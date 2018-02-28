@@ -2141,7 +2141,13 @@ fi
 dnl
 dnl  matroska demux plugin
 dnl
-PKG_ENABLE_MODULES_VLC([MATROSKA], [mkv], [libebml libmatroska], [MKV format support], [auto])
+PKG_WITH_MODULES([MATROSKA], [libebml libmatroska], [
+       VLC_ADD_PLUGIN([mkv])
+       VLC_ADD_CFLAGS([mkv], [$MATROSKA_CFLAGS])
+       VLC_ADD_LIBS([mkv], [$MATROSKA_LIBS])
+       have_matroska="yes"
+   ],,[MKV format support], [auto])
+AM_CONDITIONAL([HAVE_MATROSKA], [test "${have_matroska}" = "yes"])
 
 dnl
 dnl  modplug demux plugin
