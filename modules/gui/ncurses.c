@@ -1208,7 +1208,7 @@ static inline void RemoveLastUTF8Entity(char *psz, int len)
     psz[len] = '\0';
 }
 
-static char *GetDiscDevice(intf_thread_t *intf, const char *name)
+static char *GetDiscDevice(const char *name)
 {
     static const struct { const char *s; size_t n; const char *v; } devs[] =
     {
@@ -1253,7 +1253,7 @@ static void Eject(intf_thread_t *intf, input_thread_t *p_input)
     }
 
     name = playlist_CurrentPlayingItem(p_playlist)->p_input->psz_name;
-    device = name ? GetDiscDevice(intf, name) : NULL;
+    device = name ? GetDiscDevice(name) : NULL;
 
     PL_UNLOCK;
 
