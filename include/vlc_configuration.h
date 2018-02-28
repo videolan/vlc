@@ -148,7 +148,7 @@ VLC_API int64_t config_GetInt(const char *name) VLC_USED;
  * \param name Configuration item name
  * \param val New value
  */
-VLC_API void config_PutInt(vlc_object_t *, const char *name, int64_t val);
+VLC_API void config_PutInt(const char *name, int64_t val);
 
 /**
  * Gets an floating point configuration item.
@@ -323,7 +323,6 @@ VLC_API void config_AddIntf( vlc_object_t *, const char * );
 VLC_API void config_RemoveIntf( vlc_object_t *, const char * );
 VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) VLC_USED;
 
-#define config_PutInt(a,b,c) config_PutInt(VLC_OBJECT(a),b,c)
 #define config_PutFloat(a,b,c) config_PutFloat(VLC_OBJECT(a),b,c)
 #define config_PutPsz(a,b,c) config_PutPsz(VLC_OBJECT(a),b,c)
 

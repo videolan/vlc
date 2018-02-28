@@ -672,7 +672,7 @@
 - (IBAction)toggleEffectsButton:(id)sender
 {
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-effects-button");
-    config_PutInt(getIntf(), "macosx-show-effects-button", b_value);
+    config_PutInt("macosx-show-effects-button", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
     [_toggleEffectsButton setState: b_value];
 }
@@ -680,7 +680,7 @@
 - (IBAction)toggleJumpButtons:(id)sender
 {
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playback-buttons");
-    config_PutInt(getIntf(), "macosx-show-playback-buttons", b_value);
+    config_PutInt("macosx-show-playback-buttons", b_value);
 
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
     [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
@@ -693,7 +693,7 @@
 - (IBAction)togglePlaymodeButtons:(id)sender
 {
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
-    config_PutInt(getIntf(), "macosx-show-playmode-buttons", b_value);
+    config_PutInt("macosx-show-playmode-buttons", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [_togglePlaymodeButtons setState: b_value];
 }
@@ -797,7 +797,7 @@
     playlist_t *p_playlist = pl_Get(getIntf());
     bool b_value = !var_CreateGetBool(p_playlist, "play-and-exit");
     var_SetBool(p_playlist, "play-and-exit", b_value);
-    config_PutInt(getIntf(), "play-and-exit", b_value);
+    config_PutInt("play-and-exit", b_value);
 }
 
 - (IBAction)toggleRecord:(id)sender
@@ -1013,7 +1013,7 @@
 
 - (void)toggleFullscreenDevice:(id)sender
 {
-    config_PutInt(getIntf(), "macosx-vdev", [sender tag]);
+    config_PutInt("macosx-vdev", [sender tag]);
     [self refreshVoutDeviceMenu: nil];
 }
 

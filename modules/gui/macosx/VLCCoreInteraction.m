@@ -417,7 +417,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random On"));
             vlc_object_release(p_vout);
         }
-        config_PutInt(p_playlist, "random", 1);
+        config_PutInt("random", 1);
     }
     else
     {
@@ -425,7 +425,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
             vlc_object_release(p_vout);
         }
-        config_PutInt(p_playlist, "random", 0);
+        config_PutInt("random", 0);
     }
 }
 
@@ -439,8 +439,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     var_SetBool(p_playlist, "repeat", NO);
     var_SetBool(p_playlist, "loop", YES);
-    config_PutInt(p_playlist, "repeat", NO);
-    config_PutInt(p_playlist, "loop", YES);
+    config_PutInt("repeat", NO);
+    config_PutInt("loop", YES);
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
@@ -459,8 +459,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     var_SetBool(p_playlist, "repeat", YES);
     var_SetBool(p_playlist, "loop", NO);
-    config_PutInt(p_playlist, "repeat", YES);
-    config_PutInt(p_playlist, "loop", NO);
+    config_PutInt("repeat", YES);
+    config_PutInt("loop", NO);
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
@@ -479,8 +479,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     var_SetBool(p_playlist, "repeat", NO);
     var_SetBool(p_playlist, "loop", NO);
-    config_PutInt(p_playlist, "repeat", NO);
-    config_PutInt(p_playlist, "loop", NO);
+    config_PutInt("repeat", NO);
+    config_PutInt("loop", NO);
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
@@ -651,7 +651,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)setAspectRatioIsLocked:(BOOL)b_value
 {
-    config_PutInt(getIntf(), "macosx-lock-aspect-ratio", b_value);
+    config_PutInt("macosx-lock-aspect-ratio", b_value);
 }
 
 - (BOOL)aspectRatioIsLocked

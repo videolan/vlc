@@ -1022,7 +1022,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                  return false;
             perf_warning_shown = true;
             if ( res == 2 )
-                config_PutInt(p_stream, SOUT_CFG_PREFIX "show-perf-warning", 0 );
+                config_PutInt(SOUT_CFG_PREFIX "show-perf-warning", 0 );
         }
 
         static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";

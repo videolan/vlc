@@ -118,7 +118,7 @@
 {
     int newState = [sender state] == NSOnState ? 1 : 0;
     msg_Dbg(getIntf(), "Changing resume setting to %i", newState);
-    config_PutInt(getIntf(), "macosx-continue-playback", newState);
+    config_PutInt("macosx-continue-playback", newState);
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level

@@ -860,7 +860,7 @@ static inline void save_int_list(intf_thread_t * p_intf, id object, const char *
     NSNumber *p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
     if (p_valueobject) {
         assert([p_valueobject isKindOfClass:[NSNumber class]]);
-        config_PutInt(p_intf, name, [p_valueobject intValue]);
+        config_PutInt(name, [p_valueobject intValue]);
     }
 }
 
@@ -912,13 +912,13 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [VLCSimplePrefsController updateRightToLeftSettings];
         [defaults synchronize];
 
-        config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);
+        config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 
-        config_PutInt(p_intf, "macosx-appleremote", [_intf_appleremoteCheckbox state]);
-        config_PutInt(p_intf, "macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
-        config_PutInt(p_intf, "macosx-statusicon", [_intf_statusIconCheckbox state]);
-        config_PutInt(p_intf, "macosx-mediakeys", [_intf_mediakeysCheckbox state]);
-        config_PutInt(p_intf, "macosx-interfacestyle", [_intf_style_darkButtonCell state]);
+        config_PutInt("macosx-appleremote", [_intf_appleremoteCheckbox state]);
+        config_PutInt("macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
+        config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
+        config_PutInt("macosx-mediakeys", [_intf_mediakeysCheckbox state]);
+        config_PutInt("macosx-interfacestyle", [_intf_style_darkButtonCell state]);
 
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 
@@ -940,11 +940,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      * audio settings *
      ******************/
     if (_audioSettingChanged) {
-        config_PutInt(p_intf, "audio", [_audio_enableCheckbox state]);
-        config_PutInt(p_intf, "volume-save", [_audio_autosavevol_yesButtonCell state]);
+        config_PutInt("audio", [_audio_enableCheckbox state]);
+        config_PutInt("volume-save", [_audio_autosavevol_yesButtonCell state]);
         var_SetBool(p_intf, "volume-save", [_audio_autosavevol_yesButtonCell state]);
         if ([_audio_volTextField isEnabled])
-            config_PutInt(p_intf, "auhal-volume", ([_audio_volTextField intValue] * AOUT_VOLUME_MAX) / 200);
+            config_PutInt("auhal-volume", ([_audio_volTextField intValue] * AOUT_VOLUME_MAX) / 200);
 
         SaveIntList(_audio_dolbyPopup, "force-dolby-surround");
 
@@ -972,21 +972,21 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      * video settings *
      ******************/
     if (_videoSettingChanged) {
-        config_PutInt(p_intf, "video", [_video_enableCheckbox state]);
-        config_PutInt(p_intf, "fullscreen", [_video_startInFullscreenCheckbox state]);
-        config_PutInt(p_intf, "video-deco", [_video_videodecoCheckbox state]);
-        config_PutInt(p_intf, "video-on-top", [_video_onTopCheckbox state]);
-        config_PutInt(p_intf, "macosx-black", [_video_blackScreenCheckbox state]);
+        config_PutInt("video", [_video_enableCheckbox state]);
+        config_PutInt("fullscreen", [_video_startInFullscreenCheckbox state]);
+        config_PutInt("video-deco", [_video_videodecoCheckbox state]);
+        config_PutInt("video-on-top", [_video_onTopCheckbox state]);
+        config_PutInt("macosx-black", [_video_blackScreenCheckbox state]);
 
-        config_PutInt(p_intf, "macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
+        config_PutInt("macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
 
-        config_PutInt(p_intf, "embedded-video", [_video_embeddedCheckbox state]);
-        config_PutInt(p_intf, "macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
-        config_PutInt(p_intf, "macosx-vdev", [[_video_devicePopup selectedItem] tag]);
+        config_PutInt("embedded-video", [_video_embeddedCheckbox state]);
+        config_PutInt("macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
+        config_PutInt("macosx-vdev", [[_video_devicePopup selectedItem] tag]);
 
-        config_PutPsz(p_intf, "snapshot-path", [[_video_snap_folderTextField stringValue] UTF8String]);
-        config_PutPsz(p_intf, "snapshot-prefix", [[_video_snap_prefixTextField stringValue] UTF8String]);
-        config_PutInt(p_intf, "snapshot-sequential", [_video_snap_seqnumCheckbox state]);
+        config_PutPsz("snapshot-path", [[_video_snap_folderTextField stringValue] UTF8String]);
+        config_PutPsz("snapshot-prefix", [[_video_snap_prefixTextField stringValue] UTF8String]);
+        config_PutInt("snapshot-sequential", [_video_snap_seqnumCheckbox state]);
         SaveStringList(_video_snap_formatPopup, "snapshot-format");
         SaveIntList(_video_deinterlacePopup, "deinterlace");
         SaveStringList(_video_deinterlace_modePopup, "deinterlace-mode");
@@ -998,14 +998,14 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      ***************************/
     if (_inputSettingChanged) {
         config_PutPsz(p_intf, "input-record-path", [[_input_recordTextField stringValue] UTF8String]);
-        config_PutInt(p_intf, "postproc-q", [_input_postprocTextField intValue]);
-        config_PutInt(p_intf, "skip-frames", [_input_skipFramesCheckbox state]);
+        config_PutInt("postproc-q", [_input_postprocTextField intValue]);
+        config_PutInt("skip-frames", [_input_skipFramesCheckbox state]);
 
         SaveIntList(_input_aviPopup, "avi-index");
 
         SaveIntList(_input_skipLoopPopup, "avcodec-skiploopfilter");
 
-        #define CaC(name, factor) config_PutInt(p_intf, name, [[_input_cachelevelPopup selectedItem] tag] * factor)
+        #define CaC(name, factor) config_PutInt(name, [[_input_cachelevelPopup selectedItem] tag] * factor)
         if ([[_input_cachelevelPopup selectedItem] tag] == 0) {
             msg_Dbg(p_intf, "Custom chosen, not adjusting cache values");
         } else {
@@ -1023,7 +1023,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      * subtitles settings *
      **********************/
     if (_osdSettingChanged) {
-        config_PutInt(p_intf, "osd", [_osd_osdCheckbox state]);
+        config_PutInt("osd", [_osd_osdCheckbox state]);
 
         if ([_osd_encodingPopup indexOfSelectedItem] >= 0)
             SaveStringList(_osd_encodingPopup, "subsdec-encoding");
@@ -1035,8 +1035,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutPsz(p_intf, "freetype-font", [[_osd_fontTextField stringValue] UTF8String]);
         SaveIntList(_osd_font_colorPopup, "freetype-color");
         SaveIntList(_osd_font_sizePopup, "freetype-rel-fontsize");
-        config_PutInt(p_intf, "freetype-opacity", [_osd_opacityTextField intValue] * 255.0 / 100.0 + 0.5);
-        config_PutInt(p_intf, "freetype-bold", [_osd_forceboldCheckbox state]);
+        config_PutInt("freetype-opacity", [_osd_opacityTextField intValue] * 255.0 / 100.0 + 0.5);
+        config_PutInt("freetype-bold", [_osd_forceboldCheckbox state]);
         SaveIntList(_osd_outline_colorPopup, "freetype-outline-color");
         SaveIntList(_osd_outline_thicknessPopup, "freetype-outline-thickness");
         _osdSettingChanged = NO;

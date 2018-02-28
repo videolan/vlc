@@ -756,7 +756,7 @@ void ModuleListConfigControl::onUpdate()
 void
 VIntConfigControl::doApply()
 {
-    config_PutInt( p_this, getName(), getValue() );
+    config_PutInt( getName(), getValue() );
 }
 
 /*********** Integer **************/

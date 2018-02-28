@@ -98,6 +98,6 @@ void ErrorsDialog::dontShow()
 {
     if( stopShowing->isChecked() )
     {
-        config_PutInt( p_intf, "qt-show-errors", 0 );
+        config_PutInt( "qt-show-errors", 0 );
     }
 }

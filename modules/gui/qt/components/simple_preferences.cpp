@@ -1058,7 +1058,7 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "cd-audio", devicepath );
         }
 
-#define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
+#define CaC( name, factor ) config_PutInt( name, i_comboValue * factor )
         /* Caching */
         QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets["cachingCoB"]);
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
@@ -1093,7 +1093,7 @@ void SPrefsPanel::apply()
     case SPrefsVideo:
     {
         int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentData().toInt();
-        config_PutInt( p_intf, "qt-fullscreen-screennumber", i_fullscreenScreen );
+        config_PutInt( "qt-fullscreen-screennumber", i_fullscreenScreen );
         break;
     }
 
@@ -1146,7 +1146,7 @@ void SPrefsPanel::apply()
 #undef save_vol_aout
         free( psz_aout );
 
-        config_PutInt( p_intf, "volume-save", !b_reset_volume );
+        config_PutInt( "volume-save", !b_reset_volume );
 
         break;
     }
@@ -1154,18 +1154,18 @@ void SPrefsPanel::apply()
     {
         bool b_checked = qobject_cast<QCheckBox *>(optionWidgets["shadowCB"])->isChecked();
         if( b_checked && config_GetInt( "freetype-shadow-opacity" ) == 0 ) {
-            config_PutInt( p_intf, "freetype-shadow-opacity", 128 );
+            config_PutInt( "freetype-shadow-opacity", 128 );
         }
         else if (!b_checked ) {
-            config_PutInt( p_intf, "freetype-shadow-opacity", 0 );
+            config_PutInt( "freetype-shadow-opacity", 0 );
         }
 
         b_checked = qobject_cast<QCheckBox *>(optionWidgets["backgroundCB"])->isChecked();
         if( b_checked && config_GetInt( "freetype-background-opacity" ) == 0 ) {
-            config_PutInt( p_intf, "freetype-background-opacity", 128 );
+            config_PutInt( "freetype-background-opacity", 128 );
         }
         else if (!b_checked ) {
-            config_PutInt( p_intf, "freetype-background-opacity", 0 );
+            config_PutInt( "freetype-background-opacity", 0 );
         }
 
     }

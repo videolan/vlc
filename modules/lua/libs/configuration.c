@@ -83,11 +83,11 @@ static int vlclua_config_set( lua_State *L )
             break;
 
         case VLC_VAR_INTEGER:
-            config_PutInt( p_this, psz_name, luaL_checkinteger( L, 2 ) );
+            config_PutInt( psz_name, luaL_checkinteger( L, 2 ) );
             break;
 
         case VLC_VAR_BOOL:
-            config_PutInt( p_this, psz_name, luaL_checkboolean( L, 2 ) );
+            config_PutInt( psz_name, luaL_checkboolean( L, 2 ) );
             break;
 
         case VLC_VAR_FLOAT:

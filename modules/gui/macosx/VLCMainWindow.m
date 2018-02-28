@@ -234,7 +234,7 @@ static const float f_min_window_height = 307.;
 
         NSAlert *albumArtAlert = [NSAlert alertWithMessageText:_NS("Check for album art and metadata?") defaultButton:_NS("Enable Metadata Retrieval") alternateButton:_NS("No, Thanks") otherButton:nil informativeTextWithFormat:@"%@",_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
         NSInteger returnValue = [albumArtAlert runModal];
-        config_PutInt(getIntf(), "metadata-network-access", returnValue == NSAlertDefaultReturn);
+        config_PutInt("metadata-network-access", returnValue == NSAlertDefaultReturn);
     }
 
     if (self.darkInterface) {

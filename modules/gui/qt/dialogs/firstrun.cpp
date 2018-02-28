@@ -39,11 +39,11 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
 
 void FirstRun::save()
 {
-    config_PutInt( p_intf,  "metadata-network-access", checkbox->isChecked() );
+    config_PutInt( "metadata-network-access", checkbox->isChecked() );
 #ifdef UPDATE_CHECK
-    config_PutInt( p_intf,  "qt-updates-notif", checkbox2->isChecked() );
+    config_PutInt( "qt-updates-notif", checkbox2->isChecked() );
 #endif
-    config_PutInt( p_intf,  "qt-privacy-ask", 0 );
+    config_PutInt( "qt-privacy-ask", 0 );
 
     /* FIXME Should not save here. This will not work as expected if another
      * plugin overwrote items of its own. */

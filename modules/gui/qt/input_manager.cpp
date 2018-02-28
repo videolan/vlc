@@ -1141,7 +1141,7 @@ void MainInputManager::pause()
 
 void MainInputManager::toggleRandom()
 {
-    config_PutInt( p_intf, "random", var_ToggleBool( THEPL, "random" ) );
+    config_PutInt( "random", var_ToggleBool( THEPL, "random" ) );
 }
 
 void MainInputManager::notifyRandom(bool value)
@@ -1183,14 +1183,14 @@ void MainInputManager::loopRepeatLoopStatus()
 
     var_SetBool( THEPL, "loop", loop );
     var_SetBool( THEPL, "repeat", repeat );
-    config_PutInt( p_intf, "loop", loop );
-    config_PutInt( p_intf, "repeat", repeat );
+    config_PutInt( "loop", loop );
+    config_PutInt( "repeat", repeat );
 }
 
 void MainInputManager::activatePlayQuit( bool b_exit )
 {
     var_SetBool( THEPL, "play-and-exit", b_exit );
-    config_PutInt( p_intf, "play-and-exit", b_exit );
+    config_PutInt( "play-and-exit", b_exit );
 }
 
 bool MainInputManager::getPlayExitState()

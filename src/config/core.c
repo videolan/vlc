@@ -155,9 +155,7 @@ void config_PutPsz( vlc_object_t *p_this,
     free (oldstr);
 }
 
-#undef config_PutInt
-void config_PutInt( vlc_object_t *p_this, const char *psz_name,
-                    int64_t i_value )
+void config_PutInt(const char *psz_name, int64_t i_value )
 {
     module_config_t *p_config = config_FindConfig( psz_name );
 

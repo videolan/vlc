@@ -876,7 +876,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             var_Set(getIntf()->obj.libvlc, psz_name, val);
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
-            config_PutInt(getIntf(), psz_name, [self intValue]);
+            config_PutInt(psz_name, [self intValue]);
             break;
         case CONFIG_ITEM_FLOAT:
             config_PutFloat(getIntf(), psz_name, [self floatValue]);

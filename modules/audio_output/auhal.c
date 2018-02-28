@@ -918,8 +918,7 @@ VolumeSet(audio_output_t * p_aout, float volume)
     }
 
     if (var_InheritBool(p_aout, "volume-save"))
-        config_PutInt(p_aout, "auhal-volume",
-                      lroundf(volume * AOUT_VOLUME_DEFAULT));
+        config_PutInt("auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
 
     return ostatus;
 }

@@ -349,9 +349,9 @@ static VLCMain *sharedInstance = nil;
     [[self audioEffectsPanel] saveCurrentProfileAtTerminate];
 
     /* Save some interface state in configuration, at module quit */
-    config_PutInt(p_intf, "random", var_GetBool(p_playlist, "random"));
-    config_PutInt(p_intf, "loop", var_GetBool(p_playlist, "loop"));
-    config_PutInt(p_intf, "repeat", var_GetBool(p_playlist, "repeat"));
+    config_PutInt("random", var_GetBool(p_playlist, "random"));
+    config_PutInt("loop", var_GetBool(p_playlist, "loop"));
+    config_PutInt("repeat", var_GetBool(p_playlist, "repeat"));
 
     var_DelCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
     var_DelCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);

@@ -210,7 +210,7 @@ void ExtendedDialog::saveConfig()
                 break;
             case QMetaType::Int:
             case QMetaType::Bool:
-                config_PutInt( p_intf, qtu(i.key()), value.toInt() ) ;
+                config_PutInt( qtu(i.key()), value.toInt() ) ;
                 break;
             case QMetaType::Double:
             case QMetaType::Float:
