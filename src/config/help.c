@@ -428,7 +428,7 @@ static void print_item(const vlc_object_t *p_this, const module_t *m, const modu
             int64_t *pi_values;
             char **ppsz_texts;
 
-            ssize_t i_count = config_GetIntChoices(VLC_OBJECT(p_this), item->psz_name, &pi_values, &ppsz_texts);
+            ssize_t i_count = config_GetIntChoices(item->psz_name, &pi_values, &ppsz_texts);
 
             if (i_count > 0)
             {

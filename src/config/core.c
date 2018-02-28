@@ -194,24 +194,19 @@ void config_PutFloat(const char *psz_name, float f_value)
     vlc_rwlock_unlock (&config_lock);
 }
 
-ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
+ssize_t config_GetIntChoices(const char *name,
                              int64_t **restrict values, char ***restrict texts)
 {
     *values = NULL;
     *texts = NULL;
 
     module_config_t *cfg = config_FindConfig(name);
-    if (cfg == NULL)
-    {
-        msg_Warn (obj, "option %s does not exist", name);
-        errno = ENOENT;
-        return -1;
-    }
+    assert(cfg != NULL);
 
     size_t count = cfg->list_count;
     if (count == 0)
     {
-        if (module_Map(obj, cfg->owner))
+        if (module_Map(NULL, cfg->owner))
         {
             errno = EIO;
             return -1;

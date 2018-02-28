@@ -493,8 +493,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
     {
         int64_t *values;
         char **texts;
-        ssize_t count = config_GetIntChoices(VLC_OBJECT(p_intf), configname,
-                                             &values, &texts);
+        ssize_t count = config_GetIntChoices(configname, &values, &texts);
         for( ssize_t i = 0; i < count; i++ )
         {
             combo->addItem( qtr(texts[i]), QVariant(qlonglong(values[i])) );
@@ -905,7 +904,7 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config )
 
     int64_t *values;
     char **texts;
-    ssize_t count = config_GetIntChoices( p_this, p_module_config->psz_name,
+    ssize_t count = config_GetIntChoices( p_module_config->psz_name,
                                           &values, &texts );
     for( ssize_t i = 0; i < count; i++ )
     {

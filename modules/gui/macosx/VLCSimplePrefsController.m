@@ -466,7 +466,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     int64_t *values;
     char **texts;
-    ssize_t count = config_GetIntChoices(VLC_OBJECT(getIntf()), name, &values, &texts);
+    ssize_t count = config_GetIntChoices(name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];

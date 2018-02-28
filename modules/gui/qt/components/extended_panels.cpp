@@ -398,8 +398,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     {
         int64_t *values;
         char **texts;
-        ssize_t count = config_GetIntChoices( VLC_OBJECT( p_intf ),
-                                              qtu( option ), &values, &texts );
+        ssize_t count = config_GetIntChoices( qtu( option ), &values, &texts );
         for( ssize_t i = 0; i < count; i++ )
         {
             combobox->addItem( qtr( texts[i] ), qlonglong(values[i]) );

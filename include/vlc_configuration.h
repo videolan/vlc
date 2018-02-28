@@ -232,7 +232,7 @@ VLC_API void config_PutPsz(const char *name, const char *val);
  * \note the caller is responsible for calling free() on all descriptions and
  * on both tables. In case of error, both pointers are set to NULL.
  */
-VLC_API ssize_t config_GetIntChoices(vlc_object_t *, const char *,
+VLC_API ssize_t config_GetIntChoices(const char *,
                                      int64_t **, char ***) VLC_USED;
 
 /**

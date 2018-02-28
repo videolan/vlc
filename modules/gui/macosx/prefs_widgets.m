@@ -1474,7 +1474,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     int i_current_selection = config_GetInt(self.p_item->psz_name);
     int64_t *values;
     char **texts;
-    ssize_t count = config_GetIntChoices(VLC_OBJECT(getIntf()), self.p_item->psz_name, &values, &texts);
+    ssize_t count = config_GetIntChoices(self.p_item->psz_name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
