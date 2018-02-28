@@ -66,8 +66,7 @@ typedef union
 
 typedef int (*vlc_string_list_cb)(vlc_object_t *, const char *,
                                   char ***, char ***);
-typedef int (*vlc_integer_list_cb)(vlc_object_t *, const char *,
-                                   int64_t **, char ***);
+typedef int (*vlc_integer_list_cb)(const char *, int64_t **, char ***);
 
 /**
  * Configuration item

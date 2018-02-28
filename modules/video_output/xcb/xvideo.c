@@ -53,7 +53,7 @@
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
-static int EnumAdaptors (vlc_object_t *, const char *, int64_t **, char ***);
+static int EnumAdaptors(const char *, int64_t **, char ***);
 
 /*
  * Module descriptor
@@ -755,11 +755,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     }
 }
 
-static int EnumAdaptors (vlc_object_t *obj, const char *var,
-                         int64_t **vp, char ***tp)
+static int EnumAdaptors(const char *var, int64_t **vp, char ***tp)
 {
     /* Connect to X */
-    char *display = var_InheritString (obj, "x11-display");
+    char *display = config_GetPsz("x11-display");
     xcb_connection_t *conn;
     int snum;
 
@@ -833,6 +832,6 @@ static int EnumAdaptors (vlc_object_t *obj, const char *var,
         *(texts++) = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
     }
     free (adaptors);
-    (void) obj; (void) var;
+    (void) var;
     return values - *vp;
 }

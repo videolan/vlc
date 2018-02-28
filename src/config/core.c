@@ -219,7 +219,7 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
 
         if (cfg->list.i_cb == NULL)
             return 0;
-        return cfg->list.i_cb(obj, name, values, texts);
+        return cfg->list.i_cb(name, values, texts);
     }
 
     int64_t *vals = vlc_alloc (count, sizeof (*vals));
