@@ -318,6 +318,11 @@ void *aligned_alloc(size_t, size_t);
 # define HAVE_USELOCALE
 #endif
 
+#if !defined(HAVE_NEWLOCALE) && defined(HAVE_CXX_LOCALE_T) && defined(__cplusplus)
+# include <locale>
+# define HAVE_NEWLOCALE
+#endif
+
 /* locale.h */
 #ifndef HAVE_USELOCALE
 # ifndef HAVE_NEWLOCALE

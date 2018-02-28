@@ -854,6 +854,18 @@ AC_CHECK_HEADERS([features.h getopt.h linux/dccp.h linux/magic.h mntent.h sys/ev
 dnl  MacOS
 AC_CHECK_HEADERS([xlocale.h])
 
+dnl Check if C++ headers define locale_t
+AC_LANG_PUSH(C++)
+AC_CACHE_CHECK([if C++ headers define locale_t],
+  [ac_cv_cxx_locale_t],
+  [ac_cv_cxx_locale_t=no
+   AC_TRY_COMPILE([#include <locale>], [locale_t loc;],
+                    [ac_cv_cxx_locale_t=yes])])
+if test "${ac_cv_cxx_locale_t}" != "no"; then
+  AC_DEFINE(HAVE_CXX_LOCALE_T, 1, Define to 1 if C++ headers define locale_t)
+fi
+AC_LANG_POP(C++)
+
 dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CHECK_TYPE(ssize_t,, [
