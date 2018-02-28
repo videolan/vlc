@@ -63,7 +63,7 @@ static int vlclua_config_get( lua_State *L )
             break;
 
         case VLC_VAR_FLOAT:
-            lua_pushnumber( L, config_GetFloat( p_this, psz_name ) );
+            lua_pushnumber( L, config_GetFloat( psz_name ) );
             break;
 
         default:

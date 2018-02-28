@@ -35,8 +35,7 @@
 Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 {
     // compute preferred step in [0.,1.] range
-    m_step = config_GetFloat( pIntf, "volume-step" )
-             / (float)AOUT_VOLUME_MAX;
+    m_step = config_GetFloat( "volume-step" ) / (float)AOUT_VOLUME_MAX;
 
     // set current volume from the playlist
     setVolume( var_GetFloat( getPL(), "volume" ), false );

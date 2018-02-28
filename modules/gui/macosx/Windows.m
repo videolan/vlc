@@ -1036,7 +1036,7 @@
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 
-    [self setAlphaValue: config_GetFloat(getIntf(), "macosx-opaqueness")];
+    [self setAlphaValue: config_GetFloat("macosx-opaqueness")];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation

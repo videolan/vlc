@@ -164,7 +164,7 @@ VLC_API void config_PutInt(vlc_object_t *, const char *name, int64_t val);
  * \bug A legitimate floating point value of -1 cannot be distinguished from an
  * error.
  */
-VLC_API float config_GetFloat(vlc_object_t *, const char *name) VLC_USED;
+VLC_API float config_GetFloat(const char *name) VLC_USED;
 
 /**
  * Sets an integer configuration item.
@@ -325,7 +325,6 @@ VLC_API void config_RemoveIntf( vlc_object_t *, const char * );
 VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) VLC_USED;
 
 #define config_PutInt(a,b,c) config_PutInt(VLC_OBJECT(a),b,c)
-#define config_GetFloat(a,b) config_GetFloat(VLC_OBJECT(a),b)
 #define config_PutFloat(a,b,c) config_PutFloat(VLC_OBJECT(a),b,c)
 #define config_GetPsz(a,b) config_GetPsz(VLC_OBJECT(a),b)
 #define config_PutPsz(a,b,c) config_PutPsz(VLC_OBJECT(a),b,c)

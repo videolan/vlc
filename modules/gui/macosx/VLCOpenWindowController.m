@@ -1099,7 +1099,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [self setMRL: @"screen://"];
         [_screenHeightTextField setIntValue: config_GetInt("screen-height")];
         [_screenWidthTextField setIntValue: config_GetInt("screen-width")];
-        [_screenFPSTextField setFloatValue: config_GetFloat(p_intf, "screen-fps")];
+        [_screenFPSTextField setFloatValue: config_GetFloat("screen-fps")];
         [_screenLeftTextField setIntValue: config_GetInt("screen-left")];
         [_screenTopTextField setIntValue: config_GetInt("screen-top")];
         [_screenFollowMouseCheckbox setIntValue: config_GetInt("screen-follow-mouse")];

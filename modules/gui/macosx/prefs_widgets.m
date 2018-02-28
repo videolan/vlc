@@ -1687,7 +1687,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_textfield setFloatValue: config_GetFloat(getIntf(), self.p_item->psz_name)];
+    [o_textfield setFloatValue: config_GetFloat(self.p_item->psz_name)];
     [super resetValues];
 }
 @end
@@ -1797,8 +1797,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_textfield setFloatValue: config_GetFloat(getIntf(), self.p_item->psz_name)];
-    [o_slider setFloatValue: config_GetFloat(getIntf(), self.p_item->psz_name)];
+    [o_textfield setFloatValue: config_GetFloat(self.p_item->psz_name)];
+    [o_slider setFloatValue: config_GetFloat(self.p_item->psz_name)];
     [super resetValues];
 }
 @end

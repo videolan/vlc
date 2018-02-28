@@ -885,7 +885,7 @@ float FilterSliderData::initialValue()
     if ( ! config_FindConfig( qtu(p_data->name) ) )
         return f;
 
-    f = config_GetFloat( p_intf, qtu(p_data->name) );
+    f = config_GetFloat( qtu(p_data->name) );
     return f;
 }
 

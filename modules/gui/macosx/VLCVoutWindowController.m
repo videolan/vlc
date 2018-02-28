@@ -368,7 +368,7 @@ void WindowClose(vout_window_t *p_wnd)
         [newVideoWindow makeKeyAndOrderFront: self];
     }
 
-    [newVideoWindow setAlphaValue: config_GetFloat(getIntf(), "macosx-opaqueness")];
+    [newVideoWindow setAlphaValue: config_GetFloat("macosx-opaqueness")];
 
     [voutView setVoutThread:(vout_thread_t *)p_wnd->obj.parent];
     [newVideoWindow setHasActiveVideo: YES];
