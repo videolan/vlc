@@ -32,9 +32,9 @@ package-win-sdk: package-win-install
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	cp -rv $(prefix)/lib/libvlc.dll.a "$(win32_destdir)/sdk/lib/libvlc.lib"
 	cp -rv $(prefix)/lib/libvlccore.dll.a "$(win32_destdir)/sdk/lib/libvlccore.lib"
-	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(prefix)/bin/libvlc.dll"
+	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def"
 	echo "INPUT(libvlc.lib)" > "$(win32_destdir)/sdk/lib/vlc.lib"
-	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
+	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def"
 	echo "INPUT(libvlccore.lib)" > "$(win32_destdir)/sdk/lib/vlccore.lib"
 
 package-win-common: package-win-install package-win-sdk
