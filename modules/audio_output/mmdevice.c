@@ -1398,7 +1398,7 @@ static int ReloadAudioDevices(vlc_object_t *this, char const *name,
 {
     (void) name;
 
-    bool in_mta = TryEnterMTA(this) == 0;
+    bool in_mta = SUCCEEDED(CoInitializeEx(NULL, COINIT_MULTITHREADED));
 
     struct mm_list list = { .count = 0 };
     void *it;
@@ -1431,7 +1431,7 @@ static int ReloadAudioDevices(vlc_object_t *this, char const *name,
 error:
     IMMDeviceEnumerator_Release((IMMDeviceEnumerator *)it);
     if (in_mta)
-        LeaveMTA();
+        CoUninitialize();
 
     if (list.count > 0)
     {
