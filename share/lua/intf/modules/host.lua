@@ -254,6 +254,9 @@ function host()
                 h:listen_stdio()
             else
                 u = vlc.strings.url_parse( url )
+                if url.host == nil then
+                    u = vlc.strings.url_parse( "//" .. url )
+                end
                 h:listen_tcp( u.host, u.port, (u.protocol == "telnet") )
             end
         end
