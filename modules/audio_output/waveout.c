@@ -944,7 +944,7 @@ static int WaveoutVolumeSet( audio_output_t *p_aout, float volume )
     sys->f_volume = volume;
 
     if( var_InheritBool( p_aout, "volume-save" ) )
-        config_PutFloat( p_aout, "waveout-volume", volume );
+        config_PutFloat( "waveout-volume", volume );
 
     aout_VolumeReport( p_aout, volume );
     vlc_mutex_unlock(&p_aout->sys->lock);
@@ -1009,7 +1009,7 @@ static void WaveoutPollVolume( void * aout )
         p_aout->sys->f_volume = volume;
 
         if( var_InheritBool( p_aout, "volume-save" ) )
-            config_PutFloat( p_aout, "waveout-volume", volume );
+            config_PutFloat( "waveout-volume", volume );
 
         aout_VolumeReport( p_aout, volume );
     }

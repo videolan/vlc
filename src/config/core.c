@@ -129,9 +129,7 @@ char *config_GetPsz(const char *psz_name)
     return psz_value;
 }
 
-#undef config_PutPsz
-void config_PutPsz( vlc_object_t *p_this,
-                      const char *psz_name, const char *psz_value )
+void config_PutPsz(const char *psz_name, const char *psz_value)
 {
     module_config_t *p_config = config_FindConfig( psz_name );
 
@@ -174,9 +172,7 @@ void config_PutInt(const char *psz_name, int64_t i_value )
     vlc_rwlock_unlock (&config_lock);
 }
 
-#undef config_PutFloat
-void config_PutFloat( vlc_object_t *p_this,
-                      const char *psz_name, float f_value )
+void config_PutFloat(const char *psz_name, float f_value)
 {
     module_config_t *p_config = config_FindConfig( psz_name );
 

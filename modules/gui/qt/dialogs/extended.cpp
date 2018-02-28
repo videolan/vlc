@@ -214,7 +214,7 @@ void ExtendedDialog::saveConfig()
                 break;
             case QMetaType::Double:
             case QMetaType::Float:
-                config_PutFloat( p_intf, qtu(i.key()), value.toFloat() ) ;
+                config_PutFloat( qtu(i.key()), value.toFloat() ) ;
                 break;
             default:
                 vlc_assert_unreachable();

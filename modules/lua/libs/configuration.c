@@ -91,8 +91,7 @@ static int vlclua_config_set( lua_State *L )
             break;
 
         case VLC_VAR_FLOAT:
-            config_PutFloat( p_this, psz_name,
-                             luaL_checknumber( L, 2 ) );
+            config_PutFloat( psz_name, luaL_checknumber( L, 2 ) );
             break;
 
         default:

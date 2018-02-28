@@ -1041,7 +1041,7 @@ void ColorConfigControl::selectColor()
 void
 VFloatConfigControl::doApply()
 {
-    config_PutFloat( p_this, getName(), getValue() );
+    config_PutFloat( getName(), getValue() );
 }
 
 /*********** Float **************/

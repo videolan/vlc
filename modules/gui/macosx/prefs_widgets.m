@@ -879,7 +879,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             config_PutInt(psz_name, [self intValue]);
             break;
         case CONFIG_ITEM_FLOAT:
-            config_PutFloat(getIntf(), psz_name, [self floatValue]);
+            config_PutFloat(psz_name, [self floatValue]);
             break;
     }
 }

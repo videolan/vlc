@@ -47,7 +47,7 @@ static int aout_SoftVolumeSet(audio_output_t *aout, float volume)
         return -1;
     sys->soft_gain = gain;
     if (var_InheritBool(aout, "volume-save"))
-        config_PutFloat(aout, MODULE_STRING"-gain", gain);
+        config_PutFloat(MODULE_STRING"-gain", gain);
 
     aout_VolumeReport(aout, volume);
     return 0;

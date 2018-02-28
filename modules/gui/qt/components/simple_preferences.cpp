@@ -1124,24 +1124,24 @@ void SPrefsPanel::apply()
 #if defined( _WIN32 )
         VLC_UNUSED( f_gain );
         if( save_vol_aout( "mmdevice" ) )
-            config_PutFloat( p_intf, "mmdevice-volume", i_volume / 100.f );
+            config_PutFloat( "mmdevice-volume", i_volume / 100.f );
         if( save_vol_aout( "directsound" ) )
-            config_PutFloat( p_intf, "directx-volume", i_volume / 100.f );
+            config_PutFloat( "directx-volume", i_volume / 100.f );
         if( save_vol_aout( "waveout" ) )
-            config_PutFloat( p_intf, "waveout-volume", i_volume / 100.f );
+            config_PutFloat( "waveout-volume", i_volume / 100.f );
 #elif defined( Q_OS_MAC )
         VLC_UNUSED( f_gain );
         if( save_vol_aout( "auhal" ) )
-            config_PutFloat( p_intf, "auhal-volume", i_volume / 100.f
+            config_PutFloat( "auhal-volume", i_volume / 100.f
                     * AOUT_VOLUME_DEFAULT );
 #elif defined( __OS2__ )
         if( save_vol_aout( "kai" ) )
-            config_PutFloat( p_intf, "kai-gain",  f_gain );
+            config_PutFloat( "kai-gain",  f_gain );
 #else
         if( save_vol_aout( "alsa" ) )
-            config_PutFloat( p_intf, "alsa-gain", f_gain );
+            config_PutFloat( "alsa-gain", f_gain );
         if( save_vol_aout( "jack" ) )
-            config_PutFloat( p_intf, "jack-gain", f_gain );
+            config_PutFloat( "jack-gain", f_gain );
 #endif
 #undef save_vol_aout
         free( psz_aout );

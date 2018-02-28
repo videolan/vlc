@@ -136,7 +136,7 @@ void EqualizerPreamp::set( float percentage, bool updateVLC )
     {
         float val = 40 * percentage - 20;
 
-        config_PutFloat( getIntf(), "equalizer-preamp", val );
+        config_PutFloat( "equalizer-preamp", val );
         if( pAout )
         {
             // Update the audio output
