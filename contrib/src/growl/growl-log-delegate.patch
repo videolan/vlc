@@ -1,7 +1,15 @@
-diff -ru growl/Framework/Source/GrowlApplicationBridge.m growl-patched/Framework/Source/GrowlApplicationBridge.m
---- growl/Framework/Source/GrowlApplicationBridge.m	2011-05-25 04:10:27.000000000 +0200
-+++ growl-patched/Framework/Source/GrowlApplicationBridge.m	2015-10-15 15:26:27.000000000 +0200
-@@ -398,8 +398,8 @@
+--- a/Framework/Source/GrowlApplicationBridge.m	2018-02-28 01:49:46.000000000 +0100
++++ b/Framework/Source/GrowlApplicationBridge.m	2018-02-28 01:52:48.000000000 +0100
+@@ -730,7 +730,7 @@
+ 		regDict = [self bestRegistrationDictionary];
+ 	
+ 	if(!regDict){
+-		NSLog(@"Cannot register without a registration dictionary!");
++		//NSLog(@"Cannot register without a registration dictionary!");
+ 		return NO;
+ 	}
+ 
+@@ -815,8 +815,8 @@
  	NSDictionary *registrationDictionary = [self registrationDictionaryFromDelegate];
  	if (!registrationDictionary) {
  		registrationDictionary = [self registrationDictionaryFromBundle:nil];

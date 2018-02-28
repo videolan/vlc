@@ -1,0 +1,11 @@
+--- a/Framework/Source/GrowlApplicationBridge.m	2018-02-28 01:20:14.000000000 +0100
++++ b/Framework/Source/GrowlApplicationBridge.m	2018-02-28 01:20:33.000000000 +0100
+@@ -1128,7 +1128,7 @@
+    
+    checked = YES;
+    
+-   if(xpc_connection_create == NULL){
++   if(&xpc_connection_create == NULL){
+       sandboxed = NO;
+       networkClient = NO; //Growl.app 1.3+ is required to be a network client, Growl.app 1.3+ requires 10.7+
+       return;
