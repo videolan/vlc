@@ -131,7 +131,7 @@ VLC_API int config_GetType(const char *name) VLC_USED;
  * \return The configuration item value or -1 if not found.
  * \bug A legitimate integer value of -1 cannot be distinguished from an error.
  */
-VLC_API int64_t config_GetInt(const char *) VLC_USED;
+VLC_API int64_t config_GetInt(const char *name) VLC_USED;
 
 /**
  * Sets an integer configuration item.
