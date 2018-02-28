@@ -321,9 +321,7 @@ VLC_API char * config_GetUserDir( vlc_userdir_t ) VLC_USED VLC_MALLOC;
 
 VLC_API void config_AddIntf(const char *);
 VLC_API void config_RemoveIntf(const char *);
-VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) VLC_USED;
-
-#define config_ExistIntf(a,b) config_ExistIntf(VLC_OBJECT(a),b)
+VLC_API bool config_ExistIntf(const char *) VLC_USED;
 
 /****************************************************************************
  * config_chain_t:

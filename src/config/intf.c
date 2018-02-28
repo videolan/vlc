@@ -129,12 +129,11 @@ void config_RemoveIntf( const char *psz_intf )
     free( psz_config );
 }
 
-#undef config_ExistIntf
 /*
  * Returns true if the specified extra interface is present in the
  * configuration, false if not
  */
-bool config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
+bool config_ExistIntf( const char *psz_intf )
 {
     assert( psz_intf );
 

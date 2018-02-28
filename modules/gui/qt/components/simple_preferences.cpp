@@ -573,7 +573,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
                         lastfm_pass_edit );
 
-                if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+                if( config_ExistIntf( "audioscrobbler" ) )
                     ui.lastfm->setChecked( true );
                 else
                     ui.lastfm->setChecked( false );

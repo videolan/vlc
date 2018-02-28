@@ -628,7 +628,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [self setupField:_audio_lastuserTextField forOption:"lastfm-username"];
         [self setupField:_audio_lastpwdSecureTextField forOption:"lastfm-password"];
 
-        if (config_ExistIntf(VLC_OBJECT(p_intf), "audioscrobbler")) {
+        if (config_ExistIntf("audioscrobbler")) {
             [_audio_lastCheckbox setState: NSOnState];
             [_audio_lastuserTextField setEnabled: YES];
             [_audio_lastpwdSecureTextField setEnabled: YES];
