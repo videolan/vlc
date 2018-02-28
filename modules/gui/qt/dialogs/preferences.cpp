@@ -340,7 +340,7 @@ void PrefsDialog::reset()
 
     if( ret == QMessageBox::Ok )
     {
-        config_ResetAll( p_intf );
+        config_ResetAll();
         config_SaveConfigFile( p_intf );
         getSettings()->clear();
 

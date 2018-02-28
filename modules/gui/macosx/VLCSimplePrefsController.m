@@ -833,7 +833,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 {
     if (i_return == NSAlertAlternateReturn) {
         /* reset VLC's config */
-        config_ResetAll(p_intf);
+        config_ResetAll();
         [self resetControls];
 
         /* force config file creation, since libvlc won't exit normally */

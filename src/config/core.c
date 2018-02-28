@@ -441,8 +441,7 @@ void config_Free (module_config_t *tab, size_t confsize)
     free (tab);
 }
 
-#undef config_ResetAll
-void config_ResetAll( vlc_object_t *p_this )
+void config_ResetAll(void)
 {
     vlc_rwlock_wrlock (&config_lock);
     for (vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
@@ -466,6 +465,4 @@ void config_ResetAll( vlc_object_t *p_this )
         }
     }
     vlc_rwlock_unlock (&config_lock);
-
-    VLC_UNUSED(p_this);
 }
