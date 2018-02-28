@@ -422,8 +422,8 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Destroy( p_libvlc, "bla" );
     assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
 
-    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER) );
+    var_Create( p_libvlc, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    assert( var_Type( p_libvlc, "program" ) == (VLC_VAR_INTEGER) );
 
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
