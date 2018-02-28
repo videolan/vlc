@@ -304,6 +304,19 @@ static int Activate( vlc_object_t *p_this )
         vlc_url_t url;
 
         vlc_UrlParse( &url, psz_host );
+        if( url.psz_host == NULL )
+        {
+            vlc_UrlClean( &url );
+            char *psz_backward_compat_host;
+            if( asprintf( &psz_backward_compat_host, "//%s", psz_host ) < 0 )
+            {
+                free( psz_host );
+                return VLC_EGENERIC;
+            }
+            free( psz_host );
+            psz_host = psz_backward_compat_host;
+            vlc_UrlParse( &url, psz_host );
+        }
 
         msg_Dbg( p_intf, "base: %s, port: %d", url.psz_host, url.i_port );
 
