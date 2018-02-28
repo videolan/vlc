@@ -1,3 +1,10 @@
+Changes between 3.0.1 and 3.0.2:
+--------------------------------
+
+macOS:
+ * Fix Growl notifications on recent macOS versions
+
+
 Changes between 3.0.0 and 3.0.1:
 --------------------------------
 
