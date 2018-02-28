@@ -1,27 +1,26 @@
 # growl
 
-GROWL_VERSION := 1.2.2
-GROWL_URL := http://growl.googlecode.com/files/Growl-$(GROWL_VERSION)-src.tbz
+GROWL_VERSION := 2.0.1
+GROWL_URL := https://download.videolan.org/contrib/GrowlSDK-$(GROWL_VERSION)-src.tar.gz
 
 ifdef HAVE_MACOSX
 PKGS += growl
 endif
 
-$(TARBALLS)/growl-$(GROWL_VERSION).tar.bz2:
+$(TARBALLS)/GrowlSDK-$(GROWL_VERSION)-src.tar.gz:
 	$(call download_pkg,$(GROWL_URL),growl)
 
-.sum-growl: growl-$(GROWL_VERSION).tar.bz2
+.sum-growl: GrowlSDK-$(GROWL_VERSION)-src.tar.gz
 
-growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
+growl: GrowlSDK-$(GROWL_VERSION)-src.tar.gz .sum-growl
 	$(UNPACK)
-	mv Growl-1.2.2-src growl-1.2.2
-	$(APPLY) $(SRC)/growl/growl-xcode5.patch
+	$(APPLY) $(SRC)/growl/fix-function-check.patch
+	$(APPLY) $(SRC)/growl/security-nothanks.patch
 	$(APPLY) $(SRC)/growl/growl-log-delegate.patch
-	sed -i.orig -e s/"REVISION \$$REV"/"REVISION 0x\$$REV"/g growl-1.2.2/generateHgRevision.sh
 	$(MOVE)
 
 .growl: growl
-	cd $< && xcodebuild $(XCODE_FLAGS) -target Growl.framework -configuration Release
+	cd $< && xcodebuild $(XCODE_FLAGS) MACOSX_DEPLOYMENT_TARGET=10.7 CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" GCC_TREAT_WARNINGS_AS_ERRORS=NO -target Growl.framework -configuration Release
 	install -d $(PREFIX)
 	cd $< && mkdir -p "$(PREFIX)/Frameworks" && cp -Rf build/Release/Growl.framework "$(PREFIX)/Frameworks"
 	touch $@
