@@ -1178,9 +1178,9 @@ void SPrefsPanel::clean()
 void SPrefsPanel::lastfm_Changed( int i_state )
 {
     if( i_state == Qt::Checked )
-        config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+        config_AddIntf( "audioscrobbler" );
     else if( i_state == Qt::Unchecked )
-        config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+        config_RemoveIntf( "audioscrobbler" );
 }
 
 void SPrefsPanel::changeStyle( QString s_style )

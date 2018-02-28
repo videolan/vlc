@@ -29,9 +29,8 @@
 
 #include <assert.h>
 
-#undef config_AddIntf
 /* Adds an extra interface to the configuration */
-void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
+void config_AddIntf( const char *psz_intf )
 {
     assert( psz_intf );
 
@@ -79,9 +78,8 @@ void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
     free( psz_config );
 }
 
-#undef config_RemoveIntf
 /* Removes an extra interface from the configuration */
-void config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
+void config_RemoveIntf( const char *psz_intf )
 {
     assert( psz_intf );
 

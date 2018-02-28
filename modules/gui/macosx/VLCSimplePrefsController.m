@@ -956,9 +956,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         if (module_exists("audioscrobbler")) {
             [_audio_lastCheckbox setEnabled: YES];
             if ([_audio_lastCheckbox state] == NSOnState)
-                config_AddIntf(p_intf, "audioscrobbler");
+                config_AddIntf("audioscrobbler");
             else
-                config_RemoveIntf(p_intf, "audioscrobbler");
+                config_RemoveIntf("audioscrobbler");
 
             config_PutPsz("lastfm-username", [[_audio_lastuserTextField stringValue] UTF8String]);
             config_PutPsz("lastfm-password", [[_audio_lastpwdSecureTextField stringValue] UTF8String]);
