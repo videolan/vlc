@@ -608,8 +608,12 @@ static int Open( vlc_object_t * p_this )
 
                     switch( tk->fmt.i_codec )
                     {
-                    case VLC_CODEC_RGB24:
-                    case VLC_CODEC_RGB32: /* BGR (see biBitCount) */
+                    case VLC_CODEC_RGB32:
+                        tk->fmt.video.i_bmask = 0xff000000;
+                        tk->fmt.video.i_gmask = 0x00ff0000;
+                        tk->fmt.video.i_rmask = 0x0000ff00;
+                        break;
+                    case VLC_CODEC_RGB24: /* BGR (see biBitCount) */
                         tk->fmt.video.i_bmask = 0x00ff0000;
                         tk->fmt.video.i_gmask = 0x0000ff00;
                         tk->fmt.video.i_rmask = 0x000000ff;
