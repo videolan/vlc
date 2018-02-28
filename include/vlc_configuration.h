@@ -221,7 +221,7 @@ VLC_API char *config_GetPsz(const char *name) VLC_USED VLC_MALLOC;
  * \param val New value (will be copied)
  * \bug This function allocates memory but errors cannot be detected.
  */
-VLC_API void config_PutPsz(vlc_object_t *, const char *name, const char *val);
+VLC_API void config_PutPsz(const char *name, const char *val);
 
 /**
  * Enumerates integer configuration choices.
@@ -322,8 +322,6 @@ VLC_API char * config_GetUserDir( vlc_userdir_t ) VLC_USED VLC_MALLOC;
 VLC_API void config_AddIntf( vlc_object_t *, const char * );
 VLC_API void config_RemoveIntf( vlc_object_t *, const char * );
 VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) VLC_USED;
-
-#define config_PutPsz(a,b,c) config_PutPsz(VLC_OBJECT(a),b,c)
 
 #define config_AddIntf(a,b) config_AddIntf(VLC_OBJECT(a),b)
 #define config_RemoveIntf(a,b) config_RemoveIntf(VLC_OBJECT(a),b)

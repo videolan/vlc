@@ -1053,9 +1053,9 @@ void SPrefsPanel::apply()
             qobject_cast<QComboBox *>(optionWidgets["inputLE"])->currentText().toUtf8();
         if( devicepath.size() > 0 )
         {
-            config_PutPsz( p_intf, "dvd", devicepath );
-            config_PutPsz( p_intf, "vcd", devicepath );
-            config_PutPsz( p_intf, "cd-audio", devicepath );
+            config_PutPsz( "dvd", devicepath );
+            config_PutPsz( "vcd", devicepath );
+            config_PutPsz( "cd-audio", devicepath );
         }
 
 #define CaC( name, factor ) config_PutInt( name, i_comboValue * factor )
@@ -1077,10 +1077,10 @@ void SPrefsPanel::apply()
     case SPrefsInterface:
     {
         if( qobject_cast<QRadioButton *>(optionWidgets["skinRB"])->isChecked() )
-            config_PutPsz( p_intf, "intf", "skins2,any" );
+            config_PutPsz( "intf", "skins2,any" );
         else
         //if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
-            config_PutPsz( p_intf, "intf", "" );
+            config_PutPsz( "intf", "" );
         if( qobject_cast<QComboBox *>(optionWidgets["styleCB"]) )
             getSettings()->setValue( "MainWindow/QtStyle",
                 qobject_cast<QComboBox *>(optionWidgets["styleCB"])->currentText() );
@@ -1106,7 +1106,7 @@ void SPrefsPanel::apply()
         if( !b_checked && qs_filter.contains( "normvol" ) )
             qs_filter.removeAll( "normvol" );
 
-        config_PutPsz( p_intf, "audio-filter", qtu( qs_filter.join( ":" ) ) );
+        config_PutPsz( "audio-filter", qtu( qs_filter.join( ":" ) ) );
 
         /* Default volume */
         int i_volume =

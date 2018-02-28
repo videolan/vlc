@@ -204,7 +204,7 @@ void Theme::saveConfig()
     }
 
     // Save config to file
-    config_PutPsz( getIntf(), "skins2-config", outStream.str().c_str() );
+    config_PutPsz( "skins2-config", outStream.str().c_str() );
 }
 
 

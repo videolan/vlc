@@ -70,7 +70,7 @@ void PodcastConfigDialog::accept()
         urls +=  ui.podcastList->item(i)->text();
         if( i != ui.podcastList->count()-1 ) urls += "|";
     }
-    config_PutPsz( p_intf, "podcast-urls", qtu( urls ) );
+    config_PutPsz( "podcast-urls", qtu( urls ) );
 
     if( playlist_IsServicesDiscoveryLoaded( THEPL, "podcast" ) )
     {

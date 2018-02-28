@@ -1181,7 +1181,7 @@ static const float f_min_window_height = 307.;
             [podcastConf appendFormat:@"%s|", config_GetPsz("podcast-urls")];
 
         [podcastConf appendString: [_podcastSubscribeUrlField stringValue]];
-        config_PutPsz(getIntf(), "podcast-urls", [podcastConf UTF8String]);
+        config_PutPsz("podcast-urls", [podcastConf UTF8String]);
         var_SetString(pl_Get(getIntf()), "podcast-urls", [podcastConf UTF8String]);
     }
 }
@@ -1210,7 +1210,7 @@ static const float f_min_window_height = 307.;
         [urls removeObjectAtIndex: [_podcastUnsubscribePopUpButton indexOfSelectedItem]];
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
         var_SetString(pl_Get(getIntf()), "podcast-urls", psz_new_urls);
-        config_PutPsz(getIntf(), "podcast-urls", psz_new_urls);
+        config_PutPsz("podcast-urls", psz_new_urls);
 
         free(psz_urls);
 

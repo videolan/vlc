@@ -524,7 +524,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     // trim empty entries
     [components removeObject:@""];
 
-    config_PutPsz(p_intf, [config UTF8String], [[components componentsJoinedByString:@":"] UTF8String]);
+    config_PutPsz([config UTF8String], [[components componentsJoinedByString:@":"] UTF8String]);
 }
 
 - (void)resetControls
@@ -869,7 +869,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     NSString *p_stringobject = (NSString *)[[object selectedItem] representedObject];
     if (p_stringobject) {
         assert([p_stringobject isKindOfClass:[NSString class]]);
-        config_PutPsz(p_intf, name, [p_stringobject UTF8String]);
+        config_PutPsz(name, [p_stringobject UTF8String]);
     }
 }
 
@@ -923,7 +923,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 
         [self changeModule:@"http" inConfig:@"extraintf" enable:[_intf_enableluahttpCheckbox state] == NSOnState];
-        config_PutPsz(p_intf, "http-password", [[_intf_luahttppwdTextField stringValue] UTF8String]);
+        config_PutPsz("http-password", [[_intf_luahttppwdTextField stringValue] UTF8String]);
 
         SaveIntList(_intf_pauseitunesPopup, "macosx-control-itunes");
         SaveIntList(_intf_continueplaybackPopup, "macosx-continue-playback");
@@ -948,7 +948,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         SaveIntList(_audio_dolbyPopup, "force-dolby-surround");
 
-        config_PutPsz(p_intf, "audio-language", [[_audio_langTextField stringValue] UTF8String]);
+        config_PutPsz("audio-language", [[_audio_langTextField stringValue] UTF8String]);
 
         SaveModuleList(_audio_visualPopup, "audio-visual");
 
@@ -960,8 +960,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
             else
                 config_RemoveIntf(p_intf, "audioscrobbler");
 
-            config_PutPsz(p_intf, "lastfm-username", [[_audio_lastuserTextField stringValue] UTF8String]);
-            config_PutPsz(p_intf, "lastfm-password", [[_audio_lastpwdSecureTextField stringValue] UTF8String]);
+            config_PutPsz("lastfm-username", [[_audio_lastuserTextField stringValue] UTF8String]);
+            config_PutPsz("lastfm-password", [[_audio_lastpwdSecureTextField stringValue] UTF8String]);
         }
         else
             [_audio_lastCheckbox setEnabled: NO];
@@ -997,7 +997,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      * input & codecs settings *
      ***************************/
     if (_inputSettingChanged) {
-        config_PutPsz(p_intf, "input-record-path", [[_input_recordTextField stringValue] UTF8String]);
+        config_PutPsz("input-record-path", [[_input_recordTextField stringValue] UTF8String]);
         config_PutInt("postproc-q", [_input_postprocTextField intValue]);
         config_PutInt("skip-frames", [_input_skipFramesCheckbox state]);
 
@@ -1028,11 +1028,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         if ([_osd_encodingPopup indexOfSelectedItem] >= 0)
             SaveStringList(_osd_encodingPopup, "subsdec-encoding");
         else
-            config_PutPsz(p_intf, "subsdec-encoding", "");
+            config_PutPsz("subsdec-encoding", "");
 
-        config_PutPsz(p_intf, "sub-language", [[_osd_langTextField stringValue] UTF8String]);
+        config_PutPsz("sub-language", [[_osd_langTextField stringValue] UTF8String]);
 
-        config_PutPsz(p_intf, "freetype-font", [[_osd_fontTextField stringValue] UTF8String]);
+        config_PutPsz("freetype-font", [[_osd_fontTextField stringValue] UTF8String]);
         SaveIntList(_osd_font_colorPopup, "freetype-color");
         SaveIntList(_osd_font_sizePopup, "freetype-rel-fontsize");
         config_PutInt("freetype-opacity", [_osd_opacityTextField intValue] * 255.0 / 100.0 + 0.5);
@@ -1048,7 +1048,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     if (_hotkeyChanged) {
         NSUInteger hotKeyCount = [_hotkeySettings count];
         for (NSUInteger i = 0; i < hotKeyCount; i++)
-            config_PutPsz(p_intf, [[_hotkeyNames objectAtIndex:i] UTF8String], [[_hotkeySettings objectAtIndex:i]UTF8String]);
+            config_PutPsz([[_hotkeyNames objectAtIndex:i] UTF8String], [[_hotkeySettings objectAtIndex:i]UTF8String]);
         _hotkeyChanged = NO;
     }
 

@@ -445,7 +445,7 @@ static void SaveUrls( services_discovery_t *p_sd )
         if( i < p_sys->i_urls - 1 ) strcat( psz_urls, "|" );
     }
 
-    config_PutPsz( p_sd, "podcast-urls", psz_urls );
+    config_PutPsz( "podcast-urls", psz_urls );
 
     free( psz_urls );
 }

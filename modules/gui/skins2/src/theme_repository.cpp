@@ -102,7 +102,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
         current = itdefault->second;
 
     // save this valid skins for reuse
-    config_PutPsz( getIntf(), "skins2-last", current.c_str() );
+    config_PutPsz( "skins2-last", current.c_str() );
 
     // Update repository
     updateRepository();

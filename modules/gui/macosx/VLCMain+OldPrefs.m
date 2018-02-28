@@ -96,8 +96,8 @@ static const int kCurrentPreferencesVersion = 4;
         var_SetString(p_playlist, "audio-filter", "");
         var_SetString(p_playlist, "video-filter", "");
 
-        config_PutPsz(getIntf(), "audio-filter", "");
-        config_PutPsz(getIntf(), "video-filter", "");
+        config_PutPsz("audio-filter", "");
+        config_PutPsz("video-filter", "");
         config_SaveConfigFile(getIntf());
 
         // This migration only has effect rarely, therefore only restart then

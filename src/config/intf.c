@@ -33,8 +33,6 @@
 /* Adds an extra interface to the configuration */
 void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
 {
-    vlc_object_t *libvlc = VLC_OBJECT(p_this->obj.libvlc);
-
     assert( psz_intf );
 
     char *psz_config, *psz_parser;
@@ -71,12 +69,12 @@ void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
         char *psz_newconfig;
         if( asprintf( &psz_newconfig, "%s:%s", psz_config, psz_intf ) != -1 )
         {
-            config_PutPsz( libvlc, "extraintf", psz_newconfig );
+            config_PutPsz( "extraintf", psz_newconfig );
             free( psz_newconfig );
         }
     }
     else
-        config_PutPsz( libvlc, "extraintf", psz_intf );
+        config_PutPsz( "extraintf", psz_intf );
 
     free( psz_config );
 }
@@ -85,8 +83,6 @@ void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
 /* Removes an extra interface from the configuration */
 void config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
 {
-    vlc_object_t *libvlc = VLC_OBJECT(p_this->obj.libvlc);
-
     assert( psz_intf );
 
     char *psz_config, *psz_parser;
@@ -103,7 +99,7 @@ void config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
             *psz_parser = '\0';
             if( asprintf( &psz_newconfig, "%s%s", psz_config, psz_end ) != -1 )
             {
-                config_PutPsz( libvlc, "extraintf", psz_newconfig );
+                config_PutPsz( "extraintf", psz_newconfig );
                 free( psz_newconfig );
             }
             break;
@@ -124,7 +120,7 @@ void config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
             *psz_parser = '\0';
             if( asprintf( &psz_newconfig, "%s%s", psz_config, psz_end ) != -1 )
             {
-                config_PutPsz( libvlc, "control", psz_newconfig );
+                config_PutPsz( "control", psz_newconfig );
                 free( psz_newconfig );
             }
             break;

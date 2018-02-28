@@ -206,7 +206,7 @@ void ExtendedDialog::saveConfig()
         switch( static_cast<QMetaType::Type>(value.type()) )
         {
             case QMetaType::QString:
-                config_PutPsz( p_intf, qtu(i.key()), qtu(value.toString()) );
+                config_PutPsz( qtu(i.key()), qtu(value.toString()) );
                 break;
             case QMetaType::Int:
             case QMetaType::Bool:

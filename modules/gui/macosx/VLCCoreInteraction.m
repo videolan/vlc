@@ -699,7 +699,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             fullRange = NSMakeRange(0, [o_workString length]); \
             [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
             \
-            config_PutPsz(getIntf(), pref, [o_workString UTF8String]); \
+            config_PutPsz(pref, [o_workString UTF8String]); \
             b_needsRestart = YES; \
         } \
     }

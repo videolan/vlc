@@ -204,7 +204,7 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
 void
 VStringConfigControl::doApply()
 {
-    config_PutPsz( p_this, getName(), qtu( getValue() ) );
+    config_PutPsz( getName(), qtu( getValue() ) );
 }
 
 /*********** String **************/
@@ -1354,12 +1354,10 @@ void KeySelectorControl::doApply()
     {
         it = table->topLevelItem(i);
         if( it->data( HOTKEY_COL, Qt::UserRole ).toInt() >= 0 )
-            config_PutPsz( p_this,
-                           qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
+            config_PutPsz( qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
                            qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
 
-        config_PutPsz( p_this,
-                       qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
+        config_PutPsz( qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
                        qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
     }
 }

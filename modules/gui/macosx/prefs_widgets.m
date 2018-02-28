@@ -866,7 +866,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         case CONFIG_ITEM_MODULE_LIST:
         case CONFIG_ITEM_MODULE_LIST_CAT: {
             char *psz_val = [self stringValue];
-            config_PutPsz(getIntf(), psz_name, psz_val);
+            config_PutPsz(psz_name, psz_val);
             free(psz_val);
             break;
         }
