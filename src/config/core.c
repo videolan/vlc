@@ -83,12 +83,7 @@ int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
     module_config_t *p_config = config_FindConfig( psz_name );
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Err( p_this, "option %s does not exist", psz_name );
-        return -1;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigIntegerType(p_config->i_type));
 
     int64_t val;
@@ -107,12 +102,7 @@ float config_GetFloat( vlc_object_t *p_this, const char *psz_name )
     p_config = config_FindConfig( psz_name );
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Err( p_this, "option %s does not exist", psz_name );
-        return -1;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigFloatType(p_config->i_type));
 
     float val;
@@ -131,12 +121,7 @@ char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
     p_config = config_FindConfig( psz_name );
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Err( p_this, "option %s does not exist", psz_name );
-        return NULL;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigStringType (p_config->i_type));
 
     /* return a copy of the string */
@@ -155,12 +140,7 @@ void config_PutPsz( vlc_object_t *p_this,
 
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Warn( p_this, "option %s does not exist", psz_name );
-        return;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigStringType(p_config->i_type));
 
     char *str, *oldstr;
@@ -185,12 +165,7 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
     module_config_t *p_config = config_FindConfig( psz_name );
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Warn( p_this, "option %s does not exist", psz_name );
-        return;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigIntegerType(p_config->i_type));
 
     if (i_value < p_config->min.i)
@@ -211,12 +186,7 @@ void config_PutFloat( vlc_object_t *p_this,
     module_config_t *p_config = config_FindConfig( psz_name );
 
     /* sanity checks */
-    if( !p_config )
-    {
-        msg_Warn( p_this, "option %s does not exist", psz_name );
-        return;
-    }
-
+    assert(p_config != NULL);
     assert(IsConfigFloatType(p_config->i_type));
 
     /* if f_min == f_max == 0, then do not use them */
