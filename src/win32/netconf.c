@@ -33,11 +33,11 @@ char *vlc_getProxyUrl(const char *psz_url)
 {
     VLC_UNUSED(psz_url);
 
-    char *proxy = config_GetPsz( (vlc_object_t *)(NULL), "http-proxy" );
+    char *proxy = config_GetPsz( "http-proxy" );
     if (proxy == NULL)
         return NULL;
 
-    char *proxy_pwd = config_GetPsz( (vlc_object_t *)(NULL), "http-proxy-pwd" );
+    char *proxy_pwd = config_GetPsz( "http-proxy-pwd" );
     if (proxy_pwd == NULL)
         return proxy;
 

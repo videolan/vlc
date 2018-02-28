@@ -1026,7 +1026,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
     if ( ! config_FindConfig( qtu(p_data->name) ) )
         return bands;
 
-    char *psz_bands = config_GetPsz( p_intf, qtu(p_data->name) );
+    char *psz_bands = config_GetPsz( qtu(p_data->name) );
     if ( psz_bands )
     {
         bands = QString( psz_bands ).split( " ", QString::SkipEmptyParts );

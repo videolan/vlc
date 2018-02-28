@@ -42,13 +42,12 @@
  *****************************************************************************/
 static int vlclua_config_get( lua_State *L )
 {
-    vlc_object_t * p_this = vlclua_get_this( L );
     const char *psz_name = luaL_checkstring( L, 1 );
     switch( config_GetType( psz_name ) )
     {
         case VLC_VAR_STRING:
         {
-            char *psz = config_GetPsz( p_this, psz_name );
+            char *psz = config_GetPsz( psz_name );
             lua_pushstring( L, psz );
             free( psz );
             break;

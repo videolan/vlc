@@ -350,7 +350,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     };
     QComboBox *discCombo = ui.deviceCombo; /* avoid namespacing in macro */
     POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
-    char *psz_config = config_GetPsz( p_intf, "dvd" );
+    char *psz_config = config_GetPsz( "dvd" );
     int temp = ui.deviceCombo->findData( psz_config, Qt::UserRole, Qt::MatchStartsWith );
     free( psz_config );
     if( temp != -1 )
@@ -415,7 +415,7 @@ void DiscOpenPanel::onFocus()
         SetThreadErrorMode(oldMode, NULL);
     }
 
-    char *psz_config = config_GetPsz( p_intf, "dvd" );
+    char *psz_config = config_GetPsz( "dvd" );
     int temp = ui.deviceCombo->findData( psz_config, Qt::UserRole, Qt::MatchStartsWith );
     free( psz_config );
     if( temp != -1 )

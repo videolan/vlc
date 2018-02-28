@@ -491,7 +491,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (void)setupField:(NSTextField *)object forOption:(const char *)psz_option
 {
-    char *psz_tmp = config_GetPsz(p_intf, psz_option);
+    char *psz_tmp = config_GetPsz(psz_option);
     [object setStringValue: toNSStr(psz_tmp)];
     [object setToolTip: _NS(config_GetLabel(p_intf, psz_option))];
     free(psz_tmp);
@@ -499,7 +499,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (BOOL)hasModule:(NSString *)moduleName inConfig:(NSString *)config
 {
-    char *value = config_GetPsz(p_intf, [config UTF8String]);
+    char *value = config_GetPsz([config UTF8String]);
     NSString *modules = toNSStr(value);
     free(value);
 
@@ -508,7 +508,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (void)changeModule:(NSString *)moduleName inConfig:(NSString *)config enable:(BOOL)enable
 {
-    char *value = config_GetPsz(p_intf, [config UTF8String]);
+    char *value = config_GetPsz([config UTF8String]);
     NSString *modules = toNSStr(value);
     free(value);
 
@@ -1217,7 +1217,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)showFontPicker:(id)sender
 {
-    char * font = config_GetPsz(p_intf, "freetype-font");
+    char * font = config_GetPsz("freetype-font");
     NSString * fontName = font ? toNSStr(font) : nil;
     free(font);
     if (fontName) {

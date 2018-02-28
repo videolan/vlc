@@ -482,14 +482,14 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
             vlc_url_t url;
             vlc_UrlParse( &url, psz_base_url );
 
-            char *psz_satip_channellist = config_GetPsz(m_sd, "satip-channelist");
+            char *psz_satip_channellist = config_GetPsz("satip-channelist");
             if( !psz_satip_channellist ) {
                 break;
             }
 
             /* a user may have provided a custom playlist url */
             if (strncmp(psz_satip_channellist, "CustomList", 10) == 0) {
-                char *psz_satip_playlist_url = config_GetPsz( m_sd, "satip-channellist-url" );
+                char *psz_satip_playlist_url = config_GetPsz( "satip-channellist-url" );
                 if ( psz_satip_playlist_url ) {
                     p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_satip_playlist_url, iconUrl );
 

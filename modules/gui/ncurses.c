@@ -1222,7 +1222,7 @@ static char *GetDiscDevice(intf_thread_t *intf, const char *name)
         size_t n = devs[i].n;
         if (!strncmp(name, devs[i].s, n)) {
             if (name[n] == '@' || name[n] == '\0')
-                return config_GetPsz(intf, devs[i].v);
+                return config_GetPsz(devs[i].v);
             /* Omit the beginning MRL-selector characters */
             return strdup(name + n);
         }

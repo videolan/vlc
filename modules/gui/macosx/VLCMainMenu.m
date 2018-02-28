@@ -114,7 +114,7 @@
 
     [self initStrings];
 
-    key = config_GetPsz(p_intf, "key-quit");
+    key = config_GetPsz("key-quit");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_quit setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_quit setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
@@ -122,85 +122,85 @@
 
     // do not assign play/pause key
 
-    key = config_GetPsz(p_intf, "key-stop");
+    key = config_GetPsz("key-stop");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_stop setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_stop setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-prev");
+    key = config_GetPsz("key-prev");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_previous setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_previous setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-next");
+    key = config_GetPsz("key-next");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_next setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_next setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-jump+short");
+    key = config_GetPsz("key-jump+short");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_fwd setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_fwd setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-jump-short");
+    key = config_GetPsz("key-jump-short");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_bwd setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_bwd setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-vol-up");
+    key = config_GetPsz("key-vol-up");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_vol_up setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_vol_up setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-vol-down");
+    key = config_GetPsz("key-vol-down");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_vol_down setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_vol_down setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-vol-mute");
+    key = config_GetPsz("key-vol-mute");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_mute setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_mute setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-toggle-fullscreen");
+    key = config_GetPsz("key-toggle-fullscreen");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_fullscreenItem setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_fullscreenItem setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-snapshot");
+    key = config_GetPsz("key-snapshot");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_snapshot setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_snapshot setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-random");
+    key = config_GetPsz("key-random");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_random setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_random setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-zoom-half");
+    key = config_GetPsz("key-zoom-half");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_half_window setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_half_window setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-zoom-original");
+    key = config_GetPsz("key-zoom-original");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_normal_window setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_normal_window setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
     FREENULL(key);
 
-    key = config_GetPsz(p_intf, "key-zoom-double");
+    key = config_GetPsz("key-zoom-double");
     keyString = [NSString stringWithFormat:@"%s", key];
     [_double_window setKeyEquivalent: [stringUtility VLCKeyToString: keyString]];
     [_double_window setKeyEquivalentModifierMask: [stringUtility VLCModifiersToCocoa:keyString]];
@@ -254,7 +254,7 @@
         [mitem setTag:x];
         [mitem setTarget:self];
     }
-    char *psz_config = config_GetPsz(p_intf, "video-filter");
+    char *psz_config = config_GetPsz("video-filter");
     if (psz_config) {
         if (!strstr(psz_config, "postproc"))
             [[_postprocessingMenu itemAtIndex:0] setState:NSOnState];

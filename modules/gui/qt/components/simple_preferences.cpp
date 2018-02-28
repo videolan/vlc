@@ -595,7 +595,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
                      setEnabled( bool ) );
 
-            char* psz = config_GetPsz( p_intf, "audio-filter" );
+            char* psz = config_GetPsz( "audio-filter" );
             qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
             free( psz );
 
@@ -618,9 +618,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                          "for DVD, VCD, and CDDA are set.\n"
                          "You can define a unique one or configure them \n"
                          "individually in the advanced preferences." ) );
-                char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
-                char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
-                char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
+                char *psz_dvddiscpath = config_GetPsz( "dvd" );
+                char *psz_vcddiscpath = config_GetPsz( "vcd" );
+                char *psz_cddadiscpath = config_GetPsz( "cd-audio" );
                 if( psz_dvddiscpath && psz_vcddiscpath && psz_cddadiscpath )
                 if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
                     !strcmp( psz_dvddiscpath, psz_vcddiscpath ) )
@@ -746,7 +746,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 
             /* interface */
-            char *psz_intf = config_GetPsz( p_intf, "intf" );
+            char *psz_intf = config_GetPsz( "intf" );
             if( psz_intf )
             {
                 if( strstr( psz_intf, "skin" ) )
@@ -1113,7 +1113,7 @@ void SPrefsPanel::apply()
             qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
         bool b_reset_volume =
             qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
-        char *psz_aout = config_GetPsz( p_intf, "aout" );
+        char *psz_aout = config_GetPsz( "aout" );
 
         float f_gain = powf( i_volume / 100.f, 3 );
 

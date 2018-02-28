@@ -207,7 +207,7 @@ void ThemeRepository::updateRepository()
     vlc_value_t val, text;
 
     // retrieve the current skin
-    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
+    char* psz_current = config_GetPsz( "skins2-last" );
     if( !psz_current )
         return;
 

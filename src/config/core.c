@@ -111,8 +111,7 @@ float config_GetFloat(const char *psz_name)
     return val;
 }
 
-#undef config_GetPsz
-char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
+char *config_GetPsz(const char *psz_name)
 {
     module_config_t *p_config;
 

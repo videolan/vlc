@@ -42,7 +42,7 @@ PodcastConfigDialog::PodcastConfigDialog( intf_thread_t *_p_intf)
     CONNECT( ui.podcastDelete, clicked(), this, remove() );
     CONNECT( okButton, clicked(), this, close() );
 
-    char *psz_urls = config_GetPsz( p_intf, "podcast-urls" );
+    char *psz_urls = config_GetPsz( "podcast-urls" );
     if( psz_urls )
     {
         char *psz_url = psz_urls;

@@ -203,8 +203,7 @@ VLC_API void config_PutFloat(vlc_object_t *, const char *name, float val);
  * or if an error occurs, NULL is returned.
  * \bug The empty string value cannot be distinguished from an error.
  */
-VLC_API char * config_GetPsz(vlc_object_t *, const char *name)
-VLC_USED VLC_MALLOC;
+VLC_API char *config_GetPsz(const char *name) VLC_USED VLC_MALLOC;
 
 /**
  * Sets an string configuration item.
@@ -326,7 +325,6 @@ VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) VLC_USED;
 
 #define config_PutInt(a,b,c) config_PutInt(VLC_OBJECT(a),b,c)
 #define config_PutFloat(a,b,c) config_PutFloat(VLC_OBJECT(a),b,c)
-#define config_GetPsz(a,b) config_GetPsz(VLC_OBJECT(a),b)
 #define config_PutPsz(a,b,c) config_PutPsz(VLC_OBJECT(a),b,c)
 
 #define config_AddIntf(a,b) config_AddIntf(VLC_OBJECT(a),b)

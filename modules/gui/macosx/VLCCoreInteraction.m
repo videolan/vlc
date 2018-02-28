@@ -686,7 +686,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     BOOL b_needsRestart = NO;
 
     #define fixpref(pref) \
-    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(getIntf(), pref)]; \
+    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(pref)]; \
     if ([o_workString length] > 0) \
     { \
         returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \

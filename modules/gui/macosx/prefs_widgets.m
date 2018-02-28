@@ -974,7 +974,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void)resetValues
 {
     NSString *o_textfieldString;
-    char *psz_value = config_GetPsz(getIntf(), self.p_item->psz_name);
+    char *psz_value = config_GetPsz(self.p_item->psz_name);
     if (psz_value)
         o_textfieldString = _NS(psz_value);
     else
@@ -1055,7 +1055,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     [o_popup removeAllItems];
 
-    char *psz_value = config_GetPsz(getIntf(), self.p_item->psz_name);
+    char *psz_value = config_GetPsz(self.p_item->psz_name);
 
     char **values, **texts;
     ssize_t count = config_GetPszChoices(VLC_OBJECT(getIntf()), self.p_item->psz_name,
@@ -1170,7 +1170,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 -(void)resetValues
 {
     NSString *o_textfieldString;
-    char *psz_value = config_GetPsz(getIntf(), self.p_item->psz_name);
+    char *psz_value = config_GetPsz(self.p_item->psz_name);
     if (psz_value)
         o_textfieldString = [NSString stringWithFormat: @"%s", psz_value];
     else

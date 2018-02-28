@@ -91,7 +91,7 @@ static const float f_min_window_height = 307.;
     char *key;
     NSString *o_key;
 
-    key = config_GetPsz(getIntf(), keyString);
+    key = config_GetPsz(keyString);
     o_key = [NSString stringWithFormat:@"%s", key];
     FREENULL(key);
 
@@ -617,7 +617,7 @@ static const float f_min_window_height = 307.;
     if (p_input) {
         NSString *aString = @"";
 
-        if (!config_GetPsz(getIntf(), "video-title")) {
+        if (!config_GetPsz("video-title")) {
             char *format = var_InheritString(getIntf(), "input-title-format");
             if (format) {
                 char *formated = vlc_strfinput(p_input, format);
@@ -626,7 +626,7 @@ static const float f_min_window_height = 307.;
                 free(formated);
             }
         } else
-            aString = toNSStr(config_GetPsz(getIntf(), "video-title"));
+            aString = toNSStr(config_GetPsz("video-title"));
 
         char *uri = input_item_GetURI(input_GetItem(p_input));
 
@@ -1177,8 +1177,8 @@ static const float f_min_window_height = 307.;
 
     if (sender == _podcastSubscribeOkButton && [[_podcastSubscribeUrlField stringValue] length] > 0) {
         NSMutableString *podcastConf = [[NSMutableString alloc] init];
-        if (config_GetPsz(getIntf(), "podcast-urls") != NULL)
-            [podcastConf appendFormat:@"%s|", config_GetPsz(getIntf(), "podcast-urls")];
+        if (config_GetPsz("podcast-urls") != NULL)
+            [podcastConf appendFormat:@"%s|", config_GetPsz("podcast-urls")];
 
         [podcastConf appendString: [_podcastSubscribeUrlField stringValue]];
         config_PutPsz(getIntf(), "podcast-urls", [podcastConf UTF8String]);
@@ -1206,7 +1206,7 @@ static const float f_min_window_height = 307.;
         playlist_t * p_playlist = pl_Get(getIntf());
         char *psz_urls = var_InheritString(p_playlist, "podcast-urls");
 
-        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz(getIntf(), "podcast-urls")) componentsSeparatedByString:@"|"]];
+        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz("podcast-urls")) componentsSeparatedByString:@"|"]];
         [urls removeObjectAtIndex: [_podcastUnsubscribePopUpButton indexOfSelectedItem]];
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
         var_SetString(pl_Get(getIntf()), "podcast-urls", psz_new_urls);

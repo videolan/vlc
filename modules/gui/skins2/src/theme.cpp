@@ -98,7 +98,7 @@ int Theme::readConfig()
     msg_Dbg( getIntf(), "reading theme configuration");
 
     // Get config from vlcrc file
-    char *save = config_GetPsz( getIntf(), "skins2-config" );
+    char *save = config_GetPsz( "skins2-config" );
     if( !save || !*save )
     {
         free( save );
