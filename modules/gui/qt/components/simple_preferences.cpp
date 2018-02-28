@@ -125,7 +125,7 @@ static struct {
     { "wa",    "Walon" }
 };
 
-static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
+static int getDefaultAudioVolume(const char *aout)
 {
     if (!strcmp(aout, "") || !strcmp(aout, "any"))
 #ifdef _WIN32
@@ -1002,7 +1002,7 @@ void SPrefsPanel::updateAudioOptions( int number)
     optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
                                            value == "directsound" || value == "waveout" ) );
 
-    int volume = getDefaultAudioVolume(VLC_OBJECT(p_intf), qtu(value));
+    int volume = getDefaultAudioVolume(qtu(value));
     bool save = true;
 
     if (volume >= 0)
