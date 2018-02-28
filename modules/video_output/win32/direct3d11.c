@@ -1375,7 +1375,6 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     int best = -1;
     int score, best_score = 0;
     UINT support;
-    IDXGIOutput *dxgiOutput = NULL;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
     sys->display.colorspace = &color_spaces[0];
 
@@ -1422,6 +1421,8 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     }
 
 #ifdef HAVE_DXGI1_6_H
+    IDXGIOutput *dxgiOutput = NULL;
+
     if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->dxgiswapChain, &dxgiOutput )))
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
