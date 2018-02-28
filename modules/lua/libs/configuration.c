@@ -55,11 +55,11 @@ static int vlclua_config_get( lua_State *L )
         }
 
         case VLC_VAR_INTEGER:
-            lua_pushinteger( L, config_GetInt( p_this, psz_name ) );
+            lua_pushinteger( L, config_GetInt( psz_name ) );
             break;
 
         case VLC_VAR_BOOL:
-            lua_pushboolean( L, config_GetInt( p_this, psz_name ) );
+            lua_pushboolean( L, config_GetInt( psz_name ) );
             break;
 
         case VLC_VAR_FLOAT:

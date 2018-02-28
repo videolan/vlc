@@ -1395,7 +1395,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 -(void)resetValues
 {
-    [o_textfield setIntValue: config_GetInt(getIntf(), self.p_item->psz_name)];
+    [o_textfield setIntValue: config_GetInt(self.p_item->psz_name)];
     [super resetValues];
 }
 
@@ -1471,7 +1471,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     [o_popup removeAllItems];
 
-    int i_current_selection = config_GetInt(getIntf(), self.p_item->psz_name);
+    int i_current_selection = config_GetInt(self.p_item->psz_name);
     int64_t *values;
     char **texts;
     ssize_t count = config_GetIntChoices(VLC_OBJECT(getIntf()), self.p_item->psz_name, &values, &texts);
@@ -1596,7 +1596,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    int value = config_GetInt(getIntf(), self.p_item->psz_name);
+    int value = config_GetInt(self.p_item->psz_name);
     [o_textfield setIntValue:value];
     [o_slider setIntValue:value];
     [super resetValues];
@@ -1846,7 +1846,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_checkbox setState: config_GetInt(getIntf(), self.p_item->psz_name)];
+    [o_checkbox setState: config_GetInt(self.p_item->psz_name)];
     [super resetValues];
 }
 @end
@@ -1925,7 +1925,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt(getIntf(), self.p_item->psz_name)]];
+    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt(self.p_item->psz_name)]];
     [super resetValues];
 }
 @end

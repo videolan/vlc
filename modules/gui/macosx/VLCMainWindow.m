@@ -531,7 +531,7 @@ static const float f_min_window_height = 307.;
 
 - (void)someWindowWillMiniaturize:(NSNotification *)notification
 {
-    if (config_GetInt(getIntf(), "macosx-pause-minimized")) {
+    if (config_GetInt("macosx-pause-minimized")) {
         id obj = [notification object];
 
         if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !self.nonembedded)) {
@@ -1252,7 +1252,7 @@ static const float f_min_window_height = 307.;
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    BOOL darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
+    BOOL darkInterface = config_GetInt("macosx-interfacestyle");
 
     if (darkInterface) {
         [self setBackgroundColor: [NSColor clearColor]];

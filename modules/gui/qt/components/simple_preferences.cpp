@@ -518,7 +518,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef audioControl
 #undef audioCommon
 
-            int i_max_volume = config_GetInt( p_intf, "qt-max-volume" );
+            int i_max_volume = config_GetInt( "qt-max-volume" );
 
             /* Audio Options */
             ui.volumeValue->setMaximum( i_max_volume );
@@ -691,10 +691,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #define TestCaC( name, factor ) \
     b_cache_equal =  b_cache_equal && \
-     ( i_cache * factor == config_GetInt( p_intf, name ) );
+     ( i_cache * factor == config_GetInt( name ) );
             /* Select the accurate value of the ComboBox */
             bool b_cache_equal = true;
-            int i_cache = config_GetInt( p_intf, "file-caching" );
+            int i_cache = config_GetInt( "file-caching" );
 
             TestCaC( "network-caching", 10/3 );
             TestCaC( "disc-caching", 1);
@@ -878,8 +878,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
 
-            ui.shadowCheck->setChecked( config_GetInt( p_intf, "freetype-shadow-opacity" ) > 0 );
-            ui.backgroundCheck->setChecked( config_GetInt( p_intf, "freetype-background-opacity" ) > 0 );
+            ui.shadowCheck->setChecked( config_GetInt( "freetype-shadow-opacity" ) > 0 );
+            ui.backgroundCheck->setChecked( config_GetInt( "freetype-background-opacity" ) > 0 );
             optionWidgets["shadowCB"] = ui.shadowCheck;
             optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
@@ -1006,7 +1006,7 @@ void SPrefsPanel::updateAudioOptions( int number)
     bool save = true;
 
     if (volume >= 0)
-        save = config_GetInt(VLC_OBJECT(p_intf), "volume-save");
+        save = config_GetInt("volume-save");
 
     QCheckBox *resetVolumeCheckBox =
         qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"]);
@@ -1153,7 +1153,7 @@ void SPrefsPanel::apply()
     case SPrefsSubtitles:
     {
         bool b_checked = qobject_cast<QCheckBox *>(optionWidgets["shadowCB"])->isChecked();
-        if( b_checked && config_GetInt( p_intf, "freetype-shadow-opacity" ) == 0 ) {
+        if( b_checked && config_GetInt( "freetype-shadow-opacity" ) == 0 ) {
             config_PutInt( p_intf, "freetype-shadow-opacity", 128 );
         }
         else if (!b_checked ) {
@@ -1161,7 +1161,7 @@ void SPrefsPanel::apply()
         }
 
         b_checked = qobject_cast<QCheckBox *>(optionWidgets["backgroundCB"])->isChecked();
-        if( b_checked && config_GetInt( p_intf, "freetype-background-opacity" ) == 0 ) {
+        if( b_checked && config_GetInt( "freetype-background-opacity" ) == 0 ) {
             config_PutInt( p_intf, "freetype-background-opacity", 128 );
         }
         else if (!b_checked ) {

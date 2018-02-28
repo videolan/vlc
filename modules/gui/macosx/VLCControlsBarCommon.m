@@ -132,7 +132,7 @@
         self.fullscreenButtonWidthConstraint.constant = 0;
     }
 
-    if (config_GetInt(getIntf(), "macosx-show-playback-buttons"))
+    if (config_GetInt("macosx-show-playback-buttons"))
         [self toggleForwardBackwardMode: YES];
 
 }

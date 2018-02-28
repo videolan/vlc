@@ -485,7 +485,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
-    [object setState: config_GetInt(p_intf, name)];
+    [object setState: config_GetInt(name)];
     [object setToolTip: _NS(config_GetLabel(p_intf, name))];
 }
 
@@ -579,7 +579,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
     [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
 
-    if (config_GetInt(p_intf, "macosx-interfacestyle")) {
+    if (config_GetInt("macosx-interfacestyle")) {
         [_intf_style_darkButtonCell setState: YES];
         [_intf_style_brightButtonCell setState: NO];
     } else {
@@ -598,7 +598,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
      ******************/
     [self setupButton:_audio_enableCheckbox forBoolValue: "audio"];
 
-    if (config_GetInt(p_intf, "volume-save")) {
+    if (config_GetInt("volume-save")) {
         [_audio_autosavevol_yesButtonCell setState: NSOnState];
         [_audio_autosavevol_noButtonCell setState: NSOffState];
         [_audio_volTextField setEnabled: NO];
@@ -664,7 +664,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         i++;
     }
     [_video_devicePopup selectItemAtIndex: 0];
-    [_video_devicePopup selectItemWithTag: config_GetInt(p_intf, "macosx-vdev")];
+    [_video_devicePopup selectItemWithTag: config_GetInt("macosx-vdev")];
 
     [self setupField:_video_snap_folderTextField forOption:"snapshot-path"];
     [self setupField:_video_snap_prefixTextField forOption:"snapshot-prefix"];
@@ -680,7 +680,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
      * input & codecs settings *
      ***************************/
     [self setupField:_input_recordTextField forOption:"input-record-path"];
-    [_input_postprocTextField setIntValue: config_GetInt(p_intf, "postproc-q")];
+    [_input_postprocTextField setIntValue: config_GetInt("postproc-q")];
     [_input_postprocTextField setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
     [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
     [self setupButton:_input_aviPopup forIntList: "avi-index"];
@@ -702,11 +702,11 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     #define TestCaC(name, factor) \
     cache_equal = cache_equal && \
-    (i_cache * factor == config_GetInt(p_intf, name));
+    (i_cache * factor == config_GetInt(name));
 
     /* Select the accurate value of the PopupButton */
     bool cache_equal = true;
-    int i_cache = config_GetInt(p_intf, "file-caching");
+    int i_cache = config_GetInt("file-caching");
 
     TestCaC("network-caching", 10/3);
     TestCaC("disc-caching", 1);
@@ -731,7 +731,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [self setupField:_osd_fontTextField forOption: "freetype-font"];
     [self setupButton:_osd_font_colorPopup forIntList: "freetype-color"];
     [self setupButton:_osd_font_sizePopup forIntList: "freetype-rel-fontsize"];
-    i = config_GetInt(p_intf, "freetype-opacity") * 100.0 / 255.0 + 0.5;
+    i = config_GetInt("freetype-opacity") * 100.0 / 255.0 + 0.5;
     [_osd_opacityTextField setIntValue: i];
     [_osd_opacitySlider setIntValue: i];
     [_osd_opacitySlider setToolTip: _NS(config_GetLabel(p_intf, "freetype-opacity"))];

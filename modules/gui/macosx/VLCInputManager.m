@@ -579,7 +579,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     if (!lastPosition || lastPosition.intValue <= 0)
         return;
 
-    int settingValue = config_GetInt(getIntf(), "macosx-continue-playback");
+    int settingValue = config_GetInt("macosx-continue-playback");
     if (settingValue == 2) // never resume
         return;
 

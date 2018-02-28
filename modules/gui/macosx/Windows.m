@@ -231,7 +231,7 @@
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
+    _darkInterface = config_GetInt("macosx-interfacestyle");
 
     if (_darkInterface) {
         styleMask = NSBorderlessWindowMask | NSResizableWindowMask | NSMiniaturizableWindowMask;

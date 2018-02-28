@@ -259,7 +259,7 @@
         if (!strstr(psz_config, "postproc"))
             [[_postprocessingMenu itemAtIndex:0] setState:NSOnState];
         else
-            [[_postprocessingMenu itemWithTag:config_GetInt(p_intf, "postproc-q")] setState:NSOnState];
+            [[_postprocessingMenu itemWithTag:config_GetInt("postproc-q")] setState:NSOnState];
         free(psz_config);
     } else
         [[_postprocessingMenu itemAtIndex:0] setState:NSOnState];
@@ -276,7 +276,7 @@
     var_Create(p_playlist, "freetype-outline-thickness", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
     [self setupMenu: _subtitle_textcolorMenu withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
-    [_subtitle_bgopacity_sld setIntValue: config_GetInt(VLC_OBJECT(p_intf), "freetype-background-opacity")];
+    [_subtitle_bgopacity_sld setIntValue: config_GetInt("freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
 

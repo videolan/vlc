@@ -199,8 +199,8 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[_netModeMatrix cellAtRow:0 column:0] setTitle: _NS("Unicast")];
     [[_netModeMatrix cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
-    [_netUDPPortTextField setIntValue: config_GetInt(getIntf(), "server-port")];
-    [_netUDPPortStepper setIntValue: config_GetInt(getIntf(), "server-port")];
+    [_netUDPPortTextField setIntValue: config_GetInt("server-port")];
+    [_netUDPPortStepper setIntValue: config_GetInt("server-port")];
 
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
@@ -1011,7 +1011,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt(getIntf(), "server-port")) {
+            if (port != config_GetInt("server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @"@:%i", port];
             }
@@ -1025,7 +1025,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             else
                 mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
 
-            if (iPort != config_GetInt(getIntf(), "server-port")) {
+            if (iPort != config_GetInt("server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @":%i", iPort];
             }
@@ -1060,7 +1060,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt(getIntf(), "server-port")) {
+            if (port != config_GetInt("server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @"@:%i", port];
             }
@@ -1074,7 +1074,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             else
                 mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
 
-            if (iPort != config_GetInt(getIntf(), "server-port")) {
+            if (iPort != config_GetInt("server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @":%i", iPort];
             }
@@ -1097,15 +1097,15 @@ static NSString *kCaptureTabViewId  = @"capture";
         [_captureTabView selectTabViewItemAtIndex:1];
 
         [self setMRL: @"screen://"];
-        [_screenHeightTextField setIntValue: config_GetInt(p_intf, "screen-height")];
-        [_screenWidthTextField setIntValue: config_GetInt(p_intf, "screen-width")];
+        [_screenHeightTextField setIntValue: config_GetInt("screen-height")];
+        [_screenWidthTextField setIntValue: config_GetInt("screen-width")];
         [_screenFPSTextField setFloatValue: config_GetFloat(p_intf, "screen-fps")];
-        [_screenLeftTextField setIntValue: config_GetInt(p_intf, "screen-left")];
-        [_screenTopTextField setIntValue: config_GetInt(p_intf, "screen-top")];
-        [_screenFollowMouseCheckbox setIntValue: config_GetInt(p_intf, "screen-follow-mouse")];
+        [_screenLeftTextField setIntValue: config_GetInt("screen-left")];
+        [_screenTopTextField setIntValue: config_GetInt("screen-top")];
+        [_screenFollowMouseCheckbox setIntValue: config_GetInt("screen-follow-mouse")];
 
-        int screenIindex = config_GetInt(p_intf, "screen-index");
-        int displayID = config_GetInt(p_intf, "screen-display-id");
+        int screenIindex = config_GetInt("screen-index");
+        int displayID = config_GetInt("screen-display-id");
         unsigned int displayCount = 0;
         CGError returnedError;
         struct display_info_t *item;

@@ -656,7 +656,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (BOOL)aspectRatioIsLocked
 {
-    return config_GetInt(getIntf(), "macosx-lock-aspect-ratio");
+    return config_GetInt("macosx-lock-aspect-ratio");
 }
 
 - (void)toggleFullscreen
@@ -1052,27 +1052,27 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 [self playOrPause];
             break;
         case kRemoteButtonVolume_Plus:
-            if (config_GetInt(getIntf(), "macosx-appleremote-sysvol"))
+            if (config_GetInt("macosx-appleremote-sysvol"))
                 [NSSound increaseSystemVolume];
             else
                 if (p_intf)
                     var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
             break;
         case kRemoteButtonVolume_Minus:
-            if (config_GetInt(getIntf(), "macosx-appleremote-sysvol"))
+            if (config_GetInt("macosx-appleremote-sysvol"))
                 [NSSound decreaseSystemVolume];
             else
                 if (p_intf)
                     var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
             break;
         case kRemoteButtonRight:
-            if (config_GetInt(getIntf(), "macosx-appleremote-prevnext"))
+            if (config_GetInt("macosx-appleremote-prevnext"))
                 [self forward];
             else
                 [self next];
             break;
         case kRemoteButtonLeft:
-            if (config_GetInt(getIntf(), "macosx-appleremote-prevnext"))
+            if (config_GetInt("macosx-appleremote-prevnext"))
                 [self backward];
             else
                 [self previous];

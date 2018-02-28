@@ -77,8 +77,7 @@ bool config_IsSafe( const char *name )
     return p_config != NULL && p_config->b_safe;
 }
 
-#undef config_GetInt
-int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
+int64_t config_GetInt(const char *psz_name)
 {
     module_config_t *p_config = config_FindConfig( psz_name );
 
