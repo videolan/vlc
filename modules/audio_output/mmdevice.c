@@ -1274,7 +1274,7 @@ static int Open(vlc_object_t *obj)
     sys->acquired_device = NULL;
     sys->request_device_restart = false;
 
-    if (!var_InheritBool(aout, "volume-save"))
+    if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
 
     InitializeCriticalSection(&sys->lock);
