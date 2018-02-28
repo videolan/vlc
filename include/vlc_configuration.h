@@ -243,7 +243,7 @@ VLC_API ssize_t config_GetIntChoices(const char *, int64_t **values,
  * descriptions and on both tables.
  * In case of error, both pointers are set to NULL.
  */
-VLC_API ssize_t config_GetPszChoices(vlc_object_t *, const char *,
+VLC_API ssize_t config_GetPszChoices(const char *,
                                      char ***, char ***) VLC_USED;
 
 VLC_API int config_SaveConfigFile( vlc_object_t * );

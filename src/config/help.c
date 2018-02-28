@@ -345,7 +345,7 @@ static int vlc_swidth(const char *str)
     }
 }
 
-static void print_item(const vlc_object_t *p_this, const module_t *m, const module_config_t *item,
+static void print_item(const module_t *m, const module_config_t *item,
                        const module_config_t **section, bool color, bool desc)
 {
 #ifndef _WIN32
@@ -384,7 +384,7 @@ static void print_item(const vlc_object_t *p_this, const module_t *m, const modu
 
             char **ppsz_values, **ppsz_texts;
 
-            ssize_t i_count = config_GetPszChoices(VLC_OBJECT(p_this), item->psz_name, &ppsz_values, &ppsz_texts);
+            ssize_t i_count = config_GetPszChoices(item->psz_name, &ppsz_values, &ppsz_texts);
 
             if (i_count > 0)
             {
@@ -642,7 +642,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                 b_has_advanced = true;
                 continue;
             }
-            print_item(p_this, m, item, &section, color, desc);
+            print_item(m, item, &section, color, desc);
         }
     }
 

@@ -1058,7 +1058,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     char *psz_value = config_GetPsz(self.p_item->psz_name);
 
     char **values, **texts;
-    ssize_t count = config_GetPszChoices(VLC_OBJECT(getIntf()), self.p_item->psz_name,
+    ssize_t count = config_GetPszChoices(self.p_item->psz_name,
                                          &values, &texts);
     for (ssize_t i = 0; i < count && texts; i++) {
         if (texts[i] == NULL || values[i] == NULL)

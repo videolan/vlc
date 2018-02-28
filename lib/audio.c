@@ -194,8 +194,7 @@ libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
 
     libvlc_audio_output_device_t *list = NULL, **pp = &list;
     char **values, **texts;
-    ssize_t count = config_GetPszChoices( VLC_OBJECT(p_instance->p_libvlc_int),
-                                          varname, &values, &texts );
+    ssize_t count = config_GetPszChoices( varname, &values, &texts );
     for( ssize_t i = 0; i < count; i++ )
     {
         libvlc_audio_output_device_t *item = malloc( sizeof(*item) );

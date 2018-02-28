@@ -416,8 +416,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     assert(p_item);
 
     char **values, **texts;
-    ssize_t count = config_GetPszChoices(VLC_OBJECT(getIntf()), name,
-                                         &values, &texts);
+    ssize_t count = config_GetPszChoices(name, &values, &texts);
     if (count < 0) {
         msg_Err(p_intf, "Cannot get choices for %s", name);
         return;

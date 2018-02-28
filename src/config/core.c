@@ -284,8 +284,8 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
     return n + 2;
 }
 
-ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
-                              char ***restrict values, char ***restrict texts)
+ssize_t config_GetPszChoices(const char *name,
+                             char ***restrict values, char ***restrict texts)
 {
     *values = *texts = NULL;
 
@@ -312,7 +312,7 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
     size_t count = cfg->list_count;
     if (count == 0)
     {
-        if (module_Map(obj, cfg->owner))
+        if (module_Map(NULL, cfg->owner))
         {
             errno = EIO;
             return -1;

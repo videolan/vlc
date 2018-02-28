@@ -434,8 +434,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
     if(!p_module_config) return;
 
     char **values, **texts;
-    ssize_t count = config_GetPszChoices( p_this, p_item->psz_name,
-                                          &values, &texts );
+    ssize_t count = config_GetPszChoices( p_item->psz_name, &values, &texts );
     for( ssize_t i = 0; i < count && texts; i++ )
     {
         if( texts[i] == NULL || values[i] == NULL )
@@ -476,8 +475,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
     if( (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING )
     {
         char **values, **texts;
-        ssize_t count = config_GetPszChoices(VLC_OBJECT(p_intf),
-                                             configname, &values, &texts);
+        ssize_t count = config_GetPszChoices(configname, &values, &texts);
         for( ssize_t i = 0; i < count; i++ )
         {
             combo->addItem( qtr(texts[i]), QVariant(qfu(values[i])) );
