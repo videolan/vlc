@@ -350,12 +350,13 @@ error:
     return VLC_EGENERIC;
 }
 
-static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt)
+static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt,
+                              const AVCodecContext *avctx)
 {
     bool is_supported = mode->p_profiles == NULL || !mode->p_profiles[0];
     if (!is_supported)
     {
-        int profile = fmt->i_profile;
+        int profile = fmt->i_profile >= 0 ? fmt->i_profile : avctx->profile;
         if (mode->codec == AV_CODEC_ID_H264)
         {
             uint8_t h264_profile;
@@ -420,7 +421,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
         }
         if ( is_supported )
         {
-            is_supported = profile_supported( mode, fmt );
+            is_supported = profile_supported( mode, fmt, avctx );
             if (!is_supported)
                 msg_Warn( va, "Unsupported profile %d for %s ",
                           fmt->i_profile, directx_va_GetDecoderName(mode->guid) );
