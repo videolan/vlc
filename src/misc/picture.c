@@ -254,7 +254,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 
     picture_t *pic = &priv->picture;
     if (pic->i_planes == 0)
-        return NULL;
+        return pic;
 
     /* Calculate how big the new image should be */
     size_t plane_sizes[PICTURE_PLANE_MAX];
