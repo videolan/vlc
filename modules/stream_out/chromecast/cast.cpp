@@ -1325,10 +1325,17 @@ static int Open(vlc_object_t *p_this)
 
     b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
-    p_sys = new(std::nothrow) sout_stream_sys_t( httpd_host, p_intf, b_supports_video,
-                                                 i_local_server_port );
-    if (unlikely(p_sys == NULL))
+    try
+    {
+        p_sys = new sout_stream_sys_t( httpd_host, p_intf, b_supports_video,
+                                                    i_local_server_port );
+    }
+    catch ( std::exception& ex )
+    {
+        msg_Err( p_stream, "Failed to instantiate sout_stream_sys_t: %s", ex.what() );
+        p_sys = NULL;
         goto error;
+    }
 
     p_intf->setOnInputEventCb(on_input_event_cb, p_stream);
 
