@@ -884,8 +884,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     manager = pv;
     if (SUCCEEDED(hr))
     {
-        LPCGUID guid = var_InheritBool(aout, "volume-save") ? &GUID_VLC_AUD_OUT
-                                                            : NULL;
+        LPCGUID guid = var_GetBool(aout, "volume-save") ? &GUID_VLC_AUD_OUT : NULL;
 
         /* Register session control */
         hr = IAudioSessionManager_GetAudioSessionControl(manager, guid, 0,
