@@ -604,7 +604,7 @@ vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
 
     msg_Dbg(obj, "connecting to %s port %u ...", name, port);
 
-    /* TODO: implement RFC6555 */
+    /* TODO: implement RFC8305 */
     for (const struct addrinfo *p = res; p != NULL; p = p->ai_next)
     {
         vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(p, false);
