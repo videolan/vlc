@@ -508,6 +508,9 @@ static void Stop(audio_output_t *aout)
 
     Destroy(sys->playerObject);
     sys->playerObject = NULL;
+    sys->playerBufferQueue = NULL;
+    sys->volumeItf = NULL;
+    sys->playerPlay = NULL;
 }
 
 /*****************************************************************************
