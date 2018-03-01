@@ -336,6 +336,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         EGL_RED_SIZE, 5,
         EGL_GREEN_SIZE, 5,
         EGL_BLUE_SIZE, 5,
+        EGL_DEPTH_SIZE, 5,
         EGL_RENDERABLE_TYPE, api->render_bit,
         EGL_NONE
     };
