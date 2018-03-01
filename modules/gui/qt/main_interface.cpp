@@ -626,10 +626,10 @@ void MainInterface::debug()
 }
 
 inline void MainInterface::showVideo() { showTab( videoWidget ); }
-inline void MainInterface::restoreStackOldWidget()
-            { showTab( stackCentralOldWidget ); }
+inline void MainInterface::restoreStackOldWidget( bool video_closing )
+            { showTab( stackCentralOldWidget, video_closing ); }
 
-inline void MainInterface::showTab( QWidget *widget )
+inline void MainInterface::showTab( QWidget *widget, bool video_closing )
 {
     if ( !widget ) widget = bgWidget; /* trying to restore a null oldwidget */
 #ifdef DEBUG_INTF
@@ -652,7 +652,7 @@ inline void MainInterface::showTab( QWidget *widget )
     stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
 
     /* If we are playing video, embedded */
-    if( videoWidget && THEMIM->getIM()->hasVideo() )
+    if( !video_closing && videoWidget && THEMIM->getIM()->hasVideo() )
     {
         /* Video -> Playlist */
         if( videoWidget == stackCentralOldWidget && widget == playlistWidget )
@@ -695,7 +695,7 @@ inline void MainInterface::showTab( QWidget *widget )
 #endif
 
     /* This part is done later, to account for the new pl size */
-    if( videoWidget && THEMIM->getIM()->hasVideo() &&
+    if( !video_closing && videoWidget && THEMIM->getIM()->hasVideo() &&
         videoWidget == stackCentralOldWidget && widget == playlistWidget )
     {
         playlistWidget->artContainer->addWidget( videoWidget );
@@ -789,7 +789,7 @@ void MainInterface::releaseVideoSlot( void )
     hideResumePanel();
 
     if( stackCentralW->currentWidget() == videoWidget )
-        restoreStackOldWidget();
+        restoreStackOldWidget( true );
     else if( playlistWidget &&
              playlistWidget->artContainer->currentWidget() == videoWidget )
     {
