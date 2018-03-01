@@ -688,9 +688,9 @@ static const struct IMMNotificationClientVtbl vlc_MMNotificationClient =
     vlc_MMNotificationClient_OnPropertyValueChanged,
 };
 
-static int DevicesEnum(vlc_object_t *this, IMMDeviceEnumerator *it,
-                       void (*added_cb)(void *data, LPCWSTR wid, IMMDevice *dev),
-                       void *added_cb_data)
+static HRESULT DevicesEnum(IMMDeviceEnumerator *it,
+                           void (*added_cb)(void *data, LPCWSTR wid, IMMDevice *dev),
+                           void *added_cb_data)
 {
     HRESULT hr;
     IMMDeviceCollection *devs;
@@ -699,20 +699,12 @@ static int DevicesEnum(vlc_object_t *this, IMMDeviceEnumerator *it,
     hr = IMMDeviceEnumerator_EnumAudioEndpoints(it, eRender,
                                                 DEVICE_STATE_ACTIVE, &devs);
     if (FAILED(hr))
-    {
-        msg_Warn(this, "cannot enumerate audio endpoints (error 0x%lx)", hr);
-        return -1;
-    }
+        return hr;
 
     UINT count;
     hr = IMMDeviceCollection_GetCount(devs, &count);
     if (FAILED(hr))
-    {
-        msg_Warn(this, "cannot count audio endpoints (error 0x%lx)", hr);
-        count = 0;
-    }
-
-    unsigned n = 0;
+        return hr;
 
     for (UINT i = 0; i < count; i++)
     {
@@ -734,10 +726,9 @@ static int DevicesEnum(vlc_object_t *this, IMMDeviceEnumerator *it,
         added_cb(added_cb_data, devid, dev);
         IMMDevice_Release(dev);
         CoTaskMemFree(devid);
-        n++;
     }
     IMMDeviceCollection_Release(devs);
-    return n;
+    return S_OK;
 }
 
 static int DeviceRequestLocked(audio_output_t *aout)
@@ -1069,7 +1060,9 @@ static void *MMThread(void *data)
     EnterMTA();
     IMMDeviceEnumerator_RegisterEndpointNotificationCallback(it,
                                                           &sys->device_events);
-    DevicesEnum(VLC_OBJECT(aout), it, MMThread_DevicesEnum_Added, aout);
+    HRESULT hr = DevicesEnum(it, MMThread_DevicesEnum_Added, aout);
+    if (FAILED(hr))
+        msg_Warn(aout, "cannot enumerate audio endpoints (error 0x%lx)", hr);
 
     EnterCriticalSection(&sys->lock);
 
@@ -1425,7 +1418,7 @@ static int ReloadAudioDevices(char const *name, char ***values, char ***descs)
     }
     list.count++;
 
-    DevicesEnum(NULL, it, Reload_DevicesEnum_Added, &list);
+    DevicesEnum(it, Reload_DevicesEnum_Added, &list);
 
 error:
     IMMDeviceEnumerator_Release((IMMDeviceEnumerator *)it);
