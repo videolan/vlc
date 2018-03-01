@@ -207,14 +207,18 @@ static const char vlc_entry_name[] = "vlc_entry" MODULE_SUFFIX;
 static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
                                         bool fast)
 {
-    module_handle_t handle;
-
-    if (module_Load (obj, path, &handle, fast))
+    void *handle = vlc_dlopen(path, fast);
+    if (handle == NULL)
+    {
+        char *errmsg = vlc_dlerror();
+        msg_Err(obj, "cannot load plug-in %s: %s", path,
+                errmsg ? errmsg : "unknown error");
+        free(errmsg);
         return NULL;
+    }
 
     /* Try to resolve the symbol */
-    vlc_plugin_cb entry =
-        (vlc_plugin_cb) module_Lookup(handle, vlc_entry_name);
+    vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
     if (entry == NULL)
     {
         msg_Warn (obj, "cannot find plug-in entry point in %s", path);
@@ -235,7 +239,7 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
     atomic_init(&plugin->loaded, true);
     return plugin;
 error:
-    module_Unload( handle );
+    vlc_dlclose(handle);
     return NULL;
 }
 
@@ -500,19 +504,23 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
         return 0; /* fast path: already loaded */
 
     /* Try to load the plug-in (without locks, so read-only) */
-    module_handle_t handle;
-
     assert(plugin->abspath != NULL);
 
-    if (module_Load(obj, plugin->abspath, &handle, false))
+    void *handle = vlc_dlopen(plugin->abspath, false);
+    if (handle == NULL)
+    {
+        char *errmsg = vlc_dlerror();
+        msg_Err(obj, "cannot load plug-in %s: %s", plugin->abspath,
+                errmsg ? errmsg : "unknown error");
+        free(errmsg);
         return -1;
+    }
 
-    vlc_plugin_cb entry =
-        (vlc_plugin_cb) module_Lookup(handle, vlc_entry_name);
+    vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
     if (entry == NULL)
     {
         msg_Err(obj, "cannot find plug-in entry point in %s", plugin->abspath);
-        module_Unload(handle);
+        vlc_dlclose(handle);
         return -1;
     }
 
@@ -529,7 +537,7 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
         atomic_store_explicit(&plugin->loaded, true, memory_order_release);
     }
     else /* Another thread won the race to load the plugin */
-        module_Unload(handle);
+        vlc_dlclose(handle);
     vlc_mutex_unlock(&lock);
 
     return 0;
@@ -550,7 +558,7 @@ static void module_Unmap(vlc_plugin_t *plugin)
         return;
 
     assert(plugin->handle != NULL);
-    module_Unload(plugin->handle);
+    vlc_dlclose(plugin->handle);
 }
 #else
 int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)

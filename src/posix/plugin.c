@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include "modules/modules.h"
 
@@ -38,16 +39,7 @@
 # include <valgrind/valgrind.h>
 #endif
 
-/**
- * Load a dynamically linked library using a system dependent method.
- *
- * \param p_this vlc object
- * \param path library file
- * \param p_handle the module handle returned
- * \return 0 on success as well as the module handle.
- */
-int module_Load (vlc_object_t *p_this, const char *path,
-                 module_handle_t *p_handle, bool lazy)
+void *vlc_dlopen(const char *path, bool lazy)
 {
 #if defined (RTLD_NOW)
     const int flags = lazy ? RTLD_LAZY : RTLD_NOW;
@@ -56,51 +48,33 @@ int module_Load (vlc_object_t *p_this, const char *path,
 #else
     const int flags = 0;
 #endif
-
-    module_handle_t handle = dlopen (path, flags);
-    if( handle == NULL )
-    {
-        msg_Warn( p_this, "cannot load module `%s' (%s)", path, dlerror() );
-        return -1;
-    }
-    *p_handle = handle;
-    return 0;
+    return dlopen (path, flags);
 }
 
-/**
- * CloseModule: unload a dynamic library
- *
- * This function unloads a previously opened dynamically linked library
- * using a system dependent method. No return value is taken in consideration,
- * since some libraries sometimes refuse to close properly.
- * \param handle handle of the library
- * \return nothing
- */
-void module_Unload( module_handle_t handle )
+int vlc_dlclose(void *handle)
 {
 #if !defined(__SANITIZE_ADDRESS__)
 #ifdef HAVE_VALGRIND_VALGRIND_H
     if( RUNNING_ON_VALGRIND > 0 )
-        return; /* do not dlclose() so that we get proper stack traces */
+        return 0; /* do not dlclose() so that we get proper stack traces */
 #endif
-    dlclose( handle );
+    int err = dlclose( handle );
+    assert(err == 0);
+    return err;
 #else
     (void) handle;
+    return 0;
 #endif
 }
 
-/**
- * Looks up a symbol from a dynamically loaded library
- *
- * This function queries a loaded library for a symbol specified in a
- * string, and returns a pointer to it. We don't check for dlerror() or
- * similar functions, since we want a non-NULL symbol anyway.
- *
- * @param handle handle to the module
- * @param psz_function function name
- * @return NULL on error, or the address of the symbol
- */
-void *module_Lookup( module_handle_t handle, const char *psz_function )
+void *vlc_dlsym(void *handle, const char *name)
 {
-    return dlsym( handle, psz_function );
+    return dlsym(handle, name);
+}
+
+char *vlc_dlerror(void)
+{
+    const char *errmsg = dlerror();
+    /* XXX: This is not thread-safe at all. POSIX is helpless here. */
+    return (errmsg != NULL) ? strdup(errmsg) : NULL;
 }

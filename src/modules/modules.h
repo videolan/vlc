@@ -26,9 +26,6 @@
 
 # include <stdatomic.h>
 
-/** The plugin handle type */
-typedef void *module_handle_t;
-
 /** VLC plugin */
 typedef struct vlc_plugin_t
 {
@@ -52,7 +49,7 @@ typedef struct vlc_plugin_t
 #ifdef HAVE_DYNAMIC_PLUGINS
     atomic_bool loaded; /**< Whether the plug-in is mapped in memory */
     bool unloadable; /**< Whether the plug-in can be unloaded safely */
-    module_handle_t handle; /**< Run-time linker handle (if loaded) */
+    void *handle; /**< Run-time linker handle (if loaded) */
     char *abspath; /**< Absolute path */
 
     char *path; /**< Relative path (within plug-in directory) */
@@ -122,9 +119,48 @@ ssize_t module_list_cap (module_t ***, const char *);
 int vlc_bindtextdomain (const char *);
 
 /* Low-level OS-dependent handler */
-int module_Load (vlc_object_t *, const char *, module_handle_t *, bool);
-void *module_Lookup (module_handle_t, const char *);
-void module_Unload (module_handle_t);
+
+/**
+ * Loads a dynamically linked library.
+ *
+ * \param path library file path
+ * \param lazy whether to resolve the symbols lazily
+ * \return a module handle on success, or NULL on error.
+ */
+void *vlc_dlopen(const char *path, bool) VLC_USED;
+
+/**
+ * Unloads a dynamic library.
+ *
+ * This function unloads a previously opened dynamically linked library
+ * using a system dependent method.
+ * \param handle handle of the library
+ * \retval 0 on success
+ * \retval -1 on error (none are defined though)
+ */
+int vlc_dlclose(void *);
+
+/**
+ * Looks up a symbol from a dynamically loaded library
+ *
+ * This function looks for a named symbol within a loaded library.
+ *
+ * \param handle handle to the library
+ * \param name function name
+ * \return the address of the symbol on success, or NULL on error
+ *
+ * \note If the symbol address is NULL, errors cannot be detected. However,
+ * normal symbols such as function or global variables cannot have NULL as
+ * their address.
+ */
+void *vlc_dlsym(void *handle, const char *) VLC_USED;
+
+/**
+ * Formats an error message for vlc_dlopen() or vlc_dlsym().
+ *
+ * \return a heap-allocated nul-terminated error string, or NULL.
+ */
+char *vlc_dlerror(void) VLC_USED;
 
 /* Plugins cache */
 vlc_plugin_t *vlc_cache_load(vlc_object_t *, const char *, block_t **);
