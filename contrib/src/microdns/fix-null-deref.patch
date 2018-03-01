@@ -1,0 +1,27 @@
+From efdf2754f9f8b801048b8fdae2b269f091128193 Mon Sep 17 00:00:00 2001
+From: Jean-Baptiste Kempf <jb@videolan.org>
+Date: Thu, 1 Mar 2018 02:58:13 +0100
+Subject: [PATCH] Fix more of the same crash
+
+---
+ src/mdns.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/mdns.c b/src/mdns.c
+index 132beef..55c5cb4 100644
+--- a/src/mdns.c
++++ b/src/mdns.c
+@@ -117,7 +117,9 @@ mdns_list_interfaces(multicast_if** pp_intfs, size_t* p_nb_intf, int ai_family)
+                 return (MDNS_ERROR);
+         }
+         for (c = ifs; c != NULL; c = c->ifa_next) {
+-                if (c->ifa_addr->sa_family != ai_family || !mdns_is_interface_valuable(c))
++                if (c->ifa_addr == NULL ||
++                    c->ifa_addr->sa_family != ai_family ||
++                    !mdns_is_interface_valuable(c))
+                         continue;
+                 memcpy(intfs, c->ifa_addr, sizeof(*intfs));
+                 intfs++;
+-- 
+2.11.0
+

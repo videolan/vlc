@@ -19,6 +19,7 @@ $(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.gz:
 
 microdns: microdns-$(LIBMICRODNS_VERSION).tar.gz .sum-microdns
 	$(UNPACK)
+	$(APPLY) $(SRC)/microdns/fix-null-deref.patch
 	$(MOVE)
 
 .microdns: microdns
