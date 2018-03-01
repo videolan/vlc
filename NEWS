@@ -1,9 +1,25 @@
 Changes between 3.0.1 and 3.0.2:
 --------------------------------
 
+Demux:
+ * Fix wrong colors in some AVI files
+ * Fix IFO files playback
+ * Fix a crash with missing/invalid MPEG SDT
+
+Audio output:
+ * Fix mmdevice default audio device handling
+ * Fix "reset audio volume" being forcefully deactivated
+ * Allow a default device to be used by VLC
+
+Audio filters:
+ * Fix audio stutter after unpausing
+
 macOS:
  * Fix Growl notifications on recent macOS versions
+ * Fix conversion output file name encoding
 
+Misc:
+ * Fix lua rc & oldrc interfaces host specification
 
 Changes between 3.0.0 and 3.0.1:
 --------------------------------
