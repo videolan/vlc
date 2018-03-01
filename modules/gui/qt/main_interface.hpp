@@ -126,9 +126,9 @@ protected:
     void handleSystray();
 
     /* Central StackWidget Management */
-    void showTab( QWidget *);
+    void showTab( QWidget *, bool video_closing = false );
     void showVideo();
-    void restoreStackOldWidget();
+    void restoreStackOldWidget( bool video_closing = false );
 
     /* */
     void displayNormalView();
