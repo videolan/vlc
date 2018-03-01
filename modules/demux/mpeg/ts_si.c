@@ -261,9 +261,10 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                                         p_sys->b_broken_charset );
 
                 msg_Dbg( p_demux, "    - type=%"PRIu8" provider=%s name=%s",
-                         pD->i_service_type, str1, str2 );
+                         pD->i_service_type,
+                         str1 ? str1 : "(null)", str2 ? str2 : "(null)" );
 
-                if( strcmp( "Service01", str2 ) ) /* Skip bogus libav/ffmpeg SDT */
+                if( str2 != NULL && strcmp( "Service01", str2 ) ) /* Skip bogus libav/ffmpeg SDT */
                 {
                     vlc_meta_SetTitle( p_meta, str2 );
                     vlc_meta_SetPublisher( p_meta, str1 );
