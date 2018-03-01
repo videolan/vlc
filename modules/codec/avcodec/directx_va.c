@@ -51,7 +51,8 @@ struct picture_sys_t {
 static const int PROF_MPEG2_SIMPLE[] = { FF_PROFILE_MPEG2_SIMPLE, 0 };
 static const int PROF_MPEG2_MAIN[]   = { FF_PROFILE_MPEG2_SIMPLE,
                                          FF_PROFILE_MPEG2_MAIN, 0 };
-static const int PROF_H264_HIGH[]    = { FF_PROFILE_H264_CONSTRAINED_BASELINE,
+static const int PROF_H264_HIGH[]    = { FF_PROFILE_H264_BASELINE,
+                                         FF_PROFILE_H264_CONSTRAINED_BASELINE,
                                          FF_PROFILE_H264_MAIN,
                                          FF_PROFILE_H264_HIGH, 0 };
 static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN, 0 };
