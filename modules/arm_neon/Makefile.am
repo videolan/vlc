@@ -28,3 +28,5 @@ neon_LTLIBRARIES = \
 	libvolume_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la
 endif
+
+EXTRA_DIST += arm_neon/asm.S
