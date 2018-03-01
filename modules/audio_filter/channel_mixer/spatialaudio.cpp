@@ -58,6 +58,7 @@
 static int OpenBinauralizer(vlc_object_t *p_this);
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
+static void Flush( filter_t * );
 
 vlc_module_begin()
     set_shortname("Spatialaudio")
@@ -86,6 +87,7 @@ struct filter_sys_t
     filter_sys_t()
         : speakers(NULL)
         , i_inputPTS(0)
+        , i_last_input_pts(0)
         , inBuf(NULL)
         , outBuf(NULL)
     {}
@@ -120,6 +122,7 @@ struct filter_sys_t
 
     std::vector<float> inputSamples;
     mtime_t i_inputPTS;
+    mtime_t i_last_input_pts;
     unsigned i_order;
 
     float** inBuf;
@@ -163,6 +166,13 @@ static std::string getHRTFPath(filter_t *p_filter)
 static block_t *Mix( filter_t *p_filter, block_t *p_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    /* Detect discontinuity due to a pause */
+    static const mtime_t rounding_error = 10;
+    if( p_sys->i_inputPTS != 0
+     && p_buf->i_pts - p_sys->i_last_input_pts - p_buf->i_length > rounding_error )
+        Flush( p_filter );
+    p_sys->i_last_input_pts = p_buf->i_pts;
 
     const size_t i_prevSize = p_sys->inputSamples.size();
     p_sys->inputSamples.resize(i_prevSize + p_buf->i_nb_samples * p_sys->i_inputNb);
@@ -256,7 +266,7 @@ static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     p_sys->inputSamples.clear();
-    p_sys->i_inputPTS = 0;
+    p_sys->i_last_input_pts = p_sys->i_inputPTS = 0;
 }
 
 static void ChangeViewpoint( filter_t *p_filter, const vlc_viewpoint_t *p_vp)
