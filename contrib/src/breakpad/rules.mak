@@ -20,14 +20,14 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 .breakpad: breakpad
 	# Framework
 ifdef HAVE_MACOSX
-	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
+	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++
 	cd $</src/client/mac/ && \
 		mkdir -p "$(PREFIX)/Frameworks" && \
 		rm -Rf $(PREFIX)/Frameworks/Breakpad.framework && \
 		cp -R build/Release/Breakpad.framework "$(PREFIX)/Frameworks"
 	# Tools
 	cd $</src/tools/mac/dump_syms && \
-		xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error && \
+		xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ && \
 		cp -R build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
