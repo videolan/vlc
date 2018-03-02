@@ -2107,7 +2107,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_sys->vtsession_status = vtsession_status;
         goto end;
     }
-    assert(imageBuffer);
     if (unlikely(!imageBuffer))
     {
         msg_Err(p_dec, "critical: null imageBuffer with a valid status");
