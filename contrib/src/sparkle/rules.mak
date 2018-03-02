@@ -18,7 +18,7 @@ sparkle: Sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 
 .sparkle: sparkle
 	# Build Sparkle and change the @rpath
-	cd $< && xcodebuild $(XCODE_FLAGS) WARNING_CFLAGS=-Wno-error
+	cd $< && xcodebuild $(XCODE_FLAGS)
 	cd $< && install_name_tool -id @executable_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle build/Release/Sparkle.framework/Sparkle
 	# Install
 	cd $< && mkdir -p "$(PREFIX)/Frameworks" && \
