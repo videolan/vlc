@@ -392,7 +392,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
 
             *array = calloc( p_title->i_seekpoint, sizeof(**array) );
-            if( unlikely(array == NULL) )
+            if( unlikely(*array == NULL) )
             {
                 vlc_mutex_unlock( &priv->p_item->lock );
                 return VLC_ENOMEM;
