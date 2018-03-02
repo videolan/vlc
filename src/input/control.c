@@ -543,7 +543,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             size_t *pi_vout = va_arg( args, size_t * );
 
             input_resource_HoldVouts( priv->p_resource, ppp_vout, pi_vout );
-            if( *pi_vout <= 0 )
+            if( *pi_vout == 0 )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
