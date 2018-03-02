@@ -358,22 +358,26 @@ void ExtVideo::updateFilters()
 
 void ExtVideo::browseLogo()
 {
+    const QStringList schemes = QStringList(QStringLiteral("file"));
     QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
                         .arg( qtr("Image Files") )
                         .arg( TITLE_EXTENSIONS_ALL );
-    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Logo filenames" ),
-                   p_intf->p_sys->filepath, filter );
+    QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Logo filenames" ),
+                   p_intf->p_sys->filepath, filter,
+                   NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( logoFileText, file );
 }
 
 void ExtVideo::browseEraseFile()
 {
+    const QStringList schemes = QStringList(QStringLiteral("file"));
     QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
                         .arg( qtr("Image Files") )
                         .arg( TITLE_EXTENSIONS_ALL );
-    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Image mask" ),
-                   p_intf->p_sys->filepath, filter );
+    QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Image mask" ),
+                   p_intf->p_sys->filepath, filter,
+                   NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( eraseMaskText, file );
 }
