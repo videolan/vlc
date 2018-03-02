@@ -116,12 +116,12 @@ DialogsProvider::~DialogsProvider()
 
 QStringList DialogsProvider::getOpenURL( QWidget *parent,
                                          const QString &caption,
-                                         const QString &dir,
+                                         const QUrl &dir,
                                          const QString &filter,
                                          QString *selectedFilter )
 {
     QStringList res;
-    QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
+    QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, dir, filter, selectedFilter );
 
     foreach( const QUrl& url, urls )
         res.append( url.toEncoded() );
@@ -131,11 +131,12 @@ QStringList DialogsProvider::getOpenURL( QWidget *parent,
 
 QString DialogsProvider::getSaveFileName( QWidget *parent,
                                           const QString &caption,
-                                          const QString &dir,
+                                          const QUrl &dir,
                                           const QString &filter,
                                           QString *selectedFilter )
 {
-    return QFileDialog::getSaveFileName( parent, caption, dir, filter, selectedFilter );
+    const QStringList schemes = QStringList(QStringLiteral("file"));
+    return QFileDialog::getSaveFileUrl( parent, caption, dir, filter, selectedFilter, QFileDialog::Options(), schemes).toLocalFile();
 }
 
 void DialogsProvider::quit()
@@ -404,9 +405,9 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         foreach( const QString &uri, urls )
             p_arg->psz_results[i++] = strdup( qtu( uri ) );
         if(i == 0)
-            p_intf->p_sys->filepath = QString::fromLatin1("");
+            p_intf->p_sys->filepath = "";
         else
-            p_intf->p_sys->filepath = qfu( p_arg->psz_results[i-1] );
+            p_intf->p_sys->filepath = QUrl::fromEncoded(p_arg->psz_results[i-1]);
     }
 
     /* Callback */
@@ -473,7 +474,7 @@ void DialogsProvider::MLAppendDialog( int tab )
  ***/
 QStringList DialogsProvider::showSimpleOpen( const QString& help,
                                              int filters,
-                                             const QString& path )
+                                             const QUrl& path )
 {
     QString fileTypes = "";
     if( filters & EXT_FILTER_MEDIA ) {
@@ -500,7 +501,8 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
 
-    if( !urls.isEmpty() ) savedirpathFromFile( urls.last() );
+    if( !urls.isEmpty() )
+        p_intf->p_sys->filepath = QUrl( urls.last() );
 
     return urls;
 }
@@ -570,8 +572,10 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 
 QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
 {
-    QString dir = QFileDialog::getExistingDirectory( NULL,
-            qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
+    const QStringList schemes = QStringList(QStringLiteral("file"));
+    QString dir = QFileDialog::getExistingDirectoryUrl( NULL,
+            qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
+            QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
 
     if( dir.isEmpty() ) return QString();
 

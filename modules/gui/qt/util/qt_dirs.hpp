@@ -36,7 +36,6 @@ static inline QString removeTrailingSlash( QString s )
     return s;
 }
 
-#define savedirpathFromFile( a ) p_intf->p_sys->filepath = toNativeSeparators( QFileInfo( a ).path() )
 #define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
 
 static inline QString colon_escape( QString s )

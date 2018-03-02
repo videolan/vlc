@@ -41,6 +41,7 @@
 
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
+#include <QUrl>
 
 #if ( QT_VERSION < 0x050500 )
 # error Update your Qt version to at least 5.5.0
@@ -71,7 +72,7 @@ struct intf_sys_t
     class QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
     class PLModel *pl_model;
 
-    QString filepath;        /* Last path used in dialogs */
+    QUrl filepath;        /* Last path used in dialogs */
 
     unsigned voutWindowType; /* Type of vout_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */

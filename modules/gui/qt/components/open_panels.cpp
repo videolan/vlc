@@ -233,7 +233,7 @@ void FileOpenPanel::browseFile()
             );
         item->setFlags( Qt::ItemIsEnabled );
         ui.fileListWidg->addItem( item );
-        savedirpathFromFile( file );
+        p_intf->p_sys->filepath = url;
     }
     updateButtons();
     updateMRL();
@@ -634,8 +634,10 @@ void DiscOpenPanel::updateMRL()
 
 void DiscOpenPanel::browseDevice()
 {
-    QString dir = QFileDialog::getExistingDirectory( this,
-            qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath );
+    const QStringList schemes = QStringList(QStringLiteral("file"));
+    QString dir = QFileDialog::getExistingDirectoryUrl( this,
+            qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath,
+            QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
     if( !dir.isEmpty() )
     {
         ui.deviceCombo->addItem( toNativeSepNoSlash( dir ) );

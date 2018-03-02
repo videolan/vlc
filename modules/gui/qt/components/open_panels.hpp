@@ -96,8 +96,10 @@ class FileOpenBox: public QFileDialog
     Q_OBJECT
 public:
     FileOpenBox( QWidget *parent, const QString &caption,
-                 const QString &directory, const QString &filter ):
-                QFileDialog( parent, caption, directory, filter ) {}
+                 const QUrl &directory, const QString &filter ):
+                QFileDialog( parent, caption, "", filter ) {
+        setDirectoryUrl(directory);
+    }
 public slots:
     void accept(){}
     void reject(){}

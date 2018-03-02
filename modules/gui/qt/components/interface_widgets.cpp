@@ -885,15 +885,13 @@ void CoverArtLabel::setArtFromFile()
     if( !p_item )
         return;
 
-    QString filePath = QFileDialog::getOpenFileName( this, qtr( "Choose Cover Art" ),
+    QUrl fileUrl = QFileDialog::getOpenFileUrl( this, qtr( "Choose Cover Art" ),
         p_intf->p_sys->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
 
-    if( filePath.isEmpty() )
+    if( fileUrl.isEmpty() )
         return;
 
-    QString fileUrl = QUrl::fromLocalFile( filePath ).toString();
-
-    THEMIM->getIM()->setArt( p_item, fileUrl );
+    THEMIM->getIM()->setArt( p_item, fileUrl.toString() );
 }
 
 void CoverArtLabel::clear()
