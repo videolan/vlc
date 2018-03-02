@@ -195,7 +195,7 @@ struct pic_holder
     uint8_t     field_reorder_max;
 };
 
-static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t);
+static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t, uint8_t);
 
 #pragma mark - start & stop
 
@@ -300,18 +300,6 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
             GetxPSH264(slice.i_pic_parameter_set_id, p_sys, &p_sps, &p_pps);
             if(p_sps)
             {
-                if(!p_sys->b_invalid_pic_reorder_max && i_nal_type == H264_NAL_SLICE_IDR)
-                {
-                    unsigned dummy;
-                    uint8_t i_reorder;
-                    h264_get_dpb_values(p_sps, &i_reorder, &dummy);
-                    vlc_mutex_lock(&p_sys->lock);
-                    p_sys->i_pic_reorder_max = i_reorder;
-                    pic_holder_update_reorder_max(p_sys->pic_holder,
-                                                  p_sys->i_pic_reorder_max);
-                    vlc_mutex_unlock(&p_sys->lock);
-                }
-
                 int bFOC;
                 h264_compute_poc(p_sps, &slice, &p_sys->h264_pocctx,
                                  &p_info->i_poc, &p_info->i_foc, &bFOC);
@@ -344,6 +332,20 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
                                               p_sps->vui.i_num_units_in_tick );
                 }
+
+                if(!p_sys->b_invalid_pic_reorder_max && i_nal_type == H264_NAL_SLICE_IDR)
+                {
+                    unsigned dummy;
+                    uint8_t i_reorder;
+                    h264_get_dpb_values(p_sps, &i_reorder, &dummy);
+                    vlc_mutex_lock(&p_sys->lock);
+                    p_sys->i_pic_reorder_max = i_reorder;
+                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                                                  p_sys->i_pic_reorder_max,
+                                                  p_info->i_num_ts);
+                    vlc_mutex_unlock(&p_sys->lock);
+                }
+
             }
 
             return true; /* No need to parse further NAL */
@@ -657,15 +659,6 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 sei.p_sps = p_sps;
                 sei.p_timing = NULL;
 
-                if(!p_sys->b_invalid_pic_reorder_max && p_vps)
-                {
-                    vlc_mutex_lock(&p_sys->lock);
-                    p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
-                    pic_holder_update_reorder_max(p_sys->pic_holder,
-                                                  p_sys->i_pic_reorder_max);
-                    vlc_mutex_unlock(&p_sys->lock);
-                }
-
                 const int POC = hevc_compute_picture_order_count(p_sps, p_sli,
                                                                  &p_sys->hevc_pocctx);
 
@@ -691,6 +684,17 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
 
                 if(sei.p_timing)
                     hevc_release_sei_pic_timing(sei.p_timing);
+
+                if(!p_sys->b_invalid_pic_reorder_max && p_vps)
+                {
+                    vlc_mutex_lock(&p_sys->lock);
+                    p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
+                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                                                  p_sys->i_pic_reorder_max,
+                                                  p_info->i_num_ts);
+                    vlc_mutex_unlock(&p_sys->lock);
+                }
+
             }
 
             hevc_rbsp_release_slice_header(p_sli);
@@ -924,7 +928,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
                 pic_holder_update_reorder_max(p_sys->pic_holder,
-                                              p_sys->i_pic_reorder_max);
+                                              p_sys->i_pic_reorder_max, p_info->i_num_ts);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -935,7 +939,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
                 pic_holder_update_reorder_max(p_sys->pic_holder,
-                                              p_sys->i_pic_reorder_max);
+                                              p_sys->i_pic_reorder_max, p_info->i_num_ts);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -1362,7 +1366,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     vlc_cond_init(&p_sys->pic_holder->wait);
     p_sys->pic_holder->nb_field_out = 0;
     p_sys->pic_holder->closed = false;
-    pic_holder_update_reorder_max(p_sys->pic_holder, p_sys->i_pic_reorder_max);
+    p_sys->pic_holder->field_reorder_max = p_sys->i_pic_reorder_max * 2;
 
     vlc_mutex_init(&p_sys->lock);
 
@@ -2053,11 +2057,12 @@ pic_holder_on_cvpx_released(CVPixelBufferRef cvpx, void *data, unsigned nb_field
 }
 
 static void
-pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder_max)
+pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder_max,
+                              uint8_t nb_field)
 {
     vlc_mutex_lock(&pic_holder->lock);
 
-    pic_holder->field_reorder_max = pic_reorder_max * 2;
+    pic_holder->field_reorder_max = pic_reorder_max * (nb_field < 2 ? 2 : nb_field);
     vlc_cond_signal(&pic_holder->wait);
 
     vlc_mutex_unlock(&pic_holder->lock);
@@ -2065,7 +2070,7 @@ pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder
 
 static void pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
 {
-    static const uint8_t reserved_fields = 4;
+    const uint8_t reserved_fields = 2 * (pic->i_nb_fields < 2 ? 2 : pic->i_nb_fields);
 
     vlc_mutex_lock(&pic_holder->lock);
 
