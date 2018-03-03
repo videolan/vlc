@@ -381,33 +381,25 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
 #if (_POSIX_SPAWN >= 0)
     /* Check if QApplication works */
-    char *libdir = config_GetLibDir();
-    if (likely(libdir != NULL))
+    char *path = config_GetSysPath(VLC_PKG_LIB_DIR, "vlc-qt-check");
+    if (unlikely(path == NULL))
+        return VLC_ENOMEM;
+
+    char *argv[] = { path, NULL };
+    pid_t pid;
+
+    int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
+    free(path);
+    if (val)
+        return VLC_ENOMEM;
+
+    int status;
+    while (waitpid(pid, &status, 0) == -1);
+
+    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
     {
-        char *path;
-
-        if (unlikely(asprintf(&path, "%s/vlc-qt-check", libdir) < 0))
-            path = NULL;
-        free(libdir);
-        if (unlikely(path == NULL))
-            return VLC_ENOMEM;
-
-        char *argv[] = { path, NULL };
-        pid_t pid;
-
-        int val = posix_spawn(&pid, path, NULL, NULL, argv, environ);
-        free(path);
-        if (val)
-            return VLC_ENOMEM;
-
-        int status;
-        while (waitpid(pid, &status, 0) == -1);
-
-        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-        {
-            msg_Dbg(p_this, "Qt check failed (%d). Skipping.", status);
-            return VLC_EGENERIC;
-        }
+        msg_Dbg(p_this, "Qt check failed (%d). Skipping.", status);
+        return VLC_EGENERIC;
     }
 #endif
 

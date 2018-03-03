@@ -306,11 +306,7 @@ static void *Thread( void *p_data )
     psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
 #ifdef _WIN32
     if ( psz_preset_path == NULL )
-    {
-        char *psz_data_path = config_GetDataDir();
-        asprintf( &psz_preset_path, "%s" DIR_SEP "visualization", psz_data_path );
-        free( psz_data_path );
-    }
+        psz_preset_path = config_GetSysPath(VLC_PKG_DATA_DIR, "visualization");
 #endif
 
     psz_title_font                = var_InheritString( p_filter, "projectm-title-font" );

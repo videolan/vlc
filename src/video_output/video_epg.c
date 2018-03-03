@@ -77,14 +77,13 @@ struct subpicture_updater_sys_t
 static char * GetDefaultArtUri( void )
 {
     char *psz_uri = NULL;
-    char *psz_path;
-    char *psz_datadir = config_GetDataDir();
-    if( asprintf( &psz_path, "%s/icons/128x128/vlc.png", psz_datadir ) >= 0 )
+    char *psz_path = config_GetSysPath(VLC_PKG_DATA_DIR,
+                                       "icons/128x128/"PACKAGE_NAME".png");
+    if( psz_path != NULL )
     {
         psz_uri = vlc_path2uri( psz_path, NULL );
         free( psz_path );
     }
-    free( psz_datadir );
     return psz_uri;
 }
 

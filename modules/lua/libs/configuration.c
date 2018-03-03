@@ -104,7 +104,7 @@ static int vlclua_config_set( lua_State *L )
  *****************************************************************************/
 static int vlclua_datadir( lua_State *L )
 {
-    char *psz_data = config_GetDataDir();
+    char *psz_data = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
     lua_pushstring( L, psz_data );
     free( psz_data );
     return 1;

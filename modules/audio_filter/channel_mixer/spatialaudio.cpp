@@ -150,12 +150,10 @@ static std::string getHRTFPath(filter_t *p_filter)
     }
     else
     {
-        char *dataDir = config_GetDataDir();
+        char *dataDir = config_GetSysPath(VLC_PKG_DATA_DIR, DEFAULT_HRTF_PATH);
         if (dataDir != NULL)
         {
-            std::stringstream ss;
-            ss << std::string(dataDir) << DIR_SEP << DEFAULT_HRTF_PATH;
-            HRTFPath = ss.str();
+            HRTFPath = std::string(dataDir);
             free(dataDir);
         }
     }

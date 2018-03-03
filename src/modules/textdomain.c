@@ -45,14 +45,8 @@ int vlc_bindtextdomain (const char *domain)
         return -1;
     }
 # else
-    char *datadir = config_GetDataDir();
-    if (unlikely(datadir == NULL))
-        return -1;
-
-    char *upath;
-    int ret = asprintf (&upath, "%s" DIR_SEP "locale", datadir);
-    free (datadir);
-    if (unlikely(ret == -1))
+    char *upath = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
+    if (unlikely(upath == NULL))
         return -1;
 
     char *lpath = ToLocale(upath);

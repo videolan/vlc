@@ -90,8 +90,8 @@ bool X11Factory::init()
     m_resourcePath.push_back( (std::string)datadir + "/skins2" );
     free( datadir );
     m_resourcePath.push_back( (std::string)"share/skins2" );
-    datadir = config_GetDataDir();
-    m_resourcePath.push_back( (std::string)datadir + "/skins2" );
+    datadir = config_GetSysPath(VLC_PKG_DATA_DIR, "skins2");
+    m_resourcePath.push_back( (std::string)datadir );
     free( datadir );
 
     // Determine the monitor geometry
