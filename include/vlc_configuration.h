@@ -270,34 +270,6 @@ VLC_API void config_ResetAll(void);
 VLC_API module_config_t *config_FindConfig(const char *name) VLC_USED;
 
 /**
- * Gets the arch-independent installation directory.
- *
- * This function determines the directory containing the
- * architecture-independent installed asset files (such as image, text and
- * message translation tables).
- *
- * See also config_GetLibDir().
- *
- * @return a heap-allocated string (use free() to release it), or NULL on error
- */
-VLC_API char *config_GetDataDir(void) VLC_USED VLC_MALLOC;
-
-/**
- * Gets the arch-specific installation directory.
- *
- * This function determines the directory containing the architecture-specific
- * installed asset files (such as executable plugins and compiled byte code).
- *
- * See also config_GetDataDir().
- *
- * \note config_GetDataDir() and config_GetLibDir() may or may not return the
- * same path, depending on conventions of the operating system.
- *
- * @return a heap-allocated string (use free() to release it), or NULL on error
- */
-VLC_API char *config_GetLibDir(void) VLC_USED VLC_MALLOC;
-
-/**
  * System directory identifiers
  */
 typedef enum vlc_system_dir
