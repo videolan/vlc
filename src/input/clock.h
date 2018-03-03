@@ -31,7 +31,7 @@
 /** @struct input_clock_t
  * This structure is used to manage clock drift and reception jitters
  *
- * XXX input_clock_GetTS can be called from any threads. All others functions
+ * XXX input_clock_ConvertTS can be called from any threads. All others functions
  * MUST be called from one and only one thread.
  */
 typedef struct input_clock_t input_clock_t;
