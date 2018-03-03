@@ -297,7 +297,32 @@ VLC_API char *config_GetDataDir(void) VLC_USED VLC_MALLOC;
  */
 VLC_API char *config_GetLibDir(void) VLC_USED VLC_MALLOC;
 
-typedef enum vlc_userdir
+/**
+ * System directory identifiers
+ */
+typedef enum vlc_system_dir
+{
+    VLC_PKG_DATA_DIR, /**< Package-specific architecture-independent read-only
+                           data directory (e.g. /usr/local/data/vlc). */
+    VLC_PKG_LIB_DIR, /**< Package-specific architecture-dependent read-only
+                          data directory (e.g. /usr/local/lib/vlc). */
+} vlc_sysdir_t;
+
+/**
+ * Gets an installation directory.
+ *
+ * This function determines one of the installation directory.
+ *
+ * @param dir identifier of the directory (see \ref vlc_sysdir_t)
+ * @param filename name of a file or other object within the directory
+ *                 (or NULL to obtain the plain directory)
+ *
+ * @return a heap-allocated string (use free() to release it), or NULL on error
+ */
+VLC_API char *config_GetSysPath(vlc_sysdir_t dir, const char *filename)
+VLC_USED VLC_MALLOC;
+
+typedef enum vlc_user_dir
 {
     VLC_HOME_DIR, /* User's home */
     VLC_CONFIG_DIR, /* VLC-specific configuration directory */

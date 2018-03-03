@@ -64,6 +64,31 @@ char *config_GetDataDir (void)
     return datadir;
 }
 
+char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
+{
+    char *dir;
+
+    switch (type)
+    {
+        case VLC_PKG_DATA_DIR:
+            dir = config_GetDataDir();
+            break;
+        case VLC_PKG_LIB_DIR:
+            dir = config_GetLibDir();
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    if (filename == NULL || unlikely(dir == NULL))
+        return dir;
+
+    char *path;
+    asprintf(&path, "%s/%s", dir, filename);
+    free(dir);
+    return path;
+}
+
 static char *config_GetHomeDir (void)
 {
     const char *home = getenv ("HOME");
