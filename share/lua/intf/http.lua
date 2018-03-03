@@ -93,9 +93,9 @@ function process(filename)
     local func = false -- process_raw(filename)
     return function(...)
         local new_mtime = vlc.net.stat(filename).modification_time
-        if new_mtime ~= mtime then
+        if func == false or new_mtime ~= mtime then
             -- Re-read the file if it changed
-            if mtime == 0 then
+            if func == false then
                 vlc.msg.dbg("Loading `"..filename.."'")
             else
                 vlc.msg.dbg("Reloading `"..filename.."'")
@@ -229,9 +229,9 @@ function rawfile(h,path,url)
     local page = false -- io.open(filename):read("*a")
     local callback = function(data,request)
         local new_mtime = vlc.net.stat(filename).modification_time
-        if mtime ~= new_mtime then
+        if page == false or new_mtime ~= mtime then
             -- Re-read the file if it changed
-            if mtime == 0 then
+            if page == false then
                 vlc.msg.dbg("Loading `"..filename.."'")
             else
                 vlc.msg.dbg("Reloading `"..filename.."'")
