@@ -1,0 +1,59 @@
+--- growl/Framework/Source/GrowlApplicationBridge.m	2018-03-03 09:23:45.000000000 +0100
++++ growl_new/Framework/Source/GrowlApplicationBridge.m	2018-03-03 09:21:46.000000000 +0100
+@@ -133,6 +133,8 @@
+ 
+ #pragma mark -
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wpartial-availability"
+ #if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
+ 
+ // Obnoxiously, the Mountain Lion notification center requires an
+@@ -254,6 +256,7 @@
+ 
+ @end
+ 
++#pragma clang diagnostic pop
+ #endif // MAC_OS_X_VERSION_10_8
+ 
+ #pragma mark -
+@@ -660,6 +663,8 @@
+ 
+ + (void) _fireAppleNotificationCenter:(NSDictionary *)growlDict
+ {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wpartial-availability"
+ #if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
+    BOOL defaultOnly = YES;
+    if([[NSUserDefaults standardUserDefaults] valueForKey:GROWL_FRAMEWORK_NOTIFICATIONCENTER_DEFAULT_ONLY])
+@@ -692,6 +697,7 @@
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:appleNotification];
+    [appleNotification release];
+ #endif
++#pragma clang diagnostic pop
+ }
+ 
+ #pragma mark -
+diff -ru growl/Framework/Source/Mist/GrowlMistView.m growl_new/Framework/Source/Mist/GrowlMistView.m
+--- growl/Framework/Source/Mist/GrowlMistView.m	2012-12-12 07:18:11.000000000 +0100
++++ growl_new/Framework/Source/Mist/GrowlMistView.m	2018-03-03 09:26:16.000000000 +0100
+@@ -122,7 +122,10 @@
+ 		[strokePath setLineWidth:3.0f];
+ 		[strokePath stroke];
+ 	}
+-	
++
++    // drawInRect: is reimplemented in category
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wpartial-availability"
+ 	// Draw image.
+ 	NSRect imageRect = NSZeroRect;
+ 	if (notificationImage) {
+@@ -131,6 +134,7 @@
+ 		imageRect.origin.y = self.bounds.origin.y + MIST_PADDING;
+ 		[notificationImage drawInRect:imageRect];
+ 	}
++#pragma clang diagnostic pop
+ 	
+ 	// Draw title.
+ 	NSRect titleRect = NSZeroRect;
