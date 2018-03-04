@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_url.h>
 #include <assert.h>
 
 #include "playlist.h"
@@ -107,6 +108,7 @@ static int ReadDVD( stream_t *p_stream, input_item_node_t *node )
     input_item_t *p_input = input_item_New( psz_url, psz_url );
     if( p_input )
     {
+        input_item_AddOption( p_input, "demux=dvd", VLC_INPUT_OPTION_TRUSTED );
         input_item_node_AppendItem( node, p_input );
         input_item_Release( p_input );
     }
