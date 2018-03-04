@@ -42,8 +42,7 @@
  */
 VLC_WEAK char *config_GetLibDir(void)
 {
-    const char *path = getenv("VLC_LIB_PATH");
-    return strdup((path != NULL) ? path : PKGLIBDIR);
+    return strdup(PKGLIBDIR);
 }
 
 /**
@@ -53,10 +52,6 @@ VLC_WEAK char *config_GetLibDir(void)
  */
 static char *config_GetDataDir(void)
 {
-    const char *path = getenv("VLC_DATA_PATH");
-    if (path != NULL)
-        return strdup(path);
-
     char *libdir = config_GetLibDir();
     if (libdir == NULL)
         return NULL; /* OOM */
@@ -85,6 +80,20 @@ static char *config_GetDataDir(void)
 
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 {
+    static const char env_vars[][16] = {
+        [VLC_PKG_LIB_DIR] = "VLC_LIB_PATH",
+        [VLC_PKG_DATA_DIR] = "VLC_DATA_PATH",
+    };
+
+    if (type < ARRAY_SIZE(env_vars)) {
+        const char *name = env_vars[type];
+         if (*name != '\0') {
+             const char *value = getenv(name);
+             if (value != NULL)
+                 return strdup(value);
+         }
+    }
+
     char *dir;
 
     switch (type)
