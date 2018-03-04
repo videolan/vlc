@@ -92,7 +92,7 @@ char *config_GetLibDir (void)
     abort ();
 }
 
-char *config_GetDataDir (void)
+static char *config_GetDataDir(void)
 {
     const char *path = getenv ("VLC_DATA_PATH");
     if (path)

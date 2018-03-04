@@ -100,35 +100,3 @@ char *config_GetLibDir(void)
     pthread_once(&once, config_GetLibDirOnce);
     return strdup(cached_path);
 }
-
-char *config_GetDataDir (void)
-{
-    const char *path = getenv ("VLC_DATA_PATH");
-    if (path != NULL)
-        return strdup (path);
-
-    char *libdir = config_GetLibDir ();
-    if (libdir == NULL)
-        return NULL; /* OOM */
-
-    /* Look for common prefix between lib and data directories. */
-    size_t prefix_len = 0;
-    while (PKGLIBDIR[prefix_len] == PKGDATADIR[prefix_len])
-    {
-        if (PKGLIBDIR[prefix_len] == '\0')
-            return libdir; /* corner case: directories are identical */
-        prefix_len++;
-    }
-
-    char *datadir = NULL;
-
-    char *p = strstr(libdir, PKGLIBDIR + prefix_len);
-    if (p != NULL)
-    {
-        if (unlikely(asprintf(&datadir, "%.*s%s", (int)(p - libdir), libdir,
-                              PKGDATADIR + prefix_len) == -1))
-            datadir = NULL;
-    }
-    free (libdir);
-    return (datadir != NULL) ? datadir : strdup (PKGDATADIR);
-}

@@ -51,7 +51,7 @@ char *config_GetLibDir (void)
  *
  * @return a nul-terminated string or NULL. Use free() to release it.
  */
-char *config_GetDataDir (void)
+static char *config_GetDataDir(void)
 {
     const char *path = getenv ("VLC_DATA_PATH");
     if (path)
