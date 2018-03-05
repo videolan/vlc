@@ -109,7 +109,7 @@ vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc $(top_srcdir)/extras/package/win32/vlc.e
 # Plug-ins cache generator
 #
 if HAVE_DYNAMIC_PLUGINS
-vlclib_PROGRAMS = vlc-cache-gen
+pkglibexec_PROGRAMS = vlc-cache-gen
 endif
 vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \

@@ -165,7 +165,7 @@ install-exec-hook:
 	if test "$(build)" = "$(host)"; then \
 		PATH="$(DESTDIR)$(bindir):$$PATH" \
 		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
-		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
+		"$(DESTDIR)$(pkglibexecdir)/vlc-cache-gen$(EXEEXT)" \
 			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
