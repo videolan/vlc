@@ -42,7 +42,7 @@
  */
 VLC_WEAK char *config_GetLibDir(void)
 {
-    return strdup(PKGLIBDIR);
+    return strdup(LIBDIR);
 }
 
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
@@ -61,8 +61,8 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
          }
     }
 
-    char *pkglibdir = config_GetLibDir();
-    if (pkglibdir == NULL)
+    char *libdir = config_GetLibDir();
+    if (libdir == NULL)
         return NULL; /* OOM */
 
     static const char *const dirs[] = {
@@ -74,30 +74,30 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     const char *dir_static = dirs[type];
     /* Look for common static prefix. */
     size_t prefix_len = 0;
-    while (prefix_len < strlen(PKGLIBDIR)
-        && PKGLIBDIR[prefix_len] == dir_static[prefix_len])
+    while (prefix_len < strlen(LIBDIR)
+        && LIBDIR[prefix_len] == dir_static[prefix_len])
         prefix_len++;
 
     /* Check that suffix matches between static and dynamic libdir paths. */
     char *filepath = NULL;
-    size_t suffix_len = strlen(PKGLIBDIR) - prefix_len;
-    size_t pkglibdir_len = strlen(pkglibdir);
+    size_t suffix_len = strlen(LIBDIR) - prefix_len;
+    size_t libdir_len = strlen(libdir);
 
-    if (suffix_len > pkglibdir_len
-     || memcmp(PKGLIBDIR + prefix_len,
-               pkglibdir + (pkglibdir_len - suffix_len), suffix_len)) {
-        suffix_len = pkglibdir_len;
+    if (suffix_len > libdir_len
+     || memcmp(LIBDIR + prefix_len, libdir + (libdir_len - suffix_len),
+               suffix_len)) {
+        suffix_len = libdir_len;
         prefix_len = 0;
     }
 
     /* Graft non-common static suffix to dynamically computed common prefix. */
     const char *fmt = (filename != NULL) ? "%.*s%s/%s" : "%.*s%s";
 
-    if (unlikely(asprintf(&filepath, fmt, (int)(pkglibdir_len - suffix_len),
-                          pkglibdir, dir_static + prefix_len, filename) == -1))
+    if (unlikely(asprintf(&filepath, fmt, (int)(libdir_len - suffix_len),
+                          libdir, dir_static + prefix_len, filename) == -1))
         filepath = NULL;
 
-    free(pkglibdir);
+    free(libdir);
     return filepath;
 }
 

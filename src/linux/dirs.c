@@ -65,8 +65,7 @@ static char *config_GetLibDirRaw(void)
             continue;
         *file = '\0';
 
-        if (asprintf (&path, "%s/"PACKAGE, dir) == -1)
-            path = NULL;
+        path = strdup(dir);
         break;
     }
 
@@ -74,11 +73,11 @@ static char *config_GetLibDirRaw(void)
     fclose (maps);
 error:
     if (path == NULL)
-        path = strdup(PKGLIBDIR);
+        path = strdup(LIBDIR);
     return path;
 }
 
-static char cached_path[PATH_MAX] = PKGLIBDIR;
+static char cached_path[PATH_MAX] = LIBDIR;
 
 static void config_GetLibDirOnce(void)
 {
