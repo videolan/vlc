@@ -101,7 +101,7 @@ static vlc_fourcc_t CodecTagToFourcc( uint32_t codec_tag )
 {
     // convert from little-endian avcodec codec_tag to VLC native-endian fourcc
 #ifdef WORDS_BIGENDIAN
-    return bswap32(codec_tag);
+    return vlc_bswap32(codec_tag);
 #else
     return codec_tag;
 #endif

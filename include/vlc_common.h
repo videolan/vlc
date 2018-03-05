@@ -754,14 +754,14 @@ VLC_USED static inline int vlc_popcount(unsigned long long x)
 
 /** Byte swap (16 bits) */
 VLC_USED
-static inline uint16_t (bswap16)(uint16_t x)
+static inline uint16_t vlc_bswap16(uint16_t x)
 {
     return (x << 8) | (x >> 8);
 }
 
 /** Byte swap (32 bits) */
 VLC_USED
-static inline uint32_t (bswap32)(uint32_t x)
+static inline uint32_t vlc_bswap32(uint32_t x)
 {
 #if defined (__GNUC__) || defined(__clang__)
     return __builtin_bswap32 (x);
@@ -775,7 +775,7 @@ static inline uint32_t (bswap32)(uint32_t x)
 
 /** Byte swap (64 bits) */
 VLC_USED
-static inline uint64_t (bswap64)(uint64_t x)
+static inline uint64_t vlc_bswap64(uint64_t x)
 {
 #if defined (__GNUC__) || defined(__clang__)
     return __builtin_bswap64 (x);
@@ -968,9 +968,9 @@ VLC_API char const * vlc_error( int ) VLC_USED;
 # define hton32(i) ((uint32_t)(i))
 # define hton64(i) ((uint64_t)(i))
 #else
-# define hton16(i) bswap16(i)
-# define hton32(i) bswap32(i)
-# define hton64(i) bswap64(i)
+# define hton16(i) vlc_bswap16(i)
+# define hton32(i) vlc_bswap32(i)
+# define hton64(i) vlc_bswap64(i)
 #endif
 #define ntoh16(i) hton16(i)
 #define ntoh32(i) hton32(i)
@@ -1018,7 +1018,7 @@ static inline uint16_t GetWLE (const void *p)
 
     memcpy (&x, p, sizeof (x));
 #ifdef WORDS_BIGENDIAN
-    x = bswap16 (x);
+    x = vlc_bswap16 (x);
 #endif
     return x;
 }
@@ -1031,7 +1031,7 @@ static inline uint32_t GetDWLE (const void *p)
 
     memcpy (&x, p, sizeof (x));
 #ifdef WORDS_BIGENDIAN
-    x = bswap32 (x);
+    x = vlc_bswap32 (x);
 #endif
     return x;
 }
@@ -1044,7 +1044,7 @@ static inline uint64_t GetQWLE (const void *p)
 
     memcpy (&x, p, sizeof (x));
 #ifdef WORDS_BIGENDIAN
-    x = bswap64 (x);
+    x = vlc_bswap64 (x);
 #endif
     return x;
 }
@@ -1074,7 +1074,7 @@ static inline void SetQWBE (void *p, uint64_t qw)
 static inline void SetWLE (void *p, uint16_t w)
 {
 #ifdef WORDS_BIGENDIAN
-    w = bswap16 (w);
+    w = vlc_bswap16 (w);
 #endif
     memcpy (p, &w, sizeof (w));
 }
@@ -1083,7 +1083,7 @@ static inline void SetWLE (void *p, uint16_t w)
 static inline void SetDWLE (void *p, uint32_t dw)
 {
 #ifdef WORDS_BIGENDIAN
-    dw = bswap32 (dw);
+    dw = vlc_bswap32 (dw);
 #endif
     memcpy (p, &dw, sizeof (dw));
 }
@@ -1092,7 +1092,7 @@ static inline void SetDWLE (void *p, uint32_t dw)
 static inline void SetQWLE (void *p, uint64_t qw)
 {
 #ifdef WORDS_BIGENDIAN
-    qw = bswap64 (qw);
+    qw = vlc_bswap64 (qw);
 #endif
     memcpy (p, &qw, sizeof (qw));
 }

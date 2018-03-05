@@ -1204,7 +1204,7 @@ static void AobExtract( block_t *p_aout_buffer,
                                  | (p_block->p_buffer[2*i_src+1] << 16)
                                  | (p_block->p_buffer[4*g->i_channels+i_src] <<  8);
 #ifdef WORDS_BIGENDIAN
-                        *p_out32 = bswap32(*p_out32);
+                        *p_out32 = vlc_bswap32(*p_out32);
 #endif
                         i_aout_written += 4;
                     }
@@ -1215,7 +1215,7 @@ static void AobExtract( block_t *p_aout_buffer,
                                  | (p_block->p_buffer[2*i_src+1] << 16)
                                  | (((p_block->p_buffer[4*g->i_channels+i_src] << ((!n)?0:4) ) & 0xf0) <<  8);
 #ifdef WORDS_BIGENDIAN
-                        *p_out32 = bswap32(*p_out32);
+                        *p_out32 = vlc_bswap32(*p_out32);
 #endif
                         i_aout_written += 4;
                     }
@@ -1238,7 +1238,7 @@ static void AobExtract( block_t *p_aout_buffer,
                             *p_out32 = (p_block->p_buffer[2*i_src+0] << 24)
                                      | (p_block->p_buffer[2*i_src+1] << 16);
 #ifdef WORDS_BIGENDIAN
-                            *p_out32 = bswap32(*p_out32);
+                            *p_out32 = vlc_bswap32(*p_out32);
 #endif
                             i_aout_written += 4;
                         }

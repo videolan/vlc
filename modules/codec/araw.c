@@ -662,7 +662,7 @@ static void U16IEncode( void *outp, const uint8_t *inp, unsigned samples )
     uint16_t *out = outp;
 
     for( size_t i = 0; i < samples; i++ )
-        *(out++) =  bswap16( *(in++) + 0x8000 );
+        *(out++) =  vlc_bswap16( *(in++) + 0x8000 );
 }
 
 static void U16NEncode( void *outp, const uint8_t *inp, unsigned samples )
@@ -736,7 +736,7 @@ static void U32IEncode( void *outp, const uint8_t *inp, unsigned samples )
     uint32_t *out = outp;
 
     for( size_t i = 0; i < samples; i++ )
-        *(out++) =  bswap32( *(in++) + 0x80000000 );
+        *(out++) =  vlc_bswap32( *(in++) + 0x80000000 );
 }
 
 static void U32NEncode( void *outp, const uint8_t *inp, unsigned samples )
@@ -754,7 +754,7 @@ static void S32IEncode( void *outp, const uint8_t *inp, unsigned samples )
     int32_t *out = outp;
 
     for( size_t i = 0; i < samples; i++ )
-        *(out++) = bswap32( *(in++) );
+        *(out++) = vlc_bswap32( *(in++) );
 }
 
 static void F32IEncode( void *outp, const uint8_t *inp, unsigned samples )
@@ -767,7 +767,7 @@ static void F32IEncode( void *outp, const uint8_t *inp, unsigned samples )
         union { float f; uint32_t u; char b[4]; } s;
 
         s.f = *(in++);
-        s.u = bswap32( s.u );
+        s.u = vlc_bswap32( s.u );
         memcpy( out, s.b, 4 );
         out += 4;
     }
@@ -783,7 +783,7 @@ static void F64IEncode( void *outp, const uint8_t *inp, unsigned samples )
         union { double d; uint64_t u; char b[8]; } s;
 
         s.d = *(in++);
-        s.u = bswap64( s.u );
+        s.u = vlc_bswap64( s.u );
         memcpy( out, s.b, 8 );
         out += 8;
     }

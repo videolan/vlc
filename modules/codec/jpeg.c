@@ -216,13 +216,13 @@ de_get16( void * ptr, uint endian ) {
     if ( endian == G_BIG_ENDIAN )
     {
         #ifndef WORDS_BIGENDIAN
-        val = bswap16( val );
+        val = vlc_bswap16( val );
         #endif
     }
     else
     {
         #ifdef WORDS_BIGENDIAN
-        val = bswap16( val );
+        val = vlc_bswap16( val );
         #endif
     }
     return val;
@@ -236,13 +236,13 @@ de_get32( void * ptr, uint endian ) {
     if ( endian == G_BIG_ENDIAN )
     {
         #ifndef WORDS_BIGENDIAN
-        val = bswap32( val );
+        val = vlc_bswap32( val );
         #endif
     }
     else
     {
         #ifdef WORDS_BIGENDIAN
-        val = bswap32( val );
+        val = vlc_bswap32( val );
         #endif
     }
     return val;

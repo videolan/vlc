@@ -2543,7 +2543,7 @@ static inline uint32_t GetDW24BE( const uint8_t *p )
 {
     uint32_t i = ( p[0] << 16 ) + ( p[1] << 8 ) + ( p[2] );
 #ifdef WORDS_BIGENDIAN
-    i = bswap32(i);
+    i = vlc_bswap32(i);
 #endif
     return i;
 }
