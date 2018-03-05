@@ -193,7 +193,12 @@ static int Create( vlc_object_t *p_this )
      || infmt->i_rate != outfmt->i_rate
      || infmt->i_format != VLC_CODEC_FL32 )
         return VLC_EGENERIC;
-    if( infmt->i_physical_channels == outfmt->i_physical_channels )
+
+    /* trivial is the lowest priority converter: if chan_mode are different
+     * here, this filter will still need to convert channels (and ignore
+     * chan_mode). */
+    if( infmt->i_physical_channels == outfmt->i_physical_channels
+     && infmt->i_chan_mode == outfmt->i_chan_mode )
         return VLC_EGENERIC;
 
     p_filter->p_sys = NULL;
