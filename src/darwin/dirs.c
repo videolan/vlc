@@ -126,7 +126,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
             psz_path = "%s/Library/Preferences/%s";
             break;
         case VLC_TEMPLATES_DIR:
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
             psz_path = "%s/Library/Application Support/%s";
             break;
         case VLC_CACHE_DIR:
@@ -172,7 +172,7 @@ char *config_GetUserDir (vlc_userdir_t type)
     switch (type) {
         case VLC_CONFIG_DIR:
         case VLC_TEMPLATES_DIR:
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
         case VLC_CACHE_DIR:
             return getAppDependentDir(type);
 

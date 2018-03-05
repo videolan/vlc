@@ -100,7 +100,7 @@ static char * getAddonInstallDir( addon_type_t t )
 {
     const char *psz_subdir = NULL;
     char *psz_dir;
-    char *psz_userdir = config_GetUserDir( VLC_DATA_DIR );
+    char *psz_userdir = config_GetUserDir( VLC_USERDATA_DIR );
     if ( !psz_userdir ) return NULL;
 
     for ( unsigned int i=0; i< ARRAY_SIZE(addons_dirs); i++ )
@@ -542,7 +542,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
     char *psz_file;
     char *psz_file_tmp;
     char *psz_tempstring;
-    char *psz_userdir = config_GetUserDir( VLC_DATA_DIR );
+    char *psz_userdir = config_GetUserDir( VLC_USERDATA_DIR );
     if ( !psz_userdir ) return VLC_ENOMEM;
 
     if ( asprintf( &psz_file, "%s%s", psz_userdir, ADDONS_CATALOG ) < 1 )
@@ -671,7 +671,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
 static int LoadCatalog( addons_finder_t *p_finder )
 {
     char *psz_path;
-    char * psz_userdir = config_GetUserDir( VLC_DATA_DIR );
+    char * psz_userdir = config_GetUserDir( VLC_USERDATA_DIR );
     if ( !psz_userdir ) return VLC_ENOMEM;
 
     if ( asprintf( &psz_path, "%s%s", psz_userdir, ADDONS_CATALOG ) < 1 )

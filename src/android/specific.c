@@ -273,7 +273,7 @@ char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
             return config_GetHomeDir(".share",
                 "/sdcard/Android/data/org.videolan.vlc");
         case VLC_CACHE_DIR:

@@ -301,7 +301,7 @@ typedef enum vlc_userdir
 {
     VLC_HOME_DIR, /* User's home */
     VLC_CONFIG_DIR, /* VLC-specific configuration directory */
-    VLC_DATA_DIR, /* VLC-specific data directory */
+    VLC_USERDATA_DIR, /* VLC-specific data directory */
     VLC_CACHE_DIR, /* VLC-specific user cached data directory */
     /* Generic directories (same as XDG) */
     VLC_DESKTOP_DIR=0x80,

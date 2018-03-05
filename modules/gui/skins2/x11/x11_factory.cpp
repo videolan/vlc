@@ -86,7 +86,7 @@ bool X11Factory::init()
                                      ConnectionNumber( pDisplay ) );
 
     // Initialize the resource path
-    char *datadir = config_GetUserDir( VLC_DATA_DIR );
+    char *datadir = config_GetUserDir( VLC_USERDATA_DIR );
     m_resourcePath.push_back( (std::string)datadir + "/skins2" );
     free( datadir );
     m_resourcePath.push_back( (std::string)"share/skins2" );

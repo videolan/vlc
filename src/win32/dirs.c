@@ -259,7 +259,7 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_HOME_DIR:
             return config_GetShellDir (CSIDL_PERSONAL);
         case VLC_CONFIG_DIR:
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
             return config_GetAppDir ();
         case VLC_CACHE_DIR:
 #if !VLC_WINSTORE_APP

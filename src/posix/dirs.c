@@ -216,7 +216,7 @@ char *config_GetUserDir (vlc_userdir_t type)
             break;
         case VLC_CONFIG_DIR:
             return config_GetAppDir ("CONFIG", ".config");
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
             return config_GetAppDir ("DATA", ".local/share");
         case VLC_CACHE_DIR:
             return config_GetAppDir ("CACHE", ".cache");

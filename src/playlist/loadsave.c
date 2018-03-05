@@ -129,7 +129,7 @@ static void input_item_subitem_tree_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    char *psz_datadir = config_GetUserDir( VLC_DATA_DIR );
+    char *psz_datadir = config_GetUserDir( VLC_USERDATA_DIR );
     if( !psz_datadir ) /* XXX: This should never happen */
     {
         msg_Err( p_playlist, "no data directory, cannot load media library") ;
@@ -180,7 +180,7 @@ int playlist_MLDump( playlist_t *p_playlist )
 {
     char *psz_temp;
 
-    psz_temp = config_GetUserDir( VLC_DATA_DIR );
+    psz_temp = config_GetUserDir( VLC_USERDATA_DIR );
 
     if( !psz_temp ) /* XXX: This should never happen */
     {

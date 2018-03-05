@@ -79,7 +79,7 @@ char *config_GetUserDir (vlc_userdir_t type)
     {
         case VLC_HOME_DIR:
         case VLC_CONFIG_DIR:
-        case VLC_DATA_DIR:
+        case VLC_USERDATA_DIR:
         case VLC_CACHE_DIR:
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:

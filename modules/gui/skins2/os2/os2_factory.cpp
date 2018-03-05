@@ -217,7 +217,7 @@ bool OS2Factory::init()
     changeCursor( kDefaultArrow );
 
     // Initialize the resource path
-    char *datadir = config_GetUserDir( VLC_DATA_DIR );
+    char *datadir = config_GetUserDir( VLC_USER_DATA_DIR );
     m_resourcePath.push_back( (std::string)datadir + "\\skins" );
     free( datadir );
     datadir = config_GetDataDir();
