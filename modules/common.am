@@ -8,7 +8,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 NULL =
-pluginsdir = $(vlclibdir)/plugins
+pluginsdir = $(pkglibdir)/plugins
 BUILT_SOURCES =
 CLEANFILES = $(BUILT_SOURCES)
 

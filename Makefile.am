@@ -166,14 +166,14 @@ install-exec-hook:
 		PATH="$(DESTDIR)$(bindir):$$PATH" \
 		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
 		"$(DESTDIR)$(pkglibexecdir)/vlc-cache-gen$(EXEEXT)" \
-			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
+			 "$(DESTDIR)$(pkglibdir)/plugins" ; \
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
 endif
 
 uninstall-hook:
-	rm -f -- "$(DESTDIR)$(vlclibdir)/plugins/plugins.dat"
+	rm -f -- "$(DESTDIR)$(pkglibdir)/plugins/plugins.dat"
 
 ###############################################################################
 # Test coverage

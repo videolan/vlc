@@ -171,7 +171,7 @@ AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DMODULE_STRING=\"core\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
-	-DPKGLIBDIR=\"$(vlclibdir)\"
+	-DPKGLIBDIR=\"$(pkglibdir)\"
 AM_CFLAGS = $(CFLAGS_libvlccore)
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
