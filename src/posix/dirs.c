@@ -48,8 +48,9 @@ VLC_WEAK char *config_GetLibDir(void)
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 {
     static const char env_vars[][16] = {
-        [VLC_PKG_LIB_DIR] = "VLC_LIB_PATH",
         [VLC_PKG_DATA_DIR] = "VLC_DATA_PATH",
+        [VLC_PKG_LIB_DIR] = "VLC_LIB_PATH",
+        [VLC_PKG_LIBEXEC_DIR] = "VLC_LIB_PATH",
     };
 
     if (type < ARRAY_SIZE(env_vars)) {
@@ -66,9 +67,12 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
         return NULL; /* OOM */
 
     static const char *const dirs[] = {
-        [VLC_PKG_LIB_DIR] = PKGLIBDIR,
         [VLC_PKG_DATA_DIR] = PKGDATADIR,
+        [VLC_PKG_LIB_DIR] = PKGLIBDIR,
+        [VLC_PKG_LIBEXEC_DIR] = PKGLIBEXECDIR,
         [VLC_SYSDATA_DIR] = SYSDATADIR,
+        [VLC_LIB_DIR] = LIBDIR,
+        [VLC_LIBEXEC_DIR] = LIBEXECDIR,
     };
     assert(type < ARRAY_SIZE(dirs));
 
