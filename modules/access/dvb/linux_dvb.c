@@ -381,7 +381,7 @@ static int ScanParametersDvbS( vlc_object_t *p_access, dvb_sys_t *p_sys, scan_pa
     char *psz_name = var_InheritString( p_access, "dvb-satellite" );
     if( psz_name )
     {
-        char *data_dir = config_GetSysPath(VLC_PKG_DATA_DIR, "dvb/dvb-s");
+        char *data_dir = config_GetSysPath(VLC_SYSDATA_DIR, "dvb/dvb-s");
         if( !data_dir || -1 ==  asprintf( &p_scan->psz_scanlist_file,
             "%s/%s", data_dir, psz_name ) )
         {
