@@ -2068,19 +2068,26 @@ pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder
     vlc_mutex_unlock(&pic_holder->lock);
 }
 
-static void pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
+static int pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
 {
     const uint8_t reserved_fields = 2 * (pic->i_nb_fields < 2 ? 2 : pic->i_nb_fields);
 
     vlc_mutex_lock(&pic_holder->lock);
 
-
-    while (pic_holder->field_reorder_max != 0
+    /* Wait 200 ms max. We can't really know what the video output will do with
+     * output pictures (will they be rendered immediately ?), so don't wait
+     * infinitely. The output will be paced anyway by the vlc_cond_timedwait()
+     * call. */
+    mtime_t deadline = mdate() + INT64_C(200000);
+    int ret = 0;
+    while (ret == 0 && pic_holder->field_reorder_max != 0
         && pic_holder->nb_field_out >= pic_holder->field_reorder_max + reserved_fields)
-        vlc_cond_wait(&pic_holder->wait, &pic_holder->lock);
+        ret = vlc_cond_timedwait(&pic_holder->wait, &pic_holder->lock, deadline);
     pic_holder->nb_field_out += pic->i_nb_fields;
 
     vlc_mutex_unlock(&pic_holder->lock);
+
+    return ret;
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
@@ -2179,7 +2186,9 @@ static void DecoderCallback(void *decompressionOutputRefCon,
          * FIXME: A proper way to fix this issue is to allow decoder modules to
          * specify the dpb and having the vout re-allocating output frames when
          * this number changes. */
-        pic_holder_wait(p_sys->pic_holder, p_pic);
+        if (pic_holder_wait(p_sys->pic_holder, p_pic))
+            msg_Warn(p_dec, "pic_holder_wait timed out");
+
 
         vlc_mutex_lock(&p_sys->lock);
 
