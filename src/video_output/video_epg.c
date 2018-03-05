@@ -77,8 +77,8 @@ struct subpicture_updater_sys_t
 static char * GetDefaultArtUri( void )
 {
     char *psz_uri = NULL;
-    char *psz_path = config_GetSysPath(VLC_PKG_DATA_DIR,
-                                       "icons/128x128/"PACKAGE_NAME".png");
+    char *psz_path = config_GetSysPath(VLC_SYSDATA_DIR, "icons/hicolor/"
+                                       "128x128/"PACKAGE_NAME".png");
     if( psz_path != NULL )
     {
         psz_uri = vlc_path2uri( psz_path, NULL );
