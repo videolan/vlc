@@ -728,6 +728,13 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     p_track->fmt.video.mastering.max_luminance = BOXDATA(p_SmDm)->i_luminanceMax;
                     p_track->fmt.video.mastering.min_luminance = BOXDATA(p_SmDm)->i_luminanceMin;
                 }
+
+                const MP4_Box_t *p_CoLL = MP4_BoxGet( p_sample, "CoLL" );
+                if( p_CoLL && BOXDATA(p_CoLL) )
+                {
+                    p_track->fmt.video.lighting.MaxCLL = BOXDATA(p_CoLL)->i_maxCLL;
+                    p_track->fmt.video.lighting.MaxFALL = BOXDATA(p_CoLL)->i_maxFALL;
+                }
             }
         }
         break;
