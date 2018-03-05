@@ -1270,12 +1270,14 @@ typedef struct
 
 typedef struct
 {
+    uint8_t i_version;
     uint8_t i_profile;
     uint8_t i_level;
     uint8_t i_bit_depth;
-    uint8_t i_color_space;
     uint8_t i_chroma_subsampling;
+    uint8_t i_color_primaries;
     uint8_t i_xfer_function;
+    uint8_t i_matrix_coeffs;
     uint8_t i_fullrange;
     uint16_t i_codec_init_datasize;
     uint8_t *p_codec_init_data;

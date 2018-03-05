@@ -5,6 +5,7 @@ Demux:
  * Fix wrong colors in some AVI files
  * Fix IFO files playback
  * Fix a crash with missing/invalid MPEG SDT
+ * Update VP8/9/10 ISOBMFF bindings
 
 Audio output:
  * Fix mmdevice default audio device handling
