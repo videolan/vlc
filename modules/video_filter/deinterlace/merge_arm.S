@@ -18,7 +18,7 @@
  @ Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  @****************************************************************************/
 
-#include "../arm_neon/asm.S"
+#include "../../arm_neon/asm.S"
 
 	.syntax	unified
 #if HAVE_AS_ARCH_DIRECTIVE
