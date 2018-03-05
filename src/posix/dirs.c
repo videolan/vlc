@@ -45,39 +45,6 @@ VLC_WEAK char *config_GetLibDir(void)
     return strdup(PKGLIBDIR);
 }
 
-/**
- * Determines the shared data directory
- *
- * @return a nul-terminated string or NULL. Use free() to release it.
- */
-static char *config_GetDataDir(void)
-{
-    char *libdir = config_GetLibDir();
-    if (libdir == NULL)
-        return NULL; /* OOM */
-
-    /* Look for common prefix between lib and data directories. */
-    size_t prefix_len = 0;
-    while (PKGLIBDIR[prefix_len] == PKGDATADIR[prefix_len])
-    {
-        if (PKGLIBDIR[prefix_len] == '\0')
-            return libdir; /* corner case: directories are identical */
-        prefix_len++;
-    }
-
-    char *datadir = NULL;
-
-    char *p = strstr(libdir, PKGLIBDIR + prefix_len);
-    if (p != NULL)
-    {
-        if (unlikely(asprintf(&datadir, "%.*s%s", (int)(p - libdir), libdir,
-                              PKGDATADIR + prefix_len) == -1))
-            datadir = NULL;
-    }
-    free (libdir);
-    return (datadir != NULL) ? datadir : strdup (PKGDATADIR);
-}
-
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 {
     static const char env_vars[][16] = {
@@ -94,28 +61,44 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
          }
     }
 
-    char *dir;
+    char *pkglibdir = config_GetLibDir();
+    if (pkglibdir == NULL)
+        return NULL; /* OOM */
 
-    switch (type)
-    {
-        case VLC_PKG_DATA_DIR:
-            dir = config_GetDataDir();
-            break;
-        case VLC_PKG_LIB_DIR:
-            dir = config_GetLibDir();
-            break;
-        default:
-            vlc_assert_unreachable();
+    static const char *const dirs[] = {
+        [VLC_PKG_LIB_DIR] = PKGLIBDIR,
+        [VLC_PKG_DATA_DIR] = PKGDATADIR,
+    };
+    assert(type < ARRAY_SIZE(dirs));
+
+    const char *dir_static = dirs[type];
+    /* Look for common static prefix. */
+    size_t prefix_len = 0;
+    while (prefix_len < strlen(PKGLIBDIR)
+        && PKGLIBDIR[prefix_len] == dir_static[prefix_len])
+        prefix_len++;
+
+    /* Check that suffix matches between static and dynamic libdir paths. */
+    char *filepath = NULL;
+    size_t suffix_len = strlen(PKGLIBDIR) - prefix_len;
+    size_t pkglibdir_len = strlen(pkglibdir);
+
+    if (suffix_len > pkglibdir_len
+     || memcmp(PKGLIBDIR + prefix_len,
+               pkglibdir + (pkglibdir_len - suffix_len), suffix_len)) {
+        suffix_len = pkglibdir_len;
+        prefix_len = 0;
     }
 
-    if (filename == NULL || unlikely(dir == NULL))
-        return dir;
+    /* Graft non-common static suffix to dynamically computed common prefix. */
+    const char *fmt = (filename != NULL) ? "%.*s%s/%s" : "%.*s%s";
 
-    char *path;
-    if (unlikely(asprintf(&path, "%s/%s", dir, filename) == -1))
-        path = NULL;
-    free(dir);
-    return path;
+    if (unlikely(asprintf(&filepath, fmt, (int)(pkglibdir_len - suffix_len),
+                          pkglibdir, dir_static + prefix_len, filename) == -1))
+        filepath = NULL;
+
+    free(pkglibdir);
+    return filepath;
 }
 
 static char *config_GetHomeDir (void)
