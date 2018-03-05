@@ -162,12 +162,12 @@ static int Open(vlc_object_t *this)
         [VLCOpenGLES2VideoView performSelectorOnMainThread:@selector(getNewView:)
                                              withObject:[NSValue valueWithPointer:&sys->glESView]
                                           waitUntilDone:YES];
-        [sys->glESView setVoutDisplay:vd];
-
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
             goto bailout;
         }
+
+        [sys->glESView setVoutDisplay:vd];
 
         [sys->glESView performSelectorOnMainThread:@selector(fetchViewContainer) withObject:nil waitUntilDone:YES];
         if (!sys->viewContainer) {
