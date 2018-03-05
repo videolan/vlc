@@ -385,6 +385,7 @@ typedef int64_t stime_t;
 #define ATOM_gstd VLC_FOURCC( 'g', 's', 't', 'd' )
 #define ATOM_colr VLC_FOURCC( 'c', 'o', 'l', 'r' )
 #define ATOM_SmDm VLC_FOURCC( 'S', 'm', 'D', 'm' )
+#define ATOM_CoLL VLC_FOURCC( 'C', 'o', 'L', 'L' )
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )
@@ -1294,6 +1295,12 @@ typedef struct
 
 typedef struct
 {
+    uint16_t i_maxCLL;
+    uint16_t i_maxFALL;
+} MP4_Box_data_CoLL_t;
+
+typedef struct
+{
     WAVEFORMATEX Format;
     uint32_t i_extra;
     char    *p_extra;
@@ -1692,6 +1699,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_load_t *p_load;
     MP4_Box_data_vpcC_t *p_vpcC;
     MP4_Box_data_SmDm_t *p_SmDm;
+    MP4_Box_data_CoLL_t *p_CoLL;
 
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;
