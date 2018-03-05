@@ -413,7 +413,7 @@ static const vlc_fourcc_t p_D3D11_OPAQUE_10B_fallback[] = {
 };
 
 static const vlc_fourcc_t p_D3D11_OPAQUE_RGBA_fallback[] = {
-    VLC_CODEC_D3D11_OPAQUE, VLC_CODEC_RGBA, 0,
+    VLC_CODEC_D3D11_OPAQUE_RGBA, VLC_CODEC_RGBA, 0,
 };
 
 static const vlc_fourcc_t p_I440_fallback[] = {
