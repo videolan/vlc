@@ -34,7 +34,7 @@ icons128dir = $(iconsdatadir)/128x128/apps
 icons256dir = $(iconsdatadir)/256x256/apps
 
 if !HAVE_WIN32
-dist_vlcdata_DATA = icons/vlc.ico
+dist_pkgdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
 dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
 			icons/32x32/vlc-xmas.xpm
@@ -43,7 +43,7 @@ dist_icons128_DATA = icons/128x128/vlc.png icons/128x128/vlc-xmas.png \
                      icons/128x128/vlc-kb.png
 dist_icons256_DATA = icons/256x256/vlc.png
 
-nobase_dist_vlcdata_SCRIPTS = \
+nobase_dist_pkgdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
@@ -56,12 +56,12 @@ EXTRA_DIST += \
 	$(DIST_http_lua) \
 	$(DIST_solid)
 
-nobase_vlcdata_DATA =
+nobase_pkgdata_DATA =
 nobase_vlclib_DATA =
-nobase_dist_vlcdata_DATA =
+nobase_dist_pkgdata_DATA =
 if BUILD_SKINS
-nobase_vlcdata_DATA += skins2/default.vlt
-nobase_dist_vlcdata_DATA += $(DIST_skins2)
+nobase_pkgdata_DATA += skins2/default.vlt
+nobase_dist_pkgdata_DATA += $(DIST_skins2)
 endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
@@ -177,7 +177,7 @@ nobase_doc_DATA = \
 	lua/sd/icast.lua \
 	$(NULL)
 
-nobase_dist_vlcdata_DATA += \
+nobase_dist_pkgdata_DATA += \
 	lua/http/view.html \
 	lua/http/mobile.html \
 	lua/http/dialogs/create_stream.html \
@@ -238,7 +238,7 @@ nobase_dist_vlcdata_DATA += \
 	lua/http/js/jquery.jstree.js \
 	lua/http/js/controllers.js
 endif
-MOSTLYCLEANFILES += $(nobase_vlcdata_DATA)
+MOSTLYCLEANFILES += $(nobase_pkgdata_DATA)
 
 EXTRA_DIST += \
 	lua/README.txt \
