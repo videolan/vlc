@@ -278,6 +278,11 @@ typedef enum vlc_system_dir
                            data directory (e.g. /usr/local/data/vlc). */
     VLC_PKG_LIB_DIR, /**< Package-specific architecture-dependent read-only
                           data directory (e.g. /usr/local/lib/vlc). */
+    VLC_PKG_LIBEXEC_DIR_RESERVED,
+    VLC_PKG_INCLUDE_DIR_RESERVED,
+    VLC_SYSDATA_DIR, /**< Global architecture-independent read-only
+                          data directory (e.g. /usr/local/data).
+                          Available only on some platforms. */
 } vlc_sysdir_t;
 
 /**

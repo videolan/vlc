@@ -68,10 +68,12 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     static const char *const dirs[] = {
         [VLC_PKG_LIB_DIR] = PKGLIBDIR,
         [VLC_PKG_DATA_DIR] = PKGDATADIR,
+        [VLC_SYSDATA_DIR] = SYSDATADIR,
     };
     assert(type < ARRAY_SIZE(dirs));
 
     const char *dir_static = dirs[type];
+    assert(*dir_static != '\0');
     /* Look for common static prefix. */
     size_t prefix_len = 0;
     while (prefix_len < strlen(LIBDIR)

@@ -214,7 +214,7 @@ static char *config_GetDataDir(void)
 
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 {
-    char *dir;
+    char *dir = NULL;
 
     switch (type)
     {
@@ -223,6 +223,8 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             break;
         case VLC_PKG_LIB_DIR:
             dir = config_GetLibDir();
+            break;
+        case VLC_SYSDATA_DIR:
             break;
         default:
             vlc_assert_unreachable();

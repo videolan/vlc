@@ -169,6 +169,7 @@ lib_LTLIBRARIES = libvlccore.la
 
 AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DMODULE_STRING=\"core\" \
+	-DSYSDATADIR=\"$(datadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
