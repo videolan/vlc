@@ -1981,20 +1981,35 @@ static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_size < 6 )
         MP4_READBOX_EXIT( 0 );
 
-    uint8_t i_version;
-    MP4_GET1BYTE( i_version );
-    if( i_version != 0 )
+    MP4_GET1BYTE( p_vpcC->i_version );
+    if( p_vpcC->i_version > 1 )
         MP4_READBOX_EXIT( 0 );
 
     MP4_GET1BYTE( p_vpcC->i_profile );
     MP4_GET1BYTE( p_vpcC->i_level );
     MP4_GET1BYTE( p_vpcC->i_bit_depth );
-    p_vpcC->i_color_space = p_vpcC->i_bit_depth & 0x0F;
-    p_vpcC->i_bit_depth >>= 4;
-    MP4_GET1BYTE( p_vpcC->i_chroma_subsampling );
-    p_vpcC->i_xfer_function = ( p_vpcC->i_chroma_subsampling & 0x0F ) >> 1;
-    p_vpcC->i_fullrange = p_vpcC->i_chroma_subsampling & 0x01;
-    p_vpcC->i_chroma_subsampling >>= 4;
+
+    /* Deprecated one
+       https://github.com/webmproject/vp9-dash/blob/master/archive/VPCodecISOMediaFileFormatBinding-v0.docx */
+    if( p_vpcC->i_version == 0 )
+    {
+        p_vpcC->i_color_primaries = p_vpcC->i_bit_depth & 0x0F;
+        p_vpcC->i_bit_depth >>= 4;
+        MP4_GET1BYTE( p_vpcC->i_chroma_subsampling );
+        p_vpcC->i_xfer_function = ( p_vpcC->i_chroma_subsampling & 0x0F ) >> 1;
+        p_vpcC->i_fullrange = p_vpcC->i_chroma_subsampling & 0x01;
+        p_vpcC->i_chroma_subsampling >>= 4;
+    }
+    else
+    {
+        p_vpcC->i_chroma_subsampling = ( p_vpcC->i_bit_depth & 0x0F ) >> 1;
+        p_vpcC->i_fullrange = p_vpcC->i_bit_depth & 0x01;
+        p_vpcC->i_bit_depth >>= 4;
+        MP4_GET1BYTE( p_vpcC->i_color_primaries );
+        MP4_GET1BYTE( p_vpcC->i_xfer_function );
+        MP4_GET1BYTE( p_vpcC->i_matrix_coeffs );
+    }
+
     MP4_GET2BYTES( p_vpcC->i_codec_init_datasize );
     if( p_vpcC->i_codec_init_datasize > i_read )
         p_vpcC->i_codec_init_datasize = i_read;
