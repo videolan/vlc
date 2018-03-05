@@ -14,6 +14,8 @@ $(TARBALLS)/libdvdcss-$(DVDCSS_VERSION).tar.bz2:
 
 dvdcss: libdvdcss-$(DVDCSS_VERSION).tar.bz2 .sum-dvdcss
 	$(UNPACK)
+	$(APPLY) $(SRC)/dvdcss/fix-buffer-overflow.patch
+	$(APPLY) $(SRC)/dvdcss/fix-uninit-ptr-free.patch
 	$(MOVE)
 
 .dvdcss: dvdcss
