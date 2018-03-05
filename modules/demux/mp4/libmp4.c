@@ -1993,6 +1993,21 @@ static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_SmDm_t, NULL );
+    MP4_Box_data_SmDm_t *p_SmDm = p_box->data.p_SmDm;
+
+    for(int i=0; i<6; i++)
+        MP4_GET2BYTES( p_SmDm->primaries[i] );
+    for(int i=0; i<2; i++)
+        MP4_GET2BYTES( p_SmDm->white_point[i] );
+    MP4_GET4BYTES( p_SmDm->i_luminanceMax );
+    MP4_GET4BYTES( p_SmDm->i_luminanceMin );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_WMA2( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_WMA2->p_extra );
@@ -4425,6 +4440,7 @@ static const struct
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp08 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp09 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp10 },
+    { ATOM_SmDm,    MP4_ReadBox_SmDm,         ATOM_vpcC }, /* vpx mastering display */
     { ATOM_dac3,    MP4_ReadBox_dac3,         0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         0 },
     { ATOM_dvc1,    MP4_ReadBox_dvc1,         ATOM_vc1  },
