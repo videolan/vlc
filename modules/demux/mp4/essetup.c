@@ -717,6 +717,17 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                                 p_data->i_codec_init_datasize );
                     }
                 }
+
+                const MP4_Box_t *p_SmDm = MP4_BoxGet( p_sample, "SmDm" );
+                if( p_SmDm && BOXDATA(p_SmDm) )
+                {
+                    memcpy( p_track->fmt.video.mastering.primaries,
+                            BOXDATA(p_SmDm)->primaries, sizeof(uint16_t) * 6 );
+                    memcpy( p_track->fmt.video.mastering.white_point,
+                            BOXDATA(p_SmDm)->white_point, sizeof(uint16_t) * 2 );
+                    p_track->fmt.video.mastering.max_luminance = BOXDATA(p_SmDm)->i_luminanceMax;
+                    p_track->fmt.video.mastering.min_luminance = BOXDATA(p_SmDm)->i_luminanceMin;
+                }
             }
         }
         break;
