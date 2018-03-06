@@ -97,6 +97,9 @@ vlc_module_end ()
     BOOL _appActive;
     BOOL _placeInvalidated;
 
+    UIView *_viewContainer;
+    UITapGestureRecognizer *_tapRecognizer;
+
     /* Written from MT, read locked from vout */
     vout_display_place_t _place;
     CGSize _viewSize;
@@ -111,6 +114,7 @@ vlc_module_end ()
 @property GLuint shaderProgram;
 
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
+- (void)cleanAndRelease;
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (BOOL)makeCurrent:(EAGLContext **)previousEaglContext;
@@ -120,14 +124,11 @@ vlc_module_end ()
 - (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl;
 - (void)getPlaceLocked:(vout_display_place_t *)place;
 - (void)reshape;
-- (void)propagateDimensionsToVoutCore;
 @end
 
 struct vout_display_sys_t
 {
     VLCOpenGLES2VideoView *glESView;
-    UIView *viewContainer;
-    UITapGestureRecognizer *tapRecognizer;
 
     vlc_gl_t *gl;
 
@@ -176,13 +177,8 @@ static int Open(vlc_object_t *this)
                                              waitUntilDone:YES];
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
-            goto bailout;
-        }
-
-        [sys->glESView performSelectorOnMainThread:@selector(fetchViewContainer) withObject:nil waitUntilDone:YES];
-        if (!sys->viewContainer) {
-            msg_Err(vd, "Fetching view container failed");
-            goto bailout;
+            var_Destroy(vd->obj.parent, "ios-eaglcontext");
+            return VLC_EGENERIC;
         }
 
         const vlc_fourcc_t *subpicture_chromas;
@@ -253,17 +249,7 @@ static void Close (vlc_object_t *this)
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {
-        if (sys->tapRecognizer) {
-            [sys->tapRecognizer.view performSelectorOnMainThread:@selector(removeGestureRecognizer:) withObject:sys->tapRecognizer waitUntilDone:YES];
-            [sys->tapRecognizer release];
-        }
-
         var_Destroy (vd, "drawable-nsobject");
-        @synchronized(sys->viewContainer) {
-            [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
-            [sys->viewContainer performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-        }
-        sys->viewContainer = nil;
 
         if (sys->gl != NULL) {
             struct gl_sys *glsys = sys->gl->sys;
@@ -278,7 +264,7 @@ static void Close (vlc_object_t *this)
             vlc_object_release(sys->gl);
         }
 
-        [sys->glESView release];
+        [sys->glESView cleanAndRelease];
     }
     var_Destroy(vd->obj.parent, "ios-eaglcontext");
 }
@@ -453,67 +439,94 @@ static void GLESSwap(vlc_gl_t *gl)
     [self releaseCurrent:previousEaglContext];
 
     [self createBuffers];
-    [self reshape];
+
+    if (![self fetchViewContainer])
+    {
+        vlc_mutex_destroy(&_mutex);
+        [_eaglContext release];
+        return nil;
+    }
 
     return self;
 }
 
-- (void)fetchViewContainer
+- (BOOL)fetchViewContainer
 {
     @try {
         /* get the object we will draw into */
         UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
         if (unlikely(viewContainer == nil)) {
             msg_Err(_voutDisplay, "provided view container is nil");
-            return;
+            return NO;
         }
 
         if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
             msg_Err(_voutDisplay, "void pointer not an ObjC object");
-            return;
+            return NO;
         }
 
         [viewContainer retain];
 
-        @synchronized(viewContainer) {
-            if (![viewContainer isKindOfClass:[UIView class]]) {
-                msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
-                return;
-            }
-
-            vout_display_sys_t *sys = _voutDisplay->sys;
-
-            /* This will be released in Close(), on
-             * main thread, after we are done using it. */
-            sys->viewContainer = viewContainer;
-
-            self.frame = viewContainer.bounds;
-            [self reshape];
-
-            [sys->viewContainer addSubview:self];
-
-            /* add tap gesture recognizer for DVD menus and stuff */
-            sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                         action:@selector(tapRecognized:)];
-            if (sys->viewContainer.window) {
-                if (sys->viewContainer.window.rootViewController) {
-                    if (sys->viewContainer.window.rootViewController.view)
-                        [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
-                }
-            }
-            sys->tapRecognizer.cancelsTouchesInView = NO;
+        if (![viewContainer isKindOfClass:[UIView class]]) {
+            msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
+            return NO;
         }
+
+        /* This will be released in Close(), on
+         * main thread, after we are done using it. */
+        _viewContainer = viewContainer;
+
+        self.frame = viewContainer.bounds;
+        [self reshape];
+
+        [_viewContainer addSubview:self];
+
+        /* add tap gesture recognizer for DVD menus and stuff */
+        _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                 action:@selector(tapRecognized:)];
+        if (_viewContainer.window
+         && _viewContainer.window.rootViewController
+         && _viewContainer.window.rootViewController.view)
+            [_viewContainer.superview addGestureRecognizer:_tapRecognizer];
+        _tapRecognizer.cancelsTouchesInView = NO;
+        return YES;
     } @catch (NSException *exception) {
         msg_Err(_voutDisplay, "Handling the view container failed due to an Obj-C exception (%s, %s", [exception.name UTF8String], [exception.reason UTF8String]);
         vout_display_sys_t *sys = _voutDisplay->sys;
-        sys->viewContainer = nil;
+        if (_tapRecognizer)
+            [_tapRecognizer release];
+        return NO;
     }
+}
+
+- (void)cleanAndRelease
+{
+    if (![NSThread isMainThread])
+    {
+        vlc_mutex_lock(&_mutex);
+        _voutDisplay = nil;
+        vlc_mutex_unlock(&_mutex);
+
+        [self performSelectorOnMainThread:@selector(cleanAndRelease)
+                               withObject:nil
+                            waitUntilDone:NO];
+        return;
+    }
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
+    [_tapRecognizer release];
+
+    [self removeFromSuperview];
+    [_viewContainer release];
+
+    [_eaglContext release];
+    [self release];
 }
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [_eaglContext release];
     vlc_mutex_destroy(&_mutex);
     [super dealloc];
 }
@@ -651,6 +664,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (void)getPlaceLocked:(vout_display_place_t *)place
 {
+    assert(_voutDisplay);
     vout_display_cfg_t cfg = _cfg;
 
     cfg.display.width  = _viewSize.width * _scaleFactor;
@@ -670,6 +684,11 @@ static void GLESSwap(vlc_gl_t *gl)
     }
 
     vlc_mutex_lock(&_mutex);
+    if (!_voutDisplay)
+    {
+        vlc_mutex_unlock(&_mutex);
+        return;
+    }
     _viewSize = [self bounds].size;
     _scaleFactor = self.contentScaleFactor;
 
@@ -681,6 +700,7 @@ static void GLESSwap(vlc_gl_t *gl)
         _placeInvalidated = YES;
         _place = place;
     }
+
     vout_display_SendEventDisplaySize(_voutDisplay, _viewSize.width * _scaleFactor,
                                       _viewSize.height * _scaleFactor);
 
@@ -689,6 +709,13 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
 {
+    vlc_mutex_lock(&_mutex);
+    if (!_voutDisplay)
+    {
+        vlc_mutex_unlock(&_mutex);
+        return;
+    }
+
     UIGestureRecognizerState state = [tapRecognizer state];
     CGPoint touchPoint = [tapRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
@@ -698,6 +725,8 @@ static void GLESSwap(vlc_gl_t *gl)
 
     vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
     vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);
+
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl
