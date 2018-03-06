@@ -493,9 +493,7 @@ static void GLESSwap(vlc_gl_t *gl)
             self.frame = viewContainer.bounds;
             [self reshape];
 
-            [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
-                                                 withObject:self
-                                              waitUntilDone:YES];
+            [sys->viewContainer addSubview:self];
 
             /* add tap gesture recognizer for DVD menus and stuff */
             sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
