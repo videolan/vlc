@@ -581,19 +581,36 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &tk->fmt, VIDEO_ES,
                         AVI_FourccGetCodec( VIDEO_ES, p_vids->p_bih->biCompression ) );
 
+                /* Extradata is the remainder of the chunk less the BIH */
+                const uint8_t *p_bihextra = (const uint8_t *) &p_vids->p_bih[1];
+                size_t i_bihextra;
+                if( p_vids->i_chunk_size <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) )
+                    i_bihextra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
+                else
+                    i_bihextra = 0;
+
                 if( p_vids->p_bih->biCompression == BI_RGB )
                 {
                     switch( p_vids->p_bih->biBitCount )
                     {
                         case 32:
                             tk->fmt.i_codec = VLC_CODEC_RGB32;
+                            tk->fmt.video.i_bmask = 0xff000000;
+                            tk->fmt.video.i_gmask = 0x00ff0000;
+                            tk->fmt.video.i_rmask = 0x0000ff00;
                             break;
                         case 24:
-                            tk->fmt.i_codec = VLC_CODEC_RGB24;
+                            tk->fmt.i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
+                            tk->fmt.video.i_bmask = 0x00ff0000;
+                            tk->fmt.video.i_gmask = 0x0000ff00;
+                            tk->fmt.video.i_rmask = 0x000000ff;
                             break;
                         case 16: /* Yes it is RV15 */
-                        case 15:
+                        case 15: /* RGB (B least 5 bits) */
                             tk->fmt.i_codec = VLC_CODEC_RGB15;
+                            tk->fmt.video.i_rmask = 0x7c00;
+                            tk->fmt.video.i_gmask = 0x03e0;
+                            tk->fmt.video.i_bmask = 0x001f;
                             break;
                         case 9: /* <- TODO check that */
                             tk->fmt.i_codec = VLC_CODEC_I410;
@@ -604,53 +621,33 @@ static int Open( vlc_object_t * p_this )
                             else
                                 tk->fmt.i_codec = VLC_CODEC_GREY;
                             break;
+                        default:
+                            if( p_vids->p_bih->biClrUsed < 8 )
+                                tk->fmt.i_codec = VLC_CODEC_RGBP;
+                            break;
                     }
 
-                    switch( tk->fmt.i_codec )
+                    if( tk->fmt.i_codec == VLC_CODEC_RGBP )
                     {
-                    case VLC_CODEC_RGB32:
-                        tk->fmt.video.i_bmask = 0xff000000;
-                        tk->fmt.video.i_gmask = 0x00ff0000;
-                        tk->fmt.video.i_rmask = 0x0000ff00;
-                        break;
-                    case VLC_CODEC_RGB24: /* BGR (see biBitCount) */
-                        tk->fmt.video.i_bmask = 0x00ff0000;
-                        tk->fmt.video.i_gmask = 0x0000ff00;
-                        tk->fmt.video.i_rmask = 0x000000ff;
-                        break;
-                    case VLC_CODEC_RGB15: /* RGB (B least 5 bits) */
-                        tk->fmt.video.i_rmask = 0x7c00;
-                        tk->fmt.video.i_gmask = 0x03e0;
-                        tk->fmt.video.i_bmask = 0x001f;
-                        break;
-                    case VLC_CODEC_RGBP:
-                    {
-                        const VLC_BITMAPINFO *p_bi = (const VLC_BITMAPINFO *) p_vids->p_bih;
+                        /* The palette should not be included in biSize, but come
+                         * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
                         tk->fmt.video.p_palette = malloc( sizeof(video_palette_t) );
                         if ( tk->fmt.video.p_palette )
                         {
-                            uint32_t entry;
-                            for( uint32_t j = 0; j < p_vids->p_bih->biClrUsed; j++ )
+                            tk->fmt.video.p_palette->i_entries = __MIN(i_bihextra/4, 256);
+                            for( int k = 0; k < tk->fmt.video.p_palette->i_entries; k++ )
                             {
-                                 entry = GetDWBE( &p_bi->bmiColors[j] );
-                                 tk->fmt.video.p_palette->palette[j][0] = entry >> 24;
-                                 tk->fmt.video.p_palette->palette[j][1] = (entry >> 16) & 0xFF;
-                                 tk->fmt.video.p_palette->palette[j][2] = (entry >> 8) & 0xFF;
-                                 tk->fmt.video.p_palette->palette[j][3] = entry & 0xFF;
+                                for( int j = 0; j < 4; j++ )
+                                    tk->fmt.video.p_palette->palette[k][j] = p_bihextra[4*k+j];
                             }
-                            tk->fmt.video.p_palette->i_entries = p_vids->p_bih->biClrUsed;
                         }
-                    }
-                        break;
-                    default:
-                        break;
                     }
 
                     tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
                     /* RGB DIB are coded from bottom to top */
                     if ( p_vids->p_bih->biHeight < INT32_MAX ) tk->b_flipped = true;
                 }
-                else
+                else /* Compressed codecs */
                 {
                     tk->fmt.i_codec = p_vids->p_bih->biCompression;
                     if( tk->fmt.i_codec == VLC_CODEC_MP4V &&
@@ -658,6 +655,20 @@ static int Open( vlc_object_t * p_this )
                     {
                         tk->fmt.i_codec           =
                         tk->fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
+                    }
+
+                    /* Cop extradata if any */
+                    if( i_bihextra > 0 )
+                    {
+                        tk->fmt.p_extra = malloc( i_bihextra );
+                        if( unlikely(tk->fmt.p_extra == NULL) )
+                        {
+                            es_format_Clean( &tk->fmt );
+                            free( tk );
+                            goto error;
+                        }
+                        tk->fmt.i_extra = i_bihextra;
+                        memcpy( tk->fmt.p_extra, p_bihextra, i_bihextra );
                     }
                 }
                 tk->i_samplesize = 0;
@@ -687,23 +698,6 @@ static int Open( vlc_object_t * p_this )
                     tk->fmt.video.i_sar_den = ((i_frame_aspect_ratio >>  0) & 0xffff) *
                                               tk->fmt.video.i_width;
                 }
-                /* Extradata is the remainder of the chunk less the BIH */
-                if( p_vids->i_chunk_size <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) )
-                {
-                    int i_extra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
-                    if( i_extra > 0 )
-                    {
-                        tk->fmt.p_extra = malloc( i_extra );
-                        if( unlikely(tk->fmt.p_extra == NULL) )
-                        {
-                            es_format_Clean( &tk->fmt );
-                            free( tk );
-                            goto error;
-                        }
-                        tk->fmt.i_extra = i_extra;
-                        memcpy( tk->fmt.p_extra, &p_vids->p_bih[1], tk->fmt.i_extra );
-                    }
-                }
 
                 msg_Dbg( p_demux, "stream[%u] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
@@ -711,28 +705,6 @@ static int Open( vlc_object_t * p_this )
                          (uint32_t)p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
-
-                /* Extract palette from extradata if bpp <= 8 */
-                if( tk->fmt.video.i_bits_per_pixel > 0 && tk->fmt.video.i_bits_per_pixel <= 8 )
-                {
-                    /* The palette should not be included in biSize, but come
-                     * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
-                    if( tk->fmt.i_extra > 0 )
-                    {
-                        free( tk->fmt.video.p_palette );
-                        tk->fmt.video.p_palette = calloc( 1, sizeof(video_palette_t) );
-                        if( likely(tk->fmt.video.p_palette) )
-                        {
-                            const uint8_t *p_pal = tk->fmt.p_extra;
-                            tk->fmt.video.p_palette->i_entries = __MIN(tk->fmt.i_extra/4, 256);
-                            for( int k = 0; k < tk->fmt.video.p_palette->i_entries; k++ )
-                            {
-                                for( int j = 0; j < 4; j++ )
-                                    tk->fmt.video.p_palette->palette[k][j] = p_pal[4*k+j];
-                            }
-                        }
-                    }
-                }
                 break;
             }
 
