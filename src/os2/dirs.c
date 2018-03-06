@@ -78,6 +78,9 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             break;
         case VLC_SYSDATA_DIR:
             break;
+        case VLC_LOCALE_DIR:
+            dir = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
+            break;
         default:
             vlc_assert_unreachable();
     }

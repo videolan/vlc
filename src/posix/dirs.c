@@ -73,6 +73,7 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
         [VLC_SYSDATA_DIR] = SYSDATADIR,
         [VLC_LIB_DIR] = LIBDIR,
         [VLC_LIBEXEC_DIR] = LIBEXECDIR,
+        [VLC_LOCALE_DIR] = LOCALEDIR,
     };
     assert(type < ARRAY_SIZE(dirs));
 

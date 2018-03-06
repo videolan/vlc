@@ -289,6 +289,7 @@ typedef enum vlc_system_dir
     VLC_LIBEXEC_DIR, /**< Global executable read-only directory
                           (e.g. /usr/local/libexec). */
     VLC_INCLUDE_DIR_RESERVED,
+    VLC_LOCALE_DIR, /**< Base directory for package read-only locale data. */
 } vlc_sysdir_t;
 
 /**
