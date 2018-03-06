@@ -124,7 +124,6 @@ struct vout_display_sys_t
     UITapGestureRecognizer *tapRecognizer;
 
     vlc_gl_t *gl;
-    vout_display_opengl_t *vgl;
 
     picture_pool_t *picturePool;
 };
@@ -132,6 +131,7 @@ struct vout_display_sys_t
 struct gl_sys
 {
     VLCOpenGLES2VideoView *glESView;
+    vout_display_opengl_t *vgl;
     EAGLContext *previousEaglContext;
 };
 
@@ -191,6 +191,7 @@ static int Open(vlc_object_t *this)
         if (unlikely(!sys->gl->sys))
             goto bailout;
         glsys->glESView = sys->glESView;
+        glsys->vgl = NULL;
         /* Initialize common OpenGL video display */
         sys->gl->makeCurrent = GLESMakeCurrent;
         sys->gl->releaseCurrent = GLESReleaseCurrent;
@@ -202,11 +203,12 @@ static int Open(vlc_object_t *this)
 
         var_SetAddress(vd->obj.parent, "ios-eaglcontext", [sys->glESView eaglContext]);
 
-        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
-                                           sys->gl, &vd->cfg->viewpoint);
+        vout_display_opengl_t *vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
+                                                             sys->gl, &vd->cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
-        if (!sys->vgl)
+        if (!vgl)
             goto bailout;
+        glsys->vgl = vgl;
 
         /* */
         vout_display_info_t info = vd->info;
@@ -261,12 +263,13 @@ static void Close (vlc_object_t *this)
         sys->viewContainer = nil;
 
         if (sys->gl != NULL) {
+            struct gl_sys *glsys = sys->gl->sys;
             msg_Dbg(this, "deleting display");
 
-            if (likely(sys->vgl))
+            if (likely(glsys->vgl))
             {
                 vlc_gl_MakeCurrent(sys->gl);
-                vout_display_opengl_Delete(sys->vgl);
+                vout_display_opengl_Delete(glsys->vgl);
                 vlc_gl_ReleaseCurrent(sys->gl);
             }
             vlc_object_release(sys->gl);
@@ -284,6 +287,7 @@ static void Close (vlc_object_t *this)
 static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct gl_sys *glsys = sys->gl->sys;
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
@@ -340,7 +344,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-            return vout_display_opengl_SetViewpoint(sys->vgl,
+            return vout_display_opengl_SetViewpoint(glsys->vgl,
                 &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
 
         case VOUT_DISPLAY_RESET_PICTURES:
@@ -354,9 +358,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct gl_sys *glsys = sys->gl->sys;
+
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vout_display_opengl_Display(sys->vgl, &vd->source);
+        vout_display_opengl_Display(glsys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
 
@@ -369,9 +375,11 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct gl_sys *glsys = sys->gl->sys;
+
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+        vout_display_opengl_Prepare(glsys->vgl, pic, subpicture);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
 }
@@ -379,10 +387,11 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct gl_sys *glsys = sys->gl->sys;
 
     if (!sys->picturePool && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        sys->picturePool = vout_display_opengl_GetPool(sys->vgl, requested_count);
+        sys->picturePool = vout_display_opengl_GetPool(glsys->vgl, requested_count);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
     return sys->picturePool;
