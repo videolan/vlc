@@ -101,10 +101,10 @@ vlc_module_end ()
 }
 @property (readonly) GLuint renderBuffer;
 @property (readonly) GLuint frameBuffer;
-@property (readwrite) vout_display_t* voutDisplay;
 @property (readonly) EAGLContext* eaglContext;
 @property GLuint shaderProgram;
 
+- (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
@@ -162,15 +162,16 @@ static int Open(vlc_object_t *this)
 
     @autoreleasepool {
         /* setup the actual OpenGL ES view */
+
         [VLCOpenGLES2VideoView performSelectorOnMainThread:@selector(getNewView:)
-                                             withObject:[NSValue valueWithPointer:&sys->glESView]
-                                          waitUntilDone:YES];
+                                                withObject:[NSArray arrayWithObjects:
+                                                           [NSValue valueWithPointer:&sys->glESView],
+                                                           [NSValue valueWithPointer:vd], nil]
+                                             waitUntilDone:YES];
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
             goto bailout;
         }
-
-        [sys->glESView setVoutDisplay:vd];
 
         [sys->glESView performSelectorOnMainThread:@selector(fetchViewContainer) withObject:nil waitUntilDone:YES];
         if (!sys->viewContainer) {
@@ -251,8 +252,6 @@ static void Close (vlc_object_t *this)
             [sys->tapRecognizer.view performSelectorOnMainThread:@selector(removeGestureRecognizer:) withObject:sys->tapRecognizer waitUntilDone:YES];
             [sys->tapRecognizer release];
         }
-
-        [sys->glESView setVoutDisplay:nil];
 
         var_Destroy (vd, "drawable-nsobject");
         @synchronized(sys->viewContainer) {
@@ -422,20 +421,21 @@ static void GLESSwap(vlc_gl_t *gl)
  * Our UIView object
  *****************************************************************************/
 @implementation VLCOpenGLES2VideoView
-@synthesize voutDisplay = _voutDisplay, eaglContext = _eaglContext;
+@synthesize eaglContext = _eaglContext;
 
 + (Class)layerClass
 {
     return [CAEAGLLayer class];
 }
 
-+ (void)getNewView:(NSValue *)value
++ (void)getNewView:(NSArray *)value
 {
-    id *ret = [value pointerValue];
-    *ret = [[self alloc] initWithFrame:CGRectMake(0.,0.,320.,240.)];
+    id *ret = [[value objectAtIndex:0] pointerValue];
+    vout_display_t *vd = [[value objectAtIndex:1] pointerValue];
+    *ret = [[self alloc] initWithFrameAndVd:CGRectMake(0.,0.,320.,240.) withVd:vd];
 }
 
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd
 {
     self = [super initWithFrame:frame];
 
@@ -445,6 +445,8 @@ static void GLESSwap(vlc_gl_t *gl)
     _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
     if (unlikely(!_appActive))
         return nil;
+
+    _voutDisplay = vd;
 
     vlc_mutex_init(&_mutex);
 
@@ -471,21 +473,10 @@ static void GLESSwap(vlc_gl_t *gl)
 
     [self releaseCurrent:previousEaglContext];
 
-    return self;
-}
-
-- (void)setVoutDisplay:(vout_display_t *)vd
-{
-    _voutDisplay = vd;
-
     [self createBuffers];
-
     [self reshape];
-}
 
-- (vout_display_t *)voutDisplay
-{
-    return _voutDisplay;
+    return self;
 }
 
 - (void)fetchViewContainer
@@ -581,10 +572,8 @@ static void GLESSwap(vlc_gl_t *gl)
     [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        if (_voutDisplay)
-            msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
-    }
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
     [self releaseCurrent:previousEaglContext];
 }
@@ -671,17 +660,15 @@ static void GLESSwap(vlc_gl_t *gl)
     CGFloat scaleFactor = self.contentScaleFactor;
     vout_display_place_t place;
 
-    if (_voutDisplay) {
-        vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
+    vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
 
-        cfg_tmp.display.width  = viewSize.width * scaleFactor;
-        cfg_tmp.display.height = viewSize.height * scaleFactor;
+    cfg_tmp.display.width  = viewSize.width * scaleFactor;
+    cfg_tmp.display.height = viewSize.height * scaleFactor;
 
-        vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
-        vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
-                                          viewSize.height * scaleFactor);
-        [self setPlace:&place];
-    }
+    vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
+    vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
+                                      viewSize.height * scaleFactor);
+    [self setPlace:&place];
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
