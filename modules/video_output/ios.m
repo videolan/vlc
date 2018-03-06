@@ -66,9 +66,9 @@ static int Control(vout_display_t*, int, va_list);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
-static int OpenglESLock(vlc_gl_t *);
-static void OpenglESSwap(vlc_gl_t *);
-static void OpenglESUnlock(vlc_gl_t *);
+static int GLESMakeCurrent(vlc_gl_t *);
+static void GLESSwap(vlc_gl_t *);
+static void GLESReleaseCurrent(vlc_gl_t *);
 
 /**
  * Module declaration
@@ -105,8 +105,8 @@ vlc_module_end ()
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
-- (void)lock;
-- (void)unlock;
+- (void)makeCurrent;
+- (void)releaseCurrent;
 
 - (void)reshape;
 - (void)propagateDimensionsToVoutCore;
@@ -188,9 +188,9 @@ static int Open(vlc_object_t *this)
             goto bailout;
         glsys->glESView = sys->glESView;
         /* Initialize common OpenGL video display */
-        sys->gl->makeCurrent = OpenglESLock;
-        sys->gl->releaseCurrent = OpenglESUnlock;
-        sys->gl->swap = OpenglESSwap;
+        sys->gl->makeCurrent = GLESMakeCurrent;
+        sys->gl->releaseCurrent = GLESReleaseCurrent;
+        sys->gl->swap = GLESSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
@@ -394,26 +394,26 @@ static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
 /*****************************************************************************
  * vout opengl callbacks
  *****************************************************************************/
-static int OpenglESLock(vlc_gl_t *gl)
+static int GLESMakeCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
     if (unlikely(![sys->glESView isAppActive]))
         return VLC_EGENERIC;
 
-    [sys->glESView lock];
+    [sys->glESView makeCurrent];
     [sys->glESView resetBuffers];
     return VLC_SUCCESS;
 }
 
-static void OpenglESUnlock(vlc_gl_t *gl)
+static void GLESReleaseCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    [sys->glESView unlock];
+    [sys->glESView releaseCurrent];
 }
 
-static void OpenglESSwap(vlc_gl_t *gl)
+static void GLESSwap(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
@@ -452,8 +452,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     /* the following creates a new OpenGL ES context with the API version we
      * need if there is already an active context created by another OpenGL
-     * provider we cache it and restore analog to the lock/unlock pattern used
-     * through-out the class */
+     * provider we cache it and restore analog to the
+     * makeCurrent/releaseCurrent pattern used through-out the class */
     _previousEaglContext = [EAGLContext currentContext];
 
     _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -469,7 +469,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    [self unlock];
+    [self releaseCurrent];
 
     return self;
 }
@@ -569,7 +569,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
-    [self lock];
+    [self makeCurrent];
 
     glDisable(GL_DEPTH_TEST);
 
@@ -587,7 +587,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
             msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 
-    [self unlock];
+    [self releaseCurrent];
 }
 
 - (void)destroyBuffers
@@ -600,7 +600,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
-    [self lock];
+    [self makeCurrent];
 
     /* clear frame buffer */
     glDeleteFramebuffers(1, &_frameBuffer);
@@ -610,7 +610,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
     glDeleteRenderbuffers(1, &_renderBuffer);
     _renderBuffer = 0;
 
-    [self unlock];
+    [self releaseCurrent];
 }
 
 - (void)resetBuffers
@@ -622,13 +622,13 @@ static void OpenglESSwap(vlc_gl_t *gl)
     }
 }
 
-- (void)lock
+- (void)makeCurrent
 {
     _previousEaglContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
 }
 
-- (void)unlock
+- (void)releaseCurrent
 {
     [EAGLContext setCurrentContext:_previousEaglContext];
 }
@@ -650,7 +650,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
-    [self lock];
+    [self makeCurrent];
 
     CGSize viewSize = [self bounds].size;
     CGFloat scaleFactor = self.contentScaleFactor;
@@ -670,7 +670,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
-    [self unlock];
+    [self releaseCurrent];
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
