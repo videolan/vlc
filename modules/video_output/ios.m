@@ -107,12 +107,12 @@ vlc_module_end ()
     /* Written from vout, read locked from MT */
     vout_display_cfg_t _cfg;
 }
-@property (readonly) EAGLContext* eaglContext;
 
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
 - (void)cleanAndRelease;
 - (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
+- (void)presentRenderbuffer;
 
 - (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl;
 - (void)getPlaceLocked:(vout_display_place_t *)place;
@@ -198,8 +198,6 @@ static int Open(vlc_object_t *this)
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
             goto bailout;
-
-        var_SetAddress(vd->obj.parent, "ios-eaglcontext", [sys->glESView eaglContext]);
 
         vout_display_opengl_t *vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
                                                              sys->gl, &vd->cfg->viewpoint);
@@ -361,7 +359,7 @@ static void GLESSwap(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
+    [sys->glESView presentRenderbuffer];
 }
 
 
@@ -369,7 +367,6 @@ static void GLESSwap(vlc_gl_t *gl)
  * Our UIView object
  *****************************************************************************/
 @implementation VLCOpenGLES2VideoView
-@synthesize eaglContext = _eaglContext;
 
 + (Class)layerClass
 {
@@ -417,6 +414,9 @@ static void GLESSwap(vlc_gl_t *gl)
         return nil;
     }
     [self releaseCurrent:previousEaglContext];
+
+    /* Set "ios-eaglcontext" to be used by cvpx fitlers/glconv */
+    var_SetAddress(_voutDisplay->obj.parent, "ios-eaglcontext", _eaglContext);
 
     _layer = (CAEAGLLayer *)self.layer;
     _layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
@@ -621,6 +621,11 @@ static void GLESSwap(vlc_gl_t *gl)
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext
 {
     [EAGLContext setCurrentContext:previousEaglContext];
+}
+
+- (void)presentRenderbuffer
+{
+    [_eaglContext presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 - (void)layoutSubviews
