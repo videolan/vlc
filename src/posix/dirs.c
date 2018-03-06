@@ -57,8 +57,14 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
         const char *name = env_vars[type];
          if (*name != '\0') {
              const char *value = getenv(name);
-             if (value != NULL)
-                 return strdup(value);
+             if (value != NULL) {
+                 const char *fmt = (filename != NULL) ? "%s/%s" : "%s";
+                 char *filepath;
+
+                 if (unlikely(asprintf(&filepath, fmt, value, filename) == -1))
+                     filepath = NULL;
+                 return filepath;
+             }
          }
     }
 
