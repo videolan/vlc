@@ -88,7 +88,6 @@ vlc_module_end ()
 @interface VLCOpenGLES2VideoView : UIView {
     vout_display_t *_voutDisplay;
     EAGLContext *_eaglContext;
-    EAGLContext *_previousEaglContext;
     GLuint _renderBuffer;
     GLuint _frameBuffer;
 
@@ -97,20 +96,20 @@ vlc_module_end ()
     BOOL _bufferNeedReset;
     BOOL _appActive;
 
+    /* Written from MT, read locked from vout */
     vout_display_place_t _place;
 }
 @property (readonly) GLuint renderBuffer;
 @property (readonly) GLuint frameBuffer;
 @property (readwrite) vout_display_t* voutDisplay;
 @property (readonly) EAGLContext* eaglContext;
-@property (readonly) BOOL isAppActive;
 @property GLuint shaderProgram;
 
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
-- (void)makeCurrent;
-- (void)releaseCurrent;
+- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext;
+- (void)releaseCurrent:(EAGLContext *)previousEaglContext;
 
 - (void)setPlace:(const vout_display_place_t *)place;
 - (void)reshape;
@@ -133,6 +132,7 @@ struct vout_display_sys_t
 struct gl_sys
 {
     VLCOpenGLES2VideoView *glESView;
+    EAGLContext *previousEaglContext;
 };
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
@@ -396,10 +396,9 @@ static int GLESMakeCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    if (unlikely(![sys->glESView isAppActive]))
+    if (![sys->glESView makeCurrent:&sys->previousEaglContext])
         return VLC_EGENERIC;
 
-    [sys->glESView makeCurrent];
     [sys->glESView resetBuffers];
     return VLC_SUCCESS;
 }
@@ -408,15 +407,14 @@ static void GLESReleaseCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    [sys->glESView releaseCurrent];
+    [sys->glESView releaseCurrent:sys->previousEaglContext];
 }
 
 static void GLESSwap(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    if (likely([sys->glESView isAppActive]))
-        [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
+    [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 
@@ -424,7 +422,7 @@ static void GLESSwap(vlc_gl_t *gl)
  * Our UIView object
  *****************************************************************************/
 @implementation VLCOpenGLES2VideoView
-@synthesize voutDisplay = _voutDisplay, eaglContext = _eaglContext, isAppActive = _appActive;
+@synthesize voutDisplay = _voutDisplay, eaglContext = _eaglContext;
 
 + (Class)layerClass
 {
@@ -454,7 +452,7 @@ static void GLESSwap(vlc_gl_t *gl)
      * need if there is already an active context created by another OpenGL
      * provider we cache it and restore analog to the
      * makeCurrent/releaseCurrent pattern used through-out the class */
-    _previousEaglContext = [EAGLContext currentContext];
+    EAGLContext *previousEaglContext = [EAGLContext currentContext];
 
     _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
@@ -471,7 +469,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    [self releaseCurrent];
+    [self releaseCurrent:previousEaglContext];
 
     return self;
 }
@@ -568,11 +566,9 @@ static void GLESSwap(vlc_gl_t *gl)
         return;
     }
 
-    if (unlikely(!_appActive)) {
+    EAGLContext *previousEaglContext;
+    if (![self makeCurrent:&previousEaglContext])
         return;
-    }
-
-    [self makeCurrent];
 
     glDisable(GL_DEPTH_TEST);
 
@@ -590,7 +586,7 @@ static void GLESSwap(vlc_gl_t *gl)
             msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 
-    [self releaseCurrent];
+    [self releaseCurrent:previousEaglContext];
 }
 
 - (void)destroyBuffers
@@ -603,7 +599,9 @@ static void GLESSwap(vlc_gl_t *gl)
         return;
     }
 
-    [self makeCurrent];
+    EAGLContext *previousEaglContext;
+    if (![self makeCurrent:&previousEaglContext])
+        return;
 
     /* clear frame buffer */
     glDeleteFramebuffers(1, &_frameBuffer);
@@ -613,7 +611,7 @@ static void GLESSwap(vlc_gl_t *gl)
     glDeleteRenderbuffers(1, &_renderBuffer);
     _renderBuffer = 0;
 
-    [self releaseCurrent];
+    [self releaseCurrent:previousEaglContext];
 }
 
 - (void)resetBuffers
@@ -625,15 +623,27 @@ static void GLESSwap(vlc_gl_t *gl)
     }
 }
 
-- (void)makeCurrent
+- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext
 {
-    _previousEaglContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
+    vlc_mutex_lock(&_mutex);
+
+    if (unlikely(!_appActive))
+    {
+        vlc_mutex_unlock(&_mutex);
+        return NO;
+    }
+
+    *previousEaglContext = [EAGLContext currentContext];
+
+    BOOL success = [EAGLContext setCurrentContext:_eaglContext];
+
+    vlc_mutex_unlock(&_mutex);
+    return success;
 }
 
-- (void)releaseCurrent
+- (void)releaseCurrent:(EAGLContext *)previousEaglContext
 {
-    [EAGLContext setCurrentContext:_previousEaglContext];
+    [EAGLContext setCurrentContext:previousEaglContext];
 }
 
 - (void)layoutSubviews
@@ -653,7 +663,9 @@ static void GLESSwap(vlc_gl_t *gl)
         return;
     }
 
-    [self makeCurrent];
+    EAGLContext *previousEaglContext;
+    if (![self makeCurrent:&previousEaglContext])
+        return;
 
     CGSize viewSize = [self bounds].size;
     CGFloat scaleFactor = self.contentScaleFactor;
@@ -673,7 +685,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
-    [self releaseCurrent];
+    [self releaseCurrent:previousEaglContext];
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
