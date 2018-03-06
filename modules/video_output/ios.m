@@ -92,8 +92,12 @@ vlc_module_end ()
     GLuint _renderBuffer;
     GLuint _frameBuffer;
 
+    vlc_mutex_t _mutex;
+
     BOOL _bufferNeedReset;
     BOOL _appActive;
+
+    vout_display_place_t _place;
 }
 @property (readonly) GLuint renderBuffer;
 @property (readonly) GLuint frameBuffer;
@@ -108,6 +112,7 @@ vlc_module_end ()
 - (void)makeCurrent;
 - (void)releaseCurrent;
 
+- (void)setPlace:(const vout_display_place_t *)place;
 - (void)reshape;
 - (void)propagateDimensionsToVoutCore;
 - (CGSize)viewSize;
@@ -123,8 +128,6 @@ struct vout_display_sys_t
     vout_display_opengl_t *vgl;
 
     picture_pool_t *picturePool;
-
-    vout_display_place_t place;
 };
 
 struct gl_sys
@@ -259,15 +262,13 @@ static void Close (vlc_object_t *this)
         sys->viewContainer = nil;
 
         if (sys->gl != NULL) {
-            @synchronized (sys->glESView) {
-                msg_Dbg(this, "deleting display");
+            msg_Dbg(this, "deleting display");
 
-                if (likely(sys->vgl))
-                {
-                    vlc_gl_MakeCurrent(sys->gl);
-                    vout_display_opengl_Delete(sys->vgl);
-                    vlc_gl_ReleaseCurrent(sys->gl);
-                }
+            if (likely(sys->vgl))
+            {
+                vlc_gl_MakeCurrent(sys->gl);
+                vout_display_opengl_Delete(sys->vgl);
+                vlc_gl_ReleaseCurrent(sys->gl);
             }
             vlc_object_release(sys->gl);
         }
@@ -324,9 +325,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
                 vout_display_place_t place;
                 vout_display_PlacePicture(&place, &vd->source, &cfg_tmp, false);
-                @synchronized (sys->glESView) {
-                    sys->place = place;
-                }
+
+                [sys->glESView setPlace:&place];
 
                 vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
 
@@ -355,12 +355,10 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    @synchronized (sys->glESView) {
-        if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
-        {
-            vout_display_opengl_Display(sys->vgl, &vd->source);
-            vlc_gl_ReleaseCurrent(sys->gl);
-        }
+    if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
+    {
+        vout_display_opengl_Display(sys->vgl, &vd->source);
+        vlc_gl_ReleaseCurrent(sys->gl);
     }
 
     picture_Release(pic);
@@ -450,6 +448,8 @@ static void GLESSwap(vlc_gl_t *gl)
     if (unlikely(!_appActive))
         return nil;
 
+    vlc_mutex_init(&_mutex);
+
     /* the following creates a new OpenGL ES context with the API version we
      * need if there is already an active context created by another OpenGL
      * provider we cache it and restore analog to the
@@ -458,10 +458,12 @@ static void GLESSwap(vlc_gl_t *gl)
 
     _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
-    if (unlikely(!_eaglContext))
+    if (unlikely(!_eaglContext)
+     || unlikely(![EAGLContext setCurrentContext:_eaglContext]))
+    {
+        vlc_mutex_destroy(&_mutex);
         return nil;
-    if (unlikely(![EAGLContext setCurrentContext:_eaglContext]))
-        return nil;
+    }
 
     CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
     layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
@@ -546,6 +548,7 @@ static void GLESSwap(vlc_gl_t *gl)
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_eaglContext release];
+    vlc_mutex_destroy(&_mutex);
     [super dealloc];
 }
 
@@ -663,9 +666,9 @@ static void GLESSwap(vlc_gl_t *gl)
         cfg_tmp.display.height = viewSize.height * scaleFactor;
 
         vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
-        _voutDisplay->sys->place = place;
         vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
                                           viewSize.height * scaleFactor);
+        [self setPlace:&place];
     }
 
     // x / y are top left corner, but we need the lower left one
@@ -678,24 +681,36 @@ static void GLESSwap(vlc_gl_t *gl)
     UIGestureRecognizerState state = [tapRecognizer state];
     CGPoint touchPoint = [tapRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
+    vlc_mutex_lock(&_mutex);
+    vout_display_place_t place = _place;
+    vlc_mutex_unlock(&_mutex);
     vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay, ORIENT_NORMAL,
                                                   (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor,
-                                                  &_voutDisplay->sys->place);
+                                                  &place);
 
     vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
     vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);
 }
 
+- (void)setPlace:(const vout_display_place_t *)place
+{
+    vlc_mutex_lock(&_mutex);
+    _place = *place;
+    vlc_mutex_unlock(&_mutex);
+}
+
 - (void)applicationStateChanged:(NSNotification *)notification
 {
-    @synchronized (self) {
+    vlc_mutex_lock(&_mutex);
+
     if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification]
         || [[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification]
         || [[notification name] isEqualToString:UIApplicationWillTerminateNotification])
         _appActive = NO;
     else
         _appActive = YES;
-    }
+
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)updateConstraints
