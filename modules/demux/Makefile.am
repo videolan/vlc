@@ -208,7 +208,7 @@ libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/mp4/languages.h \
                            demux/asf/asfpacket.c demux/asf/asfpacket.h \
                            demux/mp4/avci.h \
-                           demux/mp4/color_specs.h \
+                           demux/mp4/color_config.h \
                            demux/mp4/essetup.c demux/mp4/meta.c \
                            meta_engine/ID3Genres.h
 libmp4_plugin_la_LIBADD = $(LIBM)
