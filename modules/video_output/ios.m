@@ -123,7 +123,6 @@ vlc_module_end ()
 
 - (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl;
 - (void)getPlaceLocked:(vout_display_place_t *)place;
-- (void)reshape;
 @end
 
 struct vout_display_sys_t
@@ -234,7 +233,6 @@ static int Open(vlc_object_t *this)
                                                  selector:@selector(applicationStateChanged:)
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
-        [sys->glESView reshape];
         return VLC_SUCCESS;
 
     bailout:
@@ -675,13 +673,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (void)reshape
 {
-    if (![NSThread isMainThread])
-    {
-        [self performSelectorOnMainThread:@selector(reshape)
-                                                 withObject:nil
-                                              waitUntilDone:YES];
-        return;
-    }
+    assert([NSThread isMainThread]);
 
     vlc_mutex_lock(&_mutex);
     if (!_voutDisplay)
