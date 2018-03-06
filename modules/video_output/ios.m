@@ -224,15 +224,6 @@ static int Open(vlc_object_t *this)
         vd->display = PictureDisplay;
         vd->control = Control;
 
-        /* */
-        [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
-                                                 selector:@selector(applicationStateChanged:)
-                                                     name:UIApplicationWillResignActiveNotification
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
-                                                 selector:@selector(applicationStateChanged:)
-                                                     name:UIApplicationDidBecomeActiveNotification
-                                                   object:nil];
         return VLC_SUCCESS;
 
     bailout:
@@ -445,6 +436,15 @@ static void GLESSwap(vlc_gl_t *gl)
         return nil;
     }
 
+    /* */
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
     return self;
 }
 
