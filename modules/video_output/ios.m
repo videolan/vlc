@@ -229,9 +229,6 @@ static int Open(vlc_object_t *this)
         vd->display = PictureDisplay;
         vd->control = Control;
 
-        /* forward our dimensions to the vout core */
-        [sys->glESView performSelectorOnMainThread:@selector(propagateDimensionsToVoutCore) withObject:nil waitUntilDone:YES];
-
         /* */
         [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
                                                  selector:@selector(applicationStateChanged:)
@@ -750,17 +747,6 @@ static void GLESSwap(vlc_gl_t *gl)
 - (BOOL)acceptsFirstResponder
 {
     return YES;
-}
-
-- (void)propagateDimensionsToVoutCore
-{
-    CGFloat scaleFactor;
-    CGSize viewSize;
-    @synchronized(_voutDisplay->sys->viewContainer) {
-        scaleFactor = _voutDisplay->sys->viewContainer.contentScaleFactor;
-        viewSize = _voutDisplay->sys->viewContainer.bounds.size;
-    }
-    vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
 }
 
 @end
