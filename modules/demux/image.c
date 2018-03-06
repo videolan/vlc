@@ -416,6 +416,21 @@ static bool IsJfif(stream_t *s)
     return true;
 }
 
+static bool IsWebP(stream_t *s)
+{
+    const uint8_t *header;
+    if (vlc_stream_Peek(s, &header, 20) < 20) /* WebP header size */
+        return false;
+    if (memcmp(&header[0], "RIFF", 4))
+        return false;
+    /* TODO: support other chunk types */
+    if (memcmp(&header[8], "WEBPVP8 ", 8))
+        return false;
+    /* skip headers */
+    vlc_stream_Seek(s, 20);
+    return true;
+}
+
 static bool IsSpiff(stream_t *s)
 {
     const uint8_t *header;
@@ -615,6 +630,9 @@ static const image_format_t formats[] = {
     },
     { .codec = VLC_CODEC_JPEG,
       .detect = IsExif,
+    },
+    { .codec = VLC_CODEC_WEBP,
+      .detect = IsWebP,
     },
     { .codec = VLC_CODEC_BPG,
       .marker_size = 4,
