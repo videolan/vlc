@@ -589,7 +589,8 @@ static int Open( vlc_object_t * p_this )
                 else
                     i_bihextra = 0;
 
-                if( p_vids->p_bih->biCompression == BI_RGB )
+                if( p_vids->p_bih->biCompression == BI_RGB ||
+                    p_vids->p_bih->biCompression == BI_BITFIELDS )
                 {
                     switch( p_vids->p_bih->biBitCount )
                     {
@@ -627,7 +628,22 @@ static int Open( vlc_object_t * p_this )
                             break;
                     }
 
-                    if( tk->fmt.i_codec == VLC_CODEC_RGBP )
+                    if( p_vids->p_bih->biCompression == BI_BITFIELDS ) /* Only 16 & 32 */
+                    {
+                        if( i_bihextra >= 3 * sizeof(uint32_t) )
+                        {
+                            tk->fmt.video.i_rmask = GetDWLE( &p_bihextra[0] );
+                            tk->fmt.video.i_gmask = GetDWLE( &p_bihextra[4] );
+                            tk->fmt.video.i_bmask = GetDWLE( &p_bihextra[8] );
+                            if( i_bihextra >= 4 * sizeof(uint32_t) ) /* Alpha channel ? */
+                            {
+                                uint32_t i_alpha = GetDWLE( &p_bihextra[8] );
+                                if( tk->fmt.i_codec == VLC_CODEC_RGB32 && i_alpha == 0xFF )
+                                    tk->fmt.i_codec = VLC_CODEC_BGRA;
+                            }
+                        }
+                    }
+                    else if( tk->fmt.i_codec == VLC_CODEC_RGBP )
                     {
                         /* The palette should not be included in biSize, but come
                          * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
