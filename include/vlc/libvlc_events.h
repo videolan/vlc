@@ -48,12 +48,41 @@ enum libvlc_event_e {
     /* Append new event types at the end of a category.
      * Do not remove, insert or re-order any entry.
      * Keep this in sync with lib/event.c:libvlc_event_type_name(). */
+
+    /**
+     * Metadata of a \link #libvlc_media_t media item\endlink changed
+     */
     libvlc_MediaMetaChanged=0,
+    /**
+     * Subitem was added to a \link #libvlc_media_t media item\endlink
+     * \see libvlc_media_subitems()
+     */
     libvlc_MediaSubItemAdded,
+    /**
+     * Duration of a \link #libvlc_media_t media item\endlink changed
+     * \see libvlc_media_get_duration()
+     */
     libvlc_MediaDurationChanged,
+    /**
+     * Parsing state of a \link #libvlc_media_t media item\endlink changed
+     * \see libvlc_media_parse_with_options(),
+     *      libvlc_media_get_parsed_status(),
+     *      libvlc_media_parse_stop()
+     */
     libvlc_MediaParsedChanged,
+    /**
+     * A \link #libvlc_media_t media item\endlink was freed
+     */
     libvlc_MediaFreed,
+    /**
+     * \link #libvlc_state_t State\endlink of the \link
+     * #libvlc_media_t media item\endlink changed
+     * \see libvlc_media_get_state()
+     */
     libvlc_MediaStateChanged,
+    /**
+     * Subitem tree was added to a \link #libvlc_media_t media item\endlink
+     */
     libvlc_MediaSubItemTreeAdded,
 
     libvlc_MediaPlayerMediaChanged=0x100,
@@ -87,19 +116,72 @@ enum libvlc_event_e {
     libvlc_MediaPlayerAudioDevice,
     libvlc_MediaPlayerChapterChanged,
 
+    /**
+     * A \link #libvlc_media_t media item\endlink was added to a
+     * \link #libvlc_media_list_t media list\endlink.
+     */
     libvlc_MediaListItemAdded=0x200,
+    /**
+     * A \link #libvlc_media_t media item\endlink is about to get
+     * added to a \link #libvlc_media_list_t media list\endlink.
+     */
     libvlc_MediaListWillAddItem,
+    /**
+     * A \link #libvlc_media_t media item\endlink was deleted from
+     * a \link #libvlc_media_list_t media list\endlink.
+     */
     libvlc_MediaListItemDeleted,
+    /**
+     * A \link #libvlc_media_t media item\endlink is about to get
+     * deleted from a \link #libvlc_media_list_t media list\endlink.
+     */
     libvlc_MediaListWillDeleteItem,
+    /**
+     * A \link #libvlc_media_list_t media list\endlink has reached the
+     * end.
+     * All \link #libvlc_media_t items\endlink were either added (in
+     * case of a \ref libvlc_media_discoverer_t) or parsed (preparser).
+     */
     libvlc_MediaListEndReached,
 
+    /**
+     * \deprecated No longer used.
+     * This belonged to the removed libvlc_media_list_view_t
+     */
     libvlc_MediaListViewItemAdded=0x300,
+    /**
+     * \deprecated No longer used.
+     * This belonged to the removed libvlc_media_list_view_t
+     */
     libvlc_MediaListViewWillAddItem,
+    /**
+     * \deprecated No longer used.
+     * This belonged to the removed libvlc_media_list_view_t
+     */
     libvlc_MediaListViewItemDeleted,
+    /**
+     * \deprecated No longer used.
+     * This belonged to the removed libvlc_media_list_view_t
+     */
     libvlc_MediaListViewWillDeleteItem,
 
+    /**
+     * Playback of a \link #libvlc_media_list_player_t media list
+     * player\endlink has started.
+     */
     libvlc_MediaListPlayerPlayed=0x400,
+
+    /**
+     * The current \link #libvlc_media_t item\endlink of a
+     * \link #libvlc_media_list_player_t media list player\endlink
+     * has changed to a different item.
+     */
     libvlc_MediaListPlayerNextItemSet,
+
+    /**
+     * Playback of a \link #libvlc_media_list_player_t media list
+     * player\endlink has stopped.
+     */
     libvlc_MediaListPlayerStopped,
 
     /**
@@ -113,7 +195,18 @@ enum libvlc_event_e {
      */
     libvlc_MediaDiscovererEnded,
 
+    /**
+     * A new \link #libvlc_renderer_item_t renderer item\endlink was found by a
+     * \link #libvlc_renderer_discoverer_t renderer discoverer\endlink.
+     * The renderer item is valid until deleted.
+     */
     libvlc_RendererDiscovererItemAdded,
+
+    /**
+     * A previously discovered \link #libvlc_renderer_item_t renderer item\endlink
+     * was deleted by a \link #libvlc_renderer_discoverer_t renderer discoverer\endlink.
+     * The renderer item is no longer valid.
+     */
     libvlc_RendererDiscovererItemDeleted,
 
     libvlc_VlmMediaAdded=0x600,
