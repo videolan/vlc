@@ -3,7 +3,7 @@ BUILT_SOURCES_distclean += \
 	extras/package/win32/NSIS/vlc.win32.nsi extras/package/win32/NSIS/spad.nsi
 endif
 
-win32_destdir=$(abs_top_builddir)/vlc-$(VERSION)
+win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(abs_top_builddir)/symbols-$(VERSION)
 win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 
