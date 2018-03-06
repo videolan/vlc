@@ -235,8 +235,6 @@ static void Close (vlc_object_t *this)
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {
-        var_Destroy (vd, "drawable-nsobject");
-
         if (sys->gl != NULL) {
             struct gl_sys *glsys = sys->gl->sys;
             msg_Dbg(this, "deleting display");
@@ -449,7 +447,7 @@ static void GLESSwap(vlc_gl_t *gl)
 {
     @try {
         /* get the object we will draw into */
-        UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
+        UIView *viewContainer = var_InheritAddress (_voutDisplay, "drawable-nsobject");
         if (unlikely(viewContainer == nil)) {
             msg_Err(_voutDisplay, "provided view container is nil");
             return NO;
