@@ -87,7 +87,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static int Control         ( demux_t *, int, va_list );
-static int Seek            ( demux_t *, mtime_t, int, bool );
+static int Seek            ( demux_t *, mtime_t, double, bool );
 static int Demux_Seekable  ( demux_t * );
 static int Demux_UnSeekable( demux_t * );
 
@@ -1526,11 +1526,11 @@ static int Demux_UnSeekable( demux_t *p_demux )
 /*****************************************************************************
  * Seek: goto to i_date or i_percent
  *****************************************************************************/
-static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent, bool b_accurate )
+static int Seek( demux_t *p_demux, mtime_t i_date, double f_ratio, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %d%%",
-             i_date / CLOCK_FREQ, i_percent );
+    msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %2.2f%%",
+             i_date / CLOCK_FREQ, f_ratio * 100 );
 
     if( p_sys->b_seekable )
     {
@@ -1567,20 +1567,20 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent, bool b_accurat
             if ( !p_sys->i_movi_lastchunk_pos && /* set when index is successfully loaded */
                  ! ( p_sys->i_avih_flags & AVIF_ISINTERLEAVED ) )
             {
-                msg_Err( p_demux, "seeking without index at %d%%"
-                         " only works for interleaved files", i_percent );
+                msg_Err( p_demux, "seeking without index at %2.2f%%"
+                         " only works for interleaved files", f_ratio * 100 );
                 goto failandresetpos;
             }
             /* use i_percent to create a true i_date */
-            if( i_percent >= 100 )
+            if( f_ratio >= 1.0 )
             {
                 msg_Warn( p_demux, "cannot seek so far !" );
                 goto failandresetpos;
             }
-            i_percent = __MAX( i_percent, 0 );
+            f_ratio = __MAX( f_ratio, 0 );
 
             /* try to find chunk that is at i_percent or the file */
-            i_pos = __MAX( i_percent * stream_Size( p_demux->s ) / 100,
+            i_pos = __MAX( f_ratio * stream_Size( p_demux->s ),
                            p_sys->i_movi_begin );
             /* search first selected stream (and prefer non-EOF ones) */
             for( unsigned i = 0; i < p_sys->i_track; i++ )
@@ -1723,7 +1723,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else
             {
                 i64 = (mtime_t)(f * CLOCK_FREQ * p_sys->i_length);
-                return Seek( p_demux, i64, (int)(f * 100), b );
+                return Seek( p_demux, i64, f, b );
             }
 
         case DEMUX_GET_TIME:
@@ -1733,7 +1733,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
         {
-            int i_percent = 0;
+            f = 0;
 
             i64 = va_arg( args, int64_t );
             b = va_arg( args, int );
@@ -1743,14 +1743,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_length > 0 )
             {
-                i_percent = 100 * i64 / (p_sys->i_length*CLOCK_FREQ);
+                f = (double)i64 / (p_sys->i_length*CLOCK_FREQ);
             }
             else if( p_sys->i_time > 0 )
             {
-                i_percent = (int)( 100.0 * ControlGetPosition( p_demux ) *
-                                   (double)i64 / (double)p_sys->i_time );
+                f = ControlGetPosition( p_demux ) *
+                   (double) i64 / (double)p_sys->i_time;
             }
-            return Seek( p_demux, i64, i_percent, b );
+            return Seek( p_demux, i64, f, b );
         }
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
