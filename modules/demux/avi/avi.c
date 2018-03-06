@@ -105,7 +105,7 @@ static char *FromACP( const char *str )
 typedef struct
 {
     vlc_fourcc_t i_fourcc;
-    uint32_t     i_pos;
+    uint64_t     i_pos;
     uint32_t     i_size;
     vlc_fourcc_t i_type;     /* only for AVIFOURCC_LIST */
 
@@ -120,9 +120,9 @@ typedef struct
 {
     vlc_fourcc_t i_id;
     uint32_t     i_flags;
-    uint32_t     i_pos;
+    uint64_t     i_pos;
     uint32_t     i_length;
-    int64_t      i_lengthtotal;
+    uint64_t     i_lengthtotal;
 
 } avi_entry_t;
 
@@ -135,7 +135,7 @@ typedef struct
 } avi_index_t;
 static void avi_index_Init( avi_index_t * );
 static void avi_index_Clean( avi_index_t * );
-static void avi_index_Append( avi_index_t *, uint32_t *, avi_entry_t * );
+static void avi_index_Append( avi_index_t *, uint64_t *, avi_entry_t * );
 
 typedef struct
 {
@@ -183,8 +183,8 @@ struct demux_sys_t
 
     bool  b_odml;
 
-    uint32_t i_movi_begin;
-    uint32_t i_movi_lastchunk_pos;   /* XXX position of last valid chunk */
+    uint64_t i_movi_begin;
+    uint64_t i_movi_lastchunk_pos;   /* XXX position of last valid chunk */
 
     /* number of streams and information */
     unsigned int i_track;
@@ -209,7 +209,7 @@ static int AVI_StreamChunkFind( demux_t *, unsigned int i_stream );
 static int AVI_StreamChunkSet ( demux_t *,
                                 unsigned int i_stream, unsigned int i_ck );
 static int AVI_StreamBytesSet ( demux_t *,
-                                unsigned int i_stream, uint32_t i_byte );
+                                unsigned int i_stream, uint64_t i_byte );
 
 vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t );
 static int   AVI_GetKeyFlag    ( vlc_fourcc_t , uint8_t * );
@@ -1534,7 +1534,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, double f_ratio, bool b_accura
 
     if( p_sys->b_seekable )
     {
-        int64_t i_pos_backup = vlc_stream_Tell( p_demux->s );
+        uint64_t i_pos_backup = vlc_stream_Tell( p_demux->s );
 
         /* Check and lazy load indexes if it was not done (not fastseekable) */
         if ( !p_sys->b_indexloaded && ( p_sys->i_avih_flags & AVIF_HASINDEX ) )
@@ -1562,7 +1562,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, double f_ratio, bool b_accura
         {
             avi_track_t *p_stream = NULL;
             unsigned i_stream = 0;
-            int64_t i_pos;
+            uint64_t i_pos;
 
             if ( !p_sys->i_movi_lastchunk_pos && /* set when index is successfully loaded */
                  ! ( p_sys->i_avih_flags & AVIF_ISINTERLEAVED ) )
@@ -1993,7 +1993,7 @@ static int AVI_StreamChunkSet( demux_t *p_demux, unsigned int i_stream,
 /* XXX FIXME up to now, we assume that all chunk are one after one */
 static int AVI_StreamBytesSet( demux_t    *p_demux,
                                unsigned int i_stream,
-                               uint32_t  i_byte )
+                               uint64_t  i_byte )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     avi_track_t *p_stream = p_sys->track[i_stream];
@@ -2370,7 +2370,7 @@ static void avi_index_Clean( avi_index_t *p_index )
 {
     free( p_index->p_entry );
 }
-static void avi_index_Append( avi_index_t *p_index, uint32_t *pi_last_pos,
+static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
                               avi_entry_t *p_entry )
 {
     /* Update last chunk position */
@@ -2467,7 +2467,7 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
 }
 
 static int AVI_IndexLoad_idx1( demux_t *p_demux,
-                               avi_index_t p_index[], uint32_t *pi_last_offset )
+                               avi_index_t p_index[], uint64_t *pi_last_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2523,7 +2523,7 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
     return VLC_SUCCESS;
 }
 
-static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, uint32_t *pi_max_offset,
+static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, uint64_t *pi_max_offset,
                           avi_chunk_indx_t *p_indx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -2565,7 +2565,7 @@ static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, uint32_t *pi_m
 }
 
 static void AVI_IndexLoad_indx( demux_t *p_demux,
-                                avi_index_t p_index[], uint32_t *pi_last_offset )
+                                avi_index_t p_index[], uint64_t *pi_last_offset )
 {
     demux_sys_t         *p_sys = p_demux->p_sys;
 
@@ -2635,8 +2635,8 @@ static void AVI_IndexLoad( demux_t *p_demux )
         avi_index_Init( &p_idx_indx[i] );
         avi_index_Init( &p_idx_idx1[i] );
     }
-    uint32_t i_indx_last_pos = p_sys->i_movi_lastchunk_pos;
-    uint32_t i_idx1_last_pos = p_sys->i_movi_lastchunk_pos;
+    uint64_t i_indx_last_pos = p_sys->i_movi_lastchunk_pos;
+    uint64_t i_idx1_last_pos = p_sys->i_movi_lastchunk_pos;
 
     AVI_IndexLoad_indx( p_demux, p_idx_indx, &i_indx_last_pos );
     if( !p_sys->b_odml )
