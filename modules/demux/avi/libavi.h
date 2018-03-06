@@ -225,7 +225,7 @@ typedef struct avi_chunk_indx_s
     uint32_t i_entriesinuse;
     vlc_fourcc_t i_id;
 
-    int64_t i_baseoffset;
+    uint64_t i_baseoffset;
 
     union
     {
