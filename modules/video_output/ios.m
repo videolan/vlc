@@ -88,8 +88,7 @@ vlc_module_end ()
 @interface VLCOpenGLES2VideoView : UIView {
     vout_display_t *_voutDisplay;
     EAGLContext *_eaglContext;
-    GLuint _renderBuffer;
-    GLuint _frameBuffer;
+    CAEAGLLayer *_layer;
 
     vlc_mutex_t _mutex;
 
@@ -108,16 +107,10 @@ vlc_module_end ()
     /* Written from vout, read locked from MT */
     vout_display_cfg_t _cfg;
 }
-@property (readonly) GLuint renderBuffer;
-@property (readonly) GLuint frameBuffer;
 @property (readonly) EAGLContext* eaglContext;
-@property GLuint shaderProgram;
 
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
 - (void)cleanAndRelease;
-- (void)createBuffers;
-- (void)destroyBuffers;
-- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext;
 - (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
 
@@ -138,6 +131,8 @@ struct gl_sys
 {
     VLCOpenGLES2VideoView *glESView;
     vout_display_opengl_t *vgl;
+    GLuint renderBuffer;
+    GLuint frameBuffer;
     EAGLContext *previousEaglContext;
 };
 
@@ -193,6 +188,8 @@ static int Open(vlc_object_t *this)
             goto bailout;
         glsys->glESView = sys->glESView;
         glsys->vgl = NULL;
+        glsys->renderBuffer = glsys->frameBuffer = 0;
+
         /* Initialize common OpenGL video display */
         sys->gl->makeCurrent = GLESMakeCurrent;
         sys->gl->releaseCurrent = GLESReleaseCurrent;
@@ -399,6 +396,8 @@ static void GLESSwap(vlc_gl_t *gl)
     if (unlikely(!_appActive))
         return nil;
 
+    _bufferNeedReset = YES;
+
     _voutDisplay = vd;
     _cfg = *_voutDisplay->cfg;
 
@@ -419,15 +418,13 @@ static void GLESSwap(vlc_gl_t *gl)
         return nil;
     }
 
-    CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
-    layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
-    layer.opaque = YES;
+    _layer = (CAEAGLLayer *)self.layer;
+    _layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
+    _layer.opaque = YES;
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
     [self releaseCurrent:previousEaglContext];
-
-    [self createBuffers];
 
     if (![self fetchViewContainer])
     {
@@ -538,60 +535,41 @@ static void GLESSwap(vlc_gl_t *gl)
     vlc_mutex_unlock(&_mutex);
 }
 
-- (void)createBuffers
+- (BOOL)doResetBuffers:(vlc_gl_t *)gl
 {
-    if (![NSThread isMainThread])
+    struct gl_sys *glsys = gl->sys;
+
+    if (glsys->frameBuffer != 0)
     {
-        [self performSelectorOnMainThread:@selector(createBuffers)
-                                                 withObject:nil
-                                              waitUntilDone:YES];
-        return;
+        /* clear frame buffer */
+        glDeleteFramebuffers(1, &glsys->frameBuffer);
+        glsys->frameBuffer = 0;
     }
 
-    EAGLContext *previousEaglContext;
-    if (![self makeCurrent:&previousEaglContext])
-        return;
+    if (glsys->renderBuffer != 0)
+    {
+        /* clear render buffer */
+        glDeleteRenderbuffers(1, &glsys->renderBuffer);
+        glsys->renderBuffer = 0;
+    }
 
     glDisable(GL_DEPTH_TEST);
 
-    glGenFramebuffers(1, &_frameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
+    glGenFramebuffers(1, &glsys->frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, glsys->frameBuffer);
 
-    glGenRenderbuffers(1, &_renderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
+    glGenRenderbuffers(1, &glsys->renderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, glsys->renderBuffer);
 
-    [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
+    [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer];
 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, glsys->renderBuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
-
-    [self releaseCurrent:previousEaglContext];
-}
-
-- (void)destroyBuffers
-{
-    if (![NSThread isMainThread])
     {
-        [self performSelectorOnMainThread:@selector(destroyBuffers)
-                                                 withObject:nil
-                                              waitUntilDone:YES];
-        return;
+        msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+        return NO;
     }
-
-    EAGLContext *previousEaglContext;
-    if (![self makeCurrent:&previousEaglContext])
-        return;
-
-    /* clear frame buffer */
-    glDeleteFramebuffers(1, &_frameBuffer);
-    _frameBuffer = 0;
-
-    /* clear render buffer */
-    glDeleteRenderbuffers(1, &_renderBuffer);
-    _renderBuffer = 0;
-
-    [self releaseCurrent:previousEaglContext];
+    return YES;
 }
 
 - (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl
@@ -633,17 +611,12 @@ static void GLESSwap(vlc_gl_t *gl)
 
     vlc_mutex_unlock(&_mutex);
 
-    if (resetBuffers)
+    if (resetBuffers && ![self doResetBuffers:gl])
     {
-        [self destroyBuffers];
-        [self createBuffers];
+        [EAGLContext setCurrentContext:*previousEaglContext];
+        return NO;
     }
     return success;
-}
-
-- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext
-{
-    return [self makeCurrentWithGL:previousEaglContext withGL:nil];
 }
 
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext
