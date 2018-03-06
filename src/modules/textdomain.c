@@ -27,25 +27,14 @@
 
 #ifdef ENABLE_NLS
 # include <libintl.h>
-# if defined (__APPLE__) || defined (_WIN32) || defined(__OS2__)
-#  include <vlc_charset.h>
-# endif
+# include <vlc_charset.h>
 #endif
 
 int vlc_bindtextdomain (const char *domain)
 {
 #if defined (ENABLE_NLS)
     /* Specify where to find the locales for current domain */
-# if !defined (__APPLE__) && !defined (_WIN32) && !defined(__OS2__)
-    static const char path[] = LOCALEDIR;
-
-    if (bindtextdomain (domain, path) == NULL)
-    {
-        fprintf (stderr, "%s: text domain not found in %s\n", domain, path);
-        return -1;
-    }
-# else
-    char *upath = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
+    char *upath = config_GetSysPath(VLC_LOCALE_DIR, NULL);
     if (unlikely(upath == NULL))
         return -1;
 
@@ -59,7 +48,6 @@ int vlc_bindtextdomain (const char *domain)
     }
     LocaleFree(lpath);
     free (upath);
-# endif
 
     /* LibVLC wants all messages in UTF-8.
      * Unfortunately, we cannot ask UTF-8 for strerror_r(), strsignal_r()
