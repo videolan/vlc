@@ -352,6 +352,8 @@ static int ReadBlockHeader( demux_t *p_demux )
                 goto corrupt;
 
             new_fmt.audio.i_rate = GetDWLE( buf );
+            if( !new_fmt.audio.i_rate )
+                goto corrupt;
             new_fmt.audio.i_bitspersample = buf[4];
             new_fmt.audio.i_channels = buf[5];
 
