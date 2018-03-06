@@ -95,9 +95,15 @@ vlc_module_end ()
 
     BOOL _bufferNeedReset;
     BOOL _appActive;
+    BOOL _placeInvalidated;
 
     /* Written from MT, read locked from vout */
     vout_display_place_t _place;
+    CGSize _viewSize;
+    CGFloat _scaleFactor;
+
+    /* Written from vout, read locked from MT */
+    vout_display_cfg_t _cfg;
 }
 @property (readonly) GLuint renderBuffer;
 @property (readonly) GLuint frameBuffer;
@@ -107,14 +113,14 @@ vlc_module_end ()
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
 - (void)createBuffers;
 - (void)destroyBuffers;
-- (void)resetBuffers;
 - (BOOL)makeCurrent:(EAGLContext **)previousEaglContext;
+- (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
 
-- (void)setPlace:(const vout_display_place_t *)place;
+- (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl;
+- (void)getPlaceLocked:(vout_display_place_t *)place;
 - (void)reshape;
 - (void)propagateDimensionsToVoutCore;
-- (CGSize)viewSize;
 @end
 
 struct vout_display_sys_t
@@ -296,50 +302,18 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            if (!vd->sys)
-                return VLC_EGENERIC;
+            const vout_display_cfg_t *cfg;
 
-            @autoreleasepool {
-                const vout_display_cfg_t *cfg;
+            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT ||
+                query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
+                cfg = vd->cfg;
+            else
+                cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
 
-                if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
-                    return VLC_EGENERIC;
+            assert(cfg);
 
-                if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT ||
-                    query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                    cfg = vd->cfg;
-                } else {
-                    cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
-                }
+            [sys->glESView updateVoutCfg:cfg withVGL:glsys->vgl];
 
-                /* we don't adapt anything here regardless of what the vout core
-                 * wants since we are not in a traditional desktop window */
-                if (!cfg)
-                    return VLC_EGENERIC;
-
-                vout_display_cfg_t cfg_tmp = *cfg;
-                CGSize viewSize;
-                viewSize = [sys->glESView viewSize];
-
-                /* on HiDPI displays, the point bounds don't equal the actual pixels */
-                CGFloat scaleFactor = sys->glESView.contentScaleFactor;
-                cfg_tmp.display.width = viewSize.width * scaleFactor;
-                cfg_tmp.display.height = viewSize.height * scaleFactor;
-
-                vout_display_place_t place;
-                vout_display_PlacePicture(&place, &vd->source, &cfg_tmp, false);
-
-                [sys->glESView setPlace:&place];
-
-                vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
-
-                // x / y are top left corner, but we need the lower left one
-                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    vout_display_opengl_Viewport(sys->vgl, place.x,
-                                                 cfg_tmp.display.height - (place.y + place.height),
-                                                 place.width, place.height);
-                vlc_gl_ReleaseCurrent(sys->gl);
-            }
             return VLC_SUCCESS;
         }
 
@@ -404,10 +378,8 @@ static int GLESMakeCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    if (![sys->glESView makeCurrent:&sys->previousEaglContext])
+    if (![sys->glESView makeCurrentWithGL:&sys->previousEaglContext withGL:gl])
         return VLC_EGENERIC;
-
-    [sys->glESView resetBuffers];
     return VLC_SUCCESS;
 }
 
@@ -456,6 +428,7 @@ static void GLESSwap(vlc_gl_t *gl)
         return nil;
 
     _voutDisplay = vd;
+    _cfg = *_voutDisplay->cfg;
 
     vlc_mutex_init(&_mutex);
 
@@ -553,7 +526,10 @@ static void GLESSwap(vlc_gl_t *gl)
 - (void)didMoveToWindow
 {
     self.contentScaleFactor = self.window.screen.scale;
+
+    vlc_mutex_lock(&_mutex);
     _bufferNeedReset = YES;
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)createBuffers
@@ -612,16 +588,7 @@ static void GLESSwap(vlc_gl_t *gl)
     [self releaseCurrent:previousEaglContext];
 }
 
-- (void)resetBuffers
-{
-    if (unlikely(_bufferNeedReset)) {
-        [self destroyBuffers];
-        [self createBuffers];
-        _bufferNeedReset = NO;
-    }
-}
-
-- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext
+- (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl
 {
     vlc_mutex_lock(&_mutex);
 
@@ -634,9 +601,43 @@ static void GLESSwap(vlc_gl_t *gl)
     *previousEaglContext = [EAGLContext currentContext];
 
     BOOL success = [EAGLContext setCurrentContext:_eaglContext];
+    BOOL resetBuffers = NO;
+
+    if (success && gl != NULL)
+    {
+        struct gl_sys *glsys = gl->sys;
+
+        if (unlikely(_bufferNeedReset))
+        {
+            _bufferNeedReset = NO;
+            resetBuffers = YES;
+        }
+        if (unlikely(_placeInvalidated && glsys->vgl))
+        {
+            _placeInvalidated = NO;
+
+            vout_display_place_t place;
+            [self getPlaceLocked: &place];
+            vout_display_opengl_SetWindowAspectRatio(glsys->vgl, (float)place.width / place.height);
+
+            // x / y are top left corner, but we need the lower left one
+            glViewport(_place.x, _place.y, _place.width, _place.height);
+        }
+    }
 
     vlc_mutex_unlock(&_mutex);
+
+    if (resetBuffers)
+    {
+        [self destroyBuffers];
+        [self createBuffers];
+    }
     return success;
+}
+
+- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext
+{
+    return [self makeCurrentWithGL:previousEaglContext withGL:nil];
 }
 
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext
@@ -648,7 +649,19 @@ static void GLESSwap(vlc_gl_t *gl)
 {
     [self reshape];
 
+    vlc_mutex_lock(&_mutex);
     _bufferNeedReset = YES;
+    vlc_mutex_unlock(&_mutex);
+}
+
+- (void)getPlaceLocked:(vout_display_place_t *)place
+{
+    vout_display_cfg_t cfg = _cfg;
+
+    cfg.display.width  = _viewSize.width * _scaleFactor;
+    cfg.display.height = _viewSize.height * _scaleFactor;
+
+    vout_display_PlacePicture(place, &_voutDisplay->source, &cfg, false);
 }
 
 - (void)reshape
@@ -661,27 +674,22 @@ static void GLESSwap(vlc_gl_t *gl)
         return;
     }
 
-    EAGLContext *previousEaglContext;
-    if (![self makeCurrent:&previousEaglContext])
-        return;
+    vlc_mutex_lock(&_mutex);
+    _viewSize = [self bounds].size;
+    _scaleFactor = self.contentScaleFactor;
 
-    CGSize viewSize = [self bounds].size;
-    CGFloat scaleFactor = self.contentScaleFactor;
     vout_display_place_t place;
+    [self getPlaceLocked: &place];
 
-    vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
+    if (memcmp(&place, &_place, sizeof(vout_display_place_t)) != 0)
+    {
+        _placeInvalidated = YES;
+        _place = place;
+    }
+    vout_display_SendEventDisplaySize(_voutDisplay, _viewSize.width * _scaleFactor,
+                                      _viewSize.height * _scaleFactor);
 
-    cfg_tmp.display.width  = viewSize.width * scaleFactor;
-    cfg_tmp.display.height = viewSize.height * scaleFactor;
-
-    vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
-    vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
-                                      viewSize.height * scaleFactor);
-    [self setPlace:&place];
-
-    // x / y are top left corner, but we need the lower left one
-    glViewport(place.x, place.y, place.width, place.height);
-    [self releaseCurrent:previousEaglContext];
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
@@ -689,22 +697,31 @@ static void GLESSwap(vlc_gl_t *gl)
     UIGestureRecognizerState state = [tapRecognizer state];
     CGPoint touchPoint = [tapRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
-    vlc_mutex_lock(&_mutex);
-    vout_display_place_t place = _place;
-    vlc_mutex_unlock(&_mutex);
     vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay, ORIENT_NORMAL,
                                                   (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor,
-                                                  &place);
+                                                  &_place);
 
     vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
     vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);
 }
 
-- (void)setPlace:(const vout_display_place_t *)place
+- (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl
 {
+    if (memcmp(&_cfg, cfg, sizeof(vout_display_cfg_t)) == 0)
+        return;
+
     vlc_mutex_lock(&_mutex);
-    _place = *place;
+    _cfg = *cfg;
+
+    vout_display_place_t place;
+    [self getPlaceLocked: &place];
+    vout_display_opengl_SetWindowAspectRatio(vgl, (float)place.width / place.height);
+
     vlc_mutex_unlock(&_mutex);
+
+    [self performSelectorOnMainThread:@selector(setNeedsUpdateConstraints)
+                           withObject:nil
+                        waitUntilDone:NO];
 }
 
 - (void)applicationStateChanged:(NSNotification *)notification
@@ -746,48 +763,6 @@ static void GLESSwap(vlc_gl_t *gl)
         viewSize = _voutDisplay->sys->viewContainer.bounds.size;
     }
     vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
-}
-
-- (void)mainThreadContentScaleFactor:(NSNumber *)scaleFactor
-{
-    id *ret = [scaleFactor pointerValue];
-    *ret = [[NSNumber alloc] initWithFloat:[super contentScaleFactor]];
-}
-
-- (CGFloat)contentScaleFactor
-{
-    if ([NSThread isMainThread]) {
-        return [super contentScaleFactor];
-    }
-
-    NSNumber *scaleFactor;
-    [self performSelectorOnMainThread:@selector(mainThreadContentScaleFactor:)
-                                         withObject:[NSValue valueWithPointer:&scaleFactor]
-                                      waitUntilDone:YES];
-    CGFloat ret = [scaleFactor floatValue];
-    [scaleFactor release];
-    return ret;
-}
-
-- (void)mainThreadViewBounds:(NSValue *)viewBoundsString
-{
-    id *ret = [viewBoundsString pointerValue];
-    *ret = [NSStringFromCGRect([super bounds]) retain];
-}
-
-- (CGSize)viewSize
-{
-    if ([NSThread isMainThread]) {
-        return self.bounds.size;
-    }
-
-    NSString *viewBoundsString;
-    [self performSelectorOnMainThread:@selector(mainThreadViewBounds:)
-                                         withObject:[NSValue valueWithPointer:&viewBoundsString]
-                                      waitUntilDone:YES];
-    CGRect bounds = CGRectFromString(viewBoundsString);
-    [viewBoundsString release];
-    return bounds.size;
 }
 
 @end
