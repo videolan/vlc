@@ -385,17 +385,15 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd
 {
-    self = [super initWithFrame:frame];
-
-    if (!self)
-        return nil;
-
     _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
     if (unlikely(!_appActive))
         return nil;
 
-    _bufferNeedReset = YES;
+    self = [super initWithFrame:frame];
+    if (!self)
+        return nil;
 
+    _bufferNeedReset = YES;
     _voutDisplay = vd;
     _cfg = *_voutDisplay->cfg;
 
@@ -412,9 +410,13 @@ static void GLESSwap(vlc_gl_t *gl)
     if (unlikely(!_eaglContext)
      || unlikely(![EAGLContext setCurrentContext:_eaglContext]))
     {
+        if (_eaglContext)
+            [_eaglContext release];
         vlc_mutex_destroy(&_mutex);
+        [super dealloc];
         return nil;
     }
+    [self releaseCurrent:previousEaglContext];
 
     _layer = (CAEAGLLayer *)self.layer;
     _layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
@@ -422,12 +424,11 @@ static void GLESSwap(vlc_gl_t *gl)
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    [self releaseCurrent:previousEaglContext];
-
     if (![self fetchViewContainer])
     {
         vlc_mutex_destroy(&_mutex);
         [_eaglContext release];
+        [super dealloc];
         return nil;
     }
 
