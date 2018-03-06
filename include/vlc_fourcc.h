@@ -406,6 +406,7 @@
 #define VLC_CODEC_PCX             VLC_FOURCC('p','c','x',' ')
 #define VLC_CODEC_XWD             VLC_FOURCC('X','W','D',' ')
 #define VLC_CODEC_TXD             VLC_FOURCC('T','X','D',' ')
+#define VLC_CODEC_WEBP            VLC_FOURCC('W','E','B','P')
 
 
 /* Audio codec */

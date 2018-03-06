@@ -1003,6 +1003,9 @@ static const staticentry_t p_list_video[] = {
         A("LJ2C"),
         A("LJ2K"),
 
+    B(VLC_CODEC_WEBP, "WebP Image"),
+        A("WEBP"),
+
     B(VLC_CODEC_LAGARITH, "Lagarith Lossless"),
         A("LAGS"),
 
