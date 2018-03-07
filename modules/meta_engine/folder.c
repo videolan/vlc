@@ -55,8 +55,6 @@ static const char* cover_files[] = {
     "thumb.jpg",
 };
 
-static const int i_covers = (sizeof(cover_files)/sizeof(cover_files[0]));
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -75,15 +73,35 @@ vlc_module_begin ()
     set_callbacks( FindMeta, NULL )
 vlc_module_end ()
 
-/*****************************************************************************
- *****************************************************************************/
+static bool ProbeArtFile(input_item_t *item,
+                         const char *dirpath, const char *filename)
+{
+    char *filepath;
+    struct stat st;
+    bool found = false;
+
+    if (asprintf(&filepath, "%s"DIR_SEP"%s", dirpath, filename) == -1)
+        return false;
+
+    if (vlc_stat(filepath, &st) == 0 && S_ISREG(st.st_mode))
+    {
+        char *url = vlc_path2uri(filepath, "file");
+        if (likely(url != NULL))
+        {
+            input_item_SetArtURL(item, url);
+            free(url);
+            found = true;
+        }
+    }
+
+    free(filepath);
+    return found;
+}
+
 static int FindMeta( vlc_object_t *p_this )
 {
     meta_fetcher_t *p_finder = (meta_fetcher_t *)p_this;
     input_item_t *p_item = p_finder->p_item;
-    bool b_have_art = false;
-    struct stat statinfo;
-    char *psz_path = NULL;
 
     if( !p_item )
         return VLC_EGENERIC;
@@ -92,82 +110,36 @@ static int FindMeta( vlc_object_t *p_this )
     if( !psz_uri )
         return VLC_EGENERIC;
 
-    if ( *psz_uri && psz_uri[strlen( psz_uri ) - 1] != DIR_SEP_CHAR )
-    {
-        if ( asprintf( &psz_path, "%s"DIR_SEP, psz_uri ) == -1 )
-        {
-            free( psz_uri );
-            return VLC_EGENERIC;
-        }
-        char *psz_basedir = vlc_uri2path( psz_path );
-        FREENULL( psz_path );
-        if( psz_basedir == NULL )
-        {
-            free( psz_uri );
-            return VLC_EGENERIC;
-        }
-        if( vlc_stat( psz_basedir, &statinfo ) == 0 && S_ISDIR(statinfo.st_mode) )
-            psz_path = psz_basedir;
-        else
-            free( psz_basedir );
-    }
+    char *psz_basedir = vlc_uri2path(psz_uri);
+    free(psz_uri);
+    if (psz_basedir == NULL)
+        return VLC_EGENERIC;
 
-    if ( psz_path == NULL )
+    /* If the item is an accessible directory, look for art inside it.
+     * Otherwise, look for art in the same directory. */
+    struct stat st;
+    if (vlc_stat(psz_basedir, &st) == 0 && !S_ISDIR(st.st_mode))
     {
-        char *psz_basedir = vlc_uri2path( psz_uri );
-        if( psz_basedir == NULL )
-        {
-            free( psz_uri );
-            return VLC_EGENERIC;
-        }
-
         char *psz_buf = strrchr( psz_basedir, DIR_SEP_CHAR );
-        if( psz_buf )
-            *++psz_buf = '\0';
-        else
-            *psz_basedir = '\0'; /* relative path */
-        psz_path = psz_basedir;
+        if (psz_buf != NULL)
+            *psz_buf = '\0';
     }
 
-    free( psz_uri );
+    int ret = VLC_EGENERIC;
 
-    for( int i = -1; !b_have_art && i < i_covers; i++ )
+    char *filename = var_InheritString(p_this, "album-art-filename");
+    if (filename != NULL && ProbeArtFile(p_item, psz_basedir, filename))
+        ret = VLC_SUCCESS;
+    else
     {
-        const char *filename;
-        char *filebuf, *filepath;
-
-        if( i == -1 ) /* higher priority : configured filename */
-        {
-            filebuf = var_InheritString( p_this, "album-art-filename" );
-            if( filebuf == NULL )
-                continue;
-            filename = filebuf;
-        }
-        else
-        {
-            filename = cover_files[i];
-            filebuf = NULL;
-        }
-
-        if( asprintf( &filepath, "%s%s", psz_path, filename ) == -1 )
-            filepath = NULL;
-        free( filebuf );
-        if( unlikely(filepath == NULL) )
-            continue;
-
-        if( vlc_stat( filepath, &statinfo ) == 0 && S_ISREG(statinfo.st_mode) )
-        {
-            char *psz_uri = vlc_path2uri( filepath, "file" );
-            if( psz_uri )
+        for (size_t i = 0; i < ARRAY_SIZE(cover_files); i++)
+            if (ProbeArtFile(p_item, psz_basedir, cover_files[i]))
             {
-                input_item_SetArtURL( p_item, psz_uri );
-                free( psz_uri );
-                b_have_art = true;
+                ret = VLC_SUCCESS;
+                break;
             }
-        }
-        free( filepath );
     }
-    free( psz_path );
 
-    return b_have_art ? VLC_SUCCESS : VLC_EGENERIC;
+    free(psz_basedir);
+    return ret;
 }
