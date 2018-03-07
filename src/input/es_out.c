@@ -3237,7 +3237,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            };
            static_assert(ARRAY_SIZE(space_names) == COLOR_SPACE_MAX+1,
                          "Color space table mismatch");
-           info_category_AddInfo( p_cat, _("Color space"), _("%s Range"),
+           info_category_AddInfo( p_cat, _("Color space"), _("%s %s Range"),
                                   _(space_names[fmt->video.space]),
                        _(fmt->video.b_color_range_full ? "Full" : "Limited") );
        }
