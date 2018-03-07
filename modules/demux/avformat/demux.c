@@ -67,6 +67,7 @@ struct demux_sys_t
     AVFormatContext *ic;
 
     struct avformat_track_s *tracks;
+    unsigned i_tracks;
 
     int64_t         i_pcr;
 
@@ -359,6 +360,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         avformat_CloseDemux( p_this );
         return VLC_ENOMEM;
     }
+    p_sys->i_tracks = nb_streams;
 
     if( error < 0 )
     {
@@ -743,7 +745,7 @@ static int Demux( demux_t *p_demux )
 
         return 0;
     }
-    if( pkt.stream_index < 0 || (unsigned) pkt.stream_index >= p_sys->ic->nb_streams )
+    if( pkt.stream_index < 0 || (unsigned) pkt.stream_index >= p_sys->i_tracks )
     {
         av_packet_unref( &pkt );
         return 1;
@@ -854,14 +856,14 @@ static int Demux( demux_t *p_demux )
         p_track->i_pcr = p_frame->i_dts;
 
     int64_t i_ts_max = INT64_MIN;
-    for( unsigned i = 0; i < p_sys->ic->nb_streams; i++ )
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL )
             i_ts_max = __MAX( i_ts_max, p_sys->tracks[i].i_pcr );
     }
 
     int64_t i_ts_min = INT64_MAX;
-    for( unsigned i = 0; i < p_sys->ic->nb_streams; i++ )
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL &&
                 p_sys->tracks[i].i_pcr > VLC_TS_INVALID &&
@@ -916,7 +918,7 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
         i_time = 1;
 
     p_sys->i_pcr = i_time;
-    for( unsigned i = 0; i < p_sys->ic->nb_streams; i++ )
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         p_sys->tracks[i].i_pcr = VLC_TS_INVALID;
 
     if( i_time > VLC_TS_INVALID )
