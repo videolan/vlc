@@ -34,7 +34,7 @@ endif
 if BUILD_LUA
 	## Copy lua scripts
 	cp -r "$(pkgdatadir)/lua" $@/Contents/MacOS/share/
-	cp -r "$(pkglibdir)/lua" $@/Contents/MacOS/
+	cp -r "$(pkglibexecdir)/lua" $@/Contents/MacOS/
 endif
 	## HRTFs
 	cp -r $(srcdir)/share/hrtfs $@/Contents/MacOS/share/

@@ -223,7 +223,7 @@ int vlclua_dir_list(const char *luadirname, char ***restrict listp)
     list = vlclua_dir_list_append(list, config_GetUserDir(VLC_USERDATA_DIR),
                                   luadirname);
 
-    char *libdir = config_GetSysPath(VLC_PKG_LIB_DIR, NULL);
+    char *libdir = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, NULL);
     char *datadir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
     bool both = libdir != NULL && datadir != NULL && strcmp(libdir, datadir);
 

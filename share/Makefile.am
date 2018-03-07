@@ -57,7 +57,7 @@ EXTRA_DIST += \
 	$(DIST_solid)
 
 nobase_pkgdata_DATA =
-nobase_vlclib_DATA =
+nobase_pkglibexec_SCRIPTS =
 nobase_dist_pkgdata_DATA =
 if BUILD_SKINS
 nobase_pkgdata_DATA += skins2/default.vlt
@@ -118,7 +118,7 @@ luac_verbose_0 = @echo "  LUAC   $@";
 	$(luac_verbose)$(LUAC) -o $@ $<
 
 if BUILD_LUA
-nobase_vlclib_DATA += \
+nobase_pkglibexec_SCRIPTS += \
 	lua/extensions/VLSub.luac \
 	lua/intf/cli.luac \
 	lua/intf/dummy.luac \
