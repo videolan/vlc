@@ -290,6 +290,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     switch (dec->fmt_in.i_codec)
     {
 #ifdef ENABLE_VP8_DECODER
+    case VLC_CODEC_WEBP:
     case VLC_CODEC_VP8:
         iface = &vpx_codec_vp8_dx_algo;
         vp_version = 8;
