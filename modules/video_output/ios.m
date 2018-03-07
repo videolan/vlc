@@ -605,7 +605,7 @@ static void GLESSwap(vlc_gl_t *gl)
             vout_display_opengl_SetWindowAspectRatio(glsys->vgl, (float)place.width / place.height);
 
             // x / y are top left corner, but we need the lower left one
-            glViewport(_place.x, _place.y, _place.width, _place.height);
+            vout_display_opengl_Viewport(glsys->vgl, _place.x, _place.y, _place.width, _place.height);
         }
     }
 
