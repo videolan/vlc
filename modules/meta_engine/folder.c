@@ -38,7 +38,7 @@
 #include <vlc_url.h>
 #include <vlc_input_item.h>
 
-static const char* cover_files[] = {
+static const char cover_files[][20] = {
     "Folder.jpg",           /* Windows */
     "Folder.png",
     "AlbumArtSmall.jpg",    /* Windows */
