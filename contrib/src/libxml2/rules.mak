@@ -1,6 +1,6 @@
 # libxml2
 
-LIBXML2_VERSION := 2.9.4
+LIBXML2_VERSION := 2.9.8
 LIBXML2_URL := http://xmlsoft.org/sources/libxml2-$(LIBXML2_VERSION).tar.gz
 
 PKGS += libxml2
@@ -37,14 +37,12 @@ endif
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
-	$(APPLY) $(SRC)/libxml2/no-tests.patch
 	$(APPLY) $(SRC)/libxml2/win32.patch
 	$(APPLY) $(SRC)/libxml2/bins.patch
 	$(APPLY) $(SRC)/libxml2/pthread.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libxml2/nogetcwd.patch
 endif
-	$(APPLY) $(SRC)/libxml2/libxml2-lzma.patch
 	$(call pkg_static,"libxml-2.0.pc.in")
 	$(MOVE)
 
