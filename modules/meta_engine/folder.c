@@ -40,6 +40,7 @@
 
 static const char* cover_files[] = {
     "Folder.jpg",           /* Windows */
+    "Folder.png",
     "AlbumArtSmall.jpg",    /* Windows */
     "AlbumArt.jpg",         /* Windows */
     "Album.jpg",
