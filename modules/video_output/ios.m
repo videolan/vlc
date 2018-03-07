@@ -239,9 +239,10 @@ static void Close (vlc_object_t *this)
 
             if (likely(glsys->vgl))
             {
-                vlc_gl_MakeCurrent(sys->gl);
+                int ret = vlc_gl_MakeCurrent(sys->gl);
                 vout_display_opengl_Delete(glsys->vgl);
-                vlc_gl_ReleaseCurrent(sys->gl);
+                if (ret == VLC_SUCCESS)
+                    vlc_gl_ReleaseCurrent(sys->gl);
             }
             vlc_object_release(sys->gl);
         }
