@@ -91,9 +91,12 @@ vlc_module_end ()
     CAEAGLLayer *_layer;
 
     vlc_mutex_t _mutex;
+    vlc_cond_t  _gl_attached_wait;
+    BOOL        _gl_attached;
 
     BOOL _bufferNeedReset;
     BOOL _appActive;
+    BOOL _eaglEnabled;
     BOOL _placeInvalidated;
 
     UIView *_viewContainer;
@@ -109,7 +112,7 @@ vlc_module_end ()
 }
 
 - (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
-- (void)cleanAndRelease;
+- (void)cleanAndRelease:(BOOL)flushed;
 - (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
 - (void)presentRenderbuffer;
@@ -233,6 +236,7 @@ static void Close (vlc_object_t *this)
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {
+        BOOL flushed = NO;
         if (sys->gl != NULL) {
             struct gl_sys *glsys = sys->gl->sys;
             msg_Dbg(this, "deleting display");
@@ -242,12 +246,15 @@ static void Close (vlc_object_t *this)
                 int ret = vlc_gl_MakeCurrent(sys->gl);
                 vout_display_opengl_Delete(glsys->vgl);
                 if (ret == VLC_SUCCESS)
+                {
                     vlc_gl_ReleaseCurrent(sys->gl);
+                    flushed = YES;
+                }
             }
             vlc_object_release(sys->gl);
         }
 
-        [sys->glESView cleanAndRelease];
+        [sys->glESView cleanAndRelease:flushed];
     }
     var_Destroy(vd->obj.parent, "ios-eaglcontext");
 }
@@ -391,11 +398,14 @@ static void GLESSwap(vlc_gl_t *gl)
     if (!self)
         return nil;
 
+    _eaglEnabled = YES;
     _bufferNeedReset = YES;
     _voutDisplay = vd;
     _cfg = *_voutDisplay->cfg;
 
     vlc_mutex_init(&_mutex);
+    vlc_cond_init(&_gl_attached_wait);
+    _gl_attached = YES;
 
     /* the following creates a new OpenGL ES context with the API version we
      * need if there is already an active context created by another OpenGL
@@ -411,6 +421,7 @@ static void GLESSwap(vlc_gl_t *gl)
         if (_eaglContext)
             [_eaglContext release];
         vlc_mutex_destroy(&_mutex);
+        vlc_cond_destroy(&_gl_attached_wait);
         [super dealloc];
         return nil;
     }
@@ -428,6 +439,7 @@ static void GLESSwap(vlc_gl_t *gl)
     if (![self fetchViewContainer])
     {
         vlc_mutex_destroy(&_mutex);
+        vlc_cond_destroy(&_gl_attached_wait);
         [_eaglContext release];
         [super dealloc];
         return nil;
@@ -442,6 +454,15 @@ static void GLESSwap(vlc_gl_t *gl)
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+
     return self;
 }
 
@@ -494,20 +515,8 @@ static void GLESSwap(vlc_gl_t *gl)
     }
 }
 
-- (void)cleanAndRelease
+- (void)cleanAndReleaseFromMainThread
 {
-    if (![NSThread isMainThread])
-    {
-        vlc_mutex_lock(&_mutex);
-        _voutDisplay = nil;
-        vlc_mutex_unlock(&_mutex);
-
-        [self performSelectorOnMainThread:@selector(cleanAndRelease)
-                               withObject:nil
-                            waitUntilDone:NO];
-        return;
-    }
-
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
@@ -516,13 +525,29 @@ static void GLESSwap(vlc_gl_t *gl)
     [self removeFromSuperview];
     [_viewContainer release];
 
+    assert(!_gl_attached);
     [_eaglContext release];
     [self release];
+}
+
+- (void)cleanAndRelease:(BOOL)flushed
+{
+    vlc_mutex_lock(&_mutex);
+    if (_eaglEnabled && !flushed)
+        [self flushEAGLLocked];
+    _voutDisplay = nil;
+    _eaglEnabled = NO;
+    vlc_mutex_unlock(&_mutex);
+
+    [self performSelectorOnMainThread:@selector(cleanAndReleaseFromMainThread)
+                           withObject:nil
+                        waitUntilDone:NO];
 }
 
 - (void)dealloc
 {
     vlc_mutex_destroy(&_mutex);
+    vlc_cond_destroy(&_gl_attached_wait);
     [super dealloc];
 }
 
@@ -575,12 +600,14 @@ static void GLESSwap(vlc_gl_t *gl)
 - (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl
 {
     vlc_mutex_lock(&_mutex);
+    assert(!_gl_attached);
 
     if (unlikely(!_appActive))
     {
         vlc_mutex_unlock(&_mutex);
         return NO;
     }
+    assert(_eaglEnabled);
 
     *previousEaglContext = [EAGLContext currentContext];
 
@@ -609,11 +636,14 @@ static void GLESSwap(vlc_gl_t *gl)
         }
     }
 
+    if (success)
+        _gl_attached = YES;
+
     vlc_mutex_unlock(&_mutex);
 
     if (resetBuffers && ![self doResetBuffers:gl])
     {
-        [EAGLContext setCurrentContext:*previousEaglContext];
+        [self releaseCurrent:*previousEaglContext];
         return NO;
     }
     return success;
@@ -622,6 +652,12 @@ static void GLESSwap(vlc_gl_t *gl)
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext
 {
     [EAGLContext setCurrentContext:previousEaglContext];
+
+    vlc_mutex_lock(&_mutex);
+    assert(_gl_attached);
+    _gl_attached = NO;
+    vlc_mutex_unlock(&_mutex);
+    vlc_cond_signal(&_gl_attached_wait);
 }
 
 - (void)presentRenderbuffer
@@ -718,16 +754,50 @@ static void GLESSwap(vlc_gl_t *gl)
                         waitUntilDone:NO];
 }
 
+- (void)flushEAGLLocked
+{
+    assert(_eaglEnabled);
+
+    /* Ensure that all previously submitted commands are drained from the
+     * command buffer and are executed by OpenGL ES before moving to the
+     * background.*/
+    EAGLContext *previousEaglContext = [EAGLContext currentContext];
+    if ([EAGLContext setCurrentContext:_eaglContext])
+    {
+        glFinish();
+        glFlush();
+    }
+    [EAGLContext setCurrentContext:previousEaglContext];
+}
+
 - (void)applicationStateChanged:(NSNotification *)notification
 {
     vlc_mutex_lock(&_mutex);
 
-    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification]
-        || [[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification]
-        || [[notification name] isEqualToString:UIApplicationWillTerminateNotification])
+    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
         _appActive = NO;
+    else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
+    {
+        _appActive = NO;
+
+        if (_eaglEnabled)
+        {
+            /* Wait for the vout to unlock the eagl context before releasing
+             * it. */
+            while (_gl_attached)
+                vlc_cond_wait(&_gl_attached_wait, &_mutex);
+
+            [self flushEAGLLocked];
+            _eaglEnabled = NO;
+        }
+    }
+    else if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
+        _eaglEnabled = YES;
     else
+    {
+        assert([[notification name] isEqualToString:UIApplicationDidBecomeActiveNotification]);
         _appActive = YES;
+    }
 
     vlc_mutex_unlock(&_mutex);
 }
