@@ -583,17 +583,36 @@ static void DictionaryMerge( const vlc_dictionary_t *p_src, vlc_dictionary_t *p_
     }
 }
 
-static void DictMergeWithStyleID( ttml_context_t *p_ctx, const char *psz_id,
+static void DictMergeWithStyleID( ttml_context_t *p_ctx, const char *psz_styles,
                                   vlc_dictionary_t *p_dst )
 {
     assert(p_ctx->p_rootnode);
-    if( psz_id && p_ctx->p_rootnode )
+    char *psz_dup;
+    if( psz_styles && p_ctx->p_rootnode && (psz_dup = strdup( psz_styles )) )
     {
-        /* Lookup referenced style ID */
-        const tt_node_t *p_node = FindNode( p_ctx->p_rootnode,
-                                            "style", -1, psz_id );
-        if( p_node )
-            DictionaryMerge( &p_node->attr_dict, p_dst, false );
+        /* Use temp dict instead of reverse token processing to
+         * resolve styles in specified order */
+        vlc_dictionary_t tempdict;
+        vlc_dictionary_init( &tempdict, 0 );
+
+        char *saveptr;
+        char *psz_id = strtok_r( psz_dup, " ", &saveptr );
+        while( psz_id )
+        {
+            /* Lookup referenced style ID */
+            const tt_node_t *p_node = FindNode( p_ctx->p_rootnode,
+                                                "style", -1, psz_id );
+            if( p_node )
+                DictionaryMerge( &p_node->attr_dict, &tempdict, true );
+
+            psz_id = strtok_r( NULL, " ", &saveptr );
+        }
+
+        if( !vlc_dictionary_is_empty( &tempdict ) )
+            DictionaryMerge( &tempdict, p_dst, false );
+
+        vlc_dictionary_clear( &tempdict, NULL, NULL );
+        free( psz_dup );
     }
 }
 
