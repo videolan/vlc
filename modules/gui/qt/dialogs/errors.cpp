@@ -52,6 +52,7 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf )
     messages->setReadOnly( true );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     stopShowing = new QCheckBox( qtr( "Hide future errors" ) );
+    stopShowing->setChecked( var_InheritInteger( p_intf, "qt-error-dialogs" ) != 0 );
 
     layout->addWidget( messages, 0, 0, 1, 3 );
     layout->addWidget( stopShowing, 1, 0 );
@@ -74,14 +75,14 @@ void ErrorsDialog::addError( const QString& title, const QString& text )
 
 void ErrorsDialog::add( bool error, const QString& title, const QString& text )
 {
-    if( stopShowing->isChecked() ) return;
     messages->textCursor().movePosition( QTextCursor::End );
     messages->setTextColor( error ? "red" : "yellow" );
     messages->insertPlainText( title + QString( ":\n" ) );
     messages->setTextColor( "black" );
     messages->insertPlainText( text + QString( "\n" ) );
     messages->ensureCursorVisible();
-    show();
+    if ( var_InheritInteger( p_intf, "qt-error-dialogs" ) != 0 )
+        show();
 }
 
 void ErrorsDialog::close()
@@ -98,6 +99,6 @@ void ErrorsDialog::dontShow()
 {
     if( stopShowing->isChecked() )
     {
-        config_PutInt( p_intf, "qt-show-errors", 0 );
+        config_PutInt( p_intf, "qt-error-dialogs", 0 );
     }
 }
