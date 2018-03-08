@@ -900,7 +900,8 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    assert( p_sys->data != NULL );
+    if( p_sys->data == NULL )
+        return 0;
     assert( !p_sys->out );
 
     ssize_t i_read = vlc_tls_Read( p_sys->data, p_buffer, i_len, false );
