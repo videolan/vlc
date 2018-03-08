@@ -396,6 +396,10 @@ typedef int64_t stime_t;
 
 #define ATOM_SA3D VLC_FOURCC( 'S', 'A', '3', 'D' )
 
+/* iso4 meta references */
+#define ATOM_iloc VLC_FOURCC('i','l','o','c')
+#define ATOM_iinf VLC_FOURCC('i','i','n','f')
+
 #define HANDLER_mdta VLC_FOURCC('m', 'd', 't', 'a')
 #define HANDLER_mdir VLC_FOURCC('m', 'd', 'i', 'r')
 #define HANDLER_ID32 ATOM_ID32
@@ -1621,6 +1625,34 @@ typedef struct
     uint32_t i_num_channels;
 } MP4_Box_data_SA3D_t;
 
+typedef struct
+{
+    uint8_t i_offset_size;
+    uint8_t i_length_size;
+    uint8_t i_base_offset_size;
+    uint8_t i_index_size;
+    uint32_t i_item_count;
+    struct
+    {
+        uint32_t i_item_id;
+        uint8_t  i_construction_method;
+        uint16_t i_data_reference_index;
+        uint64_t i_base_offset;
+        uint16_t i_extent_count;
+        struct
+        {
+            uint64_t i_extent_index;
+            uint64_t i_extent_offset;
+            uint64_t i_extent_length;
+        } *p_extents;
+    } *p_items;
+} MP4_Box_data_iloc_t;
+
+typedef struct
+{
+    uint32_t i_entry_count;
+} MP4_Box_data_iinf_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1734,6 +1766,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_equi_t *p_equi;
     MP4_Box_data_cbmp_t *p_cbmp;
     MP4_Box_data_SA3D_t *p_SA3D;
+
+    MP4_Box_data_iloc_t *p_iloc;
+    MP4_Box_data_iinf_t *p_iinf;
 
     /* for generic handlers */
     MP4_Box_data_binary_t *p_binary;
