@@ -181,6 +181,7 @@ struct decoder_sys_t
 
     h264_poc_context_t          h264_pocctx;
     hevc_poc_ctx_t              hevc_pocctx;
+    bool                        b_drop_blocks;
     date_t                      pts;
 
     struct pic_holder          *pic_holder;
@@ -646,6 +647,25 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                     hevc_decode_slice_header(p_nal, i_nal, true, GetxPSHEVC, p_sys);
             if(!p_sli)
                 return false;
+
+            /* XXX: Work-around a VT bug on recent devices (iPhone X, MacBook
+             * Pro 2017). The VT session will report a BadDataErr if you send a
+             * RASL frame just after a CRA one. Indeed, RASL frames are
+             * corrupted if the decoding start at an IRAP frame (IDR/CRA), VT
+             * is likely failing to handle this case. */
+            if (!p_sys->b_vt_feed && (i_nal_type != HEVC_NAL_IDR_W_RADL &&
+                                      i_nal_type != HEVC_NAL_IDR_N_LP))
+                p_sys->b_drop_blocks = true;
+            else if (p_sys->b_drop_blocks)
+            {
+                if (i_nal_type == HEVC_NAL_RASL_N || i_nal_type == HEVC_NAL_RASL_R)
+                {
+                    hevc_rbsp_release_slice_header(p_sli);
+                    return false;
+                }
+                else
+                    p_sys->b_drop_blocks = false;
+            }
 
             p_info->b_keyframe = i_nal_type >= HEVC_NAL_BLA_W_LP;
 
@@ -1298,6 +1318,7 @@ static void StopVideoToolbox(decoder_t *p_dec)
         p_sys->videoFormatDescription = nil;
     }
     p_sys->b_vt_feed = false;
+    p_sys->b_drop_blocks = false;
 }
 
 #pragma mark - module open and close
@@ -1784,6 +1805,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     assert(RemoveOneFrameFromDPB(p_sys) == NULL);
     p_sys->b_vt_flush = false;
     p_sys->b_vt_feed = false;
+    p_sys->b_drop_blocks = false;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
