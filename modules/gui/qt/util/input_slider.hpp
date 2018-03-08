@@ -55,7 +55,8 @@ class SeekSlider : public QSlider
     Q_PROPERTY(qreal handleOpacity READ handleOpacity WRITE setHandleOpacity)
     Q_PROPERTY(qreal loadingProperty READ loading WRITE setLoading)
 public:
-    SeekSlider( Qt::Orientation q, QWidget *_parent = 0, bool _classic = false );
+    SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_parent = 0,
+                bool _classic = false );
     virtual ~SeekSlider();
     void setChapters( SeekPoints * );
 
@@ -84,6 +85,7 @@ protected:
     int   getValueFromXPos( int );
 
 private:
+    intf_thread_t *p_intf;
     bool isSliding;        /* Whether we are currently sliding by user action */
     bool isJumping;              /* if we requested a jump to another chapter */
     int inputLength;                           /* InputLength that can change */
