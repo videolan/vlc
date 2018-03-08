@@ -463,7 +463,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             break;
         case INPUT_SLIDER:
             {
-                SeekSlider *slider = new SeekSlider( Qt::Horizontal, this );
+                SeekSlider *slider = new SeekSlider( p_intf, Qt::Horizontal, this );
                 widget = slider;
             }
             widgetItem->setText( qtr("Time Slider") );
