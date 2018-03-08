@@ -39,9 +39,9 @@
 
 static void on_paused_changed_cb(void *data, bool paused);
 
-struct demux_sys_t
+struct demux_cc
 {
-    demux_sys_t(demux_t * const demux, chromecast_common * const renderer)
+    demux_cc(demux_t * const demux, chromecast_common * const renderer)
         :p_demux(demux)
         ,p_renderer(renderer)
         ,m_enabled( true )
@@ -158,7 +158,7 @@ struct demux_sys_t
         m_last_pos = m_start_pos;
     }
 
-    ~demux_sys_t()
+    ~demux_cc()
     {
         if( p_renderer )
         {
@@ -462,14 +462,14 @@ static void on_paused_changed_cb( void *data, bool paused )
 
 static int Demux( demux_t *p_demux_filter )
 {
-    demux_sys_t *p_sys = (demux_sys_t *)p_demux_filter->p_sys;
+    demux_cc *p_sys = reinterpret_cast<demux_cc*>(p_demux_filter->p_sys);
 
     return p_sys->Demux();
 }
 
 static int Control( demux_t *p_demux_filter, int i_query, va_list args)
 {
-    demux_sys_t *p_sys = (demux_sys_t *)p_demux_filter->p_sys;
+    demux_cc *p_sys = reinterpret_cast<demux_cc*>(p_demux_filter->p_sys);
 
     return p_sys->Control( p_demux_filter, i_query, args );
 }
@@ -485,11 +485,12 @@ int Open(vlc_object_t *p_this)
         return VLC_ENOOBJ;
     }
 
-    demux_sys_t *p_sys = new(std::nothrow) demux_sys_t( p_demux, p_renderer );
+    demux_cc *p_sys = new(std::nothrow) demux_cc( p_demux, p_renderer );
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
     p_demux->p_sys = p_sys;
+    p_demux->p_sys = reinterpret_cast<demux_sys_t*>(p_sys);
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
@@ -499,7 +500,7 @@ int Open(vlc_object_t *p_this)
 void Close(vlc_object_t *p_this)
 {
     demux_t *p_demux = reinterpret_cast<demux_t*>(p_this);
-    demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
+    demux_cc *p_sys = reinterpret_cast<demux_cc*>(p_demux->p_sys);
 
     delete p_sys;
 }
