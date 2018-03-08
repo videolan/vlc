@@ -30,7 +30,6 @@ package-win-sdk:
 	mkdir -p "$(win32_destdir)/sdk/lib/"
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
-	cd $(prefix)/lib && cp -rv libvlc.la libvlccore.la "$(win32_destdir)/sdk/lib/"
 	cd $(prefix)/lib && cp -rv libvlc.dll.a "$(win32_destdir)/sdk/lib/libvlc.lib"
 	cd $(prefix)/lib && cp -rv libvlccore.dll.a "$(win32_destdir)/sdk/lib/libvlccore.lib"
 	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def"
