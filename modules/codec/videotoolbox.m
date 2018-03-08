@@ -49,6 +49,7 @@
 #import <mach/machine.h>
 
 #define ALIGN_16( x ) ( ( ( x ) + 15 ) / 16 * 16 )
+#define VT_RESTART_MAX 1
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
@@ -175,6 +176,7 @@ struct decoder_sys_t
     bool                        b_format_propagated;
 
     enum vtsession_status       vtsession_status;
+    unsigned                    i_restart_count;
 
     int                         i_cvpx_format;
     bool                        b_cvpx_format_forced;
@@ -1708,6 +1710,8 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                           enum vtsession_status * p_vtsession_status)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
 #define VTERRCASE(x) \
     case x: msg_Warn(p_dec, "vt session error: '" #x "'"); break;
 
@@ -1768,6 +1772,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case kVTVideoDecoderBadDataErr:
             case kVTInvalidSessionErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
+                p_sys->i_restart_count++;
                 break;
             default:
                 *p_vtsession_status = VTSESSION_STATUS_OK;
@@ -1860,19 +1865,27 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
     {
-        msg_Warn(p_dec, "restarting vt session (dec callback failed)");
-        vlc_mutex_unlock(&p_sys->lock);
-
-        /* Session will be started by Late Start code block */
-        StopVideoToolbox(p_dec);
-        if (p_dec->fmt_in.i_extra == 0)
+        if (p_sys->i_restart_count <= VT_RESTART_MAX)
         {
-            /* Clean old parameter sets since they may be corrupt */
-            hxxx_helper_clean(&p_sys->hh);
-        }
+            msg_Warn(p_dec, "restarting vt session (dec callback failed)");
+            vlc_mutex_unlock(&p_sys->lock);
 
-        vlc_mutex_lock(&p_sys->lock);
-        p_sys->vtsession_status = VTSESSION_STATUS_OK;
+            /* Session will be started by Late Start code block */
+            StopVideoToolbox(p_dec);
+            if (p_dec->fmt_in.i_extra == 0)
+            {
+                /* Clean old parameter sets since they may be corrupt */
+                hxxx_helper_clean(&p_sys->hh);
+            }
+
+            vlc_mutex_lock(&p_sys->lock);
+            p_sys->vtsession_status = VTSESSION_STATUS_OK;
+        }
+        else
+        {
+            msg_Warn(p_dec, "too many vt failure...");
+            p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        }
     }
 
     if (p_sys->vtsession_status == VTSESSION_STATUS_ABORT)
@@ -2219,6 +2232,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             picture_Release(p_pic);
             goto end;
         }
+
+        p_sys->i_restart_count = 0;
 
         OnDecodedFrame( p_dec, p_info );
         p_info = NULL;
