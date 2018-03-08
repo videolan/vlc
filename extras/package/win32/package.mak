@@ -99,7 +99,7 @@ package-win32-webplugin-common: package-win-strip
 
 package-win32-xpi: package-win32-webplugin-common
 	cp $(top_builddir)/npapi-vlc/npapi/package/install.rdf "$(win32_xpi_destdir)/"
-	zip -r -9 "../$(WINVERSION).xpi" $(win32_xpi_destdir)/install.rdf $(win32_xpi_destdir)/plugins
+	zip -r -9 $(WINVERSION).xpi $(win32_xpi_destdir)/install.rdf $(win32_xpi_destdir)/plugins
 
 
 package-win32-crx: package-win32-webplugin-common
