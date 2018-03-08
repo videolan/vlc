@@ -41,11 +41,6 @@ hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
     memset(hh, 0, sizeof(struct hxxx_helper));
     hh->p_obj = p_obj;
     hh->i_codec = i_codec;
-    switch (i_codec)
-    {
-        case VLC_CODEC_H264:
-            break;
-    }
     hh->b_need_xvcC = b_need_xvcC;
 }
 
