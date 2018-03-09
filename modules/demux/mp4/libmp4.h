@@ -400,6 +400,7 @@ typedef int64_t stime_t;
 #define ATOM_iloc VLC_FOURCC('i','l','o','c')
 #define ATOM_iinf VLC_FOURCC('i','i','n','f')
 #define ATOM_infe VLC_FOURCC('i','n','f','e')
+#define ATOM_iref VLC_FOURCC('i','r','e','f')
 #define ATOM_pitm VLC_FOURCC('p','i','t','m')
 /* HEIF specific meta */
 #define ATOM_iprp VLC_FOURCC('i','p','r','p')
@@ -1637,6 +1638,22 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_from_item_id;
+    uint16_t i_reference_count;
+    struct
+    {
+        uint32_t i_to_item_id;
+    } *p_references;
+} MP4_Box_data_refbox_t;
+
+typedef struct
+{
+    uint8_t i_version;
+    uint32_t i_flags;
+} MP4_Box_data_iref_t;
+
+typedef struct
+{
     uint8_t i_offset_size;
     uint8_t i_length_size;
     uint8_t i_base_offset_size;
@@ -1815,6 +1832,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_cbmp_t *p_cbmp;
     MP4_Box_data_SA3D_t *p_SA3D;
 
+    MP4_Box_data_refbox_t *p_refbox;
+    MP4_Box_data_iref_t *p_iref;
     MP4_Box_data_iloc_t *p_iloc;
     MP4_Box_data_iinf_t *p_iinf;
     MP4_Box_data_infe_t *p_infe;

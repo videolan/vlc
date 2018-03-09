@@ -4254,6 +4254,78 @@ static int MP4_ReadBox_SA3D( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_Reference( MP4_Box_t *p_box )
+{
+    MP4_Box_data_refbox_t *p_data = p_box->data.p_refbox;
+    free( p_data->p_references );
+}
+
+static int MP4_ReadBox_Reference( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_refbox_t, MP4_FreeBox_Reference );
+    MP4_Box_data_refbox_t *p_data = p_box->data.p_refbox;
+
+    if( p_box->p_father->data.p_iref->i_flags == 0 )
+        MP4_GET2BYTES( p_data->i_from_item_id );
+    else
+        MP4_GET4BYTES( p_data->i_from_item_id );
+    MP4_GET2BYTES( p_data->i_reference_count );
+
+    if( i_read / sizeof(*p_data->p_references) < p_data->i_reference_count )
+        MP4_READBOX_EXIT( 0 );
+
+    p_data->p_references = malloc( sizeof(*p_data->p_references) *
+                                   p_data->i_reference_count );
+    if( !p_data->p_references )
+        MP4_READBOX_EXIT( 0 );
+    for( uint16_t i=0; i<p_data->i_reference_count; i++ )
+    {
+        if( p_box->p_father->data.p_iref == 0 )
+            MP4_GET2BYTES( p_data->p_references[i].i_to_item_id );
+        else
+            MP4_GET4BYTES( p_data->p_references[i].i_to_item_id );
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_iref( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_iref_t, 12, NULL );
+    MP4_Box_data_iref_t *p_data = p_box->data.p_iref;
+    if( i_read < 4 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_data->i_version );
+    MP4_GET3BYTES( p_data->i_flags );
+    if( p_data->i_version > 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    assert( i_read == 0 );
+
+    uint32_t i = 0;
+    uint64_t i_remain = p_box->i_size - 12;
+    while ( i_remain > 8 )
+    {
+        MP4_Box_t *p_childbox = MP4_ReadBoxUsing( p_stream, p_box,
+                                                  MP4_ReadBox_Reference );
+        if( !p_childbox || i_remain < p_childbox->i_size )
+        {
+            MP4_BoxFree( p_childbox );
+            break;
+        }
+
+        MP4_BoxAddChild( p_box, p_childbox );
+        i_remain -= p_childbox->i_size;
+        i++;
+    }
+
+    if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_iloc( MP4_Box_t *p_box )
 {
     MP4_Box_data_iloc_t *p_data = p_box->data.p_iloc;
@@ -5078,6 +5150,7 @@ static const struct
     { ATOM_iloc,    MP4_ReadBox_iloc,        ATOM_meta },
     { ATOM_iinf,    MP4_ReadBox_iinf,        ATOM_meta },
     { ATOM_infe,    MP4_ReadBox_infe,        ATOM_iinf },
+    { ATOM_iref,    MP4_ReadBox_iref,        ATOM_meta },
     { ATOM_pitm,    MP4_ReadBox_pitm,        ATOM_meta },
 
     /* HEIF specific meta references */
