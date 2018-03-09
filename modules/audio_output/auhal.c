@@ -886,7 +886,7 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     else
         p_sys->i_new_selected_dev = 0;
 
-    p_sys->i_new_selected_dev = p_sys->i_new_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
+    p_sys->i_new_selected_dev = p_sys->i_new_selected_dev;
 
     aout_DeviceReport(p_aout, name);
     aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
@@ -1453,7 +1453,20 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_changed_mixing = false;
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
-    p_sys->i_selected_dev = p_sys->i_new_selected_dev;
+    bool do_spdif;
+    if (AOUT_FMT_SPDIF (fmt))
+    {
+        if (!(p_sys->i_new_selected_dev & AOUT_VAR_SPDIF_FLAG))
+        {
+            vlc_mutex_unlock(&p_sys->selected_device_lock);
+            return VLC_EGENERIC;
+        }
+        do_spdif = true;
+    }
+    else
+        do_spdif = false;
+
+    p_sys->i_selected_dev = p_sys->i_new_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
@@ -1528,7 +1541,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     mtime_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
 
     /* Check for Digital mode or Analog output mode */
-    if (AOUT_FMT_SPDIF (fmt))
+    if (do_spdif)
     {
         if (StartSPDIF (p_aout, fmt, i_latency_us) == VLC_SUCCESS)
         {
