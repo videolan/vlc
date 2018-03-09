@@ -272,8 +272,8 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
 
     cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferPixelFormatTypeKey,
                      cvpx_format);
-    cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferWidthKey, fmt->i_width);
-    cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferHeightKey, fmt->i_height);
+    cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferWidthKey, fmt->i_visible_width);
+    cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferHeightKey, fmt->i_visible_height);
     /* Required by CIFilter to render IOSurface */
     cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferBytesPerRowAlignmentKey, 16);
 
