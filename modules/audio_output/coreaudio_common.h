@@ -91,6 +91,7 @@ AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 
 int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
                    audio_sample_format_t *fmt,
-                   const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us);
+                   const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us,
+                   bool *warn_configuration);
 
 void au_Uninitialize(audio_output_t *p_aout, AudioUnit au);
