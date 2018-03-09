@@ -1772,7 +1772,6 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case kVTVideoDecoderBadDataErr:
             case kVTInvalidSessionErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
-                p_sys->i_restart_count++;
                 break;
             default:
                 *p_vtsession_status = VTSESSION_STATUS_OK;
@@ -1985,6 +1984,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     else
     {
         vlc_mutex_lock(&p_sys->lock);
+        if (vtsession_status == VTSESSION_STATUS_RESTART)
+            p_sys->i_restart_count++;
         p_sys->vtsession_status = vtsession_status;
         /* In case of abort, the decoder module will be reloaded next time
          * since we already modified the input block */
@@ -2146,7 +2147,11 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     if (HandleVTStatus(p_dec, status, &vtsession_status) != VLC_SUCCESS)
     {
         if (p_sys->vtsession_status != VTSESSION_STATUS_ABORT)
+        {
             p_sys->vtsession_status = vtsession_status;
+            if (vtsession_status == VTSESSION_STATUS_RESTART)
+                p_sys->i_restart_count++;
+        }
         goto end;
     }
     if (unlikely(!imageBuffer))
