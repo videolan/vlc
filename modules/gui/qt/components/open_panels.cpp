@@ -287,7 +287,7 @@ void FileOpenPanel::updateMRL()
 
     /* Options */
     if( ui.subGroupBox->isChecked() &&  !subUrl.isEmpty() ) {
-        mrl.append( " :sub-file=" + colon_escape( subUrl.toEncoded() ) );
+        mrl.append( " :sub-file=" + colon_escape( subUrl.toLocalFile() ) );
     }
 
     emit methodChanged( "file-caching" );
