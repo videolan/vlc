@@ -3108,7 +3108,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
 
         if( fmt->audio.i_physical_channels )
             info_category_AddInfo( p_cat, _("Channels"), "%s",
-                                   _( aout_FormatPrintChannels( &fmt->audio ) ) );
+                vlc_gettext( aout_FormatPrintChannels( &fmt->audio ) ) );
 
         if( fmt->audio.i_rate != 0 )
         {
@@ -3189,7 +3189,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                N_("Left bottom"), N_("Right top"),
            };
            info_category_AddInfo( p_cat, _("Orientation"), "%s",
-                                  _(orient_names[fmt->video.orientation]) );
+               vlc_gettext(orient_names[fmt->video.orientation]) );
        }
        if( fmt->video.primaries != COLOR_PRIMARIES_UNDEF )
        {
@@ -3207,7 +3207,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static_assert(ARRAY_SIZE(primaries_names) == COLOR_PRIMARIES_MAX+1,
                          "Color primiaries table mismatch");
            info_category_AddInfo( p_cat, _("Color primaries"), "%s",
-                                  _(primaries_names[fmt->video.primaries]) );
+               vlc_gettext(primaries_names[fmt->video.primaries]) );
        }
        if( fmt->video.transfer != TRANSFER_FUNC_UNDEF )
        {
@@ -3225,7 +3225,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static_assert(ARRAY_SIZE(func_names) == TRANSFER_FUNC_MAX+1,
                          "Transfer functions table mismatch");
            info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
-                                  _(func_names[fmt->video.transfer]) );
+               vlc_gettext(func_names[fmt->video.transfer]) );
        }
        if( fmt->video.space != COLOR_SPACE_UNDEF )
        {
@@ -3238,8 +3238,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static_assert(ARRAY_SIZE(space_names) == COLOR_SPACE_MAX+1,
                          "Color space table mismatch");
            info_category_AddInfo( p_cat, _("Color space"), _("%s %s Range"),
-                                  _(space_names[fmt->video.space]),
-                       _(fmt->video.b_color_range_full ? "Full" : "Limited") );
+               vlc_gettext(space_names[fmt->video.space]),
+               vlc_gettext(fmt->video.b_color_range_full
+                           ? N_("Full") : N_("Limited")) );
        }
        if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
        {
@@ -3255,7 +3256,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static_assert(ARRAY_SIZE(c_loc_names) == CHROMA_LOCATION_MAX+1,
                          "Chroma location table mismatch");
            info_category_AddInfo( p_cat, _("Chroma location"), "%s",
-                   _(c_loc_names[fmt->video.chroma_location]) );
+               vlc_gettext(c_loc_names[fmt->video.chroma_location]) );
        }
        if( fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR )
        {
@@ -3275,7 +3276,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                vlc_assert_unreachable();
                break;
            }
-           info_category_AddInfo( p_cat, _("Projection"), "%s", _(psz_loc_name) );
+           info_category_AddInfo( p_cat, _("Projection"), "%s",
+                                  vlc_gettext(psz_loc_name) );
 
            info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Yaw"),
                                   "%.2f", fmt->video.pose.yaw );
