@@ -3912,6 +3912,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->i_handler = BOXDATA(p_hdlr)->i_handler_type;
         switch( p_box->i_handler )
         {
+            case HANDLER_pict:
             case HANDLER_mdta:
             case HANDLER_mdir:
                 /* then it behaves like a container */
