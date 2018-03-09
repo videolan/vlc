@@ -69,7 +69,6 @@ static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix
 struct filter_sys_t
 {
     bool is_yuv_planar;
-    bool b_old;
     picture_t *p_old;
     uint32_t *p_buf;
     uint32_t *p_buf2;
@@ -116,17 +115,14 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->is_yuv_planar = is_yuv_planar;
-    p_sys->b_old = false;
-    p_sys->p_old = picture_NewFromFormat( p_fmt );
+    p_sys->p_old = NULL;
     p_sys->p_buf  = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
     p_sys->p_buf2 = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
 
-    if( !p_sys->p_old || !p_sys->p_buf || !p_sys->p_buf2 )
+    if( !p_sys->p_buf || !p_sys->p_buf2 )
     {
         free( p_sys->p_buf2 );
         free( p_sys->p_buf );
-        if( p_sys->p_old )
-            picture_Release( p_sys->p_old );
         return VLC_ENOMEM;
     }
 
@@ -143,7 +139,8 @@ static void Destroy( vlc_object_t *p_this )
 
     free( p_sys->p_buf2 );
     free( p_sys->p_buf );
-    picture_Release( p_sys->p_old );
+    if( p_sys->p_old )
+        picture_Release( p_sys->p_old );
     free( p_sys );
 }
 
@@ -272,10 +269,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     }
     picture_Copy( p_outpic, p_inpic );
 
-    if( !p_sys->b_old )
+    if( !p_sys->p_old )
     {
-        picture_Copy( p_sys->p_old, p_inpic );
-        p_sys->b_old = true;
+        p_sys->p_old = picture_Hold( p_inpic );
         goto exit;
     }
 
@@ -307,11 +303,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
      */
     Draw( p_filter, &p_outpic->p[Y_PLANE].p_pixels[i_pix_offset], p_outpic->p[Y_PLANE].i_pitch, i_pix_size );
 
-    /**
-     * We're done. Lets keep a copy of the picture
-     * TODO we may just picture_Release with a latency of 1 if the filters/vout
-     * handle it correctly */
-    picture_Copy( p_sys->p_old, p_inpic );
+    /* We're done. Lets keep a copy of the picture */
+    picture_Release( p_sys->p_old );
+    p_sys->p_old = picture_Hold( p_inpic );
 
 exit:
     picture_Release( p_inpic );
