@@ -3031,7 +3031,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
     const es_format_t *p_fmt_es = &es->fmt;
-    lldiv_t         div;
 
     if( es->fmt.i_cat == fmt->i_cat )
     {
@@ -3163,15 +3162,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        if( fmt->video.i_frame_rate > 0 &&
            fmt->video.i_frame_rate_base > 0 )
        {
-           div = lldiv( (float)fmt->video.i_frame_rate /
-                               fmt->video.i_frame_rate_base * 1000000,
-                               1000000 );
-           if( div.rem > 0 )
-               info_category_AddInfo( p_cat, _("Frame rate"), "%"PRId64".%06u",
-                                      div.quot, (unsigned int )div.rem );
+           if( fmt->video.i_frame_rate_base == 1 )
+               info_category_AddInfo( p_cat, _("Frame rate"), "%u",
+                                      fmt->video.i_frame_rate );
            else
-               info_category_AddInfo( p_cat, _("Frame rate"), "%"PRId64,
-                                      div.quot );
+               info_category_AddInfo( p_cat, _("Frame rate"), "%.6f",
+                                      (double)fmt->video.i_frame_rate
+                                      / (double)fmt->video.i_frame_rate_base );
        }
        if( fmt->i_codec != p_fmt_es->i_codec )
        {
