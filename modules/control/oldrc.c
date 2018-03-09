@@ -1772,7 +1772,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
 }
 
 #if defined(_WIN32) && !VLC_WINSTORE_APP
-static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
+static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
     DWORD i_dw;
@@ -1781,9 +1781,11 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     while( WaitForSingleObjectEx( p_intf->p_sys->hConsoleIn,
                                 INTF_IDLE_SLEEP/1000, TRUE ) == WAIT_OBJECT_0 )
     {
-        while( *pi_size < MAX_LINE_LENGTH &&
-               ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
-                                 1, &i_dw ) )
+        // Prefer to fail early when there's not enough space to store a 4 bytes
+        // UTF8 character. The function will be immediatly called again and we won't
+        // lose an input
+        while( *pi_size < MAX_LINE_LENGTH - 4 &&
+               ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record, 1, &i_dw ) )
         {
             if( input_record.EventType != KEY_EVENT ||
                 !input_record.Event.KeyEvent.bKeyDown ||
@@ -1795,42 +1797,58 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
                 /* nothing interesting */
                 continue;
             }
-
-            p_buffer[ *pi_size ] = input_record.Event.KeyEvent.uChar.AsciiChar;
-
-            /* Echo out the command */
-            putc( p_buffer[ *pi_size ], stdout );
-
-            /* Handle special keys */
-            if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
+            if( input_record.Event.KeyEvent.uChar.AsciiChar == '\n' ||
+                input_record.Event.KeyEvent.uChar.AsciiChar == '\r' )
             {
                 putc( '\n', stdout );
                 break;
             }
-            switch( p_buffer[ *pi_size ] )
+            switch( input_record.Event.KeyEvent.uChar.AsciiChar )
             {
             case '\b':
-                if( *pi_size )
+                if ( *pi_size == 0 )
+                    break;
+                if ( *pi_size > 1 && (p_buffer[*pi_size - 1] & 0xC0) == 0x80 )
                 {
-                    *pi_size -= 2;
-                    putc( ' ', stdout );
-                    putc( '\b', stdout );
+                    // pi_size currently points to the character to be written, so
+                    // we need to roll back from 2 bytes to start erasing the previous
+                    // character
+                    (*pi_size) -= 2;
+                    unsigned int nbBytes = 1;
+                    while( *pi_size > 0 && (p_buffer[*pi_size] & 0xC0) == 0x80 )
+                    {
+                        (*pi_size)--;
+                        nbBytes++;
+                    }
+                    assert( clz( (unsigned char)~(p_buffer[*pi_size]) ) == nbBytes + 1 );
+                    // The first utf8 byte will be overriden by a \0
                 }
+                else
+                    (*pi_size)--;
+                p_buffer[*pi_size] = 0;
+
+                fputs( "\b \b", stdout );
                 break;
-            case '\r':
-                (*pi_size) --;
-                break;
+            default:
+            {
+                WCHAR psz_winput[] = { input_record.Event.KeyEvent.uChar.UnicodeChar, L'\0' };
+                char* psz_input = FromWide( psz_winput );
+                int input_size = strlen(psz_input);
+                if ( *pi_size + input_size > MAX_LINE_LENGTH )
+                {
+                    p_buffer[ *pi_size ] = 0;
+                    return false;
+                }
+                strcpy( (char*)&p_buffer[*pi_size], psz_input );
+                utf8_fprintf( stdout, "%s", psz_input );
+                free(psz_input);
+                *pi_size += input_size;
             }
-
-            (*pi_size)++;
+            }
         }
 
-        if( *pi_size == MAX_LINE_LENGTH ||
-            p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
-        {
-            p_buffer[ *pi_size ] = 0;
-            return true;
-        }
+        p_buffer[ *pi_size ] = 0;
+        return true;
     }
 
     vlc_testcancel ();
@@ -1843,7 +1861,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
 #if defined(_WIN32) && !VLC_WINSTORE_APP
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
-        return ReadWin32( p_intf, p_buffer, pi_size );
+        return ReadWin32( p_intf, (unsigned char*)p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )
     {
         msleep( INTF_IDLE_SLEEP );
