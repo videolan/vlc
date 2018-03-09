@@ -1763,10 +1763,6 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
     {
         switch (status)
         {
-            case kVTParameterErr:
-            case kCVReturnInvalidArgument:
-                *p_vtsession_status = VTSESSION_STATUS_ABORT;
-                break;
             case kVTPixelTransferNotSupportedErr:
             case kVTPixelTransferNotPermittedErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART_CHROMA;
@@ -1779,7 +1775,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
             default:
-                *p_vtsession_status = VTSESSION_STATUS_OK;
+                *p_vtsession_status = VTSESSION_STATUS_ABORT;
                 break;
         }
     }
