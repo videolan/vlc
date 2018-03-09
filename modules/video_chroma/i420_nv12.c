@@ -39,29 +39,16 @@ struct filter_sys_t
     copy_cache_t cache;
 };
 
-static void I420_YUV( filter_sys_t *p_sys, picture_t *p_src, picture_t *p_dst, bool invertUV )
-{
-    p_dst->format.i_x_offset = p_src->format.i_x_offset;
-    p_dst->format.i_y_offset = p_src->format.i_y_offset;
+#define GET_PITCHES( pic ) { \
+    pic->p[Y_PLANE].i_pitch, \
+    pic->p[U_PLANE].i_pitch, \
+    pic->p[V_PLANE].i_pitch  \
+}
 
-    const size_t u_plane = invertUV ? V_PLANE : U_PLANE;
-    const size_t v_plane = invertUV ? U_PLANE : V_PLANE;
-
-    const size_t pitch[3] = {
-        p_src->p[Y_PLANE].i_pitch,
-        p_src->p[u_plane].i_pitch,
-        p_src->p[v_plane].i_pitch,
-    };
-
-    const uint8_t *plane[3] = {
-        (uint8_t*)p_src->p[Y_PLANE].p_pixels,
-        (uint8_t*)p_src->p[u_plane].p_pixels,
-        (uint8_t*)p_src->p[v_plane].p_pixels,
-    };
-
-    Copy420_P_to_SP( p_dst, plane, pitch,
-                     p_src->format.i_y_offset + p_src->format.i_visible_height,
-                     &p_sys->cache );
+#define GET_PLANES( pic ) { \
+    pic->p[Y_PLANE].p_pixels, \
+    pic->p[U_PLANE].p_pixels, \
+    pic->p[V_PLANE].p_pixels \
 }
 
 /*****************************************************************************
@@ -70,7 +57,15 @@ static void I420_YUV( filter_sys_t *p_sys, picture_t *p_src, picture_t *p_dst, b
 static void I420_NV12( filter_t *p_filter, picture_t *p_src,
                                            picture_t *p_dst )
 {
-    I420_YUV( p_filter->p_sys, p_src, p_dst, false );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    p_dst->format.i_x_offset = p_src->format.i_x_offset;
+    p_dst->format.i_y_offset = p_src->format.i_y_offset;
+    const size_t pitches[] = GET_PITCHES( p_src );
+    const uint8_t *planes[] = GET_PLANES( p_src );
+
+    Copy420_P_to_SP( p_dst, planes, pitches,
+                     p_src->format.i_y_offset + p_src->format.i_visible_height,
+                     &p_sys->cache );
 }
 
 /*****************************************************************************
@@ -79,7 +74,8 @@ static void I420_NV12( filter_t *p_filter, picture_t *p_src,
 static void YV12_NV12( filter_t *p_filter, picture_t *p_src,
                                            picture_t *p_dst )
 {
-    I420_YUV( p_filter->p_sys, p_src, p_dst, true );
+    picture_SwapUV( p_src );
+    I420_NV12( p_filter, p_src, p_dst );
 }
 
 /* Following functions are local */
