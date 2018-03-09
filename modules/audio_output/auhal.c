@@ -453,7 +453,7 @@ AudioDeviceHasOutput(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 }
 
 static void
-RebuildDeviceList(audio_output_t * p_aout)
+RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
 {
     struct aout_sys_t   *p_sys = p_aout->sys;
 
@@ -478,6 +478,15 @@ RebuildDeviceList(audio_output_t * p_aout)
     /* setup local array */
     CFMutableArrayRef currentListOfDevices =
         CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+
+    UInt32 i_id_exists;
+    if (p_id_exists)
+    {
+        i_id_exists = *p_id_exists;
+        *p_id_exists = 0;
+    }
+    else
+        i_id_exists = 0;
 
     for (size_t i = 0; i < i_devices; i++)
     {
@@ -515,6 +524,9 @@ RebuildDeviceList(audio_output_t * p_aout)
             free(psz_name);
             continue;
         }
+
+        if (p_id_exists && i_id == i_id_exists)
+            *p_id_exists = i_id;
 
         ReportDevice(p_aout, i_id, psz_name);
         CFNumberRef deviceNumber = CFNumberCreate(kCFAllocatorDefault,
@@ -676,7 +688,7 @@ StreamsChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
         return 0;
 
     msg_Dbg(p_aout, "available physical formats for audio device changed");
-    RebuildDeviceList(p_aout);
+    RebuildDeviceList(p_aout, NULL);
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     /* In this case audio has not yet started. Below code will not work and is
@@ -734,7 +746,7 @@ DevicesListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
     aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "audio device configuration changed, resetting cache");
-    RebuildDeviceList(p_aout);
+    RebuildDeviceList(p_aout, NULL);
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     vlc_mutex_lock(&p_sys->device_list_lock);
@@ -1670,7 +1682,24 @@ static int Open(vlc_object_t *obj)
                       kAudioHardwarePropertyDefaultOutputDevice,
                       kAudioObjectPropertyScopeGlobal);
 
-    RebuildDeviceList(p_aout);
+    char *psz_audio_device = var_InheritString(p_aout, "auhal-audio-device");
+    if (psz_audio_device != NULL)
+    {
+        int dev_id_int = atoi(psz_audio_device);
+        UInt32 dev_id = dev_id_int < 0 ? 0 : dev_id_int;
+        RebuildDeviceList(p_aout, &dev_id);
+        p_sys->i_new_selected_dev = dev_id;
+        free(psz_audio_device);
+    }
+    else
+    {
+        RebuildDeviceList(p_aout, NULL);
+        p_sys->i_new_selected_dev = 0;
+    }
+
+    char deviceid[10];
+    sprintf(deviceid, "%i", p_sys->i_new_selected_dev);
+    aout_DeviceReport(p_aout, deviceid);
 
     /* remember the volume */
     p_sys->f_volume = var_InheritInteger(p_aout, "auhal-volume")
@@ -1678,10 +1707,6 @@ static int Open(vlc_object_t *obj)
     aout_VolumeReport(p_aout, p_sys->f_volume);
     p_sys->b_mute = var_InheritBool(p_aout, "mute");
     aout_MuteReport(p_aout, p_sys->b_mute);
-
-    char *psz_audio_device = var_InheritString(p_aout, "auhal-audio-device");
-    SwitchAudioDevice(p_aout, psz_audio_device);
-    free(psz_audio_device);
 
     ca_Open(p_aout);
     return VLC_SUCCESS;
