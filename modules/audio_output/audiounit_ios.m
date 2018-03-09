@@ -477,7 +477,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         ca_LogWarn("failed to set IO mode");
 
     ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout,
-                        [p_sys->avInstance outputLatency] * CLOCK_FREQ);
+                        [p_sys->avInstance outputLatency] * CLOCK_FREQ, NULL);
     if (ret != VLC_SUCCESS)
         goto error;
 

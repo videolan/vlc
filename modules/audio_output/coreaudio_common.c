@@ -398,7 +398,7 @@ GetLayoutDescription(audio_output_t *p_aout,
 
 static int
 MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
-                const AudioChannelLayout *outlayout)
+                const AudioChannelLayout *outlayout, bool *warn_configuration)
 {
     /* Fill VLC physical_channels from output layout */
     fmt->i_physical_channels = 0;
@@ -476,16 +476,8 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
         if (fmt->i_physical_channels == 0)
         {
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
-            msg_Err(p_aout, "You should configure your speaker layout with "
-                    "Audio Midi Setup in /Applications/Utilities. VLC will "
-                    "output Stereo only.");
-#if !TARGET_OS_IPHONE
-            vlc_dialog_display_error(p_aout,
-                _("Audio device is not configured"), "%s",
-                _("You should configure your speaker layout with "
-                "\"Audio Midi Setup\" in /Applications/"
-                "Utilities. VLC will output Stereo only."));
-#endif
+            if (warn_configuration)
+                *warn_configuration = true;
         }
 
         if (aout_FormatNbChannels(fmt) >= 8
@@ -701,10 +693,14 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
-              const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us)
+              const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us,
+              bool *warn_configuration)
 {
     int ret;
     AudioChannelLayoutTag inlayout_tag;
+
+    if (warn_configuration)
+        *warn_configuration = false;
 
     /* Set the desired format */
     AudioStreamBasicDescription desc;
@@ -712,7 +708,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
     {
         /* PCM */
         fmt->i_format = VLC_CODEC_FL32;
-        ret = MapOutputLayout(p_aout, fmt, outlayout);
+        ret = MapOutputLayout(p_aout, fmt, outlayout, warn_configuration);
         if (ret != VLC_SUCCESS)
             return ret;
 

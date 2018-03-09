@@ -1037,7 +1037,9 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
                    "kAudioDevicePropertyPreferredChannelLayout - using stereo");
 
     /* Do the last VLC aout setups */
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, i_latency_us);
+    bool warn_configuration;
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, i_latency_us,
+                            &warn_configuration);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -1054,6 +1056,19 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     MuteSet(p_aout, p_sys->b_mute);
 
     free(layout);
+
+    if (warn_configuration)
+    {
+        msg_Err(p_aout, "You should configure your speaker layout with "
+                "Audio Midi Setup in /Applications/Utilities. VLC will "
+                "output Stereo only.");
+        vlc_dialog_display_error(p_aout,
+            _("Audio device is not configured"), "%s",
+            _("You should configure your speaker layout with "
+            "\"Audio Midi Setup\" in /Applications/"
+            "Utilities. VLC will output Stereo only."));
+    }
+
     return VLC_SUCCESS;
 error:
     AudioComponentInstanceDispose(p_sys->au_unit);
