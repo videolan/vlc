@@ -101,6 +101,7 @@ enum vtsession_status
 {
     VTSESSION_STATUS_OK,
     VTSESSION_STATUS_RESTART,
+    VTSESSION_STATUS_RESTART_CHROMA,
     VTSESSION_STATUS_ABORT,
 };
 
@@ -208,7 +209,7 @@ static void HXXXGetBestChroma(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->i_cvpx_format != 0)
+    if (p_sys->i_cvpx_format != 0 || p_sys->b_cvpx_format_forced)
         return;
 
     uint8_t i_chroma_format, i_depth_luma, i_depth_chroma;
@@ -1766,6 +1767,10 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case kCVReturnInvalidArgument:
                 *p_vtsession_status = VTSESSION_STATUS_ABORT;
                 break;
+            case kVTPixelTransferNotSupportedErr:
+            case kVTPixelTransferNotPermittedErr:
+                *p_vtsession_status = VTSESSION_STATUS_RESTART_CHROMA;
+                break;
             case -8960 /* codecErr */:
             case kVTVideoDecoderMalfunctionErr:
             case -8969 /* codecBadDataErr */:
@@ -1862,9 +1867,28 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 #endif
     }
 
-    if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
+    if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART ||
+        p_sys->vtsession_status == VTSESSION_STATUS_RESTART_CHROMA)
     {
-        if (p_sys->i_restart_count <= VT_RESTART_MAX)
+        bool do_restart;
+        if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART_CHROMA)
+        {
+            if (p_sys->i_cvpx_format == 0 && p_sys->b_cvpx_format_forced)
+            {
+                /* Already tried to fallback to the original chroma, aborting... */
+                do_restart = false;
+            }
+            else
+            {
+                p_sys->i_cvpx_format = 0;
+                p_sys->b_cvpx_format_forced = true;
+                do_restart = true;
+            }
+        }
+        else
+            do_restart = p_sys->i_restart_count <= VT_RESTART_MAX;
+
+        if (do_restart)
         {
             msg_Warn(p_dec, "restarting vt session (dec callback failed)");
             vlc_mutex_unlock(&p_sys->lock);
