@@ -4513,6 +4513,87 @@ static int MP4_ReadBox_ispe( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_ipma( MP4_Box_t *p_box )
+{
+    MP4_Box_data_ipma_t *p_data = p_box->data.p_ipma;
+    for( uint32_t i=0; i<p_data->i_entry_count; i++ )
+        free( p_data->p_entries[i].p_assocs );
+    free( p_data->p_entries );
+}
+
+static int MP4_ReadBox_ipma( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_ipma_t, MP4_FreeBox_ipma );
+    MP4_Box_data_ipma_t *p_data = p_box->data.p_ipma;
+
+    uint8_t i_version;
+    uint32_t i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags );
+
+    MP4_GET4BYTES( p_data->i_entry_count );
+    if( (i_read / ((i_version < 1) ? 3 : 5) <  p_data->i_entry_count) )
+    {
+        p_data->i_entry_count = 0;
+        MP4_READBOX_EXIT( 0 );
+    }
+
+    p_data->p_entries = malloc( sizeof(p_data->p_entries[0]) * p_data->i_entry_count );
+    if( !p_data->p_entries )
+    {
+        p_data->i_entry_count = 0;
+        MP4_READBOX_EXIT( 0 );
+    }
+
+    for( uint32_t i=0; i<p_data->i_entry_count; i++ )
+    {
+        if( i_read < ((i_version < 1) ? 3 : 5) )
+        {
+            p_data->i_entry_count = i;
+            MP4_READBOX_EXIT( 0 );
+        }
+        if( i_version < 1 )
+            MP4_GET2BYTES( p_data->p_entries[i].i_item_id );
+        else
+            MP4_GET4BYTES( p_data->p_entries[i].i_item_id );
+        MP4_GET1BYTE( p_data->p_entries[i].i_association_count );
+
+        if( i_read / ((i_flags & 0x01) ? 2 : 1) <
+               p_data->p_entries[i].i_association_count )
+        {
+            p_data->i_entry_count = i;
+            MP4_READBOX_EXIT( 0 );
+        }
+
+        p_data->p_entries[i].p_assocs =
+                malloc( sizeof(p_data->p_entries[i].p_assocs[0]) *
+                        p_data->p_entries[i].i_association_count );
+        if( !p_data->p_entries[i].p_assocs )
+        {
+            p_data->p_entries[i].i_association_count = 0;
+            p_data->i_entry_count = i;
+            MP4_READBOX_EXIT( 0 );
+        }
+
+        for( uint8_t j=0; j<p_data->p_entries[i].i_association_count; j++ )
+        {
+            MP4_GET1BYTE( p_data->p_entries[i].p_assocs[j].i_property_index );
+            p_data->p_entries[i].p_assocs[j].b_essential =
+                    p_data->p_entries[i].p_assocs[j].i_property_index & 0x80;
+            p_data->p_entries[i].p_assocs[j].i_property_index &= 0x7F;
+            if( i_flags & 0x01 )
+            {
+                p_data->p_entries[i].p_assocs[j].i_property_index <<= 8;
+                uint8_t i_low;
+                MP4_GET1BYTE( i_low );
+                p_data->p_entries[i].p_assocs[j].i_property_index |= i_low;
+            }
+        }
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -5001,6 +5082,7 @@ static const struct
     { ATOM_iprp,    MP4_ReadBoxContainer,    ATOM_meta },
     { ATOM_ipco,    MP4_ReadBoxContainer,    ATOM_iprp },
     { ATOM_ispe,    MP4_ReadBox_ispe,        ATOM_ipco },
+    { ATOM_ipma,    MP4_ReadBox_ipma,        ATOM_iprp },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }
