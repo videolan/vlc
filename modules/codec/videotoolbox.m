@@ -1839,7 +1839,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
 #else
         if (!p_sys->b_cvpx_format_forced
-         && p_sys->i_cvpx_format != kCVPixelFormatType_420YpCbCr8Planar)
+         && p_sys->i_cvpx_format == kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)
         {
             /* In case of interlaced content, force VT to output I420 since our
              * SW deinterlacer handle this chroma natively. This avoids having
