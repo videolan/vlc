@@ -38,7 +38,7 @@
  * Compare two items using their title or name
  * @param first: the first item
  * @param second: the second item
- * @return -1, 0 or 1 like strcmp
+ * @return -1, 0 or +1 like strcmp
  */
 static inline int meta_strcasecmp_title( const playlist_item_t *first,
                               const playlist_item_t *second )
@@ -50,7 +50,7 @@ static inline int meta_strcasecmp_title( const playlist_item_t *first,
     if( psz_first && psz_second )
         i_ret = strcasecmp( psz_first, psz_second );
     else if( !psz_first && psz_second )
-        i_ret = 1;
+        i_ret = +1;
     else if( psz_first && !psz_second )
         i_ret = -1;
     else
@@ -67,7 +67,7 @@ static inline int meta_strcasecmp_title( const playlist_item_t *first,
  * @param second: the second item
  * @param meta: the meta type to use to sort the items
  * @param b_integer: true if the meta are integers
- * @return -1, 0 or 1 like strcmp
+ * @return -1, 0 or +1 like strcmp
  */
 static inline int meta_sort( const playlist_item_t *first,
                              const playlist_item_t *second,
@@ -81,7 +81,7 @@ static inline int meta_sort( const playlist_item_t *first,
     if( first->i_children == -1 && second->i_children >= 0 )
         i_ret = -1;
     else if( first->i_children >= 0 && second->i_children == -1 )
-        i_ret = 1;
+        i_ret = +1;
     /* Both are nodes, sort by name */
     else if( first->i_children >= 0 && second->i_children >= 0 )
         i_ret = meta_strcasecmp_title( first, second );
@@ -89,7 +89,7 @@ static inline int meta_sort( const playlist_item_t *first,
     else if( !psz_first && !psz_second )
         i_ret = 0;
     else if( !psz_first && psz_second )
-        i_ret = 1;
+        i_ret = +1;
     else if( psz_first && !psz_second )
         i_ret = -1;
     else
@@ -269,7 +269,7 @@ SORTFN( SORT_DURATION, first, second )
 {
     mtime_t time1 = input_item_GetDuration( first->p_input );
     mtime_t time2 = input_item_GetDuration( second->p_input );
-    int i_ret = time1 > time2 ? 1 :
+    int i_ret = time1 > time2 ? +1 :
                     ( time1 == time2 ? 0 : -1 );
     return i_ret;
 }
@@ -301,7 +301,7 @@ SORTFN( SORT_TITLE_NODES_FIRST, first, second )
         return -1;
     /* If first is a node but not second */
     else if( first->i_children >= 0 && second->i_children == -1 )
-        return 1;
+        return +1;
     /* Both are nodes or both are not nodes */
     else
         return meta_strcasecmp_title( first, second );
@@ -316,7 +316,7 @@ SORTFN( SORT_TITLE_NUMERIC, first, second )
     if( psz_first && psz_second )
         i_ret = atoi( psz_first ) - atoi( psz_second );
     else if( !psz_first && psz_second )
-        i_ret = 1;
+        i_ret = +1;
     else if( psz_first && !psz_second )
         i_ret = -1;
     else
@@ -336,7 +336,7 @@ SORTFN( SORT_URI, first, second )
     if( psz_first && psz_second )
         i_ret = strcasecmp( psz_first, psz_second );
     else if( !psz_first && psz_second )
-        i_ret = 1;
+        i_ret = +1;
     else if( psz_first && !psz_second )
         i_ret = -1;
     else
