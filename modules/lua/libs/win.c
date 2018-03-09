@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -140,6 +141,14 @@ static int vlclua_console_read( lua_State *L )
     return 1;
 }
 
+static int vlclua_console_write( lua_State *L )
+{
+    if( !lua_isstring( L, 1 ) )
+        return luaL_error( L, "win.console_write usage: (text)" );
+    const char* psz_line = luaL_checkstring( L, 1 );
+    utf8_fprintf( stdout, "%s", psz_line );
+    return 0;
+}
 
 /*****************************************************************************
  *
@@ -148,6 +157,7 @@ static const luaL_Reg vlclua_win_reg[] = {
     { "console_init", vlclua_console_init },
     { "console_wait", vlclua_console_wait },
     { "console_read", vlclua_console_read },
+    { "console_write", vlclua_console_write },
     { NULL, NULL }
 };
 

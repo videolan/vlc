@@ -124,7 +124,7 @@ function host()
     local function write_console( client, data )
         -- FIXME: this method shouldn't be needed. vlc.net.write should
         -- just work
-        io.write(data or client.buffer)
+        vlc.win.console_write(data or client.buffer)
         return string.len(data or client.buffer)
     end
 
