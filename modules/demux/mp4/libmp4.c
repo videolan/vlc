@@ -4495,6 +4495,24 @@ static int MP4_ReadBox_pitm( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_ispe( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_ispe_t, NULL );
+    MP4_Box_data_ispe_t *p_data = p_box->data.p_ispe;
+
+    uint8_t i_version;
+    uint32_t i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags ); VLC_UNUSED(i_flags);
+    if( i_version > 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET4BYTES( p_data->i_width );
+    MP4_GET4BYTES( p_data->i_height );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -4978,6 +4996,11 @@ static const struct
     { ATOM_iinf,    MP4_ReadBox_iinf,        ATOM_meta },
     { ATOM_infe,    MP4_ReadBox_infe,        ATOM_iinf },
     { ATOM_pitm,    MP4_ReadBox_pitm,        ATOM_meta },
+
+    /* HEIF specific meta references */
+    { ATOM_iprp,    MP4_ReadBoxContainer,    ATOM_meta },
+    { ATOM_ipco,    MP4_ReadBoxContainer,    ATOM_iprp },
+    { ATOM_ispe,    MP4_ReadBox_ispe,        ATOM_ipco },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }
