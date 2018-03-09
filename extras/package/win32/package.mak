@@ -50,8 +50,11 @@ package-win-common: package-win-install package-win-sdk
 	done
 
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
-	mkdir -p "$(win32_destdir)"/plugins
-	find $(prefix)/lib/vlc/plugins/ -type f \( -not -name '*.la' -and -not -name '*.a' \) -exec cp -v --parents "{}" "$(win32_destdir)/plugins/" \;
+	for plugindir in $(prefix)/lib/vlc/plugins/*/; do \
+		plugin_destdir="$(win32_destdir)/plugins/`basename $$plugindir`"; \
+		mkdir -p "$$plugin_destdir"; \
+		find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \) -exec cp -v "{}" "$$plugin_destdir" \; ;\
+	done
 	-cp -r $(prefix)/share/locale $(win32_destdir)
 
 # BD-J JAR
