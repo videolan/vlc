@@ -4477,6 +4477,24 @@ static int MP4_ReadBox_infe( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_pitm( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_pitm_t, NULL );
+    MP4_Box_data_pitm_t *p_data = p_box->data.p_pitm;
+
+    uint8_t i_version;
+    uint32_t i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags ); VLC_UNUSED(i_flags);
+
+    if( i_version == 0 )
+        MP4_GET2BYTES( p_data->i_item_id );
+    else
+        MP4_GET4BYTES( p_data->i_item_id );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -4959,6 +4977,7 @@ static const struct
     { ATOM_iloc,    MP4_ReadBox_iloc,        ATOM_meta },
     { ATOM_iinf,    MP4_ReadBox_iinf,        ATOM_meta },
     { ATOM_infe,    MP4_ReadBox_infe,        ATOM_iinf },
+    { ATOM_pitm,    MP4_ReadBox_pitm,        ATOM_meta },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }
