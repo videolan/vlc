@@ -59,6 +59,7 @@ vlc_module_begin ()
                 VOLUME_TEXT, VOLUME_LONGTEXT, true)
     change_integer_range(0, AOUT_VOLUME_MAX)
     add_string("auhal-audio-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
+    add_string("auhal-warned-devices", "", NULL, NULL, true)
     add_obsolete_integer("macosx-audio-device") /* since 2.1.0 */
 vlc_module_end ()
 
@@ -990,6 +991,71 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
 #pragma mark -
 #pragma mark initialization
 
+static void
+WarnConfiguration(audio_output_t *p_aout)
+{
+    struct aout_sys_t *p_sys = p_aout->sys;
+    char *warned_devices = var_CreateGetNonEmptyString(p_aout, "auhal-warned-devices");
+    bool dev_is_warned = false;
+    unsigned dev_count = 0;
+
+    /* Check if the actual device was already warned */
+    if (warned_devices)
+    {
+        char *dup = strdup(warned_devices);
+        if (dup)
+        {
+            char *savetpr;
+            for (const char *dev = strtok_r(dup, ";", &savetpr);
+                 dev != NULL && !dev_is_warned;
+                 dev = strtok_r(NULL, ";", &savetpr))
+            {
+                dev_count++;
+                int devid = atoi(dev);
+                if (devid >= 0 && (unsigned) devid == p_sys->i_selected_dev)
+                {
+                    dev_is_warned = true;
+                    break;
+                }
+            }
+            free(dup);
+        }
+    }
+
+    /* Warn only one time per device */
+    if (!dev_is_warned)
+    {
+        msg_Warn(p_aout, "You should configure your speaker layout with "
+                "Audio Midi Setup in /Applications/Utilities. VLC will "
+                "output Stereo only.");
+        vlc_dialog_display_error(p_aout,
+            _("Audio device is not configured"), "%s",
+            _("You should configure your speaker layout with "
+            "\"Audio Midi Setup\" in /Applications/"
+            "Utilities. VLC will output Stereo only."));
+
+        /* Don't save too many devices */
+        if (dev_count >= 10)
+        {
+            char *end = strrchr(warned_devices, ';');
+            if (end)
+                *end = 0;
+        }
+
+        /* Add the actual device to the list of warned devices */
+        char *new_warned_devices;
+        if (asprintf(&new_warned_devices, "%u%s%s", p_sys->i_selected_dev,
+                     warned_devices ? ";" : "",
+                     warned_devices ? warned_devices : "") != -1)
+        {
+            config_PutPsz("auhal-warned-devices", new_warned_devices);
+            var_SetString(p_aout, "auhal-warned-devices", new_warned_devices);
+            free(new_warned_devices);
+        }
+    }
+    free(warned_devices);
+}
+
 /*
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
  */
@@ -1069,16 +1135,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     free(layout);
 
     if (warn_configuration)
-    {
-        msg_Err(p_aout, "You should configure your speaker layout with "
-                "Audio Midi Setup in /Applications/Utilities. VLC will "
-                "output Stereo only.");
-        vlc_dialog_display_error(p_aout,
-            _("Audio device is not configured"), "%s",
-            _("You should configure your speaker layout with "
-            "\"Audio Midi Setup\" in /Applications/"
-            "Utilities. VLC will output Stereo only."));
-    }
+        WarnConfiguration(p_aout);
 
     return VLC_SUCCESS;
 error:
