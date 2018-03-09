@@ -235,6 +235,8 @@ static uint8_t *mp4_readbox_enter( stream_t *s, MP4_Box_t *box,
  * Some prototypes.
  *****************************************************************************/
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
+static MP4_Box_t *MP4_ReadBoxUsing( stream_t *p_stream, MP4_Box_t *p_father,
+                                    int(*MP4_ReadBox_function)(stream_t *, MP4_Box_t *) );
 static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
 static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 
@@ -5113,11 +5115,7 @@ static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * MP4_ReadBox : parse the actual box and the children
- *  XXX : Do not go to the next box
- *****************************************************************************/
-static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
+static MP4_Box_t *MP4_ReadBoxAllocateCheck( stream_t *p_stream, MP4_Box_t *p_father )
 {
     MP4_Box_t *p_box = calloc( 1, sizeof( MP4_Box_t ) ); /* Needed to ensure simple on error handler */
     if( p_box == NULL )
@@ -5146,6 +5144,39 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
     }
     p_box->p_father = p_father;
 
+    return p_box;
+}
+
+/*****************************************************************************
+ * MP4_ReadBoxUsing : parse the actual box and the children using handler
+ *****************************************************************************/
+static MP4_Box_t *MP4_ReadBoxUsing( stream_t *p_stream, MP4_Box_t *p_father,
+                                    int(*MP4_ReadBox_function)(stream_t *, MP4_Box_t *) )
+{
+    MP4_Box_t *p_box = MP4_ReadBoxAllocateCheck( p_stream, p_father );
+    if( !p_box )
+        return NULL;
+
+    if( MP4_ReadBox_function( p_stream, p_box ) != VLC_SUCCESS )
+    {
+        uint64_t i_end = p_box->i_pos + p_box->i_size;
+        MP4_BoxFree( p_box );
+        MP4_Seek( p_stream, i_end ); /* Skip the failed box */
+        return NULL;
+    }
+    return p_box;
+}
+
+/*****************************************************************************
+ * MP4_ReadBox : parse the actual box and the children
+ *  XXX : Do not go to the next box
+ *****************************************************************************/
+static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
+{
+    MP4_Box_t *p_box = MP4_ReadBoxAllocateCheck( p_stream, p_father );
+    if( !p_box )
+        return NULL;
+
     if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
         uint64_t i_end = p_box->i_pos + p_box->i_size;
@@ -5153,7 +5184,6 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
         MP4_Seek( p_stream, i_end ); /* Skip the failed box */
         return NULL;
     }
-
     return p_box;
 }
 
