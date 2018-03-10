@@ -108,7 +108,7 @@ vlcSetContribEnvironment() {
 }
 
 vlcUnsetContribEnvironment() {
-    echo "Unsetting contrib environment"
+    echo "Unsetting contrib flags, prepare VLC flags"
 
     unset CFLAGS
     unset CXXFLAGS
@@ -117,6 +117,11 @@ vlcUnsetContribEnvironment() {
     unset EXTRA_CFLAGS
     unset EXTRA_LDFLAGS
     unset XCODE_FLAGS
+
+    # Enable debug symbols by default
+    export CFLAGS="-g"
+    export CXXFLAGS="-g"
+    export OBJCFLAGS="-g"
 }
 
 
