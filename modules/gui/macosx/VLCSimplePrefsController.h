@@ -38,8 +38,6 @@
 // Audio pane
 @property (readwrite, strong) IBOutlet NSView *audioView;
 
-@property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
-@property (readwrite, weak) IBOutlet NSTextField *audio_dolbyLabel;
 @property (readwrite, weak) IBOutlet NSBox *audio_effectsBox;
 @property (readwrite, weak) IBOutlet NSButton *audio_enableCheckbox;
 @property (readwrite, weak) IBOutlet NSBox *audio_generalBox;
