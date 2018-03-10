@@ -1,5 +1,47 @@
 #!/bin/bash
 
+vlcGetTriplet() {
+    local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)
+    if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
+        OSX_KERNELVERSION="$VLC_FORCE_KERNELVERSION"
+    fi
+
+    local LOCAL_ARCH="x86_64"
+    if [ -n "$ARCH" ]; then
+        LOCAL_ARCH="$ARCH"
+    fi
+
+    echo "$LOCAL_ARCH-apple-darwin$OSX_KERNELVERSION"
+}
+
+# Gets VLCs root dir based on location of this file, also follow symlinks
+vlcGetRootDir() {
+    local SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ]; do
+        local DIR="$(cd -P "$( dirname "$SOURCE" )" && pwd)"
+        SOURCE="$(readlink "$SOURCE")"
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # Relative symlink needs dir prepended
+    done
+    echo "$(cd -P "$(dirname "$SOURCE")/../../../" && pwd)"
+}
+
+vlcSetBaseEnvironment() {
+    local LOCAL_TRIPLET="$TRIPLET"
+    if [ -z "$LOCAL_TRIPLET" ]; then
+        LOCAL_TRIPLET="$(vlcGetTriplet)"
+    fi
+
+    local VLC_ROOT_DIR="$(vlcGetRootDir)"
+
+    echo "Setting base environment"
+    echo "Using VLC root dir $VLC_ROOT_DIR and triplet $LOCAL_TRIPLET"
+
+    export CC="$(xcrun --find clang)"
+    export CXX="$(xcrun --find clang++)"
+    export OBJC="$(xcrun --find clang)"
+    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_TRIPLET}/bin:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+}
+
 vlcSetSymbolEnvironment() {
     echo "Setting symbol environment"
 
@@ -93,9 +135,11 @@ if [ "$1" = "none" ]; then
 fi
 
 if [ "$VLC_ENV_MODE" = "contrib" ]; then
+    vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
     vlcSetContribEnvironment "10.10"
 elif [ "$VLC_ENV_MODE" = "vlc" ]; then
+    vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
     vlcUnsetContribEnvironment
 fi

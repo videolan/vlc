@@ -15,16 +15,12 @@ source "$SCRIPTDIR/env.build.sh" "none"
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.10"
 OSX_VERSION=`xcrun --show-sdk-version`
-OSX_KERNELVERSION=`uname -r | cut -d. -f1`
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 VLCBUILDDIR=""
 
 CORE_COUNT=`getconf NPROCESSORS_ONLN 2>&1`
 let JOBS=$CORE_COUNT+1
 
-if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
-    OSX_KERNELVERSION="$VLC_FORCE_KERNELVERSION"
-fi
 
 usage()
 {
@@ -121,22 +117,14 @@ fi
 
 info "Building VLC for the Mac OS X"
 
-spushd `dirname $0`/../../..
-vlcroot=`pwd`
-spopd
-
-builddir=`pwd`
-
-info "Building in \"$builddir\""
-
-TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
-
-export CC="`xcrun --find clang`"
-export CXX="`xcrun --find clang++`"
-export OBJC="`xcrun --find clang`"
-export OSX_VERSION
+TRIPLET=$(vlcGetTriplet)
 export SDKROOT
-export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+vlcSetBaseEnvironment
+vlcroot="$(vlcGetRootDir)"
+
+
+builddir="$(pwd)"
+info "Building in \"$builddir\""
 
 #
 # vlc/extras/tools
@@ -264,6 +252,6 @@ elif [ "$PACKAGETYPE" = "n" -o "$PACKAGE" = "yes" ]; then
     make package-macosx
 fi
 
-if [ ! -z "$VLCBUILDDIR" ];then
+if [ ! -z "$VLCBUILDDIR" ]; then
     popd
 fi
