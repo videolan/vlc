@@ -263,7 +263,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 - (void)initStrings
 {
     /* audio */
-    [_audio_dolbyLabel setStringValue: _NS("Force detection of Dolby Surround")];
     [_audio_effectsBox setTitle: _NS("Audio Effects")];
     [_audio_enableCheckbox setTitle: _NS("Enable audio")];
     [_audio_generalBox setTitle: _NS("General Audio")];
@@ -617,7 +616,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_audio_volTextField setIntValue: i];
     }
 
-    [self setupButton:_audio_dolbyPopup forIntList: "force-dolby-surround"];
     [self setupField:_audio_langTextField forOption: "audio-language"];
 
     [self setupButton:_audio_visualPopup forModuleList: "audio-visual"];
@@ -944,8 +942,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         var_SetBool(p_intf, "volume-save", [_audio_autosavevol_yesButtonCell state]);
         if ([_audio_volTextField isEnabled])
             config_PutInt("auhal-volume", ([_audio_volTextField intValue] * AOUT_VOLUME_MAX) / 200);
-
-        SaveIntList(_audio_dolbyPopup, "force-dolby-surround");
 
         config_PutPsz("audio-language", [[_audio_langTextField stringValue] UTF8String]);
 

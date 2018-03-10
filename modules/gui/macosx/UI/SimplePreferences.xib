@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17D47" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17D102" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
@@ -13,8 +13,6 @@
                 <outlet property="audio_autosavevolMatrix" destination="3664" id="qcu-Km-dKV"/>
                 <outlet property="audio_autosavevol_noButtonCell" destination="3666" id="BQT-wK-ru5"/>
                 <outlet property="audio_autosavevol_yesButtonCell" destination="3665" id="tcV-e8-VrC"/>
-                <outlet property="audio_dolbyLabel" destination="2339" id="YBO-jS-dA1"/>
-                <outlet property="audio_dolbyPopup" destination="2340" id="DWM-3P-YLm"/>
                 <outlet property="audio_effectsBox" destination="2347" id="J5K-qS-osR"/>
                 <outlet property="audio_enableCheckbox" destination="2331" id="wEX-Ng-Yug"/>
                 <outlet property="audio_generalBox" destination="2332" id="rHM-Za-3Gi"/>
@@ -638,13 +636,13 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="594" height="425"/>
             <subviews>
                 <box title="Last.fm" translatesAutoresizingMaskIntoConstraints="NO" id="2363">
-                    <rect key="frame" x="17" y="16" width="560" height="117"/>
+                    <rect key="frame" x="17" y="16" width="560" height="142"/>
                     <view key="contentView" id="7U2-xM-E1M">
-                        <rect key="frame" x="2" y="2" width="556" height="100"/>
+                        <rect key="frame" x="2" y="2" width="556" height="125"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2365">
-                                <rect key="frame" x="14" y="73" width="190" height="18"/>
+                                <rect key="frame" x="14" y="73" width="190" height="43"/>
                                 <buttonCell key="cell" type="check" title="Enable Last.fm submissions" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3472">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -654,7 +652,7 @@ Gw
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2367">
-                                <rect key="frame" x="229" y="45" width="307" height="22"/>
+                                <rect key="frame" x="175" y="45" width="361" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3474">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -667,7 +665,7 @@ Gw
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2368">
-                                <rect key="frame" x="160" y="15" width="63" height="17"/>
+                                <rect key="frame" x="106" y="15" width="63" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Password" usesSingleLineMode="YES" id="3475">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -675,7 +673,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2369" customClass="NSSecureTextField">
-                                <rect key="frame" x="229" y="13" width="307" height="22"/>
+                                <rect key="frame" x="175" y="13" width="361" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3476">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -688,7 +686,7 @@ Gw
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2366">
-                                <rect key="frame" x="153" y="47" width="70" height="17"/>
+                                <rect key="frame" x="99" y="47" width="70" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="User name" usesSingleLineMode="YES" id="3473">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -714,13 +712,13 @@ Gw
                     </view>
                 </box>
                 <box title="Effects" translatesAutoresizingMaskIntoConstraints="NO" id="2347">
-                    <rect key="frame" x="17" y="139" width="560" height="59"/>
+                    <rect key="frame" x="17" y="164" width="560" height="59"/>
                     <view key="contentView" id="N65-iQ-8gY">
                         <rect key="frame" x="2" y="2" width="556" height="42"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2357">
-                                <rect key="frame" x="9" y="13" width="214" height="17"/>
+                                <rect key="frame" x="9" y="13" width="160" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Visualization" usesSingleLineMode="YES" id="3470">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -728,7 +726,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2358">
-                                <rect key="frame" x="227" y="8" width="312" height="26"/>
+                                <rect key="frame" x="173" y="8" width="366" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2361" id="3471">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -756,13 +754,13 @@ Gw
                     </view>
                 </box>
                 <box title="General Audio" translatesAutoresizingMaskIntoConstraints="NO" id="2332">
-                    <rect key="frame" x="17" y="204" width="560" height="178"/>
+                    <rect key="frame" x="17" y="229" width="560" height="153"/>
                     <view key="contentView" id="sX1-um-Nbr">
-                        <rect key="frame" x="2" y="2" width="556" height="161"/>
+                        <rect key="frame" x="2" y="2" width="556" height="136"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2335">
-                                <rect key="frame" x="227" y="77" width="257" height="19"/>
+                                <rect key="frame" x="173" y="52" width="311" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="205" id="4Mt-lP-4oa"/>
                                 </constraints>
@@ -774,7 +772,7 @@ Gw
                                 </connections>
                             </slider>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2336">
-                                <rect key="frame" x="490" y="75" width="46" height="22"/>
+                                <rect key="frame" x="490" y="50" width="46" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="46" id="96N-ME-SLD"/>
                                 </constraints>
@@ -803,33 +801,8 @@ Gw
                                     <outlet property="nextKeyView" destination="2346" id="3424"/>
                                 </connections>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2339">
-                                <rect key="frame" x="10" y="51" width="213" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Force detection of Dolby Surround" usesSingleLineMode="YES" id="3462">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2340">
-                                <rect key="frame" x="227" y="46" width="312" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Auto" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2344" id="3463">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" title="OtherViews" id="2341">
-                                        <items>
-                                            <menuItem title="Auto" state="on" id="2344"/>
-                                            <menuItem title="On" id="2342"/>
-                                            <menuItem title="Off" id="2343"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                                <connections>
-                                    <action selector="audioSettingChanged:" target="-2" id="vXp-SU-H1J"/>
-                                </connections>
-                            </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2345">
-                                <rect key="frame" x="10" y="17" width="213" height="17"/>
+                                <rect key="frame" x="10" y="17" width="159" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Preferred Audio language" usesSingleLineMode="YES" id="3464">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -837,7 +810,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2346">
-                                <rect key="frame" x="229" y="15" width="307" height="22"/>
+                                <rect key="frame" x="175" y="15" width="361" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3465">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -849,7 +822,7 @@ Gw
                                 </connections>
                             </textField>
                             <matrix verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="always" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3664">
-                                <rect key="frame" x="12" y="103" width="524" height="48"/>
+                                <rect key="frame" x="12" y="78" width="524" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="Vw9-Mr-7S2"/>
                                 </constraints>
@@ -884,25 +857,18 @@ Gw
                             </matrix>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="2345" firstAttribute="top" secondItem="2339" secondAttribute="bottom" constant="17" id="346-Ep-dRw"/>
+                            <constraint firstItem="2345" firstAttribute="leading" secondItem="3664" secondAttribute="leading" id="2qf-f2-Qz7"/>
                             <constraint firstItem="2346" firstAttribute="leading" secondItem="2345" secondAttribute="trailing" constant="8" symbolic="YES" id="4L3-Eo-Hwp"/>
-                            <constraint firstItem="2339" firstAttribute="centerY" secondItem="2340" secondAttribute="centerY" id="4RC-SX-1jq"/>
                             <constraint firstItem="2345" firstAttribute="centerY" secondItem="2346" secondAttribute="centerY" id="89p-ax-4G2"/>
                             <constraint firstItem="3664" firstAttribute="trailing" secondItem="2336" secondAttribute="trailing" id="8dc-wF-prY"/>
+                            <constraint firstItem="2345" firstAttribute="top" secondItem="2335" secondAttribute="bottom" constant="20" id="9cb-SC-NJS"/>
                             <constraint firstAttribute="bottom" secondItem="2346" secondAttribute="bottom" constant="15" id="EdX-1W-xO9"/>
-                            <constraint firstItem="2346" firstAttribute="top" secondItem="2340" secondAttribute="bottom" constant="12" id="Egv-Ad-aCt"/>
-                            <constraint firstItem="2339" firstAttribute="leading" secondItem="2345" secondAttribute="leading" id="Jvf-j0-oQA"/>
                             <constraint firstAttribute="trailing" secondItem="2336" secondAttribute="trailing" constant="20" id="RiT-2N-oVX"/>
                             <constraint firstAttribute="trailing" secondItem="3664" secondAttribute="trailing" constant="20" id="SEy-Pv-8qj"/>
-                            <constraint firstItem="2336" firstAttribute="trailing" secondItem="2340" secondAttribute="trailing" id="Urb-31-SDv"/>
-                            <constraint firstItem="2346" firstAttribute="leading" secondItem="2340" secondAttribute="leading" id="WZx-n4-rgd"/>
-                            <constraint firstItem="2340" firstAttribute="leading" secondItem="2339" secondAttribute="trailing" constant="8" symbolic="YES" id="YFL-YQ-MVY"/>
-                            <constraint firstItem="2339" firstAttribute="top" secondItem="2335" secondAttribute="bottom" constant="11" id="bCe-7y-1Xv"/>
+                            <constraint firstItem="2335" firstAttribute="leading" secondItem="2346" secondAttribute="leading" id="ZeQ-93-REl"/>
                             <constraint firstItem="2336" firstAttribute="leading" secondItem="2335" secondAttribute="trailing" constant="8" id="etL-aD-xyO"/>
-                            <constraint firstItem="2339" firstAttribute="leading" secondItem="3664" secondAttribute="leading" id="f4c-20-IXn"/>
                             <constraint firstItem="2336" firstAttribute="trailing" secondItem="2346" secondAttribute="trailing" id="hsX-v8-qU8"/>
                             <constraint firstItem="3664" firstAttribute="leading" secondItem="sX1-um-Nbr" secondAttribute="leading" constant="12" id="ipe-4k-4s8"/>
-                            <constraint firstItem="2340" firstAttribute="leading" secondItem="2335" secondAttribute="leading" id="lma-5t-iwF"/>
                             <constraint firstItem="2335" firstAttribute="top" secondItem="3664" secondAttribute="bottom" constant="9" id="tDz-VB-oVJ"/>
                             <constraint firstItem="2336" firstAttribute="centerY" secondItem="2335" secondAttribute="centerY" id="tpS-N0-gGA"/>
                             <constraint firstItem="3664" firstAttribute="top" secondItem="sX1-um-Nbr" secondAttribute="top" constant="10" id="ydK-et-WGv"/>
@@ -1961,7 +1927,7 @@ Gw
                     <rect key="frame" x="20" y="60" width="530" height="311"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="310"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="287"/>
