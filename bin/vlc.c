@@ -241,7 +241,10 @@ int main(int argc, const char *argv[])
     libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif
     if (libvlc_add_intf (vlc, NULL))
+    {
+        fprintf(stderr, "%s: cannot start any interface. Exiting.\n", argv[0]);
         goto out;
+    }
 
     libvlc_playlist_play (vlc, -1, 0, NULL);
 
