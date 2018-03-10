@@ -141,7 +141,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * We have to do it before config_Load*() because this also gets the
      * list of configuration options exported by each module and loads their
      * default values. */
-    size_t module_count = module_LoadPlugins (p_libvlc);
+    module_LoadPlugins (p_libvlc);
 
     /*
      * Override default configuration with config file settings
@@ -177,13 +177,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         libvlc_InternalCleanup (p_libvlc);
         exit(0);
-    }
-
-    if( module_count <= 1 )
-    {
-        msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
-        i_ret = VLC_ENOMOD;
-        goto error;
     }
 
 #ifdef HAVE_DAEMON
