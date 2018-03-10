@@ -112,7 +112,7 @@ static void exit_timeout (int signum)
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
-int main( int i_argc, const char *ppsz_argv[] )
+int main(int argc, const char *argv[])
 {
     /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
      * if it is blocked in all thread.
@@ -147,7 +147,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         fprintf (stderr, "VLC is not supposed to be run as root. Sorry.\n"
         "If you need to use real-time priorities and/or privileged TCP ports\n"
         "you can use %s-wrapper (make sure it is Set-UID root and\n"
-        "cannot be run by non-trusted users first).\n", ppsz_argv[0]);
+        "cannot be run by non-trusted users first).\n", argv[0]);
         return 1;
     }
 #endif
@@ -202,34 +202,32 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *argv[i_argc + 3];
-    int argc = 0;
+    const char *args[argc + 3];
+    int count = 0;
 
-    argv[argc++] = "--no-ignore-config";
-    argv[argc++] = "--media-library";
+    args[count++] = "--no-ignore-config";
+    args[count++] = "--media-library";
 #ifdef HAVE_DBUS
-    argv[argc++] = "--dbus";
+    args[count++] = "--dbus";
 #endif
-    ppsz_argv++; i_argc--; /* skip executable path */
 
 #ifdef __OS2__
-    for (int i = 0; i < i_argc; i++)
-        if ((argv[argc++] = FromSystem (ppsz_argv[i])) == NULL)
+    for (int i = 1; i < argc; i++)
+        if ((args[count++] = FromSystem(argv[i])) == NULL)
         {
-            fprintf (stderr, "Converting '%s' to UTF-8 failed.\n",
-                     ppsz_argv[i]);
+            fprintf (stderr, "Converting '%s' to UTF-8 failed.\n", argv[i]);
             return 1;
         }
 #else
-    memcpy (argv + argc, ppsz_argv, i_argc * sizeof (*argv));
-    argc += i_argc;
+    memcpy(args + count, argv + 1, (argc - 1) * sizeof (*argv));
+    count += (argc - 1);
 #endif
-    argv[argc] = NULL;
+    args[count] = NULL;
 
     vlc_enable_override ();
 
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new (argc, argv);
+    libvlc_instance_t *vlc = libvlc_new(count, args);
     if (vlc == NULL)
         return 1;
 
@@ -275,8 +273,8 @@ int main( int i_argc, const char *ppsz_argv[] )
 out:
     libvlc_release (vlc);
 #ifdef __OS2__
-    for (int i = argc - i_argc; i < argc; i++)
-        free (argv[i]);
+    for (int i = count - argc; i < argc; i++)
+        free(args[i]);
 #endif
     return ret;
 }
