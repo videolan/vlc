@@ -109,7 +109,7 @@ vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb);
 int vlc_plugin_resolve(vlc_plugin_t *, vlc_plugin_cb);
 
 void module_InitBank (void);
-size_t module_LoadPlugins( vlc_object_t * );
+void module_LoadPlugins(vlc_object_t *);
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
 void module_EndBank (bool);
 int module_Map(vlc_object_t *, vlc_plugin_t *);

@@ -657,9 +657,8 @@ void module_EndBank (bool b_plugins)
  * Fills the module bank structure with the plugin modules.
  *
  * \param p_this vlc object structure
- * \return total number of modules in bank after loading all plug-ins
  */
-size_t module_LoadPlugins (vlc_object_t *obj)
+void module_LoadPlugins(vlc_object_t *obj)
 {
     /*vlc_assert_locked (&modules.lock); not for static mutexes :( */
 
@@ -681,7 +680,6 @@ size_t module_LoadPlugins (vlc_object_t *obj)
     module_t **list = module_list_get (&count);
     module_list_free (list);
     msg_Dbg (obj, "plug-ins loaded: %zu modules", count);
-    return count;
 }
 
 /**
