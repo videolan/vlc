@@ -126,6 +126,7 @@ package-translations:
 ###############################################################################
 
 EXTRA_DIST += \
+	extras/package/macosx/env.build.sh \
 	extras/package/macosx/build.sh \
 	extras/package/macosx/codesign.sh \
 	extras/package/macosx/configure.sh \
