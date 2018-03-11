@@ -33,6 +33,7 @@
     if (self) {
         NSAssert([self.cell isKindOfClass:[VLCSliderCell class]],
                  @"VLCSlider cell is not VLCSliderCell");
+        _isScrollable = YES;
     }
     return self;
 }
@@ -40,6 +41,31 @@
 + (Class)cellClass
 {
     return [VLCSliderCell class];
+}
+
+- (void)scrollWheel:(NSEvent *)event
+{
+    if (!_isScrollable)
+        return [super scrollWheel:event];
+    double increment;
+    CGFloat deltaY = [event scrollingDeltaY];
+    double range = [self maxValue] - [self minValue];
+
+    // Scroll less for high precision, else it's too fast
+    if (event.hasPreciseScrollingDeltas) {
+        increment = (range * 0.002) * deltaY;
+    } else {
+        if (deltaY == 0.0)
+            return;
+        increment = (range * 0.01 * deltaY);
+    }
+
+    // If scrolling is inversed, increment in other direction
+    if (!event.isDirectionInvertedFromDevice)
+        increment = -increment;
+
+    [self setDoubleValue:self.doubleValue - increment];
+    [self sendAction:self.action to:self.target];
 }
 
 // Workaround for 10.7
