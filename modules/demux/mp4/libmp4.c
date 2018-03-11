@@ -4690,6 +4690,7 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
             case ATOM_soun:
                 return MP4_ReadBox_sample_soun( p_stream, p_box );
             case ATOM_vide:
+            case ATOM_pict: /* heif */
                 return MP4_ReadBox_sample_vide( p_stream, p_box );
             case ATOM_hint:
                 return MP4_ReadBox_sample_hint8( p_stream, p_box );

@@ -3329,6 +3329,10 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
             es_format_Change( &p_track->fmt, AUDIO_ES, 0 );
             break;
 
+        case( ATOM_pict ): /* heif */
+            es_format_Change( &p_track->fmt, VIDEO_ES, 0 );
+            break;
+
         case( ATOM_vide ):
             if( !MP4_BoxGet( p_box_trak, "mdia/minf/vmhd") )
             {
