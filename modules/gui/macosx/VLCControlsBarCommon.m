@@ -276,6 +276,9 @@
         case NSLeftMouseDragged:
             f_updated = [sender floatValue];
             break;
+        case NSScrollWheel:
+            f_updated = [sender floatValue];
+            break;
 
         default:
             return;
