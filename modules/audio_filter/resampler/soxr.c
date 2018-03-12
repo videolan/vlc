@@ -71,11 +71,11 @@ vlc_module_begin ()
                 SOXR_QUALITY_TEXT, NULL, true )
         change_integer_list( soxr_resampler_quality_vlclist,
                              soxr_resampler_quality_vlctext )
-    set_capability ( "audio converter", 0 )
+    set_capability ( "audio converter", 51 )
     set_callbacks( OpenConverter, Close )
 
     add_submodule()
-    set_capability( "audio resampler", 0 )
+    set_capability( "audio resampler", 51 )
     set_callbacks( OpenResampler, Close )
     add_shortcut( "soxr" )
 vlc_module_end ()
