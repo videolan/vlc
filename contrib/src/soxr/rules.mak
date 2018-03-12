@@ -18,6 +18,7 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(MOVE)
 
 .soxr: soxr toolchain.cmake
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DBUILD_EXAMPLES=OFF \
