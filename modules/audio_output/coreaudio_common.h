@@ -55,6 +55,7 @@ struct aout_sys_common
     atomic_uint         i_underrun_size;
     atomic_bool         b_paused;
     atomic_bool         b_do_flush;
+    atomic_bool         b_highlatency;
     vlc_sem_t           flush_sem;
     vlc_mutex_t         lock;
     int                 i_rate;
@@ -70,7 +71,8 @@ void ca_Open(audio_output_t *p_aout);
 
 void ca_Close(audio_output_t *p_aout);
 
-void ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested);
+void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint8_t *p_output,
+               size_t i_requested);
 
 int  ca_TimeGet(audio_output_t *p_aout, mtime_t *delay);
 

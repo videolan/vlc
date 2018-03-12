@@ -50,6 +50,7 @@ ca_Open(audio_output_t *p_aout)
     atomic_init(&p_sys->i_underrun_size, 0);
     atomic_init(&p_sys->b_paused, false);
     atomic_init(&p_sys->b_do_flush, false);
+    atomic_init(&p_sys->b_highlatency, true);
     vlc_sem_init(&p_sys->flush_sem, 0);
     vlc_mutex_init(&p_sys->lock);
 
@@ -70,9 +71,16 @@ ca_Close(audio_output_t *p_aout)
 
 /* Called from render callbacks. No lock, wait, and IO here */
 void
-ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
+ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint8_t *p_output,
+          size_t i_requested)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    const bool b_highlatency = CLOCK_FREQ * (uint64_t)i_nb_samples / p_sys->i_rate
+                             > AOUT_MAX_PTS_DELAY;
+
+    if (b_highlatency)
+        atomic_store(&p_sys->b_highlatency, true);
 
     bool expected = true;
     if (atomic_compare_exchange_weak(&p_sys->b_do_flush, &expected, false))
@@ -109,12 +117,21 @@ ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
         atomic_fetch_add(&p_sys->i_underrun_size, i_requested - i_tocopy);
         memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
     }
+
+    /* Set high delay to false (re-enabling ca_Timeget) after consuming the
+     * circular buffer */
+    if (!b_highlatency)
+        atomic_store(&p_sys->b_highlatency, false);
 }
 
 int
 ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    /* Too high delay: TimeGet will be too imprecise */
+    if (atomic_load(&p_sys->b_highlatency))
+        return -1;
 
     int32_t i_bytes;
     TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
@@ -240,6 +257,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     atomic_store(&p_sys->i_underrun_size, 0);
     atomic_store(&p_sys->b_paused, false);
+    atomic_store(&p_sys->b_highlatency, true);
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
@@ -347,9 +365,8 @@ RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
-    VLC_UNUSED(inNumberFrames);
 
-    ca_Render(p_data, ioData->mBuffers[0].mData,
+    ca_Render(p_data, inNumberFrames, ioData->mBuffers[0].mData,
               ioData->mBuffers[0].mDataByteSize);
 
     return noErr;
