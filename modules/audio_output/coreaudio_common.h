@@ -27,13 +27,12 @@
 #endif
 
 #import <vlc_common.h>
-#import <vlc_atomic.h>
 #import <vlc_aout.h>
 #import <vlc_threads.h>
 
 #import <AudioUnit/AudioUnit.h>
 #import <AudioToolbox/AudioToolbox.h>
-#import "TPCircularBuffer.h"
+#import <os/lock.h>
 
 #define STREAM_FORMAT_MSG(pre, sfm) \
     pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
@@ -50,14 +49,27 @@ struct aout_sys_common
     /* The following is owned by common.c (initialized from ca_Init, cleaned
      * from ca_Clean) */
 
-    /* circular buffer to swap the audio data */
-    TPCircularBuffer    circular_buffer;
-    atomic_uint         i_underrun_size;
-    atomic_bool         b_paused;
-    atomic_bool         b_do_flush;
-    atomic_bool         b_highlatency;
+    size_t              i_underrun_size;
+    bool                b_paused;
+    bool                b_do_flush;
+    bool                b_highlatency;
+
+    size_t              i_out_max_size;
+    size_t              i_out_size;
+    block_t             *p_out_chain;
+    block_t             **pp_out_last;
+
     vlc_sem_t           flush_sem;
-    vlc_mutex_t         lock;
+
+    union lock
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        os_unfair_lock  unfair;
+#pragma clang diagnostic pop
+        pthread_mutex_t mutex;
+    } lock;
+
     int                 i_rate;
     unsigned int        i_bytes_per_frame;
     unsigned int        i_frame_length;

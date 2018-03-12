@@ -25,10 +25,13 @@
 #import "coreaudio_common.h"
 #import <CoreAudio/CoreAudioTypes.h>
 
-#if !TARGET_OS_IPHONE
-#import <CoreServices/CoreServices.h>
-#import <vlc_dialog.h>
-#endif
+#import <dlfcn.h>
+
+static struct
+{
+    void (*lock)(os_unfair_lock *lock);
+    void (*unlock)(os_unfair_lock *lock);
+} unfair_lock;
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
@@ -42,17 +45,74 @@ FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
     return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
 }
 
+static void
+ca_ClearOutBuffers(audio_output_t *p_aout)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    block_ChainRelease(p_sys->p_out_chain);
+    p_sys->p_out_chain = NULL;
+    p_sys->pp_out_last = &p_sys->p_out_chain;
+
+    p_sys->i_out_size = 0;
+}
+
+static void
+ca_init_once(void)
+{
+    unfair_lock.lock = dlsym(RTLD_DEFAULT, "os_unfair_lock_lock");
+    if (!unfair_lock.lock)
+        return;
+    unfair_lock.unlock = dlsym(RTLD_DEFAULT, "os_unfair_lock_unlock");
+    if (!unfair_lock.unlock)
+        unfair_lock.lock = NULL;
+}
+
+static void
+lock_init(struct aout_sys_common *p_sys)
+{
+    if (unfair_lock.lock)
+        p_sys->lock.unfair = OS_UNFAIR_LOCK_INIT;
+    else
+        vlc_mutex_init(&p_sys->lock.mutex);
+}
+
+static void
+lock_destroy(struct aout_sys_common *p_sys)
+{
+    if (!unfair_lock.lock)
+        vlc_mutex_destroy(&p_sys->lock.mutex);
+}
+
+static void
+lock_lock(struct aout_sys_common *p_sys)
+{
+    if (unfair_lock.lock)
+        unfair_lock.lock(&p_sys->lock.unfair);
+    else
+        vlc_mutex_lock(&p_sys->lock.mutex);
+}
+
+static void
+lock_unlock(struct aout_sys_common *p_sys)
+{
+    if (unfair_lock.lock)
+        unfair_lock.unlock(&p_sys->lock.unfair);
+    else
+        vlc_mutex_unlock(&p_sys->lock.mutex);
+}
+
 void
 ca_Open(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    atomic_init(&p_sys->i_underrun_size, 0);
-    atomic_init(&p_sys->b_paused, false);
-    atomic_init(&p_sys->b_do_flush, false);
-    atomic_init(&p_sys->b_highlatency, true);
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once(&once, ca_init_once);
+
     vlc_sem_init(&p_sys->flush_sem, 0);
-    vlc_mutex_init(&p_sys->lock);
+    lock_init(p_sys);
+    p_sys->p_out_chain = NULL;
 
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
@@ -66,7 +126,7 @@ ca_Close(audio_output_t *p_aout)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     vlc_sem_destroy(&p_sys->flush_sem);
-    vlc_mutex_destroy(&p_sys->lock);
+    lock_destroy(p_sys);
 }
 
 /* Called from render callbacks. No lock, wait, and IO here */
@@ -76,52 +136,63 @@ ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint8_t *p_output,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    const bool b_highlatency = CLOCK_FREQ * (uint64_t)i_nb_samples / p_sys->i_rate
-                             > AOUT_MAX_PTS_DELAY;
+    lock_lock(p_sys);
 
-    if (b_highlatency)
-        atomic_store(&p_sys->b_highlatency, true);
+    p_sys->b_highlatency = CLOCK_FREQ * (uint64_t)i_nb_samples / p_sys->i_rate
+                         > AOUT_MAX_PTS_DELAY;
 
-    bool expected = true;
-    if (atomic_compare_exchange_weak(&p_sys->b_do_flush, &expected, false))
+    if (p_sys->b_do_flush)
     {
-        TPCircularBufferClear(&p_sys->circular_buffer);
+        ca_ClearOutBuffers(p_aout);
         /* Signal that the renderer is flushed */
+        p_sys->b_do_flush = false;
         vlc_sem_post(&p_sys->flush_sem);
     }
 
-    if (atomic_load_explicit(&p_sys->b_paused, memory_order_relaxed))
+    if (p_sys->b_paused)
+        goto drop;
+
+    size_t i_copied = 0;
+    block_t *p_block = p_sys->p_out_chain;
+    while (p_block != NULL && i_requested != 0)
     {
-        memset(p_output, 0, i_requested);
-        return;
+        size_t i_tocopy = __MIN(i_requested, p_block->i_buffer);
+        memcpy(&p_output[i_copied], p_block->p_buffer, i_tocopy);
+        i_requested -= i_tocopy;
+        i_copied += i_tocopy;
+        if (i_tocopy == p_block->i_buffer)
+        {
+            block_t *p_release = p_block;
+            p_block = p_block->p_next;
+            block_Release(p_release);
+        }
+        else
+        {
+            assert(i_requested == 0);
+
+            p_block->p_buffer += i_tocopy;
+            p_block->i_buffer -= i_tocopy;
+        }
     }
-
-    /* Pull audio from buffer */
-    int32_t i_available;
-    void *p_data = TPCircularBufferTail(&p_sys->circular_buffer,
-                                        &i_available);
-    if (i_available < 0)
-        i_available = 0;
-
-    size_t i_tocopy = __MIN(i_requested, (size_t) i_available);
-
-    if (i_tocopy > 0)
-    {
-        memcpy(p_output, p_data, i_tocopy);
-        TPCircularBufferConsume(&p_sys->circular_buffer, i_tocopy);
-    }
+    p_sys->p_out_chain = p_block;
+    if (!p_sys->p_out_chain)
+        p_sys->pp_out_last = &p_sys->p_out_chain;
+    p_sys->i_out_size -= i_copied;
 
     /* Pad with 0 */
-    if (i_requested > i_tocopy)
+    if (i_requested > 0)
     {
-        atomic_fetch_add(&p_sys->i_underrun_size, i_requested - i_tocopy);
-        memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
+        assert(p_sys->i_out_size == 0);
+        p_sys->i_underrun_size += i_requested;
+        memset(&p_output[i_copied], 0, i_requested);
     }
 
-    /* Set high delay to false (re-enabling ca_Timeget) after consuming the
-     * circular buffer */
-    if (!b_highlatency)
-        atomic_store(&p_sys->b_highlatency, false);
+    lock_unlock(p_sys);
+    return;
+
+drop:
+    memset(p_output, 0, i_requested);
+    lock_unlock(p_sys);
 }
 
 int
@@ -129,16 +200,17 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    /* Too high delay: TimeGet will be too imprecise */
-    if (atomic_load(&p_sys->b_highlatency))
+    lock_lock(p_sys);
+    if (p_sys->b_highlatency)
+    {
+        lock_unlock(p_sys);
         return -1;
+    }
 
-    int32_t i_bytes;
-    TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
-
-    int64_t i_frames = BytesToFrames(p_sys, i_bytes);
+    int64_t i_frames = BytesToFrames(p_sys, p_sys->i_out_size);
     *delay = FramesToUs(p_sys, i_frames) + p_sys->i_dev_latency_us;
 
+    lock_unlock(p_sys);
     return 0;
 }
 
@@ -147,47 +219,41 @@ ca_Flush(audio_output_t *p_aout, bool wait)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
+    lock_lock(p_sys);
     if (wait)
     {
-        int32_t i_bytes;
-
-        while (TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes) != NULL)
+        while (p_sys->i_out_size > 0)
         {
-            if (atomic_load(&p_sys->b_paused))
+            if (p_sys->b_paused)
             {
-                TPCircularBufferClear(&p_sys->circular_buffer);
-                return;
+                ca_ClearOutBuffers(p_aout);
+                break;
             }
 
             /* Calculate the duration of the circular buffer, in order to wait
              * for the render thread to play it all */
             const mtime_t i_frame_us =
-                FramesToUs(p_sys, BytesToFrames(p_sys, i_bytes)) + 10000;
-
-            msleep(i_frame_us / 2);
+                FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + 10000;
+            lock_unlock(p_sys);
+            msleep(i_frame_us);
+            lock_lock(p_sys);
         }
     }
     else
     {
-        /* Request the renderer to flush, and wait for an ACK.
-         * b_do_flush and b_paused need to be locked together in order to not
-         * get stuck here when b_paused is being set after reading. This can
-         * happen when setAliveState() is called from any thread through an
-         * interrupt notification */
-
-        vlc_mutex_lock(&p_sys->lock);
-        assert(!atomic_load(&p_sys->b_do_flush));
-         if (atomic_load(&p_sys->b_paused))
+        assert(!p_sys->b_do_flush);
+        if (p_sys->b_paused)
+            ca_ClearOutBuffers(p_aout);
+        else
         {
-            vlc_mutex_unlock(&p_sys->lock);
-            TPCircularBufferClear(&p_sys->circular_buffer);
+            p_sys->b_do_flush = true;
+            lock_unlock(p_sys);
+            vlc_sem_wait(&p_sys->flush_sem);
             return;
         }
-
-        atomic_store_explicit(&p_sys->b_do_flush, true, memory_order_release);
-        vlc_mutex_unlock(&p_sys->lock);
-        vlc_sem_wait(&p_sys->flush_sem);
     }
+
+    lock_unlock(p_sys);
 }
 
 void
@@ -196,7 +262,9 @@ ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     VLC_UNUSED(date);
 
-    atomic_store_explicit(&p_sys->b_paused, pause, memory_order_relaxed);
+    lock_lock(p_sys);
+    p_sys->b_paused = pause;
+    lock_unlock(p_sys);
 }
 
 void
@@ -210,42 +278,65 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
                            p_sys->chans_to_reorder, p_sys->chan_table,
                            VLC_CODEC_FL32);
 
-    /* move data to buffer */
-    while (!TPCircularBufferProduceBytes(&p_sys->circular_buffer,
-                                         p_block->p_buffer, p_block->i_buffer))
+    lock_lock(p_sys);
+    do
     {
-        if (atomic_load_explicit(&p_sys->b_paused, memory_order_relaxed))
+        const size_t i_avalaible_bytes =
+            __MIN(p_block->i_buffer, p_sys->i_out_max_size - p_sys->i_out_size);
+
+        if (unlikely(i_avalaible_bytes != p_block->i_buffer))
         {
-            msg_Warn(p_aout, "dropping block because the circular buffer is "
-                     "full and paused");
-            break;
+            /* Not optimal but unlikely code path. */
+
+            lock_unlock(p_sys);
+
+            block_t *p_new = block_Alloc(i_avalaible_bytes);
+            if (!p_new)
+            {
+                block_Release(p_block);
+                return;
+            }
+
+            memcpy(p_new->p_buffer, p_block->p_buffer, i_avalaible_bytes);
+
+            p_block->p_buffer += i_avalaible_bytes;
+            p_block->i_buffer -= i_avalaible_bytes;
+
+            lock_lock(p_sys);
+
+            block_ChainLastAppend(&p_sys->pp_out_last, p_new);
+            p_sys->i_out_size += i_avalaible_bytes;
+
+            if (p_sys->b_paused)
+            {
+                lock_unlock(p_sys);
+                block_Release(p_block);
+                return;
+            }
+
+            const mtime_t i_frame_us =
+                FramesToUs(p_sys, BytesToFrames(p_sys, p_block->i_buffer));
+
+            /* Wait for the render buffer to play the remaining data */
+            lock_unlock(p_sys);
+            msleep(i_frame_us);
+            lock_lock(p_sys);
         }
+        else
+        {
+            block_ChainLastAppend(&p_sys->pp_out_last, p_block);
+            p_sys->i_out_size += i_avalaible_bytes;
+            p_block = NULL;
+        }
+    } while (p_block != NULL);
 
-        /* Try to play what we can */
-        int32_t i_avalaible_bytes;
-        TPCircularBufferHead(&p_sys->circular_buffer, &i_avalaible_bytes);
-        assert(i_avalaible_bytes >= 0);
-        if (unlikely((size_t) i_avalaible_bytes >= p_block->i_buffer))
-            continue;
+    size_t i_underrun_size = p_sys->i_underrun_size;
+    p_sys->i_underrun_size = 0;
 
-        bool ret =
-            TPCircularBufferProduceBytes(&p_sys->circular_buffer,
-                                         p_block->p_buffer, i_avalaible_bytes);
-        assert(ret == true);
-        p_block->p_buffer += i_avalaible_bytes;
-        p_block->i_buffer -= i_avalaible_bytes;
+    lock_unlock(p_sys);
 
-        /* Wait for the render buffer to play the remaining data */
-        const mtime_t i_frame_us =
-            FramesToUs(p_sys, BytesToFrames(p_sys, p_block->i_buffer));
-        msleep(i_frame_us / 2);
-    }
-
-    unsigned i_underrun_size = atomic_exchange(&p_sys->i_underrun_size, 0);
     if (i_underrun_size > 0)
-        msg_Warn(p_aout, "underrun of %u bytes", i_underrun_size);
-
-    block_Release(p_block);
+        msg_Warn(p_aout, "underrun of %zu bytes", i_underrun_size);
 }
 
 int
@@ -254,9 +345,10 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    atomic_store(&p_sys->i_underrun_size, 0);
-    atomic_store(&p_sys->b_paused, false);
-    atomic_store(&p_sys->b_highlatency, true);
+    p_sys->i_underrun_size = 0;
+    p_sys->b_paused = false;
+    p_sys->b_highlatency = true;
+
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
@@ -281,16 +373,15 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     {
         /* lower latency: 200 ms of buffering. XXX: Decrease when VLC's core
          * can handle lower audio latency */
-        i_audiobuffer_size = i_audiobuffer_size / 5;
+        p_sys->i_out_max_size = i_audiobuffer_size / 5;
     }
     else
     {
         /* 2 seconds of buffering */
-        i_audiobuffer_size = i_audiobuffer_size * AOUT_MAX_ADVANCE_TIME
-                           / CLOCK_FREQ;
+        p_sys->i_out_max_size = i_audiobuffer_size * 2;
     }
-    if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audiobuffer_size))
-        return VLC_EGENERIC;
+
+    ca_ClearOutBuffers(p_aout);
 
     return VLC_SUCCESS;
 }
@@ -299,8 +390,8 @@ void
 ca_Uninitialize(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-    /* clean-up circular buffer */
-    TPCircularBufferCleanup(&p_sys->circular_buffer);
+    ca_ClearOutBuffers(p_aout);
+    p_sys->i_out_max_size = 0;
 }
 
 void
@@ -308,17 +399,21 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    vlc_mutex_lock(&p_sys->lock);
-    atomic_store(&p_sys->b_paused, !alive);
+    lock_lock(p_sys);
 
-    bool expected = true;
-    if (!alive && atomic_compare_exchange_strong(&p_sys->b_do_flush, &expected, false))
+    bool b_sem_post = false;
+    p_sys->b_paused = !alive;
+    if (!alive && p_sys->b_do_flush)
     {
-        TPCircularBufferClear(&p_sys->circular_buffer);
-        /* Signal that the renderer is flushed */
-        vlc_sem_post(&p_sys->flush_sem);
+        ca_ClearOutBuffers(p_aout);
+        p_sys->b_do_flush = false;
+        b_sem_post = true;
     }
-    vlc_mutex_unlock(&p_sys->lock);
+
+    lock_unlock(p_sys);
+
+    if (b_sem_post)
+        vlc_sem_post(&p_sys->flush_sem);
 }
 
 AudioUnit
