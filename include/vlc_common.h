@@ -556,6 +556,7 @@ static inline unsigned (ctz)(unsigned x)
 #endif
 }
 
+#if !defined(__NetBSD__)
 /** Bit weight */
 VLC_USED
 static inline unsigned (popcount)(unsigned x)
@@ -589,6 +590,7 @@ static inline int (popcountll)(unsigned long long x)
     return count;
 #endif
 }
+#endif
 
 VLC_USED
 static inline unsigned (parity)(unsigned x)
@@ -602,6 +604,7 @@ static inline unsigned (parity)(unsigned x)
 #endif
 }
 
+#if !defined(__NetBSD__)
 /** Byte swap (16 bits) */
 VLC_USED
 static inline uint16_t (bswap16)(uint16_t x)
@@ -649,6 +652,7 @@ static inline uint64_t (bswap64)(uint64_t x)
          | ((x & 0xFF00000000000000ULL) >> 56);
 #endif
 }
+#endif
 
 /* Integer overflow */
 static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
