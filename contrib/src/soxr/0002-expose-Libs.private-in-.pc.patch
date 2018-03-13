@@ -1,0 +1,48 @@
+From 09360cec54474d8739efd058d995646160594421 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 13 Mar 2018 10:57:27 +0100
+Subject: [PATCH 2/2] expose Libs.private in .pc
+
+This fixes static build when avcodec and/or avutil is used.
+---
+ CMakeLists.txt     | 2 ++
+ src/soxr-lsr.pc.in | 1 +
+ src/soxr.pc.in     | 1 +
+ 3 files changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ee48f6c..5adb583 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -142,6 +142,8 @@ if (WITH_AVFFT OR (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" AND SIMD32_FOUND AND WI
+   endif ()
+ endif ()
+ 
++string(REPLACE ";" " " LIBS_PRIVATE_PC "${LIBS}")
++
+ check_function_exists (lrint HAVE_LRINT)
+ check_include_files (fenv.h HAVE_FENV_H)
+ check_include_files (stdbool.h HAVE_STDBOOL_H)
+diff --git a/src/soxr-lsr.pc.in b/src/soxr-lsr.pc.in
+index 7b75757..5d51778 100644
+--- a/src/soxr-lsr.pc.in
++++ b/src/soxr-lsr.pc.in
+@@ -2,4 +2,5 @@ Name: ${LSR}
+ Description: ${DESCRIPTION_SUMMARY} (with libsamplerate-like bindings)
+ Version: ${PROJECT_VERSION}
+ Libs: -L${LIB_INSTALL_DIR} -l${LSR}
++Libs.private: ${LIBS_PRIVATE_PC}
+ Cflags: -I${INCLUDE_INSTALL_DIR}
+diff --git a/src/soxr.pc.in b/src/soxr.pc.in
+index 69d225b..30f0d2d 100644
+--- a/src/soxr.pc.in
++++ b/src/soxr.pc.in
+@@ -2,4 +2,5 @@ Name: ${PROJECT_NAME}
+ Description: ${DESCRIPTION_SUMMARY}
+ Version: ${PROJECT_VERSION}
+ Libs: -L${LIB_INSTALL_DIR} -l${PROJECT_NAME}
++Libs.private: ${LIBS_PRIVATE_PC}
+ Cflags: -I${INCLUDE_INSTALL_DIR}
+-- 
+2.11.0
+

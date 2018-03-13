@@ -15,6 +15,8 @@ $(TARBALLS)/soxr-$(SOXR_VERSION)-Source.tar.xz:
 
 soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(UNPACK)
+	$(APPLY) $(SRC)/soxr/0001-always-generate-.pc.patch
+	$(APPLY) $(SRC)/soxr/0002-expose-Libs.private-in-.pc.patch
 	$(MOVE)
 
 .soxr: soxr toolchain.cmake
