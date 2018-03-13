@@ -105,6 +105,16 @@ static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
 {
     assert( *size <= SSIZE_MAX );
 
+    if( *size == 0 )
+        return NULL;
+
+    if( *in == 0 ) /* Null string stored */
+    {
+        *in += 1;
+        *size -= 1;
+        return NULL;
+    }
+
     size_t len = strnlen( (const char *)*in, *size );
     if( len == 0 || len >= *size )
         return NULL;
