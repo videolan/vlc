@@ -1,6 +1,6 @@
 pkglib_LTLIBRARIES = libcompat.la
 libcompat_la_SOURCES = dummy.c
-libcompat_la_LIBADD = $(LTLIBOBJS) $(LIBRT)
+libcompat_la_LIBADD = $(LTLIBOBJS) $(LIBRT) $(LIBM)
 libcompat_la_LDFLAGS = -no-undefined -static
 
 BUILT_SOURCES = dummy.c
