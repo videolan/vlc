@@ -261,12 +261,18 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
     CreateVideoService =
       (void *)GetProcAddress(hdecoder_dll, "DXVA2CreateVideoService");
     if (CreateVideoService == NULL)
+    {
+        msg_Err(filter, "Can't create video service");
         goto error;
+    }
 
     hr = CreateVideoService( sys->d3d_dev.dev, &IID_IDirectXVideoProcessorService,
                             (void**)&processor);
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to create the video processor. (hr=0x%lX)", hr);
         goto error;
+    }
 
     DXVA2_VideoDesc dsc;
     ZeroMemory(&dsc, sizeof(dsc));
@@ -291,7 +297,10 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
                                                                 &count,
                                                                 &processorGUIDs);
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to get processor GUIDs. (hr=0x%lX)", hr);
         goto error;
+    }
 
     const UINT neededCaps = DXVA2_ProcAmp_Brightness |
                             DXVA2_ProcAmp_Contrast |
@@ -325,25 +334,37 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
                                                         dstDesc.Format, DXVA2_ProcAmp_Brightness,
                                                         &sys->Brightness.Range );
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to get the brightness range. (hr=0x%lX)", hr);
         goto error;
+    }
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
                                                         dstDesc.Format, DXVA2_ProcAmp_Contrast,
                                                         &sys->Contrast.Range );
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to get the contrast range. (hr=0x%lX)", hr);
         goto error;
+    }
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
                                                         dstDesc.Format, DXVA2_ProcAmp_Hue,
                                                         &sys->Hue.Range );
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to get the hue range. (hr=0x%lX)", hr);
         goto error;
+    }
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
                                                         dstDesc.Format, DXVA2_ProcAmp_Saturation,
                                                         &sys->Saturation.Range );
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to get the saturation range. (hr=0x%lX)", hr);
         goto error;
+    }
 
     /* needed to get options passed in transcode using the
      * adjust{name=value} syntax */
@@ -369,7 +390,10 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
                                                              1,
                                                              &sys->processor );
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to create the video processor. (hr=0x%lX)", hr);
         goto error;
+    }
 
     hr = IDirectXVideoProcessorService_CreateSurface( processor,
                                                       dstDesc.Width,
@@ -382,7 +406,10 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
                                                       &sys->hw_surface,
                                                       NULL);
     if (FAILED(hr))
+    {
+        msg_Err(filter, "Failed to create the hardware surface. (hr=0x%lX)", hr);
         goto error;
+    }
 
     CoTaskMemFree(processorGUIDs);
     IDirectXVideoProcessorService_Release(processor);
