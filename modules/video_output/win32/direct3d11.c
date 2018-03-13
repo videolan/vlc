@@ -1727,12 +1727,28 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 {
     vout_display_sys_t *sys = vd->sys;
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
+    const char *target;
+    if (pixel)
+    {
+        if (likely(sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_10_0))
+            target = "ps_4_0";
+        else if (sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_9_3)
+            target = "ps_4_0_level_9_3";
+        else
+            target = "ps_4_0_level_9_1";
+    }
+    else
+    {
+        if (likely(sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_10_0))
+            target = "vs_4_0";
+        else if (sys->d3d_dev.feature_level >= D3D_FEATURE_LEVEL_9_3)
+            target = "vs_4_0_level_9_3";
+        else
+            target = "vs_4_0_level_9_1";
+    }
 
-    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
     HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
-                            NULL, NULL, NULL, "main",
-                            pixel ? (sys->legacy_shader ? "ps_4_0_level_9_1" : "ps_4_0") :
-                                    (sys->legacy_shader ? "vs_4_0_level_9_1" : "vs_4_0"),
+                            NULL, NULL, NULL, "main", target,
                             0, 0, &pShaderBlob, &pErrBlob);
 
     if (FAILED(hr)) {
@@ -2035,19 +2051,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
-#ifdef HAVE_ID3D11VIDEODECODER
-        if (!sys->legacy_shader)
-        {
-            sys->legacy_shader = true;
-            msg_Dbg(vd, "fallback to legacy shader mode");
-            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
-        }
-#endif
-        if (FAILED(hr))
-        {
-            msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
-            return VLC_EGENERIC;
-        }
+        msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
     }
 
     sys->picQuad.i_width  = fmt->i_width;
