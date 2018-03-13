@@ -54,8 +54,8 @@ void D3D11_FilterHoldInstance(filter_t *filter, d3d11_device_t *out, D3D11_TEXTU
         ID3D11DeviceContext_GetDevice(out->d3dcontext, &out->d3ddevice);
 
         UINT dataSize = sizeof(out->context_mutex);
-        HRESULT hr = ID3D11Device_GetPrivateData(out->d3ddevice, &GUID_CONTEXT_MUTEX,
-                                                 &dataSize, &out->context_mutex);
+        HRESULT hr = ID3D11DeviceContext_GetPrivateData(out->d3dcontext, &GUID_CONTEXT_MUTEX,
+                                                        &dataSize, &out->context_mutex);
         if (FAILED(hr) || dataSize != sizeof(out->context_mutex))
         {
             msg_Warn(filter, "No mutex found to lock the decoder");
