@@ -2125,12 +2125,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-    sys->d3d_dev.context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
-    ID3D11Device_SetPrivateData( sys->d3d_dev.d3ddevice, &GUID_CONTEXT_MUTEX,
-                                 sizeof( sys->d3d_dev.context_mutex ), &sys->d3d_dev.context_mutex );
-#endif
-
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
     spuBlendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -3011,13 +3005,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
         ID3D11PixelShader_Release(sys->picQuadPixelShader);
         sys->picQuadPixelShader = NULL;
     }
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->d3d_dev.context_mutex != INVALID_HANDLE_VALUE )
-    {
-        CloseHandle( sys->d3d_dev.context_mutex );
-        sys->d3d_dev.context_mutex = INVALID_HANDLE_VALUE;
-    }
-#endif
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");
 }
