@@ -1,0 +1,36 @@
+From f3aa21ee2ebe3bb64f121dfd2ffed9a5d904a001 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 13 Mar 2018 10:56:25 +0100
+Subject: [PATCH 1/2] always generate .pc
+
+This allows .pc files to be generated when cross-compiling for WIN32 (using
+mingw32).
+---
+ src/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index bb01a0d..f2c1c87 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -86,7 +86,7 @@ set_target_properties (${PROJECT_NAME} PROPERTIES
+   PUBLIC_HEADER "${PROJECT_NAME}.h")
+ if (BUILD_FRAMEWORK)
+   set_target_properties (${PROJECT_NAME} PROPERTIES FRAMEWORK TRUE)
+-elseif (NOT WIN32)
++else ()
+   set (TARGET_PCS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc)
+   configure_file (${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in ${TARGET_PCS})
+   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+@@ -110,7 +110,7 @@ if (WITH_LSR_BINDINGS)
+     PUBLIC_HEADER "${LSR}.h")
+   if (BUILD_FRAMEWORK)
+     set_target_properties (${LSR} PROPERTIES FRAMEWORK TRUE)
+-  elseif (NOT WIN32)
++  else ()
+     set (TARGET_PCS "${TARGET_PCS} ${CMAKE_CURRENT_BINARY_DIR}/${LSR}.pc")
+     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/${LSR}.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${LSR}.pc)
+     install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${LSR}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+-- 
+2.11.0
+
