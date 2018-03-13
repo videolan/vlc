@@ -170,9 +170,9 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
     /* Detect discontinuity due to a pause */
     static const mtime_t rounding_error = 10;
     if( p_sys->i_inputPTS != 0
-     && p_buf->i_pts - p_sys->i_last_input_pts - p_buf->i_length > rounding_error )
+     && p_buf->i_pts - p_sys->i_last_input_pts > rounding_error )
         Flush( p_filter );
-    p_sys->i_last_input_pts = p_buf->i_pts;
+    p_sys->i_last_input_pts = p_buf->i_pts + p_buf->i_length;
 
     const size_t i_prevSize = p_sys->inputSamples.size();
     p_sys->inputSamples.resize(i_prevSize + p_buf->i_nb_samples * p_sys->i_inputNb);
