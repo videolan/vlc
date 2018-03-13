@@ -1296,12 +1296,14 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     DXGI_PRESENT_PARAMETERS presentParams;
     memset(&presentParams, 0, sizeof(presentParams));
+    d3d11_device_lock( &sys->d3d_dev );
     HRESULT hr = IDXGISwapChain1_Present1(sys->dxgiswapChain, 0, 0, &presentParams);
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
     {
         /* TODO device lost */
         msg_Dbg(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
+    d3d11_device_unlock( &sys->d3d_dev );
 
     picture_Release(picture);
     if (subpicture)
