@@ -3874,6 +3874,15 @@ static int MP4_ReadBox_colr( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_irot( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_irot_t, NULL );
+    MP4_GET1BYTE( p_box->data.p_irot->i_ccw_degrees );
+    p_box->data.p_irot->i_ccw_degrees &= 0x03;
+    p_box->data.p_irot->i_ccw_degrees *= 90;
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     const uint8_t *p_peek;
@@ -4850,6 +4859,7 @@ static const struct
     { ATOM_btrt,    MP4_ReadBox_btrt,         0 }, /* codecs bitrate stsd/????/btrt */
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
     { ATOM_colr,    MP4_ReadBox_colr,         0 },
+    { ATOM_irot,    MP4_ReadBox_irot,         0 }, /* heif */
 
     /* XiphQT */
     { ATOM_vCtH,    MP4_ReadBox_Binary,       ATOM_wave },

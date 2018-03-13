@@ -391,6 +391,7 @@ typedef int64_t stime_t;
 #define ATOM_gsst VLC_FOURCC( 'g', 's', 's', 't' )
 #define ATOM_gstd VLC_FOURCC( 'g', 's', 't', 'd' )
 #define ATOM_colr VLC_FOURCC( 'c', 'o', 'l', 'r' )
+#define ATOM_irot VLC_FOURCC( 'i', 'r', 'o', 't' )
 #define ATOM_SmDm VLC_FOURCC( 'S', 'm', 'D', 'm' )
 #define ATOM_CoLL VLC_FOURCC( 'C', 'o', 'L', 'L' )
 
@@ -674,6 +675,11 @@ typedef struct MP4_Box_data_colr_s
         } nclc;
     };
 } MP4_Box_data_colr_t;
+
+typedef struct
+{
+    uint16_t i_ccw_degrees;
+} MP4_Box_data_irot_t;
 
 typedef struct MP4_Box_data_sample_soun_s
 {
@@ -1757,6 +1763,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_ctts_t *p_ctts;
     MP4_Box_data_cslg_t *p_cslg;
     MP4_Box_data_colr_t *p_colr;
+    MP4_Box_data_irot_t *p_irot;
 
     MP4_Box_data_sbgp_t *p_sbgp;
     MP4_Box_data_sgpd_t *p_sgpd;

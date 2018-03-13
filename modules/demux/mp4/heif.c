@@ -304,6 +304,16 @@ static int DemuxHEIF( demux_t *p_demux )
                         fmt.video.i_sar_den = p_prop->data.p_pasp->i_vertical_spacing;
                     }
                     break;
+                case ATOM_irot:
+                    switch( p_prop->data.p_irot->i_ccw_degrees % 360 )
+                    {
+                        default:
+                        case 0:   fmt.video.orientation = ORIENT_NORMAL ; break;
+                        case 90:  fmt.video.orientation = ORIENT_ROTATED_90; break;
+                        case 180: fmt.video.orientation = ORIENT_ROTATED_180 ; break;
+                        case 270: fmt.video.orientation = ORIENT_ROTATED_270 ; break;
+                    }
+                    break;
             }
         }
     }
