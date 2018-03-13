@@ -329,16 +329,9 @@ static const char* globPixelShaderDefault = "\
   };\
   \
   /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\
-  inline float hable(float x) {\
+  inline float3 hable(float3 x) {\
       const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\
       return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\
-  }\
-  \
-  inline float3 hable(float3 x) {\
-      x.r = hable(x.r);\
-      x.g = hable(x.g);\
-      x.b = hable(x.b);\
-      return x;\
   }\
   \
   /* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\
