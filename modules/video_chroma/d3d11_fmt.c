@@ -269,21 +269,20 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
     };
 
     for (UINT driver = 0; driver < ARRAY_SIZE(driverAttempts); driver++) {
-        D3D_FEATURE_LEVEL i_feature_level;
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
                     D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
-                    &out->d3ddevice, &i_feature_level, &out->d3dcontext);
+                    &out->d3ddevice, &out->feature_level, &out->d3dcontext);
         if (SUCCEEDED(hr)) {
 #ifndef NDEBUG
             msg_Dbg(obj, "Created the D3D11 device 0x%p ctx 0x%p type %d level %x.",
                     (void *)out->d3ddevice, (void *)out->d3dcontext,
-                    driverAttempts[driver], i_feature_level);
+                    driverAttempts[driver], out->feature_level);
             D3D11_GetDriverVersion( obj, out );
 #endif
             /* we can work with legacy levels but only if forced */
-            if ( obj->obj.force || i_feature_level >= D3D_FEATURE_LEVEL_11_0 )
+            if ( obj->obj.force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
-            msg_Dbg(obj, "Incompatible feature level %x", i_feature_level);
+            msg_Dbg(obj, "Incompatible feature level %x", out->feature_level);
             ID3D11DeviceContext_Release(out->d3dcontext);
             ID3D11Device_Release(out->d3ddevice);
             out->d3dcontext = NULL;
