@@ -237,6 +237,16 @@ static int Open (vlc_object_t *obj)
     ReleaseCurrent (gl);
 #endif
 
+    /* XXX: Prevent other gl backends (like EGL) to be opened within the same
+     * X11 window instance. Indeed, using EGL after GLX on the same X11 window
+     * instance leads to an SEGFAULT in the libEGL_nvidia.so library. */
+    const char *vendor = glXGetClientString(dpy, GLX_VENDOR);
+    if (vendor && strncmp(vendor, "NVIDIA", sizeof("NVIDIA") - 1) == 0)
+    {
+        var_Create(gl->surface, "gl", VLC_VAR_STRING);
+        var_SetString(gl->surface, "gl", "glx");
+    }
+
     return VLC_SUCCESS;
 
 error:
