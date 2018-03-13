@@ -4416,6 +4416,67 @@ static int MP4_ReadBox_iinf( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_infe( MP4_Box_t *p_box )
+{
+    MP4_Box_data_infe_t *p_data = p_box->data.p_infe;
+    free( p_data->psz_content_encoding );
+    free( p_data->psz_content_type );
+    free( p_data->psz_item_name );
+    free( p_data->psz_item_uri_type );
+}
+
+static int MP4_ReadBox_infe( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_infe_t, MP4_FreeBox_infe );
+    MP4_Box_data_infe_t *p_data = p_box->data.p_infe;
+
+    uint8_t i_version;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( p_data->i_flags );
+    if( i_version > 3 )
+        MP4_READBOX_EXIT( 0 );
+
+    if( i_version < 2 )
+    {
+        MP4_GET2BYTES( p_data->i_item_id );
+        MP4_GET2BYTES( p_data->i_item_protection_index );
+        p_data->psz_item_name = mp4_getstringz( &p_peek, &i_read );
+        if( i_read > 0 )
+        {
+            p_data->psz_content_type = mp4_getstringz( &p_peek, &i_read );
+            if( i_read > 0 )
+                p_data->psz_content_encoding = mp4_getstringz( &p_peek, &i_read );
+        }
+
+        //if( i_version == 1 )
+        {
+            /* extensions, we do not care */
+        }
+    }
+    else
+    {
+        if( i_version == 2 )
+            MP4_GET2BYTES( p_data->i_item_id );
+        else
+            MP4_GET4BYTES( p_data->i_item_id );
+        MP4_GET2BYTES( p_data->i_item_protection_index );
+        MP4_GETFOURCC( p_data->item_type );
+        p_data->psz_item_name = mp4_getstringz( &p_peek, &i_read );
+        if( p_data->item_type == VLC_FOURCC('m','i','m','e') )
+        {
+            p_data->psz_content_type = mp4_getstringz( &p_peek, &i_read );
+            if( i_read > 0 )
+                p_data->psz_content_encoding = mp4_getstringz( &p_peek, &i_read );
+        }
+        else if( p_data->item_type == VLC_FOURCC('u','r','i',' ') )
+        {
+            p_data->psz_item_uri_type = mp4_getstringz( &p_peek, &i_read );
+        }
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -4897,6 +4958,7 @@ static const struct
     /* iso4 brand meta references */
     { ATOM_iloc,    MP4_ReadBox_iloc,        ATOM_meta },
     { ATOM_iinf,    MP4_ReadBox_iinf,        ATOM_meta },
+    { ATOM_infe,    MP4_ReadBox_infe,        ATOM_iinf },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }
