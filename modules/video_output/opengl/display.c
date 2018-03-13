@@ -119,7 +119,7 @@ static int Open (vlc_object_t *obj)
             {
                 /* Force the option only if it was not previously set */
                 char *str = var_InheritString(surface, MODULE_VARNAME);
-                if (str == NULL)
+                if (str == NULL || str[0] == 0 || strcmp(str, "any") == 0)
                     gl_name = "glx";
                 free(str);
                 break;
