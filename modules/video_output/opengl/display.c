@@ -118,8 +118,12 @@ static int Open (vlc_object_t *obj)
             case VLC_CODEC_VDPAU_VIDEO_420:
             {
                 /* Force the option only if it was not previously set */
-                if (gl_name == NULL)
+                if (gl_name == NULL || gl_name[0] == 0
+                 || strcmp(gl_name, "any") == 0)
+                {
+                    free(gl_name);
                     gl_name = strdup("glx");
+                }
                 break;
             }
             default:
