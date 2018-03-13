@@ -41,6 +41,7 @@ typedef struct
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     bool                     owner;
     struct wddm_version      WDDM;
+    D3D_FEATURE_LEVEL        feature_level;
 } d3d11_device_t;
 
 typedef struct
