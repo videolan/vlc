@@ -166,11 +166,11 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 #undef D3D11_GetDriverVersion
 void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
+    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
+
 #if VLC_WINSTORE_APP
     return;
 #else
-    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
-
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
     if (!pAdapter)
         return;
@@ -376,19 +376,35 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     if (vendorId && adapterDesc.VendorId != vendorId)
         return VLC_SUCCESS;
 
-#if VLC_WINSTORE_APP
-    return VLC_EGENERIC;
-#else
-    bool newer =
-           d3d_dev->WDDM.wddm > min_ver->wddm ||
-          (d3d_dev->WDDM.wddm == min_ver->wddm && (d3d_dev->WDDM.d3d_features > min_ver->d3d_features ||
-                                    (d3d_dev->WDDM.d3d_features == min_ver->d3d_features &&
-                                                (d3d_dev->WDDM.revision > min_ver->revision ||
-                                                (d3d_dev->WDDM.revision == min_ver->revision &&
-                                                       d3d_dev->WDDM.build > min_ver->build)))));
-
-    return newer ? VLC_SUCCESS : VLC_EGENERIC;
-#endif
+    if (min_ver->wddm)
+    {
+        if (d3d_dev->WDDM.wddm > min_ver->wddm)
+            return VLC_SUCCESS;
+        else if (d3d_dev->WDDM.wddm != min_ver->wddm)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->d3d_features)
+    {
+        if (d3d_dev->WDDM.d3d_features > min_ver->d3d_features)
+            return VLC_SUCCESS;
+        else if (d3d_dev->WDDM.d3d_features != min_ver->d3d_features)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->revision)
+    {
+        if (d3d_dev->WDDM.revision > min_ver->revision)
+            return VLC_SUCCESS;
+        else if (d3d_dev->WDDM.revision != min_ver->revision)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->build)
+    {
+        if (d3d_dev->WDDM.build > min_ver->build)
+            return VLC_SUCCESS;
+        else if (d3d_dev->WDDM.build != min_ver->build)
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
