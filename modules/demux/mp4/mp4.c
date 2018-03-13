@@ -685,7 +685,7 @@ static int Open( vlc_object_t * p_this )
     bool      b_enabled_es;
 
     /* A little test to see if it could be a mp4 */
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 11 ) < 11 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 ) return VLC_EGENERIC;
 
     switch( VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) )
     {
@@ -701,10 +701,18 @@ static int Open( vlc_object_t * p_this )
         case VLC_FOURCC( 'p', 'n', 'o', 't' ):
             break;
         case ATOM_ftyp:
-            /* We don't yet support f4v, but avformat does. */
-            if( p_peek[8] == 'f' && p_peek[9] == '4' && p_peek[10] == 'v' )
-                return VLC_EGENERIC;
+        {
+            /* Early handle some brands */
+            switch( VLC_FOURCC(p_peek[8], p_peek[9], p_peek[10], p_peek[11]) )
+            {
+                /* We don't yet support f4v, but avformat does. */
+                case MAJOR_f4v:
+                    return VLC_EGENERIC;
+                default:
+                    break;
+            }
             break;
+        }
          default:
             return VLC_EGENERIC;
     }
