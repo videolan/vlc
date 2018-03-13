@@ -132,6 +132,22 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi )
     free (pp_vouts);
 }
 
+void libvlc_set_hmd( libvlc_media_player_t *p_mi, int b_hmd )
+{
+    /* This will work even if the video is not currently active */
+    var_SetBool (p_mi, "hmd", !!b_hmd);
+
+    /* Apply to current video outputs (if any) */
+    size_t n;
+    vout_thread_t **pp_vouts = GetVouts (p_mi, &n);
+    for (size_t i = 0; i < n; i++)
+    {
+        var_SetBool (pp_vouts[i], "hmd", b_hmd);
+        vlc_object_release (pp_vouts[i]);
+    }
+    free (pp_vouts);
+}
+
 void libvlc_video_set_key_input( libvlc_media_player_t *p_mi, unsigned on )
 {
     var_SetBool (p_mi, "keyboard-events", !!on);

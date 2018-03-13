@@ -776,6 +776,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
+    /* HMD */
+    var_Create (mp, "hmd", VLC_VAR_BOOL);
+
     /* Initialize the shared HTTP cookie jar */
     vlc_value_t cookies;
     cookies.p_address = vlc_http_cookies_new();

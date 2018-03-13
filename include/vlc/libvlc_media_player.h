@@ -1155,6 +1155,14 @@ LIBVLC_API void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullsc
 LIBVLC_API int libvlc_get_fullscreen( libvlc_media_player_t *p_mi );
 
 /**
+ * Enable or disable HMD mode.
+ *
+ * \param p_mi the media player
+ * \param b_hmd boolean for HMD mode status
+ */
+LIBVLC_API void libvlc_set_hmd( libvlc_media_player_t *p_mi, int b_hmd );
+
+/**
  * Enable or disable key press events handling, according to the LibVLC hotkeys
  * configuration. By default and for historical reasons, keyboard events are
  * handled by the LibVLC video widget.

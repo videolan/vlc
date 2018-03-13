@@ -274,3 +274,4 @@ libvlc_picture_get_stride
 libvlc_picture_get_width
 libvlc_picture_get_height
 libvlc_picture_get_time
+libvlc_set_hmd
