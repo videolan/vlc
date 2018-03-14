@@ -327,13 +327,19 @@ int D3D9OpenConverter( vlc_object_t *obj )
     if (!p_sys)
          return VLC_ENOMEM;
 
+    if (CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width ))
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
     if (unlikely(D3D9_Create( p_filter, &p_sys->hd3d ) != VLC_SUCCESS)) {
         msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
+        CopyCleanCache(&p_sys->cache);
         free(p_sys);
         return VLC_EGENERIC;
     }
 
-    CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width );
     p_filter->p_sys = p_sys;
     return VLC_SUCCESS;
 }
