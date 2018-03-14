@@ -11,3 +11,14 @@
  protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
  protoc_SOURCES = google/protobuf/compiler/main.cc
  
+--- protobuf/src/Makefile.am.old	2018-03-14 15:00:19.974044729 +0100
++++ protobuf/src/Makefile.am	2018-03-14 15:01:03.158043968 +0100
+@@ -174,7 +174,7 @@
+   google/protobuf/util/type_resolver_util.h                     \
+   google/protobuf/util/message_differencer.h
+ 
+-lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la libprotoc.la
++lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la
+ 
+ libprotobuf_lite_la_LIBADD = $(PTHREAD_LIBS)
+ libprotobuf_lite_la_LDFLAGS = -version-info 11:0:0 -export-dynamic -no-undefined
