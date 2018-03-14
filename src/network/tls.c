@@ -156,7 +156,6 @@ static void cleanup_tls(void *data)
     vlc_tls_SessionDelete (session);
 }
 
-#undef vlc_tls_ClientSessionCreate
 vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
                                        const char *host, const char *service,
                                        const char *const *alpn, char **alp)
