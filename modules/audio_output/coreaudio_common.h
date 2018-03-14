@@ -52,12 +52,13 @@ struct aout_sys_common
     size_t              i_underrun_size;
     bool                b_paused;
     bool                b_do_flush;
-    bool                b_highlatency;
 
     size_t              i_out_max_size;
     size_t              i_out_size;
     block_t             *p_out_chain;
     block_t             **pp_out_last;
+    uint64_t            i_render_host_time;
+    uint32_t            i_render_frames;
 
     vlc_sem_t           flush_sem;
 
@@ -83,8 +84,8 @@ void ca_Open(audio_output_t *p_aout);
 
 void ca_Close(audio_output_t *p_aout);
 
-void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint8_t *p_output,
-               size_t i_requested);
+void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint64_t i_host_time,
+               uint8_t *p_output, size_t i_requested);
 
 int  ca_TimeGet(audio_output_t *p_aout, mtime_t *delay);
 

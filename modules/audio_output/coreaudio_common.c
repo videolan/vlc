@@ -26,12 +26,15 @@
 #import <CoreAudio/CoreAudioTypes.h>
 
 #import <dlfcn.h>
+#import <mach/mach_time.h>
 
 static struct
 {
     void (*lock)(os_unfair_lock *lock);
     void (*unlock)(os_unfair_lock *lock);
 } unfair_lock;
+
+static mach_timebase_info_data_t tinfo;
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
@@ -66,6 +69,9 @@ ca_init_once(void)
     unfair_lock.unlock = dlsym(RTLD_DEFAULT, "os_unfair_lock_unlock");
     if (!unfair_lock.unlock)
         unfair_lock.lock = NULL;
+
+    if (mach_timebase_info(&tinfo) != KERN_SUCCESS)
+        tinfo.numer = tinfo.denom = 0;
 }
 
 static void
@@ -131,15 +137,15 @@ ca_Close(audio_output_t *p_aout)
 
 /* Called from render callbacks. No lock, wait, and IO here */
 void
-ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint8_t *p_output,
-          size_t i_requested)
+ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
+          uint8_t *p_output, size_t i_requested)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
 
-    p_sys->b_highlatency = CLOCK_FREQ * (uint64_t)i_nb_samples / p_sys->i_rate
-                         > AOUT_MAX_PTS_DELAY;
+    p_sys->i_render_host_time = i_host_time;
+    p_sys->i_render_frames = i_frames;
 
     if (p_sys->b_do_flush)
     {
@@ -201,14 +207,19 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-    if (p_sys->b_highlatency)
+
+    if (tinfo.denom == 0 || p_sys->i_render_host_time == 0)
     {
         lock_unlock(p_sys);
         return -1;
     }
 
-    int64_t i_frames = BytesToFrames(p_sys, p_sys->i_out_size);
-    *delay = FramesToUs(p_sys, i_frames) + p_sys->i_dev_latency_us;
+    const uint64_t i_render_time_us = p_sys->i_render_host_time
+                                    * tinfo.numer / tinfo.denom / 1000;
+
+    const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
+    *delay = FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames)
+           + p_sys->i_dev_latency_us + i_render_time_us - mdate();
 
     lock_unlock(p_sys);
     return 0;
@@ -249,10 +260,12 @@ ca_Flush(audio_output_t *p_aout, bool wait)
             p_sys->b_do_flush = true;
             lock_unlock(p_sys);
             vlc_sem_wait(&p_sys->flush_sem);
-            return;
+            lock_lock(p_sys);
         }
     }
 
+    p_sys->i_render_host_time = 0;
+    p_sys->i_render_frames = 0;
     lock_unlock(p_sys);
 }
 
@@ -347,7 +360,8 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     p_sys->i_underrun_size = 0;
     p_sys->b_paused = false;
-    p_sys->b_highlatency = true;
+    p_sys->i_render_host_time = 0;
+    p_sys->i_render_frames = 0;
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
@@ -460,7 +474,10 @@ RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
 
-    ca_Render(p_data, inNumberFrames, ioData->mBuffers[0].mData,
+    uint64_t i_host_time = (inTimeStamp->mFlags & kAudioTimeStampHostTimeValid)
+                         ? inTimeStamp->mHostTime : 0;
+
+    ca_Render(p_data, inNumberFrames, i_host_time, ioData->mBuffers[0].mData,
               ioData->mBuffers[0].mDataByteSize);
 
     return noErr;
