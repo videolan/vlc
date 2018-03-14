@@ -767,15 +767,12 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case VLC_FOURCC( 'a', 'i', '1', '5' ):
         case VLC_FOURCC( 'a', 'i', '1', '6' ):
         {
-            if( !p_track->fmt.i_extra && p_track->fmt.video.i_width < UINT16_MAX )
+            if( !p_track->fmt.i_extra && p_track->fmt.video.i_width < UINT16_MAX &&
+                p_fiel && BOXDATA(p_fiel) )
             {
-                const MP4_Box_t *p_fiel = MP4_BoxGet( p_sample, "fiel" );
-                if( p_fiel && BOXDATA(p_fiel) )
-                {
-                    p_track->fmt.p_extra =
-                            AVCi_create_AnnexB( p_track->fmt.video.i_width,
-                                              !!BOXDATA(p_fiel)->i_flags, &p_track->fmt.i_extra );
-                }
+                p_track->fmt.p_extra =
+                        AVCi_create_AnnexB( p_track->fmt.video.i_width,
+                                            !!BOXDATA(p_fiel)->i_flags, &p_track->fmt.i_extra );
             }
             break;
         }
