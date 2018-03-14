@@ -32,6 +32,7 @@
 
 #include "libmp4.h"
 #include "heif.h"
+#include "color_config.h"
 
 struct heif_private_t
 {
@@ -336,6 +337,15 @@ static int DemuxHEIF( demux_t *p_demux )
                         case 180: fmt.video.orientation = ORIENT_ROTATED_180 ; break;
                         case 270: fmt.video.orientation = ORIENT_ROTATED_270 ; break;
                     }
+                    break;
+                case ATOM_colr:
+                    fmt.video.primaries = iso_23001_8_cp_to_vlc_primaries(
+                                            p_prop->data.p_colr->nclc.i_primary_idx );
+                    fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer(
+                                            p_prop->data.p_colr->nclc.i_transfer_function_idx );
+                    fmt.video.space = iso_23001_8_mc_to_vlc_coeffs(
+                                        p_prop->data.p_colr->nclc.i_matrix_idx );
+                    fmt.video.b_color_range_full = p_prop->data.p_colr->nclc.i_full_range;
                     break;
             }
         }
