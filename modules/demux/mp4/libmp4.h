@@ -48,6 +48,8 @@ typedef int64_t stime_t;
 #define MAJOR_heix VLC_FOURCC( 'h', 'e', 'i', 'x' ) /* heif */
 #define MAJOR_hevc VLC_FOURCC( 'h', 'e', 'v', 'c' ) /* heif */
 #define MAJOR_hevx VLC_FOURCC( 'h', 'e', 'v', 'x' ) /* heif */
+#define MAJOR_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' ) /* heif */
+#define MAJOR_jpgs VLC_FOURCC( 'j', 'p', 'g', 's' ) /* heif */
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
@@ -258,6 +260,7 @@ typedef int64_t stime_t;
 #define ATOM_fiel VLC_FOURCC( 'f', 'i', 'e', 'l' )
 #define ATOM_glbl VLC_FOURCC( 'g', 'l', 'b', 'l' )
 #define ATOM_hvcC VLC_FOURCC( 'h', 'v', 'c', 'C' )
+#define ATOM_jpeC VLC_FOURCC( 'j', 'p', 'e', 'C' )
 
 #define ATOM_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define ATOM_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )

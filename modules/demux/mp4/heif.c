@@ -48,6 +48,7 @@ struct heif_private_t
     {
         MP4_Box_t *p_infe;
         es_format_t fmt;
+        const MP4_Box_t *p_shared_header;
     } current;
 };
 
@@ -227,6 +228,9 @@ static int DemuxHEIF( demux_t *p_demux )
         p_sys->i_end_display_time = 0;
     }
 
+    /* Reset prev pic params */
+    p_sys->current.p_shared_header = NULL;
+
     /* First or next picture */
     if( !p_sys->current.p_infe )
     {
@@ -255,13 +259,22 @@ static int DemuxHEIF( demux_t *p_demux )
         return VLC_DEMUXER_EOF;
 
     es_format_t fmt;
+    const char *psz_mime = p_sys->current.BOXDATA(p_infe)->psz_content_type;
     switch( p_sys->current.BOXDATA(p_infe)->item_type )
     {
         case VLC_FOURCC('h','v','c','1'):
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_HEVC );
             break;
-        default: /* Unsupported picture, goto next */
-            return VLC_DEMUXER_SUCCESS;
+        case VLC_FOURCC('j','p','e','g'):
+            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
+            break;
+        default:
+            if( psz_mime && !strcasecmp( "image/jpeg", psz_mime ) )
+            {
+                es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
+                break;
+            }
+            return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
     }
 
     /* Load properties */
@@ -291,6 +304,10 @@ static int DemuxHEIF( demux_t *p_demux )
                             memcpy( fmt.p_extra, p_prop->data.p_binary->p_blob, fmt.i_extra );
                         }
                     }
+                    break;
+                case ATOM_jpeC:
+                    if( fmt.i_codec == VLC_CODEC_JPEG )
+                        p_sys->current.p_shared_header = p_prop;
                     break;
                 case ATOM_ispe:
                     fmt.video.i_visible_width = p_prop->data.p_ispe->i_width;
@@ -346,6 +363,20 @@ static int DemuxHEIF( demux_t *p_demux )
             continue;
 
         block_t **pp_append = &p_block;
+
+        /* Shared prefix data, ex: JPEG */
+        if( p_sys->current.p_shared_header )
+        {
+            *pp_append = block_Alloc( p_sys->current.p_shared_header->data.p_binary->i_blob );
+            if( *pp_append )
+            {
+                memcpy( (*pp_append)->p_buffer,
+                        p_sys->current.p_shared_header->data.p_binary->p_blob,
+                        p_sys->current.p_shared_header->data.p_binary->i_blob );
+                pp_append = &((*pp_append)->p_next);
+            }
+        }
+
         for( uint16_t j=0; j<BOXDATA(p_iloc)->p_items[i].i_extent_count; j++ )
         {
             uint64_t i_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset +
@@ -402,6 +433,7 @@ int OpenHEIF( vlc_object_t * p_this )
         case MAJOR_mif1:
         case MAJOR_heic:
         case MAJOR_heix:
+        case MAJOR_jpeg:
             break;
         case MAJOR_msf1:
         case MAJOR_hevc:
