@@ -282,20 +282,7 @@ static void TriggerListCallback(vlc_object_t *obj, variable_t *var,
     vlc_cond_broadcast(&priv->var_wait);
 }
 
-#undef var_Create
-/**
- * Initialize a vlc variable
- *
- * We hash the given string and insert it into the sorted list. The insertion
- * may require slow memory copies, but think about what we gain in the log(n)
- * lookup phase when setting/getting the variable value!
- *
- * \param p_this The object in which to create the variable
- * \param psz_name The name of the variable
- * \param i_type The variables type. Must be one of \ref var_type combined with
- *               zero or more \ref var_flags
- */
-int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
+int (var_Create)( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
     assert( p_this );
 
@@ -386,15 +373,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     return ret;
 }
 
-/**
- * Destroy a vlc variable
- *
- * Look for the variable and destroy it if it is found. As in var_Create we
- * do a call to memmove() but we have performance counterparts elsewhere.
- *
- * \param p_this The object that holds the variable
- * \param psz_name The name of the variable
- */
 void (var_Destroy)(vlc_object_t *p_this, const char *psz_name)
 {
     variable_t *p_var;
@@ -436,18 +414,8 @@ void var_DestroyAll( vlc_object_t *obj )
     priv->var_root = NULL;
 }
 
-#undef var_Change
-/**
- * Perform an action on a variable
- *
- * \param p_this The object that holds the variable
- * \param psz_name The name of the variable
- * \param i_action The action to perform. Must be one of \ref var_action
- * \param p_val First action parameter
- * \param p_val2 Second action parameter
- */
-int var_Change( vlc_object_t *p_this, const char *psz_name,
-                int i_action, vlc_value_t *p_val, vlc_value_t *p_val2 )
+int (var_Change)(vlc_object_t *p_this, const char *psz_name,
+                 int i_action, vlc_value_t *p_val, vlc_value_t *p_val2)
 {
     int ret = VLC_SUCCESS;
     variable_t *p_var;
@@ -618,18 +586,8 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
     return ret;
 }
 
-#undef var_GetAndSet
-/**
- * Perform a Get and Set on a variable
- *
- * \param p_this: The object that hold the variable
- * \param psz_name: the name of the variable
- * \param i_action: the action to perform
- * \param p_val: The action parameter
- * \return vlc error codes
- */
-int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
-                   vlc_value_t *p_val )
+int (var_GetAndSet)(vlc_object_t *p_this, const char *psz_name, int i_action,
+                    vlc_value_t *p_val)
 {
     variable_t *p_var;
     vlc_value_t oldval;
@@ -689,15 +647,7 @@ int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
     return VLC_SUCCESS;
 }
 
-#undef var_Type
-/**
- * Request a variable's type
- *
- * \return The variable type if it exists, or 0 if the
- * variable could not be found.
- * \see \ref var_type
- */
-int var_Type( vlc_object_t *p_this, const char *psz_name )
+int (var_Type)(vlc_object_t *p_this, const char *psz_name)
 {
     variable_t *p_var;
     int i_type = 0;
@@ -718,9 +668,8 @@ int var_Type( vlc_object_t *p_this, const char *psz_name )
     return i_type;
 }
 
-#undef var_SetChecked
-int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
-                    int expected_type, vlc_value_t val )
+int (var_SetChecked)(vlc_object_t *p_this, const char *psz_name,
+                     int expected_type, vlc_value_t val)
 {
     variable_t *p_var;
     vlc_value_t oldval;
@@ -764,22 +713,13 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     return VLC_SUCCESS;
 }
 
-#undef var_Set
-/**
- * Set a variable's value
- *
- * \param p_this The object that hold the variable
- * \param psz_name The name of the variable
- * \param val the value to set
- */
-int var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
+int (var_Set)(vlc_object_t *p_this, const char *psz_name, vlc_value_t val)
 {
     return var_SetChecked( p_this, psz_name, 0, val );
 }
 
-#undef var_GetChecked
-int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
-                    int expected_type, vlc_value_t *p_val )
+int (var_GetChecked)(vlc_object_t *p_this, const char *psz_name,
+                     int expected_type, vlc_value_t *p_val)
 {
     assert( p_this );
 
@@ -807,16 +747,7 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
     return err;
 }
 
-#undef var_Get
-/**
- * Get a variable's value
- *
- * \param p_this The object that holds the variable
- * \param psz_name The name of the variable
- * \param p_val Pointer to a vlc_value_t that will hold the variable's value
- *              after the function is finished
- */
-int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
+int (var_Get)(vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val)
 {
     return var_GetChecked( p_this, psz_name, 0, p_val );
 }
@@ -857,25 +788,8 @@ static void AddCallback( vlc_object_t *p_this, const char *psz_name,
     vlc_mutex_unlock( &p_priv->var_lock );
 }
 
-#undef var_AddCallback
-/**
- * Register a callback in a variable
- *
- * We store a function pointer that will be called upon variable
- * modification.
- *
- * \param p_this The object that holds the variable
- * \param psz_name The name of the variable
- * \param pf_callback The function pointer
- * \param p_data A generic pointer that will be passed as the last
- *               argument to the callback function.
- *
- * \warning The callback function is run in the thread that calls var_Set on
- *          the variable. Use proper locking. This thread may not have much
- *          time to spare, so keep callback functions short.
- */
-void var_AddCallback( vlc_object_t *p_this, const char *psz_name,
-                      vlc_callback_t pf_callback, void *p_data )
+void (var_AddCallback)(vlc_object_t *p_this, const char *psz_name,
+                       vlc_callback_t pf_callback, void *p_data)
 {
     callback_entry_t entry;
     entry.pf_value_callback = pf_callback;
@@ -944,15 +858,8 @@ static void DelCallback( vlc_object_t *p_this, const char *psz_name,
     vlc_mutex_unlock( &p_priv->var_lock );
 }
 
-#undef var_DelCallback
-/**
- * Remove a callback from a variable
- *
- * pf_callback and p_data have to be given again, because different objects
- * might have registered the same callback function.
- */
-void var_DelCallback( vlc_object_t *p_this, const char *psz_name,
-                      vlc_callback_t pf_callback, void *p_data )
+void (var_DelCallback)(vlc_object_t *p_this, const char *psz_name,
+                       vlc_callback_t pf_callback, void *p_data)
 {
     callback_entry_t entry;
     entry.pf_value_callback = pf_callback;
@@ -961,14 +868,7 @@ void var_DelCallback( vlc_object_t *p_this, const char *psz_name,
     DelCallback(p_this, psz_name, entry, vlc_value_callback);
 }
 
-#undef var_TriggerCallback
-/**
- * Trigger callback on a variable
- *
- * \param p_this The object that hold the variable
- * \param psz_name The name of the variable
- */
-void var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
+void (var_TriggerCallback)(vlc_object_t *p_this, const char *psz_name)
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
     variable_t *p_var = Lookup( p_this, psz_name );
@@ -983,17 +883,8 @@ void var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
     vlc_mutex_unlock( &p_priv->var_lock );
 }
 
-#undef var_AddListCallback
-/**
- * Register a callback for a list variable
- *
- * The callback is triggered when an element is added/removed from the
- * list or when the list is cleared.
- *
- * See var_AddCallback().
- */
-void var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
-                          vlc_list_callback_t pf_callback, void *p_data )
+void (var_AddListCallback)(vlc_object_t *p_this, const char *psz_name,
+                           vlc_list_callback_t pf_callback, void *p_data)
 {
     callback_entry_t entry;
     entry.pf_list_callback = pf_callback;
@@ -1002,14 +893,8 @@ void var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
     AddCallback(p_this, psz_name, entry, vlc_list_callback);
 }
 
-#undef var_DelListCallback
-/**
- * Remove a callback from a list variable
- *
- * See var_DelCallback().
- */
-void var_DelListCallback( vlc_object_t *p_this, const char *psz_name,
-                          vlc_list_callback_t pf_callback, void *p_data )
+void (var_DelListCallback)(vlc_object_t *p_this, const char *psz_name,
+                           vlc_list_callback_t pf_callback, void *p_data)
 {
     callback_entry_t entry;
     entry.pf_list_callback = pf_callback;
@@ -1118,24 +1003,7 @@ cleanup:
     free( psz_name );
 }
 
-#undef var_LocationParse
-/**
- * Parses a set of colon-separated or semicolon-separated
- * <code>name=value</code> pairs.
- * Some access (or access_demux) plugins uses this scheme
- * in media resource location.
- * @note Only trusted/safe variables are allowed. This is intended.
- *
- * @warning Only use this for plugins implementing VLC-specific resource
- * location schemes. This would not make any sense for standardized ones.
- *
- * @param obj VLC object on which to set variables (and emit error messages)
- * @param mrl string to parse
- * @param pref prefix to prepend to option names in the string
- *
- * @return VLC_ENOMEM on error, VLC_SUCCESS on success.
- */
-int var_LocationParse (vlc_object_t *obj, const char *mrl, const char *pref)
+int (var_LocationParse)(vlc_object_t *obj, const char *mrl, const char *pref)
 {
     int ret = VLC_SUCCESS;
     size_t preflen = strlen (pref) + 1;
@@ -1164,12 +1032,6 @@ int var_LocationParse (vlc_object_t *obj, const char *mrl, const char *pref)
     return ret;
 }
 
-/**
- * Finds the value of a variable. If the specified object does not hold a
- * variable with the specified name, try the parent object, and iterate until
- * the top of the tree. If no match is found, the value is read from the
- * configuration.
- */
 int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
                  vlc_value_t *p_val )
 {
@@ -1204,14 +1066,6 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
     return VLC_SUCCESS;
 }
 
-
-/**
- * It inherits a string as an unsigned rational number (it also accepts basic
- * float number).
- *
- * It returns an error if the rational number cannot be parsed (0/0 is valid).
- * The rational is already reduced.
- */
 int (var_InheritURational)(vlc_object_t *object,
                            unsigned *num, unsigned *den,
                            const char *var)
@@ -1279,11 +1133,6 @@ error:
     return VLC_EGENERIC;
 }
 
-/**
- * Free a list and the associated strings
- * @param p_val: the list variable
- * @param p_val2: the variable associated or NULL
- */
 void var_FreeList( vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
     switch( p_val->p_list->i_type & VLC_VAR_CLASS )

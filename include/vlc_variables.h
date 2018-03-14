@@ -103,47 +103,118 @@
 
 /**@}*/
 
-/** \defgroup var_GetAndSet Variable actions
- * These are the different actions that can be used with var_GetAndSet()
- * @{
+/**
+ * Variable actions.
+ *
+ * These are the different actions that can be used with var_GetAndSet().
  */
-enum {
+enum vlc_var_atomic_op {
     VLC_VAR_BOOL_TOGGLE, /**< Invert a boolean value (param ignored) */
     VLC_VAR_INTEGER_ADD, /**< Add parameter to an integer value */
     VLC_VAR_INTEGER_OR,  /**< Binary OR over an integer bits field */
     VLC_VAR_INTEGER_NAND,/**< Binary NAND over an integer bits field */
 };
-/**@}*/
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-VLC_API int var_Create( vlc_object_t *, const char *, int );
-#define var_Create(a,b,c) var_Create( VLC_OBJECT(a), b, c )
+/**
+ * Creates a VLC object variable.
+ *
+ * This function creates a named variable within a VLC object.
+ * If a variable already exists with the same name within the same object, its
+ * reference count is incremented instead.
+ *
+ * \param obj Object to hold the variable
+ * \param name Variable name
+ * \param type Variable type. Must be one of \ref var_type combined with
+ *               zero or more \ref var_flags
+ */
+VLC_API int var_Create(vlc_object_t *obj, const char *name, int type);
 
-VLC_API void var_Destroy( vlc_object_t *, const char * );
-#define var_Destroy(a,b) var_Destroy( VLC_OBJECT(a), b )
+/**
+ * Destroys a VLC object variable.
+ *
+ * This function decrements the reference count of a named variable within a
+ * VLC object. If the reference count reaches zero, the variable is destroyed.
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ */
+VLC_API void var_Destroy(vlc_object_t *obj, const char *name);
 
-VLC_API int var_Change( vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t * );
-#define var_Change(a,b,c,d,e) var_Change( VLC_OBJECT(a), b, c, d, e )
+/**
+ * Performs a special action on a variable.
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ * \param action Action to perform. Must be one of \ref var_action
+ * \param val First action parameter
+ * \param val2 Second action parameter
+ */
+VLC_API int var_Change(vlc_object_t *obj, const char *name, int action,
+                       vlc_value_t *val, vlc_value_t *val2);
 
-VLC_API int var_Type( vlc_object_t *, const char * ) VLC_USED;
-#define var_Type(a,b) var_Type( VLC_OBJECT(a), b )
+/**
+ * Get the type of a variable.
+ *
+ * \see var_type
+ *
+ * \return The variable type if it exists
+ *         or 0 if the variable could not be found.
+ */
+VLC_API int var_Type(vlc_object_t *obj, const char *name) VLC_USED;
 
-VLC_API int var_Set( vlc_object_t *, const char *, vlc_value_t );
-#define var_Set(a,b,c) var_Set( VLC_OBJECT(a), b, c )
+/**
+ * Sets a variable value.
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ * \param val Variable value to set
+ */
+VLC_API int var_Set(vlc_object_t *obj, const char *name, vlc_value_t val);
 
-VLC_API int var_Get( vlc_object_t *, const char *, vlc_value_t * );
-#define var_Get(a,b,c) var_Get( VLC_OBJECT(a), b, c )
+/**
+ * Gets a variable value.
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ * \param valp Pointer to a \ref vlc_value_t object to hold the value [OUT]
+ */
+VLC_API int var_Get(vlc_object_t *obj, const char *name, vlc_value_t *valp);
 
 VLC_API int var_SetChecked( vlc_object_t *, const char *, int, vlc_value_t );
-#define var_SetChecked(o,n,t,v) var_SetChecked(VLC_OBJECT(o),n,t,v)
 VLC_API int var_GetChecked( vlc_object_t *, const char *, int, vlc_value_t * );
-#define var_GetChecked(o,n,t,v) var_GetChecked(VLC_OBJECT(o),n,t,v)
-VLC_API int var_GetAndSet( vlc_object_t *, const char *, int, vlc_value_t * );
 
+/**
+ * Perform an atomic read-modify-write of a variable.
+ *
+ * \param obj object holding the variable
+ * \param name variable name
+ * \param op read-modify-write operation to perform
+ *           (see \ref vlc_var_atomic_op)
+ * \param value value of the variable after the modification
+ * \retval VLC_SUCCESS Operation successful
+ * \retval VLC_ENOVAR Variable not found
+ *
+ * \bug The modified value is returned rather than the original value.
+ * As such, the original value cannot be known in the case of non-reversible
+ * operation such as \ref VLC_VAR_INTEGER_OR and \ref VLC_VAR_INTEGER_NAND.
+ */
+VLC_API int var_GetAndSet(vlc_object_t *obj, const char *name, int op,
+                          vlc_value_t *value);
+
+/**
+ * Finds the value of a variable.
+ *
+ * If the specified object does not hold a variable with the specified name,
+ * try the parent object, and iterate until the top of the objects tree. If no
+ * match is found, the value is read from the configuration.
+ */
 VLC_API int var_Inherit( vlc_object_t *, const char *, int, vlc_value_t * );
 
+/**
+ * Frees a list and the associated strings.
+ * @param p_val: the list variable
+ * @param p_val2: the variable associated or NULL
+ */
 VLC_API void var_FreeList( vlc_value_t *, vlc_value_t * );
 
 
@@ -156,19 +227,67 @@ VLC_API void var_FreeList( vlc_value_t *, vlc_value_t * );
  *                 vlc_value_t newvalue,
  *                 void *p_data);
  *****************************************************************************/
-VLC_API void var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
-VLC_API void var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
-VLC_API void var_TriggerCallback( vlc_object_t *, const char * );
 
+/**
+ * Registers a callback for a variable.
+ *
+ * We store a function pointer that will be called upon variable
+ * modification.
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ * \param callback Callback function pointer
+ * \param opaque Opaque data pointer for use by the callback.
+ *
+ * \warning The callback function is run in the thread that calls var_Set() on
+ *          the variable. Use proper locking. This thread may not have much
+ *          time to spare, so keep callback functions short.
+ *
+ * \bug It is not possible to atomically retrieve the current value and
+ * register a callback. As a consequence, extreme care must be taken to ensure
+ * that the variable value cannot change before the callback is registered.
+ * Failure to do so will result in intractable race conditions.
+ */
+VLC_API void var_AddCallback(vlc_object_t *obj, const char *name,
+                             vlc_callback_t callback, void *opaque);
+
+/**
+ * Deregisters a callback from a variable.
+ *
+ * The callback and opaque pointer must be supplied again, as the same callback
+ * function might have been registered more than once.
+ */
+VLC_API void var_DelCallback(vlc_object_t *obj, const char *name,
+                             vlc_callback_t callback, void *opaque);
+
+/**
+ * Triggers callbacks on a variable.
+ *
+ * This triggers any callbacks registered on the named variable without
+ * actually modifying the variable value. This is primarily useful for
+ * variables with \ref VLC_VAR_VOID type (which do not have a value).
+ *
+ * \param obj Object holding the variable
+ * \param name Variable name
+ */
+VLC_API void var_TriggerCallback(vlc_object_t *obj, const char *name);
+
+/**
+ * Register a callback for a list variable
+ *
+ * The callback is triggered when an element is added/removed from the
+ * list or when the list is cleared.
+ *
+ * See var_AddCallback().
+ */
 VLC_API void var_AddListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+
+/**
+ * Remove a callback from a list variable
+ *
+ * See var_DelCallback().
+ */
 VLC_API void var_DelListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
-
-#define var_AddCallback(a,b,c,d) var_AddCallback( VLC_OBJECT(a), b, c, d )
-#define var_DelCallback(a,b,c,d) var_DelCallback( VLC_OBJECT(a), b, c, d )
-#define var_TriggerCallback(a,b) var_TriggerCallback( VLC_OBJECT(a), b )
-
-#define var_AddListCallback(a,b,c,d) var_AddListCallback( VLC_OBJECT(a), b, c, d )
-#define var_DelListCallback(a,b,c,d) var_DelListCallback( VLC_OBJECT(a), b, c, d )
 
 /*****************************************************************************
  * helpers functions
@@ -211,7 +330,6 @@ static inline int var_SetCoords( vlc_object_t *obj, const char *name,
     val.coords.y = y;
     return var_SetChecked (obj, name, VLC_VAR_COORDS, val);
 }
-#define var_SetCoords(o,n,x,y) var_SetCoords(VLC_OBJECT(o),n,x,y)
 
 /**
  * Set the value of a float variable
@@ -255,13 +373,6 @@ int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
     val.p_address = ptr;
     return var_SetChecked( p_obj, psz_name, VLC_VAR_ADDRESS, val );
 }
-
-#define var_SetInteger(a,b,c)   var_SetInteger( VLC_OBJECT(a),b,c)
-#define var_SetBool(a,b,c)      var_SetBool( VLC_OBJECT(a),b,c)
-#define var_SetFloat(a,b,c)     var_SetFloat( VLC_OBJECT(a),b,c)
-#define var_SetString(a,b,c)    var_SetString( VLC_OBJECT(a),b,c)
-#define var_SetAddress(o, n, p) var_SetAddress(VLC_OBJECT(o), n, p)
-
 
 /**
  * Get an integer value
@@ -309,7 +420,6 @@ static inline void var_GetCoords( vlc_object_t *obj, const char *name,
     else
         *px = *py = 0;
 }
-#define var_GetCoords(o,n,x,y) var_GetCoords(VLC_OBJECT(o),n,x,y)
 
 /**
  * Get a float value
@@ -378,7 +488,6 @@ static inline int64_t var_IncInteger( vlc_object_t *p_obj, const char *psz_name 
         return 0;
     return val.i_int;
 }
-#define var_IncInteger(a,b) var_IncInteger( VLC_OBJECT(a), b )
 
 /**
  * Decrement an integer variable
@@ -393,7 +502,6 @@ static inline int64_t var_DecInteger( vlc_object_t *p_obj, const char *psz_name 
         return 0;
     return val.i_int;
 }
-#define var_DecInteger(a,b) var_DecInteger( VLC_OBJECT(a), b )
 
 static inline uint64_t var_OrInteger( vlc_object_t *obj, const char *name,
                                       unsigned v )
@@ -404,7 +512,6 @@ static inline uint64_t var_OrInteger( vlc_object_t *obj, const char *name,
         return 0;
     return val.i_int;
 }
-#define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a),b,c)
 
 static inline uint64_t var_NAndInteger( vlc_object_t *obj, const char *name,
                                         unsigned v )
@@ -415,7 +522,6 @@ static inline uint64_t var_NAndInteger( vlc_object_t *obj, const char *name,
         return 0;
     return val.i_int;
 }
-#define var_NAndInteger(a,b,c) var_NAndInteger(VLC_OBJECT(a),b,c)
 
 /**
  * Create a integer variable with inherit and get its value.
@@ -492,13 +598,6 @@ static inline void *var_CreateGetAddress( vlc_object_t *p_obj,
     return var_GetAddress( p_obj, psz_name );
 }
 
-#define var_CreateGetInteger(a,b)   var_CreateGetInteger( VLC_OBJECT(a),b)
-#define var_CreateGetBool(a,b)   var_CreateGetBool( VLC_OBJECT(a),b)
-#define var_CreateGetFloat(a,b)   var_CreateGetFloat( VLC_OBJECT(a),b)
-#define var_CreateGetString(a,b)   var_CreateGetString( VLC_OBJECT(a),b)
-#define var_CreateGetNonEmptyString(a,b)   var_CreateGetNonEmptyString( VLC_OBJECT(a),b)
-#define var_CreateGetAddress(a,b)  var_CreateGetAddress( VLC_OBJECT(a),b)
-
 /**
  * Create a integer command variable with inherit and get its value.
  *
@@ -565,12 +664,6 @@ static inline char *var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
     return var_GetNonEmptyString( p_obj, psz_name );
 }
 
-#define var_CreateGetIntegerCommand(a,b)   var_CreateGetIntegerCommand( VLC_OBJECT(a),b)
-#define var_CreateGetBoolCommand(a,b)   var_CreateGetBoolCommand( VLC_OBJECT(a),b)
-#define var_CreateGetFloatCommand(a,b)   var_CreateGetFloatCommand( VLC_OBJECT(a),b)
-#define var_CreateGetStringCommand(a,b)   var_CreateGetStringCommand( VLC_OBJECT(a),b)
-#define var_CreateGetNonEmptyStringCommand(a,b)   var_CreateGetNonEmptyStringCommand( VLC_OBJECT(a),b)
-
 VLC_USED
 static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 {
@@ -579,8 +672,6 @@ static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
         return 0;
     return count.i_int;
 }
-#define var_CountChoices(a,b) var_CountChoices( VLC_OBJECT(a),b)
-
 
 static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
 {
@@ -589,8 +680,6 @@ static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
         return false;
     return val.b_bool;
 }
-#define var_ToggleBool(a,b) var_ToggleBool( VLC_OBJECT(a),b )
-
 
 VLC_USED
 static inline bool var_InheritBool( vlc_object_t *obj, const char *name )
@@ -601,7 +690,6 @@ static inline bool var_InheritBool( vlc_object_t *obj, const char *name )
         val.b_bool = false;
     return val.b_bool;
 }
-#define var_InheritBool(o, n) var_InheritBool(VLC_OBJECT(o), n)
 
 VLC_USED
 static inline int64_t var_InheritInteger( vlc_object_t *obj, const char *name )
@@ -612,7 +700,6 @@ static inline int64_t var_InheritInteger( vlc_object_t *obj, const char *name )
         val.i_int = 0;
     return val.i_int;
 }
-#define var_InheritInteger(o, n) var_InheritInteger(VLC_OBJECT(o), n)
 
 VLC_USED
 static inline float var_InheritFloat( vlc_object_t *obj, const char *name )
@@ -623,7 +710,6 @@ static inline float var_InheritFloat( vlc_object_t *obj, const char *name )
         val.f_float = 0.;
     return val.f_float;
 }
-#define var_InheritFloat(o, n) var_InheritFloat(VLC_OBJECT(o), n)
 
 VLC_USED VLC_MALLOC
 static inline char *var_InheritString( vlc_object_t *obj, const char *name )
@@ -639,7 +725,6 @@ static inline char *var_InheritString( vlc_object_t *obj, const char *name )
     }
     return val.psz_string;
 }
-#define var_InheritString(o, n) var_InheritString(VLC_OBJECT(o), n)
 
 VLC_USED
 static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
@@ -650,20 +735,113 @@ static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
         val.p_address = NULL;
     return val.p_address;
 }
-#define var_InheritAddress(o, n) var_InheritAddress(VLC_OBJECT(o), n)
 
-VLC_API int var_InheritURational( vlc_object_t *, unsigned *num, unsigned *den, const char *var );
+
+/**
+ * Inherit a string as a fractional value.
+ *
+ * This function inherits a string, and interprets it as an unsigned rational
+ * number, i.e. a fraction. It also accepts a normally formatted floating point
+ * number.
+ *
+ * \warning The caller shall perform any and all necessary boundary checks.
+ *
+ * \note The rational number is always reduced,
+ * i.e. the returned numerator and denominator are always co-prime numbers.
+ *
+ * \note Fraction with zero as denominator are considered valid,
+ * including the undefined form zero-by-zero.
+ *
+ * \return Zero on success, an error if parsing fails.
+  */
+VLC_API int var_InheritURational(vlc_object_t *obj, unsigned *num,
+                                 unsigned *den, const char *name);
+
+/**
+ * Parses a string with multiple options.
+ *
+ * Parses a set of colon-separated or semicolon-separated
+ * <code>name=value</code> pairs.
+ * Some access (or access_demux) plugins uses this scheme
+ * in media resource location.
+ * @note Only trusted/safe variables are allowed. This is intended.
+ *
+ * @warning Only use this for plugins implementing VLC-specific resource
+ * location schemes. This would not make any sense for standardized ones.
+ *
+ * @param obj VLC object on which to set variables (and emit error messages)
+ * @param mrl string to parse
+ * @param pref prefix to prepend to option names in the string
+ *
+ * @return VLC_ENOMEM on error, VLC_SUCCESS on success.
+ */
+VLC_API int var_LocationParse(vlc_object_t *, const char *mrl, const char *prefix);
+
+#ifndef DOC
+#define var_Create(a,b,c) var_Create(VLC_OBJECT(a), b, c)
+#define var_Destroy(a,b) var_Destroy(VLC_OBJECT(a), b)
+#define var_Change(a,b,c,d,e) var_Change(VLC_OBJECT(a), b, c, d, e)
+#define var_Type(a,b) var_Type(VLC_OBJECT(a), b)
+#define var_Set(a,b,c) var_Set(VLC_OBJECT(a), b, c)
+#define var_Get(a,b,c) var_Get(VLC_OBJECT(a), b, c)
+#define var_SetChecked(o,n,t,v) var_SetChecked(VLC_OBJECT(o), n, t, v)
+#define var_GetChecked(o,n,t,v) var_GetChecked(VLC_OBJECT(o), n, t, v)
+
+#define var_AddCallback(a,b,c,d) var_AddCallback(VLC_OBJECT(a), b, c, d)
+#define var_DelCallback(a,b,c,d) var_DelCallback(VLC_OBJECT(a), b, c, d)
+#define var_TriggerCallback(a,b) var_TriggerCallback(VLC_OBJECT(a), b)
+#define var_AddListCallback(a,b,c,d) \
+        var_AddListCallback(VLC_OBJECT(a), b, c, d)
+#define var_DelListCallback(a,b,c,d) \
+        var_DelListCallback(VLC_OBJECT(a), b, c, d)
+
+#define var_SetInteger(a,b,c) var_SetInteger(VLC_OBJECT(a), b, c)
+#define var_SetBool(a,b,c) var_SetBool(VLC_OBJECT(a), b, c)
+#define var_SetCoords(o,n,x,y) var_SetCoords(VLC_OBJECT(o), n, x, y)
+#define var_SetFloat(a,b,c) var_SetFloat(VLC_OBJECT(a), b, c)
+#define var_SetString(a,b,c) var_SetString(VLC_OBJECT(a), b, c)
+#define var_SetAddress(o, n, p) var_SetAddress(VLC_OBJECT(o), n, p)
+
+#define var_GetCoords(o,n,x,y) var_GetCoords(VLC_OBJECT(o), n, x, y)
+
+#define var_IncInteger(a,b) var_IncInteger(VLC_OBJECT(a), b)
+#define var_DecInteger(a,b) var_DecInteger(VLC_OBJECT(a), b)
+#define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a), b, c)
+#define var_NAndInteger(a,b,c) var_NAndInteger(VLC_OBJECT(a), b, c)
+
+#define var_CreateGetInteger(a,b) var_CreateGetInteger(VLC_OBJECT(a), b)
+#define var_CreateGetBool(a,b) var_CreateGetBool(VLC_OBJECT(a), b)
+#define var_CreateGetFloat(a,b) var_CreateGetFloat(VLC_OBJECT(a), b)
+#define var_CreateGetString(a,b) var_CreateGetString(VLC_OBJECT(a), b)
+#define var_CreateGetNonEmptyString(a,b) \
+        var_CreateGetNonEmptyString(VLC_OBJECT(a), b)
+#define var_CreateGetAddress(a,b) var_CreateGetAddress( VLC_OBJECT(a), b)
+
+#define var_CreateGetIntegerCommand(a,b)   var_CreateGetIntegerCommand( VLC_OBJECT(a),b)
+#define var_CreateGetBoolCommand(a,b)   var_CreateGetBoolCommand( VLC_OBJECT(a),b)
+#define var_CreateGetFloatCommand(a,b)   var_CreateGetFloatCommand( VLC_OBJECT(a),b)
+#define var_CreateGetStringCommand(a,b)   var_CreateGetStringCommand( VLC_OBJECT(a),b)
+#define var_CreateGetNonEmptyStringCommand(a,b)   var_CreateGetNonEmptyStringCommand( VLC_OBJECT(a),b)
+
+#define var_CountChoices(a,b) var_CountChoices(VLC_OBJECT(a),b)
+#define var_ToggleBool(a,b) var_ToggleBool(VLC_OBJECT(a),b )
+
+#define var_InheritBool(o, n) var_InheritBool(VLC_OBJECT(o), n)
+#define var_InheritInteger(o, n) var_InheritInteger(VLC_OBJECT(o), n)
+#define var_InheritFloat(o, n) var_InheritFloat(VLC_OBJECT(o), n)
+#define var_InheritString(o, n) var_InheritString(VLC_OBJECT(o), n)
+#define var_InheritAddress(o, n) var_InheritAddress(VLC_OBJECT(o), n)
 #define var_InheritURational(a,b,c,d) var_InheritURational(VLC_OBJECT(a), b, c, d)
 
-#define var_GetInteger(a,b)   var_GetInteger( VLC_OBJECT(a),b)
-#define var_GetBool(a,b)   var_GetBool( VLC_OBJECT(a),b)
-#define var_GetFloat(a,b)   var_GetFloat( VLC_OBJECT(a),b)
-#define var_GetString(a,b)   var_GetString( VLC_OBJECT(a),b)
-#define var_GetNonEmptyString(a,b)   var_GetNonEmptyString( VLC_OBJECT(a),b)
-#define var_GetAddress(a,b)  var_GetAddress( VLC_OBJECT(a),b)
+#define var_GetInteger(a,b) var_GetInteger(VLC_OBJECT(a),b)
+#define var_GetBool(a,b) var_GetBool(VLC_OBJECT(a),b)
+#define var_GetFloat(a,b) var_GetFloat(VLC_OBJECT(a),b)
+#define var_GetString(a,b) var_GetString(VLC_OBJECT(a),b)
+#define var_GetNonEmptyString(a,b) var_GetNonEmptyString( VLC_OBJECT(a),b)
+#define var_GetAddress(a,b) var_GetAddress(VLC_OBJECT(a),b)
 
-VLC_API int var_LocationParse(vlc_object_t *, const char *mrl, const char *prefix);
 #define var_LocationParse(o, m, p) var_LocationParse(VLC_OBJECT(o), m, p)
+#endif
 
 /**
  * @}
