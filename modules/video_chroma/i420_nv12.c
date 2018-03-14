@@ -214,8 +214,10 @@ static int Create( vlc_object_t *p_this )
     if (!p_sys)
          return VLC_ENOMEM;
 
-    CopyInitCache( &p_sys->cache, ( p_filter->fmt_in.video.i_x_offset +
-                                    p_filter->fmt_in.video.i_visible_width ) * pixel_bytes );
+    if( CopyInitCache( &p_sys->cache, ( p_filter->fmt_in.video.i_x_offset +
+                       p_filter->fmt_in.video.i_visible_width ) * pixel_bytes ) )
+        return VLC_ENOMEM;
+
     p_filter->p_sys = p_sys;
 
     return 0;
