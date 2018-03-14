@@ -731,7 +731,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
         case ATOM_WMV3:
             p_track->p_asf = MP4_BoxGet( p_sample, "ASF " );
-            /* fallsthrough */
+            /* fallthrough */
         case ATOM_H264:
         case VLC_FOURCC('W','V','C','1'):
         {
