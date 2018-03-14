@@ -43,6 +43,7 @@
 #include "pes.h"
 
 #include "../../codec/jpeg2000.h"
+#include "../../packetizer/dts_header.h"
 
 #include <assert.h>
 
@@ -545,7 +546,11 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         {
             uint8_t i_ver;
             /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
-            if(vlc_popcount(p_stream->fmt->audio.i_frame_length) == 1)
+            if( p_stream->fmt->i_profile == PROFILE_DTS_HD )
+            {
+                i_ver = 'H';
+            }
+            else if(vlc_popcount(p_stream->fmt->audio.i_frame_length) == 1)
             {
                 i_ver = ctz( p_stream->fmt->audio.i_frame_length >> 8 );
                 if(i_ver == 0 || i_ver > 3)
