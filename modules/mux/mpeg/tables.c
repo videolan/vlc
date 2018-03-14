@@ -543,16 +543,18 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         }
         else if( p_stream->fmt->i_codec == VLC_CODEC_DTS )
         {
+            uint8_t i_ver;
             /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
-            if(popcount(p_stream->fmt->audio.i_bytes_per_frame) == 1)
+            if(popcount(p_stream->fmt->audio.i_frame_length) == 1)
             {
-                uint8_t i_ver = ctz( p_stream->fmt->audio.i_bytes_per_frame >> 8 );
-                if(i_ver > 0 && i_ver < 4)
-                {
-                    uint8_t data[4] = { 'D', 'T', 'S', '0' + i_ver };
-                    dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, data );
-                }
+                i_ver = ctz( p_stream->fmt->audio.i_frame_length >> 8 );
+                if(i_ver == 0 || i_ver > 3)
+                   i_ver = 1;
+                i_ver += '0';
             }
+            else i_ver = '0';
+            uint8_t data[4] = { 'D', 'T', 'S', i_ver };
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, data );
         }
         else if( p_stream->fmt->i_codec == VLC_CODEC_A52 )
         {
