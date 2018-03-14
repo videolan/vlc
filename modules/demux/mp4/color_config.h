@@ -28,6 +28,7 @@ enum iso_23001_8_cp
 {
     ISO_23001_8_CP_BT_709 = 1,
     ISO_23001_8_CP_UNSPECIFIED,
+    ISO_23001_8_CP_RESERVED0,
     ISO_23001_8_CP_BT_470_M,
     ISO_23001_8_CP_BT_470_B_G,
     ISO_23001_8_CP_BT_601,
@@ -37,7 +38,8 @@ enum iso_23001_8_cp
     ISO_23001_8_CP_XYZ, /* SMPTE 428 */
     ISO_23001_8_CP_SMPTE_431,
     ISO_23001_8_CP_SMPTE_432,
-    ISO_23001_8_CP_EBU_3213,
+    /* gap */
+    ISO_23001_8_CP_EBU_3213 = 22,
 };
 
 static const uint8_t iso_23001_8_cp_to_vlc_primaries_table[] =
@@ -45,6 +47,7 @@ static const uint8_t iso_23001_8_cp_to_vlc_primaries_table[] =
     [0]                             = COLOR_PRIMARIES_UNDEF,
     [ISO_23001_8_CP_BT_709]         = COLOR_PRIMARIES_BT709,
     [ISO_23001_8_CP_UNSPECIFIED]    = COLOR_PRIMARIES_UNDEF,
+    [ISO_23001_8_CP_RESERVED0]      = COLOR_PRIMARIES_UNDEF,
     [ISO_23001_8_CP_BT_470_M]       = COLOR_PRIMARIES_BT470_M,
     [ISO_23001_8_CP_BT_470_B_G]     = COLOR_PRIMARIES_BT470_BG,
     [ISO_23001_8_CP_BT_601]         = COLOR_PRIMARIES_SMTPE_170,
@@ -54,11 +57,13 @@ static const uint8_t iso_23001_8_cp_to_vlc_primaries_table[] =
     [ISO_23001_8_CP_XYZ]            = COLOR_PRIMARIES_UNDEF,
     [ISO_23001_8_CP_SMPTE_431]      = COLOR_PRIMARIES_UNDEF,
     [ISO_23001_8_CP_SMPTE_432]      = COLOR_PRIMARIES_UNDEF,
-    [ISO_23001_8_CP_EBU_3213]       = COLOR_PRIMARIES_EBU_3213,
+    /* [ISO_23001_8_CP_EBU_3213]       = COLOR_PRIMARIES_EBU_3213, see below */
 };
 
 static inline uint8_t iso_23001_8_cp_to_vlc_primaries( uint8_t v )
 {
+    if( v == ISO_23001_8_CP_EBU_3213 )
+        return COLOR_PRIMARIES_EBU_3213;
     return v < ARRAY_SIZE(iso_23001_8_cp_to_vlc_primaries_table)
            ? iso_23001_8_cp_to_vlc_primaries_table[v]
            : COLOR_PRIMARIES_UNDEF;
@@ -162,4 +167,4 @@ static inline uint8_t iso_23001_8_mc_to_vlc_coeffs( uint8_t v )
            : COLOR_SPACE_UNDEF;
 }
 
-#endif VLC_MP4_COLOR_CONFIG_H_
+#endif /* VLC_MP4_COLOR_CONFIG_H_ */
