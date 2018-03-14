@@ -135,8 +135,8 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
                 p_track->fmt.subs.spu.i_original_frame_width = p_track->i_width;
             if( p_track->i_height > 0 )
                 p_track->fmt.subs.spu.i_original_frame_height = p_track->i_height;
-            break;
         }
+        break;
     case( 0xe1 ): /* QCelp for 3gp */
         if( p_track->fmt.i_cat == AUDIO_ES )
         {
