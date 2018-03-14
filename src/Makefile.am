@@ -304,6 +304,7 @@ libvlccore_la_SOURCES = \
 	network/tcp.c \
 	network/udp.c \
 	network/rootbind.c \
+	network/stream.c \
 	network/tls.c \
 	text/charset.c \
 	text/memstream.c \
