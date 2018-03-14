@@ -731,6 +731,7 @@ static int Open( vlc_object_t * p_this )
                 case MAJOR_heix:
                 case MAJOR_mif1:
                 case MAJOR_jpeg:
+                case MAJOR_avci:
                 /* We don't yet support f4v, but avformat does. */
                 case MAJOR_f4v:
                     return VLC_EGENERIC;

@@ -50,6 +50,8 @@ typedef int64_t stime_t;
 #define MAJOR_hevx VLC_FOURCC( 'h', 'e', 'v', 'x' ) /* heif */
 #define MAJOR_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' ) /* heif */
 #define MAJOR_jpgs VLC_FOURCC( 'j', 'p', 'g', 's' ) /* heif */
+#define MAJOR_avci VLC_FOURCC( 'a', 'v', 'c', 'i' ) /* heif */
+#define MAJOR_avcs VLC_FOURCC( 'a', 'v', 'c', 's' ) /* heif */
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )

@@ -265,6 +265,9 @@ static int DemuxHEIF( demux_t *p_demux )
         case VLC_FOURCC('h','v','c','1'):
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_HEVC );
             break;
+        case VLC_FOURCC('a','v','c','1'):
+            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
+            break;
         case VLC_FOURCC('j','p','e','g'):
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
             break;
@@ -295,7 +298,10 @@ static int DemuxHEIF( demux_t *p_demux )
             switch( p_prop->i_type )
             {
                 case ATOM_hvcC:
-                    if( !fmt.p_extra && fmt.i_codec == VLC_CODEC_HEVC )
+                case ATOM_avcC:
+                    if( !fmt.p_extra &&
+                       ((fmt.i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
+                        (fmt.i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC)) )
                     {
                         fmt.p_extra = malloc( p_prop->data.p_binary->i_blob );
                         if( fmt.p_extra )
@@ -434,10 +440,12 @@ int OpenHEIF( vlc_object_t * p_this )
         case MAJOR_heic:
         case MAJOR_heix:
         case MAJOR_jpeg:
+        case MAJOR_avci:
             break;
         case MAJOR_msf1:
         case MAJOR_hevc:
         case MAJOR_hevx:
+        case MAJOR_avcs:
         default:
             return VLC_EGENERIC;
     }
