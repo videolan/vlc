@@ -498,21 +498,12 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         if ( BOXDATA(p_colr)->i_type == VLC_FOURCC( 'n', 'c', 'l', 'c' ) ||
              BOXDATA(p_colr)->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) )
         {
-            switch ( BOXDATA( p_colr )->nclc.i_primary_idx )
-            {
-            case 1: p_track->fmt.video.primaries = COLOR_PRIMARIES_BT709; break;
-            case 5: p_track->fmt.video.primaries = COLOR_PRIMARIES_BT601_625; break;
-            case 6: p_track->fmt.video.primaries = COLOR_PRIMARIES_BT601_525; break;
-            }
-            switch ( BOXDATA( p_colr )->nclc.i_transfer_function_idx )
-            {
-            case 1: p_track->fmt.video.transfer = TRANSFER_FUNC_BT709; break;
-            }
-            switch ( BOXDATA( p_colr )->nclc.i_matrix_idx )
-            {
-            case 1: p_track->fmt.video.space = COLOR_SPACE_BT709; break;
-            case 2: p_track->fmt.video.space = COLOR_SPACE_BT601; break;
-            }
+            p_track->fmt.video.primaries =
+                    iso_23001_8_cp_to_vlc_primaries( BOXDATA( p_colr )->nclc.i_primary_idx );
+            p_track->fmt.video.transfer =
+                    iso_23001_8_tc_to_vlc_xfer( BOXDATA( p_colr )->nclc.i_transfer_function_idx );
+            p_track->fmt.video.space =
+                    iso_23001_8_mc_to_vlc_coeffs( BOXDATA( p_colr )->nclc.i_matrix_idx );
             p_track->fmt.video.b_color_range_full = BOXDATA(p_colr)->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) &&
                     (BOXDATA(p_colr)->nclc.i_full_range >> 7) != 0;
         }
