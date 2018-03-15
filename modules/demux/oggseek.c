@@ -949,6 +949,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
 {
     OggDebug( msg_Dbg( p_demux, "=================== Seeking To Blind Pos" ) );
     int64_t i_size = stream_Size( p_demux->s );
+    uint64_t i_startpos = vlc_stream_Tell( p_demux->s );
     int64_t i_granule;
     int64_t i_pagepos;
 
@@ -956,6 +957,12 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
                                              i_size * f, i_size,
                                              p_stream,
                                              &i_granule );
+    if( i_granule == -1 )
+    {
+        if( vlc_stream_Seek( p_demux->s, i_startpos ) != VLC_SUCCESS )
+            msg_Err( p_demux, "Seek back failed. Not seekable ?" );
+        return VLC_EGENERIC;
+    }
 
     OggDebug( msg_Dbg( p_demux, "Seek start pos is %"PRId64" granule %"PRId64, i_size, i_granule ) );
 
@@ -980,7 +987,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
     }
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" granule %"PRId64, i_pagepos, i_granule ) );
-    return i_pagepos;
+    return VLC_SUCCESS;
 }
 
 int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
