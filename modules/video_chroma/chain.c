@@ -143,7 +143,7 @@ static picture_t *BufferNew( filter_t *p_filter )
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *), unsigned level_max )
+static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
 {
     filter_sys_t *p_sys;
     int i_ret = VLC_EGENERIC;
@@ -175,7 +175,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *), unsigned l
     var_IncInteger( p_filter, "chain-level" );
 
     int level = var_GetInteger( p_filter, "chain-level" );
-    if( level < 0 || level > level_max )
+    if( level < 0 || level > CHAIN_LEVEL_MAX )
         msg_Err( p_filter, "Too high level of recursion (%d)", level );
     else
         i_ret = pf_build( p_filter );
@@ -213,8 +213,7 @@ static int ActivateConverter( vlc_object_t *p_this )
 
     return Activate( p_filter, b_transform ? BuildTransformChain :
                                b_chroma_resize ? BuildChromaResize :
-                               BuildChromaChain,
-                     CHAIN_LEVEL_MAX );
+                               BuildChromaChain );
 }
 
 static int ActivateFilter( vlc_object_t *p_this )
@@ -224,9 +223,14 @@ static int ActivateFilter( vlc_object_t *p_this )
     if( !p_filter->b_allow_fmt_out_change || p_filter->psz_name == NULL )
         return VLC_EGENERIC;
 
-    /* Try to add a converter before the requested filter */
-    return Activate( p_filter, BuildFilterChain,
-                     1 /* only one level of iteration for filters */ );
+    if( var_Type( p_filter->obj.parent, "chain-filter-level" ) != 0 )
+        return VLC_EGENERIC;
+
+    var_Create( p_filter, "chain-filter-level", VLC_VAR_INTEGER );
+    int i_ret = Activate( p_filter, BuildFilterChain );
+    var_Destroy( p_filter, "chain-filter-level" );
+
+    return i_ret;
 }
 
 static void Destroy( vlc_object_t *p_this )
