@@ -1373,7 +1373,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->objDisplay.gl = vgl->gl;
     vgl->objDisplay.tc = vgl->scene_prgm->tc;
-    if (loadSceneObjects(&vgl->objDisplay, "VirtualTheater" DIR_SEP "Cinema_VLC_TARGO.fbx") != VLC_SUCCESS)
+    if (loadSceneObjects(&vgl->objDisplay, "VirtualTheater" DIR_SEP "virtualCinemaTargo.json") != VLC_SUCCESS)
         msg_Warn(vgl->gl, "Could not load the virtual theater");
 
     GL_ASSERT_NOERROR();
@@ -1902,14 +1902,15 @@ static int BuildVirtualScreen(unsigned nbPlanes,
         return VLC_ENOMEM;
     }
 
-    #define SCREEN_POS 39.95f
-    #define SCREEN_SIZE 10.f
+    #define POS_X -39.95f
     #define POS_Y 4.f
+    #define POS_Z 0.f
+    #define SCREEN_SIZE 10.f
     const GLfloat coord[] = {
-        -SCREEN_POS,    SCREEN_SIZE + POS_Y,    SCREEN_SIZE * f_ar,
-        -SCREEN_POS,    -SCREEN_SIZE + POS_Y,   SCREEN_SIZE * f_ar,
-        -SCREEN_POS,    SCREEN_SIZE + POS_Y,    -SCREEN_SIZE * f_ar,
-        -SCREEN_POS,    -SCREEN_SIZE + POS_Y,   -SCREEN_SIZE * f_ar,
+        POS_X,    SCREEN_SIZE + POS_Y,    SCREEN_SIZE * f_ar + POS_Z,
+        POS_X,    -SCREEN_SIZE + POS_Y,   SCREEN_SIZE * f_ar + POS_Z,
+        POS_X,    SCREEN_SIZE + POS_Y,    -SCREEN_SIZE * f_ar + POS_Z,
+        POS_X,    -SCREEN_SIZE + POS_Y,   -SCREEN_SIZE * f_ar + POS_Z,
     };
     #undef SCREEN_POS
     #undef SCREEN_SIZE
