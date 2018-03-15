@@ -875,8 +875,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
             {
                 Ogg_ResetStreamsHelper( p_sys );
-                Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );
-                return VLC_SUCCESS;
+                return Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );
             }
 
             assert( p_sys->i_length > 0 );
