@@ -534,10 +534,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         const double f = va_arg( args, double );
         int64_t i_length = ControlGetLength( p_demux );
+        int i_ret;
         if( i_length > 0 )
-            return ControlSetTime( p_demux, i_length * f );
+        {
+            i_ret = ControlSetTime( p_demux, i_length * f );
+            if( i_ret == VLC_SUCCESS )
+                return i_ret;
+        }
         /* just byte pos seek */
-        int i_ret = vlc_stream_Seek( p_demux->s, (int64_t) (f * stream_Size( p_demux->s )) );
+        i_ret = vlc_stream_Seek( p_demux->s, (int64_t) (f * stream_Size( p_demux->s )) );
         if( i_ret == VLC_SUCCESS )
         {
             p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
@@ -556,10 +561,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         const int64_t i_length = ControlGetLength(p_demux);
         if( i_length > 0 )
         {
-            double *pf = va_arg( args, double * );
             double current = ControlGetTime(p_demux);
-            *pf = current / (double)i_length;
-            return VLC_SUCCESS;
+            if( current <= i_length )
+            {
+                *(va_arg( args, double * )) = current / (double)i_length;
+                return VLC_SUCCESS;
+            }
         }
         /* Else fallback on byte position */
     }
