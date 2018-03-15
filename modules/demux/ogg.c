@@ -1455,18 +1455,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
-        if ( p_stream->fmt.i_codec == VLC_CODEC_FLAC &&
-             p_stream->p_es && 0 >= p_oggpacket->granulepos &&
-             p_stream->fmt.b_packetized )
-        {
-            /* Handle OggFlac spec violation (multiple frame/packet
-             * by turning on packetizer */
-            msg_Warn( p_demux, "Invalid FLAC in ogg detected. Restarting ES with packetizer." );
-            p_stream->fmt.b_packetized = false;
-            es_out_Del( p_demux->out, p_stream->p_es );
-            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
-        }
-        else if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
+        if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
         {
             /* FIXME: the biggest hack I've ever done */
             msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
@@ -1698,6 +1687,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream = NULL;
                         p_ogg->i_streams--;
                     }
+                    p_stream->fmt.b_packetized = false;
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
@@ -2467,6 +2457,8 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
         b_compatible = Ogg_IsVorbisFormatCompatible( &p_stream->fmt, &p_stream->fmt_old );
     else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
         b_compatible = Ogg_IsOpusFormatCompatible( &p_stream->fmt, &p_stream->fmt_old );
+    else if( p_stream->fmt.i_codec == VLC_CODEC_FLAC )
+        b_compatible = !p_stream->fmt.b_packetized;
 
     if( !b_compatible )
         msg_Warn( p_demux, "cannot reuse old stream, resetting the decoder" );
