@@ -197,10 +197,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argv[argc] = NULL;
     LocalFree (wargv);
 
+#ifdef HAVE_BREAKPAD
     void* eh = NULL;
     if(crash_handling)
     {
-#ifdef HAVE_BREAKPAD
         static wchar_t path[MAX_PATH];
         if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                     NULL, SHGFP_TYPE_CURRENT, path ) )
@@ -208,8 +208,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         _snwprintf( path+wcslen( path ), MAX_PATH,  L"%s", L"\\vlc\\crashdump" );
         CheckCrashDump( &path[0] );
         eh = InstallCrashHandler( &path[0] );
-#endif
     }
+#endif
 
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
 
