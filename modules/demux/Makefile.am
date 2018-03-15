@@ -5,7 +5,7 @@ libxiph_metadata_la_SOURCES = demux/xiph_metadata.h demux/xiph_metadata.c
 libxiph_metadata_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libxiph_metadata.la
 
-libflacsys_plugin_la_SOURCES = demux/flac.c
+libflacsys_plugin_la_SOURCES = demux/flac.c packetizer/flac.h
 libflacsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libflacsys_plugin_la_LIBADD = libxiph_metadata.la
 demux_LTLIBRARIES += libflacsys_plugin.la
