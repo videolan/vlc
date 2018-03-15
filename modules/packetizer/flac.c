@@ -73,9 +73,7 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    mtime_t i_firstpts;
-    mtime_t i_firstframepts;
-
+    date_t pts;
     struct flac_header_info headerinfo;
 
     size_t i_frame_size;
@@ -279,6 +277,7 @@ static void Flush(decoder_t *p_dec)
 
     p_sys->i_state = STATE_NOSYNC;
     p_sys->i_offset = 0;
+    date_Set( &p_sys->pts, VLC_TS_INVALID );
     block_BytestreamEmpty(&p_sys->bytestream);
 }
 
@@ -308,7 +307,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[FLAC_HEADER_SIZE_MAX];
-    block_t *out, *in = NULL;
+    block_t *out = NULL, *in = NULL;
 
     if ( pp_block && *pp_block)
     {
@@ -331,21 +330,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         msg_Err(p_dec, "This stream uses too many audio channels (%d > 8)",
             p_sys->stream_info.channels);
         return NULL;
-    }
-
-    if ( p_sys->headerinfo.i_pts <= VLC_TS_INVALID )
-    {
-        if ( in && in->i_pts == p_sys->headerinfo.i_pts )
-        {
-            /* We've just started the stream, wait for the first PTS. */
-            block_Release(in);
-            return NULL;
-        }
-        p_sys->headerinfo.i_rate = p_dec->fmt_out.audio.i_rate;
-    }
-    else if( in && p_sys->i_firstpts == VLC_TS_INVALID )
-    {
-         p_sys->i_firstpts = in->i_pts;
     }
 
     if ( in )
@@ -392,9 +376,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_state = STATE_NOSYNC;
             break;
         }
-        if (p_sys->headerinfo.i_rate != p_dec->fmt_out.audio.i_rate) {
-            p_dec->fmt_out.audio.i_rate = p_sys->headerinfo.i_rate;
-        }
+
         p_sys->i_state = STATE_NEXT_SYNC;
         p_sys->i_offset = 1;
         p_sys->i_frame_size = 0;
@@ -500,25 +482,44 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         break;
 
     case STATE_SEND_DATA:
-        out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
-        out->i_dts = out->i_pts = p_sys->headerinfo.i_pts;
-        out->i_length = p_sys->headerinfo.i_duration;
-        out->i_flags = p_sys->i_next_block_flags;
+        p_dec->fmt_out.audio.i_rate = p_sys->headerinfo.i_rate;
+        p_dec->fmt_out.audio.i_channels = p_sys->headerinfo.i_channels;
+        p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
 
-        p_sys->i_next_block_flags = 0;
+        if( p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
+            p_sys->bytestream.p_block->i_pts > VLC_TS_INVALID )
+        {
+            date_Init( &p_sys->pts, p_sys->headerinfo.i_rate, 1 );
+            date_Set( &p_sys->pts, p_sys->bytestream.p_block->i_pts );
+            p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+        }
+
+        if( date_Get( &p_sys->pts ) > VLC_TS_INVALID )
+        {
+            out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
+            if( out )
+            {
+                out->i_dts = out->i_pts = date_Get( &p_sys->pts );
+                out->i_flags = p_sys->i_next_block_flags;
+                p_sys->i_next_block_flags = 0;
+            }
+        }
+
+        date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
+        if( out )
+            out->i_length = date_Get( &p_sys->pts ) - out->i_pts;
+        else
+            free( p_sys->p_buf );
+
         p_sys->i_buf = 0;
         p_sys->p_buf = NULL;
         p_sys->i_frame_size = 0;
-
-        p_dec->fmt_out.audio.i_channels = p_sys->headerinfo.i_channels;
-        p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
+        p_sys->i_offset = 0;
+        p_sys->i_state = STATE_NOSYNC;
 
         /* So p_block doesn't get re-added several times */
         if ( pp_block )
             *pp_block = block_BytestreamPop(&p_sys->bytestream);
-
-        p_sys->i_offset = 0;
-        p_sys->i_state = STATE_NOSYNC;
 
         return out;
     }
@@ -545,13 +546,13 @@ static int Open(vlc_object_t *p_this)
     p_sys->b_stream_info = false;
     p_sys->i_last_frame_size = FLAC_FRAME_SIZE_MIN;
     p_sys->i_frame_size  = 0;
-    p_sys->i_firstpts    = VLC_TS_INVALID;
-    p_sys->i_firstframepts   = VLC_TS_INVALID;
     p_sys->headerinfo.i_pts  = VLC_TS_INVALID;
     p_sys->i_buf         = 0;
     p_sys->p_buf         = NULL;
     p_sys->i_next_block_flags = 0;
     block_BytestreamInit(&p_sys->bytestream);
+    date_Init( &p_sys->pts, 1, 1 );
+    date_Set( &p_sys->pts, VLC_TS_INVALID );
 
     /* */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
