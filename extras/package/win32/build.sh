@@ -142,7 +142,7 @@ info "Compiling"
 make -j$JOBS
 
 if [ "$INSTALLER" = "n" ]; then
-make package-win32-debug package-win32
+make package-win32-debug package-win32 package-msi
 elif [ "$INSTALLER" = "r" ]; then
 make package-win32
 elif [ "$INSTALLER" = "u" ]; then
