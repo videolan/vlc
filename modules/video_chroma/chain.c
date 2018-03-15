@@ -223,15 +223,14 @@ static int ActivateFilter( vlc_object_t *p_this )
     if( !p_filter->b_allow_fmt_out_change || p_filter->psz_name == NULL )
         return VLC_EGENERIC;
 
-    /* Force only one level of iteration when using the chain converter from a
-     * filter. */
-    if( var_InheritInteger( p_filter, "chain-level" ) > 0 )
+    if( var_Type( p_filter->obj.parent, "chain-filter-level" ) != 0 )
         return VLC_EGENERIC;
-    var_Create( p_filter, "chain-level", VLC_VAR_INTEGER );
-    var_SetInteger( p_filter, "chain-level", CHAIN_LEVEL_MAX - 1 );
 
-    /* Try to add a converter before the requested filter */
-    return Activate( p_filter, BuildFilterChain );
+    var_Create( p_filter, "chain-filter-level", VLC_VAR_INTEGER );
+    int i_ret = Activate( p_filter, BuildFilterChain );
+    var_Destroy( p_filter, "chain-filter-level" );
+
+    return i_ret;
 }
 
 static void Destroy( vlc_object_t *p_this )
