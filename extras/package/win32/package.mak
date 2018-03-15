@@ -176,6 +176,14 @@ package-win32-release: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll pac
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
 
+	mkdir -p "$(win32_destdir)/msi/"
+	cp    $(top_builddir)/extras/package/win32/msi/config.wxi	  "$(win32_destdir)/msi/"
+	cp    $(top_srcdir)/extras/package/win32/msi/axvlc.wxs		  "$(win32_destdir)/msi/"
+	cp    $(top_srcdir)/extras/package/win32/msi/bannrbmp.bmp	  "$(win32_destdir)/msi/"
+	cp    $(top_srcdir)/extras/package/win32/msi/extensions.wxs	  "$(win32_destdir)/msi/"
+	cp    $(top_srcdir)/extras/package/win32/msi/LICENSE.rtf	  "$(win32_destdir)/msi/"
+	cp    $(top_srcdir)/extras/package/win32/msi/product.wxs	  "$(win32_destdir)/msi/"
+
 	7z a $(7Z_OPTS) $(WINVERSION)-release.7z $(win32_debugdir) "$(win32_destdir)/"
 
 #######
