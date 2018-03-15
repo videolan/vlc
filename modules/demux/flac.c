@@ -775,8 +775,9 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, size_t i_da
         const int64_t i_sample = GetQWBE( &p_data[4+18*i+0] );
         int j;
 
-        if( i_sample < 0 || i_sample >= INT64_MAX )
-            continue;
+        if( i_sample < 0 || i_sample >= INT64_MAX ||
+            GetQWBE( &p_data[4+18*i+8] ) < FLAC_STREAMINFO_SIZE )
+            break;
 
         s = xmalloc( sizeof (*s) );
         s->i_time_offset = i_sample * CLOCK_FREQ / i_sample_rate;
