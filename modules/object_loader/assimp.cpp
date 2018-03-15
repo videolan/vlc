@@ -35,10 +35,13 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_object_loader.h>
+#include <vlc_stream.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "../misc/webservices/json.h"
 
 
 /*****************************************************************************
@@ -100,12 +103,72 @@ static void getAllNodes(std::vector<aiNode *> &nodes, aiNode *node)
 }
 
 
+_json_value *getJSONValues(object_loader_t *p_loader, const char *psz_path)
+{
+    char *psz_url = vlc_path2uri(psz_path, NULL);
+    stream_t *p_stream = vlc_stream_NewURL(p_loader, psz_url);
+
+    char psz_buffer[10 * 1024] = {0};
+    unsigned i_ret = 0;
+    while (true)
+    {
+        int i_read = sizeof(psz_buffer) - i_ret;
+
+        i_read = vlc_stream_Read(p_stream, psz_buffer + i_ret, i_read);
+        if( i_read <= 0 )
+            break;
+
+        i_ret += i_read;
+    }
+    vlc_stream_Delete(p_stream);
+    psz_buffer[i_ret] = 0;
+
+    json_settings settings;
+    char psz_error[128];
+    memset (&settings, 0, sizeof(json_settings));
+    json_value *root = json_parse_ex(&settings, psz_buffer, psz_error);
+    if (root == NULL)
+    {
+        msg_Warn(p_loader, "Cannot parse json data: %s", psz_error);
+        return NULL;
+    }
+
+    return root;
+}
+
+
+std::string getDirectoryPath(std::string path)
+{
+    std::string ret;
+    size_t pos = path.find_last_of(DIR_SEP);
+    if (pos != std::string::npos)
+        ret = path.substr(0, pos + 1);
+    return ret;
+}
+
+
 scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 {
     object_loader_sys_t *p_sys = p_loader->p_sys;
     scene_t *p_scene = NULL;
 
-    const aiScene *myAiScene = p_sys->importer.ReadFile( psz_path,
+    _json_value *root = getJSONValues(p_loader, psz_path);
+    if (unlikely(root == NULL))
+    {
+        msg_Err(p_loader, "Cannot get scene information");
+        return NULL;
+    }
+
+    _json_value modelPathValue = (*root)["modelPath"];
+    if (modelPathValue.type == json_none)
+    {
+        msg_Err(p_loader, "No model path in the scene information file");
+        return NULL;
+    }
+
+    std::string modelPath = getDirectoryPath(psz_path) + std::string(modelPathValue.u.string.ptr);
+
+    const aiScene *myAiScene = p_sys->importer.ReadFile( modelPath.c_str(),
         aiProcess_CalcTangentSpace       |
         aiProcess_Triangulate            |
         aiProcess_JoinIdenticalVertices  |
