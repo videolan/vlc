@@ -418,7 +418,8 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
     const unsigned hstep = cache_size / w16;
     assert(hstep > 0);
 
-    if (src_pitch == dst_pitch)
+    /* If SSE4.1: CopyFromUswc is faster than memcpy */
+    if (!vlc_CPU_SSE4_1() && src_pitch == dst_pitch)
         memcpy(dst, src, src_pitch * height);
     else
     for (unsigned y = 0; y < height; y += hstep) {
