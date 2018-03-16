@@ -36,6 +36,11 @@ typedef struct {
 int  CopyInitCache(copy_cache_t *cache, unsigned width);
 void CopyCleanCache(copy_cache_t *cache);
 
+/* YUVY/RGB copies */
+void CopyPacked(picture_t *dst, const uint8_t *src,
+                const size_t src_pitch, unsigned height,
+                const copy_cache_t *cache);
+
 /* Copy planes from NV12/NV21 to NV12/NV21 */
 void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
                       const size_t src_pitch[static 2], unsigned height,
