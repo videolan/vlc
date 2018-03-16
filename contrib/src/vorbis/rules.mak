@@ -1,6 +1,6 @@
 # libvorbis
 
-VORBIS_VERSION := 1.3.5
+VORBIS_VERSION := 1.3.6
 VORBIS_URL := http://downloads.xiph.org/releases/vorbis/libvorbis-$(VORBIS_VERSION).tar.xz
 
 ifdef HAVE_FPU
