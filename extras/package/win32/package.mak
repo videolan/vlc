@@ -121,7 +121,7 @@ else
 	$(STRIP) $@
 endif
 
-
+if HAVE_MAKENSIS
 package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/package/win32/NSIS/vlc.win32.nsi
 # Script installer
 	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
@@ -132,20 +132,12 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/
 	cp "$(top_srcdir)/extras/package/win32/NSIS/vlc_branding.bmp" "$(win32_destdir)/NSIS/"
 
 # Create package
-	if makensis -VERSION >/dev/null 2>&1; then \
-	    MAKENSIS="makensis"; \
-	elif [ -x "$(PROGRAMFILES)/NSIS/makensis" ]; then \
-	    MAKENSIS="$(PROGRAMFILES)/NSIS/makensis"; \
-	else \
-	    echo 'Error: cannot locate makensis tool'; exit 1; \
-	fi; \
-	MAKENSIS_VERSION=`makensis -VERSION`; echo $${MAKENSIS_VERSION:1:1}; \
-	if [ $${MAKENSIS_VERSION:1:1} -lt 3 ]; then \
-	    echo 'Please update your nsis packager';\
-	    exit 1; \
-	fi; \
-	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
-	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
+	$(MAKENSIS) "$(win32_destdir)/spad.nsi"
+	$(MAKENSIS) "$(win32_destdir)/vlc.win32.nsi"
+else
+package-win32-exe:
+	@echo "makensis require to build NSIS installer not found or too old"; exit 1;
+endif
 
 package-win32-zip: package-win-strip
 	rm -f -- $(WINVERSION).zip
