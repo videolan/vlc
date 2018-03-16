@@ -148,10 +148,10 @@ package-win32-debug-zip: package-win-common
 	zip -r -9 $(WINVERSION)-debug.zip vlc-$(VERSION)
 
 package-win32-7zip: package-win-strip
-	$(7ZIP) a $(7ZIP_OPTS) $(WINVERSION).7z vlc-$(VERSION)
+	$(SEVENZIP) a $(7ZIP_OPTS) $(WINVERSION).7z vlc-$(VERSION)
 
 package-win32-debug-7zip: package-win-common
-	$(7ZIP) a $(7ZIP_OPTS) $(WINVERSION)-debug.7z vlc-$(VERSION)
+	$(SEVENZIP) a $(7ZIP_OPTS) $(WINVERSION)-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
 	rm -Rf $(win32_destdir) $(win32_debugdir) $(win32_xpi_destdir)
@@ -176,7 +176,7 @@ package-win32-release: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll pac
 	cp    $(top_srcdir)/extras/package/win32/msi/LICENSE.rtf	  "$(win32_destdir)/msi/"
 	cp    $(top_srcdir)/extras/package/win32/msi/product.wxs	  "$(win32_destdir)/msi/"
 
-	$(7ZIP) a $(7ZIP_OPTS) $(WINVERSION)-release.7z $(win32_debugdir) "$(win32_destdir)/"
+	$(SEVENZIP) a $(7ZIP_OPTS) $(WINVERSION)-release.7z $(win32_debugdir) "$(win32_destdir)/"
 
 #######
 # WinCE
