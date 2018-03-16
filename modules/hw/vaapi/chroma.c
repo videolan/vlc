@@ -108,9 +108,9 @@ FillPictureFromVAImage(picture_t *dest,
                 Copy420_SP_to_SP(dest, src_planes, src_pitches, src_img->height,
                                  cache);
                 break;
-            case VLC_CODEC_I420_10B:
+            case VLC_CODEC_I420_10L:
                 Copy420_16_SP_to_P(dest, src_planes, src_pitches,
-                                   src_img->height, 0, cache);
+                                   src_img->height, 6, cache);
                 break;
             default:
                 vlc_assert_unreachable();
@@ -216,10 +216,10 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
                         src->format.i_height, cache);
 
         break;
-    case VLC_CODEC_I420_10B:
+    case VLC_CODEC_I420_10L:
         assert(dest_pic->format.i_chroma == VLC_CODEC_VAAPI_420_10BPP);
         Copy420_16_P_to_SP(dest_pic, src_planes, src_pitches,
-                           src->format.i_height, 0, cache);
+                           src->format.i_height, -6, cache);
         break;
     case VLC_CODEC_P010:
     {
@@ -289,7 +289,7 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
             break;
         case VLC_CODEC_VAAPI_420_10BPP:
             if (out->i_chroma == VLC_CODEC_P010
-             || out->i_chroma == VLC_CODEC_I420_10B)
+             || out->i_chroma == VLC_CODEC_I420_10L)
             {
                 *pixel_bytes = 2;
                 return VLC_SUCCESS;
@@ -306,7 +306,7 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
             break;
         case VLC_CODEC_VAAPI_420_10BPP:
             if (in->i_chroma == VLC_CODEC_P010
-             || in->i_chroma == VLC_CODEC_I420_10B)
+             || in->i_chroma == VLC_CODEC_I420_10L)
             {
                 *pixel_bytes = 2;
                 return VLC_SUCCESS;
