@@ -637,6 +637,21 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch,
     }
 }
 
+void CopyPacked(picture_t *dst, const uint8_t *src, const size_t src_pitch,
+                unsigned height, const copy_cache_t *cache)
+{
+    assert(dst);
+    assert(src); assert(src_pitch);
+    assert(height);
+
+    if (vlc_CPU_SSE4_1())
+        SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch, src, src_pitch,
+                      cache->buffer, cache->size, height, 0);
+    else
+        CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch, src, src_pitch,
+                  height, 0);
+}
+
 void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
                       const size_t src_pitch[static 2], unsigned height,
                       const copy_cache_t *cache)
