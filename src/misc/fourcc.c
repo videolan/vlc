@@ -374,10 +374,10 @@ static const vlc_fourcc_t p_I444_16B_fallback[] = {
 
 /* Fallbacks for cvpx */
 static const vlc_fourcc_t p_CVPX_VIDEO_NV12_fallback[] = {
-    VLC_CODEC_CVPX_NV12, VLC_CODEC_I420, 0,
+    VLC_CODEC_CVPX_NV12, VLC_CODEC_NV12, VLC_CODEC_I420, 0,
 };
 static const vlc_fourcc_t p_CVPX_VIDEO_UYVY_fallback[] = {
-    VLC_CODEC_CVPX_UYVY, VLC_CODEC_I420, 0,
+    VLC_CODEC_CVPX_UYVY, VLC_CODEC_UYVY, 0,
 };
 static const vlc_fourcc_t p_CVPX_VIDEO_I420_fallback[] = {
     VLC_CODEC_CVPX_I420, VLC_CODEC_I420, 0,
@@ -386,7 +386,7 @@ static const vlc_fourcc_t p_CVPX_VIDEO_BGRA_fallback[] = {
     VLC_CODEC_CVPX_BGRA, VLC_CODEC_BGRA, 0,
 };
 static const vlc_fourcc_t p_CVPX_VIDEO_P010_fallback[] = {
-    VLC_CODEC_CVPX_P010, VLC_CODEC_P010, VLC_CODEC_I420_10B, 0
+    VLC_CODEC_CVPX_P010, VLC_CODEC_P010, VLC_CODEC_I420_10L, 0
 };
 
 static const vlc_fourcc_t p_VAAPI_420_fallback[] = {
@@ -394,11 +394,15 @@ static const vlc_fourcc_t p_VAAPI_420_fallback[] = {
 };
 
 static const vlc_fourcc_t p_VAAPI_420_10BPP_fallback[] = {
-    VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_I420_10B, VLC_CODEC_P010, 0,
+    VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_P010, VLC_CODEC_I420_10L, 0,
 };
 
 static const vlc_fourcc_t p_D3D9_OPAQUE_fallback[] = {
     VLC_CODEC_D3D9_OPAQUE, VLC_CODEC_I420, 0,
+};
+
+static const vlc_fourcc_t p_D3D9_OPAQUE_10B_fallback[] = {
+    VLC_CODEC_D3D9_OPAQUE_10B, VLC_CODEC_P010, VLC_CODEC_I420_10L, 0,
 };
 
 static const vlc_fourcc_t p_D3D11_OPAQUE_fallback[] = {
@@ -406,7 +410,7 @@ static const vlc_fourcc_t p_D3D11_OPAQUE_fallback[] = {
 };
 
 static const vlc_fourcc_t p_D3D11_OPAQUE_10B_fallback[] = {
-    VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_P010, 0,
+    VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_P010, VLC_CODEC_I420_10L, 0,
 };
 
 static const vlc_fourcc_t p_I440_fallback[] = {
@@ -496,6 +500,7 @@ static const vlc_fourcc_t *pp_YUV_fallback[] = {
     p_VAAPI_420_fallback,
     p_VAAPI_420_10BPP_fallback,
     p_D3D9_OPAQUE_fallback,
+    p_D3D9_OPAQUE_10B_fallback,
     p_D3D11_OPAQUE_fallback,
     p_D3D11_OPAQUE_10B_fallback,
     NULL,
@@ -521,6 +526,7 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_CVPX_NV12,
     VLC_CODEC_CVPX_UYVY,
     VLC_CODEC_CVPX_I420,
+    VLC_CODEC_CVPX_P010,
     VLC_CODEC_VAAPI_420,
     VLC_CODEC_VAAPI_420_10BPP,
     VLC_CODEC_D3D9_OPAQUE,
