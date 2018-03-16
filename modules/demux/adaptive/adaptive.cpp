@@ -140,7 +140,7 @@ static int Open(vlc_object_t *p_obj)
 {
     demux_t *p_demux = (demux_t*) p_obj;
 
-    if(!p_demux->s->psz_url)
+    if(!p_demux->s->psz_url || p_demux->s->b_preparsing)
         return VLC_EGENERIC;
 
     std::string mimeType;
