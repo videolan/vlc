@@ -180,7 +180,7 @@ static void matrixMul(float ret[], const float m1[], const float m2[])
 }
 
 
-void scene_CalcTransformationMatrix(scene_t *p_scene)
+void scene_CalcTransformationMatrix(scene_t *p_scene, float s, float *rotationAngles)
 {
     memset(p_scene->transformMatrix, 0, sizeof(p_scene->transformMatrix));
 
@@ -209,43 +209,69 @@ void scene_CalcTransformationMatrix(scene_t *p_scene)
                  min[1] + (max[1] - min[1]) / 2.f,
                  min[2] + (max[2] - min[2]) / 2.f};
 
-    float f_diag = sqrt((max[0] - min[0]) * (max[0] - min[0])
-                        + (max[1] - min[1]) * (max[1] - min[1])
-                        + (max[2] - min[2]) * (max[2] - min[2]));
-
-    float s = 100 / f_diag;
-
     // Set the scene transformation matrix.
-    const float m1[] = {
-    /*          x          y          z         w */
-                s,       0.f,       0.f,      0.f,
-              0.f,         s,       0.f,      0.f,
-              0.f,       0.f,         s,      0.f,
-        -s * c[0], -s * c[1], -s * c[2],        1
+    const float t[] = {
+    /*         x          y          z         w */
+               s,       0.f,       0.f,      0.f,
+             0.f,         s,       0.f,      0.f,
+             0.f,       0.f,         s,      0.f,
+       -s * c[0], -s * c[1], -s * c[2],        1
     };
 
     float st, ct;
-    sincosf(-M_PI / 2.f, &st, &ct);
 
-    // Translation defines
-    #define TX 0.2f
-    #define TY 6.f
-    #define TZ 0.f
-    const float m2[] = {
-        /*   x    y    z    w */
-            ct, 0.f, -st, 0.f,
-           0.f, 1.f, 0.f, 0.f,
-            st, 0.f,  ct, 0.f,
-            TX,  TY,  TZ, 1.f
+    // Rotation on X
+    sincosf(rotationAngles[0] * M_PI / 180.f, &st, &ct);
+    const float rotX[] = {
+        /*  x    y    z    w */
+          1.f, 0.f, 0.f, 0.f,
+          0.f,  ct,  st, 0.f,
+          0.f, -st,  ct, 0.f,
+          0.f, 0.f, 0.f, 1.f
     };
-    #undef TX
-    #undef TY
-    #undef TZ
 
-    float m[16];
-    matrixMul(m, m1, m2);
+    // Rotation on Y
+    sincosf(rotationAngles[1] * M_PI / 180.f, &st, &ct);
+    const float rotY[] = {
+        /*  x    y    z    w */
+           ct, 0.f, -st, 0.f,
+          0.f, 1.f, 0.f, 0.f,
+           st, 0.f,  ct, 0.f,
+          0.f, 0.f, 0.f, 1.f
+    };
 
-    memcpy(p_scene->transformMatrix, m, sizeof(m));
+    // Rotation on Z
+    sincosf(rotationAngles[2] * M_PI / 180.f, &st, &ct);
+    const float rotZ[] = {
+        /*  x    y    z    w */
+           ct,  st, 0.f, 0.f,
+          -st,  ct, 0.f, 0.f,
+          0.f, 0.f, 1.f, 0.f,
+          0.f, 0.f, 0.f, 1.f
+    };
+
+    float res1[16];
+    matrixMul(res1, t, rotX);
+    float res2[16];
+    matrixMul(res2, res1, rotY);
+    float res3[16];
+    matrixMul(res3, res2, rotZ);
+
+    memcpy(p_scene->transformMatrix, res3, sizeof(res3));
+}
+
+
+void scene_CalcHeadPositionMatrix(scene_t *p_scene, float *p)
+{
+    const float m[] = {
+        /*   x    y    z    w */
+            1.f,   0.f,   0.f, 0.f,
+            0.f,   1.f,   0.f, 0.f,
+            0.f,   0.f,   1.f, 0.f,
+          -p[0], -p[1], -p[2], 1.f
+    };
+
+    memcpy(p_scene->headPositionMatrix, m, sizeof(m));
 }
 
 

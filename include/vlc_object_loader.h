@@ -55,10 +55,16 @@ typedef struct
     scene_material_t **materials;
 
     float transformMatrix[16];
+    float headPositionMatrix[16];
 
     unsigned nObjects;
     unsigned nMeshes;
     unsigned nMaterials;
+
+    float screenSize;
+    float screenPosition[3];
+    float screenNormalDir[3];
+    float screenFitDir[3];
 } scene_t;
 
 
@@ -90,7 +96,8 @@ VLC_API scene_material_t *scene_material_New(void);
 VLC_API int scene_material_LoadTexture(object_loader_t *p_loader, scene_material_t *p_material,
                                        const char *psz_path);
 VLC_API void scene_material_Release(scene_material_t *p_material);
-VLC_API void scene_CalcTransformationMatrix(scene_t *p_scene);
+VLC_API void scene_CalcTransformationMatrix(scene_t *p_scene, float sf, float *rotationAngles);
+VLC_API void scene_CalcHeadPositionMatrix(scene_t *p_scene, float *p);
 VLC_API scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nTextures);
 VLC_API void scene_Release(scene_t *p_scene);
 

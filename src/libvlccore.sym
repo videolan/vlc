@@ -976,5 +976,6 @@ scene_material_New
 scene_material_LoadTexture
 scene_material_Release
 scene_CalcTransformationMatrix
+scene_CalcHeadPositionMatrix
 scene_New
 scene_Release
