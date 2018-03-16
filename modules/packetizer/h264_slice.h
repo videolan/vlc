@@ -37,7 +37,7 @@ typedef struct
 
     enum h264_slice_type_e type;
     int i_pic_parameter_set_id;
-    int i_frame_num;
+    unsigned i_frame_num;
 
     int i_field_pic_flag;
     int i_bottom_field_flag;
@@ -59,7 +59,7 @@ static inline void h264_slice_init( h264_slice_t *p_slice )
     p_slice->i_nal_type = -1;
     p_slice->i_nal_ref_idc = -1;
     p_slice->i_idr_pic_id = -1;
-    p_slice->i_frame_num = -1;
+    p_slice->i_frame_num = 0;
     p_slice->type = H264_SLICE_TYPE_UNKNOWN;
     p_slice->i_pic_parameter_set_id = -1;
     p_slice->i_field_pic_flag = 0;
