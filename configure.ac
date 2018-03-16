@@ -4163,6 +4163,38 @@ AC_SUBST(soliddatadir)
 AM_CONDITIONAL(KDE_SOLID, [test "x${soliddatadir}" != "x"])
 
 dnl
+dnl  Find tools for win32 packaging
+dnl
+AS_IF([test "${SYS}" = "mingw32"], [
+    dnl
+    dnl Find makensis required to build the NSIS installer
+    dnl
+    nsis_major_required="3"
+    nsis_version_ok="no"
+    AC_PATH_PROG([MAKENSIS], [makensis], [no])
+    AS_IF([test "$MAKENSIS" != "no"], [
+        # Check version
+        AC_MSG_CHECKING([makensis version])
+        nsis_version=$($MAKENSIS -VERSION)
+        AC_MSG_RESULT([$nsis_version])
+        nsis_version_major=$(echo "$nsis_version" | awk -F \. '{print $1}' | sed 's/v//')
+        # Check if major version is a valid number
+        AS_IF([test -n "$nsis_version_major" && \
+               test "$nsis_version_major" -eq "$nsis_version_major" 2> /dev/null], [
+            # Do the version check using major version
+            AS_IF([test "$nsis_version_major" -lt "$nsis_major_required"], [
+                AC_MSG_WARN([makensis too old, (needs ${nsis_major_required}.x, have ${nsis_version_major}.x)])
+            ], [
+                nsis_version_ok="yes"
+            ])
+        ], [
+            AC_MSG_WARN([failed to check the makensis version])
+        ])
+    ])
+])
+AM_CONDITIONAL(HAVE_MAKENSIS, [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" == "yes"])
+
+dnl
 dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY 
 dnl It should only be available when building for win10, but some SDKs define it unconditionnaly
 dnl
