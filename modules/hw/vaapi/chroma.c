@@ -110,7 +110,7 @@ FillPictureFromVAImage(picture_t *dest,
                 break;
             case VLC_CODEC_I420_10B:
                 Copy420_16_SP_to_P(dest, src_planes, src_pitches,
-                                   src_img->height, cache);
+                                   src_img->height, 0, cache);
                 break;
             default:
                 vlc_assert_unreachable();
@@ -219,7 +219,7 @@ FillVAImageFromPicture(VAImage *dest_img, uint8_t *dest_buf,
     case VLC_CODEC_I420_10B:
         assert(dest_pic->format.i_chroma == VLC_CODEC_VAAPI_420_10BPP);
         Copy420_16_P_to_SP(dest_pic, src_planes, src_pitches,
-                           src->format.i_height, cache);
+                           src->format.i_height, 0, cache);
         break;
     case VLC_CODEC_P010:
     {
