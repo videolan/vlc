@@ -336,7 +336,9 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     }
     else
     {
-        p_sps->i_chroma_idc = 1; /* Not present == inferred to 4:2:2 */
+        p_sps->i_chroma_idc = 1; /* Not present == inferred to 4:2:0 */
+        p_sps->i_bit_depth_luma = 8;
+        p_sps->i_bit_depth_chroma = 8;
     }
 
     /* Skip i_log2_max_frame_num */
@@ -790,8 +792,6 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps, unsigned
 bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *p_sps, uint8_t *pi_chroma_format,
                            uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma )
 {
-    if( p_sps->i_bit_depth_luma == 0 )
-        return false;
     *pi_chroma_format = p_sps->i_chroma_idc;
     *pi_depth_luma = p_sps->i_bit_depth_luma;
     *pi_depth_chroma = p_sps->i_bit_depth_chroma;
