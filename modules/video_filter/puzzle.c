@@ -138,7 +138,7 @@ static int Open( vlc_object_t *p_this )
 
     const vlc_chroma_description_t *p_chroma =
         vlc_fourcc_GetChromaDescription( p_filter->fmt_in.video.i_chroma );
-    if( p_chroma == NULL || p_chroma->plane_count == 0 )
+    if( p_chroma == NULL || p_chroma->plane_count == 0 || p_chroma->pixel_size > 1 )
         return VLC_EGENERIC;
 
     /* Allocate structure */
