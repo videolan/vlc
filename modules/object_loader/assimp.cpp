@@ -147,6 +147,121 @@ std::string getDirectoryPath(std::string path)
 }
 
 
+int getViewer(_json_value *root, float *position)
+{
+    _json_value viewerValue = (*root)["viewer"];
+    if (viewerValue.type == json_none)
+        return VLC_EGENERIC;
+
+    _json_value positionValue = viewerValue["position"];
+    if (positionValue.type == json_none)
+        return VLC_EGENERIC;
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        _json_value positionCoordValue = positionValue[i];
+        if (positionCoordValue.type == json_none)
+            return VLC_EGENERIC;
+        const double dp = positionCoordValue;
+        position[i] = dp;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
+int getScreenParams(_json_value *root, scene_t *p_scene)
+{
+    _json_value screenValue = (*root)["screen"];
+    if (screenValue.type == json_none)
+        return VLC_EGENERIC;
+
+    _json_value sizeValue = screenValue["size"];
+    if (screenValue.type == json_none)
+        return VLC_EGENERIC;
+
+    const double ds = sizeValue;
+    p_scene->screenSize = ds;
+
+    _json_value positionValue = screenValue["position"];
+    if (positionValue.type == json_none)
+        return VLC_EGENERIC;
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        _json_value positionCoordValue = positionValue[i];
+        if (positionCoordValue.type == json_none)
+            return VLC_EGENERIC;
+        const double dp = positionCoordValue;
+        p_scene->screenPosition[i] = dp;
+    }
+
+    _json_value normalDirValue = screenValue["normalDir"];
+    if (normalDirValue.type == json_none)
+        return VLC_EGENERIC;
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        _json_value normalDirCoordValue = normalDirValue[i];
+        if (normalDirCoordValue.type == json_none)
+            return VLC_EGENERIC;
+        const double ds = normalDirCoordValue;
+        p_scene->screenNormalDir[i] = ds;
+    }
+
+    _json_value fitDirValue = screenValue["fitDir"];
+    if (fitDirValue.type == json_none)
+        return VLC_EGENERIC;
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        _json_value fitDirCoordValue = fitDirValue[i];
+        if (fitDirCoordValue.type == json_none)
+            return VLC_EGENERIC;
+        const double ds = fitDirCoordValue;
+        p_scene->screenFitDir[i] = ds;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
+int getModel(_json_value *root, std::string &modelPath, float &scale, float *rotationAngles)
+{
+    _json_value modelValue = (*root)["model"];
+    if (modelValue.type == json_none)
+        return VLC_EGENERIC;
+
+    _json_value scaleValue = modelValue["scale"];
+    if (scaleValue.type == json_none)
+        return VLC_EGENERIC;
+
+    const double ds = scaleValue;
+    scale = ds;
+
+    _json_value pathValue = modelValue["path"];
+    if (pathValue.type == json_none)
+        return VLC_EGENERIC;
+
+    modelPath = std::string(pathValue);
+
+    _json_value rotationAnglesValue = modelValue["rotationAngles"];
+    if (rotationAnglesValue.type == json_none)
+        return VLC_EGENERIC;
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        _json_value rotationAngleValue = rotationAnglesValue[i];
+        if (rotationAngleValue.type == json_none)
+            return VLC_EGENERIC;
+        const double ds = rotationAngleValue;
+        rotationAngles[i] = ds;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
 scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 {
     object_loader_sys_t *p_sys = p_loader->p_sys;
@@ -159,16 +274,20 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         return NULL;
     }
 
-    _json_value modelPathValue = (*root)["modelPath"];
-    if (modelPathValue.type == json_none)
+    std::string modelPath;
+    float scale;
+    float rotationAngles[3];
+    int ret = getModel(root, modelPath, scale, rotationAngles);
+    if (ret != VLC_SUCCESS)
     {
-        msg_Err(p_loader, "No model path in the scene information file");
+        msg_Err(p_loader, "Could not het the model information");
         return NULL;
     }
 
-    std::string modelPath = getDirectoryPath(psz_path) + std::string(modelPathValue.u.string.ptr);
+    std::string modelFullPath = getDirectoryPath(psz_path) + modelPath;
 
-    const aiScene *myAiScene = p_sys->importer.ReadFile( modelPath.c_str(),
+    const aiScene *myAiScene = p_sys->importer.ReadFile(
+        modelFullPath.c_str(),
         aiProcess_CalcTangentSpace       |
         aiProcess_Triangulate            |
         aiProcess_JoinIdenticalVertices  |
@@ -327,7 +446,25 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     std::copy(meshes.begin(), meshes.end(), p_scene->meshes);
     std::copy(materials.begin(), materials.end(), p_scene->materials);
 
-    scene_CalcTransformationMatrix(p_scene);
+    float position[3];
+    ret = getViewer(root, position);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(p_loader, "Could not het the viewer information");
+        scene_Release(p_scene);
+        return NULL;
+    }
+
+    scene_CalcTransformationMatrix(p_scene, scale, rotationAngles);
+    scene_CalcHeadPositionMatrix(p_scene, position);
+
+    ret = getScreenParams(root, p_scene);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(p_loader, "Could not get the virtual screen information");
+        scene_Release(p_scene);
+        return NULL;
+    }
 
     msg_Dbg(p_loader, "3D scene loaded with %d object(s), %d mesh(es) and %d texture(s)",
             p_scene->nObjects, p_scene->nMeshes, p_scene->nMaterials);
