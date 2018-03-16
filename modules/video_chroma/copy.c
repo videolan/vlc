@@ -865,47 +865,6 @@ void Copy420_16_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
         INTERLEAVE_UV_SHIFTL((-bitshift) & 0xf);
 }
 
-void CopyFromI420_10ToP010(picture_t *dst, const uint8_t *src[static 3],
-                           const size_t src_pitch[static 3],
-                           unsigned height, const copy_cache_t *cache)
-{
-    (void) cache;
-
-    const int i_extra_pitch_dst_y = (dst->p[0].i_pitch  - src_pitch[0]) / 2;
-    const int i_extra_pitch_src_y = (src_pitch[Y_PLANE] - src_pitch[0]) / 2;
-    uint16_t *dstY = (uint16_t *) dst->p[0].p_pixels;
-    const uint16_t *srcY = (const uint16_t *) src[Y_PLANE];
-    for (unsigned y = 0; y < height; y++) {
-        for (unsigned x = 0; x < (src_pitch[0] / 2); x++) {
-            *dstY++ = *srcY++ << 6;
-        }
-        dstY += i_extra_pitch_dst_y;
-        srcY += i_extra_pitch_src_y;
-    }
-
-    const unsigned copy_lines = height / 2;
-    const unsigned copy_pitch = src_pitch[1] / 2;
-
-    const int i_extra_pitch_uv = dst->p[1].i_pitch / 2 - 2 * copy_pitch;
-    const int i_extra_pitch_u  = src_pitch[U_PLANE] / 2 - copy_pitch;
-    const int i_extra_pitch_v  = src_pitch[V_PLANE] / 2 - copy_pitch;
-
-    uint16_t *dstUV = (uint16_t *) dst->p[1].p_pixels;
-    const uint16_t *srcU  = (const uint16_t *) src[U_PLANE];
-    const uint16_t *srcV  = (const uint16_t *) src[V_PLANE];
-    for ( unsigned int line = 0; line < copy_lines; line++ )
-    {
-        for ( unsigned int col = 0; col < copy_pitch; col++ )
-        {
-            *dstUV++ = *srcU++ << 6;
-            *dstUV++ = *srcV++ << 6;
-        }
-        dstUV += i_extra_pitch_uv;
-        srcU  += i_extra_pitch_u;
-        srcV  += i_extra_pitch_v;
-    }
-}
-
 void Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
                     const size_t src_pitch[static 3], unsigned height,
                     const copy_cache_t *cache)
