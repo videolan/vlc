@@ -166,6 +166,7 @@ struct decoder_sys_t
 
     bool                        b_vt_feed;
     bool                        b_vt_flush;
+    bool                        b_vt_need_keyframe;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
 
@@ -1396,6 +1397,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->pic_holder->nb_field_out = 0;
     p_sys->pic_holder->closed = false;
     p_sys->pic_holder->field_reorder_max = p_sys->i_pic_reorder_max * 2;
+    p_sys->b_vt_need_keyframe = false;
 
     vlc_mutex_init(&p_sys->lock);
 
@@ -1428,6 +1430,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_get_extradata = GetDecoderExtradataHEVC;
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
             p_sys->b_poc_based_reorder = true;
+            p_sys->b_vt_need_keyframe = true;
             break;
 
         case kCMVideoCodecType_MPEG4Video:
@@ -1975,7 +1978,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    if (!p_sys->b_vt_feed && !p_info->b_keyframe)
+    if (!p_sys->b_vt_feed && p_sys->b_vt_need_keyframe && !p_info->b_keyframe)
     {
         free(p_info);
         goto skip;
