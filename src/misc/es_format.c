@@ -591,7 +591,7 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
             v1.i_chroma = vlc_fourcc_GetCodec( p_fmt1->i_cat, p_fmt1->i_codec );
         if( !v2.i_chroma )
             v2.i_chroma = vlc_fourcc_GetCodec( p_fmt2->i_cat, p_fmt2->i_codec );
-        return video_format_IsSimilar( &p_fmt1->video, &p_fmt2->video );
+        return video_format_IsSimilar( &v1, &v2 );
     }
 
     case SPU_ES:
