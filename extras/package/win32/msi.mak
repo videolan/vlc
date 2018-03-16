@@ -12,7 +12,11 @@ MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`wine winepath -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`wine winepath -w '$(MSIBUILDDIR)'`
-MSIOUTFILE=vlc-$(VERSION).msi
+if HAVE_WIN64
+MSIOUTFILE=vlc-$(VERSION)-win64.msi
+else
+MSIOUTFILE=vlc-$(VERSION)-win32.msi
+endif
 WINE_C=`wine winepath c:`
 
 package-msi: heat candle light
