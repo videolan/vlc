@@ -4191,6 +4191,10 @@ AS_IF([test "${SYS}" = "mingw32"], [
             AC_MSG_WARN([failed to check the makensis version])
         ])
     ])
+    dnl
+    dnl Find 7zip
+    dnl
+    AC_PATH_PROG([7ZIP], [7z], [7z])
 ])
 AM_CONDITIONAL(HAVE_MAKENSIS, [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" == "yes"])
 
