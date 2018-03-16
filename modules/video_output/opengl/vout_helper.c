@@ -110,6 +110,7 @@ struct prgm
         GLfloat ZoomMatrix[16];
         GLfloat ObjectTransformMatrix[16];
         GLfloat SceneTransformMatrix[16];
+        GLfloat HeadPositionMatrix[16];
         GLfloat SbSCoefs[2];
         GLfloat SbSOffsets[2];
     } var;
@@ -124,6 +125,7 @@ struct prgm
         GLint ZoomMatrix;
         GLint ObjectTransformMatrix;
         GLint SceneTransformMatrix;
+        GLint HeadPositionMatrix;
         GLint SbSCoefs;
         GLint SbSOffsets;
     } uloc;
@@ -340,6 +342,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         getZoomMatrix(vgl->f_z, prgm->var.ZoomMatrix);
         memcpy(prgm->var.ObjectTransformMatrix, identity, sizeof(identity));
         memcpy(prgm->var.SceneTransformMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.HeadPositionMatrix, identity, sizeof(identity));
     }
     else
     {
@@ -351,6 +354,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
         memcpy(prgm->var.ObjectTransformMatrix, identity, sizeof(identity));
         memcpy(prgm->var.SceneTransformMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.HeadPositionMatrix, identity, sizeof(identity));
     }
 }
 
@@ -503,10 +507,11 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ObjectTransformMatrix;\n"
         "uniform mat4 SceneTransformMatrix;\n"
+        "uniform mat4 HeadPositionMatrix;\n"
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * SceneTransformMatrix * ObjectTransformMatrix * vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix * SceneTransformMatrix * ObjectTransformMatrix * vec4(VertexPosition, 1.0);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -672,6 +677,7 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
     GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
     GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
+    GET_ULOC(HeadPositionMatrix, "HeadPositionMatrix");
     GET_ULOC(SbSCoefs, "SbSCoefs");
     GET_ULOC(SbSOffsets, "SbSOffsets");
 
@@ -1880,7 +1886,8 @@ static int BuildVirtualScreen(unsigned nbPlanes,
                               GLushort **indices, unsigned *nbIndices,
                               const float *left, const float *top,
                               const float *right, const float *bottom,
-                              float f_ar)
+                              float f_ar, float screenSize,
+                              float *screenPosition, float *screenNormalDir, float *screenFitDir)
 {
     *nbVertices = 4;
     *nbIndices = 6;
@@ -1902,19 +1909,43 @@ static int BuildVirtualScreen(unsigned nbPlanes,
         return VLC_ENOMEM;
     }
 
-    #define POS_X -39.95f
-    #define POS_Y 4.f
-    #define POS_Z 0.f
-    #define SCREEN_SIZE 10.f
+    /*
+     * +----------------------------------------+
+     * |                         virtual screen |
+     * |                 /\                     |
+     * |                 |                      |
+     * |                 | screenFitDir         |
+     * |                 |                      |
+     * |   <-------------x screenNormalDir      |
+     * |         dir                            |
+     * |                                        |
+     * +----------------------------------------+
+     *
+     */
+
+    float hss = screenSize / 2.f; // Half screen size
+    // Calculate the cross-product to get the third direction.
+    float dir[3] = {(screenNormalDir[1] * screenFitDir[2]) - (screenNormalDir[2] * screenFitDir[1]),
+                    -((screenNormalDir[0] * screenFitDir[2]) - (screenNormalDir[2] * screenFitDir[0])),
+                    (screenNormalDir[0] * screenFitDir[1]) - (screenNormalDir[1] * screenFitDir[0])};
+
     const GLfloat coord[] = {
-        POS_X,    SCREEN_SIZE + POS_Y,    SCREEN_SIZE * f_ar + POS_Z,
-        POS_X,    -SCREEN_SIZE + POS_Y,   SCREEN_SIZE * f_ar + POS_Z,
-        POS_X,    SCREEN_SIZE + POS_Y,    -SCREEN_SIZE * f_ar + POS_Z,
-        POS_X,    -SCREEN_SIZE + POS_Y,   -SCREEN_SIZE * f_ar + POS_Z,
+        screenPosition[0] + dir[0] * hss * f_ar + screenFitDir[0] * hss,
+        screenPosition[1] + dir[1] * hss * f_ar + screenFitDir[1] * hss,
+        screenPosition[2] + dir[2] * hss * f_ar + screenFitDir[2] * hss,
+
+        screenPosition[0] + dir[0] * hss * f_ar - screenFitDir[0] * hss,
+        screenPosition[1] + dir[1] * hss * f_ar - screenFitDir[1] * hss,
+        screenPosition[2] + dir[2] * hss * f_ar - screenFitDir[2] * hss,
+
+        screenPosition[0] - dir[0] * hss * f_ar + screenFitDir[0] * hss,
+        screenPosition[1] - dir[1] * hss * f_ar + screenFitDir[1] * hss,
+        screenPosition[2] - dir[2] * hss * f_ar + screenFitDir[2] * hss,
+
+        screenPosition[0] - dir[0] * hss * f_ar - screenFitDir[0] * hss,
+        screenPosition[1] - dir[1] * hss * f_ar - screenFitDir[1] * hss,
+        screenPosition[2] - dir[2] * hss * f_ar - screenFitDir[2] * hss,
     };
-    #undef SCREEN_POS
-    #undef SCREEN_SIZE
-    #undef POS_Y
 
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
@@ -2014,10 +2045,24 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     {
     case PROJECTION_MODE_RECTANGULAR:
         if (vgl->b_sideBySide)
+        {
+            float screenSize = 2.f;
+            float screenPosition[3] = {0.f, 0.f, 0.f};
+            float screenNormalDir[3] = {0.f, 0.f, 0.f};
+            float screenFitDir[3] = {0.f, 0.f, 0.f};
+            if (vgl->objDisplay.p_scene)
+            {
+                memcpy(screenPosition, vgl->objDisplay.p_scene->screenPosition, sizeof(screenPosition));
+                memcpy(screenNormalDir, vgl->objDisplay.p_scene->screenNormalDir, sizeof(screenNormalDir));
+                memcpy(screenFitDir, vgl->objDisplay.p_scene->screenFitDir, sizeof(screenFitDir));
+                screenSize = vgl->objDisplay.p_scene->screenSize;
+            }
             i_ret = BuildVirtualScreen(vgl->prgm->tc->tex_count,
                                        &vertexCoord, &textureCoord, &nbVertices,
                                        &indices, &nbIndices,
-                                       left, top, right, bottom, f_ar);
+                                       left, top, right, bottom, f_ar,
+                                       screenSize, screenPosition, screenNormalDir, screenFitDir);
+        }
         else
             i_ret = BuildRectangle(vgl->prgm->tc->tex_count,
                                    &vertexCoord, &textureCoord, &nbVertices,
@@ -2130,6 +2175,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.ObjectTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                               prgm->var.SceneTransformMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
+                              prgm->var.HeadPositionMatrix);
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
@@ -2252,6 +2299,7 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         memcpy(prgm->var.ZoomMatrix, vgl->prgm->var.ZoomMatrix, 16 * sizeof(float));
         memcpy(prgm->var.ObjectTransformMatrix, vgl->prgm->var.ObjectTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
+        memcpy(prgm->var.HeadPositionMatrix, vgl->prgm->var.HeadPositionMatrix, 16 * sizeof(float));
 
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                                  prgm->var.OrientationMatrix);
@@ -2271,6 +2319,8 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
                                  prgm->var.ObjectTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                                  prgm->var.SceneTransformMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
+                                 prgm->var.HeadPositionMatrix);
 
         float *SbSCoefs = prgm->var.SbSCoefs;
         float *SbSOffsets = prgm->var.SbSOffsets;
@@ -2301,6 +2351,8 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
     memcpy(prgm->var.SceneTransformMatrix, p_scene->transformMatrix,
            sizeof(p_scene->transformMatrix));
+    memcpy(prgm->var.HeadPositionMatrix, p_scene->headPositionMatrix,
+           sizeof(p_scene->headPositionMatrix));
 
     if (vgl->b_sideBySide)
     {
@@ -2336,6 +2388,8 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.ZoomMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                               prgm->var.SceneTransformMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
+                              prgm->var.HeadPositionMatrix);
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
@@ -2471,6 +2525,13 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
         vgl->last_source.i_visible_height = source->i_visible_height;
         vgl->b_lastSideBySide = vgl->b_sideBySide;
     }
+
+    if (vgl->b_sideBySide
+        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR)
+        memcpy(vgl->prgm->var.HeadPositionMatrix, vgl->objDisplay.p_scene->headPositionMatrix,
+               sizeof(vgl->objDisplay.p_scene->headPositionMatrix));
+
+
     DrawWithShaders(vgl, vgl->prgm, eye);
 
     if (vgl->b_show_hmd_controller)
@@ -2558,6 +2619,8 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
                                   prgm->var.ObjectTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                                   prgm->var.SceneTransformMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
+                                  prgm->var.HeadPositionMatrix);
 
         getSbSParams(vgl, prgm, eye);
         vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
