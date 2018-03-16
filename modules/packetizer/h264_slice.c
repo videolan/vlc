@@ -270,7 +270,7 @@ void h264_compute_poc( const h264_sequence_parameter_set_t *p_sps,
 
         if( p_slice->i_nal_type == H264_NAL_SLICE_IDR )
             frameNumOffset = 0;
-        else if( p_ctx->prevFrameNum > (unsigned) p_slice->i_frame_num )
+        else if( p_ctx->prevFrameNum > p_slice->i_frame_num )
             frameNumOffset = p_ctx->prevFrameNumOffset + maxFrameNum;
         else
             frameNumOffset = p_ctx->prevFrameNumOffset;
