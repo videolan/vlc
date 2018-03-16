@@ -119,6 +119,7 @@ if HAVE_TVOS
 libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -mtvos-version-min=10.2
 endif
 libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+libcvpx_plugin_la_LIBADD = libchroma_copy.la
 EXTRA_LTLIBRARIES += libcvpx_plugin.la
 chroma_LTLIBRARIES += $(LTLIBcvpx)
 
