@@ -140,7 +140,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         int i_first_line, i_num_lines, i_offset, i_pixel_pitch,
             i_visible_pixels;
-        uint8_t black_pixel;
+        uint16_t black_pixel;
         uint8_t *p_in, *p_out;
 
         black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00
@@ -148,12 +148,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
+
         switch( p_filter->fmt_in.video.i_chroma )
         {
+            CASE_PLANAR_YUV10
+                black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00
+                                                                            : 0x200;
+                break;
             CASE_PACKED_YUV_422
                 // Quick hack to fix u/v inversion occuring with 2 byte pixel pitch
                 i_pixel_pitch *= 2;
+                /* fallthrough */
+            CASE_PLANAR_YUV
+                black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00
+                                                                            : 0x80;
                 break;
+            default:
+                black_pixel = 0x00;
         }
 
         i_visible_pixels = p_pic->p[i_index].i_visible_pitch/i_pixel_pitch;
@@ -184,22 +195,32 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
             if( i_offset )
             {
+                void *p_black_out;
                 if( i_offset < 0 )
                 {
                     memcpy( p_out, p_in - i_offset,
                                 p_pic->p[i_index].i_visible_pitch + i_offset );
                     p_in -= p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
-                    memset( p_out + i_offset, black_pixel, -i_offset );
+                    p_black_out = &p_out[i_offset];
+                    i_offset = -i_offset;
                 }
                 else
                 {
                     memcpy( p_out + i_offset, p_in,
                                 p_pic->p[i_index].i_visible_pitch - i_offset );
-                    memset( p_out, black_pixel, i_offset );
+                    p_black_out = p_out;
                     p_in -= p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                 }
+                if (black_pixel > 0xFF)
+                {
+                    uint16_t *p_out16 = p_black_out;
+                    for (int x = 0; x < i_offset; x += 2)
+                        *p_out16++ = black_pixel;
+                }
+                else
+                    memset( p_black_out, black_pixel, i_offset );
             }
             else
             {
