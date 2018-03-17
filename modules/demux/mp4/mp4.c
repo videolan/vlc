@@ -2965,7 +2965,9 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         break;
 
     case SPU_ES:
-        if ( p_sample->i_handler != ATOM_text ||
+        if ( ( p_sample->i_handler != ATOM_text &&
+               p_sample->i_handler != ATOM_subt &&
+               p_sample->i_handler != ATOM_sbtl ) ||
              !SetupSpuES( p_demux, p_track, p_sample ) )
            return VLC_EGENERIC;
         break;
