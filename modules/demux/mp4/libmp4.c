@@ -4307,6 +4307,7 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
             case ATOM_hint:
                 return MP4_ReadBox_sample_hint8( p_stream, p_box );
             case ATOM_text:
+            case ATOM_subt:
                 return MP4_ReadBox_sample_text( p_stream, p_box );
             case ATOM_tx3g:
             case ATOM_sbtl:
