@@ -205,6 +205,7 @@ modules/access/qtsound.m
 modules/access/rdp.c
 modules/access/rtp/rtp.c
 modules/access/rtsp/access.c
+modules/access/samba.c
 modules/access/satip.c
 modules/access/screen/screen.c
 modules/access/screen/wayland.c
@@ -212,12 +213,12 @@ modules/access/screen/xcb.c
 modules/access/sdp.c
 modules/access/sftp.c
 modules/access/shm.c
-modules/access/smb.c
 modules/access/smb_common.h
 modules/access/srt.c
 modules/access/tcp.c
 modules/access/timecode.c
 modules/access/udp.c
+modules/access/unc.c
 modules/access/v4l2/controls.c
 modules/access/v4l2/v4l2.c
 modules/access/vcd/vcd.c

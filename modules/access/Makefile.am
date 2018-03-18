@@ -341,15 +341,12 @@ libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_mms_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libaccess_mms_plugin.la
 
-libsmb_plugin_la_SOURCES = access/smb.c access/smb_common.h
-libsmb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
-libsmb_plugin_la_LIBADD = $(SMBCLIENT_LIBS)
-if HAVE_WIN32
-libsmb_plugin_la_LIBADD += -lmpr -lnetapi32
-endif
-libsmb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-access_LTLIBRARIES += $(LTLIBsmb)
-EXTRA_LTLIBRARIES += libsmb_plugin.la
+libsmbc_plugin_la_SOURCES = access/samba.c access/smb_common.h
+libsmbc_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
+libsmbc_plugin_la_LIBADD = $(SMBCLIENT_LIBS)
+libsmbc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
+access_LTLIBRARIES += $(LTLIBsmbc)
+EXTRA_LTLIBRARIES += libsmbc_plugin.la
 
 libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/sd.c access/smb_common.h
 libdsm_plugin_la_CFLAGS = $(AM_CFLAGS) $(DSM_CFLAGS)
@@ -365,6 +362,14 @@ access_LTLIBRARIES += libtcp_plugin.la
 libudp_plugin_la_SOURCES = access/udp.c
 libudp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
 access_LTLIBRARIES += libudp_plugin.la
+
+libunc_plugin_la_SOURCES = access/unc.c access/smb_common.h
+libunc_plugin_la_LIBADD = -lmpr -lnetapi32
+if HAVE_WIN32
+if !HAVE_WINSTORE
+access_LTLIBRARIES += libunc_plugin.la
+endif
+endif
 
 libsftp_plugin_la_SOURCES = access/sftp.c
 libsftp_plugin_la_CFLAGS = $(AM_CFLAGS) $(SFTP_CFLAGS)

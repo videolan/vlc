@@ -328,6 +328,7 @@ $Id$
  * rtp: rtp demux module
  * rtpvideo: encoder for raw video over RTP
  * rv32: RV32 image format conversion module
+ * samba: Samba / libsmbclient input
  * samplerate: Secret Rabbit Code (libsamplerate) audio resampler
  * sap: Interface module to read SAP/SDP announcements
  * sapi: Windows Text to Speech Synthetizer using the SAPI 5.1 API
@@ -354,7 +355,6 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
- * smb: SMB shares access module
  * smf: Standard MIDI file demuxer
  * sndio: OpenBSD sndio audio output
  * soxr: SoX Resampler library audio filter
@@ -419,6 +419,7 @@ $Id$
  * udp: UDP Network access module
  * ugly_resampler: Ugly audio resampler
  * uleaddvaudio: codec for DV Audio from Ulead
+ * unc: Microsoft Windows networking / Universal Naming Convention
  * upnp: libupnp UPNP service discovery
  * v4l2: Video 4 Linux 2 input module
  * vaapi: VAAPI hardware-accelerated decoding with vout backend

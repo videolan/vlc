@@ -1,8 +1,7 @@
 /*****************************************************************************
- * smb.c: SMB input module
+ * samba.c: Samba / libsmbclient input module
  *****************************************************************************
  * Copyright (C) 2001-2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -21,29 +20,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <assert.h>
 #include <errno.h>
-#ifdef _WIN32
-#   include <fcntl.h>
-#   include <sys/stat.h>
-#   include <io.h>
-#   include <windows.h>
-#   include <lm.h>
-#   define smbc_open(a,b,c) vlc_open(a,b,c)
-#   define smbc_stat(a,b) _stati64(a,b)
-#   define smbc_read read
-#   define smbc_lseek _lseeki64
-#   define smbc_close close
-#else
-#   include <libsmbclient.h>
-#endif
+#include <libsmbclient.h>
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
@@ -52,7 +35,6 @@
 #include <vlc_input_item.h>
 #include <vlc_url.h>
 #include <vlc_keystore.h>
-#include <vlc_charset.h>
 
 #include "smb_common.h"
 
@@ -62,46 +44,6 @@ struct access_sys_t
     uint64_t size;
     vlc_url_t url;
 };
-
-#ifdef _WIN32
-static void Win32AddConnection(stream_t *access, const char *server,
-                               const char *share, const char *user,
-                               const char *pwd, const char *domain)
-{
-    NETRESOURCE net_resource;
-    char remote_name[MAX_PATH];
-
-    VLC_UNUSED(domain);
-
-    memset(&net_resource, 0, sizeof (net_resource));
-    net_resource.dwType = RESOURCETYPE_DISK;
-
-    snprintf(remote_name, sizeof (remote_name), "\\\\%s\\%s", server,
-             (share != NULL) ? share + 1 /* skip leading '/' */: "");
-
-    /* remove trailings '/' */
-    char *delim = strchr(remote_name, '/');
-    if (delim != NULL)
-        *delim = '\0';
-
-    const char *msg;
-    net_resource.lpRemoteName = remote_name;
-
-    switch (WNetAddConnection2(&net_resource, pwd, user, 0))
-    {
-        case NO_ERROR:
-            msg = "connected to %s";
-            break;
-        case ERROR_ALREADY_ASSIGNED:
-        case ERROR_DEVICE_ALREADY_REMEMBERED:
-            msg = "already connected to %s";
-            break;
-        default:
-            msg = "failed to connect to %s";
-    }
-    msg_Dbg(access, msg, remote_name);
-}
-#endif // _WIN32
 
 /* Build an SMB URI
  * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
@@ -114,13 +56,6 @@ static int smb_get_uri( stream_t *p_access, char **ppsz_uri,
     assert(psz_server);
 #define PSZ_SHARE_PATH_OR_NULL psz_share_path ? psz_share_path : ""
 #define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
-#ifdef _WIN32
-    if( psz_user )
-        Win32AddConnection( p_access, psz_server, psz_share_path,
-                            psz_user, psz_pwd, psz_domain );
-    return asprintf( ppsz_uri, "//%s%s%s%s", psz_server, PSZ_SHARE_PATH_OR_NULL,
-                     PSZ_NAME_OR_NULL );
-#else
     (void) p_access;
     if( psz_user )
         return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s%s",
@@ -131,7 +66,6 @@ static int smb_get_uri( stream_t *p_access, char **ppsz_uri,
     else
         return asprintf( ppsz_uri, "smb://%s%s%s%s", psz_server,
                          PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL );
-#endif
 }
 
 /*****************************************************************************
@@ -186,7 +120,6 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
     struct vlc_readdir_helper rdh;
     vlc_readdir_helper_init( &rdh, p_access, p_node );
 
-#ifndef _WIN32
     struct smbc_dirent *p_entry;
 
     while( i_ret == VLC_SUCCESS && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
@@ -238,71 +171,6 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
                                             i_type, ITEM_NET );
         free( psz_uri );
     }
-#else
-    // Handle share listing from here. Directory browsing is handled by the
-    // usual filesystem module.
-    SHARE_INFO_1 *p_info;
-    DWORD i_share_enum_res;
-    DWORD i_nb_elem;
-    DWORD i_resume_handle = 0;
-    DWORD i_total_elements; // Unused, but needs to be passed
-    wchar_t *wpsz_host = ToWide( p_sys->url.psz_host );
-    if( wpsz_host == NULL )
-        return VLC_ENOMEM;
-    do
-    {
-        i_share_enum_res = NetShareEnum( wpsz_host, 1, (LPBYTE*)&p_info,
-                              MAX_PREFERRED_LENGTH, &i_nb_elem,
-                              &i_total_elements, &i_resume_handle );
-        if( i_share_enum_res == ERROR_SUCCESS ||
-            i_share_enum_res == ERROR_MORE_DATA )
-        {
-            for ( DWORD i = 0; i < i_nb_elem; ++i )
-            {
-                SHARE_INFO_1 *p_current = p_info + i;
-                if( p_current->shi1_type & STYPE_SPECIAL )
-                    continue;
-                char* psz_name = FromWide( p_current->shi1_netname );
-                if( psz_name == NULL )
-                {
-                    i_ret = VLC_ENOMEM;
-                    break;
-                }
-
-                char* psz_path;
-                if( smb_get_uri( p_access, &psz_path, NULL, NULL, NULL,
-                                 p_sys->url.psz_host, p_sys->url.psz_path,
-                                 psz_name ) < 0 )
-                {
-                    free( psz_name );
-                    i_ret = VLC_ENOMEM;
-                    break;
-                }
-                // We need to concatenate the scheme before, as the window version
-                // of smb_get_uri generates a path (and the other call site needs
-                // a path). The path is already prefixed by "//" so we just need
-                // to add "file:"
-                char* psz_uri;
-                if( asprintf( &psz_uri, "file:%s", psz_path ) < 0 )
-                {
-                    free( psz_name );
-                    free( psz_path );
-                    i_ret = VLC_ENOMEM;
-                    break;
-                }
-                free( psz_path );
-
-                i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL,
-                                    psz_name, ITEM_TYPE_DIRECTORY, ITEM_NET );
-                free( psz_name );
-                free( psz_uri );
-            }
-        }
-        NetApiBufferFree( p_info );
-    } while( i_share_enum_res == ERROR_MORE_DATA && i_ret == VLC_SUCCESS );
-
-    free( wpsz_host );
-#endif
 
     vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
 
@@ -350,7 +218,6 @@ static int Control( stream_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-#ifndef _WIN32
 static void smb_auth(const char *srv, const char *shr, char *wg, int wglen,
                      char *un, int unlen, char *pw, int pwlen)
 {
@@ -364,7 +231,6 @@ static void smb_auth(const char *srv, const char *shr, char *wg, int wglen,
     VLC_UNUSED(pwlen);
     //wglen = unlen = pwlen = 0;
 }
-#endif
 
 static int Open(vlc_object_t *obj)
 {
@@ -376,10 +242,8 @@ static int Open(vlc_object_t *obj)
     uint64_t size;
     bool is_dir;
 
-#ifndef _WIN32
     if (smbc_init(smb_auth, 0))
         return VLC_EGENERIC;
-#endif
 
     if (vlc_UrlParseFixup(&url, access->psz_url) != 0)
     {
@@ -459,11 +323,9 @@ static int Open(vlc_object_t *obj)
         sys->url = url;
         access->pf_readdir = DirRead;
         access->pf_control = access_vaDirectoryControlHelper;
-#ifndef _WIN32
         fd = smbc_opendir(psz_uri);
         if (fd < 0)
             vlc_UrlClean(&sys->url);
-#endif
     }
     else
     {
@@ -475,14 +337,12 @@ static int Open(vlc_object_t *obj)
     }
     free(psz_uri);
 
-#ifndef _WIN32
     if (fd < 0)
     {
         msg_Err(obj, "cannot open %s: %s",
                 access->psz_location, vlc_strerror_c(errno));
         return VLC_EGENERIC;
     }
-#endif
 
     sys->size = size;
     sys->i_smb = fd;
@@ -497,11 +357,9 @@ static void Close(vlc_object_t *obj)
 
     vlc_UrlClean(&sys->url);
 
-#ifndef _WIN32
     if (access->pf_readdir != NULL)
         smbc_closedir(sys->i_smb);
     else
-#endif
         smbc_close(sys->i_smb);
 }
 

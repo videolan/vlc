@@ -1851,8 +1851,7 @@ PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0]
 dnl
 dnl  libsmbclient plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smb], [smbclient], (SMB/CIFS support), [auto])
-AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" != "yes"], [ VLC_ADD_PLUGIN([smb]) ])
+PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smbc], [smbclient], (SMB/CIFS support), [auto])
 
 dnl
 dnl  liBDSM access module
