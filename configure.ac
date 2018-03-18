@@ -2826,36 +2826,12 @@ dnl x265 encoder
 PKG_ENABLE_MODULES_VLC([X265],, [x265], [HEVC/H.265 encoder], [auto])
 
 dnl
-dnl H264 encoder plugin (10-bit lib264)
-dnl
-AC_ARG_ENABLE(x26410b,
-  [  --enable-x26410b           H264 10-bit encoding support with static libx264 (default disabled)])
-if test "${enable_x26410b}" != "no"; then
-    PKG_CHECK_MODULES(X26410B, x26410b, [
-        VLC_ADD_PLUGIN([x26410b])
-        VLC_ADD_LIBS([x26410b],[${X26410B_LIBS}])
-        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-          VLC_ADD_LDFLAGS([x26410b],[${ac_cv_ld_bsymbolic}])
-        ])
-        VLC_ADD_CFLAGS([x26410b],[${X26410B_CFLAGS}])
-        if echo ${X26410B_LIBS} |grep -q 'pthreadGC2'; then
-          VLC_ADD_CFLAGS([x26410b], [-DPTW32_STATIC_LIB])
-        fi
-    ], [
-       if test "${enable_x26410b}" = "yes"; then
-        AC_MSG_ERROR([x26410b module doesn't work without staticly compiled libx264.a])
-       fi
-    ])
-fi
-
-
-dnl
 dnl H264 encoder plugin (using libx264)
 dnl
 AC_ARG_ENABLE(x264,
   [  --enable-x264           H264 encoding support with libx264 (default enabled)])
 if test "${enable_x264}" != "no"; then
-      PKG_CHECK_MODULES(X264,x264 >= 0.86, [
+      PKG_CHECK_MODULES(X264,x264 >= 0.148, [
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LIBS([x264],[${X264_LIBS}])
 
@@ -2873,6 +2849,32 @@ if test "${enable_x264}" != "no"; then
           fi
       ])
 fi
+
+dnl
+dnl H264 encoder plugin (libx264 > 153)
+dnl
+AC_ARG_ENABLE(x26410b,
+  [  --enable-x26410b           H264 10-bit encoding support with libx264 (default enabled)])
+if test "${enable_x26410b}" != "no"; then
+      PKG_CHECK_MODULES(X26410b,x264 >= 0.153, [
+        VLC_ADD_PLUGIN([x26410b])
+        VLC_ADD_LIBS([x26410b],[${X264_LIBS}])
+
+        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+          VLC_ADD_LDFLAGS([x26410b],[${ac_cv_ld_bsymbolic}])
+        ])
+
+        VLC_ADD_CFLAGS([x26410b],[${X264_CFLAGS}])
+        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
+          VLC_ADD_CFLAGS([x26410b], [-DPTW32_STATIC_LIB])
+        fi
+      ],[
+        if test "${enable_x26410b}" = "yes"; then
+            AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
+          fi
+      ])
+fi
+
 
 dnl
 dnl Intel QuickSync (aka MediaSDK) H264/H262 encoder
