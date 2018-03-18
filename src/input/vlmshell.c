@@ -1535,6 +1535,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
 
         /* We must destroy the parent node "show" of show2
          * and not the children */
+        free( show2->child );
         free( show2->psz_name );
         free( show2 );
 
