@@ -527,7 +527,7 @@ static void Win32AddConnection( stream_t *p_access, const char *psz_server,
 
     i_result = WNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
 
-    if( i_result != NO_ERROR )
+    if( i_result == NO_ERROR )
     {
         msg_Dbg( p_access, "connected to %s", psz_remote );
     }
