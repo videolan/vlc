@@ -166,15 +166,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 #endif
 
-/*
-** some version of glibc defines open as a macro, causing havoc
-** with other macros using 'open' under the hood, such as the
-** following one:
-*/
-#if defined(smbc_open) && defined(open)
-# undef open
-#endif
-
     if( vlc_UrlParseFixup( &url, p_access->psz_url ) != 0 )
     {
         vlc_UrlClean( &url );
