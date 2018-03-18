@@ -4196,7 +4196,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
     dnl
     AC_PATH_PROG([SEVENZIP], [7z], [7z])
 ])
-AM_CONDITIONAL(HAVE_MAKENSIS, [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" == "yes"])
+AM_CONDITIONAL(HAVE_MAKENSIS, [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" = "yes"])
 
 dnl
 dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY 
