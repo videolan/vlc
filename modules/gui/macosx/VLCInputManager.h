@@ -32,6 +32,7 @@
 @interface VLCInputManager : NSObject
 
 - (id)initWithMain:(VLCMain *)o_mainObj;
+- (void)deinit;
 
 - (void)inputThreadChanged;
 
