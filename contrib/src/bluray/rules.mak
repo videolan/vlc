@@ -48,7 +48,7 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
-	$(APPLY) $(SRC)/lua/0001-Implement-dl_get_path-for-darwin-macOS.patch
+	$(APPLY) $(SRC)/bluray/0001-Implement-dl_get_path-for-darwin-macOS.patch
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 
