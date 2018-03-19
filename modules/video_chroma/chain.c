@@ -61,8 +61,9 @@ static int BuildChromaResize( filter_t * );
 static int BuildChromaChain( filter_t *p_filter );
 static int BuildFilterChain( filter_t *p_filter );
 
-static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid );
-static filter_t * AppendTransform( filter_chain_t *p_chain, es_format_t *p_fmt_in, es_format_t *p_fmt_out );
+static int CreateChain( filter_t *p_parent, const es_format_t *p_fmt_mid );
+static filter_t * AppendTransform( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
+                                   const es_format_t *p_fmt_out );
 static void EsFormatMergeSize( es_format_t *p_dst,
                                const es_format_t *p_base,
                                const es_format_t *p_size );
@@ -411,7 +412,7 @@ static int BuildFilterChain( filter_t *p_filter )
 /*****************************************************************************
  *
  *****************************************************************************/
-static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
+static int CreateChain( filter_t *p_parent, const es_format_t *p_fmt_mid )
 {
     filter_chain_Reset( p_parent->p_sys->p_chain, &p_parent->fmt_in, &p_parent->fmt_out );
 
@@ -452,7 +453,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static filter_t * AppendTransform( filter_chain_t *p_chain, es_format_t *p_fmt1, es_format_t *p_fmt2 )
+static filter_t * AppendTransform( filter_chain_t *p_chain, const es_format_t *p_fmt1,
+                                   const es_format_t *p_fmt2 )
 {
     video_transform_t transform = video_format_GetTransform(p_fmt1->video.orientation, p_fmt2->video.orientation);
 
