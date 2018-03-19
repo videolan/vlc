@@ -644,10 +644,13 @@ void CopyPacked(picture_t *dst, const uint8_t *src, const size_t src_pitch,
     assert(src); assert(src_pitch);
     assert(height);
 
+#ifdef CAN_COMPILE_SSE2
     if (vlc_CPU_SSE4_1())
-        SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch, src, src_pitch,
-                      cache->buffer, cache->size, height, 0);
-    else
+        return SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch, src, src_pitch,
+                             cache->buffer, cache->size, height, 0);
+#else
+    (void) cache;
+#endif
         CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch, src, src_pitch,
                   height, 0);
 }
