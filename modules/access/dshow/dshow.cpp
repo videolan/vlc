@@ -1885,7 +1885,7 @@ static int Demux( demux_t *p_demux )
             }
 
             if( i_pts > VLC_TS_INVALID ) {
-                i_pts += (i_pts >= 0) ? +5 : -4;
+                i_pts += 5;
                 i_pts /= 10; /* 100-ns to µs conversion */
                 i_pts += VLC_TS_0;
             }
