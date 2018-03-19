@@ -503,6 +503,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                 out->i_flags = p_sys->i_next_block_flags;
                 p_sys->i_next_block_flags = 0;
             }
+            else
+                p_sys->p_buf = NULL;
         }
 
         date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
