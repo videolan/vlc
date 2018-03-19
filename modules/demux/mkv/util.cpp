@@ -388,13 +388,13 @@ void MkvTree_va( demux_t& demuxer, int i_level, const char* fmt, va_list args)
 {
     static char const * indent = "|   ";
     static char const * prefix = "+ ";
-    static int  const   indent_len = strlen( indent );
-    static int  const   prefix_len = strlen( prefix );
+    static int  const   indent_len = sizeof( indent );
+    static int  const   prefix_len = sizeof( prefix );
 
     char   fixed_buffer[256] = {};
     size_t const  static_len = sizeof( fixed_buffer );
     char *            buffer = fixed_buffer;
-    size_t         total_len = indent_len * i_level + prefix_len + strlen( fmt );
+    size_t         total_len = indent_len * i_level + prefix_len + strlen( fmt ) + 1;
 
     if( total_len >= static_len ) {
         buffer = new (std::nothrow) char[total_len] ();
