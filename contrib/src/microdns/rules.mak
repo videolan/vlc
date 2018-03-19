@@ -1,6 +1,6 @@
 # libmicrodns
 
-LIBMICRODNS_VERSION := 0.0.9
+LIBMICRODNS_VERSION := 0.0.10
 LIBMICRODNS_URL := https://github.com/videolabs/libmicrodns/releases/download/$(LIBMICRODNS_VERSION)/microdns-$(LIBMICRODNS_VERSION).tar.gz
 
 ifndef HAVE_MACOSX
@@ -19,7 +19,6 @@ $(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.gz:
 
 microdns: microdns-$(LIBMICRODNS_VERSION).tar.gz .sum-microdns
 	$(UNPACK)
-	$(APPLY) $(SRC)/microdns/fix-null-deref.patch
 	$(MOVE)
 
 .microdns: microdns
