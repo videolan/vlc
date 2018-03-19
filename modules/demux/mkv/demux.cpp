@@ -34,6 +34,7 @@ event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
     vlc_mutex_init( &lock );
     vlc_cond_init( &wait );
     is_running = false;
+    memset(&pci_packet, 0, sizeof(pci_packet));
 }
 event_thread_t::~event_thread_t()
 {
