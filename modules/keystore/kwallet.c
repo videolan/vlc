@@ -1181,7 +1181,8 @@ kwallet_read_password_list( vlc_keystore* p_keystore, char* psz_entry_name,
 error:
     free( p_secret_decoded );
     *pi_count = 0;
-    vlc_keystore_release_entries( p_entries, i );
+    if ( p_entries )
+        vlc_keystore_release_entries( p_entries, i );
     if ( msg )
         dbus_message_unref( msg );
     if ( repmsg )
