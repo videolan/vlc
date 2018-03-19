@@ -43,7 +43,7 @@
 
 struct filter_level
 {
-    atomic_int   level;
+    atomic_long  level;
     float  default_val;
     float  min;
     float  max;
@@ -131,10 +131,10 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     DXVA2_VideoSample sample = {0};
     FillSample( &sample, p_pic, &area );
 
-    params.ProcAmpValues.Brightness.Value = atomic_load( &p_sys->Brightness.level );
-    params.ProcAmpValues.Contrast.Value   = atomic_load( &p_sys->Contrast.level );
-    params.ProcAmpValues.Hue.Value        = atomic_load( &p_sys->Hue.level );
-    params.ProcAmpValues.Saturation.Value = atomic_load( &p_sys->Saturation.level );
+    params.ProcAmpValues.Brightness.ll = atomic_load( &p_sys->Brightness.level );
+    params.ProcAmpValues.Contrast.ll   = atomic_load( &p_sys->Contrast.level );
+    params.ProcAmpValues.Hue.ll        = atomic_load( &p_sys->Hue.level );
+    params.ProcAmpValues.Saturation.ll = atomic_load( &p_sys->Saturation.level );
     params.TargetFrame = 0;
     params.TargetRect  = area;
     params.DestData    = 0;
@@ -161,25 +161,32 @@ failed:
     return NULL;
 }
 
-static void SetLevel(struct filter_level *range, float val)
+static LONG StoreLevel(const struct filter_level *range, const DXVA2_ValueRange *Range, float val)
 {
-    int level;
+    LONG level;
     if (val > range->default_val)
-        level = (range->Range.MaxValue.Value - range->Range.DefaultValue.Value) * (val - range->default_val) /
+    {
+        level = (Range->MaxValue.ll - Range->DefaultValue.ll) * (val - range->default_val) /
                 (range->max - range->default_val);
+    }
     else if (val < range->default_val)
-        level = (range->Range.MinValue.Value - range->Range.DefaultValue.Value) * (val - range->default_val) /
+    {
+        level = (Range->MinValue.ll - Range->DefaultValue.ll) * (val - range->default_val) /
                 (range->min - range->default_val);
+    }
     else
         level = 0;
 
-    atomic_store( &range->level, range->Range.DefaultValue.Value + level );
+    return level + Range->DefaultValue.ll;
+}
+
+static void SetLevel(struct filter_level *range, float val)
+{
+    atomic_store( &range->level, StoreLevel( range, &range->Range, val ) );
 }
 
 static void InitLevel(filter_t *filter, struct filter_level *range, const char *p_name, float def)
 {
-    int level;
-
     module_config_t *cfg = config_FindConfig(p_name);
     range->min = cfg->min.f;
     range->max = cfg->max.f;
@@ -187,16 +194,7 @@ static void InitLevel(filter_t *filter, struct filter_level *range, const char *
 
     float val = var_CreateGetFloatCommand( filter, p_name );
 
-    if (val > range->default_val)
-        level = (range->Range.MaxValue.Value - range->Range.DefaultValue.Value) * (val - range->default_val) /
-                (range->max - range->default_val);
-    else if (val < range->default_val)
-        level = (range->Range.MinValue.Value - range->Range.DefaultValue.Value) * (val - range->default_val) /
-                (range->min - range->default_val);
-    else
-        level = 0;
-
-    atomic_init( &range->level, range->Range.DefaultValue.Value + level );
+    atomic_init( &range->level, StoreLevel( range, &range->Range, val ) );
 }
 
 static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
