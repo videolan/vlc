@@ -1329,10 +1329,16 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
         case XML_READER_STARTELEM:
             if( current_element_idx == 0 && element_stack[current_element_idx] == 0 ) {
                 if( !( element_stack[current_element_idx] = strdup( node ) ) )
+                {
+                    free(media_id);
                     return VLC_ENOMEM;
+                }
             } else {
                 if ( !( element_stack[++current_element_idx] = strdup( node ) ) )
+                {
+                    free(media_id);
                     return VLC_ENOMEM;
+                }
             }
 
             break;
@@ -1362,6 +1368,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
             if( media_idx == MAX_MEDIA_ELEMENTS )
             {
                 msg_Err( (vlc_object_t*) s, "Too many media elements, quitting" );
+                free(media_id);
                 return VLC_EGENERIC;
             }
 
@@ -1370,17 +1377,26 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                 if( !strcmp(attr_name, "streamId" ) )
                 {
                     if( !( medias[media_idx].stream_id = strdup( attr_value ) ) )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
                 }
                 else if( !strcmp(attr_name, "url" ) )
                 {
                     if( !( medias[media_idx].media_url = strdup( attr_value ) ) )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
                 }
                 else if( !strcmp(attr_name, "bootstrapInfoId" ) )
                 {
                     if( !( medias[media_idx].bootstrap_id = strdup( attr_value ) ) )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
                 }
                 else if( !strcmp(attr_name, "bitrate" ) )
                 {
@@ -1397,17 +1413,26 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                 if( !strcmp(attr_name, "url" ) )
                 {
                     if( !( bootstraps[bootstrap_idx].url = strdup( attr_value ) ) )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
                 }
                 else if( !strcmp(attr_name, "id" ) )
                 {
                     if( !( bootstraps[bootstrap_idx].id = strdup( attr_value ) ) )
-                       return VLC_ENOMEM;
+                    {
+                        free(media_id);
+                        return VLC_ENOMEM;
+                    }
                 }
                 else if( !strcmp(attr_name, "profile" ) )
                 {
                     if( !( bootstraps[bootstrap_idx].profile = strdup( attr_value ) ) )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
                 }
             }
         }
@@ -1457,7 +1482,10 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                         vlc_b64_decode_binary( (uint8_t**)&medias[mi].metadata, start );
 
                     if ( ! medias[mi].metadata )
+                    {
+                        free(media_id);
                         return VLC_ENOMEM;
+                    }
 
                     uint8_t *end_marker =
                         medias[mi].metadata + medias[mi].metadata_len - sizeof(amf_object_end);
