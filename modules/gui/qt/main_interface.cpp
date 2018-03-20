@@ -865,18 +865,11 @@ void MainInterface::setVideoFullScreen( bool fs )
     if( fs )
     {
         int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
-        /* if user hasn't defined screennumber, or screennumber that is bigger
-         * than current number of screens, take screennumber where current interface
-         * is
-         */
-        if( numscreen < 0 || numscreen >= QApplication::desktop()->screenCount() )
-            numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
 
-        if( fullscreenControls )
-            fullscreenControls->setTargetScreen( numscreen );
-
-        if ( numscreen >= 0 )
+        if ( numscreen >= 0 && numscreen < QApplication::desktop()->screenCount() )
         {
+            if( fullscreenControls )
+                fullscreenControls->setTargetScreen( numscreen );
 
             QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
             lastWinScreen = windowHandle()->screen();
