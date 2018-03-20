@@ -888,7 +888,7 @@ void FullscreenControllerWidget::restoreFSC()
         }
 
         if( currentRes == screenRes &&
-            QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+            currentRes.contains( previousPosition, true ) )
         {
             /* Restore to the last known position */
             move( previousPosition );
