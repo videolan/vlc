@@ -424,8 +424,12 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
         {
             is_supported = profile_supported( mode, fmt, avctx );
             if (!is_supported)
+            {
+                char *psz_name = directx_va_GetDecoderName(mode->guid);
                 msg_Warn( va, "Unsupported profile %d for %s ",
-                          fmt->i_profile, directx_va_GetDecoderName(mode->guid) );
+                          fmt->i_profile, psz_name );
+                free( psz_name );
+            }
         }
         if (!is_supported)
             continue;
