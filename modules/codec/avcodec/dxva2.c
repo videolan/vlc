@@ -642,13 +642,14 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     /* List all configurations available for the decoder */
     UINT                      cfg_count = 0;
     DXVA2_ConfigPictureDecode *cfg_list = NULL;
-    if (FAILED(IDirectXVideoDecoderService_GetDecoderConfigurations(sys->d3ddec,
-                                                                    &sys->input,
-                                                                    &dsc,
-                                                                    NULL,
-                                                                    &cfg_count,
-                                                                    &cfg_list))) {
-        msg_Err(va, "IDirectXVideoDecoderService_GetDecoderConfigurations failed");
+    hr = IDirectXVideoDecoderService_GetDecoderConfigurations(sys->d3ddec,
+                                                              &sys->input,
+                                                              &dsc,
+                                                              NULL,
+                                                              &cfg_count,
+                                                              &cfg_list);
+    if (FAILED(hr)) {
+        msg_Err(va, "IDirectXVideoDecoderService_GetDecoderConfigurations failed. (hr=0x%0lx)", hr);
         goto error;
     }
     msg_Dbg(va, "we got %d decoder configurations", cfg_count);
