@@ -113,6 +113,7 @@ private:
     bool addType( const char * psz_ext, QTreeWidgetItem*, QTreeWidgetItem*, QVLCRegistry* );
     void saveLang();
 #endif
+    char *getAoutModuleName();
 
 /* Display only the options for the selected audio output */
 private slots:
