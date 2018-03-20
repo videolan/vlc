@@ -1123,6 +1123,14 @@ AH_BOTTOM([
     AS_IF([test "${ac_cv_c_omit_frame_pointer}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 
+])
+
+AC_ARG_ENABLE(ssp, [
+  AS_HELP_STRING([--disable-ssp],
+  [disable stack smashing protection (default enabled for optimized builds)])
+],,[enable_ssp="yes"])
+
+AS_IF([test "${enable_ssp}" != "no" -a "${enable_optimizations}" != "no"], [
   VLC_SAVE_FLAGS
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong])
   AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong], [CXXFLAGS])
