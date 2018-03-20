@@ -682,7 +682,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     CoTaskMemFree(cfg_list);
     if (cfg_score <= 0) {
         msg_Err(va, "Failed to find a supported decoder configuration");
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Create the decoder */
