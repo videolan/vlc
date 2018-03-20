@@ -19,6 +19,8 @@ Demux:
  * Fix TTML inside MP4
  * Improve MP4 read of color information
  * Fix flac seeking and improve flac parsing
+ * Improve mkv opening & seeking speed
+ * Fix various MKV crashes
 
 Access:
  * Avoid a crash/assert in FTP after seeking
@@ -38,11 +40,20 @@ Video output:
  * Major rewrite of the iOS video output to fix numerous crashes
  * Important improvements of the D3D11 video output to use less memory
    and less GPU for HDR tone-mapping
+ * Fix crop on vertical videos with Direct3D11
+ * Fix Direct3D9 filters settings not being applied properly
+ * Fix transform filters with hardware decoding
+ * Fix snapshot and filters with HEVC hardware decoding
+ * Fix subtitles not appearing in snapshots when using hardware decoding
 
 macOS:
  * Fix Growl notifications on recent macOS versions
  * Fix conversion output file name encoding
  * Fix crash reporting on macOS 10.7 and 10.8
+ * Fix crash on exit
+ * Fix remember playback position
+ * Fix Blu-ray disc Java menu
+ * Fix swiping on time slider to change position
 
 Qt:
  * Fix last folder used in open dialogs
@@ -55,6 +66,7 @@ Misc:
  * Fix VDPAU GLX usage on Linux
  * Improve support for NetBSD
  * Fix MSI script for Windows
+ * Fix libvlc_media_list not going to next media
 
 
 Changes between 3.0.0 and 3.0.1:
