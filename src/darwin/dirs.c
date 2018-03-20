@@ -183,6 +183,8 @@ static char *getAppDependentDir(vlc_userdir_t type)
                 Boolean ret = CFStringGetCString(identifierAsNS, identifier, size, kCFStringEncodingUTF8);
                 if (ret)
                     name = identifier;
+                else
+                    free(identifier);
             }
         }
     }
