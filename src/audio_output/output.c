@@ -249,6 +249,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
         return NULL;
     }
 
+    var_Create (aout, "module-name", VLC_VAR_STRING);
+    var_SetString (aout, "module-name", module_get_object(owner->module));
+
     /*
      * Persistent audio output variables
      */
