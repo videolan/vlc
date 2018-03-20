@@ -303,6 +303,23 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
     else if (!b_add)
         list.removeAll( psz_name );
 
+#ifdef _WIN32
+    /* VLC 3.x HACK: "adjust" d3d* filters can't work with other SW filters.
+     * There is not way to fix it until VLC 4.0. As a workaround, force the
+     * adjust filter to be added at the end of the list. Therefore the SW
+     * "adjust" filter will be used since the previous filter will be SW. */
+    if( b_add && strcmp( psz_filter_type, "video-filter" ) == 0
+     && strcmp( psz_name, "adjust" ) != 0 )
+    {
+        QList<QString>::iterator it = std::find(list.begin(), list.end(), "adjust");
+        if( it != list.end() )
+        {
+            list.erase(it);
+            list << "adjust";
+        }
+    }
+#endif
+
     free( psz_chain );
 
     return list.join( ":" );
