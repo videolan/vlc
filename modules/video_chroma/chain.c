@@ -445,7 +445,7 @@ static int CreateChain( filter_t *p_parent, const es_format_t *p_fmt_mid )
     else
     {
         if( filter_chain_AppendConverter( p_parent->p_sys->p_chain,
-                                          p_fmt_mid, NULL ) )
+                                          p_fmt_mid, &p_parent->fmt_out ) )
             goto error;
     }
     return VLC_SUCCESS;
