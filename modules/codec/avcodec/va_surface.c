@@ -95,12 +95,12 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     fmt.i_frame_rate      = avctx->framerate.num;
     fmt.i_frame_rate_base = avctx->framerate.den;
 
-    if (va_pool->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count))
-        return VLC_EGENERIC;
-
-    va_pool->surface_width  = surface_width;
-    va_pool->surface_height = surface_height;
-    err = VLC_SUCCESS;
+    err = va_pool->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count);
+    if (err == VLC_SUCCESS)
+    {
+        va_pool->surface_width  = surface_width;
+        va_pool->surface_height = surface_height;
+    }
 
 done:
     va_pool->surface_count = i;
