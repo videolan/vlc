@@ -72,8 +72,11 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
                   surface_width, surface_height,
                   avctx->coded_width, avctx->coded_height);
 
-    if (va_pool->surface_width == surface_width && va_pool->surface_height == surface_height)
+    if ( va_pool->surface_count >= count &&
+         va_pool->surface_width == surface_width &&
+         va_pool->surface_height == surface_height )
     {
+        msg_Dbg(va, "reusing surface pool");
         err = VLC_SUCCESS;
         goto done;
     }
