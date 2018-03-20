@@ -101,7 +101,10 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     }
 
     xml_elem_hnd_t pl_elements[] =
-        { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
+        {
+            {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} },
+            {NULL,      UNKNOWN_CONTENT, {NULL} }
+        };
     parse_plist_node( p_demux, p_subitems, NULL, p_xml_reader, "plist",
                       pl_elements );
 
