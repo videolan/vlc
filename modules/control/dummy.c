@@ -34,15 +34,6 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 
-#ifdef _WIN32
-#define QUIET_TEXT N_("Do not open a DOS command box interface")
-#define QUIET_LONGTEXT N_( \
-    "By default the dummy interface plugin will start a DOS command box. " \
-    "Enabling the quiet mode will not bring this command box but can also " \
-    "be pretty annoying when you want to stop VLC and no video window is " \
-    "open." )
-#endif
-
 static int Open( vlc_object_t * );
 
 vlc_module_begin ()
@@ -51,7 +42,7 @@ vlc_module_begin ()
     set_capability( "interface", 0 )
     set_callbacks( Open, NULL )
 #if defined(_WIN32) && !VLC_WINSTORE_APP
-    add_bool( "dummy-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
+    add_obsolete_bool( "dummy-quiet" )
 #endif
 vlc_module_end ()
 
