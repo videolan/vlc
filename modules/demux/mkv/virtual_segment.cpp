@@ -583,7 +583,7 @@ virtual_chapter_c * virtual_segment_c::FindChapter( int64_t i_find_uid )
     return NULL;
 }
 
-int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level )
+int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level, bool allow_no_name )
 {
     if ( p_chapter && p_chapter->b_display_seekpoint )
     {
@@ -593,24 +593,27 @@ int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chap
         if (chap_name == "")
             chap_name = p_chapter->GetCodecName();
 
-        seekpoint_t *sk = vlc_seekpoint_New();
+        if (allow_no_name || chap_name != "")
+        {
+            seekpoint_t *sk = vlc_seekpoint_New();
 
-        sk->i_time_offset = i_mk_virtual_start_time;
-        if (chap_name != "")
-            sk->psz_name = strdup( chap_name.c_str() );
+            sk->i_time_offset = i_mk_virtual_start_time;
+            if (chap_name != "")
+                sk->psz_name = strdup( chap_name.c_str() );
 
-        /* A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value. */
-        title.i_seekpoint++;
-        title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
-          title.i_seekpoint * sizeof( seekpoint_t* ) );
-        title.seekpoint[title.i_seekpoint-1] = sk;
+            /* A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value. */
+            title.i_seekpoint++;
+            title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
+              title.i_seekpoint * sizeof( seekpoint_t* ) );
+            title.seekpoint[title.i_seekpoint-1] = sk;
 
-        i_user_chapters++;
+            i_user_chapters++;
+        }
     }
     i_seekpoint_num = i_user_chapters;
 
     for( size_t i = 0; i < sub_vchapters.size(); i++ )
-        sub_vchapters[i]->PublishChapters( title, i_user_chapters, i_level + 1 );
+        sub_vchapters[i]->PublishChapters( title, i_user_chapters, i_level + 1, true );
 
     return i_user_chapters;
 }
@@ -639,7 +642,7 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
 
 //    if( chapters.size() > 1 )
         for( size_t i = 0; i < vchapters.size(); i++ )
-            vchapters[i]->PublishChapters( title, i_user_chapters, i_level );
+            vchapters[i]->PublishChapters( title, i_user_chapters, i_level, false );
 
     return i_user_chapters;
 }
