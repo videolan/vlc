@@ -152,7 +152,7 @@ private:
     static void EnableStaticEntries( QMenu *, bool );
 
     /* recentMRL menu */
-    static QMenu *recentsMenu, *audioDeviceMenu;
+    static QMenu *recentsMenu;
 
     static void updateAudioDevice( intf_thread_t *, audio_output_t *, QMenu* );
 

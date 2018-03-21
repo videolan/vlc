@@ -80,7 +80,6 @@ enum
 static QActionGroup *currentGroup;
 
 QMenu *VLCMenuBar::recentsMenu = NULL;
-QMenu *VLCMenuBar::audioDeviceMenu = NULL;
 QMenu *VLCMenuBar::rendererMenu = NULL;
 QActionGroup *VLCMenuBar::rendererGroup = NULL;
 
@@ -611,28 +610,33 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
+    QMenu *audioDeviceMenu;
     audio_output_t *p_aout;
     input_thread_t *p_input;
-
-    if (!audioDeviceMenu)
-        audioDeviceMenu = new QMenu( qtr( "Audio &Device" ) );
 
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        current->addMenu( audioDeviceMenu );
+        audioDeviceMenu = addActionWithSubmenu( current, "audio-device", qtr( "Audio &Device" ) );
         addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
         current->addSeparator();
 
         addActionWithSubmenu( current, "visual", qtr( "&Visualizations" ) );
         VolumeEntries( p_intf, current );
     }
+    else
+    {
+        QAction *action = FindActionWithVar( current, "audio-device" );
+        audioDeviceMenu = action ? action->menu() : NULL;
+    }
 
     p_input = THEMIM->getInput();
     p_aout = THEMIM->getAout();
     EnableStaticEntries( current, ( p_aout != NULL ) );
     AudioAutoMenuBuilder( p_input, objects, varnames );
-    updateAudioDevice( p_intf, p_aout, audioDeviceMenu );
+    if( audioDeviceMenu )
+        updateAudioDevice( p_intf, p_aout, audioDeviceMenu );
+
     if( p_aout )
     {
         vlc_object_release( p_aout );
