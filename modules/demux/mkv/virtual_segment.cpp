@@ -585,30 +585,27 @@ virtual_chapter_c * virtual_segment_c::FindChapter( int64_t i_find_uid )
 
 int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level )
 {
-    if ( p_chapter && ( !p_chapter->b_display_seekpoint || p_chapter->psz_name == "" ) )
-    {
-        p_chapter->psz_name = p_chapter->GetCodecName();
-        if ( p_chapter->psz_name != "" )
-            p_chapter->b_display_seekpoint = true;
-    }
-
     if ( p_chapter && p_chapter->b_display_seekpoint )
     {
-        if( p_chapter->b_user_display )
-        {
-            seekpoint_t *sk = vlc_seekpoint_New();
+        std::string chap_name;
+        if ( p_chapter->b_user_display )
+            chap_name = p_chapter->psz_name;
+        if (chap_name == "")
+            chap_name = p_chapter->GetCodecName();
 
-            sk->i_time_offset = i_mk_virtual_start_time;
-            sk->psz_name = strdup( p_chapter->psz_name.c_str() );
+        seekpoint_t *sk = vlc_seekpoint_New();
 
-            /* A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value. */
-            title.i_seekpoint++;
-            title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
-              title.i_seekpoint * sizeof( seekpoint_t* ) );
-            title.seekpoint[title.i_seekpoint-1] = sk;
+        sk->i_time_offset = i_mk_virtual_start_time;
+        if (chap_name != "")
+            sk->psz_name = strdup( chap_name.c_str() );
 
-            i_user_chapters++;
-        }
+        /* A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value. */
+        title.i_seekpoint++;
+        title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
+          title.i_seekpoint * sizeof( seekpoint_t* ) );
+        title.seekpoint[title.i_seekpoint-1] = sk;
+
+        i_user_chapters++;
     }
     i_seekpoint_num = i_user_chapters;
 
@@ -624,7 +621,7 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
 
     /* HACK for now don't expose edition as a seekpoint if its start time is the same than it's first chapter */
     if( vchapters.size() > 0 &&
-        vchapters[0]->i_mk_virtual_start_time && p_edition )
+        vchapters[0]->i_mk_virtual_start_time && p_edition && !p_edition->b_hidden )
     {
         seekpoint_t *sk = vlc_seekpoint_New();
         sk->i_time_offset = 0;

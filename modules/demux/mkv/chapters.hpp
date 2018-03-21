@@ -56,7 +56,7 @@ public:
     ,p_segment_uid(NULL)
     ,p_segment_edition_uid(NULL)
     ,b_display_seekpoint(true)
-    ,b_user_display(false)
+    ,b_user_display(true)
     ,p_parent(NULL)
     ,b_is_leaving(false)
     {}
@@ -102,7 +102,6 @@ public:
     std::string GetMainName() const;
     bool                        b_ordered;
     bool                        b_default;
-    /* TODO handle hidden chapters */
     bool                        b_hidden;
 };
 

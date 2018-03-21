@@ -1377,8 +1377,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                 }
                 E_CASE( KaxEditionFlagHidden, flag_hidden )
                 {
-                    VLC_UNUSED( flag_hidden ); // TODO: FIXME: implement
-                    VLC_UNUSED( vars );
+                    vars.p_edition->b_hidden = static_cast<uint8>( flag_hidden ) != 0;
                 }
                 E_CASE( EbmlVoid, el )
                 {
