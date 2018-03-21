@@ -19,7 +19,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-static inline void intf_consoleIntroMsg(intf_thread_t *intf)
+static inline void intf_consoleIntroMsg(intf_thread_t *p_intf)
 {
     if (getenv( "PWD" ) == NULL) /* detect Cygwin shell or Wine */
     {
@@ -29,9 +29,9 @@ static inline void intf_consoleIntroMsg(intf_thread_t *intf)
         freopen("CONIN$", "r", stdin);
     }
 
-    msg_Info(intf, "VLC media player - %s", VERSION_MESSAGE);
-    msg_Info(intf, "%s", COPYRIGHT_MESSAGE);
-    msg_Info(intf, _("\nWarning: if you cannot access the GUI "
+    msg_rc("VLC media player - %s", VERSION_MESSAGE);
+    msg_rc("%s", COPYRIGHT_MESSAGE);
+    msg_rc(_("\nWarning: if you cannot access the GUI "
                      "anymore, open a command-line window, go to the "
                      "directory where you installed VLC and run "
                      "\"vlc -I qt\"\n"));
