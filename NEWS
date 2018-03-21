@@ -20,7 +20,8 @@ Demux:
  * Improve MP4 read of color information
  * Fix flac seeking and improve flac parsing
  * Improve mkv opening & seeking speed
- * Fix various MKV crashes
+ * Fix display of chapters with no name defined
+ * Miscellaneous MKV crash fixes
 
 Access:
  * Avoid a crash/assert in FTP after seeking
