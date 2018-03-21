@@ -44,7 +44,7 @@ Video output:
  * Fix Direct3D9 filters settings not being applied properly
  * Fix transform filters with hardware decoding
  * Fix snapshot and filters with HEVC hardware decoding
- * Fix subtitles not appearing in snapshots when using hardware decoding
+ * Fix a buffer overrun during GPU/CPU image copy
 
 macOS:
  * Fix Growl notifications on recent macOS versions
@@ -58,6 +58,7 @@ macOS:
 Qt:
  * Fix last folder used in open dialogs
  * Allow to customize the seek jump when using the mousewheel
+ * Fix fullscreen controller positionment on multiscreen setups
 
 Misc:
  * Fix lua rc & oldrc interfaces host specification
@@ -67,6 +68,7 @@ Misc:
  * Improve support for NetBSD
  * Fix MSI script for Windows
  * Fix libvlc_media_list not going to next media
+ * Fix character encoding on win32 consoles
 
 
 Changes between 3.0.0 and 3.0.1:
