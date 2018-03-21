@@ -565,12 +565,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     pool_size += 2;
 
     vout_display_sys_t *sys = vd->sys;
-    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     picture_t **pictures = NULL;
     picture_t *picture;
     unsigned  picture_count = 0;
-
-    memset(textures, 0, sizeof(textures));
 
     if (sys->sys.pool)
         return sys->sys.pool;
@@ -603,6 +600,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
     else
     {
+        ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
+        memset(textures, 0, sizeof(textures));
         unsigned slices = pool_size;
         if (!CanUseVoutPool(&sys->d3d_dev, pool_size))
             /* only provide enough for the filters, we can still do direct rendering */
