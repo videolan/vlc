@@ -163,7 +163,7 @@ static int aout_CheckReady (audio_output_t *aout)
              * suitable codec (like an HDMI audio format). However, keep the
              * same codec if the aout was restarted because of a stereo-mode
              * change from the user. */
-            if (!(restart & AOUT_RESTART_STEREOMODE))
+            if (restart == AOUT_RESTART_OUTPUT)
                 status = AOUT_DEC_CHANGED;
         }
 
