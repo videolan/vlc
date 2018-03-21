@@ -174,7 +174,10 @@ void
 libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_lrd )
 {
     if( p_lrd->p_rd != NULL )
+    {
         vlc_rd_release( p_lrd->p_rd );
+        p_lrd->p_rd = NULL;
+    }
 
     for( int i = 0; i < p_lrd->i_items; ++i )
         vlc_renderer_item_release( p_lrd->pp_items[i] );
