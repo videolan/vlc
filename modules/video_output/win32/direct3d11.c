@@ -1561,6 +1561,13 @@ static int Direct3D11Open(vout_display_t *vd)
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
                                               sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+    if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
+    {
+        msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
+        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+    }
     IDXGIFactory2_Release(dxgifactory);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
