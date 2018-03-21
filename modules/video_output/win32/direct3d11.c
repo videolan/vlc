@@ -399,7 +399,19 @@ static int Direct3D11MapPoolTexture(picture_t *picture)
     picture_sys_t *p_sys = picture->p_sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr;
-    hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+    ID3D11Device *dev;
+    ID3D11DeviceContext_GetDevice(p_sys->context, &dev);
+    ID3D11Device_Release(dev);
+
+#ifndef NDEBUG
+    D3D11_TEXTURE2D_DESC dsc;
+    ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &dsc);
+    assert(dsc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE);
+    assert(dsc.Usage & D3D11_USAGE_DYNAMIC);
+#endif
+
+    hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if( FAILED(hr) )
     {
         return VLC_EGENERIC;
