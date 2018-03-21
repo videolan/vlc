@@ -52,7 +52,7 @@ public:
     bool Leave( );
     bool EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bool b_enter = true );
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
-    int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level );
+    int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level, bool allow_no_name );
 
     virtual_chapter_c * BrowseCodecPrivate( unsigned int codec_id,
                                             bool (*match)( const chapter_codec_cmds_c &data,
