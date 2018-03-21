@@ -418,7 +418,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                             {
                                 ktttv_ptr->ReadData( es.I_O() );
 
-                                msg_Dbg( &sys.demuxer, "|   |   + TargetType: %u", ktttv_ptr->GetValue().c_str());
+                                msg_Dbg( &sys.demuxer, "|   |   + TargetType: %s", ktttv_ptr->GetValue().c_str());
                             }
                             else
                             {
