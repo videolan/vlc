@@ -466,7 +466,8 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
                           uint8_t *cache, size_t cache_size,
                           unsigned height, int bitshift)
 {
-    const unsigned w16 = (src_pitch+15) & ~15;
+    const size_t copy_pitch = __MIN(src_pitch, dst_pitch);
+    const unsigned w16 = (copy_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
     assert(hstep > 0);
 
@@ -481,7 +482,7 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
         CopyFromUswc(cache, w16, src, src_pitch, src_pitch, hblock, bitshift);
 
         /* Copy from our cache to the destination */
-        Copy2d(dst, dst_pitch, cache, w16, src_pitch, hblock);
+        Copy2d(dst, dst_pitch, cache, w16, copy_pitch, hblock);
 
         /* */
         src += src_pitch * hblock;
@@ -610,6 +611,7 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch,
                       const uint8_t *src, size_t src_pitch,
                       unsigned height, int bitshift)
 {
+    const size_t copy_pitch = __MIN(src_pitch, dst_pitch);
     if (bitshift != 0)
     {
         for (unsigned y = 0; y < height; y++)
@@ -618,20 +620,20 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch,
             const uint16_t *src16 = (const uint16_t *) src;
 
             if (bitshift > 0)
-                for (unsigned x = 0; x < (src_pitch / 2); x++)
+                for (unsigned x = 0; x < (copy_pitch / 2); x++)
                     *dst16++ = (*src16++) >> (bitshift & 0xf);
             else
-                for (unsigned x = 0; x < (src_pitch / 2); x++)
+                for (unsigned x = 0; x < (copy_pitch / 2); x++)
                     *dst16++ = (*src16++) << ((-bitshift) & 0xf);
             src += src_pitch;
             dst += dst_pitch;
         }
     }
     else if (src_pitch == dst_pitch)
-        memcpy(dst, src, src_pitch * height);
+        memcpy(dst, src, copy_pitch * height);
     else
     for (unsigned y = 0; y < height; y++) {
-        memcpy(dst, src, src_pitch);
+        memcpy(dst, src, copy_pitch);
         src += src_pitch;
         dst += dst_pitch;
     }
