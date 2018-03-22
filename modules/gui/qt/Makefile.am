@@ -456,6 +456,8 @@ if ENABLE_QT
 gui_LTLIBRARIES += libqt_plugin.la
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
 if !HAVE_WIN32
+if !HAVE_OS2
 pkglibexec_PROGRAMS += vlc-qt-check
+endif
 endif
 endif
