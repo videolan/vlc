@@ -32,20 +32,72 @@
 
 #include <assert.h>
 
-char *config_GetLibDir (void)
+static const char *config_GetRelDir( const char *dir )
 {
-    HMODULE hmod;
-    CHAR    psz_path[CCHMAXPATH + 4];
+    static int prefixlen = -1;
 
-    DosQueryModFromEIP( &hmod, NULL, 0, NULL, NULL, ( ULONG )system_Init );
-    DosQueryModuleName( hmod, sizeof( psz_path ), psz_path );
+    if( prefixlen == -1 )
+    {
+        prefixlen = 0;
+        while( LIBDIR[ prefixlen ] && SYSDATADIR[ prefixlen ]
+               && LIBDIR[ prefixlen ] == SYSDATADIR[ prefixlen])
+            prefixlen++;
+    }
 
-    /* remove the DLL name */
-    char *slash = strrchr( psz_path, '\\');
-    if( slash == NULL )
-        abort();
-    strcpy(slash + 1, PACKAGE);
-    return FromLocaleDup(psz_path);
+    return dir + prefixlen;
+}
+
+static const char *config_GetBaseDir( void )
+{
+    static CHAR basedir[ CCHMAXPATH + 4 ] = "";
+
+    if( basedir[ 0 ] == '\0')
+    {
+        HMODULE hmod;
+
+        DosQueryModFromEIP( &hmod, NULL, 0, NULL, NULL, ( ULONG )system_Init );
+        DosQueryModuleName( hmod, sizeof( basedir ), basedir );
+
+        /* remove \ + the DLL name */
+        char *slash = strrchr( basedir, '\\');
+        *slash = '\0';
+
+        /* remove lib dir name */
+        slash = strrchr( basedir, '\\');
+        if( slash == NULL )
+            abort();
+        slash[ 1 ] = '\0';
+    }
+
+    return basedir;
+}
+
+static char *config_GetRealDir( const char *dir )
+{
+    char realdir[ CCHMAXPATH + 4 ];
+
+    snprintf( realdir, sizeof( realdir ), "%s%s",
+              config_GetBaseDir(), config_GetRelDir( dir ));
+
+    return FromLocaleDup( realdir );
+}
+
+char *config_GetLibDir( void )
+{
+    const char *path = getenv ("VLC_LIB_PATH");
+    if (path)
+        return FromLocaleDup( path );
+
+    return config_GetRealDir( PKGLIBDIR );
+}
+
+static char *config_GetLibExecDir(void)
+{
+    const char *path = getenv ("VLC_LIB_PATH");
+    if (path)
+        return FromLocaleDup( path );
+
+    return config_GetRealDir( PKGLIBEXECDIR );
 }
 
 /**
@@ -57,13 +109,9 @@ static char *config_GetDataDir(void)
 {
     const char *path = getenv ("VLC_DATA_PATH");
     if (path)
-        return strdup (path);
+        return FromLocaleDup( path );
 
-    char *datadir = config_GetLibDir();
-    if (datadir)
-        /* replace last lib\vlc with share */
-        strcpy ( datadir + strlen (datadir) - 7, "share");
-    return datadir;
+    return config_GetRealDir( PKGDATADIR );
 }
 
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
@@ -78,10 +126,14 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
         case VLC_PKG_LIB_DIR:
             dir = config_GetLibDir();
             break;
+        case VLC_PKG_LIBEXEC_DIR:
+            dir = config_GetLibExecDir();
+            break;
         case VLC_SYSDATA_DIR:
+            dir = config_GetRealDir( SYSDATADIR );
             break;
         case VLC_LOCALE_DIR:
-            dir = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
+            dir = config_GetRealDir( LOCALEDIR );
             break;
         default:
             vlc_assert_unreachable();
