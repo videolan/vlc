@@ -350,13 +350,6 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 
         aiColor3D diffuseColor;
         myAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
-        msg_Err(p_loader, "Diffuse color: %f %f %f", diffuseColor.r, diffuseColor.g, diffuseColor.b);
-
-        unsigned i_nbProperties = myAiMaterial->mNumProperties;
-        for (unsigned j = 0; j < i_nbProperties; ++j)
-        {
-            msg_Err(p_loader, "name %s, %s", myAiMaterial->mProperties[j]->mKey.C_Str(), myAiMaterial->mProperties[j]->mData + 4);
-        }
 
         unsigned i_nbTextures = myAiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
         if (i_nbTextures > 0)
