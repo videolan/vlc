@@ -1458,7 +1458,7 @@ static const int pi_mmdevice_passthrough_values[] = {
 };
 static const char *const ppsz_mmdevice_passthrough_texts[] = {
     N_("Disabled"),
-    N_("Enabled (without HD codecs)"),
+    N_("Enabled (AC3/DTS only)"),
     N_("Enabled"),
 };
 
