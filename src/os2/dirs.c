@@ -30,6 +30,8 @@
 #include <vlc_charset.h>
 #include "config/configuration.h"
 
+#include <assert.h>
+
 char *config_GetLibDir (void)
 {
     HMODULE hmod;
