@@ -276,7 +276,7 @@ int main(int argc, const char *argv[])
 out:
     libvlc_release (vlc);
 #ifdef __OS2__
-    for (int i = count - argc; i < argc; i++)
+    for (int i = count - argc + 1; i < count; i++)
         free(args[i]);
 #endif
     return ret;
