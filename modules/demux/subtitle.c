@@ -335,7 +335,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->props.sami.psz_start     = NULL;
 
     /* Get the FPS */
-    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" ); /* FIXME */
+    f_fps = p_demux->p_input ? var_GetFloat( p_demux->p_input, "sub-original-fps" ) : 0.0f;
     if( f_fps >= 1.f )
         p_sys->props.i_microsecperframe = llroundf( 1000000.f / f_fps );
 
