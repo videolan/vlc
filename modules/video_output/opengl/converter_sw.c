@@ -587,7 +587,11 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     tc->pf_update            = tc_common_update;
     tc->pf_allocate_textures = tc_common_allocate_textures;
 
-    if (allow_dr)
+    /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
+    priv->has_unpack_subimage =
+        !tc->is_gles || HasExtension(tc->glexts, "GL_EXT_unpack_subimage");
+
+    if (allow_dr && priv->has_unpack_subimage)
     {
         bool supports_map_persistent = false;
 
@@ -627,9 +631,6 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         }
     }
 
-    /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
-    priv->has_unpack_subimage =
-        !tc->is_gles || HasExtension(tc->glexts, "GL_EXT_unpack_subimage");
     tc->fshader = fragment_shader;
 
     return VLC_SUCCESS;
