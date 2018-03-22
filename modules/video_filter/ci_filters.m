@@ -637,7 +637,10 @@ Open(vlc_object_t *obj, char const *psz_filter)
         ctx->ci_ctx = [CIContext contextWithCGLContext: glctx
                                            pixelFormat: nil
                                             colorSpace: nil
-                                               options: nil];
+                                               options: @{
+                                                kCIContextWorkingColorSpace : [NSNull null],
+                                                kCIContextOutputColorSpace : [NSNull null],
+                                               }];
 #else
         CVEAGLContext eaglctx = var_InheritAddress(filter, "ios-eaglcontext");
         if (!eaglctx)
