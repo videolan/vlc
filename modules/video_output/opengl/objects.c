@@ -8,13 +8,21 @@
 #include "objects.h"
 
 
-int loadSceneObjects(gl_scene_objects_display_t *p_objDisplay, const char *psz_path)
+gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
+                                             const opengl_tex_converter_t *tc)
 {
+    gl_scene_objects_display_t *p_objDisplay = calloc(1, sizeof(gl_scene_objects_display_t));
+    if (unlikely(p_objDisplay == NULL))
+        return NULL;
+
+    p_objDisplay->gl = gl;
+    p_objDisplay->tc = tc;
+
     object_loader_t *p_objLoader = objLoader_get((vlc_object_t *)p_objDisplay->gl);
     if (unlikely(p_objLoader == NULL))
     {
         msg_Err(p_objDisplay->gl, "Could not load the 3d object loader");
-        return VLC_EGENERIC;
+        goto error;
     }
 
     scene_t *p_scene = p_objDisplay->p_scene = objLoader_loadScene(p_objLoader, psz_path);
@@ -22,7 +30,7 @@ int loadSceneObjects(gl_scene_objects_display_t *p_objDisplay, const char *psz_p
     if (p_scene == NULL)
     {
         msg_Err(p_objDisplay->gl, "Could not load the 3d scene at path: %s", psz_path);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     objLoader_release(p_objLoader);
@@ -30,47 +38,40 @@ int loadSceneObjects(gl_scene_objects_display_t *p_objDisplay, const char *psz_p
     // Allocate buffer ojects indices arrays.
     p_objDisplay->vertex_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
     if (unlikely(p_objDisplay->vertex_buffer_object == NULL))
-        return VLC_EGENERIC;
+        goto error;
 
     p_objDisplay->index_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
     if (unlikely(p_objDisplay->index_buffer_object == NULL))
-    {
-        free(p_objDisplay->vertex_buffer_object);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     p_objDisplay->texture_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
     if (unlikely(p_objDisplay->texture_buffer_object == NULL))
-    {
-        free(p_objDisplay->vertex_buffer_object);
-        free(p_objDisplay->index_buffer_object);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     p_objDisplay->textures = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
     if (unlikely(p_objDisplay->textures == NULL))
-    {
-        free(p_objDisplay->vertex_buffer_object);
-        free(p_objDisplay->vertex_buffer_object);
-        free(p_objDisplay->index_buffer_object);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     if (loadBufferObjects(p_objDisplay) != VLC_SUCCESS)
-    {
-        free(p_objDisplay->textures);
-        free(p_objDisplay->vertex_buffer_object);
-        free(p_objDisplay->index_buffer_object);
-        free(p_objDisplay->texture_buffer_object);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
-    return VLC_SUCCESS;
+    return p_objDisplay;
+
+error:
+    free(p_objDisplay->textures);
+    free(p_objDisplay->vertex_buffer_object);
+    free(p_objDisplay->index_buffer_object);
+    free(p_objDisplay->texture_buffer_object);
+    free(p_objDisplay);
+    return NULL;
 }
 
 
 void releaseSceneObjects(gl_scene_objects_display_t *p_objDisplay)
 {
+    if (p_objDisplay == NULL)
+        return;
+
     if (p_objDisplay->p_scene != NULL)
         p_objDisplay->tc->vt->DeleteTextures(p_objDisplay->p_scene->nMaterials,
                                              p_objDisplay->textures);
@@ -81,6 +82,7 @@ void releaseSceneObjects(gl_scene_objects_display_t *p_objDisplay)
     free(p_objDisplay->texture_buffer_object);
 
     scene_Release(p_objDisplay->p_scene);
+    free(p_objDisplay);
 }
 
 

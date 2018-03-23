@@ -218,7 +218,7 @@ struct vout_display_opengl_t {
     GLuint texture_buffer_object_stereo;
 
     /* 3D objects */
-    gl_scene_objects_display_t objDisplay;
+    gl_scene_objects_display_t *p_objDisplay;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -1377,11 +1377,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     CreateFBO(vgl, &vgl->leftFBO, &vgl->leftColorTex, &vgl->leftDepthTex);
     CreateFBO(vgl, &vgl->rightFBO, &vgl->rightColorTex, &vgl->rightDepthTex);
 
-    vgl->objDisplay.gl = vgl->gl;
-    vgl->objDisplay.tc = vgl->scene_prgm->tc;
-    if (loadSceneObjects(&vgl->objDisplay, "VirtualTheater" DIR_SEP "virtualCinemaTargo.json") != VLC_SUCCESS)
-        msg_Warn(vgl->gl, "Could not load the virtual theater");
-
     GL_ASSERT_NOERROR();
     return vgl;
 }
@@ -1394,7 +1389,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    releaseSceneObjects(&vgl->objDisplay);
+    releaseSceneObjects(vgl->p_objDisplay);
 
     const size_t main_tex_count = vgl->prgm->tc->tex_count;
     const bool main_del_texs = !vgl->prgm->tc->handle_texs_gen;
@@ -2050,12 +2045,12 @@ static int SetupCoords(vout_display_opengl_t *vgl,
             float screenPosition[3] = {0.f, 0.f, 0.f};
             float screenNormalDir[3] = {0.f, 0.f, 0.f};
             float screenFitDir[3] = {0.f, 0.f, 0.f};
-            if (vgl->objDisplay.p_scene)
+            if (vgl->p_objDisplay->p_scene)
             {
-                memcpy(screenPosition, vgl->objDisplay.p_scene->screenPosition, sizeof(screenPosition));
-                memcpy(screenNormalDir, vgl->objDisplay.p_scene->screenNormalDir, sizeof(screenNormalDir));
-                memcpy(screenFitDir, vgl->objDisplay.p_scene->screenFitDir, sizeof(screenFitDir));
-                screenSize = vgl->objDisplay.p_scene->screenSize;
+                memcpy(screenPosition, vgl->p_objDisplay->p_scene->screenPosition, sizeof(screenPosition));
+                memcpy(screenNormalDir, vgl->p_objDisplay->p_scene->screenNormalDir, sizeof(screenNormalDir));
+                memcpy(screenFitDir, vgl->p_objDisplay->p_scene->screenFitDir, sizeof(screenFitDir));
+                screenSize = vgl->p_objDisplay->p_scene->screenSize;
             }
             i_ret = BuildVirtualScreen(vgl->prgm->tc->tex_count,
                                        &vertexCoord, &textureCoord, &nbVertices,
@@ -2345,7 +2340,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
     vgl->vt.Enable(GL_DEPTH_TEST);
 
-    scene_t *p_scene = vgl->objDisplay.p_scene;
+    scene_t *p_scene = vgl->p_objDisplay->p_scene;
     if (p_scene == NULL)
         return;
 
@@ -2399,9 +2394,9 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
     for (unsigned o = 0; o < p_scene->nObjects; ++o)
     {
-        scene_object_t *p_object = vgl->objDisplay.p_scene->objects[o];
-        scene_mesh_t *p_mesh = vgl->objDisplay.p_scene->meshes[p_object->meshId];
-        scene_material_t *p_material = vgl->objDisplay.p_scene->materials[p_object->textureId];
+        scene_object_t *p_object = vgl->p_objDisplay->p_scene->objects[o];
+        scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
+        scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
 
         if (p_material->material_type == MATERIAL_TYPE_TEXTURE)
         {
@@ -2409,24 +2404,24 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             GLsizei i_height = p_material->p_pic->format.i_height;
             tc->pf_prepare_shader(tc, &i_width, &i_height, 1.0f);
 
-            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->objDisplay.index_buffer_object[p_object->meshId]);
+            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
 
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.texture_buffer_object[p_object->meshId]);
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->texture_buffer_object[p_object->meshId]);
             vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
             vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT, 0, 0, 0);
 
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.vertex_buffer_object[p_object->meshId]);
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
             vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
             vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
-            vgl->vt.BindTexture(tc->tex_target, vgl->objDisplay.textures[p_object->textureId]);
+            vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->textures[p_object->textureId]);
             tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
         }
         else if (p_material->material_type == MATERIAL_TYPE_DIFFUSE_COLOR)
         {
-            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->objDisplay.index_buffer_object[p_object->meshId]);
+            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
 
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->objDisplay.vertex_buffer_object[p_object->meshId]);
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
             vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
             vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
@@ -2528,8 +2523,8 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
 
     if (vgl->b_sideBySide
         && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR)
-        memcpy(vgl->prgm->var.HeadPositionMatrix, vgl->objDisplay.p_scene->headPositionMatrix,
-               sizeof(vgl->objDisplay.p_scene->headPositionMatrix));
+        memcpy(vgl->prgm->var.HeadPositionMatrix, vgl->p_objDisplay->p_scene->headPositionMatrix,
+               sizeof(vgl->p_objDisplay->p_scene->headPositionMatrix));
 
 
     DrawWithShaders(vgl, vgl->prgm, eye);
