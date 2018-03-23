@@ -95,9 +95,6 @@ int intf_Create( playlist_t *playlist, const char *chain )
     val.psz_string = (char *)"http,none";
     text.psz_string = (char *)_("Web");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"logger,none";
-    text.psz_string = (char *)_("Debug logging");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = (char *)"gestures,none";
     text.psz_string = (char *)_("Mouse Gestures");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
