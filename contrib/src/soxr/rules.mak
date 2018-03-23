@@ -22,9 +22,15 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(call pkg_static,"src/soxr.pc.in")
 	$(MOVE)
 
+# Force CMAKE_CROSSCOMPILING to True
+ifdef HAVE_CROSS_COMPILE
+SOXR_EXTRA_CONF=-DCMAKE_SYSTEM_NAME=Generic
+endif
+
 .soxr: soxr toolchain.cmake
 	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
+		$(SOXR_EXTRA_CONF) \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DBUILD_EXAMPLES=OFF \
 		-DBUILD_TESTS=OFF \
