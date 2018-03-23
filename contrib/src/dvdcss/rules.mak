@@ -1,5 +1,5 @@
 # DVDCSS
-DVDCSS_VERSION := 1.4.1
+DVDCSS_VERSION := 1.4.2
 DVDCSS_URL := $(VIDEOLAN)/libdvdcss/$(DVDCSS_VERSION)/libdvdcss-$(DVDCSS_VERSION).tar.bz2
 
 ifeq ($(call need_pkg,"libdvdcss"),)
@@ -14,8 +14,6 @@ $(TARBALLS)/libdvdcss-$(DVDCSS_VERSION).tar.bz2:
 
 dvdcss: libdvdcss-$(DVDCSS_VERSION).tar.bz2 .sum-dvdcss
 	$(UNPACK)
-	$(APPLY) $(SRC)/dvdcss/fix-buffer-overflow.patch
-	$(APPLY) $(SRC)/dvdcss/fix-uninit-ptr-free.patch
 	$(MOVE)
 
 .dvdcss: dvdcss
