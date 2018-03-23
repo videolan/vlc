@@ -29,7 +29,6 @@
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
-#include "input_manager.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -129,7 +128,15 @@ static struct {
 static int getDefaultAudioVolume(const char *aout)
 {
     if (!strcmp(aout, "") || !strcmp(aout, "any"))
+#ifdef _WIN32
+        /* All Windows aouts, that can be selected automatically, handle volume
+         * saving. In case of automatic mode, we'll save the last volume for
+         * every modules. Therefore, all volumes variable we be the same and we
+         * can use the first one (mmdevice). */
+        return config_GetFloat("mmdevice-volume") * 100.f + .5f;
+#else
         return -1;
+#endif
     else
     /* Note: For hysterical raisins, this is sorted by decreasing priority
      * order (then alphabetical order). */
@@ -957,36 +964,15 @@ void SPrefsPanel::updateVideoOptions( int number )
 #endif
 }
 
-char *SPrefsPanel::getAoutModuleName()
-{
-    audio_output_t *p_aout = THEMIM->getAout();
-    if (p_aout == NULL)
-        return NULL;
-
-    char *module = var_GetString(p_aout, "module-name");
-    vlc_object_release(p_aout);
-    return module;
-}
 
 void SPrefsPanel::updateAudioOptions( int number)
 {
     QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
                                             ->itemData( number ).toString();
-
-    if (value == "any" || value == "")
-    {
-        char *module = getAoutModuleName();
-        if (module != NULL)
-        {
-            value = qfu(module);
-            free(module);
-        }
-    }
-
 #ifdef _WIN32
     /* Since MMDevice is most likely to be used by default, we show MMDevice
      * options by default */
-    const bool mmDeviceEnabled = value == "mmdevice";
+    const bool mmDeviceEnabled = value == "mmdevice" || value == "any";
     optionWidgets["mmdevicePassthroughL"]->setVisible( mmDeviceEnabled );
     optionWidgets["mmdevicePassthroughB"]->setVisible( mmDeviceEnabled );
     optionWidgets["mmdeviceW"]->setVisible( mmDeviceEnabled );
@@ -1127,12 +1113,12 @@ void SPrefsPanel::apply()
             qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
         bool b_reset_volume =
             qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
-        char *psz_aout = getAoutModuleName();
+        char *psz_aout = config_GetPsz( "aout" );
 
         float f_gain = powf( i_volume / 100.f, 3 );
 
 #define save_vol_aout( name ) \
-            module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) )
+            module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
 
         //FIXME this is moot
 #if defined( _WIN32 )
