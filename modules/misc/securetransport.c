@@ -96,6 +96,8 @@ typedef struct {
     bool b_blocking_send;
     bool b_handshaked;
     bool b_server_mode;
+
+    vlc_mutex_t lock;
 } vlc_tls_st_t;
 
 static int st_Error (vlc_tls_t *obj, int val)
@@ -455,6 +457,8 @@ static ssize_t st_Send (vlc_tls_t *session, const struct iovec *iov,
     if (unlikely(count == 0))
         return 0;
 
+    vlc_mutex_lock(&sys->lock);
+
     /*
      * SSLWrite does not return the number of bytes actually written to
      * the socket, but the number of bytes written to the internal cache.
@@ -483,6 +487,7 @@ static ssize_t st_Send (vlc_tls_t *session, const struct iovec *iov,
             sys->i_send_buffered_bytes = 0;
 
         } else if (ret == errSSLWouldBlock) {
+            vlc_mutex_unlock(&sys->lock);
             errno = againErr;
             return -1;
         }
@@ -494,10 +499,12 @@ static ssize_t st_Send (vlc_tls_t *session, const struct iovec *iov,
         if (ret == errSSLWouldBlock) {
             sys->i_send_buffered_bytes = iov->iov_len;
             errno = againErr;
+            vlc_mutex_unlock(&sys->lock);
             return -1;
         }
     }
 
+    vlc_mutex_unlock(&sys->lock);
     return ret != noErr ? st_Error(session, ret) : actualSize;
 }
 
@@ -511,19 +518,25 @@ static ssize_t st_Recv (vlc_tls_t *session, struct iovec *iov, unsigned count)
     if (unlikely(count == 0))
         return 0;
 
+    vlc_mutex_lock(&sys->lock);
+
     size_t actualSize;
     OSStatus ret = SSLRead(sys->p_context, iov->iov_base, iov->iov_len,
                            &actualSize);
 
-    if (ret == errSSLWouldBlock && actualSize)
+    if (ret == errSSLWouldBlock && actualSize) {
+        vlc_mutex_unlock(&sys->lock);
         return actualSize;
+    }
 
     /* peer performed shutdown */
     if (ret == errSSLClosedNoNotify || ret == errSSLClosedGraceful) {
         msg_Dbg(sys->obj, "Got close notification with code %i", (int)ret);
+        vlc_mutex_unlock(&sys->lock);
         return 0;
     }
 
+    vlc_mutex_unlock(&sys->lock);
     return ret != noErr ? st_Error(session, ret) : actualSize;
 }
 
@@ -536,6 +549,8 @@ static int st_SessionShutdown (vlc_tls_t *session, bool duplex) {
     vlc_tls_st_t *sys = (vlc_tls_st_t *)session;
 
     msg_Dbg(sys->obj, "shutdown TLS session");
+
+    vlc_mutex_destroy(&sys->lock);
 
     OSStatus ret = noErr;
     VLC_UNUSED(duplex);
@@ -587,6 +602,7 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     sys->p_context = NULL;
     sys->sock = sock;
     sys->b_server_mode = b_server;
+    vlc_mutex_init(&sys->lock);
     sys->obj = VLC_OBJECT(crd);
 
     vlc_tls_t *tls = &sys->tls;
