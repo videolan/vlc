@@ -3110,9 +3110,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_height   = r->fmt.i_height;
             RECT output;
             output.left   = r->fmt.i_x_offset;
-            output.right  = r->fmt.i_x_offset + r->fmt.i_width;
+            output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
             output.top    = r->fmt.i_y_offset;
-            output.bottom = r->fmt.i_y_offset + r->fmt.i_height;
+            output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
             err = SetupQuad( vd, &r->fmt, d3dquad, &output,
                              sys->d3dregion_format, sys->pSPUPixelShader,
