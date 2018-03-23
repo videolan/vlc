@@ -1,0 +1,52 @@
+From 5d98c6e04973d1608307d6f230b79ff9219ba480 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 23 Mar 2018 15:48:10 +0100
+Subject: [PATCH 3/3] add aarch64 support
+
+---
+ cmake/Modules/SetSystemProcessor.cmake | 1 +
+ src/pffft-wrap.c                       | 2 +-
+ src/pffft.c                            | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/Modules/SetSystemProcessor.cmake b/cmake/Modules/SetSystemProcessor.cmake
+index 8e2c292..55ac842 100644
+--- a/cmake/Modules/SetSystemProcessor.cmake
++++ b/cmake/Modules/SetSystemProcessor.cmake
+@@ -14,6 +14,7 @@ macro (set_system_processor)
+         "#if defined __x86_64__ || defined _M_X64  /*\;x86_64\;*/"
+         "#if defined __i386__   || defined _M_IX86 /*\;x86_32\;*/"
+         "#if defined __arm__    || defined _M_ARM  /*\;arm\;*/"
++        "#if defined __aarch64__ || defined _M_ARM64 /*\;arm64\;*/"
+         )
+       foreach (CPU_LINE ${CPU_LINES})
+         string (CONCAT CPU_SOURCE "${CPU_LINE}" "
+diff --git a/src/pffft-wrap.c b/src/pffft-wrap.c
+index c920f06..3687c36 100644
+--- a/src/pffft-wrap.c
++++ b/src/pffft-wrap.c
+@@ -40,7 +40,7 @@ static void pffft_zconvolve(PFFFT_Setup *s, const float *a, const float *b, floa
+ 
+   float ar, ai, br, bi;
+ 
+-#ifdef __arm__
++#if defined (__arm__) || defined(__aarch64__)
+   __builtin_prefetch(va);
+   __builtin_prefetch(vb);
+   __builtin_prefetch(va+2);
+diff --git a/src/pffft.c b/src/pffft.c
+index 46c841e..060f299 100644
+--- a/src/pffft.c
++++ b/src/pffft.c
+@@ -157,7 +157,7 @@ typedef __m128 v4sf;
+ /*
+   ARM NEON support macros
+ */
+-#elif !defined(PFFFT_SIMD_DISABLE) && defined(__arm__)
++#elif !defined(PFFFT_SIMD_DISABLE) && (defined(__arm__) || defined(__aarch64__))
+ #  include <arm_neon.h>
+ typedef float32x4_t v4sf;
+ #  define SIMD_SZ 4
+-- 
+2.11.0
+
