@@ -101,12 +101,12 @@ static int getBallColor( vlc_object_t *p_this, char const *psz_newval );
 #define EDGE_VISIBLE_LONGTEXT N_("Set edge visibility.")
 
 #define BALL_SPEED_TEXT N_("Ball speed")
-#define BALL_SPEED_LONGTEXT N_("Set ball speed, the displacement value \
-                                in number of pixels by frame.")
+#define BALL_SPEED_LONGTEXT N_("Set ball speed, the displacement value " \
+                               "in number of pixels by frame.")
 
 #define BALL_SIZE_TEXT N_("Ball size")
-#define BALL_SIZE_LONGTEXT N_("Set ball size giving its radius in number \
-                                of pixels")
+#define BALL_SIZE_LONGTEXT N_("Set ball size giving its radius in number " \
+                              "of pixels")
 
 #define GRAD_THRESH_TEXT N_("Gradient threshold")
 #define GRAD_THRESH_LONGTEXT N_("Set gradient threshold for edge computation.")
