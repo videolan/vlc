@@ -48,8 +48,8 @@ typedef struct plane_t
     int i_pixel_pitch;
 
     /* Variables used for pictures with margins */
-    int i_visible_lines;            /**< How many visible lines are there ? */
-    int i_visible_pitch;            /**< How many visible pixels are there ? */
+    int i_visible_lines;            /**< How many visible lines are there? */
+    int i_visible_pitch;            /**< How many visible pixels are there? */
 
 } plane_t;
 
@@ -89,9 +89,9 @@ struct picture_t
      * Those properties can be changed by the decoder
      * @{
      */
-    bool            b_progressive;          /**< is it a progressive frame ? */
+    bool            b_progressive;          /**< is it a progressive frame? */
     bool            b_top_field_first;             /**< which field is first */
-    unsigned int    i_nb_fields;                  /**< # of displayed fields */
+    unsigned int    i_nb_fields;                  /**< number of displayed fields */
     picture_context_t *context;      /**< video format-specific data pointer */
     /**@}*/
 
