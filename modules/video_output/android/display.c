@@ -75,8 +75,6 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 
-#define THREAD_NAME "android-display"
-
 static const vlc_fourcc_t subpicture_chromas[] =
 {
     VLC_CODEC_RGBA,

@@ -37,8 +37,6 @@
 
 #include "utils.h"
 
-#define THREAD_NAME "Android Window"
-
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
 static int Control(vout_window_t *, int, va_list ap);
