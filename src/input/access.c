@@ -67,7 +67,7 @@ static void vlc_access_Destroy(stream_t *access)
  * access_New:
  *****************************************************************************/
 static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
-                            bool preparsing, const char *mrl)
+                            es_out_t *out, bool preparsing, const char *mrl)
 {
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
@@ -77,6 +77,7 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
         return NULL;
 
     access->p_input = input;
+    access->out = out;
     access->psz_name = NULL;
     access->psz_url = strdup(mrl);
     access->psz_filepath = NULL;
@@ -145,7 +146,7 @@ error:
 
 stream_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 {
-    return access_New(parent, NULL, false, mrl);
+    return access_New(parent, NULL, NULL, false, mrl);
 }
 
 /*****************************************************************************
@@ -261,13 +262,13 @@ static void AStreamDestroy(stream_t *s)
 }
 
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
-                           bool preparsing, const char *url)
+                           es_out_t *out, bool preparsing, const char *url)
 {
     stream_t *s = vlc_stream_CommonNew(parent, AStreamDestroy);
     if (unlikely(s == NULL))
         return NULL;
 
-    stream_t *access = access_New(VLC_OBJECT(s), input, preparsing, url);
+    stream_t *access = access_New(VLC_OBJECT(s), input, out, preparsing, url);
     if (access == NULL)
     {
         stream_CommonDelete(s);

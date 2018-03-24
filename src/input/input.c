@@ -2430,8 +2430,8 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     if( asprintf( &psz_base_mrl, "%s://%s", psz_access, psz_path ) < 0 )
         return NULL;
 
-    stream_t *p_stream = stream_AccessNew( obj, p_input, priv->b_preparsing,
-                                           psz_base_mrl );
+    stream_t *p_stream = stream_AccessNew( obj, p_input, NULL,
+                                           priv->b_preparsing, psz_base_mrl );
     free( psz_base_mrl );
 
     if( p_stream == NULL )

@@ -34,7 +34,8 @@ void stream_CommonDelete( stream_t *s );
 /**
  * This function creates a raw stream_t from an URL.
  */
-stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, bool, const char *);
+stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, es_out_t *, bool,
+                           const char *);
 
 /**
  * Probes stream filters automatically.
