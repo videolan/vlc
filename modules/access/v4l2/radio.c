@@ -68,6 +68,8 @@ static int RadioControl (demux_t *demux, int query, va_list args)
 int RadioOpen (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
 
     /* Parse MRL */
     size_t pathlen = strcspn (demux->psz_location, ":;");

@@ -670,6 +670,9 @@ static int DemuxOpen( vlc_object_t *p_this )
     demux_t      *p_demux = (demux_t *)p_this;
     access_sys_t *p_sys;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;

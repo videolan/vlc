@@ -169,6 +169,9 @@ static int Open( vlc_object_t *p_this )
     char         *psz_file;
     ifo_handle_t *p_vmg_file;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     if( !p_demux->psz_filepath || !*p_demux->psz_filepath )
         psz_file = var_InheritString( p_this, "dvd" );
     else

@@ -166,6 +166,9 @@ static int Open( vlc_object_t *p_this )
     es_format_t   fmt;
     dc1394error_t res;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;

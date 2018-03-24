@@ -306,7 +306,7 @@ static int Open( vlc_object_t *obj )
     es_format_t video_format, audio_format;
     int retval;
 
-    if( !p_demux->psz_filepath )
+    if( p_demux->out == NULL || p_demux->psz_filepath == NULL )
         return VLC_EGENERIC;
 
     p_sys = new ( nothrow ) demux_sys_t();

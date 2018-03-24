@@ -73,6 +73,8 @@ static int InitVideo (demux_t *, int fd, uint32_t caps);
 int DemuxOpen( vlc_object_t *obj )
 {
     demux_t *demux = (demux_t *)obj;
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
 
     demux_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))

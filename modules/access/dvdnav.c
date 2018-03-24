@@ -349,6 +349,9 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     int i_ret = VLC_EGENERIC;
     bool forced = false;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     if( !strncasecmp(p_demux->psz_url, "dvd", 3) )
         forced = true;
 

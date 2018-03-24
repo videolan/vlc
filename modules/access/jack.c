@@ -127,6 +127,9 @@ static int Open( vlc_object_t *p_this )
     es_format_t fmt;
     int i_out_ports = 0;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 

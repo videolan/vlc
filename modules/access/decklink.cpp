@@ -487,6 +487,9 @@ static int Open(vlc_object_t *p_this)
     int         rate;
     BMDVideoInputFlags flags = bmdVideoInputFlagDefault;
 
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
+
     /* Set up demux */
     demux->pf_demux = NULL;
     demux->pf_control = Control;

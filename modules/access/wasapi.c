@@ -384,6 +384,9 @@ static int Open(vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     HRESULT hr;
 
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
+
     if (demux->psz_location != NULL && *demux->psz_location != '\0')
         return VLC_EGENERIC; /* TODO non-default device */
 

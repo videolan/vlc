@@ -175,6 +175,9 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t *p_sys;
     char        *psz_parser;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     /* Fill p_demux field */
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( unlikely(!p_sys) )

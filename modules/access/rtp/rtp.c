@@ -162,6 +162,9 @@ static int Open (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     int tp; /* transport protocol */
 
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
+
     if (!strcasecmp(demux->psz_name, "dccp"))
         tp = IPPROTO_DCCP;
     else

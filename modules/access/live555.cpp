@@ -300,6 +300,9 @@ static int  Open ( vlc_object_t *p_this )
     int i_return;
     int i_error = VLC_EGENERIC;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     /* if the rtsp URL may contain a sat.ip fake DNS, bail-out early and 
      * let the SAT>IP module handle that */
     if( !strncmp(p_demux->psz_location, "sat.ip", 6) )

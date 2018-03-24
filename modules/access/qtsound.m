@@ -244,6 +244,9 @@ static int Open(vlc_object_t *p_this)
     QTCaptureDeviceInput *audioInput;
     NSError *o_returnedAudioError;
 
+    if (p_demux->out == NULL)
+        return VLC_EGENERIC;
+
     @autoreleasepool {
         if(p_demux->psz_location && *p_demux->psz_location)
             psz_uid = p_demux->psz_location;

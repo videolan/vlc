@@ -167,8 +167,10 @@ static int Control (demux_t *demux, int query, va_list args)
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
 
+    demux_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 

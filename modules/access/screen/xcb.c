@@ -142,8 +142,10 @@ static bool CheckSHM (xcb_connection_t *conn)
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *p_sys = malloc (sizeof (*p_sys));
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
 
+    demux_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
     demux->p_sys = p_sys;
