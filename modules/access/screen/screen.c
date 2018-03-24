@@ -125,7 +125,7 @@ vlc_module_begin ()
     add_integer( "screen-index", 0, INDEX_TEXT, INDEX_LONGTEXT, true )
 #endif
 
-    set_capability( "access_demux", 0 )
+    set_capability( "access", 0 )
     add_shortcut( "screen" )
     set_callbacks( Open, Close )
 vlc_module_end ()

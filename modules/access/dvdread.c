@@ -80,7 +80,7 @@ vlc_module_begin ()
     add_integer( "dvdread-angle", 1, ANGLE_TEXT,
         ANGLE_LONGTEXT, false )
     add_obsolete_string( "dvdread-css-method" ) /* obsolete since 1.1.0 */
-    set_capability( "access_demux", 0 )
+    set_capability( "access", 0 )
     add_shortcut( "dvd", "dvdread", "dvdsimple" )
     set_callbacks( Open, Close )
 vlc_module_end ()

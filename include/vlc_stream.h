@@ -62,7 +62,7 @@ struct stream_t
          *
          * Depending on the module capability:
          * - "stream filter" or "demux": input byte stream (not NULL)
-         * - "access" or "access_demux": a NULL pointer
+         * - "access": a NULL pointer
          * - "demux_filter": undefined
          */
         stream_t    *s;

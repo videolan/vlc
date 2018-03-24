@@ -84,7 +84,7 @@ vlc_module_begin ()
     set_description (N_("Shared memory framebuffer"))
     set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACCESS)
-    set_capability ("access_demux", 0)
+    set_capability ("access", 0)
     set_callbacks (Open, Close)
 
     add_float ("shm-fps", 10.0, FPS_TEXT, FPS_LONGTEXT, true)

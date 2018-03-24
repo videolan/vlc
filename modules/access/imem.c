@@ -172,7 +172,7 @@ vlc_module_begin()
         change_safe()
 
     add_shortcut("imem")
-    set_capability("access_demux", 1)
+    set_capability("access", 1)
     set_callbacks(OpenDemux, CloseDemux)
 
     add_submodule()

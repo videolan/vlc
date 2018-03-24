@@ -106,7 +106,7 @@ vlc_module_begin()
     add_string( "linsys-sdi-telx-lang", "", TELX_LANG_TEXT, TELX_LANG_LONGTEXT,
                 true )
 
-    set_capability( "access_demux", 0 )
+    set_capability( "access", 0 )
     add_shortcut( "linsys-sdi" )
     set_callbacks( Open, Close )
 

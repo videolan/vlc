@@ -291,7 +291,7 @@ vlc_module_begin ()
                  AUDIO_BITSPERSAMPLE_LONGTEXT, true )
 
     add_shortcut( "dshow" )
-    set_capability( "access_demux", 1 )
+    set_capability( "access", 1 )
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_submodule ()

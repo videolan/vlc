@@ -101,7 +101,7 @@ vlc_module_begin()
     add_string( "linsys-hdsdi-audio", "0=1,1",
         AUDIO_TEXT, AUDIO_LONGTEXT, true )
 
-    set_capability( "access_demux", 0 )
+    set_capability( "access", 0 )
     add_shortcut( "linsys-hdsdi" )
     set_callbacks( Open, Close )
 vlc_module_end()

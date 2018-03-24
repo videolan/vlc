@@ -94,7 +94,7 @@ vlc_module_begin ()
         ANGLE_LONGTEXT, false )
     add_bool( "dvdnav-menu", true,
         MENU_TEXT, MENU_LONGTEXT, false )
-    set_capability( "access_demux", 305 )
+    set_capability( "access", 305 )
     add_shortcut( "dvd", "dvdnav", "file" )
     set_callbacks( AccessDemuxOpen, Close )
 #ifdef HAVE_DVDNAV_DEMUX

@@ -491,7 +491,7 @@ static void Close (vlc_object_t *obj)
 vlc_module_begin()
     set_shortname(N_("WASAPI"))
     set_description(N_("Windows Audio Session API input"))
-    set_capability("access_demux", 0)
+    set_capability("access", 0)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 

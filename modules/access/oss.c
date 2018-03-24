@@ -79,7 +79,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_shortcut( "oss" )
-    set_capability( "access_demux", 0 )
+    set_capability( "access", 0 )
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_bool( CFG_PREFIX "stereo", true, STEREO_TEXT, STEREO_LONGTEXT,
