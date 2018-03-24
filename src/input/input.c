@@ -2411,19 +2411,6 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     vlc_object_t *obj = VLC_OBJECT(p_source);
     demux_t *p_demux = NULL;
 
-    /* first, try to create an access demux */
-    p_demux = demux_NewAdvanced( obj, p_input, psz_access, psz_access,
-                                 psz_path, NULL, priv->p_es_out,
-                                 priv->b_preparsing );
-    if( p_demux )
-    {
-        MRLSections( psz_anchor,
-            &p_source->i_title_start, &p_source->i_title_end,
-            &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
-
-        return p_demux;
-    }
-
     /* not an access-demux: create the underlying access stream */
     char *psz_base_mrl;
 

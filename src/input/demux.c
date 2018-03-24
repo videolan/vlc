@@ -156,15 +156,6 @@ static void demux_DestroyDemux(demux_t *demux)
     vlc_stream_Delete(demux->s);
 }
 
-static void demux_DestroyAccessDemux(demux_t *demux)
-{
-    module_unneed(demux, demux->p_module);
-    free(demux->psz_filepath);
-    free(demux->psz_name);
-
-    assert(demux->s == NULL);
-}
-
 static int demux_Probe(void *func, va_list ap)
 {
     int (*probe)(vlc_object_t *) = func;
@@ -181,24 +172,19 @@ static int demux_Probe(void *func, va_list ap)
     return probe(VLC_OBJECT(demux));
 }
 
-/*****************************************************************************
- * demux_NewAdvanced:
- *  if s is NULL then load a access_demux
- *****************************************************************************/
-#undef demux_NewAdvanced
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_access, const char *psz_demux,
                             const char *psz_location,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
-    void (*destroy)(stream_t *) =
-        (s != NULL) ? demux_DestroyDemux : demux_DestroyAccessDemux;
-    demux_t *p_demux = vlc_stream_CommonNew(p_obj, destroy);
+    demux_t *p_demux = vlc_stream_CommonNew(p_obj, demux_DestroyDemux);
 
     if (unlikely(p_demux == NULL))
         return NULL;
 
-    if( s != NULL && (!strcasecmp( psz_demux, "any" ) || !psz_demux[0]) )
+    assert(s != NULL);
+
+    if (!strcasecmp( psz_demux, "any" ) || !psz_demux[0])
     {   /* Look up demux by mime-type for hard to detect formats */
         char *type = stream_MimeType( s );
         if( type != NULL )
@@ -235,29 +221,21 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
 
-    if( s != NULL )
+    const char *psz_module = NULL;
+
+    if( !strcmp( p_demux->psz_name, "any" ) && p_demux->psz_filepath )
     {
-        const char *psz_module = NULL;
+        char const* psz_ext = strrchr( p_demux->psz_filepath, '.' );
 
-        if( !strcmp( p_demux->psz_name, "any" ) && p_demux->psz_filepath )
-        {
-            char const* psz_ext = strrchr( p_demux->psz_filepath, '.' );
-
-            if( psz_ext )
-                psz_module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
-        }
-
-        if( psz_module == NULL )
-            psz_module = p_demux->psz_name;
-
-        p_demux->p_module = vlc_module_load(p_demux, "demux", psz_module,
-             !strcmp(psz_module, p_demux->psz_name), demux_Probe, p_demux);
+        if( psz_ext )
+            psz_module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
     }
-    else
-    {
-        p_demux->p_module =
-            module_need( p_demux, "access_demux", psz_access, true );
-    }
+
+    if( psz_module == NULL )
+        psz_module = p_demux->psz_name;
+
+    p_demux->p_module = vlc_module_load(p_demux, "demux", psz_module,
+        !strcmp(psz_module, p_demux->psz_name), demux_Probe, p_demux);
 
     if( p_demux->p_module == NULL )
     {

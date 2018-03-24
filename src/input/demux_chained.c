@@ -53,8 +53,8 @@ struct vlc_demux_chained_t
 static void *vlc_demux_chained_Thread(void *data)
 {
     vlc_demux_chained_t *dc = data;
-    demux_t *demux = demux_NewAdvanced(dc->fifo, NULL, "", dc->name, "",
-                                       dc->fifo, dc->out, false);
+    demux_t *demux = demux_NewAdvanced(VLC_OBJECT(dc->fifo), NULL, "",
+                                       dc->name, "", dc->fifo, dc->out, false);
     if (demux == NULL)
     {
         vlc_stream_Delete(dc->fifo);

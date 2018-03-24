@@ -34,7 +34,6 @@
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_access, const char *psz_demux,
                             const char *psz_path, stream_t *s, es_out_t *out, bool );
-#define demux_NewAdvanced( a, b, c, d, e, f, g, h ) demux_NewAdvanced(VLC_OBJECT(a),b,c,d,e,f,g,h)
 
 unsigned demux_TestAndClearFlags( demux_t *, unsigned );
 int demux_GetTitle( demux_t * );
