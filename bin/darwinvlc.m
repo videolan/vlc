@@ -288,8 +288,10 @@ int main(int i_argc, const char *ppsz_argv[])
 
     libvlc_add_intf(vlc, "hotkeys,none");
 
-    if (libvlc_add_intf(vlc, NULL))
+    if (libvlc_add_intf(vlc, NULL)) {
+        fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
         goto out;
+    }
     libvlc_playlist_play(vlc, -1, 0, NULL);
 
     /*
