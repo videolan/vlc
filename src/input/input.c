@@ -2408,12 +2408,13 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
                                const char *psz_path, const char *psz_anchor )
 {
     input_thread_private_t *priv = input_priv(p_input );
+    vlc_object_t *obj = VLC_OBJECT(p_source);
     demux_t *p_demux = NULL;
 
     /* first, try to create an access demux */
-    p_demux = demux_NewAdvanced( VLC_OBJECT( p_source ), p_input,
-                                 psz_access, psz_access, psz_path,
-                                 NULL, priv->p_es_out, priv->b_preparsing );
+    p_demux = demux_NewAdvanced( obj, p_input, psz_access, psz_access,
+                                 psz_path, NULL, priv->p_es_out,
+                                 priv->b_preparsing );
     if( p_demux )
     {
         MRLSections( psz_anchor,
@@ -2429,44 +2430,38 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     if( asprintf( &psz_base_mrl, "%s://%s", psz_access, psz_path ) < 0 )
         return NULL;
 
-    char *psz_filters = var_InheritString( p_source, "stream-filter" );
-    stream_t* p_stream = stream_AccessNew( VLC_OBJECT( p_source ), p_input,
-                                           priv->b_preparsing,
+    stream_t *p_stream = stream_AccessNew( obj, p_input, priv->b_preparsing,
                                            psz_base_mrl );
-    FREENULL( psz_base_mrl );
+    free( psz_base_mrl );
 
     if( p_stream == NULL )
-        goto error;
+        return NULL;
 
     /* attach explicit stream filters to stream */
+    char *psz_filters = var_InheritString( obj, "stream-filter" );
     if( psz_filters )
+    {
         p_stream = stream_FilterChainNew( p_stream, psz_filters );
-
-    FREENULL( psz_filters );
+        free( psz_filters );
+    }
 
     /* handle anchors */
     if( InputStreamHandleAnchor( p_source, &p_stream, psz_anchor ) )
         goto error;
 
     /* attach conditional record stream-filter */
-    if( var_InheritBool( p_source, "input-record-native" ) )
+    if( var_InheritBool( obj, "input-record-native" ) )
         p_stream = stream_FilterChainNew( p_stream, "record" );
 
     /* create a regular demux with the access stream created */
-    p_demux = demux_NewAdvanced( VLC_OBJECT( p_source ), p_input,
-                                 psz_access, psz_demux, psz_path,
+    p_demux = demux_NewAdvanced( obj, p_input, psz_access, psz_demux, psz_path,
                                  p_stream, priv->p_es_out,
                                  priv->b_preparsing );
     if( p_demux )
         return p_demux;
 
 error:
-    free( psz_base_mrl );
-    free( psz_filters );
-
-    if( p_stream )
-        vlc_stream_Delete( p_stream );
-
+    vlc_stream_Delete( p_stream );
     return NULL;
 }
 
