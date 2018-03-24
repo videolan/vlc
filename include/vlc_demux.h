@@ -276,7 +276,6 @@ enum demux_query_e
  * Main Demux
  *************************************************************************/
 
-/* stream_t *s could be null and then it mean a access+demux in one */
 VLC_API demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                             const char *psz_path, stream_t *s, es_out_t *out );
 

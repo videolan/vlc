@@ -138,16 +138,11 @@ static const char* DemuxNameFromExtension( char const* ext,
     return result ? result->name : NULL;
 }
 
-/*****************************************************************************
- * demux_New:
- *  if s is NULL then load a access_demux
- *****************************************************************************/
 demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                     const char *psz_location, stream_t *s, es_out_t *out )
 {
-    return demux_NewAdvanced( p_obj, NULL,
-                              (s == NULL) ? psz_name : "",
-                              (s != NULL) ? psz_name : "",
+    assert(s != NULL );
+    return demux_NewAdvanced( p_obj, NULL, "", psz_name,
                               psz_location, s, out, false );
 }
 
