@@ -1,7 +1,7 @@
 # x264
 
 X264_GITURL := git://git.videolan.org/x264.git
-X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20171224-2245-stable.tar.bz2
+X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180324-2245.tar.bz2
 X262_GITURL := git://git.videolan.org/x262.git
 
 ifdef BUILD_ENCODERS
@@ -10,11 +10,11 @@ PKGS += x264
 endif
 endif
 
-ifeq ($(call need_pkg,"x264 >= 0.86"),)
+ifeq ($(call need_pkg,"x264 >= 0.148"),)
 PKGS_FOUND += x264
 endif
 
-ifeq ($(call need_pkg,"x26410b"),)
+ifeq ($(call need_pkg,"x264 >= 0.153"),)
 PKGS_FOUND += x26410b
 endif
 
@@ -93,14 +93,7 @@ x262: x262-git.tar.gz .sum-x262
 	cd $< && $(MAKE) install
 	touch $@
 
-.x26410b: x26410b
-	$(REQUIRE_GPL)
-	cd $< && $(HOSTVARS) ./configure $(X264CONF) --bit-depth=10
-	cd $< && sed -i -e 's/libx264/libx26410b/g' Makefile config.mak
-	cd $< && sed -i -e 's/x264/x26410b/g' x264.pc
-	cd $< && mv x264.pc x26410b.pc
-	cd $< && sed -i -e 's/x264.pc/x26410b.pc/g' Makefile
-	cd $< && $(MAKE) install
+.x26410b: .x264
 	touch $@
 
 .x262: x262
