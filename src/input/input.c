@@ -2430,12 +2430,21 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     if( asprintf( &psz_base_mrl, "%s://%s", psz_access, psz_path ) < 0 )
         return NULL;
 
-    stream_t *p_stream = stream_AccessNew( obj, p_input, NULL,
+    stream_t *p_stream = stream_AccessNew( obj, p_input, priv->p_es_out,
                                            priv->b_preparsing, psz_base_mrl );
     free( psz_base_mrl );
 
     if( p_stream == NULL )
         return NULL;
+
+    if( p_stream->pf_read == NULL && p_stream->pf_block == NULL
+     && p_stream->pf_readdir == NULL )
+    {   /* Combined access/demux, no stream filtering */
+         MRLSections( psz_anchor,
+                    &p_source->i_title_start, &p_source->i_title_end,
+                    &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
+         return p_stream;
+    }
 
     /* attach explicit stream filters to stream */
     char *psz_filters = var_InheritString( obj, "stream-filter" );
