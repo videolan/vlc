@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_interrupt.h>
+#include <vlc_block_helper.h>
 
 /* TODO:
  *  - tune the 2 methods (block/stream)
@@ -66,51 +67,29 @@
 
 struct stream_sys_t
 {
-    uint64_t     i_pos;      /* Current reading offset */
+    block_bytestream_t cache; /* bytestream chain for storing cache */
 
-    uint64_t     i_start;        /* Offset of block for p_first */
-    uint64_t     i_offset;       /* Offset for data in p_current */
-    block_t     *p_current;     /* Current block */
-
-    uint64_t     i_size;         /* Total amount of data in the list */
-    block_t     *p_first;
-    block_t    **pp_last;
-
-    struct
-    {
-        /* Stat about reading data */
-        uint64_t i_read_count;
-        uint64_t i_bytes;
-        uint64_t i_read_time;
-    } stat;
 };
 
 static int AStreamRefillBlock(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
+    size_t cache_size = sys->cache.i_total;
 
     /* Release data */
-    while (sys->i_size >= STREAM_CACHE_SIZE &&
-           sys->p_first != sys->p_current)
+    if (cache_size >= STREAM_CACHE_SIZE)
     {
-        block_t *b = sys->p_first;
-
-        sys->i_start += b->i_buffer;
-        sys->i_size  -= b->i_buffer;
-        sys->p_first  = b->p_next;
-
-        block_Release(b);
+        block_BytestreamFlush( &sys->cache );
+        cache_size = sys->cache.i_total;
     }
-    if (sys->i_size >= STREAM_CACHE_SIZE &&
-        sys->p_current == sys->p_first &&
-        sys->p_current->p_next)    /* At least 2 packets */
+    if (cache_size >= STREAM_CACHE_SIZE &&
+        sys->cache.p_chain != *sys->cache.pp_last)
     {
         /* Enough data, don't read more */
         return VLC_SUCCESS;
     }
 
     /* Now read a new block */
-    const mtime_t start = mdate();
     block_t *b;
 
     for (;;)
@@ -125,24 +104,7 @@ static int AStreamRefillBlock(stream_t *s)
             return VLC_EGENERIC;
     }
 
-    sys->stat.i_read_time += mdate() - start;
-    while (b)
-    {
-        /* Append the block */
-        sys->i_size += b->i_buffer;
-        *sys->pp_last = b;
-        sys->pp_last = &b->p_next;
-
-        /* Fix p_current */
-        if (sys->p_current == NULL)
-            sys->p_current = b;
-
-        /* Update stat */
-        sys->stat.i_bytes += b->i_buffer;
-        sys->stat.i_read_count++;
-
-        b = b->p_next;
-    }
+    block_BytestreamPush( &sys->cache, b );
     return VLC_SUCCESS;
 }
 
@@ -156,22 +118,13 @@ static void AStreamPrebufferBlock(stream_t *s)
     for (;;)
     {
         const int64_t now = mdate();
+        size_t cache_size = block_BytestreamRemaining( &sys->cache );
 
-        if (vlc_killed() || sys->i_size > STREAM_CACHE_PREBUFFER_SIZE)
+        if (vlc_killed() || cache_size > STREAM_CACHE_PREBUFFER_SIZE)
         {
-            int64_t i_byterate;
 
-            /* Update stat */
-            sys->stat.i_bytes = sys->i_size;
-            sys->stat.i_read_time = now - start;
-            i_byterate = (CLOCK_FREQ * sys->stat.i_bytes) /
-                         (sys->stat.i_read_time + 1);
-
-            msg_Dbg(s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
-                     "%"PRId64" KiB/s",
-                     sys->stat.i_bytes,
-                     sys->stat.i_read_time / CLOCK_FREQ,
-                     i_byterate / 1024);
+            msg_Dbg(s, "prebuffering done %"PRId64" bytes in",
+                     cache_size);
             break;
         }
 
@@ -184,16 +137,7 @@ static void AStreamPrebufferBlock(stream_t *s)
             continue;
         }
 
-        while (b)
-        {
-            /* Append the block */
-            sys->i_size += b->i_buffer;
-            *sys->pp_last = b;
-            sys->pp_last = &b->p_next;
-
-            sys->stat.i_read_count++;
-            b = b->p_next;
-        }
+        block_BytestreamPush( &sys->cache, b);
 
         if (first)
         {
@@ -202,8 +146,6 @@ static void AStreamPrebufferBlock(stream_t *s)
             first = false;
         }
     }
-
-    sys->p_current = sys->p_first;
 }
 
 /****************************************************************************
@@ -213,17 +155,7 @@ static void AStreamControlReset(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
 
-    sys->i_pos = 0;
-
-    block_ChainRelease(sys->p_first);
-
-    /* Init all fields of sys->block */
-    sys->i_start = 0;
-    sys->i_offset = 0;
-    sys->p_current = NULL;
-    sys->i_size = 0;
-    sys->p_first = NULL;
-    sys->pp_last = &sys->p_first;
+    block_BytestreamEmpty( &sys->cache );
 
     /* Do the prebuffering */
     AStreamPrebufferBlock(s);
@@ -232,124 +164,21 @@ static void AStreamControlReset(stream_t *s)
 static int AStreamSeekBlock(stream_t *s, uint64_t i_pos)
 {
     stream_sys_t *sys = s->p_sys;
-    int64_t    i_offset = i_pos - sys->i_start;
-    bool b_seek;
 
-    /* We already have thoses data, just update p_current/i_offset */
-    if (i_offset >= 0 && (uint64_t)i_offset < sys->i_size)
-    {
-        block_t *b = sys->p_first;
-        int i_current = 0;
-
-        while (i_current + b->i_buffer < (uint64_t)i_offset)
-        {
-            i_current += b->i_buffer;
-            b = b->p_next;
-        }
-
-        sys->p_current = b;
-        sys->i_offset = i_offset - i_current;
-
-        sys->i_pos = i_pos;
-
+    if( block_SkipBytes( &sys->cache, i_pos) == VLC_SUCCESS )
         return VLC_SUCCESS;
-    }
 
-    /* We may need to seek or to read data */
-    if (i_offset < 0)
-    {
-        bool b_aseek;
-        vlc_stream_Control(s->s, STREAM_CAN_SEEK, &b_aseek);
+    /* Not enought bytes, empty and seek */
+    /* Do the access seek */
+    if (vlc_stream_Seek(s->s, i_pos)) return VLC_EGENERIC;
 
-        if (!b_aseek)
-        {
-            msg_Err(s, "backward seeking impossible (access not seekable)");
-            return VLC_EGENERIC;
-        }
+    block_BytestreamEmpty( &sys->cache );
 
-        b_seek = true;
-    }
-    else
-    {
-        bool b_aseek, b_aseekfast;
+    /* Refill a block */
+    if (AStreamRefillBlock(s))
+        return VLC_EGENERIC;
 
-        vlc_stream_Control(s->s, STREAM_CAN_SEEK, &b_aseek);
-        vlc_stream_Control(s->s, STREAM_CAN_FASTSEEK, &b_aseekfast);
-
-        if (!b_aseek)
-        {
-            b_seek = false;
-            msg_Warn(s, "%"PRId64" bytes need to be skipped "
-                      "(access non seekable)", i_offset - sys->i_size);
-        }
-        else
-        {
-            int64_t i_skip = i_offset - sys->i_size;
-
-            /* Avg bytes per packets */
-            int i_avg = sys->stat.i_bytes / sys->stat.i_read_count;
-            /* TODO compute a seek cost instead of fixed threshold */
-            int i_th = b_aseekfast ? 1 : 5;
-
-            if (i_skip <= i_th * i_avg &&
-                i_skip < STREAM_CACHE_SIZE)
-                b_seek = false;
-            else
-                b_seek = true;
-
-            msg_Dbg(s, "b_seek=%d th*avg=%d skip=%"PRId64,
-                     b_seek, i_th*i_avg, i_skip);
-        }
-    }
-
-    if (b_seek)
-    {
-        /* Do the access seek */
-        if (vlc_stream_Seek(s->s, i_pos)) return VLC_EGENERIC;
-
-        /* Release data */
-        block_ChainRelease(sys->p_first);
-
-        /* Reinit */
-        sys->i_start = sys->i_pos = i_pos;
-        sys->i_offset = 0;
-        sys->p_current = NULL;
-        sys->i_size = 0;
-        sys->p_first = NULL;
-        sys->pp_last = &sys->p_first;
-
-        /* Refill a block */
-        if (AStreamRefillBlock(s))
-            return VLC_EGENERIC;
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        do
-        {
-            while (sys->p_current &&
-                   sys->i_pos + sys->p_current->i_buffer - sys->i_offset <= i_pos)
-            {
-                sys->i_pos += sys->p_current->i_buffer - sys->i_offset;
-                sys->p_current = sys->p_current->p_next;
-                sys->i_offset = 0;
-            }
-            if (!sys->p_current && AStreamRefillBlock(s))
-            {
-                if (sys->i_pos != i_pos)
-                    return VLC_EGENERIC;
-            }
-        }
-        while (sys->i_start + sys->i_size < i_pos);
-
-        sys->i_offset += i_pos - sys->i_pos;
-        sys->i_pos = i_pos;
-
-        return VLC_SUCCESS;
-    }
-
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
@@ -357,25 +186,15 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
     stream_sys_t *sys = s->p_sys;
 
     /* It means EOF */
-    if (sys->p_current == NULL)
+    if (sys->cache.p_chain== NULL)
         return 0;
 
-    ssize_t i_current = sys->p_current->i_buffer - sys->i_offset;
+    ssize_t i_current = block_BytestreamRemaining( &sys->cache );
     size_t i_copy = VLC_CLIP((size_t)i_current, 0, len);
 
     /* Copy data */
-    memcpy(buf, &sys->p_current->p_buffer[sys->i_offset], i_copy);
-
-    sys->i_offset += i_copy;
-    if (sys->i_offset >= sys->p_current->i_buffer)
-    {   /* Current block is now empty, switch to next */
-        sys->i_offset = 0;
-        sys->p_current = sys->p_current->p_next;
-
-        /* Get a new block if needed */
-        if (sys->p_current == NULL)
-            AStreamRefillBlock(s);
-    }
+    if( block_GetBytes( &sys->cache, buf, i_copy ) )
+        return -1;
 
     /**
      * we should not signal end-of-file if we have not exhausted
@@ -384,10 +203,9 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
      * not contain data at the offset that we want, not EOF.
      **/
 
-    if( i_copy == 0 && sys->p_current )
+    if( i_copy == 0 && sys->cache.p_chain )
         return AStreamReadBlock( s, buf, len );
 
-    sys->i_pos += i_copy;
     return i_copy;
 }
 
@@ -443,29 +261,16 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    /* Common field */
-    sys->i_pos = 0;
-
-    /* Stats */
-    sys->stat.i_bytes = 0;
-    sys->stat.i_read_time = 0;
-    sys->stat.i_read_count = 0;
-
     msg_Dbg(s, "Using block method for AStream*");
 
     /* Init all fields of sys->block */
-    sys->i_start = sys->i_pos;
-    sys->i_offset = 0;
-    sys->p_current = NULL;
-    sys->i_size = 0;
-    sys->p_first = NULL;
-    sys->pp_last = &sys->p_first;
+    block_BytestreamInit( &sys->cache );
 
     s->p_sys = sys;
     /* Do the prebuffering */
     AStreamPrebufferBlock(s);
 
-    if (sys->i_size <= 0)
+    if (block_BytestreamRemaining( &sys->cache ) <= 0)
     {
         msg_Err(s, "cannot pre fill buffer");
         free(sys);
@@ -486,7 +291,7 @@ static void Close(vlc_object_t *obj)
     stream_t *s = (stream_t *)obj;
     stream_sys_t *sys = s->p_sys;
 
-    block_ChainRelease(sys->p_first);
+    block_BytestreamEmpty( &sys->cache );
     free(sys);
 }
 
