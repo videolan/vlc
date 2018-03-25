@@ -212,20 +212,11 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static int DemuxOpen(vlc_object_t *obj)
+static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
 {
     demux_t *demux = (demux_t *)obj;
-    unsigned track;
 
     if (demux->out == NULL)
-        return VLC_EGENERIC;
-
-    vcddev_t *dev = DiscOpen(obj, demux->psz_location, demux->psz_filepath,
-                             &track);
-    if (dev == NULL)
-        return VLC_EGENERIC;
-
-    if (track == 0 /* Whole disc -> use access plugin */)
         goto error;
 
     demux_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
@@ -273,14 +264,6 @@ static int DemuxOpen(vlc_object_t *obj)
 error:
     ioctl_Close(obj, dev);
     return VLC_EGENERIC;
-}
-
-static void DemuxClose(vlc_object_t *obj)
-{
-    demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = demux->p_sys;
-
-    ioctl_Close(obj, sys->vcddev);
 }
 
 /*****************************************************************************
@@ -606,22 +589,10 @@ static int AccessControl(stream_t *access, int query, va_list args)
     return access_vaDirectoryControlHelper(access, query, args);
 }
 
-static int AccessOpen(vlc_object_t *obj)
+static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
 {
     stream_t *access = (stream_t *)obj;
-    unsigned track;
-
-    vcddev_t *dev = DiscOpen(obj, access->psz_location, access->psz_filepath,
-                             &track);
-    if (dev == NULL)
-        return VLC_EGENERIC;
-
-    if (track != 0 /* Only whole discs here */)
-    {
-        ioctl_Close(obj, dev);
-        return VLC_EGENERIC;
-    }
-
+    /* Only whole discs here */
     access_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
@@ -676,11 +647,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void AccessClose(vlc_object_t *obj)
+static void AccessClose(access_sys_t *sys)
 {
-    stream_t *access = (stream_t *)obj;
-    access_sys_t *sys = access->p_sys;
-
     for (int i = 0; i < sys->cdtextc; i++)
     {
         vlc_meta_t *meta = sys->cdtextv[i];
@@ -695,7 +663,35 @@ static void AccessClose(vlc_object_t *obj)
 #endif
 
     free(sys->p_sectors);
-    ioctl_Close(obj, sys->vcddev);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    stream_t *stream = (stream_t *)obj;
+    unsigned track;
+
+    vcddev_t *dev = DiscOpen(obj, stream->psz_location, stream->psz_filepath,
+                             &track);
+    if (dev == NULL)
+        return VLC_EGENERIC;
+
+    if (track == 0)
+        return AccessOpen(obj, dev);
+    else
+        return DemuxOpen(obj, dev, track);
+}
+
+static void Close(vlc_object_t *obj)
+{
+    stream_t *stream = (stream_t *)obj;
+    void *sys = stream->p_sys;
+
+    if (stream->pf_readdir != NULL)
+        AccessClose(sys);
+
+    static_assert(offsetof(demux_sys_t, vcddev) == 0, "Invalid cast");
+    static_assert(offsetof(access_sys_t, vcddev) == 0, "Invalid cast");
+    ioctl_Close(obj, *(vcddev_t **)sys);
 }
 
 /*****************************************************************************
@@ -725,7 +721,7 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    set_callbacks(AccessOpen, AccessClose)
+    set_callbacks(Open, Close)
 
     add_loadfile( "cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT,
                   CDAUDIO_DEV_LONGTEXT, false )
@@ -747,8 +743,4 @@ vlc_module_begin ()
 #endif
 
     add_shortcut( "cdda", "cddasimple" )
-
-    add_submodule()
-    set_capability( "access_demux", 1 )
-    set_callbacks(DemuxOpen, DemuxClose)
 vlc_module_end ()
