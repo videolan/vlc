@@ -16,6 +16,7 @@ Codecs:
  * Support for experimental AV1 video encoding
  * WebVTT encoder
  * Remove iomx support for Android
+ * WebP image decoding
 
 Video output:
  * Remove aa plugin
