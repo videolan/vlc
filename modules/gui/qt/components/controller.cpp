@@ -1046,7 +1046,11 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
 
-            if( b_fs && isHidden() )
+            if( b_fs && ( isHidden()
+#if HAVE_TRANSPARENCY
+                 || p_slowHideTimer->isActive()
+#endif
+                    ) )
                 showFSC();
 
             break;
