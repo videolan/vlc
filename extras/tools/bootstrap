@@ -24,6 +24,26 @@ then
 	exit 1
 fi
 
+check_version() {
+    gotver=$2
+    gotmajor=`echo $gotver|cut -d. -f1`
+    gotminor=`echo $gotver|cut -d. -f2`
+    gotmicro=`echo $gotver|cut -d. -f3`
+    [ -z "$gotmicro" ] && gotmicro=0
+    needmajor=`echo $3|cut -d. -f1`
+    needminor=`echo $3|cut -d. -f2`
+    needmicro=`echo $3|cut -d. -f3`
+    [ -z "$needmicro" ] && needmicro=0
+    if [ "$needmajor" -ne "$gotmajor" \
+         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" \
+         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
+    then
+        echo "$1 too old"
+        NEEDED="$NEEDED .$1"
+    fi
+
+}
+
 check_tar() {
 if ! tar PcJ /dev/null >/dev/null 2>&1
 then
@@ -52,21 +72,7 @@ else
     # found, need to check version ?
     [ -z "$2" ] && return # no
     gotver=`$1 --version | head -1 | sed s/'.* '//`
-    gotmajor=`echo $gotver|cut -d. -f1`
-    gotminor=`echo $gotver|cut -d. -f2`
-    gotmicro=`echo $gotver|cut -d. -f3`
-    [ -z "$gotmicro" ] && gotmicro=0
-    needmajor=`echo $2|cut -d. -f1`
-    needminor=`echo $2|cut -d. -f2`
-    needmicro=`echo $2|cut -d. -f3`
-    [ -z "$needmicro" ] && needmicro=0
-    if [ "$needmajor" -ne "$gotmajor" \
-         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" \
-         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
-    then
-        echo "$1 too old"
-        NEEDED="$NEEDED .$1"
-    fi
+    check_version $1 $gotver $2
 fi
 }
 
