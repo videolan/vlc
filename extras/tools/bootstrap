@@ -63,6 +63,19 @@ then
 fi
 }
 
+check_nasm() {
+if ! nasm -v >/dev/null 2>&1
+then
+    echo "nasm not found"
+    NEEDED="$NEEDED .nasm"
+else
+    # found, need to check version ?
+    [ -z "$1" ] && return # no
+    gotver=`nasm -v | cut -d ' ' -f 3`
+    check_version nasm $gotver $1
+fi
+}
+
 check() {
 if ! $1 --version >/dev/null 2>&1 && ! $1 -version >/dev/null 2>&1
 then
@@ -91,7 +104,7 @@ check ant
 check xz
 check bison 3.0.0
 check flex
-check nasm 2.13.01
+check_nasm 2.13.01
 check meson 0.48.1
 check ninja
 
