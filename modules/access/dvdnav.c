@@ -115,6 +115,8 @@ vlc_module_end ()
 #define DVD_READ_CACHE 1
 #endif
 
+#define BLOCK_FLAG_CELL_DISCONTINUITY (BLOCK_FLAG_PRIVATE_SHIFT << 1)
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1016,6 +1018,9 @@ static int Demux( demux_t *p_demux )
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
 
+        for( int i=0; i<PS_TK_COUNT; i++ )
+            p_sys->tk[i].i_next_block_flags |= BLOCK_FLAG_CELL_DISCONTINUITY;
+
         /* FIXME is it correct or there is better way to know chapter change */
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
                                        &i_part ) == DVDNAV_STATUS_OK )
@@ -1407,13 +1412,27 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                 {
                     ESNew( p_demux, i_id );
                 }
+
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
+                    int i_next_block_flags = tk->i_next_block_flags;
+                    tk->i_next_block_flags = 0;
+                    if( i_next_block_flags & BLOCK_FLAG_CELL_DISCONTINUITY )
+                    {
+                        if( p_pkt->i_dts >= VLC_TS_INVALID )
+                        {
+                            i_next_block_flags &= ~BLOCK_FLAG_CELL_DISCONTINUITY;
+                            i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+                        }
+                        else tk->i_next_block_flags = BLOCK_FLAG_CELL_DISCONTINUITY;
+                    }
+                    p_pkt->i_flags |= i_next_block_flags;
                     es_out_Send( p_demux->out, tk->es, p_pkt );
                 }
                 else
                 {
+                    tk->i_next_block_flags = 0;
                     block_Release( p_pkt );
                 }
             }
