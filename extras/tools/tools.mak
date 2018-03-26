@@ -62,6 +62,21 @@ CLEAN_FILE += .yasm
 CLEAN_PKG += yasm
 DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.gz
 
+nasm-$(NASM_VERSION).tar.gz:
+	$(call download_pkg,$(NASM_URL),nasm)
+
+nasm: nasm-$(NASM_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.nasm: nasm
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_FILE += .nasm
+CLEAN_PKG += nasm
+DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.gz
+
 # cmake
 
 cmake-$(CMAKE_VERSION).tar.gz:
