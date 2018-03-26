@@ -229,12 +229,6 @@ signals:
     void advancedControlsToggled( bool );
 };
 
-
-/* to trying transparency with fullscreen controller on windows enable that */
-/* it can be enabled on-non windows systems,
-   but it will be transparent only with composite manager */
-#define HAVE_TRANSPARENCY 1
-
 /* Default value of opacity for FS controller */
 #define DEFAULT_OPACITY 0.70
 
@@ -292,12 +286,10 @@ private slots:
 
 private:
     QTimer *p_hideTimer;
-#if HAVE_TRANSPARENCY
     QTimer *p_slowHideTimer;
     bool b_slow_hide_begin;
     int  i_slow_hide_timeout;
     float f_opacity;
-#endif
 
     int i_mouse_last_x, i_mouse_last_y;
     bool b_mouse_over;

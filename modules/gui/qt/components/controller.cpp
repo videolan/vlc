@@ -793,10 +793,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     b_mouse_over        = false;
     i_mouse_last_move_x = -1;
     i_mouse_last_move_y = -1;
-#if HAVE_TRANSPARENCY
     b_slow_hide_begin   = false;
     i_slow_hide_timeout = 1;
-#endif
     b_fullscreen        = false;
     i_hide_timeout      = 1;
     i_screennumber      = -1;
@@ -833,11 +831,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     CONNECT( p_hideTimer, timeout(), this, hideFSC() );
 
     /* slow hiding timer */
-#if HAVE_TRANSPARENCY
     p_slowHideTimer = new QTimer( this );
     CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
     f_opacity = var_InheritFloat( p_intf, "qt-fs-opacity" );
-#endif
 
     i_sensitivity = var_InheritInteger( p_intf, "qt-fs-sensitivity" );
 
@@ -926,9 +922,7 @@ void FullscreenControllerWidget::showFSC()
 {
     restoreFSC();
 
-#if HAVE_TRANSPARENCY
     setWindowOpacity( f_opacity );
-#endif
 
     show();
 }
@@ -944,11 +938,9 @@ void FullscreenControllerWidget::planHideFSC()
 
     p_hideTimer->start( i_timeout );
 
-#if HAVE_TRANSPARENCY
     b_slow_hide_begin = true;
     i_slow_hide_timeout = i_timeout;
     p_slowHideTimer->start( i_slow_hide_timeout / 2 );
-#endif
 }
 
 /**
@@ -958,7 +950,6 @@ void FullscreenControllerWidget::planHideFSC()
  */
 void FullscreenControllerWidget::slowHideFSC()
 {
-#if HAVE_TRANSPARENCY
     if( b_slow_hide_begin )
     {
         b_slow_hide_begin = false;
@@ -980,7 +971,6 @@ void FullscreenControllerWidget::slowHideFSC()
          if ( windowOpacity() <= 0.0 )
              p_slowHideTimer->stop();
     }
-#endif
 }
 
 void FullscreenControllerWidget::updateFullwidthGeometry( int number )
@@ -1046,11 +1036,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
 
-            if( b_fs && ( isHidden()
-#if HAVE_TRANSPARENCY
-                 || p_slowHideTimer->isActive()
-#endif
-                    ) )
+            if( b_fs && ( isHidden() || p_slowHideTimer->isActive() ) )
                 showFSC();
 
             break;
@@ -1120,10 +1106,8 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
     b_mouse_over = true;
 
     p_hideTimer->stop();
-#if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
     setWindowOpacity( f_opacity );
-#endif
     event->accept();
 }
 
