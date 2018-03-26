@@ -107,6 +107,8 @@ _json_value *getJSONValues(object_loader_t *p_loader, const char *psz_path)
 {
     char *psz_url = vlc_path2uri(psz_path, NULL);
     stream_t *p_stream = vlc_stream_NewURL(p_loader, psz_url);
+    if (p_stream == NULL)
+        return NULL;
 
     char psz_buffer[10 * 1024] = {0};
     unsigned i_ret = 0;
