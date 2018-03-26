@@ -353,6 +353,14 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         aiColor3D diffuseColor;
         myAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
 
+        aiString matName;
+        myAiMaterial->Get(AI_MATKEY_NAME, matName);
+        msg_Dbg(p_loader, "Material: %s", matName.C_Str());
+
+        unsigned i_nbProperties = myAiMaterial->mNumProperties;
+        for (unsigned k = 0; k < i_nbProperties; ++k)
+            msg_Dbg(p_loader, "Property name: %s", myAiMaterial->mProperties[k]->mKey.C_Str());
+
         unsigned i_nbTextures = myAiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
         if (i_nbTextures > 0)
         {
@@ -360,6 +368,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
             {
                 aiString path;
                 myAiMaterial->GetTexture(aiTextureType_DIFFUSE, j, &path, NULL, NULL, NULL, NULL, NULL);
+
                 char psz_path[1024];
                 #define TEXTURE_DIR "VirtualTheater" DIR_SEP "Textures" DIR_SEP
                 strcpy(psz_path, TEXTURE_DIR);
