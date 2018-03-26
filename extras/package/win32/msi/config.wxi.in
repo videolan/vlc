@@ -3,9 +3,9 @@
     <?define ShortProductName = "VLC" ?>
     <?define ProductName = "VLC media player" ?>
     <?define Manufacturer = "VideoLAN" ?>
-    <?define AboutURL = "http://www.videolan.org/vlc/" ?>
-    <?define SupportURL = "http://www.videolan.org/support/" ?>
-    <?define UpdatesURL = "http://www.videolan.org/vlc/" ?>
+    <?define AboutURL = "https://www.videolan.org/vlc/" ?>
+    <?define SupportURL = "https://www.videolan.org/support/" ?>
+    <?define UpdatesURL = "https://www.videolan.org/vlc/" ?>
 
     <?define VerMajor = "@VERSION_MAJOR@" ?>
     <?define VerMinor = "@VERSION_MINOR@" ?>

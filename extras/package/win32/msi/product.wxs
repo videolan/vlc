@@ -267,8 +267,8 @@
                 <Shortcut Id="SkinShortcut" Name="$(var.ProductName) skinned" Target="[APPLICATIONFOLDER]vlc.exe" Arguments="-Iskins" />
                 <Shortcut Id="VLCCleanShortcut" Name="Reset $(var.ProductName) preferences and cache files" Target="[APPLICATIONFOLDER]vlc.exe" Arguments="--reset-config --reset-plugins-cache vlc://quit" />
                 <Shortcut Id="NEWSShortcut" Name="Release Notes" Target="[APPLICATIONFOLDER]NEWS.txt" />
-                <util:InternetShortcut Id="WebsiteShortcut" Name="VideoLAN website" Target="http://www.videolan.org/"/>
-                <util:InternetShortcut Id="DocumentationShortcut" Name="Documentation" Target="http://www.videolan.org/doc/"/>
+                <util:InternetShortcut Id="WebsiteShortcut" Name="VideoLAN website" Target="https://www.videolan.org/"/>
+                <util:InternetShortcut Id="DocumentationShortcut" Name="Documentation" Target="https://www.videolan.org/doc/"/>
                 <!-- RegistryValue which serves as KeyPath -->
                 <RegistryValue Root="HKCU"
                                Key="Software\VideoLAN\VLC"
