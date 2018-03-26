@@ -2047,10 +2047,10 @@ static int SetupCoords(vout_display_opengl_t *vgl,
         if (vgl->b_sideBySide)
         {
             float screenSize = 2.f;
-            float screenPosition[3] = {0.f, 0.f, 0.f};
-            float screenNormalDir[3] = {0.f, 0.f, 0.f};
-            float screenFitDir[3] = {0.f, 0.f, 0.f};
-            if (vgl->p_objDisplay->p_scene)
+            float screenPosition[3] = {-2.f, 0.f, 0.f};
+            float screenNormalDir[3] = {1.f, 0.f, 0.f};
+            float screenFitDir[3] = {0.f, 1.f, 0.f};
+            if (vgl->p_objDisplay)
             {
                 memcpy(screenPosition, vgl->p_objDisplay->p_scene->screenPosition, sizeof(screenPosition));
                 memcpy(screenNormalDir, vgl->p_objDisplay->p_scene->screenNormalDir, sizeof(screenNormalDir));
@@ -2527,7 +2527,8 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
     }
 
     if (vgl->b_sideBySide
-        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR)
+        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR
+        && vgl->p_objDisplay)
         memcpy(vgl->prgm->var.HeadPositionMatrix, vgl->p_objDisplay->p_scene->headPositionMatrix,
                sizeof(vgl->p_objDisplay->p_scene->headPositionMatrix));
 
@@ -2538,7 +2539,8 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
         DrawHMDController(vgl, eye);
 
     if (vgl->b_sideBySide
-        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR)
+        && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR
+        && vgl->p_objDisplay)
         DrawSceneObjects(vgl, vgl->scene_prgm, eye);
 
     /* Draw the subpictures */
