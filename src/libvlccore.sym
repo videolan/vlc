@@ -975,6 +975,8 @@ scene_mesh_Release
 scene_material_New
 scene_material_LoadTexture
 scene_material_Release
+scene_light_New
+scene_light_Release
 scene_CalcTransformationMatrix
 scene_CalcHeadPositionMatrix
 scene_New

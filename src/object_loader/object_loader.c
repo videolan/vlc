@@ -164,6 +164,22 @@ void scene_material_Release(scene_material_t *p_material)
 }
 
 
+scene_light_t *scene_light_New(void)
+{
+    scene_light_t *p_light = (scene_light_t *)calloc(1, sizeof(scene_light_t));
+    if (unlikely(p_light == NULL))
+        return NULL;
+
+    return p_light;
+}
+
+
+void scene_light_Release(scene_light_t *p_light)
+{
+    free(p_light);
+}
+
+
 static void matrixMul(float ret[], const float m1[], const float m2[])
 {
     for (unsigned i = 0; i < 4; i++)
@@ -275,7 +291,8 @@ void scene_CalcHeadPositionMatrix(scene_t *p_scene, float *p)
 }
 
 
-scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nMaterials)
+scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nMaterials,
+                   unsigned nLights)
 {
     scene_t *p_scene = (scene_t *)malloc(sizeof(scene_t));
     if (unlikely(p_scene == NULL))
@@ -306,9 +323,20 @@ scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nMaterials)
         return NULL;
     }
 
+    p_scene->lights = (scene_light_t **)malloc(nLights * sizeof(scene_light_t *));
+    if (unlikely(p_scene->lights == NULL))
+    {
+        free(p_scene->materials);
+        free(p_scene->meshes);
+        free(p_scene->objects);
+        free(p_scene);
+        return NULL;
+    }
+
     p_scene->nObjects = nObjects;
     p_scene->nMeshes = nMeshes;
     p_scene->nMaterials = nMaterials;
+    p_scene->nLights = nLights;
 
     return p_scene;
 }
@@ -321,12 +349,19 @@ void scene_Release(scene_t *p_scene)
 
     for (unsigned i = 0; i < p_scene->nObjects; ++i)
         scene_object_Release(p_scene->objects[i]);
+    free(p_scene->objects);
 
     for (unsigned i = 0; i < p_scene->nMeshes; ++i)
         scene_mesh_Release(p_scene->meshes[i]);
+    free(p_scene->meshes);
 
     for (unsigned i = 0; i < p_scene->nMaterials; ++i)
         scene_material_Release(p_scene->materials[i]);
+    free(p_scene->materials);
+
+    for (unsigned i = 0; i < p_scene->nLights; ++i)
+        scene_light_Release(p_scene->lights[i]);
+    free(p_scene->lights);
 
     free(p_scene);
 }

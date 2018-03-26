@@ -45,7 +45,22 @@ typedef struct
     material_type_t material_type;
 
     float diffuse_color[3]; // RGB
+    float emissive_color[3];
+    float ambient_color[3];
 } scene_material_t;
+
+
+typedef struct
+{
+    float angleOuterCone;
+    float attenuationConstant;
+
+    float colorAmbient[3];
+    float colorDiffuse[3];
+    float colorSpecular[3];
+    float direction[3];
+    float position[3];
+} scene_light_t;
 
 
 typedef struct
@@ -53,6 +68,7 @@ typedef struct
     scene_object_t **objects;
     scene_mesh_t **meshes;
     scene_material_t **materials;
+    scene_light_t **lights;
 
     float transformMatrix[16];
     float headPositionMatrix[16];
@@ -60,6 +76,7 @@ typedef struct
     unsigned nObjects;
     unsigned nMeshes;
     unsigned nMaterials;
+    unsigned nLights;
 
     float screenSize;
     float screenPosition[3];
@@ -96,9 +113,12 @@ VLC_API scene_material_t *scene_material_New(void);
 VLC_API int scene_material_LoadTexture(object_loader_t *p_loader, scene_material_t *p_material,
                                        const char *psz_path);
 VLC_API void scene_material_Release(scene_material_t *p_material);
+VLC_API scene_light_t *scene_light_New(void);
+VLC_API void scene_light_Release(scene_light_t *p_light);
 VLC_API void scene_CalcTransformationMatrix(scene_t *p_scene, float sf, float *rotationAngles);
 VLC_API void scene_CalcHeadPositionMatrix(scene_t *p_scene, float *p);
-VLC_API scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nTextures);
+VLC_API scene_t *scene_New(unsigned nObjects, unsigned nMeshes, unsigned nTextures,
+                           unsigned nLights);
 VLC_API void scene_Release(scene_t *p_scene);
 
 
