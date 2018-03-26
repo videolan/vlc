@@ -264,6 +264,18 @@ int getModel(_json_value *root, std::string &modelPath, float &scale, float *rot
 }
 
 
+static inline void aiColor3DToArray(aiColor3D c, float *arr)
+{
+    arr[0] = c.r; arr[1] = c.g; arr[2] = c.b;
+}
+
+
+static inline void aiVector3DToArray(aiVector3D v, float *arr)
+{
+    arr[0] = v.x; arr[1] = v.y; arr[2] = v.z;
+}
+
+
 scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 {
     object_loader_sys_t *p_sys = p_loader->p_sys;
@@ -350,8 +362,10 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     {
         aiMaterial *myAiMaterial = myAiScene->mMaterials[i];
 
-        aiColor3D diffuseColor;
+        aiColor3D diffuseColor, emissiveColor, ambientColor;
         myAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+        myAiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
+        myAiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
 
         aiString matName;
         myAiMaterial->Get(AI_MATKEY_NAME, matName);
@@ -397,15 +411,13 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
                 continue;
             p_material->material_type = MATERIAL_TYPE_DIFFUSE_COLOR;
 
-            p_material->diffuse_color[0] = diffuseColor.r;
-            p_material->diffuse_color[1] = diffuseColor.g;
-            p_material->diffuse_color[2] = diffuseColor.b;
+            aiColor3DToArray(diffuseColor, p_material->diffuse_color);
+            aiColor3DToArray(emissiveColor, p_material->emissive_color);
+            aiColor3DToArray(ambientColor, p_material->ambient_color);
 
             materials.push_back(p_material);
             aiTextureMap[i] = materials.size() - 1;
         }
-
-
     }
 
     // Objects
@@ -442,13 +454,36 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         }
     }
 
-    p_scene = scene_New(objects.size(), meshes.size(), materials.size());
+    // Ligths
+    std::vector<scene_light_t *> lights;
+    for (unsigned i = 0; i < myAiScene->mNumLights; ++i)
+    {
+        aiLight *myAiLight = myAiScene->mLights[i];
+
+        msg_Dbg(p_loader, "Light name: %s", myAiLight->mName.C_Str());
+
+        scene_light_t *p_light = scene_light_New();
+        if (p_light == NULL)
+            continue;
+
+        aiColor3DToArray(myAiLight->mColorDiffuse, p_light->colorDiffuse);
+        aiColor3DToArray(myAiLight->mColorAmbient, p_light->colorAmbient);
+        aiColor3DToArray(myAiLight->mColorSpecular, p_light->colorSpecular);
+        aiVector3DToArray(myAiLight->mDirection, p_light->direction);
+        aiVector3DToArray(myAiLight->mPosition, p_light->position);
+
+        lights.push_back(p_light);
+    }
+
+    p_scene = scene_New(objects.size(), meshes.size(), materials.size(),
+                        lights.size());
     if (unlikely(p_scene == NULL))
         return NULL;
 
     std::copy(objects.begin(), objects.end(), p_scene->objects);
     std::copy(meshes.begin(), meshes.end(), p_scene->meshes);
     std::copy(materials.begin(), materials.end(), p_scene->materials);
+    std::copy(lights.begin(), lights.end(), p_scene->lights);
 
     float position[3];
     ret = getViewer(root, position);
