@@ -543,12 +543,26 @@ int InitVideoEnc( vlc_object_t *p_this )
 
         if( p_codec->pix_fmts )
         {
+            static const enum AVPixelFormat vlc_pix_fmts[] = {
+                AV_PIX_FMT_YUV420P,
+                AV_PIX_FMT_NV12,
+                AV_PIX_FMT_RGB24,
+            };
+            bool found = false;
             const enum PixelFormat *p = p_codec->pix_fmts;
-            for( ; *p != -1; p++ )
+            for( ; !found && *p != -1; p++ )
             {
-                if( *p == p_context->pix_fmt ) break;
+                for( size_t i = 0; i < ARRAY_SIZE(vlc_pix_fmts); ++i )
+                {
+                    if( *p == vlc_pix_fmts[i] )
+                    {
+                        found = true;
+                        p_context->pix_fmt = *p;
+                        break;
+                    }
+                }
             }
-            if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
+            if (!found) p_context->pix_fmt = p_codec->pix_fmts[0];
             GetVlcChroma( &p_enc->fmt_in.video, p_context->pix_fmt );
             p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma;
         }
