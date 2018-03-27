@@ -95,6 +95,7 @@ struct sout_stream_sys_t
         , out_force_reload( false )
         , perf_warning_shown( false )
         , transcoding_state( TRANSCODING_NONE )
+        , venc_opt_idx ( -1 )
         , out_streams_added( 0 )
     {
         assert(p_intf != NULL);
@@ -141,11 +142,14 @@ struct sout_stream_sys_t
     bool                               out_force_reload;
     bool                               perf_warning_shown;
     int                                transcoding_state;
+    int                                venc_opt_idx;
     std::vector<sout_stream_id_sys_t*> streams;
     std::vector<sout_stream_id_sys_t*> out_streams;
     unsigned int                       out_streams_added;
 
 private:
+    std::string GetVencOption( sout_stream_t *, vlc_fourcc_t *,
+                               const video_format_t *, int );
     std::string GetAcodecOption( sout_stream_t *, vlc_fourcc_t *, const audio_format_t *, int );
     std::string GetVcodecOption( sout_stream_t *, vlc_fourcc_t *, const video_format_t *, int );
     bool UpdateOutput( sout_stream_t * );
@@ -953,6 +957,78 @@ static std::string GetVencX264Option( sout_stream_t * /* p_stream */,
     return ssout.str();
 }
 
+
+static struct
+{
+    vlc_fourcc_t fcc;
+    std::string (*get_opt)( sout_stream_t *, const video_format_t *, int);
+} venc_opt_list[] = {
+    { .fcc = VLC_CODEC_H264, .get_opt = GetVencX264Option },
+    { .fcc = VLC_CODEC_VP8,  .get_opt = GetVencVPXOption },
+    { .fcc = VLC_CODEC_H264, .get_opt = NULL },
+};
+
+std::string
+sout_stream_sys_t::GetVencOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec_video,
+                                  const video_format_t *p_vid, int i_quality )
+{
+    for( size_t i = (venc_opt_idx == -1 ? 0 : venc_opt_idx);
+         i < ARRAY_SIZE(venc_opt_list); ++i )
+    {
+        std::stringstream ssout, ssvenc;
+        char fourcc[5];
+        ssvenc << "vcodec=";
+        vlc_fourcc_to_char( venc_opt_list[i].fcc, fourcc );
+        fourcc[4] = '\0';
+        ssvenc << fourcc << ',';
+
+        if( venc_opt_list[i].get_opt != NULL )
+            ssvenc << venc_opt_list[i].get_opt( p_stream, p_vid, i_quality ) << ',';
+
+        if( venc_opt_list[i].get_opt == NULL
+         || ( venc_opt_idx != -1 && (unsigned) venc_opt_idx == i) )
+        {
+            venc_opt_idx = i;
+            *p_codec_video = venc_opt_list[i].fcc;
+            return ssvenc.str();
+        }
+
+        /* Test if a module can encode with the specified options / fmt_video. */
+        ssout << "transcode{" << ssvenc.str() << "}:dummy";
+
+        sout_stream_t *p_sout_test =
+            sout_StreamChainNew( p_stream->p_sout, ssout.str().c_str(), NULL, NULL );
+
+        if( p_sout_test != NULL )
+        {
+            p_sout_test->obj.flags |= OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT;
+
+            es_format_t fmt;
+            es_format_InitFromVideo( &fmt, p_vid );
+            fmt.i_codec = fmt.video.i_chroma = VLC_CODEC_I420;
+            fmt.video.i_frame_rate = 30;
+            fmt.video.i_frame_rate_base = 1;
+
+            sout_stream_id_sys_t *id = sout_StreamIdAdd( p_sout_test, &fmt );
+
+            es_format_Clean( &fmt );
+            const bool success = id != NULL;
+
+            if( id )
+                sout_StreamIdDel( p_sout_test, id );
+            sout_StreamChainDelete( p_sout_test, NULL );
+
+            if( success )
+            {
+                venc_opt_idx = i;
+                *p_codec_video = venc_opt_list[i].fcc;
+                return ssvenc.str();
+            }
+        }
+    }
+    vlc_assert_unreachable();
+}
+
 std::string
 sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec_video,
                                     const video_format_t *p_vid, int i_quality )
@@ -960,39 +1036,18 @@ sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
     std::stringstream ssout;
     static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";
     static const char video_maxres_720p[] = "maxwidth=1280,maxheight=720";
-    const char *psz_video_maxres;
+
+    ssout << GetVencOption( p_stream, p_codec_video, p_vid, i_quality );
 
     switch ( i_quality )
     {
         case CONVERSION_QUALITY_HIGH:
         case CONVERSION_QUALITY_MEDIUM:
-            psz_video_maxres = video_maxres_hd;
+            ssout << video_maxres_hd << ',';
             break;
         default:
-            psz_video_maxres = video_maxres_720p;
+            ssout << video_maxres_720p << ',';
     }
-
-    std::string venc_option;
-    if( module_exists("x264") )
-    {
-        *p_codec_video = VLC_CODEC_H264;
-        venc_option = GetVencX264Option( p_stream, p_vid, i_quality );
-    }
-    else if( module_exists("vpx") )
-    {
-        *p_codec_video = VLC_CODEC_VP8;
-        venc_option = GetVencVPXOption( p_stream, p_vid, i_quality );
-    }
-    else /* Fallback to h264 with an unknown module */
-        *p_codec_video = VLC_CODEC_H264;
-
-    msg_Dbg( p_stream, "Converting video to %.4s", (const char*)p_codec_video );
-
-    char fourcc[5];
-    ssout << "vcodec=";
-    vlc_fourcc_to_char( *p_codec_video, fourcc );
-    fourcc[4] = '\0';
-    ssout << fourcc << ',' << psz_video_maxres << ',';
 
     if( p_vid == NULL
      || p_vid->i_frame_rate == 0 || p_vid->i_frame_rate_base == 0
@@ -1003,8 +1058,7 @@ sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
         ssout << "fps=24,";
     }
 
-    if( !venc_option.empty() )
-        ssout << venc_option << ",";
+    msg_Dbg( p_stream, "Converting video to %.4s", (const char*)p_codec_video );
 
     return ssout.str();
 }
