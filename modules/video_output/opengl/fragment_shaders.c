@@ -647,14 +647,6 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];\n");
-
-        //ADD(
-            // Values from the vertex shader
-            //"in vec3 worldPos;\n"
-            //"in vec3 eyeDirection;\n"
-            //"in vec4 matNormal;\n"
-            //"varying vec2 TexCoord0;\n");
-
     ADDF(
         "\n"
         "struct Lights_t {\n"
@@ -791,19 +783,19 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " }\n"
         // We are using lights, this is the scene !
         " else {\n"
+        "  result = vec4(ambient * SceneAmbient, 1.f);\n"
         "  for(int i=0; i<LightCount; ++i) {\n"
         "   vec3 light_dir = normalize(gl_FragCoord.xyz-Lights.Position[i]);\n"
         "   vec3 eye_dir = normalize(-gl_FragCoord.xyz);\n"
         "   vec3 specular_dir = normalize(light_dir + eye_dir);\n"
         // TODO: ambient scene color
         "   result += vec4(\n"
-        "      ambient * SceneAmbient[i]\n"
         "    + ambient * Lights.Ambient[i]\n"
         "    + max(0, dot(normal, light_dir)) * diffuse * Lights.Diffuse[i]\n"
         "    + max(0, dot(normal, specular_dir)) * specular * Lights.Specular[i], 0);\n"
         "  }\n"
         " }\n"
-        "  gl_FragColor = result;\n"
+        " gl_FragColor = result;\n"
         "}\n");
 
 #undef ADD

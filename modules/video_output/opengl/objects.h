@@ -9,17 +9,17 @@
 
 typedef struct {
     // light center
-    float position[3][VLC_SCENE_MAX_LIGHT];
+    float position[VLC_SCENE_MAX_LIGHT][3];
     // light intensity parameters
-    float ambient[3][VLC_SCENE_MAX_LIGHT];
-    float diffuse[3][VLC_SCENE_MAX_LIGHT];
-    float specular[3][VLC_SCENE_MAX_LIGHT];
+    float ambient[VLC_SCENE_MAX_LIGHT][3];
+    float diffuse[VLC_SCENE_MAX_LIGHT][3];
+    float specular[VLC_SCENE_MAX_LIGHT][3];
     // distance attenuation factor (constant, linear, quadratic)
     float k_c[VLC_SCENE_MAX_LIGHT];
     float k_l[VLC_SCENE_MAX_LIGHT];
     float k_q[VLC_SCENE_MAX_LIGHT];
     // spot direction if in spot mode
-    float direction[3][VLC_SCENE_MAX_LIGHT];
+    float direction[VLC_SCENE_MAX_LIGHT][3];
     // spot cutoff in range [0, 90];
     float cutoff[VLC_SCENE_MAX_LIGHT];
 } vlc_scene_lights_t;

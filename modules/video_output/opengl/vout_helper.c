@@ -2448,7 +2448,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.HeadPositionMatrix);
 
     // lights settings
-    vgl->vt.Uniform1i(prgm->uloc.LightCount, prgm->light_count); // TODO
+    float scene_ambient[] = { 0.5f, 0.5f, 0.5f };
+    vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
+    vgl->vt.Uniform1i(prgm->uloc.LightCount, &prgm->light_count); // TODO
+    vgl->vt.Uniform1fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
                         vgl->p_objDisplay->lights.position);
@@ -2528,6 +2531,11 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             tc->vt->Uniform4f(tc->uloc.UniformColor,
                 p_material->diffuse_color[0], p_material->diffuse_color[1], p_material->diffuse_color[2],
                 1.f);
+
+            vgl->vt.Uniform1fv(prgm->uloc.MatDiffuse, 1, p_material->diffuse_color);
+            vgl->vt.Uniform1fv(prgm->uloc.MatAmbient, 1, p_material->ambient_color);
+            //vgl->vt.Uniform1fv(prgm->uloc.MatSpecular, 1, p_material->specular_color);
+
         }
 
         memcpy(prgm->var.ObjectTransformMatrix, p_object->transformMatrix,
