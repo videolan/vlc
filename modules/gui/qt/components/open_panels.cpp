@@ -719,7 +719,7 @@ void NetOpenPanel::onFocus()
 
 void NetOpenPanel::updateMRL()
 {
-    QString url = ui.urlComboBox->lineEdit()->text();
+    QString url = ui.urlComboBox->lineEdit()->text().trimmed();
 
     emit methodChanged( qfu( "network-caching" ) );
 
