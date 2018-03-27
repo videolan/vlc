@@ -2403,10 +2403,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
         scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
 
-        if (p_material->material_type == MATERIAL_TYPE_TEXTURE)
+        if (p_material->p_baseColorTex != NULL)
         {
-            GLsizei i_width = p_material->p_pic->format.i_width;
-            GLsizei i_height = p_material->p_pic->format.i_height;
+            GLsizei i_width = p_material->p_baseColorTex->format.i_width;
+            GLsizei i_height = p_material->p_baseColorTex->format.i_height;
             tc->pf_prepare_shader(tc, &i_width, &i_height, 1.0f);
 
             vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
@@ -2419,10 +2419,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
             vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
-            vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->textures[p_object->textureId]);
+            vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
             tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
         }
-        else if (p_material->material_type == MATERIAL_TYPE_DIFFUSE_COLOR)
+        else
         {
             vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
 

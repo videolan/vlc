@@ -18,7 +18,10 @@ typedef struct
     GLuint *index_buffer_object;
     GLuint *texture_buffer_object;
 
-    GLuint *textures;
+    GLuint *texturesBaseColor;
+    GLuint *texturesMetalness;
+    GLuint *texturesNormal;
+    GLuint *texturesRoughness;
 
 } gl_scene_objects_display_t;
 

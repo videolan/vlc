@@ -48,8 +48,20 @@ gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
     if (unlikely(p_objDisplay->texture_buffer_object == NULL))
         goto error;
 
-    p_objDisplay->textures = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
-    if (unlikely(p_objDisplay->textures == NULL))
+    p_objDisplay->texturesBaseColor = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
+    if (unlikely(p_objDisplay->texturesBaseColor == NULL))
+        goto error;
+
+    p_objDisplay->texturesMetalness = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
+    if (unlikely(p_objDisplay->texturesMetalness == NULL))
+        goto error;
+
+    p_objDisplay->texturesNormal = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
+    if (unlikely(p_objDisplay->texturesNormal == NULL))
+        goto error;
+
+    p_objDisplay->texturesRoughness = (GLuint *)malloc(p_scene->nMaterials * sizeof(GLuint));
+    if (unlikely(p_objDisplay->texturesRoughness == NULL))
         goto error;
 
     if (loadBufferObjects(p_objDisplay) != VLC_SUCCESS)
@@ -58,7 +70,10 @@ gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
     return p_objDisplay;
 
 error:
-    free(p_objDisplay->textures);
+    free(p_objDisplay->texturesRoughness);
+    free(p_objDisplay->texturesNormal);
+    free(p_objDisplay->texturesMetalness);
+    free(p_objDisplay->texturesBaseColor);
     free(p_objDisplay->vertex_buffer_object);
     free(p_objDisplay->index_buffer_object);
     free(p_objDisplay->texture_buffer_object);
@@ -73,16 +88,52 @@ void releaseSceneObjects(gl_scene_objects_display_t *p_objDisplay)
         return;
 
     if (p_objDisplay->p_scene != NULL)
+    {
         p_objDisplay->tc->vt->DeleteTextures(p_objDisplay->p_scene->nMaterials,
-                                             p_objDisplay->textures);
+                                             p_objDisplay->texturesBaseColor);
+        p_objDisplay->tc->vt->DeleteTextures(p_objDisplay->p_scene->nMaterials,
+                                             p_objDisplay->texturesMetalness);
+        p_objDisplay->tc->vt->DeleteTextures(p_objDisplay->p_scene->nMaterials,
+                                             p_objDisplay->texturesNormal);
+        p_objDisplay->tc->vt->DeleteTextures(p_objDisplay->p_scene->nMaterials,
+                                             p_objDisplay->texturesRoughness);
+    }
 
-    free(p_objDisplay->textures);
+    free(p_objDisplay->texturesRoughness);
+    free(p_objDisplay->texturesNormal);
+    free(p_objDisplay->texturesMetalness);
+    free(p_objDisplay->texturesBaseColor);
     free(p_objDisplay->vertex_buffer_object);
     free(p_objDisplay->index_buffer_object);
     free(p_objDisplay->texture_buffer_object);
 
     scene_Release(p_objDisplay->p_scene);
     free(p_objDisplay);
+}
+
+
+static void setTextureParameters(const opengl_tex_converter_t *tc, picture_t *p_pic, GLuint tex)
+{
+    const opengl_vtable_t *vt = tc->vt;
+
+    vt->BindTexture(tc->tex_target, tex);
+
+#if !defined(USE_OPENGL_ES2)
+    /* Set the texture parameters */
+    vt->TexParameterf(tc->tex_target, GL_TEXTURE_PRIORITY, 1.0);
+    vt->TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
+
+    vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    GLsizei tex_width = p_pic->format.i_width;
+    GLsizei tex_height = p_pic->format.i_height;
+
+    vt->TexImage2D(tc->tex_target, 0, tc->texs[0].internal, tex_width, tex_height, 0,
+                   GL_RGBA, GL_UNSIGNED_BYTE, p_pic->p[0].p_pixels);
 }
 
 
@@ -123,38 +174,23 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
     }
 
 
-    vt->GenTextures(nMaterials, p_objDisplay->textures);
-
-    GLsizei tex_width[nMaterials];
-    GLsizei tex_height[nMaterials];
+    vt->GenTextures(nMaterials, p_objDisplay->texturesBaseColor);
+    vt->GenTextures(nMaterials, p_objDisplay->texturesMetalness);
+    vt->GenTextures(nMaterials, p_objDisplay->texturesNormal);
+    vt->GenTextures(nMaterials, p_objDisplay->texturesRoughness);
 
     for (unsigned i = 0; i < nMaterials; i++)
     {
         scene_material_t *p_material = p_objDisplay->p_scene->materials[i];
-        if (p_material->material_type != MATERIAL_TYPE_TEXTURE)
-            continue;
 
-        vt->BindTexture(tc->tex_target, p_objDisplay->textures[i]);
-
-#if !defined(USE_OPENGL_ES2)
-        /* Set the texture parameters */
-        vt->TexParameterf(tc->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-        vt->TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-        vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        picture_t *p_pic = p_material->p_pic;
-
-        tex_width[i] = p_pic->format.i_width;
-        tex_height[i] = p_pic->format.i_height;
-
-        vt->BindTexture(tc->tex_target, p_objDisplay->textures[i]);
-        vt->TexImage2D(tc->tex_target, 0, tc->texs[0].internal, tex_width[i], tex_height[i], 0,
-                       GL_RGBA, GL_UNSIGNED_BYTE, p_pic->p[0].p_pixels);
+        if (p_material->p_baseColorTex != NULL)
+            setTextureParameters(tc, p_material->p_baseColorTex, p_objDisplay->texturesBaseColor[i]);
+        if (p_material->p_metalnessTex != NULL)
+            setTextureParameters(tc, p_material->p_metalnessTex, p_objDisplay->texturesMetalness[i]);
+        if (p_material->p_normalTex != NULL)
+            setTextureParameters(tc, p_material->p_normalTex, p_objDisplay->texturesNormal[i]);
+        if (p_material->p_roughnessTex != NULL)
+            setTextureParameters(tc, p_material->p_roughnessTex, p_objDisplay->texturesRoughness[i]);
     }
 
     return VLC_SUCCESS;
