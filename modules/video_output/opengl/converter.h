@@ -109,11 +109,13 @@ typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLs
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
 #   define PFNGLUNIFORM3FVPROC               typeof(glUniform3fv)*
 #   define PFNGLUNIFORM2FVPROC               typeof(glUniform2fv)*
+#   define PFNGLUNIFORM1FVPROC               typeof(glUniform1fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
 #   define PFNGLUNIFORM3FPROC                typeof(glUniform3f)*
 #   define PFNGLUNIFORM2FPROC                typeof(glUniform2f)*
 #   define PFNGLUNIFORM1FPROC                typeof(glUniform1f)*
 #   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
+#   define PFNGLUNIFORM1UIPROC               typeof(glUniform1ui)*
 #   define PFNGLCREATESHADERPROC             typeof(glCreateShader)*
 #   define PFNGLSHADERSOURCEPROC             typeof(glShaderSource)*
 #   define PFNGLCOMPILESHADERPROC            typeof(glCompileShader)*
@@ -218,11 +220,13 @@ typedef struct {
     PFNGLUNIFORM4FVPROC              Uniform4fv;
     PFNGLUNIFORM3FVPROC              Uniform3fv;
     PFNGLUNIFORM2FVPROC              Uniform2fv;
+    PFNGLUNIFORM1FVPROC              Uniform1fv;
     PFNGLUNIFORM4FPROC               Uniform4f;
     PFNGLUNIFORM3FPROC               Uniform3f;
     PFNGLUNIFORM2FPROC               Uniform2f;
     PFNGLUNIFORM1FPROC               Uniform1f;
     PFNGLUNIFORM1IPROC               Uniform1i;
+    PFNGLUNIFORM1UIPROC              Uniform1ui;
 
     /* Program commands */
     PFNGLCREATEPROGRAMPROC CreateProgram;

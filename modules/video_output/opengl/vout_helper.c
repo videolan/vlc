@@ -1143,6 +1143,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(Uniform4fv);
     GET_PROC_ADDR(Uniform3fv);
     GET_PROC_ADDR(Uniform2fv);
+    GET_PROC_ADDR(Uniform1fv);
     GET_PROC_ADDR(Uniform4f);
     GET_PROC_ADDR(Uniform3f);
     GET_PROC_ADDR(Uniform2f);
