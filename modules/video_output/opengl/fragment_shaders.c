@@ -706,7 +706,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " }\n\n"
 
         // If it's not a uniform color, it must be a texture
-        " if (!IsUniformColor && false) {\n"
+        " if (!IsUniformColor) {\n"
         "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
         "  specular.xyz = texture2D(MatSpecularTex, TexCoord0).xyz;\n"
         "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n"

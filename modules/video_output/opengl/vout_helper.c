@@ -101,7 +101,7 @@ struct prgm
     GLuint id;
     opengl_tex_converter_t *tc;
 
-    size_t light_count;
+    int light_count;
     bool b_has_light;
 
     struct {
@@ -142,6 +142,16 @@ struct prgm
             GLint Direction;
             GLint Cutoff;
         } lights;
+
+        GLint MatAmbientTex;
+        GLint MatDiffuseTex;
+        GLint MatNormalTex;
+        GLint MatSpecularTex;
+
+        GLint MatAmbient;
+        GLint MatDiffuse;
+        GLint MatSpecular;
+        GLint SceneAmbient;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
@@ -714,22 +724,27 @@ opengl_link_program(struct prgm *prgm)
         prgm->aloc.MultiTexCoord[2] = -1;
 
     GET_ULOC(HasLight, "HasLight");
+    GET_ULOC(LightCount, "LightCount");
 
-    if (prgm->b_has_light)
-    {
-        for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
-        {
-            GET_ULOC(lights.Position, "Lights.MatPosition");
-            GET_ULOC(lights.Ambient, "Lights.MatAmbient");
-            GET_ULOC(lights.Diffuse, "Lights.MatDiffuse");
-            GET_ULOC(lights.Specular, "Lights.MatSpecular");
-            GET_ULOC(lights.Kc, "Lights.Kc");
-            GET_ULOC(lights.Kl, "Lights.Kl");
-            GET_ULOC(lights.Kq, "Lights.Kq");
-            GET_ULOC(lights.Direction, "Lights.Direction");
-            GET_ULOC(lights.Cutoff, "Lights.Cutoff");
-        }
-    }
+    GET_ULOC(lights.Position, "Lights.Position");
+    GET_ULOC(lights.Ambient, "Lights.Ambient");
+    GET_ULOC(lights.Diffuse, "Lights.Diffuse");
+    GET_ULOC(lights.Specular, "Lights.Specular");
+    GET_ULOC(lights.Kc, "Lights.Kc");
+    GET_ULOC(lights.Kl, "Lights.Kl");
+    GET_ULOC(lights.Kq, "Lights.Kq");
+    GET_ULOC(lights.Direction, "Lights.Direction");
+    GET_ULOC(lights.Cutoff, "Lights.Cutoff");
+
+    GET_ULOC(MatAmbientTex, "MatAmbientTex");
+    GET_ULOC(MatDiffuseTex, "MatDiffuseTex");
+    GET_ULOC(MatNormalTex, "MatNormalTex");
+    GET_ULOC(MatSpecularTex, "MatSpecularTex");
+
+    GET_ULOC(MatAmbient, "MatAmbient");
+    GET_ULOC(MatDiffuse, "MatDiffuse");
+    GET_ULOC(MatSpecular, "MatSpecular");
+    GET_ULOC(SceneAmbient, "SceneAmbient");
 
 #undef GET_LOC
 #undef GET_ULOC
@@ -1182,6 +1197,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(Uniform2f);
     GET_PROC_ADDR(Uniform1f);
     GET_PROC_ADDR(Uniform1i);
+    GET_PROC_ADDR(Uniform1ui);
 
 
     GET_PROC_ADDR(CreateProgram);
@@ -2432,7 +2448,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.HeadPositionMatrix);
 
     // lights settings
-    vgl->vt.Uniform1ui(prgm->uloc.LightCount, prgm->light_count); // TODO
+    vgl->vt.Uniform1i(prgm->uloc.LightCount, prgm->light_count); // TODO
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
                         vgl->p_objDisplay->lights.position);
