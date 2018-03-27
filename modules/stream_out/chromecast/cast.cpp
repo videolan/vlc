@@ -906,6 +906,13 @@ bool sout_stream_sys_t::transcodingCanFallback() const
     return transcoding_state != (TRANSCODING_VIDEO|TRANSCODING_AUDIO);
 }
 
+static std::string GetVencVPXOption( sout_stream_t * /* p_stream */,
+                                      const video_format_t * /* p_vid */,
+                                      int /* i_quality */ )
+{
+    return "venc=vpx{quality-mode=1}";
+}
+
 static std::string GetVencX264Option( sout_stream_t * /* p_stream */,
                                       const video_format_t *p_vid,
                                       int i_quality )
@@ -965,11 +972,19 @@ sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
             psz_video_maxres = video_maxres_720p;
     }
 
-    *p_codec_video = VLC_CODEC_H264;
-
     std::string venc_option;
     if( module_exists("x264") )
+    {
+        *p_codec_video = VLC_CODEC_H264;
         venc_option = GetVencX264Option( p_stream, p_vid, i_quality );
+    }
+    else if( module_exists("vpx") )
+    {
+        *p_codec_video = VLC_CODEC_VP8;
+        venc_option = GetVencVPXOption( p_stream, p_vid, i_quality );
+    }
+    else /* Fallback to h264 with an unknown module */
+        *p_codec_video = VLC_CODEC_H264;
 
     msg_Dbg( p_stream, "Converting video to %.4s", (const char*)p_codec_video );
 
