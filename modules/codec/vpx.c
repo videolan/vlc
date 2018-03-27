@@ -366,6 +366,7 @@ static void CloseDecoder(vlc_object_t *p_this)
 struct encoder_sys_t
 {
     struct vpx_codec_ctx ctx;
+    unsigned long quality;
 };
 
 /*****************************************************************************
@@ -424,6 +425,19 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg);
 
+    /* Deadline (in ms) to spend in encoder */
+    switch (var_GetInteger(p_enc, ENC_CFG_PREFIX "quality-mode")) {
+        case 1:
+            p_sys->quality = VPX_DL_REALTIME;
+            break;
+        case 2:
+            p_sys->quality = VPX_DL_BEST_QUALITY;
+            break;
+        default:
+            p_sys->quality = VPX_DL_GOOD_QUALITY;
+            break;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -462,21 +476,9 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     }
 
     int flags = 0;
-    /* Deadline (in ms) to spend in encoder */
-    int quality = VPX_DL_GOOD_QUALITY;
-    switch (var_GetInteger(p_enc, ENC_CFG_PREFIX "quality-mode")) {
-        case 1:
-            quality = VPX_DL_REALTIME;
-            break;
-        case 2:
-            quality = VPX_DL_BEST_QUALITY;
-            break;
-        default:
-            break;
-    }
 
     vpx_codec_err_t res = vpx_codec_encode(ctx, &img, p_pict->date, 1,
-     flags, quality);
+     flags, p_sys->quality);
     if (res != VPX_CODEC_OK) {
         VPX_ERR(p_enc, ctx, "Failed to encode frame");
         vpx_img_free(&img);
