@@ -1018,6 +1018,10 @@ sout_stream_sys_t::GetVencOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec
             es_format_t fmt;
             es_format_InitFromVideo( &fmt, p_vid );
             fmt.i_codec = fmt.video.i_chroma = VLC_CODEC_I420;
+
+            /* Test the maximum size/fps we will encode */
+            fmt.video.i_visible_width = fmt.video.i_width = 1920;
+            fmt.video.i_visible_height = fmt.video.i_height = 1080;
             fmt.video.i_frame_rate = 30;
             fmt.video.i_frame_rate_base = 1;
 
