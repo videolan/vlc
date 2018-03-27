@@ -51,6 +51,7 @@
 #endif
 
 #define SPHERE_RADIUS 1.f
+#define SCENE_MAX_LIGHT 20
 
 /* FIXME: GL_ASSERT_NOERROR disabled for now because:
  * Proper GL error handling need to be implemented
@@ -100,6 +101,8 @@ struct prgm
     GLuint id;
     opengl_tex_converter_t *tc;
 
+    size_t light_count;
+
     struct {
         GLfloat OrientationMatrix[16];
         GLfloat ProjectionMatrix[16];
@@ -128,6 +131,15 @@ struct prgm
         GLint HeadPositionMatrix;
         GLint SbSCoefs;
         GLint SbSOffsets;
+
+        GLint LightCount;
+        struct {
+            GLint position;
+            GLint ambiant, diffuse, specular;
+            GLint k_c, k_l, k_q;
+            GLint spot_direction;
+            GLint cutoff;
+        } Lights;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
@@ -2397,6 +2409,28 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.SceneTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
                               prgm->var.HeadPositionMatrix);
+
+    // lights settings
+    vgl->vt.Uniform1ui(prgm->uloc.LightCount, prgm->light_count); // TODO
+
+    vgl->vt.Uniform3fv(prgm->uloc.Lights.position, prgm->light_count,
+                        p_scene->lights.position);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.ambiant, prgm->light_count,
+                        p_scene->lights.ambiant);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.diffuse, prgm->light_count,
+                        p_scene->lights.diffuse);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.specular, prgm->light_count,
+                        p_scene->lights.specular);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_c, prgm->light_count,
+                        p_scene->lights.k_c);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_l, prgm->light_count,
+                        p_scene->lights.k_l);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_q, prgm->light_count,
+                        p_scene->lights.k_q);
+    vgl->vt.Uniform3fv(prgm->uloc.Lights.spot_direction, prgm->light_count,
+                        p_scene->lights.spot_direction);
+    vgl->vt.Uniform1fv(prgm->uloc.Lights.cutoff, prgm->light_count,
+                        p_scene->lights.cutoff);
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);

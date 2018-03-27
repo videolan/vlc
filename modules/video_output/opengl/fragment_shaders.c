@@ -374,6 +374,19 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
     }
 #endif
 
+    for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
+    {
+        tc->uloc.Lights.position = tc->vt->GetUniformLocation(program, "Lights.position");
+        tc->uloc.Lights.ambiant = tc->vt->GetUniformLocation(program, "Lights.ambiant");
+        tc->uloc.Lights.diffuse = tc->vt->GetUniformLocation(program, "Lights.diffuse");
+        tc->uloc.Lights.specular = tc->vt->GetUniformLocation(program, "Lights.specular");
+        tc->uloc.Lights.k_c = tc->vt->GetUniformLocation(program, "Lights.k_c");
+        tc->uloc.Lights.k_l = tc->vt->GetUniformLocation(program, "Lights.k_l");
+        tc->uloc.Lights.k_q = tc->vt->GetUniformLocation(program, "Lights.k_q");
+        tc->uloc.Lights.spot_direction = tc->vt->GetUniformLocation(program, "Lights.spot_direction");
+        tc->uloc.Lights.cutoff = tc->vt->GetUniformLocation(program, "Lights.cutoff");
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -648,14 +661,56 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];\n");
 
+    if (has_light) {
+        ADD(
+            // Values from the vertex shader
+            "in vec3 worldPos;\n"
+            "in vec3 eyeDirection;\n"
+            "in vec4 matNormal;\n"
+            "varying vec2 matTexCoords;\n"
+
+            "uniform struct {\n"
+            " vec3 Position;\n"
+            " float Ambiant, Diffuse, Specular;\n"
+            " float Attenuation;\n"
+            " vec3 SpotDirection;\n"
+            " float Cutoff;\n" // TODO: structure is not aligned
+            "} Lights[" ##VLC_SCENE_MAX_LIGHT "];\n"
+            // Scene light configuration
+            "uniform int LightCount;\n"
+            // Material properties
+            "uniform sampler2D matAmbiantTex;\n"
+            "uniform sampler2D matDiffuseTex;\n"
+            "uniform sampler2D matNormaleTex;\n"
+            "uniform sampler2D matSpecularTex;\n"
+            "uniform vec4 matAmbiant;\n"
+            "uniform vec4 matDiffuse;\n"
+            "uniform vec4 matSpecular;\n");
+    }
+
     ADD("uniform vec4 FillColor;\n"
         "uniform bool IsUniformColor;\n"
-        "uniform vec4 UniformColor;\n"
-        "void main(void) {\n"
+        "uniform vec4 UniformColor;\n");
+
+    ADD("void main(void) {\n"
         " float val;\n"
-        " vec4 colors;\n"
-        " vec4 result;\n"
-        " if (!IsUniformColor) {\n");
+        " vec3 colors;\n"
+        " vec3 result;\n"
+        " vec3 ambiant  = matAmbiant;\n"
+        " vec3 specular = matDiffuse;\n"
+        " vec3 diffuse  = matSpecular;\n"
+        " vec3 normale  = vec3(0,0,0);\n"
+
+        // We don't need normal if there is no lights
+        " if (hasLight) { \n"
+        "  normale = texture2D(mat_normale, mat_tex_coords).xyz;\n"
+        " }\n"
+
+        // If it's not a uniform color, it must be a texture
+        " if (!IsUniformColor) {\n"
+        "  vec3 ambiant  = texture2D(mat_ambiant, mat_tex_coords).xyz;\n"
+        "  vec3 specular = texture2D(mat_specular, mat_tex_coords).xyz;\n"
+        "  vec3 diffuse  = texture2D(mat_diffuse, mat_tex_coords).xyz;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -727,8 +782,19 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " } else {\n"
         "  result = UniformColor;\n"
         " }\n"
-        " gl_FragColor = result;\n"
-        "}");
+        " if (lightNumber == 0) {\n"
+        "  gl_FragColor = result\n;"
+        " } else for(int i=0; i<lightNumber; ++i) {\n"
+        "  vec3 light_dir = normalize(gl_FragCoord-light.position[i]);\n"
+        "  vec3 eye_dir = normalize(-gl_FragCoord);\n"
+        "  vec3 specular_dir = normalize(light.direction[i] + eye_dir);\n"
+        // TODO: ambiant scene color
+        "  gl_FragColor += \n"
+        "     ambiant * scene_ambiant[i]\n"
+        "   + ambiant * light.ambiant[i]\n"
+        "   + max(0, dot(normal, light_dir)) * diffuse * light.diffuse[i]\n"
+        "   + max(0, dot(normal, specular_dir)) * specular * light.specular[i];\n"
+        "}\n");
 
 #undef ADD
 #undef ADDF
