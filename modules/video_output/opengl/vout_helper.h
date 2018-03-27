@@ -32,6 +32,8 @@
 #include "converter.h"
 #include <vlc_vout_display.h>
 
+#define VLC_SCENE_MAX_LIGHT 30
+
 #ifdef HAVE_LIBPLACEBO
 #include "../placebo_utils.h"
 

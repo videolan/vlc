@@ -374,18 +374,6 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
     }
 #endif
 
-    for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
-    {
-        tc->uloc.Lights.position = tc->vt->GetUniformLocation(program, "Lights.position");
-        tc->uloc.Lights.ambiant = tc->vt->GetUniformLocation(program, "Lights.ambiant");
-        tc->uloc.Lights.diffuse = tc->vt->GetUniformLocation(program, "Lights.diffuse");
-        tc->uloc.Lights.specular = tc->vt->GetUniformLocation(program, "Lights.specular");
-        tc->uloc.Lights.k_c = tc->vt->GetUniformLocation(program, "Lights.k_c");
-        tc->uloc.Lights.k_l = tc->vt->GetUniformLocation(program, "Lights.k_l");
-        tc->uloc.Lights.k_q = tc->vt->GetUniformLocation(program, "Lights.k_q");
-        tc->uloc.Lights.spot_direction = tc->vt->GetUniformLocation(program, "Lights.spot_direction");
-        tc->uloc.Lights.cutoff = tc->vt->GetUniformLocation(program, "Lights.cutoff");
-    }
 
     return VLC_SUCCESS;
 }
@@ -498,7 +486,6 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
-        "varying vec2 TexCoord0;"
         "void main()"
         "{ "
         " vec4 v_in, v_out;"
@@ -571,8 +558,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
-    ADD("uniform vec2 SbSCoefs;");
-    ADD("uniform vec2 SbSOffsets;");
+    ADD("uniform vec2 SbSCoefs;\n");
+    ADD("uniform vec2 SbSOffsets;\n");
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
@@ -661,31 +648,40 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];\n");
 
-    if (has_light) {
-        ADD(
+    if (true /* XXX: has_light*/) {
+        //ADD(
             // Values from the vertex shader
-            "in vec3 worldPos;\n"
-            "in vec3 eyeDirection;\n"
-            "in vec4 matNormal;\n"
-            "varying vec2 matTexCoords;\n"
+            //"in vec3 worldPos;\n"
+            //"in vec3 eyeDirection;\n"
+            //"in vec4 matNormal;\n"
+            //"varying vec2 TexCoord0;\n");
 
+        ADDF(
             "uniform struct {\n"
-            " vec3 Position;\n"
-            " float Ambiant, Diffuse, Specular;\n"
-            " float Attenuation;\n"
-            " vec3 SpotDirection;\n"
-            " float Cutoff;\n" // TODO: structure is not aligned
-            "} Lights[" ##VLC_SCENE_MAX_LIGHT "];\n"
-            // Scene light configuration
+            " vec3 Position[%d];\n"
+            " vec3 Ambient[%d];"
+            " vec3 Diffuse[%d];"
+            " vec3 Specular[%d];\n"
+            " float Kc[%d];\n"
+            " float Kl[%d];\n"
+            " float Kq[%d];\n"
+            " vec3 Direction[%d];\n"
+            " float Cutoff[%d];\n"
+            "} Lights;\n",
+            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
+            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
+            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT);
+        ADD(// Scene light configuration
             "uniform int LightCount;\n"
             // Material properties
-            "uniform sampler2D matAmbiantTex;\n"
-            "uniform sampler2D matDiffuseTex;\n"
-            "uniform sampler2D matNormaleTex;\n"
-            "uniform sampler2D matSpecularTex;\n"
-            "uniform vec4 matAmbiant;\n"
-            "uniform vec4 matDiffuse;\n"
-            "uniform vec4 matSpecular;\n");
+            "uniform sampler2D MatAmbientTex;\n"
+            "uniform sampler2D MatDiffuseTex;\n"
+            "uniform sampler2D MatNormalTex;\n"
+            "uniform sampler2D MatSpecularTex;\n"
+            "uniform vec3 MatAmbient;\n"
+            "uniform vec3 MatDiffuse;\n"
+            "uniform vec3 MatSpecular;\n"
+            "uniform vec3 SceneAmbient;\n");
     }
 
     ADD("uniform vec4 FillColor;\n"
@@ -694,23 +690,23 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     ADD("void main(void) {\n"
         " float val;\n"
-        " vec3 colors;\n"
-        " vec3 result;\n"
-        " vec3 ambiant  = matAmbiant;\n"
-        " vec3 specular = matDiffuse;\n"
-        " vec3 diffuse  = matSpecular;\n"
-        " vec3 normale  = vec3(0,0,0);\n"
+        " vec4 colors;\n"
+        " vec4 result;\n"
+        " vec3 ambient  = MatAmbient;\n"
+        " vec3 specular = MatDiffuse;\n"
+        " vec3 diffuse  = MatSpecular;\n"
+        " vec3 normal  = vec3(0,0,0);\n"
 
         // We don't need normal if there is no lights
-        " if (hasLight) { \n"
-        "  normale = texture2D(mat_normale, mat_tex_coords).xyz;\n"
+        " if (/* hasLight */ true) { \n"
+        "  normal = texture2D(MatNormalTex, TexCoord0).xyz;\n"
         " }\n"
 
         // If it's not a uniform color, it must be a texture
-        " if (!IsUniformColor) {\n"
-        "  vec3 ambiant  = texture2D(mat_ambiant, mat_tex_coords).xyz;\n"
-        "  vec3 specular = texture2D(mat_specular, mat_tex_coords).xyz;\n"
-        "  vec3 diffuse  = texture2D(mat_diffuse, mat_tex_coords).xyz;\n");
+        " if (!IsUniformColor && false) {\n"
+        "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
+        "  specular.xyz = texture2D(MatSpecularTex, TexCoord0).xyz;\n"
+        "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -782,18 +778,19 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " } else {\n"
         "  result = UniformColor;\n"
         " }\n"
-        " if (lightNumber == 0) {\n"
-        "  gl_FragColor = result\n;"
-        " } else for(int i=0; i<lightNumber; ++i) {\n"
-        "  vec3 light_dir = normalize(gl_FragCoord-light.position[i]);\n"
-        "  vec3 eye_dir = normalize(-gl_FragCoord);\n"
-        "  vec3 specular_dir = normalize(light.direction[i] + eye_dir);\n"
-        // TODO: ambiant scene color
-        "  gl_FragColor += \n"
-        "     ambiant * scene_ambiant[i]\n"
-        "   + ambiant * light.ambiant[i]\n"
-        "   + max(0, dot(normal, light_dir)) * diffuse * light.diffuse[i]\n"
-        "   + max(0, dot(normal, specular_dir)) * specular * light.specular[i];\n"
+        " if (LightCount == 0) {\n"
+        "  gl_FragColor = result;\n"
+        " } else for(int i=0; i<LightCount; ++i) {\n"
+        "  vec3 light_dir = normalize(gl_FragCoord.xyz-Lights.Position[i]);\n"
+        "  vec3 eye_dir = normalize(-gl_FragCoord.xyz);\n"
+        "  vec3 specular_dir = normalize(Lights.Direction[i] + eye_dir);\n"
+        // TODO: ambient scene color
+        "  gl_FragColor += vec4(\n"
+        "     ambient * SceneAmbient[i]\n"
+        "   + ambient * Lights.Ambient[i]\n"
+        "   + max(0, dot(normal, light_dir)) * diffuse * Lights.Diffuse[i]\n"
+        "   + max(0, dot(normal, specular_dir)) * specular * Lights.Specular[i], 0);\n"
+        "  }\n"
         "}\n");
 
 #undef ADD

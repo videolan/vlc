@@ -156,6 +156,7 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
 
     unsigned nMeshes = p_objDisplay->p_scene->nMeshes;
     unsigned nMaterials = p_objDisplay->p_scene->nMaterials;
+    unsigned nLights = p_objDisplay->p_scene->nLights;
 
     vt->GenBuffers(nMeshes, p_objDisplay->vertex_buffer_object);
     vt->GenBuffers(nMeshes, p_objDisplay->normal_buffer_object);
@@ -213,6 +214,19 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
             setTextureParameters(tc, p_material->p_normalTex, p_objDisplay->texturesNormal[i]);
         if (p_material->p_roughnessTex != NULL)
             setTextureParameters(tc, p_material->p_roughnessTex, p_objDisplay->texturesRoughness[i]);
+    }
+
+    for (unsigned i = 0; i < nLights; ++i)
+    {
+        memcpy(p_objDisplay->lights.position[i], p_objDisplay->p_scene->lights[i]->position, 3);
+        memcpy(p_objDisplay->lights.ambient[i], p_objDisplay->p_scene->lights[i]->colorAmbient, 3);
+        memcpy(p_objDisplay->lights.diffuse[i], p_objDisplay->p_scene->lights[i]->colorDiffuse, 3);
+        memcpy(p_objDisplay->lights.specular[i], p_objDisplay->p_scene->lights[i]->colorSpecular, 3);
+        memcpy(p_objDisplay->lights.direction[i], p_objDisplay->p_scene->lights[i]->direction, 3);
+
+        p_objDisplay->lights.k_c[i] = p_objDisplay->p_scene->lights[i]->attenuationConstant;
+        p_objDisplay->lights.k_l[i] = 0;
+        p_objDisplay->lights.k_q[i] = 0;
     }
 
     return VLC_SUCCESS;

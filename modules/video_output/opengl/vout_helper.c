@@ -134,12 +134,12 @@ struct prgm
 
         GLint LightCount;
         struct {
-            GLint position;
-            GLint ambiant, diffuse, specular;
-            GLint k_c, k_l, k_q;
-            GLint spot_direction;
-            GLint cutoff;
-        } Lights;
+            GLint Position;
+            GLint Ambient, Diffuse, Specular;
+            GLint Kc, Kl, Kq;
+            GLint Direction;
+            GLint Cutoff;
+        } lights;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
@@ -710,6 +710,21 @@ opengl_link_program(struct prgm *prgm)
         GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
     else
         prgm->aloc.MultiTexCoord[2] = -1;
+
+
+    for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
+    {
+        GET_ULOC(lights.Position, "Lights.MatPosition");
+        GET_ULOC(lights.Ambient, "Lights.MatAmbient");
+        GET_ULOC(lights.Diffuse, "Lights.MatDiffuse");
+        GET_ULOC(lights.Specular, "Lights.MatSpecular");
+        GET_ULOC(lights.Kc, "Lights.Kc");
+        GET_ULOC(lights.Kl, "Lights.Kl");
+        GET_ULOC(lights.Kq, "Lights.Kq");
+        GET_ULOC(lights.Direction, "Lights.Direction");
+        GET_ULOC(lights.Cutoff, "Lights.Cutoff");
+    }
+
 #undef GET_LOC
 #undef GET_ULOC
 #undef GET_ALOC
@@ -2413,24 +2428,24 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     // lights settings
     vgl->vt.Uniform1ui(prgm->uloc.LightCount, prgm->light_count); // TODO
 
-    vgl->vt.Uniform3fv(prgm->uloc.Lights.position, prgm->light_count,
-                        p_scene->lights.position);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.ambiant, prgm->light_count,
-                        p_scene->lights.ambiant);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.diffuse, prgm->light_count,
-                        p_scene->lights.diffuse);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.specular, prgm->light_count,
-                        p_scene->lights.specular);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_c, prgm->light_count,
-                        p_scene->lights.k_c);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_l, prgm->light_count,
-                        p_scene->lights.k_l);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.k_q, prgm->light_count,
-                        p_scene->lights.k_q);
-    vgl->vt.Uniform3fv(prgm->uloc.Lights.spot_direction, prgm->light_count,
-                        p_scene->lights.spot_direction);
-    vgl->vt.Uniform1fv(prgm->uloc.Lights.cutoff, prgm->light_count,
-                        p_scene->lights.cutoff);
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
+                        vgl->p_objDisplay->lights.position);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Ambient, prgm->light_count,
+                        vgl->p_objDisplay->lights.ambient);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Diffuse, prgm->light_count,
+                        vgl->p_objDisplay->lights.diffuse);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Specular, prgm->light_count,
+                        vgl->p_objDisplay->lights.specular);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kc, prgm->light_count,
+                        vgl->p_objDisplay->lights.k_c);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kl, prgm->light_count,
+                        vgl->p_objDisplay->lights.k_l);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kq, prgm->light_count,
+                        vgl->p_objDisplay->lights.k_q);
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Direction, prgm->light_count,
+                        vgl->p_objDisplay->lights.direction);
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Cutoff, prgm->light_count,
+                        vgl->p_objDisplay->lights.cutoff);
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);

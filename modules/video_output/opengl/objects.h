@@ -6,24 +6,23 @@
 #include "vout_helper.h"
 #include "converter.h"
 
-#define VLC_SCENE_MAX_LIGHT 30
 
-typedef struct vlc_scene_lights_t {
+typedef struct {
     // light center
     float position[3][VLC_SCENE_MAX_LIGHT];
     // light intensity parameters
-    float ambiant[VLC_SCENE_MAX_LIGHT];
-    float diffuse[VLC_SCENE_MAX_LIGHT];
-    float specular[VLC_SCENE_MAX_LIGHT];
+    float ambient[3][VLC_SCENE_MAX_LIGHT];
+    float diffuse[3][VLC_SCENE_MAX_LIGHT];
+    float specular[3][VLC_SCENE_MAX_LIGHT];
     // distance attenuation factor (constant, linear, quadratic)
     float k_c[VLC_SCENE_MAX_LIGHT];
     float k_l[VLC_SCENE_MAX_LIGHT];
     float k_q[VLC_SCENE_MAX_LIGHT];
     // spot direction if in spot mode
-    float spot_direction[3][VLC_SCENE_MAX_LIGHT];
+    float direction[3][VLC_SCENE_MAX_LIGHT];
     // spot cutoff in range [0, 90];
     float cutoff[VLC_SCENE_MAX_LIGHT];
-};
+} vlc_scene_lights_t;
 
 typedef struct
 {
