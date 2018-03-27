@@ -969,12 +969,45 @@ static std::string GetVencX264Option( sout_stream_t * /* p_stream */,
     return ssout.str();
 }
 
+#ifdef __APPLE__
+static std::string GetVencAvcodecVTOption( sout_stream_t * /* p_stream */,
+                                           const video_format_t * p_vid,
+                                           int i_quality )
+{
+    const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
+    std::stringstream ssout;
+    ssout << "venc=avcodec{codec=h264_videotoolbox,bframes=3,keyint=250,options{realtime=1,profile=high,level=4.0}}";
+    if( b_hdres )
+    {
+        switch( i_quality )
+        {
+            /* Here, performances issues won't come from videotoolbox but from
+             * some old chromecast devices */
+
+            case CONVERSION_QUALITY_HIGH:
+                break;
+            case CONVERSION_QUALITY_MEDIUM:
+                ssout << ",vb=8000000";
+                break;
+            case CONVERSION_QUALITY_LOW:
+            case CONVERSION_QUALITY_LOWCPU:
+                ssout << ",vb=3000000";
+                break;
+        }
+    }
+
+    return ssout.str();
+}
+#endif
 
 static struct
 {
     vlc_fourcc_t fcc;
     std::string (*get_opt)( sout_stream_t *, const video_format_t *, int);
 } venc_opt_list[] = {
+#ifdef __APPLE__
+    { .fcc = VLC_CODEC_H264, .get_opt = GetVencAvcodecVTOption },
+#endif
     { .fcc = VLC_CODEC_H264, .get_opt = GetVencX264Option },
     { .fcc = VLC_CODEC_VP8,  .get_opt = GetVencVPXOption },
     { .fcc = VLC_CODEC_H264, .get_opt = NULL },
