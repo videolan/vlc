@@ -83,13 +83,13 @@ OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
 void OpenUrlDialog::enqueue()
 {
     bShouldEnqueue = true;
-    lastUrl = edit->text();
+    lastUrl = edit->text().trimmed();
     accept();
 }
 
 void OpenUrlDialog::play()
 {
-    lastUrl = edit->text();
+    lastUrl = edit->text().trimmed();
     accept();
 }
 
