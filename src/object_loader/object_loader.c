@@ -130,36 +130,29 @@ scene_material_t *scene_material_New(void)
 }
 
 
-int scene_material_LoadTexture(object_loader_t *p_loader, scene_material_t *p_material,
-                               const char *psz_path)
+picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path)
 {
-    p_material->psz_path = strdup(psz_path);
-
     image_handler_t *p_imgHandler = image_HandlerCreate(p_loader);
     video_format_t fmt_in, fmt_out;
     video_format_Init(&fmt_in, 0);
     video_format_Init(&fmt_out, VLC_CODEC_RGBA);
 
     char *psz_url = vlc_path2uri(psz_path, NULL);
-    p_material->p_pic = image_ReadUrl(p_imgHandler, psz_url, &fmt_in, &fmt_out);
+    picture_t *p_pic = image_ReadUrl(p_imgHandler, psz_url, &fmt_in, &fmt_out);
     free(psz_url);
 
     video_format_Clean(&fmt_in);
     video_format_Clean(&fmt_out);
     image_HandlerDelete(p_imgHandler);
 
-    if (p_material->p_pic == NULL)
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
+    return p_pic;
 }
 
 
 void scene_material_Release(scene_material_t *p_material)
 {
-    if (p_material->p_pic != NULL)
-        picture_Release(p_material->p_pic);
-    free(p_material->psz_path);
+    if (p_material->p_baseColorTex != NULL)
+        picture_Release(p_material->p_baseColorTex);
     free(p_material);
 }
 

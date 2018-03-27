@@ -31,18 +31,12 @@ typedef struct
 } scene_mesh_t;
 
 
-typedef enum material_type_t
-{
-    MATERIAL_TYPE_TEXTURE,
-    MATERIAL_TYPE_DIFFUSE_COLOR
-} material_type_t;
-
-
 typedef struct
 {
-    char *psz_path;
-    picture_t *p_pic;
-    material_type_t material_type;
+    picture_t *p_baseColorTex;
+    picture_t *p_metalnessTex;
+    picture_t *p_normalTex;
+    picture_t *p_roughnessTex;
 
     float diffuse_color[3]; // RGB
     float emissive_color[3];
@@ -110,8 +104,7 @@ VLC_API scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
                                      unsigned int *faces);
 VLC_API void scene_mesh_Release(scene_mesh_t *p_mesh);
 VLC_API scene_material_t *scene_material_New(void);
-VLC_API int scene_material_LoadTexture(object_loader_t *p_loader, scene_material_t *p_material,
-                                       const char *psz_path);
+VLC_API picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path);
 VLC_API void scene_material_Release(scene_material_t *p_material);
 VLC_API scene_light_t *scene_light_New(void);
 VLC_API void scene_light_Release(scene_light_t *p_light);
