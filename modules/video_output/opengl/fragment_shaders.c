@@ -648,7 +648,6 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];\n");
 
-    if (true /* XXX: has_light*/) {
         //ADD(
             // Values from the vertex shader
             //"in vec3 worldPos;\n"
@@ -656,62 +655,71 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
             //"in vec4 matNormal;\n"
             //"varying vec2 TexCoord0;\n");
 
-        ADDF(
-            "uniform struct {\n"
-            " vec3 Position[%d];\n"
-            " vec3 Ambient[%d];"
-            " vec3 Diffuse[%d];"
-            " vec3 Specular[%d];\n"
-            " float Kc[%d];\n"
-            " float Kl[%d];\n"
-            " float Kq[%d];\n"
-            " vec3 Direction[%d];\n"
-            " float Cutoff[%d];\n"
-            "} Lights;\n",
-            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
-            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
-            VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT);
-        ADD(// Scene light configuration
-            "uniform int LightCount;\n"
-            // Material properties
-            "uniform sampler2D MatAmbientTex;\n"
-            "uniform sampler2D MatDiffuseTex;\n"
-            "uniform sampler2D MatNormalTex;\n"
-            "uniform sampler2D MatSpecularTex;\n"
-            "uniform vec3 MatAmbient;\n"
-            "uniform vec3 MatDiffuse;\n"
-            "uniform vec3 MatSpecular;\n"
-            "uniform vec3 SceneAmbient;\n");
-    }
+    ADDF(
+        "\n"
+        "struct Lights_t {\n"
+        " vec3 Position[%d];\n"
+        " vec3 Ambient[%d];\n"
+        " vec3 Diffuse[%d];\n"
+        " vec3 Specular[%d];\n"
+        " float Kc[%d];\n"
+        " float Kl[%d];\n"
+        " float Kq[%d];\n"
+        " vec3 Direction[%d];\n"
+        " float Cutoff[%d];\n"
+        "};\n"
+        "uniform Lights_t Lights;\n\n",
+        VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
+        VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT,
+        VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT, VLC_SCENE_MAX_LIGHT);
+    ADD(// Scene light configuration
+        "uniform int LightCount;\n"
+        "uniform bool HasLight;\n"
+        // Material properties
+        "uniform sampler2D MatAmbientTex;\n"
+        "uniform sampler2D MatDiffuseTex;\n"
+        "uniform sampler2D MatNormalTex;\n"
+        "uniform sampler2D MatSpecularTex;\n"
+        "uniform vec3 MatAmbient;\n"
+        "uniform vec3 MatDiffuse;\n"
+        "uniform vec3 MatSpecular;\n"
+        "uniform vec3 SceneAmbient;\n"
 
-    ADD("uniform vec4 FillColor;\n"
+        "uniform vec4 FillColor;\n"
         "uniform bool IsUniformColor;\n"
-        "uniform vec4 UniformColor;\n");
+        "uniform vec4 UniformColor;\n"
 
-    ADD("void main(void) {\n"
+        "\n\n"
+
+        "void main(void) {\n"
         " float val;\n"
         " vec4 colors;\n"
-        " vec4 result;\n"
+        " vec4 result = vec4(0,0,0,0);\n"
         " vec3 ambient  = MatAmbient;\n"
         " vec3 specular = MatDiffuse;\n"
         " vec3 diffuse  = MatSpecular;\n"
-        " vec3 normal  = vec3(0,0,0);\n"
+        " vec3 normal  = vec3(0,0,0);\n\n"
 
         // We don't need normal if there is no lights
-        " if (/* hasLight */ true) { \n"
+        " if (HasLight) {\n"
         "  normal = texture2D(MatNormalTex, TexCoord0).xyz;\n"
-        " }\n"
+        " }\n\n"
 
         // If it's not a uniform color, it must be a texture
         " if (!IsUniformColor && false) {\n"
         "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
         "  specular.xyz = texture2D(MatSpecularTex, TexCoord0).xyz;\n"
-        "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n");
+        "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n"
+        " }\n\n"
+
+        // If we don't have light, we're drawing the screen
+        " if (!HasLight) {\n"
+        "  if (!IsUniformColor) {\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
-            ADDF(" vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
+            ADDF("   vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
                  "TexCoord%u.y * TexSize%u.y);\n", i, i, i, i, i);
     }
 
@@ -722,11 +730,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         if (swizzle)
         {
             size_t swizzle_count = strlen(swizzle);
-            ADDF("colors = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);", lookup, i, coord_name, i);
+            ADDF("   colors = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);", lookup, i, coord_name, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
-                ADDF(" val = colors.%c;\n"
-                     " vec4 color%u = vec4(val, val, val, 1);\n",
+                ADDF("   val = colors.%c;\n"
+                     "   vec4 color%u = vec4(val, val, val, 1);\n",
                      swizzle[j], color_idx);
                 color_idx++;
                 assert(color_idx <= PICTURE_PLANE_MAX);
@@ -734,7 +742,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         }
         else
         {
-            ADDF("vec4 color%u = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);",
+            ADDF("   vec4 color%u = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);",
                  color_idx, lookup, i, coord_name, i);
             color_idx++;
             assert(color_idx <= PICTURE_PLANE_MAX);
@@ -744,9 +752,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
     if (is_yuv)
-        ADD(" result = (color0 * Coefficients[0]) + Coefficients[3];\n");
+        ADD("   result = (color0 * Coefficients[0]) + Coefficients[3];\n");
     else
-        ADD(" result = color0;\n");
+        ADD("   result = color0;\n");
 
     for (unsigned i = 1; i < color_count; ++i)
     {
@@ -759,10 +767,10 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
             color_idx = i;
 
         if (is_yuv)
-            ADDF(" result = (color%u * Coefficients[%u]) + result;\n",
+            ADDF("   result = (color%u * Coefficients[%u]) + result;\n",
                  color_idx, i);
         else
-            ADDF(" result = color%u + result;\n", color_idx);
+            ADDF("   result = color%u + result;\n", color_idx);
     }
 
 #ifdef HAVE_LIBPLACEBO
@@ -770,27 +778,32 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         const struct pl_shader_res *res = tc->pl_sh_res;
         assert(res->input  == PL_SHADER_SIG_COLOR);
         assert(res->output == PL_SHADER_SIG_COLOR);
-        ADDF(" result = %s(result);\n", res->name);
+        ADDF("   result = %s(result);\n", res->name);
     }
 #endif
 
-    ADD(" result = result * FillColor;\n"
-        " } else {\n"
-        "  result = UniformColor;\n"
-        " }\n"
-        " if (LightCount == 0) {\n"
-        "  gl_FragColor = result;\n"
-        " } else for(int i=0; i<LightCount; ++i) {\n"
-        "  vec3 light_dir = normalize(gl_FragCoord.xyz-Lights.Position[i]);\n"
-        "  vec3 eye_dir = normalize(-gl_FragCoord.xyz);\n"
-        "  vec3 specular_dir = normalize(Lights.Direction[i] + eye_dir);\n"
-        // TODO: ambient scene color
-        "  gl_FragColor += vec4(\n"
-        "     ambient * SceneAmbient[i]\n"
-        "   + ambient * Lights.Ambient[i]\n"
-        "   + max(0, dot(normal, light_dir)) * diffuse * Lights.Diffuse[i]\n"
-        "   + max(0, dot(normal, specular_dir)) * specular * Lights.Specular[i], 0);\n"
+    ADD("   result = result * FillColor;\n"
         "  }\n"
+        "  else {\n"
+        "   result = UniformColor;\n"
+        "  }\n\n"
+
+        " }\n"
+        // We are using lights, this is the scene !
+        " else {\n"
+        "  for(int i=0; i<LightCount; ++i) {\n"
+        "   vec3 light_dir = normalize(gl_FragCoord.xyz-Lights.Position[i]);\n"
+        "   vec3 eye_dir = normalize(-gl_FragCoord.xyz);\n"
+        "   vec3 specular_dir = normalize(light_dir + eye_dir);\n"
+        // TODO: ambient scene color
+        "   result += vec4(\n"
+        "      ambient * SceneAmbient[i]\n"
+        "    + ambient * Lights.Ambient[i]\n"
+        "    + max(0, dot(normal, light_dir)) * diffuse * Lights.Diffuse[i]\n"
+        "    + max(0, dot(normal, specular_dir)) * specular * Lights.Specular[i], 0);\n"
+        "  }\n"
+        " }\n"
+        "  gl_FragColor = result;\n"
         "}\n");
 
 #undef ADD

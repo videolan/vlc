@@ -102,6 +102,7 @@ struct prgm
     opengl_tex_converter_t *tc;
 
     size_t light_count;
+    bool b_has_light;
 
     struct {
         GLfloat OrientationMatrix[16];
@@ -133,6 +134,7 @@ struct prgm
         GLint SbSOffsets;
 
         GLint LightCount;
+        GLint HasLight;
         struct {
             GLint Position;
             GLint Ambient, Diffuse, Specular;
@@ -711,18 +713,22 @@ opengl_link_program(struct prgm *prgm)
     else
         prgm->aloc.MultiTexCoord[2] = -1;
 
+    GET_ULOC(HasLight, "HasLight");
 
-    for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
+    if (prgm->b_has_light)
     {
-        GET_ULOC(lights.Position, "Lights.MatPosition");
-        GET_ULOC(lights.Ambient, "Lights.MatAmbient");
-        GET_ULOC(lights.Diffuse, "Lights.MatDiffuse");
-        GET_ULOC(lights.Specular, "Lights.MatSpecular");
-        GET_ULOC(lights.Kc, "Lights.Kc");
-        GET_ULOC(lights.Kl, "Lights.Kl");
-        GET_ULOC(lights.Kq, "Lights.Kq");
-        GET_ULOC(lights.Direction, "Lights.Direction");
-        GET_ULOC(lights.Cutoff, "Lights.Cutoff");
+        for(size_t i=0; i<SCENE_MAX_LIGHT; ++i)
+        {
+            GET_ULOC(lights.Position, "Lights.MatPosition");
+            GET_ULOC(lights.Ambient, "Lights.MatAmbient");
+            GET_ULOC(lights.Diffuse, "Lights.MatDiffuse");
+            GET_ULOC(lights.Specular, "Lights.MatSpecular");
+            GET_ULOC(lights.Kc, "Lights.Kc");
+            GET_ULOC(lights.Kl, "Lights.Kl");
+            GET_ULOC(lights.Kq, "Lights.Kq");
+            GET_ULOC(lights.Direction, "Lights.Direction");
+            GET_ULOC(lights.Cutoff, "Lights.Cutoff");
+        }
     }
 
 #undef GET_LOC
