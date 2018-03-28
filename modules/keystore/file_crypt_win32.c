@@ -26,7 +26,7 @@
 #include "file_crypt.h"
 
 #include <windows.h>
-#include <wincrypt.h>
+#include <dpapi.h>
 
 typedef BOOL (WINAPI *ProcessFunc)(DATA_BLOB*, LPCWSTR, DATA_BLOB*, PVOID,
                                    CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
