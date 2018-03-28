@@ -132,6 +132,8 @@ struct prgm
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
         GLint VertexPosition;
+        GLint VertexNormal;
+        GLint VertexTangent;
     } aloc;
 };
 
@@ -498,6 +500,8 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec4 MultiTexCoord0;\n"
         "%s%s"
         "attribute vec3 VertexPosition;\n"
+        "attribute vec3 VertexNormal;\n"
+        "attribute vec3 VertexTangent;\n"
         "uniform mat4 OrientationMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ModelViewMatrix;\n"
@@ -682,6 +686,8 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(SbSOffsets, "SbSOffsets");
 
     GET_ALOC(VertexPosition, "VertexPosition");
+    GET_ALOC(VertexNormal, "VertexNormal");
+    GET_ALOC(VertexTangent, "VertexTangent");
     GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
     /* MultiTexCoord 1 and 2 can be optimized out if not used */
     if (prgm->tc->tex_count > 1)
@@ -2419,6 +2425,14 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
             vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
+
             vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
             tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
         }
@@ -2429,6 +2443,14 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
             vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
             vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
+
+            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
+            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
+            vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
 
             tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
             tc->vt->Uniform4f(tc->uloc.UniformColor,

@@ -15,6 +15,8 @@ typedef struct
     scene_t *p_scene;
 
     GLuint *vertex_buffer_object;
+    GLuint *normal_buffer_object;
+    GLuint *tangent_buffer_object;
     GLuint *index_buffer_object;
     GLuint *texture_buffer_object;
 

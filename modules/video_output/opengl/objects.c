@@ -40,6 +40,14 @@ gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
     if (unlikely(p_objDisplay->vertex_buffer_object == NULL))
         goto error;
 
+    p_objDisplay->normal_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
+    if (unlikely(p_objDisplay->normal_buffer_object == NULL))
+        goto error;
+
+    p_objDisplay->tangent_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
+    if (unlikely(p_objDisplay->tangent_buffer_object == NULL))
+        goto error;
+
     p_objDisplay->index_buffer_object = (GLuint *)malloc(p_scene->nMeshes * sizeof(GLuint));
     if (unlikely(p_objDisplay->index_buffer_object == NULL))
         goto error;
@@ -75,6 +83,8 @@ error:
     free(p_objDisplay->texturesMetalness);
     free(p_objDisplay->texturesBaseColor);
     free(p_objDisplay->vertex_buffer_object);
+    free(p_objDisplay->normal_buffer_object);
+    free(p_objDisplay->tangent_buffer_object);
     free(p_objDisplay->index_buffer_object);
     free(p_objDisplay->texture_buffer_object);
     free(p_objDisplay);
@@ -104,6 +114,8 @@ void releaseSceneObjects(gl_scene_objects_display_t *p_objDisplay)
     free(p_objDisplay->texturesMetalness);
     free(p_objDisplay->texturesBaseColor);
     free(p_objDisplay->vertex_buffer_object);
+    free(p_objDisplay->normal_buffer_object);
+    free(p_objDisplay->tangent_buffer_object);
     free(p_objDisplay->index_buffer_object);
     free(p_objDisplay->texture_buffer_object);
 
@@ -146,6 +158,8 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
     unsigned nMaterials = p_objDisplay->p_scene->nMaterials;
 
     vt->GenBuffers(nMeshes, p_objDisplay->vertex_buffer_object);
+    vt->GenBuffers(nMeshes, p_objDisplay->normal_buffer_object);
+    vt->GenBuffers(nMeshes, p_objDisplay->tangent_buffer_object);
     vt->GenBuffers(nMeshes, p_objDisplay->index_buffer_object);
     vt->GenBuffers(nMeshes, p_objDisplay->texture_buffer_object);
 
@@ -163,6 +177,14 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
         vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->vertex_buffer_object[i]);
         vt->BufferData(GL_ARRAY_BUFFER, p_mesh->nVertices * 3 * sizeof(*p_mesh->vCoords),
                        p_mesh->vCoords, GL_STATIC_DRAW);
+
+        vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->normal_buffer_object[i]);
+        vt->BufferData(GL_ARRAY_BUFFER, p_mesh->nVertices * 3 * sizeof(*p_mesh->nCoords),
+                       p_mesh->nCoords, GL_STATIC_DRAW);
+
+        vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->tangent_buffer_object[i]);
+        vt->BufferData(GL_ARRAY_BUFFER, p_mesh->nVertices * 3 * sizeof(*p_mesh->tanCoords),
+                       p_mesh->tanCoords, GL_STATIC_DRAW);
 
         vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->texture_buffer_object[i]);
         vt->BufferData(GL_ARRAY_BUFFER,  p_mesh->nVertices * 2 * sizeof(*p_mesh->tCoords),
