@@ -29,6 +29,7 @@ EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
 
 ### SRT ###
 libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c
+libaccess_output_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
 libaccess_output_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_output_srt_plugin_la_LIBADD = $(SRT_LIBS) $(LIBPTHREAD)
 libaccess_output_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(access_outdir)'
