@@ -255,7 +255,7 @@ private:
     on_paused_changed_itf m_on_paused_changed;
     void                 *m_on_paused_changed_data;
 
-    ChromecastCommunication m_communication;
+    ChromecastCommunication *m_communication;
     std::queue<QueueableMessages> m_msgQueue;
     States m_state;
     bool m_retry_on_fail;
