@@ -26,7 +26,7 @@ package-win-install:
 	$(MAKE) install
 	touch $@
 
-package-win-sdk:
+package-win-sdk: package-win-install
 	mkdir -p "$(win32_destdir)/sdk/lib/"
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
