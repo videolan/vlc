@@ -140,6 +140,14 @@ struct demux_cc
         resetTimes();
     }
 
+    void deinit()
+    {
+        assert(p_renderer);
+        p_renderer->pf_set_meta( p_renderer->p_opaque, NULL );
+        p_renderer->pf_set_on_paused_changed_cb( p_renderer->p_opaque,
+                                                 NULL, NULL );
+    }
+
     void resetTimes()
     {
         m_start_time = m_last_time = -1;
@@ -161,11 +169,7 @@ struct demux_cc
     ~demux_cc()
     {
         if( p_renderer )
-        {
-            p_renderer->pf_set_meta( p_renderer->p_opaque, NULL );
-            p_renderer->pf_set_on_paused_changed_cb( p_renderer->p_opaque,
-                                                     NULL, NULL );
-        }
+            deinit();
     }
 
     void resetDemuxEof()
@@ -413,14 +417,14 @@ struct demux_cc
         case DEMUX_FILTER_ENABLE:
             p_renderer = static_cast<chromecast_common *>(
                         var_InheritAddress( p_demux, CC_SHARED_VAR_NAME ) );
+            assert(p_renderer != NULL);
             m_enabled = true;
             init();
             return VLC_SUCCESS;
 
         case DEMUX_FILTER_DISABLE:
 
-            p_renderer->pf_set_on_paused_changed_cb( p_renderer->p_opaque,
-                                                     NULL, NULL );
+            deinit();
 
             /* Seek back to last known position. Indeed we don't want to resume
              * from the input position that can be more than 1 minutes forward
