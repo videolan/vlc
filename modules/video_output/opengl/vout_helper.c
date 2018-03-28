@@ -152,6 +152,8 @@ struct prgm
         GLint MatDiffuse;
         GLint MatSpecular;
         GLint SceneAmbient;
+
+        GLint IsUniformColor;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
@@ -521,6 +523,10 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     static const char *template =
         "#version %u\n"
         "varying vec2 TexCoord0;\n"
+        "varying vec4 Position;\n"
+        "varying mat4 ViewMatrix;\n"
+        "varying mat4 ModelMatrix;\n"
+        "varying mat4 NormalMatrix;\n"
         "attribute vec4 MultiTexCoord0;\n"
         "%s%s"
         "attribute vec3 VertexPosition;\n"
@@ -539,7 +545,11 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix * SceneTransformMatrix * ObjectTransformMatrix * vec4(VertexPosition, 1.0);\n"
+        " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix;\n"
+        " ModelMatrix = SceneTransformMatrix * ObjectTransformMatrix;\n"
+        " NormalMatrix = ViewMatrix*ModelMatrix;\n"
+        " Position =  vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * Position;\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -687,8 +697,8 @@ opengl_link_program(struct prgm *prgm)
 
     /* Fetch UniformLocations and AttribLocations */
 #define GET_LOC(type, x, str) do { \
-    x = tc->vt->Get##type##Location(prgm->id, str); \
-    assert(x != -1); \
+    x = tc->vt->Get##type##Location(prgm->id, str); }while(0)
+    //assert(x != -1); \
     if (x == -1) { \
         msg_Err(tc->gl, "Unable to Get"#type"Location(%s)", str); \
         goto error; \
@@ -2450,8 +2460,11 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     // lights settings
     float scene_ambient[] = { 0.5f, 0.5f, 0.5f };
     vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
-    vgl->vt.Uniform1i(prgm->uloc.LightCount, &prgm->light_count); // TODO
+    vgl->vt.Uniform1i(prgm->uloc.LightCount, 10);//prgm->light_count); // TODO
     vgl->vt.Uniform1fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
+    vgl->vt.Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
+
+    prgm->light_count = 10;
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
                         vgl->p_objDisplay->lights.position);
@@ -2476,7 +2489,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
     vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
 
-    vgl->vt.ActiveTexture(GL_TEXTURE0);
 
     for (unsigned o = 0; o < p_scene->nObjects; ++o)
     {
@@ -2489,54 +2501,75 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             GLsizei i_width = p_material->p_baseColorTex->format.i_width;
             GLsizei i_height = p_material->p_baseColorTex->format.i_height;
             tc->pf_prepare_shader(tc, &i_width, &i_height, 1.0f);
-
-            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->texture_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
-            vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
-            tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
         }
-        else
+
+        vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
+        vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
+        vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
+        tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->texture_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+        vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+        vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
+        vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
+        vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
+
+        tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
+        tc->vt->Uniform4f(tc->uloc.UniformColor,
+            p_material->diffuse_color[0], p_material->diffuse_color[1], p_material->diffuse_color[2],
+            1.f);
+
+        vgl->vt.Uniform1fv(prgm->uloc.MatDiffuse, 1, p_material->diffuse_color);
+        vgl->vt.Uniform1fv(prgm->uloc.MatAmbient, 1, p_material->ambient_color);
+        //vgl->vt.Uniform1fv(prgm->uloc.MatSpecular, 1, p_material->specular_color);
+
+        vgl->vt.Uniform1i(prgm->uloc.MatDiffuseTex, 0);
+        vgl->vt.Uniform1i(prgm->uloc.MatAmbientTex, 1);
+        vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
+        vgl->vt.Uniform1i(prgm->uloc.MatNormalTex, 3);
+
+        if(p_material->p_normalTex != NULL)
         {
-            vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
-
-            vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
-            vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
-            vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
-
-            tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
-            tc->vt->Uniform4f(tc->uloc.UniformColor,
-                p_material->diffuse_color[0], p_material->diffuse_color[1], p_material->diffuse_color[2],
-                1.f);
-
-            vgl->vt.Uniform1fv(prgm->uloc.MatDiffuse, 1, p_material->diffuse_color);
-            vgl->vt.Uniform1fv(prgm->uloc.MatAmbient, 1, p_material->ambient_color);
-            //vgl->vt.Uniform1fv(prgm->uloc.MatSpecular, 1, p_material->specular_color);
-
+            vgl->vt.ActiveTexture(GL_TEXTURE3);
+            vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->p_objDisplay->texturesNormal[p_object->textureId]);
         }
+
+        if(p_material->p_baseColorTex != NULL)
+        {
+            vgl->vt.ActiveTexture(GL_TEXTURE0);
+            vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
+        }
+
+        if(false) {
+            vgl->vt.ActiveTexture(GL_TEXTURE1);
+            vgl->vt.BindTexture(GL_TEXTURE_2D, 0);
+        }
+                //vgl->vt.ActiveTexture(GL_TEXTURE0);
+                //vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
+                //tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
+            //vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
+
+            //vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
+            //vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+            //vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
         memcpy(prgm->var.ObjectTransformMatrix, p_object->transformMatrix,
                sizeof(p_object->transformMatrix));

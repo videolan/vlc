@@ -558,8 +558,12 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
-    ADD("uniform vec2 SbSCoefs;\n");
-    ADD("uniform vec2 SbSOffsets;\n");
+    ADD("uniform vec2 SbSCoefs;\n"
+        "uniform vec2 SbSOffsets;\n"
+        "varying vec4 Position;\n"
+        "varying mat4 ViewMatrix;"
+        "varying mat4 NormalMatrix;\n"
+        "varying mat4 ModelMatrix;\n");
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
@@ -687,22 +691,29 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " float val;\n"
         " vec4 colors;\n"
         " vec4 result = vec4(0,0,0,0);\n"
-        " vec3 ambient  = MatAmbient;\n"
-        " vec3 specular = MatDiffuse;\n"
-        " vec3 diffuse  = MatSpecular;\n"
+        " vec3 ambient  = MatAmbient*0.0001f;\n"
+        " vec3 diffuse = MatDiffuse*0.0001f;\n"
+        " vec3 specular  = MatSpecular*0.0001;\n"
+        " ambient += vec3(0.5f, 0.5f, 0.5f);\n"
+        " diffuse += vec3(0.5f, 0.5f, 0.5f);\n"
+        " specular += vec3(0.5f, 0.5f, 0.5f);\n"
         " vec3 normal  = vec3(0,0,0);\n\n"
+
+        // Compute the view space base
 
         // We don't need normal if there is no lights
         " if (HasLight) {\n"
-        "  normal = texture2D(MatNormalTex, TexCoord0).xyz;\n"
+        "  normal = (NormalMatrix * normalize(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0)).xyz;\n"
         " }\n\n"
 
         // If it's not a uniform color, it must be a texture
-        " if (!IsUniformColor) {\n"
+        " if (false)\n"
         "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
+        " if (false)\n"
         "  specular.xyz = texture2D(MatSpecularTex, TexCoord0).xyz;\n"
+        " if (true)\n"
         "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n"
-        " }\n\n"
+        "\n\n"
 
         // If we don't have light, we're drawing the screen
         " if (!HasLight) {\n"
@@ -784,16 +795,47 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         // We are using lights, this is the scene !
         " else {\n"
         "  result = vec4(ambient * SceneAmbient, 1.f);\n"
-        "  for(int i=0; i<LightCount; ++i) {\n"
-        "   vec3 light_dir = normalize(gl_FragCoord.xyz-Lights.Position[i]);\n"
-        "   vec3 eye_dir = normalize(-gl_FragCoord.xyz);\n"
-        "   vec3 specular_dir = normalize(light_dir + eye_dir);\n"
-        // TODO: ambient scene color
-        "   result += vec4(\n"
-        "    + ambient * Lights.Ambient[i]\n"
-        "    + max(0, dot(normal, light_dir)) * diffuse * Lights.Diffuse[i]\n"
-        "    + max(0, dot(normal, specular_dir)) * specular * Lights.Specular[i], 0);\n"
-        "  }\n"
+        "  vec3 eye_dir = normalize(-Position.xyz);\n"
+        //"  vec3 eye_dir = -vec3(1.f, 0, 0);\n"
+        //"  vec3 light_pos = -normalize(ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
+        //"  vec3 light_pos = -(ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
+        "  vec3 light_pos = - (ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
+
+        "  vec3 light_dir = -normalize(light_pos-Position.xyz);\n"
+        "  vec3 light_diffuse = vec3(0.1,0.1,0.0);\n"
+        //"  vec3 light_diffuse = Lights.Diffuse[0];\n"
+        //"  vec3 light_dir = vec3(1.f, 0, 0);\n"
+        //"  normal = vec3(1.f, 1.f, 1.f);\n"
+        //"  result = vec4(dot(light_dir, normal)*vec3(1,1,1,), 1);\n"
+        "  result = vec4(ambient * SceneAmbient\n"
+        "   + ambient * Lights.Ambient[0]\n"
+        "   + max(0, dot(light_dir, normal))*light_diffuse*diffuse,1);\n"
+        //"  result = dot(light_dir, normal) * vec4(1,1,1,1);\n"
+        //"  result = vec4(diffuse, 1);"
+        //"  result = vec4(light_dir, 1.f);\n"
+        //"  result = vec4(light_pos, 1);"
+        //"result = vec4(light_dir, 1);\n"
+        //"  result = vec4(Position.xyz, 1);\n"
+        //"dot(normal, light_dir)*vec4(1, 1, 1, 1);\n"
+
+        //"  for(int i=0; i<10+max(0,LightCount); ++i) {\n"
+        //"   vec3 light_dir = normalize(Lights.Position[i]-Position.xyz);\n"
+        //"   vec3 light_dir = vec3(1.f, 0, 0);\n"
+        //"   vec3 specular_dir = normalize(light_dir + eye_dir);\n"
+        //"   normal =  normalize(light_dir + 0.001f * normal);\n"
+        //// TODO: ambient scene color
+        //"   result += 0.0001f*vec4(\n"
+        //"    + ambient * Lights.Ambient[i]\n"
+        //"    +  dot(normal, light_dir) * diffuse * vec3(0.5f, 0.5f, 0.5f)\n"//Lights.Diffuse[i]\n"
+        //"    +  dot(normal, specular_dir) * specular * Lights.Specular[i], 0.f);\n"
+        //"   {\n"
+        //"    result += vec4(0.1, 0.1, 0.1, 0);\n" //"dot(normal, light_dir)*vec4(1, 1, 1, 1);\n"
+        //"   }\n"
+
+        //"  if (i==0)\n"
+        //"   result = vec4(light_dir, 1.f) + result;\n"
+        //"  }\n"
+        "  //result = vec4(Lights.Diffuse[0].xyz, 1.f) + 0.0001  * result;\n"
         " }\n"
         " gl_FragColor = result;\n"
         "}\n");
