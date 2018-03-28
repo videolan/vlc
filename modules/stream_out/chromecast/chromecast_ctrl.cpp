@@ -131,7 +131,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_art_http_ip = ss.str();
 
     m_common.p_opaque = this;
-    m_common.pf_set_on_paused_changed_cb = set_on_paused_changed_cb;
+    m_common.pf_set_demux_enabled = set_demux_enabled;
     m_common.pf_get_time         = get_time;
     m_common.pf_pace             = pace;
     m_common.pf_send_input_event = send_input_event;
@@ -1029,8 +1029,9 @@ void intf_sys_t::setOnInputEventCb(on_input_event_itf on_input_event,
     m_on_input_event_data = on_input_event_data;
 }
 
-void intf_sys_t::setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
-                                      void *on_paused_changed_data)
+void intf_sys_t::setDemuxEnabled(bool enabled,
+                                 on_paused_changed_itf on_paused_changed,
+                                 void *on_paused_changed_data)
 {
     vlc_mutex_locker locker(&m_lock);
     m_on_paused_changed = on_paused_changed;
@@ -1140,11 +1141,11 @@ mtime_t intf_sys_t::get_time(void *pt)
     return p_this->getPlaybackTimestamp();
 }
 
-void intf_sys_t::set_on_paused_changed_cb(void *pt,
-                                          on_paused_changed_itf itf, void *data)
+void intf_sys_t::set_demux_enabled(void *pt, bool enabled,
+                                   on_paused_changed_itf itf, void *data)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
-    p_this->setOnPausedChangedCb(itf, data);
+    p_this->setDemuxEnabled(enabled, itf, data);
 }
 
 int intf_sys_t::pace(void *pt)
