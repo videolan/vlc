@@ -66,10 +66,10 @@ void scene_object_Release(scene_object_t *p_object)
 
 
 scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
-                             float *vCoords, float *tCoords,
-                             unsigned int *faces)
+                             float *vCoords, float *nCoords, float *tanCoords,
+                             float *tCoords, unsigned int *faces)
 {
-    scene_mesh_t *p_mesh = (scene_mesh_t *)malloc(sizeof(scene_mesh_t));
+    scene_mesh_t *p_mesh = (scene_mesh_t *)calloc(1, sizeof(scene_mesh_t));
     if (unlikely(p_mesh == NULL))
         return NULL;
 
@@ -79,35 +79,41 @@ scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
     // Allocations.
     p_mesh->vCoords = (float *)malloc(3 * nVertices * sizeof(float));
     if (unlikely(p_mesh->vCoords == NULL))
-    {
-        free(p_mesh);
-        return NULL;
-    }
+        goto error;
+
+    p_mesh->nCoords = (float *)malloc(3 * nVertices * sizeof(float));
+    if (unlikely(p_mesh->nCoords == NULL))
+        goto error;
+
+    p_mesh->tanCoords = (float *)malloc(3 * nVertices * sizeof(float));
+    if (unlikely(p_mesh->tanCoords == NULL))
+        goto error;
 
     p_mesh->tCoords = (float *)malloc(2 * nVertices * sizeof(float));
     if (unlikely(p_mesh->tCoords == NULL))
-    {
-        free(p_mesh->vCoords);
-        free(p_mesh);
-        return NULL;
-    }
+        goto error;
 
     p_mesh->faces = (unsigned *)malloc(3 * nFaces * sizeof(unsigned));
     if (unlikely(p_mesh->faces == NULL))
-    {
-        free(p_mesh->tCoords);
-        free(p_mesh->vCoords);
-        free(p_mesh);
-        return NULL;
-    }
+        goto error;
 
     // Copy the mesh data.
     memcpy(p_mesh->vCoords, vCoords, 3 * nVertices * sizeof(float));
+    memcpy(p_mesh->nCoords, tCoords, 3 * nVertices * sizeof(float));
+    memcpy(p_mesh->tanCoords, tanCoords, 3 * nVertices * sizeof(float));
     if (tCoords != NULL) // A mesh can have no texture coordinates
         memcpy(p_mesh->tCoords, tCoords, 2 * nVertices * sizeof(float));
     memcpy(p_mesh->faces, faces, 3 * nFaces * sizeof(unsigned));
 
     return p_mesh;
+error:
+    free(p_mesh->faces);
+    free(p_mesh->tCoords);
+    free(p_mesh->tanCoords);
+    free(p_mesh->nCoords);
+    free(p_mesh->vCoords);
+    free(p_mesh);
+    return NULL;
 }
 
 

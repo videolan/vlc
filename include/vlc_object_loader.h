@@ -24,6 +24,8 @@ typedef struct
 {
     float *vCoords;
     float *tCoords;
+    float *nCoords;
+    float *tanCoords;
     unsigned *faces;
 
     unsigned nVertices;
@@ -100,8 +102,8 @@ VLC_API scene_object_t *scene_object_New(float *transformMatrix, unsigned meshId
                                          unsigned textureId);
 VLC_API void scene_object_Release(scene_object_t *p_object);
 VLC_API scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
-                                     float *vCoords, float *tCoords,
-                                     unsigned int *faces);
+                                     float *vCoords, float *nCoords, float *tanCoords,
+                                     float *tCoords, unsigned int *faces);
 VLC_API void scene_mesh_Release(scene_mesh_t *p_mesh);
 VLC_API scene_material_t *scene_material_New(void);
 VLC_API picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path);
