@@ -1,0 +1,34 @@
+From 32917c2f3c942b7ac25bc461f5984441bcb1fd21 Mon Sep 17 00:00:00 2001
+From: Justin Kim <justin.kim@collabora.com>
+Date: Tue, 2 Jan 2018 16:20:44 +0900
+Subject: [PATCH] srt_compat.h: Enable localtime_s only if MSC_VER >= 1500
+
+Signed-off-by: Justin Kim <justin.kim@collabora.com>
+---
+ common/srt_compat.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/common/srt_compat.h b/common/srt_compat.h
+index d73e193..bddf5f8 100644
+--- a/common/srt_compat.h
++++ b/common/srt_compat.h
+@@ -177,10 +177,16 @@ inline struct tm LocalTime(time_t tt)
+ {
+ 	struct tm tm;
+ #ifdef WIN32
++#if defined(_MSC_VER) && (_MSC_VER>=1500)
+ 	errno_t rr = localtime_s(&tm, &tt);
+ 	if (rr)
+ 		return tm;
++
+ #else
++	tm = *localtime(&tt);
++#endif // _MSC_VER
++
++#else // WIN32
+ 	tm = *localtime_r(&tt, &tm);
+ #endif
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,43 @@
+From 9f9ac2b05be359e68b849d9e2948b0a0ac82b35d Mon Sep 17 00:00:00 2001
+From: Justin Kim <justin.kim@collabora.com>
+Date: Fri, 24 Nov 2017 11:09:36 +0900
+Subject: [PATCH] srtcore/api.h: change inet_ntop to getnameinfo
+
+Missing a header `arpa/inet.h` causes compilation warings.
+However, rather than the header for `inet_ntop` function, it would
+be better to use a protocol-independent address to name translator.
+
+Signed-off-by: Justin Kim <justin.kim@collabora.com>
+---
+ srtcore/api.h          | 2 +-
+ srtcore/platform_sys.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/srtcore/api.h b/srtcore/api.h
+index cd62531..7045da4 100644
+--- a/srtcore/api.h
++++ b/srtcore/api.h
+@@ -282,7 +282,7 @@ inline std::string SockaddrToString(const sockaddr* sadr)
+ 
+ 	std::ostringstream output;
+ 	char hostbuf[1024];
+-	if (inet_ntop(sadr->sa_family, addr, hostbuf, 1024))
++	if (!getnameinfo(sadr, sizeof(*sadr), hostbuf, 1024, NULL, 0, NI_NAMEREQD))
+ 	{
+ 		output << hostbuf;
+ 	}
+diff --git a/srtcore/platform_sys.h b/srtcore/platform_sys.h
+index 5a1d65c..5ffa374 100644
+--- a/srtcore/platform_sys.h
++++ b/srtcore/platform_sys.h
+@@ -16,6 +16,7 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
++#include <netdb.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <unistd.h>
+-- 
+2.11.0
+

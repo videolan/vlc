@@ -1,0 +1,41 @@
+From 3427a475be0163312986eb64d777b9f76feff554 Mon Sep 17 00:00:00 2001
+From: Justin Kim <justin.kim@collabora.com>
+Date: Fri, 23 Mar 2018 13:05:29 +0900
+Subject: [PATCH] CMakeLists.txt: let cmake find pthread
+
+---
+ CMakeLists.txt | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e02b58..dd2511a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -212,18 +212,13 @@ endif()
+ 
+ 
+ # find pthread
+-find_path(PTHREAD_INCLUDE_DIR pthread.h HINTS C:/pthread-win32/include)
+-if (PTHREAD_INCLUDE_DIR)
+-	message(STATUS "Pthread include dir: ${PTHREAD_INCLUDE_DIR}")
+-else()
+-	message(FATAL_ERROR "Failed to find pthread.h. Specify PTHREAD_INCLUDE_DIR.")
+-endif()
+-
+-find_library(PTHREAD_LIBRARY NAMES pthread pthread_dll pthread_lib HINTS C:/pthread-win32/lib)
+-if (PTHREAD_LIBRARY)
+-	message(STATUS "Pthread library: ${PTHREAD_LIBRARY}")
++set (THREADS_PTHREAD_ARG "2" CACHE STRING "Forcibly set by CMakeLists.txt." FORCE)
++set (THREADS_PREFER_PTHREAD_FLAG ON)
++find_package (Threads REQUIRED)
++if (WIN32)
++	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} -lpthreadGC2)
+ else()
+-	message(FATAL_ERROR "Failed to find pthread library. Specify PTHREAD_LIBRARY.")
++	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${CMAKE_THREAD_LIBS_INIT})
+ endif()
+ 
+ # This is required in some projects that add some other sources
+-- 
+2.7.4
+
