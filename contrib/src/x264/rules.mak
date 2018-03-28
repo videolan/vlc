@@ -3,6 +3,7 @@
 X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180324-2245.tar.bz2
 X262_GITURL := git://git.videolan.org/x262.git
+X264_BASENAME := $(notdir $(X264_SNAPURL))
 
 ifdef BUILD_ENCODERS
 ifdef GPL
@@ -61,7 +62,7 @@ $(TARBALLS)/x262-git.tar.gz:
 $(TARBALLS)/x264-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
 
-$(TARBALLS)/x264-git.tar.bz2:
+$(TARBALLS)/$(X264_BASENAME):
 	$(call download,$(X264_SNAPURL))
 
 .sum-x262: x262-git.tar.gz
@@ -71,11 +72,9 @@ $(TARBALLS)/x264-git.tar.bz2:
 .sum-x26410b: .sum-x264
 	touch $@
 
-.sum-x264: x264-git.tar.bz2
-	$(warning $@ not implemented)
-	touch $@
+.sum-x264: $(X264_BASENAME)
 
-x264 x26410b: %: x264-git.tar.bz2 .sum-%
+x264 x26410b: %: $(X264_BASENAME) .sum-%
 	rm -Rf $*-git
 	mkdir -p $*-git
 	tar xvjf "$<" --strip-components=1 -C $*-git
