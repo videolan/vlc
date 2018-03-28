@@ -1,19 +1,22 @@
 # srt
 
-SRT_VERSION := 1.2.2
+SRT_VERSION := 1.2.3
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
-ifndef HAVE_WIN32
 ifdef BUILD_NETWORK
 PKGS += srt
 endif
-endif
+
 ifeq ($(call need_pkg,"srt >= 1.2.2"),)
 PKGS_FOUND += srt
 endif
 
 ifdef HAVE_DARWIN_OS
 SRT_DARWIN=CFLAGS="$(CFLAGS) -Wno-error=partial-availability" CXXFLAGS="$(CXXFLAGS) -Wno-error=partial-availability"
+endif
+
+ifdef HAVE_WIN32
+DEPS_srt += pthreads $(DEPS_pthreads)
 endif
 
 $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
@@ -23,8 +26,9 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
-	$(APPLY) $(SRC)/srt/fix-pc.patch
-	$(APPLY) $(SRC)/srt/add-implicit-link-libraries.patch
+	$(APPLY) $(SRC)/srt/add-implicit-link-libraries.patch 
+	$(APPLY) $(SRC)/srt/0001-CMakeLists.txt-substitute-link-flags-for-package-nam.patch
+	$(APPLY) $(SRC)/srt/0002-CMakeLists.txt-let-cmake-find-pthread.patch
 	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
