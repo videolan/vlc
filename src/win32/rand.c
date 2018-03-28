@@ -27,17 +27,23 @@
 #include <vlc_rand.h>
 
 #if VLC_WINSTORE_APP
-# define COBJMACROS
-# define INITGUID
-# include <winstring.h>
-# include <roapi.h>
-# include <windows.security.cryptography.h>
+# include <bcrypt.h>
 #else
 # include <wincrypt.h>
 #endif
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
+#if VLC_WINSTORE_APP
+    BCRYPT_ALG_HANDLE algo_handle;
+    NTSTATUS ret = BCryptOpenAlgorithmProvider(&algo_handle, BCRYPT_RNG_ALGORITHM,
+                                               MS_PRIMITIVE_PROVIDER, 0);
+    if (BCRYPT_SUCCESS(ret))
+    {
+        BCryptGenRandom(algo_handle, buf, len, 0);
+        BCryptCloseAlgorithmProvider(algo_handle, 0);
+    }
+#else
     size_t count = len;
     uint8_t *p_buf = (uint8_t *)buf;
 
@@ -57,40 +63,6 @@ void vlc_rand_bytes (void *buf, size_t len)
         p_buf += sizeof (val);
     }
 
-#if VLC_WINSTORE_APP
-    static const WCHAR *className = L"Windows.Security.Cryptography.CryptographicBuffer";
-    const UINT32 clen = wcslen(className);
-
-    HSTRING hClassName = NULL;
-    HSTRING_HEADER header;
-    HRESULT hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
-    if (hr) {
-        WindowsDeleteString(hClassName);
-        return;
-    }
-
-    ICryptographicBufferStatics *cryptoStatics = NULL;
-    hr = RoGetActivationFactory(hClassName, &IID_ICryptographicBufferStatics, (void**)&cryptoStatics);
-    WindowsDeleteString(hClassName);
-
-    if (hr)
-        return;
-
-    IBuffer *buffer = NULL;
-    hr = ICryptographicBufferStatics_GenerateRandom(cryptoStatics, len, &buffer);
-    if (hr) {
-        ICryptographicBufferStatics_Release(cryptoStatics);
-        return;
-    }
-
-    UINT32 olength;
-    unsigned char *rnd = NULL;
-    hr = ICryptographicBufferStatics_CopyToByteArray(cryptoStatics, buffer, &olength, (BYTE**)&rnd);
-    memcpy(buf, rnd, len);
-
-    IBuffer_Release(buffer);
-    ICryptographicBufferStatics_Release(cryptoStatics);
-#else
     HCRYPTPROV hProv;
     /* acquire default encryption context */
     if( CryptAcquireContext(

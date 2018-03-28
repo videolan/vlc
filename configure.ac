@@ -1137,7 +1137,10 @@ AS_IF([test "${enable_ssp}" != "no" -a "${enable_optimizations}" != "no"], [
   dnl Win32 requires linking to ssp for stack-protection
   AS_IF([test "${SYS}" = "mingw32"], [
       LDFLAGS="${LDFLAGS} -lssp"
-      AS_IF([test "${vlc_winstore_app}" != 1], [LDFLAGS="${LDFLAGS} -ladvapi32"])
+      dnl library for Crypt/BCrypt APIs
+      AS_IF([test "${vlc_winstore_app}" != 1], 
+            [LDFLAGS="${LDFLAGS} -ladvapi32"],
+            [LDFLAGS="${LDFLAGS} -lbcrypt"])
       AC_CACHE_CHECK([if linker supports stack protectors], [ac_cv_ld_ssp], [
         AC_TRY_LINK([#include <stdio.h>],[char buf[100]; fgets(buf, sizeof(buf), stdin);], [
           ac_cv_ld_ssp="yes"
