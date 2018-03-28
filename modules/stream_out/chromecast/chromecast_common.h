@@ -58,7 +58,7 @@ typedef struct
 {
     void *p_opaque;
 
-    void (*pf_set_on_paused_changed_cb)(void *, on_paused_changed_itf, void *);
+    void (*pf_set_demux_enabled)(void *, bool enabled, on_paused_changed_itf, void *);
 
     mtime_t (*pf_get_time)(void*);
 

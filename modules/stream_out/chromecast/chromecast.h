@@ -172,8 +172,8 @@ struct intf_sys_t
     void setHasInput(const std::string mime_type = "");
 
     void setOnInputEventCb(on_input_event_itf on_input_event, void *on_input_event_data);
-    void setOnPausedChangedCb(on_paused_changed_itf on_paused_changed,
-                              void *on_paused_changed_data);
+    void setDemuxEnabled(bool enabled, on_paused_changed_itf on_paused_changed,
+                         void *on_paused_changed_data);
     void requestPlayerStop();
     States state() const;
 
@@ -223,7 +223,7 @@ private:
 
     static int pace(void*);
     static void send_input_event(void *, enum cc_input_event event, union cc_input_arg arg);
-    static void set_on_paused_changed_cb(void *, on_paused_changed_itf, void *);
+    static void set_demux_enabled(void *, bool, on_paused_changed_itf, void *);
 
     static void set_pause_state(void*, bool paused, mtime_t delay);
 

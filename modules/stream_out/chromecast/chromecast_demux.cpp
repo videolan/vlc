@@ -135,8 +135,8 @@ struct demux_cc
 
         es_out_Control( p_demux->p_next->out, ES_OUT_RESET_PCR );
 
-        p_renderer->pf_set_on_paused_changed_cb(p_renderer->p_opaque,
-                                                on_paused_changed_cb, p_demux);
+        p_renderer->pf_set_demux_enabled(p_renderer->p_opaque, true,
+                                         on_paused_changed_cb, p_demux);
 
         resetTimes();
     }
@@ -145,8 +145,7 @@ struct demux_cc
     {
         assert(p_renderer);
         p_renderer->pf_set_meta( p_renderer->p_opaque, NULL );
-        p_renderer->pf_set_on_paused_changed_cb( p_renderer->p_opaque,
-                                                 NULL, NULL );
+        p_renderer->pf_set_demux_enabled(p_renderer->p_opaque, false, NULL, NULL);
     }
 
     void resetTimes()
