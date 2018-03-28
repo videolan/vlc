@@ -976,7 +976,7 @@ static std::string GetVencAvcodecVTOption( sout_stream_t * /* p_stream */,
 {
     const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
     std::stringstream ssout;
-    ssout << "venc=avcodec{codec=h264_videotoolbox,bframes=3,keyint=250,options{realtime=1,profile=high,level=4.0}}";
+    ssout << "venc=avcodec{codec=h264_videotoolbox,options{realtime=1}}";
     if( b_hdres )
     {
         switch( i_quality )
