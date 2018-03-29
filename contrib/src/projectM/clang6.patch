@@ -1,0 +1,18 @@
+diff -urN projectM-orig/Renderer/VideoEcho.cpp projectM/Renderer/VideoEcho.cpp
+--- projectM-orig/Renderer/VideoEcho.cpp	2009-12-06 03:42:51.000000000 +0200
++++ projectM/Renderer/VideoEcho.cpp	2018-03-29 23:56:45.852289647 +0300
+@@ -74,10 +74,10 @@
+ 			default: flipx=1;flipy=1; break;
+ 		}
+ 
+-		float pointsFlip[4][2] = {{-0.5*flipx, -0.5*flipy},
+-					  {-0.5*flipx,  0.5*flipy},
+-					  { 0.5*flipx,  0.5*flipy},
+-					  { 0.5*flipx, -0.5*flipy}};
++		float pointsFlip[4][2] = {{-0.5f*flipx, -0.5f*flipy},
++					  {-0.5f*flipx,  0.5f*flipy},
++					  { 0.5f*flipx,  0.5f*flipy},
++					  { 0.5f*flipx, -0.5f*flipy}};
+ 
+ 		glVertexPointer(2,GL_FLOAT,0,pointsFlip);
+ 		glDrawArrays(GL_TRIANGLE_FAN,0,4);
