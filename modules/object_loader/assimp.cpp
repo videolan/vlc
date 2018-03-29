@@ -95,14 +95,6 @@ static void Close(vlc_object_t *p_this)
 }
 
 
-static void getAllNodes(std::vector<aiNode *> &nodes, aiNode *node)
-{
-    for (unsigned c = 0; c < node->mNumChildren; ++c)
-        getAllNodes(nodes, node->mChildren[c]);
-    nodes.push_back(node);
-}
-
-
 _json_value *getJSONValues(object_loader_t *p_loader, const char *psz_path)
 {
     char *psz_url = vlc_path2uri(psz_path, NULL);
@@ -276,6 +268,46 @@ static inline void aiVector3DToArray(aiVector3D v, float *arr)
 }
 
 
+static void addNodes(object_loader_t *p_loader, aiNode *node,
+                     aiMatrix4x4 parentGlobalTransform,
+                     std::vector<scene_object_t *> &objects,
+                     const aiScene *myAiScene,
+                     std::unordered_map<unsigned, unsigned> &aiTextureMap,
+                     std::unordered_map<unsigned, unsigned> &aiMeshMap)
+{
+    // Transpose the node transformation matrix to convert to OpenGL matrices.
+    aiMatrix4x4 transform = node->mTransformation.Transpose() * parentGlobalTransform;
+
+    for (unsigned c = 0; c < node->mNumChildren; ++c)
+        addNodes(p_loader, node->mChildren[c], transform, objects, myAiScene,
+                 aiTextureMap, aiMeshMap);
+
+    for (unsigned j = 0; j < node->mNumMeshes; ++j)
+    {
+        unsigned i_mesh = node->mMeshes[j];
+        unsigned i_texture = myAiScene->mMeshes[i_mesh]->mMaterialIndex;
+
+        auto texMapIt = aiTextureMap.find(i_texture);
+        if (texMapIt == aiTextureMap.end())
+        {
+            msg_Warn(p_loader, "Could not add the current object as its texture could not be loaded");
+            continue;
+        }
+
+        auto meshMapIt = aiMeshMap.find(i_mesh);
+        if (meshMapIt == aiMeshMap.end())
+        {
+            msg_Warn(p_loader, "Could not add the current object as its mesh could not be loaded");
+            continue;
+        }
+
+        unsigned texMap = texMapIt->second;
+        unsigned meshMap = meshMapIt->second;
+        objects.push_back(scene_object_New((float *)&transform, meshMap, texMap));
+    }
+}
+
+
 scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 {
     object_loader_sys_t *p_sys = p_loader->p_sys;
@@ -392,7 +424,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
             char psz_path[pathLen];
             #define TEXTURE_DIR "VirtualTheater" DIR_SEP "Textures" DIR_SEP
             strcpy(psz_path, TEXTURE_DIR);
-            strcat(psz_path, path.C_Str() + strlen("..\\..\\sourceimages\\"));
+            strcat(psz_path, path.C_Str() + strlen("Projet_maya\\sourceimages\\"));
 
             char psz_baseTexPath[pathLen];
             const char *basePathEnd = strrchr(psz_path, '_');
@@ -450,38 +482,9 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     }
 
     // Objects
-    std::vector<aiNode *> nodes;
-    getAllNodes(nodes, myAiScene->mRootNode);
-
     std::vector<scene_object_t *> objects;
-    for (auto it = nodes.begin(); it != nodes.end(); ++it)
-    {
-        aiNode *node = *it;
-        for (unsigned j = 0; j < node->mNumMeshes; ++j)
-        {
-            unsigned i_mesh = node->mMeshes[j];
-            unsigned i_texture = myAiScene->mMeshes[i_mesh]->mMaterialIndex;
-
-            auto texMapIt = aiTextureMap.find(i_texture);
-            if (texMapIt == aiTextureMap.end())
-            {
-                msg_Warn(p_loader, "Could not add the current object as its texture could not be loaded");
-                continue;
-            }
-
-            auto meshMapIt = aiMeshMap.find(i_mesh);
-            if (meshMapIt == aiMeshMap.end())
-            {
-                msg_Warn(p_loader, "Could not add the current object as its mesh could not be loaded");
-                continue;
-            }
-
-            unsigned texMap = texMapIt->second;
-            unsigned meshMap = meshMapIt->second;
-            objects.push_back(scene_object_New((float *)&node->mTransformation,
-                                               meshMap, texMap));
-        }
-    }
+    addNodes(p_loader, myAiScene->mRootNode, aiMatrix4x4(), objects,
+             myAiScene, aiTextureMap, aiMeshMap);
 
     // Ligths
     std::vector<scene_light_t *> lights;
