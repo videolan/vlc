@@ -1122,20 +1122,18 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const bool b_hdmi = AOUT_FMT_HDMI(fmt);
     if (b_spdif || b_hdmi)
     {
-        if (!var_GetBool(aout, "mmdevice-digital-output"))
-            return -1;
-
-        if (b_hdmi || fmt->i_format == VLC_CODEC_DTS)
+        switch (var_InheritInteger(aout, "mmdevice-passthrough"))
         {
-            const bool no_codec_hd =
-                var_InheritInteger(aout, "mmdevice-passthrough") == MM_PASSTHROUGH_ENABLED;
-            if (no_codec_hd)
-            {
+            case MM_PASSTHROUGH_DISABLED:
+                return -1;
+            case MM_PASSTHROUGH_ENABLED:
                 if (b_hdmi)
                     return -1;
-                else
+                else if (fmt->i_format == VLC_CODEC_DTS)
                     var_SetBool(aout, "dtshd", false );
-            }
+                /* falltrough */
+            case MM_PASSTHROUGH_ENABLED_HD:
+                break;
         }
     }
 
@@ -1239,16 +1237,6 @@ static void Stop(audio_output_t *aout)
     sys->stream = NULL;
 }
 
-static int DigitalOutCallback(vlc_object_t *obj, const char *varname,
-                               vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    (void) varname; (void) oldval; (void) newval; (void) data;
-    audio_output_t *aout = (audio_output_t *)obj;
-
-    aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
-    return 0;
-}
-
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -1326,14 +1314,6 @@ static int Open(vlc_object_t *obj)
     LeaveCriticalSection(&sys->lock);
     LeaveMTA(); /* Leave MTA after thread has entered MTA */
 
-    int passthrough = var_InheritInteger(aout, "mmdevice-passthrough");
-
-    /* Inherit mmdevice-digital-output bool from mmdevice-passthrough */
-    var_Create(aout, "mmdevice-digital-output", VLC_VAR_BOOL);
-    var_SetBool(aout, "mmdevice-digital-output",
-                passthrough != MM_PASSTHROUGH_DISABLED);
-    var_AddCallback (aout, "mmdevice-digital-output", DigitalOutCallback, NULL);
-
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = TimeGet;
@@ -1356,8 +1336,6 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-
-    var_DelCallback (aout, "mmdevice-digital-output", DigitalOutCallback, NULL);
 
     EnterCriticalSection(&sys->lock);
     sys->requested_device = default_device; /* break out of MMSession() loop */
