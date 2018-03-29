@@ -123,7 +123,7 @@ static void AStreamPrebufferBlock(stream_t *s)
         if (vlc_killed() || cache_size > STREAM_CACHE_PREBUFFER_SIZE)
         {
 
-            msg_Dbg(s, "prebuffering done %"PRId64" bytes in",
+            msg_Dbg(s, "prebuffering done %zu bytes in",
                      cache_size);
             break;
         }
