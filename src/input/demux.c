@@ -146,12 +146,6 @@ demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                               psz_location, s, out, false );
 }
 
-typedef struct demux_priv_t
-{
-    demux_t demux;
-    void (*destroy)(demux_t *);
-} demux_priv_t;
-
 static void demux_DestroyDemux(demux_t *demux)
 {
     module_unneed(demux, demux->p_module);
@@ -207,11 +201,12 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_location,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
-    demux_priv_t *priv = vlc_custom_create(p_obj, sizeof (*priv), "demux");
-    if (unlikely(priv == NULL))
-        return NULL;
+    void (*destroy)(stream_t *) =
+        (s != NULL) ? demux_DestroyDemux : demux_DestroyAccessDemux;
+    demux_t *p_demux = vlc_stream_CommonNew(p_obj, destroy);
 
-    demux_t *p_demux = &priv->demux;
+    if (unlikely(p_demux == NULL))
+        return NULL;
 
     if( s != NULL && (!strcasecmp( psz_demux, "any" ) || !psz_demux[0]) )
     {   /* Look up demux by mime-type for hard to detect formats */
@@ -249,7 +244,6 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
-    priv->destroy = s ? demux_DestroyDemux : demux_DestroyAccessDemux;
 
     if( s != NULL )
     {
@@ -278,14 +272,13 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     if( p_demux->p_module == NULL )
     {
         free( p_demux->psz_filepath );
-        free( p_demux->psz_url );
         goto error;
     }
 
     return p_demux;
 error:
     free( p_demux->psz_name );
-    vlc_object_release( p_demux );
+    stream_CommonDelete( p_demux );
     return NULL;
 }
 
@@ -294,11 +287,7 @@ error:
  *****************************************************************************/
 void demux_Delete( demux_t *p_demux )
 {
-    demux_priv_t *priv = (demux_priv_t *)p_demux;
-
-    priv->destroy(p_demux);
-    free( p_demux->psz_url );
-    vlc_object_release( p_demux );
+    vlc_stream_Delete( p_demux );
 }
 
 #define static_control_match(foo) \
@@ -519,11 +508,10 @@ int demux_GetSeekpoint( demux_t *p_demux )
 
 static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 {
-    demux_priv_t *priv = vlc_custom_create(p_next, sizeof (*priv), "demux_filter");
-    if (unlikely(priv == NULL))
+    demux_t *p_demux = vlc_stream_CommonNew(VLC_OBJECT(p_next),
+                                            demux_DestroyDemuxFilter);
+    if (unlikely(p_demux == NULL))
         return NULL;
-
-    demux_t *p_demux = &priv->demux;
 
     p_demux->p_next       = p_next;
     p_demux->p_input      = NULL;
@@ -533,7 +521,6 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     p_demux->psz_location = NULL;
     p_demux->psz_filepath = NULL;
     p_demux->out          = NULL;
-    priv->destroy         = demux_DestroyDemuxFilter;
     p_demux->p_module =
         module_need( p_demux, "demux_filter", p_name, p_name != NULL );
 
@@ -542,7 +529,7 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 
     return p_demux;
 error:
-    vlc_object_release( p_demux );
+    stream_CommonDelete( p_demux );
     return NULL;
 }
 
