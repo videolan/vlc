@@ -505,7 +505,7 @@ void intf_sys_t::sendInputEvent(enum cc_input_event event, union cc_input_arg ar
  * @param msg the CastMessage to process
  * @return 0 if the message has been successfuly processed else -1
  */
-void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
+bool intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 {
     const std::string & namespace_ = msg.namespace_();
 
@@ -513,12 +513,13 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
     msg_Dbg( m_module, "processMessage: %s->%s %s", namespace_.c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
 #endif
 
+    bool ret = true;
     if (namespace_ == NAMESPACE_DEVICEAUTH)
         processAuthMessage( msg );
     else if (namespace_ == NAMESPACE_HEARTBEAT)
         processHeartBeatMessage( msg );
     else if (namespace_ == NAMESPACE_RECEIVER)
-        processReceiverMessage( msg );
+        ret = processReceiverMessage( msg );
     else if (namespace_ == NAMESPACE_MEDIA)
         processMediaMessage( msg );
     else if (namespace_ == NAMESPACE_CONNECTION)
@@ -527,6 +528,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
     {
         msg_Err( m_module, "Unknown namespace: %s", msg.namespace_().c_str());
     }
+    return ret;
 }
 
 void intf_sys_t::queueMessage( QueueableMessages msg )
@@ -625,11 +627,12 @@ void intf_sys_t::processHeartBeatMessage( const castchannel::CastMessage& msg )
     json_value_free(p_data);
 }
 
-void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
+bool intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
 {
     json_value *p_data = json_parse(msg.payload_utf8().c_str());
     std::string type((*p_data)["type"]);
 
+    bool ret = true;
     if (type == "RECEIVER_STATUS")
     {
         json_value applications = (*p_data)["status"]["applications"];
@@ -715,6 +718,7 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
         m_appTransportId = "";
         m_mediaSessionId = 0;
         setState( Dead );
+        ret = false;
     }
     else
     {
@@ -723,6 +727,7 @@ void intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
     }
 
     json_value_free(p_data);
+    return ret;
 }
 
 void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
@@ -958,8 +963,7 @@ bool intf_sys_t::handleMessages()
     }
     castchannel::CastMessage msg;
     msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
-    processMessage(msg);
-    return true;
+    return processMessage(msg);
 }
 
 void intf_sys_t::doStop()
