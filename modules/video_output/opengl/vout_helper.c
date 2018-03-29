@@ -2467,13 +2467,13 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     prgm->light_count = 10;
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
-                        vgl->p_objDisplay->lights.position);
+                        *vgl->p_objDisplay->lights.position);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Ambient, prgm->light_count,
-                        vgl->p_objDisplay->lights.ambient);
+                        *vgl->p_objDisplay->lights.ambient);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Diffuse, prgm->light_count,
-                        vgl->p_objDisplay->lights.diffuse);
+                        *vgl->p_objDisplay->lights.diffuse);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Specular, prgm->light_count,
-                        vgl->p_objDisplay->lights.specular);
+                        *vgl->p_objDisplay->lights.specular);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Kc, prgm->light_count,
                         vgl->p_objDisplay->lights.k_c);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Kl, prgm->light_count,
@@ -2481,7 +2481,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform1fv(prgm->uloc.lights.Kq, prgm->light_count,
                         vgl->p_objDisplay->lights.k_q);
     vgl->vt.Uniform3fv(prgm->uloc.lights.Direction, prgm->light_count,
-                        vgl->p_objDisplay->lights.direction);
+                        *vgl->p_objDisplay->lights.direction);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Cutoff, prgm->light_count,
                         vgl->p_objDisplay->lights.cutoff);
 
