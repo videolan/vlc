@@ -463,10 +463,11 @@ int intf_sys_t::pace()
         return CC_PACE_OK_ENDED;
     else if( isStateError() || m_state == Stopped )
     {
-        States error_state = m_state;
-        m_state = Ready;
-        if( error_state == LoadFailed && m_retry_on_fail )
+        if( m_state == LoadFailed && m_retry_on_fail )
+        {
+            m_state = Ready;
             return CC_PACE_ERR_RETRY;
+        }
         return CC_PACE_ERR;
     }
 
