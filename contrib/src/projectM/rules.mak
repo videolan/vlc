@@ -23,6 +23,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/projectM/win32.patch
 endif
 	$(APPLY) $(SRC)/projectM/gcc6.patch
+	$(APPLY) $(SRC)/projectM/clang6.patch
 	$(MOVE)
 
 DEPS_projectM = glew $(DEPS_glew)
@@ -35,7 +36,6 @@ DEPS_projectM = glew $(DEPS_glew)
 		-DUSE_FTGL:BOOL=OFF \
 		-DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF \
 		-DINCLUDE-PROJECTM-QT:BOOL=OFF \
-		-DCMAKE_CXX_STANDARD=98 \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON .
 	cd $< && $(MAKE) install
 	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
