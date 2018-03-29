@@ -154,18 +154,29 @@ typedef struct demux_priv_t
 
 static void demux_DestroyDemux(demux_t *demux)
 {
+    module_unneed(demux, demux->p_module);
+    free(demux->psz_filepath);
+    free(demux->psz_name);
+
     assert(demux->s != NULL);
     vlc_stream_Delete(demux->s);
 }
 
 static void demux_DestroyAccessDemux(demux_t *demux)
 {
+    module_unneed(demux, demux->p_module);
+    free(demux->psz_filepath);
+    free(demux->psz_name);
+
     assert(demux->s == NULL);
-    (void) demux;
 }
 
 static void demux_DestroyDemuxFilter(demux_t *demux)
 {
+    module_unneed(demux, demux->p_module);
+    free(demux->psz_filepath);
+    free(demux->psz_name);
+
     assert(demux->p_next != NULL);
     demux_Delete(demux->p_next);
 }
@@ -285,12 +296,8 @@ void demux_Delete( demux_t *p_demux )
 {
     demux_priv_t *priv = (demux_priv_t *)p_demux;
 
-    module_unneed( p_demux, p_demux->p_module );
-
     priv->destroy(p_demux);
-    free( p_demux->psz_filepath );
     free( p_demux->psz_url );
-    free( p_demux->psz_name );
     vlc_object_release( p_demux );
 }
 
