@@ -33,6 +33,7 @@ FFMPEGCONF = \
 	--disable-protocol=concat \
 	--disable-bsfs \
 	--disable-bzlib \
+	--disable-libvpx \
 	--disable-avresample \
 	--enable-bsf=vp9_superframe
 
@@ -70,11 +71,8 @@ ifndef BUILD_NETWORK
 FFMPEGCONF += --disable-network
 endif
 ifdef BUILD_ENCODERS
-FFMPEGCONF += --enable-libmp3lame --enable-libvpx --disable-decoder=libvpx_vp8 --disable-decoder=libvpx_vp9
-ifndef USE_FFMPEG
-FFMPEGCONF += --disable-decoder=libvpx
-endif
-DEPS_ffmpeg += lame $(DEPS_lame) vpx $(DEPS_vpx)
+FFMPEGCONF += --enable-libmp3lame
+DEPS_ffmpeg += lame $(DEPS_lame)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 endif
