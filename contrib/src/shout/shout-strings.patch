@@ -1,0 +1,36 @@
+--- libshout/src/common/httpp/encoding.c.strings	2015-11-20 20:51:36.000000000 +0100
++++ libshout/src/common/httpp/encoding.c	2018-03-29 11:00:04.524097700 +0200
+@@ -27,7 +27,9 @@
+ #endif
+ 
+ #include <sys/types.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+--- libshout/src/proto_http.c.strings	2015-11-20 17:22:27.000000000 +0100
++++ libshout/src/proto_http.c	2018-03-29 10:53:02.770498200 +0200
+@@ -28,7 +28,9 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ 
+ #include <shout/shout.h>
+ #include "shout_private.h"
+--- libshout/src/shout.c.strings	2015-11-09 12:54:12.000000000 +0100
++++ libshout/src/shout.c	2018-03-29 10:52:59.169968800 +0200
+@@ -29,7 +29,9 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <errno.h>
+ 
+ #include <shout/shout.h>
