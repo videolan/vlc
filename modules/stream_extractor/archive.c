@@ -194,7 +194,7 @@ static la_ssize_t libarchive_read_cb( libarchive_t* p_arc, void* p_obj,
     if( i_ret < 0 )
     {
         archive_set_error( p_sys->p_archive, ARCHIVE_FATAL,
-          "libarchive_read_cb failed = %" PRId64, i_ret );
+          "libarchive_read_cb failed = %zd", i_ret );
 
         return ARCHIVE_FATAL;
     }
