@@ -38,6 +38,11 @@ X264CONF += --enable-win32thread
 ifeq ($(ARCH), arm)
 X264_AS = AS="./tools/gas-preprocessor.pl -arch arm -as-type clang -force-thumb -- $(CC) -mimplicit-it=always"
 endif
+ifeq ($(ARCH),aarch64)
+# Configure defaults to gas-preprocessor + armasm64 for this target,
+# unless overridden.
+X264_AS = AS="$(CC)"
+endif
 endif
 ifdef HAVE_CROSS_COMPILE
 X264CONF += --cross-prefix="$(HOST)-"
