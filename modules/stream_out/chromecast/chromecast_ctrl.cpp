@@ -801,7 +801,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                 status[0]["playerState"].operator const char *(),
                 sessionId );
 
-        if ((m_mediaSessionId != sessionId && m_mediaSessionId != 0))
+        if (sessionId != 0 && m_mediaSessionId != 0 && m_mediaSessionId != sessionId)
         {
             msg_Warn( m_module, "Ignoring message for a different media session");
             json_value_free(p_data);
