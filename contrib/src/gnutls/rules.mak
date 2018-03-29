@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.5.16
+GNUTLS_VERSION := 3.5.18
 GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
@@ -19,7 +19,6 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
-	$(APPLY) $(SRC)/gnutls/32b5628-upstream.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
