@@ -272,14 +272,6 @@ error:
     return NULL;
 }
 
-/*****************************************************************************
- * demux_Delete:
- *****************************************************************************/
-void demux_Delete( demux_t *p_demux )
-{
-    vlc_stream_Delete( p_demux );
-}
-
 #define static_control_match(foo) \
     static_assert((unsigned) DEMUX_##foo == STREAM_##foo, "Mismatch")
 

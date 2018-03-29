@@ -80,7 +80,6 @@ decoder_GetDisplayRate
 decoder_GetInputAttachments
 decoder_NewAudioBuffer
 decoder_NewSubpicture
-demux_Delete
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_New
