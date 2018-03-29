@@ -24,6 +24,7 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/libshout-arpa.patch
 	$(APPLY) $(SRC)/shout/fix-xiph_openssl.patch
 	$(APPLY) $(SRC)/shout/shout-strings.patch
+	$(APPLY) $(SRC)/shout/shout-timeval.patch
 	$(APPLY) $(SRC)/shout/no-examples.patch
 	$(APPLY) $(SRC)/shout/no-force-libwsock.patch
 	$(call pkg_static,"shout.pc.in")
