@@ -165,16 +165,6 @@ static void demux_DestroyAccessDemux(demux_t *demux)
     assert(demux->s == NULL);
 }
 
-static void demux_DestroyDemuxFilter(demux_t *demux)
-{
-    module_unneed(demux, demux->p_module);
-    free(demux->psz_filepath);
-    free(demux->psz_name);
-
-    assert(demux->p_next != NULL);
-    demux_Delete(demux->p_next);
-}
-
 static int demux_Probe(void *func, va_list ap)
 {
     int (*probe)(vlc_object_t *) = func;
@@ -509,7 +499,7 @@ int demux_GetSeekpoint( demux_t *p_demux )
 static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 {
     demux_t *p_demux = vlc_stream_CommonNew(VLC_OBJECT(p_next),
-                                            demux_DestroyDemuxFilter);
+                                            demux_DestroyDemux);
     if (unlikely(p_demux == NULL))
         return NULL;
 
