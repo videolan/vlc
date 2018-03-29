@@ -1,7 +1,7 @@
 # mfx (Media SDK)
 
 mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
-MFX_GITHASH := 7adf2e463149adf6820de745a4d9e5d9a1ba8763
+MFX_GITHASH := b3b0bc9524a8a936fb1b80ca2db45566feb2e868
 
 ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
@@ -23,6 +23,6 @@ mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(MOVE)
 
 .mfx: mfx
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CXXFLAGS="-std=c++98 -O2"
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
