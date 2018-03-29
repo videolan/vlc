@@ -548,8 +548,8 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix;\n"
         " ModelMatrix = SceneTransformMatrix * ObjectTransformMatrix;\n"
         " NormalMatrix = ViewMatrix*ModelMatrix;\n"
-        " Position =  vec4(VertexPosition, 1.0);\n"
-        " gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * Position;\n"
+        " Position =  ViewMatrix*ModelMatrix*vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * Position;\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
