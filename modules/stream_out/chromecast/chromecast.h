@@ -187,7 +187,7 @@ struct intf_sys_t
 private:
     bool handleMessages();
 
-    void processMessage(const castchannel::CastMessage &msg);
+    bool processMessage(const castchannel::CastMessage &msg);
     void queueMessage( QueueableMessages msg );
 
     void setPauseState(bool paused, mtime_t delay);
@@ -212,7 +212,7 @@ private:
     void mainLoop();
     void processAuthMessage( const castchannel::CastMessage& msg );
     void processHeartBeatMessage( const castchannel::CastMessage& msg );
-    void processReceiverMessage( const castchannel::CastMessage& msg );
+    bool processReceiverMessage( const castchannel::CastMessage& msg );
     void processMediaMessage( const castchannel::CastMessage& msg );
     void processConnectionMessage( const castchannel::CastMessage& msg );
 
