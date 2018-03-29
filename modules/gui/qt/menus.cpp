@@ -1576,25 +1576,6 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
     free( ids );
     free( names );
     free( selected );
-
-#ifdef _WIN32
-    char *module = var_GetString( p_aout, "module-name" );
-    const bool is_mmdevice = module && strcmp(module, "mmdevice") == 0;
-    free(module);
-    if (is_mmdevice)
-    {
-        current->addSeparator();
-        addActionWithCheckbox( current, "mmdevice-digital-output",
-                               qtr( "Digital Output" ) );
-
-        QVector<vlc_object_t *> objects;
-        QVector<const char *> varnames;
-        varnames.append( "mmdevice-digital-output" );
-        objects.append( VLC_OBJECT( p_aout ) );
-        Populate( current, varnames, objects );
-    }
-#endif
-
 }
 
 void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
