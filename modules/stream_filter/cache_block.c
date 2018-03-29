@@ -117,7 +117,6 @@ static void AStreamPrebufferBlock(stream_t *s)
     msg_Dbg(s, "starting pre-buffering");
     for (;;)
     {
-        const int64_t now = mdate();
         size_t cache_size = block_BytestreamRemaining( &sys->cache );
 
         if (vlc_killed() || cache_size > STREAM_CACHE_PREBUFFER_SIZE)
