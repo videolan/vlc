@@ -1,0 +1,10 @@
+--- libshout/src/common/timing/timing.c.timeval	2015-01-27 19:08:54.000000000 +0100
++++ libshout/src/common/timing/timing.c	2018-03-29 10:33:11.505409500 +0200
+@@ -35,6 +35,7 @@
+ #ifdef _WIN32
+ #include <windows.h>
+ #include <mmsystem.h>
++#include <winsock2.h>
+ #else
+ #ifdef TIME_WITH_SYS_TIME
+ #  include <sys/time.h>
