@@ -185,6 +185,7 @@ struct intf_sys_t
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
 private:
+    void reinit();
     bool handleMessages();
 
     bool processMessage(const castchannel::CastMessage &msg);
@@ -237,7 +238,9 @@ private:
 private:
     vlc_object_t  * const m_module;
     const int      m_streaming_port;
+    const int      m_device_port;
     std::string    m_mime;
+    std::string    m_device_addr;
 
     std::string m_appTransportId;
     unsigned m_last_request_id;
@@ -247,7 +250,6 @@ private:
     vlc_cond_t   m_stateChangedCond;
     vlc_cond_t   m_pace_cond;
     vlc_thread_t m_chromecastThread;
-
 
     on_input_event_itf    m_on_input_event;
     void                 *m_on_input_event_data;
