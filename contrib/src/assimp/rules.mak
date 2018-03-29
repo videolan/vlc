@@ -16,6 +16,7 @@ $(TARBALLS)/assimp-$(ASSIMP_VERSION).tar.gz:
 
 assimp: assimp-$(ASSIMP_VERSION).tar.gz 
 	$(UNPACK)
+	$(APPLY) $(SRC)/assimp/0001-FBXConverter-fix-light-and-camera-position-convertio.patch
 	$(MOVE)
 
 .assimp: assimp toolchain.cmake

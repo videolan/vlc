@@ -1,0 +1,122 @@
+From b1aeb3972326246a25100f2351e610b3c3c66909 Mon Sep 17 00:00:00 2001
+From: Adrien Maglo <magsoft@videolan.org>
+Date: Wed, 28 Mar 2018 16:19:48 +0200
+Subject: [PATCH] FBXConverter: fix light and camera position convertion
+
+---
+ code/FBXConverter.cpp | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/code/FBXConverter.cpp b/code/FBXConverter.cpp
+index 24bdfdd1..e5a31a84 100644
+--- a/code/FBXConverter.cpp
++++ b/code/FBXConverter.cpp
+@@ -115,16 +115,16 @@ private:
+     void ConvertNodes( uint64_t id, aiNode& parent, const aiMatrix4x4& parent_transform = aiMatrix4x4() );
+ 
+     // ------------------------------------------------------------------------------------------------
+-    void ConvertLights( const Model& model );
++    void ConvertLights( const Model& model, const aiMatrix4x4 &node_global_transform );
+ 
+     // ------------------------------------------------------------------------------------------------
+-    void ConvertCameras( const Model& model );
++    void ConvertCameras( const Model& model, const aiMatrix4x4 &node_global_transform );
+ 
+     // ------------------------------------------------------------------------------------------------
+-    void ConvertLight( const Model& model, const Light& light );
++    void ConvertLight(const Model& model, const Light& light, const aiMatrix4x4 &node_global_transform );
+ 
+     // ------------------------------------------------------------------------------------------------
+-    void ConvertCamera( const Model& model, const Camera& cam );
++    void ConvertCamera( const Model& model, const Camera& cam, const aiMatrix4x4 &node_global_transform );
+ 
+     // ------------------------------------------------------------------------------------------------
+     // this returns unified names usable within assimp identifiers (i.e. no space characters -
+@@ -594,11 +594,11 @@ void Converter::ConvertNodes( uint64_t id, aiNode& parent, const aiMatrix4x4& pa
+                 ConvertNodes( model->ID(), *nodes_chain.back(), new_abs_transform );
+ 
+                 if ( doc.Settings().readLights ) {
+-                    ConvertLights( *model );
++                    ConvertLights( *model, new_abs_transform );
+                 }
+ 
+                 if ( doc.Settings().readCameras ) {
+-                    ConvertCameras( *model );
++                    ConvertCameras( *model, new_abs_transform );
+                 }
+ 
+                 nodes.push_back( nodes_chain.front() );
+@@ -621,29 +621,29 @@ void Converter::ConvertNodes( uint64_t id, aiNode& parent, const aiMatrix4x4& pa
+ }
+ 
+ 
+-void Converter::ConvertLights( const Model& model )
++void Converter::ConvertLights( const Model& model, const aiMatrix4x4& node_global_transform )
+ {
+     const std::vector<const NodeAttribute*>& node_attrs = model.GetAttributes();
+     for( const NodeAttribute* attr : node_attrs ) {
+         const Light* const light = dynamic_cast<const Light*>( attr );
+         if ( light ) {
+-            ConvertLight( model, *light );
++            ConvertLight( model, *light, node_global_transform );
+         }
+     }
+ }
+ 
+-void Converter::ConvertCameras( const Model& model )
++void Converter::ConvertCameras( const Model& model, const aiMatrix4x4& node_global_transform )
+ {
+     const std::vector<const NodeAttribute*>& node_attrs = model.GetAttributes();
+     for( const NodeAttribute* attr : node_attrs ) {
+         const Camera* const cam = dynamic_cast<const Camera*>( attr );
+         if ( cam ) {
+-            ConvertCamera( model, *cam );
++            ConvertCamera( model, *cam, node_global_transform );
+         }
+     }
+ }
+ 
+-void Converter::ConvertLight( const Model& model, const Light& light )
++void Converter::ConvertLight( const Model& model, const Light& light, const aiMatrix4x4& node_global_transform )
+ {
+     lights.push_back( new aiLight() );
+     aiLight* const out_light = lights.back();
+@@ -661,9 +661,9 @@ void Converter::ConvertLight( const Model& model, const Light& light )
+     out_light->mColorSpecular = out_light->mColorDiffuse;
+ 
+     //lights are defined along negative y direction
+-    out_light->mPosition = aiVector3D(0.0f);
+-    out_light->mDirection = aiVector3D(0.0f, -1.0f, 0.0f);
+-    out_light->mUp = aiVector3D(0.0f, 0.0f, -1.0f);
++    out_light->mPosition = node_global_transform * aiVector3D(0.0f);
++    out_light->mDirection = node_global_transform * aiVector3D(0.0f, -1.0f, 0.0f) - out_light->mPosition;
++    out_light->mUp = node_global_transform * aiVector3D(0.0f, 0.0f, -1.0f) - out_light->mPosition;
+ 
+     switch ( light.LightType() )
+     {
+@@ -721,7 +721,7 @@ void Converter::ConvertLight( const Model& model, const Light& light )
+     }
+ }
+ 
+-void Converter::ConvertCamera( const Model& model, const Camera& cam )
++void Converter::ConvertCamera( const Model& model, const Camera& cam, const aiMatrix4x4& node_global_transform )
+ {
+     cameras.push_back( new aiCamera() );
+     aiCamera* const out_camera = cameras.back();
+@@ -730,9 +730,9 @@ void Converter::ConvertCamera( const Model& model, const Camera& cam )
+ 
+     out_camera->mAspect = cam.AspectWidth() / cam.AspectHeight();
+     //cameras are defined along positive x direction
+-    out_camera->mPosition = aiVector3D(0.0f);
+-    out_camera->mLookAt = aiVector3D(1.0f, 0.0f, 0.0f);
+-    out_camera->mUp = aiVector3D(0.0f, 1.0f, 0.0f);
++    out_camera->mPosition = node_global_transform * aiVector3D(0.0f);
++    out_camera->mLookAt = node_global_transform * aiVector3D(1.0f, 0.0f, 0.0f) - out_camera->mPosition;
++    out_camera->mUp = node_global_transform * aiVector3D(0.0f, 1.0f, 0.0f) - out_camera->mPosition;
+     out_camera->mHorizontalFOV = AI_DEG_TO_RAD( cam.FieldOfView() );
+     out_camera->mClipPlaneNear = cam.NearPlane();
+     out_camera->mClipPlaneFar = cam.FarPlane();
+-- 
+2.14.1
+
+
