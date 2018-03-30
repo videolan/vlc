@@ -498,11 +498,11 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         if (p_light == NULL)
             continue;
 
-        /*aiColor3DToArray(myAiLight->mColorDiffuse, p_light->colorDiffuse);
+        aiColor3DToArray(myAiLight->mColorDiffuse, p_light->colorDiffuse);
         aiColor3DToArray(myAiLight->mColorAmbient, p_light->colorAmbient);
         aiColor3DToArray(myAiLight->mColorSpecular, p_light->colorSpecular);
         aiVector3DToArray(myAiLight->mDirection, p_light->direction);
-        aiVector3DToArray(myAiLight->mPosition, p_light->position);*/
+        aiVector3DToArray(myAiLight->mPosition, p_light->position);
         msg_Err(p_loader, "** %f %f %f", myAiLight->mPosition.x, myAiLight->mPosition.y, myAiLight->mPosition.z);
         msg_Err(p_loader, "   %f %f %f", myAiLight->mDirection.x, myAiLight->mDirection.y, myAiLight->mDirection.z);
         msg_Err(p_loader, "   %f %f %f", myAiLight->mColorDiffuse.r, myAiLight->mColorDiffuse.g, myAiLight->mColorDiffuse.b);
