@@ -561,10 +561,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     ADD("uniform vec2 SbSCoefs;\n"
         "uniform vec2 SbSOffsets;\n"
         "varying vec4 Position;\n"
-        "varying vec4 Normal;\n"
-        "varying vec4 Tangent;\n"
-        "varying mat4 ViewMatrix;"
-        "varying mat4 NormalMatrix;\n"
+        "varying mat4 ViewMatrix;\n"
+        "varying mat3 TBNMatrix;\n"
         "varying mat4 ModelMatrix;\n");
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
@@ -709,8 +707,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " if (HasLight) {\n"
         " // Allows to go from tangent space to view space\n"
         "  vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
-        "  normalTexel = vec3(0,0,1);\n"
-        "  normal = normalize(normalTexel.x * normalize(Tangent.xyz) + normalTexel.y * normalize(cross(Normal.xyz, Tangent.xyz)) + normalTexel.z * normalize(Normal.xyz));\n"
+        "  normal = normalize(TBNMatrix * normalTexel);\n"
         " }\n\n"
 
         " if (false)\n"
