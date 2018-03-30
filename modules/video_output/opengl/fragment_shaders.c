@@ -805,8 +805,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         //"  vec3 light_pos = -(ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
         "  result = vec4(ambient * SceneAmbient, 1.f);\n"
         "  for(int i=0; i<29; ++i) {\n"
-        //"   vec3 light_pos = - (ViewMatrix*SceneTransformMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
-        //"   vec3 light_pos = (ViewMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
+        "   vec3 light_pos = (ViewMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
 
         "   vec3 light_to_object = light_pos-Position.xyz;\n"
         "   float distance = length(light_to_object);\n"
