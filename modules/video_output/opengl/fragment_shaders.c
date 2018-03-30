@@ -705,7 +705,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         // We don't need normal if there is no lights
         " if (HasLight) {\n"
-        "  normal = (NormalMatrix * normalize(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0)).xyz;\n"
+        "  vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
+        "  normal = normalize(NormalMatrix * vec4(normalTexel, 0)).xyz;\n"
         " }\n\n"
 
         // If it's not a uniform color, it must be a texture
@@ -803,13 +804,14 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         //"  vec3 light_pos = -normalize(ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
         //"  vec3 light_pos = -(ViewMatrix*vec4(Lights.Position[0], 1)).xyz;\n"
         "  result = vec4(ambient * SceneAmbient, 1.f);\n"
-        "  for(int i=0; i<10; ++i) {\n"
-        "   vec3 light_pos = - (ViewMatrix*SceneTransformMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
+        "  for(int i=0; i<29; ++i) {\n"
+        //"   vec3 light_pos = - (ViewMatrix*SceneTransformMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
+        //"   vec3 light_pos = (ViewMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
 
         "   vec3 light_to_object = light_pos-Position.xyz;\n"
         "   float distance = length(light_to_object);\n"
-        "   float attenuation = 1 + Lights.Kc[i]\n"
-        "    + Lights.Kl[i] * distance\n"
+        "   float attenuation = Lights.Kc[i]\n"
+        "    + (0.1+Lights.Kl[i]) * distance\n"
         "    + Lights.Kq[i] * distance * distance;\n"
 
         //"   attenuation /= 100000;\n"
@@ -820,9 +822,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         //"  vec3 light_dir = vec3(1.f, 0, 0);\n"
         //"  normal = vec3(1.f, 1.f, 1.f);\n"
         //"  result = vec4(dot(light_dir, normal)*vec3(1,1,1,), 1);\n"
-        "   result.xyz = ambient * (Lights.Ambient[i]+0.00001) / attenuation + \n"
-        "           max(0, dot(light_dir, normal))*light_diffuse*diffuse / attenuation;\n"
-        "   result = clamp(result, 0, 1);\n"
+        "   result.xyz += ambient * (Lights.Ambient[i]+0.00001) / attenuation + \n"
+        "           max(0, dot(light_dir, normal))*light_diffuse*diffuse / attenuation ;\n"
+       // "           1/(distance*distance) * vec3(1, 1, 1);\n"
+        //"   result = clamp(result, 0, 1);\n"
+        "   result.xyz += 1/distance/distance * vec3(0.5, 0.5, 0.5);\n"
         //"   result.xyz = abs(Lights.Ambient[i]);"
         "  }\n"
         //"  result = vec4(light_pos, 1);\n"

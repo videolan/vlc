@@ -44,6 +44,7 @@ typedef struct
     GLuint *texturesRoughness;
 
     vlc_scene_lights_t lights;
+    int light_count;
 
 } gl_scene_objects_display_t;
 

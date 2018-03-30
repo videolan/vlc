@@ -545,8 +545,8 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix;\n"
-        " ModelMatrix = SceneTransformMatrix * ObjectTransformMatrix;\n"
+        " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix *SceneTransformMatrix;\n"
+        " ModelMatrix = /*SceneTransformMatrix */ ObjectTransformMatrix;\n"
         " NormalMatrix = ViewMatrix*ModelMatrix;\n"
         " Position =  ViewMatrix*ModelMatrix*vec4(VertexPosition, 1.0);\n"
         " gl_Position = ProjectionMatrix * Position;\n"
@@ -2460,29 +2460,27 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     // lights settings
     float scene_ambient[] = { 0.5f, 0.5f, 0.5f };
     vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
-    vgl->vt.Uniform1i(prgm->uloc.LightCount, 10);//prgm->light_count); // TODO
+    vgl->vt.Uniform1i(prgm->uloc.LightCount, vgl->p_objDisplay->light_count);
     vgl->vt.Uniform1fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
     vgl->vt.Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
 
-    prgm->light_count = 10;
-
-    vgl->vt.Uniform3fv(prgm->uloc.lights.Position, prgm->light_count,
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Position, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.position);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Ambient, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Ambient, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.ambient);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Diffuse, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Diffuse, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.diffuse);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Specular, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Specular, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.specular);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Kc, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kc, vgl->p_objDisplay->light_count,
                         vgl->p_objDisplay->lights.k_c);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Kl, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kl, vgl->p_objDisplay->light_count,
                         vgl->p_objDisplay->lights.k_l);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Kq, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Kq, vgl->p_objDisplay->light_count,
                         vgl->p_objDisplay->lights.k_q);
-    vgl->vt.Uniform3fv(prgm->uloc.lights.Direction, prgm->light_count,
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Direction, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.direction);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Cutoff, prgm->light_count,
+    vgl->vt.Uniform1fv(prgm->uloc.lights.Cutoff, vgl->p_objDisplay->light_count,
                         vgl->p_objDisplay->lights.cutoff);
 
     getSbSParams(vgl, prgm, eye);
