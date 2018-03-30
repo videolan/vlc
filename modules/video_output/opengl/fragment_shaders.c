@@ -822,11 +822,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         "   vec3 light_contribution = \n"
         "           ambient * (Lights.Ambient[i]) / attenuation + \n"
-        "           clamp(dot(light_dir, normal), 0, 1)*light_diffuse*diffuse / attenuation ;\n"
+        "           2*clamp(dot(light_dir, normal), 0, 1)*light_diffuse*diffuse / attenuation ;\n"
         //"           vec3(0.5, 0.5, 0.5);\n"
         //"             1/distance/distance * vec3(0.5, 0.5, 0.5);\n"
 
-        "   result.xyz += 2*clamp(dot(spot_dir, light_dir), 0, 1) * light_contribution; \n"
+        "   result.xyz += 3*clamp(dot(spot_dir, light_dir), 0, 1) * light_contribution; \n"
         //"   result = clamp(result, 0, 1);\n"
         //"   result.xyz = abs(Lights.Ambient[i]);"
         "  }\n"
