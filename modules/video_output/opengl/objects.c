@@ -216,13 +216,15 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
             setTextureParameters(tc, p_material->p_roughnessTex, p_objDisplay->texturesRoughness[i]);
     }
 
+    p_objDisplay->light_count = nLights;
+
     for (unsigned i = 0; i < nLights; ++i)
     {
-        memcpy(*p_objDisplay->lights.position, p_objDisplay->p_scene->lights[i]->position, 3 * sizeof(float));
-        memcpy(*p_objDisplay->lights.ambient, p_objDisplay->p_scene->lights[i]->colorAmbient, 3 * sizeof(float));
-        memcpy(*p_objDisplay->lights.diffuse, p_objDisplay->p_scene->lights[i]->colorDiffuse, 3 * sizeof(float));
-        memcpy(*p_objDisplay->lights.specular, p_objDisplay->p_scene->lights[i]->colorSpecular, 3 * sizeof(float));
-        memcpy(*p_objDisplay->lights.direction, p_objDisplay->p_scene->lights[i]->direction, 3 * sizeof(float));
+        memcpy(p_objDisplay->lights.position[i], p_objDisplay->p_scene->lights[i]->position, 3 * sizeof(float));
+        memcpy(p_objDisplay->lights.ambient[i], p_objDisplay->p_scene->lights[i]->colorAmbient, 3 * sizeof(float));
+        memcpy(p_objDisplay->lights.diffuse[i], p_objDisplay->p_scene->lights[i]->colorDiffuse, 3 * sizeof(float));
+        memcpy(p_objDisplay->lights.specular[i], p_objDisplay->p_scene->lights[i]->colorSpecular, 3 * sizeof(float));
+        memcpy(p_objDisplay->lights.direction[i], p_objDisplay->p_scene->lights[i]->direction, 3 * sizeof(float));
 
         p_objDisplay->lights.k_c[i] = p_objDisplay->p_scene->lights[i]->attenuationConstant;
         p_objDisplay->lights.k_l[i] = 0;
