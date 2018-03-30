@@ -99,7 +99,7 @@ scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
 
     // Copy the mesh data.
     memcpy(p_mesh->vCoords, vCoords, 3 * nVertices * sizeof(float));
-    memcpy(p_mesh->nCoords, tCoords, 3 * nVertices * sizeof(float));
+    memcpy(p_mesh->nCoords, nCoords, 3 * nVertices * sizeof(float));
     memcpy(p_mesh->tanCoords, tanCoords, 3 * nVertices * sizeof(float));
     if (tCoords != NULL) // A mesh can have no texture coordinates
         memcpy(p_mesh->tCoords, tCoords, 2 * nVertices * sizeof(float));
