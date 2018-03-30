@@ -811,9 +811,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "    + Lights.Kq[i] * distance * distance;\n"
 
         "   vec3 light_dir = normalize(light_to_object);\n"
-        "   vec3 light_diffuse = Lights.Diffuse[i] + 0.03;\n"
+        "   vec3 light_diffuse = Lights.Diffuse[i];\n"
 
-        "   vec3 spot_dir = normalize(ViewMatrix*vec4(0, -1,0,0)).xyz;\n"
+        "   vec3 spot_dir = normalize(mat3(ViewMatrix)*Lights.Direction[i]);\n"
 
         "   vec3 light_contribution = \n"
         "           ambient * (Lights.Ambient[i]) / attenuation + \n"
