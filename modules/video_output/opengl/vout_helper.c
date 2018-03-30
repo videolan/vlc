@@ -2482,11 +2482,11 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.position);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Ambient, vgl->p_objDisplay->light_count,
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Ambient, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.ambient);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Diffuse, vgl->p_objDisplay->light_count,
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Diffuse, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.diffuse);
-    vgl->vt.Uniform1fv(prgm->uloc.lights.Specular, vgl->p_objDisplay->light_count,
+    vgl->vt.Uniform3fv(prgm->uloc.lights.Specular, vgl->p_objDisplay->light_count,
                         *vgl->p_objDisplay->lights.specular);
     vgl->vt.Uniform1fv(prgm->uloc.lights.Kc, vgl->p_objDisplay->light_count,
                         vgl->p_objDisplay->lights.k_c);
