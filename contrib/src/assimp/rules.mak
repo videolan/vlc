@@ -1,7 +1,7 @@
 # Assimp
 
 ASSIMP_VERSION := 4.1.0
-ASSIMP_URL = https://github.com/assimp/assimp/archive/v$(ASSIMP_VERSION).tar.gz 
+ASSIMP_URL = https://github.com/assimp/assimp/archive/v$(ASSIMP_VERSION).tar.gz
 
 DEPS_assimp = zlib
 
