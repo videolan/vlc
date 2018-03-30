@@ -562,7 +562,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "uniform vec2 SbSOffsets;\n"
         "varying vec4 Position;\n"
         "varying mat4 ViewMatrix;"
-        "varying mat4 NormalMatrix;\n"
+        "varying mat3 NormalMatrix;\n"
         "varying mat4 ModelMatrix;\n");
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
@@ -687,6 +687,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         "uniform mat4 SceneTransformMatrix;\n"
 
+        "varying mat3 TangentSpaceInvMatrix;\n"
+
         "\n\n"
 
         "void main(void) {\n"
@@ -706,7 +708,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         // We don't need normal if there is no lights
         " if (HasLight) {\n"
         "  vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
-        "  normal = normalize(NormalMatrix * vec4(normalTexel, 0)).xyz;\n"
+        "  normal = normalize(NormalMatrix * normalTexel).xyz;\n"
         " }\n\n"
 
         // If it's not a uniform color, it must be a texture

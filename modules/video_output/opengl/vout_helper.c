@@ -526,7 +526,8 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "varying vec4 Position;\n"
         "varying mat4 ViewMatrix;\n"
         "varying mat4 ModelMatrix;\n"
-        "varying mat4 NormalMatrix;\n"
+        "varying mat3 NormalMatrix;\n"
+        "varying mat3 TangentSpaceInvMatrix;\n"
         "attribute vec4 MultiTexCoord0;\n"
         "%s%s"
         "attribute vec3 VertexPosition;\n"
@@ -547,8 +548,15 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "%s%s"
         " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix *SceneTransformMatrix;\n"
         " ModelMatrix = /*SceneTransformMatrix */ ObjectTransformMatrix;\n"
-        " NormalMatrix = ViewMatrix*ModelMatrix;\n"
         " Position =  ViewMatrix*ModelMatrix*vec4(VertexPosition, 1.0);\n"
+
+        " // Allows to go from tangent space to view space\n"
+        " TangentSpaceInvMatrix = transpose(mat3(\n"
+        "  normalize(mat3(ModelMatrix)*VertexTangent),\n"
+        "  normalize(mat3(ModelMatrix)*cross(VertexNormal, VertexTangent)), \n"
+        "  normalize(mat3(ModelMatrix)*VertexNormal)\n"
+        "));"
+        " NormalMatrix = TangentSpaceInvMatrix;\n"
         " gl_Position = ProjectionMatrix * Position;\n"
         "}";
 
