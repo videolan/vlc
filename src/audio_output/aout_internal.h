@@ -84,7 +84,7 @@ typedef struct
         bool discontinuity;
     } sync;
 
-    int initial_stereo_mode; /**< Initial stereo mode set by options */
+    int requested_stereo_mode; /**< Requested stereo mode set by the user */
 
     audio_sample_format_t input_format;
     audio_sample_format_t mixer_format;

@@ -84,9 +84,6 @@ int aout_DecNew( audio_output_t *p_aout,
     owner->mixer_format = owner->input_format;
     owner->request_vout = *p_request_vout;
 
-    var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE,
-                &(vlc_value_t) { .i_int = owner->initial_stereo_mode }, NULL);
-
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
     if (aout_OutputNew (p_aout, &owner->mixer_format, &owner->filters_cfg))
         goto error;
