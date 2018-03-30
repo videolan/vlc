@@ -813,19 +813,19 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "    + (0.1+Lights.Kl[i]) * distance\n"
         "    + Lights.Kq[i] * distance * distance;\n"
 
-        //"   attenuation /= 100000;\n"
-
         "   vec3 light_dir = -normalize(light_to_object);\n"
         "   vec3 light_diffuse = Lights.Diffuse[i] + 0.03;\n"
-        //"  vec3 light_diffuse = Lights.Diffuse[0];\n"
-        //"  vec3 light_dir = vec3(1.f, 0, 0);\n"
-        //"  normal = vec3(1.f, 1.f, 1.f);\n"
-        //"  result = vec4(dot(light_dir, normal)*vec3(1,1,1,), 1);\n"
-        "   result.xyz += ambient * (Lights.Ambient[i]+0.00001) / attenuation + \n"
-        "           max(0, dot(light_dir, normal))*light_diffuse*diffuse / attenuation ;\n"
-       // "           1/(distance*distance) * vec3(1, 1, 1);\n"
+
+        "   vec3 spot_dir = normalize(ViewMatrix*vec4(0, -1,0,0)).xyz;\n"
+
+        "   vec3 light_contribution = \n"
+        "           ambient * (Lights.Ambient[i]) / attenuation + \n"
+        "           clamp(dot(light_dir, normal), 0, 1)*light_diffuse*diffuse / attenuation ;\n"
+        //"           vec3(0.5, 0.5, 0.5);\n"
+        //"             1/distance/distance * vec3(0.5, 0.5, 0.5);\n"
+
+        "   result.xyz += 2*clamp(dot(spot_dir, light_dir), 0, 1) * light_contribution; \n"
         //"   result = clamp(result, 0, 1);\n"
-        "   result.xyz += 1/distance/distance * vec3(0.5, 0.5, 0.5);\n"
         //"   result.xyz = abs(Lights.Ambient[i]);"
         "  }\n"
         //"  result = vec4(light_pos, 1);\n"
