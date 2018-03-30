@@ -680,6 +680,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "uniform vec3 MatDiffuse;\n"
         "uniform vec3 MatSpecular;\n"
         "uniform vec3 SceneAmbient;\n"
+        "uniform bool UseAmbientTexture;\n"
+        "uniform bool UseDiffuseTexture;\n"
+        "uniform bool UseSpecularTexture;\n"
 
         "uniform vec4 FillColor;\n"
         "uniform bool IsUniformColor;\n"
@@ -693,12 +696,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " float val;\n"
         " vec4 colors;\n"
         " vec4 result = vec4(0,0,0,0);\n"
-        " vec3 ambient  = MatAmbient*0.0001f;\n"
-        " vec3 diffuse = MatDiffuse*0.0001f;\n"
-        " vec3 specular  = MatSpecular*0.0001;\n"
-        " ambient += vec3(0.5f, 0.5f, 0.5f);\n"
-        " diffuse += vec3(0.5f, 0.5f, 0.5f);\n"
-        " specular += vec3(0.5f, 0.5f, 0.5f);\n"
+        " vec3 ambient  = MatAmbient;\n"
+        " vec3 diffuse = MatDiffuse;\n"
+        " vec3 specular  = MatSpecular;\n"
         " vec3 normal  = vec3(0,0,0);\n\n"
 
         // Compute the view space base
@@ -710,11 +710,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "  normal = normalize(TBNMatrix * normalTexel);\n"
         " }\n\n"
 
-        " if (false)\n"
+        " if (UseAmbientTexture)\n"
         "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
-        " if (false)\n"
+        " if (UseSpecularTexture)\n"
         "  specular.xyz = texture2D(MatSpecularTex, TexCoord0).xyz;\n"
-        " if (true)\n"
+        " if (UseDiffuseTexture)\n"
         "  diffuse.xyz  = texture2D(MatDiffuseTex, TexCoord0).xyz;\n"
         "\n\n"
 

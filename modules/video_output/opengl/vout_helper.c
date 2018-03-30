@@ -153,6 +153,10 @@ struct prgm
         GLint MatSpecular;
         GLint SceneAmbient;
 
+        GLint UseAmbiantTexture;
+        GLint UseDiffuseTexture;
+        GLint UseSpecularTexture;
+
         GLint IsUniformColor;
     } uloc;
     struct { /* AttribLocation */
@@ -763,6 +767,10 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(MatDiffuse, "MatDiffuse");
     GET_ULOC(MatSpecular, "MatSpecular");
     GET_ULOC(SceneAmbient, "SceneAmbient");
+
+    GET_ULOC(UseAmbiantTexture, "UseAmbiantTexture");
+    GET_ULOC(UseDiffuseTexture, "UseDiffuseTexture");
+    GET_ULOC(UseSpecularTexture, "UseSpecularTexture");
 
 #undef GET_LOC
 #undef GET_ULOC
@@ -2511,14 +2519,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
         vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
 
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
-        vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
-
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
-        vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
-
         vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
         tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
 
@@ -2543,10 +2543,12 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             p_material->diffuse_color[0], p_material->diffuse_color[1], p_material->diffuse_color[2],
             1.f);
 
-        vgl->vt.Uniform1fv(prgm->uloc.MatDiffuse, 1, p_material->diffuse_color);
-        vgl->vt.Uniform1fv(prgm->uloc.MatAmbient, 1, p_material->ambient_color);
+        vgl->vt.Uniform3fv(prgm->uloc.MatDiffuse, 1, p_material->diffuse_color);
+        vgl->vt.Uniform3fv(prgm->uloc.MatAmbient, 1, p_material->ambient_color);
         //vgl->vt.Uniform1fv(prgm->uloc.MatSpecular, 1, p_material->specular_color);
 
+
+        // Set the active texture id for the different sampler2D
         vgl->vt.Uniform1i(prgm->uloc.MatDiffuseTex, 0);
         vgl->vt.Uniform1i(prgm->uloc.MatAmbientTex, 1);
         vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
@@ -2562,20 +2564,14 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         {
             vgl->vt.ActiveTexture(GL_TEXTURE0);
             vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
+            vgl->vt.Uniform1i(prgm->uloc.UseDiffuseTexture, GL_TRUE);
+        }
+        else
+        {
+            vgl->vt.Uniform1i(prgm->uloc.UseDiffuseTexture, GL_FALSE);
         }
 
-        if(false) {
-            vgl->vt.ActiveTexture(GL_TEXTURE1);
-            vgl->vt.BindTexture(GL_TEXTURE_2D, 0);
-        }
-                //vgl->vt.ActiveTexture(GL_TEXTURE0);
-                //vgl->vt.BindTexture(tc->tex_target, vgl->p_objDisplay->texturesBaseColor[p_object->textureId]);
-                //tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
-            //vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->p_objDisplay->index_buffer_object[p_object->meshId]);
-
-            //vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
-            //vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
-            //vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+        vgl->vt.Uniform1i(prgm->uloc.UseAmbiantTexture, GL_FALSE);
 
         memcpy(prgm->var.ObjectTransformMatrix, p_object->transformMatrix,
                sizeof(p_object->transformMatrix));
