@@ -190,6 +190,9 @@ static int Control(stream_t *stream, int query, va_list args)
                 *va_arg(args, uint64_t *) = size - sys->header_skip;
             return ret;
         }
+
+        case STREAM_IS_DIRECTORY:
+            return VLC_EGENERIC;
     }
 
     return vlc_stream_vaControl(stream->s, query, args);
