@@ -722,5 +722,6 @@ block_t *vlc_stream_Block( stream_t *s, size_t size )
  */
 int vlc_stream_ReadDir( stream_t *s, input_item_node_t *p_node )
 {
+    assert(s->pf_readdir != NULL);
     return s->pf_readdir( s, p_node );
 }
