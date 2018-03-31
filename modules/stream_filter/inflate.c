@@ -94,12 +94,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     return -1;
 }
 
-static int ReadDir(stream_t *stream, input_item_node_t *node)
-{
-    (void) stream; (void) node;
-    return VLC_EGENERIC;
-}
-
 static int Seek(stream_t *stream, uint64_t offset)
 {
     (void) stream; (void) offset;
@@ -178,7 +172,6 @@ static int Open(vlc_object_t *obj)
 
     stream->p_sys = sys;
     stream->pf_read = Read;
-    stream->pf_readdir = ReadDir;
     stream->pf_seek = Seek;
     stream->pf_control = Control;
     return VLC_SUCCESS;

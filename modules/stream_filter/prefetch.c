@@ -333,12 +333,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     return copy;
 }
 
-static int ReadDir(stream_t *stream, input_item_node_t *node)
-{
-    (void) stream; (void) node;
-    return VLC_EGENERIC;
-}
-
 static int Control(stream_t *stream, int query, va_list args)
 {
     stream_sys_t *sys = stream->p_sys;
@@ -488,7 +482,6 @@ static int Open(vlc_object_t *obj)
     msg_Dbg(stream, "using %zu bytes buffer, %zu bytes read",
             sys->buffer_size, sys->read_size);
     stream->pf_read = Read;
-    stream->pf_readdir = ReadDir;
     stream->pf_control = Control;
     return VLC_SUCCESS;
 

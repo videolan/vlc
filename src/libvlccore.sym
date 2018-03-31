@@ -411,7 +411,6 @@ vlc_stream_NewMRL
 vlc_stream_NewURL
 vlc_stream_vaControl
 vlc_stream_ReadDir
-vlc_stream_FilterDefaultReadDir
 vlc_stream_fifo_New
 vlc_stream_fifo_Queue
 vlc_stream_fifo_Write

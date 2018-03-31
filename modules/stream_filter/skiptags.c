@@ -152,12 +152,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     return vlc_stream_Read(stream->s, buf, buflen);
 }
 
-static int ReadDir(stream_t *stream, input_item_node_t *node)
-{
-    (void) stream; (void) node;
-    return VLC_EGENERIC;
-}
-
 static int Seek(stream_t *stream, uint64_t offset)
 {
     const struct skiptags_sys_t *sys = stream->p_sys;
@@ -229,7 +223,6 @@ static int Open(vlc_object_t *obj)
     sys->p_tags = p_tags;
     stream->p_sys = sys;
     stream->pf_read = Read;
-    stream->pf_readdir = ReadDir;
     stream->pf_seek = Seek;
     stream->pf_control = Control;
     return VLC_SUCCESS;

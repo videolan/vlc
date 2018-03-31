@@ -504,22 +504,6 @@ VLC_API void vlc_stream_fifo_Close(stream_t *s);
 VLC_API stream_t* vlc_stream_FilterNew( stream_t *p_source, const char *psz_stream_filter );
 
 /**
- * Default ReadDir implementation for stream Filter. This implementation just
- * forward the pf_readdir call to the p_source stream.
- */
-VLC_API int vlc_stream_FilterDefaultReadDir(stream_t *s,
-                                            input_item_node_t *p_node);
-
-/**
- * Sets vlc_stream_FilterDefaultReadDir as the pf_readdir callback for this
- * stream filter.
- */
-#define stream_FilterSetDefaultReadDir(stream) \
-do { \
-    (stream)->pf_readdir = vlc_stream_FilterDefaultReadDir; \
-} while (0)
-
-/**
  * @}
  */
 

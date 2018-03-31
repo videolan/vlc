@@ -120,9 +120,3 @@ static void StreamDelete( stream_t *s )
 
     free(s->psz_filepath);
 }
-
-int vlc_stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node )
-{
-    assert( s->s != NULL );
-    return vlc_stream_ReadDir( s->s, p_node );
-}

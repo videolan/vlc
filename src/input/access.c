@@ -175,12 +175,6 @@ int access_vaDirectoryControlHelper( stream_t *p_access, int i_query, va_list ar
      return VLC_SUCCESS;
 }
 
-static int AStreamNoReadDir(stream_t *s, input_item_node_t *p_node)
-{
-    (void) s; (void) p_node;
-    return VLC_EGENERIC;;
-}
-
 /* Block access */
 static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
 {
@@ -298,8 +292,6 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
     if (access->pf_readdir != NULL)
         s->pf_readdir = AStreamReadDir;
-    else
-        s->pf_readdir = AStreamNoReadDir;
 
     s->pf_seek    = AStreamSeek;
     s->pf_control = AStreamControl;
