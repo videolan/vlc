@@ -223,14 +223,6 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
     return val;
 }
 
-/* Directory */
-static int AStreamReadDir(stream_t *s, input_item_node_t *p_node)
-{
-    stream_t *access = s->p_sys;
-
-    return access->pf_readdir(access, p_node);
-}
-
 /* Common */
 static int AStreamSeek(stream_t *s, uint64_t offset)
 {
@@ -260,42 +252,33 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (access == NULL)
         return NULL;
 
-    stream_t *s = vlc_stream_CommonNew(parent, AStreamDestroy);
-    if (unlikely(s == NULL))
+    stream_t *s;
+
+    if (access->pf_block != NULL || access->pf_read != NULL)
     {
-        vlc_stream_Delete(access);
-        return NULL;
-    }
+        s = vlc_stream_CommonNew(VLC_OBJECT(access), AStreamDestroy);
+        if (unlikely(s == NULL))
+        {
+            vlc_stream_Delete(access);
+            return NULL;
+        }
 
-    s->p_input = input;
-    s->psz_url = strdup(access->psz_url);
+        s->p_input = input;
+        s->psz_url = strdup(access->psz_url);
 
-    const char *cachename;
+        if (access->pf_block != NULL)
+            s->pf_block = AStreamReadBlock;
+        if (access->pf_read != NULL)
+            s->pf_read = AStreamReadStream;
 
-    if (access->pf_block != NULL)
-    {
-        s->pf_block = AStreamReadBlock;
-        cachename = "prefetch,cache_block";
+        s->pf_seek = AStreamSeek;
+        s->pf_control = AStreamControl;
+        s->p_sys = access;
+
+        s = stream_FilterChainNew(s, "prefetch,cache");
     }
     else
-    if (access->pf_read != NULL)
-    {
-        s->pf_read = AStreamReadStream;
-        cachename = "prefetch,cache_read";
-    }
-    else
-    {
-        cachename = NULL;
-    }
+        s = access;
 
-    if (access->pf_readdir != NULL)
-        s->pf_readdir = AStreamReadDir;
-
-    s->pf_seek    = AStreamSeek;
-    s->pf_control = AStreamControl;
-    s->p_sys      = access;
-
-    if (cachename != NULL)
-        s = stream_FilterChainNew(s, cachename);
     return stream_FilterAutoNew(s);
 }
