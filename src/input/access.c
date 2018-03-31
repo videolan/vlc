@@ -256,14 +256,14 @@ static void AStreamDestroy(stream_t *s)
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
                            es_out_t *out, bool preparsing, const char *url)
 {
-    stream_t *s = vlc_stream_CommonNew(parent, AStreamDestroy);
-    if (unlikely(s == NULL))
+    stream_t *access = access_New(parent, input, out, preparsing, url);
+    if (access == NULL)
         return NULL;
 
-    stream_t *access = access_New(VLC_OBJECT(s), input, out, preparsing, url);
-    if (access == NULL)
+    stream_t *s = vlc_stream_CommonNew(parent, AStreamDestroy);
+    if (unlikely(s == NULL))
     {
-        stream_CommonDelete(s);
+        vlc_stream_Delete(access);
         return NULL;
     }
 
