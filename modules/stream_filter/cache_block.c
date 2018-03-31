@@ -255,6 +255,9 @@ static int Open(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
 
+    if (s->s->pf_block == NULL)
+        return VLC_EGENERIC;
+
     stream_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -297,6 +300,7 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
     set_capability("stream_filter", 0)
+    add_shortcut("cache")
 
     set_description(N_("Block stream cache"))
     set_callbacks(Open, Close)
