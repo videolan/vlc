@@ -279,7 +279,7 @@ int Import_LuaPlaylist(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     stream_t *s = (stream_t *)obj;
-    if( !vlc_stream_Control( s->s, STREAM_IS_DIRECTORY ) )
+    if( s->s->pf_readdir != NULL )
         return VLC_EGENERIC;
 
     struct vlclua_playlist *sys = malloc(sizeof (*sys));

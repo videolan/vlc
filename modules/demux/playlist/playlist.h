@@ -62,7 +62,6 @@ void Close_WPL ( vlc_object_t * );
 
 #define CHECK_FILE(obj) \
 do { \
-    if( vlc_stream_Control( GetSource(obj), \
-                            STREAM_IS_DIRECTORY ) == VLC_SUCCESS ) \
+    if( GetSource(obj)->pf_readdir != NULL ) \
         return VLC_EGENERIC; \
 } while(0)
