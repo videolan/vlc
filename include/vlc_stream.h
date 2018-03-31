@@ -318,7 +318,18 @@ static inline int vlc_stream_Control(stream_t *s, int query, ...)
 
 VLC_API block_t *vlc_stream_Block(stream_t *s, size_t);
 VLC_API char *vlc_stream_ReadLine(stream_t *);
-VLC_API int vlc_stream_ReadDir(stream_t *, input_item_node_t *);
+
+/**
+ * Reads a directory.
+ *
+ * This function fills an input item node with any and all the items within
+ * a directory. The behaviour is undefined if the stream is not a directory.
+ *
+ * \param s directory object to read from
+ * \param node node to store the items into
+ * \return VLC_SUCCESS on success
+ */
+VLC_API int vlc_stream_ReadDir(stream_t *s, input_item_node_t *node);
 
 /**
  * Closes a byte stream.

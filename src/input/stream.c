@@ -716,10 +716,6 @@ block_t *vlc_stream_Block( stream_t *s, size_t size )
     return block;
 }
 
-/**
- * Returns a node containing all the input_item of the directory pointer by
- * this stream. returns VLC_SUCCESS on success.
- */
 int vlc_stream_ReadDir( stream_t *s, input_item_node_t *p_node )
 {
     assert(s->pf_readdir != NULL);
