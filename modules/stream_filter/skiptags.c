@@ -170,21 +170,26 @@ static int Seek(stream_t *stream, uint64_t offset)
 static int Control(stream_t *stream, int query, va_list args)
 {
     const struct skiptags_sys_t *sys = stream->p_sys;
+
     /* In principles, we should return the meta-data embedded in the skipped
      * tags in STREAM_GET_META. But the meta engine is devoted to that already.
      */
-    if( query == STREAM_GET_TAGS && sys->p_tags )
+    switch (query)
     {
-        *va_arg( args, const block_t ** ) = sys->p_tags;
-        return VLC_SUCCESS;
-    }
-    else if(query == STREAM_GET_SIZE)
-    {
-        uint64_t size;
-        int i_ret = vlc_stream_GetSize(stream->s, &size);
-        if(i_ret == VLC_SUCCESS)
-            *va_arg(args, uint64_t *) = size - sys->header_skip;
-        return i_ret;
+        case STREAM_GET_TAGS:
+            if (sys->p_tags == NULL)
+                break;
+            *va_arg(args, const block_t **) = sys->p_tags;
+            return VLC_SUCCESS;
+
+        case STREAM_GET_SIZE:
+        {
+            uint64_t size;
+            int ret = vlc_stream_GetSize(stream->s, &size);
+            if (ret == VLC_SUCCESS)
+                *va_arg(args, uint64_t *) = size - sys->header_skip;
+            return ret;
+        }
     }
 
     return vlc_stream_vaControl(stream->s, query, args);
