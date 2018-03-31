@@ -1,0 +1,121 @@
+From ecd4c9276b8407b912551ddb74b376cbcbe02e30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 31 Mar 2018 21:54:46 +0300
+Subject: [PATCH 5/5] arm: hevcdsp: Add commas between macro arguments
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When targeting darwin, clang requires commas between arguments,
+while the no-comma form is allowed for other targets.
+
+Since Xcode 9.3, the bundled clang supports altmacro and doesn't
+require using gas-preprocessor any longer.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+---
+ libavcodec/arm/hevcdsp_qpel_neon.S | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/libavcodec/arm/hevcdsp_qpel_neon.S b/libavcodec/arm/hevcdsp_qpel_neon.S
+index 86f92cf..caa6efa 100644
+--- a/libavcodec/arm/hevcdsp_qpel_neon.S
++++ b/libavcodec/arm/hevcdsp_qpel_neon.S
+@@ -667,76 +667,76 @@ endfunc
+ 
+ 
+ function ff_hevc_put_qpel_h1v1_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_1 qpel_filter_1_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_1, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h2v1_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_2 qpel_filter_1_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_2, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h3v1_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_3 qpel_filter_1_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_3, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h1v2_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_1 qpel_filter_2_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_1, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h2v2_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_2 qpel_filter_2_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_2, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h3v2_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_3 qpel_filter_2_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_3, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h1v3_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_1 qpel_filter_3_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_1, qpel_filter_3_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h2v3_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_2 qpel_filter_3_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_2, qpel_filter_3_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_h3v3_neon_8, export=1
+-        hevc_put_qpel_hXvY_neon_8 qpel_filter_3 qpel_filter_3_32b
++        hevc_put_qpel_hXvY_neon_8 qpel_filter_3, qpel_filter_3_32b
+ endfunc
+ 
+ 
+ function ff_hevc_put_qpel_uw_h1v1_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1 qpel_filter_1_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h2v1_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2 qpel_filter_1_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h3v1_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3 qpel_filter_1_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3, qpel_filter_1_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h1v2_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1 qpel_filter_2_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h2v2_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2 qpel_filter_2_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h3v2_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3 qpel_filter_2_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3, qpel_filter_2_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h1v3_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1 qpel_filter_3_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_1, qpel_filter_3_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h2v3_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2 qpel_filter_3_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_2, qpel_filter_3_32b
+ endfunc
+ 
+ function ff_hevc_put_qpel_uw_h3v3_neon_8, export=1
+-        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3 qpel_filter_3_32b
++        hevc_put_qpel_uw_hXvY_neon_8 qpel_filter_3, qpel_filter_3_32b
+ endfunc
+ 
+ .macro init_put_pixels
+-- 
+2.7.4
+

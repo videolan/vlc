@@ -1,0 +1,111 @@
+From b4ad8b2a18be134c2963371f4da1d80aff8ab433 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sat, 31 Mar 2018 21:54:32 +0300
+Subject: [PATCH 3/5] arm: swscale: Only compile the rgb2yuv asm if .dn aliases
+ are supported
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Vanilla clang supports altmacro since clang 5.0, and thus doesn't
+require gas-preprocessor for building the arm assembly any longer.
+
+However, the built-in assembler doesn't support .dn directives.
+
+This readds checks that were removed in d7320ca3ed10f0d, when
+the last usage of .dn directives within libav were removed.
+
+Alternatively, the assembly could be rewritten to not use the
+.dn directive, making it available to clang users.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+---
+ configure                         | 5 +++++
+ libswscale/arm/rgb2yuv_neon_16.S  | 3 +++
+ libswscale/arm/rgb2yuv_neon_32.S  | 3 +++
+ libswscale/arm/swscale_unscaled.c | 6 ++++++
+ 4 files changed, 17 insertions(+)
+
+diff --git a/configure b/configure
+index d5bbb5b..20c5565 100755
+--- a/configure
++++ b/configure
+@@ -2063,6 +2063,7 @@ SYSTEM_LIBRARIES="
+ 
+ TOOLCHAIN_FEATURES="
+     as_arch_directive
++    as_dn_directive
+     as_fpu_directive
+     as_func
+     as_object_arch
+@@ -5397,6 +5398,10 @@ EOF
+     check_as <<EOF && enable as_arch_directive
+ .arch armv7-a
+ EOF
++    check_as <<EOF && enable as_dn_directive
++ra .dn d0.i16
++.unreq ra
++EOF
+     check_as <<EOF && enable as_fpu_directive
+ .fpu neon
+ EOF
+diff --git a/libswscale/arm/rgb2yuv_neon_16.S b/libswscale/arm/rgb2yuv_neon_16.S
+index 601bc9a..ad7e679 100644
+--- a/libswscale/arm/rgb2yuv_neon_16.S
++++ b/libswscale/arm/rgb2yuv_neon_16.S
+@@ -18,6 +18,8 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include "config.h"
++#if HAVE_AS_DN_DIRECTIVE
+ #include "rgb2yuv_neon_common.S"
+ 
+ /* downsampled R16G16B16 x8 */
+@@ -78,3 +80,4 @@ alias_qw    c8x8x2, q10
+ .endm
+ 
+     loop_420sp  rgbx, nv12, init, kernel_420_16x2, 16
++#endif
+diff --git a/libswscale/arm/rgb2yuv_neon_32.S b/libswscale/arm/rgb2yuv_neon_32.S
+index f51a5f1..4fd0f64 100644
+--- a/libswscale/arm/rgb2yuv_neon_32.S
++++ b/libswscale/arm/rgb2yuv_neon_32.S
+@@ -18,6 +18,8 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include "config.h"
++#if HAVE_AS_DN_DIRECTIVE
+ #include "rgb2yuv_neon_common.S"
+ 
+ /* downsampled R16G16B16 x8 */
+@@ -117,3 +119,4 @@ alias_qw    c8x8x2, q10
+ 
+ 
+     loop_420sp  rgbx, nv12, init, kernel_420_16x2, 32
++#endif
+diff --git a/libswscale/arm/swscale_unscaled.c b/libswscale/arm/swscale_unscaled.c
+index e1597ab..e41f294 100644
+--- a/libswscale/arm/swscale_unscaled.c
++++ b/libswscale/arm/swscale_unscaled.c
+@@ -23,6 +23,7 @@
+ #include "libswscale/swscale_internal.h"
+ #include "libavutil/arm/cpu.h"
+ 
++#if HAVE_AS_DN_DIRECTIVE
+ extern void rgbx_to_nv12_neon_32(const uint8_t *src, uint8_t *y, uint8_t *chroma,
+                 int width, int height,
+                 int y_stride, int c_stride, int src_stride,
+@@ -178,3 +179,8 @@ void ff_get_unscaled_swscale_arm(SwsContext *c)
+     if (have_neon(cpu_flags))
+         get_unscaled_swscale_neon(c);
+ }
++#else
++void ff_get_unscaled_swscale_arm(SwsContext *c)
++{
++}
++#endif
+-- 
+2.7.4
+
