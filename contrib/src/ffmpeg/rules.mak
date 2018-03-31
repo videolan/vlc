@@ -233,7 +233,12 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
 	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
+	$(APPLY) $(SRC)/ffmpeg/0001-arm-vc1dsp-Add-commas-between-macro-arguments.patch
+	$(APPLY) $(SRC)/ffmpeg/0002-arm-Produce-.const_data-instead-of-.section-.rodata-.patch
 ifdef USE_FFMPEG
+	$(APPLY) $(SRC)/ffmpeg/0003-arm-swscale-Only-compile-the-rgb2yuv-asm-if-.dn-alia.patch
+	$(APPLY) $(SRC)/ffmpeg/0004-arm-hevcdsp-Avoid-using-macro-expansion-counters.patch
+	$(APPLY) $(SRC)/ffmpeg/0005-arm-hevcdsp-Add-commas-between-macro-arguments.patch
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
