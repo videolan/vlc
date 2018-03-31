@@ -351,8 +351,6 @@ static int Control(stream_t *stream, int query, va_list args)
         case STREAM_CAN_CONTROL_PACE:
             *va_arg (args, bool *) = sys->can_pace;
             break;
-        case STREAM_IS_DIRECTORY:
-            return VLC_EGENERIC;
         case STREAM_GET_SIZE:
             if (sys->size == (uint64_t)-1)
                 return VLC_EGENERIC;

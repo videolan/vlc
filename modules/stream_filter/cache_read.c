@@ -455,7 +455,6 @@ static int AStreamControl(stream_t *s, int i_query, va_list args)
         case STREAM_CAN_FASTSEEK:
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
-        case STREAM_IS_DIRECTORY:
         case STREAM_GET_SIZE:
         case STREAM_GET_PTS_DELAY:
         case STREAM_GET_TITLE_INFO:

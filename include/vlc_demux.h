@@ -241,8 +241,6 @@ enum demux_query_e
     /** Checks whether the stream is actually a playlist, rather than a real
      * stream.
      *
-     * \warning The prototype is different from STREAM_IS_DIRECTORY.
-     *
      * Can fail if the stream is not a playlist (same as returning false).
      *
      * arg1= bool * */

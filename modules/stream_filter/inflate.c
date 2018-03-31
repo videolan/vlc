@@ -116,7 +116,6 @@ static int Control(stream_t *stream, int query, va_list args)
         case STREAM_GET_SIGNAL:
         case STREAM_SET_PAUSE_STATE:
             return vlc_stream_vaControl(stream->s, query, args);
-        case STREAM_IS_DIRECTORY:
         case STREAM_GET_SIZE:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
