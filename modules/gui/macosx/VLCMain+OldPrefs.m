@@ -59,7 +59,7 @@ static const int kCurrentPreferencesVersion = 4;
 - (void)migrateOldPreferences
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    int version = [defaults integerForKey:kVLCPreferencesVersion];
+    NSInteger version = [defaults integerForKey:kVLCPreferencesVersion];
 
     /*
      * Store version explicitely in file, for ease of debugging.
