@@ -110,10 +110,14 @@ static const int kCurrentPreferencesVersion = 4;
         if (!libraries || [libraries count] == 0) return;
         NSString * preferences = [[libraries firstObject] stringByAppendingPathComponent:@"Preferences"];
 
-        int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
-                                               _NS("We just found an older version of VLC's preferences files."),
-                                               _NS("Move To Trash and Relaunch VLC"), _NS("Ignore"), nil, nil);
-        if (res != NSModalResponseOK) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSAlertStyleInformational];
+        [alert setMessageText:_NS("Remove old preferences?")];
+        [alert setInformativeText:_NS("We just found an older version of VLC's preferences files.")];
+        [alert addButtonWithTitle:_NS("Move To Trash and Relaunch VLC")];
+        [alert addButtonWithTitle:_NS("Ignore")];
+        NSModalResponse res = [alert runModal];
+        if (res != NSAlertFirstButtonReturn) {
             [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
             return;
         }
