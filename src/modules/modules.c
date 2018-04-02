@@ -138,23 +138,6 @@ const char *module_gettext (const module_t *m, const char *str)
 #endif
 }
 
-#undef module_start
-int module_start (vlc_object_t *obj, const module_t *m)
-{
-   int (*activate) (vlc_object_t *) = m->pf_activate;
-
-   return (activate != NULL) ? activate (obj) : VLC_SUCCESS;
-}
-
-#undef module_stop
-void module_stop (vlc_object_t *obj, const module_t *m)
-{
-   void (*deactivate) (vlc_object_t *) = m->pf_deactivate;
-
-    if (deactivate != NULL)
-        deactivate (obj);
-}
-
 static bool module_match_name(const module_t *m, const char *name, size_t len)
 {
      /* Plugins with zero score must be matched explicitly. */

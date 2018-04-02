@@ -94,6 +94,6 @@ xml_reader_t *xml_ReaderCreate(vlc_object_t *obj, stream_t *stream)
  */
 void xml_ReaderDelete(xml_reader_t *reader)
 {
-    module_stop(reader, reader->p_module);
+    module_unneed(reader, reader->p_module);
     vlc_object_release(reader);
 }
