@@ -734,7 +734,6 @@ text_style_New
 xml_Delete
 xml_ReaderCreate
 xml_ReaderDelete
-xml_ReaderReset
 vlc_xml_decode
 vlc_xml_encode
 vlc_keycode2str
