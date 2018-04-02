@@ -315,7 +315,9 @@ int Import_WPL( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
-    p_demux->p_sys = xml_ReaderReset( p_reader, p_demux->s );
+    xml_ReaderDelete( p_demux->p_sys );
+
+    p_demux->p_sys = xml_ReaderCreate( p_demux, p_demux->s );
     vlc_stream_Delete( p_probestream );
     if( unlikely( p_demux->p_sys == NULL ) )
         return VLC_EGENERIC;
