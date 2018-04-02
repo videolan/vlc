@@ -214,6 +214,12 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_screenFollowMouseCheckbox setTitle: _NS("Follow the mouse")];
     [_screenqtkAudioCheckbox setTitle: _NS("Capture Audio")];
 
+#warning QTKit stuff is deprecated and broken!
+    /* The QTKit audio capture does not work anymore since 3.x, it has to be
+     * replaced with AVFoundation audio capture stuff and things have to be
+     * changed here to not try to use the qtkit module anymore.
+     */
+
     // setup start / stop time fields
     [_fileStartTimeTextField setFormatter:[[PositionFormatter alloc] init]];
     [_fileStopTimeTextField setFormatter:[[PositionFormatter alloc] init]];
