@@ -199,8 +199,8 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[_netModeMatrix cellAtRow:0 column:0] setTitle: _NS("Unicast")];
     [[_netModeMatrix cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
-    [_netUDPPortTextField setIntValue: config_GetInt("server-port")];
-    [_netUDPPortStepper setIntValue: config_GetInt("server-port")];
+    [_netUDPPortTextField setIntegerValue: config_GetInt("server-port")];
+    [_netUDPPortStepper setIntegerValue: config_GetInt("server-port")];
 
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
