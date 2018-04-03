@@ -1451,12 +1451,12 @@ openSub = {
     end
 
     local showName, seasonNumber, episodeNumber = string.match(
-      openSub.file.cleanName,
+      openSub.file.cleanName or "",
       "(.+)[sS](%d%d)[eE](%d%d).*")
 
     if not showName then
       showName, seasonNumber, episodeNumber = string.match(
-      openSub.file.cleanName,
+      openSub.file.cleanName or "",
       "(.+)(%d)[xX](%d%d).*")
     end
 
