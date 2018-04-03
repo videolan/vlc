@@ -503,6 +503,10 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         aiColor3DToArray(myAiLight->mColorSpecular * (1 / 10000000.f), p_light->colorSpecular);
         aiVector3DToArray(myAiLight->mDirection, p_light->direction);
         aiVector3DToArray(myAiLight->mPosition, p_light->position);
+        p_light->attenuationConstant = myAiLight->mAttenuationConstant / 10000000.f;
+        p_light->attenuationLinear = myAiLight->mAttenuationLinear / 10000000.f;
+        p_light->attenuationQuadratic = myAiLight->mAttenuationQuadratic / 10000000.f;
+
         msg_Err(p_loader, "** %f %f %f", myAiLight->mPosition.x, myAiLight->mPosition.y, myAiLight->mPosition.z);
         msg_Err(p_loader, "   %f %f %f", myAiLight->mDirection.x, myAiLight->mDirection.y, myAiLight->mDirection.z);
         msg_Err(p_loader, "   %f %f %f", myAiLight->mColorDiffuse.r, myAiLight->mColorDiffuse.g, myAiLight->mColorDiffuse.b);
