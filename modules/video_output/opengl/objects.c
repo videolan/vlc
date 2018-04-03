@@ -227,8 +227,8 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
         memcpy(p_objDisplay->lights.direction[i], p_objDisplay->p_scene->lights[i]->direction, 3 * sizeof(float));
 
         p_objDisplay->lights.k_c[i] = p_objDisplay->p_scene->lights[i]->attenuationConstant;
-        p_objDisplay->lights.k_l[i] = 0;
-        p_objDisplay->lights.k_q[i] = 0;
+        p_objDisplay->lights.k_l[i] = p_objDisplay->p_scene->lights[i]->attenuationLinear;
+        p_objDisplay->lights.k_q[i] = p_objDisplay->p_scene->lights[i]->attenuationQuadratic;
     }
 
     return VLC_SUCCESS;
