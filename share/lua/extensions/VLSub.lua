@@ -2164,22 +2164,6 @@ end
 
             --[[ Misc utils]]--
 
-function make_uri(str)
-  str = str:gsub("\\", "/")
-  local windowdrive = string.match(str, "^(%a:).+$")
-  local encode_uri = vlc.strings.encode_uri_component
-  local encodedPath = ""
-  for w in string.gmatch(str, "/([^/]+)") do
-    encodedPath = encodedPath.."/"..encode_uri(w)
-  end
-
-  if windowdrive then
-    return "file:///"..windowdrive..encodedPath
-  else
-    return "file://"..encodedPath
-  end
-end
-
 function file_touch(name) -- test write ability
   if not name or trim(name) == ""
   then return false end
