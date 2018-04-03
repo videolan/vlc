@@ -168,7 +168,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
         tmp = 0;
 
         /* Append the main segment */
-        p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, main_segment,
+        p_vchap = virtual_chapter_c::CreateVirtualChapter( p_edit, main_segment,
                                                            opened_segments, tmp, b_ordered );
         if( p_vchap )
             vchapters.push_back( p_vchap );
@@ -442,7 +442,8 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     /* we have moved to a new chapter */
     if ( p_cur_vchapter != NULL && p_current_vchapter != p_cur_vchapter )
     {
-        msg_Dbg( &demux, "New Chapter %" PRId64 " uid=%" PRIu64, sys.i_pts - VLC_TS_0, p_cur_vchapter->p_chapter->i_uid );
+        msg_Dbg( &demux, "New Chapter %" PRId64 " uid=%" PRIu64, sys.i_pts - VLC_TS_0,
+                 p_cur_vchapter->p_chapter ? p_cur_vchapter->p_chapter->i_uid : 0 );
         if ( p_cur_vedition->b_ordered )
         {
             /* FIXME EnterAndLeave has probably been broken for a long time */
