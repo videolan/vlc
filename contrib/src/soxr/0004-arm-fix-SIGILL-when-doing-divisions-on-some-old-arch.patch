@@ -1,0 +1,29 @@
+From f56b350d29813a58e14213383c922d38a94ac9c7 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 3 Apr 2018 14:55:06 +0200
+Subject: [PATCH 4/4] arm: fix SIGILL when doing divisions on some old archs
+
+The UDIV and SDIV instructions are optional on ARM. The "-mfpu=neon-vfpv4
+-mcpu=cortex-a7" CFLAGS made the compiler generate the udiv optional
+instruction instead of __armeabi_udiv().
+
+(Tested with the Android clang toolchain)
+---
+ cmake/Modules/FindSIMD32.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cmake/Modules/FindSIMD32.cmake b/cmake/Modules/FindSIMD32.cmake
+index 9e42373..c70a6f7 100644
+--- a/cmake/Modules/FindSIMD32.cmake
++++ b/cmake/Modules/FindSIMD32.cmake
+@@ -12,7 +12,6 @@ if (DEFINED SIMD32_C_FLAGS)
+ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+   set (TRIAL_C_FLAGS
+     # Gcc
+-    "-mfpu=neon-vfpv4 -mcpu=cortex-a7"
+     "-mfpu=neon       -mfloat-abi=hard"
+     "-mfpu=neon       -mfloat-abi=softfp"
+     "-mfpu=neon       -mfloat-abi=soft"
+-- 
+2.11.0
+
