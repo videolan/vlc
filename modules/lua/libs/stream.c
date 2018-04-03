@@ -232,6 +232,7 @@ static int vlclua_stream_readdir( lua_State *L )
         input_item_AddOption( p_input, "show-hiddenfiles",
                               VLC_INPUT_OPTION_TRUSTED );
     input_item_node_t *p_items = input_item_node_Create( p_input );
+    input_item_Release( p_input );
     if( !p_items )
         return vlclua_error( L );
     if ( vlc_stream_ReadDir( *pp_stream, p_items ) )
@@ -247,7 +248,6 @@ static int vlclua_stream_readdir( lua_State *L )
         lua_settable( L, -3 );
     }
     input_item_node_Delete( p_items );
-    input_item_Release( p_input );
     return 1;
 }
 
