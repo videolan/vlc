@@ -50,6 +50,8 @@ typedef struct
 {
     float angleOuterCone;
     float attenuationConstant;
+    float attenuationLinear;
+    float attenuationQuadratic;
 
     float colorAmbient[3];
     float colorDiffuse[3];
