@@ -131,8 +131,6 @@ struct vout_display_sys_t
     ARect sub_last_region;
 
     bool b_has_subpictures;
-
-    uint8_t hash[16];
 };
 
 #define PRIV_WINDOW_FORMAT_YV12 0x32315659
