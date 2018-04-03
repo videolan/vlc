@@ -342,8 +342,8 @@ function activate()
   vlc.msg.dbg("[VLsub] Welcome")
 
   if not check_config() then
-  	vlc.msg.err("[VLsub] Unsupported VLC version")
-  	return false
+        vlc.msg.err("[VLsub] Unsupported VLC version")
+        return false
   end
 
   if vlc.input.item() then
