@@ -495,6 +495,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
+extern const GUID DXVA_ModeHEVC_VLD_Main;
 extern const GUID DXVA_ModeHEVC_VLD_Main10;
 static bool CanUseIntelHEVC(vlc_va_t *va)
 {
@@ -517,7 +518,8 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 {
     VLC_UNUSED(fmt);
 
-    if (IsEqualGUID(input,&DXVA_ModeHEVC_VLD_Main10) && !CanUseIntelHEVC(va))
+    if ((IsEqualGUID(input,&DXVA_ModeHEVC_VLD_Main) ||
+         IsEqualGUID(input,&DXVA_ModeHEVC_VLD_Main10)) && !CanUseIntelHEVC(va))
         return VLC_EGENERIC;
 
     int err = VLC_EGENERIC;
