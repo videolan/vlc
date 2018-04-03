@@ -1663,7 +1663,7 @@ function get_first_sel(list)
 end
 
 function find_subtitle_in_archive(archivePath, subfileExt)
-  local archive = vlc.directory_stream("file://" .. archivePath)
+  local archive = vlc.directory_stream(vlc.strings.make_uri(archivePath))
   local items = archive:readdir()
   if not items then
     return nil
