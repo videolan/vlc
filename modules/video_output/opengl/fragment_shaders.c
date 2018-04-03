@@ -560,7 +560,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
     ADD("uniform vec2 SbSCoefs;\n"
         "uniform vec2 SbSOffsets;\n"
-        "varying vec4 Position;\n"
+        "varying vec3 Position_world;\n"
         "varying mat4 ViewMatrix;\n"
         "varying mat3 TBNMatrix;\n"
         "varying mat4 ModelMatrix;\n");
@@ -654,6 +654,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     ADDF(
         "\n"
         "struct Lights_t {\n"
+        // Position is expressed in world coordinates
         " vec3 Position[%d];\n"
         " vec3 Ambient[%d];\n"
         " vec3 Diffuse[%d];\n"
@@ -699,7 +700,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " vec3 ambient  = MatAmbient;\n"
         " vec3 diffuse = MatDiffuse;\n"
         " vec3 specular  = MatSpecular;\n"
-        " vec3 normal  = vec3(0,0,0);\n\n"
+        " vec3 normal_world = vec3(0,0,0);\n\n"
 
         // Compute the view space base
 
@@ -707,7 +708,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " if (HasLight) {\n"
         " // Allows to go from tangent space to view space\n"
         "  vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
-        "  normal = normalize(TBNMatrix * normalTexel);\n"
+        "  normal_world = normalize(TBNMatrix * normalTexel);\n"
         " }\n\n"
 
         " if (UseAmbientTexture)\n"
@@ -798,26 +799,25 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         // We are using lights, this is the scene !
         " else {\n"
         "  result = vec4(ambient * SceneAmbient, 1.f);\n"
-        "  vec3 eye_dir = normalize(-Position.xyz);\n"
-
-        "  result = vec4(ambient * SceneAmbient, 1.f);\n"
         "  for(int i=0; i<29; ++i) {\n"
-        "   vec3 light_pos = (ViewMatrix*vec4(Lights.Position[i], 1)).xyz;\n"
+        "   vec3 light_pos_world= Lights.Position[i];\n"
 
-        "   vec3 light_to_object = Position.xyz - light_pos;\n"
+        "   vec3 light_to_object = Position_world - light_pos_world;\n"
         "   float distance = length(light_to_object);\n"
         "   float attenuation = Lights.Kc[i]\n"
         "    + (0.1+Lights.Kl[i]) * distance\n"
         "    + Lights.Kq[i] * distance * distance;\n"
 
+        "   attenuation /= 20;\n"
+
         "   vec3 light_dir = normalize(light_to_object);\n"
         "   vec3 light_diffuse = Lights.Diffuse[i];\n"
 
-        "   vec3 spot_dir = normalize(mat3(ViewMatrix)*Lights.Direction[i]);\n"
+        "   vec3 spot_dir = normalize(Lights.Direction[i]);\n"
 
         "   vec3 light_contribution = \n"
-        "           ambient * (Lights.Ambient[i]) / attenuation + \n"
-        "           2 * clamp(dot(-light_dir, normal), 0, 1) * light_diffuse*diffuse / attenuation ;\n"
+        "    + ambient * (Lights.Ambient[i]) / attenuation\n"
+        "    + clamp(dot(-light_dir, normal_world), 0, 1) * light_diffuse*diffuse / attenuation ;\n"
 
         "   result.xyz += 3*clamp(dot(spot_dir, light_dir), 0, 1) * light_contribution; \n"
         "  }\n"

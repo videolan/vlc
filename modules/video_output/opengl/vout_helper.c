@@ -527,7 +527,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     static const char *template =
         "#version %u\n"
         "varying vec2 TexCoord0;\n"
-        "varying vec4 Position;\n"
+        "varying vec3 Position_world;\n"
         "varying mat4 ViewMatrix;\n"
         "varying mat4 ModelMatrix;\n"
         "varying mat4 NormalMatrix;\n"
@@ -554,14 +554,18 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " ModelMatrix = ObjectTransformMatrix;\n"
         " NormalMatrix = ViewMatrix*ModelMatrix;\n"
 
-        " Position =  ViewMatrix * ModelMatrix*vec4(VertexPosition, 1);\n"
-        " vec3 Normal = mat3(ViewMatrix * ModelMatrix) * VertexNormal;\n"
-        " vec3 Tangent = mat3(ViewMatrix * ModelMatrix) * VertexTangent;\n"
-        " vec3 Bitangent = cross(Normal, Tangent);\n"
+        " Position_world = vec3(ModelMatrix*vec4(VertexPosition, 1));\n"
 
-        " TBNMatrix = mat3(Tangent, Bitangent, Normal);\n"
+        // Compute TBN matrix so as to compute normals in world space
+        // It should be inverse(transpose(ModelMatrix)) but as there no
+        // not-uniform scale, ModelMatrix is orthonormal, thus its tranpose
+        // equal its inverse
+        " vec3 Normal_world = mat3(ModelMatrix) * VertexNormal;\n"
+        " vec3 Tangent_world = mat3(ModelMatrix) * VertexTangent;\n"
+        " vec3 Bitangent_world = cross(Normal_world, Tangent_world);\n"
+        " TBNMatrix = mat3(Tangent_world, Bitangent_world, Normal_world);\n"
 
-        " gl_Position = ProjectionMatrix * Position;\n"
+        " gl_Position = ProjectionMatrix * ViewMatrix * vec4(Position_world, 1);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
