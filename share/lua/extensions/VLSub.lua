@@ -1740,7 +1740,7 @@ function download_subtitles()
   local subtitleMrl = find_subtitle_in_archive(tmpFileName, item.SubFormat)
 
   if not subtitleMrl then
-    vlc.msg.err( "Failed to extract subtitle" )
+    vlc.msg.err( lang['mess_not_load'] )
     return false
   end
 
