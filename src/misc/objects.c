@@ -388,13 +388,8 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     /* This was officially deprecated on August 19 2009. For the convenience of
      * wannabe code janitors, this is the list of names that remain used
      * and unfixed since then. */
-    static const char bad[][11] = { "adjust", "clone", "colorthres",
-        "erase", "extract", "gradient", "logo", "marq", "motionblur", "puzzle",
-        "rotate", "sharpen", "transform", "v4l2", "wall" };
-    static const char poor[][13] = { "invert", "magnify", "motiondetect",
-        "psychedelic", "ripple", "wave" };
-    if( bsearch( psz_name, bad, 15, 11, (void *)strcmp ) == NULL
-     && bsearch( psz_name, poor, 6, 13, (void *)strcmp ) == NULL )
+    static const char bad[][5] = { "v4l2", "zvbi" };
+    if( bsearch( psz_name, bad, 2, 5, (void *)strcmp ) == NULL )
         return NULL;
     msg_Err( p_this, "looking for object \"%s\"... FIXME XXX", psz_name );
 #endif
