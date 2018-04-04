@@ -851,7 +851,7 @@ end
 
 function load_config()
 -- Overwrite default conf with loaded conf
-  local tmpFile = io.open(openSub.conf.filePath, "rb")
+  local tmpFile = io.open(vlc.strings.to_codepage(openSub.conf.filePath), "rb")
   if not tmpFile then return false end
   local resp = tmpFile:read("*all")
   tmpFile:flush()
@@ -883,7 +883,7 @@ end
 
 function load_transl(path)
 -- Overwrite default conf with loaded conf
-  local tmpFile = assert(io.open(path, "rb"))
+  local tmpFile = assert(io.open(vlc.strings.to_codepage(path), "rb"))
   local resp = tmpFile:read("*all")
   tmpFile:flush()
   tmpFile:close()
@@ -1041,7 +1041,7 @@ function save_config()
 
     if file_touch(openSub.conf.filePath) then
       local tmpFile = assert(
-        io.open(openSub.conf.filePath, "wb"))
+        io.open(vlc.strings.to_codepage(openSub.conf.filePath), "wb"))
       local resp = dump_xml(openSub.option)
       tmpFile:write(resp)
       tmpFile:flush()
@@ -1542,7 +1542,7 @@ openSub = {
       file = nil
     else
       vlc.msg.dbg("[VLSub] Read hash data from file")
-      local file = io.open( openSub.file.path, "rb")
+      local file = io.open(vlc.strings.to_codepage(openSub.file.path), "rb")
       if not file then
         vlc.msg.dbg("[VLSub] No stream")
         return false
@@ -1777,7 +1777,7 @@ function download_subtitles()
 
   local stream = vlc.stream(subtitleMrl)
   local data = ""
-  local subfile = io.open(target, "wb")
+  local subfile = io.open(vlc.strings.to_codepage(target), "wb")
 
   while data do
     subfile:write(data)
@@ -1818,7 +1818,7 @@ function dump_zip(url, dir, subfileName)
   if not file_touch(tmpFileName) then
     return false
   end
-  local tmpFile = assert(io.open(tmpFileName, "wb"))
+  local tmpFile = assert(io.open(vlc.strings.to_codepage(tmpFileName), "wb"))
 
   tmpFile:write(resp)
   tmpFile:flush()
@@ -2175,7 +2175,7 @@ function file_touch(name) -- test write ability
   if not name or trim(name) == ""
   then return false end
 
-  local f=io.open(name ,"w")
+  local f=io.open(vlc.strings.to_codepage(name) ,"w")
   if f~=nil then
     io.close(f)
     return true
@@ -2187,7 +2187,7 @@ end
 function file_exist(name) -- test readability
   if not name or trim(name) == ""
   then return false end
-  local f=io.open(name ,"r")
+  local f=io.open(vlc.strings.to_codepage(name), "r")
   if f~=nil then
     io.close(f)
     return true
@@ -2201,7 +2201,7 @@ function is_dir(path)
   then return false end
   -- Remove slash at the end or it won't work on Windows
   path = string.gsub(path, "^(.-)[\\/]?$", "%1")
-  local f, _, code = io.open(path, "rb")
+  local f, _, code = io.open(vlc.strings.to_codepage(path), "rb")
 
   if f then
     _, _, code = f:read("*a")
@@ -2245,9 +2245,9 @@ function mkdir_p(path)
   if not path or trim(path) == ""
   then return false end
   if openSub.conf.os == "win" then
-    os.execute('mkdir "' .. path..'"')
+    os.execute('mkdir "' .. vlc.strings.to_codepage(path) .. '"')
   elseif openSub.conf.os == "lin" then
-    os.execute("mkdir -p '" .. path.."'")
+    os.execute("mkdir -p '" .. vlc.strings.to_codepage(path) .. "'")
   end
 end
 
