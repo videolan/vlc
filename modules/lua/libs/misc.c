@@ -35,6 +35,8 @@
 #endif
 
 #include <math.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -42,6 +44,7 @@
 #include <vlc_interface.h>
 #include <vlc_actions.h>
 #include <vlc_interrupt.h>
+#include <vlc_fs.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -145,6 +148,19 @@ static int vlclua_mwait( lua_State *L )
     return 0;
 }
 
+static int vlclua_mkdir( lua_State *L )
+{
+    if( lua_gettop( L ) < 2 ) return vlclua_error( L );
+
+    const char* psz_dir = luaL_checkstring( L, 1 );
+    const char* psz_mode = luaL_checkstring( L, 2 );
+    if ( !psz_dir || !psz_mode )
+        return vlclua_error( L );
+    int i_res = vlc_mkdir( psz_dir, strtoul( psz_mode, NULL, 0 ) );
+    lua_pushboolean( L, i_res == 0 || errno == EEXIST );
+    return 1;
+}
+
 static int vlclua_action_id( lua_State *L )
 {
     vlc_action_id_t i_key = vlc_actions_get_id( luaL_checkstring( L, 1 ) );
@@ -166,6 +182,8 @@ static const luaL_Reg vlclua_misc_reg[] = {
 
     { "mdate", vlclua_mdate },
     { "mwait", vlclua_mwait },
+
+    { "mkdir", vlclua_mkdir },
 
     { "quit", vlclua_quit },
 
