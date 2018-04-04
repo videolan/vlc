@@ -735,6 +735,8 @@ static int submit_frame(encoder_t *enc, picture_t *pic, QSVFrame **new_frame)
 
     qf->pic = picture_Hold(pic);
 
+    assert(qf->pic->p[0].p_pixels + (qf->pic->p[0].i_pitch * qf->pic->p[0].i_lines) == qf->pic->p[1].p_pixels);
+
     qf->surface.Info = sys->params.mfx.FrameInfo;
 
     // Specify picture structure at runtime.
