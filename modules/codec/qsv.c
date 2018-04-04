@@ -558,10 +558,16 @@ static int Open(vlc_object_t *this)
             sys->params.mfx.MaxKbps = var_InheritInteger(enc, SOUT_CFG_PREFIX "bitrate-max");
     }
 
-    if ( MFXVideoENCODE_Query(sys->session, &sys->params, &param_out) < 0 ||
-         sys->params.mfx.RateControlMethod != param_out.mfx.RateControlMethod )
+    sts = MFXVideoENCODE_Query(sys->session, &sys->params, &param_out);
+    if ( sts < MFX_ERR_NONE )
     {
-        msg_Err(enc, "Unsupported control method");
+        msg_Err(enc, "Unsupported encoding parameters (%d)", sts);
+        goto error;
+    }
+
+    if ( sys->params.mfx.RateControlMethod != param_out.mfx.RateControlMethod )
+    {
+        msg_Err(enc, "Unsupported control method %d got %d", sys->params.mfx.RateControlMethod, param_out.mfx.RateControlMethod);
         goto error;
     }
 
