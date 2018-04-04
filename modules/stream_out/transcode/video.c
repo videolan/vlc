@@ -576,8 +576,10 @@ static void transcode_video_sar_init( sout_stream_t *p_stream,
     {
         vlc_ureduce( &id->p_encoder->fmt_out.video.i_sar_num,
                      &id->p_encoder->fmt_out.video.i_sar_den,
-                     (uint64_t)p_vid_out->i_sar_num * id->p_encoder->fmt_out.video.i_width * p_vid_out->i_height,
-                     (uint64_t)p_vid_out->i_sar_den * id->p_encoder->fmt_out.video.i_height * p_vid_out->i_width,
+                     (uint64_t)p_vid_out->i_sar_num * (id->p_encoder->fmt_out.video.i_x_offset + id->p_encoder->fmt_out.video.i_visible_width)
+                                                    * (p_vid_out->i_x_offset + p_vid_out->i_visible_height),
+                     (uint64_t)p_vid_out->i_sar_den * (id->p_encoder->fmt_out.video.i_y_offset + id->p_encoder->fmt_out.video.i_visible_height)
+                                                    * (p_vid_out->i_y_offset + p_vid_out->i_visible_width),
                      0 );
     }
     else
