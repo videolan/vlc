@@ -16,7 +16,7 @@ DEPS_protobuf = zlib $(DEPS_zlib)
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
-	mv protobuf-3.1.0 protobuf-3.1.0-cpp
+	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
 	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(MOVE)
 
