@@ -175,6 +175,24 @@ static int vlclua_from_charset( lua_State *L )
     return 1;
 }
 
+static int vlclua_to_codepage( lua_State *L )
+{
+    if( lua_gettop( L ) < 1 ) return vlclua_error( L );
+
+#ifdef _WIN32
+    const char *psz_input = luaL_checkstring( L, 1 );
+
+    char* psz_output = ToANSI( psz_input );
+    lua_pushstring( L, psz_output ? psz_output : "" );
+    free( psz_output );
+    return 1;
+#else
+    const char *psz_input = luaL_checkstring( L, 1 );
+    lua_pushstring( L, psz_input );
+    return 1;
+#endif
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -187,6 +205,7 @@ static const luaL_Reg vlclua_strings_reg[] = {
     { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
     { "convert_xml_special_chars", vlclua_convert_xml_special_chars },
     { "from_charset", vlclua_from_charset },
+    { "to_codepage", vlclua_to_codepage },
     { NULL, NULL }
 };
 
