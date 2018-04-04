@@ -492,14 +492,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     {
         vlc_SpdifToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-        /* The max buffer duration in exclusive mode is 2 seconds */
+        /* The max buffer duration in exclusive mode is 200ms */
         buffer_duration = AOUT_MAX_PREPARE_TIME;
     }
     else if (b_hdmi)
     {
         vlc_HdmiToWave(&wf_iec61937, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-        /* The max buffer duration in exclusive mode is 2 seconds */
+        /* The max buffer duration in exclusive mode is 200ms */
         buffer_duration = AOUT_MAX_PREPARE_TIME;
     }
     else if (AOUT_FMT_LINEAR(&fmt))
