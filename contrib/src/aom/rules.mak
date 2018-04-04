@@ -1,6 +1,6 @@
 # aom
 AOM_VERSION := git
-AOM_HASH := HEAD
+AOM_HASH := 6f49b5a214fa48c226be3bc28f5c597edb81ed8c
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
 
 # Default disabled for now
