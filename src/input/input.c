@@ -1804,6 +1804,41 @@ static void ViewpointApply( input_thread_t *p_input )
     }
 }
 
+/* XXX: The two following functions are copied from the hotkeys module. The OSD
+ * handling need to be handled by the core, in the future input manager for
+ * example. */
+static void ControlNavDisplayVolume( vout_thread_t *p_vout, float vol )
+{
+    vout_FlushSubpictureChannel( p_vout, VOUT_SPU_CHANNEL_OSD );
+    vout_OSDMessage( p_vout, VOUT_SPU_CHANNEL_OSD, _( "Volume %ld%%" ),
+                     lroundf( vol * 100.f ) );
+}
+
+static void ControlNavDisplayPosition( vout_thread_t *p_vout,
+                                       input_thread_t *p_input )
+{
+    vout_FlushSubpictureChannel( p_vout, VOUT_SPU_CHANNEL_OSD );
+
+    int64_t t = var_GetInteger( p_input, "time" ) / CLOCK_FREQ;
+    int64_t l = var_GetInteger( p_input, "length" ) / CLOCK_FREQ;
+
+    char psz_time[MSTRTIME_MAX_SIZE];
+    secstotimestr( psz_time, t );
+
+    if( l > 0 )
+    {
+        char psz_duration[MSTRTIME_MAX_SIZE];
+
+        secstotimestr( psz_duration, l );
+        vout_OSDMessage( p_vout, VOUT_SPU_CHANNEL_OSD,
+                         "%s / %s", psz_time, psz_duration );
+    }
+    else if( t > 0 )
+    {
+        vout_OSDMessage( p_vout, VOUT_SPU_CHANNEL_OSD, "%s", psz_time );
+    }
+}
+
 static void ControlNav( input_thread_t *p_input, int i_type )
 {
     input_thread_private_t *priv = input_priv(p_input);
@@ -1852,9 +1887,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         if( !b_viewpoint_ch
          && var_GetBool( pp_vout[i], "viewpoint-changeable" ) )
             b_viewpoint_ch = true;
-        vlc_object_release( pp_vout[i] );
     }
-    free( pp_vout );
 
     if( b_viewpoint_ch )
     {
@@ -1864,7 +1897,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         priv->viewpoint.roll  += vp.roll;
         priv->viewpoint.fov   += vp.fov;
         ViewpointApply( p_input );
-        return;
+        goto clean;
     }
 
     /* Seek or change volume if the input doesn't have navigation or viewpoint */
@@ -1872,6 +1905,8 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     {
         mtime_t it = var_InheritInteger( p_input, "short-jump-size" );
         var_SetInteger( p_input, "time-offset", it * seek_direction * CLOCK_FREQ );
+        if( i_vout > 0 )
+            ControlNavDisplayPosition( pp_vout[0], p_input );
     }
     else
     {
@@ -1879,10 +1914,18 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
         if( p_aout )
         {
-            aout_VolumeUpdate( p_aout, vol_direction, NULL );
+            float new_vol;
+            aout_VolumeUpdate( p_aout, vol_direction, &new_vol );
             vlc_object_release( p_aout );
+            if( i_vout > 0 )
+                ControlNavDisplayVolume( pp_vout[0], new_vol );
         }
     }
+
+clean:
+    for( size_t i = 0; i < i_vout; ++i )
+        vlc_object_release( pp_vout[i] );
+    free( pp_vout );
 }
 
 #ifdef ENABLE_SOUT
