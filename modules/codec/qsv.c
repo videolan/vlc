@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_picture.h>
 #include <vlc_codec.h>
+#include <vlc_picture_pool.h>
 
 #include <vlc_fifo_helper.h>
 
@@ -293,6 +294,9 @@ struct encoder_sys_t
     fifo_t           packets;             // FIFO of queued packets
     mtime_t          offset_pts;          // The pts of the first frame, to avoid conversion overflow.
     mtime_t          last_dts;            // The dts of the last frame, to interpolate over buggy dts
+
+    picture_pool_t   *input_pool;         // pool of pictures to feed the decoder
+                                          //  as it doesn't like constantly changing buffers
 };
 
 static block_t *Encode(encoder_t *, picture_t *);
@@ -561,6 +565,17 @@ static int Open(vlc_object_t *this)
         goto error;
     }
 
+    enc->fmt_in.video.i_chroma = VLC_CODEC_NV12;
+    video_format_t pool_fmt = enc->fmt_in.video;
+    pool_fmt.i_width  = sys->params.mfx.FrameInfo.Width;
+    pool_fmt.i_height = sys->params.mfx.FrameInfo.Height;
+    sys->input_pool = picture_pool_NewFromFormat( &pool_fmt, 18 );
+    if (sys->input_pool == NULL)
+    {
+        msg_Err(enc, "Failed to create the internal pool");
+        goto error;
+    }
+
     sys->params.ExtParam    = (mfxExtBuffer**)&init_params;
     sys->params.NumExtParam =
 #if QSV_HAVE_CO2
@@ -614,7 +629,6 @@ static int Open(vlc_object_t *this)
 
     /* Vlc module configuration */
     enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
-    enc->fmt_in.video.i_chroma         = VLC_CODEC_NV12;
     enc->fmt_in.video.i_bits_per_pixel = 12;
     enc->fmt_in.video.i_width          = sys->params.mfx.FrameInfo.Width;
     enc->fmt_in.video.i_height         = sys->params.mfx.FrameInfo.Height;
@@ -643,6 +657,8 @@ static void Close(vlc_object_t *this)
     /* if (enc->fmt_out.p_extra) */
     /*     free(enc->fmt_out.p_extra); */
     async_task_t_fifo_Release(&sys->packets);
+    if (sys->input_pool)
+        picture_pool_Release(sys->input_pool);
     free(sys);
 }
 
@@ -733,7 +749,14 @@ static int submit_frame(encoder_t *enc, picture_t *pic, QSVFrame **new_frame)
         return ret;
     }
 
-    qf->pic = picture_Hold(pic);
+    qf->pic = picture_pool_Get( sys->input_pool );
+    if (unlikely(!qf->pic))
+    {
+        msg_Warn(enc, "Unable to find an unlocked surface in the pool");
+        qf->used = 0;
+        return ret;
+    }
+    picture_Copy( qf->pic, pic );
 
     assert(qf->pic->p[0].p_pixels + (qf->pic->p[0].i_pitch * qf->pic->p[0].i_lines) == qf->pic->p[1].p_pixels);
 
@@ -749,9 +772,9 @@ static int submit_frame(encoder_t *enc, picture_t *pic, QSVFrame **new_frame)
 
     //qf->surface.Data.Pitch = QSV_ALIGN(16, qf->surface.Info.Width);
 
-    qf->surface.Data.PitchLow  = pic->p[0].i_pitch;
-    qf->surface.Data.Y         = pic->p[0].p_pixels;
-    qf->surface.Data.UV        = pic->p[1].p_pixels;
+    qf->surface.Data.PitchLow  = qf->pic->p[0].i_pitch;
+    qf->surface.Data.Y         = qf->pic->p[0].p_pixels;
+    qf->surface.Data.UV        = qf->pic->p[1].p_pixels;
 
     qf->surface.Data.TimeStamp = qsv_mtime_to_timestamp(pic->date - sys->offset_pts);
 
