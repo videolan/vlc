@@ -2481,7 +2481,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     float scene_ambient[] = { 0.5f, 0.5f, 0.5f };
     vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
     vgl->vt.Uniform1i(prgm->uloc.LightCount, vgl->p_objDisplay->light_count);
-    vgl->vt.Uniform1fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
+    vgl->vt.Uniform3fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
     vgl->vt.Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
 
     vgl->vt.Uniform3fv(prgm->uloc.lights.Position, vgl->p_objDisplay->light_count,
