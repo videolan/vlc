@@ -762,11 +762,10 @@ end
 
 function load_config()
 -- Overwrite default conf with loaded conf
-  local tmpFile = io.open(openSub.conf.filePath, "rb")
+  local tmpFile = vlc.io.open(openSub.conf.filePath, "rb")
   if not tmpFile then return false end
   local resp = tmpFile:read("*all")
   tmpFile:flush()
-  tmpFile:close()
   local option = parse_xml(resp)
 
   for key, value in pairs(option) do
@@ -794,10 +793,9 @@ end
 
 function load_transl(path)
 -- Overwrite default conf with loaded conf
-  local tmpFile = assert(io.open(path, "rb"))
+  local tmpFile = assert(vlc.io.open(path, "rb"))
   local resp = tmpFile:read("*all")
   tmpFile:flush()
-  tmpFile:close()
   openSub.option.translation = nil
 
   openSub.option.translation = parse_xml(resp)
@@ -894,11 +892,10 @@ function save_config()
 
     if file_touch(openSub.conf.filePath) then
       local tmpFile = assert(
-        io.open(openSub.conf.filePath, "wb"))
+        vlc.io.open(openSub.conf.filePath, "wb"))
       local resp = dump_xml(openSub.option)
       tmpFile:write(resp)
       tmpFile:flush()
-      tmpFile:close()
       tmpFile = nil
     else
       return false
@@ -1388,7 +1385,7 @@ openSub = {
       file = nil
     else
       vlc.msg.dbg("[VLSub] Read hash data from file")
-      local file = io.open( openSub.file.path, "rb")
+      local file = vlc.io.open(openSub.file.path, "rb")
       if not file then
         vlc.msg.dbg("[VLSub] No stream")
         return false
@@ -1616,7 +1613,7 @@ function download_subtitles()
 
   local stream = vlc.stream(subtitleMrl)
   local data = ""
-  local subfile = io.open(target, "wb")
+  local subfile = vlc.io.open(target, "wb")
 
   while data do
     subfile:write(data)
@@ -1657,11 +1654,10 @@ function dump_zip(url, dir, subfileName)
   if not file_touch(tmpFileName) then
     return false
   end
-  local tmpFile = assert(io.open(tmpFileName, "wb"))
+  local tmpFile = assert(vlc.io.open(tmpFileName, "wb"))
 
   tmpFile:write(resp)
   tmpFile:flush()
-  tmpFile:close()
   tmpFile = nil
   collectgarbage()
 
@@ -2014,9 +2010,8 @@ function file_touch(name) -- test write ability
   if not name or trim(name) == ""
   then return false end
 
-  local f=io.open(name ,"w")
+  local f=vlc.io.open(name, "w")
   if f~=nil then
-    io.close(f)
     return true
   else
     return false
@@ -2026,9 +2021,8 @@ end
 function file_exist(name) -- test readability
   if not name or trim(name) == ""
   then return false end
-  local f=io.open(name ,"r")
+  local f=vlc.io.open(name, "r")
   if f~=nil then
-    io.close(f)
     return true
   else
     return false
@@ -2040,11 +2034,10 @@ function is_dir(path)
   then return false end
   -- Remove slash at the end or it won't work on Windows
   path = string.gsub(path, "^(.-)[\\/]?$", "%1")
-  local f, _, code = io.open(path, "rb")
+  local f, _, code = vlc.io.open(path, "rb")
 
   if f then
     _, _, code = f:read("*a")
-    f:close()
     if code == 21 then
       return true
     end
