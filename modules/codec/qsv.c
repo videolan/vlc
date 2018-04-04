@@ -729,8 +729,8 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     qsv_set_block_flags(block, task->bs.FrameType);
 
     /* msg_Dbg(enc, "block->i_pts = %lld, block->i_dts = %lld", block->i_pts, block->i_dts); */
-    /* msg_Dbg(enc, "FrameType = %#.4x, TimeStamp (pts) = %lld, DecodeTimeStamp = %lld", */
-    /*         task->bs.FrameType, task->bs.TimeStamp, task->bs.DecodeTimeStamp); */
+    /* msg_Dbg(enc, "FrameType = %#.4x, TimeStamp = %lld (pts %lld), DecodeTimeStamp = %lld syncp=0x%x",*/
+    /*         task->bs.FrameType, task->bs.TimeStamp, block->i_pts, task->bs.DecodeTimeStamp, *task->syncp); */
 
     /* Copied from x264.c: This isn't really valid for streams with B-frames */
     block->i_length = CLOCK_FREQ *
