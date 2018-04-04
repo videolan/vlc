@@ -3,8 +3,7 @@ AOM_HASH := 3715bf25db5cdedbd8b49560903bad02d911c62f
 AOM_VERSION := v1.0.0-$(AOM_HASH)
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
 
-# Default disabled for now
-# PKGS += aom
+PKGS += aom
 ifeq ($(call need_pkg,"aom"),)
 PKGS_FOUND += aom
 endif
