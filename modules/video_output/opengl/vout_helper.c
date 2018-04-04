@@ -2577,10 +2577,8 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
         vgl->vt.Uniform1i(prgm->uloc.UseAmbiantTexture, GL_FALSE);
 
-        memcpy(prgm->var.ObjectTransformMatrix, p_object->transformMatrix,
-               sizeof(p_object->transformMatrix));
         vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                                  prgm->var.ObjectTransformMatrix);
+                                  p_object->transformMatrix);
 
         vgl->vt.DrawElements(GL_TRIANGLES, p_mesh->nFaces * 3, GL_UNSIGNED_INT, 0);
 
