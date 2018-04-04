@@ -463,24 +463,6 @@ function interface_config()
     lang["int_remove_tag"]..':', 1, 5, 0, 1)
   input_table['removeTag'] = dlg:add_dropdown(3, 5, 1, 1)
 
-  if openSub.conf.dirPath then
-    if openSub.conf.os == "win" then
-      dlg:add_label(
-        "<a href='file:///"..openSub.conf.dirPath.."'>"..
-        lang["int_vlsub_work_dir"].."</a>", 1, 6, 2, 1)
-    else
-      dlg:add_label(
-        "<a href='"..openSub.conf.dirPath.."'>"..
-        lang["int_vlsub_work_dir"].."</a>", 1, 6, 2, 1)
-    end
-  else
-    dlg	:add_label(
-      lang["int_vlsub_work_dir"], 1, 6, 2, 1)
-  end
-
-  input_table['dir_path'] = dlg:add_text_input(
-    openSub.conf.dirPath, 2, 6, 2, 1)
-
   dlg:add_label(
     lang["int_os_username"]..':', 1, 7, 0, 1)
   input_table['os_username'] = dlg:add_text_input(
@@ -679,96 +661,26 @@ function check_config()
     slash = "/"
   end
 
-  local path_generic = {"lua", "extensions", "userdata", "vlsub"}
-  local dirPath = slash..table.concat(path_generic, slash)
   local filePath	= slash.."vlsub_conf.xml"
-  local config_saved = false
-  sub_dir = slash.."vlsub_subtitles"
 
-  -- Check if config file path is stored in vlc config
-  local other_dirs = {}
-
-  for path in
-  vlc.config.get("sub-autodetect-path"):gmatch("[^,]+") do
-    if path:match(".*"..sub_dir.."$") then
-      openSub.conf.dirPath = path:gsub(
-        "%s*(.*)"..sub_dir.."%s*$", "%1")
-      config_saved = true
+  openSub.conf.dirPath = vlc.config.userdatadir()
+  local subdirs = { "lua", "extensions", "userdata", "vlsub" }
+  for _, dir in ipairs(subdirs) do
+    if not vlc.misc.mkdir( openSub.conf.dirPath .. slash .. dir, "0700" ) then
+      vlc.msg.warn("Failed to create " .. openSub.conf.dirPath .. slash .. dir )
+      return false
     end
-    table.insert(other_dirs, path)
-  end
-
-  -- if not stored in vlc config
-  -- try to find a suitable config file path
-
-  if openSub.conf.dirPath then
-    if not is_dir(openSub.conf.dirPath) and
-    (openSub.conf.os == "lin"  or
-    is_win_safe(openSub.conf.dirPath)) then
-      mkdir_p(openSub.conf.dirPath)
-    end
-  else
-    local userdatadir = vlc.config.userdatadir()
-    local datadir = vlc.config.datadir()
-
-    -- check if the config already exist
-    if file_exist(userdatadir..dirPath..filePath) then
-      -- in vlc.config.userdatadir()
-      openSub.conf.dirPath = userdatadir..dirPath
-      config_saved = true
-    elseif file_exist(datadir..dirPath..filePath) then
-      -- in vlc.config.datadir()
-      openSub.conf.dirPath = datadir..dirPath
-      config_saved = true
-    else
-      -- if not found determine an accessible path
-      local extension_path = slash..path_generic[1]
-        ..slash..path_generic[2]
-
-      -- use the same folder as the extension if accessible
-      if is_dir(userdatadir..extension_path)
-      and file_touch(userdatadir..dirPath..filePath) then
-          openSub.conf.dirPath = userdatadir..dirPath
-      elseif file_touch(datadir..dirPath..filePath) then
-        openSub.conf.dirPath = datadir..dirPath
-      end
-
-      -- try to create working dir in user folder
-      if not openSub.conf.dirPath
-      and is_dir(userdatadir) then
-        if not is_dir(userdatadir..dirPath) then
-          mkdir_p(userdatadir..dirPath)
-        end
-        if is_dir(userdatadir..dirPath) and
-        file_touch(userdatadir..dirPath..filePath) then
-          openSub.conf.dirPath = userdatadir..dirPath
-        end
-      end
-
-      -- try to create working dir in vlc folder
-      if not openSub.conf.dirPath and
-      is_dir(datadir) then
-        if not is_dir(datadir..dirPath) then
-          mkdir_p(datadir..dirPath)
-        end
-        if file_touch(datadir..dirPath..filePath) then
-          openSub.conf.dirPath = datadir..dirPath
-        end
-      end
-    end
+    openSub.conf.dirPath = openSub.conf.dirPath .. slash .. dir
   end
 
   if openSub.conf.dirPath then
-    vlc.msg.dbg("[VLSub] Working directory: " ..
-      (openSub.conf.dirPath or "not found"))
+    vlc.msg.dbg("[VLSub] Working directory: " .. openSub.conf.dirPath)
 
     openSub.conf.filePath = openSub.conf.dirPath..filePath
     openSub.conf.localePath = openSub.conf.dirPath..slash.."locale"
 
-    if config_saved
-    and file_exist(openSub.conf.filePath) then
-      vlc.msg.dbg(
-        "[VLSub] Loading config file: "..openSub.conf.filePath)
+    if file_exist(openSub.conf.filePath) then
+      vlc.msg.dbg("[VLSub] Loading config file: "..openSub.conf.filePath)
       load_config()
     else
       vlc.msg.dbg("[VLSub] No config file")
@@ -817,6 +729,7 @@ function check_config()
   else
     vlc.msg.dbg("[VLSub] Unable to find a suitable path"..
       "to save config, please set it manually")
+    return false
   end
 
   lang = nil
@@ -831,9 +744,6 @@ function check_config()
   end
 
   SetDownloadBehaviours()
-  if not openSub.conf.dirPath then
-    setError(lang["mess_err_conf_access"])
-  end
 
   -- Set table list of available translations from assoc. array
   -- so it is sortable
@@ -966,67 +876,9 @@ function apply_config()
     openSub.option.removeTag = not openSub.option.removeTag
   end
 
-  -- Set a custom working directory
-  local dir_path = input_table['dir_path']:get_text()
-  local dir_path_err = false
-  if trim(dir_path) == "" then dir_path = nil end
-
-  if dir_path ~= openSub.conf.dirPath then
-    if openSub.conf.os == "lin"
-    or is_win_safe(dir_path)
-    or not dir_path then
-      local other_dirs = {}
-
-      for path in
-      vlc.config.get(
-        "sub-autodetect-path"):gmatch("[^,]+"
-      ) do
-        path = trim(path)
-        if path ~= (openSub.conf.dirPath or "")..sub_dir then
-          table.insert(other_dirs, path)
-        end
-      end
-      openSub.conf.dirPath = dir_path
-      if dir_path then
-        table.insert(other_dirs,
-        string.gsub(dir_path, "^(.-)[\\/]?$", "%1")..sub_dir)
-
-        if not is_dir(dir_path) then
-          mkdir_p(dir_path)
-        end
-
-        openSub.conf.filePath = openSub.conf.dirPath..
-          slash.."vlsub_conf.xml"
-        openSub.conf.localePath = openSub.conf.dirPath..
-          slash.."locale"
-      else
-        openSub.conf.filePath = nil
-        openSub.conf.localePath = nil
-      end
-      vlc.config.set(
-        "sub-autodetect-path",
-        table.concat(other_dirs, ", "))
-    else
-      dir_path_err = true
-      setError(lang["mess_err_wrong_path"]..
-        "<br><b>"..
-        string.gsub(
-          dir_path,
-          "[^%:%w%p%s§¤]+",
-          "<span style='color:#B23'>%1</span>"
-        )..
-        "</b>")
-    end
-  end
-
-  if openSub.conf.dirPath and
-  not dir_path_err then
-    local config_saved = save_config()
-    trigger_menu(1)
-    if not config_saved then
-      setError(lang["mess_err_conf_access"])
-    end
-  else
+  local config_saved = save_config()
+  trigger_menu(1)
+  if not config_saved then
     setError(lang["mess_err_conf_access"])
   end
 end
@@ -1712,29 +1564,20 @@ function download_subtitles()
   end
 
   subfileName = subfileName.."."..item.SubFormat
-  local tmp_dir
+  local tmp_dir = vlc.config.cachedir()
   local file_target_access = true
-
-  if is_dir(openSub.file.dir) then
-    tmp_dir = openSub.file.dir
-  elseif openSub.conf.dirPath then
-    tmp_dir = openSub.conf.dirPath
-
-    message = "<br>"..warn_tag(lang["mess_save_warn"].." &nbsp;"..
-    "<a href='"..vlc.strings.make_uri(openSub.conf.dirPath).."'>"..
-    lang["mess_click_link"].."</a>")
-  else
-    setError(lang["mess_save_fail"].." &nbsp;"..
-    "<a href='"..item.ZipDownloadLink.."'>"..
-    lang["mess_click_link"].."</a>")
-    return false
-  end
 
   local tmpFileName = dump_zip(
     item.ZipDownloadLink,
     tmp_dir,
     item.SubFileName)
 
+  if not tmpFileName then
+    setError(lang["mess_save_fail"].." &nbsp;"..
+    "<a href='"..item.ZipDownloadLink.."'>"..
+    lang["mess_click_link"].."</a>")
+    return false
+  end
   vlc.msg.dbg("[VLsub] tmpFileName: "..tmpFileName)
 
   local subtitleMrl = find_subtitle_in_archive(tmpFileName, item.SubFormat)
@@ -2231,16 +2074,6 @@ function list_dir(path)
     return list
   else
     return false
-  end
-end
-
-function mkdir_p(path)
-  if not path or trim(path) == ""
-  then return false end
-  if openSub.conf.os == "win" then
-    os.execute('mkdir "' .. path..'"')
-  elseif openSub.conf.os == "lin" then
-    os.execute("mkdir -p '" .. path.."'")
   end
 end
 
