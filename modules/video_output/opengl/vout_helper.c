@@ -1187,6 +1187,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(Finish);
     GET_PROC_ADDR_CORE(Flush);
     GET_PROC_ADDR_CORE(GenTextures);
+    GET_PROC_ADDR_CORE(GenerateMipmap);
     GET_PROC_ADDR_CORE(GetError);
     GET_PROC_ADDR_CORE(GetIntegerv);
     GET_PROC_ADDR_CORE(GetString);

@@ -81,6 +81,7 @@ typedef void (APIENTRY *PFNGLENABLEPROC) (GLenum cap);
 typedef void (APIENTRY *PFNGLFINISHPROC)(void);
 typedef void (APIENTRY *PFNGLFLUSHPROC)(void);
 typedef void (APIENTRY *PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
+typedef void (APIENTRY *PFNGLGENERATEMIPMAPPROC) (GLenum target);
 typedef GLenum (APIENTRY *PFNGLGETERRORPROC) (void);
 typedef void (APIENTRY *PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
 typedef const GLubyte *(APIENTRY *PFNGLGETSTRINGPROC) (GLenum name);
@@ -178,6 +179,7 @@ typedef struct {
     PFNGLFINISHPROC         Finish;
     PFNGLFLUSHPROC          Flush;
     PFNGLGENTEXTURESPROC    GenTextures;
+    PFNGLGENERATEMIPMAPPROC GenerateMipmap;
     PFNGLGETERRORPROC       GetError;
     PFNGLGETINTEGERVPROC    GetIntegerv;
     PFNGLGETSTRINGPROC      GetString;

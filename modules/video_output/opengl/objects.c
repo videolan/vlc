@@ -137,7 +137,7 @@ static void setTextureParameters(const opengl_tex_converter_t *tc, picture_t *p_
 #endif
 
     vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
     vt->TexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -146,6 +146,7 @@ static void setTextureParameters(const opengl_tex_converter_t *tc, picture_t *p_
 
     vt->TexImage2D(tc->tex_target, 0, tc->texs[0].internal, tex_width, tex_height, 0,
                    GL_RGBA, GL_UNSIGNED_BYTE, p_pic->p[0].p_pixels);
+    vt->GenerateMipmap(GL_TEXTURE_2D);
 }
 
 
