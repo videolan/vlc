@@ -2390,7 +2390,6 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         memcpy(prgm->var.YRotMatrix, vgl->prgm->var.YRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.XRotMatrix, vgl->prgm->var.XRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.ZoomMatrix, vgl->prgm->var.ZoomMatrix, 16 * sizeof(float));
-        //memcpy(prgm->var.ObjectTransformMatrix, vgl->prgm->var.ObjectTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.HeadPositionMatrix, vgl->prgm->var.HeadPositionMatrix, 16 * sizeof(float));
 
@@ -2408,8 +2407,6 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
                                  prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                  prgm->var.ZoomMatrix);
-        //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-        //                         prgm->var.ObjectTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                                  prgm->var.SceneTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
@@ -2520,6 +2517,16 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
     vgl->vt.Uniform1i(prgm->uloc.MatNormalTex, 3);
 
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
+
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
+
     unsigned instance_count = 1;
     for (unsigned o = 0; o < p_scene->nObjects; o += instance_count)
     {
@@ -2541,28 +2548,20 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         // count how many instances of this mesh will be rendered at once by openGL
         instance_count = next_object_idx - o;
 
-        fprintf(stderr, "Drawing %d instances of type %d from object id %d (max %d) \n", instance_count, p_object->meshId, o, p_scene->nObjects);
+        //fprintf(stderr, "Drawing %d instances of type %d from object id %d (max %d) \n", instance_count, p_object->meshId, o, p_scene->nObjects);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->transform_buffer_object);
         // OpenGL only allows to bind a vertex attrib but we want to bind a mat4.
         // Fortunately we can bind the attrib 4 times with the correct offset and stride
         // and the location will just be the next one for the next column
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
         vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix, 4, GL_FLOAT,
-                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 0) * sizeof(float)));
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 0) * sizeof(GLfloat)));
         vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+1, 4, GL_FLOAT,
-                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 4) * sizeof(float)));
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 4) * sizeof(GLfloat)));
         vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+2, 4, GL_FLOAT,
-                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 8) * sizeof(float)));
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 8) * sizeof(GLfloat)));
         vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+3, 4, GL_FLOAT,
-                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 12) * sizeof(float)));
-        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 1);
-        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 1);
-        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
-        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 12) * sizeof(GLfloat)));
 
         if (p_material->p_baseColorTex != NULL)
         {
@@ -2634,6 +2633,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
     //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
 
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 0);
 
     //vgl->vt.Disable(GL_DEPTH_TEST);
 }

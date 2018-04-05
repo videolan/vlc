@@ -239,9 +239,11 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
     vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->transform_buffer_object);
 
     // Initialize the vertex buffer object storage and map it into memory to fill it
-    vt->BufferData(GL_ARRAY_BUFFER, 16*nObjects*sizeof(float),
+    vt->BufferData(GL_ARRAY_BUFFER, 16*nObjects*sizeof(GLfloat),
                  NULL, GL_STATIC_DRAW);
     float *transform_buffer = vt->MapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+    assert(transform_buffer != NULL);
 
     for(int i=0; i<nObjects; ++i)
     {
