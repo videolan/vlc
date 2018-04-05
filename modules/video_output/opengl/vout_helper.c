@@ -2479,7 +2479,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.HeadPositionMatrix);
 
     // lights settings
-    float scene_ambient[] = { 0.5f, 0.5f, 0.5f };
+    float scene_ambient[] = { 0.1f, 0.1f, 0.1f };
     vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
     vgl->vt.Uniform1i(prgm->uloc.LightCount, vgl->p_objDisplay->light_count);
     vgl->vt.Uniform3fv(prgm->uloc.SceneAmbient, 1, scene_ambient);
