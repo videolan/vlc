@@ -181,7 +181,8 @@ local options = {
     mess_err_conf_access ='Can\'t find a suitable path to save'..
       'config, please set it manually',
     mess_err_wrong_path ='the path contains illegal character, '..
-      'please correct it'
+      'please correct it',
+    mess_err_hash = 'Failed to generate hash'
   }
 }
 
@@ -1462,6 +1463,8 @@ function searchHash()
     openSub.checkSession()
     openSub.request("SearchSubtitlesByHash")
     display_subtitles()
+  else
+    setError(lang["mess_err_hash"])
   end
 end
 
