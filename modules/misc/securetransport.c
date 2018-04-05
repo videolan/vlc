@@ -41,6 +41,80 @@
 #endif
 
 /*****************************************************************************
+ * ALPN helper functions
+ *****************************************************************************/
+
+/* Converts the VLC ALPN C array (null-terminated) to a ALPN
+ * CFMutableArray as expected by the Secure Transport API
+ * Returns CFMutableArrayRef on success, else NULL.
+ */
+static CFMutableArrayRef alpnToCFArray(const char *const *alpn)
+{
+    CFMutableArrayRef alpnValues =
+            CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+
+    for (size_t i = 0; alpn[i] != NULL; i++) {
+        CFStringRef alpnVal =
+                CFStringCreateWithCString(kCFAllocatorDefault, alpn[i], kCFStringEncodingASCII);
+        if (alpnVal == NULL) {
+            // Failed to convert the ALPN value to CFString, error out.
+            CFRelease(alpnValues);
+            return NULL;
+        }
+        CFArrayAppendValue(alpnValues, alpnVal);
+        CFRelease(alpnVal);
+    }
+    return alpnValues;
+}
+
+/* Obtains a copy of the contents of a CFString in ASCII encoding.
+ * Returns char* (must be freed by caller) or NULL on failure.
+ */
+static char* CFStringCopyASCIICString(CFStringRef cfString)
+{
+    // Try the quick way to obtain the buffer
+    const char *tmpBuffer = CFStringGetCStringPtr(cfString, kCFStringEncodingASCII);
+
+    if (tmpBuffer != NULL) {
+       return strdup(tmpBuffer);
+    }
+
+    // The quick way did not work, try the long way
+    CFIndex length = CFStringGetLength(cfString);
+    CFIndex maxSize =
+        CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingASCII);
+
+    // If result would exceed LONG_MAX, kCFNotFound is returned
+    if (unlikely(maxSize == kCFNotFound)) {
+        return NULL;
+    }
+
+    // Account for the null terminator
+    maxSize++;
+
+    char *buffer = (char *)malloc(maxSize);
+    Boolean success = CFStringGetCString(cfString, buffer, maxSize, kCFStringEncodingASCII);
+
+    if (!success)
+        FREENULL(buffer);
+    return buffer;
+}
+
+/* Returns the first entry copy of the ALPN array as char*
+ * or NULL on failure.
+ */
+static char* CFArrayALPNCopyFirst(CFArrayRef alpnArray)
+{
+    CFIndex count = CFArrayGetCount(alpnArray);
+
+    if (count <= 0)
+        return NULL;
+
+    CFStringRef alpnVal = CFArrayGetValueAtIndex(alpnArray, 0);
+    return CFStringCopyASCIICString(alpnVal);
+}
+
+/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  OpenClient  (vlc_tls_creds_t *);
@@ -393,9 +467,42 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
     VLC_UNUSED(service);
 
     OSStatus retValue = SSLHandshake(sys->p_context);
+
+// Only try to use ALPN on recent enough SDKs
+// macOS 10.13.2, iOS 11, tvOS 11, watchOS 4
+#if (TARGET_OS_OSX    && MAC_OS_X_VERSION_MAX_ALLOWED     >= 101302) || \
+    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED  >= 110000) || \
+    (TARGET_OS_TV     && __TV_OS_VERSION_MAX_ALLOWED      >= 110000) || \
+    (TARGET_OS_WATCH  && __WATCH_OS_VERSION_MAX_ALLOWED   >= 40000)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+
+    /* Handle ALPN data */
+    if (alp != NULL) {
+        if (SSLCopyALPNProtocols != NULL) {
+            CFArrayRef alpnArray = NULL;
+            OSStatus res = SSLCopyALPNProtocols(sys->p_context, &alpnArray);
+            if (res == noErr && alpnArray) {
+                *alp = CFArrayALPNCopyFirst(alpnArray);
+                if (unlikely(*alp == NULL))
+                    return -1;
+            } else {
+                *alp = NULL;
+            }
+        } else {
+            *alp = NULL;
+        }
+    }
+
+#pragma clang diagnostic pop
+#else
+
+    /* No ALPN support */
     if (alp != NULL) {
         *alp = NULL;
     }
+
+#endif
 
     if (retValue == errSSLWouldBlock) {
         msg_Dbg(crd, "handshake is blocked, try again later");
@@ -646,11 +753,6 @@ error:
 static vlc_tls_t *st_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *sock,
                                  const char *hostname, const char *const *alpn)
 {
-    if (alpn != NULL) {
-        msg_Warn(crd, "Ignoring ALPN request due to lack of support in the backend. Proxy behavior potentially undefined.");
-#warning ALPN support missing, proxy behavior potentially undefined (rdar://29127318, #17721)
-    }
-
     msg_Dbg(crd, "open TLS session for %s", hostname);
 
     vlc_tls_t *tls = st_SessionOpenCommon(crd, sock, false);
@@ -664,6 +766,47 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *sock,
         msg_Err(crd, "cannot set peer domain name");
         goto error;
     }
+
+// Only try to use ALPN on recent enough SDKs
+// macOS 10.13.2, iOS 11, tvOS 11, watchOS 4
+#if (TARGET_OS_OSX    && MAC_OS_X_VERSION_MAX_ALLOWED     >= 101302) || \
+    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED  >= 110000) || \
+    (TARGET_OS_TV     && __TV_OS_VERSION_MAX_ALLOWED      >= 110000) || \
+    (TARGET_OS_WATCH  && __WATCH_OS_VERSION_MAX_ALLOWED   >= 40000)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+
+    /* Handle ALPN */
+    if (alpn != NULL) {
+        if (SSLSetALPNProtocols != NULL) {
+            CFMutableArrayRef alpnValues = alpnToCFArray(alpn);
+
+            if (alpnValues == NULL) {
+                msg_Err(crd, "cannot create CFMutableArray for ALPN values");
+                goto error;
+            }
+
+            OSStatus ret = SSLSetALPNProtocols(sys->p_context, alpnValues);
+            if (ret != noErr){
+                msg_Err(crd, "failed setting ALPN protocols (%i)", ret);
+            }
+            CFRelease(alpnValues);
+        } else {
+            msg_Warn(crd, "Ignoring ALPN request due to lack of support in the backend. Proxy behavior potentially undefined.");
+        }
+    }
+
+#pragma clang diagnostic pop
+#else
+
+    /* No ALPN support */
+    if (alpn != NULL) {
+        // Fallback if SDK does not has SSLSetALPNProtocols
+        msg_Warn(crd, "Compiled in SDK without ALPN support. Proxy behavior potentially undefined.");
+        #warning ALPN support in your SDK version missing (need 10.13.2), proxy behavior potentially undefined (rdar://29127318, #17721)
+    }
+
+#endif
 
     /* disable automatic validation. We do so manually to also handle invalid
        certificates */
