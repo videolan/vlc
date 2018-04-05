@@ -375,6 +375,13 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     if (vendorId && adapterDesc.VendorId != vendorId)
         return VLC_SUCCESS;
 
+    int build = d3d_dev->WDDM.build;
+    if (adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && d3d_dev->WDDM.revision >= 100)
+    {
+        /* new Intel driver format */
+        build += (d3d_dev->WDDM.revision - 100) * 1000;
+    }
+
     if (min_ver->wddm)
     {
         if (d3d_dev->WDDM.wddm > min_ver->wddm)
@@ -398,9 +405,9 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     }
     if (min_ver->build)
     {
-        if (d3d_dev->WDDM.build > min_ver->build)
+        if (build > min_ver->build)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.build != min_ver->build)
+        else if (build != min_ver->build)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
