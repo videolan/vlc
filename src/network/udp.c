@@ -617,7 +617,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     int val = vlc_getaddrinfo (psz_server, i_server, &hints, &rem);
     if (val)
     {
-        msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
+        msg_Err (obj, "cannot resolve %s port %d : %s", psz_server, i_server,
                  gai_strerror (val));
         return -1;
     }
