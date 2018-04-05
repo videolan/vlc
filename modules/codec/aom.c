@@ -86,7 +86,6 @@ static const struct
     { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, 0 },
     { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, 0 },
     { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, 0 },
-    { VLC_CODEC_I440, AOM_IMG_FMT_I440, 8, 0 },
 
     { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, 0 },
     { VLC_CODEC_YUVA, AOM_IMG_FMT_444A, 8, 0 },
@@ -118,7 +117,7 @@ static const struct
 
 static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
 {
-    uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->cs == AOM_CS_SRGB);
+    uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->tc == AOM_CICP_TC_SRGB);
 
     for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
         if( chroma_table[i].i_chroma_id == img->fmt &&
@@ -197,19 +196,17 @@ static int Decode(decoder_t *dec, block_t *block)
 
     v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
 
-    switch( img->cs )
+    switch( img->mc )
     {
-        case AOM_CS_SRGB:
-        case AOM_CS_BT_709:
+        case AOM_CICP_MC_BT_709:
             v->space = COLOR_SPACE_BT709;
             break;
-        case AOM_CS_BT_601:
-        case AOM_CS_SMPTE_170:
-        case AOM_CS_SMPTE_240:
+        case AOM_CICP_MC_BT_601:
+        case AOM_CICP_MC_SMPTE_240:
             v->space = COLOR_SPACE_BT601;
             break;
-        case AOM_CS_BT_2020_CL:
-        case AOM_CS_BT_2020_NCL:
+        case AOM_CICP_MC_BT_2020_CL:
+        case AOM_CICP_MC_BT_2020_NCL:
             v->space = COLOR_SPACE_BT2020;
             break;
         default:
