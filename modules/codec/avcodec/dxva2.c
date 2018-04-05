@@ -502,9 +502,9 @@ static bool CanUseIntelHEVC(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
     /* it should be OK starting after driver 20.19.15.4835 */
     struct wddm_version WDMM = {
-        .wddm         = 20,
-        .d3d_features = 19,
-        .revision     = 15,
+        .wddm         = 0,
+        .d3d_features = 0,
+        .revision     = 0,
         .build        = 4836,
     };
     if (D3D9CheckDriverVersion(&sys->hd3d, &sys->d3d_dev, GPU_MANUFACTURER_INTEL, &WDMM) == VLC_SUCCESS)
