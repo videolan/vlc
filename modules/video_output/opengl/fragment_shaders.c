@@ -800,9 +800,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "   vec3 light_pos_world= Lights.Position[i];\n"
 
         "   vec3 light_to_object = Position_world - light_pos_world;\n"
-        "   vec3 light_dir = normalize(light_to_object);\n"
         "   vec3 spot_dir = normalize(Lights.Direction[i]);\n"
-        "   float light_spot_dot = dot(light_dir, spot_dir);\n"
 
         //"   if ( light_spot_dot < 0.7071) { continue; }\n"
 
@@ -811,6 +809,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         "   vec3 light_dir = light_to_object / distance;\n"
         "   vec3 light_diffuse = Lights.Diffuse[i];\n"
+        "   float light_spot_dot = dot(light_dir, spot_dir);\n"
 
         "   vec3 light_contribution = \n"
         "     max(0, dot(-light_dir, normal_world)) * light_diffuse * diffuse / attenuation ;\n"

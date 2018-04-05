@@ -545,7 +545,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 YRotMatrix;\n"
         "uniform mat4 ZRotMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
-        "varying mat4 ObjectTransformMatrix;\n"
+        "attribute mat4 ObjectTransformMatrix;\n"
         "uniform mat4 SceneTransformMatrix;\n"
         "uniform mat4 HeadPositionMatrix;\n"
         "void main() {\n"
@@ -2514,24 +2514,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
     vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
 
-    float p_eye_pos[3] = {
-        vgl->p_objDisplay->p_scene->headPositionMatrix[12],
-        vgl->p_objDisplay->p_scene->headPositionMatrix[13],
-        vgl->p_objDisplay->p_scene->headPositionMatrix[14]
-    };
-    //fprintf(stderr, "Eye pos is %f / %f / %f\n", p_eye_pos[0], p_eye_pos[1], p_eye_pos[2]);
-
-    float p_eye_dir[3] = {
-        -cos(vgl->f_teta),
-        -sin(vgl->f_teta),
-        0
-    };
-
-    fprintf(stderr, "Theta : %f, Phi: %f\n", vgl->f_teta, vgl->f_phi);
-
-    //fprintf(stderr, "Eye rot is %f / %f \n", vgl->f_teta, vgl->f_phi);
-    //fprintf(stderr, "Eye dir is %f / %f / %f\n", p_eye_dir[0], p_eye_dir[1], p_eye_dir[2]);
-
     // Set the active texture id for the different sampler2D
     vgl->vt.Uniform1i(prgm->uloc.MatDiffuseTex, 0);
     vgl->vt.Uniform1i(prgm->uloc.MatAmbientTex, 1);
@@ -2545,17 +2527,21 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
         scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
 
-        unsigned next_object_idx = o+1;
+        unsigned next_object_idx = o;
         scene_object_t* next_object = p_object;
 
-        while(next_object_idx < p_scene->nObjects && next_object->meshId == p_object->meshId)
+        while(next_object->meshId == p_object->meshId)
         {
-            next_object = vgl->p_objDisplay->p_scene->objects[next_object_idx];
             next_object_idx++;
+            if (next_object_idx >= p_scene->nObjects)
+                break;
+            next_object = vgl->p_objDisplay->p_scene->objects[next_object_idx];
         }
 
         // count how many instances of this mesh will be rendered at once by openGL
         instance_count = next_object_idx - o;
+
+        fprintf(stderr, "Drawing %d instances of type %d from object id %d (max %d) \n", instance_count, p_object->meshId, o, p_scene->nObjects);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->transform_buffer_object);
         // OpenGL only allows to bind a vertex attrib but we want to bind a mat4.
@@ -2577,30 +2563,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 1);
         vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
         vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
-
-        float p_object_pos[3] = {
-            p_object->transformMatrix[12],
-            p_object->transformMatrix[13],
-            p_object->transformMatrix[14]
-        };
-
-        //fprintf(stderr, "Object pos is %f / %f / %f\n", p_object_pos[0], p_object_pos[1], p_object_pos[2]);
-        float p_object_dir[3] = {
-            p_eye_pos[0]-p_object_pos[0],
-            p_eye_pos[1]-p_object_pos[1],
-            p_eye_pos[2]-p_object_pos[2]
-        };
-        //fprintf(stderr, "Object dir is %f / %f / %f\n", p_object_dir[0], p_object_dir[1], p_object_dir[2]);
-
-        float dot_eye_object =
-            p_object_dir[0] * p_eye_dir[0] +
-            p_object_dir[1] * p_eye_dir[1] +
-            p_object_dir[2] * p_eye_dir[2];
-
-        //fprintf(stderr, "Dot product for object %p is %f\n", p_object, dot_eye_object);
-
-        // discard object not visible
-        //if (dot_eye_object < 0) continue;
 
         if (p_material->p_baseColorTex != NULL)
         {
