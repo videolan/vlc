@@ -273,6 +273,12 @@ int D3D9CheckDriverVersion(d3d9_handle_t *hd3d, d3d9_device_t *d3d_dev,
     revision     = (int) (identifier.DriverVersion.LowPart  >> 16 & 0xFFFF);
     build        = (int) (identifier.DriverVersion.LowPart  >>  0 & 0xFFFF);
 
+    if (identifier.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
+    {
+        /* new Intel driver format */
+        build += (revision - 100) * 1000;
+    }
+
     bool newer =
            wddm > min_ver->wddm ||
           (wddm == min_ver->wddm && (d3d_features > min_ver->d3d_features ||
