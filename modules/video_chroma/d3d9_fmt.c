@@ -279,13 +279,33 @@ int D3D9CheckDriverVersion(d3d9_handle_t *hd3d, d3d9_device_t *d3d_dev,
         build += (revision - 100) * 1000;
     }
 
-    bool newer =
-           wddm > min_ver->wddm ||
-          (wddm == min_ver->wddm && (d3d_features > min_ver->d3d_features ||
-                                    (d3d_features == min_ver->d3d_features &&
-                                                (revision > min_ver->revision ||
-                                                (revision == min_ver->revision &&
-                                                       build > min_ver->build)))));
-
-    return newer ? VLC_SUCCESS : VLC_EGENERIC;
+    if (min_ver->wddm)
+    {
+        if (wddm > min_ver->wddm)
+            return VLC_SUCCESS;
+        else if (wddm != min_ver->wddm)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->d3d_features)
+    {
+        if (d3d_features > min_ver->d3d_features)
+            return VLC_SUCCESS;
+        else if (d3d_features != min_ver->d3d_features)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->revision)
+    {
+        if (revision > min_ver->revision)
+            return VLC_SUCCESS;
+        else if (revision != min_ver->revision)
+            return VLC_EGENERIC;
+    }
+    if (min_ver->build)
+    {
+        if (build > min_ver->build)
+            return VLC_SUCCESS;
+        else if (build != min_ver->build)
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
