@@ -1110,14 +1110,14 @@ static void UpdateFBOSize(vout_display_opengl_t *vgl,
     vgl->vt.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, vgl->i_displayWidth, vgl->i_displayHeight);
 #else
     vgl->vt.BindTexture(GL_TEXTURE_2D, color_tex);
-    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth / 2.f, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     vgl->vt.BindTexture(GL_TEXTURE_2D, depth_tex);
-    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, vgl->i_displayWidth / 2.f, vgl->i_displayHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -2845,6 +2845,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         // Left eye
         int64_t d_before_scene = mdate();
         vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, vgl->leftFBO);
+        vgl->vt.Viewport(0, 0, vgl->i_displayWidth / 2.f, vgl->i_displayHeight);
         vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         drawScene(vgl, source, LEFT_EYE);
         d_before_scene = mdate() - d_before_scene;
@@ -2854,6 +2855,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         // Right eye
         d_before_scene = mdate();
         vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, vgl->rightFBO);
+        vgl->vt.Viewport(0, 0, vgl->i_displayWidth / 2.f, vgl->i_displayHeight);
         vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         drawScene(vgl, source, RIGHT_EYE);
         d_before_scene = mdate() - d_before_scene;
@@ -2862,6 +2864,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
         // Exit framebuffer.
         vgl->vt.BindFramebuffer(GL_FRAMEBUFFER, 0);
+        vgl->vt.Viewport(0, 0, vgl->i_displayWidth, vgl->i_displayHeight);
 
         vgl->vt.ActiveTexture(GL_TEXTURE0);
 
