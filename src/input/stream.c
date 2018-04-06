@@ -27,6 +27,7 @@
 #endif
 
 #include <assert.h>
+#include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -58,15 +59,19 @@ typedef struct stream_priv_t
         unsigned char char_width;
         bool          little_endian;
     } text;
+
+    max_align_t private_data[];
 } stream_priv_t;
 
 /**
  * Allocates a VLC stream object
  */
-stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
-                               void (*destroy)(stream_t *))
+stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
+                               void (*destroy)(stream_t *), size_t size,
+                               const char *type_name)
 {
-    stream_priv_t *priv = vlc_custom_create(parent, sizeof (*priv), "stream");
+    stream_priv_t *priv = vlc_custom_create(parent, sizeof (*priv) + size,
+                                            type_name);
     if (unlikely(priv == NULL))
         return NULL;
 
@@ -95,6 +100,17 @@ stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
     priv->text.little_endian = false;
 
     return s;
+}
+
+void *vlc_stream_Private(stream_t *stream)
+{
+    return ((stream_priv_t *)stream)->private_data;
+}
+
+stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
+                               void (*destroy)(stream_t *))
+{
+    return vlc_stream_CustomNew(parent, destroy, 0, "stream");
 }
 
 void stream_CommonDelete(stream_t *s)

@@ -28,6 +28,11 @@
 #include <vlc_common.h>
 #include <vlc_stream.h>
 
+stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
+                               void (*destroy)(stream_t *), size_t extra_size,
+                               const char *type_name);
+void *vlc_stream_Private(stream_t *stream);
+
 /* */
 void stream_CommonDelete( stream_t *s );
 
