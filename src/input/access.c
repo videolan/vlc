@@ -72,7 +72,8 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
 
-    stream_t *access = vlc_stream_CommonNew(parent, vlc_access_Destroy);
+    stream_t *access = vlc_stream_CustomNew(parent, vlc_access_Destroy, 0,
+                                            "access");
     if (unlikely(access == NULL))
         return NULL;
 
