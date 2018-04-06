@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
@@ -189,6 +190,28 @@ static int vlclua_io_open( lua_State *L )
     return 1;
 }
 
+static int vlclua_io_readdir( lua_State *L )
+{
+    if( lua_gettop( L ) < 1 )
+        return luaL_error( L, "Usage: vlc.io.opendir(name)" );
+    const char* psz_path = luaL_checkstring( L, 1 );
+    DIR* p_dir =  vlc_opendir( psz_path );
+    if ( p_dir == NULL )
+        return 0;
+
+    lua_newtable( L );
+    const char* psz_entry;
+    int idx = 1;
+    while ( ( psz_entry = vlc_readdir( p_dir ) ) != NULL )
+    {
+        lua_pushstring( L, psz_entry );
+        lua_rawseti( L, -2, idx );
+        idx++;
+    }
+    closedir( p_dir );
+    return 1;
+}
+
 static int vlclua_mkdir( lua_State *L )
 {
     if( lua_gettop( L ) < 2 ) return vlclua_error( L );
@@ -198,13 +221,16 @@ static int vlclua_mkdir( lua_State *L )
     if ( !psz_dir || !psz_mode )
         return vlclua_error( L );
     int i_res = vlc_mkdir( psz_dir, strtoul( psz_mode, NULL, 0 ) );
-    lua_pushboolean( L, i_res == 0 || errno == EEXIST );
-    return 1;
+    int i_err = i_res != 0 ? errno : 0;
+    lua_pushinteger( L, i_res );
+    lua_pushinteger( L, i_err );
+    return 2;
 }
 
 static const luaL_Reg vlclua_io_reg[] = {
     { "mkdir", vlclua_mkdir },
     { "open", vlclua_io_open },
+    { "readdir", vlclua_io_readdir },
 
     { NULL, NULL }
 };
