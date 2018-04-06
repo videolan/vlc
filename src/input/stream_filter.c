@@ -34,7 +34,15 @@
 
 #include "stream.h"
 
-static void StreamDelete( stream_t * );
+static void StreamDelete(stream_t *s)
+{
+    module_unneed(s, s->p_module);
+
+    if (s->s != NULL)
+        vlc_stream_Delete(s->s);
+
+    free(s->psz_filepath);
+}
 
 stream_t *vlc_stream_FilterNew( stream_t *p_source,
                                 const char *psz_stream_filter )
@@ -109,14 +117,4 @@ stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain )
     free( chain );
 
     return p_source;
-}
-
-static void StreamDelete( stream_t *s )
-{
-    module_unneed( s, s->p_module );
-
-    if( s->s != NULL )
-        vlc_stream_Delete( s->s );
-
-    free(s->psz_filepath);
 }
