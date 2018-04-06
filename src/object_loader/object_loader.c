@@ -64,6 +64,18 @@ void scene_object_Release(scene_object_t *p_object)
     free(p_object);
 }
 
+float scene_mesh_computeBoundingSquareRadius(scene_mesh_t *p_mesh)
+{
+    float center[] = {0.f, 0.f, 0.f};
+    for(int i=0; i<p_mesh->nVertices; ++i)
+    {
+        center[0] += p_mesh->vCoords[i*3+0] / p_mesh->nVertices;
+        center[1] += p_mesh->vCoords[i*3+1] / p_mesh->nVertices;
+        center[2] += p_mesh->vCoords[i*3+2] / p_mesh->nVertices;
+    }
+    return center[0]*center[0] + center[1]*center[1] + center[2]*center[2];
+}
+
 
 scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
                              float *vCoords, float *nCoords, float *tanCoords,
@@ -104,6 +116,8 @@ scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
     if (tCoords != NULL) // A mesh can have no texture coordinates
         memcpy(p_mesh->tCoords, tCoords, 2 * nVertices * sizeof(float));
     memcpy(p_mesh->faces, faces, 3 * nFaces * sizeof(unsigned));
+
+    p_mesh->boundingSquareRadius = scene_mesh_computeBoundingSquareRadius(p_mesh);
 
     return p_mesh;
 error:

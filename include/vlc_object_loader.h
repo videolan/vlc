@@ -30,6 +30,8 @@ typedef struct
 
     unsigned nVertices;
     unsigned nFaces;
+
+    float boundingSquareRadius;
 } scene_mesh_t;
 
 
@@ -107,6 +109,7 @@ VLC_API scene_mesh_t *scene_mesh_New(unsigned nVertices, unsigned nFaces,
                                      float *vCoords, float *nCoords, float *tanCoords,
                                      float *tCoords, unsigned int *faces);
 VLC_API void scene_mesh_Release(scene_mesh_t *p_mesh);
+VLC_API float scene_mesh_computeBoundingSquareRadius(scene_mesh_t *p_object);
 VLC_API scene_material_t *scene_material_New(void);
 VLC_API picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path);
 VLC_API void scene_material_Release(scene_material_t *p_material);
