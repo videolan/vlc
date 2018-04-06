@@ -47,9 +47,6 @@ struct stream_t
 {
     struct vlc_common_members obj;
 
-    /* Module properties for stream filter */
-    module_t    *p_module;
-
     char        *psz_name;
     char        *psz_url; /**< Full URL or MRL (can be NULL) */
     const char  *psz_location; /**< Location (URL with the scheme stripped) */
