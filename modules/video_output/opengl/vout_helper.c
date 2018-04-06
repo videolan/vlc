@@ -2426,6 +2426,29 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
     vgl->vt.Disable(GL_BLEND);
 }
 
+static bool is_object_visible(scene_object_t *p_object, scene_mesh_t *p_mesh, float *eye_position, float *eye_direction)
+{
+    float mesh_to_eye[3] =  {
+        p_object->transformMatrix[12] - eye_position[0],
+        p_object->transformMatrix[13] - eye_position[1],
+        p_object->transformMatrix[14] - eye_position[2]
+    };
+
+    float distance = mesh_to_eye[0]*mesh_to_eye[0]
+        + mesh_to_eye[1]*mesh_to_eye[1]
+        + mesh_to_eye[2]*mesh_to_eye[2];
+
+    if (distance < p_mesh->boundingSquareRadius)
+        return true;
+
+    float mesh_dot_eye =
+        mesh_to_eye[0]*eye_direction[0] +
+        mesh_to_eye[1]*eye_direction[1] +
+        mesh_to_eye[2]*eye_direction[2];
+
+    return mesh_dot_eye < 0;
+}
+
 static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
                              side_by_side_eye eye)
 {
@@ -2527,12 +2550,32 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
     vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
 
+    float p_eye_pos[3] = {
+        vgl->p_objDisplay->p_scene->headPositionMatrix[12],
+        vgl->p_objDisplay->p_scene->headPositionMatrix[13],
+        vgl->p_objDisplay->p_scene->headPositionMatrix[14]
+    };
+
+    float p_eye_dir[3] = {
+        -cos(vgl->f_teta),
+        -sin(vgl->f_teta),
+        0
+    };
+
     unsigned instance_count = 1;
     for (unsigned o = 0; o < p_scene->nObjects; o += instance_count)
     {
-        scene_object_t *p_object = vgl->p_objDisplay->p_scene->objects[o];
-        scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
-        scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
+        scene_object_t *p_object = p_scene->objects[o];
+        scene_mesh_t *p_mesh = p_scene->meshes[p_object->meshId];
+        scene_material_t *p_material = p_scene->materials[p_object->textureId];
+
+        if (!is_object_visible(p_object, p_mesh, p_eye_pos, p_eye_dir))
+        {
+            // Skip this instance
+            instance_count = 1;
+            continue;
+        }
+
 
         unsigned next_object_idx = o;
         scene_object_t* next_object = p_object;
@@ -2542,13 +2585,15 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
             next_object_idx++;
             if (next_object_idx >= p_scene->nObjects)
                 break;
+
             next_object = vgl->p_objDisplay->p_scene->objects[next_object_idx];
+            // suboptimal, the next instance can be skipped, but it's more complex
+            if (!is_object_visible(next_object, p_scene->meshes[next_object->meshId], p_eye_pos, p_eye_dir))
+                break;
         }
 
         // count how many instances of this mesh will be rendered at once by openGL
         instance_count = next_object_idx - o;
-
-        //fprintf(stderr, "Drawing %d instances of type %d from object id %d (max %d) \n", instance_count, p_object->meshId, o, p_scene->nObjects);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->transform_buffer_object);
         // OpenGL only allows to bind a vertex attrib but we want to bind a mat4.
