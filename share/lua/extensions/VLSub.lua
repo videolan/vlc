@@ -667,7 +667,7 @@ function check_config()
   openSub.conf.dirPath = vlc.config.userdatadir()
   local subdirs = { "lua", "extensions", "userdata", "vlsub" }
   for _, dir in ipairs(subdirs) do
-    if not vlc.misc.mkdir( openSub.conf.dirPath .. slash .. dir, "0700" ) then
+    if not vlc.io.mkdir( openSub.conf.dirPath .. slash .. dir, "0700" ) then
       vlc.msg.warn("Failed to create " .. openSub.conf.dirPath .. slash .. dir )
       return false
     end

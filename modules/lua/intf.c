@@ -156,7 +156,7 @@ static char *StripPasswords( const char *psz_config )
     }
     if (n == 0)
         return strdup(psz_config);
- 
+
     char *psz_log = malloc(strlen(psz_config) + n * strlen("******") + 1);
     if (psz_log == NULL)
         return NULL;
@@ -277,6 +277,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaopen_gettext( L );
     luaopen_xml( L );
     luaopen_equalizer( L );
+    luaopen_vlcio( L );
 #if defined(_WIN32) && !VLC_WINSTORE_APP
     luaopen_win( L );
 #endif

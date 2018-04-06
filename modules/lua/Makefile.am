@@ -28,7 +28,9 @@ liblua_plugin_la_SOURCES = \
 	lua/libs/video.c \
 	lua/libs/vlm.c \
 	lua/libs/volume.c \
-	lua/libs/xml.c
+	lua/libs/xml.c \
+	lua/libs/io.c
+
 if HAVE_WIN32
 liblua_plugin_la_SOURCES += lua/libs/win.c
 endif
