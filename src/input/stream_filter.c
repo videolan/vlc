@@ -37,10 +37,7 @@
 static void StreamDelete(stream_t *s)
 {
     module_unneed(s, s->p_module);
-
-    if (s->s != NULL)
-        vlc_stream_Delete(s->s);
-
+    vlc_stream_Delete(s->s);
     free(s->psz_filepath);
 }
 
