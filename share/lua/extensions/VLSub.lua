@@ -2036,42 +2036,18 @@ function file_exist(name) -- test readability
   end
 end
 
-function is_dir(path)
-  if not path or trim(path) == ""
-  then return false end
-  -- Remove slash at the end or it won't work on Windows
-  path = string.gsub(path, "^(.-)[\\/]?$", "%1")
-  local f, _, code = vlc.io.open(path, "rb")
-
-  if f then
-    _, _, code = f:read("*a")
-    if code == 21 then
-      return true
-    end
-  elseif code == 13 then
-    return true
-  end
-
-  return false
-end
-
 function list_dir(path)
   if not path or trim(path) == ""
   then return false end
   local dir_list_cmd
   local list = {}
-  if not is_dir(path) then return false end
 
-  if openSub.conf.os == "win" then
-    dir_list_cmd = io.popen('dir /b "'..path..'"')
-  elseif openSub.conf.os == "lin" then
-    dir_list_cmd = io.popen('ls -1 "'..path..'"')
-  end
+  dir_list_cmd = vlc.io.readdir(path)
 
   if dir_list_cmd then
-    for filename in dir_list_cmd:lines() do
-      if string.match(filename, "^[^%s]+.+$") then
-        table.insert(list, filename)
+    for _, entry in dir_list_cmd do
+      if not entry.isDir and string.match(entry.filename, "^[^%s]+.+$") then
+        table.insert(list, entry.filename)
       end
     end
     return list
