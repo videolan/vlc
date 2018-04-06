@@ -47,7 +47,8 @@ stream_t *vlc_stream_FilterNew( stream_t *p_source,
     stream_t *s;
     assert( p_source != NULL );
 
-    s = vlc_stream_CommonNew( p_source->obj.parent, StreamDelete );
+    s = vlc_stream_CustomNew(p_source->obj.parent, StreamDelete, 0,
+                             "stream filter");
     if( s == NULL )
         return NULL;
 
