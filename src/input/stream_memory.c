@@ -27,7 +27,7 @@
 
 #include "stream.h"
 
-struct stream_sys_t
+struct vlc_stream_memory_private
 {
     size_t    i_pos;      /* Current reading offset */
     size_t    i_size;
@@ -40,34 +40,28 @@ static int  Control( stream_t *, int i_query, va_list );
 
 static void stream_MemoryPreserveDelete(stream_t *s)
 {
-    free(s->p_sys);
+    (void) s; /* nothing to do */
 }
 
 static void stream_MemoryDelete(stream_t *s)
 {
-    stream_sys_t *sys = s->p_sys;
+    struct vlc_stream_memory_private *sys = vlc_stream_Private(s);
 
     free(sys->p_buffer);
-    stream_MemoryPreserveDelete(s);
 }
 
 stream_t *(vlc_stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
                                  size_t i_size, bool preserve)
 {
-    stream_t *s = vlc_stream_CommonNew( p_this,
-                                        preserve ? stream_MemoryPreserveDelete
-                                                 : stream_MemoryDelete );
-    stream_sys_t *p_sys;
-
-    if( !s )
+    struct vlc_stream_memory_private *p_sys;
+    stream_t *s = vlc_stream_CustomNew(p_this,
+                                       preserve ? stream_MemoryPreserveDelete
+                                                : stream_MemoryDelete,
+                                       sizeof (*p_sys), "stream");
+    if (unlikely(s == NULL))
         return NULL;
 
-    s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
-    if( !s->p_sys )
-    {
-        stream_CommonDelete( s );
-        return NULL;
-    }
+    p_sys = vlc_stream_Private(s);
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;
@@ -84,7 +78,7 @@ stream_t *(vlc_stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
  ****************************************************************************/
 static int Control( stream_t *s, int i_query, va_list args )
 {
-    stream_sys_t *p_sys = s->p_sys;
+    struct vlc_stream_memory_private *p_sys = vlc_stream_Private(s);
 
     uint64_t   *pi_64;
 
@@ -135,7 +129,7 @@ static int Control( stream_t *s, int i_query, va_list args )
 
 static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 {
-    stream_sys_t *p_sys = s->p_sys;
+    struct vlc_stream_memory_private *p_sys = vlc_stream_Private(s);
 
     if( i_read > p_sys->i_size - p_sys->i_pos )
         i_read = p_sys->i_size - p_sys->i_pos;
@@ -147,7 +141,7 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 
 static int Seek( stream_t *s, uint64_t offset )
 {
-    stream_sys_t *p_sys = s->p_sys;
+    struct vlc_stream_memory_private *p_sys = vlc_stream_Private(s);
 
     if( offset > p_sys->i_size )
         offset = p_sys->i_size;
