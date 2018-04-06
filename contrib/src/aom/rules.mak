@@ -44,6 +44,14 @@ ifndef HAVE_WIN32
 AOM_CONF += -DCONFIG_PIC=1
 endif
 
+ifdef HAVE_WIN32
+ifneq ($(filter arm aarch64, $(ARCH)),)
+# These configurations don't build with asm enabled yet, witout further
+# patching.
+AOM_CONF += -DAOM_TARGET_CPU=generic
+endif
+endif
+
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
 	cd $< && mkdir -p aom_build
