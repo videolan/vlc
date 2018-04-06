@@ -177,7 +177,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_location,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
-    demux_t *p_demux = vlc_stream_CommonNew(p_obj, demux_DestroyDemux);
+    demux_t *p_demux = vlc_stream_CustomNew(p_obj, demux_DestroyDemux, 0,
+                                            "demux");
 
     if (unlikely(p_demux == NULL))
         return NULL;
