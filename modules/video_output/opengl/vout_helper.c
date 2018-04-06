@@ -1186,12 +1186,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(Disable);
     GET_PROC_ADDR_CORE(DrawArrays);
     GET_PROC_ADDR_CORE(DrawElements);
-    GET_PROC_ADDR_CORE(DrawElementsInstanced);
     GET_PROC_ADDR_CORE(Enable);
     GET_PROC_ADDR_CORE(Finish);
     GET_PROC_ADDR_CORE(Flush);
     GET_PROC_ADDR_CORE(GenTextures);
-    GET_PROC_ADDR_CORE(GenerateMipmap);
     GET_PROC_ADDR_CORE(GetError);
     GET_PROC_ADDR_CORE(GetIntegerv);
     GET_PROC_ADDR_CORE(GetString);
@@ -1210,6 +1208,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(CompileShader);
     GET_PROC_ADDR(AttachShader);
     GET_PROC_ADDR(DeleteShader);
+
+    GET_PROC_ADDR(DrawElementsInstanced);
 
     GET_PROC_ADDR(GetProgramiv);
     GET_PROC_ADDR(GetShaderiv);
@@ -1235,13 +1235,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(Uniform1i);
     GET_PROC_ADDR(Uniform1ui);
 
-
     GET_PROC_ADDR(CreateProgram);
     GET_PROC_ADDR(LinkProgram);
     GET_PROC_ADDR(UseProgram);
     GET_PROC_ADDR(DeleteProgram);
 
     GET_PROC_ADDR(ActiveTexture);
+    GET_PROC_ADDR(GenerateMipmap);
 
     GET_PROC_ADDR(GenBuffers);
     GET_PROC_ADDR(BindBuffer);
