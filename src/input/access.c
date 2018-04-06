@@ -38,6 +38,11 @@
 #include "stream.h"
 #include "input_internal.h"
 
+struct vlc_access_private
+{
+    module_t *module;
+};
+
 /* Decode URL (which has had its scheme stripped earlier) to a file path. */
 char *get_path(const char *location)
 {
@@ -56,7 +61,9 @@ char *get_path(const char *location)
 
 static void vlc_access_Destroy(stream_t *access)
 {
-    module_unneed(access, access->p_module);
+    struct vlc_access_private *priv = vlc_stream_Private(access);
+
+    module_unneed(access, priv->module);
     free(access->psz_filepath);
     free(access->psz_name);
 }
@@ -69,11 +76,12 @@ static void vlc_access_Destroy(stream_t *access)
 static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
                             es_out_t *out, bool preparsing, const char *mrl)
 {
+    struct vlc_access_private *priv;
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
 
-    stream_t *access = vlc_stream_CustomNew(parent, vlc_access_Destroy, 0,
-                                            "access");
+    stream_t *access = vlc_stream_CustomNew(parent, vlc_access_Destroy,
+                                            sizeof (*priv), "access");
     if (unlikely(access == NULL))
         return NULL;
 
@@ -83,6 +91,7 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
     access->psz_url = strdup(mrl);
     access->psz_filepath = NULL;
     access->b_preparsing = preparsing;
+    priv = vlc_stream_Private(access);
 
     if (unlikely(access->psz_url == NULL))
         goto error;
@@ -105,9 +114,8 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
         if (access->psz_filepath != NULL)
             msg_Dbg(access, " (path: %s)", access->psz_filepath);
 
-        access->p_module = module_need(access, "access", access->psz_name,
-                                       true);
-        if (access->p_module != NULL) /* success */
+        priv->module = module_need(access, "access", access->psz_name, true);
+        if (priv->module != NULL) /* success */
         {
             while (redirc > 0)
                 free(redirv[--redirc]);
