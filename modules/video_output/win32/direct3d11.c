@@ -1372,6 +1372,19 @@ static const dxgi_color_space color_spaces[] = {
 #undef DXGIMAP
 };
 
+#ifdef HAVE_DXGI1_6_H
+static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_space *dst)
+{
+    if (src == dst)
+        return true;
+    if (src->primaries == COLOR_PRIMARIES_BT2020)
+        return true; /* we can convert BT2020 to 2020 or 709 */
+    if (dst->transfer == TRANSFER_FUNC_BT709)
+        return true; /* we can handle anything to 709 */
+    return false; /* let Windows do the rest */
+}
+#endif
+
 static void D3D11SetColorSpace(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1440,8 +1453,13 @@ static void D3D11SetColorSpace(vout_display_t *vd)
                 {
                     if (color_spaces[i].dxgi == desc1.ColorSpace)
                     {
-                        best = i;
-                        csp = &color_spaces[i];
+                        if (!canHandleConversion(&color_spaces[best], &color_spaces[i]))
+                            msg_Warn(vd, "Can't handle conversion to screen format %s", color_spaces[i].name);
+                        else
+                        {
+                            best = i;
+                            csp = &color_spaces[i];
+                        }
                         break;
                     }
                 }
