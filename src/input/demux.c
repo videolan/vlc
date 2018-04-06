@@ -469,8 +469,9 @@ int demux_GetSeekpoint( demux_t *p_demux )
 
 static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 {
-    demux_t *p_demux = vlc_stream_CommonNew(VLC_OBJECT(p_next),
-                                            demux_DestroyDemux);
+    demux_t *p_demux = vlc_stream_CustomNew(VLC_OBJECT(p_next),
+                                            demux_DestroyDemux, 0,
+                                            "demux filter");
     if (unlikely(p_demux == NULL))
         return NULL;
 
