@@ -68,6 +68,33 @@
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C5716AB1F5B142200678627 /* coreaudio_common.c */; };
 		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
+		1CCC88EC2078A3D500E5626F /* MainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224091E4D2A9000833BE1 /* MainMenu.xib */; };
+		1CCC88ED2078A3D500E5626F /* MainWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240A1E4D2A9000833BE1 /* MainWindow.xib */; };
+		1CCC88EE2078A3D500E5626F /* VLCStatusBarIconMainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */; };
+		1CCC88EF2078A3D500E5626F /* VLCFullScreenPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */; };
+		1CCC88F02078A3D500E5626F /* About.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8223FE1E4D2A8F00833BE1 /* About.xib */; };
+		1CCC88F12078A3D500E5626F /* AddonManager.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */; };
+		1CCC88F22078A3D500E5626F /* AudioEffects.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224001E4D2A9000833BE1 /* AudioEffects.xib */; };
+		1CCC88F32078A3D500E5626F /* VideoEffects.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224171E4D2A9000833BE1 /* VideoEffects.xib */; };
+		1CCC88F42078A3D500E5626F /* Bookmarks.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224011E4D2A9000833BE1 /* Bookmarks.xib */; };
+		1CCC88F52078A3D500E5626F /* SyncTracks.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224141E4D2A9000833BE1 /* SyncTracks.xib */; };
+		1CCC88F62078A3D500E5626F /* MediaInfo.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240B1E4D2A9000833BE1 /* MediaInfo.xib */; };
+		1CCC88F72078A3D500E5626F /* ConvertAndSave.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */; };
+		1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */; };
+		1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */; };
+		1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D561EA0D3D300E94451 /* ErrorPanel.xib */; };
+		1CCC88FB2078A3D500E5626F /* Help.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224071E4D2A9000833BE1 /* Help.xib */; };
+		1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224081E4D2A9000833BE1 /* LogMessageWindow.xib */; };
+		1CCC88FD2078A3D500E5626F /* Open.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240C1E4D2A9000833BE1 /* Open.xib */; };
+		1CCC88FE2078A3D500E5626F /* PlaylistAccessoryView.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240D1E4D2A9000833BE1 /* PlaylistAccessoryView.xib */; };
+		1CCC88FF2078A3D500E5626F /* PlaylistMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240E1E4D2A9000833BE1 /* PlaylistMenu.xib */; };
+		1CCC89002078A3D500E5626F /* PopupPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240F1E4D2A9000833BE1 /* PopupPanel.xib */; };
+		1CCC89012078A3D500E5626F /* Preferences.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224101E4D2A9000833BE1 /* Preferences.xib */; };
+		1CCC89022078A3D500E5626F /* ResumeDialog.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224111E4D2A9000833BE1 /* ResumeDialog.xib */; };
+		1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224121E4D2A9000833BE1 /* SimplePreferences.xib */; };
+		1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224131E4D2A9000833BE1 /* StreamOutput.xib */; };
+		1CCC89052078A3D500E5626F /* TextfieldPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224151E4D2A9000833BE1 /* TextfieldPanel.xib */; };
+		1CCC89062078A3D500E5626F /* TimeSelectionPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
@@ -1282,7 +1309,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1307,6 +1334,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CCC88EC2078A3D500E5626F /* MainMenu.xib in Sources */,
+				1CCC88ED2078A3D500E5626F /* MainWindow.xib in Sources */,
+				1CCC88EE2078A3D500E5626F /* VLCStatusBarIconMainMenu.xib in Sources */,
+				1CCC88EF2078A3D500E5626F /* VLCFullScreenPanel.xib in Sources */,
+				1CCC88F02078A3D500E5626F /* About.xib in Sources */,
+				1CCC88F12078A3D500E5626F /* AddonManager.xib in Sources */,
+				1CCC88F22078A3D500E5626F /* AudioEffects.xib in Sources */,
+				1CCC88F32078A3D500E5626F /* VideoEffects.xib in Sources */,
+				1CCC88F42078A3D500E5626F /* Bookmarks.xib in Sources */,
+				1CCC88F52078A3D500E5626F /* SyncTracks.xib in Sources */,
+				1CCC88F62078A3D500E5626F /* MediaInfo.xib in Sources */,
+				1CCC88F72078A3D500E5626F /* ConvertAndSave.xib in Sources */,
+				1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */,
+				1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */,
+				1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */,
+				1CCC88FB2078A3D500E5626F /* Help.xib in Sources */,
+				1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */,
+				1CCC88FD2078A3D500E5626F /* Open.xib in Sources */,
+				1CCC88FE2078A3D500E5626F /* PlaylistAccessoryView.xib in Sources */,
+				1CCC88FF2078A3D500E5626F /* PlaylistMenu.xib in Sources */,
+				1CCC89002078A3D500E5626F /* PopupPanel.xib in Sources */,
+				1CCC89012078A3D500E5626F /* Preferences.xib in Sources */,
+				1CCC89022078A3D500E5626F /* ResumeDialog.xib in Sources */,
+				1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */,
+				1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */,
+				1CCC89052078A3D500E5626F /* TextfieldPanel.xib in Sources */,
+				1CCC89062078A3D500E5626F /* TimeSelectionPanel.xib in Sources */,
 				6B81662C1EBFC38100C26F1B /* VLCUIWidgets.m in Sources */,
 				6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */,
 				6B81662B1EBFC35D00C26F1B /* VLCVoutWindowController.m in Sources */,
@@ -1416,7 +1470,7 @@
 					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1441,7 +1495,7 @@
 					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -1465,7 +1519,7 @@
 					../../../modules/codec/,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -1502,7 +1556,7 @@
 					../../../build/include/,
 					../../../modules/codec/,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
@@ -1542,7 +1596,7 @@
 					../../../build/include/,
 					../../../modules/codec/,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
 				VLC_BUILD_TRIPLET = "x86_64-apple-darwin11";
@@ -1581,7 +1635,7 @@
 					../../../build/include/,
 					../../../modules/codec/,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
 				VLC_BUILD_TRIPLET = "x86_64-apple-darwin11";
@@ -1603,7 +1657,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,
