@@ -171,9 +171,11 @@ static const char *ppsz_roles_text[] = {
     "Sets the audio output channels mode that will be used by default " \
     "if your hardware and the audio stream are compatible.")
 
+#if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
 #define SPDIF_TEXT N_("Force S/PDIF support")
 #define SPDIF_LONGTEXT N_( \
     "This option should be used when the audio output can't negotiate S/PDIF support.")
+#endif
 
 #define FORCE_DOLBY_TEXT N_("Force detection of Dolby Surround")
 #define FORCE_DOLBY_LONGTEXT N_( \
@@ -1502,7 +1504,11 @@ vlc_module_begin ()
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, VOLUME_SAVE_TEXT, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
     add_obsolete_bool( "hq-resampling" ) /* since 1.1.8 */
+#if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
     add_bool( "spdif", false, SPDIF_TEXT, SPDIF_LONGTEXT, true )
+#else
+    add_obsolete_bool("spdif") /* since 4.0.0 */
+#endif
     add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
