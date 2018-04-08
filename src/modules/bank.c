@@ -517,8 +517,7 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     if (entry == NULL)
     {
         msg_Err(obj, "cannot find plug-in entry point in %s", plugin->abspath);
-        vlc_dlclose(handle);
-        return -1;
+        goto error;
     }
 
     vlc_mutex_lock(&lock);
@@ -527,7 +526,7 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
         if (vlc_plugin_resolve(plugin, entry))
         {
             vlc_mutex_unlock(&lock);
-            return -1;
+            goto error;
         }
 
         atomic_store_explicit(&plugin->handle, (uintptr_t)handle,
@@ -538,6 +537,9 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     vlc_mutex_unlock(&lock);
 
     return 0;
+error:
+    vlc_dlclose(handle);
+    return -1;
 }
 
 /**
