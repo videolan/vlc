@@ -371,19 +371,17 @@ static unsigned int Find(vlc_keystore *p_keystore,
         SecKeychainAttributeInfo attrInfo;
         attrInfo.count = 0;
 
-#ifndef NDEBUG
         attrInfo.count = 1;
         UInt32 tags[1] = {kSecAccountItemAttr}; //, kSecAccountItemAttr, kSecServerItemAttr, kSecPortItemAttr, kSecProtocolItemAttr, kSecPathItemAttr};
         attrInfo.tag = tags;
         attrInfo.format = NULL;
-#endif
 
         SecKeychainAttributeList *attrList = NULL;
 
-        UInt32 dataLength;
-        void * data;
+        UInt32 secretDataLength;
+        void * secretData;
 
-        status = SecKeychainItemCopyAttributesAndData(itemRef, &attrInfo, NULL, &attrList, &dataLength, &data);
+        status = SecKeychainItemCopyAttributesAndData(itemRef, &attrInfo, NULL, &attrList, &secretDataLength, &secretData);
 
         if (status != noErr) {
             msg_Err(p_keystore, "Lookup error: %i (%s)", status, [ErrorForStatus(status) UTF8String]);
@@ -391,30 +389,29 @@ static unsigned int Find(vlc_keystore *p_keystore,
             return 0;
         }
 
-#ifndef NDEBUG
         for (unsigned x = 0; x < attrList->count; x++) {
             SecKeychainAttribute *attr = &attrList->attr[i];
             switch (attr->tag) {
-                case kSecLabelItemAttr:
-                    NSLog(@"label %@", [[NSString alloc] initWithBytes:attr->data length:attr->length encoding:NSUTF8StringEncoding]);
-                    break;
                 case kSecAccountItemAttr:
-                    NSLog(@"account %@", [[NSString alloc] initWithBytes:attr->data length:attr->length encoding:NSUTF8StringEncoding]);
+                if (!p_entry->ppsz_values[KEY_USER]) {
+                    uint8_t *paddedAccountAttribute = calloc(1, attr->length + 1);
+                    memcpy(paddedAccountAttribute, attr->data, attr->length);
+                    p_entry->ppsz_values[KEY_USER] = strdup((const char *)attr->data);
+                    free(paddedAccountAttribute);
+                }
                     break;
                 default:
                     break;
             }
         }
-#endif
 
         /* we need to do some padding here, as string is expected to be 0 terminated */
-        uint8_t *retData = calloc(1, dataLength + 1);
-        memcpy(retData, data, dataLength);
+        uint8_t *paddedSecretData = calloc(1, secretDataLength + 1);
+        memcpy(paddedSecretData, secretData, secretDataLength);
+        vlc_keystore_entry_set_secret(p_entry, paddedSecretData, secretDataLength + 1);
+        free(paddedSecretData);
 
-        vlc_keystore_entry_set_secret(p_entry, retData, dataLength + 1);
-
-        free(retData);
-        SecKeychainItemFreeAttributesAndData(attrList, data);
+        SecKeychainItemFreeAttributesAndData(attrList, secretData);
     }
 
     *pp_entries = p_entries;
