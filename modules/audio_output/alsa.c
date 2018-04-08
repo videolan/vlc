@@ -56,6 +56,7 @@ struct aout_sys_t
 enum {
     PASSTHROUGH_NONE,
     PASSTHROUGH_SPDIF,
+    PASSTHROUGH_HDMI,
 };
 
 #include "audio_output/volume.h"
@@ -84,10 +85,10 @@ static const char *const channels_text[] = {
 
 #define PASSTHROUGH_TEXT N_("Audio passthrough mode")
 static const int passthrough_modes[] = {
-    PASSTHROUGH_NONE, PASSTHROUGH_SPDIF,
+    PASSTHROUGH_NONE, PASSTHROUGH_SPDIF, PASSTHROUGH_HDMI,
 };
 static const char *const passthrough_modes_text[] = {
-    N_("None"), N_("S/PDIF"),
+    N_("None"), N_("S/PDIF"), N_("HDMI"),
 };
 
 vlc_module_begin ()
@@ -329,6 +330,13 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                 passthrough = var_InheritInteger(aout, "alsa-passthrough");
                 channels = 2;
             }
+            if (AOUT_FMT_HDMI(fmt))
+            {
+                passthrough = var_InheritInteger(aout, "alsa-passthrough");
+                if (passthrough == PASSTHROUGH_SPDIF)
+                    passthrough = PASSTHROUGH_NONE; /* TODO? convert down */
+                channels = 8;
+            }
 
             if (passthrough != PASSTHROUGH_NONE)
             {
@@ -350,14 +358,14 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     const char *device = sys->device;
 
-    /* Choose the IEC device for S/PDIF output */
+    /* Choose the device for passthrough output */
     char sep = '\0';
     if (passthrough != PASSTHROUGH_NONE)
     {
         const char *opt = NULL;
 
         if (!strcmp (device, "default"))
-            device = "iec958"; /* TODO: hdmi */
+            device = (passthrough == PASSTHROUGH_HDMI) ? "hdmi" : "iec958";
 
         if (!strncmp (device, "iec958", 6))
             opt = device + 6;
@@ -597,7 +605,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* Setup audio_output_t */
     if (passthrough != PASSTHROUGH_NONE)
     {
-        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE * (channels / 2);
         fmt->i_frame_length = A52_FRAME_NB;
     }
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;

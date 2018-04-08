@@ -9,6 +9,10 @@ Platform support changes:
      - Android 4.1.x or later (API-16)
      - GCC 5.0 or Clang 3.4 (or equivalent)
 
+Audio output:
+ * ALSA: HDMI passthrough support.
+   Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
+
 Demuxer:
  * Support for HEIF format
 
