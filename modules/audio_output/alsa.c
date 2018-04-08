@@ -300,6 +300,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
     snd_pcm_format_t pcm_format; /* ALSA sample format */
+    unsigned channels;
     int passthrough = PASSTHROUGH_NONE;
 
     if (aout_FormatNbChannels(fmt) == 0)
@@ -324,7 +325,10 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;
         default:
             if (AOUT_FMT_SPDIF(fmt))
+            {
                 passthrough = var_InheritInteger(aout, "alsa-passthrough");
+                channels = 2;
+            }
 
             if (passthrough != PASSTHROUGH_NONE)
             {
@@ -477,7 +481,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Set channels count */
-    unsigned channels;
     if (passthrough == PASSTHROUGH_NONE)
     {
         uint16_t map = var_InheritInteger (aout, "alsa-audio-channels");
@@ -488,10 +491,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         channels = vlc_popcount (map);
     }
     else
-    {
         sys->chans_to_reorder = 0;
-        channels = 2;
-    }
 
     /* By default, ALSA plug will pad missing channels with zeroes, which is
      * usually fine. However, it will also discard extraneous channels, which
