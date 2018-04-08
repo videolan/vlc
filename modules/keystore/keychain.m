@@ -1,7 +1,7 @@
 /*****************************************************************************
  * keychain.m: Darwin Keychain keystore module
  *****************************************************************************
- * Copyright © 2016 VLC authors, VideoLAN and VideoLabs
+ * Copyright © 2016, 2018 VLC authors, VideoLAN and VideoLabs
  *
  * Author: Felix Paul Kühne <fkuehne # videolabs.io>
  *
@@ -27,6 +27,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_keystore.h>
+
+#include "list_util.h"
 
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
@@ -272,20 +274,6 @@ static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMuta
     }
 }
 
-static int CopyEntryValues(const char * ppsz_dst[KEY_MAX], const char *const ppsz_src[KEY_MAX])
-{
-    for (unsigned int i = 0; i < KEY_MAX; ++i)
-    {
-        if (ppsz_src[i])
-        {
-            ppsz_dst[i] = strdup(ppsz_src[i]);
-            if (!ppsz_dst[i])
-                return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
 static int Store(vlc_keystore *p_keystore,
                  const char *const ppsz_values[KEY_MAX],
                  const uint8_t *p_secret,
@@ -373,7 +361,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
 
     for (NSUInteger i = 0; i < count; i++) {
         vlc_keystore_entry *p_entry = &p_entries[i];
-        if (CopyEntryValues((const char **)p_entry->ppsz_values, (const char *const*)ppsz_values) != VLC_SUCCESS) {
+        if (ks_values_copy((const char **)p_entry->ppsz_values, ppsz_values) != VLC_SUCCESS) {
             vlc_keystore_release_entries(p_entries, 1);
             return 0;
         }
