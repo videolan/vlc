@@ -30,9 +30,8 @@
 
 #include "list_util.h"
 
-#import <Foundation/Foundation.h>
-#import <Security/Security.h>
 #import <Cocoa/Cocoa.h>
+#import <Security/Security.h>
 
 static int Open(vlc_object_t *);
 
@@ -299,6 +298,7 @@ static int Store(vlc_keystore *p_keystore,
     NSData *secretData = [[NSString stringWithFormat:@"%s", p_secret] dataUsingEncoding:NSUTF8StringEncoding];
 
     if (status == errSecSuccess) {
+        msg_Dbg(p_keystore, "the item was already known to keychain, so it will be updated");
         /* item already existed in keychain, let's update */
         query = [[NSMutableDictionary alloc] init];
 
@@ -307,6 +307,7 @@ static int Store(vlc_keystore *p_keystore,
 
         status = SecItemUpdate((__bridge CFDictionaryRef)(searchQuery), (__bridge CFDictionaryRef)(query));
     } else if (status == errSecItemNotFound) {
+        msg_Dbg(p_keystore, "creating new item in keychain");
         /* item not found, let's create! */
         query = CreateQuery(p_keystore);
 
@@ -353,6 +354,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
     NSArray *listOfResults = (__bridge_transfer NSArray *)result;
 
     NSUInteger count = listOfResults.count;
+    msg_Dbg(p_keystore, "found %lu result(s) for the provided attributes", count);
 
     vlc_keystore_entry *p_entries = calloc(count,
                                            sizeof(vlc_keystore_entry));
@@ -393,12 +395,13 @@ static unsigned int Find(vlc_keystore *p_keystore,
             SecKeychainAttribute *attr = &attrList->attr[i];
             switch (attr->tag) {
                 case kSecAccountItemAttr:
-                if (!p_entry->ppsz_values[KEY_USER]) {
-                    uint8_t *paddedAccountAttribute = calloc(1, attr->length + 1);
-                    memcpy(paddedAccountAttribute, attr->data, attr->length);
-                    p_entry->ppsz_values[KEY_USER] = strdup((const char *)attr->data);
-                    free(paddedAccountAttribute);
-                }
+                    if (!p_entry->ppsz_values[KEY_USER]) {
+                        msg_Dbg(p_keystore, "using account name from the keychain for login");
+                        uint8_t *paddedAccountAttribute = calloc(1, attr->length + 1);
+                        memcpy(paddedAccountAttribute, attr->data, attr->length);
+                        p_entry->ppsz_values[KEY_USER] = strdup((const char *)attr->data);
+                        free(paddedAccountAttribute);
+                    }
                     break;
                 default:
                     break;
@@ -440,6 +443,7 @@ static unsigned int Remove(vlc_keystore *p_keystore,
     if (status == errSecSuccess) {
         NSArray *matches = (__bridge_transfer NSArray *)result;
         matchCount = matches.count;
+        msg_Dbg(p_keystore, "Found %lu match(es) for deletion", matchCount);
 
         for (NSUInteger x = 0; x < matchCount; x++) {
             status = SecKeychainItemDelete((__bridge SecKeychainItemRef _Nonnull)([matches objectAtIndex:x]));
