@@ -69,6 +69,11 @@ static void Close (vlc_object_t *);
 #define AUDIO_DEV_TEXT N_("Audio output device")
 #define AUDIO_DEV_LONGTEXT N_("OSS device node path.")
 
+#define SPDIF_TEXT N_("Use S/PDIF when available")
+#define SPDIF_LONGTEXT N_( \
+    "S/PDIF can be used by default when " \
+    "your hardware supports it as well as the audio stream being played.")
+
 vlc_module_begin ()
     set_shortname( "OSS" )
     set_description (N_("Open Sound System audio output"))
@@ -76,6 +81,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("oss-audio-device", "",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
+    add_bool("oss-spdif", false, SPDIF_TEXT, SPDIF_LONGTEXT, true)
     add_sw_gain ()
     set_capability( "audio output", 100 )
     set_callbacks (Open, Close)
@@ -132,7 +138,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;
         default:
             if (AOUT_FMT_SPDIF(fmt))
-                spdif = var_InheritBool (aout, "spdif");
+                spdif = var_InheritBool(aout, "oss-spdif");
             if (spdif)
                 format = AFMT_AC3;
 #ifdef AFMT_FLOAT
