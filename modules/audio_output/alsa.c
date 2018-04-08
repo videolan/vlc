@@ -53,6 +53,11 @@ struct aout_sys_t
     char *device;
 };
 
+enum {
+    PASSTHROUGH_NONE,
+    PASSTHROUGH_SPDIF,
+};
+
 #include "audio_output/volume.h"
 
 #define A52_FRAME_NB 1536
@@ -77,6 +82,14 @@ static const char *const channels_text[] = {
     N_("Surround 5.0"), N_("Surround 5.1"), N_("Surround 7.1"),
 };
 
+#define PASSTHROUGH_TEXT N_("Audio passthrough mode")
+static const int passthrough_modes[] = {
+    PASSTHROUGH_NONE, PASSTHROUGH_SPDIF,
+};
+static const char *const passthrough_modes_text[] = {
+    N_("None"), N_("S/PDIF"),
+};
+
 vlc_module_begin ()
     set_shortname( "ALSA" )
     set_description( N_("ALSA audio output") )
@@ -88,11 +101,13 @@ vlc_module_begin ()
     add_integer ("alsa-audio-channels", AOUT_CHANS_FRONT,
                  AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)
         change_integer_list (channels, channels_text)
+    add_integer("alsa-passthrough", PASSTHROUGH_NONE, PASSTHROUGH_TEXT,
+                PASSTHROUGH_TEXT, false)
+        change_integer_list(passthrough_modes, passthrough_modes_text)
     add_sw_gain ()
     set_capability( "audio output", 150 )
     set_callbacks( Open, Close )
 vlc_module_end ()
-
 
 /** Helper for ALSA -> VLC debugging output */
 static void Dump (vlc_object_t *obj, const char *msg,
@@ -285,7 +300,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
     snd_pcm_format_t pcm_format; /* ALSA sample format */
-    bool spdif = false;
+    int passthrough = PASSTHROUGH_NONE;
 
     if (aout_FormatNbChannels(fmt) == 0)
         return VLC_EGENERIC;
@@ -309,8 +324,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;
         default:
             if (AOUT_FMT_SPDIF(fmt))
-                spdif = var_InheritBool (aout, "spdif");
-            if (spdif)
+                passthrough = var_InheritInteger(aout, "alsa-passthrough");
+
+            if (passthrough != PASSTHROUGH_NONE)
             {
                 fmt->i_format = VLC_CODEC_SPDIFL;
                 pcm_format = SND_PCM_FORMAT_S16;
@@ -332,7 +348,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     /* Choose the IEC device for S/PDIF output */
     char sep = '\0';
-    if (spdif)
+    if (passthrough != PASSTHROUGH_NONE)
     {
         const char *opt = NULL;
 
@@ -462,7 +478,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     /* Set channels count */
     unsigned channels;
-    if (!spdif)
+    if (passthrough == PASSTHROUGH_NONE)
     {
         uint16_t map = var_InheritInteger (aout, "alsa-audio-channels");
 
@@ -579,7 +595,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Setup audio_output_t */
-    if (spdif)
+    if (passthrough != PASSTHROUGH_NONE)
     {
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
         fmt->i_frame_length = A52_FRAME_NB;
