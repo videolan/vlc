@@ -47,9 +47,8 @@ typedef struct vlc_plugin_t
     } conf;
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    atomic_bool loaded; /**< Whether the plug-in is mapped in memory */
     bool unloadable; /**< Whether the plug-in can be unloaded safely */
-    void *handle; /**< Run-time linker handle (if loaded) */
+    atomic_uintptr_t handle; /**< Run-time linker handle (or nul) */
     char *abspath; /**< Absolute path */
 
     char *path; /**< Relative path (within plug-in directory) */

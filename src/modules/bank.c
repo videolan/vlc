@@ -166,7 +166,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
         return NULL;
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    atomic_init(&lib->loaded, true);
+    atomic_init(&lib->handle, 1 /* must be non-zero for module_Map() */);
     lib->unloadable = false;
 #endif
     return lib;
@@ -235,8 +235,7 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         goto error;
     }
 
-    plugin->handle = handle;
-    atomic_init(&plugin->loaded, true);
+    atomic_init(&plugin->handle, (uintptr_t)handle);
     return plugin;
 error:
     vlc_dlclose(handle);
@@ -498,7 +497,7 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
-    if (atomic_load_explicit(&plugin->loaded, memory_order_acquire))
+    if (atomic_load_explicit(&plugin->handle, memory_order_acquire))
         return 0; /* fast path: already loaded */
 
     /* Try to load the plug-in (without locks, so read-only) */
@@ -523,7 +522,7 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     }
 
     vlc_mutex_lock(&lock);
-    if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed))
+    if (atomic_load_explicit(&plugin->handle, memory_order_relaxed) == 0)
     {   /* Lock is held, update the plug-in structure */
         if (vlc_plugin_resolve(plugin, entry))
         {
@@ -531,8 +530,8 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
             return -1;
         }
 
-        plugin->handle = handle;
-        atomic_store_explicit(&plugin->loaded, true, memory_order_release);
+        atomic_store_explicit(&plugin->handle, (uintptr_t)handle,
+                              memory_order_release);
     }
     else /* Another thread won the race to load the plugin */
         vlc_dlclose(handle);
@@ -551,12 +550,11 @@ static void module_Unmap(vlc_plugin_t *plugin)
 {
     if (!plugin->unloadable)
         return;
-    if (!atomic_exchange_explicit(&plugin->loaded, false,
-                                  memory_order_acquire))
-        return;
 
-    assert(plugin->handle != NULL);
-    vlc_dlclose(plugin->handle);
+    void *handle = (void *)atomic_exchange_explicit(&plugin->handle, 0,
+                                                    memory_order_acquire);
+    if (handle != NULL)
+        vlc_dlclose(handle);
 }
 #else
 int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
