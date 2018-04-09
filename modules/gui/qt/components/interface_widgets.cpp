@@ -901,7 +901,12 @@ void CoverArtLabel::clear()
 }
 
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
-    : ClickableQLabel(), p_intf( _p_intf ), displayType( _displayType )
+    : ClickableQLabel()
+    , p_intf( _p_intf )
+    , cachedPos( -1 )
+    , cachedTime( 0 )
+    , cachedLength( 0 )
+    , displayType( _displayType )
 {
     b_remainingTime = false;
     if( _displayType != TimeLabel::Elapsed )
@@ -945,12 +950,21 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
 
 void TimeLabel::setRemainingTime( bool remainingTime )
 {
-    if (displayType != TimeLabel::Elapsed)
+    if( displayType != TimeLabel::Elapsed )
+    {
         b_remainingTime = remainingTime;
+        refresh();
+    }
+}
+
+void TimeLabel::refresh()
+{
+    setDisplayPosition( cachedPos, cachedTime, cachedLength );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 {
+    cachedPos = pos;
     if( pos == -1.f )
     {
         setMinimumSize( QSize( 0, 0 ) );
@@ -1012,6 +1026,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
             break;
     }
     cachedLength = length;
+    cachedTime = t;
 }
 
 void TimeLabel::setDisplayPosition( float pos )
