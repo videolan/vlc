@@ -158,13 +158,14 @@ struct prgm
         GLint UseSpecularTexture;
 
         GLint IsUniformColor;
+        GLint IsInstanced;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
         GLint VertexPosition;
         GLint VertexNormal;
         GLint VertexTangent;
-        GLint ObjectTransformMatrix;
+        GLint InstanceTransformMatrix;
     } aloc;
 };
 
@@ -538,6 +539,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec3 VertexPosition;\n"
         "attribute vec3 VertexNormal;\n"
         "attribute vec3 VertexTangent;\n"
+        "attribute mat4 InstanceTransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ModelViewMatrix;\n"
@@ -545,14 +547,18 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 YRotMatrix;\n"
         "uniform mat4 ZRotMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
-        "attribute mat4 ObjectTransformMatrix;\n"
+        "uniform mat4 ObjectTransformMatrix;\n"
         "uniform mat4 SceneTransformMatrix;\n"
         "uniform mat4 HeadPositionMatrix;\n"
+        "uniform bool IsInstanced;\n"
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
         " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix * SceneTransformMatrix;\n"
-        " ModelMatrix = ObjectTransformMatrix;\n"
+        " if (IsInstanced)\n"
+        "  ModelMatrix = InstanceTransformMatrix;\n"
+        " else\n"
+        "  ModelMatrix = ObjectTransformMatrix;\n"
         " NormalMatrix = ViewMatrix*ModelMatrix;\n"
 
         " Position_world = vec3(ModelMatrix*vec4(VertexPosition, 1));\n"
@@ -730,7 +736,8 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(YRotMatrix, "YRotMatrix");
     GET_ULOC(XRotMatrix, "XRotMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
-    //GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
+    GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
+    GET_ULOC(IsInstanced, "IsInstanced");
     GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
     GET_ULOC(HeadPositionMatrix, "HeadPositionMatrix");
     GET_ULOC(SbSCoefs, "SbSCoefs");
@@ -740,7 +747,7 @@ opengl_link_program(struct prgm *prgm)
     GET_ALOC(VertexNormal, "VertexNormal");
     GET_ALOC(VertexTangent, "VertexTangent");
     GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
-    GET_ALOC(ObjectTransformMatrix, "ObjectTransformMatrix");
+    GET_ALOC(InstanceTransformMatrix, "InstanceTransformMatrix");
     /* MultiTexCoord 1 and 2 can be optimized out if not used */
     if (prgm->tc->tex_count > 1)
         GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
@@ -2264,12 +2271,15 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.XRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                               prgm->var.ZoomMatrix);
-    //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-    //                          prgm->var.ObjectTransformMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                              prgm->var.ObjectTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                               prgm->var.SceneTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
                               prgm->var.HeadPositionMatrix);
+    vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_FALSE);
+
+
 
     getSbSParams(vgl, prgm, eye);
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
@@ -2504,6 +2514,8 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
                               prgm->var.HeadPositionMatrix);
 
+    vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_TRUE);
+
     // lights settings
     float scene_ambient[] = { 0.1f, 0.1f, 0.1f };
     vgl->vt.Uniform1i(prgm->uloc.HasLight, GL_TRUE);
@@ -2540,15 +2552,16 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
     vgl->vt.Uniform1i(prgm->uloc.MatNormalTex, 3);
 
-    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
-    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
-    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
-    vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.InstanceTransformMatrix);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+1);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+2);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+3);
 
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 1);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 1);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+1, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 1);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 1);
+
 
     float p_eye_pos[3] = {
         vgl->p_objDisplay->p_scene->headPositionMatrix[12],
@@ -2599,13 +2612,13 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         // OpenGL only allows to bind a vertex attrib but we want to bind a mat4.
         // Fortunately we can bind the attrib 4 times with the correct offset and stride
         // and the location will just be the next one for the next column
-        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix, 4, GL_FLOAT,
+        vgl->vt.VertexAttribPointer(prgm->aloc.InstanceTransformMatrix, 4, GL_FLOAT,
                 GL_FALSE, 16*sizeof(float), (void*) ((16*o + 0) * sizeof(GLfloat)));
-        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+1, 4, GL_FLOAT,
+        vgl->vt.VertexAttribPointer(prgm->aloc.InstanceTransformMatrix+1, 4, GL_FLOAT,
                 GL_FALSE, 16*sizeof(float), (void*) ((16*o + 4) * sizeof(GLfloat)));
-        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+2, 4, GL_FLOAT,
+        vgl->vt.VertexAttribPointer(prgm->aloc.InstanceTransformMatrix+2, 4, GL_FLOAT,
                 GL_FALSE, 16*sizeof(float), (void*) ((16*o + 8) * sizeof(GLfloat)));
-        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+3, 4, GL_FLOAT,
+        vgl->vt.VertexAttribPointer(prgm->aloc.InstanceTransformMatrix+3, 4, GL_FLOAT,
                 GL_FALSE, 16*sizeof(float), (void*) ((16*o + 12) * sizeof(GLfloat)));
 
         if (p_material->p_baseColorTex != NULL)
@@ -2678,10 +2691,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
     //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
 
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 0);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 0);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 0);
-    vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+1, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 0);
+    vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 0);
 
     //vgl->vt.Disable(GL_DEPTH_TEST);
 }
