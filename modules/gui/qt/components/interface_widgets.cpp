@@ -927,6 +927,9 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     }
     setAlignment( Qt::AlignRight | Qt::AlignVCenter );
 
+    CONNECT( THEMIM->getIM(), seekRequested( float ),
+             this, setDisplayPosition( float ) );
+
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
               this, setDisplayPosition( float, int64_t, int ) );
 
@@ -1012,24 +1015,9 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 
 void TimeLabel::setDisplayPosition( float pos )
 {
-    if( pos == -1.f || cachedLength == 0 )
-    {
-        setText( " --:--/--:-- " );
-        return;
-    }
-
-    int time = pos * cachedLength;
-    secstotimestr( psz_time,
-                   ( b_remainingTime && cachedLength ?
-                   cachedLength - time : time ) );
-    QString timestr = QString( "%1%2/%3" )
-        .arg( QString( (b_remainingTime && cachedLength) ? "-" : "" ) )
-        .arg( QString( psz_time ) )
-        .arg( QString( ( !cachedLength && time ) ? "--:--" : psz_length ) );
-
-    setText( timestr );
+    int64_t time = pos * cachedLength * 1000000;
+    setDisplayPosition( pos, time, cachedLength );
 }
-
 
 void TimeLabel::toggleTimeDisplay()
 {

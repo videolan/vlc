@@ -590,9 +590,6 @@ inline void MainInterface::createStatusBar()
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );
 
-    CONNECT( THEMIM->getIM(), seekRequested( float ),
-             timeLabel, setDisplayPosition( float ) );
-
     /* This shouldn't be necessary, but for somehow reason, the statusBarr
        starts at height of 20px and when a text is shown it needs more space.
        But, as the QMainWindow policy doesn't allow statusBar to change QMW's
