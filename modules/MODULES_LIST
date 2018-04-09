@@ -281,7 +281,7 @@ $Id$
  * opus: a opus audio decoder/packetizer/encoder using the libopus library
  * os2drive: service discovery for OS/2 drives
  * oss: audio output module using the OSS /dev/dsp interface
- * osx_notifications: announce currently playing stream to OS X/Growl
+ * osx_notifications: announce currently playing stream to OS X
  * packetizer_a52: A/52 basic parser/packetizer
  * packetizer_avparser: libavcodec packetizer
  * packetizer_copy: Simple copy packetizer

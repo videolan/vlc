@@ -23,6 +23,9 @@ Video output:
  * Remove evas plugin
  * Remove omxil_vout plugin
 
+macOS:
+ * Remove Growl notification support
+
 
 Changes between 2.2.8 and 3.0.0:
 --------------------------------
