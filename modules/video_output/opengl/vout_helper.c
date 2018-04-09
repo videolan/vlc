@@ -112,6 +112,7 @@ struct prgm
         GLfloat YRotMatrix[16];
         GLfloat XRotMatrix[16];
         GLfloat ZoomMatrix[16];
+        GLfloat ViewMatrix[16];
         GLfloat ObjectTransformMatrix[16];
         GLfloat SceneTransformMatrix[16];
         GLfloat HeadPositionMatrix[16];
@@ -120,6 +121,7 @@ struct prgm
     } var;
 
     struct { /* UniformLocation */
+        GLint ViewMatrix;
         GLint OrientationMatrix;
         GLint ProjectionMatrix;
         GLint ModelViewMatrix;
@@ -405,6 +407,21 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         memcpy(prgm->var.SceneTransformMatrix, identity, sizeof(identity));
         memcpy(prgm->var.HeadPositionMatrix, identity, sizeof(identity));
     }
+
+}
+
+static void updateViewMatrix(struct prgm *prgm)
+{
+
+    float ret1_matrix[16];
+    float ret2_matrix[16];
+
+    matrixMul(ret1_matrix, prgm->var.SceneTransformMatrix, prgm->var.HeadPositionMatrix);
+    matrixMul(ret2_matrix, ret1_matrix, prgm->var.YRotMatrix);
+    matrixMul(ret1_matrix, ret2_matrix, prgm->var.XRotMatrix);
+    matrixMul(ret2_matrix, ret1_matrix, prgm->var.ZRotMatrix);
+    matrixMul(ret1_matrix, ret2_matrix, prgm->var.ZoomMatrix);
+    matrixMul(prgm->var.ViewMatrix, ret1_matrix, prgm->var.ModelViewMatrix);
 }
 
 
@@ -545,7 +562,6 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "#version %u\n"
         "varying vec2 TexCoord0;\n"
         "varying vec3 Position_world;\n"
-        "varying mat4 ViewMatrix;\n"
         "varying mat4 ModelMatrix;\n"
         "varying mat4 NormalMatrix;\n"
         "varying mat3 TBNMatrix;\n"
@@ -556,20 +572,13 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec3 VertexTangent;\n"
         "attribute mat4 InstanceTransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n"
-        "uniform mat4 ProjectionMatrix;\n"
-        "uniform mat4 ModelViewMatrix;\n"
-        "uniform mat4 XRotMatrix;\n"
-        "uniform mat4 YRotMatrix;\n"
-        "uniform mat4 ZRotMatrix;\n"
-        "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ObjectTransformMatrix;\n"
-        "uniform mat4 SceneTransformMatrix;\n"
-        "uniform mat4 HeadPositionMatrix;\n"
+        "uniform mat4 ProjectionMatrix;\n"
+        "uniform mat4 ViewMatrix;\n"
         "uniform bool IsInstanced;\n"
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " ViewMatrix  = ModelViewMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * HeadPositionMatrix * SceneTransformMatrix;\n"
         " if (IsInstanced)\n"
         "  ModelMatrix = InstanceTransformMatrix;\n"
         " else\n"
@@ -746,15 +755,16 @@ opengl_link_program(struct prgm *prgm)
 #define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
     GET_ULOC(OrientationMatrix, "OrientationMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
-    GET_ULOC(ModelViewMatrix, "ModelViewMatrix");
-    GET_ULOC(ZRotMatrix, "ZRotMatrix");
-    GET_ULOC(YRotMatrix, "YRotMatrix");
-    GET_ULOC(XRotMatrix, "XRotMatrix");
-    GET_ULOC(ZoomMatrix, "ZoomMatrix");
+    //GET_ULOC(ModelViewMatrix, "ModelViewMatrix");
+    //GET_ULOC(ZRotMatrix, "ZRotMatrix");
+    //GET_ULOC(YRotMatrix, "YRotMatrix");
+    //GET_ULOC(XRotMatrix, "XRotMatrix");
+    //GET_ULOC(ZoomMatrix, "ZoomMatrix");
     GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
     GET_ULOC(IsInstanced, "IsInstanced");
-    GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
-    GET_ULOC(HeadPositionMatrix, "HeadPositionMatrix");
+    //GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
+    //GET_ULOC(HeadPositionMatrix, "HeadPositionMatrix");
+    GET_ULOC(ViewMatrix, "ViewMatrix");
     GET_ULOC(SbSCoefs, "SbSCoefs");
     GET_ULOC(SbSOffsets, "SbSOffsets");
 
@@ -2272,26 +2282,12 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
         }
     }
 
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                              prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                               prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                               prgm->var.ProjectionMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
-                              prgm->var.ModelViewMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                              prgm->var.ZRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                              prgm->var.YRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                              prgm->var.XRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                              prgm->var.ZoomMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                              prgm->var.ObjectTransformMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
-                              prgm->var.SceneTransformMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
-                              prgm->var.HeadPositionMatrix);
     vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_FALSE);
 
 
@@ -2418,25 +2414,12 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.HeadPositionMatrix, vgl->prgm->var.HeadPositionMatrix, 16 * sizeof(float));
 
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                                 prgm->var.ViewMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                                  prgm->var.OrientationMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                                  prgm->var.ProjectionMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
-                                 prgm->var.ModelViewMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                                 prgm->var.ZRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                                 prgm->var.YRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                                 prgm->var.XRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                                 prgm->var.ZoomMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
-                                 prgm->var.SceneTransformMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
-                                 prgm->var.HeadPositionMatrix);
-
         float *SbSCoefs = prgm->var.SbSCoefs;
         float *SbSOffsets = prgm->var.SbSOffsets;
         SbSCoefs[0] = 1.f; SbSCoefs[1] = 1.f;
@@ -2510,24 +2493,14 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         }
     }
 
+    updateViewMatrix(prgm);
+
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                              prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                               prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                               prgm->var.ProjectionMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
-                              prgm->var.ModelViewMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                              prgm->var.ZRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                              prgm->var.YRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                              prgm->var.XRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                              prgm->var.ZoomMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
-                              prgm->var.SceneTransformMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
-                              prgm->var.HeadPositionMatrix);
 
     vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_TRUE);
 
@@ -2577,34 +2550,16 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 1);
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 1);
 
-    float view_matrix[16];
-
-    float ret1_matrix[16];
-    float ret2_matrix[16];
-
-    matrixMul(ret1_matrix, prgm->var.HeadPositionMatrix, prgm->var.SceneTransformMatrix);
-    matrixMul(ret2_matrix, prgm->var.YRotMatrix, ret1_matrix);
-    matrixMul(ret1_matrix, prgm->var.XRotMatrix, ret2_matrix);
-    matrixMul(ret2_matrix, prgm->var.ZRotMatrix, ret1_matrix);
-    matrixMul(ret1_matrix, prgm->var.ZoomMatrix, ret2_matrix);
-    matrixMul(view_matrix, prgm->var.ModelViewMatrix, ret1_matrix);
-
-    printf("Matrix view : %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-            view_matrix[0], view_matrix[1], view_matrix[2], view_matrix[3],
-            view_matrix[4], view_matrix[5], view_matrix[6], view_matrix[7],
-            view_matrix[8], view_matrix[9], view_matrix[10], view_matrix[11],
-            view_matrix[12], view_matrix[13], view_matrix[14], view_matrix[15]);
-
     float p_eye_pos[3] = {
-        -view_matrix[12],
-        -view_matrix[13],
-        -view_matrix[14]
+        prgm->var.ViewMatrix[12],
+        prgm->var.ViewMatrix[13],
+        prgm->var.ViewMatrix[14]
     };
 
     float p_eye_dir[3] = {
-        -view_matrix[1],
-        -view_matrix[5],
-        -view_matrix[9]
+        prgm->var.ViewMatrix[8],
+        prgm->var.ViewMatrix[9],
+        prgm->var.ViewMatrix[10]
     };
 
     // Compress consecutive object with same mesh with instanced rendering
@@ -2891,26 +2846,16 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 2, GL_FLOAT,
                                      0, 0, 0);
 
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                                  prgm->var.ViewMatrix);
+
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                                   prgm->var.OrientationMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                                   prgm->var.ProjectionMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ModelViewMatrix, 1, GL_FALSE,
-                                  prgm->var.ModelViewMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                                  prgm->var.ZRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                                  prgm->var.YRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                                  prgm->var.XRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
-                                  prgm->var.ZoomMatrix);
-        //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-        //                          prgm->var.ObjectTransformMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
-                                  prgm->var.SceneTransformMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
-                                  prgm->var.HeadPositionMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                                 prgm->var.ObjectTransformMatrix);
+        vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_TRUE);
 
         getSbSParams(vgl, prgm, eye);
         vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
