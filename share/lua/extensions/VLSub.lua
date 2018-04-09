@@ -890,9 +890,8 @@ function save_config()
       "[VLSub] Saving config file:  "..
       openSub.conf.filePath)
 
-    if file_touch(openSub.conf.filePath) then
-      local tmpFile = assert(
-        vlc.io.open(openSub.conf.filePath, "wb"))
+    local tmpFile = vlc.io.open(openSub.conf.filePath, "wb")
+    if tmpFile ~= nil then
       local resp = dump_xml(openSub.option)
       tmpFile:write(resp)
       tmpFile:flush()
@@ -1658,10 +1657,10 @@ function dump_zip(url, dir, subfileName)
   end
 
   local tmpFileName = dir.."/"..subfileName..".gz"
-  if not file_touch(tmpFileName) then
+  local tmpFile = vlc.io.open(tmpFileName, "wb")
+  if tmpFile == nil then
     return false
   end
-  local tmpFile = assert(vlc.io.open(tmpFileName, "wb"))
 
   tmpFile:write(resp)
   tmpFile:flush()
