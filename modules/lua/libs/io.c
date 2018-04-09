@@ -78,6 +78,8 @@ static int vlclua_io_file_read_chars( lua_State *L, size_t i_len, FILE* p_file )
 static int vlclua_io_file_read( lua_State *L )
 {
     FILE **pp_file = (FILE**)luaL_checkudata( L, 1, "io_file" );
+    if ( !*pp_file )
+        return luaL_error( L, "Attempt to use a closed file" );
     if( lua_type( L, 2 ) == LUA_TNUMBER )
     {
         return vlclua_io_file_read_chars( L, (size_t)lua_tointeger( L, 2 ),
@@ -103,6 +105,8 @@ static int vlclua_io_file_read( lua_State *L )
 static int vlclua_io_file_write( lua_State *L )
 {
     FILE **pp_file = (FILE**)luaL_checkudata( L, 1, "io_file" );
+    if ( !*pp_file )
+        return luaL_error( L, "Attempt to use a closed file" );
     int i_nb_args = lua_gettop( L );
     bool b_success = true;
     for ( int i = 2; i <= i_nb_args; ++i )
@@ -125,6 +129,8 @@ static int vlclua_io_file_write( lua_State *L )
 static int vlclua_io_file_seek( lua_State *L )
 {
     FILE **pp_file = (FILE**)luaL_checkudata( L, 1, "io_file" );
+    if ( !*pp_file )
+        return luaL_error( L, "Attempt to use a closed file" );
     const char* psz_mode = luaL_optstring( L, 2, NULL );
     if ( psz_mode != NULL )
     {
@@ -146,6 +152,8 @@ static int vlclua_io_file_seek( lua_State *L )
 static int vlclua_io_file_flush( lua_State *L )
 {
     FILE **pp_file = (FILE**)luaL_checkudata( L, 1, "io_file" );
+    if ( !*pp_file )
+        return luaL_error( L, "Attempt to use a closed file" );
     fflush( *pp_file );
     return 0;
 }
@@ -153,7 +161,11 @@ static int vlclua_io_file_flush( lua_State *L )
 static int vlclua_io_file_close( lua_State *L )
 {
     FILE **pp_file = (FILE**)luaL_checkudata( L, 1, "io_file" );
-    fclose( *pp_file );
+    if ( *pp_file )
+    {
+        fclose( *pp_file );
+        *pp_file = NULL;
+    }
     return 0;
 }
 
@@ -162,6 +174,7 @@ static const luaL_Reg vlclua_io_file_reg[] = {
     { "write", vlclua_io_file_write },
     { "seek", vlclua_io_file_seek },
     { "flush", vlclua_io_file_flush },
+    { "close", vlclua_io_file_close },
     { NULL, NULL }
 };
 
