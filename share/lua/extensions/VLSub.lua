@@ -1657,7 +1657,7 @@ function dump_zip(url, dir, subfileName)
     return false
   end
 
-  local tmpFileName = dir..subfileName..".gz"
+  local tmpFileName = dir.."/"..subfileName..".gz"
   if not file_touch(tmpFileName) then
     return false
   end
