@@ -79,6 +79,7 @@ src/input/input.c
 src/input/input_internal.h
 src/input/item.c
 src/input/meta.c
+src/input/player.c
 src/input/stream.c
 src/input/stream.h
 src/input/stream_memory.c
