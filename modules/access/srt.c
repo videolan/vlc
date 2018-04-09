@@ -62,6 +62,8 @@ struct stream_sys_t
     int         i_poll_id;
     vlc_mutex_t lock;
     bool        b_interrupted;
+    char       *psz_host;
+    int         i_port;
 };
 
 static void srt_wait_interrupted(void *p_data)
@@ -112,7 +114,6 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
     int         i_latency;
     int         stat;
     char        *psz_passphrase = NULL;
-    vlc_url_t   parsed_url = { 0 };
 
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
@@ -121,21 +122,12 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
     stream_sys_t *p_sys = p_stream->p_sys;
     bool failed = false;
 
-    if ( vlc_UrlParse( &parsed_url, p_stream->psz_url ) == -1 )
-    {
-        msg_Err( p_stream, "Failed to parse input URL (%s)",
-            p_stream->psz_url );
-
-        failed = true;
-        goto out;
-    }
-
-    stat = vlc_getaddrinfo( parsed_url.psz_host, parsed_url.i_port, &hints, &res );
+    stat = vlc_getaddrinfo( p_sys->psz_host, p_sys->i_port, &hints, &res );
     if ( stat )
     {
         msg_Err( p_stream, "Cannot resolve [%s]:%d (reason: %s)",
-                 parsed_url.psz_host,
-                 parsed_url.i_port,
+                 p_sys->psz_host,
+                 p_sys->i_port,
                  gai_strerror( stat ) );
 
         failed = true;
@@ -191,7 +183,7 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
 
     /* Schedule a connect */
     msg_Dbg( p_stream, "Schedule SRT connect (dest addresss: %s, port: %d).",
-        parsed_url.psz_host, parsed_url.i_port);
+        p_sys->psz_host, p_sys->i_port);
 
     stat = srt_connect( p_sys->sock, res->ai_addr, res->ai_addrlen);
     if ( stat == SRT_ERROR )
@@ -209,7 +201,6 @@ out:
         p_sys->sock = SRT_INVALID_SOCK;
     }
 
-    vlc_UrlClean( &parsed_url );
     freeaddrinfo( res );
     free( psz_passphrase );
 
@@ -308,6 +299,7 @@ static int Open(vlc_object_t *p_this)
 {
     stream_t     *p_stream = (stream_t*)p_this;
     stream_sys_t *p_sys = NULL;
+    vlc_url_t     parsed_url = { 0 };
 
     p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
@@ -318,6 +310,18 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init( &p_sys->lock );
 
     p_stream->p_sys = p_sys;
+
+    if ( vlc_UrlParse( &parsed_url, p_stream->psz_url ) == -1 )
+    {
+        msg_Err( p_stream, "Failed to parse input URL (%s)",
+            p_stream->psz_url );
+        goto failed;
+    }
+
+    p_sys->psz_host = strdup( parsed_url.psz_host );
+    p_sys->i_port = parsed_url.i_port;
+
+    vlc_UrlClean( &parsed_url );
 
     p_sys->i_poll_id = srt_epoll_create();
     if ( p_sys->i_poll_id == -1 )
@@ -346,6 +350,8 @@ failed:
         if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
         if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
 
+        free( p_sys->psz_host );
+
         vlc_obj_free( p_this, p_sys );
         p_stream->p_sys = NULL;
     }
@@ -365,6 +371,8 @@ static void Close(vlc_object_t *p_this)
         srt_epoll_remove_usock( p_sys->i_poll_id, p_sys->sock );
         srt_close( p_sys->sock );
         srt_epoll_release( p_sys->i_poll_id );
+
+        free( p_sys->psz_host );
 
         vlc_obj_free( p_this, p_sys );
         p_stream->p_sys = NULL;
