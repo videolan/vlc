@@ -50,6 +50,11 @@ static void CloseDecoder(vlc_object_t *);
 static int OpenEncoder(vlc_object_t *);
 static void CloseEncoder(vlc_object_t *);
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
+
+static const int pi_enc_bitdepth_values_list[] =
+  { 8, 10, 12 };
+static const char *const ppsz_enc_bitdepth_text [] =
+  { N_("8 bpp"), N_("10 bpp"), N_("12 bpp") };
 #endif
 
 /*****************************************************************************
@@ -71,6 +76,8 @@ vlc_module_begin ()
         set_callbacks(OpenEncoder, CloseEncoder)
         add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL, true )
             change_integer_range( 0, 3 )
+        add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL, true )
+            change_integer_list( pi_enc_bitdepth_values_list, ppsz_enc_bitdepth_text )
 #endif
 vlc_module_end ()
 
@@ -363,26 +370,38 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     int enc_flags;
     int i_profile = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "profile" );
+    int i_bit_depth = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "bitdepth" );
+
+    /* TODO: implement higher profiles, bit depths and other pixformats. */
     switch( i_profile )
     {
         case 0:
-            p_enc->fmt_in.i_codec = VLC_CODEC_I420;
-            enc_flags = 0;
-            /* Profile 0: 8-bit 4:2:0 only. */
+            /* Main Profile: 8 and 10-bit 4:2:0. */
             enccfg.g_profile = 0;
-            enccfg.g_bit_depth = 8;
-            break;
-
-        case 2:
-            p_enc->fmt_in.i_codec = VLC_CODEC_I420_10L;
-            enc_flags = AOM_CODEC_USE_HIGHBITDEPTH;
-            /* Profile 2: 10-bit and 12-bit color only, with 4:2:0 sampling. */
-            enccfg.g_profile = 2;
-            enccfg.g_bit_depth = 10;
+            switch( i_bit_depth )
+            {
+                case 10:
+                    p_enc->fmt_in.i_codec = VLC_CODEC_I420_10L;
+                    enc_flags = AOM_CODEC_USE_HIGHBITDEPTH;
+                    break;
+                case 8:
+                    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+                    enc_flags = 0;
+                    break;
+                default:
+                    msg_Err( p_enc, "%d bit is unsupported for profile %d", i_bit_depth, i_profile );
+                    free( p_sys );
+                    return VLC_EGENERIC;
+            }
+            enccfg.g_bit_depth = i_bit_depth;
             break;
 
         case 1:
-        case 3:
+            /* High Profile: 8 and 10-bit 4:4:4 */
+            /* fallthrough */
+        case 2:
+            /* Professional Profile: 8, 10 and 12-bit for 4:2:2, otherwise 12-bit. */
+            /* fallthrough */
         default:
             msg_Err( p_enc, "Unsupported profile %d", i_profile );
             free( p_sys );
