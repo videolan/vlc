@@ -2656,7 +2656,6 @@ vlc_module_begin ()
     add_key( "key-viewpoint-roll-anticlock", NULL,
              VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT, VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT, true )
 
-    set_section ( N_("Zoom" ), NULL )
     add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER,
         ZOOM_QUARTER_KEY_TEXT,  NULL, false )
     add_key( "key-zoom-half",     KEY_ZOOM_HALF,
