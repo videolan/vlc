@@ -274,6 +274,21 @@ static const GLfloat identity[] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
+static void matrixMul(float ret[], const float m1[], const float m2[])
+{
+    for (unsigned i = 0; i < 4; i++)
+    {
+        for (unsigned j = 0; j < 4; j++)
+        {
+            float sum = 0;
+            for (unsigned k = 0; k < 4; k++) {
+                sum = sum + m1[4 * i + k] * m2[4 * k + j];
+            }
+            ret[4 * i + j] = sum;
+        }
+    }
+}
+
 /* rotation around the Z axis */
 static void getZRotMatrix(float theta, GLfloat matrix[static 16])
 {
@@ -2439,16 +2454,16 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
 static bool is_object_visible(scene_object_t *p_object, scene_mesh_t *p_mesh, float *eye_position, float *eye_direction)
 {
     float mesh_to_eye[3] =  {
-        p_object->transformMatrix[12] - eye_position[0],
-        p_object->transformMatrix[13] - eye_position[1],
-        p_object->transformMatrix[14] - eye_position[2]
+        -p_object->transformMatrix[12] + eye_position[0],
+        -p_object->transformMatrix[13] + eye_position[1],
+        -p_object->transformMatrix[14] + eye_position[2]
     };
 
     float distance = mesh_to_eye[0]*mesh_to_eye[0]
         + mesh_to_eye[1]*mesh_to_eye[1]
         + mesh_to_eye[2]*mesh_to_eye[2];
 
-    if (distance < p_mesh->boundingSquareRadius)
+    if (distance <= p_mesh->boundingSquareRadius)
         return true;
 
     float mesh_dot_eye =
@@ -2456,7 +2471,7 @@ static bool is_object_visible(scene_object_t *p_object, scene_mesh_t *p_mesh, fl
         mesh_to_eye[1]*eye_direction[1] +
         mesh_to_eye[2]*eye_direction[2];
 
-    return mesh_dot_eye < 0;
+    return mesh_dot_eye >= 0;
 }
 
 static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
@@ -2562,17 +2577,34 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 1);
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 1);
 
+    float view_matrix[16];
+
+    float ret1_matrix[16];
+    float ret2_matrix[16];
+
+    matrixMul(ret1_matrix, prgm->var.HeadPositionMatrix, prgm->var.SceneTransformMatrix);
+    matrixMul(ret2_matrix, prgm->var.YRotMatrix, ret1_matrix);
+    matrixMul(ret1_matrix, prgm->var.XRotMatrix, ret2_matrix);
+    matrixMul(ret2_matrix, prgm->var.ZRotMatrix, ret1_matrix);
+    matrixMul(ret1_matrix, prgm->var.ZoomMatrix, ret2_matrix);
+    matrixMul(view_matrix, prgm->var.ModelViewMatrix, ret1_matrix);
+
+    printf("Matrix view : %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+            view_matrix[0], view_matrix[1], view_matrix[2], view_matrix[3],
+            view_matrix[4], view_matrix[5], view_matrix[6], view_matrix[7],
+            view_matrix[8], view_matrix[9], view_matrix[10], view_matrix[11],
+            view_matrix[12], view_matrix[13], view_matrix[14], view_matrix[15]);
 
     float p_eye_pos[3] = {
-        vgl->p_objDisplay->p_scene->headPositionMatrix[12],
-        vgl->p_objDisplay->p_scene->headPositionMatrix[13],
-        vgl->p_objDisplay->p_scene->headPositionMatrix[14]
+        -view_matrix[12],
+        -view_matrix[13],
+        -view_matrix[14]
     };
 
     float p_eye_dir[3] = {
-        -cos(vgl->f_teta),
-        -sin(vgl->f_teta),
-        0
+        -view_matrix[1],
+        -view_matrix[5],
+        -view_matrix[9]
     };
 
     // Compress consecutive object with same mesh with instanced rendering
