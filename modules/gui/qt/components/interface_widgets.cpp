@@ -785,6 +785,7 @@ void SpeedControlWidget::updateRate( int sliderValue )
 {
     if( sliderValue == lastValue )
         return;
+    lastValue = sliderValue;
 
     double speed = pow( 2, (double)sliderValue / 17 );
     int rate = INPUT_RATE_DEFAULT / speed;
