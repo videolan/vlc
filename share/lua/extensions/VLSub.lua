@@ -2045,8 +2045,8 @@ function list_dir(path)
 
   if dir_list_cmd then
     for _, entry in dir_list_cmd do
-      if not entry.isDir and string.match(entry.filename, "^[^%s]+.+$") then
-        table.insert(list, entry.filename)
+      if string.match(entry, "^[^%s]+.+$") then
+        table.insert(list, entry.path .. "/" .. entry.filename)
       end
     end
     return list
