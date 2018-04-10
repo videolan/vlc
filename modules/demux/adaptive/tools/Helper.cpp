@@ -68,6 +68,16 @@ std::string Helper::getFileExtension (const std::string &uri)
     return extension.substr(pos + 1);
 }
 
+bool Helper::icaseEquals(std::string str1, std::string str2)
+{
+    if(str1.size() != str2.size())
+        return false;
+
+    std::transform(str1.begin(), str1.end(), str1.begin(), toupper);
+    std::transform(str2.begin(), str2.end(), str2.begin(), toupper);
+    return str1 == str2;
+}
+
 bool Helper::ifind(std::string haystack, std::string needle)
 {
     transform(haystack.begin(), haystack.end(), haystack.begin(), toupper);
