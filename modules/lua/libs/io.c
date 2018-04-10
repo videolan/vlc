@@ -239,8 +239,10 @@ static int vlclua_mkdir( lua_State *L )
     if ( !psz_dir || !psz_mode )
         return vlclua_error( L );
     int i_res = vlc_mkdir( psz_dir, strtoul( psz_mode, NULL, 0 ) );
-    lua_pushboolean( L, i_res == 0 || errno == EEXIST );
-    return 1;
+    int i_err = i_res != 0 ? errno : 0;
+    lua_pushinteger( L, i_res );
+    lua_pushinteger( L, i_err );
+    return 2;
 }
 
 static const luaL_Reg vlclua_io_reg[] = {
