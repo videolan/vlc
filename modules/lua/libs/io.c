@@ -34,6 +34,11 @@
 #include "../vlc.h"
 #include "../libs.h"
 
+#ifndef LUA_NUMBER_SCAN
+  /* Lua 5.3 only provides str<>long macros */
+  #define LUA_NUMBER_SCAN "%lf"
+#endif
+
 static int vlclua_io_file_read_line( lua_State *L, FILE* p_file )
 {
     char* psz_line = NULL;
