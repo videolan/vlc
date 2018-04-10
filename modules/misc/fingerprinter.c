@@ -343,10 +343,11 @@ static void *Run( void *opaque )
 
         vlc_testcancel();
 
-        for ( size_t i = 0 ; i < vlc_array_count( &p_sys->processing.queue ); i++ )
+        bool results_available = false;
+        while( vlc_array_count( &p_sys->processing.queue ) )
         {
             int canc = vlc_savecancel();
-            fingerprint_request_t *p_data = vlc_array_item_at_index( &p_sys->processing.queue, i );
+            fingerprint_request_t *p_data = vlc_array_item_at_index( &p_sys->processing.queue, 0 );
 
             char *psz_uri = input_item_GetURI( p_data->p_item );
             if ( psz_uri != NULL )
@@ -376,15 +377,21 @@ static void *Run( void *opaque )
             vlc_mutex_lock( &p_sys->results.lock );
             if( vlc_array_append( &p_sys->results.queue, p_data ) )
                 fingerprint_request_Delete( p_data );
+            else
+                results_available = true;
             vlc_mutex_unlock( &p_sys->results.lock );
+
+            // the fingerprint request must not exist both in the
+            // processing and results queue, even in case of thread
+            // cancellation, so remove it immediately
+            vlc_array_remove( &p_sys->processing.queue, 0 );
 
             vlc_testcancel();
         }
 
-        if ( vlc_array_count( &p_sys->processing.queue ) )
+        if ( results_available )
         {
             var_TriggerCallback( p_fingerprinter, "results-available" );
-            vlc_array_clear( &p_sys->processing.queue );
         }
     }
 
