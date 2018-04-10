@@ -25,6 +25,7 @@
 #include "ConnectionParams.hpp"
 #include "AuthStorage.hpp"
 #include "Transport.hpp"
+#include "../tools/Helper.h"
 
 #include <cstdio>
 #include <sstream>
@@ -370,7 +371,7 @@ void HTTPConnection::setUsed( bool b )
 void HTTPConnection::onHeader(const std::string &key,
                               const std::string &value)
 {
-    if(key == "Content-Length")
+    if(Helper::icaseEquals(key, "Content-Length"))
     {
         std::istringstream ss(value);
         ss.imbue(std::locale("C"));
@@ -378,19 +379,21 @@ void HTTPConnection::onHeader(const std::string &key,
         ss >> length;
         contentLength = length;
     }
-    else if (key == "Connection" && value =="close")
+    else if (Helper::icaseEquals(key, "Connection") &&
+             Helper::icaseEquals(value, "close"))
     {
         connectionClose = true;
     }
-    else if (key == "Transfer-Encoding" && value == "chunked")
+    else if (Helper::icaseEquals(key, "Transfer-Encoding") &&
+             Helper::icaseEquals(value, "chunked"))
     {
         chunked = true;
     }
-    else if(key == "Content-Type")
+    else if(Helper::icaseEquals(key, "Content-Type"))
     {
         contentType = value;
     }
-    else if(key == "Location")
+    else if(Helper::icaseEquals(key, "Location"))
     {
         locationparams = ConnectionParams();
         ConnectionParams loc = ConnectionParams( value );
@@ -401,7 +404,7 @@ void HTTPConnection::onHeader(const std::string &key,
         }
         else locationparams = loc;
     }
-    else if(key == "Set-Cookie" && authStorage)
+    else if(Helper::icaseEquals(key, "Set-Cookie") && authStorage)
     {
         authStorage->addCookie( value, params );
     }
