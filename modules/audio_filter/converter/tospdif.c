@@ -269,8 +269,10 @@ static int write_buffer_eac3_stream( filter_t *p_filter, block_t *p_in_buf,
                 p_sys->eac3.i_nb_blocks_substream0
                     += p_a52->i_blocks_per_sync_frame;
 
-            if( p_sys->eac3.i_nb_blocks_substream0 != 6 )
+            if( p_sys->eac3.i_nb_blocks_substream0 < 6 )
                 return SPDIF_MORE_DATA;
+            else if ( p_sys->eac3.i_nb_blocks_substream0 > 6 )
+                return SPDIF_ERROR;
             else
                 p_sys->eac3.i_nb_blocks_substream0 = 0;
         }
