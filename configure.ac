@@ -3103,6 +3103,9 @@ PKG_CHECK_MODULES([GL], [gl], [
   AC_MSG_RESULT([${have_gl}])
 ])
 AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
+AS_IF([test "${have_gl}" = "yes"], [
+  AC_DEFINE([HAVE_GL], 1, [Defined if having OpenGL])
+])
 
 dnl OpenGL ES 2: depends on EGL 1.1
 PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [disabled])
