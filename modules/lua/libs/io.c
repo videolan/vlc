@@ -222,21 +222,7 @@ static int vlclua_io_readdir( lua_State *L )
     int idx = 1;
     while ( ( psz_entry = vlc_readdir( p_dir ) ) != NULL )
     {
-        char path[PATH_MAX];
-        struct stat st;
-
-        if (snprintf(path, PATH_MAX, "%s"DIR_SEP"%s", psz_path,
-                     psz_entry) >= PATH_MAX || vlc_stat( path, &st ) )
-            continue;
-        lua_newtable( L );
-
-        lua_pushstring( L, path );
-        lua_setfield( L, -2, "path" );
         lua_pushstring( L, psz_entry );
-        lua_setfield( L, -2, "filename" );
-        lua_pushboolean( L, S_ISDIR( st.st_mode) );
-        lua_setfield( L, -2, "isDir" );
-
         lua_rawseti( L, -2, idx );
         idx++;
     }
