@@ -2284,12 +2284,16 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
         }
     }
 
+    updateViewMatrix(vgl->prgm);
+
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                               prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                               prgm->var.ProjectionMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                              prgm->var.ObjectTransformMatrix);
     vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_FALSE);
 
 
