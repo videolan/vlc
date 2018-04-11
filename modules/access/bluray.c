@@ -2008,6 +2008,27 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 /*****************************************************************************
  * libbluray event handling
  *****************************************************************************/
+static void writeTsPacketWDiscontinuity( uint8_t *p_buf, uint16_t i_pid,
+                                         const uint8_t *p_payload, uint8_t i_payload )
+{
+    uint8_t ts_header[] = {
+        0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
+        0x47,
+        0x40 | ((i_pid & 0x1f00) >> 8), i_pid & 0xFF, /* PUSI + PID */
+        i_payload ? 0x30 : 0x20,               /* adaptation field, payload / no payload */
+        192 - (4 + 5) - i_payload,             /* adaptation field length */
+        0x82,                                  /* af: discontinuity indicator + priv data */
+        0x0E,                                  /* priv data size */
+         'V',  'L',  'C',  '_',
+         'D',  'I',  'S',  'C',  'O',  'N',  'T',  'I',  'N',  'U',
+    };
+
+    memcpy( p_buf, ts_header, sizeof(ts_header) );
+    memset( &p_buf[sizeof(ts_header)], 0xFF, 192 - sizeof(ts_header) - i_payload );
+    if( i_payload )
+        memcpy( &p_buf[192 - i_payload], p_payload, i_payload );
+}
+
 static void notifyStreamsDiscontinuity( vlc_demux_chained_t *p_parser,
                                         const BLURAY_STREAM_INFO *p_sinfo, size_t i_sinfo )
 {
@@ -2019,18 +2040,7 @@ static void notifyStreamsDiscontinuity( vlc_demux_chained_t *p_parser,
         if (!p_block)
             return;
 
-        uint8_t ts_header[] = {
-            0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
-            0x47,
-            (i_pid & 0x1f00) >> 8, i_pid & 0xFF,   /* PID */
-            0x20,                                  /* adaptation field, no payload */
-            183,                                   /* adaptation field length */
-            0x80,                                  /* adaptation field: discontinuity indicator */
-        };
-
-        memcpy(p_block->p_buffer, ts_header, sizeof(ts_header));
-        memset(&p_block->p_buffer[sizeof(ts_header)], 0xFF, 192 - sizeof(ts_header));
-        p_block->i_buffer = 192;
+        writeTsPacketWDiscontinuity( p_block->p_buffer, i_pid, NULL, 0 );
 
         vlc_demux_chained_Send(p_parser, p_block);
     }
@@ -2077,20 +2087,8 @@ static void streamFlush( demux_sys_t *p_sys )
         0x00, 0x00, 0x01, 0xe0, 0x00, 0x07, 0x80, 0x00, 0x00,  /* PES header */
         0x00, 0x00, 0x01, 0xb7,                                /* PES payload: sequence end */
     };
-    static const uint8_t vid_pusi_ts[] = {
-        0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
-        0x47, 0x50, 0x11, 0x30,                /* TP header */
-        (192 - (4 + 5) - sizeof(seq_end_pes)), /* adaptation field length */
-        0x82,                                  /* af: discontinuity indicator + priv data */
-        0x0E,                                  /* priv data size */
-         'V',  'L',  'C',  '_',
-         'S',  'T',  'I',  'L',  'L',  'F',  'R',  'A',  'M',  'E',
-    };
 
-    memset(p_block->p_buffer, 0, 192);
-    memcpy(p_block->p_buffer, vid_pusi_ts, sizeof(vid_pusi_ts));
-    memcpy(p_block->p_buffer + 192 - sizeof(seq_end_pes), seq_end_pes, sizeof(seq_end_pes));
-    p_block->i_buffer = 192;
+    writeTsPacketWDiscontinuity( p_block->p_buffer, 0x1011, seq_end_pes, sizeof(seq_end_pes) );
 
     /* set correct sequence end code */
     vlc_mutex_lock(&p_sys->pl_info_lock);

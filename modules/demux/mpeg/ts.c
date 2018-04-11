@@ -2462,8 +2462,8 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
                 /* ignore, that's not that simple 2.4.3.5 */
                 //p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
 
-                /* ... or don't ignore for our Bluray still frames hack */
-                if(p[5] == 0x82 && !strncmp((const char *)&p[7], "VLC_STILLFRAME", 14))
+                /* ... or don't ignore for our Bluray still frames and seek hacks */
+                if(p[5] == 0x82 && !strncmp((const char *)&p[7], "VLC_DISCONTINU", 14))
                     p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
             }
 #if 0
