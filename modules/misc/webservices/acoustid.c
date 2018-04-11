@@ -90,7 +90,7 @@ static void parse_recordings( vlc_object_t *p_obj, json_value *node, acoustid_re
     }
 }
 
-static bool ParseJson( vlc_object_t *p_obj, char *psz_buffer, acoustid_results_t *p_results )
+static bool ParseJson( vlc_object_t *p_obj, const char *psz_buffer, acoustid_results_t *p_results )
 {
     json_settings settings;
     char psz_error[128];
