@@ -245,10 +245,17 @@ static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
     return SPDIF_SUCCESS;
 }
 
-static int write_buffer_eac3_stream( filter_t *p_filter, block_t *p_in_buf,
-                                     vlc_a52_header_t *p_a52 )
+static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    vlc_a52_header_t a52 = { };
+    if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
+        != VLC_SUCCESS || a52.i_size > p_in_buf->i_buffer )
+        return SPDIF_ERROR;
+
+    p_in_buf->i_buffer = a52.i_size;
+    p_in_buf->i_nb_samples = a52.i_samples;
 
     if( !p_sys->p_out_buf
      && write_init( p_filter, p_in_buf, AOUT_SPDIF_SIZE * 4, AOUT_SPDIF_SIZE ) )
@@ -258,21 +265,19 @@ static int write_buffer_eac3_stream( filter_t *p_filter, block_t *p_in_buf,
 
     write_buffer( p_filter, p_in_buf );
 
-    if( p_a52->b_eac3 )
+    if( a52.b_eac3 )
     {
-        if( ( p_a52->eac3.strmtyp == EAC3_STRMTYP_INDEPENDENT
-           || p_a52->eac3.strmtyp == EAC3_STRMTYP_AC3_CONVERT )
-         && p_a52->i_blocks_per_sync_frame != 6 )
+        if( ( a52.eac3.strmtyp == EAC3_STRMTYP_INDEPENDENT
+           || a52.eac3.strmtyp == EAC3_STRMTYP_AC3_CONVERT )
+         && a52.i_blocks_per_sync_frame != 6 )
         {
             /* cf. Annex E 2.3.1.2 of AC3 spec */
-            if( p_a52->eac3.i_substreamid == 0 )
+            if( a52.eac3.i_substreamid == 0 )
                 p_sys->eac3.i_nb_blocks_substream0
-                    += p_a52->i_blocks_per_sync_frame;
+                    += a52.i_blocks_per_sync_frame;
 
-            if( p_sys->eac3.i_nb_blocks_substream0 < 6 )
+            if( p_sys->eac3.i_nb_blocks_substream0 != 6 )
                 return SPDIF_MORE_DATA;
-            else if ( p_sys->eac3.i_nb_blocks_substream0 > 6 )
-                return SPDIF_ERROR;
             else
                 p_sys->eac3.i_nb_blocks_substream0 = 0;
         }
@@ -281,32 +286,7 @@ static int write_buffer_eac3_stream( filter_t *p_filter, block_t *p_in_buf,
     }
     else
         return SPDIF_MORE_DATA;
-}
 
-static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
-{
-    vlc_a52_header_t a52 = { .i_size = 0 };
-
-    size_t i_remaining = p_in_buf->i_buffer;
-    int ret;
-    do
-    {
-        p_in_buf->i_buffer = i_remaining;
-        p_in_buf->p_buffer += a52.i_size;
-
-        if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
-            != VLC_SUCCESS || a52.i_size > p_in_buf->i_buffer )
-            return SPDIF_ERROR;
-
-        p_in_buf->i_buffer = a52.i_size;
-        p_in_buf->i_nb_samples = a52.i_samples;
-
-        ret = write_buffer_eac3_stream( p_filter, p_in_buf, &a52 );
-        i_remaining -= p_in_buf->i_buffer;
-
-    } while ( ret == SPDIF_MORE_DATA && i_remaining > 0 );
-
-    return ret;
 }
 
 /* Adapted from libavformat/spdifenc.c:
