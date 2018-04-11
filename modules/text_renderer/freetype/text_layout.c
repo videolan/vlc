@@ -1194,7 +1194,7 @@ static int LayoutLine( filter_t *p_filter,
     int i_ul_thickness = 0;
 
 #ifdef HAVE_FRIBIDI
-    bool b_reordered = ( 0 ==
+    bool b_reordered = ( 0 !=
         fribidi_reorder_line( 0, &p_paragraph->p_types[i_first_char],
                           1 + i_last_char - i_first_char,
                           0, p_paragraph->paragraph_type,
