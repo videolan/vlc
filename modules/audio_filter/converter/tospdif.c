@@ -60,7 +60,7 @@ struct filter_sys_t
     {
         struct
         {
-            unsigned int i_nb_blocks_substream0;
+            unsigned int i_nb_blocks;
         } eac3;
         struct
         {
@@ -245,17 +245,46 @@ static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
     return SPDIF_SUCCESS;
 }
 
+
 static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_a52_header_t a52 = { };
+    /* The input block can contain the following:
+     * a/ One EAC3 independent stream (with 1, 2, 3 or 6 audio blocks per
+     * syncframe)
+     * b/ One AC3 stream followed by one EAC3 dependent stream (with 6 audio
+     * blocks per syncframe)
+     * c/ One EAC3 independent stream followed by one EAC3 dependent stream
+     * (with 1, 2, 3 or 6 audio blocks per syncframe)
+     *
+     * One IEC61937_EAC3 frame must contain 6 audio blocks per syncframe. This
+     * function will gather input blocks until it reaches this amount of audio
+     * blocks.
+     *
+     * Example: for the c/ case with 1 audio blocks per syncframe, a
+     * IEC61937_EAC3 frame will contain 12 a52 streams: 6 independent + 6
+     * dependent EAC3 streams.
+     */
+
+    vlc_a52_header_t a52;
     if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
         != VLC_SUCCESS || a52.i_size > p_in_buf->i_buffer )
         return SPDIF_ERROR;
 
-    p_in_buf->i_buffer = a52.i_size;
-    p_in_buf->i_nb_samples = a52.i_samples;
+    if( p_in_buf->i_buffer > a52.i_size )
+    {
+        /* Check if the next stream is an eac3 dependent one */
+        vlc_a52_header_t a52_dep;
+        const uint8_t *dep_buf = &p_in_buf->p_buffer[a52.i_size];
+        const size_t dep_size = p_in_buf->i_buffer - a52.i_size;
+
+        if( vlc_a52_header_Parse( &a52_dep, dep_buf, dep_size ) != VLC_SUCCESS
+         || a52_dep.i_size > dep_size
+         || !a52_dep.b_eac3 || a52_dep.eac3.strmtyp != EAC3_STRMTYP_DEPENDENT
+         || p_in_buf->i_buffer > a52.i_size + a52_dep.i_size )
+            return SPDIF_ERROR;
+    }
 
     if( !p_sys->p_out_buf
      && write_init( p_filter, p_in_buf, AOUT_SPDIF_SIZE * 4, AOUT_SPDIF_SIZE ) )
@@ -265,28 +294,17 @@ static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 
     write_buffer( p_filter, p_in_buf );
 
-    if( a52.b_eac3 )
-    {
-        if( ( a52.eac3.strmtyp == EAC3_STRMTYP_INDEPENDENT
-           || a52.eac3.strmtyp == EAC3_STRMTYP_AC3_CONVERT )
-         && a52.i_blocks_per_sync_frame != 6 )
-        {
-            /* cf. Annex E 2.3.1.2 of AC3 spec */
-            if( a52.eac3.i_substreamid == 0 )
-                p_sys->eac3.i_nb_blocks_substream0
-                    += a52.i_blocks_per_sync_frame;
+    /* cf. Annex E 2.3 of AC3 spec */
+    p_sys->eac3.i_nb_blocks += a52.i_blocks_per_sync_frame;
 
-            if( p_sys->eac3.i_nb_blocks_substream0 != 6 )
-                return SPDIF_MORE_DATA;
-            else
-                p_sys->eac3.i_nb_blocks_substream0 = 0;
-        }
-        write_finalize( p_filter, IEC61937_EAC3, 1 /* in bytes */ );
-        return SPDIF_SUCCESS;
-    }
-    else
+    if( p_sys->eac3.i_nb_blocks < 6 )
         return SPDIF_MORE_DATA;
+    else if ( p_sys->eac3.i_nb_blocks > 6 )
+        return SPDIF_ERROR;
 
+    write_finalize( p_filter, IEC61937_EAC3, 1 /* in bytes */ );
+    p_sys->eac3.i_nb_blocks = 0;
+    return SPDIF_SUCCESS;
 }
 
 /* Adapted from libavformat/spdifenc.c:
@@ -513,7 +531,7 @@ static void Flush( filter_t *p_filter )
             p_sys->truehd.i_frame_count = 0;
             break;
         case VLC_CODEC_EAC3:
-            p_sys->eac3.i_nb_blocks_substream0 = 0;
+            p_sys->eac3.i_nb_blocks = 0;
             break;
         default:
             break;
