@@ -61,7 +61,6 @@ struct decoder_sys_t
     int i_state;
 
     block_bytestream_t bytestream;
-    size_t i_next_offset;
 
     /*
      * Common properties
@@ -227,13 +226,13 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            p_sys->i_input_size = p_sys->i_next_offset = p_sys->frame.i_size;
+            p_sys->i_input_size = p_sys->frame.i_size;
             p_sys->i_state = STATE_NEXT_SYNC;
             /* fallthrough */
 
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
-            if( block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_next_offset,
+            if( block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_input_size,
                                        p_header, VLC_A52_HEADER_SIZE )
                                        != VLC_SUCCESS )
             {
@@ -246,11 +245,11 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-            if( p_header[0] == 0 )
+            if( p_header[0] == 0 || p_header[1] == 0 )
             {
                 /* A52 wav files and audio CD's use stuffing */
-                p_sys->i_next_offset++;
-                continue;
+                p_sys->i_state = STATE_GET_DATA;
+                break;
             }
 
             if( p_header[0] != 0x0b || p_header[1] != 0x77 )
@@ -262,16 +261,11 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->i_next_offset == p_sys->i_input_size )
-            {
-                vlc_a52_header_t a52;
-                if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_HEADER_SIZE )
-                 && a52.b_eac3 && a52.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
-                {
-                    p_sys->i_input_size += a52.i_size;
-                    p_sys->i_next_offset = p_sys->i_input_size;
-                }
-            }
+            vlc_a52_header_t a52;
+            if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_HEADER_SIZE )
+             && a52.b_eac3 && a52.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+                p_sys->i_input_size += a52.i_size;
+
             p_sys->i_state = STATE_GET_DATA;
             break;
 
