@@ -206,6 +206,7 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
         msg_Dbg( p_obj, "results count == %d", p_data->results.count );
     else
         msg_Dbg( p_obj, "No results" );
+    free( p_buffer );
 
     return VLC_SUCCESS;
 }
