@@ -84,6 +84,10 @@ static const char *const ppsz_region_code_text[] = {
 # define BLURAY_DEMUX
 #endif
 
+#ifndef BD_STREAM_TYPE_VIDEO_HEVC
+# define BD_STREAM_TYPE_VIDEO_HEVC 0x24
+#endif
+
 /* Callbacks */
 static int  blurayOpen (vlc_object_t *);
 static void blurayClose(vlc_object_t *);
@@ -2105,11 +2109,15 @@ static void streamFlush( demux_sys_t *p_sys )
         case BLURAY_STREAM_TYPE_VIDEO_H264:
             i_eos = 0x0A; /* VC1 / H.264 sequence end */
             break;
+        case BD_STREAM_TYPE_VIDEO_HEVC:
+            i_eos = 0x48; /* HEVC sequence end NALU */
+            break;
     }
 
     uint8_t seq_end_pes[] = {
         0x00, 0x00, 0x01, 0xe0, 0x00, 0x07, 0x80, 0x00, 0x00,  /* PES header */
         0x00, 0x00, 0x01, i_eos,                               /* PES payload: sequence end */
+        0x00, /* 2nd byte for HEVC NAL, pads others */
     };
 
     writeTsPacketWDiscontinuity( p_block->p_buffer, 0x1011, seq_end_pes, sizeof(seq_end_pes) );
