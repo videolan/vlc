@@ -54,7 +54,7 @@
 #   include <zlib.h>
 #endif
 
-#ifndef _WIN32
+#ifdef HAVE_NET_IF_H
 #   include <net/if.h>
 #endif
 
