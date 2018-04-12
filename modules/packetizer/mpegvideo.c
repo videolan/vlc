@@ -438,8 +438,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
     }
     else if( p_sys->b_frame_slice &&
-             (startcode == PICTURE_STARTCODE ||
-             (startcode >  SLICE_STARTCODE_LAST && startcode != EXTENSION_STARTCODE )) )
+             (startcode == PICTURE_STARTCODE || startcode >  SLICE_STARTCODE_LAST) )
     {
         const bool b_eos = startcode == SEQUENCE_END_STARTCODE;
 
