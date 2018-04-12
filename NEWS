@@ -65,6 +65,7 @@ macOS:
  * Fix remember playback position
  * Fix Blu-ray disc Java menu
  * Fix swiping on time slider to change position
+ * Fix problem with restoring user name from keychain
 
 Qt:
  * Fix last folder used in open dialogs
