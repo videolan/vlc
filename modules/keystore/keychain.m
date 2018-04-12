@@ -371,8 +371,6 @@ static unsigned int Find(vlc_keystore *p_keystore,
         SecKeychainItemRef itemRef = (__bridge SecKeychainItemRef)([listOfResults objectAtIndex:i]);
 
         SecKeychainAttributeInfo attrInfo;
-        attrInfo.count = 0;
-
         attrInfo.count = 1;
         UInt32 tags[1] = {kSecAccountItemAttr}; //, kSecAccountItemAttr, kSecServerItemAttr, kSecPortItemAttr, kSecProtocolItemAttr, kSecPathItemAttr};
         attrInfo.tag = tags;
@@ -397,10 +395,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
                 case kSecAccountItemAttr:
                     if (!p_entry->ppsz_values[KEY_USER]) {
                         msg_Dbg(p_keystore, "using account name from the keychain for login");
-                        uint8_t *paddedAccountAttribute = calloc(1, attr->length + 1);
-                        memcpy(paddedAccountAttribute, attr->data, attr->length);
                         p_entry->ppsz_values[KEY_USER] = strdup((const char *)attr->data);
-                        free(paddedAccountAttribute);
                     }
                     break;
                 default:
