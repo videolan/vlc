@@ -30,6 +30,7 @@ check_PROGRAMS = \
 	test_src_misc_bits \
 	test_src_misc_epg \
 	test_src_misc_keystore \
+	test_modules_packetizer_helpers \
 	test_modules_packetizer_hxxx \
 	test_modules_keystore
 if ENABLE_SOUT
@@ -123,6 +124,8 @@ test_src_misc_keystore_SOURCES = src/misc/keystore.c
 test_src_misc_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_packetizer_helpers_SOURCES = modules/packetizer/helpers.c
+test_modules_packetizer_helpers_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
 test_modules_packetizer_hxxx_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_keystore_SOURCES = modules/keystore/test.c
