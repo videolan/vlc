@@ -38,7 +38,7 @@
 #include <vlc_cpu.h>
 #include <math.h>
 
-#ifdef PTW32_STATIC_LIB
+#if defined(PTW32_STATIC_LIB) && defined(HAVE_PTHREAD_H)
 #include <pthread.h>
 #endif
 #ifdef MODULE_NAME_IS_x262
