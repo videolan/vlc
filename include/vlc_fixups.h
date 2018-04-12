@@ -370,9 +370,9 @@ void swab (const void *, void *, ssize_t);
 
 /* Socket stuff */
 #ifndef HAVE_INET_PTON
-# ifdef HAVE_SYS_SOCKET_H
+# ifndef _WIN32
 #  include <sys/socket.h>
-# elif defined(_WIN32)
+#else
 typedef int socklen_t;
 # endif
 int inet_pton(int, const char *, void *);

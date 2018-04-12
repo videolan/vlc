@@ -50,9 +50,7 @@
 #       define IPV6_V6ONLY 27
 #   endif
 #else
-#   ifdef HAVE_SYS_SOCKET_H
-#       include <sys/socket.h>
-#   endif
+#   include <sys/socket.h>
 #   include <netinet/in.h>
 #   include <netdb.h>
 #   define net_errno errno
