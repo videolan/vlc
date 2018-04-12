@@ -54,7 +54,7 @@ if HAVE_IOS
 vout_LTLIBRARIES += libvout_ios_plugin.la libglconv_cvpx_plugin.la
 endif
 if HAVE_TVOS
-vout_LTLIBRARIES += libvout_ios_plugin.la
+vout_LTLIBRARIES += libvout_ios_plugin.la libglconv_cvpx_plugin.la
 endif
 
 ### OpenGL ###
