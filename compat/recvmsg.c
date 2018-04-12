@@ -91,7 +91,9 @@ ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
+#ifdef HAVE_SYS_UIO_H
 #include <sys/uio.h>
+#endif
 
 ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
 {
