@@ -30,7 +30,9 @@
 #include <vlc_common.h>
 #include <vlc_network.h>
 
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 #define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
                   NI_DGRAM)

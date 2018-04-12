@@ -30,7 +30,9 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 #include <DeckLinkAPI.h>
 #include <DeckLinkAPIDispatch.cpp>

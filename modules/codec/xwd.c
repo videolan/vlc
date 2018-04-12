@@ -23,7 +23,9 @@
 #endif
 
 #include <assert.h>
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 #include <X11/XWDFile.h>
 
 #include <vlc_common.h>

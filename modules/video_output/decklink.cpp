@@ -43,7 +43,9 @@
 #include <vlc_block.h>
 #include <vlc_image.h>
 #include <vlc_aout.h>
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 #include <DeckLinkAPI.h>
 #include <DeckLinkAPIDispatch.cpp>
