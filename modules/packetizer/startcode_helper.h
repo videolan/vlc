@@ -113,12 +113,8 @@ static inline const uint8_t * startcode_FindAnnexB_SSE2( const uint8_t *p, const
  * and i believe the trick originated from
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
  */
-static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint8_t *end )
+static inline const uint8_t * startcode_FindAnnexB_Bits( const uint8_t *p, const uint8_t *end )
 {
-#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
-    if (vlc_CPU_SSE2())
-        return startcode_FindAnnexB_SSE2(p, end);
-#endif
     const uint8_t *a = p + 4 - ((intptr_t)p & 3);
 
     for (end -= 3; p < a && p <= end; p++) {
@@ -142,7 +138,18 @@ static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint
 
     return NULL;
 }
-
 #undef TRY_MATCH
+
+#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
+static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint8_t *end )
+{
+    if (vlc_CPU_SSE2())
+        return startcode_FindAnnexB_SSE2(p, end);
+    else
+        return startcode_FindAnnexB_Bits(p, end);
+}
+#else
+    #define startcode_FindAnnexB startcode_FindAnnexB_Bits
+#endif
 
 #endif
