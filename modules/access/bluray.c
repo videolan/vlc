@@ -2083,22 +2083,36 @@ static void streamFlush( demux_sys_t *p_sys )
     if (!p_block)
         return;
 
-    static const uint8_t seq_end_pes[] = {
-        0x00, 0x00, 0x01, 0xe0, 0x00, 0x07, 0x80, 0x00, 0x00,  /* PES header */
-        0x00, 0x00, 0x01, 0xb7,                                /* PES payload: sequence end */
-    };
-
-    writeTsPacketWDiscontinuity( p_block->p_buffer, 0x1011, seq_end_pes, sizeof(seq_end_pes) );
+    bd_stream_type_e i_coding_type;
 
     /* set correct sequence end code */
     vlc_mutex_lock(&p_sys->pl_info_lock);
-    if (p_sys->p_clip_info != NULL) {
-        if (p_sys->p_clip_info->video_streams[0].coding_type > 2) {
-            /* VC1 / H.264 sequence end */
-            p_block->p_buffer[191] = 0x0a;
-        }
-    }
+    if (p_sys->p_clip_info != NULL)
+        i_coding_type = p_sys->p_clip_info->video_streams[0].coding_type;
+    else
+        i_coding_type = 0;
     vlc_mutex_unlock(&p_sys->pl_info_lock);
+
+    uint8_t i_eos;
+    switch( i_coding_type )
+    {
+        case BLURAY_STREAM_TYPE_VIDEO_MPEG1:
+        case BLURAY_STREAM_TYPE_VIDEO_MPEG2:
+        default:
+            i_eos = 0xB7; /* MPEG2 sequence end */
+            break;
+        case BLURAY_STREAM_TYPE_VIDEO_VC1:
+        case BLURAY_STREAM_TYPE_VIDEO_H264:
+            i_eos = 0x0A; /* VC1 / H.264 sequence end */
+            break;
+    }
+
+    uint8_t seq_end_pes[] = {
+        0x00, 0x00, 0x01, 0xe0, 0x00, 0x07, 0x80, 0x00, 0x00,  /* PES header */
+        0x00, 0x00, 0x01, i_eos,                               /* PES payload: sequence end */
+    };
+
+    writeTsPacketWDiscontinuity( p_block->p_buffer, 0x1011, seq_end_pes, sizeof(seq_end_pes) );
 
     vlc_demux_chained_Send(p_sys->p_parser, p_block);
     p_sys->b_flushed = true;
