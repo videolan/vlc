@@ -879,23 +879,14 @@ AS_IF([test -n "${PKG_CONFIG}" ],[
 
 
 dnl
-dnl Check for zlib.h and -lz along with system -lminizip if available
+dnl Check for zlib.h and -lz if available
 dnl
 AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
 AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
   VLC_ADD_LIBS([sap],[-lz])
-  PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
-    AC_CHECK_HEADERS([unzip.h], [
-      have_minizip=yes
-      MINIZIP_LIBS="-lminizip -lz"
-    ], [
-      have_minizip=no
-    ])
-  ])
 fi
-AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
 dnl
