@@ -24,7 +24,9 @@
 # include <config.h>
 #endif
 
+#ifdef HAVE_SEARCH_H
 #include <search.h>
+#endif
 #include <assert.h>
 
 #include <vlc_common.h>

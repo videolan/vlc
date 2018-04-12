@@ -25,7 +25,9 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <limits.h>
+#ifdef HAVE_SEARCH_H
 #include <search.h>
+#endif
 #include <assert.h>
 
 struct keysym
