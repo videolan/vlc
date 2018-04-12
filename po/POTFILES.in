@@ -430,7 +430,6 @@ modules/demux/playlist/podcast.c
 modules/demux/playlist/qtl.c
 modules/demux/playlist/ram.c
 modules/demux/playlist/sgimb.c
-modules/demux/playlist/shoutcast.c
 modules/demux/playlist/wpl.c
 modules/demux/playlist/xspf.c
 modules/demux/pva.c
