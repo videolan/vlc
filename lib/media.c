@@ -123,6 +123,16 @@ static_assert(
     PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD == (int) libvlc_video_projection_cubemap_layout_standard,
     "Mismatch between libvlc_video_projection_t and video_projection_mode_t" );
 
+static_assert(
+    MULTIVIEW_2D                    == (int) libvlc_video_multiview_2d &&
+    MULTIVIEW_STEREO_SBS            == (int) libvlc_video_multiview_stereo_sbs &&
+    MULTIVIEW_STEREO_TB             == (int) libvlc_video_multiview_stereo_tb &&
+    MULTIVIEW_STEREO_ROW            == (int) libvlc_video_multiview_stereo_row &&
+    MULTIVIEW_STEREO_COL            == (int) libvlc_video_multiview_stereo_col &&
+    MULTIVIEW_STEREO_FRAME          == (int) libvlc_video_multiview_stereo_frame &&
+    MULTIVIEW_STEREO_CHECKERBOARD   == (int) libvlc_video_multiview_stereo_checkerboard,
+    "Mismatch between libvlc_video_multiview_t and video_multiview_mode_t");
+
 static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
                                                 bool b_create )
 {
@@ -1038,6 +1048,10 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
             p_mes->video->pose.f_pitch = p_es->video.pose.pitch;
             p_mes->video->pose.f_roll = p_es->video.pose.roll;
             p_mes->video->pose.f_field_of_view = p_es->video.pose.fov;
+
+            assert( p_es->video.multiview_mode >= MULTIVIEW_2D &&
+                    p_es->video.multiview_mode <= MULTIVIEW_STEREO_CHECKERBOARD );
+            p_mes->video->i_multiview = (int) p_es->video.multiview_mode;
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;

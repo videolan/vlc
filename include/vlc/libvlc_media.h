@@ -205,6 +205,17 @@ typedef struct libvlc_video_viewpoint_t
     float f_field_of_view; /**< field of view in degrees ]0;180[ (default 80.)*/
 } libvlc_video_viewpoint_t;
 
+typedef enum libvlc_video_multiview_t
+{
+    libvlc_video_multiview_2d,                  /**< No stereoscopy: 2D picture. */
+    libvlc_video_multiview_stereo_sbs,          /**< Side-by-side */
+    libvlc_video_multiview_stereo_tb,           /**< Top-bottom */
+    libvlc_video_multiview_stereo_row,          /**< Row sequential */
+    libvlc_video_multiview_stereo_col,          /**< Column sequential */
+    libvlc_video_multiview_stereo_frame,        /**< Frame sequential */
+    libvlc_video_multiview_stereo_checkerboard, /**< Checkerboard pattern */
+} libvlc_video_multiview_t;
+
 typedef struct libvlc_video_track_t
 {
     unsigned    i_height;
@@ -217,6 +228,7 @@ typedef struct libvlc_video_track_t
     libvlc_video_orient_t       i_orientation;
     libvlc_video_projection_t   i_projection;
     libvlc_video_viewpoint_t    pose; /**< Initial view point */
+    libvlc_video_multiview_t    i_multiview;
 } libvlc_video_track_t;
 
 typedef struct libvlc_subtitle_track_t
