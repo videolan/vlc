@@ -86,6 +86,14 @@ w:get_value(): Return identifier of the selected item. Corresponds to the text v
 w:clear(): Clear a list or drop_down widget. After that, all values previously added are lost.
 w:get_selection(): Retrieve a table representing the current selection. Keys are the ids, values are the texts associated. Applies to: list.
 
+errno
+-----
+List of potential errors. It contains the following values:
+  .ENOENT: No such file or directory
+  .EEXIST: File exists
+  .EACCESS: Permission denied
+  .EINVAL: Invalid argument
+
 
 Extension
 ---------
@@ -132,6 +140,24 @@ input.item(): Get the current input item. Input item methods are:
     .send_bitrate
     .played_abuffers
     .lost_abuffers
+
+Input/Output
+------------
+All path for this namespace are expected to be passed as UTF8 strings.
+
+io.mkdir("path", "mode"): Similar to mkdir(2). The mode is passed as a string
+  to allow for octal representations. This returns a success code (non 0 in
+  case of failure), and a more specific error code as its 2nd returned value
+  in case of failure. The error code is to be used with vlc.errno
+io.readdir("path"): Lists all files & directories in the provided folder.
+io.open("path"[, "mode"]): Similar to lua's io.open. Mode is optional and 
+  defaults to "r". It returns a file object with the following member functions:
+    .read
+    .write
+    .seek
+    .flush
+    .close
+  all of which are used exactly like the lua object returned by io.open
 
 Messages
 --------
