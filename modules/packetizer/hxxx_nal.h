@@ -299,11 +299,11 @@ static inline bool hxxx_annexb_iterate_next( hxxx_iterator_ctx_t *p_ctx, const u
     if( !p_ctx->p_head )
         return false;
 
-    p_ctx->p_head = startcode_FindAnyAnnexB( p_ctx->p_head, p_ctx->p_tail );
+    p_ctx->p_head = startcode_FindAnnexB( p_ctx->p_head, p_ctx->p_tail );
     if( !p_ctx->p_head )
         return false;
 
-    const uint8_t *p_end = startcode_FindAnyAnnexB( p_ctx->p_head + 3, p_ctx->p_tail );
+    const uint8_t *p_end = startcode_FindAnnexB( p_ctx->p_head + 3, p_ctx->p_tail );
     if( !p_end )
         p_end = p_ctx->p_tail;
 

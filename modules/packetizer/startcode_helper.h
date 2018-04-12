@@ -143,23 +143,6 @@ static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint
     return NULL;
 }
 
-/* Special variation to return on prefix only and no data */
-static inline const uint8_t * startcode_FindAnyAnnexB( const uint8_t *p, const uint8_t *end )
-{
-    size_t i_size = end - p;
-    if( i_size <= 4 )
-    {
-        if( i_size == 4 )
-        {
-            TRY_MATCH(p, 0);
-        }
-        else  if ( i_size == 3 && p[0] == 0 && p[1] == 0 && p[2] == 1 )
-             return p;
-        return NULL;
-    }
-    else return startcode_FindAnnexB( p, end );
-}
-
 #undef TRY_MATCH
 
 #endif
