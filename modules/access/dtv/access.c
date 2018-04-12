@@ -29,7 +29,9 @@
 #include <vlc_input.h>
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
+#ifdef HAVE_SEARCH_H
 #include <search.h>
+#endif
 
 #include "dtv/dtv.h"
 
