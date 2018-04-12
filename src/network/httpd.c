@@ -55,7 +55,7 @@
 
 #if defined(_WIN32)
 #   include <winsock2.h>
-#else
+#elif defined(HAVE_SYS_SOCKET_H)
 #   include <sys/socket.h>
 #endif
 

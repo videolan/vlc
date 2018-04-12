@@ -21,9 +21,9 @@
 #ifndef VLC_INTERRUPT_H
 # define VLC_INTERRUPT_H 1
 # include <vlc_threads.h>
-# ifndef _WIN32
+# ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h> /* socklen_t */
-# else
+# elif defined(_WIN32)
 #  include <ws2tcpip.h>
 # endif
 

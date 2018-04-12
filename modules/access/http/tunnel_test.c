@@ -31,7 +31,9 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 #ifndef SOCK_CLOEXEC
 # define SOCK_CLOEXEC 0
 # define accept4(a,b,c,d) accept(a,b,c)

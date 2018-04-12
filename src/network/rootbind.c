@@ -41,7 +41,9 @@ int rootwrap_bind (int, int, int, const struct sockaddr *, size_t);
 
 #include <sys/types.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <netinet/in.h>

@@ -399,7 +399,9 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 
 # include <fcntl.h>
 # include <sys/uio.h>
-# include <sys/socket.h>
+# ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+# endif
 
 
 /* There are currently no ways to atomically force a non-blocking read or write
