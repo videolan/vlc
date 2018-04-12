@@ -471,7 +471,7 @@ function interface_config()
     and openSub.option.os_username or "", 2, 7, 2, 1)
   dlg:add_label(
     lang["int_os_password"]..':', 1, 8, 0, 1)
-  input_table['os_password'] = dlg:add_text_input(
+  input_table['os_password'] = dlg:add_password(
     type(openSub.option.os_password) == "string"
     and openSub.option.os_password or "", 2, 8, 2, 1)
 
