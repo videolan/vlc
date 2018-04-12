@@ -10,6 +10,8 @@ Decoders:
  * Improve compatibility for DxVA2 and D3D11 decoding, fix crashes when seeking
    and fix blacklisting of broken drivers
  * Fix SSA subtitles forced alignment
+ * Fix E-AC-3 stuttering
+ * Fix MIDI playback on macOS
 
 Demux:
  * Fix wrong colors in some AVI files
@@ -22,6 +24,9 @@ Demux:
  * Improve mkv opening & seeking speed
  * Fix display of chapters with no name defined
  * Miscellaneous MKV crash fixes
+ * Fix crash with multi-region DVDs
+ * Fix audio being muted on DVD chapter change
+ * Fix audio being muted when seeking in a BluRay disc
 
 Access:
  * Avoid a crash/assert in FTP after seeking
@@ -32,6 +37,7 @@ Audio output:
  * Allow a default device to be used by VLC
  * Only warn once about misconfiguration for AUhal devices on macOS
  * Improve resampling and latency computation for CoreAudio
+ * Passthrough is now disabled by default
 
 Audio filters:
  * Fix audio stutter after unpausing with headphones
@@ -46,6 +52,10 @@ Video output:
  * Fix transform filters with hardware decoding
  * Fix snapshot and filters with HEVC hardware decoding
  * Fix a buffer overrun during GPU/CPU image copy
+ * Fix potential black screen with 10bits videos on Direct3D11
+ * Fix glitches on DVD menus with Direct3D11
+ * Fix crashes with old graphic adapter drivers
+ * Fix non-HDR content playback on HDR screens with Direct3D11
 
 macOS:
  * Fix Growl notifications on recent macOS versions
@@ -60,6 +70,10 @@ Qt:
  * Fix last folder used in open dialogs
  * Allow to customize the seek jump when using the mousewheel
  * Fix fullscreen controller positionment on multiscreen setups
+ * Fix pasted URLs not being trimmed
+ * Fix jump size not being configurable
+ * Fix missing time labels updates
+ * Fix playback speed slider not accepting 1.0x value
 
 Misc:
  * Fix lua rc & oldrc interfaces host specification
@@ -70,6 +84,9 @@ Misc:
  * Fix MSI script for Windows
  * Fix libvlc_media_list not going to next media
  * Fix character encoding on win32 consoles
+ * Miscellaneous chromecast improvements
+ * Fix missing OSD navigation feedback
+ * Various VLSub improvements
 
 
 Changes between 3.0.0 and 3.0.1:
