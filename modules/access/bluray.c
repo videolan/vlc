@@ -269,7 +269,7 @@ static es_out_t *esOutNew(demux_t *p_demux);
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
 
-static void  blurayInitTitles(demux_t *p_demux, int menu_titles);
+static void  blurayInitTitles(demux_t *p_demux, uint32_t menu_titles);
 static int   bluraySetTitle(demux_t *p_demux, int i_title);
 
 static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
@@ -1651,20 +1651,20 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
     }
 }
 
-static void blurayInitTitles(demux_t *p_demux, int menu_titles)
+static void blurayInitTitles(demux_t *p_demux, uint32_t menu_titles)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
 
     /* get and set the titles */
-    unsigned i_title = menu_titles;
+    uint32_t i_title = menu_titles;
 
     if (!p_sys->b_menu) {
         i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT, 60);
         p_sys->i_longest_title = bd_get_main_title(p_sys->bluray);
     }
 
-    for (unsigned int i = 0; i < i_title; i++) {
+    for (uint32_t i = 0; i < i_title; i++) {
         input_title_t *t = vlc_input_title_New();
         if (!t)
             break;
