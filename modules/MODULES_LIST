@@ -357,6 +357,7 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
+ * smb2: SMB2/3 access module
  * smf: Standard MIDI file demuxer
  * sndio: OpenBSD sndio audio output
  * soxr: SoX Resampler library audio filter

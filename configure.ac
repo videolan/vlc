@@ -1854,6 +1854,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([NFS], [nfs], [libnfs >= 1.10.0], (support nfs protocol via libnfs), [auto])
 
 dnl
+dnl smb2 access support
+dnl
+PKG_ENABLE_MODULES_VLC([SMB2], [smb2], [libsmb2 >= 2.0.0], (support smb2 protocol via libsmb2), [auto])
+
+dnl
 dnl  Video4Linux 2
 dnl
 AC_ARG_ENABLE(v4l2, [AS_HELP_STRING([--disable-v4l2],
