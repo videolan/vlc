@@ -432,6 +432,10 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     const unsigned regionnum = p_region->fmt.i_sar_num;
     const unsigned regionden = p_region->fmt.i_sar_den;
     fmt.i_sar_num = fmt.i_sar_den = 1;
+    fmt.transfer  = p_region->fmt.transfer;
+    fmt.primaries = p_region->fmt.primaries;
+    fmt.space     = p_region->fmt.space;
+    fmt.mastering = p_region->fmt.mastering;
 
     assert( !p_region->p_picture );
     p_region->p_picture = picture_NewFromFormat( &fmt );
@@ -889,6 +893,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               FT_BBox *p_paddedtextbbox,
                               FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
+                              const video_format_t *fmt_out,
                               void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
                               void (*FillPicture)( picture_t *p_picture, int, int, int, int ),
                               void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
@@ -903,6 +908,10 @@ static inline int RenderAXYZ( filter_t *p_filter,
     const unsigned regionnum = p_region->fmt.i_sar_num;
     const unsigned regionden = p_region->fmt.i_sar_den;
     fmt.i_sar_num = fmt.i_sar_den = 1;
+    fmt.transfer  = fmt_out->transfer;
+    fmt.primaries = fmt_out->primaries;
+    fmt.space     = fmt_out->space;
+    fmt.mastering = fmt_out->mastering;
 
     picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
@@ -1333,6 +1342,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_YUVA,
+                                 &p_region_out->fmt,
                                  YUVFromRGB,
                                  FillYUVAPicture,
                                  BlendYUVAPixel );
@@ -1340,6 +1350,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_RGBA,
+                                 &p_region_out->fmt,
                                  RGBFromRGB,
                                  FillRGBAPicture,
                                  BlendRGBAPixel );
@@ -1347,6 +1358,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_ARGB,
+                                 &p_region_out->fmt,
                                  RGBFromRGB,
                                  FillARGBPicture,
                                  BlendARGBPixel );
