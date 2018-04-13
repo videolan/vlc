@@ -288,7 +288,8 @@ static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
 #define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
-#define CUR_LENGTH    p_sys->pp_title[p_sys->cur_title]->i_length
+#define CURRENT_TITLE p_sys->pp_title[p_sys->cur_title]
+#define CUR_LENGTH    CURRENT_TITLE->i_length
 
 /* */
 static void FindMountPoint(char **file)
@@ -1910,6 +1911,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_LENGTH:
     {
         int64_t *pi_length = va_arg(args, int64_t *);
+        if(p_sys->cur_title < p_sys->i_title &&
+           (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
+                return VLC_EGENERIC;
         *pi_length = p_sys->cur_title < p_sys->i_title ? CUR_LENGTH : 0;
         return VLC_SUCCESS;
     }
@@ -1923,6 +1927,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_TIME:
     {
         int64_t *pi_time = va_arg(args, int64_t *);
+        if(p_sys->cur_title < p_sys->i_title &&
+           (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
+                return VLC_EGENERIC;
         *pi_time = (int64_t)FROM_TICKS(bd_tell_time(p_sys->bluray));
         return VLC_SUCCESS;
     }
@@ -1930,6 +1937,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_POSITION:
     {
         double *pf_position = va_arg(args, double *);
+        if(p_sys->cur_title < p_sys->i_title &&
+           (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
+                return VLC_EGENERIC;
         *pf_position = p_sys->cur_title < p_sys->i_title && CUR_LENGTH > 0 ?
                       (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
         return VLC_SUCCESS;
