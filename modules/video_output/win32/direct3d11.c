@@ -3163,7 +3163,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             err = CommonUpdatePicture(quad_picture, NULL, mappedResource.pData, mappedResource.RowPitch);
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to set the buffer on the SPU picture" );
+                ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
                 picture_Release(quad_picture);
+                if ((*region)[i] == quad_picture)
+                    (*region)[i] = NULL;
                 continue;
             }
 
@@ -3173,6 +3176,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         } else {
             msg_Err(vd, "Failed to map the SPU texture (hr=0x%lX)", hr );
             picture_Release(quad_picture);
+            if ((*region)[i] == quad_picture)
+                (*region)[i] = NULL;
             continue;
         }
 
