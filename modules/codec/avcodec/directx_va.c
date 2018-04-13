@@ -59,6 +59,9 @@ static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN, 0 };
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
                                          FF_PROFILE_HEVC_MAIN_10, 0 };
 
+static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, 0 };
+static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, 0 };
+
 #include <winapifamily.h>
 #if defined(WINAPI_FAMILY)
 # undef WINAPI_FAMILY
@@ -257,11 +260,12 @@ static const directx_va_mode_t DXVA_MODES[] = {
     /* VPx */
     { "VP8",                                                                          &DXVA_ModeVP8_VLD,                      0, NULL },
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 57, 17, 100 ) && LIBAVCODEC_VERSION_MICRO >= 100
-    { "VP9 profile 0",                                                                &DXVA_ModeVP9_VLD_Profile0,             AV_CODEC_ID_VP9, NULL },
+    { "VP9 profile 0",                                                                &DXVA_ModeVP9_VLD_Profile0,             AV_CODEC_ID_VP9, PROF_VP9_MAIN },
+    { "VP9 profile 2",                                                                &DXVA_ModeVP9_VLD_10bit_Profile2,       AV_CODEC_ID_VP9, PROF_VP9_10 },
 #else
     { "VP9 profile 0",                                                                &DXVA_ModeVP9_VLD_Profile0,             0, NULL },
-#endif
     { "VP9 profile 2",                                                                &DXVA_ModeVP9_VLD_10bit_Profile2,       0, NULL },
+#endif
     { "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                0, NULL },
 
     { NULL, NULL, 0, NULL }
