@@ -229,8 +229,8 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->ActiveTexture(GL_TEXTURE0 + i);
         tc->vt->BindTexture(tc->tex_target, textures[i]);
 
-        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH,
-                            pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
+                                * tex_width[i] / pic->p[i].i_visible_pitch);
 
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                               tc->texs[i].format, tc->texs[i].type, NULL);
@@ -326,8 +326,8 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->ActiveTexture(GL_TEXTURE0 + i);
         tc->vt->BindTexture(tc->tex_target, textures[i]);
 
-        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH,
-                            pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
+                                * tex_width[i] / pic->p[i].i_visible_pitch);
 
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                               tc->texs[i].format, tc->texs[i].type, NULL);
@@ -434,7 +434,8 @@ tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 static int
 upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
              GLsizei width, GLsizei height,
-             unsigned pitch, unsigned pixel_pitch, const void *pixels)
+             unsigned pitch, unsigned visible_pitch, unsigned pixel_pitch,
+             const void *pixels)
 {
     struct priv *priv = tc->priv;
     GLenum tex_format = tc->texs[tex_idx].format;
@@ -445,12 +446,9 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
 
     if (!priv->has_unpack_subimage)
     {
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-        unsigned dst_width = width;
-        unsigned dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
-        if (pitch != dst_pitch)
+        if (pitch != visible_pitch)
         {
-            size_t buf_size = dst_pitch * height * pixel_pitch;
+            size_t buf_size = visible_pitch * pixel_pitch * height;
             const uint8_t *source = pixels;
             uint8_t *destination;
             if (priv->texture_temp_buf_size < buf_size)
@@ -468,9 +466,9 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
 
             for (GLsizei h = 0; h < height ; h++)
             {
-                memcpy(destination, source, width * pixel_pitch);
+                memcpy(destination, source, visible_pitch);
                 source += pitch;
-                destination += dst_pitch;
+                destination += visible_pitch;
             }
             tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
                                   tex_format, tex_type, priv->texture_temp_buf);
@@ -480,11 +478,10 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
             tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
                                   tex_format, tex_type, pixels);
         }
-#undef ALIGN
     }
     else
     {
-        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / visible_pitch);
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
                               tex_format, tex_type, pixels);
     }
@@ -508,7 +505,8 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                              pic->p[i].p_pixels;
 
         ret = upload_plane(tc, i, tex_width[i], tex_height[i],
-                           pic->p[i].i_pitch, pic->p[i].i_pixel_pitch, pixels);
+                           pic->p[i].i_pitch, pic->p[i].i_visible_pitch,
+                           pic->p[i].i_pixel_pitch, pixels);
     }
     return ret;
 }

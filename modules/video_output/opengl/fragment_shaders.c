@@ -176,7 +176,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
                 GL_UNSIGNED_BYTE
             };
             tc->texs[1] = (struct opengl_tex_cfg) {
-                { 1, 2 }, { 1, 4 }, twoplanes_texfmt, twoplanes_texfmt,
+                { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt,
                 GL_UNSIGNED_BYTE
             };
         }
@@ -191,7 +191,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
                 GL_UNSIGNED_SHORT
             };
             tc->texs[1] = (struct opengl_tex_cfg) {
-                { 1, 2 }, { 1, 4 }, twoplanes16_texfmt, twoplanes_texfmt,
+                { 1, 2 }, { 1, 2 }, twoplanes16_texfmt, twoplanes_texfmt,
                 GL_UNSIGNED_SHORT
             };
         }
