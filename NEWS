@@ -44,6 +44,8 @@ Audio filters:
  * Fix silence when dolby-surround was mis-selected in preferences
 
 Video output:
+ * Fix OpenGL crashes or bad display with semi-planar chromas
+ * Fix OpenGL interop (zero-copy) disabled for tvOS
  * Major rewrite of the iOS video output to fix numerous crashes
  * Important improvements of the D3D11 video output to use less memory
    and less GPU for HDR tone-mapping
