@@ -472,10 +472,6 @@ Open(vlc_object_t *obj)
     tc->pf_update  = tc_vaegl_update;
     tc->pf_get_pool = tc_vaegl_get_pool;
 
-    /* Fix the UV plane texture scale factor for GR */
-    if (vlc_sw_chroma == VLC_CODEC_NV12 || vlc_sw_chroma == VLC_CODEC_P010)
-        tc->texs[1].h = (vlc_rational_t) { 1, 2 };
-
     return VLC_SUCCESS;
 error:
     if (priv && priv->vainst)
