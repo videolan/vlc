@@ -531,6 +531,7 @@ Core:
  * Support subtitles size live adjustments
 
 Access:
+ * Enable SMB2 / SMB3 support on mobile ports with libsmb2
  * New NFS access module using libnfs
  * New SMB access module using libdsm
  * Adaptive streaming:

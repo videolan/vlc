@@ -1854,7 +1854,14 @@ AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" != "yes"], [ VLC_AD
 dnl
 dnl  liBDSM access module
 dnl
-PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.2.0], [libdsm SMB/CIFS access/sd module], [auto])
+AM_CONDITIONAL(HAVE_DSM, [test "$AS_TR_SH(with_dsm)" = "yes"])
+PKG_WITH_MODULES([DSM], [libdsm >= 0.2.0], [
+       VLC_ADD_PLUGIN([dsm])
+       VLC_ADD_CFLAGS([dsm], [$DSM_CFLAGS])
+       VLC_ADD_LIBS([dsm], [$DSM_LIBS])
+       have_dsm="yes"
+   ],,[libdsm SMB/CIFS access/sd module], [auto])
+AM_CONDITIONAL([HAVE_DSM], [test "${have_dsm}" = "yes"])
 
 dnl
 dnl sftp access support
@@ -1865,6 +1872,12 @@ dnl
 dnl nfs access support
 dnl
 PKG_ENABLE_MODULES_VLC([NFS], [nfs], [libnfs >= 1.10.0], (support nfs protocol via libnfs), [auto])
+
+dnl
+dnl smb2 access support
+dnl Disabled by default, since it was added after the initial VLC 3.0 release
+dnl
+PKG_ENABLE_MODULES_VLC([SMB2], [smb2], [libsmb2 >= 3.0.0], (support smb2 protocol via libsmb2), [disabled])
 
 dnl
 dnl  Video4Linux 2
