@@ -684,6 +684,8 @@ static void SpuRenderRegion(spu_t *spu,
             goto exit;
     }
 
+    video_format_AdjustColorSpace(&region->fmt);
+
     /* Force palette if requested
      * FIXME b_force_palette and force_crop are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
