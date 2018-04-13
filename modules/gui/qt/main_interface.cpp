@@ -646,7 +646,8 @@ inline void MainInterface::showTab( QWidget *widget, bool video_closing )
         widget = bgWidget;
 
     stackCentralOldWidget = stackCentralW->currentWidget();
-    stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
+    if( !isFullScreen() )
+        stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
 
     /* If we are playing video, embedded */
     if( !video_closing && videoWidget && THEMIM->getIM()->hasVideo() )
@@ -892,6 +893,9 @@ void MainInterface::setVideoFullScreen( bool fs )
                 showTab( videoWidget );
             }
         }
+
+        /* we won't be able to get its windowed sized once in fullscreen, so update it now */
+        stackWidgetsSizes[stackCentralW->currentWidget()] = stackCentralW->size();
 
         /* */
         displayNormalView();
