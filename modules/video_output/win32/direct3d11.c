@@ -3102,6 +3102,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
         }
 
+        RECT output;
+        output.left   = r->fmt.i_x_offset;
+        output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        output.top    = r->fmt.i_y_offset;
+        output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+
         picture_t *quad_picture = (*region)[i];
         if (quad_picture == NULL) {
             d3d_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
@@ -3129,11 +3135,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
             d3dquad->i_width    = r->fmt.i_width;
             d3dquad->i_height   = r->fmt.i_height;
-            RECT output;
-            output.left   = r->fmt.i_x_offset;
-            output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
-            output.top    = r->fmt.i_y_offset;
-            output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
             err = SetupQuad( vd, &r->fmt, d3dquad, &output,
                              sys->d3dregion_format, sys->pSPUPixelShader,
@@ -3156,6 +3157,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad_picture = (*region)[i];
+        } else {
+            UpdateQuadPosition(vd, (d3d_quad_t *) quad_picture->p_sys, &output, PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL);
         }
 
         hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
