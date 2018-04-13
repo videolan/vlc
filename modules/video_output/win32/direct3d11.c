@@ -3090,8 +3090,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (cache != NULL && ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
                 ID3D11Texture2D_GetDesc( ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX], &texDesc );
                 if (texDesc.Format == sys->d3dregion_format->formatTexture &&
-                    texDesc.Width  == r->fmt.i_visible_width &&
-                    texDesc.Height == r->fmt.i_visible_height) {
+                    texDesc.Width  == r->p_picture->format.i_width &&
+                    texDesc.Height == r->p_picture->format.i_height) {
                     (*region)[i] = cache;
                     memset(&sys->d3dregions[j], 0, sizeof(cache)); // do not reuse this cached value
                     break;
@@ -3111,7 +3111,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->d3dregion_format, &r->fmt, 1, d3dquad->picSys.texture)) {
+            if (AllocateTextures(VLC_OBJECT(vd), &sys->d3d_dev, sys->d3dregion_format, &r->p_picture->format, 1, d3dquad->picSys.texture)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
@@ -3146,7 +3146,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 .p_sys      = (picture_sys_t *) d3dquad,
                 .pf_destroy = DestroyPictureQuad,
             };
-            (*region)[i] = picture_NewFromResource(&r->fmt, &picres);
+            (*region)[i] = picture_NewFromResource(&r->p_picture->format, &picres);
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
                         r->fmt.i_width, r->fmt.i_height);
