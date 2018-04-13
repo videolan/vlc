@@ -93,6 +93,11 @@ static void OSDTextUpdate(subpicture_t *subpic,
         r->i_y += margin_v + fmt_dst->i_y_offset;
     else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
         r->i_y += margin_v - fmt_dst->i_y_offset;
+
+    r->fmt.transfer  = fmt_dst->transfer;
+    r->fmt.primaries = fmt_dst->primaries;
+    r->fmt.space     = fmt_dst->space;
+    r->fmt.mastering = fmt_dst->mastering;
 }
 
 static void OSDTextDestroy(subpicture_t *subpic)
