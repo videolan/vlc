@@ -915,9 +915,18 @@ void MainInterface::setVideoFullScreen( bool fs )
         if( lastWinPosition.isNull() == false )
         {
             move( lastWinPosition );
-            resizeWindow( lastWinSize.width(), lastWinSize.height() );
             lastWinPosition = QPoint();
-            lastWinSize = QSize();
+            if( !pendingResize.isValid() )
+            {
+                resizeWindow( lastWinSize.width(), lastWinSize.height() );
+                lastWinSize = QSize();
+            }
+        }
+        if( pendingResize.isValid() )
+        {
+            /* apply resize requested while fullscreen was enabled */
+            resizeStack( pendingResize.width(), pendingResize.height() );
+            pendingResize = QSize(); // consume
         }
 
     }

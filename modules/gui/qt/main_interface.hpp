@@ -170,6 +170,8 @@ protected:
     QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
     QScreen             *lastWinScreen;
 
+    QSize               pendingResize; // to be applied when fullscreen is disabled
+
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
@@ -240,7 +242,12 @@ protected slots:
 
     void resizeStack( int w, int h )
     {
-        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
+        if( isFullScreen() )
+        {
+            /* postpone resize, will be applied once fullscreen is disabled */
+            pendingResize = QSize( w, h );
+        }
+        else if( !isMaximized() && !b_isWindowTiled )
         {
             if( b_minimalView )
                 resizeWindow( w, h ); /* Oh yes, it shouldn't
