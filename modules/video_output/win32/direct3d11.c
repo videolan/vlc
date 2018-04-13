@@ -3085,7 +3085,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
     int i = 0;
     for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
-        if (!r->fmt.i_width || !r->fmt.i_height)
+        if (!r->fmt.i_visible_width || !r->fmt.i_visible_height)
             continue; // won't render anything, keep the cache for later
 
         for (int j = 0; j < sys->d3dregion_count; j++) {
