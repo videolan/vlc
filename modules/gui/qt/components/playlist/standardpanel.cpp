@@ -386,7 +386,7 @@ void StandardPLPanel::popupAction( QAction *action )
         dialog = OpenDialog::getInstance( this, p_intf, false, SELECT, true, true );
         dialog->showTab( OPEN_FILE_TAB );
         dialog->exec(); /* make it modal */
-        a.uris = dialog->getMRLs( false );
+        a.uris = dialog->getMRLs();
         a.options = dialog->getOptions();
         if ( a.uris.isEmpty() ) return;
         action->setData( QVariant::fromValue( a ) );
