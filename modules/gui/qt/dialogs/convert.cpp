@@ -178,13 +178,10 @@ void ConvertDialog::close()
     for(int i = 0; i < incomingMRLs->length(); i++)
     {
         QString mrl;
-        QString newFileName;
 
         if( dumpRadio->isChecked() )
         {
-            newFileName = fileLine->text();
-            newFileName.replace( QChar('\''), "\\\'" );
-            mrl = QString( "demux=dump :demuxdump-file='%1'" ).arg( newFileName );
+            mrl = "demux=dump :demuxdump-file=" + fileLine->text();
         }
         else
         {
@@ -195,6 +192,8 @@ void ConvertDialog::close()
                 mrl += ",deinterlace}";
             }
             mrl += ":";
+
+            QString newFileName;
 
             // Only one file, use the destination provided
             if(singleFileSelected)
