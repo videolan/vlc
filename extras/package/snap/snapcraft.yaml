@@ -33,8 +33,27 @@ apps:
       - mpris
 
 parts:
+  desktop-qt5-vlc:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-commit: 3a6209d90bcec218618348f7f41c873bdacc723f
+    source-subdir: qt/
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - qtbase5-dev
+      - dpkg-dev
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5
+      - locales-all
   vlc:
-    after: [desktop-qt5]
+    after: [desktop-qt5-vlc]
     source: ../../../
     source-type: git
     plugin: autotools
