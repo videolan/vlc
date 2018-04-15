@@ -32,7 +32,7 @@
 @property (readonly) input_item_t *item;
 
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
-@property (readwrite, weak) IBOutlet NSTabView *tabView;
+@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedView;
 
 @property (readwrite, weak) IBOutlet NSTextField *uriLabel;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
