@@ -64,10 +64,9 @@
     [_authorLabel setStringValue: _NS("Artist")];
     [_saveMetaDataButton setStringValue: _NS("Save Metadata")];
 
-    [[_tabView tabViewItemAtIndex: 0] setLabel: _NS("General")];
-    [[_tabView tabViewItemAtIndex: 1] setLabel: _NS("Codec Details")];
-    [[_tabView tabViewItemAtIndex: 2] setLabel: _NS("Statistics")];
-    [_tabView selectTabViewItemAtIndex: 0];
+    [_segmentedView setLabel:_NS("General") forSegment:0];
+    [_segmentedView setLabel:_NS("Codec Details") forSegment:1];
+    [_segmentedView setLabel:_NS("Statistics") forSegment:2];
 
     /* constants defined in vlc_meta.h */
     [_genreLabel setStringValue: _NS(VLC_META_GENRE)];
@@ -102,8 +101,8 @@
 
     b_stats = var_InheritBool(getIntf(), "stats");
     if (!b_stats) {
-        if ([_tabView numberOfTabViewItems] > 2)
-            [_tabView removeTabViewItem: [_tabView tabViewItemAtIndex: 2]];
+        if ([_segmentedView segmentCount] >= 3)
+            [_segmentedView setSegmentCount: 2];
     }
     else
         [self initMediaPanelStats];
