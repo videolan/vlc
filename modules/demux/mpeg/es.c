@@ -387,7 +387,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
     bool *pb_bool;
-    int i_ret;
 
     switch( i_query )
     {
@@ -404,6 +403,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_LENGTH:
         {
             va_list ap;
+            int i_ret;
 
             va_copy ( ap, args );
             i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset,
@@ -432,7 +432,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_SET_TIME:
-        {
             if( p_sys->mllt.p_bits )
             {
                 int64_t i_time = va_arg(args, int64_t);
@@ -449,27 +448,30 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
-        }
-        default:
-            i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
-                                            p_sys->i_bitrate_avg, 1, i_query,
-                                            args );
-            if( !i_ret && p_sys->i_bitrate_avg > 0 &&
-                (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
-            {
-                int64_t i_time = INT64_C(8000000) * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset ) /
-                    p_sys->i_bitrate_avg;
-
-                /* Fix time_offset */
-                if( i_time >= 0 )
-                    p_sys->i_time_offset = i_time - p_sys->i_pts;
-                /* And reset buffered data */
-                if( p_sys->p_packetized_data )
-                    block_ChainRelease( p_sys->p_packetized_data );
-                p_sys->p_packetized_data = NULL;
-            }
-            return i_ret;
+            break;
     }
+
+    int ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
+                                       p_sys->i_bitrate_avg, 1, i_query, args );
+    if( ret != VLC_SUCCESS )
+        return ret;
+
+    if( p_sys->i_bitrate_avg > 0
+     && (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
+    {
+        int64_t i_time = INT64_C(8000000)
+            * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset )
+            / p_sys->i_bitrate_avg;
+
+        /* Fix time_offset */
+        if( i_time >= 0 )
+            p_sys->i_time_offset = i_time - p_sys->i_pts;
+        /* And reset buffered data */
+        if( p_sys->p_packetized_data )
+            block_ChainRelease( p_sys->p_packetized_data );
+        p_sys->p_packetized_data = NULL;
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
