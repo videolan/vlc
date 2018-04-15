@@ -574,6 +574,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
 {
     const uint8_t *p_peek;
     int         i_peek = 0;
+    uint32_t i_len;
 
     /* */
     *pi_skip = 0;
@@ -589,7 +590,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
     i_peek = 12 + 8;
     while( memcmp( p_peek + i_peek - 8, "fmt ", 4 ) )
     {
-        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+        i_len = GetDWLE( p_peek + i_peek - 4 );
         if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
             return VLC_EGENERIC;
 
@@ -599,7 +600,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
     }
 
     /* Sanity check the wave format header */
-    uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+    i_len = GetDWLE( p_peek + i_peek - 4 );
     if( i_len > WAV_PROBE_SIZE )
         return VLC_EGENERIC;
 
@@ -623,7 +624,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
     /* Skip the wave header */
     while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
     {
-        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+        i_len = GetDWLE( p_peek + i_peek - 4 );
         if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
             return VLC_EGENERIC;
 
