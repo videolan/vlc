@@ -114,6 +114,9 @@ static int Open( vlc_object_t * p_this )
     if ( vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable ) )
         p_sys->b_fastseekable = false;
 
+    es_out_Control( p_demux->out, ES_OUT_SET_ES_CAT_POLICY, VIDEO_ES,
+                    ES_OUT_ES_POLICY_EXCLUSIVE );
+
     p_stream = new matroska_stream_c( p_demux->s, false );
     if ( unlikely(p_stream == NULL) )
     {
