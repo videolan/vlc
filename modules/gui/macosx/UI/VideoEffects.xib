@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G1036" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17E199" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -86,6 +86,7 @@
                 <outlet property="puzzleRowsLabel" destination="142" id="XLw-Ah-BhG"/>
                 <outlet property="puzzleRowsStepper" destination="140" id="JrW-XG-5fu"/>
                 <outlet property="puzzleRowsTextField" destination="138" id="xun-HA-Tf4"/>
+                <outlet property="segmentView" destination="PmS-HT-UdA" id="508-7U-fDE"/>
                 <outlet property="sepiaCheckbox" destination="242" id="rgt-O0-CQl"/>
                 <outlet property="sepiaLabel" destination="244" id="0E7-rS-dgl"/>
                 <outlet property="sepiaStepper" destination="245" id="wUp-jU-PrZ"/>
@@ -93,7 +94,6 @@
                 <outlet property="sharpenCheckbox" destination="58" id="C4Q-3x-usz"/>
                 <outlet property="sharpenLabel" destination="54" id="LIq-VH-mIA"/>
                 <outlet property="sharpenSlider" destination="53" id="69B-oE-hwo"/>
-                <outlet property="tabView" destination="3" id="JdL-Q0-Det"/>
                 <outlet property="thresholdCheckbox" destination="271" id="DEO-tF-Qiu"/>
                 <outlet property="thresholdColorLabel" destination="292" id="ndo-6J-dNT"/>
                 <outlet property="thresholdColorTextField" destination="293" id="AkS-0h-iLI"/>
@@ -128,7 +128,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PmS-HT-UdA">
-                        <rect key="frame" x="204" y="265" width="352" height="24"/>
+                        <rect key="frame" x="194" y="265" width="372" height="24"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7" customClass="VLCHUDSegmentedCell">
                             <font key="font" metaFont="system"/>
                             <segments>
@@ -149,7 +149,7 @@
                             <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
                         </constraints>
                     </box>
-                    <tabView drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                    <tabView drawsBackground="NO" type="noTabsNoBorder" initialItem="4" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                         <rect key="frame" x="0.0" y="35" width="755" height="216"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -205,7 +205,7 @@
                                                         </connections>
                                                     </slider>
                                                     <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="46">
-                                                        <rect key="frame" x="175" y="73" width="135" height="18"/>
+                                                        <rect key="frame" x="175" y="73" width="134" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Brightness Threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="47" customClass="VLCHUDCheckboxCell">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1573,7 +1573,7 @@
                             </tabViewItem>
                             <tabViewItem label="Miscellaneous" identifier="misc" id="12">
                                 <view key="view" id="13">
-                                    <rect key="frame" x="0.0" y="0.0" width="716" height="216"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="755" height="216"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="302">
@@ -1587,13 +1587,13 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="303">
-                                            <rect key="frame" x="8" y="126" width="346" height="72"/>
+                                            <rect key="frame" x="8" y="126" width="366" height="72"/>
                                             <view key="contentView" id="0S4-qU-SrJ">
-                                                <rect key="frame" x="1" y="1" width="344" height="70"/>
+                                                <rect key="frame" x="1" y="1" width="364" height="70"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="307">
-                                                        <rect key="frame" x="15" y="42" width="27" height="14"/>
+                                                        <rect key="frame" x="15" y="42" width="26" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text" id="315" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1609,7 +1609,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="325">
-                                                        <rect key="frame" x="139" y="10" width="190" height="22"/>
+                                                        <rect key="frame" x="159" y="10" width="190" height="22"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="328" id="326" customClass="VLCHUDPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1626,7 +1626,7 @@
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="331">
-                                                        <rect key="frame" x="142" y="39" width="184" height="19"/>
+                                                        <rect key="frame" x="162" y="39" width="184" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="184" id="fsZ-s4-l8b"/>
                                                         </constraints>
@@ -1657,7 +1657,7 @@
                                             </constraints>
                                         </box>
                                         <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="643">
-                                            <rect key="frame" x="358" y="197" width="69" height="18"/>
+                                            <rect key="frame" x="378" y="197" width="69" height="18"/>
                                             <buttonCell key="cell" type="check" title="Add logo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="667" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1667,9 +1667,9 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
-                                            <rect key="frame" x="358" y="104" width="346" height="95"/>
+                                            <rect key="frame" x="378" y="104" width="365" height="95"/>
                                             <view key="contentView" id="4L0-QJ-InP">
-                                                <rect key="frame" x="1" y="1" width="344" height="93"/>
+                                                <rect key="frame" x="1" y="1" width="363" height="93"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="652">
@@ -1697,7 +1697,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="646">
-                                                        <rect key="frame" x="140" y="62" width="184" height="19"/>
+                                                        <rect key="frame" x="159" y="62" width="184" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="665" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1708,14 +1708,14 @@
                                                         </connections>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="645">
-                                                        <rect key="frame" x="140" y="11" width="184" height="15"/>
+                                                        <rect key="frame" x="159" y="11" width="184" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="255" doubleValue="255" tickMarkPosition="above" sliderType="linear" id="666" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="addLogoModifierChanged:" target="-2" id="zDd-CQ-Txa"/>
                                                         </connections>
                                                     </slider>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="692">
-                                                        <rect key="frame" x="137" y="32" width="190" height="22"/>
+                                                        <rect key="frame" x="156" y="32" width="190" height="22"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="697" id="693" customClass="VLCHUDPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>

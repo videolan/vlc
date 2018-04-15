@@ -208,6 +208,7 @@
 - (void)windowDidLoad
 {
     [_applyProfileCheckbox setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"AudioEffectApplyProfileOnStartup"]];
+    [_applyProfileCheckbox setTitle:_NS("Apply profile at next launch")];
 
     /* setup the user's language */
     /* Equalizer */
@@ -267,10 +268,11 @@
                                                   "thereby widening the stereo effect.")];
 
     /* generic */
-    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
-    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"compressor"]] setLabel:_NS("Compressor")];
-    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"spatializer"]] setLabel:_NS("Spatializer")];
-    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
+    [_segmentView setLabel:_NS("Equalizer") forSegment:0];
+    [_segmentView setLabel:_NS("Compressor") forSegment:1];
+    [_segmentView setLabel:_NS("Spatializer") forSegment:2];
+    [_segmentView setLabel:_NS("Filter") forSegment:3];
+
     [self.window setTitle:_NS("Audio Effects")];
     [self.window setExcludedFromWindowsMenu:YES];
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
