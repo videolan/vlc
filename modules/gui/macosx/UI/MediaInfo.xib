@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17E199" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -51,8 +52,15 @@
                 <outlet property="readBytesLabel" destination="531" id="700"/>
                 <outlet property="readBytesTextField" destination="535" id="701"/>
                 <outlet property="saveMetaDataButton" destination="412" id="671"/>
+                <outlet property="sentBitrateLabel" destination="597" id="702"/>
+                <outlet property="sentBitrateTextField" destination="598" id="703"/>
+                <outlet property="sentBytesLabel" destination="595" id="704"/>
+                <outlet property="sentBytesTextField" destination="596" id="705"/>
+                <outlet property="sentPacketsLabel" destination="593" id="706"/>
+                <outlet property="sentPacketsTextField" destination="594" id="707"/>
                 <outlet property="seqNumLabel" destination="442" id="672"/>
                 <outlet property="seqNumTextField" destination="441" id="673"/>
+                <outlet property="soutLabel" destination="572" id="708"/>
                 <outlet property="tabView" destination="418" id="674"/>
                 <outlet property="titleLabel" destination="429" id="675"/>
                 <outlet property="titleTextField" destination="427" id="676"/>
@@ -70,14 +78,13 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="34" width="506" height="476"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="506" height="476"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView fixedFrame="YES" drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="418">
+                    <tabView misplaced="YES" drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="418">
                         <rect key="frame" x="-21" y="11" width="542" height="432"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="419">
@@ -85,10 +92,9 @@
                                     <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="427">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="427">
                                             <rect key="frame" x="37" y="392" width="468" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="428">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="428" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -97,37 +103,40 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="726"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="429">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="429">
                                             <rect key="frame" x="35" y="414" width="373" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Title" id="430">
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="369" id="QQR-jU-J5W"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Title" id="430" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="509">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="509">
                                             <rect key="frame" x="37" y="18" width="468" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="512">
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="468" id="CrL-XR-Ww4"/>
+                                                <constraint firstAttribute="height" constant="19" id="POw-kc-CJg"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="512" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="510">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="510">
                                             <rect key="frame" x="35" y="40" width="475" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="431">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="431">
                                             <rect key="frame" x="37" y="349" width="368" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="434">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="434" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -136,19 +145,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="724"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="432">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="432">
                                             <rect key="frame" x="35" y="371" width="330" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="435">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="435">
                                             <rect key="frame" x="413" y="349" width="92" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="438">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="438" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -157,19 +164,20 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="725"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="436">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="436">
                                             <rect key="frame" x="411" y="371" width="93" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Date" id="437">
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="89" id="R0Z-z4-bc9"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Date" id="437" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="439">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="439">
                                             <rect key="frame" x="37" y="306" width="368" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="446">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="446" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -178,19 +186,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="722"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="440">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="440">
                                             <rect key="frame" x="35" y="328" width="330" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="441">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="441">
                                             <rect key="frame" x="413" y="306" width="92" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="444">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="444" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -199,19 +205,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="723"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="442">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="442">
                                             <rect key="frame" x="411" y="328" width="93" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="461">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="461">
                                             <rect key="frame" x="37" y="263" width="300" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="468">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="468" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -220,19 +224,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="720"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="462">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="462">
                                             <rect key="frame" x="35" y="285" width="307" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="476">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="476">
                                             <rect key="frame" x="37" y="220" width="300" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="479">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="479" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -241,19 +243,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="719"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="477">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="477">
                                             <rect key="frame" x="35" y="242" width="307" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" horizontalHuggingPriority="200" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="481">
+                                        <textField focusRingType="none" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="481">
                                             <rect key="frame" x="37" y="91" width="228" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="484">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="484" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -262,19 +262,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="715"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="482">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="482">
                                             <rect key="frame" x="35" y="113" width="232" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="504">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="504">
                                             <rect key="frame" x="273" y="86" width="232" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="507">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="507" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -283,19 +281,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="716"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="505">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                                             <rect key="frame" x="273" y="108" width="232" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="486">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="486">
                                             <rect key="frame" x="37" y="134" width="300" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="489">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="489" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -304,19 +300,20 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="717"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="487">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="487">
                                             <rect key="frame" x="35" y="156" width="307" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="497">
+                                        <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="497">
                                             <rect key="frame" x="37" y="177" width="300" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="500">
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="300" id="fNh-e9-7HF"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="500" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -325,19 +322,17 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="718"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="498">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="498">
                                             <rect key="frame" x="35" y="199" width="307" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="463">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="463">
                                             <rect key="frame" x="345" y="263" width="160" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="466">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" drawsBackground="YES" id="466" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -346,24 +341,28 @@
                                                 <action selector="metaFieldChanged:" target="-2" id="721"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="464">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="464">
                                             <rect key="frame" x="343" y="285" width="93" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Language" id="465">
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="89" id="qse-Y4-EaG"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Language" id="465" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88">
+                                        <imageView translatesAutoresizingMaskIntoConstraints="NO" id="88">
                                             <rect key="frame" x="345" y="118" width="160" height="130"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="130" id="f2E-e5-UdD"/>
+                                                <constraint firstAttribute="width" constant="160" id="gEI-GS-p8S"/>
+                                            </constraints>
                                             <imageCell key="cell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="noart" id="374"/>
                                         </imageView>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="412">
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="412">
                                             <rect key="frame" x="345" y="60" width="160" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="roundRect" title="Save Metadata" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="413">
+                                            <buttonCell key="cell" type="roundRect" title="Save Metadata" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="413" customClass="VLCHUDButtonCell">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
@@ -372,6 +371,91 @@
                                             </connections>
                                         </button>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="498" firstAttribute="leading" secondItem="487" secondAttribute="leading" id="2BM-dO-cxA"/>
+                                        <constraint firstItem="412" firstAttribute="top" secondItem="504" secondAttribute="bottom" constant="7" id="3sc-H3-Jb7"/>
+                                        <constraint firstItem="463" firstAttribute="leading" secondItem="88" secondAttribute="leading" id="4R1-Ov-hAj"/>
+                                        <constraint firstItem="435" firstAttribute="top" secondItem="436" secondAttribute="bottom" constant="3" id="5A4-pd-kbP"/>
+                                        <constraint firstItem="463" firstAttribute="leading" secondItem="461" secondAttribute="trailing" constant="8" id="5fW-BF-CQQ"/>
+                                        <constraint firstItem="88" firstAttribute="trailing" secondItem="504" secondAttribute="trailing" id="5mO-bs-2U7"/>
+                                        <constraint firstAttribute="trailing" secondItem="435" secondAttribute="trailing" constant="37" id="5sT-kX-Mgh"/>
+                                        <constraint firstItem="435" firstAttribute="leading" secondItem="431" secondAttribute="trailing" constant="8" id="69n-nP-QoU"/>
+                                        <constraint firstItem="439" firstAttribute="top" secondItem="440" secondAttribute="bottom" constant="3" id="71b-yF-M2B"/>
+                                        <constraint firstItem="462" firstAttribute="top" secondItem="439" secondAttribute="bottom" constant="8" id="7HM-2k-Hyo"/>
+                                        <constraint firstItem="440" firstAttribute="leading" secondItem="462" secondAttribute="leading" id="8gB-xE-tw2"/>
+                                        <constraint firstItem="463" firstAttribute="top" secondItem="464" secondAttribute="bottom" constant="3" id="AWB-mE-B6y"/>
+                                        <constraint firstItem="504" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="13" id="Ada-9g-prO"/>
+                                        <constraint firstItem="497" firstAttribute="width" secondItem="476" secondAttribute="width" id="BKv-vY-esG"/>
+                                        <constraint firstItem="482" firstAttribute="leading" secondItem="481" secondAttribute="leading" id="BbW-Tt-gK9"/>
+                                        <constraint firstItem="498" firstAttribute="trailing" secondItem="477" secondAttribute="trailing" id="Bgv-0D-P34"/>
+                                        <constraint firstAttribute="trailing" secondItem="463" secondAttribute="trailing" constant="37" id="CvZ-PW-sQT"/>
+                                        <constraint firstItem="476" firstAttribute="width" secondItem="461" secondAttribute="width" id="D6r-FW-X0O"/>
+                                        <constraint firstAttribute="trailing" secondItem="509" secondAttribute="trailing" constant="37" id="DE4-Dk-Skt"/>
+                                        <constraint firstItem="440" firstAttribute="leading" secondItem="439" secondAttribute="leading" id="DKW-vC-4a2"/>
+                                        <constraint firstItem="88" firstAttribute="top" secondItem="463" secondAttribute="bottom" constant="15" id="Deq-DF-gg9"/>
+                                        <constraint firstItem="429" firstAttribute="leading" secondItem="427" secondAttribute="leading" id="FdL-JK-SXm"/>
+                                        <constraint firstItem="504" firstAttribute="leading" secondItem="481" secondAttribute="trailing" constant="8" id="GNl-FV-0Tb"/>
+                                        <constraint firstItem="436" firstAttribute="trailing" secondItem="442" secondAttribute="trailing" id="HUt-bX-YOY"/>
+                                        <constraint firstItem="497" firstAttribute="width" secondItem="486" secondAttribute="width" id="JRM-gO-hs8"/>
+                                        <constraint firstItem="427" firstAttribute="top" secondItem="429" secondAttribute="bottom" constant="3" id="KDd-g3-yXa"/>
+                                        <constraint firstItem="509" firstAttribute="leading" secondItem="510" secondAttribute="leading" id="KTb-xp-O1t"/>
+                                        <constraint firstItem="427" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="KWu-NE-lY0"/>
+                                        <constraint firstItem="464" firstAttribute="centerX" secondItem="505" secondAttribute="centerX" id="Lur-bs-21m"/>
+                                        <constraint firstItem="504" firstAttribute="centerX" secondItem="505" secondAttribute="centerX" id="MoE-dd-II9"/>
+                                        <constraint firstItem="427" firstAttribute="top" secondItem="422" secondAttribute="top" constant="21" id="NdX-Pb-8eb"/>
+                                        <constraint firstItem="510" firstAttribute="top" secondItem="412" secondAttribute="bottom" constant="8" symbolic="YES" id="Ojm-4d-pDA"/>
+                                        <constraint firstItem="505" firstAttribute="leading" secondItem="482" secondAttribute="trailing" constant="10" id="Osi-SE-fRa"/>
+                                        <constraint firstItem="431" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="P7e-23-CBM"/>
+                                        <constraint firstItem="482" firstAttribute="top" secondItem="486" secondAttribute="bottom" constant="8" id="PSK-wM-mHh"/>
+                                        <constraint firstItem="436" firstAttribute="baseline" secondItem="432" secondAttribute="baseline" id="QFu-pB-xNB"/>
+                                        <constraint firstItem="440" firstAttribute="trailing" secondItem="432" secondAttribute="trailing" id="R0U-Ti-RiL"/>
+                                        <constraint firstItem="487" firstAttribute="leading" secondItem="486" secondAttribute="leading" id="TVB-Ot-4jD"/>
+                                        <constraint firstItem="436" firstAttribute="leading" secondItem="432" secondAttribute="trailing" constant="50" id="U9T-5s-5GS"/>
+                                        <constraint firstItem="88" firstAttribute="leading" secondItem="477" secondAttribute="trailing" constant="5" id="UT5-q0-k6z"/>
+                                        <constraint firstItem="441" firstAttribute="top" secondItem="442" secondAttribute="bottom" constant="3" id="W8o-PP-nsS"/>
+                                        <constraint firstItem="486" firstAttribute="top" secondItem="487" secondAttribute="bottom" constant="3" id="WyH-p1-BgN"/>
+                                        <constraint firstItem="462" firstAttribute="trailing" secondItem="477" secondAttribute="trailing" id="X6V-aZ-YLN"/>
+                                        <constraint firstItem="432" firstAttribute="leading" secondItem="431" secondAttribute="leading" id="XAL-L1-YUU"/>
+                                        <constraint firstItem="477" firstAttribute="leading" secondItem="498" secondAttribute="leading" id="XQ8-wk-SiP"/>
+                                        <constraint firstItem="476" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="Xl5-rh-2WD"/>
+                                        <constraint firstItem="88" firstAttribute="leading" secondItem="412" secondAttribute="leading" id="XtZ-Pm-yG4"/>
+                                        <constraint firstAttribute="trailing" secondItem="504" secondAttribute="trailing" constant="37" id="Y6Q-Cj-pKU"/>
+                                        <constraint firstItem="440" firstAttribute="baseline" secondItem="442" secondAttribute="baseline" id="ZR6-uA-mI7"/>
+                                        <constraint firstAttribute="trailing" secondItem="427" secondAttribute="trailing" constant="37" id="ZUo-m6-vIM"/>
+                                        <constraint firstItem="439" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="ana-O9-QJt"/>
+                                        <constraint firstItem="432" firstAttribute="top" secondItem="427" secondAttribute="bottom" constant="8" id="b5k-Mg-gUI"/>
+                                        <constraint firstItem="431" firstAttribute="top" secondItem="432" secondAttribute="bottom" constant="3" id="bNy-JF-PIC"/>
+                                        <constraint firstItem="504" firstAttribute="top" secondItem="505" secondAttribute="bottom" constant="3" id="cNI-ci-of3"/>
+                                        <constraint firstItem="481" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="cT2-6b-0aP"/>
+                                        <constraint firstItem="504" firstAttribute="trailing" secondItem="412" secondAttribute="trailing" id="e5v-Xe-fX8"/>
+                                        <constraint firstItem="88" firstAttribute="trailing" secondItem="463" secondAttribute="trailing" id="eBj-4p-Jxt"/>
+                                        <constraint firstItem="429" firstAttribute="top" secondItem="422" secondAttribute="top" constant="4" id="fEh-gm-DlI"/>
+                                        <constraint firstItem="440" firstAttribute="top" secondItem="431" secondAttribute="bottom" constant="8" id="fmF-KN-XYS"/>
+                                        <constraint firstItem="477" firstAttribute="top" secondItem="461" secondAttribute="bottom" constant="8" symbolic="YES" id="g6g-Ns-JmP"/>
+                                        <constraint firstItem="487" firstAttribute="trailing" secondItem="498" secondAttribute="trailing" id="gE5-M8-JCo"/>
+                                        <constraint firstItem="509" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="hTd-R3-lIr"/>
+                                        <constraint firstAttribute="trailing" secondItem="510" secondAttribute="trailing" constant="34" id="hlm-Bz-jEa"/>
+                                        <constraint firstAttribute="trailing" secondItem="441" secondAttribute="trailing" constant="37" id="jSc-l4-17k"/>
+                                        <constraint firstItem="464" firstAttribute="baseline" secondItem="462" secondAttribute="baseline" id="kmE-pS-llX"/>
+                                        <constraint firstItem="498" firstAttribute="top" secondItem="476" secondAttribute="bottom" constant="8" id="lwM-dZ-Ak0"/>
+                                        <constraint firstItem="476" firstAttribute="top" secondItem="477" secondAttribute="bottom" constant="3" id="p8W-42-Rnu"/>
+                                        <constraint firstItem="487" firstAttribute="top" secondItem="497" secondAttribute="bottom" constant="8" id="pMt-4R-J9m"/>
+                                        <constraint firstItem="462" firstAttribute="leading" secondItem="461" secondAttribute="leading" id="pU7-gV-qZe"/>
+                                        <constraint firstItem="497" firstAttribute="top" secondItem="498" secondAttribute="bottom" constant="3" id="qDT-by-zwV"/>
+                                        <constraint firstItem="498" firstAttribute="leading" secondItem="497" secondAttribute="leading" id="sKC-iV-Dvu"/>
+                                        <constraint firstItem="481" firstAttribute="top" secondItem="482" secondAttribute="bottom" constant="3" id="uut-vy-GZC"/>
+                                        <constraint firstItem="436" firstAttribute="leading" secondItem="442" secondAttribute="leading" id="v17-zN-dkL"/>
+                                        <constraint firstItem="441" firstAttribute="leading" secondItem="442" secondAttribute="leading" id="v3X-4a-uW8"/>
+                                        <constraint firstItem="461" firstAttribute="top" secondItem="462" secondAttribute="bottom" constant="3" id="w80-Go-Irk"/>
+                                        <constraint firstItem="435" firstAttribute="leading" secondItem="436" secondAttribute="leading" id="wXL-Vr-gYL"/>
+                                        <constraint firstAttribute="trailing" secondItem="436" secondAttribute="trailing" constant="40" id="xDh-3l-Ymx"/>
+                                        <constraint firstItem="477" firstAttribute="leading" secondItem="476" secondAttribute="leading" id="xQg-9a-wCf"/>
+                                        <constraint firstItem="441" firstAttribute="leading" secondItem="439" secondAttribute="trailing" constant="8" id="xy2-Ri-R5e"/>
+                                        <constraint firstItem="509" firstAttribute="top" secondItem="510" secondAttribute="bottom" constant="3" id="y3B-5i-eqG"/>
+                                        <constraint firstAttribute="bottom" secondItem="509" secondAttribute="bottom" constant="18" id="yA8-eE-NgV"/>
+                                        <constraint firstItem="463" firstAttribute="leading" secondItem="464" secondAttribute="leading" id="zBr-QZ-w2J"/>
+                                        <constraint firstItem="481" firstAttribute="centerX" secondItem="482" secondAttribute="centerX" id="zrM-mE-bbK"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Codec Details" identifier="2" id="420">
@@ -379,15 +463,14 @@
                                     <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="516">
+                                        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="516">
                                             <rect key="frame" x="17" y="0.0" width="510" height="428"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="jDW-Lc-WE4">
+                                            <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="jDW-Lc-WE4">
                                                 <rect key="frame" x="0.0" y="0.0" width="510" height="428"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519" customClass="VLCHUDOutlineView">
-                                                        <rect key="frame" x="0.0" y="0.0" width="510" height="428"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="510" height="19"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -423,269 +506,452 @@
                                                     </outlineView>
                                                 </subviews>
                                             </clipView>
-                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518">
+                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518" customClass="VLCHUDScroller">
                                                 <rect key="frame" x="0.0" y="428" width="510" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517">
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517" customClass="VLCHUDScroller">
                                                 <rect key="frame" x="-100" y="-100" width="15" height="458"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="516" firstAttribute="top" secondItem="421" secondAttribute="top" constant="4" id="IN7-1d-XgS"/>
+                                        <constraint firstItem="516" firstAttribute="leading" secondItem="421" secondAttribute="leading" constant="17" id="Kl2-Pc-PKz"/>
+                                        <constraint firstAttribute="trailing" secondItem="516" secondAttribute="trailing" constant="15" id="dUM-Kn-Ofw"/>
+                                        <constraint firstAttribute="bottom" secondItem="516" secondAttribute="bottom" id="zKT-kB-cpy"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Statistics" identifier="3" id="425">
-                                <view key="view" ambiguous="YES" id="426">
+                                <view key="view" id="426">
                                     <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="549">
-                                            <rect key="frame" x="25" y="298" width="492" height="109"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="549">
+                                            <rect key="frame" x="25" y="306" width="244" height="109"/>
                                             <view key="contentView" id="enP-o2-JOw">
-                                                <rect key="frame" x="1" y="1" width="490" height="107"/>
+                                                <rect key="frame" x="1" y="1" width="242" height="107"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="531">
-                                                        <rect key="frame" x="12" y="78" width="220" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Read at media" id="532">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="531">
+                                                        <rect key="frame" x="12" y="78" width="121" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="117" id="Fe5-cw-cYX"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Read at media" id="532" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="535">
-                                                        <rect key="frame" x="236" y="78" width="236" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="536">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="535">
+                                                        <rect key="frame" x="135" y="78" width="89" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="85" id="jaJ-qV-SHG"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="536" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="537">
-                                                        <rect key="frame" x="12" y="59" width="220" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input bitrate" id="540">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="537">
+                                                        <rect key="frame" x="12" y="59" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input bitrate" id="540" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="538">
-                                                        <rect key="frame" x="236" y="59" width="236" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="539">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="538">
+                                                        <rect key="frame" x="135" y="59" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="539" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="541">
-                                                        <rect key="frame" x="12" y="40" width="220" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Demuxed" id="544">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="541">
+                                                        <rect key="frame" x="12" y="40" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Demuxed" id="544" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="542">
-                                                        <rect key="frame" x="236" y="40" width="236" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="543">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="542">
+                                                        <rect key="frame" x="135" y="40" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="543" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="545">
-                                                        <rect key="frame" x="12" y="21" width="220" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stream bitrate" id="548">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="545">
+                                                        <rect key="frame" x="12" y="21" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stream bitrate" id="548" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="546">
-                                                        <rect key="frame" x="236" y="21" width="236" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="547">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="546">
+                                                        <rect key="frame" x="135" y="21" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="547" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="531" firstAttribute="leading" secondItem="enP-o2-JOw" secondAttribute="leading" constant="14" id="Dc9-6S-ZN6"/>
+                                                    <constraint firstItem="542" firstAttribute="baseline" secondItem="541" secondAttribute="baseline" id="Dyd-mK-lr0"/>
+                                                    <constraint firstItem="545" firstAttribute="baseline" secondItem="546" secondAttribute="baseline" id="E7S-9M-F5L"/>
+                                                    <constraint firstItem="545" firstAttribute="top" secondItem="541" secondAttribute="bottom" constant="5" id="EYj-lI-vUv"/>
+                                                    <constraint firstItem="541" firstAttribute="leading" secondItem="545" secondAttribute="leading" id="FCl-ea-ePF"/>
+                                                    <constraint firstItem="531" firstAttribute="leading" secondItem="537" secondAttribute="leading" id="Gtm-em-Tvn"/>
+                                                    <constraint firstItem="546" firstAttribute="trailing" secondItem="542" secondAttribute="trailing" id="KLO-WD-Js6"/>
+                                                    <constraint firstItem="541" firstAttribute="trailing" secondItem="537" secondAttribute="trailing" id="U2r-8m-Tok"/>
+                                                    <constraint firstItem="538" firstAttribute="leading" secondItem="535" secondAttribute="leading" id="Ugj-7t-g6f"/>
+                                                    <constraint firstItem="531" firstAttribute="top" secondItem="enP-o2-JOw" secondAttribute="top" constant="15" id="WCh-2M-dJ4"/>
+                                                    <constraint firstItem="541" firstAttribute="top" secondItem="537" secondAttribute="bottom" constant="5" id="Xhx-IO-RLK"/>
+                                                    <constraint firstItem="542" firstAttribute="leading" secondItem="538" secondAttribute="leading" id="Xi3-QO-6z3"/>
+                                                    <constraint firstItem="537" firstAttribute="leading" secondItem="541" secondAttribute="leading" id="bTf-BR-aKf"/>
+                                                    <constraint firstItem="542" firstAttribute="trailing" secondItem="538" secondAttribute="trailing" id="drM-nu-pkY"/>
+                                                    <constraint firstItem="538" firstAttribute="trailing" secondItem="535" secondAttribute="trailing" id="eHu-0r-0wA"/>
+                                                    <constraint firstItem="531" firstAttribute="trailing" secondItem="537" secondAttribute="trailing" id="gDF-wa-qeE"/>
+                                                    <constraint firstItem="535" firstAttribute="baseline" secondItem="531" secondAttribute="baseline" id="h8Y-Xk-57l"/>
+                                                    <constraint firstItem="538" firstAttribute="baseline" secondItem="537" secondAttribute="baseline" id="j3Q-Xc-bML"/>
+                                                    <constraint firstItem="537" firstAttribute="top" secondItem="531" secondAttribute="bottom" constant="5" id="sEw-5m-Z6G"/>
+                                                    <constraint firstItem="535" firstAttribute="leading" secondItem="531" secondAttribute="trailing" constant="6" id="svf-VR-zeo"/>
+                                                    <constraint firstItem="542" firstAttribute="leading" secondItem="546" secondAttribute="leading" id="trw-Nz-2w7"/>
+                                                    <constraint firstItem="541" firstAttribute="trailing" secondItem="545" secondAttribute="trailing" id="vJG-yN-xWT"/>
+                                                </constraints>
                                             </view>
                                         </box>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="550">
-                                            <rect key="frame" x="28" y="407" width="488" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input" id="551">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="550">
+                                            <rect key="frame" x="27" y="415" width="121" height="14"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="117" id="9nA-Gr-Hi1"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input" id="551" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="552">
-                                            <rect key="frame" x="27" y="176" width="244" height="98"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="552">
+                                            <rect key="frame" x="273" y="306" width="244" height="109"/>
                                             <view key="contentView" id="QnG-Hd-ZtQ">
+                                                <rect key="frame" x="1" y="1" width="242" height="107"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="555">
+                                                        <rect key="frame" x="12" y="78" width="121" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="117" id="Htg-L7-ZFh"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="570" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="556">
+                                                        <rect key="frame" x="135" y="78" width="89" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="85" id="NGB-dc-ns6"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="569" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="557">
+                                                        <rect key="frame" x="12" y="59" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Displayed frames" id="568" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="558">
+                                                        <rect key="frame" x="135" y="59" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000/s" id="567" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="559">
+                                                        <rect key="frame" x="12" y="40" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost frames" id="566" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="560">
+                                                        <rect key="frame" x="135" y="40" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="565" customClass="VLCHUDTextFieldCell">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="560" firstAttribute="trailing" secondItem="558" secondAttribute="trailing" id="45g-pC-5Hw"/>
+                                                    <constraint firstItem="556" firstAttribute="leading" secondItem="555" secondAttribute="trailing" constant="6" id="ARZ-YR-wGR"/>
+                                                    <constraint firstItem="555" firstAttribute="top" secondItem="QnG-Hd-ZtQ" secondAttribute="top" constant="15" id="DxL-BN-Ub6"/>
+                                                    <constraint firstItem="555" firstAttribute="leading" secondItem="QnG-Hd-ZtQ" secondAttribute="leading" constant="14" id="EcP-nG-ogk"/>
+                                                    <constraint firstItem="557" firstAttribute="leading" secondItem="559" secondAttribute="leading" id="Elo-Yq-JL0"/>
+                                                    <constraint firstItem="560" firstAttribute="baseline" secondItem="559" secondAttribute="baseline" id="PM1-jl-lt0"/>
+                                                    <constraint firstItem="555" firstAttribute="baseline" secondItem="556" secondAttribute="baseline" id="QRj-8V-kJh"/>
+                                                    <constraint firstItem="560" firstAttribute="leading" secondItem="558" secondAttribute="leading" id="S4f-pG-WMy"/>
+                                                    <constraint firstItem="558" firstAttribute="baseline" secondItem="557" secondAttribute="baseline" id="Sgy-RS-JwZ"/>
+                                                    <constraint firstItem="559" firstAttribute="top" secondItem="557" secondAttribute="bottom" constant="5" id="YBx-5i-pAU"/>
+                                                    <constraint firstItem="559" firstAttribute="trailing" secondItem="557" secondAttribute="trailing" id="lAu-O3-ahk"/>
+                                                    <constraint firstItem="556" firstAttribute="trailing" secondItem="558" secondAttribute="trailing" id="lIz-3L-zI4"/>
+                                                    <constraint firstItem="556" firstAttribute="leading" secondItem="558" secondAttribute="leading" id="lpi-ad-Ny0"/>
+                                                    <constraint firstItem="557" firstAttribute="top" secondItem="555" secondAttribute="bottom" constant="5" id="q79-vb-GNq"/>
+                                                    <constraint firstItem="557" firstAttribute="leading" secondItem="555" secondAttribute="leading" id="u5M-EI-Gk6"/>
+                                                    <constraint firstItem="555" firstAttribute="trailing" secondItem="557" secondAttribute="trailing" id="xDT-yR-J6i"/>
+                                                </constraints>
+                                            </view>
+                                        </box>
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="553">
+                                            <rect key="frame" x="275" y="415" width="121" height="14"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="117" id="zpS-Zr-N7Z"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Video" id="554" customClass="VLCHUDTextFieldCell">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="571">
+                                            <rect key="frame" x="25" y="182" width="244" height="98"/>
+                                            <view key="contentView" id="YFK-nx-YL4">
                                                 <rect key="frame" x="1" y="1" width="242" height="96"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="555">
-                                                        <rect key="frame" x="12" y="67" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="570">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="593">
+                                                        <rect key="frame" x="12" y="60" width="121" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="117" id="I4C-Np-0Vf"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent packets" id="608" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="556">
-                                                        <rect key="frame" x="135" y="67" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="569">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="594">
+                                                        <rect key="frame" x="135" y="60" width="89" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="85" id="Sqd-F6-iuk"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="607" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="557">
-                                                        <rect key="frame" x="12" y="48" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Displayed frames" id="568">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="595">
+                                                        <rect key="frame" x="12" y="41" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent bytes" id="606" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="558">
-                                                        <rect key="frame" x="135" y="48" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000/s" id="567">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="596">
+                                                        <rect key="frame" x="135" y="41" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="605" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="559">
-                                                        <rect key="frame" x="12" y="29" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost frames" id="566">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="597">
+                                                        <rect key="frame" x="12" y="22" width="121" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Send rate" id="604" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="560">
-                                                        <rect key="frame" x="135" y="29" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="565">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="598">
+                                                        <rect key="frame" x="135" y="22" width="89" height="14"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="603" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="598" firstAttribute="trailing" secondItem="596" secondAttribute="trailing" id="06V-v1-eik"/>
+                                                    <constraint firstItem="593" firstAttribute="baseline" secondItem="594" secondAttribute="baseline" id="2xZ-ja-Uke"/>
+                                                    <constraint firstItem="596" firstAttribute="baseline" secondItem="595" secondAttribute="baseline" id="7v1-Sj-DZ4"/>
+                                                    <constraint firstItem="595" firstAttribute="top" secondItem="593" secondAttribute="bottom" constant="5" id="Lvn-U5-1yK"/>
+                                                    <constraint firstItem="594" firstAttribute="leading" secondItem="593" secondAttribute="trailing" constant="6" id="Q5J-PY-CcL"/>
+                                                    <constraint firstItem="595" firstAttribute="leading" secondItem="597" secondAttribute="leading" id="SUA-st-P9k"/>
+                                                    <constraint firstItem="596" firstAttribute="leading" secondItem="594" secondAttribute="leading" id="T6c-Mc-WW8"/>
+                                                    <constraint firstItem="596" firstAttribute="centerY" secondItem="YFK-nx-YL4" secondAttribute="centerY" id="U6Y-gD-byA"/>
+                                                    <constraint firstItem="594" firstAttribute="trailing" secondItem="596" secondAttribute="trailing" id="Vzc-RP-VmR"/>
+                                                    <constraint firstItem="593" firstAttribute="trailing" secondItem="595" secondAttribute="trailing" id="hIF-n6-sQC"/>
+                                                    <constraint firstItem="597" firstAttribute="top" secondItem="595" secondAttribute="bottom" constant="5" id="hPn-7u-Bep"/>
+                                                    <constraint firstItem="593" firstAttribute="leading" secondItem="595" secondAttribute="leading" id="lMK-04-2Cr"/>
+                                                    <constraint firstItem="593" firstAttribute="leading" secondItem="YFK-nx-YL4" secondAttribute="leading" constant="14" id="qV3-Nn-SOm"/>
+                                                    <constraint firstItem="598" firstAttribute="baseline" secondItem="597" secondAttribute="baseline" id="qeY-OB-V1v"/>
+                                                    <constraint firstItem="596" firstAttribute="leading" secondItem="598" secondAttribute="leading" id="tKw-D8-5Ll"/>
+                                                    <constraint firstItem="597" firstAttribute="trailing" secondItem="595" secondAttribute="trailing" id="zPj-cc-dPl"/>
+                                                </constraints>
                                             </view>
                                         </box>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="553">
-                                            <rect key="frame" x="28" y="280" width="242" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Video" id="554">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="572">
+                                            <rect key="frame" x="27" y="280" width="121" height="14"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Streaming" id="592" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="573">
-                                            <rect key="frame" x="273" y="176" width="244" height="98"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="573">
+                                            <rect key="frame" x="273" y="182" width="244" height="98"/>
                                             <view key="contentView" id="7tR-kf-2ax">
                                                 <rect key="frame" x="1" y="1" width="242" height="96"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="583">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="583">
                                                         <rect key="frame" x="12" y="60" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="584">
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="117" id="FaO-BP-Myr"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="584" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="582">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="582">
                                                         <rect key="frame" x="135" y="60" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="585">
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="85" id="pgJ-Ad-US6"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="585" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="581">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="581">
                                                         <rect key="frame" x="12" y="41" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Played buffer" id="586">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Played buffer" id="586" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="580">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="580">
                                                         <rect key="frame" x="135" y="41" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="587">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="587" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="579">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="579">
                                                         <rect key="frame" x="12" y="22" width="121" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost buffers" id="588">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost buffers" id="588" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="578">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="578">
                                                         <rect key="frame" x="135" y="22" width="89" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="589">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="589" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="581" firstAttribute="leading" secondItem="583" secondAttribute="leading" id="1LK-3F-PCb"/>
+                                                    <constraint firstItem="581" firstAttribute="trailing" secondItem="583" secondAttribute="trailing" id="1zQ-7w-mC3"/>
+                                                    <constraint firstItem="581" firstAttribute="top" secondItem="583" secondAttribute="bottom" constant="5" id="7Wn-sX-VvF"/>
+                                                    <constraint firstItem="579" firstAttribute="trailing" secondItem="581" secondAttribute="trailing" id="A3j-yS-x92"/>
+                                                    <constraint firstItem="583" firstAttribute="baseline" secondItem="582" secondAttribute="baseline" id="Adi-lC-fXH"/>
+                                                    <constraint firstItem="578" firstAttribute="baseline" secondItem="579" secondAttribute="baseline" id="FaZ-hB-wmv"/>
+                                                    <constraint firstItem="578" firstAttribute="leading" secondItem="580" secondAttribute="leading" id="IRE-i7-zFY"/>
+                                                    <constraint firstItem="580" firstAttribute="baseline" secondItem="581" secondAttribute="baseline" id="JFW-g4-iFA"/>
+                                                    <constraint firstItem="582" firstAttribute="leading" secondItem="583" secondAttribute="trailing" constant="6" id="PSZ-YU-DEa"/>
+                                                    <constraint firstItem="581" firstAttribute="centerY" secondItem="7tR-kf-2ax" secondAttribute="centerY" id="UES-Ba-DhA"/>
+                                                    <constraint firstItem="579" firstAttribute="top" secondItem="581" secondAttribute="bottom" constant="5" id="X5g-op-T8Q"/>
+                                                    <constraint firstItem="578" firstAttribute="trailing" secondItem="580" secondAttribute="trailing" id="crf-WL-ght"/>
+                                                    <constraint firstItem="583" firstAttribute="leading" secondItem="7tR-kf-2ax" secondAttribute="leading" constant="14" id="ekC-9w-Kbt"/>
+                                                    <constraint firstItem="580" firstAttribute="trailing" secondItem="582" secondAttribute="trailing" id="rmW-Md-DBL"/>
+                                                    <constraint firstItem="579" firstAttribute="leading" secondItem="581" secondAttribute="leading" id="whh-h3-vuC"/>
+                                                    <constraint firstItem="580" firstAttribute="leading" secondItem="582" secondAttribute="leading" id="ypU-eT-UOn"/>
+                                                </constraints>
                                             </view>
                                         </box>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="574">
-                                            <rect key="frame" x="274" y="280" width="242" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio" id="575">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="574">
+                                            <rect key="frame" x="275" y="280" width="121" height="14"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio" id="575" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="552" firstAttribute="leading" secondItem="549" secondAttribute="trailing" constant="10" id="0Ez-cz-v90"/>
+                                        <constraint firstItem="574" firstAttribute="leading" secondItem="553" secondAttribute="leading" id="21X-aG-j4Q"/>
+                                        <constraint firstItem="549" firstAttribute="top" secondItem="552" secondAttribute="top" id="2Yi-oh-d6H"/>
+                                        <constraint firstItem="549" firstAttribute="leading" secondItem="571" secondAttribute="leading" id="7Zc-Y7-gPk"/>
+                                        <constraint firstItem="553" firstAttribute="trailing" secondItem="574" secondAttribute="trailing" id="8sq-tP-qeG"/>
+                                        <constraint firstItem="572" firstAttribute="top" secondItem="426" secondAttribute="top" constant="150" id="Am1-vm-uoY"/>
+                                        <constraint firstItem="571" firstAttribute="top" secondItem="573" secondAttribute="top" id="EVA-iY-RkW"/>
+                                        <constraint firstItem="552" firstAttribute="leading" secondItem="426" secondAttribute="leading" constant="276" id="FGT-53-3BX"/>
+                                        <constraint firstItem="572" firstAttribute="trailing" secondItem="550" secondAttribute="trailing" id="I0G-HM-XdL"/>
+                                        <constraint firstItem="573" firstAttribute="leading" secondItem="552" secondAttribute="leading" id="IDL-PJ-Hmg"/>
+                                        <constraint firstAttribute="bottom" secondItem="571" secondAttribute="bottom" constant="186" id="O5e-4Q-bQ7"/>
+                                        <constraint firstItem="571" firstAttribute="trailing" secondItem="549" secondAttribute="trailing" id="QkS-rB-PyE"/>
+                                        <constraint firstItem="572" firstAttribute="baseline" secondItem="574" secondAttribute="baseline" id="Srm-ob-vIo"/>
+                                        <constraint firstItem="549" firstAttribute="top" secondItem="550" secondAttribute="bottom" constant="2" id="ZQy-nL-q3y"/>
+                                        <constraint firstItem="552" firstAttribute="trailing" secondItem="573" secondAttribute="trailing" id="asN-Ju-AVx"/>
+                                        <constraint firstAttribute="trailing" secondItem="552" secondAttribute="trailing" constant="28" id="brS-cW-Y74"/>
+                                        <constraint firstItem="573" firstAttribute="bottom" secondItem="571" secondAttribute="bottom" id="fTu-ts-ev3"/>
+                                        <constraint firstItem="572" firstAttribute="leading" secondItem="550" secondAttribute="leading" id="fb3-Lj-xcr"/>
+                                        <constraint firstItem="550" firstAttribute="leading" secondItem="426" secondAttribute="leading" constant="29" id="kkH-bK-heJ"/>
+                                        <constraint firstItem="550" firstAttribute="top" secondItem="426" secondAttribute="top" constant="15" id="lNh-VH-ab0"/>
+                                        <constraint firstItem="549" firstAttribute="leading" secondItem="426" secondAttribute="leading" constant="28" id="o0p-pc-UWa"/>
+                                        <constraint firstAttribute="trailing" secondItem="553" secondAttribute="trailing" constant="148" id="q68-Np-8zg"/>
+                                        <constraint firstItem="571" firstAttribute="top" secondItem="572" secondAttribute="bottom" constant="2" id="rdS-bF-nP2"/>
+                                        <constraint firstItem="550" firstAttribute="baseline" secondItem="553" secondAttribute="baseline" id="sQQ-if-vbz"/>
+                                        <constraint firstItem="572" firstAttribute="top" secondItem="549" secondAttribute="bottom" constant="16" id="tzI-Ic-mdn"/>
+                                        <constraint firstItem="574" firstAttribute="top" secondItem="552" secondAttribute="bottom" constant="16" id="zto-du-DFm"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
+                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
                         <rect key="frame" x="124" y="448" width="258" height="24"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GbO-Eb-YgC">
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="WVH-Tg-9g5"/>
+                        </constraints>
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GbO-Eb-YgC" customClass="VLCHUDSegmentedCell">
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment label="General" selected="YES"/>
@@ -697,11 +963,24 @@
                             <action selector="takeSelectedTabViewItemFromSender:" target="418" id="Z4V-Lm-ikS"/>
                         </connections>
                     </segmentedControl>
-                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
                         <rect key="frame" x="0.0" y="440" width="506" height="5"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="ivG-J4-70G"/>
+                        </constraints>
                     </box>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="418" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="-21" id="20Z-VR-upq"/>
+                    <constraint firstAttribute="trailing" secondItem="cFC-fJ-8UH" secondAttribute="trailing" id="7x2-Bh-mxs"/>
+                    <constraint firstAttribute="bottom" secondItem="418" secondAttribute="bottom" constant="-1" id="ETz-u4-7hp"/>
+                    <constraint firstItem="GFW-aJ-Pub" firstAttribute="top" secondItem="3" secondAttribute="top" constant="5" id="HNk-eG-ZIv"/>
+                    <constraint firstItem="GFW-aJ-Pub" firstAttribute="centerX" secondItem="3" secondAttribute="centerX" id="JjX-KP-FIb"/>
+                    <constraint firstAttribute="trailing" secondItem="418" secondAttribute="trailing" constant="-15" id="Jzd-uz-tLR"/>
+                    <constraint firstItem="cFC-fJ-8UH" firstAttribute="top" secondItem="GFW-aJ-Pub" secondAttribute="bottom" constant="7" id="PuF-hj-94M"/>
+                    <constraint firstItem="cFC-fJ-8UH" firstAttribute="leading" secondItem="3" secondAttribute="leading" id="mZB-VM-pUu"/>
+                    <constraint firstItem="418" firstAttribute="top" secondItem="3" secondAttribute="top" constant="33" id="pj9-FZ-Fyg"/>
+                </constraints>
             </view>
         </window>
     </objects>
