@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17E199" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -57,6 +57,7 @@
                 <outlet property="filterScaleTempoCheckbox" destination="wYr-HG-zA2" id="Io2-dE-xoC"/>
                 <outlet property="filterStereoEnhancerCheckbox" destination="NUi-0U-gqN" id="aym-ex-fgv"/>
                 <outlet property="profilePopup" destination="701" id="fL3-Nz-1t7"/>
+                <outlet property="segmentView" destination="Jb1-f1-iF3" id="w66-bc-QSP"/>
                 <outlet property="spatializerBand1Label" destination="277" id="pg6-1P-KW1"/>
                 <outlet property="spatializerBand1Slider" destination="266" id="Cdn-mQ-kxW"/>
                 <outlet property="spatializerBand1TextField" destination="265" id="Zi8-go-4Ct"/>
@@ -75,7 +76,6 @@
                 <outlet property="spatializerEnableCheckbox" destination="262" id="AvT-xk-v5G"/>
                 <outlet property="spatializerResetButton" destination="618" id="QQk-Ff-tSR"/>
                 <outlet property="spatializerView" destination="725" id="ndp-B1-7e4"/>
-                <outlet property="tabView" destination="80" id="Wst-uc-Vlp"/>
                 <outlet property="window" destination="1" id="SPr-ur-9uw"/>
             </connections>
         </customObject>
@@ -91,7 +91,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jb1-f1-iF3">
-                        <rect key="frame" x="80" y="254" width="314" height="24"/>
+                        <rect key="frame" x="72" y="254" width="330" height="24"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH">
                             <font key="font" metaFont="system"/>
                             <segments>
@@ -503,7 +503,7 @@
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="621">
                                             <rect key="frame" x="424" y="190" width="39" height="17"/>
-                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:622:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622">
+                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="DBA9FF77-3F58-444F-902A-249EA5A23E3A" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
@@ -790,7 +790,7 @@
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="618">
                                             <rect key="frame" x="424" y="190" width="39" height="17"/>
-                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:619:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619">
+                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="D57F690C-D42D-46B8-B0D9-BA04207B8D4D" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
@@ -1017,7 +1017,7 @@
                                                 <action selector="filterEnableVolumeNorm:" target="-2" id="TN6-b4-Vnj"/>
                                             </connections>
                                         </button>
-                                        <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="727">
+                                        <box title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="727">
                                             <rect key="frame" x="16" y="146" width="440" height="36"/>
                                             <view key="contentView" id="eB4-KX-Qdy">
                                                 <rect key="frame" x="1" y="1" width="438" height="34"/>
@@ -1168,7 +1168,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="buttonCell:619:image" width="1" height="1">
+        <image name="D57F690C-D42D-46B8-B0D9-BA04207B8D4D" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -1209,7 +1209,7 @@ ALkAuwDAANcA2QDbBysHMAc7B0QHVwdbB2YHbwd0B3wHfweEB5MHlweeB6YHswe4B7oHvAfBB8kHzAfR
 B9kH3AfuB/EH9gAAAAAAAAIBAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAf4A
 </mutableData>
         </image>
-        <image name="buttonCell:622:image" width="1" height="1">
+        <image name="DBA9FF77-3F58-444F-902A-249EA5A23E3A" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw

@@ -30,7 +30,7 @@
 @interface VLCAudioEffectsWindowController : NSWindowController
 
 /* generic */
-@property (readwrite, weak) IBOutlet NSTabView *tabView;
+@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *profilePopup;
 @property (readwrite, weak) IBOutlet NSButton *applyProfileCheckbox;
 
