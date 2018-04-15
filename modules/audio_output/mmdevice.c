@@ -1096,8 +1096,9 @@ static int aout_stream_Start(void *func, va_list ap)
     aout_stream_t *s = va_arg(ap, aout_stream_t *);
     audio_sample_format_t *fmt = va_arg(ap, audio_sample_format_t *);
     HRESULT *hr = va_arg(ap, HRESULT *);
+    LPCGUID sid = var_InheritBool(s, "volume-save") ? &GUID_VLC_AUD_OUT : NULL;
 
-    *hr = start(s, fmt, &GUID_VLC_AUD_OUT);
+    *hr = start(s, fmt, sid);
     if (*hr == AUDCLNT_E_DEVICE_INVALIDATED)
         return VLC_ETIMEOUT;
     return SUCCEEDED(*hr) ? VLC_SUCCESS : VLC_EGENERIC;
