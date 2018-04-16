@@ -270,8 +270,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
     if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        float sar = (float) vgl->f_sar;
-        getProjectionMatrix(sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
+        getProjectionMatrix(vgl->f_sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
         getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
         getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
