@@ -107,7 +107,11 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     if( p_sys->bytestream.p_block->i_pts != date_Get( &p_sys->end_date ) &&
         p_sys->bytestream.p_block->i_pts != VLC_TS_INVALID )
     {
-        date_Set( &p_sys->end_date, p_sys->bytestream.p_block->i_pts );
+        /* Make sure we don't reuse the same pts twice
+         * as A/52 in PES sends multiple times the same pts */
+        if( p_sys->bytestream.p_block->i_pts != p_sys->i_prev_bytestream_pts )
+            date_Set( &p_sys->end_date, p_sys->bytestream.p_block->i_pts );
+        p_sys->i_prev_bytestream_pts = p_sys->bytestream.p_block->i_pts;
         p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
     }
 
@@ -155,15 +159,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 block_Release( p_block );
                 return NULL;
             }
-        }
-
-        /* Make sure we don't reuse the same pts twice */
-        if( p_block->i_pts > VLC_TS_INVALID )
-        {
-            if( p_block->i_pts == p_sys->i_prev_bytestream_pts )
-                p_block->i_pts = VLC_TS_INVALID;
-            else
-                p_sys->i_prev_bytestream_pts = p_block->i_pts;
         }
 
         block_BytestreamPush( &p_sys->bytestream, p_block );
