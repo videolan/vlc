@@ -1946,7 +1946,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         if (src_full_range)
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!IsRGBShader(format))
+    if (!IsRGBShader(format) && !src_full_range)
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
     if (range_adjust != 0)
