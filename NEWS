@@ -418,7 +418,7 @@ Service Discovery:
  * New mDNS services discovery using Bonjour (Mac OS X, tvOS, iOS)
  * Rewrite of the UPnP service discovery
 
-Mac OS X Interface:
+Mac OS X Interface
  * Drop support for Mac OS X 10.6 Snow Leopard
  * Support right-to-left user interface layout for right-to-left languages
  * New resizable fullscreen controller with improved design
@@ -545,7 +545,7 @@ Mac OS X:
    update to the newest version.
 
 Video Output:
- * Fix Direct2D9 output with odd offsets
+ * Fix Direct3D9 output with odd offsets
 
 Misc:
  * Fix crash in MTP
@@ -669,7 +669,7 @@ Decoder:
  * Fix crashes with libvpx
  * Use libass without caching dialog
 
-Video Ouptut:
+Video Output:
  * Fix green lines on Direct3D output
 
 Skins2:
@@ -4099,7 +4099,7 @@ Interfaces:
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*
-    - Support for RTP streaming in Stream Ouput dialog
+    - Support for RTP streaming in Stream Output dialog
     - Now require wx2.6 with Unicode support
  * Skins2
     - Tree playlist
