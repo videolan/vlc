@@ -139,11 +139,10 @@ static const char* DemuxNameFromExtension( char const* ext,
 }
 
 demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
-                    const char *psz_location, stream_t *s, es_out_t *out )
+                    stream_t *s, es_out_t *out )
 {
     assert(s != NULL );
-    return demux_NewAdvanced( p_obj, NULL, "", psz_name,
-                              psz_location, s, out, false );
+    return demux_NewAdvanced( p_obj, NULL, "", psz_name, "", s, out, false );
 }
 
 struct vlc_demux_private

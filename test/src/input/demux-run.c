@@ -267,7 +267,7 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
     if (out == NULL)
         return -1;
 
-    demux_t *demux = demux_New(VLC_OBJECT(s), name, "", s, out);
+    demux_t *demux = demux_New(VLC_OBJECT(s), name, s, out);
     if (demux == NULL)
     {
         es_out_Delete(out);

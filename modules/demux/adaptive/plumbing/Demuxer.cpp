@@ -171,7 +171,7 @@ bool Demuxer::create()
     if(!p_newstream)
         return false;
 
-    p_demux = demux_New( VLC_OBJECT(p_realdemux), name.c_str(), "",
+    p_demux = demux_New( VLC_OBJECT(p_realdemux), name.c_str(),
                          p_newstream, p_es_out );
     if(!p_demux)
     {
