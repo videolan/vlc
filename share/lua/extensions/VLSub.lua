@@ -1224,62 +1224,16 @@ openSub = {
     if not item then
       file.hasInput = false;
       file.cleanName = nil;
-      file.protocol = nil;
-      file.path = nil;
-      file.ext = nil;
       file.uri = nil;
     else
       vlc.msg.dbg("[VLSub] Video URI: "..item:uri())
-      local parsed_uri = vlc.strings.url_parse(item:uri())
       file.uri = item:uri()
-      file.protocol = parsed_uri["protocol"]
-      file.path = parsed_uri["path"]
-
+      local filePath = vlc.strings.make_path(file.uri)
+      file.dir, file.name = string.match(filePath, "^(.*[".. slash .."])([^" .. slash .. "]-).?[%a%d]*$")
+      if not file.name then
+        file.name = filePath
+      end
     -- Corrections
-
-      -- For windows
-      file.path = string.match(file.path, "^/(%a:/.+)$") or file.path
-
-      -- For file in archive
-      local archive_path, name_in_archive = string.match(
-        file.path, '^([^!]+)!/([^!/]*)$')
-      if archive_path and archive_path ~= "" then
-        file.path = string.gsub(
-          archive_path,
-          '\063',
-          '%%')
-        file.path = vlc.strings.decode_uri(file.path)
-        file.completeName = string.gsub(
-          name_in_archive,
-          '\063',
-          '%%')
-        file.completeName = vlc.strings.decode_uri(
-          file.completeName)
-        file.is_archive = true
-      else -- "classic" input
-        file.path = vlc.strings.decode_uri(file.path)
-        file.dir, file.completeName = string.match(
-          file.path,
-          '^(.*/)([^/]*)$')
-
-        local file_stat = vlc.net.stat(file.path)
-        if file_stat
-        then
-          file.stat = file_stat
-        end
-
-        file.is_archive = false
-      end
-
-      file.name, file.ext = string.match(
-        file.completeName,
-        '^([^/]-)%.?([^%.]*)$')
-
-      if file.ext == "part" then
-        file.name, file.ext = string.match(
-          file.name,
-          '^([^/]+)%.([^%.]+)$')
-      end
 
       file.hasInput = true;
       file.cleanName = string.gsub(
