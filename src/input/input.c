@@ -2427,10 +2427,10 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     if( p_stream->pf_read == NULL && p_stream->pf_block == NULL
      && p_stream->pf_readdir == NULL )
     {   /* Combined access/demux, no stream filtering */
-         MRLSections( psz_anchor,
-                    &p_source->i_title_start, &p_source->i_title_end,
+        MRLSections( psz_anchor,
+                     &p_source->i_title_start, &p_source->i_title_end,
                     &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
-         return p_stream;
+        return p_stream;
     }
 
     /* attach explicit stream filters to stream */
