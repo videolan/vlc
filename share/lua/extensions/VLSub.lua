@@ -654,12 +654,11 @@ function check_config()
     trsl_names[lg[1]] = lg[2]
   end
 
-  if is_window_path(vlc.config.datadir()) then
+  slash = package.config:sub(1,1)
+  if slash == "\\" then
     openSub.conf.os = "win"
-    slash = "\\"
   else
     openSub.conf.os = "lin"
-    slash = "/"
   end
 
   local filePath	= slash.."vlsub_conf.xml"
