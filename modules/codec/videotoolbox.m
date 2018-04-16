@@ -1021,6 +1021,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             switch (p_dec->fmt_in.i_original_fourcc) {
                 case VLC_FOURCC( 'a','p','4','c' ):
                 case VLC_FOURCC( 'a','p','4','h' ):
+                case VLC_FOURCC( 'a','p','4','x' ):
                     return kCMVideoCodecType_AppleProRes4444;
 
                 case VLC_FOURCC( 'a','p','c','h' ):
