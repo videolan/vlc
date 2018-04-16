@@ -412,15 +412,12 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     vlc_value_t val, txt, default_val = { .i_int = AOUT_VAR_CHAN_UNSET };
     val.i_int = 0;
 
-    if (!AOUT_FMT_LINEAR(fmt))
+    if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels == 1)
         return;
 
-    if (i_nb_input_channels > 1)
-    {
-        val.i_int = AOUT_VAR_CHAN_MONO;
-        txt.psz_string = _("Mono");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-    }
+    val.i_int = AOUT_VAR_CHAN_MONO;
+    txt.psz_string = _("Mono");
+    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
 
     if (i_nb_input_channels != 2)
     {
