@@ -254,10 +254,6 @@ void input_ConfigVarInit ( input_thread_t * );
 int subtitles_Detect( input_thread_t *, char *, const char *, input_item_slave_t ***, int * );
 int subtitles_Filter( const char *);
 
-/* input.c */
-void input_SplitMRL( const char **, const char **, const char **,
-                     const char **, char * );
-
 /* meta.c */
 void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
                                           const vlc_meta_t *p_meta );

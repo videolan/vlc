@@ -2461,6 +2461,9 @@ error:
     return NULL;
 }
 
+static void input_SplitMRL( const char **, const char **, const char **,
+                            const char **, char * );
+
 /*****************************************************************************
  * InputSourceNew:
  *****************************************************************************/
@@ -3071,8 +3074,8 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-void input_SplitMRL( const char **access, const char **demux,
-                     const char **path, const char **anchor, char *buf )
+static void input_SplitMRL( const char **access, const char **demux,
+                            const char **path, const char **anchor, char *buf )
 {
     char *p;
 
