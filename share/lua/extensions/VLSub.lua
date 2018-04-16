@@ -1633,7 +1633,7 @@ function download_subtitles()
   stream = nil
   collectgarbage()
 
-  if not os.remove(tmpFileName) then
+  if not vlc.io.unlink(tmpFileName) then
     vlc.msg.err("[VLsub] Unable to remove temp: "..tmpFileName)
   end
 
