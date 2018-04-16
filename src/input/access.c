@@ -289,5 +289,5 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     else
         s = access;
 
-    return stream_FilterAutoNew(s);
+    return s;
 }

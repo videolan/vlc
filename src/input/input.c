@@ -2416,6 +2416,8 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
     if( p_stream == NULL )
         return NULL;
 
+    p_stream = stream_FilterAutoNew( p_stream );
+
     if( p_stream->pf_read == NULL && p_stream->pf_block == NULL
      && p_stream->pf_readdir == NULL )
     {   /* Combined access/demux, no stream filtering */
