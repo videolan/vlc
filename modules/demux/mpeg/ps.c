@@ -399,6 +399,13 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
     }
 }
 
+static void CheckPCR( demux_sys_t *p_sys, es_out_t *out, mtime_t i_scr )
+{
+    if( p_sys->i_scr > VLC_TS_INVALID &&
+        llabs( p_sys->i_scr - i_scr ) > CLOCK_FREQ )
+        NotifyDiscontinuity( p_sys->tk, out );
+}
+
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
@@ -458,6 +465,7 @@ static int Demux( demux_t *p_demux )
         {
             if( p_sys->i_first_scr == -1 )
                 p_sys->i_first_scr = p_sys->i_pack_scr;
+            CheckPCR( p_sys, p_demux->out, p_sys->i_pack_scr );
             p_sys->i_scr = p_sys->i_pack_scr;
             p_sys->i_lastpack_byte = vlc_stream_Tell( p_demux->s );
             if( !p_sys->b_have_pack ) p_sys->b_have_pack = true;
@@ -610,6 +618,7 @@ static int Demux( demux_t *p_demux )
                 {
                     /* A hack to sync the A/V on PES files. */
                     msg_Dbg( p_demux, "force SCR: %"PRId64, p_pkt->i_pts );
+                    CheckPCR( p_sys, p_demux->out, p_pkt->i_pts );
                     p_sys->i_scr = p_pkt->i_pts;
                     if( p_sys->i_first_scr == -1 )
                         p_sys->i_first_scr = p_sys->i_scr;
