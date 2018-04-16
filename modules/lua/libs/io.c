@@ -230,6 +230,18 @@ static int vlclua_io_readdir( lua_State *L )
     return 1;
 }
 
+static int vlclua_io_unlink( lua_State *L )
+{
+    if( lua_gettop( L ) < 1 )
+        return luaL_error( L, "Usage: vlc.io.unlink(path)" );
+    const char* psz_path = luaL_checkstring( L, 1 );
+    int i_res = vlc_unlink( psz_path );
+    int i_err = i_res != 0 ? errno : 0;
+    lua_pushinteger( L, i_res );
+    lua_pushinteger( L, i_err );
+    return 2;
+}
+
 static int vlclua_mkdir( lua_State *L )
 {
     if( lua_gettop( L ) < 2 ) return vlclua_error( L );
@@ -249,6 +261,7 @@ static const luaL_Reg vlclua_io_reg[] = {
     { "mkdir", vlclua_mkdir },
     { "open", vlclua_io_open },
     { "readdir", vlclua_io_readdir },
+    { "unlink", vlclua_io_unlink },
 
     { NULL, NULL }
 };

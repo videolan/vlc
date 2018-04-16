@@ -156,6 +156,9 @@ io.open("path"[, "mode"]): Similar to lua's io.open. Mode is optional and
     .flush
     .close
   all of which are used exactly like the lua object returned by io.open
+io.unlink("path"): Similar to os.remove. First return value is 0 in case
+  of success. In case of failure, the 2nd return parameter is an error
+  code to be compared against vlc.errno values.
 
 Messages
 --------
