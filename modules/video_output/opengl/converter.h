@@ -341,7 +341,7 @@ struct opengl_tex_converter_t
     /* Private context */
     void *priv;
 
-    /*
+    /**
      * Callback to allocate data for bound textures
      *
      * This function pointer can be NULL. Software converters should call
@@ -349,7 +349,7 @@ struct opengl_tex_converter_t
      * caller when calling glDeleteTextures()). Won't be called if
      * handle_texs_gen is true.
      *
-     * \param fc OpenGL tex converter
+     * \param tc OpenGL tex converter
      * \param textures array of textures to bind (one per plane)
      * \param tex_width array of tex width (one per plane)
      * \param tex_height array of tex height (one per plane)
@@ -358,26 +358,26 @@ struct opengl_tex_converter_t
     int (*pf_allocate_textures)(const opengl_tex_converter_t *tc, GLuint *textures,
                                 const GLsizei *tex_width, const GLsizei *tex_height);
 
-    /*
+    /**
      * Callback to allocate a picture pool
      *
      * This function pointer *can* be NULL. If NULL, A generic pool with
      * pictures allocated from the video_format_t will be used.
      *
-     * \param fc OpenGL tex converter
+     * \param tc OpenGL tex converter
      * \param requested_count number of pictures to allocate
      * \return the picture pool or NULL in case of error
      */
-    picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *fc,
+    picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *tc,
                                    unsigned requested_count);
 
-    /*
+    /**
      * Callback to update a picture
      *
      * This function pointer cannot be NULL. The implementation should upload
      * every planes of the picture.
      *
-     * \param fc OpenGL tex converter
+     * \param tc OpenGL tex converter
      * \param textures array of textures to bind (one per plane)
      * \param tex_width array of tex width (one per plane)
      * \param tex_height array of tex height (one per plane)
@@ -386,39 +386,39 @@ struct opengl_tex_converter_t
      * (one per plane, can be NULL)
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_update)(const opengl_tex_converter_t *fc, GLuint *textures,
+    int (*pf_update)(const opengl_tex_converter_t *tc, GLuint *textures,
                      const GLsizei *tex_width, const GLsizei *tex_height,
                      picture_t *pic, const size_t *plane_offset);
 
-    /*
+    /**
      * Callback to fetch locations of uniform or attributes variables
      *
      * This function pointer cannot be NULL. This callback is called one time
      * after init.
      *
-     * \param fc OpenGL tex converter
+     * \param tc OpenGL tex converter
      * \param program linked program that will be used by this tex converter
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_fetch_locations)(opengl_tex_converter_t *fc, GLuint program);
+    int (*pf_fetch_locations)(opengl_tex_converter_t *tc, GLuint program);
 
-    /*
+    /**
      * Callback to prepare the fragment shader
      *
      * This function pointer cannot be NULL. This callback can be used to
      * specify values of uniform variables.
      *
-     * \param fc OpenGL tex converter
+     * \param tc OpenGL tex converter
      * \param tex_width array of tex width (one per plane)
      * \param tex_height array of tex height (one per plane)
      * \param alpha alpha value, used only for RGBA fragment shader
      */
-    void (*pf_prepare_shader)(const opengl_tex_converter_t *fc,
+    void (*pf_prepare_shader)(const opengl_tex_converter_t *tc,
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
 };
 
-/*
+/**
  * Generate a fragment shader
  *
  * This utility function can be used by hw opengl tex converters that need a
@@ -430,8 +430,8 @@ struct opengl_tex_converter_t
  * \param tc OpenGL tex converter
  * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
  * \param chroma chroma used to generate the fragment shader
- * \param if not COLOR_SPACE_UNDEF, YUV planes will be converted to RGB
- * according to the color space
+ * \param yuv_space if not COLOR_SPACE_UNDEF, YUV planes will be converted to
+ * RGB according to the color space
  * \return the compiled fragment shader or 0 in case of error
  */
 static inline GLuint
