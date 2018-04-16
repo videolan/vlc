@@ -1657,7 +1657,7 @@ function dump_zip(url, dir, subfileName)
     return false
   end
 
-  local tmpFileName = dir.."/"..subfileName..".gz"
+  local tmpFileName = dir..slash..subfileName..".gz"
   local tmpFile = vlc.io.open(tmpFileName, "wb")
   if tmpFile == nil then
     return false
@@ -2047,7 +2047,7 @@ function list_dir(path)
   if dir_list_cmd then
     for _, entry in dir_list_cmd do
       if string.match(entry, "^[^%s]+.+$") then
-        table.insert(list, entry.path .. "/" .. entry.filename)
+        table.insert(list, entry.path .. slash .. entry.filename)
       end
     end
     return list
