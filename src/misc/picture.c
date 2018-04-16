@@ -159,7 +159,7 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
         assert(w->den >= w->num);
 
         p->i_lines = height * h->num / h->den;
-        p->i_visible_lines = fmt->i_visible_height * h->num / h->den;
+        p->i_visible_lines = (fmt->i_visible_height + (h->den - 1)) * h->num / h->den;
 
         p->i_pitch = width * w->num / w->den * p_dsc->pixel_size;
         p->i_visible_pitch = fmt->i_visible_width * w->num / w->den
