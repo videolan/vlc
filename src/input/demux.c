@@ -142,7 +142,7 @@ demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                     stream_t *s, es_out_t *out )
 {
     assert(s != NULL );
-    return demux_NewAdvanced( p_obj, NULL, "", psz_name, "", s, out, false );
+    return demux_NewAdvanced( p_obj, NULL, psz_name, "", s, out, false );
 }
 
 struct vlc_demux_private
@@ -179,8 +179,7 @@ static int demux_Probe(void *func, va_list ap)
 }
 
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                            const char *psz_access, const char *psz_demux,
-                            const char *psz_location,
+                            const char *psz_demux, const char *url,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
     struct vlc_demux_private *priv;
@@ -203,24 +202,22 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         }
     }
 
-    size_t schemelen = strlen(psz_access);
-
     p_demux->p_input = p_parent_input;
     p_demux->psz_name = strdup( psz_demux );
     if (unlikely(p_demux->psz_name == NULL))
         goto error;
 
-    if (unlikely(asprintf(&p_demux->psz_url, "%s://%s", psz_access,
-                          psz_location) == -1))
+    p_demux->psz_url = strdup(url);
+    if (unlikely(p_demux->psz_url == NULL))
         goto error;
 
-    p_demux->psz_location = p_demux->psz_url + schemelen + 3;
-    p_demux->psz_filepath = get_path( psz_location ); /* parse URL */
+    const char *p = strstr(p_demux->psz_url, "://");
+    p_demux->psz_location = (p != NULL) ? (p + 3) : "";
+    p_demux->psz_filepath = get_path(p_demux->psz_location); /* parse URL */
 
     if( !b_preparsing )
-        msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
-                 "location='%s' file='%s'", psz_access, psz_demux,
-                 p_demux->psz_location, p_demux->psz_filepath );
+        msg_Dbg( p_obj, "creating demux \"%s\", URL: %s, path: %s",
+                 psz_demux, url, p_demux->psz_filepath );
 
     p_demux->s              = s;
     p_demux->out            = out;

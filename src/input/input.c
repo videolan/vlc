@@ -2403,24 +2403,16 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
     return VLC_SUCCESS;
 }
 
-static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source,
-                               const char *psz_access, const char *psz_demux,
-                               const char *psz_path, const char *psz_anchor )
+static demux_t *InputDemuxNew( input_thread_t *p_input,
+                               input_source_t *p_source, const char *url,
+                               const char *psz_demux, const char *psz_anchor )
 {
     input_thread_private_t *priv = input_priv(p_input );
     vlc_object_t *obj = VLC_OBJECT(p_source);
-    demux_t *p_demux = NULL;
 
-    /* not an access-demux: create the underlying access stream */
-    char *psz_base_mrl;
-
-    if( asprintf( &psz_base_mrl, "%s://%s", psz_access, psz_path ) < 0 )
-        return NULL;
-
+    /* create the underlying access stream */
     stream_t *p_stream = stream_AccessNew( obj, p_input, priv->p_es_out,
-                                           priv->b_preparsing, psz_base_mrl );
-    free( psz_base_mrl );
-
+                                           priv->b_preparsing, url );
     if( p_stream == NULL )
         return NULL;
 
@@ -2450,11 +2442,10 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
         p_stream = stream_FilterChainNew( p_stream, "record" );
 
     /* create a regular demux with the access stream created */
-    p_demux = demux_NewAdvanced( obj, p_input, psz_access, psz_demux, psz_path,
-                                 p_stream, priv->p_es_out,
-                                 priv->b_preparsing );
-    if( p_demux )
-        return p_demux;
+    demux_t *demux = demux_NewAdvanced( obj, p_input, psz_demux, url, p_stream,
+                                        priv->p_es_out, priv->b_preparsing );
+    if( demux != NULL )
+        return demux;
 
 error:
     vlc_stream_Delete( p_stream );
@@ -2557,8 +2548,14 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         TAB_CLEAN( count, tab );
     }
 
-    in->p_demux = InputDemuxNew( p_input, in, psz_access, psz_demux,
-                                 psz_path, psz_anchor );
+    char *url;
+    if( likely(asprintf( &url, "%s://%s", psz_access, psz_path ) >= 0) )
+    {
+        in->p_demux = InputDemuxNew( p_input, in, url, psz_demux, psz_anchor );
+        free( url );
+    }
+    else
+        in->p_demux = NULL;
 
     free( psz_demux_var );
     free( psz_dup );

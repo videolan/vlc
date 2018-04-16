@@ -32,8 +32,8 @@
 
 /* stream_t *s could be null and then it mean a access+demux in one */
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                            const char *psz_access, const char *psz_demux,
-                            const char *psz_path, stream_t *s, es_out_t *out, bool );
+                            const char *psz_demux, const char *url,
+                            stream_t *s, es_out_t *out, bool );
 
 unsigned demux_TestAndClearFlags( demux_t *, unsigned );
 int demux_GetTitle( demux_t * );
