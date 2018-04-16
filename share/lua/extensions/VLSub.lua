@@ -1334,74 +1334,27 @@ openSub = {
 
     openSub.getFileInfo()
 
-    if not openSub.file.path then
-      setError(lang["mess_not_found"])
-      return false
-    end
-
     local data_start = ""
     local data_end = ""
     local size
     local chunk_size = 65536
 
     -- Get data for hash calculation
-    if openSub.file.is_archive then
-      vlc.msg.dbg("[VLSub] Read hash data from stream")
+    vlc.msg.dbg("[VLSub] Read hash data from stream")
 
-      local file = vlc.stream(openSub.file.uri)
-      local dataTmp1 = ""
-      local dataTmp2 = ""
-      size = chunk_size
+    local file = vlc.stream(openSub.file.uri)
 
-      data_start = file:read(chunk_size)
-
-      while data_end do
-        size = size + string.len(data_end)
-        dataTmp1 = dataTmp2
-        dataTmp2 = data_end
-        data_end = file:read(chunk_size)
-        collectgarbage()
-      end
-      data_end = string.sub((dataTmp1..dataTmp2), -chunk_size)
-    elseif not file_exist(openSub.file.path)
-    and openSub.file.stat then
-      vlc.msg.dbg("[VLSub] Read hash data from stream")
-
-      local file = vlc.stream(openSub.file.uri)
-
-      if not file then
-        vlc.msg.dbg("[VLSub] No stream")
-        return false
-      end
-
-      size = openSub.file.stat.size
-      local decal = size%chunk_size
-
-      data_start = file:read(chunk_size)
-
-      -- "Seek" to the end
-      file:read(decal)
-
-      for i = 1, math.floor(((size-decal)/chunk_size))-2 do
-        file:read(chunk_size)
-      end
-
-      data_end = file:read(chunk_size)
-
-      file = nil
-    else
-      vlc.msg.dbg("[VLSub] Read hash data from file")
-      local file = vlc.io.open(openSub.file.path, "rb")
-      if not file then
-        vlc.msg.dbg("[VLSub] No stream")
-        return false
-      end
-
-      data_start = file:read(chunk_size)
-      size = file:seek("end", -chunk_size) + chunk_size
-      data_end = file:read(chunk_size)
-      file = nil
+    size = file:getsize()
+    data_start = file:read(chunk_size)
+    if not size then
+      vlc.msg.warn("[VLSub] Failed to get stream size")
+      return false
     end
+    if not file:seek( size - chunk_size ) then
+      vlc.msg.warn("[VLSub] Failed to seek to the end of the stream")
+      return false
+    end
+    data_end = file:read(chunk_size)
 
   -- Hash calculation
     local lo = size
