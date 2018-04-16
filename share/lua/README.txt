@@ -392,6 +392,8 @@ s = vlc.stream( "http://www.videolan.org/" )
 s:read( 128 ) -- read up to 128 characters. Return 0 if no more data is available (FIXME?).
 s:readline() -- read a line. Return nil if EOF was reached.
 s:addfilter() -- add a stream filter. If no argument was specified, try to add all automatic stream filters.
+s:getsize() -- returns the size of the stream, or nil if unknown
+s:seek(offset) -- seeks from offset bytes (from the begining of the stream). Returns nil in case of error
 
 Strings
 -------
