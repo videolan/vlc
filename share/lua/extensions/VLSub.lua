@@ -2056,11 +2056,6 @@ function list_dir(path)
   end
 end
 
-function decode_uri(str)
-  vlc.msg.err(slash)
-  return str:gsub("/", slash)
-end
-
 function is_window_path(path)
   return string.match(path, "^(%a:.+)$")
 end
