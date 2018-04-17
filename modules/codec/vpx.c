@@ -488,8 +488,9 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
             block_t *p_block = block_Alloc(pkt->data.frame.sz);
             if (unlikely(p_block == NULL))
             {
-                vpx_img_free(&img);
-                return NULL;
+                block_ChainRelease(p_out);
+                p_out = NULL;
+                break;
             }
 
             memcpy(p_block->p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
