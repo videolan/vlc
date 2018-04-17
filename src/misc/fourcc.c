@@ -660,6 +660,13 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 #define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 1, 8)
 #define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, 2, bits)
 
+#define SEMIPLANAR(w_den, h_den, size, bits) \
+    { .plane_count = 2, \
+      .p = { {.w = {1,    1}, .h = {1,    1}}, \
+             {.w = {2,w_den}, .h = {1,h_den}} }, \
+      .pixel_size = size, \
+      .pixel_bits = bits }
+
 #define PACKED_FMT(size, bits) \
     { .plane_count = 1, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
@@ -681,7 +688,7 @@ static const struct
     { { VLC_CODEC_I411 },                      PLANAR_8(3, 4, 1) },
     { { VLC_CODEC_YUV_PLANAR_410 },            PLANAR_8(3, 4, 4) },
     { { VLC_CODEC_YUV_PLANAR_420 },            PLANAR_8(3, 2, 2) },
-    { { VLC_CODEC_NV12, VLC_CODEC_NV21 },      PLANAR_8(2, 1, 2) },
+    { { VLC_CODEC_NV12, VLC_CODEC_NV21 },      SEMIPLANAR(2, 2, 1, 8) },
     { { VLC_CODEC_YUV_PLANAR_422 },            PLANAR_8(3, 2, 1) },
     { { VLC_CODEC_NV16, VLC_CODEC_NV61 },      PLANAR_8(2, 1, 1) },
     { { VLC_CODEC_YUV_PLANAR_440 },            PLANAR_8(3, 1, 2) },
@@ -720,7 +727,7 @@ static const struct
         VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
     { { VLC_CODEC_YUVA_444_10L,
         VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
-    { { VLC_CODEC_P010 },                      PLANAR_16(2, 1, 2, 10) },
+    { { VLC_CODEC_P010 },                      SEMIPLANAR(2, 2, 2, 10) },
 
     { { VLC_CODEC_YUV_PACKED },                PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
