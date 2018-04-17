@@ -59,7 +59,6 @@ struct stream_sys_t
     size_t       buffer_length;
     size_t       buffer_size;
     char        *buffer;
-    size_t       read_size;
     size_t       seek_threshold;
 };
 
@@ -215,20 +214,10 @@ static void *Thread(void *data)
 
             /* Discard some historical data to make room. */
             len = history;
-            if (len > sys->read_size)
-                len = sys->read_size;
 
             assert(len <= sys->buffer_length);
             sys->buffer_offset += len;
             sys->buffer_length -= len;
-        }
-        else
-        {   /* Some streams cannot return a short data count and just wait for
-             * all requested data to become available (e.g. regular files). So
-             * we have to limit the data read in a single operation to avoid
-             * blocking for too long. */
-            if (len > sys->read_size)
-                len = sys->read_size;
         }
 
         size_t offset = (sys->buffer_offset + sys->buffer_length)
@@ -440,7 +429,6 @@ static int Open(vlc_object_t *obj)
     sys->stream_offset = 0;
     sys->buffer_length = 0;
     sys->buffer_size = var_InheritInteger(obj, "prefetch-buffer-size") << 10u;
-    sys->read_size = var_InheritInteger(obj, "prefetch-read-size");
     sys->seek_threshold = var_InheritInteger(obj, "prefetch-seek-threshold");
 
     uint64_t size = stream_Size(stream->s);
@@ -448,11 +436,7 @@ static int Open(vlc_object_t *obj)
     {   /* No point allocating a buffer larger than the source stream */
         if (sys->buffer_size > size)
             sys->buffer_size = size;
-        if (sys->read_size > size)
-            sys->read_size = size;
     }
-    if (sys->buffer_size < sys->read_size)
-        sys->buffer_size = sys->read_size;
 
     sys->buffer = malloc(sys->buffer_size);
     if (sys->buffer == NULL)
@@ -477,8 +461,7 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    msg_Dbg(stream, "using %zu bytes buffer, %zu bytes read",
-            sys->buffer_size, sys->read_size);
+    msg_Dbg(stream, "using %zu bytes buffer", sys->buffer_size);
     stream->pf_read = Read;
     stream->pf_control = Control;
     return VLC_SUCCESS;
@@ -523,9 +506,7 @@ vlc_module_begin()
     add_integer("prefetch-buffer-size", 1 << 14, N_("Buffer size"),
                 N_("Prefetch buffer size (KiB)"), false)
         change_integer_range(4, 1 << 20)
-    add_integer("prefetch-read-size", 1 << 14, N_("Read size"),
-                N_("Prefetch background read size (bytes)"), true)
-        change_integer_range(1, 1 << 29)
+    add_obsolete_integer("prefetch-read-size") /* since 4.0.0 */
     add_integer("prefetch-seek-threshold", 1 << 14, N_("Seek threshold"),
                 N_("Prefetch forward seek threshold (bytes)"), true)
         change_integer_range(0, UINT64_C(1) << 60)
