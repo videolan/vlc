@@ -591,7 +591,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
         return S_OK;
 
     EnterCriticalSection(&sys->lock);
-    if (sys->acquired_device == default_device)
+    if (sys->acquired_device == NULL || sys->acquired_device == default_device)
     {
         msg_Dbg(aout, "default device changed: %ls", wid);
         sys->request_device_restart = true;
@@ -775,8 +775,8 @@ static int DeviceRestartLocked(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     assert(sys->requested_device == NULL);
-    assert(sys->acquired_device != NULL);
-    sys->requested_device = sys->acquired_device;
+    sys->requested_device = sys->acquired_device ? sys->acquired_device
+                                                 : default_device;
     return DeviceRequestLocked(aout);
 }
 
@@ -849,7 +849,10 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
+        {
             msg_Err(aout, "cannot get default device (error 0x%lx)", hr);
+            sys->acquired_device = NULL;
+        }
         else
             sys->acquired_device = default_device;
     }
@@ -1122,9 +1125,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
 
-    if (sys->dev == NULL)
-        return -1;
-
     const bool b_spdif = AOUT_FMT_SPDIF(fmt);
     const bool b_hdmi = AOUT_FMT_HDMI(fmt);
     if (b_spdif || b_hdmi)
@@ -1153,8 +1153,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     EnterMTA();
     EnterCriticalSection(&sys->lock);
 
-    if (sys->request_device_restart && DeviceRestartLocked(aout) != 0)
+    if ((sys->request_device_restart && DeviceRestartLocked(aout) != 0)
+      || sys->dev == NULL)
     {
+        /* Error if the device restart failed or if a request previously
+         * failed. */
         LeaveCriticalSection(&sys->lock);
         LeaveMTA();
         vlc_object_release(s);
