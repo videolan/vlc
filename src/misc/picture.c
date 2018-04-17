@@ -192,9 +192,9 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
         plane_t *p = &p_picture->p[i];
 
         p->i_lines         = (i_height_aligned + i_height_extra ) * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
-        p->i_visible_lines = fmt->i_visible_height * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
+        p->i_visible_lines = (fmt->i_visible_height + (p_dsc->p[i].h.den - 1)) * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
         p->i_pitch         = i_width_aligned * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
-        p->i_visible_pitch = fmt->i_visible_width * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
+        p->i_visible_pitch = (fmt->i_visible_width + (p_dsc->p[i].w.den - 1)) * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
         p->i_pixel_pitch   = p_dsc->pixel_size;
 
         assert( (p->i_pitch % 16) == 0 );
