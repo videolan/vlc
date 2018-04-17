@@ -116,10 +116,10 @@ static int OpenCommon( decoder_t *p_dec )
 
     for( unsigned i = 0; i < dsc->plane_count; i++ )
     {
-        unsigned pitch = p_dec->fmt_in.video.i_width * dsc->pixel_size
-                         * dsc->p[i].w.num / dsc->p[i].w.den;
-        unsigned lines = p_dec->fmt_in.video.i_height
-                         * dsc->p[i].h.num / dsc->p[i].h.den;
+        unsigned pitch = ((p_dec->fmt_in.video.i_width + (dsc->p[i].w.den - 1)) / dsc->p[i].w.den)
+                         * dsc->p[i].w.num * dsc->pixel_size;
+        unsigned lines = ((p_dec->fmt_in.video.i_height + (dsc->p[i].h.den - 1)) / dsc->p[i].h.den)
+                         * dsc->p[i].h.num;
 
         p_sys->pitches[i] = pitch;
         p_sys->lines[i] = lines;
