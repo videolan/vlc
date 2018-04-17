@@ -1618,6 +1618,7 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
         UpdateZ(vgl);
     }
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->ctl_prgm);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->scene_prgm);
 
     return VLC_SUCCESS;
@@ -2364,80 +2365,80 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
     vgl->vt.Enable(GL_BLEND);
     vgl->vt.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    vgl->vt.ActiveTexture(GL_TEXTURE0 + 0);
+    vgl->vt.ActiveTexture(GL_TEXTURE0);
+
+    const GLfloat vertexCoord[] = {
+        vgl->hmdCtlPos.f_depth,      vgl->hmdCtlPos.f_top,   vgl->hmdCtlPos.f_right,
+        vgl->hmdCtlPos.f_depth,   vgl->hmdCtlPos.f_bottom,   vgl->hmdCtlPos.f_right,
+        vgl->hmdCtlPos.f_depth,      vgl->hmdCtlPos.f_top,    vgl->hmdCtlPos.f_left,
+        vgl->hmdCtlPos.f_depth,   vgl->hmdCtlPos.f_bottom,    vgl->hmdCtlPos.f_left,
+    };
+
+    const GLfloat textureCoord[] = {
+        0.0,   0.0,
+        0.0,   1.0,
+        1.0,   0.0,
+        1.0,   1.0,
+    };
+
+    assert(vgl->hmd_controller_texture != 0);
+    vgl->vt.BindTexture(tc->tex_target, vgl->hmd_controller_texture);
+
+    tc->pf_prepare_shader(tc, &vgl->hmd_controller_width, &vgl->hmd_controller_height, 1.0);
+
+    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->hmd_controller_buffer_object[0]);
+    vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+    vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT,
+                                 0, 0, 0);
+
+    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->hmd_controller_buffer_object[1]);
+    vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+    vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT,
+                                 0, 0, 0);
+
+    if (eye == LEFT_EYE)
     {
-        const GLfloat vertexCoord[] = {
-            vgl->hmdCtlPos.f_depth,      vgl->hmdCtlPos.f_top,   vgl->hmdCtlPos.f_right,
-            vgl->hmdCtlPos.f_depth,   vgl->hmdCtlPos.f_bottom,   vgl->hmdCtlPos.f_right,
-            vgl->hmdCtlPos.f_depth,      vgl->hmdCtlPos.f_top,    vgl->hmdCtlPos.f_left,
-            vgl->hmdCtlPos.f_depth,   vgl->hmdCtlPos.f_bottom,    vgl->hmdCtlPos.f_left,
-        };
-
-        const GLfloat textureCoord[] = {
-            0.0,   0.0,
-            0.0,   1.0,
-            1.0,   0.0,
-            1.0,   1.0,
-        };
-
-        assert(vgl->hmd_controller_texture != 0);
-        vgl->vt.BindTexture(tc->tex_target, vgl->hmd_controller_texture);
-
-        tc->pf_prepare_shader(tc, &vgl->hmd_controller_width, &vgl->hmd_controller_height, 1.0);
-
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->hmd_controller_buffer_object[0]);
-        vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
-        vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT,
-                                     0, 0, 0);
-
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[1]);
-        vgl->vt.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
-        vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT,
-                                     0, 0, 0);
-
-        if (eye == LEFT_EYE)
-        {
-            memcpy(prgm->var.ModelViewMatrix,
-                   vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
-            memcpy(prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.left.projection, 16 * sizeof(float));
-        }
-        else if (eye == RIGHT_EYE)
-        {
-            memcpy(prgm->var.ModelViewMatrix,
-                   vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
-            memcpy(prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.right.projection, 16 * sizeof(float));
-        }
-
-        memcpy(prgm->var.OrientationMatrix, vgl->prgm->var.OrientationMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.ZRotMatrix, vgl->prgm->var.ZRotMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.YRotMatrix, vgl->prgm->var.YRotMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.XRotMatrix, vgl->prgm->var.XRotMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.ZoomMatrix, vgl->prgm->var.ZoomMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.HeadPositionMatrix, vgl->prgm->var.HeadPositionMatrix, 16 * sizeof(float));
-
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
-                                 prgm->var.ViewMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
-                                 prgm->var.OrientationMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
-                                 prgm->var.ProjectionMatrix);
-        float *SbSCoefs = prgm->var.SbSCoefs;
-        float *SbSOffsets = prgm->var.SbSOffsets;
-        SbSCoefs[0] = 1.f; SbSCoefs[1] = 1.f;
-        SbSOffsets[0] = 0.f; SbSOffsets[1] = 0.f;
-
-        vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, SbSCoefs);
-        vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, SbSOffsets);
-
-        vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        memcpy(prgm->var.ModelViewMatrix,
+               vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
+        memcpy(prgm->var.ProjectionMatrix,
+               vgl->hmd_cfg.left.projection, 16 * sizeof(float));
     }
+    else if (eye == RIGHT_EYE)
+    {
+        memcpy(prgm->var.ModelViewMatrix,
+               vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
+        memcpy(prgm->var.ProjectionMatrix,
+               vgl->hmd_cfg.right.projection, 16 * sizeof(float));
+    }
+
+    updateViewMatrix(vgl->ctl_prgm);
+
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                             prgm->var.ViewMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
+                             prgm->var.OrientationMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
+                             prgm->var.ProjectionMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+                              prgm->var.ObjectTransformMatrix);
+    vgl->vt.Uniform1i(prgm->uloc.IsInstanced, GL_FALSE);
+
+    float *SbSCoefs = prgm->var.SbSCoefs;
+    float *SbSOffsets = prgm->var.SbSOffsets;
+    SbSCoefs[0] = 1.f; SbSCoefs[1] = 1.f;
+    SbSOffsets[0] = 0.f; SbSOffsets[1] = 0.f;
+
+    vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, SbSCoefs);
+    vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, SbSOffsets);
+
+    vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
     vgl->vt.BlendFunc(GL_ONE, GL_ZERO);
     vgl->vt.Disable(GL_BLEND);
+
+    GL_ASSERT_NOERROR();
 }
 
 static bool is_object_visible(scene_object_t *p_object, scene_mesh_t *p_mesh, float *eye_position, float *eye_direction)
