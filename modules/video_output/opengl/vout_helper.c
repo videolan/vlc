@@ -2695,52 +2695,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 0);
 
     printf("=> %u instances have been culled out\n", instances_dropped);
-
-    float p_red[] = {1.f, 0.f, 0.f};
-    float p_blue[] = {0.f, 1.f, 0.f};
-    float p_green[] = {0.f, 0.f, 1.f};
-    float p_white[] = {1.f, 1.f, 1.f};
-    float p_purple[] = {1.f, 0.f, 1.f};
-
-    void add_vec(float* ret, float* a, float* b) {
-        ret[0] = a[0] + b[0];
-        ret[1] = a[1] + b[1];
-        ret[2] = a[2] + b[2];
-    }
-
-    float p_origin[] = { 0, 500, 0};
-    float p_x[] = { 1000000, 0, 0};
-    float p_y[] = { 0, 1000000, 0 };
-    float p_z[] = { 0, 0, 1000000 };
-
-    float p1[3], p2[2], p3[3];
-
-    add_vec(p1, p_origin, p_x);
-    add_vec(p2, p_origin, p_y);
-    add_vec(p3, p_origin, p_z);
-
-    float p_eye_dir_elevated[3];
-
-    p_eye_dir[0] *= 1000000;
-    p_eye_dir[1] *= 1000000;
-    p_eye_dir[2] *= 1000000;
-
-    add_vec(p_eye_dir_elevated, p_eye_pos, p_eye_dir);
-
-    opengl_debug_DrawLine(vgl->vt, prgm->var.ProjectionMatrix, prgm->var.ViewMatrix,
-                          identity, p_origin, p1, p_red);
-
-    opengl_debug_DrawLine(vgl->vt, prgm->var.ProjectionMatrix, prgm->var.ViewMatrix,
-                          identity, p_origin, p2, p_green);
-
-    opengl_debug_DrawLine(vgl->vt, prgm->var.ProjectionMatrix, prgm->var.ViewMatrix,
-                          identity, p_origin, p3, p_blue);
-
-    opengl_debug_DrawLine(vgl->vt, prgm->var.ProjectionMatrix, prgm->var.ViewMatrix,
-                          identity, p_origin, p_eye_pos, p_white);
-
-    opengl_debug_DrawLine(vgl->vt, prgm->var.ProjectionMatrix, prgm->var.ViewMatrix,
-                          identity, p_eye_pos, p_eye_dir_elevated, p_purple);
 }
 
 static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, side_by_side_eye eye)
