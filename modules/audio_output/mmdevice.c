@@ -1147,8 +1147,13 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     EnterMTA();
     EnterCriticalSection(&sys->lock);
 
-    if (sys->request_device_restart)
-        DeviceRestartLocked(aout);
+    if (sys->request_device_restart && DeviceRestartLocked(aout) != 0)
+    {
+        LeaveCriticalSection(&sys->lock);
+        LeaveMTA();
+        vlc_object_release(s);
+        return -1;
+    }
 
     for (;;)
     {
