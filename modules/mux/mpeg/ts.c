@@ -1274,7 +1274,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
                  (p_input->p_fmt->i_codec != VLC_CODEC_MP3) ) )
         {
             p_data = block_FifoGet( p_input->p_fifo );
-            if (p_data->i_pts <= VLC_TS_INVALID)
+            if( p_data->i_dts <= VLC_TS_INVALID )
+                p_data->i_dts = p_data->i_pts;
+            else if ( p_data->i_pts <= VLC_TS_INVALID )
                 p_data->i_pts = p_data->i_dts;
 
             if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
@@ -1286,6 +1288,13 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_data = FixPES( p_mux, p_input->p_fifo );
 
         SetBlockDuration( p_input, p_data );
+
+        if( p_data->i_dts == VLC_TS_INVALID )
+        {
+            msg_Err( p_mux, "non dated packet dropped" );
+            block_Release( p_data );
+            continue;
+        }
 
         if ( p_sys->first_dts == 0 )
         {
@@ -1638,8 +1647,10 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
         i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
 
         memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
-        p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
-        p_next->i_dts += p_next->i_length * i_copy / p_next->i_buffer;
+        if( p_next->i_pts )
+            p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
+        if( p_next->i_dts )
+            p_next->i_dts += p_next->i_length * i_copy / p_next->i_buffer;
         p_next->i_length -= p_next->i_length * i_copy / p_next->i_buffer;
         p_next->i_buffer -= i_copy;
         p_next->p_buffer += i_copy;
