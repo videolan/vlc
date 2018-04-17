@@ -1088,8 +1088,8 @@ static picture_t *pic_new_unaligned(const video_format_t *fmt)
     picture_resource_t rsc = { .pf_destroy = pic_rsc_destroy };
     for (unsigned i = 0; i < dsc->plane_count; i++)
     {
-        rsc.p[i].i_lines = ((fmt->i_visible_height + 1) & ~ 1) * dsc->p[i].h.num / dsc->p[i].h.den;
-        rsc.p[i].i_pitch = ((fmt->i_visible_width + 1) & ~ 1) * dsc->pixel_size * dsc->p[i].w.num / dsc->p[i].w.den;
+        rsc.p[i].i_lines = ((fmt->i_visible_height + (dsc->p[i].h.den - 1)) / dsc->p[i].h.den) * dsc->p[i].h.num;
+        rsc.p[i].i_pitch = ((fmt->i_visible_width + (dsc->p[i].w.den - 1)) / dsc->p[i].w.den) * dsc->p[i].w.num * dsc->pixel_size;
         rsc.p[i].p_pixels = malloc(rsc.p[i].i_lines * rsc.p[i].i_pitch);
         assert(rsc.p[i].p_pixels);
     }
