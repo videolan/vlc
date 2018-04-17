@@ -469,7 +469,7 @@ opengl_link_program(struct prgm *prgm)
             int charsWritten;
             tc->vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
                                       infolog);
-            msg_Err(tc->gl, "shader %d: %s", i, infolog);
+            msg_Err(tc->gl, "shader %u: %s", i, infolog);
             free(infolog);
         }
     }
@@ -512,7 +512,7 @@ opengl_link_program(struct prgm *prgm)
     x = tc->vt->Get##type##Location(prgm->id, str); \
     assert(x != -1); \
     if (x == -1) { \
-        msg_Err(tc->gl, "Unable to Get"#type"Location(%s)\n", str); \
+        msg_Err(tc->gl, "Unable to Get"#type"Location(%s)", str); \
         goto error; \
     } \
 } while (0)
@@ -730,7 +730,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_viewpoint_t *viewpoint)
 {
     if (gl->getProcAddress == NULL) {
-        msg_Err(gl, "getProcAddress not implemented, bailing out\n");
+        msg_Err(gl, "getProcAddress not implemented, bailing out");
         return NULL;
     }
 
@@ -748,7 +748,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #define GET_PROC_ADDR_EXT(name, critical) do { \
     vgl->vt.name = vlc_gl_GetProcAddress(gl, "gl"#name); \
     if (vgl->vt.name == NULL && critical) { \
-        msg_Err(gl, "gl"#name" symbol not found, bailing out\n"); \
+        msg_Err(gl, "gl"#name" symbol not found, bailing out"); \
         free(vgl); \
         return NULL; \
     } \
@@ -843,7 +843,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     assert(extensions);
     if (!extensions)
     {
-        msg_Err(gl, "glGetString returned NULL\n");
+        msg_Err(gl, "glGetString returned NULL");
         free(vgl);
         return NULL;
     }
@@ -852,7 +852,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
     if (!supports_shaders)
     {
-        msg_Err(gl, "shaders not supported, bailing out\n");
+        msg_Err(gl, "shaders not supported, bailing out");
         free(vgl);
         return NULL;
     }

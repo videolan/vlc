@@ -42,7 +42,7 @@
         GLenum ret = tc->vt->GetError(); \
         if (ret != GL_NO_ERROR) \
         { \
-            msg_Err(tc->gl, #fct " failed: 0x%x\n", ret); \
+            msg_Err(tc->gl, #fct " failed: 0x%x", ret); \
             return VLC_EGENERIC; \
         } \
     }
