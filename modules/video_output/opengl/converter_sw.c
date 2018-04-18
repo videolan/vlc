@@ -447,6 +447,9 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
     {
         if (pitch != visible_pitch)
         {
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+            visible_pitch = ALIGN(visible_pitch, 4);
+#undef ALIGN
             size_t buf_size = visible_pitch * height;
             const uint8_t *source = pixels;
             uint8_t *destination;
