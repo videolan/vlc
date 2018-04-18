@@ -47,6 +47,7 @@ public:
     };
 
     void showTab( panel );
+    int currentTab();
 #if 0
     void setInput( input_item_t * );
 #endif
