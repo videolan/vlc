@@ -311,12 +311,20 @@ void DialogsProvider::aboutDialog()
 
 void DialogsProvider::mediaInfoDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->showTab( MediaInfoDialog::META_PANEL );
+    MediaInfoDialog *dialog = MediaInfoDialog::getInstance( p_intf );
+    if( !dialog->isVisible() || dialog->currentTab() != MediaInfoDialog::META_PANEL )
+        dialog->showTab( MediaInfoDialog::META_PANEL );
+    else
+        dialog->hide();
 }
 
 void DialogsProvider::mediaCodecDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->showTab( MediaInfoDialog::INFO_PANEL );
+    MediaInfoDialog *dialog = MediaInfoDialog::getInstance( p_intf );
+    if( !dialog->isVisible() || dialog->currentTab() != MediaInfoDialog::INFO_PANEL )
+        dialog->showTab( MediaInfoDialog::INFO_PANEL );
+    else
+        dialog->hide();
 }
 
 void DialogsProvider::bookmarksDialog()

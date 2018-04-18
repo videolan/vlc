@@ -143,6 +143,11 @@ void MediaInfoDialog::showTab( panel i_tab = META_PANEL )
     show();
 }
 
+int MediaInfoDialog::currentTab()
+{
+    return infoTabW->currentIndex();
+}
+
 void MediaInfoDialog::saveMeta()
 {
     MP->saveMeta();
