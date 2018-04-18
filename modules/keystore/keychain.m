@@ -269,7 +269,7 @@ static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMuta
         [query setObject:[NSString stringWithUTF8String:psz_path] forKey:(__bridge id)kSecAttrPath];
     }
     if (psz_port) {
-        [query setObject:[NSString stringWithUTF8String:psz_port] forKey:(__bridge id)kSecAttrPort];
+        [query setObject:[NSNumber numberWithInt:atoi(psz_port)] forKey:(__bridge id)kSecAttrPort];
     }
 }
 
