@@ -167,7 +167,6 @@ static int EsOutControl(es_out_t *out, int query, va_list args)
         case ES_OUT_SET_ES_CAT_POLICY:
             break;
         case ES_OUT_SET_GROUP:
-            abort();
         case ES_OUT_SET_PCR:
         case ES_OUT_SET_GROUP_PCR:
         case ES_OUT_RESET_PCR:
