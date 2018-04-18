@@ -1229,7 +1229,12 @@ openSub = {
       vlc.msg.dbg("[VLSub] Video URI: "..item:uri())
       file.uri = item:uri()
       local filePath = vlc.strings.make_path(file.uri)
-      file.dir, file.name = string.match(filePath, "^(.*[".. slash .."])([^" .. slash .. "]-).?[%a%d]*$")
+      if not filePath then
+        filePath = vlc.strings.decode_uri(file.uri)
+        filePath = string.match(filePath, "^.*[".. slash .."]([^" .. slash .. "]-).?[%a%d]*$")
+      else
+        file.dir, file.name = string.match(filePath, "^(.*[".. slash .."])([^" .. slash .. "]-).?[%a%d]*$")
+      end
       if not file.name then
         file.name = filePath
       end
