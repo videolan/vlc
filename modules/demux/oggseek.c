@@ -678,12 +678,11 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
                                        int64_t i_granule, bool b_presentation )
 {
     int64_t i_timestamp = -1;
-    if ( i_granule < 1 )
+    if ( i_granule < 1 - !!p_stream->b_oggds )
         return -1;
 
     if ( p_stream->b_oggds )
     {
-        if ( b_presentation ) i_granule--;
         i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
     }
     else  switch( p_stream->fmt.i_codec )
