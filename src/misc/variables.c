@@ -266,7 +266,7 @@ static void TriggerListCallback(vlc_object_t *obj, variable_t *var,
 {
     assert(obj != NULL);
 
-    callback_entry_t *entry = var->value_callbacks;
+    callback_entry_t *entry = var->list_callbacks;
     if (entry == NULL)
         return;
 
