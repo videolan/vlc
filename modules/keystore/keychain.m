@@ -399,7 +399,10 @@ static unsigned int Find(vlc_keystore *p_keystore,
                 case kSecAccountItemAttr:
                     if (!p_entry->ppsz_values[KEY_USER]) {
                         msg_Dbg(p_keystore, "using account name from the keychain for login");
-                        p_entry->ppsz_values[KEY_USER] = strdup((const char *)attr->data);
+
+                        char *paddedName = calloc(1, attr->length + 1);
+                        memcpy(paddedName, attr->data, attr->length);
+                        p_entry->ppsz_values[KEY_USER] = paddedName;
                     }
                     break;
                 default:
