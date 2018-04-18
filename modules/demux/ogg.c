@@ -1012,6 +1012,10 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     {
         /* We're in headers, and we haven't parsed 1st data packet yet */
 //        p_stream->i_pcr = VLC_TS_UNKNOWN;
+        if( p_stream->b_oggds && ogg_page_packets( p_oggpacket ) )
+        {
+            p_stream->i_pcr = VLC_TS_0 + p_ogg->i_nzpcr_offset;
+        }
     }
     else if( p_oggpacket->granulepos > 0 )
     {
@@ -1168,7 +1172,12 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                 temp = temp->p_next;
                 tosend->p_next = NULL;
 
-                if( tosend->i_pts < VLC_TS_0 )
+                if( tosend->i_dts < VLC_TS_0 )
+                {
+                    tosend->i_dts = tosend->i_pts;
+                }
+
+                if( tosend->i_dts < VLC_TS_0 )
                 {
                     /* Don't send metadata from chained streams */
                     block_Release( tosend );
