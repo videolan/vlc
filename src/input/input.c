@@ -2149,6 +2149,9 @@ static bool Control( input_thread_t *p_input,
             input_thread_private_t *priv = input_priv(p_input);
             const vlc_hmd_controller_t *p_src = val.p_address;
 
+            if (likely(priv->hmd_controller.p_pic != NULL))
+                picture_Release(priv->hmd_controller.p_pic);
+
             priv->hmd_controller = *p_src;
             picture_Hold(priv->hmd_controller.p_pic);
 
@@ -2165,8 +2168,6 @@ static bool Control( input_thread_t *p_input,
                 vlc_object_release(pp_vout[i]);
             }
             free(pp_vout);
-
-            picture_Release(priv->hmd_controller.p_pic);
             break;
         }
 
