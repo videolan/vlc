@@ -291,9 +291,13 @@ static int Store(vlc_keystore *p_keystore,
     /* set attributes */
     SetAttributesForQuery(ppsz_values, searchQuery, psz_label);
 
-    /* search */
-    status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, nil);
+    // One return type must be added for SecItemCopyMatching, even if not used.
+    // Older macOS versions (10.7) are very picky here...
+    [searchQuery setObject:@(YES) forKey:(__bridge id)kSecReturnRef];
+    CFTypeRef result = NULL;
 
+    /* search */
+    status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &result);
     /* create storage unit */
     NSData *secretData = [[NSString stringWithFormat:@"%s", p_secret] dataUsingEncoding:NSUTF8StringEncoding];
 
