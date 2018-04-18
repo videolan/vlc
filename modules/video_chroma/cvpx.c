@@ -228,6 +228,8 @@ static void Close(vlc_object_t *obj)
 
     if (p_sys->pool != NULL)
         CVPixelBufferPoolRelease(p_sys->pool);
+
+    CopyCleanCache(&p_sys->sw.cache);
     free(p_sys);
 }
 
