@@ -434,8 +434,7 @@ tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 static int
 upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
              GLsizei width, GLsizei height,
-             unsigned pitch, unsigned visible_pitch, unsigned pixel_pitch,
-             const void *pixels)
+             unsigned pitch, unsigned visible_pitch, const void *pixels)
 {
     struct priv *priv = tc->priv;
     GLenum tex_format = tc->texs[tex_idx].format;
@@ -448,7 +447,7 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
     {
         if (pitch != visible_pitch)
         {
-            size_t buf_size = visible_pitch * pixel_pitch * height;
+            size_t buf_size = visible_pitch * height;
             const uint8_t *source = pixels;
             uint8_t *destination;
             if (priv->texture_temp_buf_size < buf_size)
@@ -505,8 +504,7 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                              pic->p[i].p_pixels;
 
         ret = upload_plane(tc, i, tex_width[i], tex_height[i],
-                           pic->p[i].i_pitch, pic->p[i].i_visible_pitch,
-                           pic->p[i].i_pixel_pitch, pixels);
+                           pic->p[i].i_pitch, pic->p[i].i_visible_pitch, pixels);
     }
     return ret;
 }
