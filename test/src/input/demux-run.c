@@ -60,6 +60,7 @@ struct es_out_id_t
     struct es_out_id_t *next;
 #ifdef HAVE_DECODERS
     decoder_t *decoder;
+    es_format_t fmt;
 #endif
 };
 
@@ -77,7 +78,8 @@ static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
     id->next = ctx->ids;
     ctx->ids = id;
 #ifdef HAVE_DECODERS
-    id->decoder = test_decoder_create((void *)out->p_sys, fmt);
+    es_format_Copy(&id->fmt, fmt);
+    id->decoder = test_decoder_create((void *)out->p_sys, &id->fmt);
 #endif
 
     debug("[%p] Added   ES\n", (void *)id);
@@ -116,6 +118,7 @@ static void IdDelete(es_out_id_t *id)
         /* Drain */
         test_decoder_process(id->decoder, NULL);
         test_decoder_destroy(id->decoder);
+        es_format_Clean(&id->fmt);
     }
 #endif
     free(id);
@@ -145,7 +148,15 @@ static int EsOutControl(es_out_t *out, int query, va_list args)
         case ES_OUT_SET_ES:
             break;
         case ES_OUT_RESTART_ES:
-            abort();
+        {
+#ifdef HAVE_DECODERS
+            es_out_id_t* id = va_arg(args, es_out_id_t*);
+            EsOutCheckId(out, id);
+            test_decoder_destroy(id->decoder);
+            test_decoder_create((void*)out->p_sys, &id->fmt);
+#endif
+            break;
+        }
         case ES_OUT_SET_ES_DEFAULT:
         case ES_OUT_SET_ES_STATE:
             break;
