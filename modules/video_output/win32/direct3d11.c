@@ -212,6 +212,7 @@ static int OpenCoreW(vout_display_t *vd)
     sys->dxgiswapChain = dxgiswapChain;
     sys->d3d_dev.d3ddevice     = d3ddevice;
     sys->d3d_dev.d3dcontext    = d3dcontext;
+    sys->d3d_dev.feature_level = ID3D11Device_GetFeatureLevel(sys->d3d_dev.d3ddevice );
     IDXGISwapChain_AddRef     (sys->dxgiswapChain);
     ID3D11Device_AddRef       (sys->d3d_dev.d3ddevice);
     ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
