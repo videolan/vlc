@@ -1297,21 +1297,24 @@ openSub = {
     local data_end = ""
     local size
     local chunk_size = 65536
+    local ok
+    local err
 
     -- Get data for hash calculation
     vlc.msg.dbg("[VLSub] Read hash data from stream")
 
     local file = vlc.stream(openSub.file.uri)
 
-    size = file:getsize()
     data_start = file:read(chunk_size)
+    ok, size = pcall(file.getsize, file)
     if not size then
-      vlc.msg.warn("[VLSub] Failed to get stream size")
+      vlc.msg.warn("[VLSub] Failed to get stream size: " .. size )
       setError(lang["mess_err_hash"])
       return false
     end
-    if not file:seek( size - chunk_size ) then
-      vlc.msg.warn("[VLSub] Failed to seek to the end of the stream")
+    ok, err = pcall(file.seek, file, size - chunk_size)
+    if not ok then
+      vlc.msg.warn("[VLSub] Failed to seek to the end of the stream: " .. err)
       setError(lang["mess_err_hash"])
       return false
     end
