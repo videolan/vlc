@@ -1307,10 +1307,12 @@ openSub = {
     data_start = file:read(chunk_size)
     if not size then
       vlc.msg.warn("[VLSub] Failed to get stream size")
+      setError(lang["mess_err_hash"])
       return false
     end
     if not file:seek( size - chunk_size ) then
       vlc.msg.warn("[VLSub] Failed to seek to the end of the stream")
+      setError(lang["mess_err_hash"])
       return false
     end
     data_end = file:read(chunk_size)
