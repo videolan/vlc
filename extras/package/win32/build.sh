@@ -25,12 +25,13 @@ OPTIONS:
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
    -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
+   -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:b:" OPTION
+while getopts "hra:pcli:sb:" OPTION
 do
      case $OPTION in
          h)
@@ -55,6 +56,9 @@ do
          ;;
          i)
              INSTALLER=$OPTARG
+         ;;
+         s)
+             INTERACTIVE="yes"
          ;;
          b)
              BREAKPAD=$OPTARG
@@ -87,13 +91,29 @@ TRIPLET=$ARCH-w64-mingw32
 
 info "Building extra tools"
 cd extras/tools
+# bootstrap only if needed in interactive mode
+if [ "$INTERACTIVE" != "yes" || ! -f ./Makefile ]; then
 ./bootstrap
+fi
 make -j$JOBS
 export PATH=$PWD/build/bin:$PATH
 cd ../../
 
-info "Building contribs"
 export USE_FFMPEG=1
+export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
+export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
+
+if [ "$INTERACTIVE" = "yes" ]; then
+if [ "x$SHELL" != "x" ]; then
+    exec $SHELL
+else
+    exec /bin/sh
+fi
+fi
+
+info "Building contribs"
+echo $PATH
+
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 if [ ! -z "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
@@ -115,9 +135,6 @@ fi
 cd ../..
 
 info "Bootstrapping"
-export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
-export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
-echo $PATH
 
 ./bootstrap
 
