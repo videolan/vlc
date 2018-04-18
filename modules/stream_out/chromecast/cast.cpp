@@ -818,7 +818,6 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
     if ( i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
             i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
             i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
-            i_codec == VLC_CODEC_MPGA ||
             i_codec == VLC_CODEC_MP4A )
     {
         return p_fmt->i_channels <= 2;
