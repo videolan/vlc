@@ -315,13 +315,12 @@ static int Open(vlc_object_t *obj)
 
     if (b_need_pool
      && (p_sys->pool = cvpxpool_create(&p_filter->fmt_out.video, 3)) == NULL)
-        goto error;
+    {
+        Close(obj);
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
-
-error:
-    Close(obj);
-    return VLC_EGENERIC;
 #undef CASE_CVPX_INPUT
 #undef CASE_CVPX_OUTPUT
 }
