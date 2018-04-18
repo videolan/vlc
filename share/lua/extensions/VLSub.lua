@@ -1509,9 +1509,12 @@ function download_subtitles()
 
   -- Determine if the path to the video file is accessible for writing
 
-  local target = openSub.file.dir..subfileName
+  local target
+  if openSub.file.dir then
+    target = openSub.file.dir..subfileName
+  end
 
-  if not file_touch(target) then
+  if not target or not file_touch(target) then
     if openSub.conf.dirPath then
       target =  openSub.conf.dirPath..slash..subfileName
       message = "<br>"..
