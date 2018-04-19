@@ -404,9 +404,9 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     if( !isSliding && isEnabled() )
     {
         if ( event->delta() > 0 )
-            var_SetInteger( p_intf->obj.libvlc, "key-pressed", KEY_MOUSEWHEELRIGHT );
+            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
         else
-            var_SetInteger( p_intf->obj.libvlc, "key-pressed", KEY_MOUSEWHEELLEFT );
+            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
     }
     event->accept();
 }
