@@ -1504,8 +1504,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     CreateFBO(vgl, &vgl->leftFBO, &vgl->leftColorTex, &vgl->leftDepthTex);
     CreateFBO(vgl, &vgl->rightFBO, &vgl->rightColorTex, &vgl->rightDepthTex);
 
-    vgl->p_objDisplay = loadSceneObjects("VirtualTheater" DIR_SEP "virtualCinemaTargo.json",
-                                         vgl->gl, vgl->scene_prgm->tc);
+    char psz_scenePath[1024];
+    strncpy(psz_scenePath, config_GetDataDir(), sizeof(psz_scenePath));
+    strncat(psz_scenePath, DIR_SEP "VirtualTheater" DIR_SEP "virtualCinemaTargo.json",
+           sizeof(psz_scenePath));
+
+    vgl->p_objDisplay = loadSceneObjects(psz_scenePath, vgl->gl, vgl->scene_prgm->tc);
     if (vgl->p_objDisplay == NULL)
         msg_Warn(vgl->gl, "Could not load the virtual theater");
 
