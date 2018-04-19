@@ -420,54 +420,41 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
             aiString path;
             myAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL);
 
-            unsigned pathLen = strlen(path.C_Str()) + 1024;
-            char psz_path[pathLen];
-            #define TEXTURE_DIR "VirtualTheater" DIR_SEP "Textures" DIR_SEP
-            strcpy(psz_path, TEXTURE_DIR);
-            strcat(psz_path, path.C_Str() + strlen("Projet_maya\\sourceimages\\"));
+            std::string baseTexFileName = std::string(path.C_Str()).substr(strlen("Projet_maya\\sourceimages\\"));
+            std::string::size_type baseTexFileNameEnd = baseTexFileName.find_last_of("_");
+            if (baseTexFileNameEnd != std::string::npos)
+                baseTexFileName = baseTexFileName.substr(0, baseTexFileNameEnd);
 
-            char psz_baseTexPath[pathLen];
-            const char *basePathEnd = strrchr(psz_path, '_');
-            if (basePathEnd != NULL)
-            {
-                strcpy(psz_baseTexPath, psz_path);
-                psz_baseTexPath[basePathEnd - psz_path] = '\0';
-            }
+            std::string baseTexPath(config_GetDataDir());
+            #define TEXTURE_DIR DIR_SEP "VirtualTheater" DIR_SEP "Textures" DIR_SEP
+            baseTexPath += TEXTURE_DIR + baseTexFileName;
 
-            char psz_baseColorTexPath[pathLen];
-            if (basePathEnd != NULL)
-            {
-                strcpy(psz_baseColorTexPath, psz_baseTexPath);
-                strcat(psz_baseColorTexPath, "_BaseColor.png");
-            }
-            else
-                strcpy(psz_baseColorTexPath, psz_path);
+            std::string diffuseTexPath = baseTexPath;
+            if (baseTexFileNameEnd != std::string::npos)
+                diffuseTexPath += + "_BaseColor.png";
 
-            msg_Dbg(p_loader, "Base color texture path: %s", psz_baseColorTexPath);
-            p_material->p_baseColorTex = scene_material_LoadTexture(p_loader, psz_baseColorTexPath);
+            msg_Dbg(p_loader, "Base color texture path: %s", diffuseTexPath.c_str());
+            p_material->p_baseColorTex = scene_material_LoadTexture(p_loader, diffuseTexPath.c_str());
             if (p_material->p_baseColorTex == NULL)
                 msg_Warn(p_loader, "Could not load the base color texture");
 
-            if (basePathEnd != NULL)
+            if (baseTexFileNameEnd != std::string::npos)
             {
-                char psz_metalnessTexPath[pathLen];
-                strcpy(psz_metalnessTexPath, psz_baseTexPath); strcat(psz_metalnessTexPath, "_Metalness.png");
-                msg_Dbg(p_loader, "Metalness texture path: %s", psz_metalnessTexPath);
-                p_material->p_metalnessTex = scene_material_LoadTexture(p_loader, psz_metalnessTexPath);
+                std::string metalnessTexPath = baseTexPath + "_Metalness.png";
+                msg_Dbg(p_loader, "Metalness texture path: %s", metalnessTexPath.c_str());
+                p_material->p_metalnessTex = scene_material_LoadTexture(p_loader, metalnessTexPath.c_str());
                 if (p_material->p_metalnessTex == NULL)
                     msg_Warn(p_loader, "Could not load the metalness texture");
 
-                char psz_normalTexPath[pathLen];
-                strcpy(psz_normalTexPath, psz_baseTexPath); strcat(psz_normalTexPath, "_Normal.png");
-                msg_Dbg(p_loader, "Normal texture path: %s", psz_normalTexPath);
-                p_material->p_normalTex = scene_material_LoadTexture(p_loader, psz_normalTexPath);
+                std::string normalTexPath = baseTexPath + "_Normal.png";
+                msg_Dbg(p_loader, "Normal texture path: %s", normalTexPath.c_str());
+                p_material->p_normalTex = scene_material_LoadTexture(p_loader, normalTexPath.c_str());
                 if (p_material->p_normalTex == NULL)
                     msg_Warn(p_loader, "Could not load the normal texture");
 
-                char psz_roughnessTexPath[pathLen];
-                strcpy(psz_roughnessTexPath, psz_baseTexPath); strcat(psz_roughnessTexPath, "_Roughness.png");
-                msg_Dbg(p_loader, "Roughness texture path: %s", psz_roughnessTexPath);
-                p_material->p_roughnessTex = scene_material_LoadTexture(p_loader, psz_roughnessTexPath);
+                std::string roughnessTexPath = baseTexPath + "_Roughness.png";
+                msg_Dbg(p_loader, "Roughness texture path: %s", roughnessTexPath.c_str());
+                p_material->p_roughnessTex = scene_material_LoadTexture(p_loader, roughnessTexPath.c_str());
                 if (p_material->p_roughnessTex == NULL)
                     msg_Warn(p_loader, "Could not load the roughness texture");
             }
