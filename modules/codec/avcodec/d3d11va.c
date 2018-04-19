@@ -482,7 +482,7 @@ static char *DxDescribe(vlc_va_sys_t *sys)
         char *utfdesc = FromWide(adapterDesc.Description);
         if (likely(utfdesc!=NULL))
         {
-            if (asprintf(&description, "D3D11VA (%s, vendor %u(%s), device %u, revision %u)",
+            if (asprintf(&description, "D3D11VA (%s, vendor %x(%s), device %x, revision %x)",
                          utfdesc,
                          adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision) < 0)
                 description = NULL;
