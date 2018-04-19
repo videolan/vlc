@@ -376,7 +376,7 @@ static char *DxDescribe(vlc_va_sys_t *sys)
     }
 
     char *description;
-    if (asprintf(&description, "DXVA2 (%.*s, vendor %s(%lu), device %lu, revision %lu)",
+    if (asprintf(&description, "DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
                  (int)sizeof(d3dai.Description), d3dai.Description,
                  DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision) < 0)
         return NULL;
