@@ -261,6 +261,8 @@ FileSeek(stream_t *p_access, uint64_t i_pos)
     if (vlc_nfs_mainloop(p_access, nfs_seek_finished_cb) < 0)
         return VLC_EGENERIC;
 
+    p_sys->b_eof = false;
+
     return VLC_SUCCESS;
 }
 
