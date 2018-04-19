@@ -1841,7 +1841,14 @@ PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smbc], [smbclient], (SMB/CIFS support), [au
 dnl
 dnl  liBDSM access module
 dnl
-PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.2.0], [libdsm SMB/CIFS access/sd module], [auto])
+AM_CONDITIONAL(HAVE_DSM, [test "$AS_TR_SH(with_dsm)" = "yes"])
+PKG_WITH_MODULES([DSM], [libdsm >= 0.2.0], [
+       VLC_ADD_PLUGIN([dsm])
+       VLC_ADD_CFLAGS([dsm], [$DSM_CFLAGS])
+       VLC_ADD_LIBS([dsm], [$DSM_LIBS])
+       have_dsm="yes"
+   ],,[libdsm SMB/CIFS access/sd module], [auto])
+AM_CONDITIONAL([HAVE_DSM], [test "${have_dsm}" = "yes"])
 
 dnl
 dnl sftp access support

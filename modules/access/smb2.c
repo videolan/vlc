@@ -47,6 +47,15 @@
 #include <smb2/libsmb2.h>
 #include <smb2/libsmb2-raw.h>
 
+#ifdef HAVE_DSM
+# include <bdsm/netbios_ns.h>
+# include <bdsm/netbios_defs.h>
+
+# ifdef HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+# endif
+#endif
+
 #include "smb_common.h"
 
 #define CIFS_PORT 445
@@ -527,12 +536,46 @@ error:
 static int
 vlc_smb2_resolve(stream_t *access, char **host, unsigned port)
 {
+    (void) access;
     if (!*host)
         return -1;
 
-    (void) access;
+#ifdef HAVE_DSM
+    /* Test if the host is an IP */
+    struct in_addr addr;
+    if (inet_pton(AF_INET, *host, &addr) == 1)
+        return 0;
+
+    /* Test if the host can be resolved */
+    struct addrinfo *info = NULL;
+    if (vlc_getaddrinfo_i11e(*host, port, NULL, &info) == 0)
+    {
+        freeaddrinfo(info);
+        /* Let smb2 resolve it */
+        return 0;
+    }
+
+    /* Test if the host is a netbios name */
+    netbios_ns *ns = netbios_ns_new();
+    uint32_t ip4_addr;
+    int ret = -1;
+    if (netbios_ns_resolve(ns, *host, NETBIOS_FILESERVER, &ip4_addr) == 0)
+    {
+        char ip[] = "xxx.xxx.xxx.xxx";
+        if (inet_ntop(AF_INET, &ip4_addr, ip, sizeof(ip)))
+        {
+            free(*host);
+            *host = strdup(ip);
+            if (*host)
+                ret = 0;
+        }
+    }
+    netbios_ns_destroy(ns);
+    return ret;
+#else
     (void) port;
     return 0;
+#endif
 }
 
 static int
