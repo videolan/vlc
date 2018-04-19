@@ -99,12 +99,4 @@ void D3D9_Destroy(d3d9_handle_t *);
 
 int D3D9_FillPresentationParameters(d3d9_handle_t *, const video_format_t *, d3d9_device_t *);
 
-struct wddm_version
-{
-    int wddm, d3d_features, revision, build;
-};
-int D3D9CheckDriverVersion(d3d9_handle_t *hd3d, d3d9_device_t *d3d_dev, UINT vendorId,
-                           const struct wddm_version *min_ver);
-
-
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */
