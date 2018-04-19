@@ -48,6 +48,13 @@
 #include "va.h"
 
 #include "../codec/cc.h"
+#define FRAME_INFO_DEPTH 64
+
+struct frame_info_s
+{
+    bool b_eos;
+    bool b_display;
+};
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -68,6 +75,8 @@ struct decoder_sys_t
     bool b_show_corrupted;
     bool b_from_preroll;
     enum AVDiscard i_skip_frame;
+
+    struct frame_info_s frame_info[FRAME_INFO_DEPTH];
 
     /* how many decoded frames are late */
     int     i_late_frames;
@@ -547,6 +556,7 @@ int InitVideoDec( vlc_object_t *obj )
      * PTS correctly */
     p_context->get_buffer2 = lavc_GetFrame;
     p_context->opaque = p_dec;
+    p_context->reordered_opaque = 0;
 
     int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
     if( i_thread_count <= 0 )
@@ -663,26 +673,6 @@ static void Flush( decoder_t *p_dec )
 
     /* Reset cancel state to false */
     decoder_AbortPictures( p_dec, false );
-}
-
-static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
-{
-    if( !block)
-        return true;
-
-    if( block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
-        cc_Flush( &p_sys->cc );
-
-        p_sys->i_late_frames = 0;
-        if( block->i_flags & BLOCK_FLAG_CORRUPTED )
-        {
-            block_Release( block );
-            return false;
-        }
-    }
-    return true;
 }
 
 static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_t current_time)
@@ -895,17 +885,16 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
 
 /*****************************************************************************
  * DecodeBlock: Called to decode one or more frames
+ *              drains if pp_block == NULL
+ *              tries to output only if p_block == NULL
  *****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
+static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
     /* Boolean if we assume that we should get valid pic as result */
     bool b_need_output_picture = true;
-
-    /* Boolean for END_OF_SEQUENCE */
-    bool eos_spotted = false;
-
+    bool b_error = false;
 
     block_t *p_block;
     mtime_t current_time;
@@ -919,24 +908,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
     p_block = pp_block ? *pp_block : NULL;
     if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     if( !avcodec_is_open( p_context ) )
     {
         if( p_block )
             block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
-
-    if( !check_block_validity( p_sys, p_block ) )
-        return NULL;
 
     current_time = mdate();
     if( p_dec->b_frame_drop_allowed &&  check_block_being_late( p_sys, p_block, current_time) )
     {
         msg_Err( p_dec, "more than 5 seconds of late video -> "
                  "dropping frame (computer too slow ?)" );
-        return NULL;
+        p_block = NULL;
     }
 
 
@@ -962,7 +948,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             if( p_block )
                 block_Release( p_block );
             msg_Warn( p_dec, "More than 11 late frames, dropping frame" );
-            return NULL;
+            p_block = NULL;
         }
     }
     if( !b_need_output_picture )
@@ -978,89 +964,99 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
      * that the real frame size */
     if( p_block && p_block->i_buffer > 0 )
     {
-        eos_spotted = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
-
         p_block = block_Realloc( p_block, 0,
                             p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
         if( !p_block )
-            return NULL;
+            return VLCDEC_SUCCESS;
         p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
         *pp_block = p_block;
         memset( p_block->p_buffer + p_block->i_buffer, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
-    while( !p_block || p_block->i_buffer > 0 || eos_spotted )
+    do
     {
-        int i_used;
-        AVPacket pkt;
+        int i_used = 0;
 
         post_mt( p_sys );
 
-        av_init_packet( &pkt );
-        if( p_block && p_block->i_buffer > 0 )
+        if( (p_block && p_block->i_buffer > 0) || pp_block == NULL /* drain */ )
         {
-            pkt.data = p_block->p_buffer;
-            pkt.size = p_block->i_buffer;
-            pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-            pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
-        }
-        else
-        {
-            /* Return delayed frames if codec has CODEC_CAP_DELAY */
-            pkt.data = NULL;
-            pkt.size = 0;
-        }
-
-        if( !p_sys->palette_sent )
-        {
-            uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
-            if (pal) {
-                memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
-                p_sys->palette_sent = true;
+            AVPacket pkt;
+            av_init_packet( &pkt );
+            if( p_block && p_block->i_buffer > 0 )
+            {
+                pkt.data = p_block->p_buffer;
+                pkt.size = p_block->i_buffer;
+                pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+                pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
             }
-        }
+            else
+            {
+                /* Drain */
+                pkt.data = NULL;
+                pkt.size = 0;
+            }
 
-        /* Make sure we don't reuse the same timestamps twice */
-        if( p_block )
-        {
-            p_block->i_pts =
-            p_block->i_dts = VLC_TS_INVALID;
-        }
+            if( !p_sys->palette_sent )
+            {
+                uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+                if (pal) {
+                    memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
+                    p_sys->palette_sent = true;
+                }
+            }
+
+            /* Make sure we don't reuse the same timestamps twice */
+            if( p_block )
+            {
+                p_block->i_pts =
+                p_block->i_dts = VLC_TS_INVALID;
+            }
 
 #if LIBAVCODEC_VERSION_CHECK( 57, 0, 0xFFFFFFFFU, 64, 101 )
-        if( !b_need_output_picture )
-            pkt.flags |= AV_PKT_FLAG_DISCARD;
+            if( !b_need_output_picture )
+                pkt.flags |= AV_PKT_FLAG_DISCARD;
 #endif
 
-        int ret = avcodec_send_packet(p_context, &pkt);
-        if( ret != 0 && ret != AVERROR(EAGAIN) )
-        {
-            if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+            int ret = avcodec_send_packet(p_context, &pkt);
+            if( ret != 0 && ret != AVERROR(EAGAIN) )
             {
-                msg_Err(p_dec, "avcodec_send_packet critical error");
-                *error = true;
+                if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+                {
+                    msg_Err(p_dec, "avcodec_send_packet critical error");
+                    b_error = true;
+                }
+                av_packet_unref( &pkt );
+                break;
             }
+
+            struct frame_info_s *p_frame_info = &p_sys->frame_info[p_context->reordered_opaque % FRAME_INFO_DEPTH];
+            p_frame_info->b_eos = p_block && (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+            p_frame_info->b_display = b_need_output_picture;
+
+            p_context->reordered_opaque++;
+            i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
             av_packet_unref( &pkt );
-            break;
+
+            if( p_frame_info->b_eos )
+                 avcodec_send_packet( p_context, NULL );
         }
-        i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
-        av_packet_unref( &pkt );
 
         AVFrame *frame = av_frame_alloc();
         if (unlikely(frame == NULL))
         {
-            *error = true;
+            b_error = true;
             break;
         }
 
-        ret = avcodec_receive_frame(p_context, frame);
+        int ret = avcodec_receive_frame(p_context, frame);
         if( ret != 0 && ret != AVERROR(EAGAIN) )
         {
             if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
             {
                 msg_Err(p_dec, "avcodec_receive_frame critical error");
-                *error = true;
+                b_error = true;
             }
             av_frame_free(&frame);
             /* After draining, we need to reset decoder with a flush */
@@ -1072,14 +1068,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
         wait_mt( p_sys );
 
-        if( eos_spotted )
-            p_sys->b_first_frame = true;
-
         if( p_block )
         {
-            if( p_block->i_buffer <= 0 )
-                eos_spotted = false;
-
             /* Consumed bytes */
             p_block->p_buffer += i_used;
             p_block->i_buffer -= i_used;
@@ -1092,6 +1082,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             if( i_used == 0 ) break;
             continue;
         }
+
+        struct frame_info_s *p_frame_info = &p_sys->frame_info[frame->reordered_opaque % FRAME_INFO_DEPTH];
+        if( p_frame_info->b_eos )
+            p_sys->b_first_frame = true;
 
         /* Compute the PTS */
 #ifdef FF_API_PKT_PTS
@@ -1122,7 +1116,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
 
 #if !LIBAVCODEC_VERSION_CHECK( 57, 0, 0xFFFFFFFFU, 64, 101 )
-        if( !b_need_output_picture )
+        if( !p_frame_info->b_display )
         {
             av_frame_free(&frame);
             continue;
@@ -1142,7 +1136,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                       = malloc( sizeof(video_palette_t) );
             if( !p_palette )
             {
-                *error = true;
+                b_error = true;
                 av_frame_free(&frame);
                 break;
             }
@@ -1229,25 +1223,42 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         if (i_pts > VLC_TS_INVALID)
         {
             p_sys->b_first_frame = false;
-            return p_pic;
+            decoder_QueueVideo( p_dec, p_pic );
         }
         else
             picture_Release( p_pic );
-    }
+
+    } while( true );
 
     if( p_block )
         block_Release( p_block );
-    return NULL;
+
+    return b_error ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
 }
 
 static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
-    block_t **pp_block = p_block ? &p_block : NULL;
-    picture_t *p_pic;
-    bool error = false;
-    while( ( p_pic = DecodeBlock( p_dec, pp_block, &error ) ) != NULL )
-        decoder_QueueVideo( p_dec, p_pic );
-    return error ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t **pp_block = p_block ? &p_block : NULL /* drain signal */;
+
+    if( p_block &&
+        p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        /* Drain */
+        DecodeBlock( p_dec, NULL );
+
+        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
+        cc_Flush( &p_sys->cc );
+
+        p_sys->i_late_frames = 0;
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            block_Release( p_block );
+            p_block = NULL; /* output only */
+        }
+    }
+
+    return DecodeBlock( p_dec, pp_block );
 }
 
 /*****************************************************************************
