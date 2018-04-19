@@ -401,10 +401,12 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     /* Don't do anything if we are for somehow reason sliding */
     if( !isSliding && isEnabled() )
     {
-        setValue( value() + event->delta() / 12 ); /* 12 = 8 * 15 / 10
-         Since delta is in 1/8 of ° and mouse have steps of 15 °
-         and that our slider is in 0.1% and we want one step to be a 1%
-         increment of position */
+        mtime_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
+        int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
+        if ( ( event->delta() > 0 && i_mode != 3 ) || ( event->delta() < 0 && i_mode == 3 ) )
+            i_size = - i_size;
+        float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
+        setValue( value() + posOffset * maximum() );
         emit sliderDragged( value() / static_cast<float>( maximum() ) );
     }
     event->accept();
