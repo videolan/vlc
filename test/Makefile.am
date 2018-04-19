@@ -196,6 +196,7 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/librawvid_plugin.la \
 	../modules/libfilesystem_plugin.la \
 	../modules/libxml_plugin.la \
+	../modules/libogg_plugin.la \
 	-lstdc++
 if HAVE_DVBPSI
 libvlc_demux_run_la_CPPFLAGS += -DHAVE_DVBPSI

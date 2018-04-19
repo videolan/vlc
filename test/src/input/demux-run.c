@@ -443,6 +443,7 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(vc1) \
     f(rawvid) \
     f(rawaud) \
+    f(ogg) \
     DECODER_PLUGINS(f)
 
 #ifdef HAVE_DVBPSI
