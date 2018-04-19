@@ -549,18 +549,20 @@ extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
 static bool CanUseIntelHEVC(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    /* it should be OK starting after driver 20.19.15.4835 */
-    struct wddm_version WDMM = {
-        .wddm         = 0,
-        .d3d_features = 0,
-        .revision     = 0,
-        .build        = 4836,
-    };
-    if (D3D11CheckDriverVersion(&sys->d3d_dev, GPU_MANUFACTURER_INTEL, &WDMM) == VLC_SUCCESS)
+    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+    if (!pAdapter)
+        return false;
+
+    DXGI_ADAPTER_DESC adapterDesc;
+    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
+    IDXGIAdapter_Release(pAdapter);
+    if (FAILED(hr))
+        return false;
+
+    if (adapterDesc.VendorId != GPU_MANUFACTURER_INTEL)
         return true;
 
-    msg_Dbg(va, "HEVC not supported with these drivers");
-    return false;
+    return directx_va_canUseHevc( va, adapterDesc.DeviceId );
 }
 
 static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)

@@ -451,3 +451,34 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
     p_list.pf_release(&p_list);
     return err;
 }
+
+static UINT hevc_blacklist[] = {
+    /* Intel Broadwell GPUs with hybrid HEVC */
+    0x1606, /* HD Graphics */
+    0x160E, /* HD Graphics */
+    0x1612, /* HD Graphics 5600 */
+    0x1616, /* HD Graphics 5500 */
+    0x161A, /* HD Graphics P5700 */
+    0x161E, /* HD Graphics 5300 */
+    0x1622, /* Iris Pro Graphics 6200 */
+    0x1626, /* HD Graphics 6000 */
+    0x162A, /* Iris Pro Graphics P6300 */
+    0x162B, /* Iris Graphics 6100 */
+};
+
+bool directx_va_canUseHevc(vlc_va_t *va, UINT DeviceId)
+{
+    if (va->obj.force)
+        return true;
+
+    for (size_t i=0; i<ARRAY_SIZE(hevc_blacklist); i++)
+    {
+        if (hevc_blacklist[i] == DeviceId)
+        {
+            msg_Warn(va, "Intel Hybrid HEVC detected, disabling hardware decoding");
+            return false;
+        }
+    }
+
+    return true;
+}
