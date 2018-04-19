@@ -351,6 +351,8 @@ valid:
     }
     const vlc_chroma_description_t *dsc =
             vlc_fourcc_GetChromaDescription(p_sys->fmt_video.video.i_chroma);
+    if (unlikely(dsc == NULL))
+        goto error;
     p_sys->frame_size = 0;
     for (unsigned i=0; i<dsc->plane_count; i++)
     {
