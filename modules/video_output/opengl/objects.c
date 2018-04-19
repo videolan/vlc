@@ -8,8 +8,7 @@
 #include "objects.h"
 
 
-gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
-                                             const opengl_tex_converter_t *tc)
+gl_scene_objects_display_t *loadSceneObjects(vlc_gl_t *gl, const opengl_tex_converter_t *tc)
 {
     gl_scene_objects_display_t *p_objDisplay = calloc(1, sizeof(gl_scene_objects_display_t));
     if (unlikely(p_objDisplay == NULL))
@@ -24,6 +23,11 @@ gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
         msg_Err(p_objDisplay->gl, "Could not load the 3d object loader");
         goto error;
     }
+
+    char psz_path[1024];
+    strncpy(psz_path, config_GetDataDir(), sizeof(psz_path));
+    strncat(psz_path, DIR_SEP "VirtualTheater" DIR_SEP "virtualCinemaTargo.json",
+            sizeof(psz_path));
 
     scene_t *p_scene = p_objDisplay->p_scene = objLoader_loadScene(p_objLoader, psz_path);
 

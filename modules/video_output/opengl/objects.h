@@ -51,8 +51,7 @@ typedef struct
 } gl_scene_objects_display_t;
 
 
-gl_scene_objects_display_t *loadSceneObjects(const char *psz_path, vlc_gl_t *gl,
-                                             const opengl_tex_converter_t *tc);
+gl_scene_objects_display_t *loadSceneObjects(vlc_gl_t *gl, const opengl_tex_converter_t *tc);
 void releaseSceneObjects(gl_scene_objects_display_t *p_objDisplay);
 int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay);
 
