@@ -3,6 +3,7 @@ Changes between 3.0.1 and 3.0.2:
 
 Core:
  * Fix snapshotting with subtitles when using hardware acceleration
+ * Fix green/missing line/column when the picture dimensions are odd
 
 Decoders:
  * Important improvements in hardware decoding for macOS, notably faster,
@@ -12,6 +13,7 @@ Decoders:
  * Fix SSA subtitles forced alignment
  * Fix E-AC-3 stuttering
  * Fix MIDI playback on macOS
+ * Add playback support for ProRes 4444 XQ
 
 Demux:
  * Fix wrong colors in some AVI files
@@ -54,10 +56,11 @@ Video output:
  * Fix transform filters with hardware decoding
  * Fix snapshot and filters with HEVC hardware decoding
  * Fix a buffer overrun during GPU/CPU image copy
- * Fix potential black screen with 10bits videos on Direct3D11
  * Fix glitches on DVD menus with Direct3D11
- * Fix crashes with old graphic adapter drivers
  * Fix non-HDR content playback on HDR screens with Direct3D11
+ * Fix YUV full range displayed incorrectly in Direct3D11
+ * Fix miscellaneous crashes in Direct3D11
+ * Fix potential black screen with 10bits videos on Direct3D11
 
 macOS:
  * Fix Growl notifications on recent macOS versions
@@ -67,7 +70,8 @@ macOS:
  * Fix remember playback position
  * Fix Blu-ray disc Java menu
  * Fix swiping on time slider to change position
- * Fix problem with restoring user name from keychain
+ * Fix problems with restoring user name from keychain
+ * Fix localization issues
 
 Qt:
  * Fix last folder used in open dialogs
@@ -77,6 +81,8 @@ Qt:
  * Fix jump size not being configurable
  * Fix missing time labels updates
  * Fix playback speed slider not accepting 1.0x value
+ * Fix raw input dump
+ * Fix window size after a fullscreen playback
 
 Misc:
  * Fix lua rc & oldrc interfaces host specification
@@ -90,6 +96,8 @@ Misc:
  * Miscellaneous chromecast improvements
  * Fix missing OSD navigation feedback
  * Various VLSub improvements
+ * lua: Fix scripts not being loaded on some filesystems
+ * lua: Add vlc.io APIs to handle UTF-8 paths
 
 
 Changes between 3.0.0 and 3.0.1:
