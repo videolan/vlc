@@ -35,8 +35,6 @@
 #include "input_manager.hpp"
 #include "imagehelper.hpp"
 
-#include <vlc_actions.h>
-
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
@@ -403,10 +401,11 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     /* Don't do anything if we are for somehow reason sliding */
     if( !isSliding && isEnabled() )
     {
-        if ( event->delta() > 0 )
-            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
-        else
-            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+        setValue( value() + event->delta() / 12 ); /* 12 = 8 * 15 / 10
+         Since delta is in 1/8 of ° and mouse have steps of 15 °
+         and that our slider is in 0.1% and we want one step to be a 1%
+         increment of position */
+        emit sliderDragged( value() / static_cast<float>( maximum() ) );
     }
     event->accept();
 }
