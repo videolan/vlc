@@ -24,12 +24,26 @@ object_loader_t *objLoader_get(vlc_object_t *p_parent)
         return NULL;
     }
 
+    p_objLoader->p_imgHandler = image_HandlerCreate(p_objLoader);
+    if (unlikely(p_objLoader->p_imgHandler == NULL))
+    {
+        module_unneed(p_objLoader, p_objLoader->p_module);
+        vlc_object_release(p_objLoader);
+        return NULL;
+    }
+
+    video_format_Init(&p_objLoader->texPic_fmt_in, 0);
+    video_format_Init(&p_objLoader->texPic_fmt_out, VLC_CODEC_RGBA);
+
     return p_objLoader;
 }
 
 
 void objLoader_release(object_loader_t* p_objLoader)
 {
+    video_format_Clean(&p_objLoader->texPic_fmt_in);
+    video_format_Clean(&p_objLoader->texPic_fmt_out);
+
     module_unneed(p_objLoader, p_objLoader->p_module);
     vlc_object_release(p_objLoader);
 }
@@ -152,18 +166,11 @@ scene_material_t *scene_material_New(void)
 
 picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path)
 {
-    image_handler_t *p_imgHandler = image_HandlerCreate(p_loader);
-    video_format_t fmt_in, fmt_out;
-    video_format_Init(&fmt_in, 0);
-    video_format_Init(&fmt_out, VLC_CODEC_RGBA);
-
     char *psz_url = vlc_path2uri(psz_path, NULL);
-    picture_t *p_pic = image_ReadUrl(p_imgHandler, psz_url, &fmt_in, &fmt_out);
+    picture_t *p_pic = image_ReadUrl(p_loader->p_imgHandler, psz_url,
+                                     &p_loader->texPic_fmt_in,
+                                     &p_loader->texPic_fmt_out);
     free(psz_url);
-
-    video_format_Clean(&fmt_in);
-    video_format_Clean(&fmt_out);
-    image_HandlerDelete(p_imgHandler);
 
     return p_pic;
 }

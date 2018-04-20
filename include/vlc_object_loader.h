@@ -95,6 +95,9 @@ struct object_loader_t
     /* Private structure */
     object_loader_sys_t* p_sys;
 
+    image_handler_t *p_imgHandler;
+    video_format_t texPic_fmt_in, texPic_fmt_out;
+
     scene_t * (*loadScene)(object_loader_t *p_loader, const char *psz_path);
 };
 
