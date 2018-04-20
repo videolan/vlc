@@ -57,7 +57,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-struct demux_sys_t
+struct demux_sid
 {
     sidplay2 *player;
     sid2_config_t config;
@@ -81,7 +81,7 @@ static int Control (demux_t *, int, va_list);
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = NULL;
+    demux_sid *sys = NULL;
     es_format_t fmt;
     bool result = false;
     SidTune *tune = NULL;
@@ -124,7 +124,7 @@ static int Open (vlc_object_t *obj)
     if (unlikely(player==NULL))
         goto error;
 
-    sys = (demux_sys_t*) calloc (1, sizeof(demux_sys_t));
+    sys = reinterpret_cast<demux_sid*>(calloc (1, sizeof(demux_sid)));
     if (unlikely(sys==NULL))
         goto error;
 
@@ -177,7 +177,7 @@ static int Open (vlc_object_t *obj)
     /* Callbacks */
     demux->pf_demux = Demux;
     demux->pf_control = Control;
-    demux->p_sys = sys;
+    demux->p_sys = reinterpret_cast<demux_sys_t*>(sys);
 
     return VLC_SUCCESS;
 
@@ -194,7 +194,7 @@ error:
 static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
+    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
 
     delete sys->player;
     delete sys->config.sidEmulation;
@@ -204,7 +204,7 @@ static void Close (vlc_object_t *obj)
 
 static int Demux (demux_t *demux)
 {
-    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
+    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
 
     block_t *block = block_Alloc( sys->block_size);
     if (unlikely(block==NULL))
@@ -235,7 +235,7 @@ static int Demux (demux_t *demux)
 
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
+    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
 
     switch (query)
     {
