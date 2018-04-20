@@ -358,7 +358,7 @@ error:
 static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt,
                               const AVCodecContext *avctx)
 {
-    bool is_supported = mode->p_profiles == NULL || !mode->p_profiles[0];
+    bool is_supported = mode->p_profiles == NULL;
     if (!is_supported)
     {
         int profile = fmt->i_profile >= 0 ? fmt->i_profile : avctx->profile;
