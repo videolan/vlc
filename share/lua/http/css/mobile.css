@@ -1,70 +1,78 @@
 root { 
     display: block;
 }
-#content{
 
+#content {
 }
-body{
+
+body {
 	font: 11pt Helvetica, Arial, sans-serif;
 	background-color:#EEE;
 	margin: 0px;
 }
 
-#libraryTree{
+#libraryTree {
 	height: 300px;
 	overflow:scroll;
 	white-space: nowrap;
 	text-align: left;
 }
 
-#mediaViewer{
+#mediaViewer {
 	min-height: 500px;
 }
+
 #meta {
 	position:relative;
 	width:100%;
 }
-#seekSlider{
+
+#seekSlider {
 	width: 100%;
 }
 
-#volumeSlider{
+#volumeSlider {
 	width: 100%;
 	display: inline-block;
 }
-#currentVolume{
+
+#currentVolume {
 	display: inline-block;
 }
-#mediaTitle{
+
+#mediaTitle {
 	text-align:center;
 	width:100%;
 	margin-top:5px;
 }
-#currentTime{
+
+#currentTime {
 	float: left;
 	text-align: left;
 }
-#totalTime{
+
+#totalTime {
 	float: right;
 	text-align: right;
 }
-#play_controls, #controls{
+
+#play_controls, #controls {
 	margin-top:30px;
 	width:95%;
 	margin-left:auto;
 	margin-right:auto;
 }
 
-#controlTable{
+#controlTable {
 	position:relative;
 	height: 150px;
 }
 
-#buttonszone li{
+#buttonszone li {
 	float: left;
 }
 
-#art{
+#art {
 	top:0px;
 	width:150px;
 	height:150px;
@@ -73,18 +81,18 @@ body{
 	-webkit-box-sizing:border-box;
 }
 
-.ui-slider-range{
+.ui-slider-range {
 	background-color:#FFB200;
 	background:#FFB200 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
 }
 
-
-#buttons{
+#buttons {
 	margin:0 auto; 
 	position: relative; 
 	width: 288px;
 }
-.button48{
+
+.button48 {
 	width: 48px;
 	height: 48px;
 	margin: 5px 0px 5px 0px;
@@ -96,52 +104,66 @@ body{
 	background-repeat: no-repeat;
 }
 
-.button{
+.button {
 	cursor: pointer;
 	display: inline-block;
 }
-#buttonOpen{
+
+#buttonOpen {
 	background-position: 0px 0px;
 }
-#buttonStop{
+
+#buttonStop {
 	background-position: -576px 0px;
 }
-#buttonRewd{
+
+#buttonRewd {
 	background-position: -528px 0px;
 }
-#buttonFwrd{
+
+#buttonFwrd {
 	background-position: -96px 0px;
 }
+
 .playing {
 	background-position: -336px 0px;
 }
+
 .paused {
 	background-position: -384px 0px;
 }
-#buttonPrev{
+
+#buttonPrev {
 	background-position: -144px 0px;
 }
-#buttonNext{
+
+#buttonNext {
 	background-position: -288px 0px;
 }
-#buttonFull{
+
+#buttonFull {
 	background-position: -192px 0px;
 }
-#buttonSout{
+
+#buttonSout {
 	background-position: -624px 0px;
 }
-#buttonEQ{
+
+#buttonEQ {
 	background-position: -48px 0px;
 }
-#window_browse ol{
+
+#window_browse ol {
 	list-style-type: none;
 }
-#window_browse ol li{
+
+#window_browse ol li {
 	list-style-type: none;
 	float: left;
 	padding: 5px;
 }
-.system_icon{
+
+.system_icon {
 	width:80px;
 	text-align:center;
 	vertical-align:top;
@@ -154,33 +176,36 @@ body{
 	background-color: #E1E1E1;
 	overflow: hidden;
 }
-#window_create_stream table tr td{
+
+#window_create_stream table tr td {
 	font-size: 11px;
 }
 
-#window_equalizer div div{
+#window_equalizer div div {
 	text-align: center;
 	font-size: 11px;
 	padding: 0px;
 }
-.eqBand{
+
+.eqBand {
 	margin-bottom: 10px;
 	margin-top: 10px;
 	height: 400px;
 	font-size: 1.5em;
 }
-.footer{
+
+.footer {
 	margin-top: 30px;
 	text-align: center;
 	font-size: 11px;
 }
 
-div.centered{
+div.centered {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-.hidden{
+.hidden {
 	visibility: hidden;
 	display: none;
 }
