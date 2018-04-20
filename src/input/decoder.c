@@ -2120,9 +2120,10 @@ void input_DecoderFlush( decoder_t *p_dec )
      * a row. */
     p_owner->flushing = true;
 
-    /* Flushing video decoder when paused: increment frames_countdown in order
-     * to display one frame */
-    if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->paused
+    /* Flush video/spu decoder when paused: increment frames_countdown in order
+     * to display one frame/subtitle */
+    if( p_owner->paused
+     && ( p_owner->fmt.i_cat == VIDEO_ES || p_owner->fmt.i_cat == SPU_ES )
      && p_owner->frames_countdown == 0 )
         p_owner->frames_countdown++;
 
