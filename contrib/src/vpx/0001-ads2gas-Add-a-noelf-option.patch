@@ -1,0 +1,80 @@
+From dcddec1e8b994e7bca90779a10e6654491e98fb8 Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Wed, 21 Mar 2018 14:09:04 +0200
+Subject: [PATCH 1/3] ads2gas: Add a -noelf option
+
+This allows skipping elf specific features from the output.
+
+Change-Id: I739299ba41286ca10415e056b4ffd561be5e0350
+---
+ build/make/ads2gas.pl | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/build/make/ads2gas.pl b/build/make/ads2gas.pl
+index 029cc4a..91609da 100755
+--- a/build/make/ads2gas.pl
++++ b/build/make/ads2gas.pl
+@@ -23,9 +23,11 @@ use lib $FindBin::Bin;
+ use thumb;
+ 
+ my $thumb = 0;
++my $elf = 1;
+ 
+ foreach my $arg (@ARGV) {
+     $thumb = 1 if ($arg eq "-thumb");
++    $elf = 0 if ($arg eq "-noelf");
+ }
+ 
+ print "@ This file was created from a .asm file\n";
+@@ -140,7 +142,11 @@ while (<STDIN>)
+ 
+     # Make function visible to linker, and make additional symbol with
+     # prepended underscore
+-    s/EXPORT\s+\|([\$\w]*)\|/.global $1 \n\t.type $1, function/;
++    if ($elf) {
++        s/EXPORT\s+\|([\$\w]*)\|/.global $1 \n\t.type $1, function/;
++    } else {
++        s/EXPORT\s+\|([\$\w]*)\|/.global $1/;
++    }
+     s/IMPORT\s+\|([\$\w]*)\|/.global $1/;
+ 
+     s/EXPORT\s+([\$\w]*)/.global $1/;
+@@ -181,11 +187,16 @@ while (<STDIN>)
+     # eabi_attributes numerical equivalents can be found in the
+     # "ARM IHI 0045C" document.
+ 
+-    # REQUIRE8 Stack is required to be 8-byte aligned
+-    s/\sREQUIRE8/.eabi_attribute 24, 1 \@Tag_ABI_align_needed/g;
++    if ($elf) {
++        # REQUIRE8 Stack is required to be 8-byte aligned
++        s/\sREQUIRE8/.eabi_attribute 24, 1 \@Tag_ABI_align_needed/g;
+ 
+-    # PRESERVE8 Stack 8-byte align is preserved
+-    s/\sPRESERVE8/.eabi_attribute 25, 1 \@Tag_ABI_align_preserved/g;
++        # PRESERVE8 Stack 8-byte align is preserved
++        s/\sPRESERVE8/.eabi_attribute 25, 1 \@Tag_ABI_align_preserved/g;
++    } else {
++        s/\sREQUIRE8//;
++        s/\sPRESERVE8//;
++    }
+ 
+     # Use PROC and ENDP to give the symbols a .size directive.
+     # This makes them show up properly in debugging tools like gdb and valgrind.
+@@ -202,7 +213,7 @@ while (<STDIN>)
+         my $proc;
+         s/\bENDP\b/@ $&/;
+         $proc = pop(@proc_stack);
+-        $_ = "\t.size $proc, .-$proc".$_ if ($proc);
++        $_ = "\t.size $proc, .-$proc".$_ if ($proc and $elf);
+     }
+ 
+     # EQU directive
+@@ -225,4 +236,4 @@ while (<STDIN>)
+ }
+ 
+ # Mark that this object doesn't need an executable stack.
+-printf ("\t.section\t.note.GNU-stack,\"\",\%\%progbits\n");
++printf ("\t.section\t.note.GNU-stack,\"\",\%\%progbits\n") if $elf;
+-- 
+2.7.4
+

@@ -1,0 +1,66 @@
+From 6c6085eb50c2a1c44151a9a1f96c925cfe5e7e34 Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Wed, 21 Mar 2018 14:12:04 +0200
+Subject: [PATCH 2/3] configure: Add an armv7-win32-gcc target
+
+This builds for windows on arm, with llvm-mingw. The target triplet
+is named -gcc since that's how similar existing targets are named,
+even though it technically runs clang (via frontends named
+"$CROSS-gcc").
+
+Assemble using $CC -c since there's no standalone assembler
+available (except perhaps llvm-mc).
+
+Change-Id: I2c9a319730afef73f811bad79f488dcdc244ab0d
+---
+ build/make/configure.sh | 14 +++++++++++++-
+ configure               |  1 +
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 007e020..9aa4f1c 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -891,7 +891,6 @@ process_common_toolchain() {
+           setup_gnu_toolchain
+           arch_int=${tgt_isa##armv}
+           arch_int=${arch_int%%te}
+-          check_add_asflags --defsym ARCHITECTURE=${arch_int}
+           tune_cflags="-mtune="
+           if [ ${tgt_isa} = "armv7" ] || [ ${tgt_isa} = "armv7s" ]; then
+             if [ -z "${float_abi}" ]; then
+@@ -918,6 +917,19 @@ EOF
+ 
+           enabled debug && add_asflags -g
+           asm_conversion_cmd="${source_path}/build/make/ads2gas.pl"
++
++          case ${tgt_os} in
++            win*)
++              asm_conversion_cmd="$asm_conversion_cmd -noelf"
++              AS="$CC -c"
++              EXE_SFX=.exe
++              enable_feature thumb
++              ;;
++            *)
++              check_add_asflags --defsym ARCHITECTURE=${arch_int}
++              ;;
++          esac
++
+           if enabled thumb; then
+             asm_conversion_cmd="$asm_conversion_cmd -thumb"
+             check_add_cflags -mthumb
+diff --git a/configure b/configure
+index fb732ac..16f301e 100755
+--- a/configure
++++ b/configure
+@@ -106,6 +106,7 @@ all_platforms="${all_platforms} armv7-darwin-gcc"    #neon Cortex-A8
+ all_platforms="${all_platforms} armv7-linux-rvct"    #neon Cortex-A8
+ all_platforms="${all_platforms} armv7-linux-gcc"     #neon Cortex-A8
+ all_platforms="${all_platforms} armv7-none-rvct"     #neon Cortex-A8
++all_platforms="${all_platforms} armv7-win32-gcc"
+ all_platforms="${all_platforms} armv7-win32-vs11"
+ all_platforms="${all_platforms} armv7-win32-vs12"
+ all_platforms="${all_platforms} armv7-win32-vs14"
+-- 
+2.7.4
+

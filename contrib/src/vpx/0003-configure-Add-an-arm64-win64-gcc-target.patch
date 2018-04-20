@@ -1,0 +1,29 @@
+From 3392bb335ee58bc930da624834c74c1625afbb82 Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Wed, 21 Mar 2018 14:15:13 +0200
+Subject: [PATCH 3/3] configure: Add an arm64-win64-gcc target
+
+This configuration doesn't require any extra custom settings, since
+it only uses neon intrinsics that are handled automatically by the
+compiler (no external assembly).
+
+Change-Id: I35415c68f483a430c0672e060a7bbd09a3469512
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure b/configure
+index 16f301e..1ba4c48 100755
+--- a/configure
++++ b/configure
+@@ -101,6 +101,7 @@ EOF
+ all_platforms="${all_platforms} arm64-android-gcc"
+ all_platforms="${all_platforms} arm64-darwin-gcc"
+ all_platforms="${all_platforms} arm64-linux-gcc"
++all_platforms="${all_platforms} arm64-win64-gcc"
+ all_platforms="${all_platforms} armv7-android-gcc"   #neon Cortex-A8
+ all_platforms="${all_platforms} armv7-darwin-gcc"    #neon Cortex-A8
+ all_platforms="${all_platforms} armv7-linux-rvct"    #neon Cortex-A8
+-- 
+2.7.4
+
