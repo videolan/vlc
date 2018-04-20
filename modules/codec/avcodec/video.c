@@ -78,9 +78,15 @@ struct decoder_sys_t
 
     struct frame_info_s frame_info[FRAME_INFO_DEPTH];
 
+    enum
+    {
+        FRAMEDROP_NONE,
+        FRAMEDROP_NONREF,
+        FRAMEDROP_AGGRESSIVE_RECOVER,
+    } framedrop;
     /* how many decoded frames are late */
     int     i_late_frames;
-    mtime_t i_late_frames_start;
+    int64_t i_last_output_frame;
     mtime_t i_last_late_delay;
 
     /* for direct rendering */
@@ -606,6 +612,8 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
     p_sys->b_from_preroll = false;
+    p_sys->i_last_output_frame = -1;
+    p_sys->framedrop = FRAMEDROP_NONE;
 
     /* Set output properties */
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
@@ -658,6 +666,7 @@ static void Flush( decoder_t *p_dec )
 
     date_Set(&p_sys->pts, VLC_TS_INVALID); /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
+    p_sys->framedrop = FRAMEDROP_NONE;
     cc_Flush( &p_sys->cc );
 
     /* Abort pictures in order to unblock all avcodec workers threads waiting
@@ -675,53 +684,53 @@ static void Flush( decoder_t *p_dec )
     decoder_AbortPictures( p_dec, false );
 }
 
-static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_t current_time)
+static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     if( !block )
-        return false;
+        return NULL;
+
     if( block->i_flags & BLOCK_FLAG_PREROLL )
     {
         /* Do not care about late frames when prerolling
          * TODO avoid decoding of non reference frame
          * (ie all B except for H264 where it depends only on nal_ref_idc) */
         p_sys->i_late_frames = 0;
+        p_sys->framedrop = FRAMEDROP_NONE;
         p_sys->b_from_preroll = true;
         p_sys->i_last_late_delay = INT64_MAX;
     }
 
-    if( p_sys->i_late_frames <= 0 )
-        return false;
+    if( p_sys->i_late_frames == 0 )
+        p_sys->framedrop = FRAMEDROP_NONE;
 
-    if( current_time - p_sys->i_late_frames_start > (5*CLOCK_FREQ))
-    {
-        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
-        block_Release( block );
-        p_sys->i_late_frames--;
-        return true;
-    }
-    return false;
-}
+    if( p_sys->framedrop == FRAMEDROP_NONE && p_sys->i_late_frames < 11 )
+        return block;
 
-static bool check_frame_should_be_dropped( decoder_sys_t *p_sys, AVCodecContext *p_context, bool *b_need_output_picture )
-{
-    if( p_sys->i_late_frames <= 4)
-        return false;
+    if( p_sys->i_last_output_frame >= 0 &&
+        p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame > 24 )
+    {
+        p_sys->framedrop = FRAMEDROP_AGGRESSIVE_RECOVER;
+    }
 
-    *b_need_output_picture = false;
-    if( p_sys->i_late_frames < 12 )
+    /* A good idea could be to decode all I pictures and see for the other */
+    if( p_sys->framedrop == FRAMEDROP_AGGRESSIVE_RECOVER )
     {
-        p_context->skip_frame =
-                (p_sys->i_skip_frame <= AVDISCARD_NONREF) ?
-                AVDISCARD_NONREF : p_sys->i_skip_frame;
+        if( !(block->i_flags & BLOCK_FLAG_TYPE_I) )
+        {
+            msg_Err( p_dec, "more than %"PRId64" frames of late video -> "
+                            "dropping frame (computer too slow ?)",
+                     p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame );
+
+            date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
+            block_Release( block );
+            p_sys->i_late_frames--;
+            return NULL;
+        }
     }
-    else
-    {
-        /* picture too late, won't decode
-         * but break picture until a new I, and for mpeg4 ...*/
-        p_sys->i_late_frames--; /* needed else it will never be decrease */
-        return true;
-    }
-    return false;
+
+    return block;
 }
 
 static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
@@ -741,7 +750,8 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
     date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
 }
 
-static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t current_time, mtime_t i_pts )
+static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
+                                     mtime_t current_time, mtime_t i_pts, int64_t i_fnum )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
    /* Update frame late count (except when doing preroll) */
@@ -763,12 +773,10 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t
        }
 
        p_sys->i_late_frames++;
-       if( p_sys->i_late_frames == 1 )
-           p_sys->i_late_frames_start = current_time;
-
    }
    else
    {
+       p_sys->i_last_output_frame = i_fnum;
        p_sys->i_late_frames = 0;
    }
 }
@@ -897,7 +905,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     bool b_error = false;
 
     block_t *p_block;
-    mtime_t current_time;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
@@ -917,17 +924,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return VLCDEC_SUCCESS;
     }
 
-    current_time = mdate();
-    if( p_dec->b_frame_drop_allowed &&  check_block_being_late( p_sys, p_block, current_time) )
-    {
-        msg_Err( p_dec, "more than 5 seconds of late video -> "
-                 "dropping frame (computer too slow ?)" );
-        p_block = NULL;
-    }
-
-
-    /* A good idea could be to decode all I pictures and see for the other */
-
     /* Defaults that if we aren't in prerolling, we want output picture
        same for if we are flushing (p_block==NULL) */
     if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
@@ -942,19 +938,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Check also if we should/can drop the block and move to next block
             as trying to catchup the speed*/
-        if( p_dec->b_frame_drop_allowed &&
-            check_frame_should_be_dropped( p_sys, p_context, &b_need_output_picture ) )
-        {
-            if( p_block )
-                block_Release( p_block );
-            msg_Warn( p_dec, "More than 11 late frames, dropping frame" );
-            p_block = NULL;
-        }
+        if( p_dec->b_frame_drop_allowed )
+            p_block = filter_earlydropped_blocks( p_dec, p_block );
     }
-    if( !b_need_output_picture )
+
+    if( !b_need_output_picture || p_sys->framedrop == FRAMEDROP_NONREF )
     {
-        p_context->skip_frame = __MAX( p_context->skip_frame,
-                                              AVDISCARD_NONREF );
+        p_context->skip_frame = __MAX( p_context->skip_frame, AVDISCARD_NONREF );
     }
 
     /*
@@ -1105,7 +1095,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         interpolate_next_pts( p_dec, frame );
 
-        update_late_frame_count( p_dec, p_block, current_time, i_pts);
+        update_late_frame_count( p_dec, p_block, mdate(), i_pts, frame->reordered_opaque);
 
         if( ( !p_sys->p_va && !frame->linesize[0] ) ||
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
@@ -1246,11 +1236,13 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
     {
         /* Drain */
         DecodeBlock( p_dec, NULL );
+        p_sys->i_late_frames = 0;
+        p_sys->i_last_output_frame = -1;
+        p_sys->framedrop = FRAMEDROP_NONE;
 
         date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
         cc_Flush( &p_sys->cc );
 
-        p_sys->i_late_frames = 0;
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
             block_Release( p_block );
