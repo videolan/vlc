@@ -207,6 +207,8 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
     vt->GenTextures(nMaterials, p_objDisplay->texturesNormal);
     vt->GenTextures(nMaterials, p_objDisplay->texturesRoughness);
 
+    tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
     for (unsigned i = 0; i < nMaterials; i++)
     {
         scene_material_t *p_material = p_objDisplay->p_scene->materials[i];
