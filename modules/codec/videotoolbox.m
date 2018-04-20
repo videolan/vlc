@@ -78,6 +78,7 @@ const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDe
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
+#define VT_ENABLE_TEXT "Enable hardware acceleration"
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #define VT_FORCE_CVPX_CHROMA "Force the VT decoder CVPX chroma"
 #define VT_FORCE_CVPX_CHROMA_LONG "Values can be 'BGRA', 'y420', '420f', '420v', '2vuy'. \
@@ -91,6 +92,7 @@ set_capability("video decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
 add_obsolete_bool("videotoolbox-temporal-deinterlacing")
+add_bool("videotoolbox", true, VT_ENABLE_TEXT, NULL, false)
 add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
 add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
 vlc_module_end()
@@ -1330,6 +1332,9 @@ static void StopVideoToolbox(decoder_t *p_dec)
 static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
+
+    if (!var_InheritBool(p_dec, "videotoolbox"))
+        return VLC_EGENERIC;
 
 #if TARGET_OS_IPHONE
     if (unlikely([[UIDevice currentDevice].systemVersion floatValue] < 8.0)) {
