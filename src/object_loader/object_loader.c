@@ -81,7 +81,7 @@ void scene_object_Release(scene_object_t *p_object)
 float scene_mesh_computeBoundingSquareRadius(scene_mesh_t *p_mesh)
 {
     float center[] = {0.f, 0.f, 0.f};
-    for(int i=0; i<p_mesh->nVertices; ++i)
+    for (unsigned i = 0; i < p_mesh->nVertices; ++i)
     {
         center[0] += p_mesh->vCoords[i*3+0] / p_mesh->nVertices;
         center[1] += p_mesh->vCoords[i*3+1] / p_mesh->nVertices;
