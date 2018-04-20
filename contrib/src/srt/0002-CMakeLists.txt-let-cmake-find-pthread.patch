@@ -1,19 +1,21 @@
-From 3427a475be0163312986eb64d777b9f76feff554 Mon Sep 17 00:00:00 2001
+From 6446d6c9294b63b3b1d363a4e92213a3bb5d4101 Mon Sep 17 00:00:00 2001
 From: Justin Kim <justin.kim@collabora.com>
 Date: Fri, 23 Mar 2018 13:05:29 +0900
-Subject: [PATCH] CMakeLists.txt: let cmake find pthread
+Subject: [PATCH 2/2] CMakeLists.txt: let cmake find pthread
 
 ---
- CMakeLists.txt | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ CMakeLists.txt | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8e02b58..dd2511a 100644
+index 77fbfb0..52d6bcd 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -212,18 +212,13 @@ endif()
+@@ -213,28 +213,16 @@ if (${ENABLE_PROFILE} AND HAVE_COMPILER_GNU_COMPAT)
+ endif()
  
  
+-if (NOT MINGW)
  # find pthread
 -find_path(PTHREAD_INCLUDE_DIR pthread.h HINTS C:/pthread-win32/include)
 -if (PTHREAD_INCLUDE_DIR)
@@ -35,7 +37,15 @@ index 8e02b58..dd2511a 100644
 +	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${CMAKE_THREAD_LIBS_INIT})
  endif()
  
+-elseif(THREADS_FOUND)
+-	set(PTHREAD_LIBRARY ${CMAKE_THREAD_LIBS_INIT})
+-else()
+-	find_library(PTHREAD_LIBRARY NAMES pthread pthreadGC2 pthreadGC)
+-endif() # if (NOT MINGW)
+-
  # This is required in some projects that add some other sources
+ # to the SRT library to be compiled together (aka "virtual library").
+ if (DEFINED SRT_EXTRA_LIB_INC)
 -- 
-2.7.4
+2.17.0
 

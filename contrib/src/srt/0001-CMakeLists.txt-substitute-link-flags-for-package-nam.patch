@@ -1,0 +1,33 @@
+From 671f9bc81168438d7cbc86f5946f2dbb720fa60e Mon Sep 17 00:00:00 2001
+From: Justin Kim <justin.kim@collabora.com>
+Date: Thu, 19 Apr 2018 20:12:21 +0900
+Subject: [PATCH 1/2] CMakeLists.txt: substitute link flags for package names
+
+Signed-off-by: Justin Kim <justin.kim@collabora.com>
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 85eb9c5..77fbfb0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -90,6 +90,7 @@ if ( USE_GNUTLS )
+ 	endif()
+  
+ 	pkg_check_modules (SSL REQUIRED ${SSL_REQUIRED_MODULES})
++	set (SRT_LIBS_PRIVATE ${SSL_LDFLAGS})
+ 
+ 	add_definitions(
+ 		-DUSE_GNUTLS=1
+@@ -103,6 +104,7 @@ else()
+ 	find_package(OpenSSL REQUIRED)
+ 	set (SSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+ 	set (SSL_LIBRARIES ${OPENSSL_LIBRARIES})
++	set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
+ 
+ 	add_definitions(
+ 		-DHAICRYPT_USE_OPENSSL_EVP=1
+-- 
+2.17.0
+
