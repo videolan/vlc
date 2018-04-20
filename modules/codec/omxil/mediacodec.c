@@ -166,6 +166,9 @@ static void RemoveInflightPictures(decoder_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define MEDIACODEC_ENABLE_TEXT N_("Enable Hardware decoder")
+#define MEDIACODEC_ENABLE_LONGTEXT N_("Use MediaCodec for hardware-accelerated video decoding")
+
 #define DIRECTRENDERING_TEXT "Android direct rendering"
 #define DIRECTRENDERING_LONGTEXT \
     "Enable Android direct rendering using opaque buffers."
@@ -183,6 +186,8 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
     set_capability("video decoder", 800)
+    add_bool("mediacodec", true, MEDIACODEC_ENABLE_TEXT,
+             MEDIACODEC_ENABLE_LONGTEXT, false)
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     add_bool(CFG_PREFIX "audio", false,
@@ -534,6 +539,10 @@ static void StopMediaCodec(decoder_t *p_dec)
 static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
+
+    if (!var_InheritBool(p_dec, "mediacodec"))
+        return VLC_EGENERIC;
+
     decoder_sys_t *p_sys;
     int i_ret;
     int i_profile = p_dec->fmt_in.i_profile;
