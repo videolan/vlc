@@ -80,6 +80,8 @@ static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
 #ifdef HAVE_DECODERS
     es_format_Copy(&id->fmt, fmt);
     id->decoder = test_decoder_create((void *)out->p_sys, &id->fmt);
+    if (id->decoder == NULL)
+        es_format_Clean(&id->fmt);
 #endif
 
     debug("[%p] Added   ES\n", (void *)id);
