@@ -33,7 +33,7 @@
 TimeTooltip::TimeTooltip( QWidget *parent ) :
     QWidget( parent )
 {
-    setWindowFlags( Qt::Tool                    |
+    setWindowFlags( Qt::ToolTip                 |
                     Qt::WindowStaysOnTopHint    |
                     Qt::FramelessWindowHint     );
 
