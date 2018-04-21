@@ -261,7 +261,7 @@ Open(vlc_object_t *obj)
         "uniform mat4 uSTMatrix;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy);"
+        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy).rgba;"
         "}";
 
     char *code;
