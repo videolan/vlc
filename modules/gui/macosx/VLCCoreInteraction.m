@@ -494,12 +494,16 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (!timeA) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
+            msg_Dbg(getIntf(), "Setting A value");
+
             timeA = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
         }
     } else if (!timeB) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
+            msg_Dbg(getIntf(), "Setting B value");
+
             timeB = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
         }
@@ -509,6 +513,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)resetAtoB
 {
+    msg_Dbg(getIntf(), "Resetting A to B values");
     timeA = 0;
     timeB = 0;
 }
