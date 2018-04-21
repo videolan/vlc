@@ -33,6 +33,7 @@
 #include <wrl/client.h>
 #include <vector>
 #include <stdexcept>
+#include <regex>
 
 #include "../platform_fonts.h"
 
@@ -310,38 +311,216 @@ public:
     }
 };
 
-static void DWrite_ParseFamily( IDWriteFontFamily *p_dw_family, vlc_family_t *p_family, vector< FT_Stream > &streams )
+/*
+ * Remove any extra null characters and escape any regex metacharacters
+ */
+static wstring SanitizeName( const wstring &name )
 {
-    for( int i = 0; i < 4; ++i )
+    const auto pattern = wregex{ L"[.^$|()\\[\\]{}*+?\\\\]" };
+    const auto replace = wstring{ L"\\\\&" };
+    auto result = regex_replace( wstring{ name.c_str() }, pattern, replace,
+                                 regex_constants::match_default | regex_constants::format_sed );
+    return result;
+}
+
+/*
+ * Check for a partial match e.g. between Roboto and Roboto Thin.
+ * In this case p_unmatched will be set to Thin.
+ * Also used for face names, in which case Thin will match Thin,
+ * Thin Italic, Thin Oblique...
+ */
+static bool DWrite_PartialMatch( filter_t *p_filter, const wstring &full_name,
+                                 const wstring &partial_name, wstring *p_unmatched = nullptr )
+{
+    auto pattern = wstring{ L"^" } + SanitizeName( partial_name ) + wstring{ L"\\s*(.*)$" };
+    auto rx = wregex{ pattern, wregex::icase };
+
+    auto match = wsmatch{};
+
+    if( !regex_match( full_name, match, rx ) )
+        return false;
+
+    msg_Dbg( p_filter, "DWrite_PartialMatch(): %S matches %S", full_name.c_str(), partial_name.c_str() );
+
+    if( p_unmatched )
+        *p_unmatched = match[ 1 ].str();
+
+    return true;
+}
+
+/*
+ * Check for a partial match between a name and any of 3 localized names of a family or face.
+ * The 3 locales tested are en-US and the user and system default locales. b_partial determines
+ * which parameter has the partial string, p_names or name.
+ */
+static bool DWrite_PartialMatch( filter_t *p_filter, ComPtr< IDWriteLocalizedStrings > &p_names,
+                                 const wstring &name, bool b_partial, wstring *p_unmatched = nullptr )
+{
+    wchar_t buff_sys[ LOCALE_NAME_MAX_LENGTH ] = {};
+    wchar_t buff_usr[ LOCALE_NAME_MAX_LENGTH ] = {};
+
+    GetSystemDefaultLocaleName( buff_sys, LOCALE_NAME_MAX_LENGTH );
+    GetUserDefaultLocaleName( buff_usr, LOCALE_NAME_MAX_LENGTH );
+
+    const wchar_t *pp_locales[] = { L"en-US", buff_sys, buff_usr };
+
+    for( int i = 0; i < 3; ++i )
     {
-        ComPtr< IDWriteFont >             p_dw_font;
+        HRESULT  hr;
+        UINT32   i_index;
+        UINT32   i_length;
+        BOOL     b_exists;
+        wstring  locale_name;
+
+        try
+        {
+            hr = p_names->FindLocaleName( pp_locales[ i ], &i_index, &b_exists );
+
+            if( SUCCEEDED( hr ) && b_exists )
+            {
+                hr = p_names->GetStringLength( i_index, &i_length );
+
+                if( SUCCEEDED( hr ) )
+                {
+                    locale_name.resize( i_length + 1 );
+                    hr = p_names->GetString( i_index, &locale_name[ 0 ], ( UINT32 ) locale_name.size() );
+
+                    if( SUCCEEDED( hr ) )
+                    {
+                        bool b_result;
+                        if( b_partial )
+                            b_result = DWrite_PartialMatch( p_filter, locale_name, name, p_unmatched );
+                        else
+                            b_result = DWrite_PartialMatch( p_filter, name, locale_name, p_unmatched );
+
+                        if( b_result )
+                            return true;
+                    }
+                }
+            }
+        }
+        catch( ... )
+        {
+        }
+    }
+
+    return false;
+}
+
+static vector< ComPtr< IDWriteFont > > DWrite_GetFonts( filter_t *p_filter, IDWriteFontFamily *p_dw_family,
+                                                        const wstring &face_name )
+{
+    vector< ComPtr< IDWriteFont > > result;
+
+    if( !face_name.empty() )
+    {
+        UINT32 i_count = p_dw_family->GetFontCount();
+        for( UINT32 i = 0; i < i_count; ++i )
+        {
+            ComPtr< IDWriteFont > p_dw_font;
+            ComPtr< IDWriteLocalizedStrings > p_dw_names;
+
+            if( FAILED( p_dw_family->GetFont( i, p_dw_font.GetAddressOf() ) ) )
+                throw runtime_error( "GetFont() failed" );
+
+            if( FAILED( p_dw_font->GetFaceNames( p_dw_names.GetAddressOf() ) ) )
+                throw runtime_error( "GetFaceNames() failed" );
+
+            if( DWrite_PartialMatch( p_filter, p_dw_names, face_name, true ) )
+                result.push_back( p_dw_font );
+        }
+    }
+    else
+    {
+        for( int i = 0; i < 4; ++i )
+        {
+            ComPtr< IDWriteFont > p_dw_font;
+            DWRITE_FONT_STYLE style;
+            DWRITE_FONT_WEIGHT weight;
+
+            switch( i )
+            {
+            case 0:
+                weight = DWRITE_FONT_WEIGHT_NORMAL; style = DWRITE_FONT_STYLE_NORMAL;
+                break;
+            case 1:
+                weight = DWRITE_FONT_WEIGHT_BOLD; style = DWRITE_FONT_STYLE_NORMAL;
+                break;
+            case 2:
+                weight = DWRITE_FONT_WEIGHT_NORMAL; style = DWRITE_FONT_STYLE_ITALIC;
+                break;
+            default:
+                weight = DWRITE_FONT_WEIGHT_BOLD; style = DWRITE_FONT_STYLE_ITALIC;
+                break;
+            }
+
+            if( FAILED( p_dw_family->GetFirstMatchingFont( weight, DWRITE_FONT_STRETCH_NORMAL, style, p_dw_font.GetAddressOf() ) ) )
+                throw runtime_error( "GetFirstMatchingFont() failed" );
+
+            result.push_back( p_dw_font );
+        }
+    }
+
+    return result;
+}
+
+static void DWrite_ParseFamily( filter_t *p_filter, IDWriteFontFamily *p_dw_family, const wstring &face_name,
+                                vlc_family_t *p_family, vector< FT_Stream > &streams )
+{
+    vector< ComPtr< IDWriteFont > > fonts = DWrite_GetFonts( p_filter, p_dw_family, face_name );
+
+    /*
+     * We select at most 4 fonts to add to p_family, one for each style. So in case of
+     * e.g multiple fonts with weights >= 700 we select the one closest to 700 as the
+     * bold font.
+     */
+    IDWriteFont *p_filtered[ 4 ] = {};
+
+    for( size_t i = 0; i < fonts.size(); ++i )
+    {
+        ComPtr< IDWriteFont > p_dw_font = fonts[ i ];
+
+        /* Skip oblique. It's handled by FreeType */
+        if( p_dw_font->GetStyle() == DWRITE_FONT_STYLE_OBLIQUE )
+            continue;
+
+        bool b_bold = p_dw_font->GetWeight() >= 700;
+        bool b_italic = p_dw_font->GetStyle() == DWRITE_FONT_STYLE_ITALIC;
+
+        size_t i_index = 0 | ( b_bold ? 1 : 0 ) | ( b_italic ? 2 : 0 );
+        IDWriteFont **pp_font = &p_filtered[ i_index ];
+
+        if( *pp_font )
+        {
+            int i_weight = b_bold ? 700 : 400;
+            if( abs( ( *pp_font )->GetWeight() - i_weight ) > abs( p_dw_font->GetWeight() - i_weight ) )
+            {
+                msg_Dbg( p_filter, "DWrite_ParseFamily(): using font at index %u with weight %u for bold: %d, italic: %d",
+                         ( unsigned ) i, p_dw_font->GetWeight(), b_bold, b_italic );
+                *pp_font = p_dw_font.Get();
+            }
+        }
+        else
+        {
+            msg_Dbg( p_filter, "DWrite_ParseFamily(): using font at index %u with weight %u for bold: %d, italic: %d",
+                     ( unsigned ) i, p_dw_font->GetWeight(), b_bold, b_italic );
+            *pp_font = p_dw_font.Get();
+        }
+    }
+
+    for( size_t i = 0; i < 4; ++i )
+    {
+        IDWriteFont                      *p_dw_font;
         ComPtr< IDWriteFontFace >         p_dw_face;
         ComPtr< IDWriteFontFileLoader >   p_dw_loader;
         ComPtr< IDWriteFontFile >         p_dw_file;
 
-        DWRITE_FONT_STYLE style;
-        DWRITE_FONT_WEIGHT weight;
-        bool b_bold, b_italic;
+        p_dw_font = p_filtered[ i ];
+        if( !p_dw_font )
+            continue;
 
-        switch( i )
-        {
-        case 0:
-            weight = DWRITE_FONT_WEIGHT_NORMAL; style = DWRITE_FONT_STYLE_NORMAL;
-            b_bold = false; b_italic = false; break;
-        case 1:
-            weight = DWRITE_FONT_WEIGHT_BOLD; style = DWRITE_FONT_STYLE_NORMAL;
-            b_bold = true; b_italic = false; break;
-        case 2:
-            weight = DWRITE_FONT_WEIGHT_NORMAL; style = DWRITE_FONT_STYLE_ITALIC;
-            b_bold = false; b_italic = true; break;
-        case 3:
-            weight = DWRITE_FONT_WEIGHT_BOLD; style = DWRITE_FONT_STYLE_ITALIC;
-            b_bold = true; b_italic = true; break;
-        }
-
-        if( p_dw_family->GetFirstMatchingFont( weight, DWRITE_FONT_STRETCH_NORMAL, style, p_dw_font.GetAddressOf() )
-         || !p_dw_font )
-            throw runtime_error( "GetFirstMatchingFont() failed" );
+        bool b_bold = i & 1;
+        bool b_italic = i & 2;
 
         if( p_dw_font->CreateFontFace( p_dw_face.GetAddressOf() ) )
             throw runtime_error( "CreateFontFace() failed" );
@@ -398,6 +577,9 @@ extern "C" const vlc_family_t *DWrite_GetFamily( filter_t *p_filter, const char 
     dw_sys_t                     *p_dw_sys     = ( dw_sys_t * ) p_sys->p_dw_sys;
     ComPtr< IDWriteFontFamily >   p_dw_family;
 
+    UINT32 i_index;
+    BOOL b_exists = false;
+
     char *psz_lc = ToLower( psz_family );
     if( unlikely( !psz_lc ) )
         return NULL;
@@ -422,28 +604,79 @@ extern "C" const vlc_family_t *DWrite_GetFamily( filter_t *p_filter, const char 
     if( unlikely( !pwsz_family ) )
         goto done;
 
-    UINT32 i_index;
-    BOOL b_exists;
-
-    if( p_dw_sys->p_dw_system_fonts->FindFamilyName( pwsz_family, &i_index, &b_exists ) || !b_exists )
+    /* Try to find an exact match first */
+    if( SUCCEEDED( p_dw_sys->p_dw_system_fonts->FindFamilyName( pwsz_family, &i_index, &b_exists ) ) && b_exists )
     {
-        msg_Warn( p_filter, "DWrite_GetFamily: FindFamilyName() failed" );
-        goto done;
+        if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, p_dw_family.GetAddressOf() ) ) )
+        {
+            msg_Err( p_filter, "DWrite_GetFamily: GetFontFamily() failed" );
+            goto done;
+        }
+
+        try
+        {
+            DWrite_ParseFamily( p_filter, p_dw_family.Get(), wstring{}, p_family, p_dw_sys->streams );
+        }
+        catch( const exception &e )
+        {
+            msg_Err( p_filter, "DWrite_GetFamily(): %s", e.what() );
+            goto done;
+        }
     }
 
-    if( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, p_dw_family.GetAddressOf() ) )
+    /*
+     * DirectWrite does not recognize Roboto Thin and similar as family names.
+     * When enumerating names via DirectWrite we get only Roboto. Thin, Black etc
+     * are face names within the Roboto family.
+     * So we try partial name matching if an exact match cannot be found. In this
+     * case Roboto Thin will match the Roboto family, and the unmatched part of
+     * the name (i.e Thin) will be used to find faces within that family (Thin,
+     * Thin Italic, Thin Oblique...)
+     */
+    if( !p_dw_family )
     {
-        msg_Err( p_filter, "DWrite_GetFamily: GetFontFamily() failed" );
-        goto done;
-    }
+        wstring face_name;
+        ComPtr< IDWriteLocalizedStrings > p_names;
 
-    try
-    {
-        DWrite_ParseFamily( p_dw_family.Get(), p_family, p_dw_sys->streams );
-    }
-    catch( const exception &e )
-    {
-        msg_Err( p_filter, "DWrite_GetFamily(): %s", e.what() );
+        UINT32 i_count = p_dw_sys->p_dw_system_fonts->GetFontFamilyCount();
+
+        for( i_index = 0; i_index < i_count; ++i_index )
+        {
+            ComPtr< IDWriteFontFamily > p_cur_family;
+            if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, p_cur_family.GetAddressOf() ) ) )
+            {
+                msg_Err( p_filter, "DWrite_GetFamily: GetFontFamily() failed" );
+                continue;
+            }
+
+            if( FAILED( p_cur_family->GetFamilyNames( p_names.GetAddressOf() ) ) )
+            {
+                msg_Err( p_filter, "DWrite_GetFamily: GetFamilyNames() failed" );
+                continue;
+            }
+
+            if( !DWrite_PartialMatch( p_filter, p_names, wstring{ pwsz_family }, false, &face_name ) )
+                continue;
+
+            try
+            {
+                DWrite_ParseFamily( p_filter, p_cur_family.Get(), face_name, p_family, p_dw_sys->streams );
+            }
+            catch( const exception &e )
+            {
+                msg_Err( p_filter, "DWrite_GetFamily(): %s", e.what() );
+            }
+
+            /*
+             * If the requested family is e.g. Microsoft JhengHei UI Light, DWrite_PartialMatch will return
+             * true for both Microsoft JhengHei and Microsoft JhengHei UI. When the former is used with
+             * DWrite_ParseFamily no faces will be matched (because face_name will be UI Light) and
+             * p_family->p_fonts will be NULL. With the latter face_name will be Light and the correct face
+             * will be added to p_family, therefore breaking this loop.
+             */
+            if( p_family->p_fonts )
+                break;
+        }
     }
 
 done:
