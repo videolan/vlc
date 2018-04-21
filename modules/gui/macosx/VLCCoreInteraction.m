@@ -808,9 +808,11 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     NSArray<NSValue *> *vouts = getVouts();
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
     if (!p_intf)
         return;
+
+    playlist_t *p_playlist = pl_Get(p_intf);
+
     int i_type = 0;
     bool b_is_command = false;
     char const *psz_filter_type = [self getFilterType: psz_filter];
