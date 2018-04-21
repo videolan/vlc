@@ -184,24 +184,28 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
 {
     stream_sys_t *sys = s->p_sys;
 
-    /* It means EOF */
-    if (sys->cache.p_chain== NULL)
-        return 0;
-
     ssize_t i_current = block_BytestreamRemaining( &sys->cache );
     size_t i_copy = VLC_CLIP((size_t)i_current, 0, len);
+
+    /**
+     * we should not signal end-of-file if we have not exhausted
+     * the cache. i_copy == 0 just means that the cache currently does
+     * not contain data at the offset that we want, not EOF.
+     **/
+    if( i_copy == 0 )
+    {
+        /* Return EOF if we are unable to refill cache, most likely
+         * really EOF */
+        if( AStreamRefillBlock(s) == VLC_EGENERIC )
+            return 0;
+    }
 
     /* Copy data */
     if( block_GetBytes( &sys->cache, buf, i_copy ) )
         return -1;
 
-    /**
-     * we should not signal end-of-file if we have not exhausted
-     * the blocks we know about, as such we should try again if that
-     * is the case. i_copy == 0 just means that the processed block does
-     * not contain data at the offset that we want, not EOF.
-     **/
 
+    /* If we ended up on refill, try to read refilled cache */
     if( i_copy == 0 && sys->cache.p_chain )
         return AStreamReadBlock( s, buf, len );
 
