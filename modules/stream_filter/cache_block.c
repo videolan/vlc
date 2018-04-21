@@ -69,6 +69,12 @@ typedef struct
 {
     block_bytestream_t cache; /* bytestream chain for storing cache */
 
+    struct
+    {
+        /* Stats for calculating speed */
+        uint64_t read_bytes;
+        uint64_t read_time;
+    } stat;
 } stream_sys_t;
 
 static int AStreamRefillBlock(stream_t *s)
@@ -90,6 +96,7 @@ static int AStreamRefillBlock(stream_t *s)
     }
 
     /* Now read a new block */
+    const mtime_t start = mdate();
     block_t *b;
 
     for (;;)
@@ -103,6 +110,10 @@ static int AStreamRefillBlock(stream_t *s)
         if (vlc_stream_Eof(s->s))
             return VLC_EGENERIC;
     }
+    sys->stat.read_time += mdate() - start;
+    size_t added_bytes;
+    block_ChainProperties( b, NULL, &added_bytes, NULL );
+    sys->stat.read_bytes += added_bytes;
 
     block_BytestreamPush( &sys->cache, b );
     return VLC_SUCCESS;
@@ -117,13 +128,23 @@ static void AStreamPrebufferBlock(stream_t *s)
     msg_Dbg(s, "starting pre-buffering");
     for (;;)
     {
+        const mtime_t now = mdate();
         size_t cache_size = block_BytestreamRemaining( &sys->cache );
 
         if (vlc_killed() || cache_size > STREAM_CACHE_PREBUFFER_SIZE)
         {
+            int64_t byterate;
 
-            msg_Dbg(s, "prebuffering done %zu bytes in",
-                     cache_size);
+            /* Update stat */
+            sys->stat.read_bytes = cache_size;
+            sys->stat.read_time = now - start;
+            byterate = (CLOCK_FREQ * sys->stat.read_bytes ) /
+                        (sys->stat.read_time -1);
+
+            msg_Dbg(s, "prebuffering done %zu bytes in %zus - %zu KiB/s",
+                        cache_size,
+                        sys->stat.read_time / CLOCK_FREQ,
+                        byterate / 1024 );
             break;
         }
 
