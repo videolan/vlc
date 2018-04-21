@@ -527,9 +527,10 @@ static NSString *kCaptureTabViewId  = @"capture";
         [self openFilePathChanged: nil];
     else if ([identifier isEqualToString: kDiscTabViewId])
         [self scanOpticalMedia: nil];
-    else if ([identifier isEqualToString: kNetworkTabViewId])
+    else if ([identifier isEqualToString: kNetworkTabViewId]) {
         [self openNetInfoChanged: nil];
-    else if ([identifier isEqualToString: kCaptureTabViewId])
+        [_netHTTPURLTextField selectText:nil];
+    } else if ([identifier isEqualToString: kCaptureTabViewId])
         [self openCaptureModeChanged: nil];
 }
 
@@ -562,6 +563,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 {
     [self openNetInfoChanged: nil];
     [self openTarget: kNetworkTabViewId];
+    [_netHTTPURLTextField selectText:nil];
 }
 
 - (void)openCapture
