@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.3.5
+EBML_VERSION := 1.3.6
 EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.xz
 
 ifeq ($(call need_pkg,"libebml"),)
@@ -14,12 +14,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
-	$(APPLY) $(SRC)/ebml/ebml-maxread.patch
-	$(APPLY) $(SRC)/ebml/unknown-check.patch
-	$(APPLY) $(SRC)/ebml/max-size-loop.patch
-	$(APPLY) $(SRC)/ebml/ebml-end-boundary.patch
-	$(APPLY) $(SRC)/ebml/ebml-null-compare.patch
-	$(APPLY) $(SRC)/ebml/ebml-infinite-start.patch
+	$(APPLY) $(SRC)/ebml/0001-fix-build-with-gcc-7.patch
 	$(MOVE)
 
 # libebml requires exceptions
@@ -29,6 +24,6 @@ EBML_EXTRA_FLAGS += CPPFLAGS=""
 endif
 
 .ebml: ebml
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(EBML_EXTRA_FLAGS)
+	cd $< && $(HOSTVARS) $(CMAKE) -DBUILD_SHARED_LIBS=OFF
 	cd $< && $(MAKE) install
 	touch $@
