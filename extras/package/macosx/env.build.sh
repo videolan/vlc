@@ -45,16 +45,18 @@ vlcSetBaseEnvironment() {
 vlcSetSymbolEnvironment() {
     echo "Setting symbol environment"
 
-    # The following symbols do not exist on the minimal macOS version (10.7), so they are disabled
+    # The following symbols do not exist on the minimal macOS / iOS, so they are disabled
     # here. This allows compilation also with newer macOS SDKs.
-    # Added symbols in 10.13
+    # List assumes macOS 10.10 / iOS 8 at minimum.
+
+    # Added symbols in macOS 10.13 / iOS 11 / watchOS 4
     export ac_cv_func_open_wmemstream=no
     export ac_cv_func_fmemopen=no
     export ac_cv_func_open_memstream=no
     export ac_cv_func_futimens=no
     export ac_cv_func_utimensat=no
 
-    # Added symbols between 10.11 and 10.12
+    # Added symbols in macOS 10.12 / iOS 10 / watchOS 3
     export ac_cv_func_basename_r=no
     export ac_cv_func_clock_getres=no
     export ac_cv_func_clock_gettime=no
@@ -63,17 +65,6 @@ vlcSetSymbolEnvironment() {
     export ac_cv_func_getentropy=no
     export ac_cv_func_mkostemp=no
     export ac_cv_func_mkostemps=no
-
-    # Added symbols between 10.7 and 10.11
-    export ac_cv_func_ffsll=no
-    export ac_cv_func_flsll=no
-    export ac_cv_func_fdopendir=no
-    export ac_cv_func_openat=no
-    export ac_cv_func_fstatat=no
-    export ac_cv_func_readlinkat=no
-
-    # libnetwork does not exist yet on 10.7 (used by libcddb)
-    export ac_cv_lib_network_connect=no
 }
 
 vlcSetContribEnvironment() {
