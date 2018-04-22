@@ -24,11 +24,11 @@
 
 #import "CompatibilityFixes.h"
 #import "misc.h"
-#import "VLCMain.h"                                          /* VLCApplication */
 #import "VLCMainWindow.h"
 #import "VLCMainMenu.h"
 #import "VLCControlsBarCommon.h"
 #import "VLCCoreInteraction.h"
+#import "VLCStringUtility.h"
 #import <vlc_actions.h>
 
 /*****************************************************************************

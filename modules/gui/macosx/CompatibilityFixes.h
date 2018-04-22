@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CompatibilityFixes.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2017 VLC authors and VideoLAN
+ * Copyright (C) 2011-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -32,8 +32,8 @@
 #define OSX_YOSEMITE_AND_HIGHER (NSAppKitVersionNumber >= 1334)
 #define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
 #define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
+#define OSX_SIERRA_DOT_TWO_AND_HIGHER (NSAppKitVersionNumber >= 1504.76) // this is needed to check for MPRemoteCommandCenter
 #define OSX_HIGH_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1560)
-
 
 // Sierra only APIs
 #ifndef MAC_OS_X_VERSION_10_12
@@ -56,5 +56,51 @@ typedef NSUInteger NSWindowStyleMask;
 
 #endif
 
-void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
+#ifndef MAC_OS_X_VERSION_10_12_2
 
+typedef NS_ENUM(NSUInteger, MPNowPlayingInfoMediaType) {
+    MPNowPlayingInfoMediaTypeNone = 0,
+    MPNowPlayingInfoMediaTypeAudio,
+    MPNowPlayingInfoMediaTypeVideo,
+};
+
+typedef NS_ENUM(NSUInteger, MPNowPlayingPlaybackState) {
+    MPNowPlayingPlaybackStateUnknown = 0,
+    MPNowPlayingPlaybackStatePlaying,
+    MPNowPlayingPlaybackStatePaused,
+    MPNowPlayingPlaybackStateStopped,
+    MPNowPlayingPlaybackStateInterrupted
+};
+
+NSString * const MPNowPlayingInfoPropertyElapsedPlaybackTime;
+NSString * const MPNowPlayingInfoPropertyPlaybackRate;
+NSString * const MPNowPlayingInfoPropertyDefaultPlaybackRate;
+NSString * const MPNowPlayingInfoPropertyPlaybackQueueIndex;
+NSString * const MPNowPlayingInfoPropertyPlaybackQueueCount;
+NSString * const MPNowPlayingInfoPropertyChapterNumber;
+NSString * const MPNowPlayingInfoPropertyChapterCount
+NSString * const MPNowPlayingInfoPropertyIsLiveStream;
+NSString * const MPNowPlayingInfoPropertyAvailableLanguageOptions;
+NSString * const MPNowPlayingInfoPropertyCurrentLanguageOptions;
+NSString * const MPNowPlayingInfoCollectionIdentifier;
+NSString * const MPNowPlayingInfoPropertyExternalContentIdentifier;
+NSString * const MPNowPlayingInfoPropertyExternalUserProfileIdentifier
+NSString * const MPNowPlayingInfoPropertyServiceIdentifier;
+NSString * const MPNowPlayingInfoPropertyPlaybackProgress
+NSString * const MPNowPlayingInfoPropertyMediaType
+NSString * const MPNowPlayingInfoPropertyAssetURL;
+NSString * const MPNowPlayingInfoPropertyCurrentPlaybackDate;
+
+@interface MPNowPlayingInfoCenter : NSObject
++ (MPNowPlayingInfoCenter *)defaultCenter;
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
+
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *nowPlayingInfo;
+@property (nonatomic) MPNowPlayingPlaybackState playbackState MP_API(macos(10.12.2));
+
+@end
+
+#endif
+
+void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);

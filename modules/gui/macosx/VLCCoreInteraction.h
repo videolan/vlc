@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2018 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -36,6 +36,7 @@
 @property (readonly) NSString * nameOfCurrentPlaylistItem;
 @property (nonatomic, readwrite) BOOL mute;
 
+- (void)play;
 - (void)playOrPause;
 - (void)pause;
 - (void)stop;
@@ -55,6 +56,7 @@
 - (void)backwardMedium;
 - (void)forwardLong;
 - (void)backwardLong;
+- (void)jumpToTime:(mtime_t)time;
 
 - (void)repeatOne;
 - (void)repeatAll;

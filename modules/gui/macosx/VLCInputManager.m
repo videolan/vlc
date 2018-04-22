@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCInputManager.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2015 VLC authors and VideoLAN
+ * Copyright (C) 2015-2018 VLC authors and VideoLAN
  * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,9 +34,12 @@
 #import "VLCResumeDialogController.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCVoutView.h"
+#import "VLCRemoteControlService.h"
 
 #import "iTunes.h"
 #import "Spotify.h"
+
+#import <MediaPlayer/MediaPlayer.h>
 
 #pragma mark Callbacks
 
@@ -155,6 +158,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     BOOL b_has_itunes_paused;
     BOOL b_has_spotify_paused;
 
+    /* remote control support */
+    VLCRemoteControlService *_remoteControlService;
+
     NSTimer *hasEndedTimer;
 }
 @end
@@ -182,6 +188,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
+        _remoteControlService = [[VLCRemoteControlService alloc] init];
+        [_remoteControlService subscribeToRemoteCommands];
     }
     return self;
 }
@@ -196,6 +204,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)deinit
 {
     msg_Dbg(getIntf(), "Deinitializing input manager");
+    [_remoteControlService unsubscribeFromRemoteCommands];
+
     if (p_current_input) {
         /* continue playback where you left off */
         [self storePlaybackPositionForItem:p_current_input];
@@ -283,7 +293,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         return;
     }
 
-    intf_thread_t *p_intf = getIntf();
     int state = -1;
     if (p_current_input) {
         state = var_GetInteger(p_current_input, "state");
@@ -304,13 +313,28 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
+
+        if (OSX_SIERRA_DOT_TWO_AND_HIGHER) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+            [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePlaying;
+#pragma clang diagnostic pop
+        }
     } else {
         [[o_main mainMenu] setSubmenusEnabled: FALSE];
         [[o_main mainMenu] setPlay];
         [[o_main mainWindow] setPlay];
 
-        if (state == PAUSE_S)
+        if (state == PAUSE_S) {
             [self releaseSleepBlockers];
+
+            if (OSX_SIERRA_DOT_TWO_AND_HIGHER) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePaused;
+#pragma clang diagnostic pop
+            }
+        }
 
         if (state == END_S || state == -1) {
             /* continue playback where you left off */
@@ -325,6 +349,13 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                                                            selector: @selector(onPlaybackHasEnded:)
                                                            userInfo: nil
                                                             repeats: NO];
+
+            if (OSX_SIERRA_DOT_TWO_AND_HIGHER) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateStopped;
+#pragma clang diagnostic pop
+            }
         }
     }
 
@@ -490,6 +521,43 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     [[[o_main playlist] model] updateItem:p_input_item];
     [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:p_input_item];
+
+    if (!OSX_SIERRA_DOT_TWO_AND_HIGHER) {
+        return;
+    }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+    if (!p_input_item) {
+        return;
+    }
+
+    NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
+
+    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(input_item_GetDuration(p_input_item) / CLOCK_FREQ);
+    currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(var_GetInteger(p_current_input, "time"));
+    currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyPlaybackRate] = @(var_GetFloat(p_current_input, "rate"));
+
+    char *psz_title = input_item_GetTitle(p_input_item);
+    if (!psz_title)
+        psz_title = input_item_GetName(p_input_item);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = toNSStr(psz_title);
+    FREENULL(psz_title);
+
+    char *psz_artist = input_item_GetArtist(p_input_item);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = toNSStr(psz_artist);
+    FREENULL(psz_artist);
+
+    char *psz_album = input_item_GetAlbum(p_input_item);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = toNSStr(psz_album);
+    FREENULL(psz_album);
+
+    char *psz_track_number = input_item_GetTrackNumber(p_input_item);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = toNSStr(psz_track_number);
+    FREENULL(psz_track_number);
+
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
+#pragma clang diagnostic pop
 }
 
 - (void)updateMainWindow
