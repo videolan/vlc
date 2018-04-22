@@ -30,7 +30,16 @@
 
 #include "list_util.h"
 
-#import <Cocoa/Cocoa.h>
+#include <TargetConditionals.h>
+
+#if TARGET_OS_IPHONE
+  #import <Foundation/Foundation.h>
+  #define OSX_MAVERICKS 1
+#else
+  #import <Cocoa/Cocoa.h>
+  #define OSX_MAVERICKS (NSAppKitVersionNumber >= 1265)
+#endif
+
 #import <Security/Security.h>
 
 static int Open(vlc_object_t *);
@@ -107,7 +116,7 @@ static const char *const accessibility_list_text[] = {
 
 vlc_module_begin()
     set_shortname(N_("Keychain keystore"))
-    set_description(N_("Keystore for iOS, Mac OS X and tvOS"))
+    set_description(N_("Keystore for iOS, macOS and tvOS"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     add_integer("keychain-synchronize", 1, SYNC_ITEMS_TEXT, SYNC_ITEMS_LONGTEXT, true)
@@ -205,7 +214,6 @@ static NSString * ErrorForStatus(OSStatus status)
     return message;
 }
 
-#define OSX_MAVERICKS (NSAppKitVersionNumber >= 1265)
 extern const CFStringRef kSecAttrAccessible;
 
 #pragma clang diagnostic push
@@ -339,24 +347,24 @@ static unsigned int Find(vlc_keystore *p_keystore,
                          vlc_keystore_entry **pp_entries)
 {
     CFTypeRef result = NULL;
-
-    NSMutableDictionary *query = CreateQuery(p_keystore);
-    [query setObject:@(YES) forKey:(__bridge id)kSecReturnRef];
-    [query setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
+    NSMutableDictionary *baseLookupQuery = CreateQuery(p_keystore);
+    OSStatus status;
 
     /* set attributes */
-    SetAttributesForQuery(ppsz_values, query, NULL);
+    SetAttributesForQuery(ppsz_values, baseLookupQuery, NULL);
 
     /* search */
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+    NSMutableDictionary *searchQuery = [baseLookupQuery mutableCopy];
+    [searchQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
+    [searchQuery setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
 
+    status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &result);
     if (status != errSecSuccess) {
         msg_Warn(p_keystore, "lookup failed (%i: '%s')", status, [ErrorForStatus(status) UTF8String]);
         return 0;
     }
 
     NSArray *listOfResults = (__bridge_transfer NSArray *)result;
-
     NSUInteger count = listOfResults.count;
     msg_Dbg(p_keystore, "found %lu result(s) for the provided attributes", count);
 
@@ -372,97 +380,73 @@ static unsigned int Find(vlc_keystore *p_keystore,
             return 0;
         }
 
-        SecKeychainItemRef itemRef = (__bridge SecKeychainItemRef)([listOfResults objectAtIndex:i]);
+        NSDictionary *keychainItem = [listOfResults objectAtIndex:i];
+        NSString *accountName = [keychainItem objectForKey:(__bridge id)kSecAttrAccount];
+        NSMutableDictionary *passwordFetchQuery = [baseLookupQuery mutableCopy];
+        [passwordFetchQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnData];
+        [passwordFetchQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
+        [passwordFetchQuery setObject:accountName forKey:(__bridge id)kSecAttrAccount];
 
-        SecKeychainAttributeInfo attrInfo;
-        attrInfo.count = 1;
-        UInt32 tags[1] = {kSecAccountItemAttr}; //, kSecAccountItemAttr, kSecServerItemAttr, kSecPortItemAttr, kSecProtocolItemAttr, kSecPathItemAttr};
-        attrInfo.tag = tags;
-        attrInfo.format = NULL;
-
-        SecKeychainAttributeList *attrList = NULL;
-
-        UInt32 secretDataLength;
-        void * secretData;
-
-        status = SecKeychainItemCopyAttributesAndData(itemRef, &attrInfo, NULL, &attrList, &secretDataLength, &secretData);
-
+        CFTypeRef secretResult = NULL;
+        status = SecItemCopyMatching((__bridge CFDictionaryRef)passwordFetchQuery, &secretResult);
         if (status != noErr) {
             msg_Err(p_keystore, "Lookup error: %i (%s)", status, [ErrorForStatus(status) UTF8String]);
-            vlc_keystore_release_entries(p_entries, count);
+            vlc_keystore_release_entries(p_entries, (unsigned int)count);
             return 0;
         }
 
-        for (unsigned x = 0; x < attrList->count; x++) {
-            SecKeychainAttribute *attr = &attrList->attr[i];
-            switch (attr->tag) {
-                case kSecAccountItemAttr:
-                    if (!p_entry->ppsz_values[KEY_USER]) {
-                        msg_Dbg(p_keystore, "using account name from the keychain for login");
-
-                        char *paddedName = calloc(1, attr->length + 1);
-                        memcpy(paddedName, attr->data, attr->length);
-                        p_entry->ppsz_values[KEY_USER] = paddedName;
-                    }
-                    break;
-                default:
-                    break;
-            }
+        if (!p_entry->ppsz_values[KEY_USER]) {
+            msg_Dbg(p_keystore, "using account name from the keychain for login");
+            p_entry->ppsz_values[KEY_USER] = strdup([accountName UTF8String]);
         }
+
+        NSData *secretData = (__bridge_transfer NSData *)secretResult;
+        NSUInteger secretDataLength = secretData.length;
 
         /* we need to do some padding here, as string is expected to be 0 terminated */
         uint8_t *paddedSecretData = calloc(1, secretDataLength + 1);
-        memcpy(paddedSecretData, secretData, secretDataLength);
+        memcpy(paddedSecretData, secretData.bytes, secretDataLength);
         vlc_keystore_entry_set_secret(p_entry, paddedSecretData, secretDataLength + 1);
         free(paddedSecretData);
-
-        SecKeychainItemFreeAttributesAndData(attrList, secretData);
     }
 
     *pp_entries = p_entries;
 
-    return count;
+    return (unsigned int)count;
 }
 
 static unsigned int Remove(vlc_keystore *p_keystore,
                            const char *const ppsz_values[KEY_MAX])
 {
-    OSStatus status;
-
+    CFTypeRef result = NULL;
     NSMutableDictionary *query = CreateQuery(p_keystore);
+    OSStatus status;
 
     SetAttributesForQuery(ppsz_values, query, NULL);
 
-    CFTypeRef result = NULL;
-    [query setObject:@(YES) forKey:(__bridge id)kSecReturnRef];
+    [query setObject:@(YES) forKey:(__bridge id)kSecReturnAttributes];
     [query setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
 
-    BOOL failed = NO;
+    /* do a copy matching to see how many items we are going to delete */
     status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+    if (status != errSecSuccess) {
+        msg_Warn(p_keystore, "lookup failed (%i: '%s')", status, [ErrorForStatus(status) UTF8String]);
+        return 0;
+    }
 
-    NSUInteger matchCount = 0;
+    NSArray *listOfResults = (__bridge_transfer NSArray *)result;
+    NSUInteger count = listOfResults.count;
+    msg_Dbg(p_keystore, "found %lu result(s) for the provided attributes", count);
 
-    if (status == errSecSuccess) {
-        NSArray *matches = (__bridge_transfer NSArray *)result;
-        matchCount = matches.count;
-        msg_Dbg(p_keystore, "Found %lu match(es) for deletion", matchCount);
+    /* delete everything!! */
+    status = SecItemDelete((__bridge CFDictionaryRef)query);
 
-        for (NSUInteger x = 0; x < matchCount; x++) {
-            status = SecKeychainItemDelete((__bridge SecKeychainItemRef _Nonnull)([matches objectAtIndex:x]));
-            if (status != noErr) {
-                msg_Err(p_keystore, "Deletion error %i (%s)", status , [ErrorForStatus(status) UTF8String]);
-                failed = YES;
-            }
-        }
-    } else {
-        msg_Err(p_keystore, "Lookup error for deletion %i (%s)", status, [ErrorForStatus(status) UTF8String]);
+    if (status != errSecSuccess) {
+        msg_Err(p_keystore, "deleting items matching the provided attributes failed");
         return VLC_EGENERIC;
     }
 
-    if (failed)
-        return VLC_EGENERIC;
-
-    return matchCount;
+    return (unsigned int)count;
 }
 
 static int Open(vlc_object_t *p_this)
