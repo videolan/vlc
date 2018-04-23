@@ -381,12 +381,18 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
+    char *psz_subtitle = NULL;
+
     /* Should be resiliant against bad subtitles */
-    char *psz_subtitle = malloc( p_block->i_buffer + 1 );
-    if( psz_subtitle == NULL )
-        return NULL;
-    memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
-    psz_subtitle[p_block->i_buffer] = '\0';
+    if( p_sys->iconv_handle == (vlc_iconv_t)-1 ||
+        p_sys->b_autodetect_utf8 )
+    {
+        psz_subtitle = malloc( p_block->i_buffer + 1 );
+        if( psz_subtitle == NULL )
+            return NULL;
+        memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
+        psz_subtitle[p_block->i_buffer] = '\0';
+    }
 
     if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
     {
@@ -415,7 +421,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             size_t outbytes_left = 6 * inbytes_left;
             char *psz_new_subtitle = xmalloc( outbytes_left + 1 );
             char *psz_convert_buffer_out = psz_new_subtitle;
-            const char *psz_convert_buffer_in = psz_subtitle;
+            const char *psz_convert_buffer_in =
+                    psz_subtitle ? psz_subtitle : (char *)p_block->p_buffer;
 
             size_t ret = vlc_iconv( p_sys->iconv_handle,
                                     &psz_convert_buffer_in, &inbytes_left,
