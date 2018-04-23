@@ -113,9 +113,6 @@ static int ThreadControl(stream_t *stream, int query, ...)
     return ret;
 }
 
-#define MAX_READ 65536
-#define SEEK_THRESHOLD MAX_READ
-
 static void *Thread(void *data)
 {
     stream_t *stream = data;
