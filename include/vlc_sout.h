@@ -78,7 +78,7 @@ struct sout_access_out_t
     char                    *psz_access;
 
     char                    *psz_path;
-    sout_access_out_sys_t   *p_sys;
+    void                    *p_sys;
     int                     (*pf_seek)( sout_access_out_t *, off_t );
     ssize_t                 (*pf_read)( sout_access_out_t *, block_t * );
     ssize_t                 (*pf_write)( sout_access_out_t *, block_t * );

@@ -653,7 +653,7 @@ void sout_access_out_sys_t::close()
 
 ssize_t AccessWrite(sout_access_out_t *p_access, block_t *p_block)
 {
-    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    sout_access_out_sys_t *p_sys = reinterpret_cast<sout_access_out_sys_t *>( p_access->p_sys );
     return p_sys->write(p_access, p_block);
 }
 
@@ -691,7 +691,7 @@ static int AccessOpen(vlc_object_t *p_this)
 static void AccessClose(vlc_object_t *p_this)
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
-    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    sout_access_out_sys_t *p_sys = reinterpret_cast<sout_access_out_sys_t *>( p_access->p_sys );
 
     p_sys->close();
 }
