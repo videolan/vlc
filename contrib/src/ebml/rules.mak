@@ -23,7 +23,7 @@ ifdef HAVE_ANDROID
 EBML_EXTRA_FLAGS += CPPFLAGS=""
 endif
 
-.ebml: ebml
+.ebml: ebml toolchain.cmake
 	cd $< && $(HOSTVARS) $(CMAKE) -DBUILD_SHARED_LIBS=OFF
 	cd $< && $(MAKE) install
 	touch $@
