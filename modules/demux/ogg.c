@@ -297,7 +297,7 @@ static int Demux( demux_t * p_demux )
     {
         if ( p_sys->i_streams ) /* All finished */
         {
-            msg_Dbg( p_demux, "end of a group of logical streams" );
+            msg_Dbg( p_demux, "end of a group of %d logical streams", p_sys->i_streams );
 
             mtime_t i_lastpcr = VLC_TS_INVALID;
             for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
