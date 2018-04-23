@@ -68,7 +68,7 @@ struct filter_t
 
     /* Module properties */
     module_t *          p_module;
-    filter_sys_t *      p_sys;
+    void               *p_sys;
 
     /* Input format */
     es_format_t         fmt_in;

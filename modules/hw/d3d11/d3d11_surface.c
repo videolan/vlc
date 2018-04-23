@@ -583,7 +583,8 @@ static void DeleteFilter( filter_t * p_filter )
 static picture_t *NewBuffer(filter_t *p_filter)
 {
     filter_t *p_parent = p_filter->owner.sys;
-    return p_parent->p_sys->staging_pic;
+    filter_sys_t *p_sys = p_parent->p_sys;
+    return p_sys->staging_pic;
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,

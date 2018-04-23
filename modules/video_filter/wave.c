@@ -87,14 +87,12 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
-        return VLC_ENOMEM;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     p_filter->pf_video_filter = Filter;
 
-    p_filter->p_sys->f_angle = 0.0;
-    p_filter->p_sys->last_date = 0;
+    p_sys->f_angle = 0.0;
+    p_sys->last_date = 0;
 
     return VLC_SUCCESS;
 }
@@ -132,9 +130,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_filter->p_sys->f_angle += (new_date - p_filter->p_sys->last_date) / 200000.0;
-    p_filter->p_sys->last_date = new_date;
-    f_angle = p_filter->p_sys->f_angle;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_sys->f_angle += (new_date - p_sys->last_date) / 200000.0;
+    p_sys->last_date = new_date;
+    f_angle = p_sys->f_angle;
 
     for( int i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {

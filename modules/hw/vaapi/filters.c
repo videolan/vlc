@@ -961,7 +961,8 @@ error:
 static void
 Deinterlace_Flush(filter_t *filter)
 {
-    struct deint_data *const    p_deint_data = filter->p_sys->p_data;
+    filter_sys_t *p_sys = filter->p_sys;
+    struct deint_data *const p_deint_data = p_sys->p_data;
 
     while (p_deint_data->history.num_pics)
     {

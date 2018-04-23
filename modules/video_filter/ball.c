@@ -46,24 +46,24 @@
 enum { RED, GREEN, BLUE, WHITE };
 
 #define COLORS_RGB \
-    p_filter->p_sys->colorList[RED].comp1 = 255; p_filter->p_sys->colorList[RED].comp2 = 0;        \
-                                p_filter->p_sys->colorList[RED].comp3 = 0;        \
-    p_filter->p_sys->colorList[GREEN].comp1 = 0; p_filter->p_sys->colorList[GREEN].comp2 = 255;    \
-                               p_filter->p_sys->colorList[GREEN].comp3 = 0;       \
-    p_filter->p_sys->colorList[BLUE].comp1 = 0; p_filter->p_sys->colorList[BLUE].comp2 = 0;        \
-                               p_filter->p_sys->colorList[BLUE].comp3 = 255;      \
-    p_filter->p_sys->colorList[WHITE].comp1 = 255; p_filter->p_sys->colorList[WHITE].comp2 = 255;  \
-                                  p_filter->p_sys->colorList[WHITE].comp3 = 255;
+    p_sys->colorList[RED].comp1 = 255; p_sys->colorList[RED].comp2 = 0;        \
+                                p_sys->colorList[RED].comp3 = 0;        \
+    p_sys->colorList[GREEN].comp1 = 0; p_sys->colorList[GREEN].comp2 = 255;    \
+                               p_sys->colorList[GREEN].comp3 = 0;       \
+    p_sys->colorList[BLUE].comp1 = 0; p_sys->colorList[BLUE].comp2 = 0;        \
+                               p_sys->colorList[BLUE].comp3 = 255;      \
+    p_sys->colorList[WHITE].comp1 = 255; p_sys->colorList[WHITE].comp2 = 255;  \
+                                  p_sys->colorList[WHITE].comp3 = 255;
 
 #define COLORS_YUV \
-    p_filter->p_sys->colorList[RED].comp1 = 82; p_filter->p_sys->colorList[RED].comp2 = 240;        \
-                                p_filter->p_sys->colorList[RED].comp3 = 90;        \
-    p_filter->p_sys->colorList[GREEN].comp1 = 145; p_filter->p_sys->colorList[GREEN].comp2 = 34;    \
-                               p_filter->p_sys->colorList[GREEN].comp3 = 54 ;      \
-    p_filter->p_sys->colorList[BLUE].comp1 = 41; p_filter->p_sys->colorList[BLUE].comp2 = 146;      \
-                               p_filter->p_sys->colorList[BLUE].comp3 = 240;       \
-    p_filter->p_sys->colorList[WHITE].comp1 = 255; p_filter->p_sys->colorList[WHITE].comp2 = 128;   \
-                                  p_filter->p_sys->colorList[WHITE].comp3 = 128;
+    p_sys->colorList[RED].comp1 = 82; p_sys->colorList[RED].comp2 = 240;        \
+                                p_sys->colorList[RED].comp3 = 90;        \
+    p_sys->colorList[GREEN].comp1 = 145; p_sys->colorList[GREEN].comp2 = 34;    \
+                               p_sys->colorList[GREEN].comp3 = 54 ;      \
+    p_sys->colorList[BLUE].comp1 = 41; p_sys->colorList[BLUE].comp2 = 146;      \
+                               p_sys->colorList[BLUE].comp3 = 240;       \
+    p_sys->colorList[WHITE].comp1 = 255; p_sys->colorList[WHITE].comp2 = 128;   \
+                                  p_sys->colorList[WHITE].comp3 = 128;
 
 
 /*****************************************************************************
@@ -224,27 +224,28 @@ static int Create( vlc_object_t *p_this )
     char *psz_method;
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
+    filter_sys_t *p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
+    p_filter->p_sys = p_sys;
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:
         case VLC_CODEC_J420:
-            p_filter->p_sys->drawingPixelFunction = drawPixelI420;
+            p_sys->drawingPixelFunction = drawPixelI420;
             COLORS_YUV
             break;
         CASE_PACKED_YUV_422
-            p_filter->p_sys->drawingPixelFunction = drawPixelPacked;
+            p_sys->drawingPixelFunction = drawPixelPacked;
             COLORS_YUV
             GetPackedYuvOffsets( p_filter->fmt_in.video.i_chroma,
-                                 &p_filter->p_sys->i_y_offset,
-                                 &p_filter->p_sys->i_u_offset,
-                                 &p_filter->p_sys->i_v_offset );
+                                 &p_sys->i_y_offset,
+                                 &p_sys->i_u_offset,
+                                 &p_sys->i_v_offset );
             break;
         case VLC_CODEC_RGB24:
-            p_filter->p_sys->drawingPixelFunction = drawPixelRGB24;
+            p_sys->drawingPixelFunction = drawPixelRGB24;
             COLORS_RGB
             break;
         default:
@@ -253,8 +254,8 @@ static int Create( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
-    p_filter->p_sys->p_image = image_HandlerCreate( p_filter );
-    if( p_filter->p_sys->p_image == NULL )
+    p_sys->p_image = image_HandlerCreate( p_filter );
+    if( p_sys->p_image == NULL )
         return VLC_EGENERIC;
 
     p_filter->pf_video_filter = Filter;
@@ -268,42 +269,42 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "configuration variable "
                  FILTER_PREFIX "color empty" );
-        p_filter->p_sys->ballColor = RED;
+        p_sys->ballColor = RED;
     }
     else
-        p_filter->p_sys->ballColor = getBallColor( p_this, psz_method );
+        p_sys->ballColor = getBallColor( p_this, psz_method );
 
     free( psz_method );
 
-    p_filter->p_sys->i_ballSize =
+    p_sys->i_ballSize =
             var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "size" );
-    p_filter->p_sys->i_ballSpeed =
+    p_sys->i_ballSpeed =
             var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "speed" );
-    p_filter->p_sys->b_edgeVisible =
+    p_sys->b_edgeVisible =
             var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "edge-visible" );
-    p_filter->p_sys->i_gradThresh =
+    p_sys->i_gradThresh =
             var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "gradient-threshold" );
 
-    vlc_mutex_init( &p_filter->p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
 
     var_AddCallback( p_filter, FILTER_PREFIX "color",
-                     ballCallback, p_filter->p_sys );
+                     ballCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "size",
-                     ballCallback, p_filter->p_sys );
+                     ballCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "speed",
-                     ballCallback, p_filter->p_sys );
+                     ballCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "edge-visible",
-                     ballCallback, p_filter->p_sys );
+                     ballCallback, p_sys );
 
-    p_filter->p_sys->p_smooth = NULL;
-    p_filter->p_sys->p_grad_x = NULL;
-    p_filter->p_sys->p_grad_y = NULL;
+    p_sys->p_smooth = NULL;
+    p_sys->p_grad_x = NULL;
+    p_sys->p_grad_y = NULL;
 
-    p_filter->p_sys->i_ball_x = 100;
-    p_filter->p_sys->i_ball_y = 100;
+    p_sys->i_ball_x = 100;
+    p_sys->i_ball_y = 100;
 
-    p_filter->p_sys->f_lastVect_x = 0;
-    p_filter->p_sys->f_lastVect_y = -1;
+    p_sys->f_lastVect_x = 0;
+    p_sys->f_lastVect_y = -1;
 
     return VLC_SUCCESS;
 }
@@ -360,9 +361,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    vlc_mutex_lock( &p_filter->p_sys->lock );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_mutex_lock( &p_sys->lock );
     FilterBall( p_filter, p_pic, p_outpic );
-    vlc_mutex_unlock( &p_filter->p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
@@ -558,7 +560,7 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
             fmt_comp.i_visible_width = fmt_comp.i_width;
             fmt_comp.i_visible_height = fmt_comp.i_height;
 
-            p_converted = image_Convert( p_filter->p_sys->p_image, p_inpic,
+            p_converted = image_Convert( p_sys->p_image, p_inpic,
                                          &(p_filter->fmt_in.video),
                                          &fmt_comp );
             if( !p_converted )
@@ -574,23 +576,23 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
     const int i_numCols = p_converted->p[0].i_visible_pitch;
     const int i_numLines = p_converted->p[0].i_visible_lines;
 
-    if( !p_filter->p_sys->p_smooth )
-        p_filter->p_sys->p_smooth =
+    if( !p_sys->p_smooth )
+        p_sys->p_smooth =
                 (uint32_t *)vlc_alloc( i_numLines * i_numCols,
                                        sizeof(uint32_t));
-    p_smooth = p_filter->p_sys->p_smooth;
+    p_smooth = p_sys->p_smooth;
 
-    if( !p_filter->p_sys->p_grad_x )
-        p_filter->p_sys->p_grad_x =
+    if( !p_sys->p_grad_x )
+        p_sys->p_grad_x =
                 (int32_t *)vlc_alloc( i_numLines * i_numCols,
                                       sizeof(int32_t));
-    p_grad_x = p_filter->p_sys->p_grad_x;
+    p_grad_x = p_sys->p_grad_x;
 
-    if( !p_filter->p_sys->p_grad_y )
-        p_filter->p_sys->p_grad_y =
+    if( !p_sys->p_grad_y )
+        p_sys->p_grad_y =
                 (int32_t *)vlc_alloc( i_numLines * i_numCols,
                                       sizeof(int32_t));
-    p_grad_y = p_filter->p_sys->p_grad_y;
+    p_grad_y = p_sys->p_grad_y;
 
     if( !p_smooth || !p_grad_x || !p_grad_y ) return;
 
@@ -642,9 +644,9 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
                     > p_sys->i_gradThresh )
                 {
                     ( *p_sys->drawingPixelFunction )( p_sys, p_outpic,
-                                                      p_filter->p_sys->colorList[ WHITE ].comp1,
-                                                      p_filter->p_sys->colorList[ WHITE ].comp2,
-                                                      p_filter->p_sys->colorList[ WHITE ].comp3,
+                                                      p_sys->colorList[ WHITE ].comp1,
+                                                      p_sys->colorList[ WHITE ].comp2,
+                                                      p_sys->colorList[ WHITE ].comp3,
                                                       x, y, 0 );
                 }
             }

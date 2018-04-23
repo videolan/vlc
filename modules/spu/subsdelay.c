@@ -413,7 +413,8 @@ static subpicture_t * SubsdelayFilter( filter_t *p_filter, subpicture_t* p_subpi
         return NULL;
     }
 
-    p_heap = &p_filter->p_sys->heap;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    p_heap = &p_sys->heap;
 
     /* add subpicture to the heap */
 
@@ -778,13 +779,15 @@ static void SubsdelayEnforceDelayRules( filter_t *p_filter )
     int64_t i_min_stop_start_interval;
     int64_t i_min_start_stop_interval;
 
-    p_list = p_filter->p_sys->heap.p_list;
-    i_count = p_filter->p_sys->heap.i_count;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    i_overlap = p_filter->p_sys->i_overlap;
-    i_min_stops_interval = p_filter->p_sys->i_min_stops_interval;
-    i_min_stop_start_interval = p_filter->p_sys->i_min_stop_start_interval;
-    i_min_start_stop_interval = p_filter->p_sys->i_min_start_stop_interval;
+    p_list = p_sys->heap.p_list;
+    i_count = p_sys->heap.i_count;
+
+    i_overlap = p_sys->i_overlap;
+    i_min_stops_interval = p_sys->i_min_stops_interval;
+    i_min_stop_start_interval = p_sys->i_min_stop_start_interval;
+    i_min_start_stop_interval = p_sys->i_min_start_stop_interval;
 
     /* step 1 - enforce min stops interval rule (extend delays) */
 
@@ -907,7 +910,8 @@ static void SubsdelayEnforceDelayRules( filter_t *p_filter )
  *****************************************************************************/
 static void SubsdelayRecalculateDelays( filter_t *p_filter )
 {
-    for( subsdelay_heap_entry_t *p_curr = p_filter->p_sys->heap.p_head;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    for( subsdelay_heap_entry_t *p_curr = p_sys->heap.p_head;
          p_curr != NULL; p_curr = p_curr->p_next )
     {
         if( !p_curr->b_update_ephemer )
@@ -1018,7 +1022,8 @@ static void SubpicDestroyWrapper( subpicture_t *p_subpic )
 
     if( p_entry->p_filter )
     {
-        p_heap = &p_entry->p_filter->p_sys->heap;
+        filter_sys_t *p_sys = p_entry->p_filter->p_sys;
+        p_heap = &p_sys->heap;
 
         SubsdelayHeapLock( p_heap );
         SubsdelayHeapRemove( p_heap, p_entry );
@@ -1046,7 +1051,8 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, mtime_t i_ts )
     }
 
     p_filter = p_entry->p_filter;
-    p_heap = &p_filter->p_sys->heap;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    p_heap = &p_sys->heap;
 
     SubsdelayHeapLock( p_heap );
 
@@ -1169,8 +1175,10 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
     int i_factor;
     int i_rank;
 
-    i_mode = p_filter->p_sys->i_mode;
-    i_factor = p_filter->p_sys->i_factor;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    i_mode = p_sys->i_mode;
+    i_factor = p_sys->i_factor;
 
     if( i_mode == SUBSDELAY_MODE_ABSOLUTE )
     {
@@ -1208,14 +1216,16 @@ static int SubsdelayCalculateAlpha( filter_t *p_filter, int i_overlapping, int i
     int i_new_alpha;
     int i_min_alpha;
 
-    i_min_alpha = p_filter->p_sys->i_min_alpha;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( i_overlapping > p_filter->p_sys->i_overlap - 1)
+    i_min_alpha = p_sys->i_min_alpha;
+
+    if( i_overlapping > p_sys->i_overlap - 1)
     {
-        i_overlapping = p_filter->p_sys->i_overlap - 1;
+        i_overlapping = p_sys->i_overlap - 1;
     }
 
-    switch ( p_filter->p_sys->i_overlap )
+    switch ( p_sys->i_overlap )
     {
     case 1:
         i_new_alpha = 255;

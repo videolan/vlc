@@ -434,7 +434,8 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
 static void GetOutputFormat( filter_t *p_filter,
                       video_format_t *p_dst, const video_format_t *p_src )
 {
-    GetDeinterlacingOutput(&p_filter->p_sys->context, p_dst, p_src);
+    filter_sys_t *p_sys = p_filter->p_sys;
+    GetDeinterlacingOutput(&p_sys->context, p_dst, p_src);
 }
 
 /*****************************************************************************
@@ -444,7 +445,8 @@ static void GetOutputFormat( filter_t *p_filter,
 /* This is the filter function. See Open(). */
 picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 {
-    return DoDeinterlacing( p_filter, &p_filter->p_sys->context, p_pic );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    return DoDeinterlacing( p_filter, &p_sys->context, p_pic );
 }
 
 /*****************************************************************************
@@ -453,7 +455,8 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
 void Flush( filter_t *p_filter )
 {
-    FlushDeinterlacing(&p_filter->p_sys->context);
+    filter_sys_t *p_sys = p_filter->p_sys;
+    FlushDeinterlacing(&p_sys->context);
 
     IVTCClearState( p_filter );
 }
@@ -468,7 +471,8 @@ int Mouse( filter_t *p_filter,
 {
     VLC_UNUSED(p_old);
     *p_mouse = *p_new;
-    if( p_filter->p_sys->context.settings.b_half_height )
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if( p_sys->context.settings.b_half_height )
         p_mouse->i_y *= 2;
     return VLC_SUCCESS;
 }

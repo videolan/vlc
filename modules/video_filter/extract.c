@@ -119,27 +119,29 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
+    filter_sys_t *p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_filter->p_sys->projection_matrix = malloc( 9 * sizeof( int ) );
-    if( !p_filter->p_sys->projection_matrix )
+    p_filter->p_sys = p_sys;
+
+    p_sys->projection_matrix = malloc( 9 * sizeof( int ) );
+    if( !p_sys->projection_matrix )
     {
-        free( p_filter->p_sys );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_filter->p_sys->i_color = var_CreateGetIntegerCommand( p_filter,
+    p_sys->i_color = var_CreateGetIntegerCommand( p_filter,
                                                FILTER_PREFIX "component" );
     /* Matrix won't be used for RED, GREEN or BLUE in planar formats */
-    make_projection_matrix( p_filter, p_filter->p_sys->i_color,
-                            p_filter->p_sys->projection_matrix );
-    vlc_mutex_init( &p_filter->p_sys->lock );
+    make_projection_matrix( p_filter, p_sys->i_color,
+                            p_sys->projection_matrix );
+    vlc_mutex_init( &p_sys->lock );
     var_AddCallback( p_filter, FILTER_PREFIX "component",
-                     ExtractCallback, p_filter->p_sys );
+                     ExtractCallback, p_sys );
 
     p_filter->pf_video_filter = Filter;
 

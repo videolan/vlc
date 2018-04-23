@@ -165,9 +165,10 @@ static void write_data( filter_t *p_filter, const void *p_buf, size_t i_size,
 
 static void write_buffer( filter_t *p_filter, block_t *p_in_buf )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     write_data( p_filter, p_in_buf->p_buffer, p_in_buf->i_buffer,
                 is_big_endian( p_filter, p_in_buf ) );
-    p_filter->p_sys->p_out_buf->i_length += p_in_buf->i_length;
+    p_sys->p_out_buf->i_length += p_in_buf->i_length;
 }
 
 static int write_init( filter_t *p_filter, block_t *p_in_buf,
@@ -389,6 +390,7 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
 static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
 {
     uint16_t i_data_type;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Only send the DTS core part */
     vlc_dts_header_t core;
@@ -429,7 +431,7 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
 
     if( i_data_type == 0 )
-        p_filter->p_sys->i_out_offset = 0;
+        p_sys->i_out_offset = 0;
 
     write_buffer( p_filter, p_in_buf );
     write_finalize( p_filter, i_data_type, 8 /* in bits */ );
@@ -481,7 +483,7 @@ static int write_buffer_dtshd( filter_t *p_filter, block_t *p_in_buf )
     size_t i_out_size = i_period * 4;
     uint16_t i_data_type = IEC61937_DTSHD | i_subtype << 8;
 
-    if( p_filter->p_sys->dtshd.b_skip
+    if( p_sys->dtshd.b_skip
      || i_in_size + SPDIF_HEADER_SIZE > i_out_size )
     {
         /* The bitrate is too high, pass only the core part */
@@ -492,7 +494,7 @@ static int write_buffer_dtshd( filter_t *p_filter, block_t *p_in_buf )
 
         /* Don't try to send substreams anymore. That way, we avoid to switch
          * back and forth between DTD and DTS-HD */
-        p_filter->p_sys->dtshd.b_skip = true;
+        p_sys->dtshd.b_skip = true;
     }
 
     if( write_init( p_filter, p_in_buf, i_out_size,

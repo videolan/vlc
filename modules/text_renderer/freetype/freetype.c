@@ -896,6 +896,8 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               void (*FillPicture)( picture_t *p_picture, int, int, int, int ),
                               void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+
     /* Create a new subpicture region */
     video_format_t fmt;
     video_format_Init( &fmt, i_chroma );
@@ -920,7 +922,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     p_region->fmt.i_sar_den = regionden;
 
     /* Initialize the picture background */
-    const text_style_t *p_style = p_filter->p_sys->p_default_style;
+    const text_style_t *p_style = p_sys->p_default_style;
     uint8_t i_x, i_y, i_z;
 
     if (p_region->b_noregionbg) {
@@ -959,7 +961,8 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
 static void UpdateDefaultLiveStyles( filter_t *p_filter )
 {
-    text_style_t *p_style = p_filter->p_sys->p_default_style;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    text_style_t *p_style = p_sys->p_default_style;
 
     p_style->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
 

@@ -354,7 +354,7 @@ Filter(filter_t *filter, picture_t *src)
         return NULL;
     }
 
-    if (VTPixelTransferSessionTransferImage(filter->p_sys->vttransfer,
+    if (VTPixelTransferSessionTransferImage(p_sys->vttransfer,
                                             src_cvpx, dst_cvpx) != noErr)
     {
         picture_Release(dst);

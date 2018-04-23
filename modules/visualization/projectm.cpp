@@ -165,7 +165,7 @@ static int Open( vlc_object_t * p_this )
     filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
-    p_sys = p_filter->p_sys = (filter_sys_t*)malloc( sizeof( *p_sys ) );
+    p_filter->p_sys = p_sys = (filter_sys_t*)malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -215,7 +215,7 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     filter_t  *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
 
     /* Stop the thread
      * XXX vlc_cleanup_push does not seems to work with C++ so no
@@ -243,7 +243,7 @@ static void Close( vlc_object_t *p_this )
  */
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
 
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->i_buffer_size > 0 )
@@ -272,7 +272,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 static void *Thread( void *p_data )
 {
     filter_t  *p_filter = (filter_t*)p_data;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     vlc_gl_t *gl = p_sys->gl;
     locale_t loc;
     locale_t oldloc;

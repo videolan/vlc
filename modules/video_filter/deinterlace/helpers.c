@@ -269,6 +269,8 @@ void ComposeFrame( filter_t *p_filter,
             i_output_chroma == CC_SOURCE_BOTTOM ||
             i_output_chroma == CC_MERGE );
 
+    filter_sys_t *p_sys = p_filter->p_sys;
+
     const bool b_upconvert_chroma = i_output_chroma == CC_UPCONVERT;
 
     for( int i_plane = 0 ; i_plane < p_inpic_top->i_planes ; i_plane++ )

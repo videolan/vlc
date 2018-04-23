@@ -132,14 +132,15 @@ extern "C" int InitDWrite( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
-    p_filter->p_sys->p_dw_sys = p_dw_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
+    p_sys->p_dw_sys = p_dw_sys;
     msg_Dbg( p_filter, "Using DWrite backend" );
     return VLC_SUCCESS;
 }
 
 extern "C" int ReleaseDWrite( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     dw_sys_t *p_dw_sys = ( dw_sys_t * ) p_sys->p_dw_sys;
 
 #if VLC_WINSTORE_APP
@@ -158,7 +159,8 @@ extern "C" int ReleaseDWrite( filter_t *p_filter )
 
 extern "C" int DWrite_GetFontStream( filter_t *p_filter, int i_index, FT_Stream *pp_stream )
 {
-    dw_sys_t *p_dw_sys = ( dw_sys_t * ) p_filter->p_sys->p_dw_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
+    dw_sys_t *p_dw_sys = ( dw_sys_t * ) p_sys->p_dw_sys;
 
     if( i_index < 0 || i_index >= ( int ) p_dw_sys->streams.size() )
         return VLC_ENOITEM;
@@ -394,7 +396,7 @@ static void DWrite_ParseFamily( IDWriteFontFamily *p_dw_family, vlc_family_t *p_
 
 extern "C" const vlc_family_t *DWrite_GetFamily( filter_t *p_filter, const char *psz_family )
 {
-    filter_sys_t                 *p_sys        = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     dw_sys_t                     *p_dw_sys     = ( dw_sys_t * ) p_sys->p_dw_sys;
     ComPtr< IDWriteFontFamily >   p_dw_family;
 
@@ -454,7 +456,7 @@ done:
 static char *DWrite_Fallback( filter_t *p_filter, const char *psz_family,
                               uni_char_t codepoint )
 {
-    filter_sys_t                     *p_sys             = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     dw_sys_t                         *p_dw_sys          = ( dw_sys_t * ) p_sys->p_dw_sys;
     wchar_t                          *pwsz_buffer       = NULL;
     char                             *psz_result        = NULL;
@@ -527,7 +529,7 @@ done:
 extern "C" vlc_family_t *DWrite_GetFallbacks( filter_t *p_filter, const char *psz_family,
                                               uni_char_t codepoint )
 {
-    filter_sys_t  *p_sys         = p_filter->p_sys;
+    filter_sys_t  *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_fallback  = NULL;

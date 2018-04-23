@@ -110,7 +110,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->f_max <= 0 ) p_sys->f_max = 0.01;
 
     /* We need to store (nb_buffers+1)*nb_channels floats */
-    p_sys->p_last = calloc( i_channels * (p_filter->p_sys->i_nb + 2), sizeof(float) );
+    p_sys->p_last = calloc( i_channels * (p_sys->i_nb + 2), sizeof(float) );
     if( !p_sys->p_last )
     {
         free( p_sys );

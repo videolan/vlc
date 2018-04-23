@@ -114,21 +114,22 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
+    filter_sys_t *p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
+    p_filter->p_sys = p_sys;
 
     p_filter->pf_video_filter = Filter;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 
-    atomic_init(&p_filter->p_sys->sigma,
+    atomic_init(&p_sys->sigma,
                 var_CreateGetFloatCommand(p_filter, FILTER_PREFIX "sigma")
                 * (1 << 20));
 
     var_AddCallback( p_filter, FILTER_PREFIX "sigma",
-                     SharpenCallback, p_filter->p_sys );
+                     SharpenCallback, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -168,7 +169,7 @@ static void Destroy( vlc_object_t *p_this )
         const unsigned data_sz = sizeof(data_t);                        \
         const int i_src_line_len = p_outpic->p[Y_PLANE].i_pitch / data_sz; \
         const int i_out_line_len = p_pic->p[Y_PLANE].i_pitch / data_sz; \
-        const int sigma = atomic_load(&p_filter->p_sys->sigma);         \
+        const int sigma = atomic_load(&p_sys->sigma);         \
                                                                         \
         memcpy(p_out, p_src, i_visible_pitch);                          \
                                                                         \
@@ -218,6 +219,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
+
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     if (!IS_YUV_420_10BITS(p_pic->format.i_chroma))
         SHARPEN_FRAME(255, uint8_t);

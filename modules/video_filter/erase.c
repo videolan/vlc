@@ -97,26 +97,26 @@ struct filter_sys_t
 
 static void LoadMask( filter_t *p_filter, const char *psz_filename )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     image_handler_t *p_image;
     video_format_t fmt_in, fmt_out;
-    picture_t *p_old_mask = p_filter->p_sys->p_mask;
+    picture_t *p_old_mask = p_sys->p_mask;
     video_format_Init( &fmt_in, 0 );
     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
     p_image = image_HandlerCreate( p_filter );
     char *psz_url = vlc_path2uri( psz_filename, NULL );
-    p_filter->p_sys->p_mask =
-        image_ReadUrl( p_image, psz_url, &fmt_in, &fmt_out );
+    p_sys->p_mask = image_ReadUrl( p_image, psz_url, &fmt_in, &fmt_out );
     free( psz_url );
     video_format_Clean( &fmt_in );
     video_format_Clean( &fmt_out );
-    if( p_filter->p_sys->p_mask )
+    if( p_sys->p_mask )
     {
         if( p_old_mask )
             picture_Release( p_old_mask );
     }
     else if( p_old_mask )
     {
-        p_filter->p_sys->p_mask = p_old_mask;
+        p_sys->p_mask = p_old_mask;
         msg_Err( p_filter, "Error while loading new mask. Keeping old mask." );
     }
     else

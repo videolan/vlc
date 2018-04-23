@@ -43,6 +43,8 @@ static void SetOffset( int, int, int, int, bool *, int *, int * );
  *****************************************************************************/
 void I420_RGB8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+
     /* We got this one from the old arguments */
     uint8_t *p_pic = (uint8_t*)p_dest->p->p_pixels;
     uint8_t *p_y   = p_src->Y_PIXELS;
@@ -58,10 +60,10 @@ void I420_RGB8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     unsigned int i_chroma_width = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 2;/* chroma width */
 
     /* Lookup table */
-    uint8_t *        p_lookup = p_filter->p_sys->p_base;
+    uint8_t *        p_lookup = p_sys->p_base;
 
     /* Offset array pointer */
-    int *       p_offset_start = p_filter->p_sys->p_offset;
+    int *       p_offset_start = p_sys->p_offset;
     int *       p_offset;
 
     const int i_source_margin = p_src->p[0].i_pitch

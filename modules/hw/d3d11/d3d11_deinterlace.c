@@ -119,7 +119,8 @@ static int assert_ProcessorInput(filter_t *p_filter, picture_sys_t *p_sys_src)
 
 static void Flush(filter_t *filter)
 {
-    FlushDeinterlacing(&filter->p_sys->context);
+    filter_sys_t *p_sys = filter->p_sys;
+    FlushDeinterlacing(&p_sys->context);
 }
 
 static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
@@ -274,7 +275,8 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
 
 static picture_t *NewOutputPicture( filter_t *p_filter )
 {
-    picture_t *pic = p_filter->p_sys->buffer_new( p_filter );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    picture_t *pic = p_sys->buffer_new( p_filter );
     picture_sys_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
@@ -288,7 +290,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             pic->p_sys = pic_sys;
 
             D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc(p_filter->p_sys->outTexture, &dstDesc);
+            ID3D11Texture2D_GetDesc(p_sys->outTexture, &dstDesc);
 
             const d3d_format_t *cfg = NULL;
             for (const d3d_format_t *output_format = GetRenderFormatList();
@@ -311,7 +313,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             video_format_t fmt = p_filter->fmt_out.video;
             fmt.i_width  = dstDesc.Width;
             fmt.i_height = dstDesc.Height;
-            if (AllocateTextures(VLC_OBJECT(p_filter), &p_filter->p_sys->d3d_dev, cfg,
+            if (AllocateTextures(VLC_OBJECT(p_filter), &p_sys->d3d_dev, cfg,
                                  &fmt, 1, pic_sys->texture) != VLC_SUCCESS)
             {
                 free(pic_sys);
@@ -319,7 +321,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             }
             b_local_texture = true;
 
-            pic_sys->context = p_filter->p_sys->d3d_dev.d3dcontext;
+            pic_sys->context = p_sys->d3d_dev.d3dcontext;
             pic_sys->formatTexture = dstDesc.Format;
 
         }

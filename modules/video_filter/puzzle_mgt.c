@@ -520,8 +520,8 @@ int puzzle_piece_foreground( filter_t *p_filter, int32_t i_piece) {
         }
     }
 
-    free( p_filter->p_sys->ps_pieces );
-    p_filter->p_sys->ps_pieces = ps_pieces_tmp;
+    free( p_sys->ps_pieces );
+    p_sys->ps_pieces = ps_pieces_tmp;
 
     return VLC_SUCCESS;
 }
@@ -715,8 +715,8 @@ int puzzle_sort_layers( filter_t *p_filter)
         }
     }
 
-    free( p_filter->p_sys->ps_pieces );
-    p_filter->p_sys->ps_pieces = p_sys->ps_pieces_tmp;
+    free( p_sys->ps_pieces );
+    p_sys->ps_pieces = p_sys->ps_pieces_tmp;
     p_sys->ps_pieces_tmp = malloc( sizeof( piece_t) * p_sys->s_allocated.i_pieces_nbr );
     if (!p_sys->ps_pieces_tmp)
         return VLC_ENOMEM;

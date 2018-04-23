@@ -58,7 +58,7 @@
  * merge routine.
  *
  */
-#define Merge p_filter->p_sys->pf_merge
+#define Merge p_sys->pf_merge
 
 /*
  * EndMerge() macro, which must be called after the merge is
@@ -66,7 +66,7 @@
  */
 #if defined(__i386__) || defined(__x86_64__)
 # define EndMerge() \
-    if(p_filter->p_sys->pf_end_merge) (p_filter->p_sys->pf_end_merge)()
+    if(p_sys->pf_end_merge) (p_sys->pf_end_merge)()
 #else
 # define EndMerge() (void)0
 #endif

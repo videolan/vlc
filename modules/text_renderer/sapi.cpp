@@ -170,7 +170,7 @@ error:
 static void Destroy(vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
 
     if (p_sys->cpVoice)
         p_sys->cpVoice->Release();
@@ -184,7 +184,7 @@ static int RenderText(filter_t *p_filter,
         subpicture_region_t *p_region_in,
         const vlc_fourcc_t *)
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     text_segment_t *p_segment = p_region_in->p_text;
 
     if (!p_segment)

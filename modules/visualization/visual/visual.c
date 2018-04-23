@@ -388,8 +388,9 @@ static void *Thread( void *data )
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     block_t *block = block_Duplicate( p_in_buf );
+    filter_sys_t *p_sys = p_filter->p_sys;
     if( likely(block != NULL) )
-        block_FifoPut( p_filter->p_sys->fifo, block );
+        block_FifoPut( p_sys->fifo, block );
     return p_in_buf;
 }
 
@@ -404,7 +405,7 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
     block_FifoRelease( p_sys->fifo );
-    aout_filter_RequestVout( p_filter, p_filter->p_sys->p_vout, NULL );
+    aout_filter_RequestVout( p_filter, p_sys->p_vout, NULL );
 
     /* Free the list */
     for( int i = 0; i < p_sys->i_effect; i++ )

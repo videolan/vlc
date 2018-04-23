@@ -81,7 +81,8 @@ static struct filter_mode_t filter_mode [] = {
 
 static void Flush(filter_t *filter)
 {
-    FlushDeinterlacing(&filter->p_sys->context);
+    filter_sys_t *p_sys = filter->p_sys;
+    FlushDeinterlacing(&p_sys->context);
 }
 
 static void FillSample( DXVA2_VideoSample *p_sample,
@@ -211,7 +212,8 @@ static int RenderSinglePic( filter_t *p_filter, picture_t *p_outpic, picture_t *
 
 static picture_t *Deinterlace(filter_t *p_filter, picture_t *p_pic)
 {
-    return DoDeinterlacing( p_filter, &p_filter->p_sys->context, p_pic );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    return DoDeinterlacing( p_filter, &p_sys->context, p_pic );
 }
 
 static const struct filter_mode_t *GetFilterMode(const char *mode)
