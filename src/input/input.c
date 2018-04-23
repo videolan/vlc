@@ -1720,7 +1720,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         return; /* The demux handled the navigation control */
 
     /* Handle Up/Down/Left/Right if the demux can't navigate */
-    vlc_viewpoint_t vp = {};
+    vlc_viewpoint_t vp = {0};
     int vol_direction = 0;
     int seek_direction = 0;
     switch( i_type )
