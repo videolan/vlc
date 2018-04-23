@@ -1,0 +1,10 @@
+--- ebml/src/EbmlSInteger.cpp.old	2018-04-23 12:01:29.747339700 +0200
++++ ebml/src/EbmlSInteger.cpp	2018-04-23 12:01:53.219339286 +0200
+@@ -34,6 +34,7 @@
+ */
+ #include <cassert>
+ #include <climits>
++#include <limits>
+ 
+ #include "ebml/EbmlSInteger.h"
+ 

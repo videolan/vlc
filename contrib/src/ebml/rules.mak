@@ -15,6 +15,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
 	$(APPLY) $(SRC)/ebml/0001-fix-build-with-gcc-7.patch
+	$(APPLY) $(SRC)/ebml/fix-clang-build.patch
 	$(MOVE)
 
 # libebml requires exceptions
