@@ -155,7 +155,7 @@ static int avformat_ProbeDemux( vlc_object_t *p_this,
                                 AVInputFormat **pp_fmt, const char *psz_url )
 {
     demux_t       *p_demux = (demux_t*)p_this;
-    AVProbeData   pd = { };
+    AVProbeData   pd = { 0 };
     const uint8_t *peek;
 
     /* Init Probe data */

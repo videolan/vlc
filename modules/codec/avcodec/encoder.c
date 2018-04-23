@@ -741,7 +741,7 @@ int InitVideoEnc( vlc_object_t *p_this )
          * Copied from audio.c
          */
         const unsigned i_order_max = 8 * sizeof(p_context->channel_layout);
-        uint32_t pi_order_dst[AOUT_CHAN_MAX] = { };
+        uint32_t pi_order_dst[AOUT_CHAN_MAX] = { 0 };
         int i_channels_src = 0;
 
         if( p_context->channel_layout )

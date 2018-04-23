@@ -98,7 +98,7 @@ static const int pi_channels_maps[FLAC__MAX_CHANNELS + 1] =
 /* XXX it supposes our internal format is WG4 */
 static const uint8_t ppi_reorder[1+FLAC__MAX_CHANNELS][FLAC__MAX_CHANNELS] =
 {
-    { },
+    { 0 },
     { 0, },
     { 0, 1 },
     { 0, 1, 2 },
