@@ -116,7 +116,7 @@ struct es_out_t
     int          (*pf_control)( es_out_t *, int i_query, va_list );
     void         (*pf_destroy)( es_out_t * );
 
-    es_out_sys_t    *p_sys;
+    void        *p_sys;
 };
 
 VLC_USED

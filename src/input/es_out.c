@@ -422,10 +422,11 @@ static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
         return es_cat - i_id;
     }
 
-    for( int i = 0; i < out->p_sys->i_es; i++ )
+    es_out_sys_t *p_sys = out->p_sys;
+    for( int i = 0; i < p_sys->i_es; i++ )
     {
-        if( out->p_sys->es[i]->i_id == i_id )
-            return out->p_sys->es[i];
+        if( p_sys->es[i]->i_id == i_id )
+            return p_sys->es[i];
     }
     return NULL;
 }
@@ -826,7 +827,7 @@ static void EsOutFrameNext( es_out_t *out )
     mtime_t i_duration;
     input_DecoderFrameNext( p_es_video->p_dec, &i_duration );
 
-    msg_Dbg( out->p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
+    msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
 
     if( i_duration <= 0 )
         i_duration = 40*1000;
@@ -992,7 +993,8 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
 
 static bool EsOutIsProgramVisible( es_out_t *out, int i_group )
 {
-    return out->p_sys->i_group_id == 0 || out->p_sys->i_group_id == i_group;
+    es_out_sys_t *p_sys = out->p_sys;
+    return p_sys->i_group_id == 0 || p_sys->i_group_id == i_group;
 }
 
 /* EsOutProgramSelect:
@@ -3370,7 +3372,8 @@ static void EsDeleteInfo( es_out_t *out, es_out_id_t *es )
 
     if( likely( psz_info_category = EsInfoCategoryName( es ) ) )
     {
-        input_Control( out->p_sys->p_input, INPUT_DEL_INFO,
+        es_out_sys_t *p_sys = out->p_sys;
+        input_Control( p_sys->p_input, INPUT_DEL_INFO,
           psz_info_category, NULL );
 
         free( psz_info_category );

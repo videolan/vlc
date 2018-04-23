@@ -1001,7 +1001,8 @@ static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
 
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
-    demux_t *p_demux = p_out->p_sys->p_demux;
+    es_out_sys_t *es_out_sys = p_out->p_sys;
+    demux_t *p_demux = es_out_sys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
     bool b_select = false;
@@ -1061,14 +1062,16 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 
 static int esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block)
 {
-    demux_t *p_demux = p_out->p_sys->p_demux;
+    es_out_sys_t *es_out_sys = p_out->p_sys;
+    demux_t *p_demux = es_out_sys->p_demux;
 
     return es_out_Send(p_demux->out, p_es, p_block);
 }
 
 static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
-    demux_t *p_demux = p_out->p_sys->p_demux;
+    es_out_sys_t *es_out_sys = p_out->p_sys;
+    demux_t *p_demux = es_out_sys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     int idx = findEsPairIndexByEs(p_sys, p_es);
@@ -1081,14 +1084,16 @@ static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 
 static int esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
-    demux_t *p_demux = p_out->p_sys->p_demux;
+    es_out_sys_t *es_out_sys = p_out->p_sys;
+    demux_t *p_demux = es_out_sys->p_demux;
 
     return es_out_vaControl(p_demux->out, i_query, args);
 }
 
 static void esOutDestroy(es_out_t *p_out)
 {
-    demux_t *p_demux = p_out->p_sys->p_demux;
+    es_out_sys_t *es_out_sys = p_out->p_sys;
+    demux_t *p_demux = es_out_sys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
@@ -1114,12 +1119,13 @@ static es_out_t *esOutNew(demux_t *p_demux)
     p_out->pf_destroy   = esOutDestroy;
     p_out->pf_send      = esOutSend;
 
-    p_out->p_sys = malloc(sizeof(*p_out->p_sys));
-    if (unlikely(p_out->p_sys == NULL)) {
+    es_out_sys_t *es_out_sys = malloc(sizeof(*es_out_sys));
+    if (unlikely(es_out_sys == NULL)) {
         free(p_out);
         return NULL;
     }
-    p_out->p_sys->p_demux = p_demux;
+    p_out->p_sys = es_out_sys;
+    es_out_sys->p_demux = p_demux;
     return p_out;
 }
 
