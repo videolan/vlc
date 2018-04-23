@@ -712,8 +712,9 @@ vlc_vaapi_PicAttachContext(picture_t *pic)
     assert(pic->p_sys != NULL);
     assert(pic->context == NULL);
 
-    pic->p_sys->ctx.picref = pic;
-    pic->context = &pic->p_sys->ctx.s;
+    picture_sys_t *p_sys = pic->p_sys;
+    p_sys->ctx.picref = pic;
+    pic->context = &p_sys->ctx.s;
 }
 
 VASurfaceID
@@ -731,5 +732,6 @@ vlc_vaapi_PicGetDisplay(picture_t *pic)
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
-    return ((struct vaapi_pic_ctx *)pic->context)->picref->p_sys->instance->va_dpy;
+    picture_sys_t *p_sys = ((struct vaapi_pic_ctx *)pic->context)->picref->p_sys;
+    return p_sys->instance->va_dpy;
 }

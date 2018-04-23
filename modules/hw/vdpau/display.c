@@ -243,7 +243,8 @@ out:/* Destroy GPU surface */
 static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
 {
     vout_display_sys_t *sys = vd->sys;
-    VdpOutputSurface surface = pic->p_sys->surface;
+    picture_sys_t *p_sys = pic->p_sys;
+    VdpOutputSurface surface = p_sys->surface;
     VdpStatus err;
 
     VdpPresentationQueueStatus status;

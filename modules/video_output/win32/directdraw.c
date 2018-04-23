@@ -297,6 +297,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    picture_sys_t *p_sys = picture->p_sys;
 
     assert(sys->display);
 
@@ -316,8 +317,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     if (sys->sys.use_overlay) {
         /* Flip the overlay buffers if we are using back buffers */
-        if (picture->p_sys->surface != picture->p_sys->front_surface) {
-            HRESULT hr = IDirectDrawSurface2_Flip(picture->p_sys->front_surface,
+        if (p_sys->surface != p_sys->front_surface) {
+            HRESULT hr = IDirectDrawSurface2_Flip(p_sys->front_surface,
                                                   NULL, DDFLIP_WAIT);
             if (hr != DD_OK)
                 msg_Warn(vd, "could not flip overlay (error %li)", hr);
@@ -331,7 +332,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
         HRESULT hr = IDirectDrawSurface2_Blt(sys->display,
                                              &sys->sys.rect_dest_clipped,
-                                             picture->p_sys->surface,
+                                             p_sys->surface,
                                              &sys->sys.rect_src_clipped,
                                              DDBLT_ASYNC, &ddbltfx);
         if (hr != DD_OK)
@@ -1270,18 +1271,20 @@ static void DirectXDestroyPictureResource(vout_display_t *vd)
 
 static int DirectXLock(picture_t *picture)
 {
+    picture_sys_t *p_sys = picture->p_sys;
     DDSURFACEDESC ddsd;
-    if (DirectXLockSurface(picture->p_sys->front_surface,
-                           picture->p_sys->surface, &ddsd))
-        return CommonUpdatePicture(picture, &picture->p_sys->fallback, NULL, 0);
+    if (DirectXLockSurface(p_sys->front_surface,
+                           p_sys->surface, &ddsd))
+        return CommonUpdatePicture(picture, &p_sys->fallback, NULL, 0);
 
     CommonUpdatePicture(picture, NULL, ddsd.lpSurface, ddsd.lPitch);
     return VLC_SUCCESS;
 }
 static void DirectXUnlock(picture_t *picture)
 {
-    DirectXUnlockSurface(picture->p_sys->front_surface,
-                         picture->p_sys->surface);
+    picture_sys_t *p_sys = picture->p_sys;
+    DirectXUnlockSurface(p_sys->front_surface,
+                         p_sys->surface);
 }
 
 static int DirectXCreatePool(vout_display_t *vd,

@@ -132,6 +132,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
                       int order, int i_field )
 {
     filter_sys_t *sys = filter->p_sys;
+    picture_sys_t *p_out_sys = p_outpic->p_sys;
     const int i_samples = sys->decoder_caps.NumBackwardRefSamples + 1 +
                           sys->decoder_caps.NumForwardRefSamples;
     HRESULT hr;
@@ -195,7 +196,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
 
     hr = IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
                                        sys->hw_surface, NULL,
-                                       p_outpic->p_sys->surface, NULL,
+                                       p_out_sys->surface, NULL,
                                        D3DTEXF_NONE);
     if (FAILED(hr))
         return VLC_EGENERIC;
@@ -251,32 +252,34 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *pic = p_sys->buffer_new( p_filter );
+    picture_sys_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
         bool b_local_texture = false;
 
-        if (!pic->p_sys )
+        if ( !pic_sys )
         {
             D3DSURFACE_DESC dstDesc;
             if ( !p_sys->hw_surface ||
                  FAILED(IDirect3DSurface9_GetDesc( p_sys->hw_surface, &dstDesc )) )
                 return NULL;
 
-            pic->p_sys = calloc(1, sizeof(*pic->p_sys));
-            if (unlikely(pic->p_sys == NULL))
+            pic_sys = calloc(1, sizeof(*pic_sys));
+            if (unlikely(pic_sys == NULL))
                 return NULL;
+            pic->p_sys = pic_sys;
 
             HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
                                                               p_filter->fmt_out.video.i_width,
                                                               p_filter->fmt_out.video.i_height,
                                                               dstDesc.Format,
                                                               D3DPOOL_DEFAULT,
-                                                              &pic->p_sys->surface,
+                                                              &pic_sys->surface,
                                                               NULL);
 
             if (FAILED(hr))
             {
-                free(pic->p_sys);
+                free(p_sys);
                 pic->p_sys = NULL;
                 return NULL;
             }
@@ -288,12 +291,12 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
         {
             pic_ctx->s.destroy = d3d9_pic_context_destroy;
             pic_ctx->s.copy    = d3d9_pic_context_copy;
-            pic_ctx->picsys = *pic->p_sys;
+            pic_ctx->picsys = *pic_sys;
             AcquirePictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;
         }
         if (b_local_texture)
-            IDirect3DSurface9_Release(pic->p_sys->surface);
+            IDirect3DSurface9_Release(pic_sys->surface);
     }
     return pic;
 }

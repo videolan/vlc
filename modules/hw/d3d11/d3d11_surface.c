@@ -645,11 +645,13 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
+    picture_sys_t *p_staging_sys = sys->staging_pic->p_sys;
+
     D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc( sys->staging_pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
+    ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
 
     D3D11_MAPPED_SUBRESOURCE lock;
-    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_pic->p_sys->resource[KNOWN_DXGI_INDEX],
+    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX],
                                          0, D3D11_MAP_WRITE, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
@@ -661,7 +663,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
     picture_Hold( src );
     sys->filter->pf_video_filter(sys->filter, src);
 
-    ID3D11DeviceContext_Unmap(p_sys->context, sys->staging_pic->p_sys->resource[KNOWN_DXGI_INDEX], 0);
+    ID3D11DeviceContext_Unmap(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
 
     D3D11_BOX copyBox = {
         .right = dst->format.i_width, .bottom = dst->format.i_height, .back = 1,
@@ -670,7 +672,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                               p_sys->resource[KNOWN_DXGI_INDEX],
                                               p_sys->slice_index,
                                               0, 0, 0,
-                                              sys->staging_pic->p_sys->resource[KNOWN_DXGI_INDEX], 0,
+                                              p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
                                               &copyBox);
     if (dst->context == NULL)
     {
@@ -679,7 +681,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         {
             pic_ctx->s.destroy = d3d11_pic_context_destroy;
             pic_ctx->s.copy    = d3d11_pic_context_copy;
-            pic_ctx->picsys = *dst->p_sys;
+            pic_ctx->picsys = *p_sys;
             AcquirePictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
         }
@@ -827,6 +829,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
     }
+    picture_sys_t *p_dst_sys = p_dst->p_sys;
     picture_Setup(p_dst, &p_dst->format);
 
     texDesc.MipLevels = 1;
@@ -845,7 +848,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     }
 
     res.p_sys->texture[KNOWN_DXGI_INDEX] = texture;
-    ID3D11DeviceContext_AddRef(p_dst->p_sys->context);
+    ID3D11DeviceContext_AddRef(p_dst_sys->context);
 
     if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
     {

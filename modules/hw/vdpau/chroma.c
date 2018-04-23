@@ -516,7 +516,8 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     if (dst == NULL)
         goto skip;
 
-    assert(dst->p_sys != NULL && dst->p_sys->vdp ==sys->vdp);
+    picture_sys_t *p_sys = dst->p_sys;
+    assert(p_sys != NULL && p_sys->vdp == sys->vdp);
     dst->date = sys->history[MAX_PAST].date;
     dst->b_force = sys->history[MAX_PAST].force;
 
@@ -589,7 +590,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
         }
     }
 
-    VdpOutputSurface output = dst->p_sys->surface;
+    VdpOutputSurface output = p_sys->surface;
 
     if (swap)
     {
@@ -670,7 +671,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     if (swap)
     {
         err = vdp_output_surface_render_output_surface(sys->vdp,
-            dst->p_sys->surface, NULL, output, NULL, NULL, NULL,
+            p_sys->surface, NULL, output, NULL, NULL, NULL,
             VDP_OUTPUT_SURFACE_RENDER_ROTATE_90);
         vdp_output_surface_destroy(sys->vdp, output);
         if (err != VDP_STATUS_OK)

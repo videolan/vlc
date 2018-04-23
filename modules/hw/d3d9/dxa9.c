@@ -251,12 +251,13 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
     picture_sys_t *p_sys = dst->p_sys;
+    picture_sys_t *p_staging_sys = sys->staging->p_sys;
 
     D3DSURFACE_DESC texDesc;
     IDirect3DSurface9_GetDesc( p_sys->surface, &texDesc);
 
     D3DLOCKED_RECT d3drect;
-    HRESULT hr = IDirect3DSurface9_LockRect(sys->staging->p_sys->surface, &d3drect, NULL, 0);
+    HRESULT hr = IDirect3DSurface9_LockRect(p_staging_sys->surface, &d3drect, NULL, 0);
     if (FAILED(hr))
         return;
 
@@ -266,14 +267,14 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     sys->filter->pf_video_filter(sys->filter, src);
 
-    IDirect3DSurface9_UnlockRect(sys->staging->p_sys->surface);
+    IDirect3DSurface9_UnlockRect(p_staging_sys->surface);
 
     RECT visibleSource = {
         .right = dst->format.i_width, .bottom = dst->format.i_height,
     };
     IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
-                                  sys->staging->p_sys->surface, &visibleSource,
-                                  dst->p_sys->surface, &visibleSource,
+                                  p_staging_sys->surface, &visibleSource,
+                                  p_sys->surface, &visibleSource,
                                   D3DTEXF_NONE );
 
     if (dst->context == NULL)
@@ -283,7 +284,7 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
         {
             pic_ctx->s.destroy = d3d9_pic_context_destroy;
             pic_ctx->s.copy    = d3d9_pic_context_copy;
-            pic_ctx->picsys = *dst->p_sys;
+            pic_ctx->picsys = *p_sys;
             AcquirePictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
         }

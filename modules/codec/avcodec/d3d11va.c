@@ -250,36 +250,37 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
+    picture_sys_t *p_sys = pic->p_sys;
 #if D3D11_DIRECT_DECODE
     if (va->sys->dx_sys.can_extern_pool)
     {
         /* copy the original picture_sys_t in the va_pic_context */
         if (!pic->context)
         {
-            assert(pic->p_sys!=NULL);
-            if (!pic->p_sys->decoder)
+            assert(p_sys!=NULL);
+            if (!p_sys->decoder)
             {
                 HRESULT hr;
                 D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
                 ZeroMemory(&viewDesc, sizeof(viewDesc));
                 viewDesc.DecodeProfile = va->sys->dx_sys.input;
                 viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
-                viewDesc.Texture2D.ArraySlice = pic->p_sys->slice_index;
+                viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
 
                 hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( va->sys->dx_sys.d3ddec,
-                                                                     pic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                                     p_sys->resource[KNOWN_DXGI_INDEX],
                                                                      &viewDesc,
-                                                                     &pic->p_sys->decoder );
+                                                                     &p_sys->decoder );
                 if (FAILED(hr))
                     return VLC_EGENERIC;
             }
 
             pic->context = (picture_context_t*)CreatePicContext(
-                                             pic->p_sys->decoder,
-                                             pic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                             p_sys->decoder,
+                                             p_sys->resource[KNOWN_DXGI_INDEX],
                                              va->sys->d3d_dev.d3dcontext,
-                                             pic->p_sys->slice_index,
-                                             pic->p_sys->resourceView );
+                                             p_sys->slice_index,
+                                             p_sys->resourceView );
             if (pic->context == NULL)
                 return VLC_EGENERIC;
         }

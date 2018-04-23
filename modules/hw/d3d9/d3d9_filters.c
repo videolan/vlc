@@ -107,7 +107,11 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     picture_sys_t *p_src_sys = ActivePictureSys(p_pic);
 
     picture_t *p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic || !p_outpic->p_sys || !p_outpic->p_sys->surface )
+    if( !p_outpic )
+        goto failed;
+
+    picture_sys_t *p_out_sys = p_outpic->p_sys;
+    if( !p_out_sys || !p_out_sys->surface )
         goto failed;
 
     picture_CopyProperties( p_outpic, p_pic );
@@ -149,7 +153,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                                  1, NULL );
     hr = IDirect3DDevice9_StretchRect( p_sys->d3d_dev.dev,
                                        p_sys->hw_surface, NULL,
-                                       p_outpic->p_sys->surface, NULL,
+                                       p_out_sys->surface, NULL,
                                        D3DTEXF_NONE);
     if (FAILED(hr))
         goto failed;

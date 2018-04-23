@@ -379,9 +379,10 @@ static void DestroyPicture(picture_t *picture)
  */
 static int Direct3D9LockSurface(picture_t *picture)
 {
+    picture_sys_t *p_sys = picture->p_sys;
     /* Lock the surface to get a valid pointer to the picture buffer */
     D3DLOCKED_RECT d3drect;
-    HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
+    HRESULT hr = IDirect3DSurface9_LockRect(p_sys->surface, &d3drect, NULL, 0);
     if (FAILED(hr)) {
         return VLC_EGENERIC;
     }
@@ -394,8 +395,9 @@ static int Direct3D9LockSurface(picture_t *picture)
  */
 static void Direct3D9UnlockSurface(picture_t *picture)
 {
+    picture_sys_t *p_sys = picture->p_sys;
     /* Unlock the Surface */
-    HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
+    HRESULT hr = IDirect3DSurface9_UnlockRect(p_sys->surface);
     if (FAILED(hr)) {
         //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
     }
@@ -496,7 +498,8 @@ static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    LPDIRECT3DSURFACE9 surface = picture->p_sys->surface;
+    picture_sys_t *p_sys = picture->p_sys;
+    LPDIRECT3DSURFACE9 surface = p_sys->surface;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
     /* FIXME it is a bit ugly, we need the surface to be unlocked for

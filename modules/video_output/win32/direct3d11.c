@@ -662,11 +662,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         {
             sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuadConfig);
             for (picture_count = 0; picture_count < pool_size; picture_count++) {
-                if (!pictures[picture_count]->p_sys->texture[0])
+                picture_sys_t *p_sys = pictures[picture_count]->p_sys;
+                if (!p_sys->texture[0])
                     continue;
                 if (AllocateShaderView(VLC_OBJECT(vd), sys->d3d_dev.d3ddevice, sys->picQuadConfig,
-                                       pictures[picture_count]->p_sys->texture, picture_count,
-                                       pictures[picture_count]->p_sys->resourceView))
+                                       p_sys->texture, picture_count,
+                                       p_sys->resourceView))
                     goto error;
             }
         }

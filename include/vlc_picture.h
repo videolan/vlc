@@ -97,7 +97,7 @@ struct picture_t
 
     /** Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
-    picture_sys_t * p_sys;
+    void           *p_sys;
 
     /** Next picture in a FIFO a pictures */
     struct picture_t *p_next;

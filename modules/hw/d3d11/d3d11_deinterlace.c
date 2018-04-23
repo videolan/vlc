@@ -128,6 +128,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     VLC_UNUSED(order);
     HRESULT hr;
     filter_sys_t *p_sys = p_filter->p_sys;
+    picture_sys_t *p_out_sys = p_outpic->p_sys;
 
     picture_t *p_prev = p_sys->context.pp_history[0];
     picture_t *p_cur  = p_sys->context.pp_history[1];
@@ -209,9 +210,9 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
         .back = 1,
     };
 
-    ID3D11DeviceContext_CopySubresourceRegion(p_outpic->p_sys->context,
-                                              p_outpic->p_sys->resource[KNOWN_DXGI_INDEX],
-                                              p_outpic->p_sys->slice_index,
+    ID3D11DeviceContext_CopySubresourceRegion(p_out_sys->context,
+                                              p_out_sys->resource[KNOWN_DXGI_INDEX],
+                                              p_out_sys->slice_index,
                                               0, 0, 0,
                                               p_sys->outResource,
                                               0, &box);
@@ -274,15 +275,17 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
 static picture_t *NewOutputPicture( filter_t *p_filter )
 {
     picture_t *pic = p_filter->p_sys->buffer_new( p_filter );
+    picture_sys_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
         bool b_local_texture = false;
 
-        if ( !pic->p_sys )
+        if ( !pic_sys )
         {
-            pic->p_sys = calloc(1, sizeof(*pic->p_sys));
-            if (unlikely(pic->p_sys == NULL))
+            pic_sys = calloc(1, sizeof(*pic_sys));
+            if (unlikely(pic_sys == NULL))
                 return NULL;
+            pic->p_sys = pic_sys;
 
             D3D11_TEXTURE2D_DESC dstDesc;
             ID3D11Texture2D_GetDesc(p_filter->p_sys->outTexture, &dstDesc);
@@ -300,7 +303,7 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             }
             if (unlikely(cfg == NULL))
             {
-                free(pic->p_sys);
+                free(pic_sys);
                 return NULL;
             }
 
@@ -309,15 +312,15 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
             fmt.i_width  = dstDesc.Width;
             fmt.i_height = dstDesc.Height;
             if (AllocateTextures(VLC_OBJECT(p_filter), &p_filter->p_sys->d3d_dev, cfg,
-                                 &fmt, 1, pic->p_sys->texture) != VLC_SUCCESS)
+                                 &fmt, 1, pic_sys->texture) != VLC_SUCCESS)
             {
-                free(pic->p_sys);
+                free(pic_sys);
                 return NULL;
             }
             b_local_texture = true;
 
-            pic->p_sys->context = p_filter->p_sys->d3d_dev.d3dcontext;
-            pic->p_sys->formatTexture = dstDesc.Format;
+            pic_sys->context = p_filter->p_sys->d3d_dev.d3dcontext;
+            pic_sys->formatTexture = dstDesc.Format;
 
         }
         /* the picture might be duplicated for snapshots so it needs a context */
@@ -326,14 +329,14 @@ static picture_t *NewOutputPicture( filter_t *p_filter )
         {
             pic_ctx->s.destroy = d3d11_pic_context_destroy;
             pic_ctx->s.copy    = d3d11_pic_context_copy;
-            pic_ctx->picsys = *pic->p_sys;
+            pic_ctx->picsys = *pic_sys;
             AcquirePictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;
         }
         if (b_local_texture) {
             for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-                if (pic->p_sys->texture[i])
-                    ID3D11Texture2D_Release(pic->p_sys->texture[i]);
+                if (pic_sys->texture[i])
+                    ID3D11Texture2D_Release(pic_sys->texture[i]);
             }
         }
     }

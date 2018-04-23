@@ -216,6 +216,7 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
     struct priv *priv = tc->priv;
 
     picture_t *display_pic = priv->pbo.display_pics[priv->pbo.display_idx];
+    picture_sys_t *p_sys = display_pic->p_sys;
     priv->pbo.display_idx = (priv->pbo.display_idx + 1) % PBO_DISPLAY_COUNT;
 
     for (int i = 0; i < pic->i_planes; i++)
@@ -223,7 +224,7 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
         GLsizeiptr size = pic->p[i].i_lines * pic->p[i].i_pitch;
         const GLvoid *data = pic->p[i].p_pixels;
         tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
-                            display_pic->p_sys->buffers[i]);
+                           p_sys->buffers[i]);
         tc->vt->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
 
         tc->vt->ActiveTexture(GL_TEXTURE0 + i);
@@ -344,7 +345,7 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
     }
 
     picsys->fence = tc->vt->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    if (pic->p_sys->fence == NULL)
+    if (picsys->fence == NULL)
     {
         /* Error (corner case): don't hold the picture */
         hold = false;
@@ -355,7 +356,7 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
     if (hold)
     {
         /* Hold the picture while it's used by the GPU */
-        unsigned index = pic->p_sys->index;
+        unsigned index = picsys->index;
 
         priv->persistent.list |= 1ULL << index;
         assert(priv->persistent.pics[index] == NULL);
@@ -384,11 +385,13 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, unsigned requested_coun
         picture_t *pic = pictures[count] = pbo_picture_create(tc, true);
         if (pic == NULL)
             break;
+
+        picture_sys_t *p_sys = pic->p_sys;
 #ifndef NDEBUG
         for (int i = 0; i < pic->i_planes; ++i)
-            assert(pic->p_sys->bytes[i] == pictures[0]->p_sys->bytes[i]);
+            assert(p_sys->bytes[i] == ((picture_sys_t *) pictures[0]->p_sys)->bytes[i]);
 #endif
-        pic->p_sys->index = count;
+        p_sys->index = count;
 
         if (persistent_map(tc, pic) != VLC_SUCCESS)
         {
