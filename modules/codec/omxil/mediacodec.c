@@ -166,8 +166,7 @@ static void RemoveInflightPictures(decoder_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MEDIACODEC_ENABLE_TEXT N_("Enable Hardware decoder")
-#define MEDIACODEC_ENABLE_LONGTEXT N_("Use MediaCodec for hardware-accelerated video decoding")
+#define MEDIACODEC_ENABLE_TEXT N_("Enable hardware acceleration")
 
 #define DIRECTRENDERING_TEXT "Android direct rendering"
 #define DIRECTRENDERING_LONGTEXT \
@@ -186,8 +185,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
     set_capability("video decoder", 800)
-    add_bool("mediacodec", true, MEDIACODEC_ENABLE_TEXT,
-             MEDIACODEC_ENABLE_LONGTEXT, false)
+    add_bool("mediacodec", true, MEDIACODEC_ENABLE_TEXT, NULL, false)
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     add_bool(CFG_PREFIX "audio", false,
