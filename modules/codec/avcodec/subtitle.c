@@ -317,12 +317,14 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     if (!spu)
         return NULL;
 
+    decoder_sys_t *p_sys = dec->p_sys;
+
     //msg_Err(dec, "%lld %d %d",
     //        pts, ffsub->start_display_time, ffsub->end_display_time);
     spu->i_start    = pts + ffsub->start_display_time * INT64_C(1000);
     spu->i_stop     = pts + ffsub->end_display_time * INT64_C(1000);
     spu->b_absolute = true; /* We have offset and size for subtitle */
-    spu->b_ephemer  = dec->p_sys->b_need_ephemer;
+    spu->b_ephemer  = p_sys->b_need_ephemer;
                     /* We only show subtitle for i_stop time only */
 
     if (avctx->coded_width != 0 && avctx->coded_height != 0) {

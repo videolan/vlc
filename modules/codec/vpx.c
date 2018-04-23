@@ -161,7 +161,8 @@ static vlc_fourcc_t FindVlcChroma( struct vpx_image *img )
  ****************************************************************************/
 static int Decode(decoder_t *dec, block_t *block)
 {
-    struct vpx_codec_ctx *ctx = &dec->p_sys->ctx;
+    decoder_sys_t *p_sys = dec->p_sys;
+    struct vpx_codec_ctx *ctx = &p_sys->ctx;
 
     if (block == NULL) /* No Drain */
         return VLCDEC_SUCCESS;

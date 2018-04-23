@@ -1107,6 +1107,7 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 
             subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
             subpicture_updater_sys_region_t *p_updtregion = NULL;
+            decoder_sys_t *p_dec_sys = p_dec->p_sys;
 
             /* Create region update info from each ttml region */
             for( ttml_region_t *p_region = p_regions;
@@ -1125,8 +1126,8 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
                 }
 
                 /* broken legacy align var (can't handle center...). Will change only regions content. */
-                if( p_dec->p_sys->i_align & SUBPICTURE_ALIGN_MASK )
-                    p_spu_sys->region.inner_align = p_dec->p_sys->i_align;
+                if( p_dec_sys->i_align & SUBPICTURE_ALIGN_MASK )
+                    p_spu_sys->region.inner_align = p_dec_sys->i_align;
 
                 p_spu_sys->margin_ratio = 0.0;
 

@@ -381,6 +381,8 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     if (p_block == NULL) /* No Drain */
         return VLCDEC_SUCCESS;
 
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     if(p_block->i_buffer < STL_TTI_SIZE)
         p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
 
@@ -395,11 +397,11 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    const char *psz_charset = cct_nums[p_dec->p_sys->cct - CCT_BEGIN].str;
+    const char *psz_charset = cct_nums[p_sys->cct - CCT_BEGIN].str;
     for (size_t i = 0; i < p_block->i_buffer / STL_TTI_SIZE; i++)
     {
-        stl_sg_t *p_group = &p_dec->p_sys->groups[p_block->p_buffer[0]];
-        if(ParseTTI(p_group, &p_block->p_buffer[i * STL_TTI_SIZE], psz_charset, p_dec->p_sys->i_fps) &&
+        stl_sg_t *p_group = &p_sys->groups[p_block->p_buffer[0]];
+        if(ParseTTI(p_group, &p_block->p_buffer[i * STL_TTI_SIZE], psz_charset, p_sys->i_fps) &&
            p_group->p_segment != NULL )
         {
             /* output */
@@ -426,7 +428,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    ResetGroups(p_dec->p_sys);
+    ResetGroups(p_sys);
 
     block_Release(p_block);
     return VLCDEC_SUCCESS;

@@ -862,7 +862,8 @@ static void webvtt_domnode_SelectNodesInTree( decoder_t *p_dec, const vlc_css_se
 static void webvtt_domnode_SelectRuleNodes( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
                                             mtime_t i_playbacktime, vlc_array_t *p_results )
 {
-    const webvtt_dom_node_t *p_cues = p_dec->p_sys->p_root->p_child;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    const webvtt_dom_node_t *p_cues = p_sys->p_root->p_child;
     for( const vlc_css_selector_t *p_sel = p_rule->p_selectors; p_sel; p_sel = p_sel->p_next )
     {
         vlc_array_t tempresults;
@@ -1309,6 +1310,7 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
     text_style_t *p_style = NULL;
     text_style_t *p_dfltstyle = NULL;
     mtime_t i_tagtime = -1;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     for( const webvtt_dom_node_t *p_node = p_leaf ; p_node; p_node = p_node->p_parent )
     {
@@ -1364,7 +1366,7 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
                 else if ( !strcmp( p_tagnode->psz_tag, "v" ) && p_tagnode->psz_attrs )
                 {
 #ifdef HAVE_CSS
-                    if( p_dec->p_sys->p_css_rules == NULL ) /* Only auto style when no CSS sheet */
+                    if( p_sys->p_css_rules == NULL ) /* Only auto style when no CSS sheet */
 #endif
                     {
                         if( p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )) )
@@ -1714,13 +1716,14 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
 {
     subpicture_t *p_spu = NULL;
     subpicture_updater_sys_region_t *p_updtregion = NULL;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
 #ifdef HAVE_CSS
-    ApplyCSSRules( p_dec, p_dec->p_sys->p_css_rules, i_start );
+    ApplyCSSRules( p_dec, p_sys->p_css_rules, i_start );
 #endif
 
     const webvtt_dom_cue_t *p_rlcue = NULL;
-    for( const webvtt_dom_node_t *p_node = p_dec->p_sys->p_root->p_child;
+    for( const webvtt_dom_node_t *p_node = p_sys->p_root->p_child;
                                   p_node; p_node = p_node->p_next )
     {
         if( p_node->type == NODE_REGION )
@@ -1879,6 +1882,7 @@ static int ProcessISOBMFF( decoder_t *p_dec,
                            const uint8_t *p_buffer, size_t i_buffer,
                            mtime_t i_start, mtime_t i_stop )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     mp4_box_iterator_t it;
     mp4_box_iterator_Init( &it, p_buffer, i_buffer );
     while( mp4_box_iterator_Next( &it ) )
@@ -1916,7 +1920,7 @@ static int ProcessISOBMFF( decoder_t *p_dec,
                 free( psz );
             }
 
-            webvtt_region_t *p_region = webvtt_region_GetByID( p_dec->p_sys,
+            webvtt_region_t *p_region = webvtt_region_GetByID( p_sys,
                                                                p_cue->settings.psz_region );
             if( p_region )
             {
@@ -1925,8 +1929,8 @@ static int ProcessISOBMFF( decoder_t *p_dec,
             }
             else
             {
-                webvtt_domnode_AppendLast( &p_dec->p_sys->p_root->p_child, p_cue );
-                p_cue->p_parent = (webvtt_dom_node_t *) p_dec->p_sys->p_root;
+                webvtt_domnode_AppendLast( &p_sys->p_root->p_child, p_cue );
+                p_cue->p_parent = (webvtt_dom_node_t *) p_sys->p_root;
             }
         }
     }
@@ -2052,13 +2056,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     mtime_t i_start = p_block->i_pts - VLC_TS_0;
     mtime_t i_stop = i_start + p_block->i_length;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, INT64_MAX );
+        ClearCuesByTime( &p_sys->p_root->p_child, INT64_MAX );
     else
-        ClearCuesByTime( &p_dec->p_sys->p_root->p_child, i_start );
+        ClearCuesByTime( &p_sys->p_root->p_child, i_start );
 
     ProcessISOBMFF( p_dec, p_block->p_buffer, p_block->i_buffer,
                     i_start, i_stop );

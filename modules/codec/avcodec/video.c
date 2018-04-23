@@ -337,15 +337,17 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if (val)
         return val;
 
+    decoder_sys_t *p_sys = dec->p_sys;
+
     /* always have date in fields/ticks units */
-    if(dec->p_sys->pts.i_divider_num)
-        date_Change(&dec->p_sys->pts, fmt_out.i_frame_rate *
-                                      __MAX(ctx->ticks_per_frame, 1),
-                                      fmt_out.i_frame_rate_base);
+    if(p_sys->pts.i_divider_num)
+        date_Change(&p_sys->pts, fmt_out.i_frame_rate *
+                                 __MAX(ctx->ticks_per_frame, 1),
+                                 fmt_out.i_frame_rate_base);
     else
-        date_Init(&dec->p_sys->pts, fmt_out.i_frame_rate *
-                                    __MAX(ctx->ticks_per_frame, 1),
-                                    fmt_out.i_frame_rate_base);
+        date_Init(&p_sys->pts, fmt_out.i_frame_rate *
+                               __MAX(ctx->ticks_per_frame, 1),
+                               fmt_out.i_frame_rate_base);
 
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
@@ -1373,7 +1375,8 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
                             picture_t *pic)
 {
     decoder_t *dec = ctx->opaque;
-    vlc_va_t *va = dec->p_sys->p_va;
+    decoder_sys_t *p_sys = dec->p_sys;
+    vlc_va_t *va = p_sys->p_va;
 
     if (vlc_va_Get(va, pic, &frame->data[0]))
     {

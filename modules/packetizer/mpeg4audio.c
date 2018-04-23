@@ -150,9 +150,10 @@ enum
 };
 
 #define WARN_ONCE(warn, msg) do{\
-        if( (p_dec->p_sys->i_warnings & warn) == 0 )\
+        decoder_sys_t *p_sys = p_dec->p_sys;\
+        if( (p_sys->i_warnings & warn) == 0 )\
         {\
-            p_dec->p_sys->i_warnings |= warn;\
+            p_sys->i_warnings |= warn;\
             msg_Warn( p_dec, msg );\
         }\
     } while(0)

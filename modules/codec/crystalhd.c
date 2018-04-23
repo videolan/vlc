@@ -183,8 +183,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_nal_size       = 4; // assume 4 byte start codes
     p_sys->i_sps_pps_size   = 0;
     p_sys->p_sps_pps_buf    = NULL;
-    p_dec->p_sys->p_pic     = NULL;
-    p_dec->p_sys->proc_out  = NULL;
+    p_sys->p_pic            = NULL;
+    p_sys->proc_out         = NULL;
 
     /* Win32 code *
      * We cannot link and ship BCM dll, even with LGPL license (too big)
@@ -392,7 +392,8 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
     VLC_UNUSED(width); VLC_UNUSED(height); VLC_UNUSED(stride);
 
     decoder_t *p_dec          = (decoder_t *)shnd;
-    BC_DTS_PROC_OUT *proc_out = p_dec->p_sys->proc_out;
+    decoder_sys_t *p_sys      = p_dec->p_sys;
+    BC_DTS_PROC_OUT *proc_out = p_sys->proc_out;
     BC_DTS_PROC_OUT *proc_in  = (BC_DTS_PROC_OUT*)pOut;
 
     /* Direct Rendering */
@@ -401,11 +402,11 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
         !(proc_in->PicInfo.flags & VDEC_FLAG_FIELDPAIR) )
     {
         if( !decoder_UpdateVideoFormat( p_dec ) )
-            p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+            p_sys->p_pic = decoder_NewPicture( p_dec );
     }
 
     /* */
-    picture_t *p_pic = p_dec->p_sys->p_pic;
+    picture_t *p_pic = p_sys->p_pic;
     if( !p_pic )
         return BC_STS_ERROR;
 

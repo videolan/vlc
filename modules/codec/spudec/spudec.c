@@ -113,8 +113,11 @@ static int PacketizerOpen( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
+
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     p_dec->pf_packetize  = Packetize;
-    p_dec->p_sys->b_packetizer = true;
+    p_sys->b_packetizer = true;
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_SPU;
 

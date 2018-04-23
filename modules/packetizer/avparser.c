@@ -142,11 +142,12 @@ int OpenPacketizer( vlc_object_t *p_this )
 void ClosePacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
-    if (likely( p_dec->p_sys != NULL ))
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    if (likely( p_sys != NULL ))
     {
-        avcodec_free_context( &p_dec->p_sys->p_codec_ctx );
-        av_parser_close( p_dec->p_sys->p_parser_ctx );
-        free( p_dec->p_sys );
+        avcodec_free_context( &p_sys->p_codec_ctx );
+        av_parser_close( p_sys->p_parser_ctx );
+        free( p_sys );
     }
 }
 

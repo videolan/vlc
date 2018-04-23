@@ -216,10 +216,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
-    p_dec->p_sys->bits.buf_size = 0;
-    p_dec->p_sys->b_packetizer = false;
-    p_dec->p_sys->rtp_rate = p_dec->fmt_in.audio.i_rate;
-    p_dec->p_sys->b_has_headers = false;
+    p_sys->bits.buf_size = 0;
+    p_sys->b_packetizer = false;
+    p_sys->rtp_rate = p_dec->fmt_in.audio.i_rate;
+    p_sys->b_has_headers = false;
 
     date_Set( &p_sys->end_date, 0 );
 
@@ -255,12 +255,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     int i_ret = OpenDecoder( p_this );
 
     if( i_ret == VLC_SUCCESS )
     {
-        p_dec->p_sys->b_packetizer = true;
+        p_sys->b_packetizer = true;
         p_dec->fmt_out.i_codec = VLC_CODEC_SPEEX;
     }
 

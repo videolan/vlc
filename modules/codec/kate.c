@@ -436,12 +436,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     int i_ret = OpenDecoder( p_this );
 
     if( i_ret == VLC_SUCCESS )
     {
-        p_dec->p_sys->b_packetizer = true;
+        p_sys->b_packetizer = true;
         p_dec->fmt_out.i_codec = VLC_CODEC_KATE;
     }
 
@@ -1247,9 +1248,11 @@ static void ParseKateComments( decoder_t *p_dec )
     char *psz_name, *psz_value, *psz_comment;
     int i = 0;
 
-    while ( i < p_dec->p_sys->kc.comments )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    while ( i < p_sys->kc.comments )
     {
-        psz_comment = strdup( p_dec->p_sys->kc.user_comments[i] );
+        psz_comment = strdup( p_sys->kc.user_comments[i] );
         if( !psz_comment )
             break;
         psz_name = psz_comment;

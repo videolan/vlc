@@ -159,7 +159,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
         return VLC_ENOMEM;
-    p_dec->p_sys->b_packetizer = false;
+    p_sys->b_packetizer = false;
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_decoded_first_keyframe = false;
@@ -183,12 +183,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     int i_ret = OpenDecoder( p_this );
 
     if( i_ret == VLC_SUCCESS )
     {
-        p_dec->p_sys->b_packetizer = true;
+        p_sys->b_packetizer = true;
         p_dec->fmt_out.i_codec = VLC_CODEC_THEORA;
     }
 
@@ -550,6 +551,9 @@ static void ParseTheoraComments( decoder_t *p_dec )
 {
     char *psz_name, *psz_value, *psz_comment;
     int i = 0;
+
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     /* Regarding the th_comment structure: */
 
     /* The metadata is stored as a series of (tag, value) pairs, in
@@ -565,14 +569,14 @@ static void ParseTheoraComments( decoder_t *p_dec )
        the bitstream format itself treats them as 8-bit clean vectors,
        possibly containing null characters, and so the length array
        should be treated as their authoritative length. */
-    while ( i < p_dec->p_sys->tc.comments )
+    while ( i < p_sys->tc.comments )
     {
-        int clen = p_dec->p_sys->tc.comment_lengths[i];
+        int clen = p_sys->tc.comment_lengths[i];
         if ( clen <= 0 || clen >= INT_MAX ) { i++; continue; }
         psz_comment = (char *)malloc( clen + 1 );
         if( !psz_comment )
             break;
-        memcpy( (void*)psz_comment, (void*)p_dec->p_sys->tc.user_comments[i], clen + 1 );
+        memcpy( (void*)psz_comment, (void*)p_sys->tc.user_comments[i], clen + 1 );
         psz_name = psz_comment;
         psz_value = strchr( psz_comment, '=' );
         if( psz_value )

@@ -502,6 +502,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
     p_spu->b_absolute = false;
 
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    decoder_sys_t *p_dec_sys = p_dec->p_sys;
 
     /* Set first region defaults */
     /* The "leavetext" alignment is a special mode where the subpicture
@@ -512,7 +513,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
 
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
-    if( p_dec->p_sys->b_opaque )
+    if( p_dec_sys->b_opaque )
     {
         p_spu_sys->p_default_style->i_background_alpha = STYLE_ALPHA_OPAQUE >> 1;
         p_spu_sys->p_default_style->i_features |= STYLE_HAS_BACKGROUND_ALPHA;

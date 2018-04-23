@@ -399,7 +399,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_bit_rate == 0 )
             {
                 /* Free bitrate, but 99% emulated startcode :( */
-                if( p_dec->p_sys->i_free_frame_size == MPGA_HEADER_SIZE )
+                if( p_sys->i_free_frame_size == MPGA_HEADER_SIZE )
                 {
                     msg_Dbg( p_dec, "free bitrate mode");
                 }

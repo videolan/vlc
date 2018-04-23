@@ -116,11 +116,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    decoder_sys_t *p_sys = malloc( sizeof(decoder_sys_t) );
     if( p_dec->p_sys == NULL )
         return VLC_ENOMEM;
+    p_dec->p_sys = p_sys;
 
-    p_dec->p_sys->p_obj = p_this;
+    p_sys->p_obj = p_this;
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;

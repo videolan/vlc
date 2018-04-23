@@ -132,10 +132,11 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->p_sys->p_block )
+    if( p_sys->p_block )
     {
-        block_ChainRelease( p_dec->p_sys->p_block );
+        block_ChainRelease( p_sys->p_block );
     }
 
     free( p_dec->p_sys );
@@ -143,11 +144,12 @@ static void Close( vlc_object_t *p_this )
 
 static void Flush( decoder_t *p_dec )
 {
-    block_t *p_ret = p_dec->p_sys->p_block;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_ret = p_sys->p_block;
     if ( p_ret )
     {
         block_Release( p_ret );
-        p_dec->p_sys->p_block = NULL;
+        p_sys->p_block = NULL;
     }
 }
 
@@ -157,7 +159,8 @@ static void Flush( decoder_t *p_dec )
 static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_block;
-    block_t *p_ret = p_dec->p_sys->p_block;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_ret = p_sys->p_block;
 
     if( pp_block == NULL || *pp_block == NULL )
         return NULL;
@@ -187,10 +190,10 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
         if (p_dec->fmt_in.i_codec != VLC_CODEC_OPUS)
             p_ret->i_length = p_block->i_pts - p_ret->i_pts;
     }
-    p_dec->p_sys->p_block = p_block;
+    p_sys->p_block = p_block;
 
-    if( p_ret && p_dec->p_sys->pf_parse )
-        p_dec->p_sys->pf_parse( p_dec, p_ret );
+    if( p_ret && p_sys->pf_parse )
+        p_sys->pf_parse( p_dec, p_ret );
     return p_ret;
 }
 

@@ -1615,13 +1615,15 @@ static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
 
 static int ConfigureVout(decoder_t *p_dec)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     /* return our proper VLC internal state */
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.video.p_palette = NULL;
     p_dec->fmt_out.i_codec = 0;
 
-    if(p_dec->p_sys->pf_configure_vout &&
-       !p_dec->p_sys->pf_configure_vout(p_dec))
+    if(p_sys->pf_configure_vout &&
+       !p_sys->pf_configure_vout(p_dec))
         return VLC_EGENERIC;
 
     if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
@@ -1667,11 +1669,12 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
                                               CMFormatDescriptionRef fmt_desc,
                                               block_t *p_block)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     OSStatus status;
     CMBlockBufferRef  block_buf = NULL;
     CMSampleBufferRef sample_buf = NULL;
     CMTime pts;
-    if(!p_dec->p_sys->b_poc_based_reorder && p_block->i_pts == VLC_TS_INVALID)
+    if(!p_sys->b_poc_based_reorder && p_block->i_pts == VLC_TS_INVALID)
         pts = CMTimeMake(p_block->i_dts, CLOCK_FREQ);
     else
         pts = CMTimeMake(p_block->i_pts, CLOCK_FREQ);
@@ -2029,6 +2032,7 @@ skip:
 
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     NSDictionary *attachmentDict =
         (__bridge NSDictionary *)CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
 
@@ -2088,13 +2092,13 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             assert(CVPixelBufferIsPlanar(imageBuffer) == false);
             break;
         default:
-            p_dec->p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+            p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
             return -1;
     }
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     if (decoder_UpdateVideoFormat(p_dec) != 0)
     {
-        p_dec->p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
         return -1;
     }
     return 0;

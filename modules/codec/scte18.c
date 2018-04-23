@@ -178,7 +178,9 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if (p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
         goto exit;
 
-    scte18_cea_t *p_cea = scte18_cea_Decode( p_dec->p_sys->p_handle, p_block );
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    scte18_cea_t *p_cea = scte18_cea_Decode( p_sys->p_handle, p_block );
     if( p_cea )
     {
         p_spu = decoder_NewSubpictureText( p_dec );
