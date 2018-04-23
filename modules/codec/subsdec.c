@@ -361,7 +361,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
-    char *psz_subtitle = NULL;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         return NULL;
@@ -383,7 +382,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Should be resiliant against bad subtitles */
-    psz_subtitle = malloc( p_block->i_buffer + 1 );
+    char *psz_subtitle = malloc( p_block->i_buffer + 1 );
     if( psz_subtitle == NULL )
         return NULL;
     memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
@@ -400,7 +399,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
     else
     {
-
         if( p_sys->b_autodetect_utf8 )
         {
             if( IsUTF8( psz_subtitle ) == NULL )
@@ -413,7 +411,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
         if( !p_sys->b_autodetect_utf8 )
         {
-            size_t inbytes_left = strlen( psz_subtitle );
+            size_t inbytes_left = p_block->i_buffer;
             size_t outbytes_left = 6 * inbytes_left;
             char *psz_new_subtitle = xmalloc( outbytes_left + 1 );
             char *psz_convert_buffer_out = psz_new_subtitle;
