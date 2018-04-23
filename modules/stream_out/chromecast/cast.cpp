@@ -279,7 +279,7 @@ vlc_module_end ()
 
 static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     sout_stream_id_sys_t *id = sout_StreamIdAdd(p_stream->p_next, p_fmt);
     if (id)
     {
@@ -292,7 +292,7 @@ static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t
 
 static void ProxyDel(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     p_sys->out_streams_added--;
     if (id == p_sys->video_proxy_id)
         p_sys->video_proxy_id = NULL;
@@ -302,7 +302,7 @@ static void ProxyDel(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 static int ProxySend(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                      block_t *p_buffer)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     if (p_sys->cc_has_input
      || p_sys->out_streams_added >= p_sys->out_streams.size() - p_sys->spu_streams_count)
     {
@@ -701,7 +701,7 @@ static void AccessClose(vlc_object_t *p_this)
  *****************************************************************************/
 static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     vlc_mutex_locker locker(&p_sys->lock);
 
     if (!p_sys->b_supports_video)
@@ -727,7 +727,7 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
 static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                         bool reset_config)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
     for (std::vector<sout_stream_id_sys_t*>::iterator it = p_sys->streams.begin();
          it != p_sys->streams.end(); )
@@ -775,7 +775,7 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
 static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
     vlc_mutex_locker locker(&p_sys->lock);
     DelInternal(p_stream, id, true);
@@ -1404,7 +1404,7 @@ bool sout_stream_sys_t::isFlushing( sout_stream_t *p_stream )
 static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 block_t *p_buffer)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     vlc_mutex_locker locker(&p_sys->lock);
 
     if( p_sys->isFlushing( p_stream ) )
@@ -1429,7 +1429,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
 static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     vlc_mutex_locker locker(&p_sys->lock);
 
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id, false );
@@ -1457,7 +1457,7 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static void on_input_event_cb(void *data, enum cc_input_event event, union cc_input_arg arg )
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(data);
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
     vlc_mutex_locker locker(&p_sys->lock);
     switch (event)
@@ -1598,7 +1598,7 @@ error:
 static void Close(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
     assert(p_sys->out_streams.empty() && p_sys->streams.empty());
     var_Destroy( p_stream->p_sout, SOUT_CFG_PREFIX "sys" );

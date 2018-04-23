@@ -298,8 +298,9 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
 static void transcode_video_filter_init( sout_stream_t *p_stream,
                                          sout_stream_id_sys_t *id )
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     filter_owner_t owner = {
-        .sys = p_stream->p_sys,
+        .sys = p_sys,
         .video = {
             .buffer_new = transcode_video_filter_buffer_new,
         },
@@ -317,17 +318,17 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         id->p_decoder->fmt_out.video.i_visible_width = id->p_decoder->fmt_out.video.i_width;
 
     /* Deinterlace */
-    if( p_stream->p_sys->psz_deinterlace != NULL )
+    if( p_sys->psz_deinterlace != NULL )
     {
         filter_chain_AppendFilter( id->p_f_chain,
-                                   p_stream->p_sys->psz_deinterlace,
-                                   p_stream->p_sys->p_deinterlace_cfg,
+                                   p_sys->psz_deinterlace,
+                                   p_sys->p_deinterlace_cfg,
                                    &id->p_decoder->fmt_out,
                                    &id->p_decoder->fmt_out );
 
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
     }
-    if( p_stream->p_sys->b_master_sync )
+    if( p_sys->b_master_sync )
     {
         filter_chain_AppendFilter( id->p_f_chain,
                                    "fps",
@@ -338,7 +339,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
     }
 
-    if( p_stream->p_sys->psz_vf2 )
+    if( p_sys->psz_vf2 )
     {
         id->p_uf_chain = filter_chain_NewVideo( p_stream, true, &owner );
         filter_chain_Reset( id->p_uf_chain, p_fmt_out,
@@ -348,7 +349,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
             filter_chain_AppendConverter( id->p_uf_chain, p_fmt_out,
                                            &id->p_encoder->fmt_in );
         }
-        filter_chain_AppendFromString( id->p_uf_chain, p_stream->p_sys->psz_vf2 );
+        filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
         p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
         es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
         id->p_encoder->fmt_out.video.i_width =
@@ -363,8 +364,8 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
     if( p_fmt_out )
     {
-        p_stream->p_sys->i_spu_width = p_fmt_out->video.i_visible_width;
-        p_stream->p_sys->i_spu_height = p_fmt_out->video.i_visible_height;
+        p_sys->i_spu_width = p_fmt_out->video.i_visible_width;
+        p_sys->i_spu_height = p_fmt_out->video.i_visible_height;
     }
 
     /* Keep colorspace etc info along */
@@ -661,23 +662,24 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 void transcode_video_close( sout_stream_t *p_stream,
                                    sout_stream_id_sys_t *id )
 {
-    if( p_stream->p_sys->i_threads >= 1 && !p_stream->p_sys->b_abort )
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    if( p_sys->i_threads >= 1 && !p_sys->b_abort )
     {
-        vlc_mutex_lock( &p_stream->p_sys->lock_out );
-        p_stream->p_sys->b_abort = true;
-        vlc_cond_signal( &p_stream->p_sys->cond );
-        vlc_mutex_unlock( &p_stream->p_sys->lock_out );
+        vlc_mutex_lock( &p_sys->lock_out );
+        p_sys->b_abort = true;
+        vlc_cond_signal( &p_sys->cond );
+        vlc_mutex_unlock( &p_sys->lock_out );
 
-        vlc_join( p_stream->p_sys->thread, NULL );
+        vlc_join( p_sys->thread, NULL );
 
-        picture_fifo_Delete( p_stream->p_sys->pp_pics );
-        block_ChainRelease( p_stream->p_sys->p_buffers );
+        picture_fifo_Delete( p_sys->pp_pics );
+        block_ChainRelease( p_sys->p_buffers );
     }
 
-    if( p_stream->p_sys->i_threads >= 1 )
+    if( p_sys->i_threads >= 1 )
     {
-        vlc_mutex_destroy( &p_stream->p_sys->lock_out );
-        vlc_cond_destroy( &p_stream->p_sys->cond );
+        vlc_mutex_destroy( &p_sys->lock_out );
+        vlc_cond_destroy( &p_sys->cond );
     }
 
     /* Close decoder */
@@ -902,12 +904,12 @@ end:
         else
         {
             msg_Dbg( p_stream, "Flushing thread and waiting that");
-            vlc_mutex_lock( &p_stream->p_sys->lock_out );
-            p_stream->p_sys->b_abort = true;
-            vlc_cond_signal( &p_stream->p_sys->cond );
-            vlc_mutex_unlock( &p_stream->p_sys->lock_out );
+            vlc_mutex_lock( &p_sys->lock_out );
+            p_sys->b_abort = true;
+            vlc_cond_signal( &p_sys->cond );
+            vlc_mutex_unlock( &p_sys->lock_out );
 
-            vlc_join( p_stream->p_sys->thread, NULL );
+            vlc_join( p_sys->thread, NULL );
             vlc_mutex_lock( &p_sys->lock_out );
             *out = p_sys->p_buffers;
             p_sys->p_buffers = NULL;

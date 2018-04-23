@@ -1264,8 +1264,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
-    assert( p_stream->p_sys->p_mux == NULL );
-    (void)p_stream;
+    assert( ((sout_stream_sys_t *)p_stream->p_sys)->p_mux == NULL );
 
     while( p_buffer != NULL )
     {
@@ -1679,7 +1678,8 @@ static sout_stream_id_sys_t *MuxAdd( sout_stream_t *p_stream,
                                      const es_format_t *p_fmt )
 {
     sout_input_t      *p_input;
-    sout_mux_t *p_mux = p_stream->p_sys->p_mux;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_mux_t *p_mux = p_sys->p_mux;
     assert( p_mux != NULL );
 
     p_input = sout_MuxAddStream( p_mux, p_fmt );
@@ -1696,7 +1696,8 @@ static sout_stream_id_sys_t *MuxAdd( sout_stream_t *p_stream,
 static int MuxSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                     block_t *p_buffer )
 {
-    sout_mux_t *p_mux = p_stream->p_sys->p_mux;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_mux_t *p_mux = p_sys->p_mux;
     assert( p_mux != NULL );
 
     return sout_MuxSendBuffer( p_mux, (sout_input_t *)id, p_buffer );
@@ -1706,7 +1707,8 @@ static int MuxSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 /** Remove an ES from a non-RTP muxed stream */
 static void MuxDel( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_mux_t *p_mux = p_stream->p_sys->p_mux;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_mux_t *p_mux = p_sys->p_mux;
     assert( p_mux != NULL );
 
     sout_MuxDeleteStream( p_mux, (sout_input_t *)id );

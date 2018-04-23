@@ -132,23 +132,27 @@ struct sout_stream_sys_t
 
 static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
-    return (sout_stream_id_sys_t*)sout_MuxAddStream( p_stream->p_sys->p_mux, p_fmt );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    return (sout_stream_id_sys_t*)sout_MuxAddStream( p_sys->p_mux, p_fmt );
 }
 
 static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_MuxDeleteStream( p_stream->p_sys->p_mux, (sout_input_t*)id );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_MuxDeleteStream( p_sys->p_mux, (sout_input_t*)id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
-    return sout_MuxSendBuffer( p_stream->p_sys->p_mux, (sout_input_t*)id, p_buffer );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    return sout_MuxSendBuffer( p_sys->p_mux, (sout_input_t*)id, p_buffer );
 }
 
 static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_MuxFlush( p_stream->p_sys->p_mux, (sout_input_t*)id );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_MuxFlush( p_sys->p_mux, (sout_input_t*)id );
 }
 
 static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)

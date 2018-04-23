@@ -213,7 +213,7 @@ struct sout_stream_t
     int               (*pf_control)( sout_stream_t *, int, va_list );
     void              (*pf_flush)( sout_stream_t *, sout_stream_id_sys_t * );
 
-    sout_stream_sys_t *p_sys;
+    void              *p_sys;
     bool pace_nocontrol;
 };
 

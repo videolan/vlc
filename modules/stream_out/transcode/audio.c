@@ -125,7 +125,7 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
         id->p_encoder->fmt_out.audio.i_physical_channels;
     aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
 
-    id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
+    id->p_encoder->p_cfg = p_sys->p_audio_cfg;
     id->p_encoder->p_module =
         module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     /* p_sys->i_acodec = 0 if there isn't acodec defined */
