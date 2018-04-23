@@ -776,9 +776,10 @@ static int DeviceRestartLocked(audio_output_t *aout)
 
 static int DeviceSelect(audio_output_t *aout, const char *id)
 {
-    EnterCriticalSection(&aout->sys->lock);
+    aout_sys_t *sys = aout->sys;
+    EnterCriticalSection(&sys->lock);
     int ret = DeviceSelectLocked(aout, id);
-    LeaveCriticalSection(&aout->sys->lock);
+    LeaveCriticalSection(&sys->lock);
     return ret;
 }
 

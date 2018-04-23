@@ -636,7 +636,7 @@ DefaultDeviceChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
 
     aout_sys_t *p_sys = p_aout->sys;
 
-    if (!p_aout->sys->b_selected_dev_is_default)
+    if (!p_sys->b_selected_dev_is_default)
         return noErr;
 
     AudioObjectID defaultDeviceID;
@@ -651,7 +651,7 @@ DefaultDeviceChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
 
     /* Default device is changed by the os to allow other apps to play sound
      * while in digital mode. But this should not affect ourself. */
-    if (p_aout->sys->b_digital)
+    if (p_sys->b_digital)
     {
         msg_Dbg(p_aout, "ignore, as digital mode is active");
         return noErr;
@@ -659,7 +659,7 @@ DefaultDeviceChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     /* Also ignore events which announce the same device id */
-    if (defaultDeviceID != p_aout->sys->i_selected_dev)
+    if (defaultDeviceID != p_sys->i_selected_dev)
     {
         msg_Dbg(p_aout, "default device actually changed, resetting aout");
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);

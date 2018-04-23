@@ -175,7 +175,7 @@ static void stream_start_now(pa_stream *s, audio_output_t *aout)
 {
     pa_operation *op;
 
-    assert (aout->sys->trigger == NULL);
+    assert ( ((aout_sys_t *)aout->sys)->trigger == NULL );
 
     op = pa_stream_cork(s, 0, NULL, NULL);
     if (op != NULL)

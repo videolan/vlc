@@ -694,7 +694,8 @@ static void Play (audio_output_t *aout, block_t *block)
  */
 static void Pause (audio_output_t *aout, bool pause, mtime_t date)
 {
-    snd_pcm_t *pcm = aout->sys->pcm;
+    aout_sys_t *p_sys = aout->sys;
+    snd_pcm_t *pcm = p_sys->pcm;
 
     int val = snd_pcm_pause (pcm, pause);
     if (unlikely(val))
@@ -703,7 +704,8 @@ static void Pause (audio_output_t *aout, bool pause, mtime_t date)
 
 static void PauseDummy (audio_output_t *aout, bool pause, mtime_t date)
 {
-    snd_pcm_t *pcm = aout->sys->pcm;
+    aout_sys_t *p_sys = aout->sys;
+    snd_pcm_t *pcm = p_sys->pcm;
 
     /* Stupid device cannot pause. Discard samples. */
     if (pause)
@@ -718,7 +720,8 @@ static void PauseDummy (audio_output_t *aout, bool pause, mtime_t date)
  */
 static void Flush (audio_output_t *aout, bool wait)
 {
-    snd_pcm_t *pcm = aout->sys->pcm;
+    aout_sys_t *p_sys = aout->sys;
+    snd_pcm_t *pcm = p_sys->pcm;
 
     if (wait)
         snd_pcm_drain (pcm);

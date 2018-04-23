@@ -116,7 +116,7 @@ struct audio_output
 {
     struct vlc_common_members obj;
 
-    struct aout_sys_t *sys; /**< Private data for callbacks */
+    void *sys; /**< Private data for callbacks */
 
     int (*start)(audio_output_t *, audio_sample_format_t *fmt);
     /**< Starts a new stream (mandatory, cannot be NULL).

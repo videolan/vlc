@@ -183,7 +183,8 @@ static HRESULT StreamTimeGet( aout_stream_t *s, mtime_t *delay )
 
 static int OutputTimeGet( audio_output_t *aout, mtime_t *delay )
 {
-    return (TimeGet( &aout->sys->s, delay ) == DS_OK) ? 0 : -1;
+    aout_sys_t *sys = aout->sys;
+    return (TimeGet( &sys->s, delay ) == DS_OK) ? 0 : -1;
 }
 
 /**
@@ -304,7 +305,8 @@ static HRESULT StreamPlay( aout_stream_t *s, block_t *block )
 
 static void OutputPlay( audio_output_t *aout, block_t *block )
 {
-    Play( VLC_OBJECT(aout), &aout->sys->s, block );
+    aout_sys_t *sys = aout->sys;
+    Play( VLC_OBJECT(aout), &sys->s, block );
 }
 
 static HRESULT Pause( aout_stream_sys_t *sys, bool pause )
@@ -333,7 +335,8 @@ static HRESULT StreamPause( aout_stream_t *s, bool pause )
 
 static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    Pause( &aout->sys->s, pause );
+    aout_sys_t *sys = aout->sys;
+    Pause( &sys->s, pause );
     (void) date;
 }
 
@@ -359,8 +362,8 @@ static HRESULT StreamFlush( aout_stream_t *s )
 
 static void OutputFlush( audio_output_t *aout, bool drain )
 {
-    aout_stream_sys_t *sys = &aout->sys->s;
-    Flush( sys, drain );
+    aout_sys_t *sys = aout->sys;
+    Flush( &sys->s, drain );
 }
 
 /**
@@ -585,7 +588,8 @@ static HRESULT StreamStop( aout_stream_t *s )
 static void OutputStop( audio_output_t *aout )
 {
     msg_Dbg( aout, "closing audio device" );
-    Stop( &aout->sys->s );
+    aout_sys_t *sys = aout->sys;
+    Stop( &sys->s );
 }
 
 static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
@@ -964,13 +968,14 @@ static int OutputStart( audio_output_t *p_aout,
         return -1;
     }
 
-    HRESULT hr = Start( VLC_OBJECT(p_aout), &p_aout->sys->s, fmt );
+    aout_sys_t *sys = p_aout->sys;
+    HRESULT hr = Start( VLC_OBJECT(p_aout), &sys->s, fmt );
     if( FAILED(hr) )
         return -1;
 
     /* Force volume update */
-    VolumeSet( p_aout, p_aout->sys->volume.volume );
-    MuteSet( p_aout, p_aout->sys->volume.mute );
+    VolumeSet( p_aout, sys->volume.volume );
+    MuteSet( p_aout, sys->volume.mute );
 
     /* then launch the notification thread */
     p_aout->time_get = OutputTimeGet;
@@ -1099,7 +1104,8 @@ static void Close(vlc_object_t *obj)
 static void * PlayedDataEraser( void * data )
 {
     const audio_output_t *aout = (audio_output_t *) data;
-    aout_stream_sys_t *p_sys = &aout->sys->s;
+    aout_sys_t *aout_sys = aout->sys;
+    aout_stream_sys_t *p_sys = &aout_sys->s;
     void *p_write_position, *p_wrap_around;
     unsigned long l_bytes1, l_bytes2;
     DWORD i_read;
