@@ -458,6 +458,7 @@ static void CloseDemux( vlc_object_t *p_this )
 static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     char *psz_addr;
     int timeout = -1;
     int canc = vlc_savecancel ();
@@ -524,7 +525,7 @@ static void *Run( void *data )
         InitSocket( p_sd, psz_addr, SAP_PORT );
     free( psz_addr );
 
-    if( p_sd->p_sys->i_fd == 0 )
+    if( p_sys->i_fd == 0 )
     {
         msg_Err( p_sd, "unable to listen on any address" );
         return NULL;
@@ -534,12 +535,12 @@ static void *Run( void *data )
     for (;;)
     {
         vlc_restorecancel (canc);
-        unsigned n = p_sd->p_sys->i_fd;
+        unsigned n = p_sys->i_fd;
         struct pollfd ufd[n];
 
         for (unsigned i = 0; i < n; i++)
         {
-            ufd[i].fd = p_sd->p_sys->pi_fd[i];
+            ufd[i].fd = p_sys->pi_fd[i];
             ufd[i].events = POLLIN;
             ufd[i].revents = 0;
         }
@@ -576,10 +577,10 @@ static void *Run( void *data )
         timeout = 1000 * 60 * 60;
 
         /* Check for items that need deletion */
-        for( int i = 0; i < p_sd->p_sys->i_announces; i++ )
+        for( int i = 0; i < p_sys->i_announces; i++ )
         {
-            mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
-            sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
+            mtime_t i_timeout = ( mtime_t ) 1000000 * p_sys->i_timeout;
+            sap_announce_t * p_announce = p_sys->pp_announces[i];
             mtime_t i_last_period = now - p_announce->i_last;
 
             /* Remove the announcement, if the last announcement was 1 hour ago
@@ -599,7 +600,7 @@ static void *Run( void *data )
             }
         }
 
-        if( !p_sd->p_sys->i_announces )
+        if( !p_sys->i_announces )
             timeout = -1; /* We can safely poll indefinitely. */
         else if( timeout < 200 )
             timeout = 200; /* Don't wakeup too fast. */
@@ -663,6 +664,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                      size_t len )
 {
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     const char          *psz_sdp;
     const uint8_t *end = buf + len;
     sdp_t               *p_sdp;
@@ -693,7 +695,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
     uint16_t i_hash = U16_AT (buf + 2);
 
-    if( p_sd->p_sys->b_strict && i_hash == 0 )
+    if( p_sys->b_strict && i_hash == 0 )
     {
         msg_Dbg( p_sd, "strict mode, discarding announce with null id hash");
         return VLC_EGENERIC;
@@ -774,7 +776,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         p_sdp->psz_uri = NULL;
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
-    if( !IsWellKnownPayload( p_sdp->i_media_type ) || !p_sd->p_sys->b_parse )
+    if( !IsWellKnownPayload( p_sdp->i_media_type ) || !p_sys->b_parse )
     {
         free( p_sdp->psz_uri );
         if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
@@ -787,9 +789,9 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         goto error;
     }
 
-    for( int i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
+    for( int i = 0 ; i < p_sys->i_announces ; i++ )
     {
-        sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
+        sap_announce_t * p_announce = p_sys->pp_announces[i];
         /* FIXME: slow */
         if( ( !i_hash && IsSameSession( p_announce->p_sdp, p_sdp ) )
             || ( i_hash && p_announce->i_hash == i_hash
@@ -800,7 +802,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
              * Instead we cleverly implement Implicit Announcement removal.
              *
              * if( b_need_delete )
-             *    RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i]);
+             *    RemoveAnnounce( p_sd, p_sys->pp_announces[i]);
              * else
              */
 
@@ -1481,7 +1483,8 @@ static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
         return VLC_EGENERIC;
 
     shutdown( i_fd, SHUT_WR );
-    TAB_APPEND(p_sd->p_sys->i_fd, p_sd->p_sys->pi_fd, i_fd);
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    TAB_APPEND(p_sys->i_fd, p_sys->pi_fd, i_fd);
     return VLC_SUCCESS;
 }
 
@@ -1572,8 +1575,8 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
         p_announce->p_item = NULL;
     }
 
-    TAB_REMOVE(p_sd->p_sys->i_announces, p_sd->p_sys->pp_announces,
-               p_announce);
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    TAB_REMOVE(p_sys->i_announces, p_sys->pp_announces, p_announce);
     free( p_announce );
 
     return VLC_SUCCESS;

@@ -223,7 +223,7 @@ static void *
 SearchThread( void *p_data )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_data;
-    services_discovery_sys_t *p_sys  = p_sd->p_sys;
+    services_discovery_sys_t *p_sys = reinterpret_cast<services_discovery_sys_t *>( p_sd->p_sys );
 
     /* Search for media servers */
     int i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    services_discovery_sys_t *p_sys = reinterpret_cast<services_discovery_sys_t *>( p_sd->p_sys );
 
     vlc_join( p_sys->thread, NULL );
     p_sys->p_upnp->release( true );

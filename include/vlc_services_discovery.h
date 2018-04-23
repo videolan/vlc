@@ -66,7 +66,7 @@ struct services_discovery_t
      */
     int ( *pf_control ) ( services_discovery_t *, int, va_list );
 
-    services_discovery_sys_t *p_sys;          /**< Custom private data */
+    void *p_sys;                              /**< Custom private data */
 
     struct services_discovery_owner_t owner; /**< Owner callbacks */
 };

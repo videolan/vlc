@@ -118,11 +118,12 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    free( p_sd->p_sys->psz_name );
-    vlc_cancel( p_sd->p_sys->thread );
-    vlc_join( p_sd->p_sys->thread, NULL );
-    free( p_sd->p_sys );
+    free( p_sys->psz_name );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -180,6 +181,7 @@ static void *Run( void *data )
 static int AddDevice( services_discovery_t *p_sd,
                       LIBMTP_raw_device_t *p_raw_device )
 {
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     char *psz_name = NULL;
     LIBMTP_mtpdevice_t *p_device;
     LIBMTP_track_t *p_track, *p_tmp;
@@ -191,24 +193,24 @@ static int AddDevice( services_discovery_t *p_sd,
                 if( !( psz_name = strdup( N_( "MTP Device" ) ) ) )
                     return VLC_ENOMEM;
         msg_Info( p_sd, "Found device: %s", psz_name );
-        p_sd->p_sys->i_bus = p_raw_device->bus_location;
-        p_sd->p_sys->i_dev = p_raw_device->devnum;
-        p_sd->p_sys->i_product_id = p_raw_device->device_entry.product_id;
+        p_sys->i_bus = p_raw_device->bus_location;
+        p_sys->i_dev = p_raw_device->devnum;
+        p_sys->i_product_id = p_raw_device->device_entry.product_id;
         if( ( p_track = LIBMTP_Get_Tracklisting_With_Callback( p_device,
                             CountTracks, p_sd ) ) == NULL )
         {
             msg_Warn( p_sd, "No tracks on the device" );
-            p_sd->p_sys->pp_items = NULL;
+            p_sys->pp_items = NULL;
         }
         else
         {
-            if( !( p_sd->p_sys->pp_items = calloc( p_sd->p_sys->i_tracks_num,
+            if( !( p_sys->pp_items = calloc( p_sys->i_tracks_num,
                                                    sizeof( input_item_t * ) ) ) )
             {
                 free( psz_name );
                 return VLC_ENOMEM;
             }
-            p_sd->p_sys->i_count = 0;
+            p_sys->i_count = 0;
             while( p_track != NULL )
             {
                 msg_Dbg( p_sd, "Track found: %s - %s", p_track->artist,
@@ -219,7 +221,7 @@ static int AddDevice( services_discovery_t *p_sd,
                 LIBMTP_destroy_track_t( p_tmp );
             }
         }
-        p_sd->p_sys->psz_name = psz_name;
+        p_sys->psz_name = psz_name;
         LIBMTP_Release_Device( p_device );
         return VLC_SUCCESS;
     }
@@ -232,14 +234,15 @@ static int AddDevice( services_discovery_t *p_sd,
 
 static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
 {
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     input_item_t *p_input;
     char *psz_string;
     char *extension;
 
     extension = rindex( p_track->filename, '.' );
     if( asprintf( &psz_string, "mtp://%"PRIu32":%"PRIu8":%"PRIu16":%d%s",
-                  p_sd->p_sys->i_bus, p_sd->p_sys->i_dev,
-                  p_sd->p_sys->i_product_id, p_track->item_id,
+                  p_sys->i_bus, p_sys->i_dev,
+                  p_sys->i_product_id, p_track->item_id,
                   extension ) == -1 )
     {
         msg_Err( p_sd, "Error adding %s, skipping it", p_track->filename );
@@ -269,16 +272,17 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
     input_item_SetDate( p_input, p_track->date );
     p_input->i_duration = p_track->duration * INT64_C(1000);
     services_discovery_AddItem( p_sd, p_input );
-    p_sd->p_sys->pp_items[p_sd->p_sys->i_count++] = p_input;
+    p_sys->pp_items[p_sys->i_count++] = p_input;
 }
 
 static void CloseDevice( services_discovery_t *p_sd )
 {
-    input_item_t **pp_items = p_sd->p_sys->pp_items;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    input_item_t **pp_items = p_sys->pp_items;
 
     if( pp_items != NULL )
     {
-        for( int i_i = 0; i_i < p_sd->p_sys->i_count; i_i++ )
+        for( int i_i = 0; i_i < p_sys->i_count; i_i++ )
         {
             if( pp_items[i_i] != NULL )
             {
@@ -295,6 +299,7 @@ static int CountTracks( uint64_t const sent, uint64_t const total,
 {
     VLC_UNUSED( sent );
     services_discovery_t *p_sd = (services_discovery_t *)data;
-    p_sd->p_sys->i_tracks_num = total;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    p_sys->i_tracks_num = total;
     return 0;
 }

@@ -184,16 +184,16 @@ static void Close( vlc_object_t *p_this )
 
     for( int i = 0; i < p_sys->i_input; i++ )
     {
-        input_thread_t *p_input = p_sd->p_sys->pp_input[i];
+        input_thread_t *p_input = p_sys->pp_input[i];
         if( !p_input )
             continue;
 
         input_Stop( p_input );
         input_Close( p_input );
 
-        p_sd->p_sys->pp_input[i] = NULL;
+        p_sys->pp_input[i] = NULL;
     }
-    free( p_sd->p_sys->pp_input );
+    free( p_sys->pp_input );
 
     for( int i = 0; i < p_sys->i_urls; i++ )
          free( p_sys->ppsz_urls[i] );
@@ -237,9 +237,9 @@ noreturn static void *Run( void *data )
 
         p_sys->b_update = false;
 
-        for( int i = 0; i < p_sd->p_sys->i_input; i++ )
+        for( int i = 0; i < p_sys->i_input; i++ )
         {
-            input_thread_t *p_input = p_sd->p_sys->pp_input[i];
+            input_thread_t *p_input = p_sys->pp_input[i];
             int state = var_GetInteger( p_input, "state" );
 
             if( state == END_S || state == ERROR_S )
@@ -247,7 +247,7 @@ noreturn static void *Run( void *data )
                 input_Stop( p_input );
                 input_Close( p_input );
 
-                p_sd->p_sys->pp_input[i] = NULL;
+                p_sys->pp_input[i] = NULL;
                 TAB_ERASE(p_sys->i_input, p_sys->pp_input, i);
                 i--;
             }
