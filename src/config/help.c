@@ -122,8 +122,6 @@ bool config_PrintHelp (vlc_object_t *obj)
     /* Check for full help option */
     if (var_InheritBool (obj, "full-help"))
     {
-        var_Create (obj, "advanced", VLC_VAR_BOOL);
-        var_SetBool (obj, "advanced", true);
         var_Create (obj, "help-verbose", VLC_VAR_BOOL);
         var_SetBool (obj, "help-verbose", true);
         Help (obj, "full-help");
@@ -565,7 +563,7 @@ static bool module_match(const module_t *m, const char *pattern, bool strict)
     return false;
 }
 
-static bool plugin_show(const vlc_plugin_t *plugin, bool advanced)
+static bool plugin_show(const vlc_plugin_t *plugin)
 {
     for (size_t i = 0; i < plugin->conf.size; i++)
     {
@@ -575,8 +573,6 @@ static bool plugin_show(const vlc_plugin_t *plugin, bool advanced)
             continue;
         if (item->b_removed)
             continue;
-        if ((!advanced) && item->b_advanced)
-            continue;
         return true;
     }
     return false;
@@ -584,10 +580,7 @@ static bool plugin_show(const vlc_plugin_t *plugin, bool advanced)
 
 static void Usage (vlc_object_t *p_this, char const *psz_search)
 {
-    bool b_has_advanced = false;
     bool found = false;
-    unsigned i_only_advanced = 0; /* Number of modules ignored because they
-                               * only have advanced options */
     bool strict = false;
     if (psz_search != NULL && psz_search[0] == '=')
     {
@@ -602,7 +595,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
 #endif
 
     const bool desc = var_InheritBool(p_this, "help-verbose");
-    const bool advanced = var_InheritBool(p_this, "advanced");
 
     /* Enumerate the config for each module */
     for (const vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
@@ -617,11 +609,8 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
             continue;
         found = true;
 
-        if (!plugin_show(p, advanced))
-        {   /* Ignore plugins with only advanced config options if requested */
-            i_only_advanced++;
+        if (!plugin_show(p))
             continue;
-        }
 
         /* Print name of module */
         printf(color ? "\n " GREEN "%s" GRAY " (%s)\n" : "\n %s (%s)\n",
@@ -637,28 +626,12 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
 
             if (item->b_removed)
                 continue; /* Skip removed options */
-            if (item->b_advanced && !advanced)
-            {   /* Skip advanced options unless requested */
-                b_has_advanced = true;
-                continue;
-            }
+
             print_item(m, item, &section, color, desc);
         }
     }
 
-    if( b_has_advanced )
-        printf(color ? "\n" WHITE "%s" GRAY " %s\n"
-                     : "\n%s %s\n", _( "Note:" ), _( "add --advanced to your "
-                                     "command line to see advanced options."));
-    if( i_only_advanced > 0 )
-    {
-        printf(color ? "\n" WHITE "%s" GRAY " " : "\n%s ", _( "Note:" ) );
-        printf(vlc_ngettext("%u module was not displayed because it only has "
-               "advanced options.\n", "%u modules were not displayed because "
-               "they only have advanced options.\n", i_only_advanced),
-               i_only_advanced);
-    }
-    else if (!found)
+    if (!found)
         printf(color ? "\n" WHITE "%s" GRAY "\n" : "\n%s\n",
                _("No matching module found. Use --list or "
                  "--list-verbose to list available modules."));
