@@ -81,7 +81,6 @@ class ConfigControl : public QObject
 public:
     virtual int getType() const = 0;
     const char * getName() const { return  p_item->psz_name; }
-    bool isAdvanced() const { return p_item->b_advanced; }
     void hide() { changeVisibility( false ); }
     void show() { changeVisibility( true ); }
     /* ConfigControl factory */
