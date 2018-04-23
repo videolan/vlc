@@ -213,7 +213,7 @@ struct encoder_t
 
     /* Module properties */
     module_t *          p_module;
-    encoder_sys_t *     p_sys;
+    void               *p_sys;
 
     /* Properties of the input data fed to the encoder */
     es_format_t         fmt_in;

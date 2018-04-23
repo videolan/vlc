@@ -337,13 +337,15 @@ static int OpenEncoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the encoder's structure */
+    encoder_sys_t *p_sys = malloc( sizeof(encoder_sys_t) );
     p_enc->p_sys = malloc( sizeof(encoder_sys_t) );
     if( p_enc->p_sys  == NULL )
         return VLC_ENOMEM;
+    p_enc->p_sys = p_sys;
 
-    p_enc->p_sys->p_obj = p_this;
+    p_sys->p_obj = p_this;
 
-    p_enc->p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width *
+    p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width *
         p_enc->fmt_in.video.i_visible_height;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_RGB24;

@@ -684,7 +684,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     sys->i_nb_samples = 0;
 
     sys->i_samples_delay = 0;
-    int ret = opus_multistream_encoder_ctl(enc->p_sys->enc,
+    int ret = opus_multistream_encoder_ctl(sys->enc,
             OPUS_GET_LOOKAHEAD(&sys->i_samples_delay));
     if (ret != OPUS_OK)
         msg_Err(enc, "Unable to get number of lookahead samples: %s\n",
