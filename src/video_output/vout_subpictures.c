@@ -289,11 +289,11 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
 
 #define SCALE_UNIT (10000)
 typedef struct {
-    unsigned w;
-    unsigned h;
+    int w;
+    int h;
 } spu_scale_t;
 
-static spu_scale_t spu_scale_create(unsigned w, unsigned h)
+static spu_scale_t spu_scale_create(int w, int h)
 {
     spu_scale_t s = { .w = w, .h = h };
     if (s.w <= 0)
@@ -306,24 +306,24 @@ static spu_scale_t spu_scale_unit(void)
 {
     return spu_scale_create(SCALE_UNIT, SCALE_UNIT);
 }
-static spu_scale_t spu_scale_createq(uint64_t wn, uint64_t wd, uint64_t hn, uint64_t hd)
+static spu_scale_t spu_scale_createq(int64_t wn, int64_t wd, int64_t hn, int64_t hd)
 {
     return spu_scale_create(wn * SCALE_UNIT / wd,
                             hn * SCALE_UNIT / hd);
 }
-static int spu_scale_w(unsigned v, const spu_scale_t s)
+static int spu_scale_w(int v, const spu_scale_t s)
 {
     return v * s.w / SCALE_UNIT;
 }
-static int spu_scale_h(unsigned v, const spu_scale_t s)
+static int spu_scale_h(int v, const spu_scale_t s)
 {
     return v * s.h / SCALE_UNIT;
 }
-static int spu_invscale_w(unsigned v, const spu_scale_t s)
+static int spu_invscale_w(int v, const spu_scale_t s)
 {
     return v * SCALE_UNIT / s.w;
 }
-static int spu_invscale_h(unsigned v, const spu_scale_t s)
+static int spu_invscale_h(int v, const spu_scale_t s)
 {
     return v * SCALE_UNIT / s.h;
 }
@@ -1092,8 +1092,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
              * FIXME The current scaling ensure that the heights match, the width being
              * cropped.
              */
-            spu_scale_t scale = spu_scale_createq((uint64_t)fmt_dst->i_visible_height * fmt_dst->i_sar_den * region_fmt.i_sar_num,
-                                                  (uint64_t)subpic->i_original_picture_height * fmt_dst->i_sar_num * region_fmt.i_sar_den,
+            spu_scale_t scale = spu_scale_createq((int64_t)fmt_dst->i_visible_height                 * fmt_dst->i_sar_den * region_fmt.i_sar_num,
+                                                  (int64_t)subpic->i_original_picture_height * fmt_dst->i_sar_num * region_fmt.i_sar_den,
                                                   fmt_dst->i_visible_height,
                                                   subpic->i_original_picture_height);
 
