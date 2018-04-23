@@ -96,12 +96,6 @@ static const char *const ppsz_snap_formats[] =
     "This enables colorization of the messages sent to the console. " \
     "Your terminal needs Linux color support for this to work.")
 
-#define ADVANCED_TEXT N_("Show advanced options")
-#define ADVANCED_LONGTEXT N_( \
-    "When this is enabled, the preferences and/or interfaces will " \
-    "show all available options, including those that most users should " \
-    "never touch.")
-
 #define INTERACTION_TEXT N_("Interface interaction")
 #define INTERACTION_LONGTEXT N_( \
     "When this is enabled, the interface will show a dialog box each time " \
@@ -2161,8 +2155,7 @@ vlc_module_begin ()
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )
         change_volatile ()
-    add_bool( "advanced", false, ADVANCED_TEXT, ADVANCED_LONGTEXT,
-                    false )
+    add_obsolete_bool( "advanced" ) /* since 4.0.0 */
     add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
 

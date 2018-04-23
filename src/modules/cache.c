@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 34
+#define CACHE_SUBVERSION_NUM 35
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -183,7 +183,6 @@ static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
 {
     LOAD_IMMEDIATE (cfg->i_type);
     LOAD_IMMEDIATE (cfg->i_short);
-    LOAD_FLAG (cfg->b_advanced);
     LOAD_FLAG (cfg->b_internal);
     LOAD_FLAG (cfg->b_unsaveable);
     LOAD_FLAG (cfg->b_safe);
@@ -516,7 +515,6 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
 {
     SAVE_IMMEDIATE (cfg->i_type);
     SAVE_IMMEDIATE (cfg->i_short);
-    SAVE_FLAG (cfg->b_advanced);
     SAVE_FLAG (cfg->b_internal);
     SAVE_FLAG (cfg->b_unsaveable);
     SAVE_FLAG (cfg->b_safe);

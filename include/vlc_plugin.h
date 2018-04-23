@@ -61,8 +61,8 @@ enum vlc_module_properties
     VLC_CONFIG_RANGE,
     /* minimum value (args=int64_t/double/const char * twice) */
 
-    VLC_CONFIG_ADVANCED,
-    /* enable advanced flag (args=none) */
+    VLC_CONFIG_ADVANCED_RESERVED,
+    /* reserved - do not use */
 
     VLC_CONFIG_VOLATILE,
     /* don't write variable to storage (args=none) */
@@ -337,20 +337,16 @@ VLC_METADATA_EXPORTS
     vlc_config_set (VLC_CONFIG_DESC, \
                     (const char *)(text), (const char *)(longtext));
 
-#define add_typeadv_inner( type, text, longtext, advc ) \
-    add_typedesc_inner( type, text, longtext ) \
-    if (advc) vlc_config_set (VLC_CONFIG_ADVANCED);
-
-#define add_typename_inner( type, name, text, longtext, advc ) \
-    add_typeadv_inner( type, text, longtext, advc ) \
+#define add_typename_inner(type, name, text, longtext) \
+    add_typedesc_inner(type, text, longtext) \
     vlc_config_set (VLC_CONFIG_NAME, (const char *)(name));
 
-#define add_string_inner( type, name, text, longtext, advc, v ) \
-    add_typename_inner( type, name, text, longtext, advc ) \
+#define add_string_inner(type, name, text, longtext, v) \
+    add_typename_inner(type, name, text, longtext) \
     vlc_config_set (VLC_CONFIG_VALUE, (const char *)(v));
 
-#define add_int_inner( type, name, text, longtext, advc, v ) \
-    add_typename_inner( type, name, text, longtext, advc ) \
+#define add_int_inner(type, name, text, longtext, v) \
+    add_typename_inner(type, name, text, longtext) \
     vlc_config_set (VLC_CONFIG_VALUE, (int64_t)(v));
 
 
@@ -366,75 +362,66 @@ VLC_METADATA_EXPORTS
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
 
 #define add_category_hint( text, longtext, advc ) \
-    add_typeadv_inner( CONFIG_HINT_CATEGORY, text, longtext, advc )
+    add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
 
 #define add_usage_hint( text ) \
     add_typedesc_inner( CONFIG_HINT_USAGE, text, NULL )
 
 #define add_string( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_STRING, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
 
 #define add_password( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_PASSWORD, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_PASSWORD, name, text, longtext, value)
 
 #define add_loadfile( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_LOADFILE, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_LOADFILE, name, text, longtext, value)
 
 #define add_savefile( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_SAVEFILE, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_SAVEFILE, name, text, longtext, value)
 
 #define add_directory( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_DIRECTORY, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_DIRECTORY, name, text, longtext, value)
 
 #define add_font( name, value, text, longtext, advc )\
-    add_string_inner( CONFIG_ITEM_FONT, name, text, longtext, advc, \
-                      value )
+    add_string_inner(CONFIG_ITEM_FONT, name, text, longtext, value)
 
 #define add_module( name, psz_caps, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_MODULE, name, text, longtext, advc, \
-                      value ) \
+    add_string_inner(CONFIG_ITEM_MODULE, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
 #define add_module_list( name, psz_caps, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_MODULE_LIST, name, text, longtext, advc, \
-                      value ) \
+    add_string_inner(CONFIG_ITEM_MODULE_LIST, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
 #ifndef __PLUGIN__
 #define add_module_cat( name, i_subcategory, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, \
-                      value ) \
+    add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
     change_integer_range (i_subcategory /* gruik */, 0);
 
 #define add_module_list_cat( name, i_subcategory, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
-                      advc, value ) \
+    add_string_inner(CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
+                     value) \
     change_integer_range (i_subcategory /* gruik */, 0);
 #endif
 
 #define add_integer( name, value, text, longtext, advc ) \
-    add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, value )
+    add_int_inner(CONFIG_ITEM_INTEGER, name, text, longtext, value)
 
 #define add_rgb( name, value, text, longtext, advc ) \
-    add_int_inner( CONFIG_ITEM_RGB, name, text, longtext, advc, value ) \
+    add_int_inner(CONFIG_ITEM_RGB, name, text, longtext, value) \
     change_integer_range( 0, 0xFFFFFF )
 
 #define add_key( name, value, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_KEY, "global-" name, text, longtext, advc, \
-                   KEY_UNSET ) \
-    add_string_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, value )
+    add_string_inner(CONFIG_ITEM_KEY, "global-" name, text, longtext, \
+                     KEY_UNSET) \
+    add_string_inner(CONFIG_ITEM_KEY, name, text, longtext, value)
 
 #define add_integer_with_range( name, value, i_min, i_max, text, longtext, advc ) \
     add_integer( name, value, text, longtext, advc ) \
     change_integer_range( i_min, i_max )
 
 #define add_float( name, v, text, longtext, advc ) \
-    add_typename_inner( CONFIG_ITEM_FLOAT, name, text, longtext, advc ) \
+    add_typename_inner(CONFIG_ITEM_FLOAT, name, text, longtext) \
     vlc_config_set (VLC_CONFIG_VALUE, (double)(v));
 
 #define add_float_with_range( name, value, f_min, f_max, text, longtext, advc ) \
@@ -442,7 +429,7 @@ VLC_METADATA_EXPORTS
     change_float_range( f_min, f_max )
 
 #define add_bool( name, v, text, longtext, advc ) \
-    add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc ) \
+    add_typename_inner(CONFIG_ITEM_BOOL, name, text, longtext) \
     if (v) vlc_config_set (VLC_CONFIG_VALUE, (int64_t)true);
 
 /* For removed option */

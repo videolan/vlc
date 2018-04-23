@@ -362,10 +362,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             break;
         }
 
-        case VLC_CONFIG_ADVANCED:
-            item->b_advanced = true;
-            break;
-
         case VLC_CONFIG_VOLATILE:
             item->b_unsaveable = true;
             break;
