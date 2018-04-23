@@ -140,7 +140,7 @@ struct  sout_mux_t
     sout_input_t        **pp_inputs;
 
     /* mux private */
-    sout_mux_sys_t      *p_sys;
+    void                *p_sys;
 
     /* XXX private to stream_output.c */
     /* if muxer doesn't support adding stream at any time then we first wait

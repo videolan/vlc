@@ -474,7 +474,8 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     case MUX_GET_MIME:
     {
         char **ppsz = va_arg( args, char ** );
-        *ppsz = strdup( p_mux->p_sys->oc->oformat->mime_type );
+        sout_mux_sys_t *p_sys = p_mux->p_sys;
+        *ppsz = strdup( p_sys->oc->oformat->mime_type );
         return VLC_SUCCESS;
     }
 
