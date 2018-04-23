@@ -311,6 +311,8 @@ static int Demux( demux_t * p_demux )
              * only 1 ES is supported (common case for ogg web radio) */
             if( p_sys->i_streams == 1 && p_sys->pp_stream[0]->p_es )
             {
+                if( p_sys->p_old_stream ) /* if no setupEs has reused */
+                    Ogg_LogicalStreamDelete( p_demux, p_sys->p_old_stream );
                 p_sys->p_old_stream = p_sys->pp_stream[0];
                 TAB_CLEAN( p_sys->i_streams, p_sys->pp_stream );
             }
