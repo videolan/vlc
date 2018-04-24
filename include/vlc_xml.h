@@ -39,7 +39,7 @@ struct xml_t
 
     /* Module properties */
     module_t  *p_module;
-    xml_sys_t *p_sys;
+    void      *p_sys;
 
     void (*pf_catalog_load) ( xml_t *, const char * );
     void (*pf_catalog_add) ( xml_t *, const char *, const char *,
