@@ -1248,6 +1248,7 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
             block_Release( p_block );
             p_block = NULL; /* output only */
         }
+        avcodec_flush_buffers( p_sys->p_context );
     }
 
     return DecodeBlock( p_dec, pp_block );
