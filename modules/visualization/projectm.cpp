@@ -107,8 +107,8 @@ vlc_module_begin ()
     add_loadfile("projectm-config", "/usr/share/projectM/config.inp",
                  CONFIG_TEXT, CONFIG_LONGTEXT)
 #else
-    add_directory( "projectm-preset-path", PRESET_PATH,
-                  PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
+    add_directory("projectm-preset-path", PRESET_PATH,
+                  PRESET_PATH_TXT, PRESET_PATH_LONGTXT)
     add_loadfile("projectm-title-font", FONT_PATH,
                  TITLE_FONT_TXT, TITLE_FONT_LONGTXT)
     add_loadfile("projectm-menu-font", FONT_PATH_MENU,

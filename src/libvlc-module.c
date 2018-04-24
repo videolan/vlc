@@ -1596,8 +1596,7 @@ vlc_module_begin ()
     add_integer( "mouse-hide-timeout", 1000, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false )
     set_section( N_("Snapshot") , NULL )
-    add_directory( "snapshot-path", NULL, SNAP_PATH_TEXT,
-                   SNAP_PATH_LONGTEXT, false )
+    add_directory("snapshot-path", NULL, SNAP_PATH_TEXT, SNAP_PATH_LONGTEXT)
     add_string( "snapshot-prefix", "vlcsnap-", SNAP_PREFIX_TEXT,
                    SNAP_PREFIX_LONGTEXT, false )
     add_string( "snapshot-format", "png", SNAP_FORMAT_TEXT,
@@ -1914,13 +1913,13 @@ vlc_module_begin ()
     add_bool( "network-synchronisation", false, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true )
 
-    add_directory( "input-record-path", NULL, INPUT_RECORD_PATH_TEXT,
-                INPUT_RECORD_PATH_LONGTEXT, true )
+    add_directory("input-record-path", NULL,
+                  INPUT_RECORD_PATH_TEXT, INPUT_RECORD_PATH_LONGTEXT)
     add_bool( "input-record-native", true, INPUT_RECORD_NATIVE_TEXT,
               INPUT_RECORD_NATIVE_LONGTEXT, true )
 
-    add_directory( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
-                INPUT_TIMESHIFT_PATH_LONGTEXT, true )
+    add_directory("input-timeshift-path", NULL,
+                  INPUT_TIMESHIFT_PATH_TEXT, INPUT_TIMESHIFT_PATH_LONGTEXT)
     add_integer( "input-timeshift-granularity", -1, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
 
