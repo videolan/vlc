@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_capability( "demux", 240 )
     set_callbacks( Open, Close )
 
-    add_category_hint("Hacks", NULL, true)
+    add_category_hint("Hacks", NULL)
     add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT, true )
 
     add_submodule()

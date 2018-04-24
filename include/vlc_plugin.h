@@ -361,7 +361,7 @@ VLC_METADATA_EXPORTS
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
 
-#define add_category_hint( text, longtext, advc ) \
+#define add_category_hint(text, longtext) \
     add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
 
 #define add_usage_hint( text ) \

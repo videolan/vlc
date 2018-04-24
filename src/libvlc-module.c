@@ -1467,7 +1467,7 @@ static const char *const mouse_wheel_texts[] = {
 /*
  * Quick usage guide for the configuration options:
  *
- * add_category_hint( N_(text), N_(longtext), b_advanced_option )
+ * add_category_hint(N_(text), N_(longtext))
  * add_usage_hint( N_(text), b_advanced_option )
  * add_string( option_name, value, N_(text), N_(longtext),
                b_advanced_option )
@@ -1485,7 +1485,7 @@ vlc_module_begin ()
 /* Audio options */
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_GENERAL )
-    add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , false )
+    add_category_hint(N_("Audio"), AOUT_CAT_LONGTEXT)
 
     add_bool( "audio", 1, AUDIO_TEXT, AUDIO_LONGTEXT, false )
         change_safe ()
@@ -1548,7 +1548,7 @@ vlc_module_begin ()
 /* Video options */
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_GENERAL )
-    add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , false )
+    add_category_hint(N_("Video"), VOUT_CAT_LONGTEXT)
 
     add_bool( "video", 1, VIDEO_TEXT, VIDEO_LONGTEXT, true )
         change_safe ()
@@ -1672,7 +1672,7 @@ vlc_module_begin ()
 /* Subpictures options */
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     set_section( N_("On Screen Display") , NULL )
-    add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , false )
+    add_category_hint(N_("Subpictures"), SUB_CAT_LONGTEXT)
 
     add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, false )
         change_safe ()
@@ -1934,14 +1934,14 @@ vlc_module_begin ()
 
 /* Decoder options */
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true )
+    add_category_hint(N_("Decoders"), CODEC_CAT_LONGTEXT)
     add_string( "codec", NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, true )
     add_string( "encoder",  NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , false )
+    add_category_hint(N_("Input"), INPUT_CAT_LONGTEXT)
     add_module( "access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
@@ -1959,7 +1959,7 @@ vlc_module_begin ()
 /* Stream output options */
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_GENERAL )
-    add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , true )
+    add_category_hint(N_("Stream output"), SOUT_CAT_LONGTEXT)
 
     add_string( "sout", NULL, SOUT_TEXT, SOUT_LONGTEXT, true )
     add_bool( "sout-display", false, SOUT_DISPLAY_TEXT,
@@ -2024,7 +2024,7 @@ vlc_module_begin ()
 /* Misc options */
     set_subcategory( SUBCAT_ADVANCED_MISC )
     set_section( N_("Special modules"), NULL )
-    add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, true )
+    add_category_hint(N_("Miscellaneous"), MISC_CAT_LONGTEXT)
     add_module( "vod-server", "vod server", NULL, VOD_SERVER_TEXT,
                 VOD_SERVER_LONGTEXT, true )
 
@@ -2067,7 +2067,7 @@ vlc_module_begin ()
 /* Playlist options */
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
-    add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , false )
+    add_category_hint(N_("Playlist"), PLAYLIST_CAT_LONGTEXT)
     add_bool( "random", 0, RANDOM_TEXT, RANDOM_LONGTEXT, false )
         change_short('Z')
         change_safe()
@@ -2175,7 +2175,7 @@ vlc_module_begin ()
 
 /* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
-    add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , false )
+    add_category_hint(N_("Hot keys"), HOTKEY_CAT_LONGTEXT)
 
     add_integer( "hotkeys-y-wheel-mode", 0, MOUSE_Y_WHEEL_MODE_TEXT,
                  MOUSE_Y_WHEEL_MODE_LONGTEXT, false )
