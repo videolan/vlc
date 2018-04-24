@@ -388,7 +388,7 @@ static void print_item(const module_t *m, const module_config_t *item,
             {
                 size_t len = 0;
 
-                for (unsigned i = 0; i < i_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                     len += strlen(ppsz_values[i]) + 1;
 
                 typebuf = malloc(len);
@@ -400,7 +400,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                 ket = "}";
 
                 *typebuf = 0;
-                for (unsigned i = 0; i < i_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                 {
                     if (i > 0)
                         strcat(typebuf, ",");
@@ -408,7 +408,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                 }
 
             end_string:
-                for (unsigned i = 0; i < i_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                 {
                     free(ppsz_values[i]);
                     free(ppsz_texts[i]);
@@ -432,7 +432,7 @@ static void print_item(const module_t *m, const module_config_t *item,
             {
                 size_t len = 0;
 
-                for (unsigned i = 0; i < i_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                     len += strlen(ppsz_texts[i])
                            + 4 * sizeof (int64_t) + 5;
 
@@ -445,7 +445,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                 ket = "}";
 
                 *typebuf = 0;
-                for (unsigned i = 0; i < item->list_count; i++)
+                for (size_t i = 0; i < item->list_count; i++)
                 {
                     if (i != 0)
                         strcat(typebuf, ", ");
@@ -455,7 +455,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                 }
 
             end_integer:
-                for (unsigned i = 0; i < i_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                     free(ppsz_texts[i]);
                 free(pi_values);
                 free(ppsz_texts);
