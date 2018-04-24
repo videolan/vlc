@@ -132,8 +132,7 @@ vlc_module_begin ()
     set_description(N_("Submission of played songs to last.fm"))
     add_string("lastfm-username", "",
                 USERNAME_TEXT, USERNAME_LONGTEXT, false)
-    add_password("lastfm-password", "",
-                PASSWORD_TEXT, PASSWORD_LONGTEXT, false)
+    add_password("lastfm-password", "", PASSWORD_TEXT, PASSWORD_LONGTEXT)
     add_string("scrobbler-url", "post.audioscrobbler.com",
                 URL_TEXT, URL_LONGTEXT, false)
     set_capability("interface", 0)

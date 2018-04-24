@@ -72,8 +72,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_string( SOUT_CFG_PREFIX "user", "",
                 USER_TEXT, USER_LONGTEXT, true )
-    add_password( SOUT_CFG_PREFIX "pwd", "",
-                  PASS_TEXT, PASS_LONGTEXT, true )
+    add_password(SOUT_CFG_PREFIX "pwd", "", PASS_TEXT, PASS_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "mime", "",
                 MIME_TEXT, MIME_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "metacube", false,

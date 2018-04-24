@@ -95,7 +95,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_section( N_("Lua HTTP"), 0 )
-            add_password ( "http-password", NULL, PASS_TEXT, PASS_LONGTEXT, false )
+            add_password("http-password", NULL, PASS_TEXT, PASS_LONGTEXT)
             add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT, true )
         set_capability( "interface", 0 )
@@ -123,9 +123,8 @@ vlc_module_begin ()
             add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
                 change_integer_range( 1, 65535 )
-            add_password( "telnet-password", NULL, TELNETPWD_TEXT,
-
-                          TELNETPWD_LONGTEXT, true )
+            add_password("telnet-password", NULL, TELNETPWD_TEXT,
+                         TELNETPWD_LONGTEXT)
         set_capability( "interface", 0 )
         set_callbacks( Open_LuaTelnet, Close_LuaIntf )
         set_description( N_("Lua Telnet") )

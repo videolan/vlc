@@ -370,7 +370,7 @@ VLC_METADATA_EXPORTS
 #define add_string( name, value, text, longtext, advc ) \
     add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
 
-#define add_password( name, value, text, longtext, advc ) \
+#define add_password(name, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_PASSWORD, name, text, longtext, value)
 
 #define add_loadfile( name, value, text, longtext, advc ) \

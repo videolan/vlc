@@ -91,7 +91,7 @@ vlc_module_begin()
 
     add_string( CFG_PREFIX "user", NULL, USER_TEXT, USER_LONGTEXT, false )
         change_safe()
-    add_password( CFG_PREFIX "password", NULL, PASS_TEXT, PASS_LONGTEXT, false )
+    add_password(CFG_PREFIX "password", NULL, PASS_TEXT, PASS_LONGTEXT)
         change_safe()
     add_float( CFG_PREFIX "fps", 5, RDP_FPS, RDP_FPS_LONGTEXT, true )
 

@@ -443,7 +443,7 @@ vlc_module_begin()
     add_integer( "poll-timeout", SRT_DEFAULT_POLL_TIMEOUT,
             N_("Return poll wait after timeout milliseconds (-1 = infinite)"), NULL, true )
     add_integer( "latency", SRT_DEFAULT_LATENCY, N_("SRT latency (ms)"), NULL, true )
-    add_password( "passphrase", "", N_("Password for stream encryption"), NULL, false )
+    add_password("passphrase", "", N_("Password for stream encryption"), NULL)
     add_integer( "key-length", SRT_DEFAULT_KEY_LENGTH,
             SRT_KEY_LENGTH_TEXT, SRT_KEY_LENGTH_TEXT, false )
         change_integer_list( srt_key_lengths, srt_key_length_names )

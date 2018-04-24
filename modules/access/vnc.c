@@ -84,7 +84,7 @@ vlc_module_begin()
 
     add_string( CFG_PREFIX "user", NULL, RFB_USER, RFB_USER, false )
         change_safe()
-    add_password( CFG_PREFIX "password", NULL, RFB_PASSWORD, RFB_PASSWORD, false )
+    add_password(CFG_PREFIX "password", NULL, RFB_PASSWORD, RFB_PASSWORD)
         change_safe()
     add_loadfile( CFG_PREFIX "x509-ca", NULL, RFB_CA_TEXT, RFB_CA_LONGTEXT, true )
         change_safe()

@@ -252,8 +252,7 @@ vlc_module_begin ()
                  RTSP_TIMEOUT_LONGTEXT, true )
     add_string( "sout-rtsp-user", "",
                 RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
-    add_password( "sout-rtsp-pwd", "",
-                  RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT, true )
+    add_password("sout-rtsp-pwd", "", RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT)
 
 vlc_module_end ()
 

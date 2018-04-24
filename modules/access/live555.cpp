@@ -134,8 +134,7 @@ vlc_module_begin ()
         add_string( "rtsp-user", NULL, USER_TEXT,
                     USER_LONGTEXT, true )
             change_safe()
-        add_password( "rtsp-pwd", NULL, PASS_TEXT,
-                      PASS_LONGTEXT, true )
+        add_password("rtsp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT)
         add_integer( "rtsp-frame-buffer-size", DEFAULT_FRAME_BUFFER_SIZE,
                      FRAME_BUFFER_SIZE_TEXT, FRAME_BUFFER_SIZE_LONGTEXT,
                      true )

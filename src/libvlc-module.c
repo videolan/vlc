@@ -1815,8 +1815,7 @@ vlc_module_begin ()
 #ifdef _WIN32
     add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 false )
-    add_password( "http-proxy-pwd", NULL,
-                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
+    add_password("http-proxy-pwd", NULL, PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT)
 #else
     add_obsolete_string( "http-proxy" )
     add_obsolete_string( "http-proxy-pwd" )
