@@ -224,8 +224,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 
     add_bool("file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT, false)
-    add_savefile("logfile", NULL,
-                 LOGFILE_NAME_TEXT, LOGFILE_NAME_LONGTEXT, false)
+    add_savefile("logfile", NULL, LOGFILE_NAME_TEXT, LOGFILE_NAME_LONGTEXT)
     add_string("logmode", "text", LOGMODE_TEXT, LOGMODE_LONGTEXT, false)
         change_string_list(mode_list, mode_list_text)
     add_integer("log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT, false)
