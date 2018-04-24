@@ -73,8 +73,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
-    add_rgb( CFG_PREFIX "color", 0x00FF0000, COLOR_TEXT,
-                 COLOR_LONGTEXT, false )
+    add_rgb(CFG_PREFIX "color", 0x00FF0000, COLOR_TEXT, COLOR_LONGTEXT)
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "saturationthres", 20,
                  N_("Saturation threshold"), "", false )

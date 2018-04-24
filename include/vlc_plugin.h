@@ -407,7 +407,7 @@ VLC_METADATA_EXPORTS
 #define add_integer( name, value, text, longtext, advc ) \
     add_int_inner(CONFIG_ITEM_INTEGER, name, text, longtext, value)
 
-#define add_rgb( name, value, text, longtext, advc ) \
+#define add_rgb(name, value, text, longtext) \
     add_int_inner(CONFIG_ITEM_RGB, name, text, longtext, value) \
     change_integer_range( 0, 0xFFFFFF )
 
