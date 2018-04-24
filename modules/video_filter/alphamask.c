@@ -70,8 +70,7 @@ vlc_module_begin ()
     add_shortcut( "alphamask", "mask" )
     set_callbacks( Create, Destroy )
 
-    add_loadfile( CFG_PREFIX "mask", NULL, MASK_TEXT,
-                MASK_LONGTEXT, false )
+    add_loadfile(CFG_PREFIX "mask", NULL, MASK_TEXT, MASK_LONGTEXT)
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

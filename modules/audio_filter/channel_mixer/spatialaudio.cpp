@@ -69,8 +69,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
     add_bool(CFG_PREFIX "headphones", false,
              HEADPHONES_TEXT, HEADPHONES_LONGTEXT, true)
-    add_loadfile("hrtf-file", NULL,
-                 HRTF_FILE_TEXT, HRTF_FILE_LONGTEXT, true)
+    add_loadfile("hrtf-file", NULL, HRTF_FILE_TEXT, HRTF_FILE_LONGTEXT)
     add_shortcut("ambisonics")
 
     add_submodule()

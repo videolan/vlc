@@ -76,7 +76,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_shortname( N_( "DCP" ) )
     add_shortcut( "dcp" )
-    add_loadfile( "kdm", "", KDM_HELP_TEXT, KDM_HELP_LONG_TEXT, false )
+    add_loadfile("kdm", "", KDM_HELP_TEXT, KDM_HELP_LONG_TEXT)
     set_description( N_( "Digital Cinema Package module" ) )
     set_capability( "access", 0 )
     set_category( CAT_INPUT )

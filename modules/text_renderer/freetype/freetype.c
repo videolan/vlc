@@ -151,8 +151,9 @@ vlc_module_begin ()
     add_font( "freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT, false )
     add_font( "freetype-monofont", DEFAULT_MONOSPACE_FAMILY, MONOSPACE_FONT_TEXT, FAMILY_LONGTEXT, false )
 #else
-    add_loadfile( "freetype-font", DEFAULT_FONT_FILE, FONT_TEXT, FONT_LONGTEXT, false )
-    add_loadfile( "freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE, MONOSPACE_FONT_TEXT, FONT_LONGTEXT, false )
+    add_loadfile("freetype-font", DEFAULT_FONT_FILE, FONT_TEXT, FONT_LONGTEXT)
+    add_loadfile("freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE,
+                 MONOSPACE_FONT_TEXT, FONT_LONGTEXT)
 #endif
 
     /* opacity valid on 0..255, with default 255 = fully opaque */

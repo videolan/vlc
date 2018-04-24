@@ -104,15 +104,15 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
 #ifndef HAVE_PROJECTM2
-    add_loadfile( "projectm-config", "/usr/share/projectM/config.inp",
-                  CONFIG_TEXT, CONFIG_LONGTEXT, true )
+    add_loadfile("projectm-config", "/usr/share/projectM/config.inp",
+                 CONFIG_TEXT, CONFIG_LONGTEXT)
 #else
     add_directory( "projectm-preset-path", PRESET_PATH,
                   PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
-    add_loadfile( "projectm-title-font", FONT_PATH,
-                  TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
-    add_loadfile( "projectm-menu-font", FONT_PATH_MENU,
-                  MENU_FONT_TXT, MENU_FONT_LONGTXT, true )
+    add_loadfile("projectm-title-font", FONT_PATH,
+                 TITLE_FONT_TXT, TITLE_FONT_LONGTXT)
+    add_loadfile("projectm-menu-font", FONT_PATH_MENU,
+                 MENU_FONT_TXT, MENU_FONT_LONGTXT)
 #endif
     add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )

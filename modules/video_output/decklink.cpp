@@ -264,7 +264,7 @@ vlc_module_begin()
                 AR_INDEX_TEXT, AR_INDEX_LONGTEXT, true)
                 change_integer_list(rgi_ar_values, rgsz_ar_text)
     add_loadfile(VIDEO_CFG_PREFIX "nosignal-image", NULL,
-                NOSIGNAL_IMAGE_TEXT, NOSIGNAL_IMAGE_LONGTEXT, true)
+                 NOSIGNAL_IMAGE_TEXT, NOSIGNAL_IMAGE_LONGTEXT)
 
 
     add_submodule ()

@@ -96,7 +96,8 @@ vlc_module_begin ()
 
     add_string("direct3d9-shader", "", PIXEL_SHADER_TEXT, PIXEL_SHADER_LONGTEXT, true)
         change_string_cb(FindShadersCallback)
-    add_loadfile("direct3d9-shader-file", NULL, PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT, false)
+    add_loadfile("direct3d9-shader-file", NULL,
+                 PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
     set_capability("vout display", 280)
     add_shortcut("direct3d9", "direct3d")

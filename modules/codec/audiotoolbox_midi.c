@@ -61,7 +61,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_ACODEC)
     set_callbacks(Open, Close)
     add_loadfile(CFG_PREFIX "soundfont", "",
-                 SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, false)
+                 SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT)
 vlc_module_end()
 
 

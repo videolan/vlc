@@ -1681,8 +1681,7 @@ vlc_module_begin ()
                 TEXTRENDERER_LONGTEXT, true )
 
     set_section( N_("Subtitles") , NULL )
-    add_loadfile( "sub-file", NULL, SUB_FILE_TEXT,
-                  SUB_FILE_LONGTEXT, false )
+    add_loadfile("sub-file", NULL, SUB_FILE_TEXT, SUB_FILE_LONGTEXT)
         change_safe()
     add_bool( "sub-autodetect-file", true,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, false )
@@ -1781,10 +1780,8 @@ vlc_module_begin ()
 
     set_section( N_( "Default devices") , NULL )
 
-    add_loadfile( "dvd", DVD_DEVICE, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
-                  false )
-    add_loadfile( "vcd", VCD_DEVICE, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
-                  false )
+    add_loadfile("dvd", DVD_DEVICE, DVD_DEV_TEXT, DVD_DEV_LONGTEXT)
+    add_loadfile("vcd", VCD_DEVICE, VCD_DEV_TEXT, VCD_DEV_LONGTEXT)
 
     set_section( N_( "Network settings" ), NULL )
 
@@ -1803,9 +1800,9 @@ vlc_module_begin ()
     add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, RTSP_HOST_LONGTEXT, true )
     add_integer( "rtsp-port", 554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
-    add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
+    add_loadfile("http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT)
     add_obsolete_string( "sout-http-cert" ) /* since 2.0.0 */
-    add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )
+    add_loadfile("http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT)
     add_obsolete_string( "sout-http-key" ) /* since 2.0.0 */
     add_obsolete_string( "http-ca" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
@@ -1977,9 +1974,7 @@ vlc_module_begin ()
                                 SOUT_MUX_CACHING_LONGTEXT, true )
 
     set_section( N_("VLM"), NULL )
-    add_loadfile( "vlm-conf", NULL, VLM_CONF_TEXT,
-                    VLM_CONF_LONGTEXT, true )
-
+    add_loadfile("vlm-conf", NULL, VLM_CONF_TEXT, VLM_CONF_LONGTEXT)
 
 
     set_subcategory( SUBCAT_SOUT_STREAM )

@@ -131,10 +131,10 @@ vlc_module_begin ()
                 INDEXURL_TEXT, INDEXURL_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "key-uri", NULL,
                 KEYURI_TEXT, KEYURI_TEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "key-file", NULL,
-                KEYFILE_TEXT, KEYFILE_LONGTEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "key-loadfile", NULL,
-                KEYLOADFILE_TEXT, KEYLOADFILE_LONGTEXT, true )
+    add_loadfile(SOUT_CFG_PREFIX "key-file", NULL,
+                 KEYFILE_TEXT, KEYFILE_LONGTEXT)
+    add_loadfile(SOUT_CFG_PREFIX "key-loadfile", NULL,
+                 KEYLOADFILE_TEXT, KEYLOADFILE_LONGTEXT)
     set_callbacks( Open, Close )
 vlc_module_end ()
 

@@ -723,8 +723,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_callbacks(Open, Close)
 
-    add_loadfile( "cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT,
-                  CDAUDIO_DEV_LONGTEXT, false )
+    add_loadfile("cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT, CDAUDIO_DEV_LONGTEXT)
 
     add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-track", 0 , NULL, NULL, true )

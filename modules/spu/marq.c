@@ -146,7 +146,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "marquee", "VLC", MSG_TEXT, MSG_LONGTEXT,
                 false )
-    add_loadfile( CFG_PREFIX "file", NULL, FILE_TEXT, FILE_LONGTEXT, true )
+    add_loadfile(CFG_PREFIX "file", NULL, FILE_TEXT, FILE_LONGTEXT)
 
     set_section( N_("Position"), NULL )
     add_integer( CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true )
