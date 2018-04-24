@@ -442,7 +442,10 @@ static int Open(vlc_object_t *this)
     sts = MFXInit(MFX_IMPL_AUTO_ANY, &ver, &sys->session);
 
     if (sts != MFX_ERR_NONE) {
-        msg_Err(enc, "Unable to find an Intel Media SDK implementation.");
+        if (sts == MFX_ERR_UNSUPPORTED)
+            msg_Err(enc, "Intel Media SDK implementation not supported, is your card plugged?");
+        else
+            msg_Err(enc, "Unable to find an Intel Media SDK implementation (%d).", sts);
         free(sys);
         return VLC_EGENERIC;
     }
