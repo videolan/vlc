@@ -176,8 +176,8 @@ vlc_module_begin ()
                  MAXWIDTH_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "maxheight", 0, MAXHEIGHT_TEXT,
                  MAXHEIGHT_LONGTEXT, true )
-    add_module_list( SOUT_CFG_PREFIX "vfilter", "video filter",
-                     NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
+    add_module_list(SOUT_CFG_PREFIX "vfilter", "video filter", NULL,
+                    VFILTER_TEXT, VFILTER_LONGTEXT)
 
     set_section( N_("Audio"), NULL )
     add_module(SOUT_CFG_PREFIX "aenc", "encoder", NULL,
@@ -195,8 +195,8 @@ vlc_module_begin ()
                  ARATE_LONGTEXT, true )
         change_integer_range( 0, 48000 )
     add_obsolete_bool( SOUT_CFG_PREFIX "audio-sync" ) /*Since 2.2.0 */
-    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
-                     NULL, AFILTER_TEXT, AFILTER_LONGTEXT, false )
+    add_module_list(SOUT_CFG_PREFIX "afilter",  "audio filter", NULL,
+                    AFILTER_TEXT, AFILTER_LONGTEXT)
 
     set_section( N_("Overlays/Subtitles"), NULL )
     add_module(SOUT_CFG_PREFIX "senc", "encoder", NULL,
@@ -205,8 +205,8 @@ vlc_module_begin ()
                 SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", false, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )
-    add_module_list( SOUT_CFG_PREFIX "sfilter", "spu source",
-                     NULL, SFILTER_TEXT, SFILTER_LONGTEXT, false )
+    add_module_list(SOUT_CFG_PREFIX "sfilter", "spu source", NULL,
+                    SFILTER_TEXT, SFILTER_LONGTEXT)
 
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, THREADS_TEXT,

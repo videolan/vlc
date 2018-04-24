@@ -1533,8 +1533,8 @@ vlc_module_begin ()
         change_string_list( ppsz_roles, ppsz_roles_text )
 
     set_subcategory( SUBCAT_AUDIO_AFILTER )
-    add_module_list( "audio-filter", "audio filter", NULL,
-                     AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT, false )
+    add_module_list("audio-filter", "audio filter", NULL,
+                    AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT)
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_module("audio-visual", "visualization", "none",
                AUDIO_VISUAL_TEXT, AUDIO_VISUAL_LONGTEXT)
@@ -1656,12 +1656,12 @@ vlc_module_begin ()
         change_short('V')
 
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    add_module_list( "video-filter", "video filter", NULL,
-                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
+    add_module_list("video-filter", "video filter", NULL,
+                    VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT)
 
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
-    add_module_list( "video-splitter", "video splitter", NULL,
-                     VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT, false )
+    add_module_list("video-splitter", "video splitter", NULL,
+                    VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT)
     add_obsolete_string( "vout-filter" ) /* since 2.0.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
@@ -1698,10 +1698,10 @@ vlc_module_begin ()
                SUB_TEXT_SCALE_TEXT, SUB_TEXT_SCALE_LONGTEXT, false )
         change_volatile  ()
     set_section( N_( "Overlays" ) , NULL )
-    add_module_list( "sub-source", "sub source", NULL,
-                     SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
-    add_module_list( "sub-filter", "sub filter", NULL,
-                     SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, false )
+    add_module_list("sub-source", "sub source", NULL,
+                    SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT)
+    add_module_list("sub-filter", "sub filter", NULL,
+                    SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT)
 
 /* Input options */
     set_category( CAT_INPUT )
@@ -1945,8 +1945,8 @@ vlc_module_begin ()
     add_obsolete_bool( "prefer-system-codecs" )
 
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
-    add_module_list( "stream-filter", "stream_filter", NULL,
-                     STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT, false )
+    add_module_list("stream-filter", "stream_filter", NULL,
+                    STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT)
 
     add_string( "demux-filter", NULL, DEMUX_FILTER_TEXT, DEMUX_FILTER_LONGTEXT, true )
 

@@ -389,7 +389,7 @@ VLC_METADATA_EXPORTS
     add_string_inner(CONFIG_ITEM_MODULE, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
-#define add_module_list( name, psz_caps, value, text, longtext, advc ) \
+#define add_module_list(name, psz_caps, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_LIST, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
