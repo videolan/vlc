@@ -411,7 +411,7 @@ VLC_METADATA_EXPORTS
     add_int_inner(CONFIG_ITEM_RGB, name, text, longtext, value) \
     change_integer_range( 0, 0xFFFFFF )
 
-#define add_key( name, value, text, longtext, advc ) \
+#define add_key(name, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_KEY, "global-" name, text, longtext, \
                      KEY_UNSET) \
     add_string_inner(CONFIG_ITEM_KEY, name, text, longtext, value)

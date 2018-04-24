@@ -5,7 +5,7 @@
 # The current full list of config strings vlc understands is always in vlc's
 # src/libvlc.h file. Look for lines like:
 # add_key( "key-fullscreen", KEY_FULLSCREEN, FULLSCREEN_KEY_TEXT,
-#          FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+#          FULLSCREEN_KEY_LONGTEXT )
 # You will need the first argument of these lines. in this case: key-fullscreen
 
 begin
