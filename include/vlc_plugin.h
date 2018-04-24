@@ -382,7 +382,7 @@ VLC_METADATA_EXPORTS
 #define add_directory(name, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_DIRECTORY, name, text, longtext, value)
 
-#define add_font( name, value, text, longtext, advc )\
+#define add_font(name, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_FONT, name, text, longtext, value)
 
 #define add_module( name, psz_caps, value, text, longtext, advc ) \
