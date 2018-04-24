@@ -66,7 +66,7 @@ struct xml_reader_t
 {
     struct vlc_common_members obj;
 
-    xml_reader_sys_t *p_sys;
+    void     *p_sys;
     stream_t *p_stream;
     module_t *p_module;
 

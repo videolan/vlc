@@ -111,9 +111,10 @@ struct xml_reader_sys_t
 static int ReaderUseDTD ( xml_reader_t *p_reader )
 {
     /* Activate DTD validation */
-    xmlTextReaderSetParserProp( p_reader->p_sys->xml,
+    xml_reader_sys_t *p_sys = p_reader->p_sys;
+    xmlTextReaderSetParserProp( p_sys->xml,
                                 XML_PARSER_DEFAULTATTRS, true );
-    xmlTextReaderSetParserProp( p_reader->p_sys->xml,
+    xmlTextReaderSetParserProp( p_sys->xml,
                                 XML_PARSER_VALIDATE, true );
 
     return VLC_SUCCESS;
@@ -183,7 +184,8 @@ static char *ReaderValue( xml_reader_t *p_reader )
 
 static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
 {
-    xmlTextReaderPtr xml = p_reader->p_sys->xml;
+    xml_reader_sys_t *p_sys = p_reader->p_sys;
+    xmlTextReaderPtr xml = p_sys->xml;
     const xmlChar *name, *value;
 
     if( xmlTextReaderMoveToNextAttribute( xml ) != 1
@@ -203,7 +205,8 @@ static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
 
 static int ReaderIsEmptyElement( xml_reader_t *p_reader )
 {
-    return xmlTextReaderIsEmptyElement( p_reader->p_sys->xml );
+    xml_reader_sys_t *p_sys = p_reader->p_sys;
+    return xmlTextReaderIsEmptyElement( p_sys->xml );
 }
 
 static int ReaderOpen( vlc_object_t *p_this )
