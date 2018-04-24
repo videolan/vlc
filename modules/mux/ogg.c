@@ -376,14 +376,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
     case VIDEO_ES:
     {
-        unsigned int i_frame_rate = p_input->p_fmt->video.i_frame_rate;
-        unsigned int i_frame_rate_base = p_input->p_fmt->video.i_frame_rate_base;
-        if( !p_input->p_fmt->video.i_frame_rate ||
-            !p_input->p_fmt->video.i_frame_rate_base )
+        if( !p_stream->fmt.video.i_frame_rate ||
+            !p_stream->fmt.video.i_frame_rate_base )
         {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
-            i_frame_rate = 25;
-            i_frame_rate_base = 1;
+            p_stream->fmt.video.i_frame_rate = 25;
+            p_stream->fmt.video.i_frame_rate_base = 1;
         }
 
         switch( p_stream->fmt.i_codec )
@@ -421,8 +419,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             p_stream->p_oggds_header->i_size = 0 ;
             p_stream->p_oggds_header->i_time_unit =
-                     INT64_C(10000000) * i_frame_rate_base /
-                     (int64_t)i_frame_rate;
+                     INT64_C(10000000) * p_stream->fmt.video.i_frame_rate_base /
+                     (int64_t)p_stream->fmt.video.i_frame_rate;
             p_stream->p_oggds_header->i_samples_per_unit = 1;
             p_stream->p_oggds_header->i_default_len = 1 ; /* ??? */
             p_stream->p_oggds_header->i_buffer_size = 1024*1024;
@@ -828,8 +826,8 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
     switch ( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
-            SetQWLE( &(*pp_buffer)[20], p_input->p_fmt->video.i_frame_rate );
-            SetQWLE( &(*pp_buffer)[28], p_input->p_fmt->video.i_frame_rate_base );
+            SetQWLE( &(*pp_buffer)[20], p_stream->fmt.video.i_frame_rate );
+            SetQWLE( &(*pp_buffer)[28], p_stream->fmt.video.i_frame_rate_base );
         break;
         case AUDIO_ES:
             SetQWLE( &(*pp_buffer)[20], p_input->p_fmt->audio.i_rate );
@@ -925,13 +923,15 @@ static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_heade
 
 static void OggFillVP8Header( uint8_t *p_buffer, sout_input_t *p_input )
 {
+    ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
+
     memcpy( p_buffer, "OVP80\x01\x01\x00", 8 );
     SetWBE( &p_buffer[8], p_input->p_fmt->video.i_width );
     SetDWBE( &p_buffer[14], p_input->p_fmt->video.i_sar_den );/* 24 bits, 15~ */
     SetDWBE( &p_buffer[11], p_input->p_fmt->video.i_sar_num );/* 24 bits, 12~ */
     SetWBE( &p_buffer[10], p_input->p_fmt->video.i_height );
-    SetDWBE( &p_buffer[18], p_input->p_fmt->video.i_frame_rate );
-    SetDWBE( &p_buffer[22], p_input->p_fmt->video.i_frame_rate_base );
+    SetDWBE( &p_buffer[18], p_stream->fmt.video.i_frame_rate );
+    SetDWBE( &p_buffer[22], p_stream->fmt.video.i_frame_rate_base );
 }
 
 static bool OggCreateHeaders( sout_mux_t *p_mux )
@@ -1432,13 +1432,13 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
         uint64_t i;
 
         if( p_input->p_fmt->i_cat == VIDEO_ES &&
-                p_input->p_fmt->video.i_frame_rate )
+                p_stream->fmt.video.i_frame_rate )
         {
             /* optimize for fps < 1 */
             i_interval= __MAX( p_mux->p_sys->skeleton.i_index_intvl * 1000,
                        INT64_C(10000000) *
-                       p_input->p_fmt->video.i_frame_rate_base /
-                       p_input->p_fmt->video.i_frame_rate );
+                       p_stream->fmt.video.i_frame_rate_base /
+                       p_stream->fmt.video.i_frame_rate );
         }
 
         size_t i_tuple_size = 0;
@@ -1643,7 +1643,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
                 /* presentation time */
                 i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
-                         p_input->p_fmt->video.i_frame_rate_base /  p_input->p_fmt->video.i_frame_rate;
+                        p_stream->fmt.video.i_frame_rate_base /
+                        p_stream->fmt.video.i_frame_rate;
                 AddIndexEntry( p_mux, i_time, p_input );
             }
 
@@ -1658,10 +1659,12 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         a += 5000;\
     a /= CLOCK_FREQ;
 
-            mtime_t dt = (p_data->i_dts - p_sys->i_start_dts) * p_input->p_fmt->video.i_frame_rate / p_input->p_fmt->video.i_frame_rate_base;
+            mtime_t dt = (p_data->i_dts - p_sys->i_start_dts) * p_stream->fmt.video.i_frame_rate /
+                    p_stream->fmt.video.i_frame_rate_base;
             FRAME_ROUND( dt );
 
-            mtime_t pt = (p_data->i_pts - p_sys->i_start_dts - p_stream->i_baseptsdelay ) * p_input->p_fmt->video.i_frame_rate / p_input->p_fmt->video.i_frame_rate_base;
+            mtime_t pt = (p_data->i_pts - p_sys->i_start_dts - p_stream->i_baseptsdelay ) *
+                    p_stream->fmt.video.i_frame_rate / p_stream->fmt.video.i_frame_rate_base;
             FRAME_ROUND( pt );
 
             /* (shro) some PTS could be repeated within 1st frames */
@@ -1711,7 +1714,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
                 /* presentation time */
                 i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
-                         p_input->p_fmt->video.i_frame_rate_base /  p_input->p_fmt->video.i_frame_rate;
+                         p_stream->fmt.video.i_frame_rate_base / p_stream->fmt.video.i_frame_rate;
                 AddIndexEntry( p_mux, i_time, p_input );
             }
             op.granulepos = ( ((int64_t)p_stream->i_num_frames) << 32 ) |
