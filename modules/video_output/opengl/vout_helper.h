@@ -202,7 +202,7 @@ static const char * const dither_text[] = {
     "Force a \"glconv\" module.")
 
 #define add_glopts() \
-    add_module ("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT, true) \
+    add_module("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT) \
     add_glopts_placebo ()
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {

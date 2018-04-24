@@ -1527,8 +1527,7 @@ vlc_module_begin ()
               AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT, false )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_module( "aout", "audio output", NULL, AOUT_TEXT, AOUT_LONGTEXT,
-                true )
+    add_module("aout", "audio output", NULL, AOUT_TEXT, AOUT_LONGTEXT)
         change_short('A')
     add_string( "role", "video", ROLE_TEXT, ROLE_LONGTEXT, true )
         change_string_list( ppsz_roles, ppsz_roles_text )
@@ -1537,12 +1536,12 @@ vlc_module_begin ()
     add_module_list( "audio-filter", "audio filter", NULL,
                      AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT, false )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
-    add_module( "audio-visual", "visualization", "none", AUDIO_VISUAL_TEXT,
-                AUDIO_VISUAL_LONGTEXT, false )
+    add_module("audio-visual", "visualization", "none",
+               AUDIO_VISUAL_TEXT, AUDIO_VISUAL_LONGTEXT)
 
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
-    add_module( "audio-resampler", "audio resampler", NULL,
-                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT, true )
+    add_module("audio-resampler", "audio resampler", NULL,
+               AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT)
 
 
 /* Video options */
@@ -1653,7 +1652,7 @@ vlc_module_begin ()
         change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_module( "vout", "vout display", NULL, VOUT_TEXT, VOUT_LONGTEXT, true )
+    add_module("vout", "vout display", NULL, VOUT_TEXT, VOUT_LONGTEXT)
         change_short('V')
 
     set_subcategory( SUBCAT_VIDEO_VFILTER )
@@ -1676,8 +1675,8 @@ vlc_module_begin ()
     add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, false )
         change_safe ()
     add_bool( "osd", 1, OSD_TEXT, OSD_LONGTEXT, false )
-    add_module( "text-renderer", "text renderer", NULL, TEXTRENDERER_TEXT,
-                TEXTRENDERER_LONGTEXT, true )
+    add_module("text-renderer", "text renderer", NULL,
+               TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
     set_section( N_("Subtitles") , NULL )
     add_loadfile("sub-file", NULL, SUB_FILE_TEXT, SUB_FILE_LONGTEXT)
@@ -1937,10 +1936,10 @@ vlc_module_begin ()
 
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_category_hint(N_("Input"), INPUT_CAT_LONGTEXT)
-    add_module( "access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT, true )
+    add_module("access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT)
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_module( "demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT, true )
+    add_module("demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT)
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_obsolete_bool( "prefer-system-codecs" )
@@ -1981,18 +1980,18 @@ vlc_module_begin ()
                                ANN_SAPINTV_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_MUX )
-    add_module( "mux", "sout mux", NULL, MUX_TEXT, MUX_LONGTEXT, true )
+    add_module("mux", "sout mux", NULL, MUX_TEXT, MUX_LONGTEXT)
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_module( "access_output", "sout access", NULL,
-                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, true )
+    add_module("access_output", "sout access", NULL,
+               ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT)
     add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT, true )
     add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
     add_obsolete_string( "miface-addr" ) /* since 2.0.0 */
     add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
-    add_module( "packetizer", "packetizer", NULL,
-                PACKETIZER_TEXT, PACKETIZER_LONGTEXT, true )
+    add_module("packetizer", "packetizer", NULL,
+               PACKETIZER_TEXT, PACKETIZER_LONGTEXT)
 
     set_subcategory( SUBCAT_SOUT_VOD )
 
@@ -2018,8 +2017,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_MISC )
     set_section( N_("Special modules"), NULL )
     add_category_hint(N_("Miscellaneous"), MISC_CAT_LONGTEXT)
-    add_module( "vod-server", "vod server", NULL, VOD_SERVER_TEXT,
-                VOD_SERVER_LONGTEXT, true )
+    add_module("vod-server", "vod server", NULL,
+               VOD_SERVER_TEXT, VOD_SERVER_LONGTEXT)
 
     set_section( N_("Plugins" ), NULL )
 #ifdef HAVE_DYNAMIC_PLUGINS

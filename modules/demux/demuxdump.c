@@ -46,8 +46,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("File dumper") )
     set_capability( "demux", 0 )
-    add_module( "demuxdump-access", "sout access", "file", ACCESS_TEXT,
-                ACCESS_TEXT, true )
+    add_module("demuxdump-access", "sout access", "file",
+               ACCESS_TEXT, ACCESS_TEXT)
     add_savefile("demuxdump-file", "stream-demux.dump",
                  FILE_TEXT, FILE_LONGTEXT)
     add_bool( "demuxdump-append", false, APPEND_TEXT, APPEND_LONGTEXT,

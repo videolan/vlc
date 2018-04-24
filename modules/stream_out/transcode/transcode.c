@@ -151,8 +151,8 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
-    add_module( SOUT_CFG_PREFIX "venc", "encoder", NULL, VENC_TEXT,
-                VENC_LONGTEXT, false )
+    add_module(SOUT_CFG_PREFIX "venc", "encoder", NULL,
+               VENC_TEXT, VENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "vb", 0, VB_TEXT,
@@ -180,8 +180,8 @@ vlc_module_begin ()
                      NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
 
     set_section( N_("Audio"), NULL )
-    add_module( SOUT_CFG_PREFIX "aenc", "encoder", NULL, AENC_TEXT,
-                AENC_LONGTEXT, false )
+    add_module(SOUT_CFG_PREFIX "aenc", "encoder", NULL,
+               AENC_TEXT, AENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "ab", 96, AB_TEXT,
@@ -199,8 +199,8 @@ vlc_module_begin ()
                      NULL, AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
     set_section( N_("Overlays/Subtitles"), NULL )
-    add_module( SOUT_CFG_PREFIX "senc", "encoder", NULL, SENC_TEXT,
-                SENC_LONGTEXT, false )
+    add_module(SOUT_CFG_PREFIX "senc", "encoder", NULL,
+               SENC_TEXT, SENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", false, SCODEC_TEXT,

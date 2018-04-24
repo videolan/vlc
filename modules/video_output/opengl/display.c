@@ -51,8 +51,7 @@ vlc_module_begin ()
     set_capability ("vout display", 265)
     set_callbacks (Open, Close)
     add_shortcut ("opengles2", "gles2")
-    add_module ("gles2", "opengl es2", NULL,
-                GLES2_TEXT, PROVIDER_LONGTEXT, true)
+    add_module("gles2", "opengl es2", NULL, GLES2_TEXT, PROVIDER_LONGTEXT)
 
 #else
 
@@ -65,8 +64,7 @@ vlc_module_begin ()
     set_capability ("vout display", 270)
     set_callbacks (Open, Close)
     add_shortcut ("opengl", "gl")
-    add_module ("gl", "opengl", NULL,
-                GL_TEXT, PROVIDER_LONGTEXT, true)
+    add_module("gl", "opengl", NULL, GL_TEXT, PROVIDER_LONGTEXT)
 #endif
     add_glopts ()
 vlc_module_end ()

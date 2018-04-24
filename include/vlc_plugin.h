@@ -385,7 +385,7 @@ VLC_METADATA_EXPORTS
 #define add_font(name, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_FONT, name, text, longtext, value)
 
-#define add_module( name, psz_caps, value, text, longtext, advc ) \
+#define add_module(name, psz_caps, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
