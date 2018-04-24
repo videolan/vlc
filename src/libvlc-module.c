@@ -2154,16 +2154,16 @@ vlc_module_begin ()
     add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-    add_module_cat( "intf", SUBCAT_INTERFACE_MAIN, NULL, INTF_TEXT,
-                INTF_LONGTEXT, false )
+    add_module_cat("intf", SUBCAT_INTERFACE_MAIN, NULL,
+                   INTF_TEXT, INTF_LONGTEXT)
         change_short('I')
-    add_module_list_cat( "extraintf", SUBCAT_INTERFACE_MAIN, NULL,
-                         EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, false )
+    add_module_list_cat("extraintf", SUBCAT_INTERFACE_MAIN, NULL,
+                        EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT)
 
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
-    add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL,
-                         CONTROL_TEXT, CONTROL_LONGTEXT, false )
+    add_module_list_cat("control", SUBCAT_INTERFACE_CONTROL, NULL,
+                        CONTROL_TEXT, CONTROL_LONGTEXT)
 
 /* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )

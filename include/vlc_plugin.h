@@ -394,11 +394,11 @@ VLC_METADATA_EXPORTS
     vlc_config_set (VLC_CONFIG_CAPABILITY, (const char *)(psz_caps));
 
 #ifndef __PLUGIN__
-#define add_module_cat( name, i_subcategory, value, text, longtext, advc ) \
+#define add_module_cat(name, i_subcategory, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
     change_integer_range (i_subcategory /* gruik */, 0);
 
-#define add_module_list_cat( name, i_subcategory, value, text, longtext, advc ) \
+#define add_module_list_cat(name, i_subcategory, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
                      value) \
     change_integer_range (i_subcategory /* gruik */, 0);
