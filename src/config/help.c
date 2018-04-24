@@ -445,7 +445,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                 ket = "}";
 
                 *typebuf = 0;
-                for (size_t i = 0; i < item->list_count; i++)
+                for (size_t i = 0; i < (size_t)i_count; i++)
                 {
                     if (i != 0)
                         strcat(typebuf, ", ");
