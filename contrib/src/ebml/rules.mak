@@ -24,6 +24,6 @@ EBML_EXTRA_FLAGS += CPPFLAGS=""
 endif
 
 .ebml: ebml toolchain.cmake
-	cd $< && $(HOSTVARS) $(CMAKE) -DBUILD_SHARED_LIBS=OFF
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DBUILD_SHARED_LIBS=OFF
 	cd $< && $(MAKE) install
 	touch $@
