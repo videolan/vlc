@@ -1343,13 +1343,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         /* build the stepper */
         ADD_STEPPER(o_stepper, mainFrame, mainFrame.size.width - 19,
                     0, toolTip, -100000, 100000)
-        [o_stepper setIntValue: p_item->value.i];
+        [o_stepper setIntegerValue: p_item->value.i];
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
         ADD_TEXTFIELD(o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
                       1, 49, toolTip, @"")
-        [o_textfield setIntValue: p_item->value.i];
+        [o_textfield setIntegerValue: p_item->value.i];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(textfieldChanged:)
