@@ -964,13 +964,16 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
+    bool b_drain = ( pp_block == NULL );
+    bool b_drained = false;
+
     do
     {
         int i_used = 0;
 
         post_mt( p_sys );
 
-        if( (p_block && p_block->i_buffer > 0) || pp_block == NULL /* drain */ )
+        if( (p_block && p_block->i_buffer > 0) || b_drain )
         {
             AVPacket pkt;
             av_init_packet( &pkt );
@@ -986,6 +989,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Drain */
                 pkt.data = NULL;
                 pkt.size = 0;
+                b_drain = false;
+                b_drained = true;
             }
 
             if( !p_sys->palette_sent )
@@ -1029,8 +1034,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
             av_packet_unref( &pkt );
 
-            if( p_frame_info->b_eos )
+            if( p_frame_info->b_eos && !b_drained )
+            {
                  avcodec_send_packet( p_context, NULL );
+                 b_drained = true;
+            }
         }
 
         AVFrame *frame = av_frame_alloc();
@@ -1049,10 +1057,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 b_error = true;
             }
             av_frame_free(&frame);
-            /* After draining, we need to reset decoder with a flush */
             if( ret == AVERROR_EOF )
-                avcodec_flush_buffers( p_sys->p_context );
-            break;
+                break;
         }
         bool not_received_frame = ret;
 
@@ -1220,6 +1226,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     } while( true );
 
+    /* After draining, we need to reset decoder with a flush */
+    if( b_drained )
+        avcodec_flush_buffers( p_sys->p_context );
+
     if( p_block )
         block_Release( p_block );
 
@@ -1248,7 +1258,6 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
             block_Release( p_block );
             p_block = NULL; /* output only */
         }
-        avcodec_flush_buffers( p_sys->p_context );
     }
 
     return DecodeBlock( p_dec, pp_block );
