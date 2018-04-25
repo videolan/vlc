@@ -519,6 +519,10 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     p_pes->p_buffer += i_skip;
     p_pes->i_buffer -= i_skip;
 
+    /* ISO/IEC 13818-1 2.7.5: if no pts and no dts, then dts == pts */
+    if( i_pts >= 0 && i_dts < 0 )
+        i_dts = i_pts;
+
     if( i_dts >= 0 )
         p_pes->i_dts = FROM_SCALE( i_dts );
     if( i_pts >= 0 )
