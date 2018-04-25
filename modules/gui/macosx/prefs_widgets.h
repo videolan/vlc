@@ -33,7 +33,6 @@ static NSMenu *o_keys_menu = nil;
 @property (readonly) NSString *name;
 @property (readonly) int type;
 @property (readwrite) int viewType;
-@property (readonly) bool advanced;
 @property (readonly) int intValue;
 @property (readonly) float floatValue;
 @property (readonly) char *stringValue;

@@ -408,7 +408,6 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         _p_item = p_item;
         psz_name = p_item->psz_name;
         _type = p_item->i_type;
-        _advanced = false;
         [self setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin ];
     }
     return (self);
