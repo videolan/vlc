@@ -50,6 +50,10 @@ function parse_json(url)
         string = string .. line
     end
 
+    if string == "" then
+    	return 0, 0, "Got empty response from server."
+    end
+
     return json.decode(string)
 end
 
@@ -72,7 +76,12 @@ function parse()
     -- Found a video id
     if video_id ~= nil then
         -- Lookup info from the json endpoint
-        local info = filmid_info(video_id)
+        local info, _, err = filmid_info(video_id)
+
+        if err ~= nil then
+        	vlc.msg.err("Error to parse JSON response from Apple trailers: " .. err)
+        	return playlist
+        end
 
         -- Parse data
         if info["clips"] == nil then
