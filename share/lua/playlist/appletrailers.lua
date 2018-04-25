@@ -32,26 +32,27 @@ function find( haystack, needle )
 end
 
 function parse_json(url)
-    vlc.msg.dbg("Trying to parse JSON from " .. url)
-    local json = require ("dkjson")
-
-    -- Use vlc.stream to grab a remote json file, place it in a string,
-    -- decode it and return the decoded data.
+    local json   = require("dkjson")
     local stream = vlc.stream(url)
     local string = ""
     local line   = ""
 
-    if not stream then return false end
+    if not stream then
+        return nil, nil, "Failed creating VLC stream"
+    end
 
     while true do
         line = stream:readline()
-        if not line then break end
+
+        if not line then
+            break
+        end
 
         string = string .. line
     end
 
     if string == "" then
-    	return 0, 0, "Got empty response from server."
+        return nil, nil, "Got empty response from server."
     end
 
     return json.decode(string)
