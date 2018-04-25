@@ -619,7 +619,7 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_waiting )
+    if( p_owner->b_waiting || p_owner->paused )
         i_ts = VLC_TS_INVALID;
     vlc_mutex_unlock( &p_owner->lock );
 
