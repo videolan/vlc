@@ -164,4 +164,4 @@ VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, int );
 
 /**@}*/
 
-#endif /* _VLC_VIDEO_H */
+#endif /* _VLC_VOUT_H */

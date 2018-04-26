@@ -234,4 +234,4 @@ VLC_API unsigned picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpic
 
 /**@}*/
 
-#endif /* _VLC_VIDEO_H */
+#endif /* _VLC_SUBPICTURE_H */
