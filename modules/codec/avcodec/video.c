@@ -901,10 +901,12 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
             p_pic->format.multiview_mode = MULTIVIEW_2D;
             break;
         }
+#if LIBAVUTIL_VERSION_CHECK( 56, 7, 0, 4, 100 )
         p_pic->format.b_multiview_right_eye_first = stereo_data->flags & AV_STEREO3D_FLAG_INVERT;
         p_pic->format.b_multiview_left_eye = stereo_data->flags & AV_STEREO3D_VIEW_LEFT;
 
         p_dec->fmt_out.video.b_multiview_right_eye_first = p_pic->format.b_multiview_right_eye_first;
+#endif
 
         if (p_dec->fmt_out.video.multiview_mode != p_pic->format.multiview_mode)
         {
