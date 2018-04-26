@@ -710,6 +710,30 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
     free(picture);
 }
 
+#if !VLC_WINSTORE_APP
+static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
+{
+    ZeroMemory(out, sizeof(*out));
+    out->BufferCount = 3;
+    out->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    out->SampleDesc.Count = 1;
+    out->SampleDesc.Quality = 0;
+    out->Width = vd->source.i_visible_width;
+    out->Height = vd->source.i_visible_height;
+    switch(vd->source.i_chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE_10B:
+        out->Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+        break;
+    default:
+        out->Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
+        break;
+    }
+    //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
+    out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+}
+#endif
+
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1537,24 +1561,7 @@ static int Direct3D11Open(vout_display_t *vd)
     HRESULT hr = S_OK;
 
     DXGI_SWAP_CHAIN_DESC1 scd;
-    memset(&scd, 0, sizeof(scd));
-    scd.BufferCount = 3;
-    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.SampleDesc.Count = 1;
-    scd.SampleDesc.Quality = 0;
-    scd.Width = vd->source.i_visible_width;
-    scd.Height = vd->source.i_visible_height;
-    switch(vd->source.i_chroma)
-    {
-    case VLC_CODEC_D3D11_OPAQUE_10B:
-        scd.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
-        break;
-    default:
-        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
-        break;
-    }
-    //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
-    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    FillSwapChainDesc(vd, &scd);
 
     hr = D3D11_CreateDevice(vd, &sys->hd3d,
                             is_d3d11_opaque(vd->source.i_chroma),
