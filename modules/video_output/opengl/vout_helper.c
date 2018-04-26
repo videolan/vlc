@@ -168,7 +168,6 @@ struct vout_display_opengl_t {
     float f_fovx; /* f_fovx and f_fovy are linked but we keep both */
     float f_fovy; /* to avoid recalculating them when needed.      */
     float f_z;    /* Position of the camera on the shpere radius vector */
-    float f_z_min;
     float f_sar;
 };
 
