@@ -5,13 +5,13 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=eaff5fcb7cde8d1614755269773d471d3a3d1bfc
+FFMPEG_HASH=d268094f889479a8edee43d8c847da8838b8bf0f
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
-FFMPEG_HASH=e171022c24c42b1e88a51bb3b4c27f13c87c85cb
+FFMPEG_HASH=99e9697e3a12ab4a6638a36b95edafd6a98f9eaa
 FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
