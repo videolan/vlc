@@ -1107,6 +1107,8 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11S
     UINT stride = sizeof(d3d_vertex_t);
     UINT offset = 0;
 
+    ID3D11DeviceContext_OMSetRenderTargets(sys->d3d_dev.d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
+
     /* Render the quad */
     /* vertex shader */
     ID3D11DeviceContext_IASetVertexBuffers(sys->d3d_dev.d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
@@ -1277,8 +1279,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     ID3D11DeviceContext_ClearRenderTargetView(sys->d3d_dev.d3dcontext, sys->d3drenderTargetView, blackRGBA);
 
     /* no ID3D11Device operations should come here */
-
-    ID3D11DeviceContext_OMSetRenderTargets(sys->d3d_dev.d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3d_dev.d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
