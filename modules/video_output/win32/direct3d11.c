@@ -2205,8 +2205,11 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         hr = CompilePixelShader(vd, sys->d3dregion_format, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
-            ID3D11PixelShader_Release(sys->picQuadPixelShader);
-            sys->picQuadPixelShader = NULL;
+            if (sys->picQuadPixelShader)
+            {
+                ID3D11PixelShader_Release(sys->picQuadPixelShader);
+                sys->picQuadPixelShader = NULL;
+            }
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
