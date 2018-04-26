@@ -46,6 +46,10 @@ AbstractDemuxer *DASHStream::newDemux(demux_t *p_realdemux, const StreamFormat &
             ret = AbstractStream::newDemux(p_realdemux, format, out, source);
             break;
 
+        case StreamFormat::WEBM:
+            ret = new Demuxer(p_realdemux, "mkv", out, source);
+            break;
+
         case StreamFormat::WEBVTT:
             ret = new SlaveDemuxer(p_realdemux, "webvtt", out, source);
             break;

@@ -46,6 +46,8 @@ std::string StreamFormat::str() const
             return "Timed Text";
         case PACKEDAAC:
             return "Packed AAC";
+        case WEBM:
+            return "WebM";
         case UNSUPPORTED:
             return "Unsupported";
         default:
@@ -76,6 +78,8 @@ StreamFormat::StreamFormat( const std::string &mimetype )
             formatid = StreamFormat::WEBVTT;
         else if (tail == "ttml+xml")
             formatid = StreamFormat::TTML;
+        else if (tail == "webm")
+            formatid = StreamFormat::WEBM;
     }
 }
 

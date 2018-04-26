@@ -15,6 +15,7 @@ Audio output:
 
 Demuxer:
  * Support for HEIF format
+ * Support for DASH WebM
 
 Codecs:
  * Support for experimental AV1 video encoding
