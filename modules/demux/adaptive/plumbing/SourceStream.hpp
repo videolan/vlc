@@ -22,6 +22,7 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
+#include <vlc_block_helper.h>
 #include <string>
 
 namespace adaptive
@@ -46,18 +47,37 @@ namespace adaptive
 
         protected:
             std::string getContentType();
-            ssize_t Read(uint8_t *, size_t);
+            virtual ssize_t Read(uint8_t *, size_t);
+            virtual int     Seek(uint64_t);
+            bool b_eof;
+            vlc_object_t *p_obj;
+            ChunksSource *source;
 
         private:
             block_t *p_block;
-            bool b_eof;
             static ssize_t read_Callback(stream_t *, void *, size_t);
             static int seek_Callback(stream_t *, uint64_t);
             static int control_Callback( stream_t *, int i_query, va_list );
             static void delete_Callback( stream_t * );
-            vlc_object_t *p_obj;
-            ChunksSource *source;
     };
 
+    class BufferedChunksSourceStream : public ChunksSourceStream
+    {
+        public:
+            BufferedChunksSourceStream(vlc_object_t *, ChunksSource *);
+            virtual ~BufferedChunksSourceStream();
+            virtual void Reset(); /* reimpl */
+
+        protected:
+            virtual ssize_t Read(uint8_t *, size_t); /* reimpl */
+            virtual int     Seek(uint64_t); /* reimpl */
+
+        private:
+            static const int MAX_BACKEND = 5 * 1024 * 1024;
+            static const int MIN_BACKEND_CLEANUP = 50 * 1024;
+            uint64_t i_global_offset;
+            size_t i_bytestream_offset;
+            block_bytestream_t bs;
+    };
 }
 #endif // SOURCESTREAM_HPP
