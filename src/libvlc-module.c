@@ -44,6 +44,7 @@
 #include "vlc_actions.h"
 #include "vlc_meta.h"
 #include <vlc_aout.h>
+#include <vlc_vout.h>
 
 static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff" };
