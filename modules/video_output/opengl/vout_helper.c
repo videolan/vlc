@@ -1053,11 +1053,12 @@ static void UpdateFOVy(vout_display_opengl_t *vgl)
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
+    if (p_vp->fov > FIELD_OF_VIEW_DEGREES_MAX
+            || p_vp->fov < FIELD_OF_VIEW_DEGREES_MIN)
+        return VLC_EBADVAR;
+
 #define RAD(d) ((float) ((d) * M_PI / 180.f))
     float f_fovx = RAD(p_vp->fov);
-    if (f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f
-        || f_fovx < -0.001f)
-        return VLC_EBADVAR;
 
     vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
     vgl->f_phi  = RAD(p_vp->pitch);
