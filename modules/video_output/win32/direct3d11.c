@@ -116,6 +116,7 @@ typedef struct
     D3D11_VIEWPORT            cropViewport;
     unsigned int              i_width;
     unsigned int              i_height;
+    video_projection_mode_t   projection;
 
     PS_CONSTANT_BUFFER        shaderConstants;
 } d3d_quad_t;
@@ -239,7 +240,6 @@ static int SetupQuad(vout_display_t *, const video_format_t *, d3d_quad_t *, con
                      video_orientation_t);
 static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
                                 const RECT *output,
-                                video_projection_mode_t projection,
                                 video_orientation_t orientation );
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
@@ -975,7 +975,7 @@ static void UpdateSize(vout_display_t *vd)
     UpdatePicQuadPosition(vd);
 
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
-                       vd->fmt.projection_mode, vd->fmt.orientation);
+                       vd->fmt.orientation);
 
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
@@ -2667,13 +2667,12 @@ static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
 }
 
 
-static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
-                              video_projection_mode_t projection)
+static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
 {
     HRESULT hr;
     vout_display_sys_t *sys = vd->sys;
 
-    switch (projection)
+    switch (quad->projection)
     {
     case PROJECTION_MODE_RECTANGULAR:
         quad->vertexCount = 4;
@@ -2688,7 +2687,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
         quad->indexCount = 6 * 2 * 3;
         break;
     default:
-        msg_Warn(vd, "Projection mode %d not handled", projection);
+        msg_Warn(vd, "Projection mode %d not handled", quad->projection);
         return false;
     }
 
@@ -2726,7 +2725,6 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
 
 static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
                                 const RECT *output,
-                                video_projection_mode_t projection,
                                 video_orientation_t orientation )
 {
     vout_display_sys_t *sys = vd->sys;
@@ -2753,7 +2751,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     }
     WORD *triangle_pos = mappedResource.pData;
 
-    switch (projection)
+    switch (quad->projection)
     {
     case PROJECTION_MODE_RECTANGULAR:
         SetupQuadFlat(dst_data, output, quad, triangle_pos, orientation);
@@ -2765,7 +2763,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
         SetupQuadCube(dst_data, output, quad, triangle_pos);
         break;
     default:
-        msg_Warn(vd, "Projection mode %d not handled", projection);
+        msg_Warn(vd, "Projection mode %d not handled", quad->projection);
         return false;
     }
 
@@ -2914,6 +2912,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
     quad->PSConstantsCount = 2;
+    quad->projection = projection;
 
     /* vertex shader constant buffer */
     if (projection == PROJECTION_MODE_EQUIRECTANGULAR
@@ -2934,9 +2933,9 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     quad->picSys.context = sys->d3d_dev.d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
-    if (!AllocQuadVertices(vd, quad, projection))
+    if (!AllocQuadVertices(vd, quad))
         goto error;
-    if (!UpdateQuadPosition(vd, quad, output, projection, orientation))
+    if (!UpdateQuadPosition(vd, quad, output, orientation))
         goto error;
 
     quad->d3dpixelShader = d3dpixelShader;
@@ -3160,7 +3159,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
             quad_picture = (*region)[i];
         } else {
-            UpdateQuadPosition(vd, (d3d_quad_t *) quad_picture->p_sys, &output, PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL);
+            UpdateQuadPosition(vd, (d3d_quad_t *) quad_picture->p_sys, &output, ORIENT_NORMAL);
         }
 
         hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
