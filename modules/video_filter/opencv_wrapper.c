@@ -316,7 +316,7 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in )
 {
     int planes = p_in->i_planes;    //num input video planes
     // input video size
-    CvSize sz = cvSize(abs(p_in->format.i_width), abs(p_in->format.i_height));
+    CvSize sz = cvSize(p_in->format.i_width, p_in->format.i_height);
     video_format_t fmt_out;
     filter_sys_t* p_sys = p_filter->p_sys;
 
