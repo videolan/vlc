@@ -14,6 +14,8 @@
 /*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT 100000
 
+typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
+
 typedef struct
 {
     sout_stream_id_sys_t *id_video;

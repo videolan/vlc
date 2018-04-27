@@ -140,13 +140,15 @@ static const char *const ppsz_sout_options_in[] = {
     NULL
 };
 
-static sout_stream_id_sys_t *AddOut( sout_stream_t *, const es_format_t * );
-static void              DelOut ( sout_stream_t *, sout_stream_id_sys_t * );
-static int               SendOut( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
+static void *AddOut( sout_stream_t *, const es_format_t * );
+static void  DelOut( sout_stream_t *, void * );
+static int   SendOut( sout_stream_t *, void *, block_t * );
 
-static sout_stream_id_sys_t *AddIn( sout_stream_t *, const es_format_t * );
-static void              DelIn ( sout_stream_t *, sout_stream_id_sys_t * );
-static int               SendIn( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
+static void *AddIn( sout_stream_t *, const es_format_t * );
+static void  DelIn( sout_stream_t *, void * );
+static int   SendIn( sout_stream_t *, void *, block_t * );
+
+typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 
 typedef struct bridged_es_t
 {
@@ -233,7 +235,7 @@ static void CloseOut( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridge_t *p_bridge;
@@ -292,10 +294,10 @@ static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, const es_format_t
 
     vlc_mutex_unlock( &lock );
 
-    return (sout_stream_id_sys_t *)p_sys;
+    return p_sys;
 }
 
-static void DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void DelOut( sout_stream_t *p_stream, void *id )
 {
     VLC_UNUSED(id);
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
@@ -318,8 +320,7 @@ static void DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     p_sys->b_inited = false;
 }
 
-static int SendOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                    block_t *p_buffer )
+static int SendOut( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridged_es_t *p_es;
@@ -451,7 +452,7 @@ struct sout_stream_id_sys_t
     enum es_format_category_e i_cat; /* es category. Used for placeholder option */
 };
 
-static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void* AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
@@ -488,9 +489,10 @@ static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, const es_format_t 
     return id;
 }
 
-static void DelIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void DelIn( sout_stream_t *p_stream, void *_id )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
     if( id == p_sys->id_video ) p_sys->id_video = NULL;
     if( id == p_sys->id_audio ) p_sys->id_audio = NULL;
@@ -499,10 +501,10 @@ static void DelIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     free( id );
 }
 
-static int SendIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                   block_t *p_buffer )
+static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     bridge_t *p_bridge;
     bool b_no_es = true;
     int i;

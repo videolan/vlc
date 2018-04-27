@@ -53,10 +53,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
-static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
-static int               Send( sout_stream_t *, sout_stream_id_sys_t *,
-                               block_t* );
+static void *Add( sout_stream_t *, const es_format_t * );
+static void  Del( sout_stream_t *, void * );
+static int   Send( sout_stream_t *, void *, block_t * );
 
 typedef struct
 {
@@ -70,11 +69,11 @@ typedef struct
     char            **ppsz_select;
 } sout_stream_sys_t;
 
-struct sout_stream_id_sys_t
+typedef struct
 {
     int                 i_nb_ids;
     void                **pp_ids;
-};
+} sout_stream_id_sys_t;
 
 static bool ESSelected( const es_format_t *fmt, char *psz_select );
 
@@ -181,7 +180,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Add:
  *****************************************************************************/
-static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t  *id;
@@ -237,9 +236,10 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
 /*****************************************************************************
  * Del:
  *****************************************************************************/
-static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, void *_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     int               i_stream;
 
     for( i_stream = 0; i_stream < p_sys->i_nb_streams; i_stream++ )
@@ -258,10 +258,10 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 /*****************************************************************************
  * Send:
  *****************************************************************************/
-static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                 block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     sout_stream_t     *p_dup_stream;
     int               i_stream;
 

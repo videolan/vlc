@@ -95,10 +95,10 @@ static const char *ppsz_sout_options_lang[] = {
     "id", "lang", NULL
 };
 
-static sout_stream_id_sys_t *AddId  ( sout_stream_t *, const es_format_t * );
-static sout_stream_id_sys_t *AddLang( sout_stream_t *, const es_format_t * );
-static void              Del     ( sout_stream_t *, sout_stream_id_sys_t * );
-static int               Send    ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
+static void *AddId  ( sout_stream_t *, const es_format_t * );
+static void *AddLang( sout_stream_t *, const es_format_t * );
+static void  Del    ( sout_stream_t *, void * );
+static int   Send   ( sout_stream_t *, void *, block_t * );
 
 typedef struct
 {
@@ -187,7 +187,7 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_sys_t * AddId( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *AddId( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     es_format_t fmt;
@@ -205,7 +205,7 @@ static sout_stream_id_sys_t * AddId( sout_stream_t *p_stream, const es_format_t 
     return sout_StreamIdAdd( p_stream->p_next, p_fmt );
 }
 
-static sout_stream_id_sys_t * AddLang( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *AddLang( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     es_format_t fmt;
@@ -224,13 +224,12 @@ static sout_stream_id_sys_t * AddLang( sout_stream_t *p_stream, const es_format_
     return sout_StreamIdAdd( p_stream->p_next, p_fmt );
 }
 
-static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, void *id )
 {
     sout_StreamIdDel( p_stream->p_next, id );
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                 block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }

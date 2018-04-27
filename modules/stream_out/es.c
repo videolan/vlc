@@ -120,9 +120,9 @@ static const char *const ppsz_sout_options[] = {
     NULL
 };
 
-static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
-static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
-static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
+static void *Add( sout_stream_t *, const es_format_t * );
+static void  Del( sout_stream_t *, void * );
+static int   Send( sout_stream_t *, void *, block_t * );
 
 typedef struct
 {
@@ -203,11 +203,11 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-struct sout_stream_id_sys_t
+typedef struct
 {
     sout_input_t *p_input;
     sout_mux_t   *p_mux;
-};
+} sout_stream_id_sys_t;
 
 static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
                             const char *psz_access, const char *psz_mux )
@@ -257,7 +257,7 @@ out:
     return stream.ptr;
 }
 
-static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t  *id;
@@ -392,9 +392,10 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, const es_format_t *p_
     return id;
 }
 
-static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, void *_id )
 {
     VLC_UNUSED(p_stream);
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     sout_access_out_t *p_access = id->p_mux->p_access;
 
     sout_MuxDeleteStream( id->p_mux, id->p_input );
@@ -406,10 +407,10 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     free( id );
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                 block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     VLC_UNUSED(p_stream);
+    sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     return sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 }
 

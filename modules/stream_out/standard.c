@@ -130,26 +130,25 @@ typedef struct
     session_descriptor_t *p_session;
 } sout_stream_sys_t;
 
-static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    return (sout_stream_id_sys_t*)sout_MuxAddStream( p_sys->p_mux, p_fmt );
+    return sout_MuxAddStream( p_sys->p_mux, p_fmt );
 }
 
-static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, void *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_MuxDeleteStream( p_sys->p_mux, (sout_input_t*)id );
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                 block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     return sout_MuxSendBuffer( p_sys->p_mux, (sout_input_t*)id, p_buffer );
 }
 
-static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Flush( sout_stream_t *p_stream, void *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_MuxFlush( p_sys->p_mux, (sout_input_t*)id );

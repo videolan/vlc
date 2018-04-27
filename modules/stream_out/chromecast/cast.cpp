@@ -82,6 +82,8 @@ private:
     std::string        m_mime;
 };
 
+typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
+
 struct sout_stream_sys_t
 {
     sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port)
@@ -277,10 +279,10 @@ vlc_module_begin ()
         set_callbacks(AccessOpen, AccessClose)
 vlc_module_end ()
 
-static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt)
+static void *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
-    sout_stream_id_sys_t *id = sout_StreamIdAdd(p_stream->p_next, p_fmt);
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( sout_StreamIdAdd(p_stream->p_next, p_fmt) );
     if (id)
     {
         if (p_fmt->i_cat == VIDEO_ES)
@@ -290,19 +292,20 @@ static sout_stream_id_sys_t *ProxyAdd(sout_stream_t *p_stream, const es_format_t
     return id;
 }
 
-static void ProxyDel(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+static void ProxyDel(sout_stream_t *p_stream, void *_id)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
     p_sys->out_streams_added--;
     if (id == p_sys->video_proxy_id)
         p_sys->video_proxy_id = NULL;
     return sout_StreamIdDel(p_stream->p_next, id);
 }
 
-static int ProxySend(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                     block_t *p_buffer)
+static int ProxySend(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
     if (p_sys->cc_has_input
      || p_sys->out_streams_added >= p_sys->out_streams.size() - p_sys->spu_streams_count)
     {
@@ -349,7 +352,7 @@ static int ProxySend(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     }
 }
 
-static void ProxyFlush(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+static void ProxyFlush(sout_stream_t *p_stream, void *id)
 {
     sout_StreamFlush(p_stream->p_next, id);
 }
@@ -699,7 +702,7 @@ static void AccessClose(vlc_object_t *p_this)
 /*****************************************************************************
  * Sout callbacks
  *****************************************************************************/
-static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
+static void *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     vlc_mutex_locker locker(&p_sys->lock);
@@ -724,10 +727,10 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
 }
 
 
-static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                        bool reset_config)
+static void DelInternal(sout_stream_t *p_stream, void *_id, bool reset_config)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
 
     for (std::vector<sout_stream_id_sys_t*>::iterator it = p_sys->streams.begin();
          it != p_sys->streams.end(); )
@@ -773,9 +776,10 @@ static void DelInternal(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     }
 }
 
-static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+static void Del(sout_stream_t *p_stream, void *_id)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
 
     vlc_mutex_locker locker(&p_sys->lock);
     DelInternal(p_stream, id, true);
@@ -877,7 +881,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
          it != out_streams.end(); )
     {
         sout_stream_id_sys_t *p_sys_id = *it;
-        p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
+        p_sys_id->p_sub_id = reinterpret_cast<sout_stream_id_sys_t *>( sout_StreamIdAdd( p_out, &p_sys_id->fmt ) );
         if ( p_sys_id->p_sub_id == NULL )
         {
             msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
@@ -1097,7 +1101,7 @@ sout_stream_sys_t::GetVencOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec
             fmt.video.i_frame_rate = 30;
             fmt.video.i_frame_rate_base = 1;
 
-            sout_stream_id_sys_t *id = sout_StreamIdAdd( p_sout_test, &fmt );
+            void *id = sout_StreamIdAdd( p_sout_test, &fmt );
 
             es_format_Clean( &fmt );
             const bool success = id != NULL;
@@ -1401,10 +1405,10 @@ bool sout_stream_sys_t::isFlushing( sout_stream_t *p_stream )
     return false;
 }
 
-static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                block_t *p_buffer)
+static int Send(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
     vlc_mutex_locker locker(&p_sys->lock);
 
     if( p_sys->isFlushing( p_stream ) )
@@ -1427,9 +1431,10 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     return ret;
 }
 
-static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Flush( sout_stream_t *p_stream, void *_id )
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( _id );
     vlc_mutex_locker locker(&p_sys->lock);
 
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id, false );
