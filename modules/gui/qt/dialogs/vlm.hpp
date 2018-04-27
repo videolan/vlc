@@ -29,8 +29,6 @@
 # include "config.h"
 #endif
 
-#ifdef ENABLE_VLM
-
 #include <vlc_vlm.h>
 
 #include "ui/vlm.h"
@@ -224,7 +222,5 @@ private:
     int rNumber;
     int rDays;
 };
-
-#endif
 
 #endif
