@@ -129,7 +129,7 @@ static int OpenFilter( vlc_object_t *p_this )
 static void CloseFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
 
     if( p_sys->p_cascade )
         cvReleaseHaarClassifierCascade( &p_sys->p_cascade );
@@ -151,7 +151,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     IplImage** p_img = NULL;
     CvPoint pt1, pt2;
     int scale = 1;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
  
     if ((!p_pic) )
     {
