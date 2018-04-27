@@ -4263,15 +4263,10 @@ static int ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented )
 
                 for( unsigned i=0; i<p_sys->i_tracks; i++ )
                 {
-                    stime_t i_duration = 0;
                     MP4_Box_t *p_tfdt = NULL;
                     MP4_Box_t *p_traf = MP4_GetTrafByTrackID( p_moof, p_sys->track[i].i_track_ID );
                     if( p_traf )
                         p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
-
-                    /* Set first fragment time offset from moov */
-                    if( index == 0 )
-                        pi_track_times[i] = GetMoovTrackDuration( p_sys, p_sys->track[i].i_track_ID );
 
                     if( p_tfdt && BOXDATA(p_tfdt) )
                     {
@@ -4279,13 +4274,14 @@ static int ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented )
                     }
                     else if( index == 0 ) /* Set first fragment time offset from moov */
                     {
-                        i_duration = GetMoovTrackDuration( p_sys, p_sys->track[i].i_track_ID );
+                        stime_t i_duration = GetMoovTrackDuration( p_sys, p_sys->track[i].i_track_ID );
                         pi_track_times[i] = MP4_rescale( i_duration, p_sys->i_timescale, p_sys->track[i].i_timescale );
                     }
 
                     stime_t i_movietime = MP4_rescale( pi_track_times[i], p_sys->track[i].i_timescale, p_sys->i_timescale );
                     p_sys->p_fragsindex->p_times[index * p_sys->i_tracks + i] = i_movietime;
 
+                    stime_t i_duration = 0;
                     if( GetMoofTrackDuration( p_sys->p_moov, p_moof, p_sys->track[i].i_track_ID, &i_duration ) )
                         pi_track_times[i] += i_duration;
                 }
