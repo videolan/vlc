@@ -68,7 +68,7 @@ typedef struct d3d_vertex_t {
 
 void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *,
                       ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
-                      ID3D11RenderTargetView *);
+                      ID3D11RenderTargetView *renderTarget[D3D11_MAX_SHADER_VIEW]);
 
 void D3D11_ReleaseQuad(d3d_quad_t *);
 
