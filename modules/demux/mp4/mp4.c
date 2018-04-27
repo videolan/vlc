@@ -4938,7 +4938,17 @@ static int DemuxFrag( demux_t *p_demux )
         p_sys->context.i_current_box_type = VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
         if( p_sys->context.i_current_box_type == ATOM_mdat )
         {
-            p_sys->context.i_post_mdat_offset = vlc_stream_Tell( p_demux->s ) + GetDWBE( p_peek );
+            uint64_t size = GetDWBE( p_peek );
+            if ( size == 1 )
+            {
+                if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) != 16 )
+                {
+                    i_status = VLC_DEMUXER_EOF;
+                    goto end;
+                }
+                size = GetQWBE( p_peek + 8 );
+            }
+            p_sys->context.i_post_mdat_offset = vlc_stream_Tell( p_demux->s ) + size;
         }
         else
         {
