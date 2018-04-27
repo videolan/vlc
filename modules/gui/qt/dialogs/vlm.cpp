@@ -27,9 +27,8 @@
 # include "config.h"
 #endif
 
-#include "dialogs/vlm.hpp"
-
 #ifdef ENABLE_VLM
+#include "dialogs/vlm.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs/sout.hpp"
 #include "util/qt_dirs.hpp"
