@@ -5138,5 +5138,3 @@ static void MP4ASF_ResetFrames( demux_sys_t *p_sys )
         }
     }
 }
-
-#undef BOXDATA
