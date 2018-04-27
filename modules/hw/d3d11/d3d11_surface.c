@@ -813,13 +813,14 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     picture_resource_t res;
     res.pf_destroy = DestroyPicture;
-    res.p_sys = calloc(1, sizeof(picture_sys_t));
-    if (res.p_sys == NULL) {
+    picture_sys_t *res_sys = calloc(1, sizeof(picture_sys_t));
+    if (res_sys == NULL) {
         err = VLC_ENOMEM;
         goto done;
     }
-    res.p_sys->context = d3d_dev.d3dcontext;
-    res.p_sys->formatTexture = texDesc.Format;
+    res.p_sys = res_sys;
+    res_sys->context = d3d_dev.d3dcontext;
+    res_sys->formatTexture = texDesc.Format;
 
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = d3d_fourcc;
@@ -849,7 +850,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         goto done;
     }
 
-    res.p_sys->texture[KNOWN_DXGI_INDEX] = texture;
+    res_sys->texture[KNOWN_DXGI_INDEX] = texture;
     ID3D11DeviceContext_AddRef(p_dst_sys->context);
 
     if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )

@@ -81,9 +81,10 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct picture_sys_t {
+typedef struct
+{
     void *id;
-};
+} picture_sys_t;
 
 /* NOTE: the callback prototypes must match those of LibVLC */
 struct vout_display_sys_t {

@@ -544,11 +544,11 @@ struct pic_sys_vaapi_instance
     VASurfaceID render_targets[];
 };
 
-struct picture_sys_t
+typedef struct
 {
     struct pic_sys_vaapi_instance *instance;
     struct vaapi_pic_ctx ctx;
-};
+} picture_sys_t;
 
 static void
 pool_pic_destroy_cb(picture_t *pic)
@@ -685,17 +685,18 @@ error:
 }
 
 unsigned
-vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
-                                 VASurfaceID **render_targets)
+vlc_vaapi_PicSysGetRenderTargets(void *_sys, VASurfaceID **render_targets)
 {
+    picture_sys_t *sys = (picture_sys_t *)_sys;
     assert(sys && sys->instance);
     *render_targets = sys->instance->render_targets;
     return sys->instance->num_render_targets;
 }
 
 struct vlc_vaapi_instance *
-vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy)
+vlc_vaapi_PicSysHoldInstance(void *_sys, VADisplay *dpy)
 {
+    picture_sys_t *sys = (picture_sys_t *)_sys;
     assert(sys->instance != NULL);
     *dpy = vlc_vaapi_HoldInstance(sys->instance->va_inst);
     return sys->instance->va_inst;

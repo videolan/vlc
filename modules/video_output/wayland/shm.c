@@ -178,7 +178,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
         if (buf == NULL)
             break;
 
-        res.p_sys = (picture_sys_t *)buf;
+        res.p_sys = buf;
         res.p[0].p_pixels = base;
         base = ((char *)base) + picsize;
         offset += picsize;

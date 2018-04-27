@@ -30,12 +30,13 @@
 /* Think twice before changing this. Incorrect values cause havoc. */
 #define NUM_ACTUAL_OPAQUE_BUFFERS 30
 
-struct picture_sys_t {
+typedef struct
+{
     vlc_object_t *owner;
 
     MMAL_BUFFER_HEADER_T *buffer;
     bool displayed;
-};
+} picture_sys_t;
 
 int mmal_picture_lock(picture_t *picture);
 

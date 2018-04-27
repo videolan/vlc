@@ -412,11 +412,12 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     {
         picture_resource_t res;
         res.pf_destroy = DestroyPicture;
-        res.p_sys = calloc(1, sizeof(picture_sys_t));
-        if (res.p_sys == NULL) {
+        picture_sys_t *res_sys = calloc(1, sizeof(picture_sys_t));
+        if (res_sys == NULL) {
             err = VLC_ENOMEM;
             goto done;
         }
+        res.p_sys = res_sys;
 
         video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
         fmt_staging.i_chroma = texDesc.Format;
@@ -441,7 +442,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
             msg_Err(p_filter, "Failed to create a %4.4s staging texture to extract surface pixels (hr=0x%0lx)", (char *)texDesc.Format, hr );
             goto done;
         }
-        res.p_sys->surface = texture;
+        res_sys->surface = texture;
         IDirect3DSurface9_AddRef(texture);
 
         p_cpu_filter = CreateFilter(VLC_OBJECT(p_filter), &p_filter->fmt_in, p_dst->format.i_chroma);

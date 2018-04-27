@@ -97,9 +97,9 @@ static int vlc_va_Start(void *func, va_list ap)
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
     enum PixelFormat pix_fmt = va_arg(ap, enum PixelFormat);
     const es_format_t *fmt = va_arg(ap, const es_format_t *);
-    picture_sys_t *p_sys = va_arg(ap, picture_sys_t *);
+    void *p_sys = va_arg(ap, void *);
     int (*open)(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, picture_sys_t *) = func;
+                const es_format_t *, void *) = func;
 
     return open(va, ctx, pix_fmt, fmt, p_sys);
 }
@@ -115,7 +115,7 @@ static void vlc_va_Stop(void *func, va_list ap)
 
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
                      enum PixelFormat pix_fmt, const es_format_t *fmt,
-                     picture_sys_t *p_sys)
+                     void *p_sys)
 {
     vlc_va_t *va = vlc_object_create(obj, sizeof (*va));
     if (unlikely(va == NULL))

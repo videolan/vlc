@@ -201,12 +201,11 @@ vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *vainst,
 /* Get render targets from a pic_sys allocated by the vaapi pool (see
  * vlc_vaapi_PoolNew()) */
 unsigned
-vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
-                                 VASurfaceID **render_targets);
+vlc_vaapi_PicSysGetRenderTargets(void *sys, VASurfaceID **render_targets);
 
 /* Get and hold the VADisplay instance attached to the picture sys */
 struct vlc_vaapi_instance *
-vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy);
+vlc_vaapi_PicSysHoldInstance(void *sys, VADisplay *dpy);
 
 /* Attachs the VASurface to the picture context, the picture must be allocated
  * by a vaapi pool (see vlc_vaapi_PoolNew()) */

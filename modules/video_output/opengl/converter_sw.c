@@ -68,7 +68,7 @@
 #endif
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
-struct picture_sys_t
+typedef struct
 {
     vlc_gl_t    *gl;
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
@@ -76,7 +76,7 @@ struct picture_sys_t
     size_t      bytes[PICTURE_PLANE_MAX];
     GLsync      fence;
     unsigned    index;
-};
+} picture_sys_t;
 
 struct priv
 {

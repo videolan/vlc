@@ -256,13 +256,13 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
     return true;
 }
 
-struct picture_sys_t
+typedef struct
 {
     VdpOutputSurface surface;
     VdpDevice device;
     vdp_t *vdp;
     void *gl_nv_surface;
-};
+} picture_sys_t;
 
 typedef struct vlc_vdp_video_frame
 {

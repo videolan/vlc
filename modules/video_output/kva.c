@@ -105,10 +105,10 @@ struct vout_display_sys_t
     bool               is_on_top;
 };
 
-struct picture_sys_t
+typedef struct
 {
     int i_chroma_shift;
-};
+} picture_sys_t;
 
 /*****************************************************************************
  * Local prototypes

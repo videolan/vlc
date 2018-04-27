@@ -124,7 +124,7 @@ VLC_API picture_t * picture_NewFromFormat( const video_format_t *p_fmt ) VLC_USE
  */
 typedef struct
 {
-    picture_sys_t *p_sys;
+    void *p_sys;
     void (*pf_destroy)(picture_t *);
 
     /* Plane resources

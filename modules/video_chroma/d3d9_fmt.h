@@ -32,13 +32,13 @@
 #include "dxgi_fmt.h"
 
 /* owned by the vout for VLC_CODEC_D3D9_OPAQUE */
-struct picture_sys_t
+typedef struct
 {
     IDirect3DSurface9    *surface;
     /* decoder only */
     IDirectXVideoDecoder *decoder; /* keep a reference while the surface exist */
     HINSTANCE            dxva2_dll;
-};
+} picture_sys_t;
 
 typedef struct
 {

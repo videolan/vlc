@@ -36,7 +36,7 @@
 #include <vlc_vout_display.h>
 #include <android/native_window.h>
 
-struct picture_sys_t
+typedef struct
 {
     union {
         struct {
@@ -59,7 +59,7 @@ struct picture_sys_t
         } sw;
     };
     bool b_locked;
-};
+} picture_sys_t;
 
 static inline void
 AndroidOpaquePicture_DetachDecoder(picture_sys_t *p_picsys)

@@ -152,7 +152,7 @@ static void Delete(vlc_va_t *va, void *hwctx)
 }
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                  const es_format_t *fmt, picture_sys_t *p_sys)
+                  const es_format_t *fmt, void *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
         return VLC_EGENERIC;
@@ -261,7 +261,7 @@ static void DeleteDRM(vlc_va_t *va, void **hwctx)
 }
 
 static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                     const es_format_t *fmt, picture_sys_t *p_sys)
+                     const es_format_t *fmt, void *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys)
         return VLC_EGENERIC;

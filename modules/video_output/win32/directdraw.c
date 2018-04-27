@@ -123,11 +123,12 @@ vlc_module_end()
  * Local prototypes.
  *****************************************************************************/
 
-struct picture_sys_t {
+typedef struct
+{
     LPDIRECTDRAWSURFACE2 surface;
     LPDIRECTDRAWSURFACE2 front_surface;
     picture_t            *fallback;
-};
+} picture_sys_t;
 
 struct vout_display_sys_t
 {

@@ -55,7 +55,7 @@ typedef struct
 } d3d11_handle_t;
 
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
-struct picture_sys_t
+typedef struct
 {
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
     union {
@@ -68,7 +68,7 @@ struct picture_sys_t
     ID3D11VideoProcessorOutputView *processorOutput; /* when used as processor output */
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   formatTexture;
-};
+} picture_sys_t;
 
 #include "../codec/avcodec/va_surface.h"
 

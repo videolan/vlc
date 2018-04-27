@@ -56,7 +56,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  */
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
                      enum PixelFormat, const es_format_t *fmt,
-                     picture_sys_t *p_sys);
+                     void *p_sys);
 
 /**
  * Allocates a hardware video surface for a libavcodec frame.

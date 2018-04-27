@@ -39,9 +39,10 @@
 #define D3D_DecoderType     IUnknown
 #define D3D_DecoderDevice   IUnknown
 #define D3D_DecoderSurface  IUnknown
-struct picture_sys_t {
+typedef struct
+{
     void *dummy;
-};
+} picture_sys_t;
 #include "directx_va.h"
 
 #include "avcodec.h"
